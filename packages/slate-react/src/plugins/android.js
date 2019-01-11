@@ -65,7 +65,9 @@ function AndroidPlugin() {
   }
 
   function onBeforeInput(event, editor, next) {
+    const isNative = !event.nativeEvent
     debug('onBeforeInput', {
+      isNative,
       event,
       status,
       e: pick(event, ['data', 'inputType', 'isComposing', 'nativeEvent']),
@@ -82,35 +84,40 @@ function AndroidPlugin() {
           preventNextBeforeInput = false
           return
         }
-        // This looks at the beforeInput event's data property and sees if it
-        // ends in an 'enter' which is character code 10. This appears to be
-        // the only way to detect that enter has been pressed except at end
-        // of line where it doesn't work.
-        const isEnter = isInputDataEnter(event.data)
-        if (isEnter) {
-          const window = getWindow(event.target)
-          window.cancelAnimationFrame(beforeSplitReconcileId)
-          window.requestAnimationFrame(() => {
-            debug('onBeforeInput:enter', {})
-            beforeSplitSnapshot.apply()
-            const selection = beforeSplitSelection
+        // This analyses Android's native `beforeInput` which Slate adds
+        // on in the `Content` component. It only fires if the cursor is at
+        // the end of a block. Otherwise, the code above detects the `enter.
+        //
+        if (isNative) {
+          if (
+            event.inputType === 'insertParagraph' ||
+            event.inputType === 'insertLineBreak'
+          ) {
+            debug('onBeforeInput:enter:native', {})
+            const domSelection = window.getSelection()
+            const selection = getSelectionFromDom(window, editor, domSelection)
+            preventNextBeforeInput = true
+            event.preventDefault()
             editor.moveTo(selection.anchor.key, selection.anchor.offset)
             editor.splitBlock()
-          })
-          // This analyses Android's native `beforeInput` which Slate adds
-          // on in the `Content` component. It only fires if the cursor is at
-          // the end of a block. Otherwise, the code above detects the `enter.
-          //
-        } else if (
-          event.inputType === 'insertParagraph' ||
-          event.inputType === 'insertLineBreak'
-        ) {
-          const domSelection = window.getSelection()
-          const selection = getSelectionFromDom(window, editor, domSelection)
-          preventNextBeforeInput = true
-          event.preventDefault()
-          editor.moveTo(selection.anchor.key, selection.anchor.offset)
-          editor.splitBlock()
+          }
+        } else {
+          // This looks at the beforeInput event's data property and sees if it
+          // ends in an 'enter' which is character code 10. This appears to be
+          // the only way to detect that enter has been pressed except at end
+          // of line where it doesn't work.
+          const isEnter = isInputDataEnter(event.data)
+          if (isEnter) {
+            const window = getWindow(event.target)
+            window.cancelAnimationFrame(beforeSplitReconcileId)
+            window.requestAnimationFrame(() => {
+              debug('onBeforeInput:enter:react', {})
+              beforeSplitSnapshot.apply()
+              const selection = beforeSplitSelection
+              editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              editor.splitBlock()
+            })
+          }
         }
         break
       default:
