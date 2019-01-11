@@ -14,6 +14,7 @@ import getEventTransfer from '../utils/get-event-transfer'
 import setEventTransfer from '../utils/set-event-transfer'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
+import isInputDataEnter from '../utils/is-input-data-enter'
 
 /**
  * Debug.
@@ -66,6 +67,20 @@ function AfterPlugin(options = {}) {
 
     const { document, selection } = value
     const range = findRange(targetRange, editor)
+
+    // Android API 27 Handling
+    // if (isInputDataEnter) {
+    //   console.log('handled Enter for Android API 27')
+    //   const hasVoidParent = document.hasVoidParent(selection.start.path, editor)
+
+    //   if (hasVoidParent) {
+    //     editor.moveToStartOfNextText()
+    //   } else {
+    //     editor.splitBlockAtRange(range)
+    //   }
+    //   next()
+    //   return
+    // }
 
     switch (event.inputType) {
       case 'deleteByDrag':

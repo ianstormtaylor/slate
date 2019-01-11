@@ -32,6 +32,7 @@ import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
 import Mentions from './mentions'
+import SmokeTest from './smoke-test'
 
 /**
  * Examples.
@@ -64,6 +65,7 @@ const EXAMPLES = [
   ['Versions', Versions, '/versions'],
   ['Input Tester', InputTester, '/input-tester'],
   ['Mentions', Mentions, '/mentions'],
+  ['Smoke Test', SmokeTest, '/smoke'],
 ]
 
 /**

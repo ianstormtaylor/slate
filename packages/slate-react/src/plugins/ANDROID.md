@@ -15,6 +15,11 @@ slate:android,slate:before,slate:update,slate:reconcile
 Appears similar to the bug in API 27.
 
 
+## Can't hit Enter at begining of word API27 (probably 26 too)
+
+WORKING ON THIS
+
+
 ## Can't split word with Enter (PARTIAL FIXED)
 
 Move the cursor to `edit|able` where | is the cursor.

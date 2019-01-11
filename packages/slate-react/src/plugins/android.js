@@ -11,36 +11,14 @@ import {
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 
+import API_VERSION from '../utils/android-api-version'
 import findNode from '../utils/find-node'
+import closest from '../utils/closest'
+import getSelectionFromDom from '../utils/get-selection-from-dom'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
-
-const ANDROID_API_VERSIONS = [
-  [/^9([.]0|)/, 28],
-  [/^8[.]1/, 27],
-  [/^8([.]0|)/, 26],
-  [/^7[.]1/, 25],
-  [/^7([.]0|)/, 24],
-  [/^6([.]0|)/, 23],
-  [/^5[.]1/, 22],
-  [/^5([.]0|)/, 21],
-  [/^4[.]4/, 20],
-]
-
-function getApiVersion() {
-  if (!IS_ANDROID) return null
-  const { userAgent } = window.navigator
-  const matchData = userAgent.match(/Android\s([0-9\.]+)/)
-  if (matchData == null) return null
-  const versionString = matchData[1]
-  for (let tuple of ANDROID_API_VERSIONS) {
-    const [regex, version] = tuple
-    if (versionString.match(regex)) return version //tags.push(tag)
-  }
-  return null
-}
-
-const API_VERSION = getApiVersion()
+import isInputDataEnter from '../utils/is-input-data-enter'
+import ElementSnapshot from '../utils/element-snapshot'
 
 const debug = Debug('slate:android')
 debug.reconcile = Debug('slate:reconcile')
@@ -58,31 +36,50 @@ function AndroidPlugin() {
 
   let nodes = new Set()
 
+  // Keep a snapshot after a composition end for API 27.
+  // If a `beforeInput` gets called with data that ends in an ENTER then we
+  // need to use this snapshot to revert the DOM so that React doesn't get
+  // out of sync with the DOM.
+  let beforeSplitSnapshot = null
+  let beforeSplitSelection = null
+  let beforeSplitReconcileId = null
+
   function reconcile(window, editor) {
     debug.reconcile()
     const selection = window.getSelection()
-    // const { anchorNode } = selection
-    // setTextFromDomNode(window, editor, anchorNode)
-    console.log(1)
     nodes.forEach(node => {
       setTextFromDomNode(window, editor, node)
     })
-    console.log(2)
     setSelectionFromDom(window, editor, selection)
     nodes.clear()
-    console.log(3, editor.value.document.text)
   }
 
   function onBeforeInput(event, editor, next) {
     debug('onBeforeInput', {
       event,
       status,
-      e: pick(event, ['data', 'inputType', 'isComposing']),
+      e: pick(event, ['data', 'inputType', 'isComposing', 'nativeEvent']),
     })
     switch (API_VERSION) {
       case 25:
         // prevent onBeforeInput to allow selecting an alternate suggest to
         // work.
+        break
+      case 26:
+      case 27:
+        // This looks at the beforeInput event's data property and sees if it
+        // ends in an Enter. This appears to be the only possible way to detect
+        // that enter has been pressed.
+        const isEnter = isInputDataEnter(event.data)
+        if (isEnter) {
+          const window = getWindow(event.target)
+          window.requestAnimationFrame(() => {
+            beforeSplitSnapshot.apply()
+            const selection = beforeSplitSelection
+            editor.moveTo(selection.anchor.key, selection.anchor.offset)
+            editor.splitBlock()
+          })
+        }
         break
       default:
         if (status !== COMPOSING) next()
@@ -91,19 +88,22 @@ function AndroidPlugin() {
 
   function onCompositionEnd(event, editor, next) {
     debug('onCompositionEnd', { event })
-    // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
-    // without the corresponding `compositionStart` event when clicking a
-    // suggestion.
-    //
-    // If we don't add this, the `onBeforeInput` is triggered and passes
-    // through to the `before` plugin.
-    if (API_VERSION === 26 || API_VERSION === 27) {
-      status = COMPOSING
-    }
-
     const window = getWindow(event.target)
     const selection = window.getSelection()
     const { anchorNode } = selection
+    if (API_VERSION === 26 || API_VERSION === 27) {
+      const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
+      beforeSplitSelection = getSelectionFromDom(window, editor, selection)
+      beforeSplitSnapshot = new ElementSnapshot(subrootEl)
+      // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
+      // without the corresponding `compositionStart` event when clicking a
+      // suggestion.
+      //
+      // If we don't add this, the `onBeforeInput` is triggered and passes
+      // through to the `before` plugin.
+      status = COMPOSING
+    }
+
     nodes.add(anchorNode)
     window.requestAnimationFrame(() => {
       status = NONE
@@ -157,7 +157,7 @@ function AndroidPlugin() {
       case 25:
         // in API25 prevent other keys to fix clicking a word and then
         // selecting an alternate suggestion.
-        // 
+        //
         // NOTE:
         // The `setSelectionFromDom` is to allow hitting `Enter` to work
         // because the selection needs to be in the right place; however,
@@ -192,9 +192,20 @@ function AndroidPlugin() {
       // Not sure why we had this exception to not handle `onSelect` before.
       // If we add this code back in, make sure to re-enable the `onKeyDown`
       // special case.
-      
+
       // case 25:
       //   break
+
+      // We don't want to have the selection move around in an onSelect because
+      // it happens after we press `enter` in the same transaction. This
+      // causes the cursor position to not be properly placed.
+      case 26:
+      case 27:
+        const window = getWindow(event.target)
+        const selection = window.getSelection()
+        beforeSplitSelection = getSelectionFromDom(window, editor, selection)
+        console.log('onSelect', beforeSplitSelection.toJSON())
+        break
       default:
         if (status !== COMPOSING) next()
     }
