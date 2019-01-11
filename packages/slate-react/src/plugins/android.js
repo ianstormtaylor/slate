@@ -86,8 +86,7 @@ function AndroidPlugin() {
         }
         // This analyses Android's native `beforeInput` which Slate adds
         // on in the `Content` component. It only fires if the cursor is at
-        // the end of a block. Otherwise, the code above detects the `enter.
-        //
+        // the end of a block. Otherwise, the code below checks.
         if (isNative) {
           if (
             event.inputType === 'insertParagraph' ||
@@ -103,7 +102,7 @@ function AndroidPlugin() {
           }
         } else {
           // This looks at the beforeInput event's data property and sees if it
-          // ends in an 'enter' which is character code 10. This appears to be
+          // ends in a linefeed which is character code 10. This appears to be
           // the only way to detect that enter has been pressed except at end
           // of line where it doesn't work.
           const isEnter = isInputDataEnter(event.data)
