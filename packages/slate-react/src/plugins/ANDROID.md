@@ -41,6 +41,15 @@ Although there are minor differences, API 26/27 behave similarly.
   + revert to the last good state
   + splitBlock using Slate
 
+### Enter at Start of Line
+**TODO:**
+
+- Go through all the steps in the Backspace handler. An enter at the beginning of a block looks exactly like a `delete` action at the beginning. The `reconciler` will be cancelled in the course of these events.
+- A `keydown` event will fire with `event.key` === `Enter`. We need to set a variable `ENTER_START_OF_LINE` to `true`. Cancel the delete event and remove the reference.
+- NOTE!!! Looks like splitting at other positions (not end of line) also provides an `Enter` and might be preferable to using the native `beforeInput` which we had to hack in!!! Try this!!!
+- A `beforeinput` event will be called like in the `delete` code which usually cancels the `deleter` and resumes the `reconciler`. But since we removed the reference to the `deleter` neither of these methods are called.
+- 
+
 
 # API 28
 
