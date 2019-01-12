@@ -19,6 +19,7 @@ import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
 import isInputDataEnter from '../utils/is-input-data-enter'
 import ElementSnapshot from '../utils/element-snapshot'
+import Executor from '../utils/executor'
 
 const debug = Debug('slate:android')
 debug.reconcile = Debug('slate:reconcile')
@@ -44,7 +45,9 @@ function AndroidPlugin() {
   // certain scenarios like hitting 'enter' at the end of a word.
   let beforeSplitSnapshot = null
   let beforeSplitSelection = null
-  let reconcileCallbackId = null
+  // let reconcileCallbackId = null
+
+  let reconciler = null
 
   // Keey a snapshot after a `keydown` event in API 26/27.
   // If an `input` gets called with `inputType` of `deleteContentBackward`
@@ -52,7 +55,9 @@ function AndroidPlugin() {
   // with the DOM.
   let beforeDeleteSnapshot = null
   let beforeDeleteSelection = null
-  let deleteCallbackId = null
+  // let deleteCallbackId = null
+
+  let deleter = null
 
   // Because Slate implements its own event handler for `beforeInput` in
   // addition to React's version, we actually get two. If we cancel the
@@ -93,7 +98,11 @@ function AndroidPlugin() {
       case 26:
       case 27:
         const window = getWindow(event.target)
-        window.cancelAnimationFrame(deleteCallbackId)
+        // window.cancelAnimationFrame(deleteCallbackId)
+        if (deleter) {
+          deleter.cancel()
+          reconciler.resume()
+        }
         // This analyses Android's native `beforeInput` which Slate adds
         // on in the `Content` component. It only fires if the cursor is at
         // the end of a block. Otherwise, the code below checks.
@@ -117,7 +126,8 @@ function AndroidPlugin() {
           // of line where it doesn't work.
           const isEnter = isInputDataEnter(event.data)
           if (isEnter) {
-            window.cancelAnimationFrame(reconcileCallbackId)
+            reconciler && reconciler.cancel()
+            // window.cancelAnimationFrame(reconcileCallbackId)
             window.requestAnimationFrame(() => {
               debug('onBeforeInput:enter:react', {})
               beforeSplitSnapshot.apply()
@@ -152,7 +162,11 @@ function AndroidPlugin() {
     }
 
     nodes.add(anchorNode)
-    reconcileCallbackId = window.requestAnimationFrame(() => {
+    // reconcileCallbackId = window.requestAnimationFrame(() => {
+    //   status = NONE
+    //   reconcile(window, editor, { from: onCompositionEnd })
+    // })
+    reconciler = new Executor(window, () => {
       status = NONE
       reconcile(window, editor, { from: onCompositionEnd })
     })
@@ -185,15 +199,29 @@ function AndroidPlugin() {
             beforeDeleteSelection: beforeDeleteSelection.toJSON(),
           })
           const window = getWindow(event.target)
-          window.cancelAnimationFrame(reconcileCallbackId)
+          reconciler && reconciler.cancel()
+          // window.cancelAnimationFrame(reconcileCallbackId)
           // We need this call because when we select an alternate suggestion
           // we can get two `deleteContentBackward` calls in a row.
           // We want to make sure they are all cancelled. This is kind of a
           // guard against that because we might get multiple `keyDown` events
           // before we get the `beforeInput` that cancels only the last
           // deleteCallback.
-          window.cancelAnimationFrame(deleteCallbackId)
-          deleteCallbackId = window.requestAnimationFrame(() => {
+
+
+          // window.cancelAnimationFrame(deleteCallbackId)
+          // deleteCallbackId = window.requestAnimationFrame(() => {
+          //   debug('onInput:delete:callback', {
+          //     beforeDeleteSnapshot,
+          //     beforeDeleteSelection: beforeDeleteSelection.toJSON(),
+          //   })
+          //   beforeDeleteSnapshot.apply()
+          //   const selection = beforeDeleteSelection
+          //   editor.moveTo(selection.anchor.key, selection.anchor.offset)
+          //   editor.deleteBackward()
+          // })
+          deleter && deleter.cancel()
+          deleter = new Executor(window, () => {
             debug('onInput:delete:callback', {
               beforeDeleteSnapshot,
               beforeDeleteSelection: beforeDeleteSelection.toJSON(),
@@ -202,6 +230,7 @@ function AndroidPlugin() {
             const selection = beforeDeleteSelection
             editor.moveTo(selection.anchor.key, selection.anchor.offset)
             editor.deleteBackward()
+            deleter = null
           })
         }
         break

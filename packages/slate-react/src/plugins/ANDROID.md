@@ -13,6 +13,17 @@ slate:android,slate:before,slate:update,slate:reconcile
 
 Although there are minor differences, API 26/27 behave similarly.
 
+## Backspace Handling
+
+- Save the state during a `keydown` event as it may end up being a delete. The DOM is in a good before state at this time.
+- Look at the native `input` event fromt he React one to see if `inputType` is equal to `deleteContentBackward`. If it is, then we are going to have to handle a delete.
+- If we are handling a delete then:
+  + stop the `reconciler` because we don't need to reconcile anything. We will be reverting anyways.
+  + start the `deleter` which will revert to the snapshot then execute the delete command within Slate.
+  + HOWEVER!!! if an `onBeforeInput` is called before the `delete` handler is executed, we now know that it wasn't a delete after all and instead it was responding to a text change from a suggestion. In this case:
+    * cancel the `deleter`
+    * resume the `reconciler`
+
 ## Enter Handling
 
 - You can't detect an `enter` until it is too late. You detect it by looking for a `beforeInput` event with a data property that is a string that ends in the last character having a character code 10. At this point, Android has manipulated the DOM. We use an ElementSnapshot to record the state of the element earlier and then revert it later so that React doesn't get confused by an out-of-sync DOM. We then programmatically split the block through Slate.
