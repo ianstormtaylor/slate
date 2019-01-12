@@ -208,7 +208,6 @@ function AndroidPlugin() {
           // before we get the `beforeInput` that cancels only the last
           // deleteCallback.
 
-
           // window.cancelAnimationFrame(deleteCallbackId)
           // deleteCallbackId = window.requestAnimationFrame(() => {
           //   debug('onInput:delete:callback', {
@@ -232,6 +231,11 @@ function AndroidPlugin() {
             editor.deleteBackward()
             deleter = null
           })
+          return
+        }
+        if (status === COMPOSING) {
+          const { anchorNode } = window.getSelection()
+          nodes.add(anchorNode)
         }
         break
       default:

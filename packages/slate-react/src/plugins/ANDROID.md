@@ -13,21 +13,34 @@ slate:android,slate:before,slate:update,slate:reconcile
 
 Although there are minor differences, API 26/27 behave similarly.
 
-## Backspace Handling
+### Backspace Handling
 
-- Save the state during a `keydown` event as it may end up being a delete. The DOM is in a good before state at this time.
-- Look at the native `input` event fromt he React one to see if `inputType` is equal to `deleteContentBackward`. If it is, then we are going to have to handle a delete.
+- Save the state using a snapshot during a `keydown` event as it may end up being a delete. The DOM is in a good before state at this time.
+- Look at the `input` event to see if `event.nativeEvent.inputType` is equal to `deleteContentBackward`. If it is, then we are going to have to handle a delete but the DOM is already damaged.
 - If we are handling a delete then:
-  + stop the `reconciler` because we don't need to reconcile anything. We will be reverting anyways.
-  + start the `deleter` which will revert to the snapshot then execute the delete command within Slate.
-  + HOWEVER!!! if an `onBeforeInput` is called before the `delete` handler is executed, we now know that it wasn't a delete after all and instead it was responding to a text change from a suggestion. In this case:
+  + stop the `reconciler` which was started at `compositionEnd` because we don't need to reconcile anything as we will be reverting dom then deleting.
+  + start the `deleter` which will revert to the snapshot then execute the delete command within Slate after a `requestAnimationFrame` time.
+  + HOWEVER! if an `onBeforeInput` is called before the `deleter` handler is executed, we now know that it wasn't a delete after all and instead it was responding to a text change from a suggestion. In this case:
     * cancel the `deleter`
     * resume the `reconciler`
 
-## Enter Handling
+### Enter Handling
 
-- You can't detect an `enter` until it is too late. You detect it by looking for a `beforeInput` event with a data property that is a string that ends in the last character having a character code 10. At this point, Android has manipulated the DOM. We use an ElementSnapshot to record the state of the element earlier and then revert it later so that React doesn't get confused by an out-of-sync DOM. We then programmatically split the block through Slate.
-- One exception is hitting enter at the end of a line. In this case, you can detect it by a `beforeInput` with a property `inputType` having a value `insertParagraph`. In this case, we actually can't detect it in the other way because this version of `beforeInput` event has no `data` property for some reason.
+- Save the state using a snapshot during a `compositionEnd` event as it may end up being an `enter`. The DOM is in a good before state at this time.
+- Look at the native version of the `beforeInput` event (two will fire a native and a React). Note: We manually forced Android to handle the native `beforeInput` by adding it to the `content` code.
+- If the `event.nativeEvent.inputType` is equal to `insertParagraph` or `insertLineBreak` then we have determined that the user pressed enter at the end of a block (and only at the end of a block).
+- If `enter is detected then:
+  + `preventDefault`
+  + set Slate's selection using the DOM
+  + call `splitBlock`
+  + Put some code in to make sure React's version of `beforeInput` doesn't fire by setting a variable. React's version will fire as it can't be cancelled from the native version even though we told it to stop.
+- During React's version of `beforeInput`, if the `data` property which is a string ends in a linefeed (character code 10) then we know that it was an enter anywhere other than the end of block. At this point the DOM is already damaged.
+- If we are handling an enter then:
+  + cancel the reconciler which was started from the `compositionEnd` event because we don't want reconciliation from the DOM to happen.
+  + wait until next animation frame
+  + revert to the last good state
+  + splitBlock using Slate
+
 
 # API 28
 
