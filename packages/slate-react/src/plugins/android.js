@@ -204,11 +204,11 @@ function AndroidPlugin() {
             editor.deleteBackward()
           })
         }
-        return
         break
+      default:
+        if (status === COMPOSING) return
+        next()
     }
-    if (status === COMPOSING) return
-    next()
   }
 
   function onKeyDown(event, editor, next) {
