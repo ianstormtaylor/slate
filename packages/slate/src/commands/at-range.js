@@ -1110,7 +1110,7 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
     wrappers.forEach(block => {
       const first = block.nodes.first()
       const last = block.nodes.last()
-      const parent = document.getParent(block.key)
+      const parent = editor.value.document.getParent(block.key)
       const index = parent.nodes.indexOf(block)
 
       const children = block.nodes.filter(child => {
