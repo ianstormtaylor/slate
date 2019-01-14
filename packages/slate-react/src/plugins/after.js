@@ -3,7 +3,7 @@ import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
-import { IS_IOS } from 'slate-dev-environment'
+import { IS_IOS, IS_IE } from 'slate-dev-environment'
 
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
@@ -392,7 +392,7 @@ function AfterPlugin(options = {}) {
     // followed by a `selectionchange`, so we need to deselect here to prevent
     // the old selection from being set by the `updateSelection` of `<Content>`,
     // preventing the `selectionchange` from firing. (2018/11/07)
-    if (isMouseDown) {
+    if (isMouseDown && !IS_IE) {
       editor.deselect().focus()
     } else {
       editor.focus()
