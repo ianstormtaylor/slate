@@ -41,6 +41,37 @@ Although there are minor differences, API 26/27 behave similarly.
   + revert to the last good state
   + splitBlock using Slate
 
+Events for different cases
+
+- Start of word & Start of line
+  + compositionEnd
+  + keydown:Unidentified
+  + input:deleteContentBackward
+  + keydown:Enter
+  + beforeInput:insertParagraph
+  + TOO LATE TO CANCEL
+- Middle of word
+  + compositionEnd
+  + keydown:Unidentified
+  + input:deleteContentBackward
+  + keydown:Unidentified
+  + beforeInput:CHR(10) at end
+  + TOO LATE TO CANCEL
+- End of word
+  + compositionEnd
+  + keydown:Enter
+  + beforeInput:insertParagraph
+  + CANCELLABLE
+- End of line
+  + keydown:Enter
+  + beforeInput:insertParagraph
+  + CANCELLABLE
+
+Based on the previous cases:
+
+- Use a snapshot if `input:deleteContentBackward` is detected before an Enter which is detected either by a `keydown:Enter` or a `beforeInput:insertParagraph` and we don't know which.
+- Cancel the event if we detect a `keydown:Enter` without an immediately preceding `input:deleteContentBackward`.
+
 ### Enter at Start of Line
 **TODO:**
 
@@ -49,6 +80,13 @@ Although there are minor differences, API 26/27 behave similarly.
 - NOTE!!! Looks like splitting at other positions (not end of line) also provides an `Enter` and might be preferable to using the native `beforeInput` which we had to hack in!!! Try this!!!
 - A `beforeinput` event will be called like in the `delete` code which usually cancels the `deleter` and resumes the `reconciler`. But since we removed the reference to the `deleter` neither of these methods are called.
 - 
+
+
+**!!!!!!!!!WORKING ON SOMETHING**
+If we revert to head, we will be in a safe spot.
+Right now, I played with using `keydown` and `enter` instead of the `beforeInput` stuff.
+But hitting backspace from beginning of second line then hitting enter again breaks!
+
 
 
 # API 28

@@ -220,17 +220,25 @@ function AndroidPlugin() {
           //   editor.deleteBackward()
           // })
           deleter && deleter.cancel()
-          deleter = new Executor(window, () => {
-            debug('onInput:delete:callback', {
-              beforeDeleteSnapshot,
-              beforeDeleteSelection: beforeDeleteSelection.toJSON(),
-            })
-            beforeDeleteSnapshot.apply()
-            const selection = beforeDeleteSelection
-            editor.moveTo(selection.anchor.key, selection.anchor.offset)
-            editor.deleteBackward()
-            deleter = null
-          })
+          deleter = new Executor(
+            window,
+            () => {
+              debug('onInput:delete:callback', {
+                beforeDeleteSnapshot,
+                beforeDeleteSelection: beforeDeleteSelection.toJSON(),
+              })
+              beforeDeleteSnapshot.apply()
+              const selection = beforeDeleteSelection
+              editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              editor.deleteBackward()
+              deleter = null
+            },
+            {
+              onCancel() {
+                deleter = null
+              },
+            }
+          )
           return
         }
         if (status === COMPOSING) {
@@ -285,12 +293,42 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
+        const window = getWindow(event.target)
+        if (event.key === 'Enter') {
+          debug('onKeyDown:enter', {})
+          if (deleter) {
+            // If a `deleter` exists which means there was an onInput with
+            // `deleteContentBackwards` that hasn't fired yet, then we know
+            // this is one of the cases where we have to revert to before
+            // the split.
+            deleter.cancel()
+            event.preventDefault()
+            window.requestAnimationFrame(() => {
+              debug('onKeyDown:enter:callback')
+              beforeSplitSnapshot.apply()
+              const selection = beforeSplitSelection
+              // preventNextBeforeInput = true
+              editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              editor.splitBlock()
+            })
+          } else {
+            event.preventDefault()
+            // If there is no deleter, all we have to do is prevent the
+            // action before applying or splitBlock. In this scenario, we
+            // have to grab the selection from the DOM.
+            const domSelection = window.getSelection()
+            const selection = getSelectionFromDom(window, editor, domSelection)
+            editor.moveTo(selection.anchor.key, selection.anchor.offset)
+            editor.splitBlock()
+          }
+          return
+        }
+
         // We need to take a snapshot of the current selection and the
         // element before when the user hits the backspace key. This is because
         // we only know if the user hit backspace if the `onInput` event that
         // follows has an `inputType` of `deleteContentBackward`. At that time
         // it's too late to stop the event.
-        const window = getWindow(event.target)
         const selection = window.getSelection()
         const { anchorNode } = selection
         const subrootEl = closest(anchorNode, '[data-slate-editor] > *')

@@ -8,11 +8,12 @@
 function noop() {}
 
 export default class Executor {
-  constructor(window, fn, timeout) {
+  constructor(window, fn, options={}) {
     this.fn = fn
     this.window = window
     this.resume()
-    this.__setTimeout__(timeout)
+    this.onCancel = options.onCancel
+    this.__setTimeout__(options.timeout)
   }
 
   __call__ = () => {
@@ -36,6 +37,7 @@ export default class Executor {
   cancel = () => {
     if (this.callbackId) {
       this.window.cancelAnimationFrame(this.callbackId)
+      this.onCancel && this.onCancel()
     }
   }
 
