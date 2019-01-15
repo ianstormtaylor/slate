@@ -44,9 +44,7 @@ function AndroidPlugin() {
   // out of sync with the DOM.
   // We also need to cancel the `reconcile` operation as it interferes in
   // certain scenarios like hitting 'enter' at the end of a word.
-  let beforeSplitSnapshot = null
-  // let beforeSplitSelection = null
-  // let reconcileCallbackId = null
+  let compositionEndSnapshot = null
 
   let reconciler = null
 
@@ -55,8 +53,6 @@ function AndroidPlugin() {
   // immediately after then we need to undo the delete to keep React in sync
   // with the DOM.
   let beforeDeleteSnapshot = null
-  let beforeDeleteSelection = null
-  // let deleteCallbackId = null
 
   let deleter = null
 
@@ -132,12 +128,9 @@ function AndroidPlugin() {
           const isEnter = isInputDataEnter(event.data)
           if (isEnter) {
             reconciler && reconciler.cancel()
-            // window.cancelAnimationFrame(reconcileCallbackId)
             window.requestAnimationFrame(() => {
               debug('onBeforeInput:enter:react', {})
-              beforeSplitSnapshot.apply()
-              // const { selection } = beforeSplitSnapshot.data
-              // editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              compositionEndSnapshot.apply()
               editor.splitBlock()
             })
           }
@@ -168,7 +161,7 @@ function AndroidPlugin() {
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
     if (API_VERSION === 26 || API_VERSION === 27) {
-      beforeSplitSnapshot = new SlateSnapshot(window, editor)
+      compositionEndSnapshot = new SlateSnapshot(window, editor)
       // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
       // without the corresponding `compositionStart` event when clicking a
       // suggestion.
@@ -216,9 +209,7 @@ function AndroidPlugin() {
             window,
             () => {
               debug('onInput:delete:callback', { beforeDeleteSnapshot })
-              beforeDeleteSnapshot.apply()
-              const { selection } = beforeDeleteSnapshot.data
-              editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              beforeDeleteSnapshot.apply(editor)
               editor.deleteBackward()
               deleter = null
             },
@@ -294,9 +285,7 @@ function AndroidPlugin() {
             event.preventDefault()
             window.requestAnimationFrame(() => {
               debug('onKeyDown:enter:callback')
-              beforeSplitSnapshot.apply(editor)
-              // const { selection } = beforeSplitSnapshot.data
-              // editor.moveTo(selection.anchor.key, selection.anchor.offset)
+              compositionEndSnapshot.apply(editor)
               editor.splitBlock()
             })
           } else {
@@ -317,16 +306,11 @@ function AndroidPlugin() {
         // we only know if the user hit backspace if the `onInput` event that
         // follows has an `inputType` of `deleteContentBackward`. At that time
         // it's too late to stop the event.
-        const domSelection = window.getSelection()
-        const { anchorNode } = domSelection
-        const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
-        const elements = [subrootEl]
-        const { previousElementSibling } = subrootEl
-        if (previousElementSibling) {
-          elements.unshift(previousElementSibling)
-        }
-        const selection = getSelectionFromDom(window, editor, domSelection)
-        beforeDeleteSnapshot = new ElementSnapshot(elements, { selection })
+
+        beforeDeleteSnapshot = new SlateSnapshot(window, editor, {
+          before: true,
+        })
+
         // If we let 'Enter' through it breaks handling of hitting
         // enter at the beginning of a word so we need to stop it.
         break
@@ -340,22 +324,16 @@ function AndroidPlugin() {
             next()
             return
           }
-          const window = getWindow(event.target)
-          // We need to take a snapshot of the current selection and the
-          // element before when the user hits the backspace key. This is because
-          // we only know if the user hit backspace if the `onInput` event that
-          // follows has an `inputType` of `deleteContentBackward`. At that time
-          // it's too late to stop the event.
-          const selection = window.getSelection()
-          const { anchorNode } = selection
-          const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
-          const elements = [subrootEl]
-          const { previousElementSibling } = subrootEl
-          if (previousElementSibling) {
-            elements.unshift(previousElementSibling)
-          }
-          beforeDeleteSelection = getSelectionFromDom(window, editor, selection)
-          beforeDeleteSnapshot = new ElementSnapshot(elements)
+          // const window = getWindow(event.target)
+          // // We need to take a snapshot of the current selection and the
+          // // element before when the user hits the backspace key. This is because
+          // // we only know if the user hit backspace if the `onInput` event that
+          // // follows has an `inputType` of `deleteContentBackward`. At that time
+          // // it's too late to stop the event.
+
+          beforeDeleteSnapshot = new SlateSnapshot(window, editor, {
+            before: true,
+          })
         }
         // If we let 'Enter' through it breaks handling of hitting
         // enter at the beginning of a word so we need to stop it.
@@ -375,10 +353,6 @@ function AndroidPlugin() {
       // causes the cursor position to not be properly placed.
       case 26:
       case 27:
-        // const window = getWindow(event.target)
-        // const selection = window.getSelection()
-        // beforeSplitSelection = getSelectionFromDom(window, editor, selection)
-        // console.log('onSelect', beforeSplitSelection.toJSON())
         break
       default:
         if (status !== COMPOSING) next()
