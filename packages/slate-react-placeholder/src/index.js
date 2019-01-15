@@ -41,7 +41,7 @@ function SlateReactPlaceholder(options = {}) {
     const last = node.getLastText()
     const decoration = {
       anchor: { key: first.key, offset: 0, path: document.getPath(first.key) },
-      focus: { 
+      focus: {
         key: last.key,
         offset: last.text.length,
         path: document.getPath(last.key),
