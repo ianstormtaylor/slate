@@ -367,24 +367,11 @@ function AndroidPlugin() {
 
   return {
     onBeforeInput,
-    // onBlur,
-    // onClick,
     onCompositionEnd,
     onCompositionStart,
     onCompositionUpdate,
-    // onCopy,
-    // onCut,
-    // onDragEnd,
-    // onDragEnter,
-    // onDragExit,
-    // onDragLeave,
-    // onDragOver,
-    // onDragStart,
-    // onDrop,
-    // onFocus,
     onInput,
     onKeyDown,
-    // onPaste,
     onSelect,
   }
 }
