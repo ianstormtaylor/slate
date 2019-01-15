@@ -29,6 +29,7 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
+import SmokeTest from './smoke-test'
 import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
@@ -62,6 +63,7 @@ const EXAMPLES = [
   ['Rich Text', RichText, '/rich-text'],
   ['RTL', RTL, '/rtl'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
+  ['Smoke Test', SmokeTest, '/smoke-test/:subpage?'],
   ['Syncing Operations', SyncingOperations, '/syncing-operations'],
   ['Tables', Tables, '/tables'],
   ['Versions', Versions, '/versions'],
@@ -262,11 +264,13 @@ export default class App extends React.Component {
       <Switch>
         {EXAMPLES.map(([name, Component, path]) => (
           <Route key={path} path={path}>
-            <div>
-              <ExampleContent>
-                <Component />
-              </ExampleContent>
-            </div>
+            {({ match }) => (
+              <div>
+                <ExampleContent>
+                  <Component params={match.params} />
+                </ExampleContent>
+              </div>
+            )}
           </Route>
         ))}
         <Redirect from="/" to="/rich-text" />
@@ -290,7 +294,7 @@ export default class App extends React.Component {
         </TabButton>
         <Switch>
           {EXAMPLES.map(([name, Component, path]) => (
-            <Route key={path} exact path={path}>
+            <Route key={path} path={path}>
               <ExampleTitle>{name}</ExampleTitle>
             </Route>
           ))}
