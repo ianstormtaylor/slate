@@ -63,12 +63,10 @@ const EXAMPLES = [
   ['Rich Text', RichText, '/rich-text'],
   ['RTL', RTL, '/rtl'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
+  ['Smoke Test', SmokeTest, '/smoke'],
   ['Syncing Operations', SyncingOperations, '/syncing-operations'],
   ['Tables', Tables, '/tables'],
   ['Versions', Versions, '/versions'],
-  ['Input Tester', InputTester, '/input-tester'],
-  ['Mentions', Mentions, '/mentions'],
-  ['Smoke Test', SmokeTest, '/smoke'],
 ]
 
 /**

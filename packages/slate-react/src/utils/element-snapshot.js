@@ -73,11 +73,16 @@ function applySnapshot(snapshot) {
 }
 
 export default class ElementSnapshot {
-  constructor(els) {
+  constructor(els, data) {
     this.snapshot = getSnapshot(els)
+    this.data = data
   }
 
   apply() {
     applySnapshot(this.snapshot)
+  }
+
+  getData() {
+    return this.data
   }
 }

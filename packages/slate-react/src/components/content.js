@@ -113,7 +113,8 @@ class Content extends React.Component {
 
     // COMPAT: Restrict scope of `beforeinput` to clients that support the
     // Input Events Level 2 spec, since they are preventable events.
-    if (HAS_INPUT_EVENTS_LEVEL_2) {
+    console.log({ANDROID_API_VERSION})
+    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
       this.element.addEventListener('beforeinput', this.handlers.onBeforeInput)
     }
 
@@ -134,7 +135,7 @@ class Content extends React.Component {
       )
     }
 
-    if (HAS_INPUT_EVENTS_LEVEL_2) {
+    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
       this.element.removeEventListener(
         'beforeinput',
         this.handlers.onBeforeInput

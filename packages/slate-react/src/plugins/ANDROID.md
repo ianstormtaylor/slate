@@ -8,6 +8,16 @@ The following is a list of unexpected behaviors in Android
 slate:android,slate:before,slate:update,slate:reconcile
 ```
 
+# API 28
+
+### Backspace Handling
+
+- join previous paragraph
+  + compositionEnd
+  + keydown:Unidentified
+  + beforeinput:deleteContentBackward
+  + DOM change
+  + input:deleteContentBackward
 
 # API 26/27
 
@@ -46,24 +56,24 @@ Events for different cases
 - Start of word & Start of line
   + compositionEnd
   + keydown:Unidentified
-  + input:deleteContentBackward
-  + keydown:Enter
-  + beforeInput:insertParagraph
+  + input:deleteContentBackward START DELETER
+  + keydown:Enter *
+  + beforeInput:insertParagraph *
   + TOO LATE TO CANCEL
 - Middle of word
   + compositionEnd
   + keydown:Unidentified
-  + input:deleteContentBackward
+  + input:deleteContentBackward START DELETER => SELF 
   + keydown:Unidentified
-  + beforeInput:CHR(10) at end
+  + beforeInput:CHR(10) at end *
   + TOO LATE TO CANCEL
 - End of word
   + compositionEnd
-  + keydown:Enter
+  + keydown:Enter *
   + beforeInput:insertParagraph
   + CANCELLABLE
 - End of line
-  + keydown:Enter
+  + keydown:Enter *
   + beforeInput:insertParagraph
   + CANCELLABLE
 
