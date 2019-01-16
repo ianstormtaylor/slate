@@ -2,7 +2,10 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import styled from 'react-emotion'
+import { Link, Redirect } from 'react-router-dom'
+import splitJoin from './split-join.js'
+import insert from './insert.js'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
 
@@ -13,6 +16,46 @@ import { Button, Icon, Toolbar } from '../components'
  */
 
 const DEFAULT_NODE = 'paragraph'
+
+/**
+ * Some styled components.
+ *
+ * @type {Component}
+ */
+
+const Instruction = styled('div')`
+  white-space: pre-wrap;
+  margin: -1em -1em 1em;
+  padding: 0.5em;
+  background: #eee;
+`
+
+const Tabs = styled('div')`
+  margin-bottom: 0.5em;
+`
+
+const TabLink = ({ active, ...props }) => <Link {...props} />
+
+const Tab = styled(TabLink)`
+  display: inline-block;
+  text-decoration: none;
+  color: black;
+  background: ${p => (p.active ? '#AAA' : '#DDD')};
+  padding: 0.25em 0.5em;
+  border-radius: 0.25em;
+  margin-right: 0.25em;
+`
+
+/**
+ * Subpages which are each a smoke test.
+ *
+ * @type {Array}
+ */
+
+const SUBPAGES = [
+  ['Split/Join', splitJoin, 'split-join'],
+  ['Insertion', insert, 'insert'],
+]
 
 /**
  * Define hotkey matchers.
@@ -32,14 +75,26 @@ const isCodeHotkey = isKeyHotkey('mod+`')
  */
 
 class RichTextExample extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
+  state = {}
 
-  state = {
-    value: Value.fromJSON(initialValue),
+  /**
+   * Select and deserialize the initial editor value.
+   *
+   * @return {Object}
+   */
+  static getDerivedStateFromProps(nextProps, prevState) {
+    const { subpage } = nextProps.params
+    if (subpage === prevState.subpage) return null
+    const found = SUBPAGES.find(
+      ([name, value, iSubpage]) => iSubpage === subpage
+    )
+    if (found == null) return {}
+    const { text, document } = found[1]
+    return {
+      subpage,
+      text,
+      value: Value.fromJSON({ document }),
+    }
   }
 
   /**
@@ -83,8 +138,27 @@ class RichTextExample extends React.Component {
    */
 
   render() {
+    const { text } = this.state
+    if (text == null) return <Redirect to="/smoke-test/split-join" />
     return (
       <div>
+        <Instruction>
+          <Tabs>
+            {SUBPAGES.map(([name, Component, subpage]) => {
+              const active = subpage === this.props.params.subpage
+              return (
+                <Tab
+                  key={subpage}
+                  to={`/smoke-test/${subpage}`}
+                  active={active}
+                >
+                  {name}
+                </Tab>
+              )
+            })}
+          </Tabs>
+          <div>{this.state.text}</div>
+        </Instruction>
         <Toolbar>
           {this.renderMarkButton('bold', 'format_bold')}
           {this.renderMarkButton('italic', 'format_italic')}
