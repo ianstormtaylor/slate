@@ -6,6 +6,7 @@ import styled from 'react-emotion'
 import { Link, Redirect } from 'react-router-dom'
 import splitJoin from './split-join.js'
 import insert from './insert.js'
+import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
 
@@ -55,6 +56,7 @@ const Tab = styled(TabLink)`
 const SUBPAGES = [
   ['Split/Join', splitJoin, 'split-join'],
   ['Insertion', insert, 'insert'],
+  ['Special', special, 'special'],
 ]
 
 /**
