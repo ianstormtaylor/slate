@@ -204,6 +204,12 @@ function AndroidPlugin() {
       case 28:
         const { nativeEvent } = event
         if (API_VERSION === 28) {
+          // NOTE API 27:
+          // It is confirmed that this bug does not present itself on API27.
+          // A space fires a `compositionEnd` (as well as other events including
+          // an input that is a delete) so the reconciliation happens.
+          // 
+          // NOTE API 28:
           // When a user hits space and then backspace in `middle` we end up
           // with `midle`.
           // 
