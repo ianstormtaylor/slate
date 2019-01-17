@@ -86,6 +86,7 @@ function AndroidPlugin() {
       status,
       e: pick(event, ['data', 'inputType', 'isComposing', 'nativeEvent']),
     })
+    const window = getWindow(event.target)
     if (preventNextBeforeInput) {
       event.preventDefault()
       preventNextBeforeInput = false
@@ -98,8 +99,6 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
-        const window = getWindow(event.target)
-        // window.cancelAnimationFrame(deleteCallbackId)
         if (deleter) {
           deleter.cancel()
           reconciler.resume()
@@ -137,18 +136,15 @@ function AndroidPlugin() {
         }
         break
       case 28:
-        // console.log('beforeInput API28')
-        // if (isNative) {
-        //   if (event.inputType === 'deleteContentBackward') {
-        //     console.log('API28 prevent deleteContentBackward')
-        //     reconciler && reconciler.cancel()
-        //     // event.preventDefault()
-        //     // preventNextInput = true
-        //   }
-        // } else {
-        //   console.log('NOT NATIVE BEFOREINPUT')
-        // }
-
+        // If a `beforeInput` event fires after an `input:deleteContentBackward`
+        // event, it appears to be a good indicator that it is some sort of
+        // special combined Android event. If this is the case, then we don't
+        // want to have a deletion to happen, we just want to wait until Android
+        // has done its thing and then at the end we just want to reconcile.
+        if (deleter) {
+          deleter.cancel()
+          reconciler.resume()
+        }
         break
       default:
         if (status !== COMPOSING) next()
@@ -160,15 +156,18 @@ function AndroidPlugin() {
     const window = getWindow(event.target)
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
-    if (API_VERSION === 26 || API_VERSION === 27) {
-      compositionEndSnapshot = new SlateSnapshot(window, editor)
-      // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
-      // without the corresponding `compositionStart` event when clicking a
-      // suggestion.
-      //
-      // If we don't add this, the `onBeforeInput` is triggered and passes
-      // through to the `before` plugin.
-      status = COMPOSING
+    switch (API_VERSION) {
+      case 26:
+      case 27:
+        compositionEndSnapshot = new SlateSnapshot(window, editor)
+        // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
+        // without the corresponding `compositionStart` event when clicking a
+        // suggestion.
+        //
+        // If we don't add this, the `onBeforeInput` is triggered and passes
+        // through to the `before` plugin.
+        status = COMPOSING
+        break
     }
 
     nodes.add(anchorNode)
@@ -224,6 +223,13 @@ function AndroidPlugin() {
         if (status === COMPOSING) {
           const { anchorNode } = window.getSelection()
           nodes.add(anchorNode)
+          return
+        }
+        // TODO: The API 27 check is the todo.
+        // Some keys like '.' are input without compositions. This happens
+        // in API28. It might be happening in API 27 as well. Check!
+        if (API_VERSION === 28) {
+          next()
         }
         break
       default:
@@ -249,6 +255,7 @@ function AndroidPlugin() {
         'which',
       ]),
     })
+    const window = getWindow(event.target)
     switch (API_VERSION) {
       // 1. We want to allow enter keydown to allows go through
       // 2. We want to deny keydown, I think, when it fires before the composition
@@ -273,7 +280,6 @@ function AndroidPlugin() {
         break
       case 26:
       case 27:
-        const window = getWindow(event.target)
         if (event.key === 'Enter') {
           debug('onKeyDown:enter', {})
           if (deleter) {
@@ -315,12 +321,11 @@ function AndroidPlugin() {
         // enter at the beginning of a word so we need to stop it.
         break
       case 28:
-        // TODO:
-        //
-        // Refactor this using a reusable slate-snapshot object.
         {
-          // API 28 handles the 'Enter' key properly so we can let that through.
           if (event.key === 'Enter') {
+            debug('onKeyDown:enter')
+            const domSelection = window.getSelection()
+            setSelectionFromDom(window, editor, domSelection)
             next()
             return
           }
@@ -330,7 +335,7 @@ function AndroidPlugin() {
           // // we only know if the user hit backspace if the `onInput` event that
           // // follows has an `inputType` of `deleteContentBackward`. At that time
           // // it's too late to stop the event.
-
+          debug('onKeyDown:snapshot')
           beforeDeleteSnapshot = new SlateSnapshot(window, editor, {
             before: true,
           })

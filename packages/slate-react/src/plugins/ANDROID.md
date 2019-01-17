@@ -19,6 +19,12 @@ slate:android,slate:before,slate:update,slate:reconcile
   + DOM change
   + input:deleteContentBackward
 
+## Two Words. One.
+
+Type two words followed by a period. Then one word followed by a period.
+
+The space after the second period is deleted. It does not happen if there is only one word followed by a period.
+
 # API 26/27
 
 Although there are minor differences, API 26/27 behave similarly.
