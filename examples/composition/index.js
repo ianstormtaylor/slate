@@ -139,7 +139,7 @@ class RichTextExample extends React.Component {
 
   render() {
     const { text } = this.state
-    if (text == null) return <Redirect to="/smoke-test/split-join" />
+    if (text == null) return <Redirect to="/composition/split-join" />
     return (
       <div>
         <Instruction>
@@ -149,7 +149,7 @@ class RichTextExample extends React.Component {
               return (
                 <Tab
                   key={subpage}
-                  to={`/smoke-test/${subpage}`}
+                  to={`/composition/${subpage}`}
                   active={active}
                 >
                   {name}

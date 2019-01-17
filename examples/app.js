@@ -29,7 +29,7 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
-import SmokeTest from './smoke-test'
+import Composition from './composition'
 import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
@@ -44,6 +44,7 @@ import Mentions from './mentions'
 const EXAMPLES = [
   ['Check Lists', CheckLists, '/check-lists'],
   ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
+  ['Composition', Composition, '/composition/:subpage?'],
   ['Embeds', Embeds, '/embeds'],
   ['Emojis', Emojis, '/emojis'],
   ['Forced Layout', ForcedLayout, '/forced-layout'],
@@ -63,7 +64,6 @@ const EXAMPLES = [
   ['Rich Text', RichText, '/rich-text'],
   ['RTL', RTL, '/rtl'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
-  ['Smoke Test', SmokeTest, '/smoke-test/:subpage?'],
   ['Syncing Operations', SyncingOperations, '/syncing-operations'],
   ['Tables', Tables, '/tables'],
   ['Versions', Versions, '/versions'],
