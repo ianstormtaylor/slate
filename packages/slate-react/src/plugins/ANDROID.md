@@ -5,8 +5,24 @@ The following is a list of unexpected behaviors in Android
 # Debugging
 
 ```
-slate:android,slate:before,slate:update,slate:reconcile
+slate:android,slate:before,slate:after,slate:update,slate:reconcile
 ```
+
+# API 25
+
+### Backspace Handling
+
+There appears know way to discern that backspace was pressed in the events. There are two options (1) check the DOM and (2) look for a signature in the mutation.
+
+For (1) we may be able to look at the current block and see if it disappears in the `input` event. If it no longer appears there, we know a `backspace` is likely what happened.
+
+- Join previous paragraph
+  + keydown:Unidentified
+  + DOM change
+  + input:native
+  + mutation
+  + input:react
+  + keyup
 
 # API 28
 
@@ -19,11 +35,38 @@ slate:android,slate:before,slate:update,slate:reconcile
   + DOM change
   + input:deleteContentBackward
 
+## In the middle of a word, space then backspace
+
+When you select in `edit|able` then press space and backspace we end up with `editble`.
+
+When you hit `space` the composition hasn't ended.
+
+
+
 ## Two Words. One.
 
 Type two words followed by a period. Then one word followed by a period.
 
 The space after the second period is deleted. It does not happen if there is only one word followed by a period.
+
+This text exhibits that issue when typed in a blank paragraph:
+
+```
+It me. No.
+```
+
+When we hit the period, here are the events:
+
+- onCompositionEnd
+- onKeyDown:Unidentified
+- onBeforeInput:native:insertText "."
+- onBeforeInput:synthetic:TextEvent data:"."
+- onInput:insertText data:"."
+- onSelect
+- onKeyDown:Unidentified
+- onBeforeInput:deleteContentBackward
+- onInput:deleteContentBackward
+
 
 # API 26/27
 

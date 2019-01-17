@@ -196,9 +196,39 @@ function AndroidPlugin() {
       e: pick(event, ['data', 'nativeEvent', 'inputType', 'isComposing']),
     })
     switch (API_VERSION) {
+      case 24:
+      case 25:
+        break
       case 26:
       case 27:
       case 28:
+        const { nativeEvent } = event
+        if (API_VERSION === 28) {
+          // When a user hits space and then backspace in `middle` we end up
+          // with `midle`.
+          // 
+          // This is because when the user hits space, the composition is not
+          // ended because `compositionEnd` is not called yet. When backspace is
+          // hit, the `compositionEnd` is called. We need to revert the DOM but
+          // the reconciler has not had a chance to run from the
+          // `compositionEnd` because it is set to run on the next
+          // `requestAnimationFrame`. When the backspace is carried out on the
+          // Slate Value, Slate doesn't know about the space yet so the
+          // backspace is carried out without the space cuasing us to lose a
+          // character.
+          // 
+          // This fix forces Android to reconcile immediately after hitting
+          // the space.
+          if (
+            nativeEvent.inputType === 'insertText' &&
+            nativeEvent.data === ' '
+          ) {
+            reconciler && reconciler.cancel()
+            deleter && deleter.cancel()
+            reconcile(window, editor, { from: 'onInput:space' })
+            return
+          }
+        }
         if (event.nativeEvent.inputType === 'deleteContentBackward') {
           debug('onInput:delete', { beforeDeleteSnapshot })
           const window = getWindow(event.target)
@@ -227,7 +257,8 @@ function AndroidPlugin() {
         }
         // TODO: The API 27 check is the todo.
         // Some keys like '.' are input without compositions. This happens
-        // in API28. It might be happening in API 27 as well. Check!
+        // in API28. It might be happening in API 27 as well. Check by typing
+        // `It me. No.` On a blank line.
         if (API_VERSION === 28) {
           next()
         }
@@ -360,6 +391,7 @@ function AndroidPlugin() {
       case 27:
         break
       default:
+        console.log({ status })
         if (status !== COMPOSING) next()
     }
   }
