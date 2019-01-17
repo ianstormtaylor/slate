@@ -147,6 +147,16 @@ class NodeInterface {
   }
 
   /**
+   * Check if the node has content
+   *
+   * @return {Boolean}
+   */
+
+  isEmpty() {
+    return this.getText() === '' && this.nodes.length === 1
+  }
+
+  /**
    * Check if a node exists.
    *
    * @param {List|String} path
@@ -231,6 +241,7 @@ memoize(NodeInterface.prototype, [
   'getKeysToPathsTable',
   'getLastText',
   'getText',
+  'isEmpty',
   'normalize',
   'validate',
 ])
