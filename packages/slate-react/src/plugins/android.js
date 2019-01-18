@@ -3,13 +3,6 @@ import Hotkeys from 'slate-hotkeys'
 import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
 import pick from 'lodash/pick'
-import {
-  IS_FIREFOX,
-  IS_IE,
-  IS_IOS,
-  IS_ANDROID,
-  HAS_INPUT_EVENTS_LEVEL_2,
-} from 'slate-dev-environment'
 
 import API_VERSION from '../utils/android-api-version'
 import findNode from '../utils/find-node'
@@ -28,24 +21,38 @@ debug.reconcile = Debug('slate:reconcile')
 
 debug('API_VERSION', { API_VERSION })
 
+/**
+ * Define variables related to composition state.
+ */
+
 const NONE = 0
 const COMPOSING = 1
 const WAITING = 2
 
-// API27
 function AndroidPlugin() {
-  // composition status can be NONE, COMPOSING or WAITING
+  /**
+   * The current state of composition.
+   *
+   * @type {NONE|COMPOSING|WAITING}
+   */
   let status = NONE
 
+  /**
+   * The set of nodes that we need to process when we next reconcile.
+   * Usually this is soon after the `onCompositionEnd` event.
+   *
+   * @type {Set} set containing Node objects
+   */
   let nodes = new Set()
 
-  // Keep a snapshot after a composition end for API 26/27.
-  // If a `beforeInput` gets called with data that ends in an ENTER then we
-  // need to use this snapshot to revert the DOM so that React doesn't get
-  // out of sync with the DOM.
-  // We also need to cancel the `reconcile` operation as it interferes in
-  // certain scenarios like hitting 'enter' at the end of a word.
-  let compositionEndSnapshot = null
+
+/*  Keep a snapshot after a composition end for API 26/27.
+  If a `beforeInput` gets called with data that ends in an ENTER then we
+  need to use this snapshot to revert the DOM so that React doesn't get
+  out of sync with the DOM.
+  We also need to cancel the `reconcile` operation as it interferes in
+  certain scenarios like hitting 'enter' at the end of a word.
+*/  let compositionEndSnapshot = null
 
   let reconciler = null
 
@@ -69,16 +76,31 @@ function AndroidPlugin() {
   // happening. We set this to true to prevent the input that follows.
   let preventNextInput = false
 
-  // When a composition ends, in some API versions we may want to know what
-  // to do next and that can depend on what combination of events happens
-  // after. For example in API 26/27, if we get a `beforeInput` that tells
-  // us that the input was a `.`, then we want the reconcile to happen even
-  // if there are `onInput:delete` events that follow. In this case, we would
-  // set `compositionEndAction` to `period`. During the `onInput` we would
-  // check if the `compositionEndAction` says `period` and if so we would
-  // not start the `delete` action.
+  //
+  // When a composition ends, in some API versions we may need to know what we
+  // have learned so far about the composition and what we want to do because of
+  // some actions that may come later.
+  //
+  // For example in API 26/27, if we get a `beforeInput` that tells us that the
+  // input was a `.`, then we want the reconcile to happen even if there are
+  // `onInput:delete` events that follow. In this case, we would set
+  // `compositionEndAction` to `period`. During the `onInput` we would check if
+  // the `compositionEndAction` says `period` and if so we would not start the
+  // `delete` action.
+  //
+  // @type       {(String|null)}
   let compositionEndAction = null
 
+  /**
+   * Looks at the `nodes` we have collected, usually the things we have edited
+   * during the course of a composition, and then updates Slate's internal
+   * Document based on the text values in these DOM nodes and also updates
+   * Slate's Selection based on the current cursor position in the Editor.
+   *
+   * @param  {Window} window
+   * @param  {Editor} editor
+   * @param  {String} options.from - where reconcile was called from for debug
+   */
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
     const domSelection = window.getSelection()
@@ -91,6 +113,19 @@ function AndroidPlugin() {
     nodes.clear()
   }
 
+  /**
+   * On before input.
+   *
+   * Check `components/content` because some versions of Android attach a
+   * native `beforeinput` event on the Editor. In this case, you might need
+   * to distinguish whether the event coming through is the native or React
+   * version of the event. Also, if you cancel the native version that does
+   * not necessarily mean that the React version is cancelled.
+   * 
+   * @param  {Event} event
+   * @param  {Editor}   editor
+   * @param  {Function} next
+   */
   function onBeforeInput(event, editor, next) {
     const isNative = !event.nativeEvent
     debug('onBeforeInput', {
@@ -170,6 +205,14 @@ function AndroidPlugin() {
     }
   }
 
+  /**
+   * On Composition end.
+   * 
+   * @param  {Event} event
+   * @param  {Editor} editor
+   * @param  {Function} next
+   */
+
   function onCompositionEnd(event, editor, next) {
     debug('onCompositionEnd', { event })
     const window = getWindow(event.target)
@@ -198,6 +241,14 @@ function AndroidPlugin() {
     })
   }
 
+  /**
+   * On composition start.
+   * 
+   * @param  {Event} event
+   * @param  {Editor} editor
+   * @param  {Function} next
+   */
+  
   function onCompositionStart(event, editor, next) {
     debug('onCompositionStart', { event })
     status = COMPOSING
@@ -205,11 +256,27 @@ function AndroidPlugin() {
     // next()
   }
 
+  /**
+   * On composition update.
+   * 
+   * @param  {Event} event
+   * @param  {Editor} editor
+   * @param  {Function} next
+   */
+  
   function onCompositionUpdate(event, editor, next) {
     debug('onCompositionUpdate', { event })
     // next()
   }
 
+  /**
+   * On input.
+   * 
+   * @param  {Event} event
+   * @param  {Editor} editor
+   * @param  {Function} next
+   */
+  
   function onInput(event, editor, next) {
     debug('onInput', {
       event,
@@ -310,6 +377,14 @@ function AndroidPlugin() {
     }
   }
 
+  /**
+   * On key down.
+   * 
+   * @param  {Event} event
+   * @param  {Editor} editor
+   * @param  {Function} next
+   */
+  
   function onKeyDown(event, editor, next) {
     debug('onKeyDown', {
       event,
@@ -419,6 +494,14 @@ function AndroidPlugin() {
         }
     }
   }
+
+  /**
+   * On select.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
 
   function onSelect(event, editor, next) {
     debug('onSelect', { event, status })

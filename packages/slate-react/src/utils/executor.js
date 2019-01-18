@@ -1,13 +1,23 @@
-// Creates an executor like a `resolver` or a `deleter` that handles
-// delayed execution of a method using a `requestAnimationFrame`.
-//
-// Unlike a `requestAnimationFrame`, after a method is cancelled, it can be
-// resumed. You can also optionally add a `timeout` after which time the
-// executor is automatically cancelled.
 
 function noop() {}
 
+/**
+ * 
+ * Creates an executor like a `resolver` or a `deleter` that handles
+ * delayed execution of a method using a `requestAnimationFrame` or `setTimeout`.
+ *
+ * Unlike a `requestAnimationFrame`, after a method is cancelled, it can be
+ * resumed. You can also optionally add a `timeout` after which time the
+ * executor is automatically cancelled.
+ */
 export default class Executor {
+
+  /**
+   * Executor
+   * @param {window} window
+   * @param {Function} fn - the function to execute when done
+   * @param {Object} options
+   */
   constructor(window, fn, options = {}) {
     this.fn = fn
     this.window = window
@@ -22,13 +32,22 @@ export default class Executor {
     this.preventFurtherCalls() // Ensure you can only call the function once
   }
 
+  /**
+   * Make sure that the function cannot be executed any more, even if other
+   * methods attempt to call `__call__`.
+   */
   preventFurtherCalls = () => {
     this.fn = noop
   }
 
+  /**
+   * Resume the executor's timer, usually after it has been cancelled.
+   * 
+   * @param {number} [ms] - how long to wait by default it is until next frame
+   */
   resume = ms => {
-    // in case resume is called more than once, we don't want old animation
-    // frames from executing because the `callbackId` is overwritten
+    // in case resume is called more than once, we don't want old timers
+    // from executing because the `timeoutId` or `callbackId` is overwritten.
     this.cancel()
     if (ms) {
       this.mode = 'timeout'
@@ -39,7 +58,10 @@ export default class Executor {
     }
   }
 
-  // Cancel the animation frame callback
+  /**
+   * Cancel the executor from executing after the wait. This can be resumed
+   * with the `resume` method.
+   */
   cancel = () => {
     if (this.mode === 'timeout') {
       this.window.clearTimeout(this.timeoutId)
@@ -49,8 +71,6 @@ export default class Executor {
     this.onCancel && this.onCancel()
   }
 
-  // If the method is not __call__'ed before a given timeout period, we
-  // cancel it permanently.
   __setTimeout__ = timeout => {
     if (timeout == null) return
     this.window.setTimeout(() => {

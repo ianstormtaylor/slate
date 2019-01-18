@@ -2,7 +2,19 @@ import closest from './closest'
 import getSelectionFromDom from './get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
 
+/**
+ * A SlateSnapshot remembers the state of elements at a given point in time
+ * and also remembers the state of the Editor at that time as well.
+ * The state can be applied to the DOM at a time in the future.
+ */
 export default class SlateSnapshot {
+  /**
+   * Constructor.
+   *
+   * @param {Window} window
+   * @param {Editor} editor
+   * @param {Boolean} options.before - should we remember the element before the one passed in
+   */
   constructor(window, editor, { before = false } = {}) {
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
@@ -20,6 +32,11 @@ export default class SlateSnapshot {
     this.selection = getSelectionFromDom(window, editor, domSelection)
   }
 
+  /**
+   * Apply the snapshot to the DOM and set the selection in the Editor.
+   *
+   * @param {Editor} editor
+   */
   apply(editor) {
     if (editor == null) throw new Error('editor is required')
     const { snapshot, selection } = this

@@ -74,6 +74,4 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   selection = selection.set('marks', value.selection.marks)
 
   return selection
-
-  // editor.select(selection)
 }

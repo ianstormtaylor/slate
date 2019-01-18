@@ -3,9 +3,9 @@
  * Unlike the native `Element.closest` method, this doesn't require the
  * starting node to be an Element.
  * 
- * @param  {Node} node       starting node
- * @param  {String} selector CSS selector
- * @return {Element}         the matching element
+ * @param  {Node} node to start at
+ * @param  {String} css selector to match
+ * @return {Element} the closest matching element
  */
 export default function closest(node, selector) {
   if (node.nodeType === Node.TEXT_NODE) {
