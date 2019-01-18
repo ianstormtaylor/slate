@@ -1,5 +1,5 @@
 import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Value, Point } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
@@ -70,10 +70,12 @@ function getContent(token) {
 
 function initPointWithCache(pointCache, textNode, document) {
   if (pointCache[0] !== textNode) {
-    pointCache[0] = textNode;
-    pointCache[1] = pointCache[1].moveToStartOfNode(textNode).normalize(document);
+    pointCache[0] = textNode
+    pointCache[1] = pointCache[1]
+                .moveToStartOfNode(textNode)
+                .normalize(document)
   }
-  return pointCache[1];
+  return pointCache[1]
 }
 
 /**
@@ -203,8 +205,8 @@ class CodeHighlighting extends React.Component {
     let endOffset = 0
     let start = 0
 
-    const document = editor.value.document;
-    const pointCache = [null, Point.create({})];
+    const document = editor.value.document
+    const pointCache = [null, Point.create({})]
 
     for (const token of tokens) {
       startText = endText
