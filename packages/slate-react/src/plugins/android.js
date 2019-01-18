@@ -46,13 +46,21 @@ function AndroidPlugin() {
    */
   let nodes = new Set()
 
-  /*  Keep a snapshot after a composition end for API 26/27.
-  If a `beforeInput` gets called with data that ends in an ENTER then we
-  need to use this snapshot to revert the DOM so that React doesn't get
-  out of sync with the DOM.
-  We also need to cancel the `reconcile` operation as it interferes in
-  certain scenarios like hitting 'enter' at the end of a word.
-*/ let compositionEndSnapshot = null
+  /**
+   * Keep a snapshot after a composition end for API 26/27. If a `beforeInput`
+   * gets called with data that ends in an ENTER then we need to use this
+   * snapshot to revert the DOM so that React doesn't get out of sync with the
+   * DOM. We also need to cancel the `reconcile` operation as it interferes in
+   * certain scenarios like hitting 'enter' at the end of a word.
+   *
+   * @type {SlateSnapshot} [compositionEndSnapshot]
+   */
+  let compositionEndSnapshot = null
+
+  /**
+   * [reconciler description]
+   * @type {[type]}
+   */
 
   let reconciler = null
 
@@ -484,8 +492,9 @@ function AndroidPlugin() {
         {
           if (event.key === 'Enter') {
             debug('onKeyDown:enter')
-            const domSelection = window.getSelection()
-            setSelectionFromDom(window, editor, domSelection)
+            reconcile(window, editor, { from: 'onKeyDown:enter' })
+            // const domSelection = window.getSelection()
+            // setSelectionFromDom(window, editor, domSelection)
             next()
             return
           }

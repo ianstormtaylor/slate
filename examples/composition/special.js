@@ -6,6 +6,12 @@ export default {
     nodes: [
       p(
         bold(
+          'Type "it is". cursor to "i|t" then hit enter.'
+        )
+      ),
+      p(''),
+      p(
+        bold(
           'Cursor to "mid|dle" then press space then backspace. Should say "middle" again.'
         )
       ),
