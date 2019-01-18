@@ -384,7 +384,6 @@ function AndroidPlugin() {
         // we only know if the user hit backspace if the `onInput` event that
         // follows has an `inputType` of `deleteContentBackward`. At that time
         // it's too late to stop the event.
-
         keyDownSnapshot = new SlateSnapshot(window, editor, {
           before: true,
         })
@@ -401,12 +400,11 @@ function AndroidPlugin() {
             next()
             return
           }
-          // const window = getWindow(event.target)
-          // // We need to take a snapshot of the current selection and the
-          // // element before when the user hits the backspace key. This is because
-          // // we only know if the user hit backspace if the `onInput` event that
-          // // follows has an `inputType` of `deleteContentBackward`. At that time
-          // // it's too late to stop the event.
+          // We need to take a snapshot of the current selection and the
+          // element before when the user hits the backspace key. This is because
+          // we only know if the user hit backspace if the `onInput` event that
+          // follows has an `inputType` of `deleteContentBackward`. At that time
+          // it's too late to stop the event.
           debug('onKeyDown:snapshot')
           keyDownSnapshot = new SlateSnapshot(window, editor, {
             before: true,
