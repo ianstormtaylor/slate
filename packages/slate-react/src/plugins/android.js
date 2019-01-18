@@ -7,6 +7,7 @@ import pick from 'lodash/pick'
 import API_VERSION from '../utils/android-api-version'
 import findNode from '../utils/find-node'
 import closest from '../utils/closest'
+import fixSelectionInZeroWidthBlock from '../utils/fix-selection-in-zero-width-block'
 import getSelectionFromDom from '../utils/get-selection-from-dom'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
@@ -45,14 +46,13 @@ function AndroidPlugin() {
    */
   let nodes = new Set()
 
-
-/*  Keep a snapshot after a composition end for API 26/27.
+  /*  Keep a snapshot after a composition end for API 26/27.
   If a `beforeInput` gets called with data that ends in an ENTER then we
   need to use this snapshot to revert the DOM so that React doesn't get
   out of sync with the DOM.
   We also need to cancel the `reconcile` operation as it interferes in
   certain scenarios like hitting 'enter' at the end of a word.
-*/  let compositionEndSnapshot = null
+*/ let compositionEndSnapshot = null
 
   let reconciler = null
 
@@ -121,7 +121,7 @@ function AndroidPlugin() {
    * to distinguish whether the event coming through is the native or React
    * version of the event. Also, if you cancel the native version that does
    * not necessarily mean that the React version is cancelled.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor}   editor
    * @param  {Function} next
@@ -207,7 +207,7 @@ function AndroidPlugin() {
 
   /**
    * On Composition end.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
@@ -243,12 +243,12 @@ function AndroidPlugin() {
 
   /**
    * On composition start.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
    */
-  
+
   function onCompositionStart(event, editor, next) {
     debug('onCompositionStart', { event })
     status = COMPOSING
@@ -258,12 +258,12 @@ function AndroidPlugin() {
 
   /**
    * On composition update.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
    */
-  
+
   function onCompositionUpdate(event, editor, next) {
     debug('onCompositionUpdate', { event })
     // next()
@@ -271,12 +271,12 @@ function AndroidPlugin() {
 
   /**
    * On input.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
    */
-  
+
   function onInput(event, editor, next) {
     debug('onInput', {
       event,
@@ -368,7 +368,21 @@ function AndroidPlugin() {
         // in API28. It might be happening in API 27 as well. Check by typing
         // `It me. No.` On a blank line.
         if (API_VERSION === 28) {
-          next()
+          debug('onInput:fallback')
+          const { anchorNode } = window.getSelection()
+          nodes.add(anchorNode)
+          console.log({ anchorNode, nodes })
+          window.requestAnimationFrame(() => {
+            debug('onInput:fallback:callback')
+            reconcile(window, editor, { from: 'onInput:fallback' })
+          })
+          // const domSelection = window.getSelection()
+          // const { anchorNode } = domSelection
+          // console.log(111)
+          // setSelectionFromDom(window, editor, domSelection)
+          // setTextFromDomNode(window, editor, anchorNode)
+          // console.log(222)
+          return
         }
         break
       default:
@@ -379,12 +393,12 @@ function AndroidPlugin() {
 
   /**
    * On key down.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
    */
-  
+
   function onKeyDown(event, editor, next) {
     debug('onKeyDown', {
       event,
@@ -512,9 +526,15 @@ function AndroidPlugin() {
       case 26:
       case 27:
         break
+      case 28:
+        const window = getWindow(event.target)
+        fixSelectionInZeroWidthBlock(window)
+        break
+      // if (status !== COMPOSING) next()
       default:
-        console.log({ status })
-        if (status !== COMPOSING) next()
+        // console.log({ status })
+        // if (status !== COMPOSING) next()
+        break
     }
   }
 

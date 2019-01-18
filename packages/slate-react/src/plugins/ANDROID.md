@@ -223,6 +223,15 @@ Android is destroying the `strong` tag and replacing it with a `b` tag.
 
 The problem does not present itself if the word is surrounding by spaces before the `strong` tag.
 
-A possible fix may be to surround the word with a `ZERO WIDTH NO-BREAK SPACE` represented as `&#65279;` in HTML. It appears in React for empty paragraphs.
+A possible fix may be to surround the word with a `ZERO WIDTH NO-BREAK SPACE` represented as `&#65279;` in HTML. It appears in React for empty paragraphs.# 
 
 
+## Other stuff
+
+In API 28 and possibly other versions of Android, when you select inside an empty block, the block is not actually empty. It contains a `ZERO WIDTH NO-BREAK SPACE` which is `&#65729` or `\uFEFF`.
+
+When the editor first starts, if you click immediately into an empty block, you will end up to the right of the zero-width space. Because of this, we don't get the all caps because I presume the editor only capitalizes the first characters and since the no break space is the first character it doesn't do this.
+
+But also, as a side effect, you end up in a different editing mode which fires events differently. This breaks a bunch of things.
+
+The fix (which I will be attempting) is to move the offset to `0` if we find ourselves in a block with the property `data-slate-zero-width="n"`.
