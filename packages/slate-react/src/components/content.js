@@ -168,10 +168,10 @@ class Content extends React.Component {
     const { value } = editor
     const { selection } = value
     const { isBackward } = selection
-    debug.update('updateSelection', { selection: selection.toJSON() })
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { activeElement } = window.document
+    debug.update('updateSelection', { selection: selection.toJSON() })
 
     // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
