@@ -492,10 +492,16 @@ function AndroidPlugin() {
         {
           if (event.key === 'Enter') {
             debug('onKeyDown:enter')
-            reconcile(window, editor, { from: 'onKeyDown:enter' })
-            // const domSelection = window.getSelection()
-            // setSelectionFromDom(window, editor, domSelection)
-            next()
+            event.preventDefault()
+            reconciler && reconciler.cancel()
+            deleter && deleter.cancel()
+            window.requestAnimationFrame(() => {
+              console.log('onKeyDown:enter:selection', editor.value.selection.toJSON())
+              reconcile(window, editor, { from: 'onKeyDown:enter' })
+              console.log('onKeyDown:enter:selection:after', editor.value.selection.toJSON())
+              editor.splitBlock()
+            })
+            // next()
             return
           }
           // We need to take a snapshot of the current selection and the
@@ -503,10 +509,11 @@ function AndroidPlugin() {
           // we only know if the user hit backspace if the `onInput` event that
           // follows has an `inputType` of `deleteContentBackward`. At that time
           // it's too late to stop the event.
-          debug('onKeyDown:snapshot')
           keyDownSnapshot = new SlateSnapshot(window, editor, {
             before: true,
           })
+          debug('onKeyDown:snapshot', {keyDownSnapshot})
+          
         }
         // If we let 'Enter' through it breaks handling of hitting
         // enter at the beginning of a word so we need to stop it.

@@ -38,6 +38,7 @@ export default class SlateSnapshot {
    * @param {Editor} editor
    */
   apply(editor) {
+    console.log('SlateSnapshot:apply', { slateSnapshot: this })
     if (editor == null) throw new Error('editor is required')
     const { snapshot, selection } = this
     snapshot.apply()
