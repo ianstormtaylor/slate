@@ -8,7 +8,7 @@
 function noop() {}
 
 export default class Executor {
-  constructor(window, fn, options={}) {
+  constructor(window, fn, options = {}) {
     this.fn = fn
     this.window = window
     this.resume()
@@ -26,19 +26,27 @@ export default class Executor {
     this.fn = noop
   }
 
-  resume = () => {
+  resume = ms => {
     // in case resume is called more than once, we don't want old animation
     // frames from executing because the `callbackId` is overwritten
     this.cancel()
-    this.callbackId = this.window.requestAnimationFrame(this.__call__)
+    if (ms) {
+      this.mode = 'timeout'
+      this.timeoutId = this.window.setTimeout(this.__call__, ms)
+    } else {
+      this.mode = 'animationFrame'
+      this.callbackId = this.window.requestAnimationFrame(this.__call__)
+    }
   }
 
   // Cancel the animation frame callback
   cancel = () => {
-    if (this.callbackId) {
+    if (this.mode === 'timeout') {
+      this.window.clearTimeout(this.timeoutId)
+    } else {
       this.window.cancelAnimationFrame(this.callbackId)
-      this.onCancel && this.onCancel()
     }
+    this.onCancel && this.onCancel()
   }
 
   // If the method is not __call__'ed before a given timeout period, we

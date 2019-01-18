@@ -18,6 +18,7 @@ import getSelectionFromDom from '../utils/get-selection-from-dom'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
 import isInputDataEnter from '../utils/is-input-data-enter'
+import isInputDataLastChar from '../utils/is-input-data-last-char'
 import ElementSnapshot from '../utils/element-snapshot'
 import SlateSnapshot from '../utils/slate-snapshot'
 import Executor from '../utils/executor'
@@ -52,7 +53,7 @@ function AndroidPlugin() {
   // If an `input` gets called with `inputType` of `deleteContentBackward`
   // immediately after then we need to undo the delete to keep React in sync
   // with the DOM.
-  let beforeDeleteSnapshot = null
+  let keyDownSnapshot = null
 
   let deleter = null
 
@@ -68,13 +69,25 @@ function AndroidPlugin() {
   // happening. We set this to true to prevent the input that follows.
   let preventNextInput = false
 
+  // When a composition ends, in some API versions we may want to know what
+  // to do next and that can depend on what combination of events happens
+  // after. For example in API 26/27, if we get a `beforeInput` that tells
+  // us that the input was a `.`, then we want the reconcile to happen even
+  // if there are `onInput:delete` events that follow. In this case, we would
+  // set `compositionEndAction` to `period`. During the `onInput` we would
+  // check if the `compositionEndAction` says `period` and if so we would
+  // not start the `delete` action.
+  let compositionEndAction = null
+
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
-    const selection = window.getSelection()
+    const domSelection = window.getSelection()
     nodes.forEach(node => {
       setTextFromDomNode(window, editor, node)
     })
-    setSelectionFromDom(window, editor, selection)
+    const sel = getSelectionFromDom(window, editor, domSelection)
+    console.log({ sel: sel ? sel.toJSON() : null })
+    setSelectionFromDom(window, editor, domSelection)
     nodes.clear()
   }
 
@@ -120,6 +133,12 @@ function AndroidPlugin() {
             editor.splitBlock()
           }
         } else {
+          if (isInputDataLastChar(event.data, ['.'])) {
+            debug('onBeforeInput:period')
+            reconciler.cancel()
+            compositionEndAction = 'period'
+            return
+          }
           // This looks at the beforeInput event's data property and sees if it
           // ends in a linefeed which is character code 10. This appears to be
           // the only way to detect that enter has been pressed except at end
@@ -170,10 +189,12 @@ function AndroidPlugin() {
         break
     }
 
+    compositionEndAction = 'reconcile'
     nodes.add(anchorNode)
     reconciler = new Executor(window, () => {
       status = NONE
-      reconcile(window, editor, { from: onCompositionEnd })
+      reconcile(window, editor, { from: 'onCompositionEnd:reconciler' })
+      compositionEndAction = null
     })
   }
 
@@ -208,11 +229,11 @@ function AndroidPlugin() {
           // It is confirmed that this bug does not present itself on API27.
           // A space fires a `compositionEnd` (as well as other events including
           // an input that is a delete) so the reconciliation happens.
-          // 
+          //
           // NOTE API 28:
           // When a user hits space and then backspace in `middle` we end up
           // with `midle`.
-          // 
+          //
           // This is because when the user hits space, the composition is not
           // ended because `compositionEnd` is not called yet. When backspace is
           // hit, the `compositionEnd` is called. We need to revert the DOM but
@@ -222,7 +243,7 @@ function AndroidPlugin() {
           // Slate Value, Slate doesn't know about the space yet so the
           // backspace is carried out without the space cuasing us to lose a
           // character.
-          // 
+          //
           // This fix forces Android to reconcile immediately after hitting
           // the space.
           if (
@@ -235,16 +256,31 @@ function AndroidPlugin() {
             return
           }
         }
-        if (event.nativeEvent.inputType === 'deleteContentBackward') {
-          debug('onInput:delete', { beforeDeleteSnapshot })
+        if (API_VERSION === 26 || API_VERSION === 27) {
+          if (compositionEndAction === 'period') {
+            debug('onInput:period:abort')
+            // This means that there was a `beforeInput` that indicated the
+            // period was pressed. When a period is pressed, you get a bunch
+            // of delete actions mixed in. We want to ignore those. At this
+            // point, we add the current node to the list of things we need to
+            // resolve at the next compositionEnd. We know that a new
+            // composition will start right after this event so it is safe to
+            // do this.
+            const { anchorNode } = window.getSelection()
+            nodes.add(anchorNode)
+            return
+          }
+        }
+        if (nativeEvent.inputType === 'deleteContentBackward') {
+          debug('onInput:delete', { keyDownSnapshot })
           const window = getWindow(event.target)
           reconciler && reconciler.cancel()
           deleter && deleter.cancel()
           deleter = new Executor(
             window,
             () => {
-              debug('onInput:delete:callback', { beforeDeleteSnapshot })
-              beforeDeleteSnapshot.apply(editor)
+              debug('onInput:delete:callback', { keyDownSnapshot })
+              keyDownSnapshot.apply(editor)
               editor.deleteBackward()
               deleter = null
             },
@@ -261,7 +297,6 @@ function AndroidPlugin() {
           nodes.add(anchorNode)
           return
         }
-        // TODO: The API 27 check is the todo.
         // Some keys like '.' are input without compositions. This happens
         // in API28. It might be happening in API 27 as well. Check by typing
         // `It me. No.` On a blank line.
@@ -350,7 +385,7 @@ function AndroidPlugin() {
         // follows has an `inputType` of `deleteContentBackward`. At that time
         // it's too late to stop the event.
 
-        beforeDeleteSnapshot = new SlateSnapshot(window, editor, {
+        keyDownSnapshot = new SlateSnapshot(window, editor, {
           before: true,
         })
 
@@ -373,7 +408,7 @@ function AndroidPlugin() {
           // // follows has an `inputType` of `deleteContentBackward`. At that time
           // // it's too late to stop the event.
           debug('onKeyDown:snapshot')
-          beforeDeleteSnapshot = new SlateSnapshot(window, editor, {
+          keyDownSnapshot = new SlateSnapshot(window, editor, {
             before: true,
           })
         }

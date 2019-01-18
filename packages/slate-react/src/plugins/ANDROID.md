@@ -72,6 +72,20 @@ When we hit the period, here are the events:
 
 Although there are minor differences, API 26/27 behave similarly.
 
+### It me. No. Failure with uppercase I.
+
+Touch away from original selection position. Touch into a blank line. Wait for the keyboard to display uppercase letters. If it doesn't, this bug won't present itself.
+
+Type `It me. No.` and upon hitting the final `.` you will end up with unexpected value which is usually removing the first `.` and putting the cursor behind it.
+
+### Data in Input
+
+In API 27, in certain situations, the `input` event returns data which lets us identify, for example, that a '.' was the last character typed. Other times, it does not provide this data.
+
+If you start typing a line and the first character capitalizes itself, then you will not receive the data. If you start typing a line and the first character stays lower case, you will receive the data.
+
+Because of this, `data` is not a reliable source of information even when it is available because in other scenarios it may not be.
+
 ### Backspace Handling
 
 - Save the state using a snapshot during a `keydown` event as it may end up being a delete. The DOM is in a good before state at this time.

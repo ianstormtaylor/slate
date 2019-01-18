@@ -10,6 +10,12 @@ export default {
         )
       ),
       p('The middle word.'),
+      p(
+        bold(
+          'Cursor in line below. Wait for caps on keyboard to show up. If not try again. Type "It me. No." and it should not mangle on the last period.'
+        )
+      ),
+      p(''),
     ],
   },
 }
