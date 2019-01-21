@@ -30,9 +30,10 @@ function getApiVersion() {
   const matchData = userAgent.match(/Android\s([0-9\.]+)/)
   if (matchData == null) return null
   const versionString = matchData[1]
-  for (let tuple of ANDROID_API_VERSIONS) {
+
+  for (const tuple of ANDROID_API_VERSIONS) {
     const [regex, version] = tuple
-    if (versionString.match(regex)) return version //tags.push(tag)
+    if (versionString.match(regex)) return version
   }
   return null
 }

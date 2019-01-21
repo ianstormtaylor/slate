@@ -392,7 +392,6 @@ function BeforePlugin() {
     // Certain hotkeys have native editing behaviors in `contenteditable`
     // elements which will editor the DOM and cause our value to be out of sync,
     // so they need to always be prevented.
-    console.log('should we prevent default?')
     if (
       !IS_IOS &&
       (Hotkeys.isBold(event) ||
@@ -408,7 +407,6 @@ function BeforePlugin() {
         Hotkeys.isTransposeCharacter(event) ||
         Hotkeys.isUndo(event))
     ) {
-      console.log('preventDefault')
       event.preventDefault()
     }
 

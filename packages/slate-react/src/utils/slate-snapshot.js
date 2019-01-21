@@ -22,14 +22,17 @@ export default class SlateSnapshot {
     const { anchorNode } = domSelection
     const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
     const elements = [subrootEl]
+
     // The before option is for when we need to take a snapshot of the current
     // subroot and the element before when the user hits the backspace key.
     if (before) {
       const { previousElementSibling } = subrootEl
+
       if (previousElementSibling) {
         elements.unshift(previousElementSibling)
       }
     }
+
     this.snapshot = new ElementSnapshot(elements)
     this.selection = getSelectionFromDom(window, editor, domSelection)
   }
@@ -39,9 +42,8 @@ export default class SlateSnapshot {
    *
    * @param {Editor} editor
    */
-   
+
   apply(editor) {
-    console.log('SlateSnapshot:apply', { slateSnapshot: this })
     if (editor == null) throw new Error('editor is required')
     const { snapshot, selection } = this
     snapshot.apply()

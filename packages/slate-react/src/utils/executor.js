@@ -13,6 +13,7 @@ function noop() {}
  * resumed. You can also optionally add a `timeout` after which time the
  * executor is automatically cancelled.
  */
+
 export default class Executor {
   /**
    * Executor
@@ -54,6 +55,7 @@ export default class Executor {
     // in case resume is called more than once, we don't want old timers
     // from executing because the `timeoutId` or `callbackId` is overwritten.
     this.cancel()
+
     if (ms) {
       this.mode = 'timeout'
       this.timeoutId = this.window.setTimeout(this.__call__, ms)
@@ -74,16 +76,18 @@ export default class Executor {
     } else {
       this.window.cancelAnimationFrame(this.callbackId)
     }
-    this.onCancel && this.onCancel()
+
+    if (this.onCancel) this.onCancel()
   }
 
   /**
    * Sets a timeout after which this executor is automatically cancelled.
    * @param {Number} ms
    */
-  
+
   __setTimeout__ = timeout => {
     if (timeout == null) return
+
     this.window.setTimeout(() => {
       this.cancel()
       this.preventFurtherCalls()

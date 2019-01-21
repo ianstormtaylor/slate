@@ -8,7 +8,7 @@ import findPoint from './find-point'
  * composition changes where we don't know what changes the user made by
  * looking at events. Instead we wait until the DOM is in a safe state, we
  * read from it, and update the Editor's Document.
- * 
+ *
  * @param {Window} window
  * @param {Editor} editor
  * @param {Node} domNode

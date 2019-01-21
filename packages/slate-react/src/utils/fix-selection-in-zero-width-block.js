@@ -4,7 +4,7 @@
  * cursor can end up either before or after the non-breaking space. This
  * causes different behavior in Android and so we make sure the seleciton is
  * always before the zero-width space.
- * 
+ *
  * @param {Window} window
  */
 
@@ -13,6 +13,7 @@ export default function fixSelectionInZeroWidthBlock(window) {
   const { anchorNode } = domSelection
   const { dataset } = anchorNode.parentElement
   const isZeroWidth = dataset ? dataset.slateZeroWidth === 'n' : false
+
   // We are doing three checks to see if we need to move the cursor.
   // Is this a zero-width slate span?
   // Is the current cursor position not at the start of it?

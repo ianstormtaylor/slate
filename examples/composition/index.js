@@ -82,8 +82,11 @@ class RichTextExample extends React.Component {
   /**
    * Select and deserialize the initial editor value.
    *
+   * @param  {Object} nextProps
+   * @param  {Object} prevState
    * @return {Object}
    */
+
   static getDerivedStateFromProps(nextProps, prevState) {
     const { subpage } = nextProps.params
     if (subpage === prevState.subpage) return null

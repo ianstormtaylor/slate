@@ -6,10 +6,10 @@ export function p(...leaves) {
   }
 }
 
-export function text(text) {
-  return { text }
+export function text(textContent) {
+  return { text: textContent }
 }
 
-export function bold(text) {
-  return { text, marks: [{ type: 'bold' }] }
+export function bold(textContent) {
+  return { text: textContent, marks: [{ type: 'bold' }] }
 }

@@ -1,19 +1,14 @@
 import Debug from 'debug'
-import Hotkeys from 'slate-hotkeys'
-import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
 import pick from 'lodash/pick'
 
 import API_VERSION from '../utils/android-api-version'
-import findNode from '../utils/find-node'
-import closest from '../utils/closest'
 import fixSelectionInZeroWidthBlock from '../utils/fix-selection-in-zero-width-block'
 import getSelectionFromDom from '../utils/get-selection-from-dom'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
 import isInputDataEnter from '../utils/is-input-data-enter'
 import isInputDataLastChar from '../utils/is-input-data-last-char'
-import ElementSnapshot from '../utils/element-snapshot'
 import SlateSnapshot from '../utils/slate-snapshot'
 import Executor from '../utils/executor'
 
@@ -28,7 +23,6 @@ debug('API_VERSION', { API_VERSION })
 
 const NONE = 0
 const COMPOSING = 1
-const WAITING = 2
 
 function AndroidPlugin() {
   /**
@@ -46,7 +40,7 @@ function AndroidPlugin() {
    * @type {Set} set containing Node objects
    */
 
-  let nodes = new Set()
+  const nodes = new window.Set()
 
   /**
    * Keep a snapshot after a composition end for API 26/27. If a `beforeInput`
@@ -67,7 +61,7 @@ function AndroidPlugin() {
    * this for us. It is created on every `compositionEnd` and executes on the
    * next `requestAnimationFrame`. The `Executor` can be cancelled and resumed
    * which some methods do.
-   * 
+   *
    * @type {Executor}
    */
 
@@ -78,7 +72,7 @@ function AndroidPlugin() {
    * If an `input` gets called with `inputType` of `deleteContentBackward`
    * we need to undo the delete that Android does to keep React in sync with
    * the DOM.
-   * 
+   *
    * @type {SlateSnapshot}
    */
 
@@ -90,7 +84,7 @@ function AndroidPlugin() {
    * we need Android to finish all of its DOM operations to do with deletion
    * before we revert them to a Snapshot. After reverting, we then execute
    * Slate's version of delete.
-   * 
+   *
    * @type {Executor}
    */
 
@@ -110,30 +104,20 @@ function AndroidPlugin() {
   let preventNextBeforeInput = false
 
   /**
-   * Cancelling a `beforeInput` in API 28 does not stop the event from
-   * continuing to the `input` event. We st this to true to prevent the
-   * `input` that follows from firing.
-   *
-   * @type {Boolean}
-   */
-  
-  let preventNextInput = false
-
-  /**
    * When a composition ends, in some API versions we may need to know what we
    * have learned so far about the composition and what we want to do because of
    * some actions that may come later.
-   * 
+   *
    * For example in API 26/27, if we get a `beforeInput` that tells us that the
    * input was a `.`, then we want the reconcile to happen even if there are
    * `onInput:delete` events that follow. In this case, we would set
    * `compositionEndAction` to `period`. During the `onInput` we would check if
    * the `compositionEndAction` says `period` and if so we would not start the
    * `delete` action.
-   * 
+   *
    * @type {(String|null)}
    */
-  
+
   let compositionEndAction = null
 
   /**
@@ -150,10 +134,11 @@ function AndroidPlugin() {
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
     const domSelection = window.getSelection()
+
     nodes.forEach(node => {
       setTextFromDomNode(window, editor, node)
     })
-    const sel = getSelectionFromDom(window, editor, domSelection)
+
     setSelectionFromDom(window, editor, domSelection)
     nodes.clear()
   }
@@ -174,18 +159,22 @@ function AndroidPlugin() {
 
   function onBeforeInput(event, editor, next) {
     const isNative = !event.nativeEvent
+
     debug('onBeforeInput', {
       isNative,
       event,
       status,
       e: pick(event, ['data', 'inputType', 'isComposing', 'nativeEvent']),
     })
+
     const window = getWindow(event.target)
+
     if (preventNextBeforeInput) {
       event.preventDefault()
       preventNextBeforeInput = false
       return
     }
+
     switch (API_VERSION) {
       case 25:
         // prevent onBeforeInput to allow selecting an alternate suggest to
@@ -197,6 +186,7 @@ function AndroidPlugin() {
           deleter.cancel()
           reconciler.resume()
         }
+
         // This analyses Android's native `beforeInput` which Slate adds
         // on in the `Content` component. It only fires if the cursor is at
         // the end of a block. Otherwise, the code below checks.
@@ -220,20 +210,24 @@ function AndroidPlugin() {
             compositionEndAction = 'period'
             return
           }
+
           // This looks at the beforeInput event's data property and sees if it
           // ends in a linefeed which is character code 10. This appears to be
           // the only way to detect that enter has been pressed except at end
           // of line where it doesn't work.
           const isEnter = isInputDataEnter(event.data)
+
           if (isEnter) {
-            reconciler && reconciler.cancel()
+            if (reconciler) reconciler.cancel()
+
             window.requestAnimationFrame(() => {
               debug('onBeforeInput:enter:react', {})
-              compositionEndSnapshot.apply()
+              compositionEndSnapshot.apply(editor)
               editor.splitBlock()
             })
           }
         }
+
         break
       case 28:
         // If a `beforeInput` event fires after an `input:deleteContentBackward`
@@ -245,6 +239,7 @@ function AndroidPlugin() {
           deleter.cancel()
           reconciler.resume()
         }
+
         break
       default:
         if (status !== COMPOSING) next()
@@ -258,7 +253,7 @@ function AndroidPlugin() {
    * be cancelled and can also be resumed. For example, when a delete
    * immediately followed a `compositionEnd`, we don't want to reconcile.
    * Instead, we want the `delete` to take precedence.
-   * 
+   *
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
@@ -269,6 +264,7 @@ function AndroidPlugin() {
     const window = getWindow(event.target)
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
+
     switch (API_VERSION) {
       case 26:
       case 27:
@@ -285,6 +281,7 @@ function AndroidPlugin() {
 
     compositionEndAction = 'reconcile'
     nodes.add(anchorNode)
+
     reconciler = new Executor(window, () => {
       status = NONE
       reconcile(window, editor, { from: 'onCompositionEnd:reconciler' })
@@ -332,6 +329,7 @@ function AndroidPlugin() {
       status,
       e: pick(event, ['data', 'nativeEvent', 'inputType', 'isComposing']),
     })
+
     switch (API_VERSION) {
       case 24:
       case 25:
@@ -340,6 +338,7 @@ function AndroidPlugin() {
       case 27:
       case 28:
         const { nativeEvent } = event
+
         if (API_VERSION === 28) {
           // NOTE API 28:
           // When a user hits space and then backspace in `middle` we end up
@@ -357,7 +356,7 @@ function AndroidPlugin() {
           //
           // This fix forces Android to reconcile immediately after hitting
           // the space.
-          // 
+          //
           // NOTE API 27:
           // It is confirmed that this bug does not present itself on API27.
           // A space fires a `compositionEnd` (as well as other events including
@@ -367,12 +366,13 @@ function AndroidPlugin() {
             nativeEvent.inputType === 'insertText' &&
             nativeEvent.data === ' '
           ) {
-            reconciler && reconciler.cancel()
-            deleter && deleter.cancel()
+            if (reconciler) reconciler.cancel()
+            if (deleter) deleter.cancel()
             reconcile(window, editor, { from: 'onInput:space' })
             return
           }
         }
+
         if (API_VERSION === 26 || API_VERSION === 27) {
           if (compositionEndAction === 'period') {
             debug('onInput:period:abort')
@@ -388,11 +388,13 @@ function AndroidPlugin() {
             return
           }
         }
+
         if (nativeEvent.inputType === 'deleteContentBackward') {
           debug('onInput:delete', { keyDownSnapshot })
           const window = getWindow(event.target)
-          reconciler && reconciler.cancel()
-          deleter && deleter.cancel()
+          if (reconciler) reconciler.cancel()
+          if (deleter) deleter.cancel()
+
           deleter = new Executor(
             window,
             () => {
@@ -409,11 +411,13 @@ function AndroidPlugin() {
           )
           return
         }
+
         if (status === COMPOSING) {
           const { anchorNode } = window.getSelection()
           nodes.add(anchorNode)
           return
         }
+
         // Some keys like '.' are input without compositions. This happens
         // in API28. It might be happening in API 27 as well. Check by typing
         // `It me. No.` On a blank line.
@@ -421,12 +425,14 @@ function AndroidPlugin() {
           debug('onInput:fallback')
           const { anchorNode } = window.getSelection()
           nodes.add(anchorNode)
+
           window.requestAnimationFrame(() => {
             debug('onInput:fallback:callback')
             reconcile(window, editor, { from: 'onInput:fallback' })
           })
           return
         }
+
         break
       default:
         if (status === COMPOSING) return
@@ -459,7 +465,9 @@ function AndroidPlugin() {
         'which',
       ]),
     })
+
     const window = getWindow(event.target)
+
     switch (API_VERSION) {
       // 1. We want to allow enter keydown to allows go through
       // 2. We want to deny keydown, I think, when it fires before the composition
@@ -481,11 +489,13 @@ function AndroidPlugin() {
           // setSelectionFromDom(window, editor, selection)
           next()
         }
+
         break
       case 26:
       case 27:
         if (event.key === 'Enter') {
           debug('onKeyDown:enter', {})
+
           if (deleter) {
             // If a `deleter` exists which means there was an onInput with
             // `deleteContentBackward` that hasn't fired yet, then we know
@@ -493,6 +503,7 @@ function AndroidPlugin() {
             // the split.
             deleter.cancel()
             event.preventDefault()
+
             window.requestAnimationFrame(() => {
               debug('onKeyDown:enter:callback')
               compositionEndSnapshot.apply(editor)
@@ -528,17 +539,16 @@ function AndroidPlugin() {
           if (event.key === 'Enter') {
             debug('onKeyDown:enter')
             event.preventDefault()
-            reconciler && reconciler.cancel()
-            deleter && deleter.cancel()
+            if (reconciler) reconciler.cancel()
+            if (deleter) deleter.cancel()
+
             window.requestAnimationFrame(() => {
-              console.log('onKeyDown:enter:selection', editor.value.selection.toJSON())
               reconcile(window, editor, { from: 'onKeyDown:enter' })
-              console.log('onKeyDown:enter:selection:after', editor.value.selection.toJSON())
               editor.splitBlock()
             })
-            // next()
             return
           }
+
           // We need to take a snapshot of the current selection and the
           // element before when the user hits the backspace key. This is because
           // we only know if the user hit backspace if the `onInput` event that
@@ -547,12 +557,14 @@ function AndroidPlugin() {
           keyDownSnapshot = new SlateSnapshot(window, editor, {
             before: true,
           })
-          debug('onKeyDown:snapshot', {keyDownSnapshot})
-          
+
+          debug('onKeyDown:snapshot', { keyDownSnapshot })
         }
+
         // If we let 'Enter' through it breaks handling of hitting
         // enter at the beginning of a word so we need to stop it.
         break
+
       default:
         if (status !== COMPOSING) {
           next()
@@ -570,6 +582,7 @@ function AndroidPlugin() {
 
   function onSelect(event, editor, next) {
     debug('onSelect', { event, status })
+
     switch (API_VERSION) {
       // We don't want to have the selection move around in an onSelect because
       // it happens after we press `enter` in the same transaction. This
@@ -580,10 +593,7 @@ function AndroidPlugin() {
         const window = getWindow(event.target)
         fixSelectionInZeroWidthBlock(window)
         break
-      // if (status !== COMPOSING) next()
       default:
-        // console.log({ status })
-        // if (status !== COMPOSING) next()
         break
     }
   }

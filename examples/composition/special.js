@@ -1,14 +1,10 @@
-import { p, text, bold } from './util'
+import { p, bold } from './util'
 
 export default {
   text: `Follow the instructions on each line exactly`,
   document: {
     nodes: [
-      p(
-        bold(
-          'Type "it is". cursor to "i|t" then hit enter.'
-        )
-      ),
+      p(bold('Type "it is". cursor to "i|t" then hit enter.')),
       p(''),
       p(
         bold(

@@ -75,7 +75,6 @@ const FEATURE_RULES = [
     window => {
       const element = window.document.createElement('div')
       element.contentEditable = true
-      console.log('inputeventslevels2', element.onbeforeinput)
       const support = 'onbeforeinput' in element
       return support
     },
