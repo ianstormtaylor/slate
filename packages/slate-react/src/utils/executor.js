@@ -1,8 +1,11 @@
+/**
+ * A function that does nothing
+ * @return {Function}
+ */
 
 function noop() {}
 
 /**
- * 
  * Creates an executor like a `resolver` or a `deleter` that handles
  * delayed execution of a method using a `requestAnimationFrame` or `setTimeout`.
  *
@@ -11,13 +14,13 @@ function noop() {}
  * executor is automatically cancelled.
  */
 export default class Executor {
-
   /**
    * Executor
    * @param {window} window
    * @param {Function} fn - the function to execute when done
    * @param {Object} options
    */
+
   constructor(window, fn, options = {}) {
     this.fn = fn
     this.window = window
@@ -36,15 +39,17 @@ export default class Executor {
    * Make sure that the function cannot be executed any more, even if other
    * methods attempt to call `__call__`.
    */
+
   preventFurtherCalls = () => {
     this.fn = noop
   }
 
   /**
    * Resume the executor's timer, usually after it has been cancelled.
-   * 
-   * @param {number} [ms] - how long to wait by default it is until next frame
+   *
+   * @param {Number} [ms] - how long to wait by default it is until next frame
    */
+
   resume = ms => {
     // in case resume is called more than once, we don't want old timers
     // from executing because the `timeoutId` or `callbackId` is overwritten.
@@ -62,6 +67,7 @@ export default class Executor {
    * Cancel the executor from executing after the wait. This can be resumed
    * with the `resume` method.
    */
+
   cancel = () => {
     if (this.mode === 'timeout') {
       this.window.clearTimeout(this.timeoutId)
@@ -71,6 +77,11 @@ export default class Executor {
     this.onCancel && this.onCancel()
   }
 
+  /**
+   * Sets a timeout after which this executor is automatically cancelled.
+   * @param {Number} ms
+   */
+  
   __setTimeout__ = timeout => {
     if (timeout == null) return
     this.window.setTimeout(() => {

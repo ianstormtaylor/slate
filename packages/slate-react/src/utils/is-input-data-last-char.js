@@ -1,10 +1,13 @@
-// In Android API 26 and 27 we can tell if the input key was pressed by
-// waiting for the `beforeInput` event and seeing that the last character
-// of its `data` property is `10`.
-//
-// Note that at this point it is too late to prevent the event from affecting
-// the DOM so we use other methods to clean the DOM up after we have detected
-// the input.
+/**
+ * In Android sometimes the only way to tell what the user is trying to do
+ * is to look at an event's `data` property and see if the last characters
+ * matches a character. This method helps us make that determination.
+ *
+ * @param {String} data
+ * @param {[String]} chars
+ * @return {Boolean}
+ */
+
 export default function isInputDataLastChar(data, chars) {
   if (!Array.isArray(chars))
     throw new Error(`chars must be an array of one character strings`)

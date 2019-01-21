@@ -36,6 +36,7 @@ function AndroidPlugin() {
    *
    * @type {NONE|COMPOSING|WAITING}
    */
+
   let status = NONE
 
   /**
@@ -44,6 +45,7 @@ function AndroidPlugin() {
    *
    * @type {Set} set containing Node objects
    */
+
   let nodes = new Set()
 
   /**
@@ -54,49 +56,84 @@ function AndroidPlugin() {
    * certain scenarios like hitting 'enter' at the end of a word.
    *
    * @type {SlateSnapshot} [compositionEndSnapshot]
+   
    */
+
   let compositionEndSnapshot = null
 
   /**
-   * [reconciler description]
-   * @type {[type]}
+   * When there is a `compositionEnd` we ened to reconcile Slate's Document
+   * with the DOM. The `reconciler` is an instance of `Executor` that does
+   * this for us. It is created on every `compositionEnd` and executes on the
+   * next `requestAnimationFrame`. The `Executor` can be cancelled and resumed
+   * which some methods do.
+   * 
+   * @type {Executor}
    */
 
   let reconciler = null
 
-  // Keey a snapshot after a `keydown` event in API 26/27.
-  // If an `input` gets called with `inputType` of `deleteContentBackward`
-  // immediately after then we need to undo the delete to keep React in sync
-  // with the DOM.
+  /**
+   * A snapshot that gets taken when there is a `keydown` event in API26/27.
+   * If an `input` gets called with `inputType` of `deleteContentBackward`
+   * we need to undo the delete that Android does to keep React in sync with
+   * the DOM.
+   * 
+   * @type {SlateSnapshot}
+   */
+
   let keyDownSnapshot = null
+
+  /**
+   * The deleter is an instace of `Executor` that will execute a delete
+   * operation on the next `requestAnimationFrame`. It has to wait because
+   * we need Android to finish all of its DOM operations to do with deletion
+   * before we revert them to a Snapshot. After reverting, we then execute
+   * Slate's version of delete.
+   * 
+   * @type {Executor}
+   */
 
   let deleter = null
 
-  // Because Slate implements its own event handler for `beforeInput` in
-  // addition to React's version, we actually get two. If we cancel the
-  // first native version, the React one will still fire. We set this to
-  // `true` if we don't want that to happen. Remember that when we prevent it,
-  // we need to tell React to `preventDefault` so the event doesn't continue
-  // through React's event system.
+  /**
+   * Because Slate implements its own event handler for `beforeInput` in
+   * addition to React's version, we actually get two. If we cancel the
+   * first native version, the React one will still fire. We set this to
+   * `true` if we don't want that to happen. Remember that when we prevent it,
+   * we need to tell React to `preventDefault` so the event doesn't continue
+   * through React's event system.
+   *
+   * type {Boolean}
+   */
+
   let preventNextBeforeInput = false
 
-  // Canceling beforeInput in API 28 doesn't seem to stop the event from
-  // happening. We set this to true to prevent the input that follows.
+  /**
+   * Cancelling a `beforeInput` in API 28 does not stop the event from
+   * continuing to the `input` event. We st this to true to prevent the
+   * `input` that follows from firing.
+   *
+   * @type {Boolean}
+   */
+  
   let preventNextInput = false
 
-  //
-  // When a composition ends, in some API versions we may need to know what we
-  // have learned so far about the composition and what we want to do because of
-  // some actions that may come later.
-  //
-  // For example in API 26/27, if we get a `beforeInput` that tells us that the
-  // input was a `.`, then we want the reconcile to happen even if there are
-  // `onInput:delete` events that follow. In this case, we would set
-  // `compositionEndAction` to `period`. During the `onInput` we would check if
-  // the `compositionEndAction` says `period` and if so we would not start the
-  // `delete` action.
-  //
-  // @type       {(String|null)}
+  /**
+   * When a composition ends, in some API versions we may need to know what we
+   * have learned so far about the composition and what we want to do because of
+   * some actions that may come later.
+   * 
+   * For example in API 26/27, if we get a `beforeInput` that tells us that the
+   * input was a `.`, then we want the reconcile to happen even if there are
+   * `onInput:delete` events that follow. In this case, we would set
+   * `compositionEndAction` to `period`. During the `onInput` we would check if
+   * the `compositionEndAction` says `period` and if so we would not start the
+   * `delete` action.
+   * 
+   * @type {(String|null)}
+   */
+  
   let compositionEndAction = null
 
   /**
@@ -105,10 +142,11 @@ function AndroidPlugin() {
    * Document based on the text values in these DOM nodes and also updates
    * Slate's Selection based on the current cursor position in the Editor.
    *
-   * @param  {Window} window
-   * @param  {Editor} editor
-   * @param  {String} options.from - where reconcile was called from for debug
+   * @param {Window} window
+   * @param {Editor} editor
+   * @param {String} options.from - where reconcile was called from for debug
    */
+
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
     const domSelection = window.getSelection()
@@ -116,7 +154,6 @@ function AndroidPlugin() {
       setTextFromDomNode(window, editor, node)
     })
     const sel = getSelectionFromDom(window, editor, domSelection)
-    console.log({ sel: sel ? sel.toJSON() : null })
     setSelectionFromDom(window, editor, domSelection)
     nodes.clear()
   }
@@ -130,10 +167,11 @@ function AndroidPlugin() {
    * version of the event. Also, if you cancel the native version that does
    * not necessarily mean that the React version is cancelled.
    *
-   * @param  {Event} event
-   * @param  {Editor}   editor
-   * @param  {Function} next
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
    */
+
   function onBeforeInput(event, editor, next) {
     const isNative = !event.nativeEvent
     debug('onBeforeInput', {
@@ -214,8 +252,13 @@ function AndroidPlugin() {
   }
 
   /**
-   * On Composition end.
-   *
+   * On Composition end. By default, when a `compositionEnd` event happens,
+   * we start a reconciler. The reconciler will update Slate's Document using
+   * the DOM as the source of truth. In some cases, the reconciler needs to
+   * be cancelled and can also be resumed. For example, when a delete
+   * immediately followed a `compositionEnd`, we don't want to reconcile.
+   * Instead, we want the `delete` to take precedence.
+   * 
    * @param  {Event} event
    * @param  {Editor} editor
    * @param  {Function} next
@@ -261,7 +304,6 @@ function AndroidPlugin() {
     debug('onCompositionStart', { event })
     status = COMPOSING
     nodes.clear()
-    // next()
   }
 
   /**
@@ -274,7 +316,6 @@ function AndroidPlugin() {
 
   function onCompositionUpdate(event, editor, next) {
     debug('onCompositionUpdate', { event })
-    // next()
   }
 
   /**
@@ -300,11 +341,6 @@ function AndroidPlugin() {
       case 28:
         const { nativeEvent } = event
         if (API_VERSION === 28) {
-          // NOTE API 27:
-          // It is confirmed that this bug does not present itself on API27.
-          // A space fires a `compositionEnd` (as well as other events including
-          // an input that is a delete) so the reconciliation happens.
-          //
           // NOTE API 28:
           // When a user hits space and then backspace in `middle` we end up
           // with `midle`.
@@ -321,6 +357,12 @@ function AndroidPlugin() {
           //
           // This fix forces Android to reconcile immediately after hitting
           // the space.
+          // 
+          // NOTE API 27:
+          // It is confirmed that this bug does not present itself on API27.
+          // A space fires a `compositionEnd` (as well as other events including
+          // an input that is a delete) so the reconciliation happens.
+          //
           if (
             nativeEvent.inputType === 'insertText' &&
             nativeEvent.data === ' '
@@ -379,17 +421,10 @@ function AndroidPlugin() {
           debug('onInput:fallback')
           const { anchorNode } = window.getSelection()
           nodes.add(anchorNode)
-          console.log({ anchorNode, nodes })
           window.requestAnimationFrame(() => {
             debug('onInput:fallback:callback')
             reconcile(window, editor, { from: 'onInput:fallback' })
           })
-          // const domSelection = window.getSelection()
-          // const { anchorNode } = domSelection
-          // console.log(111)
-          // setSelectionFromDom(window, editor, domSelection)
-          // setTextFromDomNode(window, editor, anchorNode)
-          // console.log(222)
           return
         }
         break
@@ -453,7 +488,7 @@ function AndroidPlugin() {
           debug('onKeyDown:enter', {})
           if (deleter) {
             // If a `deleter` exists which means there was an onInput with
-            // `deleteContentBackwards` that hasn't fired yet, then we know
+            // `deleteContentBackward` that hasn't fired yet, then we know
             // this is one of the cases where we have to revert to before
             // the split.
             deleter.cancel()
@@ -541,7 +576,6 @@ function AndroidPlugin() {
       // causes the cursor position to not be properly placed.
       case 26:
       case 27:
-        break
       case 28:
         const window = getWindow(event.target)
         fixSelectionInZeroWidthBlock(window)

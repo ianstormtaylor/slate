@@ -7,6 +7,7 @@ import ElementSnapshot from './element-snapshot'
  * and also remembers the state of the Editor at that time as well.
  * The state can be applied to the DOM at a time in the future.
  */
+
 export default class SlateSnapshot {
   /**
    * Constructor.
@@ -15,6 +16,7 @@ export default class SlateSnapshot {
    * @param {Editor} editor
    * @param {Boolean} options.before - should we remember the element before the one passed in
    */
+
   constructor(window, editor, { before = false } = {}) {
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
@@ -37,6 +39,7 @@ export default class SlateSnapshot {
    *
    * @param {Editor} editor
    */
+   
   apply(editor) {
     console.log('SlateSnapshot:apply', { slateSnapshot: this })
     if (editor == null) throw new Error('editor is required')

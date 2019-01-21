@@ -1,19 +1,21 @@
 /**
  * Is the given node a text node?
- * 
- * @param  {node} node
+ *
+ * @param {node} node
  * @return {Boolean}
  */
+
 function isTextNode(node) {
   return node.nodeType === Node.TEXT_NODE
 }
 
 /**
  * Takes a node and returns a snapshot of the node.
- * 
- * @param  {node} node
+ *
+ * @param {node} node
  * @return {object} element snapshot
  */
+
 function getElementSnapshot(node) {
   const snapshot = {}
   snapshot.node = node
@@ -26,10 +28,11 @@ function getElementSnapshot(node) {
 
 /**
  * Takes an array of elements and returns a snapshot
- * 
- * @param  {elements[]} elements
+ *
+ * @param {elements[]} elements
  * @return {object} snapshot
  */
+
 function getSnapshot(elements) {
   if (!elements.length) throw new Error(`elements must be an Array`)
   // const snapshot = __getSnapshot(node)
@@ -46,9 +49,10 @@ function getSnapshot(elements) {
  * Takes an element snapshot and applies it to the element in the DOM.
  * Basically, it fixes the DOM to the point in time that the snapshot was
  * taken. This will put the DOM back in sync with React.
- * 
- * @param  {object} element snapshot
+ *
+ * @param {object} element snapshot
  */
+
 function applyElementSnapshot(snapshot) {
   const el = snapshot.node
   if (isTextNode(el)) {
@@ -85,9 +89,10 @@ function applyElementSnapshot(snapshot) {
  * of the elements in the snapshot as well as putting the elements back into
  * position relative to each other and also makes sure the last element is
  * before the same element as it was when the snapshot was taken.
- * 
+ *
  * @param  {snapshot} snapshot
  */
+
 function applySnapshot(snapshot) {
   const { elements, next, parent } = snapshot
   elements.forEach(applyElementSnapshot)
@@ -108,8 +113,8 @@ function applySnapshot(snapshot) {
 /**
  * A snapshot of one or more elements.
  */
-export default class ElementSnapshot {
 
+export default class ElementSnapshot {
   /**
    * constructor
    * @param  {elements[]} array of element to snapshot. Must be in order.
@@ -123,15 +128,17 @@ export default class ElementSnapshot {
   /**
    * apply the current snapshot to the DOM.
    */
+
   apply() {
     applySnapshot(this.snapshot)
   }
 
   /**
    * get the data you passed into the constructor.
-   * 
+   *
    * @return {object} data
    */
+
   getData() {
     return this.data
   }

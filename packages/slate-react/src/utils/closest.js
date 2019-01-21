@@ -7,6 +7,7 @@
  * @param  {String} css selector to match
  * @return {Element} the closest matching element
  */
+
 export default function closest(node, selector) {
   if (node.nodeType === Node.TEXT_NODE) {
     node = node.parentNode

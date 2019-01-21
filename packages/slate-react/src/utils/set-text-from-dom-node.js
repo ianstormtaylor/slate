@@ -13,6 +13,7 @@ import findPoint from './find-point'
  * @param {Editor} editor
  * @param {Node} domNode
  */
+
 export default function setTextFromDomNode(window, editor, domNode) {
   const point = findPoint(domNode, 0, editor)
   if (!point) return

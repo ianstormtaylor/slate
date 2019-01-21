@@ -12,7 +12,7 @@ export default {
       p(''),
       p(
         bold(
-          'Cursor to "mid|dle" then press space then backspace. Should say "middle" again.'
+          'Cursor to "mid|dle" then press space, backspace, space, backspace. Should say "middle".'
         )
       ),
       p('The middle word.'),

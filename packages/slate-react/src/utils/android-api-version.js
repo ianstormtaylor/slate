@@ -2,9 +2,10 @@ import { IS_ANDROID } from 'slate-dev-environment'
 
 /**
  * Array of regular expression matchers and their API version
- * 
+ *
  * @type {Array}
  */
+
 const ANDROID_API_VERSIONS = [
   [/^9([.]0|)/, 28],
   [/^8[.]1/, 27],
@@ -19,9 +20,10 @@ const ANDROID_API_VERSIONS = [
 
 /**
  * get the Android API version from the userAgent
- * 
+ *
  * @return {number} version
  */
+
 function getApiVersion() {
   if (!IS_ANDROID) return null
   const { userAgent } = window.navigator
