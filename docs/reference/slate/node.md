@@ -372,7 +372,6 @@ Check whether a node exists in the tree by `path` or `key`.
 
 Check whether a node is inside a `range`. This will return true for all [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.
 
-
 ### `isEmpty`
 
 `isEmpty() => Boolean`
