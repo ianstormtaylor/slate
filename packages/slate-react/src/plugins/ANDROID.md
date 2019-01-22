@@ -12,7 +12,7 @@ slate:android,slate:before,slate:after,slate:update,slate:reconcile
 
 ### Backspace Handling
 
-There appears know way to discern that backspace was pressed in the events. There are two options (1) check the DOM and (2) look for a signature in the mutation.
+There appears to be no way to discern that backspace was pressed by looking at the events. There are two options (1) check the DOM and (2) look for a signature in the mutation.
 
 For (1) we may be able to look at the current block and see if it disappears in the `input` event. If it no longer appears there, we know a `backspace` is likely what happened.
 
