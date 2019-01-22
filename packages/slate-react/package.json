@@ -27,7 +27,6 @@
     "slate-plain-serializer": "^0.6.33",
     "slate-prop-types": "^0.5.24",
     "slate-react-placeholder": "^0.1.12",
-    "snapback": "^0.8.0",
     "tiny-invariant": "^1.0.1",
     "tiny-warning": "^0.0.3"
   },
