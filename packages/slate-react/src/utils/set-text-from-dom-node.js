@@ -1,5 +1,19 @@
 import findPoint from './find-point'
 
+/**
+ * setTextFromDomNode lets us take a domNode and reconcile the text in the
+ * editor's Document such that it reflects the text in the DOM. This is the
+ * opposite of what the Editor usually does which takes the Editor's Document
+ * and React modifies the DOM to match. The purpose of this method is for
+ * composition changes where we don't know what changes the user made by
+ * looking at events. Instead we wait until the DOM is in a safe state, we
+ * read from it, and update the Editor's Document.
+ *
+ * @param {Window} window
+ * @param {Editor} editor
+ * @param {Node} domNode
+ */
+
 export default function setTextFromDomNode(window, editor, domNode) {
   const point = findPoint(domNode, 0, editor)
   if (!point) return

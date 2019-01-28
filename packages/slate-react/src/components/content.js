@@ -4,7 +4,12 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
-import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
+import {
+  IS_ANDROID,
+  IS_FIREFOX,
+  HAS_INPUT_EVENTS_LEVEL_2,
+} from 'slate-dev-environment'
+import ANDROID_API_VERSION from '../utils/android-api-version'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -23,6 +28,15 @@ const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "no
  */
 
 const debug = Debug('slate:content')
+
+/**
+ * Separate debug to easily see when the DOM has updated either by render or
+ * changing selection.
+ *
+ * @type {Function}
+ */
+
+debug.update = Debug('slate:update')
 
 /**
  * Content.
@@ -99,7 +113,7 @@ class Content extends React.Component {
 
     // COMPAT: Restrict scope of `beforeinput` to clients that support the
     // Input Events Level 2 spec, since they are preventable events.
-    if (HAS_INPUT_EVENTS_LEVEL_2) {
+    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
       this.element.addEventListener('beforeinput', this.handlers.onBeforeInput)
     }
 
@@ -120,7 +134,7 @@ class Content extends React.Component {
       )
     }
 
-    if (HAS_INPUT_EVENTS_LEVEL_2) {
+    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
       this.element.removeEventListener(
         'beforeinput',
         this.handlers.onBeforeInput
@@ -133,6 +147,14 @@ class Content extends React.Component {
    */
 
   componentDidUpdate() {
+    debug.update('componentDidUpdate')
+    // NOTE:
+    // Don't disable `updateSelection` on Android. Clicking a word and a
+    // suggestion breaks on API27. It does fix the crazy jumping cursor loop
+    // when doing an auto-suggest on a fully enclosed text with bold though.
+    // Most likely it still needs other fix issues though.
+    //
+    // if (IS_ANDROID) return
     this.updateSelection()
   }
 
@@ -148,6 +170,7 @@ class Content extends React.Component {
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { activeElement } = window.document
+    debug.update('updateSelection', { selection: selection.toJSON() })
 
     // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
@@ -260,6 +283,7 @@ class Content extends React.Component {
 
     if (updated) {
       debug('updateSelection', { selection, native, activeElement })
+      debug.update('updateSelection-applied', { selection })
     }
   }
 
@@ -339,7 +363,12 @@ class Content extends React.Component {
     // cases we don't need to trigger any changes, since our internal model is
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
-    if (handler == 'onSelect') {
+    //
+    // ANDROID: The updateSelection causes issues in Android when you are
+    // at the end of a black. The selection ends up to the left of the inserted
+    // character instead of to the right. This behavior continues even if
+    // you enter more than one character. (2019/01/03)
+    if (!IS_ANDROID && handler == 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
@@ -460,6 +489,12 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
+
+    debug.update('render', {
+      text: value.document.text,
+      selection: value.selection.toJSON(),
+      value: value.toJSON(),
+    })
 
     return (
       <Container
