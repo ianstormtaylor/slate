@@ -3,12 +3,12 @@ import getSelectionFromDom from './get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
 
 /**
- * A SlateSnapshot remembers the state of elements at a given point in time
+ * A DomSnapshot remembers the state of elements at a given point in time
  * and also remembers the state of the Editor at that time as well.
  * The state can be applied to the DOM at a time in the future.
  */
 
-export default class SlateSnapshot {
+export default class DomSnapshot {
   /**
    * Constructor.
    *

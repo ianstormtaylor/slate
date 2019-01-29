@@ -9,7 +9,7 @@ import setSelectionFromDom from '../utils/set-selection-from-dom'
 import setTextFromDomNode from '../utils/set-text-from-dom-node'
 import isInputDataEnter from '../utils/is-input-data-enter'
 import isInputDataLastChar from '../utils/is-input-data-last-char'
-import SlateSnapshot from '../utils/slate-snapshot'
+import DomSnapshot from '../utils/dom-snapshot'
 import Executor from '../utils/executor'
 
 const debug = Debug('slate:android')
@@ -49,7 +49,7 @@ function AndroidPlugin() {
    * DOM. We also need to cancel the `reconcile` operation as it interferes in
    * certain scenarios like hitting 'enter' at the end of a word.
    *
-   * @type {SlateSnapshot} [compositionEndSnapshot]
+   * @type {DomSnapshot} [compositionEndSnapshot]
    
    */
 
@@ -73,7 +73,7 @@ function AndroidPlugin() {
    * we need to undo the delete that Android does to keep React in sync with
    * the DOM.
    *
-   * @type {SlateSnapshot}
+   * @type {DomSnapshot}
    */
 
   let keyDownSnapshot = null
@@ -268,7 +268,7 @@ function AndroidPlugin() {
     switch (API_VERSION) {
       case 26:
       case 27:
-        compositionEndSnapshot = new SlateSnapshot(window, editor)
+        compositionEndSnapshot = new DomSnapshot(window, editor)
         // fixes a bug in Android API 26 & 27 where a `compositionEnd` is triggered
         // without the corresponding `compositionStart` event when clicking a
         // suggestion.
@@ -527,7 +527,7 @@ function AndroidPlugin() {
         // we only know if the user hit backspace if the `onInput` event that
         // follows has an `inputType` of `deleteContentBackward`. At that time
         // it's too late to stop the event.
-        keyDownSnapshot = new SlateSnapshot(window, editor, {
+        keyDownSnapshot = new DomSnapshot(window, editor, {
           before: true,
         })
 
@@ -554,7 +554,7 @@ function AndroidPlugin() {
           // we only know if the user hit backspace if the `onInput` event that
           // follows has an `inputType` of `deleteContentBackward`. At that time
           // it's too late to stop the event.
-          keyDownSnapshot = new SlateSnapshot(window, editor, {
+          keyDownSnapshot = new DomSnapshot(window, editor, {
             before: true,
           })
 
