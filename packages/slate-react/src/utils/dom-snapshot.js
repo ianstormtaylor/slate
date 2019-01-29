@@ -44,7 +44,6 @@ export default class DomSnapshot {
    */
 
   apply(editor) {
-    if (editor == null) throw new Error('editor is required')
     const { snapshot, selection } = this
     snapshot.apply()
     editor.moveTo(selection.anchor.key, selection.anchor.offset)
