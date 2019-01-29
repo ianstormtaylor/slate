@@ -16,9 +16,7 @@ function DOMPlugin(options = {}) {
   // Add Android specific handling separately before it gets to the other
   // plugins because it is specific (other browser don't need it) and finicky
   // (it has to come before other plugins to work).
-  const beforeBeforePlugins = IS_ANDROID
-    ? [AndroidPlugin(), DebugPlugin('slate:debug')]
-    : []
+  const beforeBeforePlugins = IS_ANDROID ? [AndroidPlugin()] : []
   const beforePlugin = BeforePlugin()
   const afterPlugin = AfterPlugin()
   return [...beforeBeforePlugins, beforePlugin, ...plugins, afterPlugin]
