@@ -1,6 +1,22 @@
-import closest from './closest'
 import getSelectionFromDom from './get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
+
+/**
+ * Returns the closest element that matches the selector.
+ * Unlike the native `Element.closest` method, this doesn't require the
+ * starting node to be an Element.
+ *
+ * @param  {Node} node to start at
+ * @param  {String} css selector to match
+ * @return {Element} the closest matching element
+ */
+
+function closest(node, selector, win = window) {
+  if (node.nodeType === win.Node.TEXT_NODE) {
+    node = node.parentNode
+  }
+  return node.closest(selector)
+}
 
 /**
  * A DomSnapshot remembers the state of elements at a given point in time
