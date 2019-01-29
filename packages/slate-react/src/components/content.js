@@ -148,13 +148,6 @@ class Content extends React.Component {
 
   componentDidUpdate() {
     debug.update('componentDidUpdate')
-    // NOTE:
-    // Don't disable `updateSelection` on Android. Clicking a word and a
-    // suggestion breaks on API27. It does fix the crazy jumping cursor loop
-    // when doing an auto-suggest on a fully enclosed text with bold though.
-    // Most likely it still needs other fix issues though.
-    //
-    // if (IS_ANDROID) return
     this.updateSelection()
   }
 
