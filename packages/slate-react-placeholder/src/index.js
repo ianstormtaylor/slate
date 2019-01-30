@@ -1,6 +1,12 @@
 import invariant from 'tiny-invariant'
 import React from 'react'
 
+/*
+ * Instance counter to enable unique marks for multiple Placeholder instances.
+ */
+
+let instanceCounter = 0
+
 /**
  * A plugin that renders a React placeholder for a given Slate node.
  *
@@ -9,6 +15,12 @@ import React from 'react'
  */
 
 function SlateReactPlaceholder(options = {}) {
+  const instanceId = instanceCounter++
+  const placeholderMark = {
+    type: 'placeholder',
+    data: { key: instanceId },
+  }
+
   const { placeholder, when } = options
 
   invariant(
@@ -41,7 +53,7 @@ function SlateReactPlaceholder(options = {}) {
     const decoration = {
       anchor: { key: first.key, offset: 0 },
       focus: { key: last.key, offset: last.text.length },
-      mark: { type: 'placeholder' },
+      mark: placeholderMark,
     }
 
     return [...others, decoration]
@@ -59,7 +71,7 @@ function SlateReactPlaceholder(options = {}) {
   function renderMark(props, editor, next) {
     const { children, mark } = props
 
-    if (mark.type === 'placeholder') {
+    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
       const style = {
         pointerEvents: 'none',
         display: 'inline-block',

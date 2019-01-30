@@ -245,9 +245,9 @@ Move the current selection to the `{Edge}` of the closest inline parent. Where `
 
 Move the current selection to the `{Edge}` of the current text node. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
 
-### `moveToRangeOf`
+### `moveToRangeOfNode`
 
-`moveToRangeOf(node: Node) => Editor`
+`moveToRangeOfNode(node: Node) => Editor`
 
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 

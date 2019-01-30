@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .insertNodeByKey('a0', 0, <paragraph>Hello world</paragraph>)
     .insertNodeByKey('a1', 1, <paragraph>Hello world</paragraph>)
     .insertNodeByKey('a2', 2, <paragraph>Hello world</paragraph>)
@@ -29,5 +30,5 @@ const value = (
 )
 
 module.exports.input = function() {
-  return value.change()
+  return new Editor({ value })
 }

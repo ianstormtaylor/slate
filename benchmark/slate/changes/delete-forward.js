@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .deleteForward()
     .deleteForward()
     .deleteForward()
@@ -31,5 +32,5 @@ const value = (
 )
 
 module.exports.input = () => {
-  return value.change()
+  return new Editor({ value })
 }

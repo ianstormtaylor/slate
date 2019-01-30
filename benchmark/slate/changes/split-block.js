@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .splitBlock()
     .moveForward(5)
     .splitBlock()
@@ -35,5 +36,5 @@ const value = (
 )
 
 module.exports.input = function() {
-  return value.change()
+  return new Editor({ value })
 }

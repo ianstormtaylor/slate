@@ -809,7 +809,11 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 }
 
 const findInsertionNode = (fragment, document, startKey) => {
-  const hasSingleNode = object => object && object.nodes.size === 1
+  const hasSingleNode = object => {
+    if (!object || object.object === 'text') return
+    return object.nodes.size === 1
+  }
+
   const firstNode = object => object && object.nodes.first()
   let node = fragment
 
@@ -1112,7 +1116,7 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
     wrappers.forEach(block => {
       const first = block.nodes.first()
       const last = block.nodes.last()
-      const parent = document.getParent(block.key)
+      const parent = editor.value.document.getParent(block.key)
       const index = parent.nodes.indexOf(block)
 
       const children = block.nodes.filter(child => {

@@ -183,19 +183,25 @@ Commands.mergeNodeByPath = (editor, path) => {
 }
 
 /**
- * Move a node by `path` to a new parent by `newPath` and `index`.
+ * Move a node by `path` to a new parent by `newParentPath` and `newIndex`.
  *
  * @param {Editor} editor
  * @param {Array} path
- * @param {String} newPath
- * @param {Number} index
+ * @param {String} newParentPath
+ * @param {Number} newIndex
  */
 
-Commands.moveNodeByPath = (editor, path, newPath, newIndex) => {
+Commands.moveNodeByPath = (editor, path, newParentPath, newIndex) => {
   const { value } = editor
 
-  // If the operation path and newPath are the same,
+  // If the operation path and newParentPath are the same,
   // this should be considered a NOOP
+  if (PathUtils.isEqual(path, newParentPath)) {
+    return editor
+  }
+
+  const newPath = newParentPath.concat(newIndex)
+
   if (PathUtils.isEqual(path, newPath)) {
     return editor
   }
@@ -204,7 +210,7 @@ Commands.moveNodeByPath = (editor, path, newPath, newIndex) => {
     type: 'move_node',
     value,
     path,
-    newPath: newPath.concat(newIndex),
+    newPath,
   })
 }
 

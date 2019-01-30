@@ -3,16 +3,17 @@ import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
-import { IS_IOS } from 'slate-dev-environment'
+import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
 import findNode from '../utils/find-node'
-import findPoint from '../utils/find-point'
 import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
 import setEventTransfer from '../utils/set-event-transfer'
+import setSelectionFromDom from '../utils/set-selection-from-dom'
+import setTextFromDomNode from '../utils/set-text-from-dom-node'
 
 /**
  * Debug.
@@ -391,7 +392,7 @@ function AfterPlugin(options = {}) {
     // followed by a `selectionchange`, so we need to deselect here to prevent
     // the old selection from being set by the `updateSelection` of `<Content>`,
     // preventing the `selectionchange` from firing. (2018/11/07)
-    if (isMouseDown) {
+    if (isMouseDown && !IS_IE && !IS_EDGE) {
       editor.deselect().focus()
     } else {
       editor.focus()
@@ -409,62 +410,15 @@ function AfterPlugin(options = {}) {
    */
 
   function onInput(event, editor, next) {
+    debug('onInput')
     const window = getWindow(event.target)
-    const { value } = editor
 
     // Get the selection point.
-    const native = window.getSelection()
-    const { anchorNode } = native
-    const point = findPoint(anchorNode, 0, editor)
-    if (!point) return next()
+    const selection = window.getSelection()
+    const { anchorNode } = selection
 
-    // Get the text node and leaf in question.
-    const { document, selection } = value
-    const node = document.getDescendant(point.key)
-    const block = document.getClosestBlock(node.key)
-    const leaves = node.getLeaves()
-    const lastText = block.getLastText()
-    const lastLeaf = leaves.last()
-    let start = 0
-    let end = 0
-
-    const leaf =
-      leaves.find(r => {
-        start = end
-        end += r.text.length
-        if (end > point.offset) return true
-      }) || lastLeaf
-
-    // Get the text information.
-    const { text } = leaf
-    let { textContent } = anchorNode
-    const isLastText = node == lastText
-    const isLastLeaf = leaf == lastLeaf
-    const lastChar = textContent.charAt(textContent.length - 1)
-
-    // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
-    // we will have added another new line in <Leaf>'s render method to account
-    // for browsers collapsing a single trailing new lines, so remove it.
-    if (isLastText && isLastLeaf && lastChar == '\n') {
-      textContent = textContent.slice(0, -1)
-    }
-
-    // If the text is no different, abort.
-    if (textContent == text) return next()
-
-    debug('onInput', { event })
-
-    // Determine what the selection should be after changing the text.
-    const delta = textContent.length - text.length
-    const corrected = selection.moveToEnd().moveForward(delta)
-    let entire = selection
-      .moveAnchorTo(point.key, start)
-      .moveFocusTo(point.key, end)
-
-    entire = document.resolveRange(entire)
-
-    // Change the current value to have the leaf's text replaced.
-    editor.insertTextAtRange(entire, textContent, leaf.marks).select(corrected)
+    setTextFromDomNode(window, editor, anchorNode)
+    setSelectionFromDom(window, editor, selection)
     next()
   }
 
@@ -677,82 +631,9 @@ function AfterPlugin(options = {}) {
 
   function onSelect(event, editor, next) {
     debug('onSelect', { event })
-
     const window = getWindow(event.target)
-    const { value } = editor
-    const { document } = value
-    const native = window.getSelection()
-
-    // If there are no ranges, the editor was blurred natively.
-    if (!native.rangeCount) {
-      editor.blur()
-      return
-    }
-
-    // Otherwise, determine the Slate selection from the native one.
-    let range = findRange(native, editor)
-
-    if (!range) {
-      return
-    }
-
-    const { anchor, focus } = range
-    const anchorText = document.getNode(anchor.key)
-    const focusText = document.getNode(focus.key)
-    const anchorInline = document.getClosestInline(anchor.key)
-    const focusInline = document.getClosestInline(focus.key)
-    const focusBlock = document.getClosestBlock(focus.key)
-    const anchorBlock = document.getClosestBlock(anchor.key)
-
-    // COMPAT: If the anchor point is at the start of a non-void, and the
-    // focus point is inside a void node with an offset that isn't `0`, set
-    // the focus offset to `0`. This is due to void nodes <span>'s being
-    // positioned off screen, resulting in the offset always being greater
-    // than `0`. Since we can't know what it really should be, and since an
-    // offset of `0` is less destructive because it creates a hanging
-    // selection, go with `0`. (2017/09/07)
-    if (
-      anchorBlock &&
-      !editor.isVoid(anchorBlock) &&
-      anchor.offset == 0 &&
-      focusBlock &&
-      editor.isVoid(focusBlock) &&
-      focus.offset != 0
-    ) {
-      range = range.setFocus(focus.setOffset(0))
-    }
-
-    // COMPAT: If the selection is at the end of a non-void inline node, and
-    // there is a node after it, put it in the node after instead. This
-    // standardizes the behavior, since it's indistinguishable to the user.
-    if (
-      anchorInline &&
-      !editor.isVoid(anchorInline) &&
-      anchor.offset == anchorText.text.length
-    ) {
-      const block = document.getClosestBlock(anchor.key)
-      const nextText = block.getNextText(anchor.key)
-      if (nextText) range = range.moveAnchorTo(nextText.key, 0)
-    }
-
-    if (
-      focusInline &&
-      !editor.isVoid(focusInline) &&
-      focus.offset == focusText.text.length
-    ) {
-      const block = document.getClosestBlock(focus.key)
-      const nextText = block.getNextText(focus.key)
-      if (nextText) range = range.moveFocusTo(nextText.key, 0)
-    }
-
-    let selection = document.createSelection(range)
-    selection = selection.setIsFocused(true)
-
-    // Preserve active marks from the current selection.
-    // They will be cleared by `editor.select` if the selection actually moved.
-    selection = selection.set('marks', value.selection.marks)
-
-    editor.select(selection)
+    const selection = window.getSelection()
+    setSelectionFromDom(window, editor, selection)
     next()
   }
 
