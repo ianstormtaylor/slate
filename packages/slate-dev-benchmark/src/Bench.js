@@ -27,7 +27,7 @@ class Bench {
     this.name = name
     this.options = makeOptions({ ...suite.options, ...options })
     this.isFinished = false
-    this.inputer = () => undefined
+    this.inputter = () => undefined
     this.runner = () => {}
     this.report = { ...errorReport }
     suite.addBench(this)
@@ -45,22 +45,22 @@ class Bench {
 
   /**
    * Set the method to generate (different} inputs for each run
-   * @param {Array|Function|Scalar} inputer
+   * @param {Array|Function|Scalar} inputter
    * @return {void}
    */
 
-  input(inputer) {
-    if (Array.isArray(inputer)) {
-      this.inputer = index => inputer[index % inputer.length]
+  input(inputter) {
+    if (Array.isArray(inputter)) {
+      this.inputter = index => inputter[index % inputter.length]
       return
     }
 
-    if (typeof inputer === 'function') {
-      this.inputer = inputer
+    if (typeof inputter === 'function') {
+      this.inputter = inputter
       return
     }
 
-    this.inputer = () => inputer
+    this.inputter = () => inputter
   }
 
   /**
@@ -84,7 +84,7 @@ class Bench {
   async compose(times, initial) {
     times = Math.floor(times)
     const isAsync = this.options.async
-    const { runner, inputer } = this
+    const { runner, inputter } = this
 
     const { maxTime } = this.options
     let seq = Number.isFinite(this.options.maxTries) ? 1 : NaN
@@ -125,7 +125,7 @@ class Bench {
 
     function runBundleTasks(tries, initialIndex) {
       const inputs = Array.from({ length: tries }).map(index =>
-        inputer(index + initialIndex)
+        inputter(index + initialIndex)
       )
       const timer = new Timer()
       timer.start()
