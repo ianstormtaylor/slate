@@ -2,12 +2,13 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
 module.exports.default = function(value) {
   value.document.getTextsAtRange(value.selection)
 }
 
-const value = (
+let value = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
@@ -23,8 +24,10 @@ const value = (
     </document>
   </value>
 )
-  .change()
-  .moveToRangeOfDocument().value
+
+const editor = new Editor({ value })
+editor.moveToRangeOfDocument()
+value = editor.value
 
 module.exports.input = function() {
   return value
