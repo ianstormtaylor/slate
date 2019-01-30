@@ -351,9 +351,17 @@ function transform(path, operation) {
     const npAbove = isAbove(np, path)
 
     if (pAbove) {
-      path = np.concat(path.slice(p.size))
+      if (isAfter(np, p)) {
+        path = decrement(np, 1, min(np, p) - 1).concat(path.slice(p.size))
+      } else {
+        path = np.concat(path.slice(p.size))
+      }
     } else if (pEqual) {
-      path = np
+      if (isAfter(np, p)) {
+        path = decrement(np, 1, min(np, p) - 1)
+      } else {
+        path = np
+      }
     } else {
       if (pYounger) {
         path = decrement(path, 1, pIndex)
