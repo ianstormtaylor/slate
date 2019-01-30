@@ -12,7 +12,7 @@ module.exports.default = function(value) {
   ReactDOM.renderToStaticMarkup(el)
 }
 
-const value = (
+let value = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
@@ -50,6 +50,8 @@ const decorations = texts.flatMap((t, index) => {
   ]
 })
 
-const editor = new Editor({ value, decorations })
+value = value.setProperties({ decorations })
+
+const editor = new Editor({ value })
 
 module.exports.input = editor.value
