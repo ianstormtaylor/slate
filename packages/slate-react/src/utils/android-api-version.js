@@ -21,7 +21,7 @@ const ANDROID_API_VERSIONS = [
 /**
  * get the Android API version from the userAgent
  *
- * @return {number} version
+ * @return {Number} version
  */
 
 function getApiVersion() {
