@@ -1,6 +1,5 @@
 import { IS_ANDROID } from 'slate-dev-environment'
 import AndroidPlugin from './android'
-import DebugPlugin from './debug'
 import AfterPlugin from './after'
 import BeforePlugin from './before'
 
