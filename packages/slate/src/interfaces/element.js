@@ -1763,13 +1763,12 @@ class ElementInterface {
     const newParentPath = PathUtils.lift(newPath)
     this.assertNode(newParentPath)
 
-    const [p, np] = PathUtils.crop(path, newPath)
-    const position = PathUtils.compare(p, np)
+    const position = PathUtils.compare(path, newPath)
 
     // If the old path ends above and before a node in the new path, then
     // removing it will alter the target, so we need to adjust the new path.
     if (path.size < newPath.size && position === -1) {
-      newPath = PathUtils.decrement(newPath, 1, p.size - 1)
+      newPath = PathUtils.decrement(newPath, 1, path.size - 1)
     }
 
     let ret = this
