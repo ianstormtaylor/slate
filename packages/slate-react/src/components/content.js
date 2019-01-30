@@ -9,7 +9,6 @@ import {
   IS_FIREFOX,
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
-import ANDROID_API_VERSION from '../utils/android-api-version'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -113,7 +112,7 @@ class Content extends React.Component {
 
     // COMPAT: Restrict scope of `beforeinput` to clients that support the
     // Input Events Level 2 spec, since they are preventable events.
-    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
+    if (HAS_INPUT_EVENTS_LEVEL_2) {
       this.element.addEventListener('beforeinput', this.handlers.onBeforeInput)
     }
 
@@ -134,7 +133,7 @@ class Content extends React.Component {
       )
     }
 
-    if (HAS_INPUT_EVENTS_LEVEL_2 || ANDROID_API_VERSION === 28) {
+    if (HAS_INPUT_EVENTS_LEVEL_2) {
       this.element.removeEventListener(
         'beforeinput',
         this.handlers.onBeforeInput
@@ -358,7 +357,7 @@ class Content extends React.Component {
     // to make sure it is in sync. (2017/10/16)
     //
     // ANDROID: The updateSelection causes issues in Android when you are
-    // at the end of a black. The selection ends up to the left of the inserted
+    // at the end of a block. The selection ends up to the left of the inserted
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
     if (!IS_ANDROID && handler == 'onSelect') {

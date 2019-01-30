@@ -2,7 +2,7 @@ import Debug from 'debug'
 import getWindow from 'get-window'
 import pick from 'lodash/pick'
 
-import API_VERSION from '../utils/android-api-version'
+import { ANDROID_API_VERSION } from 'slate-dev-environment'
 import fixSelectionInZeroWidthBlock from '../utils/fix-selection-in-zero-width-block'
 import getSelectionFromDom from '../utils/get-selection-from-dom'
 import setSelectionFromDom from '../utils/set-selection-from-dom'
@@ -15,7 +15,7 @@ import Executor from '../utils/executor'
 const debug = Debug('slate:android')
 debug.reconcile = Debug('slate:reconcile')
 
-debug('API_VERSION', { API_VERSION })
+debug('ANDROID_API_VERSION', { ANDROID_API_VERSION })
 
 /**
  * Define variables related to composition state.
@@ -175,7 +175,7 @@ function AndroidPlugin() {
       return
     }
 
-    switch (API_VERSION) {
+    switch (ANDROID_API_VERSION) {
       case 25:
         // prevent onBeforeInput to allow selecting an alternate suggest to
         // work.
@@ -265,7 +265,7 @@ function AndroidPlugin() {
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
 
-    switch (API_VERSION) {
+    switch (ANDROID_API_VERSION) {
       case 26:
       case 27:
         compositionEndSnapshot = new DomSnapshot(window, editor)
@@ -330,7 +330,7 @@ function AndroidPlugin() {
       e: pick(event, ['data', 'nativeEvent', 'inputType', 'isComposing']),
     })
 
-    switch (API_VERSION) {
+    switch (ANDROID_API_VERSION) {
       case 24:
       case 25:
         break
@@ -339,7 +339,7 @@ function AndroidPlugin() {
       case 28:
         const { nativeEvent } = event
 
-        if (API_VERSION === 28) {
+        if (ANDROID_API_VERSION === 28) {
           // NOTE API 28:
           // When a user hits space and then backspace in `middle` we end up
           // with `midle`.
@@ -373,7 +373,7 @@ function AndroidPlugin() {
           }
         }
 
-        if (API_VERSION === 26 || API_VERSION === 27) {
+        if (ANDROID_API_VERSION === 26 || ANDROID_API_VERSION === 27) {
           if (compositionEndAction === 'period') {
             debug('onInput:period:abort')
             // This means that there was a `beforeInput` that indicated the
@@ -421,7 +421,7 @@ function AndroidPlugin() {
         // Some keys like '.' are input without compositions. This happens
         // in API28. It might be happening in API 27 as well. Check by typing
         // `It me. No.` On a blank line.
-        if (API_VERSION === 28) {
+        if (ANDROID_API_VERSION === 28) {
           debug('onInput:fallback')
           const { anchorNode } = window.getSelection()
           nodes.add(anchorNode)
@@ -468,7 +468,7 @@ function AndroidPlugin() {
 
     const window = getWindow(event.target)
 
-    switch (API_VERSION) {
+    switch (ANDROID_API_VERSION) {
       // 1. We want to allow enter keydown to allows go through
       // 2. We want to deny keydown, I think, when it fires before the composition
       //    or something. Need to remember what it was.
@@ -583,7 +583,7 @@ function AndroidPlugin() {
   function onSelect(event, editor, next) {
     debug('onSelect', { event, status })
 
-    switch (API_VERSION) {
+    switch (ANDROID_API_VERSION) {
       // We don't want to have the selection move around in an onSelect because
       // it happens after we press `enter` in the same transaction. This
       // causes the cursor position to not be properly placed.
