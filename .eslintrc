@@ -19,6 +19,7 @@
   "rules": {
     "constructor-super": "error",
     "dot-notation": ["error", { "allowKeywords": true }],
+    "eqeqeq": ["error", "smart"],
     "import/default": "error",
     "import/export": "error",
     "import/first": "error",
