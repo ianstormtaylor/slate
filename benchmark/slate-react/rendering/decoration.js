@@ -4,14 +4,15 @@
 const React = require('react')
 const ReactDOM = require('react-dom/server')
 const h = require('../../helpers/h')
-const { Editor } = require('slate-react')
+const { Editor } = require('slate')
+const { Editor: EditorComponent } = require('slate-react')
 
 module.exports.default = function(value) {
-  const el = React.createElement(Editor, { value })
+  const el = React.createElement(EditorComponent, { value })
   ReactDOM.renderToStaticMarkup(el)
 }
 
-const value = (
+let value = (
   <value>
     <document>
       {Array.from(Array(10)).map(() => (
@@ -49,4 +50,8 @@ const decorations = texts.flatMap((t, index) => {
   ]
 })
 
-module.exports.input = value.change().setValue({ decorations }).value
+value = value.setProperties({ decorations })
+
+const editor = new Editor({ value })
+
+module.exports.input = editor.value

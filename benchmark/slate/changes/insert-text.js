@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .insertText('one')
     .moveForward(5)
     .insertText('two')
@@ -34,6 +35,6 @@ const value = (
   </value>
 )
 
-module.exports.input = function() {
-  return value.change()
+module.exports.input = () => {
+  return new Editor({ value })
 }

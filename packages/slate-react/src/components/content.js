@@ -173,9 +173,10 @@ class Content extends React.Component {
     }
 
     // If the Slate selection is focused, but the DOM's active element is not
-    // the editor, we need to focus it.
+    // the editor, we need to focus it. We prevent scrolling because we handle
+    // scrolling to the correct selection.
     if (selection.isFocused && activeElement !== this.element) {
-      this.element.focus()
+      this.element.focus({ preventScroll: true })
       updated = true
     }
 

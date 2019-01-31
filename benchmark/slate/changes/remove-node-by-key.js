@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function({ change, text }) {
-  change
+module.exports.default = function(editor) {
+  editor
     .removeNodeByKey('T1')
     .removeNodeByKey('T2')
     .removeNodeByKey('T3')
@@ -34,6 +35,5 @@ const value = (
 const text = value.document.getLastText()
 
 module.exports.input = function() {
-  const change = value.change()
-  return { change, text }
+  return new Editor({ value })
 }

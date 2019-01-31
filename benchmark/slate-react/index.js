@@ -29,7 +29,7 @@ module.exports.run = function(include) {
       const dir = resolve(benchmarkDir, benchmark)
       const module = require(dir)
       const fn = module.default
-      bench.input(() => module.input)
+      bench.input(module.input)
 
       bench.run(input => {
         fn(input)
