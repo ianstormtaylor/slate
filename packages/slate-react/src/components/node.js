@@ -142,16 +142,15 @@ class Node extends React.Component {
     const children = []
 
     node.nodes.forEach((child, i) => {
-      const containedInSelection =
+      const contained =
         containedInSelection ||
         (!!indexes && indexes.start < i && i < indexes.end - 1)
-      const onEdgeOfSelection =
-        !!indexes && (i === indexes.start || i === indexes.end - 1)
+      const onEdge = !!indexes && (i === indexes.start || i === indexes.end - 1)
 
       children.push(
         this.renderNode(
           child,
-          { onEdgeOfSelection, containedInSelection },
+          { onEdgeOfSelection: onEdge, containedInSelection: contained },
           childrenDecorations[i],
           i
         )
