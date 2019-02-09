@@ -41,8 +41,7 @@
     "mocha": "^2.5.3",
     "react-test-renderer": "^16.6.3",
     "slate": "^0.44.10",
-    "slate-hyperscript": "^0.11.25",
-    "slate-simulator": "^0.4.67"
+    "slate-hyperscript": "^0.11.25"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
