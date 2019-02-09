@@ -807,36 +807,86 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
   })
 }
 
-const findInsertionNode = (fragment, document, startKey) => {
-  const hasSingleNode = object => {
-    if (!object || object.object === 'text') return
-    return object.nodes.size === 1
+/**
+ * Get the deepest single child block inside `fragment` whose reversed block
+ * ancestors match the reversed block ancestors of the `document` starting at
+ * the `documentKey`.
+ *
+ * @param {Document} document
+ * @param {string} documentKey
+ * @param {Document} fragment
+ * @return {Node}
+ */
+
+const findInsertionNode = (fragment, document, documentKey) => {
+  // Find the deepest block in a doc with no siblings.
+  const deepestSingleBlock = doc => {
+    let result = doc
+
+    while (result.nodes.size === 1 && result.nodes.first().object === 'block') {
+      result = result.nodes.first()
+    }
+
+    return result
   }
 
-  const firstNode = object => object && object.nodes.first()
-  let node = fragment
+  // Return whether every block in the `fragmentAncestors` list has the
+  // same type as the block in `documentAncestors` with the same index.
+  const ancestorTypesMatch = (fragmentAncestors, documentAncestors) => {
+    return (
+      documentAncestors.size >= fragmentAncestors.size &&
+      fragmentAncestors.every((fragmentNode, i) => {
+        return documentAncestors.get(i).type === fragmentNode.type
+      })
+    )
+  }
 
-  if (hasSingleNode(fragment)) {
-    let fragmentInner = firstNode(fragment)
-
-    const matches = documentNode => documentNode.type === fragmentInner.type
-    let documentInner = document.getFurthest(startKey, matches)
-
-    if (documentInner === document.getParent(startKey)) node = fragmentInner
-
-    while (hasSingleNode(fragmentInner) && hasSingleNode(documentInner)) {
-      fragmentInner = firstNode(fragmentInner)
-      documentInner = firstNode(documentInner)
-
-      if (fragmentInner.type === documentInner.type) {
-        node = fragmentInner
-      } else {
-        break
+  // Given two reverse lists of ancestors, check if all fragment ancestor types
+  // match the doc ancestors at some position.
+  const findMatchIndex = (documentAncestors, fragmentAncestors) => {
+    for (let fragIdx = 0; fragIdx < fragmentAncestors.size; fragIdx++) {
+      // The docIdx loop relaxes our check in that we can still match if there
+      // are node type differences leaf-side.
+      // This is important for example if our fragment inserts multiple siblings
+      // or inserts another type while the tree structure remains the same.
+      for (
+        let docIdx = 0;
+        docIdx <= documentAncestors.size - fragmentAncestors.size;
+        docIdx++
+      ) {
+        if (
+          ancestorTypesMatch(
+            fragmentAncestors.slice(fragIdx),
+            documentAncestors.slice(docIdx)
+          )
+        ) {
+          return fragmentAncestors.get(fragIdx)
+        }
       }
     }
+    return fragment
   }
 
-  return node
+  // Get the type definitions for all ancestors up from node with key `key`,
+  // except the document object.
+  const getAncestorBlocks = (doc, key) => {
+    return doc
+      .getAncestors(key)
+      .slice(1)
+      .push(doc.getNode(key))
+      .reverse()
+  }
+
+  const fragmentStartBlock = deepestSingleBlock(fragment)
+
+  if (!fragmentStartBlock) {
+    return fragment
+  }
+
+  const documentAncestors = getAncestorBlocks(document, documentKey)
+  const fragmentAncestors = getAncestorBlocks(fragment, fragmentStartBlock.key)
+
+  return findMatchIndex(documentAncestors, fragmentAncestors)
 }
 
 /**
