@@ -37,7 +37,14 @@ const Image = styled('img')`
  */
 
 function isImage(url) {
-  return !!imageExtensions.find(url.endsWith)
+  return !!imageExtensions.find(
+    element =>
+      element ===
+      url
+        .split('?')[0]
+        .split('.')
+        .pop()
+  )
 }
 
 /**
