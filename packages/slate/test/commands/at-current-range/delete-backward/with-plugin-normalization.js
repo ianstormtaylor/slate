@@ -1,8 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Editor, PathUtils, Block, Text } from 'slate'
-import assert from 'assert'
+import { Block, Text } from 'slate'
 
 function normalizeNode(node, editor, next) {
   if (node.type === 'container' && node.nodes.first().type === 'container') {

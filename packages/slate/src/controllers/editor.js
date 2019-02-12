@@ -528,17 +528,15 @@ function getDirtyPaths(operation) {
         return []
       }
 
-      const oldAncestors = PathUtils.getAncestors(path)
-        .reduce((arr, p) => {
-          arr.push(...PathUtils.transform(p, operation).toArray())
-          return arr
-        }, [])
+      const oldAncestors = PathUtils.getAncestors(path).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
-      const newAncestors = PathUtils.getAncestors(newPath)
-        .reduce((arr, p) => {
-          arr.push(...PathUtils.transform(p, operation).toArray())
-          return arr
-        }, [])
+      const newAncestors = PathUtils.getAncestors(newPath).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
       return [...oldAncestors, ...newAncestors]
     }
