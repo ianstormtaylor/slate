@@ -844,16 +844,19 @@ const findInsertionNode = (fragment, document, documentKey) => {
   // Given two reverse lists of ancestors, check if all fragment ancestor types
   // match the doc ancestors at some position.
   const matchingFragmentAncestor = (documentAncestors, fragmentAncestors) => {
+    const depthDifference = documentAncestors.size - fragmentAncestors.size
+
+    // There is nothing to align if the fragment is deeper than the document.
+    if (depthDifference < 0) {
+      return fragment
+    }
+
     for (let fragIdx = 0; fragIdx < fragmentAncestors.size; fragIdx++) {
       // The docIdx loop relaxes our check in that we can still match if there
       // are node type differences leaf-side.
       // This is important for example if our fragment inserts multiple siblings
       // or inserts another type while the tree structure remains the same.
-      for (
-        let docIdx = 0;
-        docIdx <= documentAncestors.size - fragmentAncestors.size;
-        docIdx++
-      ) {
+      for (let docIdx = 0; docIdx <= depthDifference; docIdx++) {
         if (
           ancestorTypesMatch(
             fragmentAncestors.slice(fragIdx),
