@@ -4,11 +4,8 @@ import h from '../../../helpers/h'
 import { Editor, PathUtils, Block, Text } from 'slate'
 import assert from 'assert'
 
-let calls = 0
-
 function normalizeNode(node, editor, next) {
   if (node.type === 'container' && node.nodes.first().type === 'container') {
-    calls = 1
     return () =>
       editor.insertNodeByKey(
         node.key,
@@ -27,7 +24,6 @@ export const plugins = [{ normalizeNode }]
 
 export default function(editor) {
   editor.deleteBackward()
-  assert(calls === 1)
 }
 
 export const input = (
