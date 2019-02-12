@@ -827,7 +827,7 @@ const findInsertionNode = (fragment, document, documentKey) => {
       result = result.nodes.first()
     }
 
-    return result
+    return result === doc ? null : result
   }
 
   // Return whether every block in the `fragmentAncestors` list has the
@@ -843,7 +843,7 @@ const findInsertionNode = (fragment, document, documentKey) => {
 
   // Given two reverse lists of ancestors, check if all fragment ancestor types
   // match the doc ancestors at some position.
-  const findMatchIndex = (documentAncestors, fragmentAncestors) => {
+  const matchingFragmentAncestor = (documentAncestors, fragmentAncestors) => {
     for (let fragIdx = 0; fragIdx < fragmentAncestors.size; fragIdx++) {
       // The docIdx loop relaxes our check in that we can still match if there
       // are node type differences leaf-side.
@@ -886,7 +886,7 @@ const findInsertionNode = (fragment, document, documentKey) => {
   const documentAncestors = getAncestorBlocks(document, documentKey)
   const fragmentAncestors = getAncestorBlocks(fragment, fragmentStartBlock.key)
 
-  return findMatchIndex(documentAncestors, fragmentAncestors)
+  return matchingFragmentAncestor(documentAncestors, fragmentAncestors)
 }
 
 /**
