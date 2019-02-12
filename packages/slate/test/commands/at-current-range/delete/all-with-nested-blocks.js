@@ -19,7 +19,10 @@ export const input = (
           <block type="container">
             <paragraph> four</paragraph>
             <block type="container">
-              <paragraph> five<focus /></paragraph>
+              <paragraph>
+                {' '}
+                five<focus />
+              </paragraph>
             </block>
           </block>
         </block>
@@ -32,7 +35,9 @@ export const output = (
   <value>
     <document>
       <block type="container">
-        <paragraph key="original paragraph"><cursor /></paragraph>
+        <paragraph key="original paragraph">
+          <cursor />
+        </paragraph>
       </block>
     </document>
   </value>
