@@ -115,7 +115,7 @@ describe('slate', () => {
     const { input, output, options = {}, plugins: module_plugins } = module
     const fn = module.default
     const editor = new Editor({
-      plugins: module_plugins ? plugins.concat(module_plugins) : plugins
+      plugins: module_plugins ? plugins.concat(module_plugins) : plugins,
     })
     const opts = { preserveSelection: true, ...options }
 
