@@ -160,4 +160,9 @@ describe('slate', () => {
 
     assert.deepEqual(actual, expected)
   })
+
+  fixtures(__dirname, 'utils/path-utils', ({ module }) => {
+    const fn = module.default
+    fn()
+  })
 })
