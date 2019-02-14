@@ -340,15 +340,10 @@ function transform(path, operation) {
 
   if (type === 'move_node') {
     const { newPath: np } = operation
-    const npIndex = np.size - 1
-    const npEqual = isEqual(np, path)
 
     if (isEqual(p, np)) {
       return List([path])
     }
-
-    const npYounger = isYounger(np, path)
-    const npAbove = isAbove(np, path)
 
     if (pAbove) {
       if (isAfter(np, p)) {
@@ -357,7 +352,7 @@ function transform(path, operation) {
         path = np.concat(path.slice(p.size))
       }
     } else if (pEqual) {
-      if (isAfter(np, p)) {
+      if (isYounger(p, np)) {
         path = decrement(np, 1, min(np, p) - 1)
       } else {
         path = np
@@ -367,8 +362,8 @@ function transform(path, operation) {
         path = decrement(path, 1, pIndex)
       }
 
-      if (npEqual || npYounger || npAbove) {
-        path = increment(path, 1, npIndex)
+      if (isEqual(np, path) || isYounger(np, path) || isAbove(np, path)) {
+        path = increment(path, 1, np.size - 1)
       }
     }
   }
