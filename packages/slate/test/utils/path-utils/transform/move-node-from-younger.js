@@ -1,7 +1,8 @@
 import assert from 'assert'
 import { PathUtils, Operation } from 'slate'
 
-const assertEqualPaths = (p1, p2) => assert.deepEqual(p1.toArray(), p2.toArray())
+const assertEqualPaths = (p1, p2) =>
+  assert.deepEqual(p1.toArray(), p2.toArray())
 
 export default () => {
   const path = PathUtils.create([0, 1, 1])
@@ -14,7 +15,7 @@ export default () => {
   const before_old = PathUtils.create([0, 1, 0])
   const result_before_old = PathUtils.transform(before_old, op).first()
   assertEqualPaths(result_before_old, before_old)
-  
+
   const after_old = PathUtils.create([0, 1, 2])
   const result_after_old = PathUtils.transform(after_old, op).first()
   assertEqualPaths(result_after_old, PathUtils.decrement(after_old))

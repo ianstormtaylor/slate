@@ -1,7 +1,8 @@
 import assert from 'assert'
 import { PathUtils, Operation } from 'slate'
 
-const assertEqualPaths = (p1, p2) => assert.deepEqual(p1.toArray(), p2.toArray())
+const assertEqualPaths = (p1, p2) =>
+  assert.deepEqual(p1.toArray(), p2.toArray())
 
 export default () => {
   const path = PathUtils.create([0, 1, 0, 1])
