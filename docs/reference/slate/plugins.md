@@ -14,6 +14,7 @@ Plugins are plain JavaScript objects, containing a set of middleware functions t
   onChange: Function,
   onCommand: Function,
   onConstruct: Function,
+  onSetValue: Function,
   onQuery: Function,
   validateNode: Function,
 }
@@ -87,6 +88,12 @@ The `onQuery` hook is a low-level way to have access to all of the queries passi
 The `onConstruct` hook is called when a new instance of `Editor` is created. This is where you can call `editor.registerCommand` or `editor.registerQuery`.
 
 > 🤖 This is always called with the low-level `Editor` instance, and not the React `<Editor>` component. And it is called before the React editor has its `value` set based on its props. It is purely used for editor-related configuration setup, and not for any schema-related or value-related purposes.
+
+### `onSetValue`
+
+`onSetValue(editor: Editor, next: Function) => Void`
+
+The `onSetValue` hook is called when current value changes without an operation being applied, e.g. when the `Editor` is first created or as a result of `Editor.setValue()`.
 
 ### `onQuery`
 

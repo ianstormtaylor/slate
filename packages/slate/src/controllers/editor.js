@@ -381,6 +381,8 @@ class Editor {
       this.normalize()
     }
 
+    this.run('onSetValue')
+
     return this
   }
 
