@@ -291,7 +291,14 @@ export default class App extends React.Component {
         <Switch>
           {EXAMPLES.map(([name, Component, path]) => (
             <Route key={path} exact path={path}>
-              <ExampleTitle>{name}</ExampleTitle>
+              <ExampleTitle>
+                {name}
+                <Link
+                  href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+                >
+                  (View Source)
+                </Link>
+              </ExampleTitle>
             </Route>
           ))}
         </Switch>
