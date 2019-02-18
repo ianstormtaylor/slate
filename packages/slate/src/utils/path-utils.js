@@ -345,26 +345,25 @@ function transform(path, operation) {
       return List([path])
     }
 
-    if (pAbove) {
-      if (isAfter(np, p)) {
+    if (pAbove || pEqual) {
+      // We are comparing something that was moved
+      // The new path is unaffected unless the old path was the left-sibling of an ancestor
+      if (isYounger(p, np) && p.size < np.size) {
         path = decrement(np, 1, min(np, p) - 1).concat(path.slice(p.size))
       } else {
         path = np.concat(path.slice(p.size))
       }
-    } else if (pEqual) {
-      if (isYounger(p, np) && p.size < np.size) {
-        path = decrement(np, 1, min(np, p) - 1)
-      } else {
-        path = np
-      }
     } else {
-      if (pYounger) {
-        path = decrement(path, 1, pIndex)
-      }
+      // If we are comparing other paths, we transform for both parts of move
+      path = transform(path, {
+        type: 'remove_node',
+        path: p,
+      }).first()
 
-      if (isEqual(np, path) || isYounger(np, path) || isAbove(np, path)) {
-        path = increment(path, 1, np.size - 1)
-      }
+      path = transform(path, {
+        type: 'insert_node',
+        path: np,
+      }).first()
     }
   }
 
