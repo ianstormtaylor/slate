@@ -352,7 +352,7 @@ function transform(path, operation) {
         path = np.concat(path.slice(p.size))
       }
     } else if (pEqual) {
-      if (isYounger(p, np)) {
+      if (isYounger(p, np) && p.size < np.size) {
         path = decrement(np, 1, min(np, p) - 1)
       } else {
         path = np
