@@ -84,11 +84,11 @@ function decrement(path, n = 1, index = path.size - 1) {
  */
 
 function getAncestors(path) {
-  let ancestors = new List()
-
-  for (let i = 0; i < path.size; i++) {
-    ancestors = ancestors.push(path.slice(0, i))
-  }
+  const ancestors = List().withMutations(list => {
+    for (let i = 0; i < path.size; i++) {
+      list.push(path.slice(0, i))
+    }
+  })
 
   return ancestors
 }
@@ -370,6 +370,7 @@ function transform(path, operation) {
   const paths = Array.isArray(path) ? path : [path]
   return List(paths)
 }
+
 
 /**
  * Export.
