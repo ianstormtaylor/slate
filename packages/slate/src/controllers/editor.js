@@ -100,14 +100,13 @@ class Editor {
 
     // Get the paths of the affected nodes, and mark them as dirty.
     const newDirtyPaths = getDirtyPaths(operation)
-    const dirty = this.tmp.dirty.reduce((memo, path) => {
-      path = PathUtils.create(path)
-      const transformed = PathUtils.transform(path, operation)
-      Array.prototype.push.apply(memo, transformed.toArray())
-      return memo
-    }, newDirtyPaths)
 
-    this.tmp.dirty = dirty
+    const dirty = this.tmp.dirty.map(path => {
+      path = PathUtils.create(path)
+      return PathUtils.transform(path, operation).toArray()
+    })
+
+    this.tmp.dirty = Array.prototype.concat.apply(newDirtyPaths, dirty)
 
     // If we're not already, queue the flushing process on the next tick.
     if (!this.tmp.flushing) {
