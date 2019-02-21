@@ -9,11 +9,11 @@ const fragment = (
       <block type="c">
         <block type="d">
           <paragraph>B</paragraph>
-            <paragraph>
-              <block type="d">
-                <paragraph>C</paragraph>
-              </block>
-            </paragraph>
+          <paragraph>
+            <block type="d">
+              <paragraph>C</paragraph>
+            </block>
+          </paragraph>
         </block>
         <block type="d">
           <paragraph>D</paragraph>
@@ -33,11 +33,13 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-     <block type="d">
-       <paragraph>
-         <text><cursor/></ text>
-       </paragraph>
-     </block>
+      <block type="d">
+        <paragraph>
+          <text>
+            <cursor />
+          </text>
+        </paragraph>
+      </block>
     </document>
   </value>
 )

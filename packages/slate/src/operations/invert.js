@@ -49,9 +49,14 @@ function invertOperation(op) {
       // We transform the right-sibling of the path
       // This will end up at the operation.path most of the time
       // But if the newPath is a left-sibling or left-ancestor-sibling, this will account for it
-      const transformedSibling = PathUtils.transform(PathUtils.increment(path), op).first()
+      const transformedSibling = PathUtils.transform(
+        PathUtils.increment(path),
+        op
+      ).first()
 
-      const inverse = op.set('path', inversePath).set('newPath', transformedSibling)
+      const inverse = op
+        .set('path', inversePath)
+        .set('newPath', transformedSibling)
       return inverse
     }
 
