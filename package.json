@@ -52,6 +52,7 @@
     "npm-run-all": "^4.1.2",
     "prettier": "^1.10.2",
     "prismjs": "^1.5.1",
+    "prop-types": "^15.7.2",
     "react": "^16.4.1",
     "react-dom": "^16.4.1",
     "react-emotion": "^9.2.4",
