@@ -6,8 +6,8 @@ const { Editor } = require('slate')
 
 const fragment = (
   <document>
-    {Array.from(Array(10)).map((v, i) => (
-      <quote key={`a${i}`}>
+    {Array.from(Array(100)).map((v, i) => (
+      <quote>
         <paragraph>
           This is editable <b>rich</b> text, <i>much</i> better than a textarea!
           {i == 0 ? <cursor /> : ''}
