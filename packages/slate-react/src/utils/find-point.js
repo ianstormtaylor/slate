@@ -51,7 +51,7 @@ function findPoint(nativeNode, nativeOffset, editor) {
     range.setStart(textNode, 0)
     range.setEnd(nearestNode, nearestOffset)
     node = textNode
-    offset = range.toString().length
+    offset = range.cloneContents().textContent.length
   } else {
     // For void nodes, the element with the offset key will be a cousin, not an
     // ancestor, so find it by going down from the nearest void parent.
