@@ -13,6 +13,7 @@ import findRange from '../utils/find-range'
 import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
+import List from './list'
 
 const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "nodeType"/
 
@@ -439,11 +440,17 @@ class Content extends React.Component {
     const decs = document.getDecorations(editor).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
-    const children = document.nodes.toArray().map((child, i) => {
-      const isSelected = !!indexes && indexes.start <= i && i < indexes.end
+    const rows = document.nodes.toArray()
 
-      return this.renderNode(child, isSelected, childrenDecorations[i])
-    })
+    const rowRenderer = ({ key, index, parent, style }) => {
+      const isSelected =
+        !!indexes && indexes.start <= index && index < indexes.end
+      return (
+        <div key={key} style={style}>
+          {this.renderNode(rows[index], isSelected, childrenDecorations[index])}
+        </div>
+      )
+    }
 
     const style = {
       // Prevent the default outline styles.
@@ -482,7 +489,7 @@ class Content extends React.Component {
         // so we have to disable it like this. (2017/04/24)
         data-gramm={false}
       >
-        {children}
+        <List list={rows} height={style.height} rowRenderer={rowRenderer} />
       </Container>
     )
   }

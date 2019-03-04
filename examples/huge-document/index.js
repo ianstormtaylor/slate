@@ -64,6 +64,7 @@ class HugeDocument extends React.Component {
         defaultValue={initialValue}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
+        style={{ height: 500 }}
       />
     )
   }
