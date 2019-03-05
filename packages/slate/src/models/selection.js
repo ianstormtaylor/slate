@@ -80,7 +80,7 @@ class Selection extends Record(DEFAULTS) {
       if ('focus' in a) p.focus = Point.create(a.focus)
       if ('isFocused' in a) p.isFocused = a.isFocused
       if ('marks' in a)
-        p.marks = a.marks == null ? null : Mark.createSet(a.marks)
+        p.marks = a.marks == null? null : Mark.createSet(a.marks)
       return p
     }
 
@@ -102,7 +102,7 @@ class Selection extends Record(DEFAULTS) {
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
       isFocused,
-      marks: marks == null ? null : new Set(marks.map(Mark.fromJSON)),
+      marks: marks == null? null : new Set(marks.map(Mark.fromJSON)),
     })
 
     return selection
@@ -179,7 +179,7 @@ class Selection extends Record(DEFAULTS) {
       focus: this.focus.toJSON(options),
       isFocused: this.isFocused,
       marks:
-        this.marks == null ? null : this.marks.toArray().map(m => m.toJSON()),
+        this.marks == null? null : this.marks.toArray().map(m => m.toJSON()),
     }
 
     return object

@@ -98,10 +98,10 @@ const RULES = [
   {
     // Special case for code blocks, which need to grab the nested childNodes.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'pre') {
+      if (el.tagName.toLowerCase() === 'pre') {
         const code = el.childNodes[0]
         const childNodes =
-          code && code.tagName.toLowerCase() == 'code'
+          code && code.tagName.toLowerCase() === 'code'
             ? code.childNodes
             : el.childNodes
 
@@ -116,7 +116,7 @@ const RULES = [
   {
     // Special case for images, to grab their src.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'img') {
+      if (el.tagName.toLowerCase() === 'img') {
         return {
           object: 'block',
           type: 'image',
@@ -131,7 +131,7 @@ const RULES = [
   {
     // Special case for links, to grab their href.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'a') {
+      if (el.tagName.toLowerCase() === 'a') {
         return {
           object: 'inline',
           type: 'link',
@@ -283,7 +283,7 @@ class PasteHtml extends React.Component {
 
   onPaste = (event, editor, next) => {
     const transfer = getEventTransfer(event)
-    if (transfer.type != 'html') return next()
+    if (transfer.type !== 'html') return next()
     const { document } = serializer.deserialize(transfer.html)
     editor.insertFragment(document)
   }

@@ -22,7 +22,7 @@ let generate
  */
 
 function create(key) {
-  if (key == null) {
+  if (key === null) {
     return generate()
   }
 

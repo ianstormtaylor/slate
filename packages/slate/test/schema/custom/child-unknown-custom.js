@@ -13,7 +13,7 @@ export const schema = {
         },
       ],
       normalize: (editor, { code, node, child }) => {
-        if (code == 'child_unknown') {
+        if (code === 'child_unknown') {
           const previous = node.getPreviousSibling(child.key)
           const offset = previous.nodes.size
 

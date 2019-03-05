@@ -570,7 +570,7 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 
   editor.withoutNormalizing(() => {
     nodes.forEach(n => {
-      const prevIndex = index == null ? null : index
+      const prevIndex = index == null? null : index
       index = previous ? n.nodes.indexOf(previous) + 1 : textOffset
       previous = n
       editor.splitNodeByKey(n.key, index, { target: prevIndex })

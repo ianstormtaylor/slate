@@ -23,8 +23,8 @@ import {
 function create(name, validate) {
   function check(isRequired, props, propName, componentName, location) {
     const value = props[propName]
-    if (value == null && !isRequired) return null
-    if (value == null && isRequired)
+    if (value == null&& !isRequired) return null
+    if (value == null&& isRequired)
       return new Error(
         `The ${location} \`${propName}\` is marked as required in \`${componentName}\`, but it was not supplied.`
       )

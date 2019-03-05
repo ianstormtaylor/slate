@@ -66,7 +66,7 @@ class RangeInterface {
 
   get isForward() {
     const { isBackward } = this
-    const isForward = isBackward == null ? null : !isBackward
+    const isForward = isBackward == null? null : !isBackward
     return isForward
   }
 

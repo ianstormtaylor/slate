@@ -57,7 +57,7 @@ class Links extends React.Component {
 
   hasLinks = () => {
     const { value } = this.state
-    return value.inlines.some(inline => inline.type == 'link')
+    return value.inlines.some(inline => inline.type === 'link')
   }
 
   /**
@@ -192,7 +192,7 @@ class Links extends React.Component {
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
-    if (type != 'text' && type != 'html') return next()
+    if (type !== 'text' && type !== 'html') return next()
     if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {

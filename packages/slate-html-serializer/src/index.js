@@ -36,7 +36,7 @@ const TEXT_RULE = {
       }
     }
 
-    if (el.nodeName == '#text') {
+    if (el.nodeName === '#text') {
       if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
@@ -54,7 +54,7 @@ const TEXT_RULE = {
   serialize(obj, children) {
     if (obj.object === 'string') {
       return children.split('\n').reduce((array, text, i) => {
-        if (i != 0) array.push(<br key={i} />)
+        if (i !== 0) array.push(<br key={i} />)
         array.push(text)
         return array
       }, [])
@@ -130,12 +130,12 @@ class Html {
 
     // COMPAT: ensure that all top-level inline nodes are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
-      if (node.object == 'block') {
+      if (node.object === 'block') {
         memo.push(node)
         return memo
       }
 
-      if (i > 0 && original[i - 1].object != 'block') {
+      if (i > 0 && original[i - 1].object !== 'block') {
         const block = memo[memo.length - 1]
         block.nodes.push(node)
         return memo
@@ -153,7 +153,7 @@ class Html {
     }, [])
 
     // TODO: pretty sure this is no longer needed.
-    if (nodes.length == 0) {
+    if (nodes.length === 0) {
       nodes = [
         {
           object: 'block',
@@ -229,7 +229,7 @@ class Html {
     }
 
     const next = elements => {
-      if (Object.prototype.toString.call(elements) == '[object NodeList]') {
+      if (Object.prototype.toString.call(elements) === '[object NodeList]') {
         elements = Array.from(elements)
       }
 
@@ -254,10 +254,10 @@ class Html {
       const type = typeOf(ret)
 
       if (
-        type != 'array' &&
-        type != 'object' &&
-        type != 'null' &&
-        type != 'undefined'
+        type !== 'array' &&
+        type !== 'object' &&
+        type !== 'null' &&
+        type !== 'undefined'
       ) {
         throw new Error(
           `A rule returned an invalid deserialized representation: "${node}".`
@@ -268,7 +268,7 @@ class Html {
         continue
       } else if (ret === null) {
         return null
-      } else if (ret.object == 'mark') {
+      } else if (ret.object === 'mark') {
         node = this.deserializeMark(ret)
       } else {
         node = ret
@@ -291,9 +291,9 @@ class Html {
     const { type, data } = mark
 
     const applyMark = node => {
-      if (node.object == 'mark') {
+      if (node.object === 'mark') {
         return this.deserializeMark(node)
-      } else if (node.object == 'text') {
+      } else if (node.object === 'text') {
         node.leaves = node.leaves.map(leaf => {
           leaf.marks = leaf.marks || []
           leaf.marks.push({ type, data })
@@ -404,7 +404,7 @@ class Html {
    */
 
   cruftNewline = element => {
-    return !(element.nodeName === '#text' && element.nodeValue == '\n')
+    return !(element.nodeName === '#text' && element.nodeValue === '\n')
   }
 }
 

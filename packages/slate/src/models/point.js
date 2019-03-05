@@ -107,7 +107,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   get isSet() {
-    return this.key != null && this.offset != null && this.path != null
+    return this.key != null&& this.offset != null&& this.path !== null
   }
 
   /**
@@ -236,7 +236,7 @@ class Point extends Record(DEFAULTS) {
     if (this.isUnset) return false
 
     // PERF: Do a check for a `0` offset first since it's quickest.
-    if (this.offset != 0) return false
+    if (this.offset !== 0) return false
 
     const first = node.getFirstText()
     const is = this.key === first.key
@@ -350,7 +350,7 @@ class Point extends Record(DEFAULTS) {
   normalize(node) {
     // If both the key and path are null, there's no reference to a node, so
     // make sure it is entirely unset.
-    if (this.key == null && this.path == null) {
+    if (this.key == null&& this.path === null) {
       return this.setOffset(null)
     }
 
@@ -392,8 +392,8 @@ class Point extends Record(DEFAULTS) {
 
     const point = this.merge({
       key: target.key,
-      path: path == null ? node.getPath(target.key) : path,
-      offset: offset == null ? 0 : Math.min(offset, target.text.length),
+      path: path == null? node.getPath(target.key) : path,
+      offset: offset == null? 0 : Math.min(offset, target.text.length),
     })
 
     return point

@@ -95,7 +95,7 @@ class NodeInterface {
     let descendant = null
 
     const found = this.nodes.findLast(node => {
-      if (node.object == 'text') return true
+      if (node.object === 'text') return true
       descendant = node.getLastText()
       return descendant
     })
@@ -199,7 +199,7 @@ class NodeInterface {
     if (typeof path === 'string') {
       path = this.getPath(path)
 
-      if (index != null) {
+      if (index !== null) {
         path = path.concat(index)
       }
     } else {

@@ -139,7 +139,7 @@ class SearchHighlighting extends React.Component {
       let offset = 0
 
       parts.forEach((part, i) => {
-        if (i != 0) {
+        if (i !== 0) {
           decorations.push({
             anchor: { key, offset: offset - string.length },
             focus: { key, offset },

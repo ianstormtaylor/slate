@@ -64,7 +64,7 @@ function createHyperscript(options = {}) {
       throw new Error(`No hyperscript creator found for tag: "${tagName}"`)
     }
 
-    if (attributes == null) {
+    if (attributes === null) {
       attributes = {}
     }
 
@@ -93,11 +93,11 @@ function createHyperscript(options = {}) {
  */
 
 function normalizeCreator(value, creator) {
-  if (typeof value == 'function') {
+  if (typeof value === 'function') {
     return value
   }
 
-  if (typeof value == 'string') {
+  if (typeof value === 'string') {
     value = { type: value }
   }
 

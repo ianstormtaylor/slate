@@ -83,7 +83,7 @@ function getInput(value) {
   const textBefore = value.startText.text.slice(0, startOffset)
   const result = CAPTURE_REGEX.exec(textBefore)
 
-  return result === null ? null : result[1]
+  return result == null? null : result[1]
 }
 
 /**

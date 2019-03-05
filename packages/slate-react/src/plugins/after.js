@@ -123,17 +123,17 @@ function AfterPlugin(options = {}) {
         // `insertReplacementText` input type, but Safari uses `insertText` for
         // spell check replacements and sets `data` to `null`. (2018/08/09)
         const text =
-          event.data == null
+          event.data === null
             ? event.dataTransfer.getData('text/plain')
             : event.data
 
-        if (text == null) break
+        if (text === null) break
 
         editor.insertTextAtRange(range, text, selection.marks)
 
         // If the text was successfully inserted, and the selection had marks
         // on it, unset the selection's marks.
-        if (selection.marks && value.document != editor.value.document) {
+        if (selection.marks && value.document !== editor.value.document) {
           editor.select({ marks: null })
         }
 
@@ -313,11 +313,11 @@ function AfterPlugin(options = {}) {
     // needs to account for the selection's content being deleted.
     if (
       isDraggingInternally &&
-      selection.end.key == target.end.key &&
+      selection.end.key === target.end.key &&
       selection.end.offset < target.end.offset
     ) {
       target = target.moveForward(
-        selection.start.key == selection.end.key
+        selection.start.key === selection.end.key
           ? 0 - selection.end.offset + selection.start.offset
           : 0 - selection.end.offset
       )
@@ -329,7 +329,7 @@ function AfterPlugin(options = {}) {
 
     editor.select(target)
 
-    if (type == 'text' || type == 'html') {
+    if (type === 'text' || type === 'html') {
       const { anchor } = target
       let hasVoidParent = document.hasVoidParent(anchor.key, editor)
 
@@ -353,7 +353,7 @@ function AfterPlugin(options = {}) {
       }
     }
 
-    if (type == 'fragment') {
+    if (type === 'fragment') {
       editor.insertFragment(fragment)
     }
 
@@ -539,7 +539,7 @@ function AfterPlugin(options = {}) {
       const isPreviousInVoid =
         previousText && document.hasVoidParent(previousText.key, editor)
 
-      if (hasVoidParent || isPreviousInVoid || startText.text == '') {
+      if (hasVoidParent || isPreviousInVoid || startText.text === '') {
         event.preventDefault()
         return editor.moveFocusBackward()
       }
@@ -550,7 +550,7 @@ function AfterPlugin(options = {}) {
       const isNextInVoid =
         nextText && document.hasVoidParent(nextText.key, editor)
 
-      if (hasVoidParent || isNextInVoid || startText.text == '') {
+      if (hasVoidParent || isNextInVoid || startText.text === '') {
         event.preventDefault()
         return editor.moveFocusForward()
       }
@@ -602,11 +602,11 @@ function AfterPlugin(options = {}) {
     const transfer = getEventTransfer(event)
     const { type, fragment, text } = transfer
 
-    if (type == 'fragment') {
+    if (type === 'fragment') {
       editor.insertFragment(fragment)
     }
 
-    if (type == 'text' || type == 'html') {
+    if (type === 'text' || type === 'html') {
       if (!text) return next()
       const { document, selection, startBlock } = value
       if (editor.isVoid(startBlock)) return next()

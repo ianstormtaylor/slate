@@ -28,7 +28,7 @@ Commands.save = (editor, operation) => {
 
   // If `merge` is non-commital, and this is not the first operation in a new
   // editor, then merge, otherwise merge based on the last operation.
-  if (merge == null) {
+  if (merge === null) {
     if (operations.size !== 0) {
       merge = true
     } else {

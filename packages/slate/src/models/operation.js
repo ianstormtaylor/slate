@@ -134,10 +134,10 @@ class Operation extends Record(DEFAULTS) {
       if (v === undefined) {
         // Skip keys for objects that should not be serialized, and are only used
         // for providing the local-only invert behavior for the history stack.
-        if (key == 'document') continue
-        if (key == 'selection') continue
-        if (key == 'value') continue
-        if (key == 'node' && type != 'insert_node') continue
+        if (key === 'document') continue
+        if (key === 'selection') continue
+        if (key === 'value') continue
+        if (key === 'node' && type !== 'insert_node') continue
 
         throw new Error(
           `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
@@ -152,7 +152,7 @@ class Operation extends Record(DEFAULTS) {
         v = Mark.create(v)
       }
 
-      if (key === 'marks' && v != null) {
+      if (key === 'marks' && v !== null) {
         v = Mark.createSet(v)
       }
 
@@ -254,43 +254,43 @@ class Operation extends Record(DEFAULTS) {
 
       // Skip keys for objects that should not be serialized, and are only used
       // for providing the local-only invert behavior for the history stack.
-      if (key == 'document') continue
-      if (key == 'selection') continue
-      if (key == 'value') continue
-      if (key == 'node' && type != 'insert_node') continue
+      if (key === 'document') continue
+      if (key === 'selection') continue
+      if (key === 'value') continue
+      if (key === 'node' && type !== 'insert_node') continue
 
       if (
-        key == 'mark' ||
-        key == 'marks' ||
-        key == 'node' ||
-        key == 'path' ||
-        key == 'newPath'
+        key === 'mark' ||
+        key === 'marks' ||
+        key === 'node' ||
+        key === 'path' ||
+        key === 'newPath'
       ) {
         value = value.toJSON()
       }
 
-      if (key == 'properties' && type == 'merge_node') {
+      if (key === 'properties' && type === 'merge_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_mark') {
+      if (key === 'properties' && type === 'set_mark') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_node') {
+      if (key === 'properties' && type === 'set_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_selection') {
+      if (key === 'properties' && type === 'set_selection') {
         const v = {}
         if ('anchor' in value) v.anchor = value.anchor.toJSON()
         if ('focus' in value) v.focus = value.focus.toJSON()
@@ -299,14 +299,14 @@ class Operation extends Record(DEFAULTS) {
         value = v
       }
 
-      if (key == 'properties' && type == 'set_value') {
+      if (key === 'properties' && type === 'set_value') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
         value = v
       }
 
-      if (key == 'properties' && type == 'split_node') {
+      if (key === 'properties' && type === 'split_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
