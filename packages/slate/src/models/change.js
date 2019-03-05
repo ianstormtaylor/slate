@@ -155,7 +155,9 @@ class Change {
 
     while (this.tmp.dirty.length) {
       const path = this.tmp.dirty.pop()
-      this.normalizeNodeByPath(path)
+      if (this.value.document.getNode(path)) {
+        this.normalizeNodeByPath(path)
+      }
     }
 
     return this
