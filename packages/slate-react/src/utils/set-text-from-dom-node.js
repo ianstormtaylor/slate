@@ -25,19 +25,19 @@ export default function setTextFromDomNode(window, editor, domNode) {
   // Get the text information.
   const { text } = leaf
   let { textContent } = domNode
-  const isLastText = node == lastText
-  const isLastLeaf = leaf == lastLeaf
+  const isLastText = node === lastText
+  const isLastLeaf = leaf === lastLeaf
   const lastChar = textContent.charAt(textContent.length - 1)
 
   // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
   // we will have added another new line in <Leaf>'s render method to account
   // for browsers collapsing a single trailing new lines, so remove it.
-  if (isLastText && isLastLeaf && lastChar == '\n') {
+  if (isLastText && isLastLeaf && lastChar === '\n') {
     textContent = textContent.slice(0, -1)
   }
 
   // If the text is no different, abort.
-  if (textContent == text) return
+  if (textContent === text) return
 
   // Determine what the selection should be after changing the text.
   // const delta = textContent.length - text.length
