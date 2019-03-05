@@ -23,7 +23,7 @@ const value = (
               <text key={`T${i}`}>
                 This is editable <b>rich</b> text, <i>much</i> better than a
                 textarea!
-                {i == 0 ? <cursor /> : ''}
+                {i === 0 ? <cursor /> : ''}
               </text>
             </paragraph>
           </paragraph>
