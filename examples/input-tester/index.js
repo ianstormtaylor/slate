@@ -109,10 +109,10 @@ const BooleanCell = ({ value }) =>
   )
 
 const StringCell = ({ value }) =>
-  value == null? <MissingCell /> : JSON.stringify(value)
+  value == null ? <MissingCell /> : JSON.stringify(value)
 
 const RangeCell = ({ value }) =>
-  value == null? (
+  value == null ? (
     <MissingCell />
   ) : (
     `${value.anchor.path.toJSON()}.${

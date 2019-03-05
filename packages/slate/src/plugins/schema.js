@@ -359,7 +359,7 @@ function validateNodes(node, rule, rules = []) {
   if (node.nodes == null) return
 
   const children = node.nodes
-  const defs = rule.nodes != null? rule.nodes.slice() : []
+  const defs = rule.nodes != null ? rule.nodes.slice() : []
   let count = 0
   let lastCount = 0
   let min = null

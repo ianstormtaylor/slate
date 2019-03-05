@@ -392,8 +392,8 @@ class Point extends Record(DEFAULTS) {
 
     const point = this.merge({
       key: target.key,
-      path: path == null? node.getPath(target.key) : path,
-      offset: offset == null? 0 : Math.min(offset, target.text.length),
+      path: path == null ? node.getPath(target.key) : path,
+      offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
 
     return point

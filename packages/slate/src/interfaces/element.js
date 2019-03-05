@@ -1381,12 +1381,12 @@ class ElementInterface {
       }
 
       // PERF: exit early if both start and end have been found.
-      return startIndex == null|| endIndex == null
+      return startIndex == null || endIndex == null
     })
 
     if (isSelected && startIndex == null) startIndex = 0
     if (isSelected && endIndex == null) endIndex = this.nodes.size
-    return startIndex == null? null : { start: startIndex, end: endIndex }
+    return startIndex == null ? null : { start: startIndex, end: endIndex }
   }
 
   /**
