@@ -59,7 +59,7 @@ class Mark extends Record(DEFAULTS) {
       return marks
     }
 
-    if (elements === null) {
+    if (elements == null) {
       return Set()
     }
 

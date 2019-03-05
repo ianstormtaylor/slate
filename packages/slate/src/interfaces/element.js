@@ -1373,19 +1373,19 @@ class ElementInterface {
 
     this.nodes.forEach((child, i) => {
       if (child.object === 'text') {
-        if (startIndex == null&& child.key === start.key) startIndex = i
-        if (endIndex == null&& child.key === end.key) endIndex = i + 1
+        if (startIndex == null && child.key === start.key) startIndex = i
+        if (endIndex == null && child.key === end.key) endIndex = i + 1
       } else {
-        if (startIndex == null&& child.hasDescendant(start.key)) startIndex = i
-        if (endIndex == null&& child.hasDescendant(end.key)) endIndex = i + 1
+        if (startIndex == null && child.hasDescendant(start.key)) startIndex = i
+        if (endIndex == null && child.hasDescendant(end.key)) endIndex = i + 1
       }
 
       // PERF: exit early if both start and end have been found.
-      return startIndex == null|| endIndex === null
+      return startIndex == null|| endIndex == null
     })
 
-    if (isSelected && startIndex === null) startIndex = 0
-    if (isSelected && endIndex === null) endIndex = this.nodes.size
+    if (isSelected && startIndex == null) startIndex = 0
+    if (isSelected && endIndex == null) endIndex = this.nodes.size
     return startIndex == null? null : { start: startIndex, end: endIndex }
   }
 
@@ -1986,7 +1986,7 @@ for (const method of ASSERTS) {
   ElementInterface.prototype[`assert${method}`] = function(path, ...args) {
     const ret = this[`get${method}`](path, ...args)
 
-    if (ret === null) {
+    if (ret == null) {
       throw new Error(
         `\`Node.assert${method}\` could not find node with path or key: ${path}`
       )

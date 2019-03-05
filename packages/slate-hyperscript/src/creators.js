@@ -324,19 +324,19 @@ export function createValue(tagName, attributes, children) {
     document.getTexts().forEach(text => {
       const { __anchor, __decorations, __focus } = text
 
-      if (__anchor !== null) {
+      if (__anchor != null) {
         anchor = Point.create({ key: text.key, offset: __anchor.offset })
         marks = __anchor.marks
         isFocused = __anchor.isFocused
       }
 
-      if (__focus !== null) {
+      if (__focus != null) {
         focus = Point.create({ key: text.key, offset: __focus.offset })
         marks = __focus.marks
         isFocused = __focus.isFocused
       }
 
-      if (__decorations !== null) {
+      if (__decorations != null) {
         for (const dec of __decorations) {
           const { id } = dec
           const partial = partials[id]
@@ -484,15 +484,15 @@ class DecorationPoint {
 function incrementPoint(object, n) {
   const { __anchor, __focus, __decorations } = object
 
-  if (__anchor !== null) {
+  if (__anchor != null) {
     __anchor.offset += n
   }
 
-  if (__focus != null&& __focus !== __anchor) {
+  if (__focus != null && __focus !== __anchor) {
     __focus.offset += n
   }
 
-  if (__decorations !== null) {
+  if (__decorations != null) {
     __decorations.forEach(d => (d.offset += n))
   }
 }
@@ -524,9 +524,9 @@ function isPoint(object) {
 function preservePoint(object, updator) {
   const { __anchor, __focus, __decorations } = object
   const next = updator(object)
-  if (__anchor !== null) next.__anchor = __anchor
-  if (__focus !== null) next.__focus = __focus
-  if (__decorations !== null) next.__decorations = __decorations
+  if (__anchor != null) next.__anchor = __anchor
+  if (__focus != null) next.__focus = __focus
+  if (__decorations != null) next.__decorations = __decorations
   return next
 }
 

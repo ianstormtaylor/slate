@@ -152,7 +152,7 @@ class Operation extends Record(DEFAULTS) {
         v = Mark.create(v)
       }
 
-      if (key === 'marks' && v !== null) {
+      if (key === 'marks' && v != null) {
         v = Mark.createSet(v)
       }
 

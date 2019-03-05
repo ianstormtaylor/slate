@@ -76,7 +76,7 @@ class Node extends React.Component {
     // If the `Component` has a custom logic to determine whether the component
     // needs to be updated or not, return true if it returns true. If it returns
     // false, we need to ignore it, because it shouldn't be allowed it.
-    if (shouldUpdate !== null) {
+    if (shouldUpdate != null) {
       if (shouldUpdate) {
         return true
       }

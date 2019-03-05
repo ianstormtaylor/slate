@@ -34,7 +34,7 @@ function compare(path, target) {
  */
 
 function create(attrs) {
-  if (attrs === null) {
+  if (attrs == null) {
     return null
   }
 

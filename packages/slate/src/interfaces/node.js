@@ -199,7 +199,7 @@ class NodeInterface {
     if (typeof path === 'string') {
       path = this.getPath(path)
 
-      if (index !== null) {
+      if (index != null) {
         path = path.concat(index)
       }
     } else {

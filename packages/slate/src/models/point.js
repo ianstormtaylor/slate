@@ -107,7 +107,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   get isSet() {
-    return this.key != null&& this.offset != null&& this.path !== null
+    return this.key != null && this.offset != null && this.path != null
   }
 
   /**
@@ -350,7 +350,7 @@ class Point extends Record(DEFAULTS) {
   normalize(node) {
     // If both the key and path are null, there's no reference to a node, so
     // make sure it is entirely unset.
-    if (this.key == null&& this.path === null) {
+    if (this.key == null && this.path == null) {
       return this.setOffset(null)
     }
 
@@ -407,7 +407,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setKey(key) {
-    if (key !== null) {
+    if (key != null) {
       key = KeyUtils.create(key)
     }
 
@@ -435,7 +435,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setPath(path) {
-    if (path !== null) {
+    if (path != null) {
       path = PathUtils.create(path)
     }
 

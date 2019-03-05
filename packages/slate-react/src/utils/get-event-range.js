@@ -24,7 +24,7 @@ function getEventRange(event, editor) {
   }
 
   const { x, y, target } = event
-  if (x == null|| y === null) return null
+  if (x == null|| y == null) return null
 
   const { value } = editor
   const { document } = value

@@ -123,11 +123,11 @@ function AfterPlugin(options = {}) {
         // `insertReplacementText` input type, but Safari uses `insertText` for
         // spell check replacements and sets `data` to `null`. (2018/08/09)
         const text =
-          event.data === null
+          event.data == null
             ? event.dataTransfer.getData('text/plain')
             : event.data
 
-        if (text === null) break
+        if (text == null) break
 
         editor.insertTextAtRange(range, text, selection.marks)
 

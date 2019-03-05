@@ -266,7 +266,7 @@ class Html {
 
       if (ret === undefined) {
         continue
-      } else if (ret === null) {
+      } else if (ret == null) {
         return null
       } else if (ret.object === 'mark') {
         node = this.deserializeMark(ret)
@@ -351,7 +351,7 @@ class Html {
     for (const rule of this.rules) {
       if (!rule.serialize) continue
       const ret = rule.serialize(node, children)
-      if (ret === null) return
+      if (ret == null) return
       if (ret) return addKey(ret)
     }
 
@@ -373,7 +373,7 @@ class Html {
       for (const rule of this.rules) {
         if (!rule.serialize) continue
         const ret = rule.serialize(mark, children)
-        if (ret === null) return
+        if (ret == null) return
         if (ret) return addKey(ret)
       }
 

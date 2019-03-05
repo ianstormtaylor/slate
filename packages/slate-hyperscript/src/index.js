@@ -64,7 +64,7 @@ function createHyperscript(options = {}) {
       throw new Error(`No hyperscript creator found for tag: "${tagName}"`)
     }
 
-    if (attributes === null) {
+    if (attributes == null) {
       attributes = {}
     }
 

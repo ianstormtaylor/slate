@@ -273,22 +273,22 @@ function validateRules(object, rule, rules, options = {}) {
 }
 
 function validateObject(node, rule) {
-  if (rule.object === null) return
+  if (rule.object == null) return
   if (rule.object === node.object) return
   if (typeof rule.object === 'function' && rule.object(node.object)) return
   return fail('node_object_invalid', { rule, node })
 }
 
 function validateType(node, rule) {
-  if (rule.type === null) return
+  if (rule.type == null) return
   if (rule.type === node.type) return
   if (typeof rule.type === 'function' && rule.type(node.type)) return
   return fail('node_type_invalid', { rule, node })
 }
 
 function validateData(node, rule) {
-  if (rule.data === null) return
-  if (node.data === null) return
+  if (rule.data == null) return
+  if (node.data == null) return
 
   if (typeof rule.data === 'function') {
     if (rule.data(node.data)) return
@@ -305,7 +305,7 @@ function validateData(node, rule) {
 }
 
 function validateMarks(node, rule) {
-  if (rule.marks === null) return
+  if (rule.marks == null) return
   const marks = node.getMarks().toArray()
 
   for (const mark of marks) {
@@ -321,7 +321,7 @@ function validateMarks(node, rule) {
 }
 
 function validateText(node, rule) {
-  if (rule.text === null) return
+  if (rule.text == null) return
   const { text } = node
   const valid =
     typeof rule.text === 'function' ? rule.text(text) : rule.text.test(text)
@@ -330,7 +330,7 @@ function validateText(node, rule) {
 }
 
 function validateFirst(node, rule) {
-  if (rule.first === null) return
+  if (rule.first == null) return
   const first = node.nodes.first()
   if (!first) return
   const error = validateRules(first, rule.first)
@@ -343,7 +343,7 @@ function validateFirst(node, rule) {
 }
 
 function validateLast(node, rule) {
-  if (rule.last === null) return
+  if (rule.last == null) return
   const last = node.nodes.last()
   if (!last) return
   const error = validateRules(last, rule.last)
@@ -356,7 +356,7 @@ function validateLast(node, rule) {
 }
 
 function validateNodes(node, rule, rules = []) {
-  if (node.nodes === null) return
+  if (node.nodes == null) return
 
   const children = node.nodes
   const defs = rule.nodes != null? rule.nodes.slice() : []
@@ -398,7 +398,7 @@ function validateNodes(node, rule, rules = []) {
     }
   }
 
-  if (rule.nodes !== null) {
+  if (rule.nodes != null) {
     nextDef()
   }
 
@@ -410,7 +410,7 @@ function validateNodes(node, rule, rules = []) {
 
     if (err) return err
 
-    if (rule.nodes !== null) {
+    if (rule.nodes != null) {
       if (!def) {
         return fail('child_unknown', { rule, node, child, index })
       }
@@ -422,7 +422,7 @@ function validateNodes(node, rule, rules = []) {
           // Since we want to report overflow on last matching child we don't
           // immediately check for count > max, but instead do so once we find
           // a child that doesn't match.
-          if (max != null&& count - 1 > max) {
+          if (max != null && count - 1 > max) {
             rewind()
             return fail('child_max_invalid', {
               rule,
@@ -453,7 +453,7 @@ function validateNodes(node, rule, rules = []) {
             // current child is in fact the first of the next group. If so, the
             // next def will not report errors, in which case we can rewind and
             // report an minimum error.
-            if (validateRules(child, def.match) === null) {
+            if (validateRules(child, def.match) == null) {
               rewind()
               return fail('child_min_invalid', {
                 rule,
@@ -482,7 +482,7 @@ function validateNodes(node, rule, rules = []) {
 
           // Otherwise either we exhausted the last group, in which case it's
           // an unknown child, ...
-          if (max != null&& count > max) {
+          if (max != null && count > max) {
             return fail('child_unknown', { rule, node, child, index })
           }
 
@@ -500,7 +500,7 @@ function validateNodes(node, rule, rules = []) {
 
   // Since we want to report overflow on last matching child we don't
   // immediately check for count > max, but do so after processing all nodes.
-  if (max != null&& count > max) {
+  if (max != null && count > max) {
     return fail('child_max_invalid', {
       rule,
       node,
@@ -511,7 +511,7 @@ function validateNodes(node, rule, rules = []) {
     })
   }
 
-  if (rule.nodes !== null) {
+  if (rule.nodes != null) {
     do {
       if (count < min) {
         return fail('child_min_invalid', {
@@ -528,7 +528,7 @@ function validateNodes(node, rule, rules = []) {
 
 function validateParent(node, child, rules) {
   for (const rule of rules) {
-    if (rule.parent === null) continue
+    if (rule.parent == null) continue
     if (!testRules(child, rule.match)) continue
 
     const error = validateRules(node, rule.parent)
@@ -546,7 +546,7 @@ function validatePrevious(node, child, previous, index, rules) {
   if (!previous) return
 
   for (const rule of rules) {
-    if (rule.previous === null) continue
+    if (rule.previous == null) continue
     if (!testRules(child, rule.match)) continue
 
     const error = validateRules(previous, rule.previous)
@@ -566,7 +566,7 @@ function validateNext(node, child, next, index, rules) {
   if (!next) return
 
   for (const rule of rules) {
-    if (rule.next === null) continue
+    if (rule.next == null) continue
     if (!testRules(child, rule.match)) continue
 
     const error = validateRules(next, rule.next)
