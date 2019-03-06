@@ -8,9 +8,9 @@ module.exports.default = function(editor) {
   editor
     .insertNodeByKey('a0', 0, <paragraph>Hello world</paragraph>)
     .insertNodeByKey('a1', 1, <paragraph>Hello world</paragraph>)
-    .insertNodeByKey('a2', 2, <paragraph>Hello world</paragraph>)
-    .insertNodeByKey('a3', 3, <paragraph>Hello world</paragraph>)
-    .insertNodeByKey('a4', 4, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a2', 0, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a3', 1, <paragraph>Hello world</paragraph>)
+    .insertNodeByKey('a4', 0, <paragraph>Hello world</paragraph>)
 }
 
 const value = (
