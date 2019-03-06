@@ -6,7 +6,7 @@ export const schema = {
   blocks: {
     paragraph: {
       data: {
-        thing: v => v == null || v == 'value',
+        thing: v => v == null || v === 'value',
       },
     },
   },

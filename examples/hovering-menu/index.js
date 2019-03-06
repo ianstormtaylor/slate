@@ -65,7 +65,7 @@ class HoverMenu extends React.Component {
   renderMarkButton(type, icon) {
     const { editor } = this.props
     const { value } = editor
-    const isActive = value.activeMarks.some(mark => mark.type == type)
+    const isActive = value.activeMarks.some(mark => mark.type === type)
     return (
       <Button
         reversed

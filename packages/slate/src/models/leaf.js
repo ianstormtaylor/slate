@@ -33,7 +33,7 @@ class Leaf extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { text: attrs }
     }
 

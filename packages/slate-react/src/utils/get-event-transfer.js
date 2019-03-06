@@ -69,7 +69,7 @@ function getEventTransfer(event) {
     // Get and normalize files if they exist.
     if (transfer.items && transfer.items.length) {
       files = Array.from(transfer.items)
-        .map(item => (item.kind == 'file' ? item.getAsFile() : null))
+        .map(item => (item.kind === 'file' ? item.getAsFile() : null))
         .filter(exists => exists)
     } else if (transfer.files && transfer.files.length) {
       files = Array.from(transfer.files)
@@ -97,7 +97,7 @@ function getEventTransfer(event) {
 function getEmbeddedTypes(text) {
   const prefix = 'SLATE-DATA-EMBED::'
 
-  if (text.substring(0, prefix.length) != prefix) {
+  if (text.substring(0, prefix.length) !== prefix) {
     return { TEXT: text }
   }
 
@@ -147,7 +147,7 @@ function getType(transfer, type) {
   if (!transfer.types || !transfer.types.length) {
     // COMPAT: In IE 11, there is no `types` field but `getData('Text')`
     // is supported`. (2017/06/23)
-    return type == TEXT ? transfer.getData('Text') || null : null
+    return type === TEXT ? transfer.getData('Text') || null : null
   }
 
   // COMPAT: In Edge, transfer.types doesn't respond to `indexOf`. (2017/10/25)

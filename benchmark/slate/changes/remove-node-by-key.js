@@ -21,7 +21,7 @@ const value = (
           <paragraph>
             <paragraph>
               <text key={`T${i}`}>
-                {i == 0 ? <cursor /> : ''}
+                {i === 0 ? <cursor /> : ''}
                 This is editable <b>rich</b> text, <i>much</i> better than a
                 textarea!
               </text>

@@ -320,7 +320,7 @@ Commands.insertText = (editor, text, marks) => {
 
   // If the text was successfully inserted, and the selection had marks on it,
   // unset the selection's marks.
-  if (selection.marks && document != editor.value.document) {
+  if (selection.marks && document !== editor.value.document) {
     editor.select({ marks: null })
   }
 }
@@ -519,7 +519,7 @@ Commands.wrapText = (editor, prefix, suffix = prefix) => {
 
   // There's a chance that the selection points moved "through" each other,
   // resulting in a now-incorrect selection direction.
-  if (selection.isForward != editor.value.selection.isForward) {
+  if (selection.isForward !== editor.value.selection.isForward) {
     editor.flip()
   }
 }

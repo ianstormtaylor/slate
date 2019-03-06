@@ -93,7 +93,7 @@ class Node {
       }
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       return { type: attrs }
     }
 

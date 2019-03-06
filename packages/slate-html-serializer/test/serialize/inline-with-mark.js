@@ -6,15 +6,15 @@ import h from '../helpers/h'
 export const rules = [
   {
     serialize(obj, children) {
-      if (obj.object == 'block' && obj.type == 'paragraph') {
+      if (obj.object === 'block' && obj.type === 'paragraph') {
         return React.createElement('p', {}, children)
       }
 
-      if (obj.object == 'inline' && obj.type == 'link') {
+      if (obj.object === 'inline' && obj.type === 'link') {
         return React.createElement('a', {}, children)
       }
 
-      if (obj.object == 'mark' && obj.type == 'bold') {
+      if (obj.object === 'mark' && obj.type === 'bold') {
         return React.createElement('strong', {}, children)
       }
     },

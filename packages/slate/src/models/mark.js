@@ -33,7 +33,7 @@ class Mark extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { type: attrs }
     }
 
@@ -83,7 +83,7 @@ class Mark extends Record(DEFAULTS) {
       }
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       return { type: attrs }
     }
 
@@ -109,7 +109,7 @@ class Mark extends Record(DEFAULTS) {
   static fromJSON(object) {
     const { data = {}, type } = object
 
-    if (typeof type != 'string') {
+    if (typeof type !== 'string') {
       throw new Error('`Mark.fromJS` requires a `type` string.')
     }
 

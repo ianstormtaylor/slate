@@ -24,7 +24,7 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable {i == 0 ? <anchor /> : ''}rich{i == 0 ? (
+              This is editable {i === 0 ? <anchor /> : ''}rich{i === 0 ? (
                 <focus />
               ) : (
                 ''

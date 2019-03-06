@@ -84,9 +84,9 @@ function ReactPlugin(options = {}) {
   function renderNode(props, editor, next) {
     const { attributes, children, node } = props
     const { object } = node
-    if (object != 'block' && object != 'inline') return null
+    if (object !== 'block' && object !== 'inline') return null
 
-    const Tag = object == 'block' ? 'div' : 'span'
+    const Tag = object === 'block' ? 'div' : 'span'
     const style = { position: 'relative' }
     return (
       <Tag {...attributes} style={style}>
