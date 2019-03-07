@@ -6,10 +6,10 @@ export const schema = {
   blocks: {
     paragraph: {
       data: {
-        thing: v => v == 'value',
+        thing: v => v === 'value',
       },
       normalize: (editor, { code, node, key }) => {
-        if (code == 'node_data_invalid') {
+        if (code === 'node_data_invalid') {
           editor.setNodeByKey(node.key, { data: { thing: 'value' } })
         }
       },

@@ -77,14 +77,14 @@ class Text extends React.Component {
     // changed, but it's properties will be exactly the same (eg. copy-paste)
     // which this won't catch. But that's rare and not a drag on performance, so
     // for simplicity we just let them through.
-    if (n.node != p.node) return true
+    if (n.node !== p.node) return true
 
     // If the node parent is a block node, and it was the last child of the
     // block, re-render to cleanup extra `\n`.
-    if (n.parent.object == 'block') {
+    if (n.parent.object === 'block') {
       const pLast = p.parent.nodes.last()
       const nLast = n.parent.nodes.last()
-      if (p.node == pLast && n.node != nLast) return true
+      if (p.node === pLast && n.node !== nLast) return true
     }
 
     // Re-render if the current decorations have changed.

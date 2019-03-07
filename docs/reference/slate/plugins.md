@@ -52,7 +52,7 @@ The `onChange` hook is called whenever a new change is about to be applied to an
     const { type, args } = command
 
     if (type === 'wrapQuote') {
-      change.wrapBlock('quote')
+      editor.wrapBlock('quote')
     } else {
       return next()
     }
@@ -67,9 +67,9 @@ The `onChange` hook is called whenever a new change is about to be applied to an
 }
 ```
 
-The `onQuery` hook is called with a `query` object resulting from an `editor.query(type, ...args)` or a `change[query](...args)` call:
+The `onCommand` hook is called with a `command` object resulting from an `editor.command(type, ...args)` or a `change[command](...args)` call:
 
-The `onQuery` hook is a low-level way to have access to all of the queries passing through the editor. Most of the time you should use the `queries` shorthand instead.
+The `onCommand` hook is a low-level way to have access to all of the commands passing through the editor. Most of the time you should use the `commands` shorthand instead.
 
 ### `onConstruct`
 

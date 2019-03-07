@@ -51,7 +51,7 @@ class RichTextExample extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
   }
 
   /**
@@ -63,7 +63,7 @@ class RichTextExample extends React.Component {
 
   hasBlock = type => {
     const { value } = this.state
-    return value.blocks.some(node => node.type == type)
+    return value.blocks.some(node => node.type === type)
   }
 
   /**
@@ -278,7 +278,7 @@ class RichTextExample extends React.Component {
     const { document } = value
 
     // Handle everything but list buttons.
-    if (type != 'bulleted-list' && type != 'numbered-list') {
+    if (type !== 'bulleted-list' && type !== 'numbered-list') {
       const isActive = this.hasBlock(type)
       const isList = this.hasBlock('list-item')
 
@@ -294,7 +294,7 @@ class RichTextExample extends React.Component {
       // Handle the extra wrapping required for list buttons.
       const isList = this.hasBlock('list-item')
       const isType = value.blocks.some(block => {
-        return !!document.getClosest(block.key, parent => parent.type == type)
+        return !!document.getClosest(block.key, parent => parent.type === type)
       })
 
       if (isList && isType) {
@@ -305,7 +305,7 @@ class RichTextExample extends React.Component {
       } else if (isList) {
         editor
           .unwrapBlock(
-            type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+            type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
           )
           .wrapBlock(type)
       } else {

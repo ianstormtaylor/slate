@@ -16,7 +16,7 @@ export const schema = {
         },
       ],
       normalize: (editor, { code, node, index }) => {
-        if (code == 'child_max_invalid') {
+        if (code === 'child_max_invalid') {
           editor.mergeNodeByKey(node.nodes.get(index).key)
         }
       },

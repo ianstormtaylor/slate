@@ -36,7 +36,7 @@ class Text extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { leaves: [{ text: attrs }] }
     }
 
@@ -250,8 +250,8 @@ class Text extends Record(DEFAULTS) {
 
     decorations.forEach(dec => {
       const { start, end, mark } = dec
-      const hasStart = start.key == key
-      const hasEnd = end.key == key
+      const hasStart = start.key === key
+      const hasEnd = end.key === key
 
       if (hasStart && hasEnd) {
         const index = hasStart ? start.offset : 0

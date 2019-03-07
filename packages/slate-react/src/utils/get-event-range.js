@@ -37,7 +37,7 @@ function getEventRange(event, editor) {
   if (editor.query('isVoid', node)) {
     const rect = target.getBoundingClientRect()
     const isPrevious =
-      node.object == 'inline'
+      node.object === 'inline'
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 

@@ -4,17 +4,8 @@
 const h = require('../../helpers/h')
 const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
-    .normalize()
-    .moveForward(5)
-    .normalize()
-    .moveForward(5)
-    .normalize()
-    .moveForward(5)
-    .normalize()
-    .moveForward(5)
-    .normalize()
+module.exports.default = function(editor) {
+  editor.normalize().normalize()
 }
 
 const value = (
@@ -24,9 +15,14 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              {i === 0 ? <cursor /> : ''}
-              This is editable <b>rich</b> text, <i>much</i> better than a
-              textarea!
+              <link>link text</link>
+            </paragraph>
+            <paragraph />
+            <paragraph>
+              <paragraph>
+                <link>link text</link>
+                <text> more text after</text>
+              </paragraph>
             </paragraph>
           </paragraph>
         </quote>
