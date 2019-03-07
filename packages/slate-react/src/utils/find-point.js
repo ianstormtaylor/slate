@@ -51,7 +51,12 @@ function findPoint(nativeNode, nativeOffset, editor) {
     range.setStart(textNode, 0)
     range.setEnd(nearestNode, nearestOffset)
     node = textNode
-    offset = range.toString().length
+
+    // COMPAT: Edge has a bug where Range.prototype.toString() will convert \n
+    // into \r\n. The bug causes a loop when slate-react attempts to reposition
+    // its cursor to match the native position. Use textContent.length instead.
+    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
+    offset = range.cloneContents().textContent.length
   } else {
     // For void nodes, the element with the offset key will be a cousin, not an
     // ancestor, so find it by going down from the nearest void parent.
