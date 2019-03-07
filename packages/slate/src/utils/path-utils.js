@@ -354,16 +354,15 @@ function transform(path, operation) {
         path = np.concat(path.slice(p.size))
       }
     } else {
-      // If we are comparing other paths, we transform for both parts of move
-      path = transform(path, {
-        type: 'remove_node',
-        path: p,
-      }).first()
+      // This is equivalent logic to remove_node for path
+      if (pYounger) {
+        path = decrement(path, 1, pIndex)
+      }
 
-      path = transform(path, {
-        type: 'insert_node',
-        path: np,
-      }).first()
+      // This is the equivalent logic to insert_node for newPath
+      if (isYounger(np, path) || isEqual(np, path) || isAbove(np, path)) {
+        path = increment(path, 1, np.size - 1)
+      }
     }
   }
 
