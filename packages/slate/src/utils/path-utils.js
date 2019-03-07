@@ -84,11 +84,11 @@ function decrement(path, n = 1, index = path.size - 1) {
  */
 
 function getAncestors(path) {
-  let ancestors = new List()
-
-  for (let i = 0; i < path.size; i++) {
-    ancestors = ancestors.push(path.slice(0, i))
-  }
+  const ancestors = List().withMutations(list => {
+    for (let i = 0; i < path.size; i++) {
+      list.push(path.slice(0, i))
+    }
+  })
 
   return ancestors
 }
@@ -340,35 +340,28 @@ function transform(path, operation) {
 
   if (type === 'move_node') {
     const { newPath: np } = operation
-    const npIndex = np.size - 1
-    const npEqual = isEqual(np, path)
 
     if (isEqual(p, np)) {
       return List([path])
     }
 
-    const npYounger = isYounger(np, path)
-    const npAbove = isAbove(np, path)
-
-    if (pAbove) {
-      if (isAfter(np, p)) {
+    if (pAbove || pEqual) {
+      // We are comparing something that was moved
+      // The new path is unaffected unless the old path was the left-sibling of an ancestor
+      if (isYounger(p, np) && p.size < np.size) {
         path = decrement(np, 1, min(np, p) - 1).concat(path.slice(p.size))
       } else {
         path = np.concat(path.slice(p.size))
       }
-    } else if (pEqual) {
-      if (isAfter(np, p)) {
-        path = decrement(np, 1, min(np, p) - 1)
-      } else {
-        path = np
-      }
     } else {
+      // This is equivalent logic to remove_node for path
       if (pYounger) {
         path = decrement(path, 1, pIndex)
       }
 
-      if (npEqual || npYounger || npAbove) {
-        path = increment(path, 1, npIndex)
+      // This is the equivalent logic to insert_node for newPath
+      if (isYounger(np, path) || isEqual(np, path) || isAbove(np, path)) {
+        path = increment(path, 1, np.size - 1)
       }
     }
   }

@@ -14,6 +14,7 @@ import Point from '../models/point'
 import Range from '../models/range'
 import Selection from '../models/selection'
 import Value from '../models/value'
+import Operation from '../models/operation'
 
 /**
  * The interface that `Document`, `Block` and `Inline` all implement, to make
@@ -1763,13 +1764,15 @@ class ElementInterface {
     const newParentPath = PathUtils.lift(newPath)
     this.assertNode(newParentPath)
 
-    const position = PathUtils.compare(path, newPath)
-
-    // If the old path ends above and before a node in the new path, then
-    // removing it will alter the target, so we need to adjust the new path.
-    if (path.size < newPath.size && position === -1) {
-      newPath = PathUtils.decrement(newPath, 1, path.size - 1)
-    }
+    // TODO: this is a bit hacky, re-creating the operation that led to this method being called
+    // Alternative 1: pass the operation through from apply -> value.moveNode
+    // Alternative 2: add a third property to the operation called "transformedNewPath", pass that through
+    const op = Operation.create({
+      type: 'move_node',
+      path,
+      newPath,
+    })
+    newPath = PathUtils.transform(path, op).first()
 
     let ret = this
     ret = ret.removeNode(path)
