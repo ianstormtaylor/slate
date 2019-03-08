@@ -8,7 +8,7 @@ export const schema = {
     item: {
       parent: { type: 'list' },
       normalize: (editor, { code, node }) => {
-        if (code == 'parent_type_invalid') {
+        if (code === 'parent_type_invalid') {
           editor.wrapBlockByKey(node.key, 'list')
         }
       },

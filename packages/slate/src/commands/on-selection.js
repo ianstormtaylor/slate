@@ -666,7 +666,7 @@ function pointEdgeObject(editor, point, edge, object) {
   const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
   const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
   const method = `move${Point}To${Edge}OfNode`
-  const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
+  const getNode = object === 'text' ? 'getNode' : `getClosest${Object}`
   const { value } = editor
   const { document, selection } = value
   const p = selection[point]
@@ -681,7 +681,7 @@ function pointEdgeSideObject(editor, point, edge, side, object) {
   const Side = side.slice(0, 1).toUpperCase() + side.slice(1)
   const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
   const method = `move${Point}To${Edge}OfNode`
-  const getNode = object == 'text' ? 'getNode' : `getClosest${Object}`
+  const getNode = object === 'text' ? 'getNode' : `getClosest${Object}`
   const getDirectionNode = `get${Side}${Object}`
   const { value } = editor
   const { document, selection } = value

@@ -12,7 +12,7 @@ export const schema = {
         },
       ],
       normalize: (editor, { code, child }) => {
-        if (code == 'child_object_invalid') {
+        if (code === 'child_object_invalid') {
           editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },

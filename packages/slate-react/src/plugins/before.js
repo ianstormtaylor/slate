@@ -346,7 +346,7 @@ function BeforePlugin() {
     // COMPAT: If the editor has nested editable elements, the focus can go to
     // those elements. In Firefox, this must be prevented because it results in
     // issues with keyboard navigation. (2017/03/30)
-    if (IS_FIREFOX && event.target != el) {
+    if (IS_FIREFOX && event.target !== el) {
       el.focus()
       return
     }

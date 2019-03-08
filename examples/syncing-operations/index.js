@@ -69,7 +69,7 @@ class SyncingEditor extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
   }
 
   /**
@@ -248,8 +248,8 @@ class SyncingOperationsExample extends React.Component {
     const ops = change.operations
       .filter(
         o =>
-          o.type != 'set_selection' &&
-          o.type != 'set_value' &&
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
           (!o.data || !o.data.has('source'))
       )
       .toJS()
@@ -268,8 +268,8 @@ class SyncingOperationsExample extends React.Component {
     const ops = change.operations
       .filter(
         o =>
-          o.type != 'set_selection' &&
-          o.type != 'set_value' &&
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
           (!o.data || !o.data.has('source'))
       )
       .toJS()

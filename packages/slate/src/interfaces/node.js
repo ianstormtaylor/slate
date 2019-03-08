@@ -95,7 +95,7 @@ class NodeInterface {
     let descendant = null
 
     const found = this.nodes.findLast(node => {
-      if (node.object == 'text') return true
+      if (node.object === 'text') return true
       descendant = node.getLastText()
       return descendant
     })

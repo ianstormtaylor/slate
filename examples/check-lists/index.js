@@ -147,16 +147,16 @@ class CheckLists extends React.Component {
   onKeyDown = (event, editor, next) => {
     const { value } = editor
 
-    if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
+    if (event.key === 'Enter' && value.startBlock.type === 'check-list-item') {
       editor.splitBlock().setBlocks({ data: { checked: false } })
       return
     }
 
     if (
-      event.key == 'Backspace' &&
+      event.key === 'Backspace' &&
       value.isCollapsed &&
-      value.startBlock.type == 'check-list-item' &&
-      value.selection.startOffset == 0
+      value.startBlock.type === 'check-list-item' &&
+      value.selection.startOffset === 0
     ) {
       editor.setBlocks('paragraph')
       return

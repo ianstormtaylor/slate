@@ -72,12 +72,14 @@ class App extends React.Component {
       case 'b': {
         event.preventDefault()
         editor.addMark('bold')
+        break
       }
       // When "`" is pressed, keep our existing code block logic.
       case '`': {
         const isCode = editor.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
         editor.setBlocks(isCode ? 'paragraph' : 'code')
+        break
       }
       // Otherwise, let other plugins handle it.
       default: {
@@ -144,11 +146,13 @@ class App extends React.Component {
       case 'b': {
         event.preventDefault()
         editor.toggleMark('bold')
+        break
       }
       case '`': {
         const isCode = editor.value.blocks.some(block => block.type == 'code')
         event.preventDefault()
         editor.setBlocks(isCode ? 'paragraph' : 'code')
+        break
       }
       default: {
         return next()

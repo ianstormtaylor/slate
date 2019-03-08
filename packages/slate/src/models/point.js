@@ -236,7 +236,7 @@ class Point extends Record(DEFAULTS) {
     if (this.isUnset) return false
 
     // PERF: Do a check for a `0` offset first since it's quickest.
-    if (this.offset != 0) return false
+    if (this.offset !== 0) return false
 
     const first = node.getFirstText()
     const is = this.key === first.key
@@ -407,7 +407,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setKey(key) {
-    if (key !== null) {
+    if (key != null) {
       key = KeyUtils.create(key)
     }
 
@@ -435,7 +435,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setPath(path) {
-    if (path !== null) {
+    if (path != null) {
       path = PathUtils.create(path)
     }
 

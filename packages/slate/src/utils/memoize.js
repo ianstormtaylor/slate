@@ -127,7 +127,7 @@ function getIn(map, keys) {
   for (let key of keys) {
     if (key === undefined) {
       key = UNDEFINED
-    } else if (key === null) {
+    } else if (key == null) {
       key = NULL
     }
 
@@ -158,7 +158,7 @@ function setIn(map, keys, value) {
   for (let key of keys) {
     if (key === undefined) {
       key = UNDEFINED
-    } else if (key === null) {
+    } else if (key == null) {
       key = NULL
     }
 

@@ -141,7 +141,7 @@ class MarkdownPreview extends React.Component {
 
   decorateNode(node, editor, next) {
     const others = next() || []
-    if (node.object != 'block') return others
+    if (node.object !== 'block') return others
 
     const string = node.text
     const texts = node.getTexts().toArray()
@@ -155,9 +155,9 @@ class MarkdownPreview extends React.Component {
     let start = 0
 
     function getLength(token) {
-      if (typeof token == 'string') {
+      if (typeof token === 'string') {
         return token.length
-      } else if (typeof token.content == 'string') {
+      } else if (typeof token.content === 'string') {
         return token.content.length
       } else {
         return token.content.reduce((l, t) => l + getLength(t), 0)
@@ -183,7 +183,7 @@ class MarkdownPreview extends React.Component {
         endOffset = remaining
       }
 
-      if (typeof token != 'string') {
+      if (typeof token !== 'string') {
         const dec = {
           anchor: {
             key: startText.key,

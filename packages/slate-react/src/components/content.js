@@ -188,9 +188,10 @@ class Content extends React.Component {
     }
 
     // If the Slate selection is focused, but the DOM's active element is not
-    // the editor, we need to focus it.
+    // the editor, we need to focus it. We prevent scrolling because we handle
+    // scrolling to the correct selection.
     if (selection.isFocused && activeElement !== this.element) {
-      this.element.focus()
+      this.element.focus({ preventScroll: true })
       updated = true
     }
 
@@ -216,14 +217,14 @@ class Content extends React.Component {
       // to check both orientations here. (2017/10/31)
       if (current) {
         if (
-          (startContainer == current.startContainer &&
-            startOffset == current.startOffset &&
-            endContainer == current.endContainer &&
-            endOffset == current.endOffset) ||
-          (startContainer == current.endContainer &&
-            startOffset == current.endOffset &&
-            endContainer == current.startContainer &&
-            endOffset == current.startOffset)
+          (startContainer === current.startContainer &&
+            startOffset === current.startOffset &&
+            endContainer === current.endContainer &&
+            endOffset === current.endOffset) ||
+          (startContainer === current.endContainer &&
+            startOffset === current.endOffset &&
+            endContainer === current.startContainer &&
+            endOffset === current.startOffset)
         ) {
           return
         }
@@ -345,7 +346,7 @@ class Content extends React.Component {
     // programmatically while updating selection.
     if (
       this.tmp.isUpdatingSelection &&
-      (handler == 'onSelect' || handler == 'onBlur' || handler == 'onFocus')
+      (handler === 'onSelect' || handler === 'onBlur' || handler === 'onFocus')
     ) {
       return
     }
@@ -376,13 +377,13 @@ class Content extends React.Component {
 
     // Don't handle drag and drop events coming from embedded editors.
     if (
-      handler == 'onDragEnd' ||
-      handler == 'onDragEnter' ||
-      handler == 'onDragExit' ||
-      handler == 'onDragLeave' ||
-      handler == 'onDragOver' ||
-      handler == 'onDragStart' ||
-      handler == 'onDrop'
+      handler === 'onDragEnd' ||
+      handler === 'onDragEnter' ||
+      handler === 'onDragExit' ||
+      handler === 'onDragLeave' ||
+      handler === 'onDragOver' ||
+      handler === 'onDragStart' ||
+      handler === 'onDrop'
     ) {
       const closest = event.target.closest('[data-slate-editor]')
 
@@ -394,18 +395,18 @@ class Content extends React.Component {
     // Some events require being in editable in the editor, so if the event
     // target isn't, ignore them.
     if (
-      handler == 'onBeforeInput' ||
-      handler == 'onBlur' ||
-      handler == 'onCompositionEnd' ||
-      handler == 'onCompositionStart' ||
-      handler == 'onCopy' ||
-      handler == 'onCut' ||
-      handler == 'onFocus' ||
-      handler == 'onInput' ||
-      handler == 'onKeyDown' ||
-      handler == 'onKeyUp' ||
-      handler == 'onPaste' ||
-      handler == 'onSelect'
+      handler === 'onBeforeInput' ||
+      handler === 'onBlur' ||
+      handler === 'onCompositionEnd' ||
+      handler === 'onCompositionStart' ||
+      handler === 'onCopy' ||
+      handler === 'onCut' ||
+      handler === 'onFocus' ||
+      handler === 'onInput' ||
+      handler === 'onKeyDown' ||
+      handler === 'onKeyUp' ||
+      handler === 'onPaste' ||
+      handler === 'onSelect'
     ) {
       if (!this.isInEditor(event.target)) {
         return

@@ -294,8 +294,15 @@ export default class App extends React.Component {
         </TabButton>
         <Switch>
           {EXAMPLES.map(([name, Component, path]) => (
-            <Route key={path} path={path}>
-              <ExampleTitle>{name}</ExampleTitle>
+            <Route key={path} exact path={path}>
+              <ExampleTitle>
+                {name}
+                <Link
+                  href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+                >
+                  (View Source)
+                </Link>
+              </ExampleTitle>
             </Route>
           ))}
         </Switch>

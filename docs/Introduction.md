@@ -95,7 +95,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 * [**FAQ**](http://docs.slatejs.org/general/faq)
 * [**Resources**](http://docs.slatejs.org/general/resources)
 
-If even that's not enough, you can always [read the source itself](../packages/), which is heavily commented.
+If even that's not enough, you can always [read the source itself](https://github.com/ianstormtaylor/slate/tree/master/packages), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 

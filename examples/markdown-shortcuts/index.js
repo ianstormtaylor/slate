@@ -145,12 +145,12 @@ class MarkdownShortcuts extends React.Component {
     const chars = startBlock.text.slice(0, start.offset).replace(/\s*/g, '')
     const type = this.getType(chars)
     if (!type) return next()
-    if (type == 'list-item' && startBlock.type == 'list-item') return next()
+    if (type === 'list-item' && startBlock.type === 'list-item') return next()
     event.preventDefault()
 
     editor.setBlocks(type)
 
-    if (type == 'list-item') {
+    if (type === 'list-item') {
       editor.wrapBlock('bulleted-list')
     }
 
@@ -170,15 +170,15 @@ class MarkdownShortcuts extends React.Component {
     const { value } = editor
     const { selection } = value
     if (selection.isExpanded) return next()
-    if (selection.start.offset != 0) return next()
+    if (selection.start.offset !== 0) return next()
 
     const { startBlock } = value
-    if (startBlock.type == 'paragraph') return next()
+    if (startBlock.type === 'paragraph') return next()
 
     event.preventDefault()
     editor.setBlocks('paragraph')
 
-    if (startBlock.type == 'list-item') {
+    if (startBlock.type === 'list-item') {
       editor.unwrapBlock('bulleted-list')
     }
   }
@@ -199,18 +199,18 @@ class MarkdownShortcuts extends React.Component {
     if (isExpanded) return next()
 
     const { startBlock } = value
-    if (start.offset == 0 && startBlock.text.length == 0)
+    if (start.offset === 0 && startBlock.text.length === 0)
       return this.onBackspace(event, editor, next)
-    if (end.offset != startBlock.text.length) return next()
+    if (end.offset !== startBlock.text.length) return next()
 
     if (
-      startBlock.type != 'heading-one' &&
-      startBlock.type != 'heading-two' &&
-      startBlock.type != 'heading-three' &&
-      startBlock.type != 'heading-four' &&
-      startBlock.type != 'heading-five' &&
-      startBlock.type != 'heading-six' &&
-      startBlock.type != 'block-quote'
+      startBlock.type !== 'heading-one' &&
+      startBlock.type !== 'heading-two' &&
+      startBlock.type !== 'heading-three' &&
+      startBlock.type !== 'heading-four' &&
+      startBlock.type !== 'heading-five' &&
+      startBlock.type !== 'heading-six' &&
+      startBlock.type !== 'block-quote'
     ) {
       return next()
     }

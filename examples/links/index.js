@@ -57,7 +57,7 @@ class Links extends React.Component {
 
   hasLinks = () => {
     const { value } = this.state
-    return value.inlines.some(inline => inline.type == 'link')
+    return value.inlines.some(inline => inline.type === 'link')
   }
 
   /**
@@ -154,7 +154,7 @@ class Links extends React.Component {
     } else if (value.selection.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
 
-      if (href === null) {
+      if (href == null) {
         return
       }
 
@@ -162,13 +162,13 @@ class Links extends React.Component {
     } else {
       const href = window.prompt('Enter the URL of the link:')
 
-      if (href === null) {
+      if (href == null) {
         return
       }
 
       const text = window.prompt('Enter the text for the link:')
 
-      if (text === null) {
+      if (text == null) {
         return
       }
 
@@ -192,7 +192,7 @@ class Links extends React.Component {
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
-    if (type != 'text' && type != 'html') return next()
+    if (type !== 'text' && type !== 'html') return next()
     if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {

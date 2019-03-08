@@ -122,8 +122,7 @@ function getAndroidApiVersion() {
   if (matchData == null) return null
   const versionString = matchData[1]
 
-  for (const tuple of ANDROID_API_VERSIONS) {
-    const [regex, version] = tuple
+  for (const [regex, version] of ANDROID_API_VERSIONS) {
     if (versionString.match(regex)) return version
   }
   return null
@@ -151,4 +150,5 @@ export const ANDROID_API_VERSION = getAndroidApiVersion()
 
 export const HAS_INPUT_EVENTS_LEVEL_1 = features.includes('inputeventslevel1')
 export const HAS_INPUT_EVENTS_LEVEL_2 =
-  features.includes('inputeventslevel2') || ANDROID_API_VERSION === 28
+  features.includes('inputeventslevel2') ||
+  (IS_ANDROID && (ANDROID_API_VERSION === 28 || ANDROID_API_VERSION === null))

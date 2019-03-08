@@ -146,7 +146,7 @@ class ElementInterface {
         return false
       }
 
-      if (child.object != 'text') {
+      if (child.object !== 'text') {
         ret = child.forEachDescendant(iterator)
         return ret
       }
@@ -261,7 +261,7 @@ class ElementInterface {
 
   getBlocksAsArray() {
     return this.nodes.reduce((array, child) => {
-      if (child.object != 'block') return array
+      if (child.object !== 'block') return array
       if (!child.isLeafBlock()) return array.concat(child.getBlocksAsArray())
       array.push(child)
       return array
@@ -321,9 +321,9 @@ class ElementInterface {
 
   getBlocksByTypeAsArray(type) {
     return this.nodes.reduce((array, node) => {
-      if (node.object != 'block') {
+      if (node.object !== 'block') {
         return array
-      } else if (node.isLeafBlock() && node.type == type) {
+      } else if (node.isLeafBlock() && node.type === type) {
         array.push(node)
         return array
       } else {
@@ -622,7 +622,7 @@ class ElementInterface {
     let array = []
 
     this.nodes.forEach(child => {
-      if (child.object == 'text') return
+      if (child.object === 'text') return
 
       if (child.isLeafInline()) {
         array.push(child)
@@ -688,9 +688,9 @@ class ElementInterface {
 
   getInlinesByTypeAsArray(type) {
     const array = this.nodes.reduce((inlines, node) => {
-      if (node.object == 'text') {
+      if (node.object === 'text') {
         return inlines
-      } else if (node.isLeafInline() && node.type == type) {
+      } else if (node.isLeafInline() && node.type === type) {
         inlines.push(node)
         return inlines
       } else {
@@ -887,8 +887,8 @@ class ElementInterface {
 
   getMarksByTypeAsArray(type) {
     const array = this.nodes.reduce((memo, node) => {
-      return node.object == 'text'
-        ? memo.concat(node.getMarksAsArray().filter(m => m.type == type))
+      return node.object === 'text'
+        ? memo.concat(node.getMarksAsArray().filter(m => m.type === type))
         : memo.concat(node.getMarksByTypeAsArray(type))
     }, [])
 
@@ -906,7 +906,7 @@ class ElementInterface {
     const child = this.assertDescendant(key)
     let last
 
-    if (child.object == 'block') {
+    if (child.object === 'block') {
       last = child.getLastText()
     } else {
       const block = this.getClosestBlock(key)
@@ -1060,7 +1060,7 @@ class ElementInterface {
     // Calculate the offset of the nodes before the highest child.
     const child = this.getFurthestAncestor(key)
     const offset = this.nodes
-      .takeUntil(n => n == child)
+      .takeUntil(n => n === child)
       .reduce((memo, n) => memo + n.text.length, 0)
 
     // Recurse if need be.
@@ -1205,7 +1205,7 @@ class ElementInterface {
     const child = this.assertDescendant(key)
     let first
 
-    if (child.object == 'block') {
+    if (child.object === 'block') {
       first = child.getFirstText()
     } else {
       const block = this.getClosestBlock(key)
@@ -1361,7 +1361,7 @@ class ElementInterface {
 
     // PERF: if the start and end keys are the same, just check for the child
     // that contains that single key.
-    if (start.key == end.key) {
+    if (start.key === end.key) {
       const child = this.getFurthestAncestor(start.key)
       const index = child ? this.nodes.indexOf(child) : null
       return { start: index, end: index + 1 }
@@ -1372,9 +1372,9 @@ class ElementInterface {
     let endIndex = null
 
     this.nodes.forEach((child, i) => {
-      if (child.object == 'text') {
-        if (startIndex == null && child.key == start.key) startIndex = i
-        if (endIndex == null && child.key == end.key) endIndex = i + 1
+      if (child.object === 'text') {
+        if (startIndex == null && child.key === start.key) startIndex = i
+        if (endIndex == null && child.key === end.key) endIndex = i + 1
       } else {
         if (startIndex == null && child.hasDescendant(start.key)) startIndex = i
         if (endIndex == null && child.hasDescendant(end.key)) endIndex = i + 1
@@ -1443,7 +1443,7 @@ class ElementInterface {
     let array = []
 
     this.nodes.forEach(node => {
-      if (node.object == 'text') {
+      if (node.object === 'text') {
         array.push(node)
       } else {
         array = array.concat(node.getTextsAsArray())
@@ -1498,7 +1498,7 @@ class ElementInterface {
 
     // PERF: the most common case is when the range is in a single text node,
     // where we can avoid a lot of iterating of the tree.
-    if (startKey == endKey) return [startText]
+    if (startKey === endKey) return [startText]
 
     const endText = this.getDescendant(endKey)
     const texts = this.getTextsAsArray()
@@ -1763,13 +1763,12 @@ class ElementInterface {
     const newParentPath = PathUtils.lift(newPath)
     this.assertNode(newParentPath)
 
-    const [p, np] = PathUtils.crop(path, newPath)
-    const position = PathUtils.compare(p, np)
+    const position = PathUtils.compare(path, newPath)
 
     // If the old path ends above and before a node in the new path, then
     // removing it will alter the target, so we need to adjust the new path.
     if (path.size < newPath.size && position === -1) {
-      newPath = PathUtils.decrement(newPath, 1, p.size - 1)
+      newPath = PathUtils.decrement(newPath, 1, path.size - 1)
     }
 
     let ret = this
