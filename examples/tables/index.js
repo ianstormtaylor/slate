@@ -163,6 +163,11 @@ class Tables extends React.Component {
 
     if (isCollapsed && start.isAtStartOfNode(startNode)) {
       const previous = document.getPreviousText(startNode.key)
+
+      if (!previous) {
+        return next()
+      }
+
       const prevBlock = document.getClosestBlock(previous.key)
 
       if (prevBlock.type === 'table-cell') {
