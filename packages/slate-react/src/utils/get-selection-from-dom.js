@@ -35,10 +35,10 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   if (
     anchorBlock &&
     !editor.isVoid(anchorBlock) &&
-    anchor.offset == 0 &&
+    anchor.offset === 0 &&
     focusBlock &&
     editor.isVoid(focusBlock) &&
-    focus.offset != 0
+    focus.offset !== 0
   ) {
     range = range.setFocus(focus.setOffset(0))
   }
@@ -49,7 +49,7 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   if (
     anchorInline &&
     !editor.isVoid(anchorInline) &&
-    anchor.offset == anchorText.text.length
+    anchor.offset === anchorText.text.length
   ) {
     const block = document.getClosestBlock(anchor.key)
     const nextText = block.getNextText(anchor.key)
@@ -59,7 +59,7 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   if (
     focusInline &&
     !editor.isVoid(focusInline) &&
-    focus.offset == focusText.text.length
+    focus.offset === focusText.text.length
   ) {
     const block = document.getClosestBlock(focus.key)
     const nextText = block.getNextText(focus.key)

@@ -361,7 +361,7 @@ class Content extends React.Component {
     // at the end of a block. The selection ends up to the left of the inserted
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
-    if (!IS_ANDROID && handler == 'onSelect') {
+    if (!IS_ANDROID && handler === 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
