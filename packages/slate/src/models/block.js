@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { List, Map, Record } from 'immutable'
+import { fromJS, List, Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
 import Node from './node'
@@ -88,7 +88,7 @@ class Block extends Record(DEFAULTS) {
     const block = new Block({
       key,
       type,
-      data: Map(data),
+      data: fromJS(data),
       nodes: Node.createList(nodes),
     })
 
