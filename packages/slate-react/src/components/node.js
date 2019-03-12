@@ -124,9 +124,6 @@ class Node extends React.Component {
       editor,
       isSelected,
       isFocused,
-      containedInSelection,
-      onEdgeOfSelection,
-      path,
       node,
       decorations,
       parent,
@@ -134,26 +131,16 @@ class Node extends React.Component {
     } = this.props
     const { value } = editor
     const { selection } = value
-    // Only do this calculation if we need to
-    const indexes =
-      onEdgeOfSelection && node.getSelectionIndexes(selection, path)
+    const indexes = node.getSelectionIndexes(selection, isSelected)
     const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
     const children = []
 
     node.nodes.forEach((child, i) => {
-      const contained =
-        containedInSelection ||
-        (!!indexes && indexes.start < i && i < indexes.end - 1)
-      const onEdge = !!indexes && (i === indexes.start || i === indexes.end - 1)
+      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
 
       children.push(
-        this.renderNode(
-          child,
-          { onEdgeOfSelection: onEdge, containedInSelection: contained },
-          childrenDecorations[i],
-          i
-        )
+        this.renderNode(child, isChildSelected, childrenDecorations[i])
       )
     })
 
@@ -210,9 +197,6 @@ class Node extends React.Component {
         decorations={decorations}
         editor={editor}
         isSelected={isSelected}
-        containedInSelection={containedInSelection}
-        onEdgeOfSelection={onEdgeOfSelection}
-        path={onEdgeOfSelection && path.concat(index)}
         isFocused={isFocused && isSelected}
         key={child.key}
         node={child}
