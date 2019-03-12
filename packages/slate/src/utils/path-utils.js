@@ -212,12 +212,25 @@ function isYounger(path, target) {
  * Lift a `path` to refer to its parent.
  *
  * @param {List} path
- * @return {Array}
+ * @return {List}
  */
 
 function lift(path) {
   const parent = path.slice(0, -1)
   return parent
+}
+
+
+/**
+ * Drop a `path` to make it relative to 
+ *
+ * @param {List} path
+ * @return {List}
+ */
+
+function drop(path) {
+  const relative = path.slice(1)
+  return relative
 }
 
 /**
@@ -391,6 +404,7 @@ export default {
   isSibling,
   isYounger,
   lift,
+  drop,
   max,
   min,
   relate,

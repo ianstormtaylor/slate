@@ -112,7 +112,7 @@ class ElementInterface {
   }
 
   /**
-   * Recursively find all descendant nodes by `iterator`.
+   * Recursively find a descendant node by `iterator`.
    *
    * @param {Function} iterator
    * @return {Node|Null}
@@ -129,6 +129,45 @@ class ElementInterface {
     })
 
     return found
+  }
+
+  /**
+   * Recursively find a descendant node and its path by `iterator`.
+   *
+   * @param {Function} iterator
+   * @return {Null|[Node, List]}
+   */
+
+  findDescendantAndPath(
+    iterator,
+    pathToThisNode = PathUtils.create([]),
+    findLast = false
+  ) {
+    let found
+    let foundPath
+
+    this.forEachDescendantWithPath(
+      (node, path, nodes) => {
+        if (iterator(node, path, nodes)) {
+          found = node
+          foundPath = path
+          return false
+        }
+      },
+      pathToThisNode,
+      findLast
+    )
+
+    return found ? [found, foundPath] : null
+  }
+
+  // Easy helpers to avoid needing to pass findLast boolean
+  findFirstDescendantAndPath(iterator, pathToThisNode) {
+    return this.findDescendantAndPath(iterator, pathToThisNode, false)
+  }
+
+  findLastDescendantAndPath(iterator, pathToThisNode) {
+    return this.findDescendantAndPath(iterator, pathToThisNode, true)
   }
 
   /**
@@ -157,6 +196,39 @@ class ElementInterface {
   }
 
   /**
+   * Recursively iterate over all descendant nodes with `iterator`. If the
+   * iterator returns false it will break the loop.
+   * Calls iterator with node and path.
+   *
+   * @param {Function} iterator
+   * @param {List} path
+   * @param {Boolean} findLast - whether to iterate in reverse order
+   */
+
+  forEachDescendantWithPath(iterator, path = PathUtils.create([]), findLast) {
+    let nodes = this.nodes
+    let ret
+
+    if (findLast) nodes = nodes.reverse()
+
+    nodes.forEach((child, i) => {
+      const childPath = path.concat(i)
+
+      if (iterator(child, childPath, nodes) === false) {
+        ret = false
+        return false
+      }
+
+      if (child.object != 'text') {
+        ret = child.forEachDescendantWithPath(iterator, childPath, findLast)
+        return ret
+      }
+    })
+
+    return ret
+  }
+
+  /**
    * Get a set of the active marks in a `range`.
    *
    * @param {Range} range
@@ -169,31 +241,33 @@ class ElementInterface {
 
     if (range.isCollapsed) {
       const { start } = range
-      return this.getMarksAtPosition(start.key, start.offset).toSet()
+      return this.getMarksAtPosition(start.path, start.offset).toSet()
     }
 
     const { start, end } = range
-    let startKey = start.key
+    let startPath = start.path
     let startOffset = start.offset
-    let endKey = end.key
+    let endPath = end.path
     let endOffset = end.offset
-    let startText = this.getDescendant(startKey)
+    let startText = this.getDescendant(startPath)
+    let endText = this.getDescendant(endPath)
 
-    if (startKey !== endKey) {
-      while (startKey !== endKey && endOffset === 0) {
-        const endText = this.getPreviousText(endKey)
-        endKey = endText.key
+    if (!PathUtils.isEqual(startPath, endPath)) {
+      while (!PathUtils.isEqual(startPath, endPath) && endOffset === 0) {
+        ;[endText, endPath] = this.getPreviousTextAndPath(endPath)
         endOffset = endText.text.length
       }
 
-      while (startKey !== endKey && startOffset === startText.text.length) {
-        startText = this.getNextText(startKey)
-        startKey = startText.key
+      while (
+        !PathUtils.isEqual(startPath, endPath) &&
+        startOffset === startText.text.length
+      ) {
+        ;[startText, startPath] = this.getNextTextAndPath(startPath)
         startOffset = 0
       }
     }
 
-    if (startKey === endKey) {
+    if (PathUtils.isEqual(startPath, endPath)) {
       return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
     }
 
@@ -202,21 +276,23 @@ class ElementInterface {
       startText.text.length
     )
     if (startMarks.size === 0) return Set()
-    const endText = this.getDescendant(endKey)
     const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
     let marks = startMarks.intersect(endMarks)
+
     // If marks is already empty, the active marks is empty
-    if (marks.size === 0) return marks
+    if (marks.size === 0) {
+      return marks
+    }
 
-    let text = this.getNextText(startKey)
+    ;[startText, startPath] = this.getNextTextAndPath(startPath)
 
-    while (text.key !== endKey) {
-      if (text.text.length !== 0) {
-        marks = marks.intersect(text.getActiveMarks())
+    while (!PathUtils.isEqual(startPath, endPath)) {
+      if (startText.text.length !== 0) {
+        marks = marks.intersect(startText.getActiveMarks())
         if (marks.size === 0) return Set()
       }
 
-      text = this.getNextText(text.key)
+      ;[startText, startPath] = this.getNextTextAndPath(startPath)
     }
     return marks
   }
@@ -342,8 +418,8 @@ class ElementInterface {
 
   getChild(path) {
     path = this.resolvePath(path)
-    if (!path) return null
-    const child = path.size === 1 ? this.nodes.get(path.first()) : null
+    if (!path || path.size > 1) return null
+    const child = this.nodes.get(path.first())
     return child
   }
 
@@ -376,6 +452,7 @@ class ElementInterface {
    */
 
   getClosestBlock(path) {
+    path = this.resolvePath(path)
     const closest = this.getClosest(path, n => n.object === 'block')
     return closest
   }
@@ -388,6 +465,7 @@ class ElementInterface {
    */
 
   getClosestInline(path) {
+    path = this.resolvePath(path)
     const closest = this.getClosest(path, n => n.object === 'inline')
     return closest
   }
@@ -469,17 +547,23 @@ class ElementInterface {
   /**
    * Get a descendant node.
    *
-   * @param {List|String} path
+   * @param {List|string} path
    * @return {Node|Null}
    */
 
   getDescendant(path) {
     path = this.resolvePath(path)
-    if (!path) return null
+    if (!path || !path.size) return null
 
-    const deep = path.flatMap(x => ['nodes', x])
-    const ret = this.getIn(deep)
-    return ret
+    let node = this
+    let i = 0
+
+    while (i < path.size && node) {
+      node = node.getIn(['nodes', path.get(i)])
+      i++
+    }
+
+    return node
   }
 
   /**
@@ -546,14 +630,14 @@ class ElementInterface {
   /**
    * Get the furthest ancestor of a node.
    *
-   * @param {Path} path
+   * @param {Path|string} path
    * @return {Node|Null}
    */
 
   getFurthestAncestor(path) {
     path = this.resolvePath(path)
-    if (!path) return null
-    const furthest = path.size ? this.nodes.get(path.first()) : null
+    if (!path || !path.size) return null
+    const furthest = this.nodes.get(path.first())
     return furthest
   }
 
@@ -565,6 +649,7 @@ class ElementInterface {
    */
 
   getFurthestBlock(path) {
+    path = this.resolvePath(path)
     const furthest = this.getFurthest(path, n => n.object === 'block')
     return furthest
   }
@@ -577,14 +662,15 @@ class ElementInterface {
    */
 
   getFurthestInline(path) {
+    path = this.resolvePath(path)
     const furthest = this.getFurthest(path, n => n.object === 'inline')
     return furthest
   }
 
   /**
-   * Get the furthest ancestor of a node that has only one child.
+   * Get the furthest ancestor of a node, where all ancestors to that point only have one child.
    *
-   * @param {Path} path
+   * @param {Path|string} path
    * @return {Node|Null}
    */
 
@@ -616,7 +702,7 @@ class ElementInterface {
   /**
    * Get the closest inline nodes for each text node in the node, as an array.
    *
-   * @return {List<Node>}
+   * @return {Array<Node>}
    */
 
   getInlinesAsArray() {
@@ -719,10 +805,10 @@ class ElementInterface {
 
     if (range.isCollapsed) {
       // PERF: range is not cachable, use key and offset as proxies for cache
-      return this.getMarksAtPosition(start.key, start.offset)
+      return this.getMarksAtPosition(start.path, start.offset)
     }
 
-    const text = this.getDescendant(start.key)
+    const text = this.getDescendant(start.path)
     const marks = text.getMarksAtIndex(start.offset + 1)
     return marks
   }
@@ -744,7 +830,7 @@ class ElementInterface {
    * Get the bottom-most descendants in a `range` as an array
    *
    * @param {Range} range
-   * @return {Array}
+   * @return {Array<Node>}
    */
 
   getLeafBlocksAtRangeAsArray(range) {
@@ -752,17 +838,57 @@ class ElementInterface {
     if (range.isUnset) return []
 
     const { start, end } = range
-    const startBlock = this.getClosestBlock(start.key)
 
+    return this.getLeafBlocksBetweenPathPositionsAsArray(start.path, end.path)
+  }
+
+  /**
+   * Get the bottom-most descendants between two paths as an array
+   *
+   * @param {List|Null} startPath
+   * @param {List|Null} endPath
+   * @return {Array<Node>}
+   */
+
+  getLeafBlocksBetweenPathPositionsAsArray(startPath, endPath) {
     // PERF: the most common case is when the range is in a single block node,
     // where we can avoid a lot of iterating of the tree.
-    if (start.key === end.key) return [startBlock]
+    if (startPath && endPath && PathUtils.isEqual(startPath, endPath)) {
+      return [this.getClosestBlock(startPath)]
+    } else if (!startPath && !endPath) {
+      return this.getBlocksAsArray()
+    }
 
-    const endBlock = this.getClosestBlock(end.key)
-    const blocks = this.getBlocksAsArray()
-    const startIndex = blocks.indexOf(startBlock)
-    const endIndex = blocks.indexOf(endBlock)
-    return blocks.slice(startIndex, endIndex + 1)
+    const startIndex = startPath ? startPath.get(0, 0) : 0
+    const endIndex = endPath
+      ? endPath.get(0, this.nodes.size - 1)
+      : this.nodes.size - 1
+
+    let array = []
+
+    this.nodes.slice(startIndex, endIndex + 1).forEach((node, i) => {
+      if (node.object !== 'block') {
+        return
+      } else if (node.isLeafBlock()) {
+        array.push(node)
+      } else {
+        const childStartPath =
+          startPath && i === 0 ? PathUtils.drop(startPath) : null
+        const childEndPath =
+          endPath && i === endIndex - startIndex
+            ? PathUtils.drop(endPath)
+            : null
+
+        array = array.concat(
+          node.getLeafBlocksBetweenPathPositionsAsArray(
+            childStartPath,
+            childEndPath
+          )
+        )
+      }
+    })
+
+    return array
   }
 
   /**
@@ -783,7 +909,7 @@ class ElementInterface {
    * Get the bottom-most inline nodes for each text node in a `range` as an array.
    *
    * @param {Range} range
-   * @return {Array}
+   * @return {Array<Node>}
    */
 
   getLeafInlinesAtRangeAsArray(range) {
@@ -829,27 +955,30 @@ class ElementInterface {
   /**
    * Get a set of marks in a `position`, the equivalent of a collapsed range
    *
-   * @param {string} key
+   * @param {List|string} key
    * @param {number} offset
    * @return {Set}
    */
 
-  getMarksAtPosition(key, offset) {
-    const text = this.getDescendant(key)
+  getMarksAtPosition(path, offset) {
+    path = this.resolvePath(path)
+    const text = this.getDescendant(path)
     const currentMarks = text.getMarksAtIndex(offset)
     if (offset !== 0) return currentMarks
-    const closestBlock = this.getClosestBlock(key)
+    const closestBlock = this.getClosestBlock(path)
 
     if (closestBlock.text === '') {
       // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
       return currentMarks
     }
 
-    const previous = this.getPreviousText(key)
+    const previous = this.getPreviousTextAndPath(path)
     if (!previous) return Set()
 
-    if (closestBlock.hasDescendant(previous.key)) {
-      return previous.getMarksAtIndex(previous.text.length)
+    const [previousText, previousPath] = previous
+
+    if (closestBlock.hasDescendant(previousPath)) {
+      return previous.getMarksAtIndex(previousText.text.length)
     }
 
     return currentMarks
@@ -897,28 +1026,20 @@ class ElementInterface {
   }
 
   /**
-   * Get the block node before a descendant text node by `key`.
+   * Get the block node after a descendant text node by `path`.
    *
-   * @param {String} key
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getNextBlock(key) {
-    const child = this.assertDescendant(key)
-    let last
+  getNextBlock(path) {
+    path = this.resolvePath(path)
+    const match = this.getNextDeepMatchingNodeAndPath(
+      path,
+      n => n.object === 'block'
+    )
 
-    if (child.object === 'block') {
-      last = child.getLastText()
-    } else {
-      const block = this.getClosestBlock(key)
-      last = block.getLastText()
-    }
-
-    const next = this.getNextText(last.key)
-    if (!next) return null
-
-    const closest = this.getClosestBlock(next.key)
-    return closest
+    return match ? match[0] : null
   }
 
   /**
@@ -944,6 +1065,74 @@ class ElementInterface {
     }
 
     return null
+  }
+
+  /**
+   * Get the next node in the tree from a node that matches iterator
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the next ancestor if no sibling is found.
+   *
+   * @param {List} path
+   * @return {Node|Null}
+   */
+
+  getNextMatchingNodeAndPath(path, iterator = () => true) {
+    if (!path) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+
+      let nextPath = PathUtils.increment(p)
+      let nextNode = this.getNode(nextPath)
+
+      while (nextNode && !iterator(nextNode)) {
+        nextPath = PathUtils.increment(nextPath)
+        nextNode = this.getNode(nextPath)
+      }
+
+      if (nextNode) return [nextNode, nextPath]
+    }
+
+    return null
+  }
+
+  /**
+   * Get the next, deepest node in the tree from a node that matches iterator
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the next ancestor if no sibling is found.
+   *
+   * @param {List} path
+   * @param {Function} iterator
+   * @return {Node|Null}
+   */
+
+  getNextDeepMatchingNodeAndPath(path, iterator = () => true) {
+    const match = this.getNextMatchingNodeAndPath(path)
+
+    if (!match) return null
+
+    let [nextNode, nextPath] = match
+
+    let childMatch
+
+    const assign = () => {
+      childMatch =
+        nextNode.object !== 'text' &&
+        nextNode.findFirstDescendantAndPath(iterator, nextPath)
+      return childMatch
+    }
+
+    while (assign(childMatch)) {
+      ;[nextNode, nextPath] = childMatch
+    }
+
+    if (!nextNode) return null
+
+    return iterator(nextNode)
+      ? [nextNode, nextPath]
+      : this.getNextDeepMatchingNodeAndPath(match[1], iterator)
   }
 
   /**
@@ -977,6 +1166,16 @@ class ElementInterface {
     if (!next) return null
     const text = next.getFirstText()
     return text
+  }
+
+  getNextTextAndPath(path) {
+    if (!path) return null
+    if (!path.size) return null
+    const match = this.getNextDeepMatchingNodeAndPath(
+      path,
+      n => n.object === 'text'
+    )
+    return match
   }
 
   /**
@@ -1049,23 +1248,28 @@ class ElementInterface {
   }
 
   /**
-   * Get the offset for a descendant text node by `key`.
+   * Get the offset for a descendant text node by `path` or `key`.
    *
-   * @param {String} key
+   * @param {List|string} path
    * @return {Number}
    */
 
-  getOffset(key) {
-    this.assertDescendant(key)
+  getOffset(path) {
+    path = this.resolvePath(path)
+    this.assertDescendant(path)
 
     // Calculate the offset of the nodes before the highest child.
-    const child = this.getFurthestAncestor(key)
+    const index = path.first()
+
     const offset = this.nodes
-      .takeUntil(n => n === child)
+      .slice(0, index)
       .reduce((memo, n) => memo + n.text.length, 0)
 
     // Recurse if need be.
-    const ret = this.hasChild(key) ? offset : offset + child.getOffset(key)
+    const ret =
+      path.size === 1
+        ? offset
+        : offset + this.nodes.get(index).getOffset(PathUtils.drop(path))
     return ret
   }
 
@@ -1088,7 +1292,7 @@ class ElementInterface {
     }
 
     const { start } = range
-    const offset = this.getOffset(start.key) + start.offset
+    const offset = this.getOffset(start.path) + start.offset
     return offset
   }
 
@@ -1119,14 +1323,14 @@ class ElementInterface {
     }
 
     if (range.isCollapsed) {
-      // PERF: range is not cachable, use key and offset as proxies for cache
-      return this.getMarksAtPosition(start.key, start.offset)
+      // PERF: range is not cachable, use path? and offset as proxies for cache
+      return this.getMarksAtPosition(start.path, start.offset)
     }
 
     const marks = this.getOrderedMarksBetweenPositions(
-      start.key,
+      start.path,
       start.offset,
-      end.key,
+      end.path,
       end.offset
     )
 
@@ -1137,28 +1341,34 @@ class ElementInterface {
    * Get a set of the marks in a `range`.
    * PERF: arguments use key and offset for utilizing cache
    *
-   * @param {string} startKey
+   * @param {List|string} startPath
    * @param {number} startOffset
-   * @param {string} endKey
+   * @param {List|string} endPath
    * @param {number} endOffset
    * @returns {OrderedSet<Mark>}
    */
 
-  getOrderedMarksBetweenPositions(startKey, startOffset, endKey, endOffset) {
-    if (startKey === endKey) {
-      const startText = this.getDescendant(startKey)
+  getOrderedMarksBetweenPositions(startPath, startOffset, endPath, endOffset) {
+    startPath = this.resolvePath(startPath)
+    endPath = this.resolvePath(endPath)
+
+    const startText = this.getDescendant(startPath)
+
+    if (PathUtils.isEqual(startPath, endPath)) {
       return startText.getMarksBetweenOffsets(startOffset, endOffset)
     }
 
-    const texts = this.getTextsBetweenPositionsAsArray(startKey, endKey)
+    const endText = this.getDescendant(endPath)
+
+    const texts = this.getTextsBetweenPathPositionsAsArray(startPath, endPath)
 
     return OrderedSet().withMutations(result => {
       texts.forEach(text => {
-        if (text.key === startKey) {
+        if (text.key === startText.key) {
           result.union(
             text.getMarksBetweenOffsets(startOffset, text.text.length)
           )
-        } else if (text.key === endKey) {
+        } else if (text.key === endText.key) {
           result.union(text.getMarksBetweenOffsets(0, endOffset))
         } else {
           result.union(text.getMarks())
@@ -1196,28 +1406,20 @@ class ElementInterface {
   }
 
   /**
-   * Get the block node before a descendant text node by `key`.
+   * Get the block node before a descendant text node by `path`.
    *
-   * @param {String} key
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
-  getPreviousBlock(key) {
-    const child = this.assertDescendant(key)
-    let first
+  getPreviousBlock(path) {
+    path = this.resolvePath(path)
+    const match = this.getPreviousDeepMatchingNodeAndPath(
+      path,
+      n => n.object === 'block'
+    )
 
-    if (child.object === 'block') {
-      first = child.getFirstText()
-    } else {
-      const block = this.getClosestBlock(key)
-      first = block.getFirstText()
-    }
-
-    const previous = this.getPreviousText(first.key)
-    if (!previous) return null
-
-    const closest = this.getClosestBlock(previous.key)
-    return closest
+    return match ? match[0] : null
   }
 
   /**
@@ -1232,16 +1434,8 @@ class ElementInterface {
     if (range.isUnset) return List()
 
     const { start, end } = range
-    const startBlock = this.getFurthestBlock(start.key)
 
-    // PERF: the most common case is when the range is in a single block node,
-    // where we can avoid a lot of iterating of the tree.
-    if (start.key === end.key) return List([startBlock])
-
-    const endBlock = this.getFurthestBlock(end.key)
-    const startIndex = this.nodes.indexOf(startBlock)
-    const endIndex = this.nodes.indexOf(endBlock)
-    return this.nodes.slice(startIndex, endIndex + 1)
+    return this.nodes.slice(start.path.first(), end.path.first() + 1)
   }
 
   /**
@@ -1304,6 +1498,76 @@ class ElementInterface {
   }
 
   /**
+   * Get the previous node in the tree from a node that matches iterator
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the previous ancestor if no sibling is found.
+   *
+   * @param {List} path
+   * @return {Node|Null}
+   */
+
+  getPreviousMatchingNodeAndPath(path, iterator = () => true) {
+    if (!path) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+      if (p.last() === 0) continue
+
+      let previousPath = PathUtils.decrement(p)
+      let previousNode = this.getNode(previousPath)
+
+      while (previousNode && !iterator(previousNode)) {
+        previousPath = PathUtils.decrement(previousPath)
+        previousNode = this.getNode(previousPath)
+      }
+
+      if (previousNode) return [previousNode, previousPath]
+    }
+
+    return null
+  }
+
+  /**
+   * Get the next previous in the tree from a node that matches iterator
+   *
+   * This will not only check for siblings but instead move up the tree
+   * returning the previous ancestor if no sibling is found.
+   * Once a node is found, the last deepest child matching is returned
+   *
+   * @param {List} path
+   * @param {Function} iterator
+   * @return {Node|Null}
+   */
+
+  getPreviousDeepMatchingNodeAndPath(path, iterator = () => true) {
+    const match = this.getPreviousMatchingNodeAndPath(path)
+
+    if (!match) return null
+
+    let [previousNode, previousPath] = match
+
+    let childMatch
+
+    const assign = () => {
+      childMatch =
+        previousNode.object !== 'text' &&
+        previousNode.findLastDescendantAndPath(iterator, previousPath)
+      return childMatch
+    }
+
+    while (assign(childMatch)) {
+      ;[previousNode, previousPath] = childMatch
+    }
+
+    if (!previousNode) return null
+
+    return iterator(previousNode)
+      ? [previousNode, previousPath]
+      : this.getPreviousDeepMatchingNodeAndPath(match[1], iterator)
+  }
+
+  /**
    * Get the previous sibling of a node.
    *
    * @param {List|String} path
@@ -1321,7 +1585,7 @@ class ElementInterface {
   }
 
   /**
-   * Get the text node after a descendant text node.
+   * Get the text node before a descendant text node.
    *
    * @param {List|String} path
    * @return {Node|Null}
@@ -1333,8 +1597,18 @@ class ElementInterface {
     if (!path.size) return null
     const previous = this.getPreviousNode(path)
     if (!previous) return null
-    const text = previous.getLastText()
-    return text
+    const match = previous.getLastText()
+    return match
+  }
+
+  getPreviousTextAndPath(path) {
+    if (!path) return null
+    if (!path.size) return null
+    const match = this.getPreviousDeepMatchingNodeAndPath(
+      path,
+      n => n.object === 'text'
+    )
+    return match
   }
 
   /**
@@ -1455,58 +1729,92 @@ class ElementInterface {
   }
 
   /**
-   * Get all of the text nodes in a `range`.
+   * Get all of the text nodes in a `range` as a List.
    *
    * @param {Range} range
    * @return {List<Node>}
    */
 
   getTextsAtRange(range) {
-    range = this.resolveRange(range)
-    if (range.isUnset) return List()
-    const { start, end } = range
-    const list = List(this.getTextsBetweenPositionsAsArray(start.key, end.key))
-
-    return list
+    const arr = this.getTextsAtRangeAsArray(range)
+    return List(arr)
   }
 
   /**
    * Get all of the text nodes in a `range` as an array.
    *
    * @param {Range} range
-   * @return {Array}
+   * @return {Array<Node>}
    */
 
   getTextsAtRangeAsArray(range) {
     range = this.resolveRange(range)
     if (range.isUnset) return []
     const { start, end } = range
-    const texts = this.getTextsBetweenPositionsAsArray(start.key, end.key)
+    const texts = this.getTextsBetweenPathPositionsAsArray(start.path, end.path)
     return texts
   }
 
   /**
    * Get all of the text nodes in a `range` as an array.
-   * PERF: use key in arguments for cache
+   * PERF: use key / path in arguments for cache
    *
-   * @param {string} startKey
-   * @param {string} endKey
+   * @param {List|string} startPath
+   * @param {List|string} endPath
    * @returns {Array}
    */
 
-  getTextsBetweenPositionsAsArray(startKey, endKey) {
-    const startText = this.getDescendant(startKey)
+  getTextsBetweenPositionsAsArray(startPath, endPath) {
+    startPath = this.resolvePath(startPath)
+    endPath = this.resolvePath(endPath)
 
+    return this.getTextsBetweenPathPositionsAsArray(startPath, endPath)
+  }
+
+  /**
+   * Get all of the text nodes in a `range` as an array.
+   *
+   * @param {List|falsey} startPath
+   * @param {List|falsey} endPath
+   * @returns {Array}
+   */
+
+  getTextsBetweenPathPositionsAsArray(startPath, endPath) {
     // PERF: the most common case is when the range is in a single text node,
     // where we can avoid a lot of iterating of the tree.
-    if (startKey === endKey) return [startText]
+    if (startPath && endPath && PathUtils.isEqual(startPath, endPath)) {
+      return [this.getDescendant(startPath)]
+    } else if (!startPath && !endPath) {
+      return this.getTextsAsArray()
+    }
 
-    const endText = this.getDescendant(endKey)
-    const texts = this.getTextsAsArray()
-    const start = texts.indexOf(startText)
-    const end = texts.indexOf(endText, start)
-    const ret = texts.slice(start, end + 1)
-    return ret
+    const startIndex = startPath ? startPath.get(0, 0) : 0
+    const endIndex = endPath
+      ? endPath.get(0, this.nodes.size - 1)
+      : this.nodes.size - 1
+
+    let array = []
+
+    this.nodes.slice(startIndex, endIndex + 1).forEach((node, i) => {
+      if (node.object === 'text') {
+        array.push(node)
+      } else {
+        // For the node at start and end of this list, we want to provide a start and end path
+        // For other nodes, we can just get all their text nodes, they are between the paths
+        const childStartPath =
+          startPath && i === 0 ? PathUtils.drop(startPath) : null
+        const childEndPath =
+          endPath && i === endIndex - startIndex
+            ? PathUtils.drop(endPath)
+            : null
+
+        array = array.concat(
+          node.getTextsBetweenPathPositionsAsArray(childStartPath, childEndPath)
+        )
+      }
+    })
+
+    return array
   }
 
   /**
@@ -1619,9 +1927,10 @@ class ElementInterface {
 
   isLeafBlock() {
     const { object, nodes } = this
+    if (object !== 'block') return false
     if (!nodes.size) return true
-    const first = nodes.first()
-    return object === 'block' && first.object !== 'block'
+
+    return nodes.first().object !== 'block'
   }
 
   /**
@@ -1632,16 +1941,17 @@ class ElementInterface {
 
   isLeafInline() {
     const { object, nodes } = this
+    if (object !== 'inline') return false
     if (!nodes.size) return true
-    const first = nodes.first()
-    return object === 'inline' && first.object !== 'inline'
+
+    return nodes.first().object !== 'inline'
   }
 
   /**
    * Check whether a descendant node is inside a range. This will return true for all
    * text nodes inside the range and all ancestors of those text nodes up to this node.
    *
-   * @param {List|Key} path
+   * @param {List|string} path
    * @param {Range} range
    * @return {Node}
    */
@@ -2005,7 +2315,7 @@ for (const method of ASSERTS) {
 
 memoize(ElementInterface.prototype, [
   'getBlocksAsArray',
-  'getBlocksAtRangeAsArray',
+  'getLeafBlocksAtRangeAsArray',
   'getBlocksByTypeAsArray',
   'getDecorations',
   'getFragmentAtRange',
@@ -2028,7 +2338,7 @@ memoize(ElementInterface.prototype, [
   'getTextAtOffset',
   'getTextDirection',
   'getTextsAsArray',
-  'getTextsBetweenPositionsAsArray',
+  'getTextsBetweenPathPositionsAsArray',
 ])
 
 /**
