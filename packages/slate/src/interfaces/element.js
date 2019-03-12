@@ -219,7 +219,7 @@ class ElementInterface {
         return false
       }
 
-      if (child.object != 'text') {
+      if (child.object !== 'text') {
         ret = child.forEachDescendantWithPath(iterator, childPath, findLast)
         return ret
       }

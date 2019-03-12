@@ -220,9 +220,8 @@ function lift(path) {
   return parent
 }
 
-
 /**
- * Drop a `path` to make it relative to 
+ * Drop a `path`, returning the path from the first child.
  *
  * @param {List} path
  * @return {List}
