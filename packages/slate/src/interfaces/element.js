@@ -452,7 +452,6 @@ class ElementInterface {
    */
 
   getClosestBlock(path) {
-    path = this.resolvePath(path)
     const closest = this.getClosest(path, n => n.object === 'block')
     return closest
   }
@@ -465,7 +464,6 @@ class ElementInterface {
    */
 
   getClosestInline(path) {
-    path = this.resolvePath(path)
     const closest = this.getClosest(path, n => n.object === 'inline')
     return closest
   }
@@ -547,7 +545,7 @@ class ElementInterface {
   /**
    * Get a descendant node.
    *
-   * @param {List|string} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
@@ -556,12 +554,11 @@ class ElementInterface {
     if (!path || !path.size) return null
 
     let node = this
-    let i = 0
 
-    while (i < path.size && node) {
-      node = node.getIn(['nodes', path.get(i)])
-      i++
-    }
+    path.forEach(index => {
+      node = node.getIn(['nodes', index])
+      return !!node
+    })
 
     return node
   }
@@ -630,7 +627,7 @@ class ElementInterface {
   /**
    * Get the furthest ancestor of a node.
    *
-   * @param {Path|string} path
+   * @param {List|String} path
    * @return {Node|Null}
    */
 
@@ -649,7 +646,6 @@ class ElementInterface {
    */
 
   getFurthestBlock(path) {
-    path = this.resolvePath(path)
     const furthest = this.getFurthest(path, n => n.object === 'block')
     return furthest
   }
@@ -662,7 +658,6 @@ class ElementInterface {
    */
 
   getFurthestInline(path) {
-    path = this.resolvePath(path)
     const furthest = this.getFurthest(path, n => n.object === 'inline')
     return furthest
   }
@@ -670,7 +665,7 @@ class ElementInterface {
   /**
    * Get the furthest ancestor of a node, where all ancestors to that point only have one child.
    *
-   * @param {Path|string} path
+   * @param {Path} path
    * @return {Node|Null}
    */
 
