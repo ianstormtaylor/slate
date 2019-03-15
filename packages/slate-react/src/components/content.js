@@ -207,7 +207,7 @@ class Content extends React.Component {
     this.tmp.isUpdatingSelection = true
 
     if (!IS_FIREFOX) {
-      removeAllRanges(native);
+      removeAllRanges(native)
 
       // COMPAT: IE 11 does not support Selection.setBaseAndExtent
       if (native.setBaseAndExtent) {
