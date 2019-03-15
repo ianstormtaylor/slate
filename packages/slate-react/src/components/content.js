@@ -270,12 +270,6 @@ class Content extends React.Component {
     let el
 
     try {
-      // COMPAT: In Firefox, sometimes the node can be comment which doesn't
-      // have .closest and it crashes.
-      if (target.nodeType === 8) {
-        return false
-      }
-
       // COMPAT: Text nodes don't have `isContentEditable` property. So, when
       // `target` is a text node use its parent node for check.
       el = target.nodeType === 3 ? target.parentNode : target
