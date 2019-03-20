@@ -2,21 +2,22 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .splitNodeByKey('a', 2)
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.splitNodeByKey('a', 2)
+  editor.flush().undo()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph key="a">
+        <text />
         <link>one</link>
-        <cursor />
+        <text>
+          <cursor />
+        </text>
         <link>two</link>
+        <text />
       </paragraph>
     </document>
   </value>

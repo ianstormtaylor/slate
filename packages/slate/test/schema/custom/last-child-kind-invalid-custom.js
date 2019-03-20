@@ -7,9 +7,9 @@ export const schema = {
     paragraph: {},
     quote: {
       last: [{ object: 'block' }],
-      normalize: (change, { code, child }) => {
-        if (code == 'last_child_object_invalid') {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      normalize: (editor, { code, child }) => {
+        if (code === 'last_child_object_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

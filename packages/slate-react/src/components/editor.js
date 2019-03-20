@@ -2,15 +2,13 @@ import Debug from 'debug'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-import warning from 'slate-dev-warning'
-import { Schema, Stack } from 'slate'
+import invariant from 'tiny-invariant'
 import memoizeOne from 'memoize-one'
+import warning from 'tiny-warning'
+import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
-import PLUGINS_PROPS from '../constants/plugin-props'
-import AfterPlugin from '../plugins/after'
-import BeforePlugin from '../plugins/before'
-import noop from '../utils/noop'
+import ReactPlugin from '../plugins/react'
 
 /**
  * Debug.
@@ -37,7 +35,10 @@ class Editor extends React.Component {
     autoCorrect: Types.bool,
     autoFocus: Types.bool,
     className: Types.string,
+    defaultValue: SlateTypes.value,
+    id: Types.string,
     onChange: Types.func,
+    options: Types.object,
     placeholder: Types.any,
     plugins: Types.array,
     readOnly: Types.bool,
@@ -46,7 +47,11 @@ class Editor extends React.Component {
     spellCheck: Types.bool,
     style: Types.object,
     tabIndex: Types.number,
-    value: SlateTypes.value.isRequired,
+    value: SlateTypes.value,
+    ...EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = Types.func
+      return obj
+    }, {}),
   }
 
   /**
@@ -58,7 +63,9 @@ class Editor extends React.Component {
   static defaultProps = {
     autoFocus: false,
     autoCorrect: true,
-    onChange: noop,
+    onChange: () => {},
+    options: {},
+    placeholder: '',
     plugins: [],
     readOnly: false,
     schema: {},
@@ -71,7 +78,7 @@ class Editor extends React.Component {
    * @type {Object}
    */
 
-  state = {}
+  state = { value: this.props.defaultValue }
 
   /**
    * Temporary values.
@@ -80,69 +87,49 @@ class Editor extends React.Component {
    */
 
   tmp = {
+    mounted: false,
     change: null,
-    isChanging: false,
-    operationsSize: null,
-    plugins: null,
     resolves: 0,
     updates: 0,
-    value: null,
   }
 
   /**
-   * Create a set of bound event handlers.
-   *
-   * @type {Object}
-   */
-
-  handlers = EVENT_HANDLERS.reduce((obj, handler) => {
-    obj[handler] = event => this.onEvent(handler, event)
-    return obj
-  }, {})
-
-  /**
-   * When the component first mounts, flush any temporary changes, and then,
-   * focus the editor if `autoFocus` is set.
+   * When the component first mounts, flush a queued change if one exists.
    */
 
   componentDidMount() {
+    this.tmp.mounted = true
     this.tmp.updates++
 
-    const { autoFocus } = this.props
-    const { change } = this.tmp
-
-    if (autoFocus) {
-      if (change) {
-        change.focus()
-      } else {
-        this.focus()
-      }
+    if (this.props.autoFocus) {
+      this.focus()
     }
 
-    if (change) {
-      this.onChange(change)
+    if (this.tmp.change) {
+      this.handleChange(this.tmp.change)
+      this.tmp.change = null
     }
   }
 
   /**
-   * When the component updates, flush any temporary change.
+   * When the component updates, flush a queued change if one exists.
    */
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate() {
     this.tmp.updates++
 
-    const { change, resolves, updates } = this.tmp
-
-    // If we've resolved a few times already, and it's exactly in line with
-    // the updates, then warn the user that they may be doing something wrong.
-    warning(
-      resolves < 5 || resolves !== updates,
-      'A Slate <Editor> component is re-resolving `props.plugins` or `props.schema` on each update, which leads to poor performance. This is often due to passing in a new `schema` or `plugins` prop with each render by declaring them inline in your render function. Do not do this!'
-    )
-
-    if (change) {
-      this.onChange(change)
+    if (this.tmp.change) {
+      this.handleChange(this.tmp.change)
+      this.tmp.change = null
     }
+  }
+
+  /**
+   * When the component unmounts, make sure async commands don't trigger react updates.
+   */
+
+  componentWillUnmount() {
+    this.tmp.mounted = false
   }
 
   /**
@@ -153,260 +140,194 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-    const props = { ...this.props }
-    const tree = this.stack.render('renderEditor', props, this)
-    return tree
+    const props = { ...this.props, editor: this }
+
+    // Re-resolve the controller if needed based on memoized props.
+    const { commands, placeholder, plugins, queries, schema } = props
+    this.resolveController(plugins, schema, commands, queries, placeholder)
+
+    // Set the current props on the controller.
+    const { options, readOnly, value: valueFromProps } = props
+    const { value: valueFromState } = this.state
+    const value = valueFromProps || valueFromState
+    this.controller.setReadOnly(readOnly)
+    this.controller.setValue(value, options)
+
+    // Render the editor's children with the controller.
+    const children = this.controller.run('renderEditor', {
+      ...props,
+      value,
+    })
+    return children
   }
 
   /**
-   * Get the editor's current plugins.
+   * Resolve an editor controller from the passed-in props. This method takes
+   * all of the props as individual arguments to be able to properly memoize
+   * against anything that could change and invalidate the old editor.
    *
-   * @return {Array}
+   * @param {Array} plugins
+   * @param {Object} schema
+   * @param {Object} commands
+   * @param {Object} queries
+   * @param {String} placeholder
+   * @return {Editor}
    */
 
-  get plugins() {
-    const plugins = this.resolvePlugins(this.props.plugins, this.props.schema)
-    return plugins
-  }
-
-  /**
-   * Get the editor's current schema.
-   *
-   * @return {Schema}
-   */
-
-  get schema() {
-    const schema = this.resolveSchema(this.plugins)
-    return schema
-  }
-
-  /**
-   * Get the editor's current stack.
-   *
-   * @return {Stack}
-   */
-
-  get stack() {
-    const stack = this.resolveStack(this.plugins)
-    return stack
-  }
-
-  /**
-   * Get the editor's current value.
-   *
-   * @return {Value}
-   */
-
-  get value() {
-    // If the current `plugins` and `value` are the same as the last seen ones
-    // that were saved in `tmp`, don't re-resolve because that will trigger
-    // extra `onChange` runs.
-    if (
-      this.plugins === this.tmp.plugins &&
-      this.props.value === this.tmp.value
-    ) {
-      return this.tmp.value
-    }
-
-    const value = this.resolveValue(this.plugins, this.props.value)
-    return value
-  }
-
-  /**
-   * Perform a change on the editor, passing `...args` to `change.call`.
-   *
-   * @param {Mixed} ...args
-   */
-
-  change = (...args) => {
-    if (this.tmp.isChanging) {
+  resolveController = memoizeOne(
+    (plugins = [], schema, commands, queries, placeholder) => {
+      // If we've resolved a few times already, and it's exactly in line with
+      // the updates, then warn the user that they may be doing something wrong.
       warning(
-        false,
-        "The `editor.change` method was called from within an existing `editor.change` callback. This is not allowed, and often due to calling `editor.change` directly from a plugin's event handler which is unnecessary."
+        this.tmp.resolves < 5 || this.tmp.resolves !== this.tmp.updates,
+        'A Slate <Editor> component is re-resolving the `plugins`, `schema`, `commands`, `queries` or `placeholder` prop on each update, which leads to poor performance. This is often due to passing in a new references for these props with each render by declaring them inline in your render function. Do not do this! Declare them outside your render function, or memoize them instead.'
       )
 
-      return
-    }
+      this.tmp.resolves++
+      const react = ReactPlugin({
+        ...this.props,
+        value: this.props.value || this.state.value,
+      })
 
-    const change = this.value.change()
-
-    try {
-      this.tmp.isChanging = true
-      change.call(...args)
-    } catch (error) {
-      throw error
-    } finally {
-      this.tmp.isChanging = false
-    }
-
-    this.onChange(change)
-  }
-
-  /**
-   * Programmatically blur the editor.
-   */
-
-  blur = () => {
-    this.change(c => c.blur())
-  }
-
-  /**
-   * Programmatically focus the editor.
-   */
-
-  focus = () => {
-    this.change(c => c.focus())
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = change => {
-    // If the change doesn't define any operations to apply, abort.
-    if (change.operations.size === 0) {
-      return
-    }
-
-    debug('onChange', { change })
-    change = this.resolveChange(this.plugins, change, change.operations.size)
-
-    // Store a reference to the last `value` and `plugins` that were seen by the
-    // editor, so we can know whether to normalize a new unknown value if one
-    // is passed in via `this.props`.
-    this.tmp.value = change.value
-    this.tmp.plugins = this.plugins
-
-    // Remove the temporary `change`, since it's being flushed.
-    delete this.tmp.change
-    delete this.tmp.operationsSize
-
-    this.props.onChange(change)
-  }
-
-  /**
-   * On event.
-   *
-   * @param {String} handler
-   * @param {Event} event
-   */
-
-  onEvent = (handler, event) => {
-    this.change(change => {
-      this.stack.run(handler, event, change, this)
-    })
-  }
-
-  /**
-   * Resolve a change from the current `plugins`, a potential `change` and its
-   * current operations `size`.
-   *
-   * @param {Array} plugins
-   * @param {Change} change
-   * @param {Number} size
-   */
-
-  resolveChange = memoizeOne((plugins, change, size) => {
-    const stack = this.resolveStack(plugins)
-    stack.run('onChange', change, this)
-    return change
-  })
-
-  /**
-   * Resolve a set of plugins from potential `plugins` and a `schema`.
-   *
-   * In addition to the plugins provided in props, this will initialize three
-   * other plugins:
-   *
-   * - The top-level editor plugin, which allows for top-level handlers, etc.
-   * - The two "core" plugins, one before all the other and one after.
-   *
-   * @param {Array|Void} plugins
-   * @param {Schema|Object|Void} schema
-   * @return {Array}
-   */
-
-  resolvePlugins = memoizeOne((plugins = [], schema = {}) => {
-    debug('resolvePlugins', { plugins, schema })
-    this.tmp.resolves++
-
-    const beforePlugin = BeforePlugin()
-    const afterPlugin = AfterPlugin()
-    const editorPlugin = { schema }
-
-    for (const prop of PLUGINS_PROPS) {
-      // Skip `onChange` because the editor's `onChange` is special.
-      if (prop == 'onChange') continue
-
-      // Skip `schema` because it can't be proxied easily, so it must be passed
-      // in as an argument to this function instead.
-      if (prop == 'schema') continue
-
-      // Define a function that will just proxies into `props`.
-      editorPlugin[prop] = (...args) => {
-        return this.props[prop] && this.props[prop](...args)
+      const onChange = change => {
+        if (this.tmp.mounted) {
+          this.handleChange(change)
+        } else {
+          this.tmp.change = change
+        }
       }
+
+      this.controller = new Controller(
+        { plugins: [react], onChange },
+        { controller: this, construct: false }
+      )
+
+      this.controller.run('onConstruct')
+    }
+  )
+
+  handleChange(change) {
+    const { onChange } = this.props
+    const { value } = this.state
+
+    if (value) {
+      // Syncing value inside this component since parent does not want control of it (defaultValue was used)
+      this.setState({ value: change.value })
     }
 
-    return [beforePlugin, editorPlugin, ...plugins, afterPlugin]
-  })
+    onChange(change)
+  }
 
   /**
-   * Resolve a schema from the current `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Schema}
+   * Mimic the API of the `Editor` controller, so that this component instance
+   * can be passed in its place to plugins.
    */
 
-  resolveSchema = memoizeOne(plugins => {
-    debug('resolveSchema', { plugins })
-    const schema = Schema.create({ plugins })
-    return schema
-  })
+  get operations() {
+    return this.controller.operations
+  }
+
+  get readOnly() {
+    return this.controller.readOnly
+  }
+
+  get value() {
+    return this.controller.value
+  }
+
+  applyOperation(...args) {
+    return this.controller.applyOperation(...args)
+  }
+
+  command(...args) {
+    return this.controller.command(...args)
+  }
+
+  hasCommand(...args) {
+    return this.controller.hasCommand(...args)
+  }
+
+  hasQuery(...args) {
+    return this.controller.hasQuery(...args)
+  }
+
+  normalize(...args) {
+    return this.controller.normalize(...args)
+  }
+
+  query(...args) {
+    return this.controller.query(...args)
+  }
+
+  registerCommand(...args) {
+    return this.controller.registerCommand(...args)
+  }
+
+  registerQuery(...args) {
+    return this.controller.registerQuery(...args)
+  }
+
+  run(...args) {
+    return this.controller.run(...args)
+  }
+
+  withoutNormalizing(...args) {
+    return this.controller.withoutNormalizing(...args)
+  }
 
   /**
-   * Resolve a stack from the current `plugins`.
-   *
-   * @param {Array} plugins
-   * @return {Stack}
+   * Deprecated.
    */
 
-  resolveStack = memoizeOne(plugins => {
-    debug('resolveStack', { plugins })
-    const stack = Stack.create({ plugins })
-    return stack
-  })
+  get editor() {
+    return this.controller.editor
+  }
 
-  /**
-   * Resolve a value from the current `plugins` and a potential `value`.
-   *
-   * @param {Array} plugins
-   * @param {Value} value
-   * @return {Change}
-   */
+  get schema() {
+    invariant(
+      false,
+      'As of Slate 0.42, the `editor.schema` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+    )
+  }
 
-  resolveValue = memoizeOne((plugins, value) => {
-    debug('resolveValue', { plugins, value })
-    let change = value.change()
-    change = this.resolveChange(plugins, change, change.operations.size)
+  get stack() {
+    invariant(
+      false,
+      'As of Slate 0.42, the `editor.stack` property no longer exists, and its functionality has been folded into the editor itself. Use the `editor` instead.'
+    )
+  }
 
-    // Store the change and it's operations count so that it can be flushed once
-    // the component next updates.
-    this.tmp.change = change
-    this.tmp.operationsSize = change.operations.size
+  call(...args) {
+    return this.controller.call(...args)
+  }
 
-    return change.value
-  })
-}
+  change(...args) {
+    return this.controller.change(...args)
+  }
 
-/**
- * Mix in the prop types for the event handlers.
- */
+  onChange(...args) {
+    return this.controller.onChange(...args)
+  }
 
-for (const prop of EVENT_HANDLERS) {
-  Editor.propTypes[prop] = Types.func
+  applyOperations(...args) {
+    return this.controller.applyOperations(...args)
+  }
+
+  setOperationFlag(...args) {
+    return this.controller.setOperationFlag(...args)
+  }
+
+  getFlag(...args) {
+    return this.controller.getFlag(...args)
+  }
+
+  unsetOperationFlag(...args) {
+    return this.controller.unsetOperationFlag(...args)
+  }
+
+  withoutNormalization(...args) {
+    return this.controller.withoutNormalization(...args)
+  }
 }
 
 /**

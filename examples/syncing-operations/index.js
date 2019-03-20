@@ -55,9 +55,9 @@ class SyncingEditor extends React.Component {
    */
 
   applyOperations = operations => {
-    const { value } = this.state
-    const change = value.change().applyOperations(operations)
-    this.onChange(change, { remote: true })
+    this.remote = true
+    operations.forEach(o => this.editor.applyOperation(o))
+    this.remote = false
   }
 
   /**
@@ -69,7 +69,17 @@ class SyncingEditor extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
+  }
+
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -89,6 +99,7 @@ class SyncingEditor extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
@@ -125,7 +136,7 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -137,6 +148,8 @@ class SyncingEditor extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
@@ -144,14 +157,14 @@ class SyncingEditor extends React.Component {
    * On change, save the new `value`. And if it's a local change, call the
    * passed-in `onChange` handler.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    * @param {Object} options
    */
 
   onChange = (change, options = {}) => {
     this.setState({ value: change.value })
 
-    if (!options.remote) {
+    if (!this.remote) {
       this.props.onChange(change)
     }
   }
@@ -160,11 +173,11 @@ class SyncingEditor extends React.Component {
    * On key down, if it's a formatting command toggle a mark.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, editor, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -176,12 +189,11 @@ class SyncingEditor extends React.Component {
     } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
-      return
+      return next()
     }
 
     event.preventDefault()
-    change.toggleMark(mark)
-    return true
+    editor.toggleMark(mark)
   }
 
   /**
@@ -193,9 +205,7 @@ class SyncingEditor extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().toggleMark(type)
-    this.onChange(change)
+    this.editor.toggleMark(type)
   }
 }
 
@@ -229,35 +239,43 @@ class SyncingOperationsExample extends React.Component {
   }
 
   /**
-   * When editor one changes, send document-alterting operations to edtior two.
+   * When editor one changes, send document-altering operations to editor two.
    *
    * @param {Array} operations
    */
 
   onOneChange = change => {
     const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .filter(
+        o =>
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
       .toJS()
+      .map(o => ({ ...o, data: { source: 'one' } }))
 
-    setTimeout(() => {
-      this.two.applyOperations(ops)
-    })
+    setTimeout(() => this.two.applyOperations(ops))
   }
 
   /**
-   * When editor two changes, send document-alterting operations to edtior one.
+   * When editor two changes, send document-altering operations to editor one.
    *
    * @param {Array} operations
    */
 
   onTwoChange = change => {
     const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
+      .filter(
+        o =>
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
       .toJS()
+      .map(o => ({ ...o, data: { source: 'two' } }))
 
-    setTimeout(() => {
-      this.one.applyOperations(ops)
-    })
+    setTimeout(() => this.one.applyOperations(ops))
   }
 }
 

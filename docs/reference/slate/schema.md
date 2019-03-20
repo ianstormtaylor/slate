@@ -1,4 +1,4 @@
-# `Schema`
+# Schema
 
 Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases, you can enforce rules about what the content of a Slate document can contain.
 
@@ -9,6 +9,7 @@ Every Slate editor has a "schema" associated with it, which contains information
   document: Object,
   blocks: Object,
   inlines: Object,
+  rules: Array,
 }
 ```
 
@@ -210,17 +211,17 @@ Will validate a node's marks. The `marks` definitions can declare the `type` pro
 
 ### `normalize`
 
-`normalize(change: Change, error: SlateError) => Void`
+`normalize(editor: Editor, error: SlateError) => Void`
 
 ```js
 {
-  normalize: (change, error) => {
+  normalize: (editor, error) => {
     switch (error.code) {
       case 'child_object_invalid':
-        change.wrapBlockByKey(error.child.key, 'paragraph')
+        editor.wrapBlockByKey(error.child.key, 'paragraph')
         return
       case 'child_type_invalid':
-        change.setNodeByKey(error.child.key, 'paragraph')
+        editor.setNodeByKey(error.child.key, 'paragraph')
         return
     }
   }
@@ -285,37 +286,9 @@ Will validate the previous sibling node against a [`match`](#match).
 
 Will validate a node's text with a regex or function.
 
-## Static Methods
-
-### `Schema.create`
-
-`Schema.create(properties: Object) => Schema`
-
-Create a new `Schema` instance with `properties`.
-
-### `Schema.fromJSON`
-
-`Schema.fromJSON(object: Object) => Schema`
-
-Create a schema from a JSON `object`.
-
-### `Schema.isSchema`
-
-`Schema.isSchema(maybeSchema: Any) => Boolean`
-
-Returns a boolean if the passed in argument is a `Schema`.
-
-## Instance Methods
-
-### `toJSON`
-
-`toJSON() => Object`
-
-Returns a JSON representation of the schema.
-
 ## Errors
 
-When supplying your own `normalize` property for a schema rule, it will be called with `(change, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
+When supplying your own `normalize` property for a schema rule, it will be called with `(editor, error)`. The error `code` will be one of a set of potential code strings, and it will contain additional helpful properties depending on the type of error.
 
 ### `'child_object_invalid'`
 
@@ -330,17 +303,34 @@ When supplying your own `normalize` property for a schema rule, it will be calle
 
 Raised when the `object` property of a child node is invalid.
 
-### `'child_required'`
+### `child_min_invalid`
 
 ```js
 {
   index: Number,
+  count: Number,
+  limit: Number,
   node: Node,
   rule: Object,
 }
 ```
 
-Raised when a child node was required but none was found.
+Raised when a child node repeats less than required by a rule's `min` property.
+
+### `child_max_invalid`
+
+```js
+{
+  index: Number,
+  count: Number,
+  limit: Number,
+  node: Node,
+  rule: Object,
+}
+```
+
+Raised when a child node repeats more than permitted by a rule's `max`
+property.
 
 ### `'child_type_invalid'`
 

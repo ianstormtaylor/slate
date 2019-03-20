@@ -13,6 +13,12 @@ const h = createHyperscript({
     quote: 'quote',
     code: 'code',
     image: 'image',
+    table: 'table',
+    tbody: 'tbody',
+    tr: 'tr',
+    td: 'td',
+    thead: 'thead',
+    th: 'th',
   },
   inlines: {
     link: 'link',

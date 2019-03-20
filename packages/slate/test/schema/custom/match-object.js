@@ -7,7 +7,7 @@ export const schema = {
     {
       match: [{ object: 'block' }],
       data: {
-        thing: v => v == 'value',
+        thing: v => v === 'value',
       },
     },
   ],
@@ -16,7 +16,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
     </document>
   </value>
 )

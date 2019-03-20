@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
@@ -121,6 +121,97 @@ class Point extends Record(DEFAULTS) {
   }
 
   /**
+   * Check whether the point is after another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterPoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset > point.offset) ||
+      PathUtils.compare(this.path, point.path) === 1
+    return is
+  }
+
+  /**
+   * Check whether the point is after a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAfterRange(range) {
+    if (this.isUnset) return false
+    const is = this.isAfterPoint(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the end of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtEndOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.end)
+    return is
+  }
+
+  /**
+   * Check whether the point is at the start of a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isAtStartOfRange(range) {
+    if (this.isUnset) return false
+    const is = this.equals(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is before another `point`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforePoint(point) {
+    if (this.isUnset) return false
+    const is =
+      (this.key === point.key && this.offset < point.offset) ||
+      PathUtils.compare(this.path, point.path) === -1
+    return is
+  }
+
+  /**
+   * Check whether the point is before a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isBeforeRange(range) {
+    if (this.isUnset) return false
+    const is = this.isBeforePoint(range.start)
+    return is
+  }
+
+  /**
+   * Check whether the point is inside a `range`.
+   *
+   * @return {Boolean}
+   */
+
+  isInRange(range) {
+    if (this.isUnset) return false
+    const is =
+      this.equals(range.start) ||
+      this.equals(range.end) ||
+      (this.isAfterPoint(range.start) && this.isBeforePoint(range.end))
+    return is
+  }
+
+  /**
    * Check whether the point is at the end of a `node`.
    *
    * @param {Node} node
@@ -145,7 +236,7 @@ class Point extends Record(DEFAULTS) {
     if (this.isUnset) return false
 
     // PERF: Do a check for a `0` offset first since it's quickest.
-    if (this.offset != 0) return false
+    if (this.offset !== 0) return false
 
     const first = node.getFirstText()
     const is = this.key === first.key
@@ -316,7 +407,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setKey(key) {
-    if (key !== null) {
+    if (key != null) {
       key = KeyUtils.create(key)
     }
 
@@ -344,7 +435,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   setPath(path) {
-    if (path !== null) {
+    if (path != null) {
       path = PathUtils.create(path)
     }
 

@@ -1,4 +1,6 @@
 import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
+import { Value } from 'slate'
 
 import findNode from './find-node'
 import findRange from './find-range'
@@ -7,11 +9,16 @@ import findRange from './find-range'
  * Get the target range from a DOM `event`.
  *
  * @param {Event} event
- * @param {Value} value
+ * @param {Editor} editor
  * @return {Range}
  */
 
-function getEventRange(event, value) {
+function getEventRange(event, editor) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `findNode` utility takes an `editor` instead of a `value`.'
+  )
+
   if (event.nativeEvent) {
     event = event.nativeEvent
   }
@@ -19,17 +26,18 @@ function getEventRange(event, value) {
   const { x, y, target } = event
   if (x == null || y == null) return null
 
-  const { document, schema } = value
-  const node = findNode(target, value)
+  const { value } = editor
+  const { document } = value
+  const node = findNode(target, editor)
   if (!node) return null
 
   // If the drop target is inside a void node, move it into either the next or
   // previous node, depending on which side the `x` and `y` coordinates are
   // closest to.
-  if (schema.isVoid(node)) {
+  if (editor.query('isVoid', node)) {
     const rect = target.getBoundingClientRect()
     const isPrevious =
-      node.object == 'inline'
+      node.object === 'inline'
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 
@@ -75,7 +83,7 @@ function getEventRange(event, value) {
   }
 
   // Resolve a Slate range from the DOM range.
-  const range = findRange(native, value)
+  const range = findRange(native, editor)
   if (!range) return null
 
   return range

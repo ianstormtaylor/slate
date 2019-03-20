@@ -7,9 +7,9 @@ export const schema = {
     list: {},
     item: {
       parent: { type: 'list' },
-      normalize: (change, { code, node }) => {
-        if (code == 'parent_type_invalid') {
-          change.wrapBlockByKey(node.key, 'list')
+      normalize: (editor, { code, node }) => {
+        if (code === 'parent_type_invalid') {
+          editor.wrapBlockByKey(node.key, 'list')
         }
       },
     },
@@ -20,7 +20,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <item />
+        <item>
+          <text />
+        </item>
       </paragraph>
     </document>
   </value>
@@ -31,7 +33,9 @@ export const output = (
     <document>
       <paragraph>
         <list>
-          <item />
+          <item>
+            <text />
+          </item>
         </list>
       </paragraph>
     </document>

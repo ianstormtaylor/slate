@@ -2,8 +2,16 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Create a few styling components.
@@ -51,7 +59,7 @@ class CheckListItem extends React.Component {
   onChange = event => {
     const checked = event.target.checked
     const { editor, node } = this.props
-    editor.change(c => c.setNodeByKey(node.key, { data: { checked } }))
+    editor.setNodeByKey(node.key, { data: { checked } })
   }
 
   /**
@@ -89,16 +97,6 @@ class CheckListItem extends React.Component {
 
 class CheckLists extends React.Component {
   /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Render.
    *
    * @return {Element}
@@ -109,8 +107,7 @@ class CheckLists extends React.Component {
       <Editor
         spellCheck
         placeholder="Get to work..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
       />
@@ -124,21 +121,13 @@ class CheckLists extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'check-list-item':
         return <CheckListItem {...props} />
+      default:
+        return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
@@ -151,27 +140,29 @@ class CheckLists extends React.Component {
    * then turn it back into a paragraph.
    *
    * @param {Event} event
-   * @param {Change} change
-   * @return {Value|Void}
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onKeyDown = (event, change) => {
-    const { value } = change
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
 
-    if (event.key == 'Enter' && value.startBlock.type == 'check-list-item') {
-      change.splitBlock().setBlocks({ data: { checked: false } })
-      return true
+    if (event.key === 'Enter' && value.startBlock.type === 'check-list-item') {
+      editor.splitBlock().setBlocks({ data: { checked: false } })
+      return
     }
 
     if (
-      event.key == 'Backspace' &&
+      event.key === 'Backspace' &&
       value.isCollapsed &&
-      value.startBlock.type == 'check-list-item' &&
-      value.selection.startOffset == 0
+      value.startBlock.type === 'check-list-item' &&
+      value.selection.startOffset === 0
     ) {
-      change.setBlocks('paragraph')
-      return true
+      editor.setBlocks('paragraph')
+      return
     }
+
+    next()
   }
 }
 

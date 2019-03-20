@@ -2,7 +2,7 @@
 
 One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
 
-To that end, Slate gives you control over the rendering behavior of every node and mark in your document, any placeholders you want to render, and even the top-level editor itself.
+To that end, Slate gives you control over the rendering behavior of every node and mark in your document, and even the top-level editor itself.
 
 You can define these behaviors by passing `props` into the editor, or you can define them in Slate plugins.
 
@@ -13,7 +13,7 @@ Using custom components for the nodes and marks is the most common rendering nee
 The function is called with the node's props, including `props.node` which is the node itself. You can use these to determine what to render. For example, you can render nodes using simple HTML elements:
 
 ```js
-function renderNode(props) {
+function renderNode(props, editor, next) {
   const { node, attributes, children } = props
 
   switch (node.type) {
@@ -25,6 +25,8 @@ function renderNode(props) {
       const src = node.data.get('src')
       return <img {...attributes} src={src} />
     }
+    default:
+      return next()
   }
 }
 ```
@@ -34,11 +36,16 @@ function renderNode(props) {
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```js
-function renderNode(props) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
-    case 'paragraph': <ParagraphComponent {...props} />
-    case 'quote': <QuoteComponent {...props} />
-    ...
+    case 'paragraph':
+      return <ParagraphComponent {...props} />
+    case 'quote':
+      return <QuoteComponent {...props} />
+    case 'image':
+      return <ImageComponent {...props} />
+    default:
+      return next()
   }
 }
 ```
@@ -48,7 +55,7 @@ And you can just as easily put that `renderNode` logic into a plugin, and pass t
 ```js
 function SomeRenderingPlugin() {
   return {
-    renderNode(props) {
+    renderNode(props, editor, next) {
       ...
     }
   }
@@ -68,7 +75,7 @@ const plugins = [
 Marks work the same way, except they invoke the `renderMark` function. Like so:
 
 ```js
-function renderMark(props) {
+function renderMark(props, editor, next) {
   const { children, mark, attributes } = props
   switch (mark.type) {
     case 'bold':
@@ -81,6 +88,8 @@ function renderMark(props) {
       return <u {...{ attributes }}>{children}</u>
     case 'strikethrough':
       return <strike {...{ attributes }}>{children}</strike>
+    default:
+      return next()
   }
 }
 ```
@@ -91,37 +100,6 @@ That way, if you happen to have a global stylesheet that defines `strong`, `em`,
 
 > 🤖 Be aware though that marks aren't guaranteed to be "contiguous". Which means even though a **word** is bolded, it's not guaranteed to render as a single `<strong>` element. If some of its characters are also italic, it might be split up into multiple elements—one `<strong>wo</strong>` and one `<em><strong>rd</strong></em>`.
 
-## Placeholders
-
-By default Slate will render a placeholder for you which mimics the native DOM `placeholder` attribute of `<input>` and `<textarea>` elements—it's in the same typeface as the editor, and it's slightly translucent. And as soon as the document has any content, the placeholder disappears.
-
-However sometimes you want to customize things. Or maybe you want to render placeholders inside specific blocks like inside an image caption. To do that, you can define your own `renderPlaceholder` function:
-
-```js
-function renderPlaceholder(props) {
-  const { node, editor } = props
-  if (node.object != 'block') return
-  if (node.type != 'caption') return
-  if (node.text != '') return
-
-  return (
-    <span
-      contentEditable={false}
-      style={{ display: 'inline-block', width: '0', whiteSpace: 'nowrap', opacity: '0.33' }}
-    >
-      {editor.props.placeholder}
-    </span>
-  )
-}
-
-<Editor
-  renderPlaceholder={renderPlaceholder}
-  ...
-/>
-```
-
-That will render a simple placeholder element inside all of your `caption` blocks until someone decides to write in a caption.
-
 ## The Editor Itself
 
 Not only can you control the rendering behavior of the components inside the editor, but you can also control the rendering of the editor itself.
@@ -129,14 +107,15 @@ Not only can you control the rendering behavior of the components inside the edi
 This sounds weird, but it can be pretty useful if you want to render additional top-level elements from inside a plugin. To do so, you use the `renderEditor` function:
 
 ```js
-function renderEditor(props) {
-  const { children, editor } = props
+function renderEditor(props, editor, next) {
+  const { editor } = props
   const wordCount = countWords(editor.value.text)
+  const children = next()
   return (
-    <div>
+    <React.Fragment>
       {children}
       <span className="word-count">{wordCount}</span>
-    </div>
+    </React.Fragment>
   )
 }
 

@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     paragraph: {
       parent: { object: 'document' },
-      normalize: (change, { code, node }) => {
-        if (code == 'parent_object_invalid') {
-          change.unwrapNodeByKey(node.key)
+      normalize: (editor, { code, node }) => {
+        if (code === 'parent_object_invalid') {
+          editor.unwrapNodeByKey(node.key)
         }
       },
     },

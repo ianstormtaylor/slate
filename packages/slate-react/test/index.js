@@ -1,25 +1,24 @@
-import AfterPlugin from '../src/plugins/after'
 import assert from 'assert'
-import BeforePlugin from '../src/plugins/before'
 import clean from './helpers/clean'
 import React from 'react'
 import ReactDOM from 'react-dom/server'
-import Simulator from 'slate-simulator'
+import ShallowRenderer from 'react-test-renderer/shallow'
 import { Editor } from 'slate-react'
 import { fixtures } from 'slate-dev-test-utils'
 import { JSDOM } from 'jsdom'
 
 describe('slate-react', () => {
-  fixtures.skip(__dirname, 'plugins', ({ module }) => {
-    const { input, output, props = {} } = module
-    const fn = module.default
-    const plugins = [BeforePlugin(props), AfterPlugin(props)]
-    const simulator = new Simulator({ plugins, value: input })
-    fn(simulator)
+  fixtures(__dirname, 'components', ({ module }) => {
+    const { input, output, default: fn } = module
 
-    const actual = simulator.value.toJSON({ preserveSelection: true })
-    const expected = output.toJSON({ preserveSelection: true })
-    assert.deepEqual(actual, expected)
+    const renderer = new ShallowRenderer()
+    renderer.render(React.createElement(Editor, input, null))
+    const editor = renderer.getRenderOutput().props.editor
+
+    const actual = fn(editor)
+    const expected = output
+
+    assert.equal(actual, expected)
   })
 
   fixtures(__dirname, 'rendering/fixtures', ({ module }) => {

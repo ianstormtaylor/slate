@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import { List } from 'immutable'
 
 import Block from './block'
@@ -93,7 +93,7 @@ class Node {
       }
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       return { type: attrs }
     }
 

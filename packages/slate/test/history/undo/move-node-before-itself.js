@@ -2,10 +2,9 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  const next = value.change().moveNodeByKey('h', 'a', 0).value
-  const undo = next.change().undo().value
-  return undo
+export default function(editor) {
+  editor.moveNodeByKey('h', 'a', 0)
+  editor.flush().undo()
 }
 
 export const input = (

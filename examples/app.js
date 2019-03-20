@@ -8,6 +8,7 @@ import {
   Switch,
 } from 'react-router-dom'
 
+import { Icon } from './components'
 import CheckLists from './check-lists'
 import CodeHighlighting from './code-highlighting'
 import Embeds from './embeds'
@@ -28,9 +29,11 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
+import Composition from './composition'
 import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
+import Mentions from './mentions'
 
 /**
  * Examples.
@@ -39,29 +42,31 @@ import Tables from './tables'
  */
 
 const EXAMPLES = [
-  ['Rich Text', RichText, '/rich-text'],
-  ['Plain Text', PlainText, '/plain-text'],
-  ['Hovering Menu', HoveringMenu, '/hovering-menu'],
-  ['Links', Links, '/links'],
-  ['Images', Images, '/images'],
-  ['Embeds', Embeds, '/embeds'],
-  ['Emojis', Emojis, '/emojis'],
-  ['Markdown Preview', MarkdownPreview, '/markdown-preview'],
-  ['Markdown Shortcuts', MarkdownShortcuts, '/markdown-shortcuts'],
   ['Check Lists', CheckLists, '/check-lists'],
   ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
-  ['Tables', Tables, '/tables'],
+  ['Composition', Composition, '/composition/:subpage?'],
+  ['Embeds', Embeds, '/embeds'],
+  ['Emojis', Emojis, '/emojis'],
+  ['Forced Layout', ForcedLayout, '/forced-layout'],
+  ['History', History, '/history'],
+  ['Hovering Menu', HoveringMenu, '/hovering-menu'],
+  ['Huge Document', HugeDocument, '/huge-document'],
+  ['Images', Images, '/images'],
+  ['Input Tester', InputTester, '/input-tester'],
+  ['Links', Links, '/links'],
+  ['Markdown Preview', MarkdownPreview, '/markdown-preview'],
+  ['Markdown Shortcuts', MarkdownShortcuts, '/markdown-shortcuts'],
+  ['Mentions', Mentions, '/mentions'],
   ['Paste HTML', PasteHtml, '/paste-html'],
+  ['Plain Text', PlainText, '/plain-text'],
+  ['Plugins', Plugins, '/plugins'],
+  ['Read-only', ReadOnly, '/read-only'],
+  ['Rich Text', RichText, '/rich-text'],
+  ['RTL', RTL, '/rtl'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
   ['Syncing Operations', SyncingOperations, '/syncing-operations'],
-  ['Read-only', ReadOnly, '/read-only'],
-  ['RTL', RTL, '/rtl'],
-  ['Plugins', Plugins, '/plugins'],
-  ['Forced Layout', ForcedLayout, '/forced-layout'],
-  ['Huge Document', HugeDocument, '/huge-document'],
-  ['History', History, '/history'],
+  ['Tables', Tables, '/tables'],
   ['Versions', Versions, '/versions'],
-  ['Input Tester', InputTester, '/input-tester'],
 ]
 
 /**
@@ -70,18 +75,23 @@ const EXAMPLES = [
  * @type {Component}
  */
 
-const Nav = styled('div')`
-  padding: 10px 15px;
-  color: #aaa;
+const Header = styled('div')`
+  align-items: center;
   background: #000;
+  color: #aaa;
+  display: flex;
+  height: 42px;
+  position: relative;
+  z-index: 1; /* To appear above the underlay */
 `
 
 const Title = styled('span')`
-  margin-right: 0.5em;
+  margin-left: 1em;
 `
 
 const LinkList = styled('div')`
-  float: right;
+  margin-left: auto;
+  margin-right: 1em;
 `
 
 const Link = styled('a')`
@@ -96,13 +106,37 @@ const Link = styled('a')`
 `
 
 const TabList = styled('div')`
-  padding: 15px 15px;
   background-color: #222;
-  text-align: center;
-  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-top: 0.2em;
+  position: absolute;
+  transition: width 0.2s;
+  width: ${props => (props.isVisible ? '200px' : '0')};
+  white-space: nowrap;
+  z-index: 1; /* To appear above the underlay */
+`
 
-  & > * + * {
-    margin-left: 0.5em;
+const TabListUnderlay = styled('div')`
+  background-color: rgba(200, 200, 200, 0.8);
+  display: ${props => (props.isVisible ? 'block' : 'none')};
+  height: 100%;
+  top: 0;
+  position: fixed;
+  width: 100%;
+`
+
+const TabButton = styled('span')`
+  margin-left: 0.8em;
+
+  &:hover {
+    cursor: pointer;
+  }
+
+  .material-icons {
+    color: #aaa;
+    font-size: 24px;
   }
 `
 
@@ -111,7 +145,7 @@ const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
 const Tab = styled(MaskedRouterLink)`
   display: inline-block;
   margin-bottom: 0.2em;
-  padding: 0.2em 0.5em;
+  padding: 0.2em 1em;
   border-radius: 0.2em;
   text-decoration: none;
   color: ${p => (p.active ? 'white' : '#777')};
@@ -124,11 +158,25 @@ const Tab = styled(MaskedRouterLink)`
 
 const Wrapper = styled('div')`
   max-width: 42em;
-  margin: 0 auto 20px;
+  margin: 20px auto;
   padding: 20px;
 `
 
-const Example = styled(Wrapper)`
+const ExampleHeader = styled('div')`
+  align-items: center;
+  background-color: #555;
+  color: #ddd;
+  display: flex;
+  height: 42px;
+  position: relative;
+  z-index: 1; /* To appear above the underlay */
+`
+
+const ExampleTitle = styled('span')`
+  margin-left: 1em;
+`
+
+const ExampleContent = styled(Wrapper)`
   background: #fff;
 `
 
@@ -159,6 +207,7 @@ export default class App extends React.Component {
   state = {
     error: null,
     info: null,
+    isTabListVisible: false,
   }
 
   /**
@@ -182,49 +231,118 @@ export default class App extends React.Component {
     return (
       <HashRouter>
         <div>
-          <Nav>
-            <Title>Slate Examples</Title>
-            <LinkList>
-              <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
-              <Link href="https://docs.slatejs.org/">Docs</Link>
-            </LinkList>
-          </Nav>
-          <TabList>
-            {EXAMPLES.map(([name, Component, path]) => (
-              <Route key={path} exact path={path}>
-                {({ match }) => (
-                  <Tab to={path} active={match && match.isExact}>
-                    {name}
-                  </Tab>
-                )}
-              </Route>
-            ))}
-          </TabList>
-          {this.state.error ? (
-            <Warning>
-              <p>
-                An error was thrown by one of the example's React components!
-              </p>
-              <pre>
-                <code>
-                  {this.state.error.stack}
-                  {'\n'}
-                  {this.state.info.componentStack}
-                </code>
-              </pre>
-            </Warning>
-          ) : (
-            <Example>
-              <Switch>
-                {EXAMPLES.map(([name, Component, path]) => (
-                  <Route key={path} path={path} component={Component} />
-                ))}
-                <Redirect from="/" to="/rich-text" />
-              </Switch>
-            </Example>
-          )}
+          {this.renderHeader()}
+          {this.renderExampleHeader()}
+          {this.renderTabList()}
+          {this.state.error ? this.renderError() : this.renderExample()}
+          <TabListUnderlay
+            isVisible={this.state.isTabListVisible}
+            onClick={this._hideTabList}
+          />
         </div>
       </HashRouter>
     )
+  }
+
+  renderError() {
+    return (
+      <Warning>
+        <p>An error was thrown by one of the example's React components!</p>
+        <pre>
+          <code>
+            {this.state.error.stack}
+            {'\n'}
+            {this.state.info.componentStack}
+          </code>
+        </pre>
+      </Warning>
+    )
+  }
+
+  renderExample() {
+    return (
+      <Switch>
+        {EXAMPLES.map(([name, Component, path]) => (
+          <Route key={path} path={path}>
+            {({ match }) => (
+              <div>
+                <ExampleContent>
+                  <Component params={match.params} />
+                </ExampleContent>
+              </div>
+            )}
+          </Route>
+        ))}
+        <Redirect from="/" to="/rich-text" />
+      </Switch>
+    )
+  }
+
+  renderExampleHeader() {
+    return (
+      <ExampleHeader>
+        <TabButton
+          onClick={e => {
+            e.stopPropagation()
+
+            this.setState({
+              isTabListVisible: !this.state.isTabListVisible,
+            })
+          }}
+        >
+          <Icon>menu</Icon>
+        </TabButton>
+        <Switch>
+          {EXAMPLES.map(([name, Component, path]) => (
+            <Route key={path} exact path={path}>
+              <ExampleTitle>
+                {name}
+                <Link
+                  href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+                >
+                  (View Source)
+                </Link>
+              </ExampleTitle>
+            </Route>
+          ))}
+        </Switch>
+      </ExampleHeader>
+    )
+  }
+
+  renderHeader() {
+    return (
+      <Header>
+        <Title>Slate Examples</Title>
+        <LinkList>
+          <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
+          <Link href="https://docs.slatejs.org/">Docs</Link>
+        </LinkList>
+      </Header>
+    )
+  }
+
+  renderTabList() {
+    return (
+      <TabList isVisible={this.state.isTabListVisible}>
+        {EXAMPLES.map(([name, Component, path]) => (
+          <Route key={path} exact path={path}>
+            {({ match }) => (
+              <Tab
+                to={path}
+                active={match && match.isExact}
+                onClick={this._hideTabList}
+              >
+                {name}
+              </Tab>
+            )}
+          </Route>
+        ))}
+      </TabList>
+    )
+  }
+
+  _hideTabList = () => {
+    this.setState({ isTabListVisible: false })
   }
 }

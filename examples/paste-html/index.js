@@ -3,8 +3,16 @@ import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Tags to blocks.
@@ -90,10 +98,10 @@ const RULES = [
   {
     // Special case for code blocks, which need to grab the nested childNodes.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'pre') {
+      if (el.tagName.toLowerCase() === 'pre') {
         const code = el.childNodes[0]
         const childNodes =
-          code && code.tagName.toLowerCase() == 'code'
+          code && code.tagName.toLowerCase() === 'code'
             ? code.childNodes
             : el.childNodes
 
@@ -108,7 +116,7 @@ const RULES = [
   {
     // Special case for images, to grab their src.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'img') {
+      if (el.tagName.toLowerCase() === 'img') {
         return {
           object: 'block',
           type: 'image',
@@ -123,7 +131,7 @@ const RULES = [
   {
     // Special case for links, to grab their href.
     deserialize(el, next) {
-      if (el.tagName.toLowerCase() == 'a') {
+      if (el.tagName.toLowerCase() === 'a') {
         return {
           object: 'inline',
           type: 'link',
@@ -153,16 +161,6 @@ const serializer = new Html({ rules: RULES })
 
 class PasteHtml extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * The editor's schema.
    *
    * @type {Object}
@@ -186,10 +184,9 @@ class PasteHtml extends React.Component {
     return (
       <Editor
         placeholder="Paste in some HTML..."
-        value={this.state.value}
+        defaultValue={initialValue}
         schema={this.schema}
         onPaste={this.onPaste}
-        onChange={this.onChange}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
       />
@@ -203,7 +200,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
@@ -246,6 +243,10 @@ class PasteHtml extends React.Component {
         const src = node.data.get('src')
         return <Image src={src} selected={isFocused} {...attributes} />
       }
+
+      default: {
+        return next()
+      }
     }
   }
 
@@ -256,7 +257,7 @@ class PasteHtml extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -268,32 +269,23 @@ class PasteHtml extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
    * On paste, deserialize the HTML and then insert the fragment.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onPaste = (event, change) => {
+  onPaste = (event, editor, next) => {
     const transfer = getEventTransfer(event)
-    if (transfer.type != 'html') return
+    if (transfer.type !== 'html') return next()
     const { document } = serializer.deserialize(transfer.html)
-    change.insertFragment(document)
-    return true
+    editor.insertFragment(document)
   }
 }
 

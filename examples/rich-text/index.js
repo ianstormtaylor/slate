@@ -51,7 +51,7 @@ class RichTextExample extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
   }
 
   /**
@@ -63,7 +63,17 @@ class RichTextExample extends React.Component {
 
   hasBlock = type => {
     const { value } = this.state
-    return value.blocks.some(node => node.type == type)
+    return value.blocks.some(node => node.type === type)
+  }
+
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -90,6 +100,7 @@ class RichTextExample extends React.Component {
           spellCheck
           autoFocus
           placeholder="Enter some rich text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
@@ -133,9 +144,12 @@ class RichTextExample extends React.Component {
     let isActive = this.hasBlock(type)
 
     if (['numbered-list', 'bulleted-list'].includes(type)) {
-      const { value } = this.state
-      const parent = value.document.getParent(value.blocks.first().key)
-      isActive = this.hasBlock('list-item') && parent && parent.type === type
+      const { value: { document, blocks } } = this.state
+
+      if (blocks.size > 0) {
+        const parent = document.getParent(blocks.first().key)
+        isActive = this.hasBlock('list-item') && parent && parent.type === type
+      }
     }
 
     return (
@@ -155,7 +169,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -171,6 +185,8 @@ class RichTextExample extends React.Component {
         return <li {...attributes}>{children}</li>
       case 'numbered-list':
         return <ol {...attributes}>{children}</ol>
+      default:
+        return next()
     }
   }
 
@@ -181,7 +197,7 @@ class RichTextExample extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -193,13 +209,15 @@ class RichTextExample extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 
   /**
    * On change, save the new `value`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -210,11 +228,11 @@ class RichTextExample extends React.Component {
    * On key down, if it's a formatting command toggle a mark.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
    * @return {Change}
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, editor, next) => {
     let mark
 
     if (isBoldHotkey(event)) {
@@ -226,12 +244,11 @@ class RichTextExample extends React.Component {
     } else if (isCodeHotkey(event)) {
       mark = 'code'
     } else {
-      return
+      return next()
     }
 
     event.preventDefault()
-    change.toggleMark(mark)
-    return true
+    editor.toggleMark(mark)
   }
 
   /**
@@ -243,9 +260,7 @@ class RichTextExample extends React.Component {
 
   onClickMark = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change().toggleMark(type)
-    this.onChange(change)
+    this.editor.toggleMark(type)
   }
 
   /**
@@ -257,47 +272,46 @@ class RichTextExample extends React.Component {
 
   onClickBlock = (event, type) => {
     event.preventDefault()
-    const { value } = this.state
-    const change = value.change()
+
+    const { editor } = this
+    const { value } = editor
     const { document } = value
 
     // Handle everything but list buttons.
-    if (type != 'bulleted-list' && type != 'numbered-list') {
+    if (type !== 'bulleted-list' && type !== 'numbered-list') {
       const isActive = this.hasBlock(type)
       const isList = this.hasBlock('list-item')
 
       if (isList) {
-        change
+        editor
           .setBlocks(isActive ? DEFAULT_NODE : type)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else {
-        change.setBlocks(isActive ? DEFAULT_NODE : type)
+        editor.setBlocks(isActive ? DEFAULT_NODE : type)
       }
     } else {
       // Handle the extra wrapping required for list buttons.
       const isList = this.hasBlock('list-item')
       const isType = value.blocks.some(block => {
-        return !!document.getClosest(block.key, parent => parent.type == type)
+        return !!document.getClosest(block.key, parent => parent.type === type)
       })
 
       if (isList && isType) {
-        change
+        editor
           .setBlocks(DEFAULT_NODE)
           .unwrapBlock('bulleted-list')
           .unwrapBlock('numbered-list')
       } else if (isList) {
-        change
+        editor
           .unwrapBlock(
-            type == 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
+            type === 'bulleted-list' ? 'numbered-list' : 'bulleted-list'
           )
           .wrapBlock(type)
       } else {
-        change.setBlocks('list-item').wrapBlock(type)
+        editor.setBlocks('list-item').wrapBlock(type)
       }
     }
-
-    this.onChange(change)
   }
 }
 

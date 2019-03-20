@@ -1,0 +1,21 @@
+{
+  "document": {
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "text":
+                  "This example shows how you might implement a version history, where you can save a new version after applying some changes, and then rollback to a previous version at any time."
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     image: {
       previous: [{ object: 'inline' }, { object: 'text' }],
-      normalize: (change, { code, previous }) => {
-        if (code == 'previous_sibling_object_invalid') {
-          change.unwrapBlockByKey(previous.key, 'paragraph')
+      normalize: (editor, { code, previous }) => {
+        if (code === 'previous_sibling_object_invalid') {
+          editor.unwrapBlockByKey(previous.key, 'paragraph')
         }
       },
     },
@@ -19,8 +19,12 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <quote />
-        <image />
+        <quote>
+          <text />
+        </quote>
+        <image>
+          <text />
+        </image>
       </paragraph>
     </document>
   </value>
@@ -29,9 +33,13 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <quote />
+      <quote>
+        <text />
+      </quote>
       <paragraph>
-        <image />
+        <image>
+          <text />
+        </image>
       </paragraph>
     </document>
   </value>

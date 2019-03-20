@@ -12,24 +12,22 @@ import React from 'react'
 ;Prism.languages.markdown=Prism.languages.extend("markup",{}),Prism.languages.insertBefore("markdown","prolog",{blockquote:{pattern:/^>(?:[\t ]*>)*/m,alias:"punctuation"},code:[{pattern:/^(?: {4}|\t).+/m,alias:"keyword"},{pattern:/``.+?``|`[^`\n]+`/,alias:"keyword"}],title:[{pattern:/\w+.*(?:\r?\n|\r)(?:==+|--+)/,alias:"important",inside:{punctuation:/==+$|--+$/}},{pattern:/(^\s*)#+.+/m,lookbehind:!0,alias:"important",inside:{punctuation:/^#+|#+$/}}],hr:{pattern:/(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,lookbehind:!0,alias:"punctuation"},list:{pattern:/(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,lookbehind:!0,alias:"punctuation"},"url-reference":{pattern:/!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,inside:{variable:{pattern:/^(!?\[)[^\]]+/,lookbehind:!0},string:/(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,punctuation:/^[\[\]!:]|[<>]/},alias:"url"},bold:{pattern:/(^|[^\\])(\*\*|__)(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,lookbehind:!0,inside:{punctuation:/^\*\*|^__|\*\*$|__$/}},italic:{pattern:/(^|[^\\])([*_])(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,lookbehind:!0,inside:{punctuation:/^[*_]|[*_]$/}},url:{pattern:/!?\[[^\]]+\](?:\([^\s)]+(?:[\t ]+"(?:\\.|[^"\\])*")?\)| ?\[[^\]\n]*\])/,inside:{variable:{pattern:/(!?\[)[^\]]+(?=\]$)/,lookbehind:!0},string:{pattern:/"(?:\\.|[^"\\])*"(?=\)$)/}}}}),Prism.languages.markdown.bold.inside.url=Prism.util.clone(Prism.languages.markdown.url),Prism.languages.markdown.italic.inside.url=Prism.util.clone(Prism.languages.markdown.url),Prism.languages.markdown.bold.inside.italic=Prism.util.clone(Prism.languages.markdown.italic),Prism.languages.markdown.italic.inside.bold=Prism.util.clone(Prism.languages.markdown.bold); // prettier-ignore
 
 /**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Plain.deserialize(
+  'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.\n## Try it out!\nTry it out for yourself!'
+)
+
+/**
  * The markdown preview example.
  *
  * @type {Component}
  */
 
 class MarkdownPreview extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Plain.deserialize(
-      'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.\n## Try it out!\nTry it out for yourself!'
-    ),
-  }
-
   /**
    *
    * Render the example.
@@ -41,8 +39,7 @@ class MarkdownPreview extends React.Component {
     return (
       <Editor
         placeholder="Write some markdown..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         renderMark={this.renderMark}
         decorateNode={this.decorateNode}
       />
@@ -53,21 +50,27 @@ class MarkdownPreview extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
+
       case 'code':
         return <code {...attributes}>{children}</code>
+
       case 'italic':
         return <em {...attributes}>{children}</em>
+
       case 'underlined':
         return <u {...attributes}>{children}</u>
+
       case 'title': {
         return (
           <span
@@ -83,6 +86,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'punctuation': {
         return (
           <span {...attributes} style={{ opacity: 0.2 }}>
@@ -90,6 +94,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'list': {
         return (
           <span
@@ -104,6 +109,7 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
       case 'hr': {
         return (
           <span
@@ -118,28 +124,24 @@ class MarkdownPreview extends React.Component {
           </span>
         )
       }
+
+      default: {
+        return next()
+      }
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
    * Define a decorator for markdown styles.
    *
    * @param {Node} node
+   * @param {Function} next
    * @return {Array}
    */
 
-  decorateNode(node) {
-    if (node.object != 'block') return
+  decorateNode(node, editor, next) {
+    const others = next() || []
+    if (node.object !== 'block') return others
 
     const string = node.text
     const texts = node.getTexts().toArray()
@@ -153,9 +155,9 @@ class MarkdownPreview extends React.Component {
     let start = 0
 
     function getLength(token) {
-      if (typeof token == 'string') {
+      if (typeof token === 'string') {
         return token.length
-      } else if (typeof token.content == 'string') {
+      } else if (typeof token.content === 'string') {
         return token.content.length
       } else {
         return token.content.reduce((l, t) => l + getLength(t), 0)
@@ -181,7 +183,7 @@ class MarkdownPreview extends React.Component {
         endOffset = remaining
       }
 
-      if (typeof token != 'string') {
+      if (typeof token !== 'string') {
         const dec = {
           anchor: {
             key: startText.key,
@@ -202,7 +204,7 @@ class MarkdownPreview extends React.Component {
       start = end
     }
 
-    return decorations
+    return [...others, ...decorations]
   }
 }
 

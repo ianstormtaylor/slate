@@ -2,12 +2,9 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .wrapInline('hashtag')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.wrapInline('hashtag')
+  editor.flush().undo()
 }
 
 export const input = (

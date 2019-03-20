@@ -11,9 +11,9 @@ export const schema = {
           match: [{ object: 'block' }],
         },
       ],
-      normalize: (change, { code, child }) => {
-        if (code == 'child_object_invalid') {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      normalize: (editor, { code, child }) => {
+        if (code === 'child_object_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

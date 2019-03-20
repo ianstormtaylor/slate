@@ -2,9 +2,15 @@
 
 An operation is the lowest-level description of a specific change to a part of Slate's value. They are designed to be collaborative-editing friendly.
 
-All of the [`Change`](./change.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `change.operations` property.
+All of the [`Commands`](./commands.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `editor.operations` property.
 
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
+
+## Properties
+
+See each operation separately below to see what they consist of.
+
+Note that all operations have a `data` property which can be used to attach arbitrary data to the operation, just like the [`Node`](./node.md) models ([`Block`](./block.md), [`Inline`](./inline.md), etc).
 
 ## Text Operations
 
@@ -17,6 +23,7 @@ There are a handful of Slate operation types. The goal is to have the fewest pos
   offset: Number,
   text: String,
   marks: List,
+  data: Map,
 }
 ```
 
@@ -30,6 +37,7 @@ Inserts a `text` string at `offset` into a text node at `path`, with optional `m
   path: List,
   offset: Number,
   text: String,
+  data: Map,
 }
 ```
 
@@ -46,6 +54,7 @@ Removes a string of `text` at `offset` into a text node at `path`.
   offset: Number,
   length: Number,
   mark: Mark,
+  data: Map,
 }
 ```
 
@@ -60,6 +69,7 @@ Adds a `mark` to the text node at `path` starting at an `offset` and spanning `l
   offset: Number,
   length: Number,
   mark: Mark,
+  data: Map,
 }
 ```
 
@@ -75,6 +85,7 @@ Removes a `mark` from a text node at `path` starting at an `offset` and spanning
   length: Number,
   mark: Mark,
   properties: Object,
+  data: Map,
 }
 ```
 
@@ -89,6 +100,7 @@ Set new `properties` on any marks that match an existing `mark` in a text node a
   type: 'insert_node',
   path: List,
   node: Node,
+  data: Map,
 }
 ```
 
@@ -102,6 +114,7 @@ Insert a new `node` at `path`.
   path: List,
   position: Number,
   properties: Object,
+  data: Map,
 }
 ```
 
@@ -114,6 +127,7 @@ Merge the node at `path` with its previous sibling. The `position` refers to eit
   type: 'move_node',
   path: List,
   newPath: Array,
+  data: Map,
 }
 ```
 
@@ -126,6 +140,7 @@ Move the node at `path` to a `newPath`.
   type: 'remove_node',
   path: List,
   node: Node,
+  data: Map,
 }
 ```
 
@@ -139,6 +154,7 @@ Remove the node at `path`.
   path: List,
   properties: Object,
   node: Node,
+  data: Map,
 }
 ```
 
@@ -153,6 +169,7 @@ Set new `properties` on the node at `path`.
   position: Number,
   target: Number,
   properties: Object,
+  data: Map,
 }
 ```
 
@@ -167,6 +184,7 @@ Split the node at `path` at `position`. The `position` refers to either the inde
   type: 'set_selection',
   properties: Object,
   selection: Selection,
+  data: Map,
 }
 ```
 
@@ -179,6 +197,7 @@ Set new `properties` on the selection.
   type: 'set_value',
   properties: Object,
   value: Value,
+  data: Map,
 }
 ```
 

@@ -2,12 +2,9 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .delete()
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.delete()
+  editor.flush().undo()
 }
 
 // the paragraph and code blocks have some random data

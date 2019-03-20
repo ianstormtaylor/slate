@@ -24,29 +24,14 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/slate">
-    <img src="https://img.shields.io/npm/dt/localeval.svg?maxAge=3600">
-  </a>
   <a href="https://unpkg.com/slate/dist/slate.min.js">
-    <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=slate">
-  </a>
-  <a href="https://unpkg.com/slate-react/dist/slate-react.min.js">
-    <img src="http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&amp;label=slate--react">
-  </a>
-  <a href="https://travis-ci.org/ianstormtaylor/slate">
-    <img src="https://travis-ci.org/ianstormtaylor/slate.svg?branch=master">
+    <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=size">
   </a>
   <a href="https://slate-slack.herokuapp.com">
     <img src="https://slate-slack.herokuapp.com/badge.svg">
   </a>
   <a href="./packages/slate/package.json">
-    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=slate&colorB=007ec6">
-  </a>
-  <a href="./packages/slate-react/package.json">
-    <img src="https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=slate-react&colorB=007ec6">
-  </a>
-  <a href="./License.md">
-    <img src="https://img.shields.io/npm/l/slate.svg?maxAge=3600">
+    <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6">
   </a>
 </p>
 <br/>
@@ -55,7 +40,7 @@ Slate lets you build rich, intuitive editors like those in [Medium](https://medi
 
 It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/) and [Immutable](https://facebook.github.io/immutable-js/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-_**Slate is currently in beta**. It's useable now, but you might need to pull request a fix or two for advanced use cases._
+> 🤖 **Slate is currently in beta**. Its core API is useable now, but you might need to pull request a fix or two for advanced use cases. Some of its APIs are not "finalized" and will (breaking) change over time as we discover better solutions.
 
 <br/>
 
@@ -75,7 +60,7 @@ Before creating Slate, I tried a lot of the other rich text libraries out there�
 
 * **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use to for a realtime, collaborative editing use case without basically rewriting the editor.
 
-* **The repostories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
+* **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
 
 * **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
 
@@ -170,6 +155,23 @@ There are also translations of the documentation into other languages:
 If you're maintaining a translation, feel free to pull request it here!
 
 <br/>
+
+### Packages
+
+Slate's codebase is monorepo managed with [Lerna](https://lernajs.io/). It consists of a handful of packages—although you won't always use all of them. They are:
+
+| **Package**                                                     | **Version**                                                                                                                                     | **Size**                                                                                                                                                                                                                | **Description**                                     |
+| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| [`slate`](./packages/slate)                                     | [![](https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6)](./slate/package.json)                                     | [![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=size)](https://unpkg.com/slate/dist/slate.min.js)                                                                         | Slate's core data model logic.                      |
+| [`slate-base64-serializer`](./packages/slate-base64-serializer) | [![](https://img.shields.io/npm/v/slate-base64-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-base64-serializer/package.json) | [![](http://img.badgesize.io/https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js) | A Base64 string serializer for Slate documents.     |
+| [`slate-html-serializer`](./packages/slate-html-serializer)     | [![](https://img.shields.io/npm/v/slate-html-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-html-serializer/package.json)     | [![](http://img.badgesize.io/https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js)         | An HTML serializer for Slate documents.             |
+| [`slate-hyperscript`](./packages/slate-hyperscript)             | [![](https://img.shields.io/npm/v/slate-hyperscript.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hyperscript/package.json)             | [![](http://img.badgesize.io/https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js)                         | A hyperscript tool to write JSX Slate documents!    |
+| [`slate-plain-serializer`](./packages/slate-plain-serializer)   | [![](https://img.shields.io/npm/v/slate-plain-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-plain-serializer/package.json)   | [![](http://img.badgesize.io/https://unpkg.com/slate-plain-serializer/dist/slate-plain-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-plain-serializer/dist/slate-plain-serializer.min.js)     | A plain text serializer for Slate documents.        |
+| [`slate-prop-types`](./packages/slate-prop-types)               | [![](https://img.shields.io/npm/v/slate-prop-types.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-prop-types/package.json)               | [![](http://img.badgesize.io/https://unpkg.com/slate-prop-types/dist/slate-prop-types.min.js?compression=gzip&label=size)](https://unpkg.com/slate-prop-types/dist/slate-prop-types.min.js)                             | React prop types for checking Slate values.         |
+| [`slate-react`](./packages/slate-react)                         | [![](https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-react/package.json)                         | [![](http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=size)](https://unpkg.com/slate-react/dist/slate-react.min.js)                                                 | React components for rendering Slate editors.       |
+| [`slate-hotkeys`](./packages/slate-hotkeys)                     | [![](https://img.shields.io/npm/v/slate-hotkeys.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hotkeys/package.json)                     | [![](http://img.badgesize.io/https://unpkg.com/slate-hotkeys/dist/slate-hotkeys.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hotkeys/dist/slate-hotkeys.min.js)                                         | Detect common keypresses in a platform-agnostic way |
+
+<br />
 
 ### Contributing!
 

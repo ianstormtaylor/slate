@@ -7,9 +7,9 @@ export const schema = {
     paragraph: {},
     quote: {
       last: [{ type: 'paragraph' }],
-      normalize: (change, { code, child }) => {
-        if (code == 'last_child_type_invalid') {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      normalize: (editor, { code, child }) => {
+        if (code === 'last_child_type_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },
@@ -20,9 +20,15 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph />
-        <paragraph />
-        <image />
+        <paragraph>
+          <text />
+        </paragraph>
+        <paragraph>
+          <text />
+        </paragraph>
+        <image>
+          <text />
+        </image>
       </quote>
     </document>
   </value>
@@ -32,10 +38,16 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph />
-        <paragraph />
         <paragraph>
-          <image />
+          <text />
+        </paragraph>
+        <paragraph>
+          <text />
+        </paragraph>
+        <paragraph>
+          <image>
+            <text />
+          </image>
         </paragraph>
       </quote>
     </document>

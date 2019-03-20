@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { List, Map, Record } from 'immutable'
+import { fromJS, List, Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
 import Node from './node'
@@ -36,7 +36,7 @@ class Block extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { type: attrs }
     }
 
@@ -81,14 +81,14 @@ class Block extends Record(DEFAULTS) {
 
     const { data = {}, key = KeyUtils.create(), nodes = [], type } = object
 
-    if (typeof type != 'string') {
+    if (typeof type !== 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
     }
 
     const block = new Block({
       key,
       type,
-      data: Map(data),
+      data: fromJS(data),
       nodes: Node.createList(nodes),
     })
 

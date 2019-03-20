@@ -33,7 +33,7 @@ class Leaf extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { text: attrs }
     }
 
@@ -242,6 +242,20 @@ class Leaf extends Record(DEFAULTS) {
   addMarks(set) {
     const { marks } = this
     return this.set('marks', marks.union(set))
+  }
+
+  /**
+   * Insert a text `string` into the leaf at `offset`.
+   *
+   * @param {Number} offset
+   * @param {String} string
+   * @return {Leaf}
+   */
+
+  insertText(offset, string) {
+    const { text } = this
+    const next = text.slice(0, offset) + string + text.slice(offset)
+    return this.set('text', next)
   }
 
   /**

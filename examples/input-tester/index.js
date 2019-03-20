@@ -3,9 +3,17 @@ import { Value } from 'slate'
 
 import React from 'react'
 import styled from 'react-emotion'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 const EventsValue = createArrayValue()
 
@@ -176,7 +184,7 @@ const Event = ({ event, targetRange, selection }) => {
       </td>
       <td>
         <StringCell
-          value={event.dataTransfer && event.dataTransfer.get('text/plain')}
+          value={event.dataTransfer && event.dataTransfer.getData('text/plain')}
         />
       </td>
       <td>
@@ -193,10 +201,6 @@ const Event = ({ event, targetRange, selection }) => {
 }
 
 class InputTester extends React.Component {
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   componentDidMount() {
     const editor = this.el.querySelector('[contenteditable="true"]')
     editor.addEventListener('keydown', this.onEvent)
@@ -210,46 +214,63 @@ class InputTester extends React.Component {
     window.document.addEventListener('selectionchange', this.onEvent)
   }
 
+  ref = editor => {
+    this.editor = editor
+  }
+
   render() {
     return (
       <Wrapper innerRef={this.onRef}>
         <Editor
           spellCheck
           placeholder="Enter some text..."
-          value={this.state.value}
+          ref={this.ref}
+          defaultValue={initialValue}
           onChange={this.onChange}
-          renderNode={({ attributes, children, node }) => {
-            switch (node.type) {
-              case 'block-quote':
-                return <blockquote {...attributes}>{children}</blockquote>
-              case 'bulleted-list':
-                return <ul {...attributes}>{children}</ul>
-              case 'heading-one':
-                return <h1 {...attributes}>{children}</h1>
-              case 'heading-two':
-                return <h2 {...attributes}>{children}</h2>
-              case 'list-item':
-                return <li {...attributes}>{children}</li>
-              case 'numbered-list':
-                return <ol {...attributes}>{children}</ol>
-            }
-          }}
-          renderMark={({ attributes, children, mark }) => {
-            switch (mark.type) {
-              case 'bold':
-                return <strong {...attributes}>{children}</strong>
-              case 'code':
-                return <code {...attributes}>{children}</code>
-              case 'italic':
-                return <em {...attributes}>{children}</em>
-              case 'underlined':
-                return <u {...attributes}>{children}</u>
-            }
-          }}
+          renderNode={this.renderNode}
+          renderMark={this.renderMark}
         />
         <EventsList />
       </Wrapper>
     )
+  }
+
+  renderNode = (props, editor, next) => {
+    const { attributes, children, node } = props
+
+    switch (node.type) {
+      case 'block-quote':
+        return <blockquote {...attributes}>{children}</blockquote>
+      case 'bulleted-list':
+        return <ul {...attributes}>{children}</ul>
+      case 'heading-one':
+        return <h1 {...attributes}>{children}</h1>
+      case 'heading-two':
+        return <h2 {...attributes}>{children}</h2>
+      case 'list-item':
+        return <li {...attributes}>{children}</li>
+      case 'numbered-list':
+        return <ol {...attributes}>{children}</ol>
+      default:
+        return next()
+    }
+  }
+
+  renderMark = (props, editor, next) => {
+    const { attributes, children, mark } = props
+
+    switch (mark.type) {
+      case 'bold':
+        return <strong {...attributes}>{children}</strong>
+      case 'code':
+        return <code {...attributes}>{children}</code>
+      case 'italic':
+        return <em {...attributes}>{children}</em>
+      case 'underlined':
+        return <u {...attributes}>{children}</u>
+      default:
+        return next()
+    }
   }
 
   onRef = ref => {
@@ -268,19 +289,20 @@ class InputTester extends React.Component {
   }
 
   recordEvent = event => {
-    const { value } = this.state
+    const { editor } = this
+    const { value } = editor
     let targetRange
 
     if (event.getTargetRanges) {
       const [nativeTargetRange] = event.getTargetRanges()
-      targetRange = nativeTargetRange && findRange(nativeTargetRange, value)
+      targetRange = nativeTargetRange && findRange(nativeTargetRange, editor)
     }
 
     const nativeSelection = window.getSelection()
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, value)
+    const selection = nativeRange && findRange(nativeRange, editor)
 
     EventsValue.push({
       event,
@@ -291,12 +313,13 @@ class InputTester extends React.Component {
   }
 
   logEvent = event => {
-    const { value } = this.state
+    const { editor } = this
+    const { value } = editor
     const nativeSelection = window.getSelection()
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, value)
+    const selection = nativeRange && findRange(nativeRange, editor)
 
     const {
       type,
@@ -323,7 +346,7 @@ class InputTester extends React.Component {
         style += '; background-color: lightskyblue'
         const [nativeTargetRange] = event.getTargetRanges()
         const targetRange =
-          nativeTargetRange && findRange(nativeTargetRange, value)
+          nativeTargetRange && findRange(nativeTargetRange, editor)
 
         details = {
           inputType,

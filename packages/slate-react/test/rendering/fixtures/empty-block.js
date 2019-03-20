@@ -7,7 +7,9 @@ export const props = {}
 export const value = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
     </document>
   </value>
 )
@@ -16,8 +18,8 @@ export const output = `
 <div data-slate-editor="true" contenteditable="true" role="textbox">
   <div style="position:relative">
     <span>
-      <span>
-        <span data-slate-zero-width="n">\u200B</span>
+      <span data-slate-leaf="true">
+        <span data-slate-zero-width="n" data-slate-length="0">&#xFEFF;<br /></span>
       </span>
     </span>
   </div>

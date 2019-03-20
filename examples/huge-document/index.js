@@ -36,20 +36,20 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 /**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(json, { normalize: false })
+
+/**
  * The huge document example.
  *
  * @type {Component}
  */
 
 class HugeDocument extends React.Component {
-  /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = { value: Value.fromJSON(json, { normalize: false }) }
-
   /**
    * Render the editor.
    *
@@ -61,8 +61,7 @@ class HugeDocument extends React.Component {
       <Editor
         placeholder="Enter some text..."
         spellCheck={false}
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
       />
@@ -73,15 +72,19 @@ class HugeDocument extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
       case 'heading':
         return <h1 {...attributes}>{children}</h1>
+      default:
+        return next()
     }
   }
 
@@ -89,10 +92,12 @@ class HugeDocument extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -104,17 +109,9 @@ class HugeDocument extends React.Component {
         return <em {...attributes}>{children}</em>
       case 'underlined':
         return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 }
 

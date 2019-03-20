@@ -41,8 +41,9 @@ class App extends React.Component {
   }
 
   // Define a new handler which prints the key that was pressed.
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, editor, next) => {
     console.log(event.key)
+    return next()
   }
 
   render() {
@@ -73,16 +74,15 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, editor, next) => {
     // Return with no changes if the keypress is not '&'
-    if (event.key !== '&') return
+    if (event.key !== '&') return next()
 
     // Prevent the ampersand character from being inserted.
     event.preventDefault()
 
     // Change the value by inserting 'and' at the cursor's position.
-    change.insertText('and')
-    return true
+    editor.insertText('and')
   }
 
   render() {
@@ -99,7 +99,7 @@ class App extends React.Component {
 
 With that added, try typing `&`, and you should see it suddenly become `and` instead!
 
-This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and a `change` object that lets you perform changes to the editor's value. Simple!
+This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and the `editor` that lets you perform commands. Simple!
 
 <br/>
 <p align="center"><strong>Next:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>

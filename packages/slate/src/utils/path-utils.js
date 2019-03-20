@@ -1,18 +1,17 @@
 import { List } from 'immutable'
 
 /**
- * Compare paths `path` and `b` to see which is before or after.
+ * Compare paths `path` and `target` to see which is before or after.
  *
  * @param {List} path
- * @param {List} b
+ * @param {List} target
  * @return {Number|Null}
  */
 
 function compare(path, target) {
-  // PERF: if the paths are not the same size we can exit early.
-  if (path.size !== target.size) return null
+  const m = min(path, target)
 
-  for (let i = 0; i < path.size; i++) {
+  for (let i = 0; i < m; i++) {
     const pv = path.get(i)
     const tv = target.get(i)
 
@@ -23,8 +22,8 @@ function compare(path, target) {
     if (pv > tv) return 1
   }
 
-  // Otherwise they were equal the whole way, it's the same.
-  return 0
+  // Paths should now be equal, otherwise something is wrong
+  return path.size === target.size ? 0 : null
 }
 
 /**
@@ -75,6 +74,23 @@ function crop(a, b, size = min(a, b)) {
 
 function decrement(path, n = 1, index = path.size - 1) {
   return increment(path, 0 - n, index)
+}
+
+/**
+ * Get all ancestor paths of th given path.
+ *
+ * @param {List} path
+ * @returns {List}
+ */
+
+function getAncestors(path) {
+  const ancestors = List().withMutations(list => {
+    for (let i = 0; i < path.size; i++) {
+      list.push(path.slice(0, i))
+    }
+  })
+
+  return ancestors
 }
 
 /**
@@ -324,22 +340,28 @@ function transform(path, operation) {
 
   if (type === 'move_node') {
     const { newPath: np } = operation
-    const npIndex = np.size - 1
-    const npEqual = isEqual(np, path)
-    const npYounger = isYounger(np, path)
-    const npAbove = isAbove(np, path)
 
-    if (pAbove) {
-      path = np.concat(path.slice(p.size))
+    if (isEqual(p, np)) {
+      return List([path])
+    }
+
+    if (pAbove || pEqual) {
+      // We are comparing something that was moved
+      // The new path is unaffected unless the old path was the left-sibling of an ancestor
+      if (isYounger(p, np) && p.size < np.size) {
+        path = decrement(np, 1, min(np, p) - 1).concat(path.slice(p.size))
+      } else {
+        path = np.concat(path.slice(p.size))
+      }
     } else {
-      if (pEqual) {
-        path = np
-      } else if (pYounger) {
+      // This is equivalent logic to remove_node for path
+      if (pYounger) {
         path = decrement(path, 1, pIndex)
       }
 
-      if (npEqual || npYounger || npAbove) {
-        path = increment(path, 1, npIndex)
+      // This is the equivalent logic to insert_node for newPath
+      if (isYounger(np, path) || isEqual(np, path) || isAbove(np, path)) {
+        path = increment(path, 1, np.size - 1)
       }
     }
   }
@@ -359,6 +381,7 @@ export default {
   create,
   crop,
   decrement,
+  getAncestors,
   increment,
   isAbove,
   isAfter,

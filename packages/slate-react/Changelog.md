@@ -4,6 +4,102 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.21.0` — November 2, 2018
+
+###### NEW
+
+**Introducing the `slate-react-placeholder` package.** This new package is what handles the default `placeholder=` prop logic for the editor, and it can be used yourself for situations where you want to render browser-like placeholders in custom nodes.
+
+###### BREAKING
+
+**The `renderPlacehodler` middleware has been removed.** Previously this was how you rendered custom placeholders in the editor, but that logic can now be implemented with `decorateNode` instead, in a way that causes less confusion and overlap in the API. The new `slate-react-placeholder` package does exactly that, adding a decoration to the editor when it is empty.
+
+---
+
+### `0.20.0` — October 27, 2018
+
+###### BREAKING
+
+**Updated to work with `slate@0.43`.** The React bindings have been updated to work with the newest version of Slate which removes the `Change` object.
+
+**The `Change` object has been removed.** The `Change` object as we know it previously has been removed, and all of its behaviors have been folded into the `Editor` controller. This includes the top-level commands and queries methods, as well as methods like `applyOperation` and `normalize`. _All places that used to receive `change` now receive `editor`, which is API equivalent._
+
+**Changes are now flushed to `onChange` asynchronously.** Previously this was done synchronously, which resulted in some strange race conditions in React environments. Now they will always be flushed asynchronously, just like `setState`.
+
+**The `render*`, `decorate*` and `shouldNodeComponentUpdate` middleware signatures have changed!** Previously the `render*`, `decorate*` and `shouldNodeComponentUpdate` middleware was passed `(props, next)`. However now, for consistency with the other middleware they are all passed `(props, editor, next)`. The `shouldNodeComponentUpdate` is passed `(prevProps, props, editor, next)`. This way, all middleware always receive `editor` and `next` as their final two arguments.
+
+---
+
+### `0.19.0` — October 9, 2018
+
+###### NEW
+
+**The `<Editor>` can now choose to not normalize on mount.** A nice side effect of splitting out the `Editor` logic into a reusable place is that it's easier to implement customizable behaviors for normalization. You can now pass an `options={{ normalize: false }}` prop to the React `<Editor>` which will disable the default normalization that takes place when the editor is constructed. This is helpful in cases where you are guaranteed to have an already normalized value, and don't want to incur the performance cost of normalizing it again.
+
+**The middleware stack is now deferrable.** With the introduction of the `Editor` controller, the middleware stack in Slate has also been upgraded. Each middleware now receives a `next` function (similar to Express or Koa) that allows you to choose whether to iterating the stack or not.
+
+```js
+// Previously, you'd return `undefined` to continue.
+function onKeyDown(event, editor, next) {
+  if (event.key !== 'Enter') return
+  ...
+}
+
+// Now, you call `next()` to continue...
+function onKeyDown(event, editor, next) {
+  if (event.key !== 'Enter') return next()
+  ...
+}
+```
+
+While that may seem inconvenient, it opens up an entire new behavior, which is deferring to the plugins later in the stack to see if they "handle" a specific case, and if not, handling it yourself:
+
+```js
+function onKeyDown(event, editor, next) {
+  if (event.key === 'Enter') {
+    const handled = next()
+    if (handled) return handled
+
+    // Otherwise, handle `Enter` yourself...
+  }
+}
+```
+
+This is how all of the core logic in `slate-react` is now implemented, eliminating the need for a "before" and an "after" plugin that duplicate logic.
+
+Under the covers, the `schema`, `commands` and `queries` concept are all implemented as plugins that attach varying middleware as well. For example, commands are processed using the `onCommand` middleware under the covers:
+
+```js
+const plugin = {
+  onCommand(command, editor, next) {
+    ...
+  }
+}
+```
+
+This allows you to actually listen in to all commands, and override individual behaviors if you choose to do so, without having to override the command itself. This is a very advanced feature, which most people won't need, but it shows the flexibility provided by migrating all of the previously custom internal logic to be based on the new middleware stack.
+
+###### BREAKING
+
+**Updated to the latest version of `slate`.** The `slate-react` codebase has been updated to be compatible with the latest version of `slate`, `0.42.0`. This is a backward incompatible upgrade, and so the peer dependency range has been bumped.
+
+**The middleware stack must now be explicitly continued, using `next`.** Previously returning `undefined` from a middleware would (usually) continue the stack onto the next middleware. Now, with middleware taking a `next` function argument you must explicitly decide to continue the stack by call `next()` yourself.
+
+**The `editor` object is no longer passed to event handlers.** Previously, the third argument to event handlers would be the React `editor` instance. However, now that `Change` objects contain a direct reference to the editor, you can access this on `change.editor` instead.
+
+```js
+function onKeyDown(event, editor, next) {
+  const { editor } = change
+  ...
+}
+```
+
+In its place is the new `next` argument, which allows you to choose to defer to the plugins further on the stack before handling the event yourself.
+
+**The `findRange`, `findPoint`, `cloneFragment`, and `getEventRange` utils now take an `editor`.** Previously these utility functions took a `schema` argument, but this has been replaced with the new `editor` controller instead now that the `Schema` model has been removed.
+
+---
+
 ### `0.18.0` — August 22, 2018
 
 ###### BREAKING
@@ -136,7 +232,7 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ###### BREAKING
 
-**The `data` argument to event handlers has been removed.** Previously event handlers had a signature of `(event, data, change, editor)`, but now they have a signature of just `(event, change, editor)`. This leads to simpler internal Slate logic, and less complex relationship dependencies between plugins. All of the information inside the old `data` argument can be accessed via the similar properties on the `event` argument, or via the `getEventRange`, `getEventTransfer` and `setEventTransfer` helpers.
+**The `data` argument to event handlers has been removed.** Previously event handlers had a signature of `(event, data, change, editor)`, but now they have a signature of just `(event, editor, next)`. This leads to simpler internal Slate logic, and less complex relationship dependencies between plugins. All of the information inside the old `data` argument can be accessed via the similar properties on the `event` argument, or via the `getEventRange`, `getEventTransfer` and `setEventTransfer` helpers.
 
 ###### NEW
 

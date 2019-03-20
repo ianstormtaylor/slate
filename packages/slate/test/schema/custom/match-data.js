@@ -14,7 +14,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph thing="value" />
+      <paragraph thing="value">
+        <text />
+      </paragraph>
     </document>
   </value>
 )

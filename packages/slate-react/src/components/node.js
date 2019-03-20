@@ -2,7 +2,7 @@ import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import Types from 'prop-types'
 
 import Void from './void'
@@ -64,8 +64,8 @@ class Node extends React.Component {
 
   shouldComponentUpdate(nextProps) {
     const { props } = this
-    const { stack } = props.editor
-    const shouldUpdate = stack.find(
+    const { editor } = props
+    const shouldUpdate = editor.run(
       'shouldNodeComponentUpdate',
       props,
       nextProps
@@ -89,13 +89,13 @@ class Node extends React.Component {
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
-    if (n.readOnly != p.readOnly) return true
+    if (n.readOnly !== p.readOnly) return true
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
     // which this won't catch. But that's rare and not a drag on performance, so
     // for simplicity we just let them through.
-    if (n.node != p.node) return true
+    if (n.node !== p.node) return true
 
     // If the selection value of the node or of some of its children has changed,
     // re-render in case there is any user-land logic depends on it to render.
@@ -130,13 +130,11 @@ class Node extends React.Component {
       readOnly,
     } = this.props
     const { value } = editor
-    const { selection, schema } = value
-    const { stack } = editor
+    const { selection } = value
     const indexes = node.getSelectionIndexes(selection, isSelected)
-    const decs = decorations.concat(node.getDecorations(stack))
+    const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
-
-    let children = []
+    const children = []
 
     node.nodes.forEach((child, i) => {
       const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
@@ -152,9 +150,9 @@ class Node extends React.Component {
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
-    if (node.object == 'block' && node.nodes.first().object != 'block') {
+    if (node.isLeafBlock()) {
       const direction = node.getTextDirection()
-      if (direction == 'rtl') attributes.dir = 'rtl'
+      if (direction === 'rtl') attributes.dir = 'rtl'
     }
 
     const props = {
@@ -167,23 +165,13 @@ class Node extends React.Component {
       readOnly,
     }
 
-    let placeholder = stack.find('renderPlaceholder', props)
-
-    if (placeholder) {
-      placeholder = React.cloneElement(placeholder, {
-        key: `${node.key}-placeholder`,
-      })
-
-      children = [placeholder, ...children]
-    }
-
-    const element = stack.find('renderNode', {
+    const element = editor.run('renderNode', {
       ...props,
       attributes,
       children,
     })
 
-    return schema.isVoid(node) ? (
+    return editor.query('isVoid', node) ? (
       <Void {...this.props}>{element}</Void>
     ) : (
       element
@@ -201,11 +189,11 @@ class Node extends React.Component {
 
   renderNode = (child, isSelected, decorations) => {
     const { block, editor, node, readOnly, isFocused } = this.props
-    const Component = child.object == 'text' ? Text : Node
+    const Component = child.object === 'text' ? Text : Node
 
     return (
       <Component
-        block={node.object == 'block' ? node : block}
+        block={node.object === 'block' ? node : block}
         decorations={decorations}
         editor={editor}
         isSelected={isSelected}

@@ -2,7 +2,15 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * The auto-markdown example.
@@ -11,16 +19,6 @@ import initialValue from './value.json'
  */
 
 class MarkdownShortcuts extends React.Component {
-  /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
   /**
    * Get the block type for a series of auto-markdown shortcut `chars`.
    *
@@ -64,8 +62,7 @@ class MarkdownShortcuts extends React.Component {
     return (
       <Editor
         placeholder="Write some markdown..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
       />
@@ -76,10 +73,12 @@ class MarkdownShortcuts extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -101,34 +100,29 @@ class MarkdownShortcuts extends React.Component {
         return <h6 {...attributes}>{children}</h6>
       case 'list-item':
         return <li {...attributes}>{children}</li>
+      default:
+        return next()
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
    * On key down, check for our specific key shortcuts.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onKeyDown = (event, change) => {
+  onKeyDown = (event, editor, next) => {
     switch (event.key) {
       case ' ':
-        return this.onSpace(event, change)
+        return this.onSpace(event, editor, next)
       case 'Backspace':
-        return this.onBackspace(event, change)
+        return this.onBackspace(event, editor, next)
       case 'Enter':
-        return this.onEnter(event, change)
+        return this.onEnter(event, editor, next)
+      default:
+        return next()
     }
   }
 
@@ -137,31 +131,30 @@ class MarkdownShortcuts extends React.Component {
    * node into the shortcut's corresponding type.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onSpace = (event, change) => {
-    const { value } = change
+  onSpace = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
-    if (selection.isExpanded) return
+    if (selection.isExpanded) return next()
 
     const { startBlock } = value
     const { start } = selection
     const chars = startBlock.text.slice(0, start.offset).replace(/\s*/g, '')
     const type = this.getType(chars)
-
-    if (!type) return
-    if (type == 'list-item' && startBlock.type == 'list-item') return
+    if (!type) return next()
+    if (type === 'list-item' && startBlock.type === 'list-item') return next()
     event.preventDefault()
 
-    change.setBlocks(type)
+    editor.setBlocks(type)
 
-    if (type == 'list-item') {
-      change.wrapBlock('bulleted-list')
+    if (type === 'list-item') {
+      editor.wrapBlock('bulleted-list')
     }
 
-    change.moveFocusToStartOfNode(startBlock).delete()
-    return true
+    editor.moveFocusToStartOfNode(startBlock).delete()
   }
 
   /**
@@ -169,26 +162,25 @@ class MarkdownShortcuts extends React.Component {
    * paragraph node.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onBackspace = (event, change) => {
-    const { value } = change
+  onBackspace = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
-    if (selection.isExpanded) return
-    if (selection.start.offset != 0) return
+    if (selection.isExpanded) return next()
+    if (selection.start.offset !== 0) return next()
 
     const { startBlock } = value
-    if (startBlock.type == 'paragraph') return
+    if (startBlock.type === 'paragraph') return next()
 
     event.preventDefault()
-    change.setBlocks('paragraph')
+    editor.setBlocks('paragraph')
 
-    if (startBlock.type == 'list-item') {
-      change.unwrapBlock('bulleted-list')
+    if (startBlock.type === 'list-item') {
+      editor.unwrapBlock('bulleted-list')
     }
-
-    return true
   }
 
   /**
@@ -196,35 +188,35 @@ class MarkdownShortcuts extends React.Component {
    * create a new paragraph below it.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onEnter = (event, change) => {
-    const { value } = change
+  onEnter = (event, editor, next) => {
+    const { value } = editor
     const { selection } = value
     const { start, end, isExpanded } = selection
-    if (isExpanded) return
+    if (isExpanded) return next()
 
     const { startBlock } = value
-    if (start.offset == 0 && startBlock.text.length == 0)
-      return this.onBackspace(event, change)
-    if (end.offset != startBlock.text.length) return
+    if (start.offset === 0 && startBlock.text.length === 0)
+      return this.onBackspace(event, editor, next)
+    if (end.offset !== startBlock.text.length) return next()
 
     if (
-      startBlock.type != 'heading-one' &&
-      startBlock.type != 'heading-two' &&
-      startBlock.type != 'heading-three' &&
-      startBlock.type != 'heading-four' &&
-      startBlock.type != 'heading-five' &&
-      startBlock.type != 'heading-six' &&
-      startBlock.type != 'block-quote'
+      startBlock.type !== 'heading-one' &&
+      startBlock.type !== 'heading-two' &&
+      startBlock.type !== 'heading-three' &&
+      startBlock.type !== 'heading-four' &&
+      startBlock.type !== 'heading-five' &&
+      startBlock.type !== 'heading-six' &&
+      startBlock.type !== 'block-quote'
     ) {
-      return
+      return next()
     }
 
     event.preventDefault()
-    change.splitBlock().setBlocks('paragraph')
-    return true
+    editor.splitBlock().setBlocks('paragraph')
   }
 }
 

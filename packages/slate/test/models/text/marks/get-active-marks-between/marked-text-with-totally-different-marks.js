@@ -8,7 +8,7 @@ export const input = (
     <b>Cat</b>
     <i> is</i> Cute
   </text>
-)[0]
+)
 
 export default function(t) {
   return t.getActiveMarksBetweenOffsets(0, 6)

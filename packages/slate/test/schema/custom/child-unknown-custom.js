@@ -12,16 +12,16 @@ export const schema = {
           max: 1,
         },
       ],
-      normalize: (change, { code, node, child }) => {
-        if (code == 'child_unknown') {
+      normalize: (editor, { code, node, child }) => {
+        if (code === 'child_unknown') {
           const previous = node.getPreviousSibling(child.key)
           const offset = previous.nodes.size
 
           child.nodes.forEach((n, i) =>
-            change.moveNodeByKey(n.key, previous.key, offset + i)
+            editor.moveNodeByKey(n.key, previous.key, offset + i)
           )
 
-          change.removeNodeByKey(child.key)
+          editor.removeNodeByKey(child.key)
         }
       },
     },
@@ -33,7 +33,7 @@ export const input = (
     <document>
       <quote>
         <paragraph>one</paragraph>
-        <paragraph>two</paragraph>
+        <block type="title">two</block>
       </quote>
     </document>
   </value>

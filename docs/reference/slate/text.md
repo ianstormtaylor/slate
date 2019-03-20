@@ -40,7 +40,7 @@ A concatenated string of all of the characters in the text node.
 
 `Text.create(properties: Object) => Text`
 
-Create a text from a plain Javascript object of `properties`.
+Create a text from a plain JavaScript object of `properties`.
 
 ### `Text.fromJSON`
 

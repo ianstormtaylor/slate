@@ -10,20 +10,30 @@ The top-level React component that renders the Slate editor itself.
 
 ```js
 <Editor
+  id={String}
   autoCorrect={Boolean}
   autoFocus={Boolean}
   className={String}
+  commands={Object}
   onChange={Function}
-  placeholder={String || Element}
+  placeholder={String | Element}
   plugins={Array}
+  queries={Object}
   readOnly={Boolean}
   role={String}
+  schema={Object}
   spellCheck={Boolean}
   value={Value}
   style={Object}
   tabIndex={Number}
 />
 ```
+
+### `id`
+
+`String`
+
+Id for the top-level rendered HTML element of the editor.
 
 ### `autoCorrect`
 
@@ -53,7 +63,7 @@ A change handler that will be called with the `change` that applied the change. 
 
 `String || Element`
 
-A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+A placeholder string (or React element) that will be rendered if the document only contains a single empty block.
 
 ### `plugins`
 
@@ -156,46 +166,3 @@ const plugins = [
 ### `schema`
 
 To see how these properties behave, check out the [Plugins reference](./plugins.md).
-
-## Instance Methods
-
-### `blur`
-
-`blur() => Void`
-
-Programmatically blur the editor.
-
-### `change`
-
-`change(fn) => Void`
-`change(fn, ...args) => Void`
-
-Programmatically invoke a change `fn` on the editor. The function will be invoked with a new `change` object representing the editor's current value.
-
-If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
-
-### `focus`
-
-`focus() => Void`
-
-Programmatically focus the editor.
-
-## Instance Properties
-
-### `schema`
-
-`Schema`
-
-The editor's current schema.
-
-### `stack`
-
-`Stack`
-
-The editor's current stack.
-
-### `value`
-
-`Value`
-
-The editor's current value.

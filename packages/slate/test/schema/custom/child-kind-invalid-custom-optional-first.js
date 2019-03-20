@@ -17,9 +17,11 @@ export const schema = {
           min: 1,
         },
       ],
-      normalize: (change, { code, child }) => {
-        if (code == 'child_object_invalid') {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      normalize: (editor, error) => {
+        const { code, child } = error
+
+        if (code === 'child_object_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

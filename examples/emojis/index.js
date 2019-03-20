@@ -2,9 +2,17 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import styled from 'react-emotion'
 import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A styled emoji inline component.
@@ -58,16 +66,6 @@ const noop = e => e.preventDefault()
 
 class Emojis extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * The editor's schema.
    *
    * @type {Object}
@@ -79,6 +77,16 @@ class Emojis extends React.Component {
         isVoid: true,
       },
     },
+  }
+
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -99,9 +107,9 @@ class Emojis extends React.Component {
         </Toolbar>
         <Editor
           placeholder="Write some 😍👋🎉..."
-          value={this.state.value}
+          ref={this.ref}
+          defaultValue={initialValue}
           schema={this.schema}
-          onChange={this.onChange}
           renderNode={this.renderNode}
         />
       </div>
@@ -112,16 +120,19 @@ class Emojis extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'paragraph': {
         return <p {...attributes}>{children}</p>
       }
+
       case 'emoji': {
         const code = node.data.get('code')
         return (
@@ -135,17 +146,11 @@ class Emojis extends React.Component {
           </Emoji>
         )
       }
+
+      default: {
+        return next()
+      }
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
@@ -156,18 +161,11 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
-    const { value } = this.state
-    const change = value.change()
 
-    change
-      .insertInline({
-        type: 'emoji',
-        data: { code },
-      })
+    this.editor
+      .insertInline({ type: 'emoji', data: { code } })
       .moveToStartOfNextText()
       .focus()
-
-    this.onChange(change)
   }
 }
 

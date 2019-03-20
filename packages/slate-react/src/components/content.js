@@ -2,9 +2,13 @@ import Debug from 'debug'
 import React from 'react'
 import Types from 'prop-types'
 import getWindow from 'get-window'
-import warning from 'slate-dev-warning'
+import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
-import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
+import {
+  IS_ANDROID,
+  IS_FIREFOX,
+  HAS_INPUT_EVENTS_LEVEL_2,
+} from 'slate-dev-environment'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -25,6 +29,15 @@ const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "no
 const debug = Debug('slate:content')
 
 /**
+ * Separate debug to easily see when the DOM has updated either by render or
+ * changing selection.
+ *
+ * @type {Function}
+ */
+
+debug.update = Debug('slate:update')
+
+/**
  * Content.
  *
  * @type {Component}
@@ -41,6 +54,7 @@ class Content extends React.Component {
     autoCorrect: Types.bool.isRequired,
     className: Types.string,
     editor: Types.object.isRequired,
+    id: Types.string,
     readOnly: Types.bool.isRequired,
     role: Types.string,
     spellCheck: Types.bool.isRequired,
@@ -132,6 +146,7 @@ class Content extends React.Component {
    */
 
   componentDidUpdate() {
+    debug.update('componentDidUpdate')
     this.updateSelection()
   }
 
@@ -146,103 +161,115 @@ class Content extends React.Component {
     const { isBackward } = selection
     const window = getWindow(this.element)
     const native = window.getSelection()
+    const { activeElement } = window.document
+    debug.update('updateSelection', { selection: selection.toJSON() })
 
-    // .getSelection() can return null in some cases
-    // https://bugzilla.mozilla.org/show_bug.cgi?id=827585
-    if (!native) return
+    // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
+    // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
+    if (!native) {
+      return
+    }
 
     const { rangeCount, anchorNode } = native
+    let updated = false
 
-    // If both selections are blurred, do nothing.
-    if (!rangeCount && selection.isBlurred) return
-
-    // If the selection has been blurred, but is still inside the editor in the
-    // DOM, blur it manually.
-    if (selection.isBlurred) {
-      if (!this.isInEditor(anchorNode)) return
-      removeAllRanges(native)
+    // If the Slate selection is blurred, but the DOM's active element is still
+    // the editor, we need to blur it.
+    if (selection.isBlurred && activeElement === this.element) {
       this.element.blur()
-      debug('updateSelection', { selection, native })
-      return
+      updated = true
     }
 
-    // If the selection isn't set, do nothing.
-    if (selection.isUnset) return
+    // If the Slate selection is unset, but the DOM selection has a range
+    // selected in the editor, we need to remove the range.
+    if (selection.isUnset && rangeCount && this.isInEditor(anchorNode)) {
+      removeAllRanges(native)
+      updated = true
+    }
+
+    // If the Slate selection is focused, but the DOM's active element is not
+    // the editor, we need to focus it. We prevent scrolling because we handle
+    // scrolling to the correct selection.
+    if (selection.isFocused && activeElement !== this.element) {
+      this.element.focus({ preventScroll: true })
+      updated = true
+    }
 
     // Otherwise, figure out which DOM nodes should be selected...
-    const current = !!rangeCount && native.getRangeAt(0)
-    const range = findDOMRange(selection, window)
+    if (selection.isFocused && selection.isSet) {
+      const current = !!rangeCount && native.getRangeAt(0)
+      const range = findDOMRange(selection, window)
 
-    if (!range) {
-      warning(
-        false,
-        'Unable to find a native DOM range from the current selection.'
-      )
+      if (!range) {
+        warning(
+          false,
+          'Unable to find a native DOM range from the current selection.'
+        )
 
-      return
-    }
-
-    const { startContainer, startOffset, endContainer, endOffset } = range
-
-    // If the new range matches the current selection, there is nothing to fix.
-    // COMPAT: The native `Range` object always has it's "start" first and "end"
-    // last in the DOM. It has no concept of "backwards/forwards", so we have
-    // to check both orientations here. (2017/10/31)
-    if (current) {
-      if (
-        (startContainer == current.startContainer &&
-          startOffset == current.startOffset &&
-          endContainer == current.endContainer &&
-          endOffset == current.endOffset) ||
-        (startContainer == current.endContainer &&
-          startOffset == current.endOffset &&
-          endContainer == current.startContainer &&
-          endOffset == current.startOffset)
-      ) {
         return
       }
-    }
+
+      const { startContainer, startOffset, endContainer, endOffset } = range
+
+      // If the new range matches the current selection, there is nothing to fix.
+      // COMPAT: The native `Range` object always has it's "start" first and "end"
+      // last in the DOM. It has no concept of "backwards/forwards", so we have
+      // to check both orientations here. (2017/10/31)
+      if (current) {
+        if (
+          (startContainer === current.startContainer &&
+            startOffset === current.startOffset &&
+            endContainer === current.endContainer &&
+            endOffset === current.endOffset) ||
+          (startContainer === current.endContainer &&
+            startOffset === current.endOffset &&
+            endContainer === current.startContainer &&
+            endOffset === current.startOffset)
+        ) {
+          return
+        }
+      }
 
     // Otherwise, set the `isUpdatingSelection` flag and update the selection.
-    this.tmp.isUpdatingSelection = true
+    updated = truethis.tmp.isUpdatingSelection = true
+if (!IS_FIREFOX) {    removeAllRanges(native)
 
-    if (!IS_FIREFOX) {
-      removeAllRanges(native)
-
-      // COMPAT: IE 11 does not support Selection.setBaseAndExtent
-      if (native.setBaseAndExtent) {
-        // COMPAT: Since the DOM range has no concept of backwards/forwards
-        // we need to check and do the right thing here.
-        if (isBackward) {
-          native.setBaseAndExtent(
-            range.endContainer,
-            range.endOffset,
-            range.startContainer,
-            range.startOffset
-          )
-        } else {
-          native.setBaseAndExtent(
-            range.startContainer,
-            range.startOffset,
-            range.endContainer,
-            range.endOffset
-          )
-        }
+    // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
+    if (native.setBaseAndExtent) {
+      // COMPAT: Since the DOM range has no concept of backwards/forwards
+      // we need to check and do the right thing here.
+      if (isBackward) {
+        native.setBaseAndExtent(
+          range.endContainer,
+          range.endOffset,
+          range.startContainer,
+          range.startOffset
+        )
       } else {
-        // COMPAT: IE 11 does not support Selection.extend, fallback to addRange
-        native.addRange(range)
+        native.setBaseAndExtent(
+          range.startContainer,
+          range.startOffset,
+          range.endContainer,
+          range.endOffset
+        )
       }
-    }
+    } else {
 
-    // Scroll to the selection, in case it's out of view.
-    scrollToSelection(native)
+      native.addRange(range)
+    }}
+
+      // Scroll to the selection, in case it's out of view.
+      scrollToSelection(native)
 
     // Then unset the `isUpdatingSelection` flag after a delay.
     setTimeout(() => {
       this.tmp.isUpdatingSelection = false
     })
 
-    debug('updateSelection', { selection, native })
+    if (updated) {
+      debug('updateSelection', { selection, native, activeElement })
+      debug.update('updateSelection-applied', { selection })
+    }
   }
 
   /**
@@ -285,9 +312,8 @@ class Content extends React.Component {
       throw err
     }
 
-    const allowEdit = el.isContentEditable || el.closest('[data-slate-void]')
     return (
-      allowEdit &&
+      el.isContentEditable &&
       (el === element || el.closest('[data-slate-editor]') === element)
     )
   }
@@ -306,7 +332,7 @@ class Content extends React.Component {
     // programmatically while updating selection.
     if (
       this.tmp.isUpdatingSelection &&
-      (handler == 'onSelect' || handler == 'onBlur' || handler == 'onFocus')
+      (handler === 'onSelect' || handler === 'onBlur' || handler === 'onFocus')
     ) {
       return
     }
@@ -316,13 +342,18 @@ class Content extends React.Component {
     // cases we don't need to trigger any changes, since our internal model is
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
-    if (handler == 'onSelect') {
+    //
+    // ANDROID: The updateSelection causes issues in Android when you are
+    // at the end of a block. The selection ends up to the left of the inserted
+    // character instead of to the right. This behavior continues even if
+    // you enter more than one character. (2019/01/03)
+    if (!IS_ANDROID && handler === 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
       const window = getWindow(event.target)
       const native = window.getSelection()
-      const range = findRange(native, value)
+      const range = findRange(native, editor)
 
       if (range && range.equals(selection.toRange())) {
         this.updateSelection()
@@ -332,39 +363,43 @@ class Content extends React.Component {
 
     // Don't handle drag and drop events coming from embedded editors.
     if (
-      handler == 'onDragEnd' ||
-      handler == 'onDragEnter' ||
-      handler == 'onDragExit' ||
-      handler == 'onDragLeave' ||
-      handler == 'onDragOver' ||
-      handler == 'onDragStart' ||
-      handler == 'onDrop'
+      handler === 'onDragEnd' ||
+      handler === 'onDragEnter' ||
+      handler === 'onDragExit' ||
+      handler === 'onDragLeave' ||
+      handler === 'onDragOver' ||
+      handler === 'onDragStart' ||
+      handler === 'onDrop'
     ) {
-      const { target } = event
-      const targetEditorNode = target.closest('[data-slate-editor]')
-      if (targetEditorNode !== this.element) return
+      const closest = event.target.closest('[data-slate-editor]')
+
+      if (closest !== this.element) {
+        return
+      }
     }
 
     // Some events require being in editable in the editor, so if the event
     // target isn't, ignore them.
     if (
-      handler == 'onBeforeInput' ||
-      handler == 'onBlur' ||
-      handler == 'onCompositionEnd' ||
-      handler == 'onCompositionStart' ||
-      handler == 'onCopy' ||
-      handler == 'onCut' ||
-      handler == 'onFocus' ||
-      handler == 'onInput' ||
-      handler == 'onKeyDown' ||
-      handler == 'onKeyUp' ||
-      handler == 'onPaste' ||
-      handler == 'onSelect'
+      handler === 'onBeforeInput' ||
+      handler === 'onBlur' ||
+      handler === 'onCompositionEnd' ||
+      handler === 'onCompositionStart' ||
+      handler === 'onCopy' ||
+      handler === 'onCut' ||
+      handler === 'onFocus' ||
+      handler === 'onInput' ||
+      handler === 'onKeyDown' ||
+      handler === 'onKeyUp' ||
+      handler === 'onPaste' ||
+      handler === 'onSelect'
     ) {
-      if (!this.isInEditor(event.target)) return
+      if (!this.isInEditor(event.target)) {
+        return
+      }
     }
 
-    this.props[handler](event)
+    this.props.onEvent(handler, event)
   }
 
   /**
@@ -383,7 +418,7 @@ class Content extends React.Component {
     const { activeElement } = window.document
     if (activeElement !== this.element) return
 
-    this.props.onSelect(event)
+    this.props.onEvent('onSelect', event)
   }, 100)
 
   /**
@@ -395,6 +430,7 @@ class Content extends React.Component {
   render() {
     const { props, handlers } = this
     const {
+      id,
       className,
       readOnly,
       editor,
@@ -403,11 +439,11 @@ class Content extends React.Component {
       tagName,
       spellCheck,
     } = props
-    const { value, stack } = editor
+    const { value } = editor
     const Container = tagName
     const { document, selection, decorations } = value
     const indexes = document.getSelectionIndexes(selection)
-    const decs = document.getDecorations(stack).concat(decorations)
+    const decs = document.getDecorations(editor).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {
@@ -433,6 +469,12 @@ class Content extends React.Component {
 
     debug('render', { props })
 
+    debug.update('render', {
+      text: value.document.text,
+      selection: value.selection.toJSON(),
+      value: value.toJSON(),
+    })
+
     return (
       <Container
         {...handlers}
@@ -441,6 +483,7 @@ class Content extends React.Component {
         data-key={document.key}
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
+        id={id}
         className={className}
         autoCorrect={props.autoCorrect ? 'on' : 'off'}
         spellCheck={spellCheck}
@@ -486,14 +529,6 @@ class Content extends React.Component {
     )
   }
 }
-
-/**
- * Mix in handler prop types.
- */
-
-EVENT_HANDLERS.forEach(handler => {
-  Content.propTypes[handler] = Types.func.isRequired
-})
 
 /**
  * Export.

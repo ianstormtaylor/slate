@@ -1,8 +1,11 @@
 {
   "presets": [
-    ["env", {
-      "modules": false
-    }],
+    [
+      "env",
+      {
+        "modules": false
+      }
+    ],
     "react",
     "stage-0"
   ],
@@ -10,40 +13,48 @@
   "env": {
     "webpack": {
       "presets": [
-        ["env", {
-          "modules": false
-        }],
+        [
+          "env",
+          {
+            "modules": false
+          }
+        ],
         "react",
         "stage-0"
       ],
-      "plugins": [
-        "transform-runtime",
-        "react-hot-loader/babel"
-      ]
+      "plugins": ["transform-runtime", "react-hot-loader/babel"]
     },
     "test": {
       "presets": [
-        ["env", {
-          "exclude": ["transform-regenerator"]
-        }],
+        [
+          "env",
+          {
+            "exclude": ["transform-regenerator"]
+          }
+        ],
         "react",
         "stage-0"
       ],
       "plugins": [
         "transform-runtime",
-        ["module-resolver", {
-          "alias" : {
-            "^(slate.*)": "./packages/\\1/src"
+        [
+          "module-resolver",
+          {
+            "alias": {
+              "^(slate.*)": "./packages/\\1/src"
+            }
           }
-        }],
-        "istanbul"
+        ]
       ]
     },
     "benchmark": {
       "presets": [
-        ["env", {
-          "exclude": ["transform-regenerator"]
-        }],
+        [
+          "env",
+          {
+            "exclude": ["transform-regenerator"]
+          }
+        ],
         "react",
         "stage-0"
       ],

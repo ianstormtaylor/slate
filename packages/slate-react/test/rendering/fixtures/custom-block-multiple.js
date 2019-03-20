@@ -11,10 +11,12 @@ function Code(props) {
   )
 }
 
-function renderNode(props) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
     case 'code':
       return Code(props)
+    default:
+      return next()
   }
 }
 
@@ -37,21 +39,27 @@ export const output = `
   <pre>
     <code>
       <span>
-        <span>word</span>
+        <span data-slate-leaf="true">
+          <span data-slate-content="true">word</span>
+        </span>
       </span>
     </code>
   </pre>
   <pre>
     <code>
       <span>
-        <span>word</span>
+        <span data-slate-leaf="true">
+          <span data-slate-content="true">word</span>
+        </span>
       </span>
     </code>
   </pre>
   <pre>
     <code>
       <span>
-        <span>word</span>
+        <span data-slate-leaf="true">
+          <span data-slate-content="true">word</span>
+        </span>
       </span>
     </code>
   </pre>

@@ -3,7 +3,15 @@ import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Define our code components.
@@ -17,9 +25,7 @@ function CodeBlock(props) {
   const language = node.data.get('language')
 
   function onChange(event) {
-    editor.change(c =>
-      c.setNodeByKey(node.key, { data: { language: event.target.value } })
-    )
+    editor.setNodeByKey(node.key, { data: { language: event.target.value } })
   }
 
   return (
@@ -53,9 +59,9 @@ function CodeBlockLine(props) {
  */
 
 function getContent(token) {
-  if (typeof token == 'string') {
+  if (typeof token === 'string') {
     return token
-  } else if (typeof token.content == 'string') {
+  } else if (typeof token.content === 'string') {
     return token.content
   } else {
     return token.content.map(getContent).join('')
@@ -70,16 +76,6 @@ function getContent(token) {
 
 class CodeHighlighting extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
    * Render.
    *
    * @return {Component}
@@ -89,8 +85,7 @@ class CodeHighlighting extends React.Component {
     return (
       <Editor
         placeholder="Write some code..."
-        value={this.state.value}
-        onChange={this.onChange}
+        defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderNode={this.renderNode}
         renderMark={this.renderMark}
@@ -106,12 +101,14 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeBlock {...props} />
       case 'code_line':
         return <CodeBlockLine {...props} />
+      default:
+        return next()
     }
   }
 
@@ -122,7 +119,7 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
@@ -150,35 +147,29 @@ class CodeHighlighting extends React.Component {
             {children}
           </span>
         )
+      default:
+        return next()
     }
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
    * On key down inside code blocks, insert soft new lines.
    *
    * @param {Event} event
-   * @param {Change} change
-   * @return {Change}
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onKeyDown = (event, change) => {
-    const { value } = change
-    const { selection, startBlock } = value
-    if (event.key != 'Enter') return
-    if (startBlock.type != 'code') return
-    if (selection.isExpanded) change.delete()
-    change.insertText('\n')
-    return true
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
+    const { startBlock } = value
+
+    if (event.key === 'Enter' && startBlock.type === 'code') {
+      editor.insertText('\n')
+      return
+    }
+
+    next()
   }
 
   /**
@@ -188,8 +179,9 @@ class CodeHighlighting extends React.Component {
    * @return {Array}
    */
 
-  decorateNode = node => {
-    if (node.type != 'code') return
+  decorateNode = (node, editor, next) => {
+    const others = next() || []
+    if (node.type !== 'code') return others
 
     const language = node.data.get('language')
     const texts = node.getTexts().toArray()
@@ -224,7 +216,7 @@ class CodeHighlighting extends React.Component {
         endOffset = remaining
       }
 
-      if (typeof token != 'string') {
+      if (typeof token !== 'string') {
         const dec = {
           anchor: {
             key: startText.key,
@@ -245,7 +237,7 @@ class CodeHighlighting extends React.Component {
       start = end
     }
 
-    return decorations
+    return [...others, ...decorations]
   }
 }
 

@@ -6,9 +6,9 @@ export const schema = {
   blocks: {
     paragraph: {
       next: [{ type: 'paragraph' }],
-      normalize: (change, { code, next }) => {
-        if (code == 'next_sibling_type_invalid') {
-          change.wrapBlockByKey(next.key, 'paragraph')
+      normalize: (editor, { code, next }) => {
+        if (code === 'next_sibling_type_invalid') {
+          editor.wrapBlockByKey(next.key, 'paragraph')
         }
       },
     },
@@ -18,8 +18,12 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph />
-      <image />
+      <paragraph>
+        <text />
+      </paragraph>
+      <image>
+        <text />
+      </image>
     </document>
   </value>
 )
@@ -27,9 +31,13 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
       <paragraph>
-        <image />
+        <text />
+      </paragraph>
+      <paragraph>
+        <image>
+          <text />
+        </image>
       </paragraph>
     </document>
   </value>

@@ -2,12 +2,9 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .addMark('bold')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.addMark('bold')
+  editor.flush().undo()
 }
 
 export const input = (
