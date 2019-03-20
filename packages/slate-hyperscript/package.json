@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.41.4"
+    "slate": "^0.41.2"
   },
   "scripts": {
     "clean": "rm -rf ./dist ./lib ./node_modules"
