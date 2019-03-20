@@ -2850,6 +2850,13 @@ es6-weak-map@^2.0.1:
     es6-iterator "^2.0.1"
     es6-symbol "^3.1.1"
 
+es7-object-polyfill@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/es7-object-polyfill/-/es7-object-polyfill-0.0.7.tgz#4cc46ab66aebb8db73f5466184d057ee6795713f"
+  integrity sha512-XoD2Grsf1JvpREOmH9yFMd/GHMVjISpxq9sHm1RKZ3XZ+IBXJDIuyqbTu/zegL5GYZnL3hBA9vqJQVGawWIvgQ==
+  dependencies:
+    reflect.ownkeys "^0.2.0"
+
 escape-html@~1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/escape-html/-/escape-html-1.0.3.tgz#0258eae4d3d0c0974de1c169188ef0051d1d1988"
@@ -6601,6 +6608,11 @@ reduce-function-call@^1.0.1:
   resolved "https://registry.yarnpkg.com/reduce-function-call/-/reduce-function-call-1.0.2.tgz#5a200bf92e0e37751752fe45b0ab330fd4b6be99"
   dependencies:
     balanced-match "^0.4.2"
+
+reflect.ownkeys@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/reflect.ownkeys/-/reflect.ownkeys-0.2.0.tgz#749aceec7f3fdf8b63f927a04809e90c5c0b3460"
+  integrity sha1-dJrO7H8/34tj+SegSAnpDFwLNGA=
 
 regenerate@^1.2.1:
   version "1.3.3"

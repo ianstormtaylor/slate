@@ -15,6 +15,7 @@
   "dependencies": {
     "debug": "^3.1.0",
     "direction": "^0.1.5",
+    "es7-object-polyfill": "^0.0.7",
     "esrever": "^0.2.0",
     "is-plain-object": "^2.0.4",
     "lodash": "^4.17.4",

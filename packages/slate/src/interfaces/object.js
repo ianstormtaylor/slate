@@ -16,6 +16,8 @@ import Value from '../models/value'
 import isObject, { TYPES } from '../utils/is-object'
 import mixin from '../utils/mixin'
 
+require('es7-object-polyfill')
+
 /**
  * A factory for the interface that all Slate objects implement.
  *
