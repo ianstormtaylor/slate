@@ -147,14 +147,14 @@ class Editor {
 
     if (typeof type === 'function') {
       type(controller, ...args)
-      normalizeDirtyPaths(this)
+      normalizeDirtyNodes(this)
       return controller
     }
 
     debug('command', { type, args })
     const obj = { type, args }
     this.run('onCommand', obj)
-    normalizeDirtyPaths(this)
+    normalizeDirtyNodes(this)
     return controller
   }
 
@@ -198,7 +198,7 @@ class Editor {
     const table = document.getKeysToPathsTable()
     const keys = Object.keys(table)
     this.tmp.dirty.push(...keys)
-    normalizeDirtyPaths(this)
+    normalizeDirtyNodes(this)
 
     const { selection } = value
     document = value.document
@@ -398,7 +398,7 @@ class Editor {
     this.tmp.normalize = false
     fn(controller)
     this.tmp.normalize = value
-    normalizeDirtyPaths(this)
+    normalizeDirtyNodes(this)
     return controller
   }
 
@@ -553,12 +553,12 @@ function getDirtyPaths(operation) {
 }
 
 /**
- * Normalize any new "dirty" paths that have been added to the change.
+ * Normalize any new "dirty" nodes that have been added to the change.
  *
  * @param {Editor}
  */
 
-function normalizeDirtyPaths(editor) {
+function normalizeDirtyNodes(editor) {
   if (!editor.tmp.normalize) {
     return
   }
@@ -569,8 +569,8 @@ function normalizeDirtyPaths(editor) {
 
   editor.withoutNormalizing(() => {
     while (editor.tmp.dirty.length) {
-      const path = editor.tmp.dirty.pop()
-      normalizeNodeByPath(editor, path)
+      const key = editor.tmp.dirty.pop()
+      normalizeNodeByKey(editor, key)
     }
   })
 }
@@ -582,11 +582,11 @@ function normalizeDirtyPaths(editor) {
  * @param {Array} path
  */
 
-function normalizeNodeByPath(editor, path) {
+function normalizeNodeByKey(editor, key) {
   const { controller } = editor
   let { value } = editor
   let { document } = value
-  let node = document.getNode(path)
+  let node = document.getNode(key)
 
   if (!node) {
     return
@@ -605,25 +605,16 @@ function normalizeNodeByPath(editor, path) {
     // Run the normalize `fn` to fix the node.
     fn(controller)
 
-    // Attempt to re-find the node by path, or by key if it has changed
-    // locations in the tree continue iterating.
+    // Attempt to re-find the node and continue iterating
     value = editor.value
     document = value.document
-    const { key } = node
-    let found = document.getDescendant(path)
+    const found = document.getDescendant(key)
 
-    if (found && found.key === key) {
+    if (found) {
       node = found
     } else {
-      found = document.getDescendant(key)
-
-      if (found) {
-        node = found
-        path = document.getPath(key)
-      } else {
-        // If it no longer exists by key, it was removed, so we're done.
-        break
-      }
+      // If it no longer exists by key, it was removed, so we're done.
+      break
     }
 
     // Increment the iterations counter, and check to make sure that we haven't
