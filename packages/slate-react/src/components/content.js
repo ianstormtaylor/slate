@@ -230,41 +230,46 @@ class Content extends React.Component {
         }
       }
 
-    // Otherwise, set the `isUpdatingSelection` flag and update the selection.
-    updated = truethis.tmp.isUpdatingSelection = true
-if (!IS_FIREFOX) {    removeAllRanges(native)
+      // Otherwise, set the `isUpdatingSelection` flag and update the selection.
+      updated = true
+      this.tmp.isUpdatingSelection = true
 
-    // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
-    if (native.setBaseAndExtent) {
-      // COMPAT: Since the DOM range has no concept of backwards/forwards
-      // we need to check and do the right thing here.
-      if (isBackward) {
-        native.setBaseAndExtent(
-          range.endContainer,
-          range.endOffset,
-          range.startContainer,
-          range.startOffset
-        )
-      } else {
-        native.setBaseAndExtent(
-          range.startContainer,
-          range.startOffset,
-          range.endContainer,
-          range.endOffset
-        )
+      if (!IS_FIREFOX) {
+        removeAllRanges(native)
+
+        // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
+        if (native.setBaseAndExtent) {
+          // COMPAT: Since the DOM range has no concept of backwards/forwards
+          // we need to check and do the right thing here.
+          if (isBackward) {
+            native.setBaseAndExtent(
+              range.endContainer,
+              range.endOffset,
+              range.startContainer,
+              range.startOffset
+            )
+          } else {
+            native.setBaseAndExtent(
+              range.startContainer,
+              range.startOffset,
+              range.endContainer,
+              range.endOffset
+            )
+          }
+        } else {
+
+          native.addRange(range)
+        }
       }
-    } else {
-
-      native.addRange(range)
-    }}
 
       // Scroll to the selection, in case it's out of view.
       scrollToSelection(native)
 
-    // Then unset the `isUpdatingSelection` flag after a delay.
-    setTimeout(() => {
-      this.tmp.isUpdatingSelection = false
-    })
+      // Then unset the `isUpdatingSelection` flag after a delay.
+      setTimeout(() => {
+        this.tmp.isUpdatingSelection = false
+      })
+    }
 
     if (updated) {
       debug('updateSelection', { selection, native, activeElement })
