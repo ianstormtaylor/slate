@@ -257,7 +257,6 @@ class Content extends React.Component {
             )
           }
         } else {
-
           native.addRange(range)
         }
       }
