@@ -93,6 +93,19 @@ class Editor extends React.Component {
     updates: 0,
   }
 
+  constructor(props) {
+    super(props)
+
+    const { commands, placeholder, plugins, queries, schema } = props
+    this.resolveController(plugins, schema, commands, queries, placeholder)
+
+    // Set the current props on the controller.
+    const { options, value: valueFromProps } = props
+    const { value: valueFromState } = this.state
+    const value = valueFromProps || valueFromState
+    this.controller.setValue(value, options)
+  }
+
   /**
    * When the component first mounts, flush a queued change if one exists.
    */
@@ -115,8 +128,12 @@ class Editor extends React.Component {
    * When the component updates, flush a queued change if one exists.
    */
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     this.tmp.updates++
+
+    if (prevProps.value !== this.props.value) {
+      this.controller.setValue(this.props.value, this.props.options)
+    }
 
     if (this.tmp.change) {
       this.handleChange(this.tmp.change)
@@ -147,11 +164,10 @@ class Editor extends React.Component {
     this.resolveController(plugins, schema, commands, queries, placeholder)
 
     // Set the current props on the controller.
-    const { options, readOnly, value: valueFromProps } = props
+    const { readOnly, value: valueFromProps } = props
     const { value: valueFromState } = this.state
     const value = valueFromProps || valueFromState
     this.controller.setReadOnly(readOnly)
-    this.controller.setValue(value, options)
 
     // Render the editor's children with the controller.
     const children = this.controller.run('renderEditor', {
