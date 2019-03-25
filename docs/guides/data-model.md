@@ -10,6 +10,13 @@ Mirroring the DOM is an intentional decision given Slate is a richer implementat
 
 Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range-like object called a [`Selection`](../reference/slate/selection.md) that represents the user's current cursor selection.
 
+The following content on Mozilla's Developer Network may help you learn more about the corresponding DOM concepts:
+
+* [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document)
+* [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements)
+* [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
+* [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
+
 ## Immutable Objects
 
 Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/immutable-js/) objects. This allows us to make rendering much more performant, and it ensures that we don't end up with hard to track down bugs due to accidentally modifying objects in-place.
