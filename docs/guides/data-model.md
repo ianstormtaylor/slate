@@ -22,7 +22,7 @@ The following content on Mozilla's Developer Network may help you learn more abo
 
 Slate's data model is implemented using [`Immutable.js`](https://facebook.github.io/immutable-js/)  objects to allow more performant rendering and ensure objects cannot be accidentally modified (which are especially tricky bugs to track down).
 
-Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieiving values:
+Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieving values:
 
 ```js
 const block = Block.create({ type: 'paragraph' })
