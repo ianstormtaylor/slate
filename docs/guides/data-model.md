@@ -31,7 +31,7 @@ block.object // "block"
 block.type // "paragraph"
 ```
 
-But for updating values, you'll need to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).
+Changing values requires you to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).
 
 Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc, which means we get nice support for expressive methods like `filter`, `includes`, `take`, `skip`, `rest` and `last`.
 
