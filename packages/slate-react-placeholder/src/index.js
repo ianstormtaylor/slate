@@ -74,20 +74,19 @@ function SlateReactPlaceholder(options = {}) {
     if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
       const style = {
         pointerEvents: 'none',
-        display: 'inline-block',
-        width: '0',
+        height: 0,
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
       }
 
       return (
-        <span>
-          <span contentEditable={false} style={style}>
+        <div>
+          <div contentEditable={false} style={style}>
             {placeholder}
-          </span>
+          </div>
           {children}
-        </span>
+        </div>
       )
     }
 
