@@ -2,7 +2,7 @@
 
 Slate is based on an immutable data model that closely resembles the DOM. When you start using Slate, one of the most important things to do is familiarize yourself with this data model. This guide will help you do just that!
 
-## Mirror the DOM
+## Slate Mirrors the DOM
 
 One of the main principles of Slate is that it tries to mirror the native DOM API's as much as possible.
 
