@@ -10,12 +10,12 @@ Mirroring the DOM is an intentional decision given Slate is a richer implementat
 
 Because it mirrors the DOM, Slate's data model features a [`Document`](../reference/slate/document.md) with [`Block`](../reference/slate/block.md), [`Inline`](../reference/slate/inline.md) and [`Text`](../reference/slate/text.md) nodes. You can reference parts of the document with a [`Range`](../reference/slate/range.md). And there is a special range-like object called a [`Selection`](../reference/slate/selection.md) that represents the user's current cursor selection.
 
-The following content on Mozilla's Developer Network may help you learn more about the corresponding DOM concepts:
-
-* [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document)
-* [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements)
-* [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
-* [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
+> The following content on Mozilla's Developer Network may help you learn more about the corresponding DOM concepts:
+> 
+> * [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document)
+> * [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements)
+> * [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
+> * [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
 
 ## Immutable Objects
 
@@ -39,9 +39,9 @@ If you haven't used [`Immutable.js`](https://facebook.github.io/immutable-js/) b
 
 ## The "Value"
 
-The top-level object in Slate—the object encapsulating the entire value of an Slate editor—is called a [`Value`](../reference/slate/value.md).
+The top-level object in Slate—the object encapsulating the entire value of a Slate editor—is called a [`Value`](../reference/slate/value.md).
 
-It is made up of a document filled with content, and a selection representing the user's current cursor selection. It also has a few other more advanced properties like `decorations` and `data`.
+Value consists of the document which contains all content, and a `selection` representing the user's current cursor selection. Value also has a few other advanced properties such as `decorations` and `data`.
 
 > 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
 
