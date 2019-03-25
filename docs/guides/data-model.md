@@ -19,7 +19,8 @@ The following content on Mozilla's Developer Network may help you learn more abo
 
 ## Immutable Objects
 
-Slate's data model is built out of [`Immutable.js`](https://facebook.github.io/immutable-js/) objects. This allows us to make rendering much more performant, and it ensures that we don't end up with hard to track down bugs due to accidentally modifying objects in-place.
+
+Slate's data model is implemented using [`Immutable.js`](https://facebook.github.io/immutable-js/)  objects to allow more performant rendering and ensure objects cannot be accidentally modified (which are especially tricky bugs to track down).
 
 Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieiving values:
 
