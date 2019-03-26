@@ -16,7 +16,7 @@ An *"anchor point"* is a point where a range starts.
 
 ### Character
 
-A "character" is the smallest element that makes up a text node in Slate.
+A *"character"* is the smallest element that makes up a text node in Slate.
 
 ### Collapsed
 
@@ -28,7 +28,7 @@ A "character" is the smallest element that makes up a text node in Slate.
 
 ### Document
 
-The "document" is the top-level ["node"](#node) that contains all other nodes that make up the content of the Slate editor.
+The *"document"* is the top-level ["node"](#node) that contains all other nodes that make up the content of the Slate editor.
 
 ### Editor
 
@@ -48,7 +48,7 @@ The "document" is the top-level ["node"](#node) that contains all other nodes th
 
 ### Key
 
-Keys are unique identifiers given to nodes in Slate to be able to reference them uniquely even as the document changes.
+A *"keys"* is a unique identifier assigned to a node in Slate and is used to reference a node uniquely. As as the document changes, new unique keys are issued to avoid collisions within the data model. 
 
 ### Mark
 
@@ -62,7 +62,7 @@ Keys are unique identifiers given to nodes in Slate to be able to reference them
 
 ### Offset
 
-An offset is a distance from the start of a text node, measured in ["characters"](#character).
+An *"offset"* is a distance from the start of a text node, measured in ["characters"](#character).
 
 ### Operation
 
@@ -72,11 +72,11 @@ An offset is a distance from the start of a text node, measured in ["characters"
 
 ### Point
 
-A point represents a specific location in a document, where a user's cursor could be placed. It is represented by the `key` of the node in the document, and the `offset` of characters into a node.
+A *"point"* represents a specific location in a document, where a user's cursor could be placed. It is represented by the `key` of the node in the document, and the `offset` of characters into a node.
 
 ### Range
 
-A range is a way to represent a specific section of a document between two ["points"](#point). It is modelled after the [DOM Range](https://developer.mozilla.org/en-US/docs/Web/API/Range) concept.
+A *"range"* is a way to represent a specific section of a document between two ["points"](#point). It is modelled after the [DOM Range](https://developer.mozilla.org/en-US/docs/Web/API/Range) concept.
 
 ### Redo
 
@@ -98,7 +98,7 @@ A range is a way to represent a specific section of a document between two ["poi
 
 ### Unwrap
 
-To "unwrap" is the opposite of to ["wrap"](#wrap), removing a surrounding node from a selection.
+To *"unwrap"* is the opposite of to ["wrap"](#wrap), removing a surrounding node from a selection.
 
 ### Validate
 
@@ -106,4 +106,4 @@ To "unwrap" is the opposite of to ["wrap"](#wrap), removing a surrounding node f
 
 ### Wrap
 
-To "wrap" is to surround a piece of text or a node in another node. For example, if you select the text `Google` and want to turn it into a link, you'd "wrap" it with an inline link node.
+To *"wrap"* is to surround a piece of text or a node in another node. For example, if you select the text `Google` and want to turn it into a link, you'd "wrap" it with an inline link node.
