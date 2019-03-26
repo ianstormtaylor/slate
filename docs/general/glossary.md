@@ -4,6 +4,10 @@ A glossary explaining the terms commonly used in Slate:
 
 ### Anchor
 
+An *"anchor point"* is a point where a range starts.
+
+![An animated gif illustrating an anchor point within a selection](../images/glossary/anchor-point.gif "Anchor Point")
+
 ### Block
 
 ### Blur
@@ -31,6 +35,10 @@ The "document" is the top-level ["node"](#node) that contains all other nodes th
 ### Extend
 
 ### Focus
+
+* A *"focus point"* is where a range ends. Unlike a anchor point, a focus point can be expanded.
+
+![An animated gif illustrating the focus point as it changes for an expanding selection](../images/glossary/focus-point.gif "Focus Point") 
 
 ### Fragment
 
