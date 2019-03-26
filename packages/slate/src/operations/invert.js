@@ -42,23 +42,21 @@ function invertOperation(op) {
         return op
       }
 
-      let inversePath = newPath
-      let inverseNewPath = path
+      // Get the true path that the moved node ended up at
+      const inversePath = PathUtils.transform(path, op).first()
 
-      const position = PathUtils.compare(path, newPath)
+      // Get the true path we are trying to move back to
+      // We transform the right-sibling of the path
+      // This will end up at the operation.path most of the time
+      // But if the newPath is a left-sibling or left-ancestor-sibling, this will account for it
+      const transformedSibling = PathUtils.transform(
+        PathUtils.increment(path),
+        op
+      ).first()
 
-      // If the node's old position was a left sibling of an ancestor of
-      // its new position, we need to adjust part of the path by -1.
-      // If the node's new position is an ancestor of the old position,
-      // or a left sibling of an ancestor of its old position, we need
-      // to adjust part of the path by 1.
-      if (path.size < newPath.size && position === -1) {
-        inversePath = PathUtils.decrement(newPath, 1, path.size - 1)
-      } else if (path.size > newPath.size && position !== -1) {
-        inverseNewPath = PathUtils.increment(path, 1, newPath.size - 1)
-      }
-
-      const inverse = op.set('path', inversePath).set('newPath', inverseNewPath)
+      const inverse = op
+        .set('path', inversePath)
+        .set('newPath', transformedSibling)
       return inverse
     }
 

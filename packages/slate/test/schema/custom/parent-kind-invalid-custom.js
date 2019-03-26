@@ -7,7 +7,7 @@ export const schema = {
     paragraph: {
       parent: { object: 'document' },
       normalize: (editor, { code, node }) => {
-        if (code == 'parent_object_invalid') {
+        if (code === 'parent_object_invalid') {
           editor.unwrapNodeByKey(node.key)
         }
       },

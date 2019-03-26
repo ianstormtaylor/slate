@@ -94,7 +94,7 @@ class Tables extends React.Component {
   onBackspace = (event, editor, next) => {
     const { value } = editor
     const { selection } = value
-    if (selection.start.offset != 0) return next()
+    if (selection.start.offset !== 0) return next()
     event.preventDefault()
   }
 
@@ -108,7 +108,7 @@ class Tables extends React.Component {
   onDelete = (event, editor, next) => {
     const { value } = editor
     const { selection } = value
-    if (selection.end.offset != value.startText.text.length) return next()
+    if (selection.end.offset !== value.startText.text.length) return next()
     event.preventDefault()
   }
 
@@ -163,6 +163,11 @@ class Tables extends React.Component {
 
     if (isCollapsed && start.isAtStartOfNode(startNode)) {
       const previous = document.getPreviousText(startNode.key)
+
+      if (!previous) {
+        return next()
+      }
+
       const prevBlock = document.getClosestBlock(previous.key)
 
       if (prevBlock.type === 'table-cell') {

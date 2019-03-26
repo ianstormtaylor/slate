@@ -19,9 +19,9 @@ Because it mirrors the DOM, Slate's data model features a [`Document`](../refere
 
 ## Immutable Objects
 
-Slate's data model is implemented using [`Immutable.js`](https://facebook.github.io/immutable-js/) objects to allow more performant rendering and ensure objects cannot be accidentally modified (which are especially tricky bugs to track down).
+Slate's data model is implemented using [`Immutable.js`](https://immutable-js.github.io/immutable-js/) objects to allow more performant rendering and ensure objects cannot be accidentally modified (which are especially tricky bugs to track down).
 
-Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieving values:
+Specifically, Slate's models are [`Immutable.Record`](https://immutable-js.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieving values:
 
 ```js
 const block = Block.create({ type: 'paragraph' })
@@ -30,11 +30,11 @@ block.object // "block"
 block.type // "paragraph"
 ```
 
-Changing values requires you to use the [`Immutable.Record` API](https://facebook.github.io/immutable-js/docs/#/Record/set).
+Changing values requires you to use the [`Immutable.Record` API](https://immutable-js.github.io/immutable-js/docs/#/Record/set).
 
 Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc, which means we enjoy expressive methods like `filter`, `includes`, `take`, `skip`, `rest` and `last`.
 
-If you haven't used [`Immutable.js`](https://facebook.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://facebook.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is is well worth the investment!
+If you haven't used [`Immutable.js`](https://immutable-js.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://immutable-js.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is is well worth the investment!
 
 ## The "Value"
 

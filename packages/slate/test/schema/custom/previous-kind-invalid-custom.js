@@ -7,7 +7,7 @@ export const schema = {
     image: {
       previous: [{ object: 'inline' }, { object: 'text' }],
       normalize: (editor, { code, previous }) => {
-        if (code == 'previous_sibling_object_invalid') {
+        if (code === 'previous_sibling_object_invalid') {
           editor.unwrapBlockByKey(previous.key, 'paragraph')
         }
       },
