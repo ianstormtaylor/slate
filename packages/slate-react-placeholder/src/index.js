@@ -79,7 +79,7 @@ function SlateReactPlaceholder(options = {}) {
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
-        ...style
+        ...style,
       }
 
       return (

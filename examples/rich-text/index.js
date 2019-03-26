@@ -77,18 +77,17 @@ class RichTextExample extends React.Component {
     this.editor = editor
   }
 
-  plugins =
-  [
+  plugins = [
     {
       queries: {
-        'isEmpty': (editor) => editor.value.document.text === ''
-      }
+        isEmpty: editor => editor.value.document.text === '',
+      },
     },
     PlaceholderPlugin({
       placeholder: 'You can also customise your placeholder text!',
       when: 'isEmpty',
-      style: { color: '#ccc', opacity: '1', fontStyle: 'italic' }
-    })
+      style: { color: '#ccc', opacity: '1', fontStyle: 'italic' },
+    }),
   ]
 
   /**
