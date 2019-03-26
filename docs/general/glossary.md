@@ -52,6 +52,8 @@ A *"keys"* is a unique identifier assigned to a node in Slate and is used to ref
 
 ### Mark
 
+A *"mark"* represents formatting data that is attached to characters within text. Standard formatting such as **bold**, _italic_, `code`, or custom formatting for your application can be implemented using marks.
+
 ### Merge
 
 ### Model
