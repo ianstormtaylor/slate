@@ -21,7 +21,7 @@ function SlateReactPlaceholder(options = {}) {
     data: { key: instanceId },
   }
 
-  const { placeholder, when } = options
+  const { placeholder, when, style } = options
 
   invariant(
     placeholder,
@@ -72,18 +72,19 @@ function SlateReactPlaceholder(options = {}) {
     const { children, mark } = props
 
     if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
-      const style = {
+      const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
         width: '0',
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
+        ...style
       }
 
       return (
         <span>
-          <span contentEditable={false} style={style}>
+          <span contentEditable={false} style={placeHolderStyle}>
             {placeholder}
           </span>
           {children}
