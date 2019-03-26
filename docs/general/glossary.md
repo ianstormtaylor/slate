@@ -72,6 +72,8 @@ An *"offset"* is a distance from the start of a text node, measured in ["charact
 
 ### Plugin
 
+A *"plugin"* is a reusable object that implements one or more of Slate's plugin hooks to add specific behavior to your editor. A plugin helps you express your application while keeping it easy to maintain and reason about.  
+
 ### Point
 
 A *"point"* represents a specific location in a document, where a user's cursor could be placed. It is represented by the `key` of the node in the document, and the `offset` of characters into a node.
