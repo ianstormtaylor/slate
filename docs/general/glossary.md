@@ -88,6 +88,8 @@ A *"range"* is a way to represent a specific section of a document between two [
 
 ### Schema
 
+A Slate *"schema"* is a JavaScript object with properties that describe the document, block nodes, and inline nodes in your editor. Every Slate editor has a "schema" associated with it, which contains information about the structure of its content. For the most basic cases, you'll just rely on Slate's default core schema. But for advanced use cases, you can enforce rules about what the content of a Slate document can contain. Visit the [Schema reference](../reference/slate/schema.md) to learn more.
+
 ### Selection
 
 ### Serializer
