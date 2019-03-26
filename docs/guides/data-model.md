@@ -19,7 +19,6 @@ Because it mirrors the DOM, Slate's data model features a [`Document`](../refere
 
 ## Immutable Objects
 
-
 Slate's data model is implemented using [`Immutable.js`](https://facebook.github.io/immutable-js/)  objects to allow more performant rendering and ensure objects cannot be accidentally modified (which are especially tricky bugs to track down).
 
 Specifically, Slate's models are [`Immutable.Record`](https://facebook.github.io/immutable-js/docs/#/Record) objects, which makes them very similar to JavaScript objects for retrieving values:
@@ -45,6 +44,37 @@ Value consists of the document which contains all content, and a `selection` rep
 
 > 📋 For more info, check out the [`Value` reference](../reference/slate/value.md).
 
+The following example illustrates a simple Slate value which has been serialized and logged to the console. Continue reading to learn more about the data types represented. 
+
+```js
+{
+  "object": "value",
+  "document": {
+    "object": "document",
+    "data": {},
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "data": {},
+        "nodes": [
+          {
+            "object": "text",
+            "leaves": [
+              {
+                "object": "leaf",
+                "text": "A line of text in a paragraph.",
+                "marks": []
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
 ## Documents and Nodes
 
 A Slate document is a nested and recursive structure. In a document block nodes can have child nodes—all which may have child nodes without limit. The nested and recursive structure enable you to model simple behaviors such as user mentions and hashtags or complex behaviors such as tables and figures with captions.
@@ -66,6 +96,8 @@ Slate enforces all of these constraints for you automatically. As you [run comma
 > 🙃 Fun fact: "normalizing" is actually based on the DOM's [`Node.normalize()`](https://developer.mozilla.org/en-US/docs/Web/API/Node/normalize)!
 
 In addition to documents, blocks and inlines, Slate introduces one other type of markup that the DOM does not have natively, the [`Mark`](../reference/slate/mark.md) which is used for formatting.
+
+
 
 ## Marks
 
