@@ -34,6 +34,7 @@ import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
 import Mentions from './mentions'
+import Placeholder from './placeholder'
 
 /**
  * Examples.
@@ -58,6 +59,7 @@ const EXAMPLES = [
   ['Markdown Shortcuts', MarkdownShortcuts, '/markdown-shortcuts'],
   ['Mentions', Mentions, '/mentions'],
   ['Paste HTML', PasteHtml, '/paste-html'],
+  ['Placeholders', Placeholder, '/placeholders'],
   ['Plain Text', PlainText, '/plain-text'],
   ['Plugins', Plugins, '/plugins'],
   ['Read-only', ReadOnly, '/read-only'],

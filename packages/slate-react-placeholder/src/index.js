@@ -21,7 +21,7 @@ function SlateReactPlaceholder(options = {}) {
     data: { key: instanceId },
   }
 
-  const { placeholder, when, style } = options
+  const { placeholder, when, style = {} } = options
 
   invariant(
     placeholder,

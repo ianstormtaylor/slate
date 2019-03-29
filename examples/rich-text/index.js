@@ -1,6 +1,5 @@
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
-import PlaceholderPlugin from 'slate-react-placeholder'
 
 import React from 'react'
 import initialValue from './value.json'
@@ -77,19 +76,6 @@ class RichTextExample extends React.Component {
     this.editor = editor
   }
 
-  plugins = [
-    {
-      queries: {
-        isEmpty: editor => editor.value.document.text === '',
-      },
-    },
-    PlaceholderPlugin({
-      placeholder: 'You can also customise your placeholder text!',
-      when: 'isEmpty',
-      style: { color: '#ccc', opacity: '1', fontStyle: 'italic' },
-    }),
-  ]
-
   /**
    * Render.
    *
@@ -113,13 +99,13 @@ class RichTextExample extends React.Component {
         <Editor
           spellCheck
           autoFocus
+          placeholder="Enter some rich text..."
           ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
           renderNode={this.renderNode}
           renderMark={this.renderMark}
-          plugins={this.plugins}
         />
       </div>
     )
