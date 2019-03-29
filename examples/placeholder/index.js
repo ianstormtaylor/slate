@@ -7,15 +7,15 @@ import React from 'react'
 
 class Placeholder extends React.Component {
   value = Value.fromJSON(initialValue)
-  plugins =
-  [
+  plugins = [
     {
       queries: {
         isEmpty: editor => editor.value.document.text === '',
       },
     },
     PlaceholderPlugin({
-      placeholder: 'You can extensively customise your placeholder text using the slate-react-placeholder plugin!',
+      placeholder:
+        'You can extensively customise your placeholder text using the slate-react-placeholder plugin!',
       when: 'isEmpty',
       style: { color: '#ADD8E6', opacity: '1', fontFamily: 'monospace' },
     }),
@@ -37,4 +37,3 @@ class Placeholder extends React.Component {
  */
 
 export default Placeholder
-
