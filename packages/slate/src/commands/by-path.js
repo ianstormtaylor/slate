@@ -165,7 +165,7 @@ Commands.mergeNodeByPath = (editor, path) => {
   }
 
   const position =
-    previous.object == 'text' ? previous.text.length : previous.nodes.size
+    previous.object === 'text' ? previous.text.length : previous.nodes.size
 
   editor.applyOperation({
     type: 'merge_node',
@@ -561,7 +561,7 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
   const text = document.assertNode(textPath)
   const ancestors = document.getAncestors(textPath)
   const nodes = ancestors
-    .skipUntil(a => a.key == node.key)
+    .skipUntil(a => a.key === node.key)
     .reverse()
     .unshift(text)
 

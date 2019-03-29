@@ -1,3 +1,5 @@
+import { IS_ANDROID } from 'slate-dev-environment'
+import AndroidPlugin from './android'
 import AfterPlugin from './after'
 import BeforePlugin from './before'
 
@@ -10,9 +12,13 @@ import BeforePlugin from './before'
 
 function DOMPlugin(options = {}) {
   const { plugins = [] } = options
+  // Add Android specific handling separately before it gets to the other
+  // plugins because it is specific (other browser don't need it) and finicky
+  // (it has to come before other plugins to work).
+  const beforeBeforePlugins = IS_ANDROID ? [AndroidPlugin()] : []
   const beforePlugin = BeforePlugin()
   const afterPlugin = AfterPlugin()
-  return [beforePlugin, ...plugins, afterPlugin]
+  return [...beforeBeforePlugins, beforePlugin, ...plugins, afterPlugin]
 }
 
 /**

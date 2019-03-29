@@ -1,5 +1,19 @@
 import findPoint from './find-point'
 
+/**
+ * setTextFromDomNode lets us take a domNode and reconcile the text in the
+ * editor's Document such that it reflects the text in the DOM. This is the
+ * opposite of what the Editor usually does which takes the Editor's Document
+ * and React modifies the DOM to match. The purpose of this method is for
+ * composition changes where we don't know what changes the user made by
+ * looking at events. Instead we wait until the DOM is in a safe state, we
+ * read from it, and update the Editor's Document.
+ *
+ * @param {Window} window
+ * @param {Editor} editor
+ * @param {Node} domNode
+ */
+
 export default function setTextFromDomNode(window, editor, domNode) {
   const point = findPoint(domNode, 0, editor)
   if (!point) return
@@ -25,19 +39,19 @@ export default function setTextFromDomNode(window, editor, domNode) {
   // Get the text information.
   const { text } = leaf
   let { textContent } = domNode
-  const isLastText = node == lastText
-  const isLastLeaf = leaf == lastLeaf
+  const isLastText = node === lastText
+  const isLastLeaf = leaf === lastLeaf
   const lastChar = textContent.charAt(textContent.length - 1)
 
   // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
   // we will have added another new line in <Leaf>'s render method to account
   // for browsers collapsing a single trailing new lines, so remove it.
-  if (isLastText && isLastLeaf && lastChar == '\n') {
+  if (isLastText && isLastLeaf && lastChar === '\n') {
     textContent = textContent.slice(0, -1)
   }
 
   // If the text is no different, abort.
-  if (textContent == text) return
+  if (textContent === text) return
 
   // Determine what the selection should be after changing the text.
   // const delta = textContent.length - text.length

@@ -7,7 +7,7 @@ export const schema = {
     paragraph: {
       marks: [{ type: 'bold' }],
       normalize: (editor, { code, node }) => {
-        if (code == 'node_mark_invalid') {
+        if (code === 'node_mark_invalid') {
           node.nodes.forEach(n => editor.removeNodeByKey(n.key))
         }
       },

@@ -29,7 +29,7 @@ const Image = styled('img')`
   box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
 `
 
-/*
+/**
  * A function to determine whether a URL has an image extension.
  *
  * @param {String} url
@@ -37,7 +37,18 @@ const Image = styled('img')`
  */
 
 function isImage(url) {
-  return !!imageExtensions.find(url.endsWith)
+  return imageExtensions.includes(getExtension(url))
+}
+
+/**
+ * Get the extension of the URL, using the URL API.
+ *
+ * @param {String} url
+ * @return {String}
+ */
+
+function getExtension(url) {
+  return new URL(url).pathname.split('.').pop()
 }
 
 /**

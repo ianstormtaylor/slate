@@ -16,6 +16,12 @@ const h = createHyperscript({
     list: 'list',
     item: 'item',
     image: 'image',
+    table: 'table',
+    tbody: 'tbody',
+    tr: 'tr',
+    td: 'td',
+    thead: 'thead',
+    th: 'th',
   },
   inlines: {
     link: 'link',

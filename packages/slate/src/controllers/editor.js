@@ -524,29 +524,21 @@ function getDirtyPaths(operation) {
     }
 
     case 'move_node': {
-      let parentPath = PathUtils.lift(path)
-      let newParentPath = PathUtils.lift(newPath)
-
       if (PathUtils.isEqual(path, newPath)) {
         return []
       }
 
-      // HACK: this clause only exists because the `move_path` logic isn't
-      // consistent when it deals with siblings.
-      if (!PathUtils.isSibling(path, newPath)) {
-        if (newParentPath.size && PathUtils.isYounger(path, newPath)) {
-          newParentPath = PathUtils.decrement(newParentPath, 1, path.size - 1)
-        }
+      const oldAncestors = PathUtils.getAncestors(path).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
-        if (parentPath.size && PathUtils.isYounger(newPath, path)) {
-          parentPath = PathUtils.increment(parentPath, 1, newPath.size - 1)
-        }
-      }
+      const newAncestors = PathUtils.getAncestors(newPath).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
-      const oldAncestors = PathUtils.getAncestors(parentPath).toArray()
-      const newAncestors = PathUtils.getAncestors(newParentPath).toArray()
-
-      return [...oldAncestors, parentPath, ...newAncestors, newParentPath]
+      return [...oldAncestors, ...newAncestors]
     }
 
     case 'remove_node': {

@@ -29,6 +29,7 @@ import RTL from './rtl'
 import ReadOnly from './read-only'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
+import Composition from './composition'
 import InputTester from './input-tester'
 import SyncingOperations from './syncing-operations'
 import Tables from './tables'
@@ -43,6 +44,7 @@ import Mentions from './mentions'
 const EXAMPLES = [
   ['Check Lists', CheckLists, '/check-lists'],
   ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
+  ['Composition', Composition, '/composition/:subpage?'],
   ['Embeds', Embeds, '/embeds'],
   ['Emojis', Emojis, '/emojis'],
   ['Forced Layout', ForcedLayout, '/forced-layout'],
@@ -262,11 +264,13 @@ export default class App extends React.Component {
       <Switch>
         {EXAMPLES.map(([name, Component, path]) => (
           <Route key={path} path={path}>
-            <div>
-              <ExampleContent>
-                <Component />
-              </ExampleContent>
-            </div>
+            {({ match }) => (
+              <div>
+                <ExampleContent>
+                  <Component params={match.params} />
+                </ExampleContent>
+              </div>
+            )}
           </Route>
         ))}
         <Redirect from="/" to="/rich-text" />
@@ -291,7 +295,14 @@ export default class App extends React.Component {
         <Switch>
           {EXAMPLES.map(([name, Component, path]) => (
             <Route key={path} exact path={path}>
-              <ExampleTitle>{name}</ExampleTitle>
+              <ExampleTitle>
+                {name}
+                <Link
+                  href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+                >
+                  (View Source)
+                </Link>
+              </ExampleTitle>
             </Route>
           ))}
         </Switch>
