@@ -1,7 +1,8 @@
-import { Editor } from 'slate-react'
+import { Editor, getEventTransfer } from 'slate-react'
 import { Value, Point } from 'slate'
 
 import Prism from 'prismjs'
+import 'prismjs/themes/prism.css'
 import React from 'react'
 import initialValueAsJson from './value.json'
 
@@ -68,15 +69,36 @@ function getContent(token) {
   }
 }
 
-function initPointWithCache(pointCache, textNode, document) {
+/**
+ *
+ * @param {Point} point
+ * @param {Document} document
+ */
+
+function normalizePoint(point, document) {
+  return point.path ? point : point.normalize(document)
+}
+
+/**
+ * A helper function to normalize path of `point` with cache for performance
+ * @param {Array} pointCache
+ * @param {Node} textNode
+ * @param {Document} document
+ */
+
+function withPointCache(pointCache, textNode, document) {
   if (pointCache[0] !== textNode) {
     pointCache[0] = textNode
-    pointCache[1] = pointCache[1]
-                .moveToStartOfNode(textNode)
-                .normalize(document)
+
+    pointCache[1] = normalizePoint(
+      pointCache[1].moveToStartOfNode(textNode),
+      document
+    )
   }
   return pointCache[1]
 }
+
+const CODE_SYNTAX_MARKS = {}
 
 /**
  * The code highlighting example.
@@ -132,34 +154,15 @@ class CodeHighlighting extends React.Component {
   renderMark = (props, editor, next) => {
     const { children, mark, attributes } = props
 
-    switch (mark.type) {
-      case 'comment':
-        return (
-          <span {...attributes} style={{ opacity: '0.33' }}>
-            {children}
-          </span>
-        )
-      case 'keyword':
-        return (
-          <span {...attributes} style={{ fontWeight: 'bold' }}>
-            {children}
-          </span>
-        )
-      case 'tag':
-        return (
-          <span {...attributes} style={{ fontWeight: 'bold' }}>
-            {children}
-          </span>
-        )
-      case 'punctuation':
-        return (
-          <span {...attributes} style={{ opacity: '0.75' }}>
-            {children}
-          </span>
-        )
-      default:
-        return next()
+    if (CODE_SYNTAX_MARKS[mark.type]) {
+      const className = `token ${mark.type}`
+      return (
+        <span {...attributes} className={className}>
+          {children}
+        </span>
+      )
     }
+    return next()
   }
 
   /**
@@ -213,8 +216,7 @@ class CodeHighlighting extends React.Component {
       startOffset = endOffset
 
       const content = getContent(token)
-      const newlines = content.split('\n').length - 1
-      const length = content.length - newlines
+      const length = content.length
       const end = start + length
 
       let available = startText.text.length - startOffset
@@ -224,7 +226,9 @@ class CodeHighlighting extends React.Component {
 
       while (available < remaining && texts.length > 0) {
         endText = texts.shift()
-        remaining = length - available
+        // Should consider line break carefully. The original way has a bug when dealing with cross-line syntax token
+        // And there are performance benefits in this way, better than `split` way.
+        remaining = remaining - available - 1
         available = endText.text.length
         endOffset = remaining
       }
@@ -233,17 +237,22 @@ class CodeHighlighting extends React.Component {
         const dec = {
           anchor: {
             key: startText.key,
-            path: initPointWithCache(pointCache, startText, document),
+            path: withPointCache(pointCache, startText, document).path,
             offset: startOffset,
           },
           focus: {
             key: endText.key,
-            path: initPointWithCache(pointCache, endText, document),
+            path: withPointCache(pointCache, endText, document).path,
             offset: endOffset,
           },
           mark: {
             type: token.type,
           },
+        }
+
+        if (!CODE_SYNTAX_MARKS[token.type]) {
+          // Handling token marks intelligently
+          CODE_SYNTAX_MARKS[token.type] = true
         }
 
         decorations.push(dec)
@@ -253,6 +262,55 @@ class CodeHighlighting extends React.Component {
     }
 
     return [...others, ...decorations]
+  }
+
+  /**
+   * On paste inside code blocks, insert code lines . Fix the original error of pasting html content.
+   * Note that: paste any unknown html, fragment content should not be supported in code blocks
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  onPaste = (event, editor, next) => {
+    const { startBlock } = editor.value
+
+    if (startBlock.type === 'code_line') {
+      const transfer = getEventTransfer(event)
+      const text = transfer.text
+
+      if (text) {
+        const textLines = text.split('\n'),
+          codeLines = []
+
+        for (const i in textLines) {
+          codeLines.push({
+            object: 'block',
+            type: 'code_line',
+            nodes: [
+              {
+                object: 'text',
+                leaves: [{ text: textLines[i] }],
+              },
+            ],
+          })
+        }
+
+        const valueJSON = {
+          object: 'value',
+          document: {
+            object: 'document',
+            nodes: codeLines,
+          },
+        }
+
+        const fragment = Value.fromJSON(valueJSON)
+        editor.insertFragment(fragment.document)
+      }
+      return
+    }
+    return next()
   }
 }
 
