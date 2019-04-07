@@ -93,9 +93,9 @@ function getCharOffset(text, forward) {
   // Helpers (Move outside?)
   function isModifier(highSurr, offset, txt) {
     // https://emojipedia.org/modifiers/
-    if (highSurr == 0xD83C) {
+    if (highSurr === 0xd83c) {
       const lowSurr = txt.charCodeAt(offset + 1)
-      return 0xDFFB <= lowSurr && lowSurr <= 0xDFFF
+      return lowSurr >= 0xdffb && lowSurr <= 0xdfff
     }
     return false
   }
@@ -108,19 +108,19 @@ function getCharOffset(text, forward) {
     // Fails gracefully if upkeep lags behind, similar
     // to the behavior Slate currently has with all emojis.
     return (
-      code == 0x2764 || // heart (❤)
-      code == 0x2642 || // male (♂)
-      code == 0x2640 || // female (♀)
-      code == 0x2620 || // scull (☠)
-      code == 0x2695 || // medical (⚕)
-      code == 0x2708 || // plane (✈️)
-      code == 0x25EF    // large circle (◯)
+      code === 0x2764 || // heart (❤)
+      code === 0x2642 || // male (♂)
+      code === 0x2640 || // female (♀)
+      code === 0x2620 || // scull (☠)
+      code === 0x2695 || // medical (⚕)
+      code === 0x2708 || // plane (✈️)
+      code === 0x25ef // large circle (◯)
     )
   }
 
   function isVarSelector(code) {
     // https://codepoints.net/variation_selectors
-    return 0xFE00 <= code && code <= 0xFE0F
+    return code >= 0xfe00 && code <= 0xfe0f
   }
 
   let offset = 0
@@ -135,7 +135,7 @@ function getCharOffset(text, forward) {
 
   while (charCode) {
     if (isSurrogate(charCode)) {
-      let modifier = isModifier(charCode, offset, text)
+      const modifier = isModifier(charCode, offset, text)
 
       // Early returns are the heart of this function,
       // where we decide if previous and current codepoints
@@ -143,15 +143,13 @@ function getCharOffset(text, forward) {
       // how many of them should selection jump over).
       if (forward) {
         if (
-          (!modifier && prev && prev != 'ZWJ') ||
-          (modifier && prev && prev != 'SURR')
+          (!modifier && prev && prev !== 'ZWJ') ||
+          (modifier && prev && prev !== 'SURR')
         ) {
           break
         }
-      } else {
-        if (prev == 'SURR' || prev == 'BMP') {
-          break
-        }
+      } else if (prev === 'SURR' || prev === 'BMP') {
+        break
       }
 
       offset += 2
@@ -165,7 +163,7 @@ function getCharOffset(text, forward) {
     }
 
     // If zero width joiner
-    if (charCode == 0x200D) {
+    if (charCode === 0x200d) {
       offset += 1
       prev = 'ZWJ'
       charCode = text.charCodeAt(offset)
@@ -174,11 +172,12 @@ function getCharOffset(text, forward) {
 
     if (isBMPEmoji(charCode)) {
       if (
-        (forward && prev == 'VAR') ||
-        (prev && prev != 'ZWJ' && prev != 'VAR')
+        (forward && prev === 'VAR') ||
+        (prev && prev !== 'ZWJ' && prev !== 'VAR')
       ) {
         break
       }
+
       offset += 1
       prev = 'BMP'
       charCode = text.charCodeAt(offset)
@@ -186,9 +185,10 @@ function getCharOffset(text, forward) {
     }
 
     if (isVarSelector(charCode)) {
-      if (!forward && prev && prev != 'ZWJ') {
+      if (!forward && prev && prev !== 'ZWJ') {
         break
       }
+
       offset += 1
       prev = 'VAR'
       charCode = text.charCodeAt(offset)
@@ -199,13 +199,14 @@ function getCharOffset(text, forward) {
     // before that (even whitespace), need to look ahead.
     if (forward) {
       const nextCharCode = text.charCodeAt(offset + 1)
+
       if (isModifier(nextCharCode, offset + 1, text)) {
         offset += 3
         prev = 'MOD'
         charCode = text.charCodeAt(offset)
         continue
       }
-    } else if (prev == 'MOD') {
+    } else if (prev === 'MOD') {
       offset += 1
       break
     }
