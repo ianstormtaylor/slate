@@ -46,6 +46,63 @@ function isSurrogate(code) {
 }
 
 /**
+ * Does `code` form Modifier with next one.
+ *
+ * https://emojipedia.org/modifiers/
+ *
+ * @param {Number} code
+ * @param {String} text
+ * @param {Number} offset
+ * @return {Boolean}
+ */
+
+function isModifier(code, text, offset) {
+  if (code === 0xd83c) {
+    const next = text.charCodeAt(offset + 1)
+    return next <= 0xdfff && next >= 0xdffb
+  }
+  return false
+}
+
+/**
+ * Is `code` a Variation Selector.
+ *
+ * https://codepoints.net/variation_selectors
+ *
+ * @param {Number} code
+ * @return {Boolean}
+ */
+
+function isVariationSelector(code) {
+  return code <= 0xfe0f && code >= 0xfe00
+}
+
+/**
+ * Is `code` one of the BMP codes used in emoji sequences.
+ *
+ * https://emojipedia.org/emoji-zwj-sequences/
+ *
+ * @param {Number} code
+ * @return {Boolean}
+ */
+
+function isBMPEmoji(code) {
+  // This requires tiny bit of maintanance, better ideas?
+  // Fortunately it only happens if new Unicode Standard
+  // is released. Fails gracefully if upkeep lags behind,
+  // same way Slate previously behaved with all emojis.
+  return (
+    code === 0x2764 || // heart (❤)
+    code === 0x2642 || // male (♂)
+    code === 0x2640 || // female (♀)
+    code === 0x2620 || // scull (☠)
+    code === 0x2695 || // medical (⚕)
+    code === 0x2708 || // plane (✈️)
+    code === 0x25ef    // large circle (◯)
+  )
+}
+
+/**
  * Is a character a word character? Needs the `remaining` characters too.
  *
  * @param {String} char
@@ -82,7 +139,7 @@ function getCharLength(char) {
 
 /**
  * Get the offset to the end of the first character in `text`.
- * This function is unicode (including emojis) aware.
+ * This function is emoji aware and return correct offset for all cases.
  *
  * @param {String} text
  * @param {Boolean} forward
@@ -90,52 +147,19 @@ function getCharLength(char) {
  */
 
 function getCharOffset(text, forward) {
-  // Helpers (Move outside?)
-  function isModifier(highSurr, offset, txt) {
-    // https://emojipedia.org/modifiers/
-    if (highSurr === 0xd83c) {
-      const lowSurr = txt.charCodeAt(offset + 1)
-      return lowSurr >= 0xdffb && lowSurr <= 0xdfff
-    }
-    return false
-  }
-
-  function isBMPEmoji(code) {
-    // All codes with length 4 used in sequences:
-    // https://emojipedia.org/emoji-zwj-sequences/
-
-    // This requires tiny bit of maintanance, better ideas?
-    // Fails gracefully if upkeep lags behind, similar
-    // to the behavior Slate currently has with all emojis.
-    return (
-      code === 0x2764 || // heart (❤)
-      code === 0x2642 || // male (♂)
-      code === 0x2640 || // female (♀)
-      code === 0x2620 || // scull (☠)
-      code === 0x2695 || // medical (⚕)
-      code === 0x2708 || // plane (✈️)
-      code === 0x25ef // large circle (◯)
-    )
-  }
-
-  function isVarSelector(code) {
-    // https://codepoints.net/variation_selectors
-    return code >= 0xfe00 && code <= 0xfe0f
-  }
-
-  let offset = 0
-  // prev types:
-  // SURR: surrogate pair
-  // MOD: modifier (technically also surrogate pair)
-  // ZWJ: zero width joiner
-  // VAR: variation selector
-  // BMP: sequenceable character from basic multilingual plane
+  // prev types (better ideas?):
+  // - SURR: surrogate pair
+  // - MOD: modifier (technically also surrogate pair)
+  // - ZWJ: zero width joiner
+  // - VAR: variation selector
+  // - BMP: sequenceable character from Basic Multilingual Plane
   let prev = null
+  let offset = 0
   let charCode = text.charCodeAt(0)
 
   while (charCode) {
     if (isSurrogate(charCode)) {
-      const modifier = isModifier(charCode, offset, text)
+      const modifier = isModifier(charCode, text, offset)
 
       // Early returns are the heart of this function,
       // where we decide if previous and current codepoints
@@ -155,9 +179,9 @@ function getCharOffset(text, forward) {
       offset += 2
       prev = modifier ? 'MOD' : 'SURR'
       charCode = text.charCodeAt(offset)
-      // Absolutely fine to `continue` without any
-      // checks because if `charCode` is NaN (which
-      // is the case when out of `text` range), next
+      // It's okay to `continue` without checking
+      // because if `charCode` is NaN (which is
+      // the case when out of `text` range), next
       // `while` loop won't execute and we're done.
       continue
     }
@@ -184,7 +208,7 @@ function getCharOffset(text, forward) {
       continue
     }
 
-    if (isVarSelector(charCode)) {
+    if (isVariationSelector(charCode)) {
       if (!forward && prev && prev !== 'ZWJ') {
         break
       }
@@ -195,12 +219,12 @@ function getCharOffset(text, forward) {
       continue
     }
 
-    // Modifier "groups up" with what ever character is
-    // before that (even whitespace), need to look ahead.
+    // Modifier "fuses" with what ever character is before
+    // that (even whitespace), need to look ahead in this case.
     if (forward) {
       const nextCharCode = text.charCodeAt(offset + 1)
 
-      if (isModifier(nextCharCode, offset + 1, text)) {
+      if (isModifier(nextCharCode, text, offset + 1)) {
         offset += 3
         prev = 'MOD'
         charCode = text.charCodeAt(offset)
@@ -211,8 +235,8 @@ function getCharOffset(text, forward) {
       break
     }
 
-    // If while loop ever gets here,
-    // we're done (e.g latin chars).
+    // If while loop ever gets here, we're
+    // done (e.g unicodes with length 1).
     break
   }
 
