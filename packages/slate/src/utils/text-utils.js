@@ -98,7 +98,7 @@ function isBMPEmoji(code) {
     code === 0x2620 || // scull (☠)
     code === 0x2695 || // medical (⚕)
     code === 0x2708 || // plane (✈️)
-    code === 0x25ef    // large circle (◯)
+    code === 0x25ef // large circle (◯)
   )
 }
 
