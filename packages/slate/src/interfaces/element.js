@@ -973,7 +973,7 @@ class ElementInterface {
     const [previousText, previousPath] = previous
 
     if (closestBlock.hasDescendant(previousPath)) {
-      return previous.getMarksAtIndex(previousText.text.length)
+      return previousText.getMarksAtIndex(previousText.text.length)
     }
 
     return currentMarks
