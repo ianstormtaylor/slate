@@ -1,10 +1,8 @@
 import getWindow from 'get-window'
 import invariant from 'tiny-invariant'
-import { IS_IE, IS_EDGE } from 'slate-dev-environment'
 import { Value } from 'slate'
 
 import findPoint from './find-point'
-import findDOMPoint from './find-dom-point'
 
 /**
  * Find a Slate range from a DOM `native` selection.
@@ -50,21 +48,6 @@ function findRange(native, editor) {
   const anchor = findPoint(anchorNode, anchorOffset, editor)
   const focus = isCollapsed ? anchor : findPoint(focusNode, focusOffset, editor)
   if (!anchor || !focus) return null
-
-  // COMPAT: ??? The Edge browser seems to have a case where if you select the
-  // last word of a span, it sets the endContainer to the containing span.
-  // `selection-is-backward` doesn't handle this case.
-  if (IS_IE || IS_EDGE) {
-    const domAnchor = findDOMPoint(anchor)
-    const domFocus = findDOMPoint(focus)
-
-    native = {
-      anchorNode: domAnchor.node,
-      anchorOffset: domAnchor.offset,
-      focusNode: domFocus.node,
-      focusOffset: domFocus.offset,
-    }
-  }
 
   const { document } = value
   const range = document.createRange({
