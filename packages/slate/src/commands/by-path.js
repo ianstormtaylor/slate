@@ -1,3 +1,4 @@
+import pick from 'lodash/pick'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -52,7 +53,6 @@ Commands.addMarkByPath = (editor, path, offset, length, mark) => {
 
     operations.push({
       type: 'add_mark',
-      value,
       path,
       offset: start,
       length: end - start,
@@ -88,11 +88,8 @@ Commands.insertFragmentByPath = (editor, path, index, fragment) => {
  */
 
 Commands.insertNodeByPath = (editor, path, index, node) => {
-  const { value } = editor
-
   editor.applyOperation({
     type: 'insert_node',
-    value,
     path: path.concat(index),
     node,
   })
@@ -137,7 +134,6 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
 
   editor.applyOperation({
     type: 'insert_text',
-    value,
     path,
     offset,
     text,
@@ -165,11 +161,10 @@ Commands.mergeNodeByPath = (editor, path) => {
   }
 
   const position =
-    previous.object == 'text' ? previous.text.length : previous.nodes.size
+    previous.object === 'text' ? previous.text.length : previous.nodes.size
 
   editor.applyOperation({
     type: 'merge_node',
-    value,
     path,
     position,
     // for undos to succeed we only need the type and data because
@@ -183,28 +178,31 @@ Commands.mergeNodeByPath = (editor, path) => {
 }
 
 /**
- * Move a node by `path` to a new parent by `newPath` and `index`.
+ * Move a node by `path` to a new parent by `newParentPath` and `newIndex`.
  *
  * @param {Editor} editor
  * @param {Array} path
- * @param {String} newPath
- * @param {Number} index
+ * @param {String} newParentPath
+ * @param {Number} newIndex
  */
 
-Commands.moveNodeByPath = (editor, path, newPath, newIndex) => {
-  const { value } = editor
-
-  // If the operation path and newPath are the same,
+Commands.moveNodeByPath = (editor, path, newParentPath, newIndex) => {
+  // If the operation path and newParentPath are the same,
   // this should be considered a NOOP
+  if (PathUtils.isEqual(path, newParentPath)) {
+    return editor
+  }
+
+  const newPath = newParentPath.concat(newIndex)
+
   if (PathUtils.isEqual(path, newPath)) {
     return editor
   }
 
   editor.applyOperation({
     type: 'move_node',
-    value,
     path,
-    newPath: newPath.concat(newIndex),
+    newPath,
   })
 }
 
@@ -248,7 +246,6 @@ Commands.removeMarkByPath = (editor, path, offset, length, mark) => {
 
     operations.push({
       type: 'remove_mark',
-      value,
       path,
       offset: start,
       length: end - start,
@@ -293,7 +290,6 @@ Commands.removeNodeByPath = (editor, path) => {
 
   editor.applyOperation({
     type: 'remove_node',
-    value,
     path,
     node,
   })
@@ -364,7 +360,6 @@ Commands.removeTextByPath = (editor, path, offset, length) => {
 
     removals.push({
       type: 'remove_text',
-      value,
       path,
       offset: start,
       text: string,
@@ -441,28 +436,35 @@ Commands.replaceTextByPath = (editor, path, offset, length, text, marks) => {
 }
 
 /**
- * Set `properties` on mark on text at `offset` and `length` in node by `path`.
+ * Set `newProperties` on mark on text at `offset` and `length` in node by `path`.
  *
  * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
- * @param {Mark} mark
+ * @param {Object|Mark} properties
+ * @param {Object} newProperties
  */
 
-Commands.setMarkByPath = (editor, path, offset, length, mark, properties) => {
-  mark = Mark.create(mark)
-  properties = Mark.createProperties(properties)
-  const { value } = editor
+Commands.setMarkByPath = (
+  editor,
+  path,
+  offset,
+  length,
+  properties,
+  newProperties
+) => {
+  // we call Mark.create() here because we need the complete previous mark instance
+  properties = Mark.create(properties)
+  newProperties = Mark.createProperties(newProperties)
 
   editor.applyOperation({
     type: 'set_mark',
-    value,
     path,
     offset,
     length,
-    mark,
     properties,
+    newProperties,
   })
 }
 
@@ -471,21 +473,21 @@ Commands.setMarkByPath = (editor, path, offset, length, mark, properties) => {
  *
  * @param {Editor} editor
  * @param {Array} path
- * @param {Object|String} properties
+ * @param {Object|String} newProperties
  */
 
-Commands.setNodeByPath = (editor, path, properties) => {
-  properties = Node.createProperties(properties)
+Commands.setNodeByPath = (editor, path, newProperties) => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
+  newProperties = Node.createProperties(newProperties)
+  const prevProperties = pick(node, Object.keys(newProperties))
 
   editor.applyOperation({
     type: 'set_node',
-    value,
     path,
-    node,
-    properties,
+    properties: prevProperties,
+    newProperties,
   })
 }
 
@@ -523,7 +525,6 @@ Commands.splitNodeByPath = (editor, path, position, options = {}) => {
 
   editor.applyOperation({
     type: 'split_node',
-    value,
     path,
     position,
     target,
@@ -555,7 +556,7 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
   const text = document.assertNode(textPath)
   const ancestors = document.getAncestors(textPath)
   const nodes = ancestors
-    .skipUntil(a => a.key == node.key)
+    .skipUntil(a => a.key === node.key)
     .reverse()
     .unshift(text)
 

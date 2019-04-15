@@ -576,8 +576,8 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { document } = value
     const node = document.assertNode(path)
-    const first = node.object == 'text' ? node : node.getFirstText() || node
-    const last = node.object == 'text' ? node : node.getLastText() || node
+    const first = node.object === 'text' ? node : node.getFirstText() || node
+    const last = node.object === 'text' ? node : node.getLastText() || node
     const prev = document.getPreviousText(first.key)
     const next = document.getNextText(last.key)
 

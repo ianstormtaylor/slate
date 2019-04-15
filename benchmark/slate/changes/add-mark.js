@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .addMark('bold')
     .moveForward(5)
     .addMark('bold')
@@ -23,7 +24,7 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable {i == 0 ? <anchor /> : ''}rich{i == 0 ? (
+              This is editable {i === 0 ? <anchor /> : ''}rich{i === 0 ? (
                 <focus />
               ) : (
                 ''
@@ -37,6 +38,6 @@ const value = (
   </value>
 )
 
-module.exports.input = function() {
-  return value.change()
+module.exports.input = () => {
+  return new Editor({ value })
 }

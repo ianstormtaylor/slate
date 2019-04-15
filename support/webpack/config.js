@@ -13,7 +13,14 @@ const IS_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = !IS_PROD
 
 const config = {
-  entry: ['react-hot-loader/patch', './examples/index.js'],
+  entry: [
+    'babel-polyfill',
+    // COMPAT: Missing in IE 11 and included separately because babel-polyfill does not support DOM elements:
+    // https://github.com/zloirock/core-js/issues/317
+    'element-closest',
+    'react-hot-loader/patch',
+    './examples/index.js',
+  ],
   output: {
     path: path.resolve(__dirname, '../../build'),
     filename: '[name]-[hash].js',
@@ -79,7 +86,6 @@ const config = {
           content: 'width=device-width, initial-scale=1',
         },
       ],
-      scripts: ['https://cdn.polyfill.io/v2/polyfill.min.js'],
       links: [
         'https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&subset=latin-ext',
         'https://fonts.googleapis.com/icon?family=Material+Icons',

@@ -83,7 +83,6 @@ class App extends React.Component {
 
     // Change the value by inserting 'and' at the cursor's position.
     editor.insertText('and')
-    return true
   }
 
   render() {

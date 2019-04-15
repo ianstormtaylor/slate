@@ -6,7 +6,7 @@ import h from '../helpers/h'
 export const rules = [
   {
     serialize(obj, children) {
-      if (obj.object == 'block' && obj.type == 'image') {
+      if (obj.object === 'block' && obj.type === 'image') {
         return React.createElement('img')
       }
     },

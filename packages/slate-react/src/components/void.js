@@ -58,7 +58,7 @@ class Void extends React.Component {
   render() {
     const { props } = this
     const { children, node, readOnly } = props
-    const Tag = node.object == 'block' ? 'div' : 'span'
+    const Tag = node.object === 'block' ? 'div' : 'span'
     const style = {
       height: '0',
       color: 'transparent',
@@ -82,7 +82,7 @@ class Void extends React.Component {
       <Tag
         data-slate-void
         data-key={node.key}
-        contentEditable={readOnly || node.object == 'block' ? null : false}
+        contentEditable={readOnly || node.object === 'block' ? null : false}
       >
         {readOnly ? null : spacer}
         {content}
@@ -106,7 +106,7 @@ class Void extends React.Component {
     const child = node.getFirstText()
     return (
       <Text
-        block={node.object == 'block' ? node : block}
+        block={node.object === 'block' ? node : block}
         decorations={decorations}
         editor={editor}
         key={child.key}

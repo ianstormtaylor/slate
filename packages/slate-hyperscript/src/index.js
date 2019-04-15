@@ -93,11 +93,11 @@ function createHyperscript(options = {}) {
  */
 
 function normalizeCreator(value, creator) {
-  if (typeof value == 'function') {
+  if (typeof value === 'function') {
     return value
   }
 
-  if (typeof value == 'string') {
+  if (typeof value === 'string') {
     value = { type: value }
   }
 

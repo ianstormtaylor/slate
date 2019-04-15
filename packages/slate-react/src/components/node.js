@@ -89,13 +89,13 @@ class Node extends React.Component {
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
-    if (n.readOnly != p.readOnly) return true
+    if (n.readOnly !== p.readOnly) return true
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
     // which this won't catch. But that's rare and not a drag on performance, so
     // for simplicity we just let them through.
-    if (n.node != p.node) return true
+    if (n.node !== p.node) return true
 
     // If the selection value of the node or of some of its children has changed,
     // re-render in case there is any user-land logic depends on it to render.
@@ -152,7 +152,7 @@ class Node extends React.Component {
     // for text direction.
     if (node.isLeafBlock()) {
       const direction = node.getTextDirection()
-      if (direction == 'rtl') attributes.dir = 'rtl'
+      if (direction === 'rtl') attributes.dir = 'rtl'
     }
 
     const props = {
@@ -189,11 +189,11 @@ class Node extends React.Component {
 
   renderNode = (child, isSelected, decorations) => {
     const { block, editor, node, readOnly, isFocused } = this.props
-    const Component = child.object == 'text' ? Text : Node
+    const Component = child.object === 'text' ? Text : Node
 
     return (
       <Component
-        block={node.object == 'block' ? node : block}
+        block={node.object === 'block' ? node : block}
         decorations={decorations}
         editor={editor}
         isSelected={isSelected}

@@ -245,9 +245,9 @@ Move the current selection to the `{Edge}` of the closest inline parent. Where `
 
 Move the current selection to the `{Edge}` of the current text node. Where `{Edge}` is either `Start` or `End`. And where `{Point}` is either `Anchor`, `Focus`, `Start` or `End`. You can also omit `{Point}` to move both the anchor and focus points at the same time.
 
-### `moveToRangeOf`
+### `moveToRangeOfNode`
 
-`moveToRangeOf(node: Node) => Editor`
+`moveToRangeOfNode(node: Node) => Editor`
 
 Move the current selection's anchor point to the start of a `node` and its focus point to the end of the `node`.
 
@@ -472,10 +472,10 @@ Remove `length` characters of text starting at an `offset` in a [`Node`](./node.
 
 ### `setMarkByKey/Path`
 
-`setMarkByKey(key: String, offset: Number, length: Number, mark: Mark, properties: Object) => Editor`
-`setMarkByPath(path: List, offset: Number, length: Number, mark: Mark, properties: Object) => Editor`
+`setMarkByKey(key: String, offset: Number, length: Number, properties: Object, newProperties: Object) => Editor`
+`setMarkByPath(path: List, offset: Number, length: Number, properties: Object, newProperties: Object) => Editor`
 
-Set a dictionary of `properties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key` or `path`.
+Set a dictionary of `newProperties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key` or `path`.
 
 ### `setNodeByKey/Path`
 

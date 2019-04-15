@@ -2,6 +2,7 @@ import isPlainObject from 'is-plain-object'
 import warning from 'tiny-warning'
 import { List, OrderedSet, Record, Set } from 'immutable'
 
+import Mark from './mark'
 import Leaf from './leaf'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
@@ -36,7 +37,7 @@ class Text extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { leaves: [{ text: attrs }] }
     }
 
@@ -250,8 +251,8 @@ class Text extends Record(DEFAULTS) {
 
     decorations.forEach(dec => {
       const { start, end, mark } = dec
-      const hasStart = start.key == key
-      const hasEnd = end.key == key
+      const hasStart = start.key === key
+      const hasEnd = end.key === key
 
       if (hasStart && hasEnd) {
         const index = hasStart ? start.offset : 0
@@ -572,13 +573,14 @@ class Text extends Record(DEFAULTS) {
    *
    * @param {Number} index
    * @param {Number} length
-   * @param {Mark} mark
    * @param {Object} properties
+   * @param {Object} newProperties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, properties) {
-    const newMark = mark.merge(properties)
+  updateMark(index, length, properties, newProperties) {
+    const mark = Mark.create(properties)
+    const newMark = mark.merge(newProperties)
 
     if (this.text === '' && length === 0 && index === 0) {
       const { leaves } = this

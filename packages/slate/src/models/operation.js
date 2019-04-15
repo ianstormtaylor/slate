@@ -16,19 +16,19 @@ import invert from '../operations/invert'
  */
 
 const OPERATION_ATTRIBUTES = {
-  add_mark: ['value', 'path', 'offset', 'length', 'mark', 'data'],
-  insert_node: ['value', 'path', 'node', 'data'],
-  insert_text: ['value', 'path', 'offset', 'text', 'marks', 'data'],
-  merge_node: ['value', 'path', 'position', 'properties', 'target', 'data'],
-  move_node: ['value', 'path', 'newPath', 'data'],
-  remove_mark: ['value', 'path', 'offset', 'length', 'mark', 'data'],
-  remove_node: ['value', 'path', 'node', 'data'],
-  remove_text: ['value', 'path', 'offset', 'text', 'marks', 'data'],
-  set_mark: ['value', 'path', 'offset', 'length', 'mark', 'properties', 'data'],
-  set_node: ['value', 'path', 'node', 'properties', 'data'],
-  set_selection: ['value', 'selection', 'properties', 'data'],
-  set_value: ['value', 'properties', 'data'],
-  split_node: ['value', 'path', 'position', 'properties', 'target', 'data'],
+  add_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  insert_node: ['path', 'node', 'data'],
+  insert_text: ['path', 'offset', 'text', 'marks', 'data'],
+  merge_node: ['path', 'position', 'properties', 'target', 'data'],
+  move_node: ['path', 'newPath', 'data'],
+  remove_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  remove_node: ['path', 'node', 'data'],
+  remove_text: ['path', 'offset', 'text', 'marks', 'data'],
+  set_mark: ['path', 'offset', 'length', 'properties', 'newProperties', 'data'],
+  set_node: ['path', 'properties', 'newProperties', 'data'],
+  set_selection: ['properties', 'newProperties', 'data'],
+  set_value: ['properties', 'newProperties', 'data'],
+  split_node: ['path', 'position', 'properties', 'target', 'data'],
 }
 
 /**
@@ -47,11 +47,10 @@ const DEFAULTS = {
   path: undefined,
   position: undefined,
   properties: undefined,
-  selection: undefined,
+  newProperties: undefined,
   target: undefined,
   text: undefined,
   type: undefined,
-  value: undefined,
   data: undefined,
 }
 
@@ -132,13 +131,6 @@ class Operation extends Record(DEFAULTS) {
       }
 
       if (v === undefined) {
-        // Skip keys for objects that should not be serialized, and are only used
-        // for providing the local-only invert behavior for the history stack.
-        if (key == 'document') continue
-        if (key == 'selection') continue
-        if (key == 'value') continue
-        if (key == 'node' && type != 'insert_node') continue
-
         throw new Error(
           `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
         )
@@ -160,31 +152,35 @@ class Operation extends Record(DEFAULTS) {
         v = Node.create(v)
       }
 
-      if (key === 'selection') {
-        v = Selection.create(v)
-      }
-
-      if (key === 'value') {
-        v = Value.create(v)
-      }
-
       if (key === 'properties' && type === 'merge_node') {
         v = Node.createProperties(v)
       }
 
-      if (key === 'properties' && type === 'set_mark') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_mark'
+      ) {
         v = Mark.createProperties(v)
       }
 
-      if (key === 'properties' && type === 'set_node') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_node'
+      ) {
         v = Node.createProperties(v)
       }
 
-      if (key === 'properties' && type === 'set_selection') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_selection'
+      ) {
         v = Selection.createProperties(v)
       }
 
-      if (key === 'properties' && type === 'set_value') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_value'
+      ) {
         v = Value.createProperties(v)
       }
 
@@ -252,45 +248,47 @@ class Operation extends Record(DEFAULTS) {
     for (const key of ATTRIBUTES) {
       let value = this[key]
 
-      // Skip keys for objects that should not be serialized, and are only used
-      // for providing the local-only invert behavior for the history stack.
-      if (key == 'document') continue
-      if (key == 'selection') continue
-      if (key == 'value') continue
-      if (key == 'node' && type != 'insert_node') continue
-
       if (
-        key == 'mark' ||
-        key == 'marks' ||
-        key == 'node' ||
-        key == 'path' ||
-        key == 'newPath'
+        key === 'mark' ||
+        key === 'marks' ||
+        key === 'node' ||
+        key === 'path' ||
+        key === 'newPath'
       ) {
         value = value.toJSON()
       }
 
-      if (key == 'properties' && type == 'merge_node') {
+      if (key === 'properties' && type === 'merge_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_mark') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_mark'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_node') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_node'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_selection') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_selection'
+      ) {
         const v = {}
         if ('anchor' in value) v.anchor = value.anchor.toJSON()
         if ('focus' in value) v.focus = value.focus.toJSON()
@@ -299,14 +297,17 @@ class Operation extends Record(DEFAULTS) {
         value = v
       }
 
-      if (key == 'properties' && type == 'set_value') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_value'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
         value = v
       }
 
-      if (key == 'properties' && type == 'split_node') {
+      if (key === 'properties' && type === 'split_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type

@@ -1,5 +1,4 @@
 import Debug from 'debug'
-import pick from 'lodash/pick'
 
 import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
@@ -42,42 +41,21 @@ function invertOperation(op) {
         return op
       }
 
-      let inversePath = newPath
-      let inverseNewPath = path
+      // Get the true path that the moved node ended up at
+      const inversePath = PathUtils.transform(path, op).first()
 
-      const pathLast = path.size - 1
-      const newPathLast = newPath.size - 1
+      // Get the true path we are trying to move back to
+      // We transform the right-sibling of the path
+      // This will end up at the operation.path most of the time
+      // But if the newPath is a left-sibling or left-ancestor-sibling, this will account for it
+      const transformedSibling = PathUtils.transform(
+        PathUtils.increment(path),
+        op
+      ).first()
 
-      // If the node's old position was a left sibling of an ancestor of
-      // its new position, we need to adjust part of the path by -1.
-      if (
-        path.size < inversePath.size &&
-        path.slice(0, pathLast).every((e, i) => e == inversePath.get(i)) &&
-        path.last() < inversePath.get(pathLast)
-      ) {
-        inversePath = inversePath
-          .slice(0, pathLast)
-          .concat(inversePath.get(pathLast) - 1)
-          .concat(inversePath.slice(pathLast + 1, inversePath.size))
-      }
-
-      // If the node's new position is an ancestor of the old position,
-      // or a left sibling of an ancestor of its old position, we need
-      // to adjust part of the path by 1.
-      if (
-        newPath.size < inverseNewPath.size &&
-        newPath
-          .slice(0, newPathLast)
-          .every((e, i) => e == inverseNewPath.get(i)) &&
-        newPath.last() <= inverseNewPath.get(newPathLast)
-      ) {
-        inverseNewPath = inverseNewPath
-          .slice(0, newPathLast)
-          .concat(inverseNewPath.get(newPathLast) + 1)
-          .concat(inverseNewPath.slice(newPathLast + 1, inverseNewPath.size))
-      }
-
-      const inverse = op.set('path', inversePath).set('newPath', inverseNewPath)
+      const inverse = op
+        .set('path', inversePath)
+        .set('newPath', transformedSibling)
       return inverse
     }
 
@@ -95,13 +73,14 @@ function invertOperation(op) {
       return inverse
     }
 
-    case 'set_node': {
-      const { properties, node } = op
-      const inverseNode = node.merge(properties)
-      const inverseProperties = pick(node, Object.keys(properties))
+    case 'set_node':
+    case 'set_value':
+    case 'set_selection':
+    case 'set_mark': {
+      const { properties, newProperties } = op
       const inverse = op
-        .set('node', inverseNode)
-        .set('properties', inverseProperties)
+        .set('properties', newProperties)
+        .set('newProperties', properties)
       return inverse
     }
 
@@ -122,36 +101,6 @@ function invertOperation(op) {
 
     case 'remove_mark': {
       const inverse = op.set('type', 'add_mark')
-      return inverse
-    }
-
-    case 'set_mark': {
-      const { properties, mark } = op
-      const inverseMark = mark.merge(properties)
-      const inverseProperties = pick(mark, Object.keys(properties))
-      const inverse = op
-        .set('mark', inverseMark)
-        .set('properties', inverseProperties)
-      return inverse
-    }
-
-    case 'set_selection': {
-      const { properties, selection } = op
-      const inverseSelection = selection.merge(properties)
-      const inverseProps = pick(selection, Object.keys(properties))
-      const inverse = op
-        .set('selection', inverseSelection)
-        .set('properties', inverseProps)
-      return inverse
-    }
-
-    case 'set_value': {
-      const { properties, value } = op
-      const inverseValue = value.merge(properties)
-      const inverseProperties = pick(value, Object.keys(properties))
-      const inverse = op
-        .set('value', inverseValue)
-        .set('properties', inverseProperties)
       return inverse
     }
 

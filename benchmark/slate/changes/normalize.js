@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .normalize()
     .moveForward(5)
     .normalize()
@@ -23,7 +24,7 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              {i == 0 ? <cursor /> : ''}
+              {i === 0 ? <cursor /> : ''}
               This is editable <b>rich</b> text, <i>much</i> better than a
               textarea!
             </paragraph>
@@ -35,5 +36,5 @@ const value = (
 )
 
 module.exports.input = function() {
-  return value.change()
+  return new Editor({ value }, { normalize: false })
 }

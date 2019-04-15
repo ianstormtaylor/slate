@@ -4,7 +4,11 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
-import { IS_FIREFOX, HAS_INPUT_EVENTS_LEVEL_2 } from 'slate-dev-environment'
+import {
+  IS_ANDROID,
+  IS_FIREFOX,
+  HAS_INPUT_EVENTS_LEVEL_2,
+} from 'slate-dev-environment'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
@@ -23,6 +27,15 @@ const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "no
  */
 
 const debug = Debug('slate:content')
+
+/**
+ * Separate debug to easily see when the DOM has updated either by render or
+ * changing selection.
+ *
+ * @type {Function}
+ */
+
+debug.update = Debug('slate:update')
 
 /**
  * Content.
@@ -133,6 +146,7 @@ class Content extends React.Component {
    */
 
   componentDidUpdate() {
+    debug.update('componentDidUpdate')
     this.updateSelection()
   }
 
@@ -148,6 +162,7 @@ class Content extends React.Component {
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { activeElement } = window.document
+    debug.update('updateSelection', { selection: selection.toJSON() })
 
     // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
@@ -173,9 +188,10 @@ class Content extends React.Component {
     }
 
     // If the Slate selection is focused, but the DOM's active element is not
-    // the editor, we need to focus it.
+    // the editor, we need to focus it. We prevent scrolling because we handle
+    // scrolling to the correct selection.
     if (selection.isFocused && activeElement !== this.element) {
-      this.element.focus()
+      this.element.focus({ preventScroll: true })
       updated = true
     }
 
@@ -201,14 +217,14 @@ class Content extends React.Component {
       // to check both orientations here. (2017/10/31)
       if (current) {
         if (
-          (startContainer == current.startContainer &&
-            startOffset == current.startOffset &&
-            endContainer == current.endContainer &&
-            endOffset == current.endOffset) ||
-          (startContainer == current.endContainer &&
-            startOffset == current.endOffset &&
-            endContainer == current.startContainer &&
-            endOffset == current.startOffset)
+          (startContainer === current.startContainer &&
+            startOffset === current.startOffset &&
+            endContainer === current.endContainer &&
+            endOffset === current.endOffset) ||
+          (startContainer === current.endContainer &&
+            startOffset === current.endOffset &&
+            endContainer === current.startContainer &&
+            endOffset === current.startOffset)
         ) {
           return
         }
@@ -260,6 +276,7 @@ class Content extends React.Component {
 
     if (updated) {
       debug('updateSelection', { selection, native, activeElement })
+      debug.update('updateSelection-applied', { selection })
     }
   }
 
@@ -329,7 +346,7 @@ class Content extends React.Component {
     // programmatically while updating selection.
     if (
       this.tmp.isUpdatingSelection &&
-      (handler == 'onSelect' || handler == 'onBlur' || handler == 'onFocus')
+      (handler === 'onSelect' || handler === 'onBlur' || handler === 'onFocus')
     ) {
       return
     }
@@ -339,7 +356,12 @@ class Content extends React.Component {
     // cases we don't need to trigger any changes, since our internal model is
     // already up to date, but we do want to update the native selection again
     // to make sure it is in sync. (2017/10/16)
-    if (handler == 'onSelect') {
+    //
+    // ANDROID: The updateSelection causes issues in Android when you are
+    // at the end of a block. The selection ends up to the left of the inserted
+    // character instead of to the right. This behavior continues even if
+    // you enter more than one character. (2019/01/03)
+    if (!IS_ANDROID && handler === 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
@@ -355,13 +377,13 @@ class Content extends React.Component {
 
     // Don't handle drag and drop events coming from embedded editors.
     if (
-      handler == 'onDragEnd' ||
-      handler == 'onDragEnter' ||
-      handler == 'onDragExit' ||
-      handler == 'onDragLeave' ||
-      handler == 'onDragOver' ||
-      handler == 'onDragStart' ||
-      handler == 'onDrop'
+      handler === 'onDragEnd' ||
+      handler === 'onDragEnter' ||
+      handler === 'onDragExit' ||
+      handler === 'onDragLeave' ||
+      handler === 'onDragOver' ||
+      handler === 'onDragStart' ||
+      handler === 'onDrop'
     ) {
       const closest = event.target.closest('[data-slate-editor]')
 
@@ -373,18 +395,18 @@ class Content extends React.Component {
     // Some events require being in editable in the editor, so if the event
     // target isn't, ignore them.
     if (
-      handler == 'onBeforeInput' ||
-      handler == 'onBlur' ||
-      handler == 'onCompositionEnd' ||
-      handler == 'onCompositionStart' ||
-      handler == 'onCopy' ||
-      handler == 'onCut' ||
-      handler == 'onFocus' ||
-      handler == 'onInput' ||
-      handler == 'onKeyDown' ||
-      handler == 'onKeyUp' ||
-      handler == 'onPaste' ||
-      handler == 'onSelect'
+      handler === 'onBeforeInput' ||
+      handler === 'onBlur' ||
+      handler === 'onCompositionEnd' ||
+      handler === 'onCompositionStart' ||
+      handler === 'onCopy' ||
+      handler === 'onCut' ||
+      handler === 'onFocus' ||
+      handler === 'onInput' ||
+      handler === 'onKeyDown' ||
+      handler === 'onKeyUp' ||
+      handler === 'onPaste' ||
+      handler === 'onSelect'
     ) {
       if (!this.isInEditor(event.target)) {
         return
@@ -460,6 +482,12 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
+
+    debug.update('render', {
+      text: value.document.text,
+      selection: value.selection.toJSON(),
+      value: value.toJSON(),
+    })
 
     return (
       <Container
