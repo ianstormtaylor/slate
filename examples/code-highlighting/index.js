@@ -3,6 +3,7 @@ import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
+
 import initialValueAsJson from './value.json'
 
 /**
@@ -183,6 +184,7 @@ class CodeHighlighting extends React.Component {
     const others = next() || []
     if (node.type !== 'code') return others
 
+    const { document } = editor.value
     const language = node.data.get('language')
     const texts = node.getTexts().toArray()
     const string = texts.map(t => t.text).join('\n')
@@ -217,13 +219,18 @@ class CodeHighlighting extends React.Component {
       }
 
       if (typeof token !== 'string') {
+        const startPath = document.assertPath(startText.key)
+        const endPath = document.assertPath(endText.key)
+
         const dec = {
           anchor: {
             key: startText.key,
+            path: startPath,
             offset: startOffset,
           },
           focus: {
             key: endText.key,
+            path: endPath,
             offset: endOffset,
           },
           mark: {
