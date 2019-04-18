@@ -1,7 +1,9 @@
 import { Editor } from 'slate-react'
+import { Value } from 'slate'
+
 import Prism from 'prismjs'
 import React from 'react'
-import { Value } from 'slate'
+
 import initialValueAsJson from './value.json'
 
 /**
