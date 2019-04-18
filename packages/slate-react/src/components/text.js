@@ -125,10 +125,12 @@ class Text extends React.Component {
         start.path != null,
         'No path for the decoration start. Not providing one is deprecated.'
       )
+
       warning(
         end.path != null,
         'No path for the decoration end. Not providing one is deprecated.'
       )
+
       const startPath = start.path || document.assertPath(start.key)
       const endPath = end.path || document.assertPath(end.key)
 
