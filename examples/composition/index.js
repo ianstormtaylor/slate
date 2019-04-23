@@ -9,6 +9,7 @@ import insert from './insert.js'
 import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
+import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
  * Define the default node type.
@@ -45,6 +46,13 @@ const Tab = styled(TabLink)`
   padding: 0.25em 0.5em;
   border-radius: 0.25em;
   margin-right: 0.25em;
+`
+
+const Version = styled('div')`
+  float: right;
+  padding: 0.5em;
+  font-size: 75%;
+  color: #808080;
 `
 
 const EditorText = styled('div')`
@@ -190,6 +198,11 @@ class RichTextExample extends React.Component {
                 </Tab>
               )
             })}
+            <Version>
+              {ANDROID_API_VERSION
+                ? `Android API ${ANDROID_API_VERSION}`
+                : null}
+            </Version>
           </Tabs>
           <div>{this.state.text}</div>
         </Instruction>
