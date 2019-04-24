@@ -83,6 +83,7 @@
   "peerDependencies": {
     "slate": "*",
     "slate-dev-benchmark": "*",
+    "slate-dev-environment": "*",
     "slate-dev-test-utils": "*",
     "slate-html-serializer": "*",
     "slate-plain-serializer": "*",

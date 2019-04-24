@@ -9,6 +9,7 @@ import insert from './insert.js'
 import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
+import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
  * Define the default node type.
@@ -46,6 +47,41 @@ const Tab = styled(TabLink)`
   border-radius: 0.25em;
   margin-right: 0.25em;
 `
+
+const Version = styled('div')`
+  float: right;
+  padding: 0.5em;
+  font-size: 75%;
+  color: #808080;
+`
+
+const EditorText = styled('div')`
+  color: #808080;
+  background: #f0f0f0;
+  font: 12px monospace;
+  white-space: pre-wrap;
+  margin: 1em -1em;
+  padding: 0.5em;
+  div {
+    margin: 0 0 0.5em;
+  }
+`
+
+const EditorTextCaption = styled('div')`
+  color: white;
+  background: #808080;
+  padding: 0.5em;
+`
+
+/**
+ * Extract lines of text from `Value`
+ *
+ * @return {String[]}
+ */
+
+function getTextLines(value) {
+  return value.document.nodes.map(node => node.text).toArray()
+}
 
 /**
  * Subpages which are each a smoke test.
@@ -145,6 +181,7 @@ class RichTextExample extends React.Component {
   render() {
     const { text } = this.state
     if (text == null) return <Redirect to="/composition/split-join" />
+    const textLines = getTextLines(this.state.value)
     return (
       <div>
         <Instruction>
@@ -161,6 +198,11 @@ class RichTextExample extends React.Component {
                 </Tab>
               )
             })}
+            <Version>
+              {ANDROID_API_VERSION
+                ? `Android API ${ANDROID_API_VERSION}`
+                : null}
+            </Version>
           </Tabs>
           <div>{this.state.text}</div>
         </Instruction>
@@ -186,6 +228,12 @@ class RichTextExample extends React.Component {
           renderNode={this.renderNode}
           renderMark={this.renderMark}
         />
+        <EditorText>
+          <EditorTextCaption>Text in Slate's `Value`</EditorTextCaption>
+          {textLines.map((line, index) => (
+            <div key={index}>{line.length > 0 ? line : ' '}</div>
+          ))}
+        </EditorText>
       </div>
     )
   }
