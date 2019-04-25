@@ -5,7 +5,6 @@ import { PathUtils } from 'slate'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
-import warning from 'tiny-warning'
 
 /**
  * Debug.
