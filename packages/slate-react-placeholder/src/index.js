@@ -48,11 +48,16 @@ function SlateReactPlaceholder(options = {}) {
     }
 
     const others = next()
+    const document = editor.value.document
     const first = node.getFirstText()
     const last = node.getLastText()
     const decoration = {
-      anchor: { key: first.key, offset: 0 },
-      focus: { key: last.key, offset: last.text.length },
+      anchor: { key: first.key, offset: 0, path: document.getPath(first.key) },
+      focus: {
+        key: last.key,
+        offset: last.text.length,
+        path: document.getPath(last.key),
+      },
       mark: placeholderMark,
     }
 
