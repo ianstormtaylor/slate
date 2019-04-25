@@ -4,6 +4,14 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.45.0` — April 2, 2019
+
+###### BREAKING
+
+**A few properties of `Operation` objects have changed.** In an effort to standardize and streamline operations, their properties have changed. This **won't** affect 90% of use cases, since operations are usually low-level concerns. However, if you are using operational transform or some other low-level parts of Slate, this may affect you. The `value`, `selection`, `node`, and `mark` properties—which contained references to Immutable.js objects—have all been removed. In their place, we have standardized a `properties` and `newProperties` pair. This will greatly reduce the size of operations stored in memory, and makes dealing with them easier when serialized as well.
+
+---
+
 ### `0.44.0` — November 8, 2018
 
 ###### NEW
