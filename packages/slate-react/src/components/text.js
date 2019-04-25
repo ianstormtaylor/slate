@@ -118,19 +118,6 @@ class Text extends React.Component {
       if (start.key === end.key) return false
 
       const path = document.assertPath(key)
-
-      // Show warnings and revert to key if no path is provided on `start` or
-      // `end` of decoration.
-      warning(
-        start.path != null,
-        'No path for the decoration start. Not providing one is deprecated.'
-      )
-
-      warning(
-        end.path != null,
-        'No path for the decoration end. Not providing one is deprecated.'
-      )
-
       const startPath = start.path || document.assertPath(start.key)
       const endPath = end.path || document.assertPath(end.key)
 
