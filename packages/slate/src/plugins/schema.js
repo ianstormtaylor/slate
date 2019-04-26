@@ -243,7 +243,12 @@ function testRules(object, rules) {
  */
 
 function validateRules(object, rule, rules, options = {}) {
-  const { every = false } = options
+  const { every = false, match = null } = options
+
+  if (typeof rule === 'function') {
+    const valid = rule(object, match)
+    return valid ? null : fail('node_invalid', { rule, node: object })
+  }
 
   if (Array.isArray(rule)) {
     const array = rule.length ? rule : [{}]
@@ -306,7 +311,9 @@ function validateData(node, rule) {
 
 function validateMarks(node, rule) {
   if (rule.marks == null) return
-  const marks = node.getMarks().toArray()
+
+  const marks =
+    node.object === 'text' ? node.marks.toArray() : node.getMarks().toArray()
 
   for (const mark of marks) {
     const valid = rule.marks.some(
@@ -569,7 +576,7 @@ function validateNext(node, child, next, index, rules) {
     if (rule.next == null) continue
     if (!testRules(child, rule.match)) continue
 
-    const error = validateRules(next, rule.next)
+    const error = validateRules(next, rule.next, [], { match: child })
     if (!error) continue
 
     error.rule = rule

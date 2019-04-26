@@ -316,13 +316,16 @@ Commands.insertText = (editor, text, marks) => {
   const { value } = editor
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
-  editor.insertTextAtRange(selection, text, marks)
 
-  // If the text was successfully inserted, and the selection had marks on it,
-  // unset the selection's marks.
-  if (selection.marks && document !== editor.value.document) {
-    editor.select({ marks: null })
-  }
+  editor.withoutNormalizing(() => {
+    editor.insertTextAtRange(selection, text, marks)
+
+    // If the text was successfully inserted, and the selection had marks on it,
+    // unset the selection's marks.
+    if (selection.marks && document !== editor.value.document) {
+      editor.select({ marks: null })
+    }
+  })
 }
 
 /**

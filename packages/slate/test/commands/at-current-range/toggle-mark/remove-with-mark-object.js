@@ -16,9 +16,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />
-        <b thing="value">w</b>
-        <focus />ord
+        <b thing="value">
+          <anchor />w<focus />
+        </b>
+        ord
       </paragraph>
     </document>
   </value>

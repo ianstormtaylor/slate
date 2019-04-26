@@ -408,11 +408,24 @@ class Point extends Record(DEFAULTS) {
       // TODO: if we look up by path above and it differs by key, do we want to reset it to looking up by key?
     }
 
-    const point = this.merge({
+    let point = this.merge({
       key: target.key,
       path: path == null ? node.getPath(target.key) : path,
       offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
+
+    // HACK: for now testing.
+    if (point.offset === target.text.length) {
+      const next = node.getNextText()
+
+      if (next) {
+        point = point.merge({
+          key: next.key,
+          path: node.getPath(next.key),
+          offset: 0,
+        })
+      }
+    }
 
     return point
   }

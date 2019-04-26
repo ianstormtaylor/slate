@@ -23,9 +23,11 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wo<anchor />
+        wo
         <i>
-          <b>rd</b>
+          <b>
+            <anchor />rd
+          </b>
         </i>
       </paragraph>
       <paragraph>

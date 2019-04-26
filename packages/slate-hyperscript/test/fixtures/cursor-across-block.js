@@ -33,13 +33,8 @@ export const output = {
           {
             object: 'text',
             key: '0',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'word',
-                marks: [],
-              },
-            ],
+            text: 'word',
+            marks: [],
           },
         ],
       },

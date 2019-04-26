@@ -11,13 +11,8 @@ export const output = {
   nodes: [
     {
       object: 'text',
-      leaves: [
-        {
-          object: 'leaf',
-          text: 'word',
-          marks: [],
-        },
-      ],
+      text: 'word',
+      marks: [],
     },
   ],
 }

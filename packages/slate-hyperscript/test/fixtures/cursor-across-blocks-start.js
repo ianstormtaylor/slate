@@ -36,13 +36,8 @@ export const output = {
           {
             object: 'text',
             key: '0',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'one',
-                marks: [],
-              },
-            ],
+            text: 'one',
+            marks: [],
           },
         ],
       },
@@ -55,13 +50,8 @@ export const output = {
           {
             object: 'text',
             key: '2',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'two',
-                marks: [],
-              },
-            ],
+            text: 'two',
+            marks: [],
           },
         ],
       },

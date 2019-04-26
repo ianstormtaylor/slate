@@ -27,12 +27,8 @@ const TEXT_RULE = {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
         object: 'text',
-        leaves: [
-          {
-            object: 'leaf',
-            text: '\n',
-          },
-        ],
+        text: '\n',
+        marks: [],
       }
     }
 
@@ -41,12 +37,8 @@ const TEXT_RULE = {
 
       return {
         object: 'text',
-        leaves: [
-          {
-            object: 'leaf',
-            text: el.nodeValue,
-          },
-        ],
+        text: el.nodeValue,
+        marks: [],
       }
     }
   },
@@ -162,13 +154,8 @@ class Html {
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  object: 'leaf',
-                  text: '',
-                  marks: [],
-                },
-              ],
+              text: '',
+              marks: [],
             },
           ],
         },
@@ -274,6 +261,14 @@ class Html {
         node = ret
       }
 
+      if (node.object === 'block' || node.object === 'inline') {
+        node.data = node.data || {}
+        node.nodes = node.nodes || []
+      } else if (node.object === 'text') {
+        node.marks = node.marks || []
+        node.text = node.text || ''
+      }
+
       break
     }
 
@@ -292,13 +287,11 @@ class Html {
 
     const applyMark = node => {
       if (node.object === 'mark') {
-        return this.deserializeMark(node)
+        const ret = this.deserializeMark(node)
+        return ret
       } else if (node.object === 'text') {
-        node.leaves = node.leaves.map(leaf => {
-          leaf.marks = leaf.marks || []
-          leaf.marks.push({ type, data })
-          return leaf
-        })
+        node.marks = node.marks || []
+        node.marks.push({ type, data })
       } else if (node.nodes) {
         node.nodes = node.nodes.map(applyMark)
       }

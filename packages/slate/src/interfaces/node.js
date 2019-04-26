@@ -19,16 +19,6 @@ import Text from '../models/text'
 
 class NodeInterface {
   /**
-   * Get the concatenated text of the node.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getText()
-  }
-
-  /**
    * Get the first text node of a node, or the node itself.
    *
    * @return {Node|Null}
@@ -141,8 +131,11 @@ class NodeInterface {
    */
 
   getText() {
-    const children = this.object === 'text' ? this.leaves : this.nodes
-    const text = children.reduce((memo, c) => memo + c.text, '')
+    if (this.object === 'text') {
+      return this.text
+    }
+
+    const text = this.nodes.reduce((memo, c) => memo + c.text, '')
     return text
   }
 

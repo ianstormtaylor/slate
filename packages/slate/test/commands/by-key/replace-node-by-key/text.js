@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.replaceNodeByKey('a', { object: 'text', leaves: [{ text: 'three' }] })
+  editor.replaceNodeByKey('a', { object: 'text', text: 'three' })
 }
 
 export const input = (
