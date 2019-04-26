@@ -162,6 +162,7 @@ class Content extends React.Component {
     const window = getWindow(this.element)
     const native = window.getSelection()
     const { activeElement } = window.document
+
     if (debug.enabled) {
       debug.update('updateSelection', { selection: selection.toJSON() })
     }
