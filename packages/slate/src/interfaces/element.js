@@ -8,7 +8,6 @@ import Block from '../models/block'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
 import Inline from '../models/inline'
-import Text from '../models/text'
 import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
 import Point from '../models/point'
@@ -49,24 +48,6 @@ class ElementInterface {
     node = node.addMark(mark)
     const ret = this.replaceNode(path, node)
     return ret
-
-    // if (offset + length < node.text.length) {
-    //   const string = node.text.slice(offset + length)
-    //   const last = node.set('text', string).regenerateKey()
-    //   ret = ret.insertNode(path, last)
-    // }
-
-    // const text = node.text.slice(offset, offset + length)
-    // const middle = node.set('text', text).addMark(mark)
-    // ret = ret.insertNode(path, middle)
-
-    // // if (offset > 0) {
-    // //   const string = node.text.slice(0, offset)
-    // //   const first = node.set('text', string).regenerateKey()
-    // //   ret = ret.insertNode(path, first)
-    // // }
-
-    // return ret
   }
 
   /**
@@ -2130,28 +2111,6 @@ class ElementInterface {
     node = node.removeMark(mark)
     const ret = this.replaceNode(path, node)
     return ret
-
-    // path = this.resolvePath(path)
-    // const node = this.assertDescendant(path)
-    // let ret = this.removeNode(path)
-
-    // if (offset + length < node.text.length) {
-    //   const string = node.text.slice(offset + length)
-    //   const last = node.set('text', string).regenerateKey()
-    //   ret = ret.insertNode(path, last)
-    // }
-
-    // const text = node.text.slice(offset, offset + length)
-    // const middle = node.set('text', text).removeMark(mark)
-    // ret = ret.insertNode(path, middle)
-
-    // if (offset > 0) {
-    //   const string = node.text.slice(0, offset)
-    //   const first = node.set('text', string).regenerateKey()
-    //   ret = ret.insertNode(path, first)
-    // }
-
-    // return ret
   }
 
   /**
@@ -2297,28 +2256,6 @@ class ElementInterface {
     node = node.setMark(properties, newProperties)
     const ret = this.replaceNode(path, node)
     return ret
-
-    // path = this.resolvePath(path)
-    // const node = this.assertDescendant(path)
-    // let ret = this.removeNode(path)
-
-    // if (offset + length < node.text.length) {
-    //   const string = node.text.slice(offset + length)
-    //   const last = node.set('text', string)
-    //   ret = ret.insertNode(path, last)
-    // }
-
-    // const text = node.text.slice(offset, offset + length)
-    // const middle = node.set('text', text).setMark(properties, newProperties)
-    // ret = ret.insertNode(path, middle)
-
-    // if (offset > 0) {
-    //   const string = node.text.slice(0, offset)
-    //   const first = node.set('text', string)
-    //   ret = ret.insertNode(path, first)
-    // }
-
-    // return ret
   }
 
   /**

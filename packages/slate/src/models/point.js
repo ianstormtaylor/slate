@@ -414,9 +414,12 @@ class Point extends Record(DEFAULTS) {
       offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
 
-    // HACK: for now testing.
+    // COMPAT: There is an ambiguity, since a point can exist at the end of a
+    // text node, or at the start of the following one. To eliminate it we
+    // enforce that if there is a following text node, we always move it there.
     if (point.offset === target.text.length) {
-      const next = node.getNextText()
+      const block = node.getClosestBlock(point.path)
+      const next = block.getNextText()
 
       if (next) {
         point = point.merge({

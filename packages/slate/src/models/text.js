@@ -1,4 +1,5 @@
 import isPlainObject from 'is-plain-object'
+import invariant from 'tiny-invariant'
 import { List, Record } from 'immutable'
 
 import Leaf from './leaf'
@@ -78,6 +79,11 @@ class Text extends Record(DEFAULTS) {
     if (Text.isText(object)) {
       return object
     }
+
+    invariant(
+      object.leaves == null,
+      'As of slate@0.46, the `leaves` property of text nodes has been removed! Each individual leaf should be created as a text node instead.'
+    )
 
     const { text = '', marks = [], key = KeyUtils.create() } = object
     const node = new Text({

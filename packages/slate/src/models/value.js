@@ -430,39 +430,8 @@ class Value extends Record(DEFAULTS) {
     mark = Mark.create(mark)
     let value = this
     let { document } = value
-    // const node = document.assertNode(path)
     document = document.addMark(path, mark)
     value = value.set('document', document)
-
-    // if (
-    //   !node.marks.has(mark) &&
-    //   !(offset === 0 && length === node.text.length)
-    // ) {
-    //   value = value.mapPoints(point => {
-    //     if (
-    //       point.key === node.key &&
-    //       point.offset >= offset &&
-    //       point.offset !== 0
-    //     ) {
-    //       const nextPath = PathUtils.increment(path)
-    //       const next = document.assertNode(nextPath)
-    //       const nextOffset =
-    //         point.offset === offset + length
-    //           ? point.offset - length
-    //           : point.offset - offset
-
-    //       if (next) {
-    //         return point
-    //           .setKey(null)
-    //           .setPath(nextPath)
-    //           .setOffset(nextOffset)
-    //       }
-    //     }
-
-    //     return point
-    //   })
-    // }
-
     return value
   }
 
@@ -591,39 +560,8 @@ class Value extends Record(DEFAULTS) {
     mark = Mark.create(mark)
     let value = this
     let { document } = value
-    // const node = document.assertNode(path)
     document = document.removeMark(path, mark)
     value = value.set('document', document)
-
-    // if (
-    //   !node.marks.has(mark) &&
-    //   !(offset === 0 && length === node.text.length)
-    // ) {
-    //   value = value.mapPoints(point => {
-    //     if (
-    //       point.key === node.key &&
-    //       point.offset >= offset &&
-    //       point.offset !== 0
-    //     ) {
-    //       const nextPath = PathUtils.increment(path)
-    //       const next = document.assertNode(nextPath)
-    //       const nextOffset =
-    //         point.offset === offset + length
-    //           ? point.offset - length
-    //           : point.offset - offset
-
-    //       if (next) {
-    //         return point
-    //           .setKey(null)
-    //           .setPath(nextPath)
-    //           .setOffset(nextOffset)
-    //       }
-    //     }
-
-    //     return point
-    //   })
-    // }
-
     return value
   }
 
