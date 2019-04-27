@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,14 +9,14 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              { "text": "Insert Text: ", "marks": [{ "type": "bold" }] },
-              {
-                "text":
-                  "Type 'cat' before every word 'before' and after every word 'after' and in the middle of the word 'pion' so that it says 'pi cat on' using the virtual keyboard",
-                "marks": [{ "type": "italic" }]
-              }
-            ]
+            "text": "Insert Text: ",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text":
+              "Type 'cat' before every word 'before' and after every word 'after' and in the middle of the word 'pion' so that it says 'pi cat on' using the virtual keyboard",
+            "marks": [{ "type": "italic" }]
           }
         ]
       },
@@ -24,11 +26,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Before there before is pion at after for after"
-              }
-            ]
+            "text": "Before there before is pion at after for after"
           }
         ]
       },
@@ -38,14 +36,14 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              { "text": "Handle Enter: ", "marks": [{ "type": "bold" }] },
-              {
-                "text":
-                  "Hit Enter twice before every word 'before' and after every word 'after' and in the middle of the word 'split'",
-                "marks": [{ "type": "italic" }]
-              }
-            ]
+            "text": "Handle Enter: ",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text":
+              "Hit Enter twice before every word 'before' and after every word 'after' and in the middle of the word 'split'",
+            "marks": [{ "type": "italic" }]
           }
         ]
       },
@@ -55,11 +53,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Before there before is split at after for after"
-              }
-            ]
+            "text": "Before there before is split at after for after"
           }
         ]
       },
@@ -69,20 +63,18 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Since it's rich text, you can do things like turn a selection of text "
-              },
-              {
-                "text": "bold",
-                "marks": [{ "type": "bold" }]
-              },
-              {
-                "text":
-                  ", or add a semantically rendered block quote in the middle of the page, like this:"
-              }
-            ]
+            "text":
+              "Since it's rich text, you can do things like turn a selection of text "
+          },
+          {
+            "object": "text",
+            "text": "bold",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text":
+              ", or add a semantically rendered block quote in the middle of the page, like this:"
           }
         ]
       },
@@ -92,11 +84,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "A wise quote."
-              }
-            ]
+            "text": "A wise quote."
           }
         ]
       },
@@ -106,11 +94,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out for yourself!"
-              }
-            ]
+            "text": "Try it out for yourself!"
           }
         ]
       }

@@ -23,14 +23,14 @@ for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
     object: 'block',
     type: 'heading',
-    nodes: [{ object: 'text', leaves: [{ text: faker.lorem.sentence() }] }],
+    nodes: [{ object: 'text', text: faker.lorem.sentence() }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
       object: 'block',
       type: 'paragraph',
-      nodes: [{ object: 'text', leaves: [{ text: faker.lorem.paragraph() }] }],
+      nodes: [{ object: 'text', text: faker.lorem.paragraph() }],
     })
   }
 }

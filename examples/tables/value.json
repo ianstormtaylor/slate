@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
-              }
-            ]
+            "text":
+              "Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:"
           }
         ]
       },
@@ -30,11 +28,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": ""
-                      }
-                    ]
+                    "text": ""
                   }
                 ]
               },
@@ -44,16 +38,8 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "Human",
-                        "marks": [
-                          {
-                            "type": "bold"
-                          }
-                        ]
-                      }
-                    ]
+                    "text": "Human",
+                    "marks": [{ "type": "bold" }]
                   }
                 ]
               },
@@ -63,16 +49,8 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "Dog",
-                        "marks": [
-                          {
-                            "type": "bold"
-                          }
-                        ]
-                      }
-                    ]
+                    "text": "Dog",
+                    "marks": [{ "type": "bold" }]
                   }
                 ]
               },
@@ -82,16 +60,8 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "Cat",
-                        "marks": [
-                          {
-                            "type": "bold"
-                          }
-                        ]
-                      }
-                    ]
+                    "text": "Cat",
+                    "marks": [{ "type": "bold" }]
                   }
                 ]
               }
@@ -107,16 +77,8 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "# of Feet",
-                        "marks": [
-                          {
-                            "type": "bold"
-                          }
-                        ]
-                      }
-                    ]
+                    "text": "# of Feet",
+                    "marks": [{ "type": "bold" }]
                   }
                 ]
               },
@@ -126,11 +88,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "2"
-                      }
-                    ]
+                    "text": "2"
                   }
                 ]
               },
@@ -140,11 +98,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "4"
-                      }
-                    ]
+                    "text": "4"
                   }
                 ]
               },
@@ -154,11 +108,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "4"
-                      }
-                    ]
+                    "text": "4"
                   }
                 ]
               }
@@ -174,16 +124,8 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "# of Lives",
-                        "marks": [
-                          {
-                            "type": "bold"
-                          }
-                        ]
-                      }
-                    ]
+                    "text": "# of Lives",
+                    "marks": [{ "type": "bold" }]
                   }
                 ]
               },
@@ -193,11 +135,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "1"
-                      }
-                    ]
+                    "text": "1"
                   }
                 ]
               },
@@ -207,11 +145,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "1"
-                      }
-                    ]
+                    "text": "1"
                   }
                 ]
               },
@@ -221,11 +155,7 @@
                 "nodes": [
                   {
                     "object": "text",
-                    "leaves": [
-                      {
-                        "text": "9"
-                      }
-                    ]
+                    "text": "9"
                   }
                 ]
               }
@@ -239,12 +169,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "This table is just a basic example of rendering a table, and it doesn't have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!"
-              }
-            ]
+            "text":
+              "This table is just a basic example of rendering a table, and it doesn't have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!"
           }
         ]
       }
