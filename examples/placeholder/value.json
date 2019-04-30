@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,7 +9,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": []
+            "text": ""
           }
         ]
       }

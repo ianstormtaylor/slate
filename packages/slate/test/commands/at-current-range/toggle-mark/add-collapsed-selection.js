@@ -20,8 +20,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        word<b>s</b>
-        <cursor />
+        word<b>
+          s<cursor />
+        </b>
       </paragraph>
     </document>
   </value>

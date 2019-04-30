@@ -16,15 +16,15 @@ import invert from '../operations/invert'
  */
 
 const OPERATION_ATTRIBUTES = {
-  add_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  add_mark: ['path', 'mark', 'data'],
   insert_node: ['path', 'node', 'data'],
-  insert_text: ['path', 'offset', 'text', 'marks', 'data'],
+  insert_text: ['path', 'offset', 'text', 'data'],
   merge_node: ['path', 'position', 'properties', 'target', 'data'],
   move_node: ['path', 'newPath', 'data'],
-  remove_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  remove_mark: ['path', 'mark', 'data'],
   remove_node: ['path', 'node', 'data'],
-  remove_text: ['path', 'offset', 'text', 'marks', 'data'],
-  set_mark: ['path', 'offset', 'length', 'properties', 'newProperties', 'data'],
+  remove_text: ['path', 'offset', 'text', 'data'],
+  set_mark: ['path', 'properties', 'newProperties', 'data'],
   set_node: ['path', 'properties', 'newProperties', 'data'],
   set_selection: ['properties', 'newProperties', 'data'],
   set_value: ['properties', 'newProperties', 'data'],

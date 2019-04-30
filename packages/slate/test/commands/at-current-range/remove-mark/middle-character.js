@@ -10,8 +10,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        w<anchor />
-        <b>o</b>
+        w
+        <b>
+          <anchor />o
+        </b>
         <focus />rd
       </paragraph>
     </document>

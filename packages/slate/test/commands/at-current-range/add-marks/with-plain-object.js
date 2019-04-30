@@ -3,19 +3,17 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  const marks = []
+  editor.addMarks([
+    {
+      type: 'bold',
+      data: { thing: 'value' },
+    },
 
-  marks.push({
-    type: 'bold',
-    data: { thing: 'value' },
-  })
-
-  marks.push({
-    type: 'italic',
-    data: { thing2: 'value2' },
-  })
-
-  editor.addMarks(marks)
+    {
+      type: 'italic',
+      data: { thing2: 'value2' },
+    },
+  ])
 }
 
 export const input = (
@@ -32,9 +30,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
         <i thing2="value2">
-          <b thing="value">w</b>
+          <b thing="value">
+            <anchor />w
+          </b>
         </i>
         <focus />ord
       </paragraph>

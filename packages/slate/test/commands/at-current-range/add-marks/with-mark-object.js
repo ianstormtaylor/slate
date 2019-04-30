@@ -5,23 +5,16 @@ import h from '../../../helpers/h'
 import { Mark } from 'slate'
 
 export default function(editor) {
-  const marks = []
-
-  marks.push(
+  editor.addMarks([
     Mark.create({
       type: 'bold',
       data: { thing: 'value' },
-    })
-  )
-
-  marks.push(
+    }),
     Mark.create({
       type: 'italic',
       data: { thing2: 'value2' },
-    })
-  )
-
-  editor.addMarks(marks)
+    }),
+  ])
 }
 
 export const input = (
@@ -38,9 +31,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
         <i thing2="value2">
-          <b thing="value">w</b>
+          <b thing="value">
+            <anchor />w
+          </b>
         </i>
         <focus />ord
       </paragraph>

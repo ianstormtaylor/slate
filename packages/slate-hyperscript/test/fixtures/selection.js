@@ -25,25 +25,20 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '1',
+    key: '2',
     data: {},
     nodes: [
       {
         object: 'block',
-        key: '0',
+        key: '1',
         type: 'paragraph',
         data: {},
         nodes: [
           {
             object: 'text',
             key: 'a',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'two',
-                marks: [],
-              },
-            ],
+            text: 'two',
+            marks: [],
           },
         ],
       },

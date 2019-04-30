@@ -37,11 +37,15 @@ export const output = `
       <span data-slate-leaf="true">
         <span data-slate-content="true">one</span>
       </span>
+    </span>
+    <span>
       <span data-slate-leaf="true">
         <strong data-slate-mark="true">
           <span data-slate-content="true">two</span>
         </strong>
       </span>
+    </span>
+    <span>
       <span data-slate-leaf="true">
         <span data-slate-content="true">three</span>
       </span>

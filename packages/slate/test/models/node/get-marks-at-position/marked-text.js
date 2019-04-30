@@ -11,11 +11,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text>
-          <i>Cat </i>
-          is
-          <b> Cute</b>
-        </text>
+        <i>Cat </i>
+        is
+        <b> Cute</b>
       </paragraph>
     </document>
   </value>

@@ -43,12 +43,8 @@ export const output = (
     <document>
       <paragraph>
         <text>o</text>
-        <text>
-          <b>n</b>
-        </text>
-        <text>
-          <b>e</b>
-        </text>
+        <b>n</b>
+        <b>e</b>
       </paragraph>
     </document>
   </value>

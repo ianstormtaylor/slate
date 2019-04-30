@@ -2,6 +2,7 @@ import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
 import { Record, Set, List } from 'immutable'
 
+import Mark from './mark'
 import PathUtils from '../utils/path-utils'
 import Data from './data'
 import Decoration from './decoration'
@@ -418,20 +419,19 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Add mark to text at `offset` and `length` in node by `path`.
+   * Add `mark` to text at `path`.
    *
    * @param {List|String} path
-   * @param {Number} offset
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Value}
    */
 
-  addMark(path, offset, length, mark) {
+  addMark(path, mark) {
+    mark = Mark.create(mark)
     let value = this
     let { document } = value
-    document = document.addMark(path, offset, length, mark)
-    value = this.set('document', document)
+    document = document.addMark(path, mark)
+    value = value.set('document', document)
     return value
   }
 
@@ -462,23 +462,23 @@ class Value extends Record(DEFAULTS) {
    * @param {List|String} path
    * @param {Number} offset
    * @param {String} text
-   * @param {Set} marks
    * @return {Value}
    */
 
-  insertText(path, offset, text, marks) {
+  insertText(path, offset, text) {
     let value = this
     let { document } = value
-    const node = document.assertNode(path)
-    document = document.insertText(path, offset, text, marks)
+    let node = document.assertNode(path)
+    document = document.insertText(path, offset, text)
+    node = document.assertNode(path)
     value = value.set('document', document)
 
-    value = value.mapRanges(range => {
-      return range.updatePoints(point => {
-        return point.key === node.key && point.offset >= offset
-          ? point.setOffset(point.offset + text.length)
-          : point
-      })
+    value = value.mapPoints(point => {
+      if (point.key === node.key && point.offset >= offset) {
+        return point.setOffset(point.offset + text.length)
+      } else {
+        return point
+      }
     })
 
     return value
@@ -537,31 +537,31 @@ class Value extends Record(DEFAULTS) {
   moveNode(path, newPath, newIndex = 0) {
     let value = this
     let { document } = value
+
+    if (PathUtils.isEqual(path, newPath)) {
+      return value
+    }
+
     document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
-
-    value = value.mapRanges(range =>
-      range.updatePoints(point => point.setPath(null))
-    )
-
+    value = value.mapPoints(point => point.setPath(null))
     return value
   }
 
   /**
-   * Remove mark from text at `offset` and `length` in node.
+   * Remove `mark` at `path`.
    *
    * @param {List|String} path
-   * @param {Number} offset
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Value}
    */
 
-  removeMark(path, offset, length, mark) {
+  removeMark(path, mark) {
+    mark = Mark.create(mark)
     let value = this
     let { document } = value
-    document = document.removeMark(path, offset, length, mark)
-    value = this.set('document', document)
+    document = document.removeMark(path, mark)
+    value = value.set('document', document)
     return value
   }
 
@@ -627,22 +627,20 @@ class Value extends Record(DEFAULTS) {
     const start = offset
     const end = offset + length
 
-    value = value.mapRanges(range => {
-      return range.updatePoints(point => {
-        if (point.key !== node.key) {
-          return point
-        }
-
-        if (point.offset >= end) {
-          return point.setOffset(point.offset - length)
-        }
-
-        if (point.offset > start) {
-          return point.setOffset(start)
-        }
-
+    value = value.mapPoints(point => {
+      if (point.key !== node.key) {
         return point
-      })
+      }
+
+      if (point.offset >= end) {
+        return point.setOffset(point.offset - length)
+      }
+
+      if (point.offset > start) {
+        return point.setOffset(start)
+      }
+
+      return point
     })
 
     return value
@@ -668,17 +666,15 @@ class Value extends Record(DEFAULTS) {
    * Set `properties` on `mark` on text at `offset` and `length` in node.
    *
    * @param {List|String} path
-   * @param {Number} offset
-   * @param {Number} length
    * @param {Mark} mark
    * @param {Object} properties
    * @return {Value}
    */
 
-  setMark(path, offset, length, mark, properties) {
+  setMark(path, mark, properties) {
     let value = this
     let { document } = value
-    document = document.setMark(path, offset, length, mark, properties)
+    document = document.setMark(path, mark, properties)
     value = value.set('document', document)
     return value
   }
@@ -791,6 +787,10 @@ class Value extends Record(DEFAULTS) {
     decs = decs.filter(decoration => !!decoration)
     value = value.set('decorations', decs)
     return value
+  }
+
+  mapPoints(iterator) {
+    return this.mapRanges(range => range.updatePoints(iterator))
   }
 
   /**

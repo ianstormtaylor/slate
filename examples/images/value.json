@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos."
-              }
-            ]
+            "text":
+              "In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos."
           }
         ]
       },
@@ -30,12 +28,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!"
-              }
-            ]
+            "text":
+              "This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!"
           }
         ]
       }
