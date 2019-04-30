@@ -116,6 +116,8 @@ function AfterPlugin(options = {}) {
       }
 
       case 'insertFromYank':
+      case 'insertFromComposition':
+      case 'insertCompositionText':
       case 'insertReplacementText':
       case 'insertText': {
         // COMPAT: `data` should have the text for the `insertText` input type
@@ -135,6 +137,10 @@ function AfterPlugin(options = {}) {
         // on it, unset the selection's marks.
         if (selection.marks && value.document !== editor.value.document) {
           editor.select({ marks: null })
+        }
+
+        if (event.inputType === 'insertFromComposition') {
+          editor.deleteBackward(1)
         }
 
         break
