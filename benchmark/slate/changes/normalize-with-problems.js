@@ -15,13 +15,18 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
+              <text />
               <link>link text</link>
+              <text />
             </paragraph>
             <paragraph />
             <paragraph>
               <paragraph>
+                <text />
                 <link>link text</link>
+                <text />
                 <text> more text after</text>
+                <text />
               </paragraph>
             </paragraph>
           </paragraph>
