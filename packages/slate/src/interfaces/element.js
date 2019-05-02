@@ -51,22 +51,22 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator for all of the ancestors of the node.
+   * Create an iteratable for all of the ancestors of the node.
    *
    * @return {Iterable}
    */
 
   ancestors(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward'],
       includeUpward: true,
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for all of the blocks of a node with `options`.
+   * Create an iteratable for all of the blocks of a node with `options`.
    *
    * @param {Options}
    * @return {Iterable}
@@ -74,7 +74,7 @@ class ElementInterface {
 
   blocks(options = {}) {
     const { leaf = false, type = null } = options
-    const iterator = this.createIterator([], {
+    const iterable = this.createIterable([], {
       directions: n => {
         if (n.object === 'block' && n.isLeafBlock()) {
           return ['upward', 'forward']
@@ -95,7 +95,7 @@ class ElementInterface {
       },
     })
 
-    return iterator
+    return iterable
   }
 
   /**
@@ -112,14 +112,14 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator function starting at `target` path with `options`.
+   * Create an iteratable function starting at `target` path with `options`.
    *
    * @param {List|Array|String} target
    * @param {Object} options (optional)
    * @return {Function}
    */
 
-  createIterator(target, options = {}) {
+  createIterable(target, options = {}) {
     const root = this
     const startPath = root.resolvePath(target)
     const {
@@ -273,14 +273,14 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator for all of the descendants of the node.
+   * Create an iteratable for all of the descendants of the node.
    *
    * @return {Iterable}
    */
 
   descendants() {
-    const iterator = this.createIterator([])
-    return iterator
+    const iterable = this.createIterable([])
+    return iterable
   }
 
   /**
@@ -968,9 +968,8 @@ class ElementInterface {
 
   getMarksAsArray() {
     const result = []
-    const iterator = this.createIterator([], { objects: ['text'] })
 
-    for (const [node] of iterator) {
+    for (const [node] of this.texts()) {
       result.push(node.marks.toArray())
     }
 
@@ -1698,7 +1697,7 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator for all of the inlines of a node with `options`.
+   * Create an iteratable for all of the inlines of a node with `options`.
    *
    * @param {Options}
    * @return {Iterable}
@@ -1706,7 +1705,7 @@ class ElementInterface {
 
   inlines(options = {}) {
     const { leaf = false, type = null } = options
-    const iterator = this.createIterator([], {
+    const iterable = this.createIterable([], {
       directions: n => {
         if (n.object === 'inline' && n.isLeafInline()) {
           return ['upward', 'forward']
@@ -1727,7 +1726,7 @@ class ElementInterface {
       },
     })
 
-    return iterator
+    return iterable
   }
 
   /**
@@ -1819,15 +1818,15 @@ class ElementInterface {
    * Map all child nodes, updating them in their parents. This method is
    * optimized to not return a new node if no changes are made.
    *
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node}
    */
 
-  mapChildren(iterator) {
+  mapChildren(predicate) {
     let { nodes } = this
 
     nodes.forEach((node, i) => {
-      const ret = iterator(node, i, this.nodes)
+      const ret = predicate(node, i, this.nodes)
       if (ret !== node) nodes = nodes.set(ret.key, ret)
     })
 
@@ -1839,17 +1838,17 @@ class ElementInterface {
    * Map all descendant nodes, updating them in their parents. This method is
    * optimized to not return a new node if no changes are made.
    *
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node}
    */
 
-  mapDescendants(iterator) {
+  mapDescendants(predicate) {
     let { nodes } = this
 
     nodes.forEach((node, index) => {
       let ret = node
-      if (ret.object !== 'text') ret = ret.mapDescendants(iterator)
-      ret = iterator(ret, index, this.nodes)
+      if (ret.object !== 'text') ret = ret.mapDescendants(predicate)
+      ret = predicate(ret, index, this.nodes)
       if (ret === node) return
 
       nodes = nodes.set(index, ret)
@@ -1934,23 +1933,23 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator for the next leaf blocks in the tree at `path`.
+   * Create an iteratable for the next leaf blocks in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   nextLeafBlocks(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'downward', 'forward'],
       objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for the next nodes in the tree at `path`, either finding
+   * Create an iteratable for the next nodes in the tree at `path`, either finding
    * siblings or ancestors's siblings.
    *
    * @param {List|Array} path
@@ -1958,59 +1957,59 @@ class ElementInterface {
    */
 
   nextNodes(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'forward'],
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for the next siblings in the tree at `path`.
+   * Create an iteratable for the next siblings in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   nextSiblings(path) {
-    const iterator = this.createIterator(path, { directions: ['forward'] })
-    return iterator
+    const iterable = this.createIterable(path, { directions: ['forward'] })
+    return iterable
   }
 
   /**
-   * Create an iterator for the next texts in the tree at `path`.
+   * Create an iteratable for the next texts in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   nextTexts(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'downward', 'forward'],
       objects: ['text'],
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for the previous leaf blocks in the tree at `path`.
+   * Create an iteratable for the previous leaf blocks in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   previousLeafBlocks(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'downward', 'backward'],
       objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for the previous nodes in the tree at `path`, either finding
+   * Create an iteratable for the previous nodes in the tree at `path`, either finding
    * siblings or ancestors's siblings.
    *
    * @param {List|Array} path
@@ -2018,39 +2017,39 @@ class ElementInterface {
    */
 
   previousNodes(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'backward'],
     })
 
-    return iterator
+    return iterable
   }
 
   /**
-   * Create an iterator for the previous siblings in the tree at `path`.
+   * Create an iteratable for the previous siblings in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   previousSiblings(path) {
-    const iterator = this.createIterator(path, { directions: ['backward'] })
-    return iterator
+    const iterable = this.createIterable(path, { directions: ['backward'] })
+    return iterable
   }
 
   /**
-   * Create an iterator for the previous texts in the tree at `path`.
+   * Create an iteratable for the previous texts in the tree at `path`.
    *
    * @param {List|Array} path
    * @return {Iterable}
    */
 
   previousTexts(path) {
-    const iterator = this.createIterator(path, {
+    const iterable = this.createIterable(path, {
       directions: ['upward', 'downward', 'backward'],
       objects: ['text'],
     })
 
-    return iterator
+    return iterable
   }
 
   /**
@@ -2251,7 +2250,7 @@ class ElementInterface {
   }
 
   /**
-   * Create an iterator for all the text node descendants.
+   * Create an iteratable for all the text node descendants.
    *
    * @param {List|Array} path
    * @return {Iterable}
@@ -2259,12 +2258,12 @@ class ElementInterface {
 
   texts(options = {}) {
     const { reverse = false } = options
-    const iterator = this.createIterator([], {
+    const iterable = this.createIterable([], {
       directions: ['upward', 'downward', reverse ? 'backward' : 'forward'],
       objects: ['text'],
     })
 
-    return iterator
+    return iterable
   }
 
   /**
