@@ -57,9 +57,12 @@ class ElementInterface {
    */
 
   ancestors(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward'],
-      includeUpward: true,
+    const iterable = this.createIterable({
+      path,
+      direction: null,
+      downward: false,
+      includeAncestors: true,
+      includeRoot: true,
     })
 
     return iterable
@@ -74,25 +77,11 @@ class ElementInterface {
 
   blocks(options = {}) {
     const { leaf = false, type = null } = options
-    const iterable = this.createIterable([], {
-      directions: n => {
-        if (n.object === 'block' && n.isLeafBlock()) {
-          return ['upward', 'forward']
-        } else {
-          return ['upward', 'downward', 'forward']
-        }
-      },
-      objects: n => {
-        if (
-          n.object === 'block' &&
-          (!type || n.type === type) &&
-          (!leaf || n.isLeafBlock())
-        ) {
-          return ['block']
-        } else {
-          return []
-        }
-      },
+    const iterable = this.createIterable({
+      path: [],
+      objects: ['block'],
+      types: type ? [type] : null,
+      match: leaf ? node => node.isLeafBlock() : null,
     })
 
     return iterable
@@ -114,112 +103,155 @@ class ElementInterface {
   /**
    * Create an iteratable function starting at `target` path with `options`.
    *
-   * @param {List|Array|String} target
    * @param {Object} options (optional)
    * @return {Function}
    */
 
-  createIterable(target, options = {}) {
-    const root = this
-    const startPath = root.resolvePath(target)
+  createIterable(options = {}) {
     const {
       includeTarget = false,
-      includeUpward = false,
-      directions = ['downward', 'upward', 'forward', 'backward'],
-      objects = ['text', 'block', 'inline', 'document'],
+      includeAncestors = false,
+      includeRoot = false,
+      direction = 'forward',
+      upward = true,
+      downward = true,
+      objects = null,
+      types = null,
+      match = null,
     } = options
 
-    const startNode = startPath && root.assertNode(startPath)
+    const root = this
+    let targetPath = null
+    let targetRange = null
+
+    if (options.range) {
+      targetRange = root.resolveRange(options.range)
+    }
+
+    if (options.path) {
+      targetPath = root.resolvePath(options.path)
+    } else if (targetRange) {
+      targetPath = root.resolvePath(targetRange.start.path)
+    }
+
+    const targetNode = targetPath && root.assertNode(targetPath)
     const NativeSet = typeof window === 'undefined' ? global.Set : window.Set
 
     const generate = () => {
       const visited = new NativeSet()
-      let path = startPath
-      let node = startNode
+      const startPath = targetRange && targetRange.start.path
+      const endPath = targetRange && targetRange.end.path
+      let path = targetPath
+      let node = targetNode
       let includedTarget = false
-      let going = 'forward'
+      let includedStart = false
+      let includingStart = false
 
-      const match = () => {
-        const o = typeof objects === 'function' ? objects(node, path) : objects
-
-        if (o.includes(node.object)) {
-          return { value: [node, path], done: false }
-        }
-
-        return next()
-      }
-
-      const next = () => {
+      const result = () => {
         if (!path || !node) {
           return { done: true }
         }
 
+        if (!includeRoot && node === root) {
+          return next()
+        }
+
+        if (objects && !objects.includes(node.object)) {
+          return next()
+        }
+
+        if (types && !types.includes(node.type)) {
+          return next()
+        }
+
+        if (match && !match(node, path)) {
+          return next()
+        }
+
+        return { value: [node, path], done: false }
+      }
+
+      const next = () => {
+        if (!path || !node) {
+          return result()
+        }
+
+        if (startPath && !includedStart) {
+          if (!includingStart) {
+            includingStart = true
+            path = PathUtils.create([])
+            node = root
+            return result()
+          }
+
+          if (path.size === startPath.size - 1) {
+            includedStart = true
+            path = targetPath
+            node = targetNode
+            return next()
+          }
+
+          path = startPath.slice(0, path.size + 1)
+          node = root.assertNode(path)
+          return result()
+        }
+
         if (includeTarget && !includedTarget) {
           includedTarget = true
-          return match()
+          return result()
         }
 
-        const d =
-          typeof directions === 'function' ? directions(node, path) : directions
+        if (endPath && path.equals(endPath)) {
+          node = null
+          path = null
+          return next()
+        }
 
-        if (
-          node.nodes &&
-          node.nodes.size &&
-          d.includes('downward') &&
-          !visited.has(node)
-        ) {
+        if (downward && node.nodes && node.nodes.size && !visited.has(node)) {
           visited.add(node)
-          const nextIndex = going === 'forward' ? 0 : node.nodes.size - 1
+          const nextIndex = direction === 'forward' ? 0 : node.nodes.size - 1
           path = path.push(nextIndex)
           node = root.assertNode(path)
-          return match()
+          return result()
         }
 
-        if (going === 'forward' && d.includes('forward')) {
+        if (direction === 'forward') {
           const newPath = PathUtils.increment(path)
           const newNode = root.getNode(newPath)
 
           if (newNode) {
             path = newPath
             node = newNode
-            return match()
+            return result()
           }
         }
 
-        if (
-          going === 'backward' &&
-          d.includes('backward') &&
-          path.last() !== 0
-        ) {
+        if (direction === 'backward' && path.last() !== 0) {
           const newPath = PathUtils.decrement(path)
           const newNode = root.getNode(newPath)
 
           if (newNode) {
             path = newPath
             node = newNode
-            return match()
+            return result()
           }
         }
 
-        if (path.size && d.includes('upward')) {
+        if (upward && path.size) {
           path = PathUtils.lift(path)
           node = root.assertNode(path)
 
           if (visited.has(node)) {
             return next()
-          } else if (!includeUpward) {
-            visited.add(node)
+          }
+
+          visited.add(node)
+
+          if (!includeAncestors) {
             return next()
           } else {
-            return match()
+            return result()
           }
-        }
-
-        if (going === 'forward' && d.includes('backward')) {
-          going = 'backward'
-          path = startPath
-          node = startNode
-          return next()
         }
 
         path = null
@@ -279,7 +311,7 @@ class ElementInterface {
    */
 
   descendants() {
-    const iterable = this.createIterable([])
+    const iterable = this.createIterable({ path: [] })
     return iterable
   }
 
@@ -1120,6 +1152,15 @@ class ElementInterface {
    */
 
   getNodesAtRange(range) {
+    const iterable = this.createIterable({
+      range,
+      includeTarget: true,
+    })
+
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
+
     range = this.resolveRange(range)
     if (range.isUnset) return List()
     const { start, end } = range
@@ -1652,25 +1693,11 @@ class ElementInterface {
 
   inlines(options = {}) {
     const { leaf = false, type = null } = options
-    const iterable = this.createIterable([], {
-      directions: n => {
-        if (n.object === 'inline' && n.isLeafInline()) {
-          return ['upward', 'forward']
-        } else {
-          return ['upward', 'downward', 'forward']
-        }
-      },
-      objects: n => {
-        if (
-          n.object === 'inline' &&
-          (!type || n.type === type) &&
-          (!leaf || n.isLeafInline())
-        ) {
-          return ['inline']
-        } else {
-          return []
-        }
-      },
+    const iterable = this.createIterable({
+      path: [],
+      objects: ['inline'],
+      types: type ? [type] : null,
+      match: leaf ? node => node.isLeafInline() : null,
     })
 
     return iterable
@@ -1887,9 +1914,10 @@ class ElementInterface {
    */
 
   nextLeafBlocks(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'downward', 'forward'],
-      objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
+    const iterable = this.createIterable({
+      path,
+      objects: ['block'],
+      match: node => node.isLeafBlock(),
     })
 
     return iterable
@@ -1904,10 +1932,7 @@ class ElementInterface {
    */
 
   nextNodes(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'forward'],
-    })
-
+    const iterable = this.createIterable({ path, downward: false })
     return iterable
   }
 
@@ -1919,7 +1944,12 @@ class ElementInterface {
    */
 
   nextSiblings(path) {
-    const iterable = this.createIterable(path, { directions: ['forward'] })
+    const iterable = this.createIterable({
+      path,
+      upward: false,
+      downward: false,
+    })
+
     return iterable
   }
 
@@ -1931,8 +1961,8 @@ class ElementInterface {
    */
 
   nextTexts(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'downward', 'forward'],
+    const iterable = this.createIterable({
+      path,
       objects: ['text'],
     })
 
@@ -1947,9 +1977,11 @@ class ElementInterface {
    */
 
   previousLeafBlocks(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'downward', 'backward'],
-      objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
+    const iterable = this.createIterable({
+      path,
+      direction: 'backward',
+      objects: ['block'],
+      match: node => node.isLeafBlock(),
     })
 
     return iterable
@@ -1964,8 +1996,10 @@ class ElementInterface {
    */
 
   previousNodes(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'backward'],
+    const iterable = this.createIterable({
+      path,
+      downward: false,
+      direction: 'backward',
     })
 
     return iterable
@@ -1979,7 +2013,13 @@ class ElementInterface {
    */
 
   previousSiblings(path) {
-    const iterable = this.createIterable(path, { directions: ['backward'] })
+    const iterable = this.createIterable({
+      path,
+      upward: false,
+      downward: false,
+      direction: 'backward',
+    })
+
     return iterable
   }
 
@@ -1991,8 +2031,9 @@ class ElementInterface {
    */
 
   previousTexts(path) {
-    const iterable = this.createIterable(path, {
-      directions: ['upward', 'downward', 'backward'],
+    const iterable = this.createIterable({
+      path,
+      direction: 'backward',
       objects: ['text'],
     })
 
@@ -2205,8 +2246,9 @@ class ElementInterface {
 
   texts(options = {}) {
     const { reverse = false } = options
-    const iterable = this.createIterable([], {
-      directions: ['upward', 'downward', reverse ? 'backward' : 'forward'],
+    const iterable = this.createIterable({
+      path: [],
+      direction: reverse ? 'backward' : 'forward',
       objects: ['text'],
     })
 
