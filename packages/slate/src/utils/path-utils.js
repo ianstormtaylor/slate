@@ -209,26 +209,27 @@ function isYounger(path, target) {
 }
 
 /**
- * Lift a `path` to refer to its parent.
+ * Lift a `path` to refer to its `n`th ancestor.
  *
  * @param {List} path
  * @return {List}
  */
 
-function lift(path) {
-  const parent = path.slice(0, -1)
-  return parent
+function lift(path, n = 1) {
+  const ancestor = path.slice(0, -1 * n)
+  return ancestor
 }
 
 /**
- * Drop a `path`, returning the path from the first child.
+ * Drop a `path`, returning a relative path from a depth of `n`.
  *
  * @param {List} path
+ * @param {Number} n
  * @return {List}
  */
 
-function drop(path) {
-  const relative = path.slice(1)
+function drop(path, n = 1) {
+  const relative = path.slice(n)
   return relative
 }
 

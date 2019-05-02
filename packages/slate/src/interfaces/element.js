@@ -1431,59 +1431,6 @@ class ElementInterface {
   }
 
   /**
-   * Get the indexes of the selection for a `range`, given an extra flag for
-   * whether the node `isSelected`, to determine whether not finding matches
-   * means everything is selected or nothing is.
-   *
-   * @param {Range} range
-   * @param {Boolean} isSelected
-   * @return {Object|Null}
-   */
-
-  getSelectionIndexes(range, isSelected = true) {
-    const { start, end } = range
-
-    // PERF: if we're not selected, we can exit early.
-    if (!isSelected) {
-      return null
-    }
-
-    // if we've been given an invalid selection we can exit early.
-    if (range.isUnset) {
-      return null
-    }
-
-    // PERF: if the start and end keys are the same, just check for the child
-    // that contains that single key.
-    if (start.key === end.key) {
-      const child = this.getFurthestAncestor(start.key)
-      const index = child ? this.nodes.indexOf(child) : null
-      return { start: index, end: index + 1 }
-    }
-
-    // Otherwise, check all of the children...
-    let startIndex = null
-    let endIndex = null
-
-    this.nodes.forEach((child, i) => {
-      if (child.object === 'text') {
-        if (startIndex == null && child.key === start.key) startIndex = i
-        if (endIndex == null && child.key === end.key) endIndex = i + 1
-      } else {
-        if (startIndex == null && child.hasDescendant(start.key)) startIndex = i
-        if (endIndex == null && child.hasDescendant(end.key)) endIndex = i + 1
-      }
-
-      // PERF: exit early if both start and end have been found.
-      return startIndex == null || endIndex == null
-    })
-
-    if (isSelected && startIndex == null) startIndex = 0
-    if (isSelected && endIndex == null) endIndex = this.nodes.size
-    return startIndex == null ? null : { start: startIndex, end: endIndex }
-  }
-
-  /**
    * Get the descendent text node at an `offset`.
    *
    * @param {String} offset
@@ -2511,6 +2458,64 @@ class ElementInterface {
     }
 
     return null
+  }
+
+  getSelectionIndexes(range, isSelected = true) {
+    warning(
+      false,
+      'As of slate@0.47, the `getSelectionIndexes` method is deprecated.'
+    )
+
+    const { start, end } = range
+
+    // PERF: if we're not selected, we can exit early.
+    if (!isSelected) {
+      return null
+    }
+
+    // PERF: if we've been given an invalid selection we can exit early.
+    if (range.isUnset) {
+      return null
+    }
+
+    // PERF: if the start and end keys are the same, just check for the child
+    // that contains that single key.
+    if (start.path.equals(end.path)) {
+      const child = this.getFurthestAncestor(start.path)
+      const index = child ? this.nodes.indexOf(child) : null
+      return { start: index, end: index + 1 }
+    }
+
+    // Otherwise, check all of the children...
+    let startIndex = null
+    let endIndex = null
+
+    this.nodes.forEach((child, i) => {
+      if (child.object === 'text') {
+        if (startIndex == null && child.key === start.key) startIndex = i
+        if (endIndex == null && child.key === end.key) endIndex = i + 1
+      } else {
+        if (startIndex == null && child.hasDescendant(start.key)) startIndex = i
+        if (endIndex == null && child.hasDescendant(end.key)) endIndex = i + 1
+      }
+
+      // PERF: exit early if both start and end have been found.
+      return startIndex == null || endIndex == null
+    })
+
+    if (isSelected && startIndex == null) {
+      startIndex = 0
+    }
+
+    if (isSelected && endIndex == null) {
+      endIndex = this.nodes.size
+    }
+
+    if (startIndex == null) {
+      return null
+    }
+
+    return { start: startIndex, end: endIndex }
   }
 }
 
