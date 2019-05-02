@@ -14,7 +14,9 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ```jsx
 <paragraph>
-  <b>a few <i>italic</i> and bold words.</b>
+  <b>
+    a few <i>italic</i> and bold words.
+  </b>
 </paragraph>
 ```
 
@@ -23,13 +25,14 @@ Must now be written as:
 ```jsx
 <paragraph>
   <b>a few </b>
-  <b><i>italic</i></b>
+  <b>
+    <i>italic</i>
+  </b>
   <b> and bold words.</b>
 </paragraph>
 ```
 
 Slightly more verbose, but with the benefit of being easy to tell exactly how many text nodes you will receive in your resulting document. And it allows setting `key=` values on the mark tags directly, since they map `1:1` to text nodes.
-
 
 ---
 
