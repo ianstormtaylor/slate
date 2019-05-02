@@ -7,7 +7,7 @@ import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import cloneFragment from '../utils/clone-fragment'
 import findDOMNode from '../utils/find-dom-node'
-import findNode from '../utils/find-node'
+import findPath from '../utils/find-path'
 import findRange from '../utils/find-range'
 import getEventRange from '../utils/get-event-range'
 import getEventTransfer from '../utils/get-event-transfer'
@@ -171,12 +171,13 @@ function AfterPlugin(options = {}) {
 
     const { value } = editor
     const { document } = value
-    const node = findNode(event.target, editor)
-    if (!node) return next()
+    const path = findPath(event.target, editor)
+    if (!path) return next()
 
     debug('onClick', { event })
 
-    const ancestors = document.getAncestors(node.key)
+    const node = document.getNode(path)
+    const ancestors = document.getAncestors(path)
     const isVoid =
       node && (editor.isVoid(node) || ancestors.some(a => editor.isVoid(a)))
 
@@ -222,15 +223,21 @@ function AfterPlugin(options = {}) {
       // If user cuts a void block node or a void inline node,
       // manually removes it since selection is collapsed in this case.
       const { value } = editor
-      const { endBlock, endInline, selection } = value
-      const { isCollapsed } = selection
-      const isVoidBlock = endBlock && editor.isVoid(endBlock) && isCollapsed
-      const isVoidInline = endInline && editor.isVoid(endInline) && isCollapsed
+      const { document, selection } = value
+      const { end, isCollapsed } = selection
+      let voidPath
 
-      if (isVoidBlock) {
-        editor.removeNodeByKey(endBlock.key)
-      } else if (isVoidInline) {
-        editor.removeNodeByKey(endInline.key)
+      if (isCollapsed) {
+        for (const [node, path] of document.ancestors(end.path)) {
+          if (editor.isVoid(node)) {
+            voidPath = path
+            break
+          }
+        }
+      }
+
+      if (voidPath) {
+        editor.removeNodeByKey(voidPath)
       } else {
         editor.delete()
       }
@@ -268,13 +275,12 @@ function AfterPlugin(options = {}) {
 
     const { value } = editor
     const { document } = value
-    const node = findNode(event.target, editor)
-    const ancestors = document.getAncestors(node.key)
+    const path = findPath(event.target, editor)
+    const node = document.getNode(path)
+    const ancestors = document.getAncestors(path)
     const isVoid =
       node && (editor.isVoid(node) || ancestors.some(a => editor.isVoid(a)))
-    const selectionIncludesNode = value.blocks.some(
-      block => block.key === node.key
-    )
+    const selectionIncludesNode = value.blocks.some(block => block === node)
 
     // If a void block is dragged and is not selected, select it (necessary for local drags).
     if (isVoid && !selectionIncludesNode) {
@@ -313,11 +319,11 @@ function AfterPlugin(options = {}) {
     // needs to account for the selection's content being deleted.
     if (
       isDraggingInternally &&
-      selection.end.key === target.end.key &&
-      selection.end.offset < target.end.offset
+      selection.end.offset < target.end.offset &&
+      selection.end.path.equals(target.end.path)
     ) {
       target = target.moveForward(
-        selection.start.key === selection.end.key
+        selection.start.path.equals(selection.end.path)
           ? 0 - selection.end.offset + selection.start.offset
           : 0 - selection.end.offset
       )
@@ -331,15 +337,21 @@ function AfterPlugin(options = {}) {
 
     if (type === 'text' || type === 'html') {
       const { anchor } = target
-      let hasVoidParent = document.hasVoidParent(anchor.key, editor)
+      let hasVoidParent = document.hasVoidParent(anchor.path, editor)
 
       if (hasVoidParent) {
-        let n = document.getNode(anchor.key)
+        let p = anchor.path
+        let n = document.getNode(anchor.path)
 
         while (hasVoidParent) {
-          n = document.getNextText(n.key)
-          if (!n) break
-          hasVoidParent = document.hasVoidParent(n.key, editor)
+          const [nxt] = document.nextTexts(p)
+
+          if (!nxt) {
+            break
+          }
+
+          ;[n, p] = nxt
+          hasVoidParent = document.hasVoidParent(p, editor)
         }
 
         if (n) editor.moveToStartOfNode(n)
@@ -361,8 +373,7 @@ function AfterPlugin(options = {}) {
     // has fired in a node: https://github.com/facebook/react/issues/11379.
     // Until this is fixed in React, we dispatch a mouseup event on that
     // DOM node, since that will make it go back to normal.
-    const focusNode = document.getNode(target.focus.key)
-    const el = findDOMNode(focusNode, window)
+    const el = findDOMNode(target.focus.path)
 
     if (el) {
       el.dispatchEvent(
@@ -435,7 +446,8 @@ function AfterPlugin(options = {}) {
 
     const { value } = editor
     const { document, selection } = value
-    const hasVoidParent = document.hasVoidParent(selection.start.path, editor)
+    const { start } = selection
+    const hasVoidParent = document.hasVoidParent(start.path, editor)
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
@@ -535,20 +547,30 @@ function AfterPlugin(options = {}) {
     }
 
     if (Hotkeys.isExtendBackward(event)) {
-      const { previousText, startText } = value
-      const isPreviousInVoid =
-        previousText && document.hasVoidParent(previousText.key, editor)
+      const startText = document.getNode(start.path)
+      const prevEntry = document.previousTexts(start.path)
+      let isPrevInVoid = false
 
-      if (hasVoidParent || isPreviousInVoid || startText.text === '') {
+      if (prevEntry) {
+        const [, prevPath] = prevEntry
+        isPrevInVoid = document.hasVoidParent(prevPath, editor)
+      }
+
+      if (hasVoidParent || isPrevInVoid || startText.text === '') {
         event.preventDefault()
         return editor.moveFocusBackward()
       }
     }
 
     if (Hotkeys.isExtendForward(event)) {
-      const { nextText, startText } = value
-      const isNextInVoid =
-        nextText && document.hasVoidParent(nextText.key, editor)
+      const startText = document.getNode(start.path)
+      const [nextEntry] = document.nextTexts(start.path)
+      let isNextInVoid = false
+
+      if (nextEntry) {
+        const [, nextPath] = nextEntry
+        isNextInVoid = document.hasVoidParent(nextPath, editor)
+      }
 
       if (hasVoidParent || isNextInVoid || startText.text === '') {
         event.preventDefault()

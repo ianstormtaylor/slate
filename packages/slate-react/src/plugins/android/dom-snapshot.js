@@ -1,4 +1,4 @@
-import getSelectionFromDom from './get-selection-from-dom'
+import getSelectionFromDom from '../../utils/get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
 
 /**
@@ -62,6 +62,6 @@ export default class DomSnapshot {
   apply(editor) {
     const { snapshot, selection } = this
     snapshot.apply()
-    editor.moveTo(selection.anchor.key, selection.anchor.offset)
+    editor.moveTo(selection.anchor.path, selection.anchor.offset)
   }
 }

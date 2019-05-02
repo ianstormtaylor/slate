@@ -3,14 +3,14 @@ import getWindow from 'get-window'
 import pick from 'lodash/pick'
 
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
-import fixSelectionInZeroWidthBlock from '../utils/fix-selection-in-zero-width-block'
-import getSelectionFromDom from '../utils/get-selection-from-dom'
-import setSelectionFromDom from '../utils/set-selection-from-dom'
-import setTextFromDomNode from '../utils/set-text-from-dom-node'
-import isInputDataEnter from '../utils/is-input-data-enter'
-import isInputDataLastChar from '../utils/is-input-data-last-char'
-import DomSnapshot from '../utils/dom-snapshot'
-import Executor from '../utils/executor'
+import fixSelectionInZeroWidthBlock from './fix-selection-in-zero-width-block'
+import getSelectionFromDom from '../../utils/get-selection-from-dom'
+import setSelectionFromDom from '../../utils/set-selection-from-dom'
+import setTextFromDomNode from '../../utils/set-text-from-dom-node'
+import isInputDataEnter from './is-input-data-enter'
+import isInputDataLastChar from './is-input-data-last-char'
+import DomSnapshot from './dom-snapshot'
+import Executor from './executor'
 
 const debug = Debug('slate:android')
 debug.reconcile = Debug('slate:reconcile')
@@ -50,7 +50,7 @@ function AndroidPlugin() {
    * certain scenarios like hitting 'enter' at the end of a word.
    *
    * @type {DomSnapshot} [compositionEndSnapshot]
-   
+
    */
 
   let compositionEndSnapshot = null
@@ -200,7 +200,7 @@ function AndroidPlugin() {
             const selection = getSelectionFromDom(window, editor, domSelection)
             preventNextBeforeInput = true
             event.preventDefault()
-            editor.moveTo(selection.anchor.key, selection.anchor.offset)
+            editor.moveTo(selection.anchor.path, selection.anchor.offset)
             editor.splitBlock()
           }
         } else {
@@ -516,7 +516,7 @@ function AndroidPlugin() {
             // have to grab the selection from the DOM.
             const domSelection = window.getSelection()
             const selection = getSelectionFromDom(window, editor, domSelection)
-            editor.moveTo(selection.anchor.key, selection.anchor.offset)
+            editor.moveTo(selection.anchor.path, selection.anchor.offset)
             editor.splitBlock()
           }
           return

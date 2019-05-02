@@ -18,12 +18,12 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   }
 
   const { anchor, focus } = range
-  const anchorText = document.getNode(anchor.key)
-  const focusText = document.getNode(focus.key)
-  const anchorInline = document.getClosestInline(anchor.key)
-  const focusInline = document.getClosestInline(focus.key)
-  const focusBlock = document.getClosestBlock(focus.key)
-  const anchorBlock = document.getClosestBlock(anchor.key)
+  const anchorText = document.getNode(anchor.path)
+  const focusText = document.getNode(focus.path)
+  const anchorInline = document.getClosestInline(anchor.path)
+  const focusInline = document.getClosestInline(focus.path)
+  const focusBlock = document.getClosestBlock(focus.path)
+  const anchorBlock = document.getClosestBlock(anchor.path)
 
   // COMPAT: If the anchor point is at the start of a non-void, and the
   // focus point is inside a void node with an offset that isn't `0`, set
@@ -51,9 +51,13 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
     !editor.isVoid(anchorInline) &&
     anchor.offset === anchorText.text.length
   ) {
-    const block = document.getClosestBlock(anchor.key)
-    const nextText = block.getNextText(anchor.key)
-    if (nextText) range = range.moveAnchorTo(nextText.key, 0)
+    const block = document.getClosestBlock(anchor.path)
+    const [next] = block.nextTexts(anchor.path)
+
+    if (next) {
+      const [, nextPath] = next
+      range = range.moveAnchorTo(nextPath, 0)
+    }
   }
 
   if (
@@ -61,9 +65,13 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
     !editor.isVoid(focusInline) &&
     focus.offset === focusText.text.length
   ) {
-    const block = document.getClosestBlock(focus.key)
-    const nextText = block.getNextText(focus.key)
-    if (nextText) range = range.moveFocusTo(nextText.key, 0)
+    const block = document.getClosestBlock(focus.path)
+    const [next] = block.nextTexts(focus.path)
+
+    if (next) {
+      const [, nextPath] = next
+      range = range.moveFocusTo(nextPath, 0)
+    }
   }
 
   let selection = document.createSelection(range)

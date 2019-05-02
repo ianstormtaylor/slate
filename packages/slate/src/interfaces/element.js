@@ -1,4 +1,4 @@
-import direction from 'direction'
+import getDirection from 'direction'
 import invariant from 'tiny-invariant'
 import warning from 'tiny-warning'
 import { List, OrderedSet, Set, Stack } from 'immutable'
@@ -51,6 +51,47 @@ class ElementInterface {
   }
 
   /**
+   * Create an iterator for all of the ancestors of the node.
+   *
+   * @return {Iterable}
+   */
+
+  ancestors(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward'],
+      includeUpward: true,
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for all of the blocks of a node with `options`.
+   *
+   * @param {Options}
+   * @return {Iterable}
+   */
+
+  blocks(options = {}) {
+    const { leaf = false, type = null } = options
+    const iterator = this.createIterator([], {
+      objects: n => {
+        if (
+          n.object === 'block' &&
+          (!type || n.type === type) &&
+          (!leaf || n.isLeafBlock())
+        ) {
+          return ['block']
+        } else {
+          return []
+        }
+      },
+    })
+
+    return iterator
+  }
+
+  /**
    * Create a decoration with `properties` relative to the node.
    *
    * @param {Object|Decoration} properties
@@ -61,6 +102,128 @@ class ElementInterface {
     properties = Decoration.createProperties(properties)
     const decoration = this.resolveDecoration(properties)
     return decoration
+  }
+
+  /**
+   * Create an iterator function starting at `target` path with `options`.
+   *
+   * @param {List|Array|String} target
+   * @param {Object} options (optional)
+   * @return {Function}
+   */
+
+  createIterator(target, options = {}) {
+    const root = this
+    const startPath = root.resolvePath(target)
+    const {
+      includeTarget = false,
+      includeUpward = false,
+      directions = ['downward', 'upward', 'forward', 'backward'],
+      objects = ['text', 'block', 'inline', 'document'],
+    } = options
+
+    const startNode = startPath && root.assertNode(startPath)
+    const NativeSet = typeof window === 'undefined' ? global.Set : window.Set
+
+    const generate = () => {
+      const visited = new NativeSet()
+      let path = startPath
+      let node = startNode
+      let includedTarget = false
+      let going = 'forward'
+
+      const match = () => {
+        const o = typeof objects === 'function' ? objects(node, path) : objects
+
+        if (o.includes(node.object)) {
+          return { value: [node, path], done: false }
+        }
+
+        return next()
+      }
+
+      const next = () => {
+        if (!path || !node) {
+          return { done: true }
+        }
+
+        if (includeTarget && !includedTarget) {
+          includedTarget = true
+          return match()
+        }
+
+        const d =
+          typeof directions === 'function' ? directions(node, path) : directions
+
+        if (
+          node.nodes &&
+          node.nodes.size &&
+          d.includes('downward') &&
+          !visited.has(node)
+        ) {
+          visited.add(node)
+          const nextIndex = going === 'forward' ? 0 : node.nodes.size - 1
+          path = path.push(nextIndex)
+          node = root.assertNode(path)
+          return match()
+        }
+
+        if (going === 'forward' && d.includes('forward')) {
+          const newPath = PathUtils.increment(path)
+          const newNode = root.getNode(newPath)
+
+          if (newNode) {
+            path = newPath
+            node = newNode
+            return match()
+          }
+        }
+
+        if (
+          going === 'backward' &&
+          d.includes('backward') &&
+          path.last() !== 0
+        ) {
+          const newPath = PathUtils.decrement(path)
+          const newNode = root.getNode(newPath)
+
+          if (newNode) {
+            path = newPath
+            node = newNode
+            return match()
+          }
+        }
+
+        if (path.size && d.includes('upward')) {
+          path = PathUtils.lift(path)
+          node = root.assertNode(path)
+
+          if (visited.has(node)) {
+            return next()
+          } else if (!includeUpward) {
+            visited.add(node)
+            return next()
+          } else {
+            return match()
+          }
+        }
+
+        if (going === 'forward' && d.includes('backward')) {
+          going = 'backward'
+          path = startPath
+          node = startNode
+          return next()
+        }
+
+        path = null
+        node = null
+        return next()
+      }
+
+      return { next }
+    }
+
+    return { [Symbol.iterator]: generate }
   }
 
   /**
@@ -103,137 +266,66 @@ class ElementInterface {
   }
 
   /**
-   * Recursively filter all descendant nodes with `iterator`.
+   * Create an iterator for all of the descendants of the node.
    *
-   * @param {Function} iterator
+   * @return {Iterable}
+   */
+
+  descendants() {
+    const iterator = this.createIterator([])
+    return iterator
+  }
+
+  /**
+   * Find all of the descendants that match a `predicate`.
+   *
+   * @param {Function} predicate
    * @return {List<Node>}
    */
 
-  filterDescendants(iterator) {
+  filterDescendants(predicate) {
     const matches = []
 
-    this.forEachDescendant((node, i, nodes) => {
-      if (iterator(node, i, nodes)) matches.push(node)
-    })
+    for (const [node, path] of this.descendants()) {
+      if (predicate(node, path)) {
+        matches.push(node)
+      }
+    }
 
     return List(matches)
   }
 
   /**
-   * Recursively find a descendant node by `iterator`.
+   * Find the first descendant that matches a `predicate`.
    *
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node|Null}
    */
 
-  findDescendant(iterator) {
-    let found = null
-
-    this.forEachDescendant((node, i, nodes) => {
-      if (iterator(node, i, nodes)) {
-        found = node
-        return false
+  findDescendant(predicate) {
+    for (const [node, path] of this.descendants()) {
+      if (predicate(node, path)) {
+        return node
       }
-    })
+    }
 
-    return found
+    return null
   }
 
   /**
-   * Recursively find a descendant node and its path by `iterator`.
+   * Iterate over all descendants, breaking if `predicate` returns false.
    *
-   * @param {Function} iterator
-   * @return {Null|[Node, List]}
+   * @param {Function} predicate
    */
 
-  findDescendantAndPath(
-    iterator,
-    pathToThisNode = PathUtils.create([]),
-    findLast = false
-  ) {
-    let found
-    let foundPath
+  forEachDescendant(predicate) {
+    for (const next of this.descendants()) {
+      const ret = predicate(...next)
 
-    this.forEachDescendantWithPath(
-      (node, path, nodes) => {
-        if (iterator(node, path, nodes)) {
-          found = node
-          foundPath = path
-          return false
-        }
-      },
-      pathToThisNode,
-      findLast
-    )
-
-    return found ? [found, foundPath] : null
-  }
-
-  // Easy helpers to avoid needing to pass findLast boolean
-  findFirstDescendantAndPath(iterator, pathToThisNode) {
-    return this.findDescendantAndPath(iterator, pathToThisNode, false)
-  }
-
-  findLastDescendantAndPath(iterator, pathToThisNode) {
-    return this.findDescendantAndPath(iterator, pathToThisNode, true)
-  }
-
-  /**
-   * Recursively iterate over all descendant nodes with `iterator`. If the
-   * iterator returns false it will break the loop.
-   *
-   * @param {Function} iterator
-   */
-
-  forEachDescendant(iterator) {
-    let ret
-
-    this.nodes.forEach((child, i, nodes) => {
-      if (iterator(child, i, nodes) === false) {
-        ret = false
-        return false
+      if (ret === false) {
+        return
       }
-
-      if (child.object !== 'text') {
-        ret = child.forEachDescendant(iterator)
-        return ret
-      }
-    })
-
-    return ret
-  }
-
-  /**
-   * Recursively iterate over all descendant nodes with `iterator`. If the
-   * iterator returns false it will break the loop.
-   * Calls iterator with node and path.
-   *
-   * @param {Function} iterator
-   * @param {List} path
-   * @param {Boolean} findLast - whether to iterate in reverse order
-   */
-
-  forEachDescendantWithPath(iterator, path = PathUtils.create([]), findLast) {
-    let nodes = this.nodes
-    let ret
-
-    if (findLast) nodes = nodes.reverse()
-
-    nodes.forEach((child, i) => {
-      const childPath = path.concat(i)
-
-      if (iterator(child, childPath, nodes) === false) {
-        ret = false
-        return false
-      }
-
-      if (child.object !== 'text') {
-        ret = child.forEachDescendantWithPath(iterator, childPath, findLast)
-        return ret
-      }
-    })
-
-    return ret
+    }
   }
 
   /**
@@ -262,7 +354,7 @@ class ElementInterface {
 
     if (!PathUtils.isEqual(startPath, endPath)) {
       while (!PathUtils.isEqual(startPath, endPath) && endOffset === 0) {
-        ;[endText, endPath] = this.getPreviousTextAndPath(endPath)
+        ;[[endText, endPath]] = this.previousTexts(endPath)
         endOffset = endText.text.length
       }
 
@@ -270,7 +362,7 @@ class ElementInterface {
         !PathUtils.isEqual(startPath, endPath) &&
         startOffset === startText.text.length
       ) {
-        ;[startText, startPath] = this.getNextTextAndPath(startPath)
+        ;[[startText, startPath]] = this.nextTexts(startPath)
         startOffset = 0
       }
     }
@@ -294,7 +386,7 @@ class ElementInterface {
       return marks
     }
 
-    ;[startText, startPath] = this.getNextTextAndPath(startPath)
+    ;[[startText, startPath]] = this.nextTexts(startPath)
 
     while (!PathUtils.isEqual(startPath, endPath)) {
       if (startText.text.length !== 0) {
@@ -305,7 +397,7 @@ class ElementInterface {
         }
       }
 
-      ;[startText, startPath] = this.getNextTextAndPath(startPath)
+      ;[[startText, startPath]] = this.nextTexts(startPath)
     }
 
     return marks
@@ -320,17 +412,13 @@ class ElementInterface {
 
   getAncestors(path) {
     path = this.resolvePath(path)
-    if (!path) return null
 
-    const ancestors = []
+    if (!path) {
+      return null
+    }
 
-    path.forEach((p, i) => {
-      const current = path.slice(0, i)
-      const parent = this.getNode(current)
-      ancestors.push(parent)
-    })
-
-    return List(ancestors)
+    const array = Array.from(this.ancestors(path), ([node]) => node).reverse()
+    return List(array)
   }
 
   /**
@@ -351,44 +439,8 @@ class ElementInterface {
    */
 
   getBlocksAsArray() {
-    return this.nodes.reduce((array, child) => {
-      if (child.object !== 'block') return array
-      if (!child.isLeafBlock()) return array.concat(child.getBlocksAsArray())
-      array.push(child)
-      return array
-    }, [])
-  }
-
-  /**
-   * Get the leaf block descendants in a `range`.
-   *
-   * @param {Range} range
-   * @return {List<Node>}
-   */
-
-  getBlocksAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getBlocksAtRange` method has been renamed to `getLeafBlocksAtRange`.'
-    )
-
-    return this.getLeafBlocksAtRange(range)
-  }
-
-  /**
-   * Get the bottom-most block descendants in a `range` as an array
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getBlocksAtRangeAsArray(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getBlocksAtRangeAsArray` method has been renamed to `getLeafBlocksAtRangeAsArray`.'
-    )
-
-    return this.getLeafBlocksAtRangeAsArray(range)
+    const array = Array.from(this.blocks({ leaf: true }), ([node]) => node)
+    return array
   }
 
   /**
@@ -411,16 +463,11 @@ class ElementInterface {
    */
 
   getBlocksByTypeAsArray(type) {
-    return this.nodes.reduce((array, node) => {
-      if (node.object !== 'block') {
-        return array
-      } else if (node.isLeafBlock() && node.type === type) {
-        array.push(node)
-        return array
-      } else {
-        return array.concat(node.getBlocksByTypeAsArray(type))
-      }
-    }, [])
+    const array = Array.from(
+      this.blocks({ leaf: true, type }),
+      ([node]) => node
+    )
+    return array
   }
 
   /**
@@ -438,24 +485,21 @@ class ElementInterface {
   }
 
   /**
-   * Get closest parent of node that matches an `iterator`.
+   * Get closest parent of node that matches a `predicate`.
    *
    * @param {List|String} path
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node|Null}
    */
 
-  getClosest(path, iterator) {
-    const ancestors = this.getAncestors(path)
-    if (!ancestors) return null
+  getClosest(path, predicate) {
+    for (const [n, p] of this.ancestors(path)) {
+      if (predicate(n, p)) {
+        return n
+      }
+    }
 
-    const closest = ancestors.findLast((node, ...args) => {
-      // We never want to include the top-level node.
-      if (node === this) return false
-      return iterator(node, ...args)
-    })
-
-    return closest || null
+    return null
   }
 
   /**
@@ -496,11 +540,8 @@ class ElementInterface {
       'As of Slate 0.42.0, the `node.getClosestVoid` method takes an `editor` instead of a `value`.'
     )
 
-    const ancestors = this.getAncestors(path)
-    if (!ancestors) return null
-
-    const ancestor = ancestors.findLast(a => editor.query('isVoid', a))
-    return ancestor
+    const closest = this.getClosest(path, n => editor.isVoid(n))
+    return closest
   }
 
   /**
@@ -618,24 +659,23 @@ class ElementInterface {
   }
 
   /**
-   * Get the furthest parent of a node that matches an `iterator`.
+   * Get the furthest ancestors of a node that matches a `predicate`.
    *
    * @param {Path} path
-   * @param {Function} iterator
+   * @param {Function} predicate
    * @return {Node|Null}
    */
 
-  getFurthest(path, iterator) {
-    const ancestors = this.getAncestors(path)
-    if (!ancestors) return null
+  getFurthest(path, predicate) {
+    const results = Array.from(this.ancestors(path)).reverse()
 
-    const furthest = ancestors.find((node, ...args) => {
-      // We never want to include the top-level node.
-      if (node === this) return false
-      return iterator(node, ...args)
-    })
+    for (const [n, p] of results) {
+      if (predicate(n, p)) {
+        return n
+      }
+    }
 
-    return furthest || null
+    return null
   }
 
   /**
@@ -715,51 +755,8 @@ class ElementInterface {
    */
 
   getInlinesAsArray() {
-    let array = []
-
-    this.nodes.forEach(child => {
-      if (child.object === 'text') return
-
-      if (child.isLeafInline()) {
-        array.push(child)
-      } else {
-        array = array.concat(child.getInlinesAsArray())
-      }
-    })
-
+    const array = Array.from(this.inlines({ leaf: true }), ([node]) => node)
     return array
-  }
-
-  /**
-   * Get the bottom-most inline nodes for each text node in a `range`.
-   *
-   * @param {Range} range
-   * @return {List<Node>}
-   */
-
-  getInlinesAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getInlinesAtRange` method has been renamed to `getLeafInlinesAtRange`.'
-    )
-
-    return this.getLeafInlinesAtRange(range)
-  }
-
-  /**
-   * Get the bottom-most inline nodes for each text node in a `range` as an array.
-   *
-   * @param {Range} range
-   * @return {Array}
-   */
-
-  getInlinesAtRangeAsArray(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getInlinesAtRangeAsArray` method has been renamed to `getLeafInlinesAtRangeAsArray`.'
-    )
-
-    return this.getLeafInlinesAtRangeAsArray(range)
   }
 
   /**
@@ -783,17 +780,10 @@ class ElementInterface {
    */
 
   getInlinesByTypeAsArray(type) {
-    const array = this.nodes.reduce((inlines, node) => {
-      if (node.object === 'text') {
-        return inlines
-      } else if (node.isLeafInline() && node.type === type) {
-        inlines.push(node)
-        return inlines
-      } else {
-        return inlines.concat(node.getInlinesByTypeAsArray(type))
-      }
-    }, [])
-
+    const array = Array.from(
+      this.inlines({ leaf: true, type }),
+      ([node]) => node
+    )
     return array
   }
 
@@ -933,6 +923,26 @@ class ElementInterface {
   }
 
   /**
+   * Get an object mapping all the keys in the node to their paths.
+   *
+   * @return {Map}
+   */
+
+  getNodesToPathsMap() {
+    const root = this
+    const map =
+      typeof window === 'undefined' ? new global.Map() : new window.Map()
+
+    map.set(root, PathUtils.create([]))
+
+    root.forEachDescendant((node, path) => {
+      map.set(node, path)
+    })
+
+    return map
+  }
+
+  /**
    * Get all of the marks for all of the characters of every text node.
    *
    * @return {Set<Mark>}
@@ -951,12 +961,11 @@ class ElementInterface {
 
   getMarksAsArray() {
     const result = []
+    const iterator = this.createIterator([], { objects: ['text'] })
 
-    this.nodes.forEach(node => {
-      result.push(
-        node.object === 'text' ? node.marks.toArray() : node.getMarksAsArray()
-      )
-    })
+    for (const [node] of iterator) {
+      result.push(node.marks.toArray())
+    }
 
     // PERF: use only one concat rather than multiple for speed.
     const array = [].concat(...result)
@@ -987,7 +996,7 @@ class ElementInterface {
       return currentMarks
     }
 
-    const previous = this.getPreviousTextAndPath(path)
+    const [previous] = this.previousTexts(path)
 
     if (!previous) {
       return Set()
@@ -1051,106 +1060,22 @@ class ElementInterface {
    */
 
   getNextBlock(path) {
-    path = this.resolvePath(path)
-    const match = this.getNextDeepMatchingNodeAndPath(
-      path,
-      n => n.object === 'block'
-    )
-
-    return match ? match[0] : null
+    const [entry] = this.nextLeafBlocks(path)
+    const block = entry ? entry[0] : null
+    return block
   }
 
   /**
-   * Get the next node in the tree from a node.
-   *
-   * This will not only check for siblings but instead move up the tree
-   * returning the next ancestor if no sibling is found.
+   * Get the next node in the tree, returning siblings or ancestor siblings.
    *
    * @param {List|String} path
    * @return {Node|Null}
    */
 
   getNextNode(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-
-    for (let i = path.size; i > 0; i--) {
-      const p = path.slice(0, i)
-      const target = PathUtils.increment(p)
-      const node = this.getNode(target)
-      if (node) return node
-    }
-
-    return null
-  }
-
-  /**
-   * Get the next node in the tree from a node that matches iterator
-   *
-   * This will not only check for siblings but instead move up the tree
-   * returning the next ancestor if no sibling is found.
-   *
-   * @param {List} path
-   * @return {Node|Null}
-   */
-
-  getNextMatchingNodeAndPath(path, iterator = () => true) {
-    if (!path) return null
-
-    for (let i = path.size; i > 0; i--) {
-      const p = path.slice(0, i)
-
-      let nextPath = PathUtils.increment(p)
-      let nextNode = this.getNode(nextPath)
-
-      while (nextNode && !iterator(nextNode)) {
-        nextPath = PathUtils.increment(nextPath)
-        nextNode = this.getNode(nextPath)
-      }
-
-      if (nextNode) return [nextNode, nextPath]
-    }
-
-    return null
-  }
-
-  /**
-   * Get the next, deepest node in the tree from a node that matches iterator
-   *
-   * This will not only check for siblings but instead move up the tree
-   * returning the next ancestor if no sibling is found.
-   *
-   * @param {List} path
-   * @param {Function} iterator
-   * @return {Node|Null}
-   */
-
-  getNextDeepMatchingNodeAndPath(path, iterator = () => true) {
-    const match = this.getNextMatchingNodeAndPath(path)
-
-    if (!match) return null
-
-    let [nextNode, nextPath] = match
-
-    let childMatch
-
-    const assign = () => {
-      childMatch =
-        nextNode.object !== 'text' &&
-        nextNode.findFirstDescendantAndPath(iterator, nextPath)
-      return childMatch
-    }
-
-    while (assign(childMatch)) {
-      ;[nextNode, nextPath] = childMatch
-    }
-
-    if (!nextNode) return null
-
-    return iterator(nextNode)
-      ? [nextNode, nextPath]
-      : this.getNextDeepMatchingNodeAndPath(match[1], iterator)
+    const [entry] = this.nextNodes(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1161,12 +1086,9 @@ class ElementInterface {
    */
 
   getNextSibling(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-    const p = PathUtils.increment(path)
-    const sibling = this.getNode(p)
-    return sibling
+    const [entry] = this.nextSiblings(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1177,23 +1099,9 @@ class ElementInterface {
    */
 
   getNextText(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-    const next = this.getNextNode(path)
-    if (!next) return null
-    const text = next.getFirstText()
-    return text
-  }
-
-  getNextTextAndPath(path) {
-    if (!path) return null
-    if (!path.size) return null
-    const match = this.getNextDeepMatchingNodeAndPath(
-      path,
-      n => n.object === 'text'
-    )
-    return match
+    const [entry] = this.nextTexts(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1421,13 +1329,9 @@ class ElementInterface {
    */
 
   getPreviousBlock(path) {
-    path = this.resolvePath(path)
-    const match = this.getPreviousDeepMatchingNodeAndPath(
-      path,
-      n => n.object === 'block'
-    )
-
-    return match ? match[0] : null
+    const [entry] = this.previousLeafBlocks(path)
+    const block = entry ? entry[0] : null
+    return block
   }
 
   /**
@@ -1489,90 +1393,9 @@ class ElementInterface {
    */
 
   getPreviousNode(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-
-    for (let i = path.size; i > 0; i--) {
-      const p = path.slice(0, i)
-      if (p.last() === 0) continue
-
-      const target = PathUtils.decrement(p)
-      const node = this.getNode(target)
-      if (node) return node
-    }
-
-    return null
-  }
-
-  /**
-   * Get the previous node in the tree from a node that matches iterator
-   *
-   * This will not only check for siblings but instead move up the tree
-   * returning the previous ancestor if no sibling is found.
-   *
-   * @param {List} path
-   * @return {Node|Null}
-   */
-
-  getPreviousMatchingNodeAndPath(path, iterator = () => true) {
-    if (!path) return null
-
-    for (let i = path.size; i > 0; i--) {
-      const p = path.slice(0, i)
-      if (p.last() === 0) continue
-
-      let previousPath = PathUtils.decrement(p)
-      let previousNode = this.getNode(previousPath)
-
-      while (previousNode && !iterator(previousNode)) {
-        previousPath = PathUtils.decrement(previousPath)
-        previousNode = this.getNode(previousPath)
-      }
-
-      if (previousNode) return [previousNode, previousPath]
-    }
-
-    return null
-  }
-
-  /**
-   * Get the next previous in the tree from a node that matches iterator
-   *
-   * This will not only check for siblings but instead move up the tree
-   * returning the previous ancestor if no sibling is found.
-   * Once a node is found, the last deepest child matching is returned
-   *
-   * @param {List} path
-   * @param {Function} iterator
-   * @return {Node|Null}
-   */
-
-  getPreviousDeepMatchingNodeAndPath(path, iterator = () => true) {
-    const match = this.getPreviousMatchingNodeAndPath(path)
-
-    if (!match) return null
-
-    let [previousNode, previousPath] = match
-
-    let childMatch
-
-    const assign = () => {
-      childMatch =
-        previousNode.object !== 'text' &&
-        previousNode.findLastDescendantAndPath(iterator, previousPath)
-      return childMatch
-    }
-
-    while (assign(childMatch)) {
-      ;[previousNode, previousPath] = childMatch
-    }
-
-    if (!previousNode) return null
-
-    return iterator(previousNode)
-      ? [previousNode, previousPath]
-      : this.getPreviousDeepMatchingNodeAndPath(match[1], iterator)
+    const [entry] = this.previousNodes(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1583,13 +1406,9 @@ class ElementInterface {
    */
 
   getPreviousSibling(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-    if (path.last() === 0) return null
-    const p = PathUtils.decrement(path)
-    const sibling = this.getNode(p)
-    return sibling
+    const [entry] = this.previousSiblings(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1600,23 +1419,9 @@ class ElementInterface {
    */
 
   getPreviousText(path) {
-    path = this.resolvePath(path)
-    if (!path) return null
-    if (!path.size) return null
-    const previous = this.getPreviousNode(path)
-    if (!previous) return null
-    const match = previous.getLastText()
-    return match
-  }
-
-  getPreviousTextAndPath(path) {
-    if (!path) return null
-    if (!path.size) return null
-    const match = this.getPreviousDeepMatchingNodeAndPath(
-      path,
-      n => n.object === 'text'
-    )
-    return match
+    const [entry] = this.previousTexts(path)
+    const node = entry ? entry[0] : null
+    return node
   }
 
   /**
@@ -1701,7 +1506,7 @@ class ElementInterface {
    */
 
   getTextDirection() {
-    const dir = direction(this.text)
+    const dir = getDirection(this.text)
     return dir === 'neutral' ? null : dir
   }
 
@@ -1723,16 +1528,7 @@ class ElementInterface {
    */
 
   getTextsAsArray() {
-    let array = []
-
-    this.nodes.forEach(node => {
-      if (node.object === 'text') {
-        array.push(node)
-      } else {
-        array = array.concat(node.getTextsAsArray())
-      }
-    })
-
+    const array = Array.from(this.texts(), ([node]) => node)
     return array
   }
 
@@ -1891,6 +1687,32 @@ class ElementInterface {
   }
 
   /**
+   * Create an iterator for all of the inlines of a node with `options`.
+   *
+   * @param {Options}
+   * @return {Iterable}
+   */
+
+  inlines(options = {}) {
+    const { leaf = false, type = null } = options
+    const iterator = this.createIterator([], {
+      objects: n => {
+        if (
+          n.object === 'inline' &&
+          (!type || n.type === type) &&
+          (!leaf || n.isLeafInline())
+        ) {
+          return ['inline']
+        } else {
+          return []
+        }
+      },
+    })
+
+    return iterator
+  }
+
+  /**
    * Insert a `node`.
    *
    * @param {List|String} path
@@ -1970,11 +1792,7 @@ class ElementInterface {
     if (range.isUnset) return false
 
     const toStart = PathUtils.compare(path, range.start.path)
-    const toEnd =
-      range.start.key === range.end.key
-        ? toStart
-        : PathUtils.compare(path, range.end.path)
-
+    const toEnd = PathUtils.compare(path, range.end.path)
     const is = toStart !== -1 && toEnd !== 1
     return is
   }
@@ -2095,6 +1913,126 @@ class ElementInterface {
     ret = ret.removeNode(path)
     ret = ret.insertNode(newPath, node)
     return ret
+  }
+
+  /**
+   * Create an iterator for the next leaf blocks in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  nextLeafBlocks(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'downward', 'forward'],
+      objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the next nodes in the tree at `path`, either finding
+   * siblings or ancestors's siblings.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  nextNodes(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'forward'],
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the next siblings in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  nextSiblings(path) {
+    const iterator = this.createIterator(path, { directions: ['forward'] })
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the next texts in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  nextTexts(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'downward', 'forward'],
+      objects: ['text'],
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the previous leaf blocks in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  previousLeafBlocks(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'downward', 'backward'],
+      objects: n => (n.object === 'block' && n.isLeafBlock() ? ['block'] : []),
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the previous nodes in the tree at `path`, either finding
+   * siblings or ancestors's siblings.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  previousNodes(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'backward'],
+    })
+
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the previous siblings in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  previousSiblings(path) {
+    const iterator = this.createIterator(path, { directions: ['backward'] })
+    return iterator
+  }
+
+  /**
+   * Create an iterator for the previous texts in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  previousTexts(path) {
+    const iterator = this.createIterator(path, {
+      directions: ['upward', 'downward', 'backward'],
+      objects: ['text'],
+    })
+
+    return iterator
   }
 
   /**
@@ -2293,6 +2231,270 @@ class ElementInterface {
     ret = ret.insertNode(path, a)
     return ret
   }
+
+  /**
+   * Create an iterator for all the text node descendants.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  texts(options = {}) {
+    const { reverse = false } = options
+    const iterator = this.createIterator([], {
+      directions: ['upward', 'downward', reverse ? 'backward' : 'forward'],
+      objects: ['text'],
+    })
+
+    return iterator
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  getBlocksAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRange` method has been renamed to `getLeafBlocksAtRange`.'
+    )
+
+    return this.getLeafBlocksAtRange(range)
+  }
+
+  getBlocksAtRangeAsArray(range) {
+    warning(
+      false,
+      'As of slate@0.44 the `node.getBlocksAtRangeAsArray` method has been renamed to `getLeafBlocksAtRangeAsArray`.'
+    )
+
+    return this.getLeafBlocksAtRangeAsArray(range)
+  }
+
+  getInlinesAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRange` method has been renamed to `getLeafInlinesAtRange`.'
+    )
+
+    return this.getLeafInlinesAtRange(range)
+  }
+
+  getInlinesAtRangeAsArray(range) {
+    warning(
+      false,
+      'As of slate@0.44 the `node.getInlinesAtRangeAsArray` method has been renamed to `getLeafInlinesAtRangeAsArray`.'
+    )
+
+    return this.getLeafInlinesAtRangeAsArray(range)
+  }
+
+  getNextTextAndPath(path) {
+    warning(
+      false,
+      'As of slate@0.47, the `getNextTextAndPath` method has been renamed to `getNextTextEntry`.'
+    )
+
+    return this.getNextTextEntry(path)
+  }
+
+  getNextDeepMatchingNodeAndPath(path, iterator = () => true) {
+    warning(
+      false,
+      'As of slate@0.47, the `getNextDeepMatchingNodeAndPath` method is deprecated.'
+    )
+
+    const match = this.getNextMatchingNodeAndPath(path)
+
+    if (!match) return null
+
+    let [nextNode, nextPath] = match
+
+    let childMatch
+
+    const assign = () => {
+      childMatch =
+        nextNode.object !== 'text' &&
+        nextNode.findFirstDescendantAndPath(iterator, nextPath)
+      return childMatch
+    }
+
+    while (assign(childMatch)) {
+      ;[nextNode, nextPath] = childMatch
+    }
+
+    if (!nextNode) return null
+
+    return iterator(nextNode)
+      ? [nextNode, nextPath]
+      : this.getNextDeepMatchingNodeAndPath(match[1], iterator)
+  }
+
+  getPreviousTextAndPath(path) {
+    warning(
+      false,
+      'As of slate@0.47, the `getPreviousTextAndPath` method has been renamed to `getPreviousTextEntry`.'
+    )
+
+    return this.getPreviousTextEntry(path)
+  }
+
+  findFirstDescendantAndPath(iterator, pathToThisNode) {
+    warning(
+      false,
+      'As of slate@0.47, the `findFirstDescendantAndPath` method is deprecated.'
+    )
+
+    return this.findDescendantAndPath(iterator, pathToThisNode, false)
+  }
+
+  getPreviousMatchingNodeAndPath(path, iterator = () => true) {
+    warning(
+      false,
+      'As of slate@0.47, the `getPreviousMatchingNodeAndPath` method is deprecated.'
+    )
+
+    if (!path) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+      if (p.last() === 0) continue
+
+      let previousPath = PathUtils.decrement(p)
+      let previousNode = this.getNode(previousPath)
+
+      while (previousNode && !iterator(previousNode)) {
+        previousPath = PathUtils.decrement(previousPath)
+        previousNode = this.getNode(previousPath)
+      }
+
+      if (previousNode) return [previousNode, previousPath]
+    }
+
+    return null
+  }
+
+  getPreviousDeepMatchingNodeAndPath(path, iterator = () => true) {
+    warning(
+      false,
+      'As of slate@0.47, the `getPreviousDeepMatchingNodeAndPath` method is deprecated.'
+    )
+
+    const match = this.getPreviousMatchingNodeAndPath(path)
+
+    if (!match) return null
+
+    let [previousNode, previousPath] = match
+
+    let childMatch
+
+    const assign = () => {
+      childMatch =
+        previousNode.object !== 'text' &&
+        previousNode.findLastDescendantAndPath(iterator, previousPath)
+      return childMatch
+    }
+
+    while (assign(childMatch)) {
+      ;[previousNode, previousPath] = childMatch
+    }
+
+    if (!previousNode) return null
+
+    return iterator(previousNode)
+      ? [previousNode, previousPath]
+      : this.getPreviousDeepMatchingNodeAndPath(match[1], iterator)
+  }
+
+  findLastDescendantAndPath(iterator, pathToThisNode) {
+    warning(
+      false,
+      'As of slate@0.47, the `findLastDescendantAndPath` method is deprecated.'
+    )
+
+    return this.findDescendantAndPath(iterator, pathToThisNode, true)
+  }
+
+  findDescendantAndPath(
+    iterator,
+    pathToThisNode = PathUtils.create([]),
+    findLast = false
+  ) {
+    warning(
+      false,
+      'As of slate@0.47, the `findDescendantAndPath` method is deprecated.'
+    )
+
+    let found
+    let foundPath
+
+    this.forEachDescendantWithPath(
+      (node, path, nodes) => {
+        if (iterator(node, path, nodes)) {
+          found = node
+          foundPath = path
+          return false
+        }
+      },
+      pathToThisNode,
+      findLast
+    )
+
+    return found ? [found, foundPath] : null
+  }
+
+  forEachDescendantWithPath(iterator, path = PathUtils.create([]), findLast) {
+    warning(
+      false,
+      'As of slate@0.47, the `forEachDescendantWithPath` method is deprecated.'
+    )
+
+    let nodes = this.nodes
+    let ret
+
+    if (findLast) nodes = nodes.reverse()
+
+    nodes.forEach((child, i) => {
+      const childPath = path.concat(i)
+
+      if (iterator(child, childPath, nodes) === false) {
+        ret = false
+        return false
+      }
+
+      if (child.object !== 'text') {
+        ret = child.forEachDescendantWithPath(iterator, childPath, findLast)
+        return ret
+      }
+    })
+
+    return ret
+  }
+
+  getNextMatchingNodeAndPath(path, iterator = () => true) {
+    warning(
+      false,
+      'As of slate@0.47, the `getNextMatchingNodeAndPath` method is deprecated.'
+    )
+
+    if (!path) return null
+
+    for (let i = path.size; i > 0; i--) {
+      const p = path.slice(0, i)
+
+      let nextPath = PathUtils.increment(p)
+      let nextNode = this.getNode(nextPath)
+
+      while (nextNode && !iterator(nextNode)) {
+        nextPath = PathUtils.increment(nextPath)
+        nextNode = this.getNode(nextPath)
+      }
+
+      if (nextNode) return [nextNode, nextPath]
+    }
+
+    return null
+  }
 }
 
 /**
@@ -2321,23 +2523,24 @@ for (const method of ASSERTS) {
 
 memoize(ElementInterface.prototype, [
   'getBlocksAsArray',
-  'getLeafBlocksAtRangeAsArray',
   'getBlocksByTypeAsArray',
   'getDecorations',
   'getFragmentAtRange',
   'getInlinesAsArray',
   'getInlinesByTypeAsArray',
+  'getInsertMarksAtRange',
+  'getLeafBlocksAtRangeAsArray',
   'getLeafBlocksAtRangeAsArray',
   'getLeafInlinesAtRangeAsArray',
   'getMarksAsArray',
   'getMarksAtPosition',
-  'getNodesAtRange',
-  'getOrderedMarksBetweenPositions',
-  'getInsertMarksAtRange',
   'getMarksByTypeAsArray',
   'getNextBlock',
+  'getNodesAtRange',
+  'getNodesToPathsMap',
   'getOffset',
   'getOffsetAtRange',
+  'getOrderedMarksBetweenPositions',
   'getPreviousBlock',
   'getRootBlocksAtRange',
   'getRootInlinesAtRangeAsArray',

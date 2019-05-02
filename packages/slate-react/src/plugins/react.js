@@ -57,6 +57,7 @@ function ReactPlugin(options = {}) {
   function renderEditor(props, editor, next) {
     return (
       <Content
+        ref={props.ref}
         autoCorrect={props.autoCorrect}
         className={props.className}
         editor={editor}
