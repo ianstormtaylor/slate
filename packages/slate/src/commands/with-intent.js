@@ -259,7 +259,7 @@ Commands.insertFragment = (editor, fragment) => {
   const lastBlock = fragment.getClosestBlock(lastText.key)
   const firstChild = fragment.nodes.first()
   const lastChild = fragment.nodes.last()
-  const keys = document.getTexts().map(text => text.key)
+  const keys = Array.from(document.texts(), ([text]) => text.key)
   const isAppending =
     !startInline ||
     (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||

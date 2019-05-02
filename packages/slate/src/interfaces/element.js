@@ -75,6 +75,13 @@ class ElementInterface {
   blocks(options = {}) {
     const { leaf = false, type = null } = options
     const iterator = this.createIterator([], {
+      directions: n => {
+        if (n.object === 'block' && n.isLeafBlock()) {
+          return ['upward', 'forward']
+        } else {
+          return ['upward', 'downward', 'forward']
+        }
+      },
       objects: n => {
         if (
           n.object === 'block' &&
@@ -1491,12 +1498,16 @@ class ElementInterface {
     if (offset < 0 || offset > this.text.length) return null
 
     let length = 0
-    const text = this.getTexts().find((node, i, nodes) => {
-      length += node.text.length
-      return length > offset
-    })
 
-    return text
+    for (const [node] of this.texts()) {
+      length += node.text.length
+
+      if (length > offset) {
+        return node
+      }
+    }
+
+    return null
   }
 
   /**
@@ -1696,6 +1707,13 @@ class ElementInterface {
   inlines(options = {}) {
     const { leaf = false, type = null } = options
     const iterator = this.createIterator([], {
+      directions: n => {
+        if (n.object === 'inline' && n.isLeafInline()) {
+          return ['upward', 'forward']
+        } else {
+          return ['upward', 'downward', 'forward']
+        }
+      },
       objects: n => {
         if (
           n.object === 'inline' &&

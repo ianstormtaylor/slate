@@ -122,7 +122,7 @@ function ReactPlugin(options = {}) {
           node.object === 'document' &&
           node.text === '' &&
           node.nodes.size === 1 &&
-          node.getTexts().size === 1,
+          Array.from(node.texts()).length === 1,
       })
     )
   }
