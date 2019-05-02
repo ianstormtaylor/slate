@@ -4,6 +4,52 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.46.0` — May 1, 2019
+
+###### BREAKING
+
+**Mark operations no longer have `offset` or `length` properties.** Since text nodes now contain a unique set of marks, it wouldn't make sense for a single mark-related operation to result in a splitting of nodes. Instead, when a mark is added to only part of a text node, it will result in a `split_node` operation as well as an `add_mark` operation.
+
+**Text operations no longer have a `marks` property.** Previously it was used to add text with a specific set of marks. However this is no longer necessary, and when text is added with marks it will result in an `insert_text` operation as well as an `add_mark` operation.
+
+**Using `Text.create` or `Text.createList` with a `leaves` property will error.** Now that text nodes no longer have leaves, you will need to pass in the `text` string and `marks` directly when creating a new text node. (However, you can still create entire values using `Value.create` in a backwards compatible way for convenience while migrating.)
+
+```js
+// This works, although deprecated, which is the common case...
+Value.create(oldValueJson)
+
+// ...but this will error!
+Text.create(oldTextJson)
+```
+
+**`Value.toJSON` returns the new data model format, without leaves.** Although `Value.fromJSON` and `Value.create` allow the old format in deprecated mode, calling `Value.toJSON` will return the new data format. If you still need the old one you'll need to iterate the document tree converting text nodes yourself.
+
+**The low-level `Value.*` and `Node.*` mutation methods have changed.** These changes follow the operation signature changes, since the methods take the same arguments as the operations themselves. For example:
+
+```js
+// Previously...
+value.addMark(path, offset, length, mark)
+
+// ...is now:
+value.addMark(path, mark)
+```
+
+These are low-level methods, so this change shouldn't affect the majority of use cases.
+
+###### DEPRECATED
+
+**Initializing editors with `Text` nodes with a `leaves` property is deprecated.** In this new version of Slate, creating a new value with `Value.create` with the old leaf data model is still allowed for convenience in migration, but it will be removed in a coming version. (However, using the low-level `Text.create` will throw an error!)
+
+```js
+// This works, although deprecated, which is the common case...
+Value.create(oldValueJson)
+
+// ...but this will error!
+Text.create(oldTextJson)
+```
+
+---
+
 ### `0.45.0` — April 2, 2019
 
 ###### BREAKING

@@ -19,7 +19,7 @@
     "immutable": ">=3.8.1 || >4.0.0-rc",
     "react": ">=0.14.0",
     "react-dom": ">=0.14.0",
-    "slate": ">=0.32.0"
+    "slate": ">=0.36.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",

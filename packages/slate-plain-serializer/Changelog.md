@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-plain-serializer` packag
 
 ---
 
+### `0.7.0` — May 1, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.46`.** The plain serializer has been updated to work alongside the new text data model in the latest version of slate. For serializing it requires you pass in the new format for text nodes. And for deserializing it will return the new format.
+
+---
+
 ### `0.6.0` — August 22, 2018
 
 ###### BREAKING
