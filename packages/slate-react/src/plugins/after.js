@@ -344,7 +344,7 @@ function AfterPlugin(options = {}) {
         let n = document.getNode(anchor.path)
 
         while (hasVoidParent) {
-          const [nxt] = document.nextTexts(p)
+          const [nxt] = document.texts({ path: p })
 
           if (!nxt) {
             break
@@ -548,7 +548,11 @@ function AfterPlugin(options = {}) {
 
     if (Hotkeys.isExtendBackward(event)) {
       const startText = document.getNode(start.path)
-      const prevEntry = document.previousTexts(start.path)
+      const prevEntry = document.texts({
+        path: start.path,
+        direction: 'backward',
+      })
+
       let isPrevInVoid = false
 
       if (prevEntry) {
@@ -564,7 +568,7 @@ function AfterPlugin(options = {}) {
 
     if (Hotkeys.isExtendForward(event)) {
       const startText = document.getNode(start.path)
-      const [nextEntry] = document.nextTexts(start.path)
+      const [nextEntry] = document.texts({ path: start.path })
       let isNextInVoid = false
 
       if (nextEntry) {

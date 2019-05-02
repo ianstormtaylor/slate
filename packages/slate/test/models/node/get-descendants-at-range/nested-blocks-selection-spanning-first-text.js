@@ -8,30 +8,24 @@ export const input = (
       <quote key="a">
         <quote key="b">
           <paragraph key="c">
-            <text key="d">one</text>
-          </paragraph>
-          <paragraph key="e">
-            <text key="f">two</text>
-          </paragraph>
-        </quote>
-        <quote key="g">
-          <paragraph key="h">
-            <text key="i">
-              three
-              <cursor />
+            <text key="d">
+              <anchor />one<focus />
             </text>
           </paragraph>
         </quote>
       </quote>
+      <paragraph key="e">
+        <text key="f">two</text>
+      </paragraph>
     </document>
   </value>
 )
 
 export default function({ document, selection }) {
   return document
-    .getNodesAtRange(selection)
+    .getDescendantsAtRange(selection)
     .map(n => n.key)
     .toArray()
 }
 
-export const output = ['a', 'g', 'h', 'i']
+export const output = ['a', 'b', 'c', 'd']

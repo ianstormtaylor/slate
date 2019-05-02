@@ -77,13 +77,15 @@ class ElementInterface {
    */
 
   blocks(options = {}) {
-    const { onlyLeaves, onlyTypes, match, ...rest } = options
+    const { onlyLeaves, onlyRoots, onlyTypes, match, ...rest } = options
     const iterable = this.createIterable({
       path: [],
       objects: ['block'],
       ...rest,
       match: (node, path) => {
         if (onlyTypes && !onlyTypes.includes(node.type)) {
+          return false
+        } else if (onlyRoots && path.size !== 1) {
           return false
         } else if (onlyLeaves && !node.isLeafBlock()) {
           return false
@@ -425,7 +427,11 @@ class ElementInterface {
 
     if (!startPath.equals(endPath)) {
       while (!startPath.equals(endPath) && endOffset === 0) {
-        ;[[endText, endPath]] = this.previousTexts(endPath)
+        ;[[endText, endPath]] = this.texts({
+          path: endPath,
+          direction: 'backward',
+        })
+
         endOffset = endText.text.length
       }
 
@@ -433,7 +439,7 @@ class ElementInterface {
         !startPath.equals(endPath) &&
         startOffset === startText.text.length
       ) {
-        ;[[startText, startPath]] = this.nextTexts(startPath)
+        ;[[startText, startPath]] = this.texts({ path: startPath })
         startOffset = 0
       }
     }
@@ -457,7 +463,7 @@ class ElementInterface {
       return marks
     }
 
-    ;[[startText, startPath]] = this.nextTexts(startPath)
+    ;[[startText, startPath]] = this.texts({ path: startPath })
 
     while (!startPath.equals(endPath)) {
       if (startText.text.length !== 0) {
@@ -468,7 +474,7 @@ class ElementInterface {
         }
       }
 
-      ;[[startText, startPath]] = this.nextTexts(startPath)
+      ;[[startText, startPath]] = this.texts({ path: startPath })
     }
 
     return marks
@@ -677,6 +683,20 @@ class ElementInterface {
   }
 
   /**
+   * Get all of the descendant nodes in a `range`.
+   *
+   * @param {Range} range
+   * @return {List<Node>}
+   */
+
+  getDescendantsAtRange(range) {
+    const iterable = this.descendants({ range })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
+  }
+
+  /**
    * Get a fragment of the node at a `range`.
    *
    * @param {Range} range
@@ -837,7 +857,10 @@ class ElementInterface {
     }
 
     const relativePath = PathUtils.drop(path, blockPath.size)
-    const [previous] = blockNode.previousTexts(relativePath)
+    const [previous] = blockNode.texts({
+      path: relativePath,
+      direction: 'backward',
+    })
 
     // If there's no previous text, we're at the start of the block, so use
     // the current text nodes marks.
@@ -968,7 +991,7 @@ class ElementInterface {
    */
 
   getNextBlock(path) {
-    const [entry] = this.nextLeafBlocks(path)
+    const [entry] = this.blocks({ path, onlyLeaves: true })
     const block = entry ? entry[0] : null
     return block
   }
@@ -981,7 +1004,8 @@ class ElementInterface {
    */
 
   getNextNode(path) {
-    const [entry] = this.nextNodes(path)
+    const iterable = this.createIterable({ path, downward: false })
+    const [entry] = iterable
     const node = entry ? entry[0] : null
     return node
   }
@@ -994,7 +1018,7 @@ class ElementInterface {
    */
 
   getNextSibling(path) {
-    const [entry] = this.nextSiblings(path)
+    const [entry] = this.siblings(path)
     const node = entry ? entry[0] : null
     return node
   }
@@ -1007,25 +1031,9 @@ class ElementInterface {
    */
 
   getNextText(path) {
-    const [entry] = this.nextTexts(path)
+    const [entry] = this.texts({ path })
     const node = entry ? entry[0] : null
     return node
-  }
-
-  /**
-   * Get all of the nodes in a `range`. This includes all of the
-   * text nodes inside the range and all ancestors of those text
-   * nodes up to this node.
-   *
-   * @param {Range} range
-   * @return {List<Node>}
-   */
-
-  getNodesAtRange(range) {
-    const iterable = this.descendants({ range })
-    const array = Array.from(iterable, ([node]) => node)
-    const list = List(array)
-    return list
   }
 
   /**
@@ -1102,7 +1110,11 @@ class ElementInterface {
    */
 
   getPreviousBlock(path) {
-    const [entry] = this.previousLeafBlocks(path)
+    const [entry] = this.blocks({
+      path,
+      onlyLeaves: true,
+      direction: 'backward',
+    })
     const block = entry ? entry[0] : null
     return block
   }
@@ -1118,7 +1130,13 @@ class ElementInterface {
    */
 
   getPreviousNode(path) {
-    const [entry] = this.previousNodes(path)
+    const iterable = this.createIterable({
+      path,
+      downward: false,
+      direction: 'backward',
+    })
+
+    const [entry] = iterable
     const node = entry ? entry[0] : null
     return node
   }
@@ -1131,7 +1149,7 @@ class ElementInterface {
    */
 
   getPreviousSibling(path) {
-    const [entry] = this.previousSiblings(path)
+    const [entry] = this.siblings(path, { direction: 'backward' })
     const node = entry ? entry[0] : null
     return node
   }
@@ -1144,9 +1162,37 @@ class ElementInterface {
    */
 
   getPreviousText(path) {
-    const [entry] = this.previousTexts(path)
+    const [entry] = this.texts({ path, direction: 'backward' })
     const node = entry ? entry[0] : null
     return node
+  }
+
+  /**
+   * Get only the root block nodes in a `range`.
+   *
+   * @param {Range} range
+   * @return {List}
+   */
+
+  getRootBlocksAtRange(range) {
+    const iterable = this.blocks({ range, onlyRoots: true })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
+  }
+
+  /**
+   * Get only the root inline nodes in a `range`.
+   *
+   * @param {Range} range
+   * @return {List}
+   */
+
+  getRootInlinesAtRange(range) {
+    const iterable = this.inlines({ range, onlyRoots: true })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
   }
 
   /**
@@ -1286,7 +1332,7 @@ class ElementInterface {
    */
 
   inlines(options = {}) {
-    const { onlyLeaves, onlyTypes, match, ...rest } = options
+    const { onlyLeaves, onlyRoots, onlyTypes, match, ...rest } = options
     const iterable = this.createIterable({
       path: [],
       objects: ['inline'],
@@ -1295,6 +1341,8 @@ class ElementInterface {
         if (onlyTypes && !onlyTypes.includes(node.type)) {
           return false
         } else if (onlyLeaves && !node.isLeafInline()) {
+          return false
+        } else if (onlyRoots && this.getParent(path).object !== 'block') {
           return false
         } else if (match && !match(node, path)) {
           return false
@@ -1566,140 +1614,6 @@ class ElementInterface {
   }
 
   /**
-   * Create an iteratable for the next leaf blocks in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  nextLeafBlocks(path) {
-    const iterable = this.createIterable({
-      path,
-      objects: ['block'],
-      match: node => node.isLeafBlock(),
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the next nodes in the tree at `path`, either finding
-   * siblings or ancestors's siblings.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  nextNodes(path) {
-    const iterable = this.createIterable({ path, downward: false })
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the next siblings in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  nextSiblings(path) {
-    const iterable = this.createIterable({
-      path,
-      upward: false,
-      downward: false,
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the next texts in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  nextTexts(path) {
-    const iterable = this.createIterable({
-      path,
-      objects: ['text'],
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the previous leaf blocks in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  previousLeafBlocks(path) {
-    const iterable = this.createIterable({
-      path,
-      direction: 'backward',
-      objects: ['block'],
-      match: node => node.isLeafBlock(),
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the previous nodes in the tree at `path`, either finding
-   * siblings or ancestors's siblings.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  previousNodes(path) {
-    const iterable = this.createIterable({
-      path,
-      downward: false,
-      direction: 'backward',
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the previous siblings in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  previousSiblings(path) {
-    const iterable = this.createIterable({
-      path,
-      upward: false,
-      downward: false,
-      direction: 'backward',
-    })
-
-    return iterable
-  }
-
-  /**
-   * Create an iteratable for the previous texts in the tree at `path`.
-   *
-   * @param {List|Array} path
-   * @return {Iterable}
-   */
-
-  previousTexts(path) {
-    const iterable = this.createIterable({
-      path,
-      direction: 'backward',
-      objects: ['text'],
-    })
-
-    return iterable
-  }
-
-  /**
    * Remove `mark` from text at `path`.
    *
    * @param {List} path
@@ -1858,6 +1772,24 @@ class ElementInterface {
     node = node.setMark(properties, newProperties)
     const ret = this.replaceNode(path, node)
     return ret
+  }
+
+  /**
+   * Create an iteratable for the siblings in the tree at `path`.
+   *
+   * @param {List|Array} path
+   * @return {Iterable}
+   */
+
+  siblings(path, options) {
+    const iterable = this.createIterable({
+      path,
+      upward: false,
+      downward: false,
+      ...options,
+    })
+
+    return iterable
   }
 
   /**
@@ -2504,32 +2436,6 @@ class ElementInterface {
     return array
   }
 
-  getRootBlocksAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.47, the `getRootBlocksAtRange` method is deprecated.'
-    )
-
-    range = this.resolveRange(range)
-    if (range.isUnset) return List()
-
-    const { start, end } = range
-
-    return this.nodes.slice(start.path.first(), end.path.first() + 1)
-  }
-
-  getRootInlinesAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.47, the `getRootInlinesAtRange` method is deprecated.'
-    )
-
-    const array = this.getRootInlinesAtRangeAsArray(range)
-    // Remove duplicates by converting it to an `OrderedSet` first.
-    const list = List(OrderedSet(array))
-    return list
-  }
-
   getRootInlinesAtRangeAsArray(range) {
     warning(
       false,
@@ -2589,7 +2495,7 @@ class ElementInterface {
       return OrderedSet(currentMarks)
     }
 
-    const [previous] = this.previousTexts(path)
+    const [previous] = this.texts({ path, direction: 'backward' })
 
     if (!previous) {
       return OrderedSet()
@@ -2602,6 +2508,18 @@ class ElementInterface {
     }
 
     return OrderedSet(currentMarks)
+  }
+
+  getNodesAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.47, the `getNodesAtRange` method has been renamed to `getDescendantsAtRange`.'
+    )
+
+    const iterable = this.descendants({ range })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
   }
 }
 

@@ -7,15 +7,11 @@ export const input = (
     <document>
       <paragraph key="a">
         <text key="b">one</text>
-      </paragraph>
-      <paragraph key="c">
-        <text key="d">
-          two
-          <cursor />
-        </text>
-      </paragraph>
-      <paragraph key="e">
-        <text key="f">three</text>
+        <inline type="link" key="c">
+          <text key="d">
+            tw<cursor />o
+          </text>
+        </inline>
       </paragraph>
     </document>
   </value>
@@ -23,9 +19,9 @@ export const input = (
 
 export default function({ document, selection }) {
   return document
-    .getNodesAtRange(selection)
+    .getDescendantsAtRange(selection)
     .map(n => n.key)
     .toArray()
 }
 
-export const output = ['c', 'd']
+export const output = ['a', 'c', 'd']

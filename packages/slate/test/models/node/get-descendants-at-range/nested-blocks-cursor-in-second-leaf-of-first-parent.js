@@ -27,7 +27,7 @@ export const input = (
 
 export default function({ document, selection }) {
   return document
-    .getNodesAtRange(selection)
+    .getDescendantsAtRange(selection)
     .map(n => n.key)
     .toArray()
 }
