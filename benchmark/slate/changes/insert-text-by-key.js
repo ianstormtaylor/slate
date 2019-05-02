@@ -21,9 +21,8 @@ const value = (
           <paragraph>
             <paragraph>
               <text key={`T${i}`}>
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
-                {i === 0 ? <cursor /> : ''}
+                This is editable rich text, much better than a textarea!
+                {i === 0 ? <cursor /> : null}
               </text>
             </paragraph>
           </paragraph>

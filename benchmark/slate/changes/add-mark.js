@@ -24,11 +24,9 @@ const value = (
         <quote>
           <paragraph>
             <paragraph>
-              This is editable {i === 0 ? <anchor /> : ''}rich{i === 0 ? (
+              This is editable {i === 0 ? <anchor /> : null}rich{i === 0 ? (
                 <focus />
-              ) : (
-                ''
-              )}{' '}
+              ) : null}
               text, <i>much</i> better than a textarea! For reals.
             </paragraph>
           </paragraph>
