@@ -43,7 +43,7 @@ import Placeholder from './placeholder'
  */
 
 const EXAMPLES = [
-  ['Check Lists', CheckLists, '/check-lists'],
+  ['Checklists', CheckLists, '/check-lists'],
   ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
   ['Composition', Composition, '/composition/:subpage?'],
   ['Embeds', Embeds, '/embeds'],
