@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { PathUtils } from '../../../..'
+import { PathUtils } from 'slate'
 
 export const input = (
   <value>
