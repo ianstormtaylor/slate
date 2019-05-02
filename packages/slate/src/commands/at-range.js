@@ -186,8 +186,8 @@ Commands.deleteAtRange = (editor, range) => {
       const endLength = endOffset
 
       const ancestor = document.getCommonAncestor(startKey, endKey)
-      const startChild = ancestor.getFurthestAncestor(startKey)
-      const endChild = ancestor.getFurthestAncestor(endKey)
+      const startChild = ancestor.getFurthestChild(startKey)
+      const endChild = ancestor.getFurthestChild(endKey)
 
       const startParent = document.getParent(startBlock.key)
       const startParentIndex = startParent.nodes.indexOf(startBlock)
@@ -248,7 +248,15 @@ Commands.deleteAtRange = (editor, range) => {
       // into the start block.
       if (startBlock.key !== endBlock.key) {
         document = editor.value.document
-        const lonely = document.getFurthestOnlyChildAncestor(endBlock.key)
+        let onlyChildAncestor
+
+        for (const [node] of document.ancestors(endBlock.key)) {
+          if (node.nodes.size > 1) {
+            break
+          } else {
+            onlyChildAncestor = node
+          }
+        }
 
         // Move the end block to be right after the start block.
         if (endParentIndex !== startParentIndex + 1) {
@@ -268,8 +276,8 @@ Commands.deleteAtRange = (editor, range) => {
         }
 
         // If nested empty blocks are left over above the end block, remove them.
-        if (lonely) {
-          editor.removeNodeByKey(lonely.key)
+        if (onlyChildAncestor) {
+          editor.removeNodeByKey(onlyChildAncestor.key)
         }
       }
     }
@@ -712,7 +720,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     let { document } = value
     let startText = document.getDescendant(start.path)
     let startBlock = document.getClosestBlock(startText.key)
-    let startChild = startBlock.getFurthestAncestor(startText.key)
+    let startChild = startBlock.getFurthestChild(startText.key)
     const isAtStart = start.isAtStartOfNode(startBlock)
     const parent = document.getParent(startBlock.key)
     const index = parent.nodes.indexOf(startBlock)
@@ -768,7 +776,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     document = editor.value.document
     startText = document.getDescendant(start.key)
     startBlock = document.getClosestBlock(start.key)
-    startChild = startBlock.getFurthestAncestor(startText.key)
+    startChild = startBlock.getFurthestChild(startText.key)
 
     // If the first and last block aren't the same, we need to move any of the
     // starting block's children after the split into the last block of the
@@ -800,7 +808,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     } else {
       // Otherwise, we maintain the starting block, and insert all of the first
       // block's inline nodes into it at the split point.
-      const inlineChild = startBlock.getFurthestAncestor(startText.key)
+      const inlineChild = startBlock.getFurthestChild(startText.key)
       const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
       firstBlock.nodes.forEach((inline, i) => {
@@ -1315,8 +1323,8 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
   let endBlock = document.getClosestBlock(end.path)
   const startInline = document.getClosestInline(start.path)
   const endInline = document.getClosestInline(end.path)
-  let startChild = startBlock.getFurthestAncestor(start.key)
-  let endChild = endBlock.getFurthestAncestor(end.key)
+  let startChild = startBlock.getFurthestChild(start.key)
+  let endChild = endBlock.getFurthestChild(end.key)
 
   editor.withoutNormalizing(() => {
     if (!startInline || startInline !== endInline) {
@@ -1327,8 +1335,8 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
     document = editor.value.document
     startBlock = document.getDescendant(startBlock.key)
     endBlock = document.getDescendant(endBlock.key)
-    startChild = startBlock.getFurthestAncestor(start.key)
-    endChild = endBlock.getFurthestAncestor(end.key)
+    startChild = startBlock.getFurthestChild(start.key)
+    endChild = endBlock.getFurthestChild(end.key)
     const startIndex = startBlock.nodes.indexOf(startChild)
     const endIndex = endBlock.nodes.indexOf(endChild)
 
@@ -1353,14 +1361,14 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
     } else if (startBlock === endBlock) {
       document = editor.value.document
       startBlock = document.getClosestBlock(start.key)
-      startChild = startBlock.getFurthestAncestor(start.key)
+      startChild = startBlock.getFurthestChild(start.key)
 
       const startInner = document.getNextSibling(startChild.key)
       const startInnerIndex = startBlock.nodes.indexOf(startInner)
       const endInner =
         start.key === end.key
           ? startInner
-          : startBlock.getFurthestAncestor(end.key)
+          : startBlock.getFurthestChild(end.key)
       const inlines = startBlock.nodes
         .skipUntil(n => n === startInner)
         .takeUntil(n => n === endInner)

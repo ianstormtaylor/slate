@@ -1,7 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Set } from 'immutable'
+import { OrderedSet } from 'immutable'
 import { Mark } from 'slate'
 import PathUtils from '../../../../src/utils/path-utils'
 
@@ -29,4 +29,4 @@ export default function({ document, selection }) {
   return document.getMarksAtPosition(path, 0)
 }
 
-export const output = Set.of(Mark.create('bold'))
+export const output = OrderedSet.of(Mark.create('bold'))

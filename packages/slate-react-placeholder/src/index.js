@@ -49,7 +49,7 @@ function SlateReactPlaceholder(options = {}) {
 
     const others = next()
     const [first] = node.texts()
-    const [last] = node.texts({ reverse: true })
+    const [last] = node.texts({ direction: 'backward' })
     const [firstNode, firstPath] = first
     const [lastNode, lastPath] = last
     const decoration = {
