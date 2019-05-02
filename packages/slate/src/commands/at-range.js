@@ -884,19 +884,21 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
  */
 
 Commands.insertTextAtRange = (editor, range, text, marks) => {
-  range = deleteExpandedAtRange(editor, range)
+  editor.withoutNormalizing(() => {
+    range = deleteExpandedAtRange(editor, range)
 
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const offset = start.offset
-  const parent = document.getParent(start.key)
+    const { value } = editor
+    const { document } = value
+    const { start } = range
+    const offset = start.offset
+    const parent = document.getParent(start.key)
 
-  if (editor.isVoid(parent)) {
-    return
-  }
+    if (editor.isVoid(parent)) {
+      return
+    }
 
-  editor.insertTextByKey(start.key, offset, text, marks)
+    editor.insertTextByKey(start.key, offset, text, marks)
+  })
 }
 
 /**
