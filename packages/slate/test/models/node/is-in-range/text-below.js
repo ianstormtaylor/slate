@@ -32,7 +32,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document.isNodeInRange([4], selection)
+  return document.isInRange([4, 0], selection)
 }
 
 export const output = false

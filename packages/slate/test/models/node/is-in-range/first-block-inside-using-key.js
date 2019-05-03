@@ -29,7 +29,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document.isNodeInRange([1], selection)
+  return document.isInRange('c', selection)
 }
 
 export const output = true

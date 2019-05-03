@@ -24,12 +24,15 @@ export const input = (
           <focus />four
         </text>
       </paragraph>
+      <paragraph key="k">
+        <text key="l">five</text>
+      </paragraph>
     </document>
   </value>
 )
 
 export default function({ document, selection }) {
-  return document.isNodeInRange([3], selection)
+  return document.isInRange('k', selection)
 }
 
-export const output = true
+export const output = false

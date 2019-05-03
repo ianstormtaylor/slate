@@ -177,6 +177,20 @@ function isOlder(path, target) {
 }
 
 /**
+ * Is an `any` object a path?
+ *
+ * @param {Mixed} any
+ * @return {Boolean}
+ */
+
+function isPath(any) {
+  return (
+    (List.isList(any) || Array.isArray(any)) &&
+    any.every(n => typeof n === 'number')
+  )
+}
+
+/**
  * Is a `path` a sibling of a `target` path?
  *
  * @param {List} path
@@ -401,6 +415,7 @@ export default {
   isBefore,
   isEqual,
   isOlder,
+  isPath,
   isSibling,
   isYounger,
   lift,

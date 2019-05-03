@@ -1428,24 +1428,25 @@ class ElementInterface {
   }
 
   /**
-   * Check whether a descendant node is inside a range. This will return true for all
-   * text nodes inside the range and all ancestors of those text nodes up to this node.
+   * Check whether a descendant node is inside a `range` by `path`.
    *
-   * @param {List|string} path
+   * @param {List|String} path
    * @param {Range} range
    * @return {Node}
    */
 
-  isNodeInRange(path, range) {
-    this.assertDescendant(path)
+  isInRange(path, range) {
     path = this.resolvePath(path)
     range = this.resolveRange(range)
-    if (range.isUnset) return false
+
+    if (range.isUnset) {
+      return false
+    }
 
     const toStart = PathUtils.compare(path, range.start.path)
     const toEnd = PathUtils.compare(path, range.end.path)
-    const is = toStart !== -1 && toEnd !== 1
-    return is
+    const isInRange = toStart !== -1 && toEnd !== 1
+    return isInRange
   }
 
   /**
@@ -2520,6 +2521,15 @@ class ElementInterface {
     const array = Array.from(iterable, ([node]) => node)
     const list = List(array)
     return list
+  }
+
+  isNodeInRange(path, range) {
+    warning(
+      false,
+      'As of slate@0.47, the `isNodeInRange` method has been renamed to `isInRange`.'
+    )
+
+    return this.isInRange(path, range)
   }
 }
 
