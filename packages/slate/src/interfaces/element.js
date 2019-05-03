@@ -634,18 +634,30 @@ class ElementInterface {
   /**
    * Get the decorations for the node from an `editor`.
    *
+   * @param {List} path
    * @param {Editor} editor
    * @return {List}
    */
 
-  getDecorations(editor) {
-    invariant(
-      !Value.isValue(editor),
-      'As of Slate 0.42.0, the `node.getDecorations` method takes an `editor` instead of a `value`.'
-    )
+  getDecorations(path, editor) {
+    path = this.resolvePath(path)
+    const node = this.assertNode(path)
+    let decorations = editor.run('decorateNode', node, path)
+    decorations = Decoration.createList(decorations)
 
-    const array = editor.run('decorateNode', this)
-    const decorations = Decoration.createList(array)
+    decorations = decorations.map(dec => {
+      dec = dec.updatePoints(point => {
+        if (point.path) {
+          return point.setPath(path.concat(point.path))
+        } else {
+          return point
+        }
+      })
+
+      dec = this.resolveDecoration(dec)
+      return dec
+    })
+
     return decorations
   }
 

@@ -4,6 +4,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
+import { PathUtils } from 'slate'
 import {
   IS_ANDROID,
   IS_FIREFOX,
@@ -14,7 +15,6 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import Node from './node'
 import findDOMRange from '../utils/find-dom-range'
 import findRange from '../utils/find-range'
-import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
 
@@ -462,12 +462,13 @@ class Content extends React.Component {
     const { start, end } = selection
     const startIndex = start.path.first()
     const endIndex = end.path.first() + 1
-    const decs = document.getDecorations(editor).concat(decorations)
-    const childrenDecorations = getChildrenDecorations(document, decs)
+    const decs = document.getDecorations([], editor).concat(decorations)
 
     const children = document.nodes.toArray().map((child, i) => {
+      const childPath = PathUtils.create([i])
+      const childDecs = decs.filter(d => document.isInRange(childPath, d))
       const isSelected = startIndex <= i && i < endIndex
-      return this.renderNode(child, isSelected, childrenDecorations[i])
+      return this.renderNode(child, isSelected, childDecs)
     })
 
     const style = {

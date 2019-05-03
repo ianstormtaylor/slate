@@ -106,17 +106,16 @@ class Text extends React.Component {
     const { value } = editor
     const { document } = value
     const { key } = node
+    const path = document.getPath(node)
 
     const decs = decorations.filter(d => {
       const { start, end } = d
 
       // If either of the decoration's keys match, include it.
-      if (start.key === key || end.key === key) return true
+      if (start.path.equals(path) || end.path.equals(path)) return true
 
       // Otherwise, if the decoration is in a single node, it's not ours.
-      if (start.key === end.key) return false
-
-      const path = document.assertPath(key)
+      if (start.path.equals(end.path)) return false
 
       // If the node's path is before the start path, ignore it.
       if (PathUtils.compare(path, start.path) === -1) return false

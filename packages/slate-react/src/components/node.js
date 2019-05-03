@@ -8,7 +8,6 @@ import { PathUtils } from 'slate'
 
 import Void from './void'
 import Text from './text'
-import getChildrenDecorations from '../utils/get-children-decorations'
 
 /**
  * Debug.
@@ -133,16 +132,17 @@ class Node extends React.Component {
     const { value } = editor
     const { document, selection } = value
     const { start, end } = selection
-    const path = document.getPath(node.key)
+    const path = document.getPath(node)
     const startPath = start.path.slice(0, path.size)
     const endPath = end.path.slice(0, path.size)
     const startComp = PathUtils.compare(path, startPath)
     const endComp = PathUtils.compare(path, endPath)
-    const decs = decorations.concat(node.getDecorations(editor))
-    const childrenDecorations = getChildrenDecorations(node, decs)
+    const decs = decorations.concat(document.getDecorations(path, editor))
     const children = []
 
     node.nodes.forEach((child, i) => {
+      const childPath = path.push(i)
+      const childDecs = decs.filter(d => document.isInRange(childPath, d))
       const isChildSelected =
         isSelected &&
         startComp != null &&
@@ -150,9 +150,7 @@ class Node extends React.Component {
         endComp != null &&
         endComp < 1
 
-      children.push(
-        this.renderNode(child, isChildSelected, childrenDecorations[i])
-      )
+      children.push(this.renderNode(child, isChildSelected, childDecs))
     })
 
     // Attributes that the developer must mix into the element in their

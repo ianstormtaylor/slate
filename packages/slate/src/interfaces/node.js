@@ -5,6 +5,7 @@ import mixin from '../utils/mixin'
 import Block from '../models/block'
 import Document from '../models/document'
 import Inline from '../models/inline'
+import Node from '../models/node'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
@@ -116,8 +117,18 @@ class NodeInterface {
    */
 
   getPath(key) {
-    // Handle the case of passing in a path directly, to match other methods.
-    if (List.isList(key)) return key
+    // COMPAT: Handle passing in a path, to match other methods.
+    if (List.isList(key)) {
+      return key
+    }
+
+    // COMPAT: Handle a node object by iterating the descendants tree, so that
+    // we avoid using keys for the future.
+    if (Node.isNode(key) && this.descendants) {
+      for (const [node, path] of this.descendants()) {
+        if (key === node) return path
+      }
+    }
 
     const dict = this.getKeysToPathsTable()
     const path = dict[key]

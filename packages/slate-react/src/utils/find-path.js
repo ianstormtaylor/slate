@@ -10,11 +10,14 @@ import findNode from './find-node'
 
 function findPath(element, editor) {
   const node = findNode(element, editor)
-  if (!node) return null
+
+  if (!node) {
+    return null
+  }
 
   const { value } = editor
   const { document } = value
-  const path = document.assertPath(node.key)
+  const path = document.getPath(node)
   return path
 }
 
