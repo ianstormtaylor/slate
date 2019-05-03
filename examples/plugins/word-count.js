@@ -16,7 +16,7 @@ export default function WordCount(options) {
       const children = next()
       let wordCount = 0
 
-      for (const [node] of document.blocks({ leaf: true })) {
+      for (const [node] of document.blocks({ onlyLeaves: true })) {
         const words = node.text.trim().split(/\s+/)
         wordCount += words.length
       }
