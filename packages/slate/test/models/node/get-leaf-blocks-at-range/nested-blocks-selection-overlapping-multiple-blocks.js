@@ -4,7 +4,7 @@ import h from '../../../helpers/h'
 
 export const input = (
   <value>
-    <document>
+    <document key="zz">
       <paragraph key="a">
         <text key="b">
           <focus />

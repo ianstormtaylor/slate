@@ -62,7 +62,7 @@ class ElementInterface {
       path,
       direction: null,
       downward: false,
-      includeAncestors: true,
+      includeTargetAncestors: true,
       includeRoot: true,
     })
 
@@ -78,9 +78,10 @@ class ElementInterface {
 
   blocks(options = {}) {
     const { onlyLeaves, onlyRoots, onlyTypes, match, ...rest } = options
-    const iterable = this.createIterable({
-      path: [],
-      objects: ['block'],
+    const iterable = this.descendants({
+      includeDocument: false,
+      includeInlines: false,
+      includeTexts: false,
       ...rest,
       match: (node, path) => {
         if (onlyTypes && !onlyTypes.includes(node.type)) {
@@ -125,12 +126,14 @@ class ElementInterface {
       direction = 'forward',
       downward = true,
       upward = true,
-      includeAncestors = false,
+      includeBlocks = true,
+      includeDocument = true,
+      includeInlines = true,
       includeRoot = false,
       includeTarget = !!options.range,
+      includeTargetAncestors = false,
+      includeTexts = true,
       match = null,
-      objects = null,
-      types = null,
     } = options
 
     const root = this
@@ -171,11 +174,19 @@ class ElementInterface {
             return next()
           }
 
-          if (objects && !objects.includes(node.object)) {
+          if (!includeBlocks && node.object === 'block') {
             return next()
           }
 
-          if (types && !types.includes(node.type)) {
+          if (!includeDocument && node.object === 'document') {
+            return next()
+          }
+
+          if (!includeInlines && node.object === 'inline') {
+            return next()
+          }
+
+          if (!includeTexts && node.object === 'text') {
             return next()
           }
 
@@ -273,7 +284,7 @@ class ElementInterface {
             visited.add(node)
 
             // If ancestors of the target node shouldn't be included, skip them.
-            if (!includeAncestors) {
+            if (!includeTargetAncestors) {
               return next()
             } else {
               return result()
@@ -1333,9 +1344,10 @@ class ElementInterface {
 
   inlines(options = {}) {
     const { onlyLeaves, onlyRoots, onlyTypes, match, ...rest } = options
-    const iterable = this.createIterable({
-      path: [],
-      objects: ['inline'],
+    const iterable = this.descendants({
+      includeBlocks: false,
+      includeTexts: false,
+      includeDocument: false,
       ...rest,
       match: (node, path) => {
         if (onlyTypes && !onlyTypes.includes(node.type)) {
@@ -1837,9 +1849,10 @@ class ElementInterface {
    */
 
   texts(options) {
-    const iterable = this.createIterable({
-      path: [],
-      objects: ['text'],
+    const iterable = this.descendants({
+      includeBlocks: false,
+      includeInlines: false,
+      includeDocument: false,
       ...options,
     })
 

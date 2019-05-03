@@ -1,11 +1,8 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { OrderedSet } from 'immutable'
+import { Set } from 'immutable'
 import { Mark } from 'slate'
-import PathUtils from '../../../../src/utils/path-utils'
-
-const path = PathUtils.create([1, 0])
 
 export const input = (
   <value>
@@ -14,16 +11,16 @@ export const input = (
         <text>Cat is Cute</text>
       </paragraph>
       <paragraph>
-        <text>
-          <b>Dog is Delightful</b>
-        </text>
+        <b>
+          <cursor />Dog is Delightful
+        </b>
       </paragraph>
     </document>
   </value>
 )
 
 export default function({ document, selection }) {
-  return document.getMarksAtPosition(path, 0)
+  return document.getInsertMarksAtPoint(selection.start)
 }
 
-export const output = OrderedSet.of(Mark.create('bold'))
+export const output = Set.of(Mark.create('bold'))

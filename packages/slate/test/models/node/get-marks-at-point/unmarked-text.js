@@ -1,17 +1,14 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { OrderedSet } from 'immutable'
-import PathUtils from '../../../../src/utils/path-utils'
-
-const path = PathUtils.create([0, 0])
+import { Set } from 'immutable'
 
 export const input = (
   <value>
     <document>
       <paragraph>
         <text>
-          <b>Cat is Cute</b>
+          C<cursor />at is Cute
         </text>
       </paragraph>
     </document>
@@ -19,7 +16,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document.getMarksAtPosition(path, 0)
+  return document.getInsertMarksAtPoint(selection.start)
 }
 
-export const output = OrderedSet.of()
+export const output = Set.of()
