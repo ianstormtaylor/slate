@@ -209,8 +209,6 @@ class CodeHighlighting extends React.Component {
     let startOffset = 0
     let endOffset = 0
     let start = 0
-
-    const document = editor.value.document
     const pointCache = [null, Point.create({})]
 
     for (const token of tokens) {
