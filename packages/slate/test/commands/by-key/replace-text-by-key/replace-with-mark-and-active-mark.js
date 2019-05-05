@@ -29,11 +29,11 @@ export const output = (
       <paragraph>
         Meow,{' '}
         <i>
-          <b>
-            cat is cute<cursor />
-          </b>
+          <b>cat is cute</b>
         </i>
-        <b>d.</b>
+        <b>
+          <cursor />d.
+        </b>
       </paragraph>
     </document>
   </value>

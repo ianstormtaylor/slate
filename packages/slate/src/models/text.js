@@ -1,10 +1,10 @@
 import isPlainObject from 'is-plain-object'
-import warning from 'tiny-warning'
-import { List, OrderedSet, Record, Set } from 'immutable'
+import invariant from 'tiny-invariant'
+import { List, Record } from 'immutable'
 
 import Leaf from './leaf'
+import Mark from './mark'
 import KeyUtils from '../utils/key-utils'
-import memoize from '../utils/memoize'
 
 /**
  * Default properties.
@@ -13,8 +13,9 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  leaves: undefined,
   key: undefined,
+  marks: undefined,
+  text: undefined,
 }
 
 /**
@@ -37,15 +38,10 @@ class Text extends Record(DEFAULTS) {
     }
 
     if (typeof attrs === 'string') {
-      attrs = { leaves: [{ text: attrs }] }
+      attrs = { text: attrs }
     }
 
     if (isPlainObject(attrs)) {
-      if (attrs.text) {
-        const { text, marks, key } = attrs
-        attrs = { key, leaves: [{ text, marks }] }
-      }
-
       return Text.fromJSON(attrs)
     }
 
@@ -84,37 +80,16 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { key = KeyUtils.create() } = object
-    let { leaves } = object
+    invariant(
+      object.leaves == null,
+      'As of slate@0.46, the `leaves` property of text nodes has been removed! Each individual leaf should be created as a text node instead.'
+    )
 
-    if (!leaves) {
-      if (object.ranges) {
-        warning(
-          false,
-          'As of slate@0.27.0, the `ranges` property of Slate objects has been renamed to `leaves`.'
-        )
-
-        leaves = object.ranges
-      } else {
-        leaves = List()
-      }
-    }
-
-    if (Array.isArray(leaves)) {
-      leaves = List(leaves.map(x => Leaf.create(x)))
-    } else if (List.isList(leaves)) {
-      leaves = leaves.map(x => Leaf.create(x))
-    } else {
-      throw new Error('leaves must be either Array or Immutable.List')
-    }
-
-    if (leaves.size === 0) {
-      leaves = leaves.push(Leaf.create())
-    }
-
+    const { text = '', marks = [], key = KeyUtils.create() } = object
     const node = new Text({
-      leaves: Leaf.createLeaves(leaves),
       key,
+      text,
+      marks: Mark.createSet(marks),
     })
 
     return node
@@ -132,121 +107,57 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Find the 'first' leaf at offset; By 'first' the alorighthm prefers `endOffset === offset` than `startOffset === offset`
-   * Corner Cases:
-   *   1. if offset is negative, return the first leaf;
-   *   2. if offset is larger than text length, the leaf is null, startOffset, endOffset and index is of the last leaf
+   * Add a `mark`.
    *
-   * @param {number}
-   * @returns {Object}
-   *   @property {number} startOffset
-   *   @property {number} endOffset
-   *   @property {number} index
-   *   @property {Leaf} leaf
-   */
-
-  searchLeafAtOffset(offset) {
-    let endOffset = 0
-    let startOffset = 0
-    let index = -1
-
-    const leaf = this.leaves.find(l => {
-      index++
-      startOffset = endOffset
-      endOffset = startOffset + l.text.length
-      return endOffset >= offset
-    })
-
-    return {
-      leaf,
-      endOffset,
-      index,
-      startOffset,
-    }
-  }
-
-  /**
-   * Add a `mark` at `index` and `length`.
-   *
-   * @param {Number} index
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Text}
    */
 
-  addMark(index, length, mark) {
-    const marks = Set.of(mark)
-    return this.addMarks(index, length, marks)
+  addMark(mark) {
+    mark = Mark.create(mark)
+    const { marks } = this
+    const next = marks.add(mark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
-   * Add a `set` of marks at `index` and `length`.
-   * Corner Cases:
-   *   1. If empty text, and if length === 0 and index === 0, will make sure the text contain an empty leaf with the given mark.
+   * Add a set of `marks`.
    *
-   * @param {Number} index
-   * @param {Number} length
-   * @param {Set<Mark>} set
+   * @param {Set<Mark>} marks
    * @return {Text}
    */
 
-  addMarks(index, length, set) {
-    if (this.text === '' && length === 0 && index === 0) {
-      const { leaves } = this
-      const first = leaves.first()
-
-      if (!first) {
-        return this.set(
-          'leaves',
-          List.of(Leaf.fromJSON({ text: '', marks: set }))
-        )
-      }
-
-      const newFirst = first.addMarks(set)
-      if (newFirst === first) return this
-      return this.set('leaves', List.of(newFirst))
-    }
-
-    if (this.text === '') return this
-    if (length === 0) return this
-    if (index >= this.text.length) return this
-
-    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
-    const [middle, after] = Leaf.splitLeaves(bundle, length)
-    const leaves = before.concat(middle.map(x => x.addMarks(set)), after)
-    return this.setLeaves(leaves)
+  addMarks(marks) {
+    marks = Mark.createSet(marks)
+    const node = this.set('marks', this.marks.union(marks))
+    return node
   }
 
   /**
-   * Derive the leaves for a list of `decorations`.
+   * Get the leaves for the text node, with `decorations`.
    *
-   * @param {List} decorations (optional)
+   * @param {List<Decoration>} decorations
    * @return {List<Leaf>}
    */
 
   getLeaves(decorations) {
-    let { leaves } = this
+    const { key, text, marks } = this
+    const leaf = Leaf.create({ text, marks })
+    let leaves = Leaf.createList([leaf])
 
     // PERF: We can exit early without decorations.
-    if (!decorations || decorations.size === 0) return leaves
-
-    // HACK: We shouldn't need this, because text nodes should never be in a
-    // position of not having any leaves...
-    if (leaves.size === 0) {
-      const marks = decorations.map(d => d.mark)
-      const leaf = Leaf.create({ marks })
-      return List([leaf])
+    if (!decorations || decorations.size === 0) {
+      return leaves
     }
 
     // HACK: this shouldn't be necessary, because the loop below should handle
     // the `0` case without failures. It may already even, not sure.
-    if (this.text.length === 0) {
-      const marks = decorations.map(d => d.mark)
-      const leaf = Leaf.create({ marks })
-      return List([leaf])
+    if (text === '') {
+      const decMarks = decorations.map(d => d.mark)
+      const l = Leaf.create({ marks: decMarks })
+      return List([l])
     }
-
-    const { key, text } = this
 
     decorations.forEach(dec => {
       const { start, end, mark } = dec
@@ -276,273 +187,48 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get all of the active marks on between two offsets
-   * Corner Cases:
-   *   1. if startOffset is equal or bigger than endOffset, then return Set();
-   *   2. If no text is selected between start and end, then return Set()
-   *
-   * @return {Set<Mark>}
-   */
-
-  getActiveMarksBetweenOffsets(startOffset, endOffset) {
-    if (startOffset <= 0 && endOffset >= this.text.length) {
-      return this.getActiveMarks()
-    }
-
-    if (startOffset >= endOffset) return Set()
-    // For empty text in a paragraph, use getActiveMarks;
-    if (this.text === '') return this.getActiveMarks()
-
-    let result = null
-    let leafEnd = 0
-
-    this.leaves.forEach(leaf => {
-      const leafStart = leafEnd
-      leafEnd = leafStart + leaf.text.length
-
-      if (leafEnd <= startOffset) return
-      if (leafStart >= endOffset) return false
-
-      if (!result) {
-        result = leaf.marks
-        return
-      }
-
-      result = result.intersect(leaf.marks)
-      if (result && result.size === 0) return false
-      return false
-    })
-
-    return result || Set()
-  }
-
-  /**
-   * Get all of the active marks on the text
-   *
-   * @return {Set<Mark>}
-   */
-
-  getActiveMarks() {
-    if (this.leaves.size === 0) return Set()
-
-    const result = this.leaves.first().marks
-    if (result.size === 0) return result
-
-    return result.toOrderedSet().withMutations(x => {
-      this.leaves.forEach(c => {
-        x.intersect(c.marks)
-        if (x.size === 0) return false
-      })
-    })
-  }
-
-  /**
-   * Get all of the marks on between two offsets
-   * Corner Cases:
-   *   1. if startOffset is equal or bigger than endOffset, then return Set();
-   *   2. If no text is selected between start and end, then return Set()
-   *
-   * @return {OrderedSet<Mark>}
-   */
-
-  getMarksBetweenOffsets(startOffset, endOffset) {
-    if (startOffset <= 0 && endOffset >= this.text.length) {
-      return this.getMarks()
-    }
-
-    if (startOffset >= endOffset) return Set()
-    // For empty text in a paragraph, use getActiveMarks;
-    if (this.text === '') return this.getActiveMarks()
-
-    let result = null
-    let leafEnd = 0
-
-    this.leaves.forEach(leaf => {
-      const leafStart = leafEnd
-      leafEnd = leafStart + leaf.text.length
-
-      if (leafEnd <= startOffset) return
-      if (leafStart >= endOffset) return false
-
-      if (!result) {
-        result = leaf.marks
-        return
-      }
-
-      result = result.union(leaf.marks)
-    })
-
-    return result || Set()
-  }
-
-  /**
-   * Get all of the marks on the text.
-   *
-   * @return {OrderedSet<Mark>}
-   */
-
-  getMarks() {
-    const array = this.getMarksAsArray()
-    return new OrderedSet(array)
-  }
-
-  /**
-   * Get all of the marks on the text as an array
-   *
-   * @return {Array}
-   */
-
-  getMarksAsArray() {
-    if (this.leaves.size === 0) return []
-    const first = this.leaves.first().marks
-    if (this.leaves.size === 1) return first.toArray()
-
-    const result = []
-
-    this.leaves.forEach(leaf => {
-      result.push(leaf.marks.toArray())
-    })
-
-    return Array.prototype.concat.apply(first.toArray(), result)
-  }
-
-  /**
-   * Get the marks on the text at `index`.
-   * Corner Cases:
-   *   1. if no text is before the index, and index !== 0, then return Set()
-   *   2. (for insert after split node or mark at range) if index === 0, and text === '', then return the leaf.marks
-   *   3. if index === 0, text !== '', return Set()
-   *
-   *
-   * @param {Number} index
-   * @return {Set<Mark>}
-   */
-
-  getMarksAtIndex(index) {
-    const { leaf } = this.searchLeafAtOffset(index)
-    if (!leaf) return Set()
-    return leaf.marks
-  }
-
-  /**
    * Insert `text` at `index`.
    *
-   * @param {Numbder} offset
-   * @param {String} text
-   * @param {Set} marks (optional)
+   * @param {Number} index
+   * @param {String} string
    * @return {Text}
    */
 
-  insertText(offset, text, marks) {
-    if (this.text === '') {
-      return this.set('leaves', List.of(Leaf.create({ text, marks })))
-    }
-
-    if (text.length === 0) return this
-    if (!marks) marks = Set()
-
-    const { startOffset, leaf, index } = this.searchLeafAtOffset(offset)
-    const delta = offset - startOffset
-    const beforeText = leaf.text.slice(0, delta)
-    const afterText = leaf.text.slice(delta)
-    const { leaves } = this
-
-    if (leaf.marks.equals(marks)) {
-      return this.set(
-        'leaves',
-        leaves.set(index, leaf.set('text', beforeText + text + afterText))
-      )
-    }
-
-    const nextLeaves = leaves.splice(
-      index,
-      1,
-      leaf.set('text', beforeText),
-      Leaf.create({ text, marks }),
-      leaf.set('text', afterText)
-    )
-
-    return this.setLeaves(nextLeaves)
+  insertText(index, string) {
+    const { text } = this
+    const next = text.slice(0, index) + string + text.slice(index)
+    const node = this.set('text', next)
+    return node
   }
 
   /**
-   * Remove a `mark` at `index` and `length`.
+   * Remove a `mark`.
    *
-   * @param {Number} index
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Text}
    */
 
-  removeMark(index, length, mark) {
-    if (this.text === '' && index === 0 && length === 0) {
-      const first = this.leaves.first()
-      if (!first) return this
-      const newFirst = first.removeMark(mark)
-      if (newFirst === first) return this
-      return this.set('leaves', List.of(newFirst))
-    }
-
-    if (length <= 0) return this
-    if (index >= this.text.length) return this
-    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
-    const [middle, after] = Leaf.splitLeaves(bundle, length)
-    const leaves = before.concat(middle.map(x => x.removeMark(mark)), after)
-    return this.setLeaves(leaves)
+  removeMark(mark) {
+    mark = Mark.create(mark)
+    const { marks } = this
+    const next = marks.remove(mark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
-   * Remove text from the text node at `start` for `length`.
+   * Remove text from the text node at `index` for `length`.
    *
-   * @param {Number} start
+   * @param {Number} index
    * @param {Number} length
    * @return {Text}
    */
 
-  removeText(start, length) {
-    if (length <= 0) return this
-    if (start >= this.text.length) return this
-
-    // PERF: For simple backspace, we can operate directly on the leaf
-    if (length === 1) {
-      const { leaf, index, startOffset } = this.searchLeafAtOffset(start + 1)
-      const offset = start - startOffset
-
-      if (leaf) {
-        if (leaf.text.length === 1) {
-          const leaves = this.leaves.remove(index)
-          return this.setLeaves(leaves)
-        }
-
-        const beforeText = leaf.text.slice(0, offset)
-        const afterText = leaf.text.slice(offset + length)
-        const text = beforeText + afterText
-
-        if (text.length > 0) {
-          return this.set(
-            'leaves',
-            this.leaves.set(index, leaf.set('text', text))
-          )
-        }
-      }
-    }
-
-    const [before, bundle] = Leaf.splitLeaves(this.leaves, start)
-    const after = Leaf.splitLeaves(bundle, length)[1]
-    const leaves = Leaf.createLeaves(before.concat(after))
-
-    if (leaves.size === 1) {
-      const first = leaves.first()
-
-      if (first.text === '') {
-        return this.set(
-          'leaves',
-          List.of(first.set('marks', this.getActiveMarks()))
-        )
-      }
-    }
-
-    return this.set('leaves', leaves)
+  removeText(index, length) {
+    const { text } = this
+    const next = text.slice(0, index) + text.slice(index + length)
+    const node = this.set('text', next)
+    return node
   }
 
   /**
@@ -555,9 +241,8 @@ class Text extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
-      leaves: this.getLeaves()
-        .toArray()
-        .map(r => r.toJSON()),
+      text: this.text,
+      marks: this.marks.toArray().map(m => m.toJSON()),
     }
 
     if (options.preserveKeys) {
@@ -568,98 +253,49 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Update a `mark` at `index` and `length` with `properties`.
+   * Set a `newProperties` on an existing `mark`.
    *
-   * @param {Number} index
-   * @param {Number} length
-   * @param {Mark} mark
-   * @param {Object} properties
+   * @param {Object} mark
+   * @param {Object} newProperties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, properties) {
-    const newMark = mark.merge(properties)
-
-    if (this.text === '' && length === 0 && index === 0) {
-      const { leaves } = this
-      const first = leaves.first()
-      if (!first) return this
-      const newFirst = first.updateMark(mark, newMark)
-      if (newFirst === first) return this
-      return this.set('leaves', List.of(newFirst))
-    }
-
-    if (length <= 0) return this
-    if (index >= this.text.length) return this
-
-    const [before, bundle] = Leaf.splitLeaves(this.leaves, index)
-    const [middle, after] = Leaf.splitLeaves(bundle, length)
-
-    const leaves = before.concat(
-      middle.map(x => x.updateMark(mark, newMark)),
-      after
-    )
-
-    return this.setLeaves(leaves)
+  setMark(properties, newProperties) {
+    const { marks } = this
+    const mark = Mark.create(properties)
+    const newMark = mark.merge(newProperties)
+    const next = marks.remove(mark).add(newMark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
-   * Split this text and return two different texts
-   * @param {Number} position
+   * Split the node into two at `index`.
+   *
+   * @param {Number} index
    * @returns {Array<Text>}
    */
 
-  splitText(offset) {
-    const splitted = Leaf.splitLeaves(this.leaves, offset)
-    const one = this.set('leaves', splitted[0])
-    const two = this.set('leaves', splitted[1]).regenerateKey()
+  splitText(index) {
+    const { text } = this
+    const one = this.set('text', text.slice(0, index))
+    const two = this.set('text', text.slice(index)).regenerateKey()
     return [one, two]
   }
 
   /**
-   * merge this text and another text at the end
-   * @param {Text} text
-   * @returns {Text}
-   */
-
-  mergeText(text) {
-    const leaves = this.leaves.concat(text.leaves)
-    return this.setLeaves(leaves)
-  }
-
-  /**
-   * Set leaves with normalized `leaves`
+   * Merge the node with an `other` text node.
    *
-   * @param {List} leaves
+   * @param {Text} other
    * @returns {Text}
    */
 
-  setLeaves(leaves) {
-    leaves = Leaf.createLeaves(leaves)
-
-    if (leaves.size === 1) {
-      const first = leaves.first()
-
-      if (!first.marks || first.marks.size === 0) {
-        if (first.text === '') {
-          return this.set('leaves', List([Leaf.create()]))
-        }
-      }
-    }
-
-    if (leaves.size === 0) {
-      leaves = leaves.push(Leaf.create())
-    }
-
-    return this.set('leaves', leaves)
+  mergeText(other) {
+    const next = this.text + other.text
+    const node = this.set('text', next)
+    return node
   }
 }
-
-/**
- * Memoize read methods.
- */
-
-memoize(Text.prototype, ['getActiveMarks', 'getMarks', 'getMarksAsArray'])
 
 /**
  * Export.

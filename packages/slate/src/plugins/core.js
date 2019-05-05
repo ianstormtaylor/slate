@@ -154,15 +154,37 @@ function CorePlugin(options = {}) {
         },
       },
 
-      // Merge adjacent text nodes.
+      // Merge adjacent text nodes with the same marks.
       {
         match: { object: 'text' },
-        next: [{ object: 'block' }, { object: 'inline' }],
+        next: (next, match) => {
+          return next.object !== 'text' || !match.marks.equals(next.marks)
+        },
         normalize: (editor, error) => {
           const { code, next } = error
 
-          if (code === 'next_sibling_object_invalid') {
+          if (code === 'next_sibling_invalid') {
             editor.mergeNodeByKey(next.key)
+          }
+        },
+      },
+
+      // Remove extra adjacent empty text nodes.
+      {
+        match: { object: 'text' },
+        previous: prev => {
+          return prev.object !== 'text' || prev.text !== ''
+        },
+        next: next => {
+          return next.object !== 'text' || next.text !== ''
+        },
+        normalize: (editor, error) => {
+          const { code, next, previous } = error
+
+          if (code === 'next_sibling_invalid') {
+            editor.removeNodeByKey(next.key)
+          } else if (code === 'previous_sibling_invalid') {
+            editor.removeNodeByKey(previous.key)
           }
         },
       },

@@ -7,25 +7,22 @@ module.exports.default = function(json) {
 }
 
 const input = {
+  object: 'value',
   document: {
+    object: 'document',
     nodes: Array.from(Array(100)).map(() => ({
-      type: 'list',
       object: 'block',
+      type: 'list',
       data: {},
       nodes: Array.from(Array(10)).map(() => ({
-        type: 'list-item',
         object: 'block',
+        type: 'list-item',
         data: {},
         nodes: [
           {
-            leaves: [
-              {
-                object: 'leaf',
-                marks: [],
-                text: '',
-              },
-            ],
             object: 'text',
+            marks: [],
+            text: '',
           },
           {
             type: 'link',
@@ -35,26 +32,16 @@ const input = {
             },
             nodes: [
               {
-                leaves: [
-                  {
-                    object: 'leaf',
-                    marks: [],
-                    text: 'Some text for a link',
-                  },
-                ],
                 object: 'text',
+                marks: [],
+                text: 'Some text for a link',
               },
             ],
           },
           {
-            leaves: [
-              {
-                object: 'leaf',
-                marks: [],
-                text: '',
-              },
-            ],
             object: 'text',
+            marks: [],
+            text: '',
           },
         ],
       })),

@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
-              }
-            ]
+            "text":
+              "There are certain behaviors that require rendering dynamic marks on string of text, like rendering code highlighting. For example:"
           }
         ]
       },
@@ -29,11 +27,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "// A simple FizzBuzz implementation."
-                  }
-                ]
+                "text": "// A simple FizzBuzz implementation."
               }
             ]
           },
@@ -43,11 +37,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "for (var i = 1; i <= 100; i++) {"
-                  }
-                ]
+                "text": "for (var i = 1; i <= 100; i++) {"
               }
             ]
           },
@@ -57,11 +47,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "  if (i % 15 == 0) {"
-                  }
-                ]
+                "text": "  if (i % 15 == 0) {"
               }
             ]
           },
@@ -71,11 +57,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "    console.log('Fizz Buzz');"
-                  }
-                ]
+                "text": "    console.log('Fizz Buzz');"
               }
             ]
           },
@@ -85,11 +67,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "  } else if (i % 5 == 0) {"
-                  }
-                ]
+                "text": "  } else if (i % 5 == 0) {"
               }
             ]
           },
@@ -99,11 +77,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "    console.log('Buzz');"
-                  }
-                ]
+                "text": "    console.log('Buzz');"
               }
             ]
           },
@@ -113,11 +87,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "  } else if (i % 3 == 0) {"
-                  }
-                ]
+                "text": "  } else if (i % 3 == 0) {"
               }
             ]
           },
@@ -127,11 +97,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "    console.log('Fizz');"
-                  }
-                ]
+                "text": "    console.log('Fizz');"
               }
             ]
           },
@@ -141,11 +107,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "  } else {"
-                  }
-                ]
+                "text": "  } else {"
               }
             ]
           },
@@ -155,11 +117,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "    console.log(i);"
-                  }
-                ]
+                "text": "    console.log(i);"
               }
             ]
           },
@@ -169,11 +127,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "  }"
-                  }
-                ]
+                "text": "  }"
               }
             ]
           },
@@ -183,11 +137,7 @@
             "nodes": [
               {
                 "object": "text",
-                "leaves": [
-                  {
-                    "text": "}"
-                  }
-                ]
+                "text": "}"
               }
             ]
           }
@@ -199,11 +149,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out for yourself!"
-              }
-            ]
+            "text": "Try it out for yourself!"
           }
         ]
       }

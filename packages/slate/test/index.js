@@ -49,13 +49,13 @@ describe('slate', () => {
     assert.equal(actual, expected)
   })
 
-  fixtures(__dirname, 'models/text', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
+  // fixtures(__dirname, 'models/text', ({ module }) => {
+  //   const { input, output } = module
+  //   const fn = module.default
+  //   const actual = fn(input).toJSON()
+  //   const expected = output.toJSON()
+  //   assert.deepEqual(actual, expected)
+  // })
 
   fixtures(__dirname, 'models/node', ({ module }) => {
     const { input, output } = module

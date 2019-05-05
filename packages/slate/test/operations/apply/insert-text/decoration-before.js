@@ -8,7 +8,6 @@ export default [
     path: [0, 0],
     offset: 1,
     text: 'x',
-    marks: [],
   },
 ]
 

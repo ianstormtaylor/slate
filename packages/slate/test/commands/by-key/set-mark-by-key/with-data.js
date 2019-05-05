@@ -21,9 +21,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text key="a">
-          <b thing="value">word</b>
-        </text>
+        <b key="a" thing="value">
+          word
+        </b>
       </paragraph>
     </document>
   </value>

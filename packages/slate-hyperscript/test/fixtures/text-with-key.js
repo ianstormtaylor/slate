@@ -11,11 +11,6 @@ export const options = {
 export const output = {
   object: 'text',
   key: 'a',
-  leaves: [
-    {
-      object: 'leaf',
-      text: 'word',
-      marks: [],
-    },
-  ],
+  text: 'word',
+  marks: [],
 }

@@ -69,7 +69,30 @@ class Node {
 
   static createList(elements = []) {
     if (List.isList(elements) || Array.isArray(elements)) {
-      const list = List(elements.map(Node.create))
+      let array = []
+
+      elements.forEach(el => {
+        if (
+          el &&
+          el.object === 'text' &&
+          el.leaves &&
+          Array.isArray(el.leaves)
+        ) {
+          warning(
+            false,
+            'As of slate@0.46, the `leaves` property of Text nodes has been removed. Instead, each text node contains a string of text and a unique set of marks and leaves are unnecessary.'
+          )
+
+          const texts = Text.createList(el.leaves).toArray()
+          array = array.concat(texts)
+          return
+        }
+
+        const node = Node.create(el)
+        array.push(node)
+      })
+
+      const list = List(array)
       return list
     }
 

@@ -1,7 +1,6 @@
 import Debug from 'debug'
 
 import Operation from '../models/operation'
-import PathUtils from '../utils/path-utils'
 
 /**
  * Debug.
@@ -26,8 +25,8 @@ function applyOperation(value, op) {
 
   switch (type) {
     case 'add_mark': {
-      const { path, offset, length, mark } = op
-      const next = value.addMark(path, offset, length, mark)
+      const { path, mark } = op
+      const next = value.addMark(path, mark)
       return next
     }
 
@@ -51,18 +50,13 @@ function applyOperation(value, op) {
 
     case 'move_node': {
       const { path, newPath } = op
-
-      if (PathUtils.isEqual(path, newPath)) {
-        return value
-      }
-
       const next = value.moveNode(path, newPath)
       return next
     }
 
     case 'remove_mark': {
-      const { path, offset, length, mark } = op
-      const next = value.removeMark(path, offset, length, mark)
+      const { path, mark } = op
+      const next = value.removeMark(path, mark)
       return next
     }
 
@@ -79,26 +73,26 @@ function applyOperation(value, op) {
     }
 
     case 'set_mark': {
-      const { path, offset, length, mark, properties } = op
-      const next = value.setMark(path, offset, length, mark, properties)
+      const { path, properties, newProperties } = op
+      const next = value.setMark(path, properties, newProperties)
       return next
     }
 
     case 'set_node': {
-      const { path, properties } = op
-      const next = value.setNode(path, properties)
+      const { path, newProperties } = op
+      const next = value.setNode(path, newProperties)
       return next
     }
 
     case 'set_selection': {
-      const { properties } = op
-      const next = value.setSelection(properties)
+      const { newProperties } = op
+      const next = value.setSelection(newProperties)
       return next
     }
 
     case 'set_value': {
-      const { properties } = op
-      const next = value.setProperties(properties)
+      const { newProperties } = op
+      const next = value.setProperties(newProperties)
       return next
     }
 

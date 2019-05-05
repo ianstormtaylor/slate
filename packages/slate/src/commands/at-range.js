@@ -865,7 +865,9 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
     const startText = document.assertDescendant(start.key)
     const index = parent.nodes.indexOf(startText)
 
-    if (editor.isVoid(parent)) return
+    if (editor.isVoid(parent)) {
+      return
+    }
 
     editor.splitNodeByKey(start.key, start.offset)
     editor.insertNodeByKey(parent.key, index + 1, inline)
@@ -882,19 +884,21 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
  */
 
 Commands.insertTextAtRange = (editor, range, text, marks) => {
-  range = deleteExpandedAtRange(editor, range)
+  editor.withoutNormalizing(() => {
+    range = deleteExpandedAtRange(editor, range)
 
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const offset = start.offset
-  const parent = document.getParent(start.key)
+    const { value } = editor
+    const { document } = value
+    const { start } = range
+    const offset = start.offset
+    const parent = document.getParent(start.key)
 
-  if (editor.isVoid(parent)) {
-    return
-  }
+    if (editor.isVoid(parent)) {
+      return
+    }
 
-  editor.insertTextByKey(start.key, offset, text, marks)
+    editor.insertTextByKey(start.key, offset, text, marks)
+  })
 }
 
 /**
@@ -1329,28 +1333,23 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
     const endIndex = endBlock.nodes.indexOf(endChild)
 
     if (startInline && startInline === endInline) {
-      const text = startBlock
-        .getTextsAtRange(range)
-        .get(0)
-        .splitText(start.offset)[1]
-        .splitText(end.offset - start.offset)[0]
+      const texts = startBlock.getTextsAtRange(range).map(text => {
+        if (start.key === text.key && end.key === text.key) {
+          return text
+            .splitText(start.offset)[1]
+            .splitText(end.offset - start.offset)[0]
+            .regenerateKey()
+        } else if (start.key === text.key) {
+          return text.splitText(start.offset)[1].regenerateKey()
+        } else if (end.key === text.key) {
+          return text.splitText(end.offset)[0].regenerateKey()
+        } else {
+          return text.regenerateKey()
+        }
+      })
 
-      inline = inline.set('nodes', List([text]))
+      inline = inline.set('nodes', texts)
       editor.insertInlineAtRange(range, inline)
-
-      const inlinekey = inline.getFirstText().key
-      const rng = {
-        anchor: {
-          key: inlinekey,
-          offset: 0,
-        },
-        focus: {
-          key: inlinekey,
-          offset: end.offset - start.offset,
-        },
-        isFocused: true,
-      }
-      editor.select(rng)
     } else if (startBlock === endBlock) {
       document = editor.value.document
       startBlock = document.getClosestBlock(start.key)
@@ -1422,8 +1421,8 @@ Commands.wrapTextAtRange = (editor, range, prefix, suffix = prefix) => {
   }
 
   editor.withoutNormalizing(() => {
-    editor.insertTextAtRange(startRange, prefix, [])
-    editor.insertTextAtRange(endRange, suffix, [])
+    editor.insertTextAtRange(startRange, prefix)
+    editor.insertTextAtRange(endRange, suffix)
   })
 }
 

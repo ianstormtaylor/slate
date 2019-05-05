@@ -36,7 +36,7 @@ export const value = (
     <document>
       <paragraph>
         <text key="a">
-          <anchor />
+          <anchor isFocused={false} />
         </text>
       </paragraph>
       <image src="https://example.com/image.png">
@@ -44,17 +44,13 @@ export const value = (
       </image>
       <paragraph>
         <text key="b">
-          <focus />
+          <focus isFocused={false} />
         </text>
       </paragraph>
       <image src="https://example.com/image2.png">
         <text />
       </image>
     </document>
-    <selection isFocused={false}>
-      <anchor key="a" offset={0} />
-      <focus key="b" offset={0} />
-    </selection>
   </value>
 )
 

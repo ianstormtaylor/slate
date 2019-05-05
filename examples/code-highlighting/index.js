@@ -4,6 +4,7 @@ import { Value, Point } from 'slate'
 import Prism from 'prismjs'
 import 'prismjs/themes/prism.css'
 import React from 'react'
+
 import initialValueAsJson from './value.json'
 
 /**
@@ -196,6 +197,7 @@ class CodeHighlighting extends React.Component {
     const others = next() || []
     if (node.type !== 'code') return others
 
+    const { document } = editor.value
     const language = node.data.get('language')
     const texts = node.getTexts().toArray()
     const string = texts.map(t => t.text).join('\n')

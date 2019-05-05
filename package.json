@@ -83,10 +83,12 @@
   "peerDependencies": {
     "slate": "*",
     "slate-dev-benchmark": "*",
+    "slate-dev-environment": "*",
     "slate-dev-test-utils": "*",
     "slate-html-serializer": "*",
     "slate-plain-serializer": "*",
-    "slate-react": "*"
+    "slate-react": "*",
+    "slate-react-placeholder": "*"
   },
   "scripts": {
     "benchmark": "cross-env COMPARE=compare node --expose-gc ./tmp/benchmark/index.js",

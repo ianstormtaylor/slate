@@ -634,6 +634,11 @@ function AfterPlugin(options = {}) {
     const window = getWindow(event.target)
     const selection = window.getSelection()
     setSelectionFromDom(window, editor, selection)
+
+    // COMPAT: reset the `isMouseDown` state here in case a `mouseup` event
+    // happens outside the editor. This is needed for `onFocus` handling.
+    isMouseDown = false
+
     next()
   }
 

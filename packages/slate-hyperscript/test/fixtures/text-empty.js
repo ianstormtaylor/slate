@@ -6,11 +6,6 @@ export const input = <text />
 
 export const output = {
   object: 'text',
-  leaves: [
-    {
-      object: 'leaf',
-      text: '',
-      marks: [],
-    },
-  ],
+  text: '',
+  marks: [],
 }

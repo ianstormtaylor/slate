@@ -83,13 +83,13 @@ Removes a `mark` from a text node at `path` starting at an `offset` and spanning
   path: List,
   offset: Number,
   length: Number,
-  mark: Mark,
   properties: Object,
+  newProperties: Object,
   data: Map,
 }
 ```
 
-Set new `properties` on any marks that match an existing `mark` in a text node at `path`, starting at an `offset` and spanning `length` characters.
+Set new `newProperties` on any marks that match an existing `properties` mark in a text node at `path`, starting at an `offset` and spanning `length` characters.
 
 ## Node Operations
 
@@ -153,7 +153,7 @@ Remove the node at `path`.
   type: 'set_node',
   path: List,
   properties: Object,
-  node: Node,
+  newProperties: Object,
   data: Map,
 }
 ```
@@ -183,7 +183,7 @@ Split the node at `path` at `position`. The `position` refers to either the inde
 {
   type: 'set_selection',
   properties: Object,
-  selection: Selection,
+  newProperties: Object,
   data: Map,
 }
 ```
@@ -196,7 +196,7 @@ Set new `properties` on the selection.
 {
   type: 'set_value',
   properties: Object,
-  value: Value,
+  newProperties: Object,
   data: Map,
 }
 ```

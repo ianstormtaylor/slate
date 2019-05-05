@@ -6,6 +6,11 @@ export default [
   {
     type: 'remove_node',
     path: [0],
+    node: (
+      <paragraph>
+        o<highlight key="a" />ne
+      </paragraph>
+    ),
   },
 ]
 

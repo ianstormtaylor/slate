@@ -25,19 +25,27 @@ import Operation from '../models/operation'
 
 class ElementInterface {
   /**
-   * Add mark to text at `offset` and `length` in node by `path`.
+   * Get the concatenated text of the node.
+   *
+   * @return {String}
+   */
+
+  get text() {
+    return this.getText()
+  }
+
+  /**
+   * Add `mark` to text at `path`.
    *
    * @param {List|String} path
-   * @param {Number} offset
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Node}
    */
 
-  addMark(path, offset, length, mark) {
-    let node = this.assertDescendant(path)
+  addMark(path, mark) {
     path = this.resolvePath(path)
-    node = node.addMark(offset, length, mark)
+    let node = this.assertDescendant(path)
+    node = node.addMark(mark)
     const ret = this.replaceNode(path, node)
     return ret
   }
@@ -268,15 +276,17 @@ class ElementInterface {
     }
 
     if (PathUtils.isEqual(startPath, endPath)) {
-      return startText.getActiveMarksBetweenOffsets(startOffset, endOffset)
+      return startText.marks
     }
 
-    const startMarks = startText.getActiveMarksBetweenOffsets(
-      startOffset,
-      startText.text.length
-    )
-    if (startMarks.size === 0) return Set()
-    const endMarks = endText.getActiveMarksBetweenOffsets(0, endOffset)
+    const startMarks = startText.marks
+
+    // PERF: if start marks is empty we can return early.
+    if (startMarks.size === 0) {
+      return Set()
+    }
+
+    const endMarks = endText.marks
     let marks = startMarks.intersect(endMarks)
 
     // If marks is already empty, the active marks is empty
@@ -288,12 +298,16 @@ class ElementInterface {
 
     while (!PathUtils.isEqual(startPath, endPath)) {
       if (startText.text.length !== 0) {
-        marks = marks.intersect(startText.getActiveMarks())
-        if (marks.size === 0) return Set()
+        marks = marks.intersect(startText.marks)
+
+        if (marks.size === 0) {
+          return Set()
+        }
       }
 
       ;[startText, startPath] = this.getNextTextAndPath(startPath)
     }
+
     return marks
   }
 
@@ -804,7 +818,7 @@ class ElementInterface {
     }
 
     const text = this.getDescendant(start.path)
-    const marks = text.getMarksAtIndex(start.offset + 1)
+    const { marks } = text
     return marks
   }
 
@@ -939,7 +953,9 @@ class ElementInterface {
     const result = []
 
     this.nodes.forEach(node => {
-      result.push(node.getMarksAsArray())
+      result.push(
+        node.object === 'text' ? node.marks.toArray() : node.getMarksAsArray()
+      )
     })
 
     // PERF: use only one concat rather than multiple for speed.
@@ -958,22 +974,29 @@ class ElementInterface {
   getMarksAtPosition(path, offset) {
     path = this.resolvePath(path)
     const text = this.getDescendant(path)
-    const currentMarks = text.getMarksAtIndex(offset)
-    if (offset !== 0) return currentMarks
+    const currentMarks = text.marks
+
+    if (offset !== 0) {
+      return currentMarks
+    }
+
     const closestBlock = this.getClosestBlock(path)
 
+    // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
     if (closestBlock.text === '') {
-      // insert mark for empty block; the empty block are often created by split node or add marks in a range including empty blocks
       return currentMarks
     }
 
     const previous = this.getPreviousTextAndPath(path)
-    if (!previous) return Set()
+
+    if (!previous) {
+      return Set()
+    }
 
     const [previousText, previousPath] = previous
 
     if (closestBlock.hasDescendant(previousPath)) {
-      return previous.getMarksAtIndex(previousText.text.length)
+      return previousText.marks
     }
 
     return currentMarks
@@ -1346,28 +1369,18 @@ class ElementInterface {
   getOrderedMarksBetweenPositions(startPath, startOffset, endPath, endOffset) {
     startPath = this.resolvePath(startPath)
     endPath = this.resolvePath(endPath)
-
     const startText = this.getDescendant(startPath)
 
+    // PERF: if the paths are equal, we can just use the start.
     if (PathUtils.isEqual(startPath, endPath)) {
-      return startText.getMarksBetweenOffsets(startOffset, endOffset)
+      return startText.marks
     }
-
-    const endText = this.getDescendant(endPath)
 
     const texts = this.getTextsBetweenPathPositionsAsArray(startPath, endPath)
 
     return OrderedSet().withMutations(result => {
       texts.forEach(text => {
-        if (text.key === startText.key) {
-          result.union(
-            text.getMarksBetweenOffsets(startOffset, text.text.length)
-          )
-        } else if (text.key === endText.key) {
-          result.union(text.getMarksBetweenOffsets(0, endOffset))
-        } else {
-          result.union(text.getMarks())
-        }
+        result.union(text.marks)
       })
     })
   }
@@ -1902,14 +1915,13 @@ class ElementInterface {
    * @param {List|String} path
    * @param {Number} offset
    * @param {String} text
-   * @param {Set} marks
    * @return {Node}
    */
 
-  insertText(path, offset, text, marks) {
-    let node = this.assertDescendant(path)
+  insertText(path, offset, text) {
     path = this.resolvePath(path)
-    node = node.insertText(offset, text, marks)
+    let node = this.assertDescendant(path)
+    node = node.insertText(offset, text)
     const ret = this.replaceNode(path, node)
     return ret
   }
@@ -2086,19 +2098,17 @@ class ElementInterface {
   }
 
   /**
-   * Remove mark from text at `offset` and `length` in node.
+   * Remove `mark` from text at `path`.
    *
    * @param {List} path
-   * @param {Number} offset
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Node}
    */
 
-  removeMark(path, offset, length, mark) {
-    let node = this.assertDescendant(path)
+  removeMark(path, mark) {
     path = this.resolvePath(path)
-    node = node.removeMark(offset, length, mark)
+    let node = this.assertDescendant(path)
+    node = node.removeMark(mark)
     const ret = this.replaceNode(path, node)
     return ret
   }
@@ -2240,9 +2250,10 @@ class ElementInterface {
    * @return {Node}
    */
 
-  setMark(path, offset, length, mark, properties) {
-    let node = this.assertNode(path)
-    node = node.updateMark(offset, length, mark, properties)
+  setMark(path, properties, newProperties) {
+    path = this.resolvePath(path)
+    let node = this.assertDescendant(path)
+    node = node.setMark(properties, newProperties)
     const ret = this.replaceNode(path, node)
     return ret
   }

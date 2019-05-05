@@ -23,7 +23,7 @@ function getEventRange(event, editor) {
     event = event.nativeEvent
   }
 
-  const { x, y, target } = event
+  const { clientX: x, clientY: y, target } = event
   if (x == null || y == null) return null
 
   const { value } = editor

@@ -22,7 +22,7 @@ const value = (
             <paragraph>
               This is editable <b>rich</b> text, <i>much</i> better than a
               textarea!
-              {i === 0 ? <cursor /> : ''}
+              {i === 0 ? <cursor /> : null}
             </paragraph>
           </paragraph>
         </quote>

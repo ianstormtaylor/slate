@@ -20,11 +20,11 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
         <i>
-          <b>word</b>
+          <b>
+            <anchor />word<focus />
+          </b>
         </i>
-        <focus />
       </paragraph>
     </document>
   </value>
