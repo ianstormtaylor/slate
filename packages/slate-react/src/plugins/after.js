@@ -643,6 +643,32 @@ function AfterPlugin(options = {}) {
   }
 
   /**
+   * On composition end.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  function onCompositionEnd(event, editor, next) {
+    debug('onCompositionEnd', { event })
+
+    const { data } = event
+
+    // A reliable way for adding text from IME
+    // For example, when typing Vietnamese if the user finishes a word without
+    // whitespace or enter (no onCompositionEnd yet) and suddenly change the
+    // selection (onCompositionEnd occurred) then no text was inserted, but the
+    // component still displays the text which causes that text to disappear if
+    // the user does other edit commands (text input, bold,...)
+    window.requestAnimationFrame(() => {
+      editor.insertText(data)
+    })
+
+    next()
+  }
+
+  /**
    * Return the plugin.
    *
    * @type {Object}
@@ -664,6 +690,7 @@ function AfterPlugin(options = {}) {
     onMouseUp,
     onPaste,
     onSelect,
+    onCompositionEnd,
   }
 }
 

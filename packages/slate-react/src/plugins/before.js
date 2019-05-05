@@ -33,6 +33,16 @@ function BeforePlugin() {
   let isDragging = false
 
   /**
+   * The before plugin queries.
+   *
+   * @type {Object}
+   */
+
+  const queries = {
+    isComposing: () => isComposing,
+  }
+
+  /**
    * On before input.
    *
    * @param {Event} event
@@ -42,7 +52,7 @@ function BeforePlugin() {
 
   function onBeforeInput(event, editor, next) {
     const isSynthetic = !!event.nativeEvent
-    if (editor.readOnly) return
+    if (editor.readOnly || isComposing) return
 
     // COMPAT: If the browser supports Input Events Level 2, we will have
     // attached a custom handler for the real `beforeinput` events, instead of
@@ -461,6 +471,7 @@ function BeforePlugin() {
    */
 
   return {
+    queries,
     onBeforeInput,
     onBlur,
     onClick,
