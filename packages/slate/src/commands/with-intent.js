@@ -283,13 +283,14 @@ Commands.insertFragment = (editor, fragment) => {
     // these have to be skipped.
     const { nodes } = lastBlock
     const lastIndex = nodes.findLastIndex(
-      node => node && node.object == 'inline'
+      node => node && node.object === 'inline'
     )
     const remainingTexts = nodes.takeLast(nodes.size - lastIndex - 1)
     const remainingTextLength = remainingTexts.reduce(
       (acc, val) => acc + val.text.length,
       0
     )
+    editor.moveToStartOfNode(newText).moveForward(remainingTextLength)
   }
 }
 
