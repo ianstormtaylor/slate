@@ -4,7 +4,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
-import { PathUtils } from 'slate'
+import { List } from 'immutable'
 import {
   IS_ANDROID,
   IS_FIREFOX,
@@ -458,18 +458,7 @@ class Content extends React.Component {
     } = props
     const { value } = editor
     const Container = tagName
-    const { document, selection, decorations } = value
-    const { start, end } = selection
-    const startIndex = start.path.first()
-    const endIndex = end.path.first() + 1
-    const decs = document.getDecorations([], editor).concat(decorations)
-
-    const children = document.nodes.toArray().map((child, i) => {
-      const childPath = PathUtils.create([i])
-      const childDecs = decs.filter(d => document.isInRange(childPath, d))
-      const isSelected = startIndex <= i && i < endIndex
-      return this.renderNode(child, isSelected, childDecs)
-    })
+    const { document, selection } = value
 
     const style = {
       // Prevent the default outline styles.
@@ -508,37 +497,17 @@ class Content extends React.Component {
         // so we have to disable it like this. (2017/04/24)
         data-gramm={false}
       >
-        {children}
+        <Node
+          annotations={value.annotations}
+          block={null}
+          decorations={List()}
+          editor={editor}
+          node={document}
+          parent={null}
+          readOnly={readOnly}
+          selection={selection}
+        />
       </Container>
-    )
-  }
-
-  /**
-   * Render a `child` node of the document.
-   *
-   * @param {Node} child
-   * @param {Boolean} isSelected
-   * @return {Element}
-   */
-
-  renderNode = (child, isSelected, decorations) => {
-    const { editor, readOnly } = this.props
-    const { value } = editor
-    const { document, selection } = value
-    const { isFocused } = selection
-
-    return (
-      <Node
-        block={null}
-        editor={editor}
-        decorations={decorations}
-        isSelected={isSelected}
-        isFocused={isFocused && isSelected}
-        key={child.key}
-        node={child}
-        parent={document}
-        readOnly={readOnly}
-      />
     )
   }
 }

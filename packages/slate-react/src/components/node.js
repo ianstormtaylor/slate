@@ -31,14 +31,14 @@ class Node extends React.Component {
    */
 
   static propTypes = {
+    annotations: ImmutableTypes.map.isRequired,
     block: SlateTypes.block,
     decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
-    isFocused: Types.bool.isRequired,
-    isSelected: Types.bool.isRequired,
     node: SlateTypes.node.isRequired,
-    parent: SlateTypes.node.isRequired,
+    parent: SlateTypes.node,
     readOnly: Types.bool.isRequired,
+    selection: SlateTypes.selection,
   }
 
   /**
@@ -105,6 +105,9 @@ class Node extends React.Component {
     if (n.isSelected || p.isSelected) return true
     if (n.isFocused || p.isFocused) return true
 
+    // If the annotations have changed, update.
+    if (!n.annotations.equals(p.annotations)) return true
+
     // If the decorations have changed, update.
     if (!n.decorations.equals(p.decorations)) return true
 
@@ -121,36 +124,43 @@ class Node extends React.Component {
   render() {
     this.debug('render', this)
     const {
-      editor,
-      isSelected,
-      isFocused,
-      node,
+      annotations,
+      block,
       decorations,
+      editor,
+      node,
       parent,
       readOnly,
+      selection,
     } = this.props
-    const { value } = editor
-    const { document, selection } = value
-    const { start, end } = selection
-    const path = document.getPath(node)
-    const startPath = start.path.slice(0, path.size)
-    const endPath = end.path.slice(0, path.size)
-    const startComp = PathUtils.compare(path, startPath)
-    const endComp = PathUtils.compare(path, endPath)
-    const decs = decorations.concat(document.getDecorations(path, editor))
-    const children = []
 
-    node.nodes.forEach((child, i) => {
-      const childPath = path.push(i)
-      const childDecs = decs.filter(d => document.isInRange(childPath, d))
-      const isChildSelected =
-        isSelected &&
-        startComp != null &&
-        startComp > -1 &&
-        endComp != null &&
-        endComp < 1
+    const newDecorations = node.getDecorations(editor)
+    const children = node.nodes.toArray().map((child, i) => {
+      const Component = child.object === 'text' ? Text : Node
+      const sel = selection && getRelativeRange(node, i, selection)
 
-      children.push(this.renderNode(child, isChildSelected, childDecs))
+      const decs = newDecorations
+        .map(d => getRelativeRange(node, i, d))
+        .filter(d => d)
+        .concat(decorations)
+
+      const anns = annotations
+        .map(a => getRelativeRange(node, i, a))
+        .filter(a => a)
+
+      return (
+        <Component
+          block={node.object === 'block' ? node : block}
+          editor={editor}
+          annotations={anns}
+          decorations={decs}
+          selection={sel}
+          key={child.key}
+          node={child}
+          parent={node}
+          readOnly={readOnly}
+        />
+      )
     })
 
     // Attributes that the developer must mix into the element in their
@@ -167,53 +177,88 @@ class Node extends React.Component {
     const props = {
       key: node.key,
       editor,
-      isFocused,
-      isSelected,
+      isFocused: selection && selection.isFocused,
+      isSelected: selection,
       node,
       parent,
       readOnly,
     }
 
-    const element = editor.run('renderNode', {
+    let render
+
+    if (node.object === 'block') {
+      render = 'renderBlock'
+    } else if (node.object === 'document') {
+      render = 'renderDocument'
+    } else if (node.object === 'inline') {
+      render = 'renderInline'
+    }
+
+    const element = editor.run(render, {
       ...props,
       attributes,
       children,
     })
 
-    return editor.query('isVoid', node) ? (
+    return editor.isVoid(node) ? (
       <Void {...this.props}>{element}</Void>
     ) : (
       element
     )
   }
+}
 
-  /**
-   * Render a `child` node.
-   *
-   * @param {Node} child
-   * @param {Boolean} isSelected
-   * @param {Array<Decoration>} decorations
-   * @return {Element}
-   */
+/**
+ * Return a `range` relative to a child at `index`.
+ *
+ * @param {Range} range
+ * @param {Number} index
+ * @return {Range}
+ */
 
-  renderNode = (child, isSelected, decorations) => {
-    const { block, editor, node, readOnly, isFocused } = this.props
-    const Component = child.object === 'text' ? Text : Node
+function getRelativeRange(node, index, range) {
+  const child = node.nodes.get(index)
+  let { start, end } = range
+  const { path: startPath } = start
+  const { path: endPath } = end
+  const startIndex = startPath.first()
+  const endIndex = endPath.first()
 
-    return (
-      <Component
-        block={node.object === 'block' ? node : block}
-        decorations={decorations}
-        editor={editor}
-        isSelected={isSelected}
-        isFocused={isFocused && isSelected}
-        key={child.key}
-        node={child}
-        parent={node}
-        readOnly={readOnly}
-      />
-    )
+  if (startIndex === index) {
+    start = start.setPath(startPath.rest())
+  } else if (startIndex < index && index <= endIndex) {
+    if (child.object === 'text') {
+      start = start.moveTo(PathUtils.create([index]), 0)
+    } else {
+      const [first] = child.texts()
+      const [, firstPath] = first
+      start = start.moveTo(firstPath, 0)
+    }
+  } else {
+    start = null
   }
+
+  if (endIndex === index) {
+    end = end.setPath(endPath.rest())
+  } else if (startIndex <= index && index < endIndex) {
+    if (child.object === 'text') {
+      end = end.moveTo(PathUtils.create([index]), child.text.length)
+    } else {
+      const [last] = child.texts({ direction: 'backward' })
+      const [lastNode, lastPath] = last
+      end = end.moveTo(lastPath, lastNode.text.length)
+    }
+  } else {
+    end = null
+  }
+
+  if (!start || !end) {
+    return null
+  }
+
+  range = range.setStart(start)
+  range = range.setEnd(end)
+  return range
 }
 
 /**
@@ -222,4 +267,5 @@ class Node extends React.Component {
  * @type {Component}
  */
 
+Node.List = NodeList
 export default Node

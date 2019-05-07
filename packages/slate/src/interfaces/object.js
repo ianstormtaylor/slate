@@ -1,3 +1,4 @@
+import Annotation from '../models/annotation'
 import Block from '../models/block'
 import Change from '../models/change'
 import Decoration from '../models/decoration'
@@ -49,6 +50,7 @@ function create(type) {
  */
 
 Object.entries({
+  Annotation,
   Block,
   Change,
   Decoration,

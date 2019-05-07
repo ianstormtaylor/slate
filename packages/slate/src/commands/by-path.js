@@ -109,37 +109,28 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
 Commands.insertTextByPath = (editor, path, offset, text, marks) => {
   marks = Mark.createSet(marks)
   const { value } = editor
-  const { decorations, document } = value
-  let updated = false
-
+  const { annotations, document } = value
   document.assertNode(path)
 
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-
-    if (!isAtomic) {
-      return true
-    }
-
-    if (!start.path.equals(path)) {
-      return true
-    }
-
-    if (
-      start.offset < offset &&
-      (!end.path.equals(path) || end.offset > offset)
-    ) {
-      updated = true
-      return false
-    }
-
-    return true
-  })
-
   editor.withoutNormalizing(() => {
-    if (updated) {
-      editor.setDecorations(decs)
+    for (const annotation of annotations.values()) {
+      const { start, end, mark } = annotation
+      const isAtomic = editor.isAtomic(mark)
+
+      if (!isAtomic) {
+        continue
+      }
+
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
     editor.applyOperation({
@@ -328,45 +319,36 @@ Commands.removeNodeByPath = (editor, path) => {
 
 Commands.removeTextByPath = (editor, path, offset, length) => {
   const { value } = editor
-  const { document, decorations } = value
+  const { document, annotations } = value
   const node = document.assertNode(path)
-  const { text } = node
-  const string = text.slice(offset, offset + length)
-  let updated = false
-
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-
-    if (!isAtomic) {
-      return true
-    }
-
-    if (!start.path.equals(path)) {
-      return true
-    }
-
-    if (
-      start.offset < offset &&
-      (!end.path.equals(path) || end.offset > offset)
-    ) {
-      updated = true
-      return false
-    }
-
-    return true
-  })
+  const text = node.text.slice(offset, offset + length)
 
   editor.withoutNormalizing(() => {
-    if (updated) {
-      editor.setDecorations(decs)
+    for (const annotation of annotations.values()) {
+      const { start, end, mark } = annotation
+      const isAtomic = editor.isAtomic(mark)
+
+      if (!isAtomic) {
+        continue
+      }
+
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
     editor.applyOperation({
       type: 'remove_text',
       path,
       offset,
-      text: string,
+      text,
     })
   })
 }

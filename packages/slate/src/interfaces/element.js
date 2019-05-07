@@ -3,6 +3,7 @@ import invariant from 'tiny-invariant'
 import warning from 'tiny-warning'
 import { List, OrderedSet, Set } from 'immutable'
 
+import Annotation from '../models/annotation'
 import Block from '../models/block'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
@@ -99,6 +100,19 @@ class ElementInterface {
     })
 
     return iterable
+  }
+
+  /**
+   * Create an annotation with `properties` relative to the node.
+   *
+   * @param {Object|Annotation} properties
+   * @return {Annotation}
+   */
+
+  createAnnotation(properties) {
+    properties = Annotation.createProperties(properties)
+    const annotation = this.resolveAnnotation(properties)
+    return annotation
   }
 
   /**
@@ -634,30 +648,13 @@ class ElementInterface {
   /**
    * Get the decorations for the node from an `editor`.
    *
-   * @param {List} path
    * @param {Editor} editor
    * @return {List}
    */
 
-  getDecorations(path, editor) {
-    path = this.resolvePath(path)
-    const node = this.assertNode(path)
-    let decorations = editor.run('decorateNode', node, path)
+  getDecorations(editor) {
+    let decorations = editor.run('decorateNode', this)
     decorations = Decoration.createList(decorations)
-
-    decorations = decorations.map(dec => {
-      dec = dec.updatePoints(point => {
-        if (point.path) {
-          return point.setPath(path.concat(point.path))
-        } else {
-          return point
-        }
-      })
-
-      dec = this.resolveDecoration(dec)
-      return dec
-    })
-
     return decorations
   }
 
@@ -1707,6 +1704,20 @@ class ElementInterface {
     const deep = path.flatMap(x => ['nodes', x])
     const ret = this.setIn(deep, node)
     return ret
+  }
+
+  /**
+   * Resolve a `annotation`, relative to the node, ensuring that the keys and
+   * offsets in the annotation exist and that they are synced with the paths.
+   *
+   * @param {Annotation|Object} annotation
+   * @return {Annotation}
+   */
+
+  resolveAnnotation(annotation) {
+    annotation = Annotation.create(annotation)
+    annotation = annotation.normalize(this)
+    return annotation
   }
 
   /**

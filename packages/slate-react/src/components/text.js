@@ -1,10 +1,10 @@
 import Debug from 'debug'
 import ImmutableTypes from 'react-immutable-proptypes'
-import Leaf from './leaf'
-import { PathUtils } from 'slate'
 import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
+
+import Leaf from './leaf'
 
 /**
  * Debug.
@@ -28,6 +28,7 @@ class Text extends React.Component {
    */
 
   static propTypes = {
+    annotations: ImmutableTypes.map.isRequired,
     block: SlateTypes.block,
     decorations: ImmutableTypes.list.isRequired,
     editor: Types.object.isRequired,
@@ -86,6 +87,9 @@ class Text extends React.Component {
       if (p.node === pLast && n.node !== nLast) return true
     }
 
+    // Re-render if the current annotations have changed.
+    if (!n.annotations.equals(p.annotations)) return true
+
     // Re-render if the current decorations have changed.
     if (!n.decorations.equals(p.decorations)) return true
 
@@ -102,75 +106,48 @@ class Text extends React.Component {
   render() {
     this.debug('render', this)
 
-    const { decorations, editor, node, style } = this.props
-    const { value } = editor
-    const { document } = value
+    const {
+      annotations,
+      block,
+      decorations,
+      node,
+      parent,
+      editor,
+      style,
+    } = this.props
     const { key } = node
-    const path = document.getPath(node)
+    const markers = annotations.concat(decorations)
 
-    const decs = decorations.filter(d => {
-      const { start, end } = d
+    // PERF: Take advantage of cache by avoiding arguments.
+    const leaves =
+      markers.size === 0 ? node.getLeaves() : node.getLeaves(markers)
 
-      // If either of the decoration's keys match, include it.
-      if (start.path.equals(path) || end.path.equals(path)) return true
+    let o = 0
+    const children = leaves.map((leaf, index) => {
+      const { text, marks } = leaf
+      const offset = o
+      o += text.length
 
-      // Otherwise, if the decoration is in a single node, it's not ours.
-      if (start.path.equals(end.path)) return false
-
-      // If the node's path is before the start path, ignore it.
-      if (PathUtils.compare(path, start.path) === -1) return false
-
-      // If the node's path is after the end path, ignore it.
-      if (PathUtils.compare(path, end.path) === 1) return false
-
-      // Otherwise, include it.
-      return true
-    })
-
-    // PERF: Take advantage of cache by avoiding arguments
-    const leaves = decs.size === 0 ? node.getLeaves() : node.getLeaves(decs)
-    let offset = 0
-
-    const children = leaves.map((leaf, i) => {
-      const child = this.renderLeaf(leaves, leaf, i, offset)
-      offset += leaf.text.length
-      return child
+      return (
+        <Leaf
+          key={`${node.key}-${index}`}
+          block={block}
+          editor={editor}
+          index={index}
+          marks={marks}
+          node={node}
+          offset={offset}
+          parent={parent}
+          leaves={leaves}
+          text={text}
+        />
+      )
     })
 
     return (
       <span data-key={key} style={style}>
         {children}
       </span>
-    )
-  }
-
-  /**
-   * Render a single leaf given a `leaf` and `offset`.
-   *
-   * @param {List<Leaf>} leaves
-   * @param {Leaf} leaf
-   * @param {Number} index
-   * @param {Number} offset
-   * @return {Element} leaf
-   */
-
-  renderLeaf = (leaves, leaf, index, offset) => {
-    const { block, node, parent, editor } = this.props
-    const { text, marks } = leaf
-
-    return (
-      <Leaf
-        key={`${node.key}-${index}`}
-        block={block}
-        editor={editor}
-        index={index}
-        marks={marks}
-        node={node}
-        offset={offset}
-        parent={parent}
-        leaves={leaves}
-        text={text}
-      />
     )
   }
 }

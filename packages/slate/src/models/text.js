@@ -135,32 +135,32 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the leaves for the text node, with `decorations`.
+   * Get the leaves for the text node, with `markers`.
    *
-   * @param {List<Decoration>} decorations
+   * @param {List<Annotation|Decoration>} markers
    * @return {List<Leaf>}
    */
 
-  getLeaves(decorations) {
+  getLeaves(markers) {
     const { key, text, marks } = this
     const leaf = Leaf.create({ text, marks })
     let leaves = Leaf.createList([leaf])
 
-    // PERF: We can exit early without decorations.
-    if (!decorations || decorations.size === 0) {
+    // PERF: We can exit early without markers.
+    if (!markers || markers.size === 0) {
       return leaves
     }
 
     // HACK: this shouldn't be necessary, because the loop below should handle
     // the `0` case without failures. It may already even, not sure.
     if (text === '') {
-      const decMarks = decorations.map(d => d.mark)
-      const l = Leaf.create({ marks: decMarks })
+      const markerMarks = markers.map(m => m.mark)
+      const l = Leaf.create({ marks: markerMarks })
       return List([l])
     }
 
-    decorations.forEach(dec => {
-      const { start, end, mark } = dec
+    markers.forEach(m => {
+      const { start, end, mark } = m
       const hasStart = start.key === key
       const hasEnd = end.key === key
 
@@ -182,7 +182,6 @@ class Text extends Record(DEFAULTS) {
       leaves = leaves.map(x => x.addMark(mark))
     })
 
-    if (leaves === this.leaves) return leaves
     return Leaf.createLeaves(leaves)
   }
 

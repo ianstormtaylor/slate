@@ -90,7 +90,7 @@ class Range extends Record(DEFAULTS) {
     }
 
     throw new Error(
-      `\`Range.createProperties\` only accepts objects, decorations, ranges or selections, but you passed it: ${a}`
+      `\`Range.createProperties\` only accepts objects, annotations, decorations, ranges or selections, but you passed it: ${a}`
     )
   }
 

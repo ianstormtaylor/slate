@@ -7,6 +7,18 @@ import styled from 'react-emotion'
 import { Icon, Toolbar } from '../components'
 
 /**
+ * Get a unique key for the search highlight annotations.
+ *
+ * @return {String}
+ */
+
+let n = 0
+
+function getHighlightKey() {
+  return `highlight_${n++}`
+}
+
+/**
  * Deserialize the initial editor value.
  *
  * @type {Object}
@@ -121,7 +133,7 @@ class SearchHighlighting extends React.Component {
   }
 
   /**
-   * On input change, update the decorations.
+   * On input change, update the annotations.
    *
    * @param {Event} event
    */
@@ -129,32 +141,36 @@ class SearchHighlighting extends React.Component {
   onInputChange = event => {
     const { editor } = this
     const { value } = editor
-    const { document } = value
+    const { document, annotations } = value
     const string = event.target.value
-    const decorations = []
 
-    for (const [node, path] of document.texts()) {
-      const { key, text } = node
-      const parts = text.split(string)
-      let offset = 0
-
-      parts.forEach((part, i) => {
-        if (i !== 0) {
-          decorations.push({
-            anchor: { path, key, offset: offset - string.length },
-            focus: { path, key, offset },
-            mark: { type: 'highlight' },
-          })
-        }
-
-        offset = offset + part.length + string.length
-      })
-    }
-
-    // Make the change to decorations without saving it into the undo history,
+    // Make the change to annotations without saving it into the undo history,
     // so that there isn't a confusing behavior when undoing.
     editor.withoutSaving(() => {
-      editor.setDecorations(decorations)
+      annotations.forEach(ann => {
+        if (ann.mark.type === 'highlight') {
+          editor.removeAnnotation(ann)
+        }
+      })
+
+      for (const [node, path] of document.texts()) {
+        const { key, text } = node
+        const parts = text.split(string)
+        let offset = 0
+
+        parts.forEach((part, i) => {
+          if (i !== 0) {
+            editor.addAnnotation({
+              key: getHighlightKey(),
+              anchor: { path, key, offset: offset - string.length },
+              focus: { path, key, offset },
+              mark: { type: 'highlight' },
+            })
+          }
+
+          offset = offset + part.length + string.length
+        })
+      }
     })
   }
 }

@@ -2,11 +2,11 @@ import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
 import { Record, Set, List } from 'immutable'
 
+import Annotation from './annotation'
+import Data from './data'
+import Document from './document'
 import Mark from './mark'
 import PathUtils from '../utils/path-utils'
-import Data from './data'
-import Decoration from './decoration'
-import Document from './document'
 
 /**
  * Default properties.
@@ -15,8 +15,8 @@ import Document from './document'
  */
 
 const DEFAULTS = {
+  annotations: undefined,
   data: undefined,
-  decorations: undefined,
   document: undefined,
   selection: undefined,
 }
@@ -60,16 +60,16 @@ class Value extends Record(DEFAULTS) {
   static createProperties(a = {}) {
     if (Value.isValue(a)) {
       return {
+        annotations: a.annotations,
         data: a.data,
-        decorations: a.decorations,
       }
     }
 
     if (isPlainObject(a)) {
       const p = {}
+      if ('annotations' in a)
+        p.annotations = Annotation.createList(a.annotations)
       if ('data' in a) p.data = Data.create(a.data)
-      if ('decorations' in a)
-        p.decorations = Decoration.createList(a.decorations)
       return p
     }
 
@@ -89,11 +89,11 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { data = {}, decorations = [], document = {}, selection = {} } = object
+    let { data = {}, annotations = {}, document = {}, selection = {} } = object
     data = Data.fromJSON(data)
     document = Document.fromJSON(document)
     selection = document.createSelection(selection)
-    decorations = List(decorations.map(d => Decoration.fromJSON(d)))
+    annotations = Annotation.createMap(annotations)
 
     if (selection.isUnset) {
       const text = document.getFirstText()
@@ -102,8 +102,8 @@ class Value extends Record(DEFAULTS) {
     }
 
     const value = new Value({
+      annotations,
       data,
-      decorations,
       document,
       selection,
     })
@@ -419,6 +419,24 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Add an `annotation` to the value.
+   *
+   * @param {Annotation} annotation
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  addAnnotation(annotation) {
+    annotation = Annotation.create(annotation)
+    let value = this
+    let { annotations } = value
+    const { key } = annotation
+    annotations = annotations.set(key, annotation)
+    value = value.set('annotations', annotations)
+    return value
+  }
+
+  /**
    * Add `mark` to text at `path`.
    *
    * @param {List|String} path
@@ -549,6 +567,24 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Remove an `annotation` from the value.
+   *
+   * @param {Annotation} annotation
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  removeAnnotation(annotation) {
+    annotation = Annotation.create(annotation)
+    let value = this
+    let { annotations } = value
+    const { key } = annotation
+    annotations = annotations.delete(key)
+    value = value.set('annotations', annotations)
+    return value
+  }
+
+  /**
    * Remove `mark` at `path`.
    *
    * @param {List|String} path
@@ -647,6 +683,26 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
+   * Add an `annotation` to the value.
+   *
+   * @param {Annotation} annotation
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  setAnnotation(properties, newProperties) {
+    newProperties = Annotation.createProperties(newProperties)
+    const annotation = Annotation.create(properties)
+    const next = annotation.merge(newProperties)
+    let value = this
+    let { annotations } = value
+    const { key } = annotation
+    annotations = annotations.set(key, next)
+    value = value.set('annotations', annotations)
+    return value
+  }
+
+  /**
    * Set `properties` on a node.
    *
    * @param {List|String} path
@@ -689,16 +745,16 @@ class Value extends Record(DEFAULTS) {
   setProperties(properties) {
     let value = this
     const { document } = value
-    const { data, decorations } = properties
+    const { data, annotations } = properties
     const props = {}
 
     if (data) {
       props.data = data
     }
 
-    if (decorations) {
-      props.decorations = decorations.map(d => {
-        return d.isSet ? d : document.resolveDecoration(d)
+    if (annotations) {
+      props.annotations = annotations.map(a => {
+        return a.isSet ? a : document.resolveAnnotation(a)
       })
     }
 
@@ -771,21 +827,21 @@ class Value extends Record(DEFAULTS) {
 
   mapRanges(iterator) {
     let value = this
-    const { document, selection, decorations } = value
+    const { document, selection, annotations } = value
 
     let sel = selection.isSet ? iterator(selection) : selection
     if (!sel) sel = selection.unset()
     if (sel !== selection) sel = document.createSelection(sel)
     value = value.set('selection', sel)
 
-    let decs = decorations.map(decoration => {
-      let n = decoration.isSet ? iterator(decoration) : decoration
-      if (n && n !== decoration) n = document.createDecoration(n)
+    let anns = annotations.map(annotation => {
+      let n = annotation.isSet ? iterator(annotation) : annotation
+      if (n && n !== annotation) n = document.createAnnotation(n)
       return n
     })
 
-    decs = decs.filter(decoration => !!decoration)
-    value = value.set('decorations', decs)
+    anns = anns.filter(annotation => !!annotation)
+    value = value.set('annotations', anns)
     return value
   }
 
@@ -810,10 +866,10 @@ class Value extends Record(DEFAULTS) {
       object.data = this.data.toJSON(options)
     }
 
-    if (options.preserveDecorations) {
-      object.decorations = this.decorations
+    if (options.preserveAnnotations) {
+      object.annotations = this.annotations
         .toArray()
-        .map(d => d.toJSON(options))
+        .map(a => a.toJSON(options))
     }
 
     if (options.preserveSelection) {

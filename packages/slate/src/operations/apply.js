@@ -24,6 +24,12 @@ function applyOperation(value, op) {
   debug(type, op)
 
   switch (type) {
+    case 'add_annotation': {
+      const { annotation } = op
+      const next = value.addAnnotation(annotation)
+      return next
+    }
+
     case 'add_mark': {
       const { path, mark } = op
       const next = value.addMark(path, mark)
@@ -54,6 +60,12 @@ function applyOperation(value, op) {
       return next
     }
 
+    case 'remove_annotation': {
+      const { annotation } = op
+      const next = value.removeAnnotation(annotation)
+      return next
+    }
+
     case 'remove_mark': {
       const { path, mark } = op
       const next = value.removeMark(path, mark)
@@ -69,6 +81,12 @@ function applyOperation(value, op) {
     case 'remove_text': {
       const { path, offset, text } = op
       const next = value.removeText(path, offset, text)
+      return next
+    }
+
+    case 'set_annotation': {
+      const { properties, newProperties } = op
+      const next = value.setAnnotation(properties, newProperties)
       return next
     }
 

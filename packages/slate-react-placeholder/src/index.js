@@ -42,7 +42,7 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Array}
    */
 
-  function decorateNode(node, path, editor, next) {
+  function decorateNode(node, editor, next) {
     if (!editor.query(when, node)) {
       return next()
     }
@@ -53,11 +53,11 @@ function SlateReactPlaceholder(options = {}) {
     const [firstNode, firstPath] = first
     const [lastNode, lastPath] = last
     const decoration = {
-      anchor: { key: firstNode.key, offset: 0, path: path.concat(firstPath) },
+      anchor: { key: firstNode.key, offset: 0, path: firstPath },
       focus: {
         key: lastNode.key,
         offset: lastNode.text.length,
-        path: path.concat(lastPath),
+        path: lastPath,
       },
       mark: placeholderMark,
     }

@@ -16,9 +16,11 @@ const PROPS = [
   'commands',
   'decorateNode',
   'queries',
+  'renderBlock',
+  'renderDocument',
   'renderEditor',
+  'renderInline',
   'renderMark',
-  'renderNode',
   'schema',
 ]
 
@@ -74,7 +76,7 @@ function ReactPlugin(options = {}) {
   }
 
   /**
-   * Render node.
+   * Render block.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -82,17 +84,43 @@ function ReactPlugin(options = {}) {
    * @return {Element}
    */
 
-  function renderNode(props, editor, next) {
-    const { attributes, children, node } = props
-    const { object } = node
-    if (object !== 'block' && object !== 'inline') return null
-
-    const Tag = object === 'block' ? 'div' : 'span'
-    const style = { position: 'relative' }
+  function renderBlock(props, editor, next) {
+    const { attributes, children } = props
     return (
-      <Tag {...attributes} style={style}>
+      <div {...attributes} style={{ position: 'relative' }}>
         {children}
-      </Tag>
+      </div>
+    )
+  }
+
+  /**
+   * Render document.
+   *
+   * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Element}
+   */
+
+  function renderDocument(props, editor, next) {
+    return props.children
+  }
+
+  /**
+   * Render inline.
+   *
+   * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Element}
+   */
+
+  function renderInline(props, editor, next) {
+    const { attributes, children } = props
+    return (
+      <span {...attributes} style={{ position: 'relative' }}>
+        {children}
+      </span>
     )
   }
 
@@ -130,7 +158,9 @@ function ReactPlugin(options = {}) {
   ret.push({
     decorateNode,
     renderEditor,
-    renderNode,
+    renderBlock,
+    renderDocument,
+    renderInline,
   })
 
   return ret

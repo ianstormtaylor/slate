@@ -1,5 +1,5 @@
 import {
-  Decoration,
+  Annotation,
   Document,
   Mark,
   Node,
@@ -10,7 +10,7 @@ import {
 } from 'slate'
 
 /**
- * Auto-incrementing ID to keep track of paired decorations.
+ * Auto-incrementing ID to keep track of paired annotations.
  *
  * @type {Number}
  */
@@ -267,14 +267,14 @@ export function createValue(tagName, attributes, children) {
   let focus
   let marks
   let isFocused
-  let decorations = []
+  let annotations = []
   const partials = {}
 
   // Search the document's texts to see if any of them have the anchor or
-  // focus information saved, or decorations applied.
+  // focus information saved, or annotations applied.
   if (document) {
     for (const [node, path] of document.texts()) {
-      const { __anchor, __decorations, __focus } = node
+      const { __anchor, __annotations, __focus } = node
 
       if (__anchor != null) {
         anchor = Point.create({ path, key: node.key, offset: __anchor.offset })
@@ -288,19 +288,19 @@ export function createValue(tagName, attributes, children) {
         isFocused = __focus.isFocused
       }
 
-      if (__decorations != null) {
-        for (const dec of __decorations) {
-          const { id } = dec
+      if (__annotations != null) {
+        for (const ann of __annotations) {
+          const { id } = ann
           const partial = partials[id]
           delete partials[id]
 
           if (!partial) {
-            dec.key = node.key
-            partials[id] = dec
+            ann.key = node.key
+            partials[id] = ann
             continue
           }
 
-          const decoration = Decoration.create({
+          const decoration = Annotation.create({
             anchor: {
               key: partial.key,
               offset: partial.offset,
@@ -308,15 +308,15 @@ export function createValue(tagName, attributes, children) {
             focus: {
               path,
               key: node.key,
-              offset: dec.offset,
+              offset: ann.offset,
             },
             mark: {
-              type: dec.type,
-              data: dec.data,
+              type: ann.type,
+              data: ann.data,
             },
           })
 
-          decorations.push(decoration)
+          annotations.push(decoration)
         }
       }
     }
@@ -352,13 +352,13 @@ export function createValue(tagName, attributes, children) {
 
   selection = selection.normalize(document)
 
-  if (decorations.length > 0) {
-    decorations = decorations.map(d => d.normalize(document))
+  if (annotations.length > 0) {
+    annotations = annotations.map(a => a.normalize(document))
   }
 
   const value = Value.fromJSON({
     data,
-    decorations,
+    annotations,
     document,
     selection,
     ...attributes,
@@ -503,7 +503,7 @@ class DecorationPoint {
  */
 
 function incrementPoints(object, n) {
-  const { __anchor, __focus, __decorations } = object
+  const { __anchor, __focus, __annotations } = object
 
   if (__anchor != null) {
     __anchor.offset += n
@@ -513,8 +513,8 @@ function incrementPoints(object, n) {
     __focus.offset += n
   }
 
-  if (__decorations != null) {
-    __decorations.forEach(d => (d.offset += n))
+  if (__annotations != null) {
+    __annotations.forEach(a => (a.offset += n))
   }
 }
 
@@ -549,10 +549,10 @@ function preservePoints(object, updator) {
 }
 
 function copyPoints(object, other) {
-  const { __anchor, __focus, __decorations } = object
+  const { __anchor, __focus, __annotations } = object
   if (__anchor != null) other.__anchor = __anchor
   if (__focus != null) other.__focus = __focus
-  if (__decorations != null) other.__decorations = __decorations
+  if (__annotations != null) other.__annotations = __annotations
 }
 
 /**
@@ -576,7 +576,7 @@ function setPoint(object, point, offset) {
 
   if (point instanceof DecorationPoint) {
     point.offset = offset
-    object.__decorations = object.__decorations || []
-    object.__decorations = object.__decorations.concat(point)
+    object.__annotations = object.__annotations || []
+    object.__annotations = object.__annotations.concat(point)
   }
 }
