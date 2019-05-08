@@ -110,14 +110,15 @@ class Emojis extends React.Component {
           ref={this.ref}
           defaultValue={initialValue}
           schema={this.schema}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
+          renderInline={this.renderInline}
         />
       </div>
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -125,31 +126,43 @@ class Emojis extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
-    const { attributes, children, node, isFocused } = props
+  renderBlock = (props, editor, next) => {
+    const { attributes, children, node } = props
 
     switch (node.type) {
-      case 'paragraph': {
+      case 'paragraph':
         return <p {...attributes}>{children}</p>
-      }
+      default:
+        return next()
+    }
+  }
 
-      case 'emoji': {
-        const code = node.data.get('code')
+  /**
+   * Render a Slate inline.
+   *
+   * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Element}
+   */
+
+  renderInline = (props, editor, next) => {
+    const { attributes, node, isFocused } = props
+
+    switch (node.type) {
+      case 'emoji':
         return (
           <Emoji
-            {...props.attributes}
+            {...attributes}
             selected={isFocused}
             contentEditable={false}
             onDrop={noop}
           >
-            {code}
+            {node.data.get('code')}
           </Emoji>
         )
-      }
-
-      default: {
+      default:
         return next()
-      }
     }
   }
 

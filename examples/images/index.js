@@ -133,20 +133,20 @@ class Images extends React.Component {
           schema={schema}
           onDrop={this.onDropOrPaste}
           onPaste={this.onDropOrPaste}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
         />
       </div>
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, node, isFocused } = props
 
     switch (node.type) {

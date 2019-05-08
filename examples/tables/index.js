@@ -34,7 +34,7 @@ class Tables extends React.Component {
         onKeyDown={this.onKeyDown}
         onDrop={this.onDropOrPaste}
         onPaste={this.onDropOrPaste}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
         renderMark={this.renderMark}
       />
     )
@@ -47,7 +47,7 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

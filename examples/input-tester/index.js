@@ -227,7 +227,7 @@ class InputTester extends React.Component {
           ref={this.ref}
           defaultValue={initialValue}
           onChange={this.onChange}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
         <EventsList />
@@ -235,7 +235,7 @@ class InputTester extends React.Component {
     )
   }
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

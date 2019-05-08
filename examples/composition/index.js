@@ -225,7 +225,7 @@ class RichTextExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
         <EditorText>
@@ -290,13 +290,13 @@ class RichTextExample extends React.Component {
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

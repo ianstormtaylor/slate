@@ -118,7 +118,7 @@ class MentionsExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           ref={this.editorRef}
-          renderNode={this.renderNode}
+          renderInline={this.renderInline}
           renderMark={this.renderMark}
           schema={schema}
         />
@@ -145,7 +145,7 @@ class MentionsExample extends React.Component {
     return next()
   }
 
-  renderNode(props, editor, next) {
+  renderInline(props, editor, next) {
     const { attributes, node } = props
 
     if (node.type === USER_MENTION_NODE_TYPE) {

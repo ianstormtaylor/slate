@@ -109,19 +109,19 @@ class CheckLists extends React.Component {
         placeholder="Get to work..."
         defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'check-list-item':
         return <CheckListItem {...props} />
