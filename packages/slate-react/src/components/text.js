@@ -125,15 +125,11 @@ class Text extends React.Component {
       style,
     } = this.props
     const { key } = node
-    const markers = decorations.concat(annotations.toList())
-
-    // PERF: Take advantage of cache by avoiding arguments.
-    const leaves =
-      markers.size === 0 ? node.getLeaves() : node.getLeaves(markers)
-
+    const leaves = node.getLeaves(annotations, decorations)
     let o = 0
+
     const children = leaves.map((leaf, index) => {
-      const { text, marks } = leaf
+      const { text } = leaf
       const offset = o
       o += text.length
 
@@ -143,7 +139,9 @@ class Text extends React.Component {
           block={block}
           editor={editor}
           index={index}
-          marks={marks}
+          annotations={leaf.annotations}
+          decorations={leaf.decorations}
+          marks={leaf.marks}
           node={node}
           offset={offset}
           parent={parent}

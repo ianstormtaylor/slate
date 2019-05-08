@@ -12,12 +12,20 @@ function Rendering() {
       return []
     },
 
+    renderAnnotation({ attributes, children }) {
+      return <span {...attributes}>{children}</span>
+    },
+
     renderBlock({ attributes, children }) {
       return (
         <div {...attributes} style={{ position: 'relative' }}>
           {children}
         </div>
       )
+    },
+
+    renderDecoration({ attributes, children }) {
+      return <span {...attributes}>{children}</span>
     },
 
     renderDocument({ children }) {

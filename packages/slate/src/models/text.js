@@ -2,7 +2,6 @@ import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
 import { List, Record } from 'immutable'
 
-import Leaf from './leaf'
 import Mark from './mark'
 import KeyUtils from '../utils/key-utils'
 
@@ -17,6 +16,13 @@ const DEFAULTS = {
   marks: undefined,
   text: undefined,
 }
+
+const Leaf = Record({
+  text: undefined,
+  marks: undefined,
+  annotations: undefined,
+  decorations: undefined,
+})
 
 /**
  * Text.
@@ -135,54 +141,109 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the leaves for the text node, with `markers`.
+   * Get a list of uniquely-formatted leaves for the text node, given its
+   * existing marks, and its current `annotations` and `decorations`.
    *
-   * @param {List<Annotation|Decoration>} markers
+   * @param {Map<String,Annotation>} annotations
+   * @param {List<Decoration>} decorations
    * @return {List<Leaf>}
    */
 
-  getLeaves(markers) {
-    const { key, text, marks } = this
-    const leaf = Leaf.create({ text, marks })
-    let leaves = Leaf.createList([leaf])
+  getLeaves(annotations, decorations) {
+    const { text, marks } = this
+    let leaves = [{ text, marks, annotations: [], decorations: [] }]
 
-    // PERF: We can exit early without markers.
-    if (!markers || markers.size === 0) {
-      return leaves
+    // Helper to split a leaf into two `at` an offset.
+    const split = (leaf, at) => {
+      return [
+        {
+          text: leaf.text.slice(0, at),
+          marks: leaf.marks,
+          annotations: [...leaf.annotations],
+          decorations: [...leaf.decorations],
+        },
+        {
+          text: leaf.text.slice(at),
+          marks: leaf.marks,
+          annotations: [...leaf.annotations],
+          decorations: [...leaf.decorations],
+        },
+      ]
     }
 
-    // HACK: this shouldn't be necessary, because the loop below should handle
-    // the `0` case without failures. It may already even, not sure.
-    if (text === '') {
-      const markerMarks = markers.map(m => m.mark)
-      const l = Leaf.create({ marks: markerMarks })
-      return List([l])
-    }
+    // Helper to compile the leaves for a `kind` of format.
+    const compile = kind => {
+      const formats =
+        kind === 'annotations' ? annotations.values() : decorations
 
-    markers.forEach(m => {
-      const { start, end, mark } = m
-      const hasStart = start.key === key
-      const hasEnd = end.key === key
+      for (const format of formats) {
+        const { start, end } = format
+        const next = []
+        let o = 0
 
-      if (hasStart && hasEnd) {
-        const index = hasStart ? start.offset : 0
-        const length = hasEnd ? end.offset - index : text.length - index
+        for (const leaf of leaves) {
+          const { length } = leaf.text
+          const offset = o
+          o += length
 
-        if (length < 1) return
-        if (index >= text.length) return
+          // If the range starts after the leaf, or ends before it, continue.
+          if (start.offset > offset + length || end.offset <= offset) {
+            next.push(leaf)
+            continue
+          }
 
-        if (index !== 0 || length < text.length) {
-          const [before, bundle] = Leaf.splitLeaves(leaves, index)
-          const [middle, after] = Leaf.splitLeaves(bundle, length)
-          leaves = before.concat(middle.map(x => x.addMark(mark)), after)
-          return
+          // If the range encompases the entire leaf, add the format.
+          if (start.offset <= offset && end.offset >= offset + length) {
+            leaf[kind].push(format)
+            next.push(leaf)
+            continue
+          }
+
+          // Otherwise we need to split the leaf, at the start, end, or both,
+          // and add the format to the middle intersecting section. Do the end
+          // split first since we don't need to update the offset that way.
+          let middle = leaf
+          let before
+          let after
+
+          if (end.offset < offset + length) {
+            ;[middle, after] = split(middle, end.offset - offset)
+          }
+
+          if (start.offset > offset) {
+            ;[before, middle] = split(middle, start.offset - offset)
+          }
+
+          middle[kind].push(format)
+
+          if (before) {
+            next.push(before)
+          }
+
+          next.push(middle)
+
+          if (after) {
+            next.push(after)
+          }
         }
-      }
 
-      leaves = leaves.map(x => x.addMark(mark))
+        leaves = next
+      }
+    }
+
+    compile('annotations')
+    compile('decorations')
+
+    leaves = leaves.map(leaf => {
+      return new Leaf({
+        ...leaf,
+        annotations: List(leaf.annotations),
+        decorations: List(leaf.decorations),
+      })
     })
 
-    return Leaf.createLeaves(leaves)
+    const list = List(leaves)
+    return list
   }
 
   /**

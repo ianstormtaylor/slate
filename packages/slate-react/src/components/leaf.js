@@ -64,7 +64,7 @@ class Leaf extends React.Component {
     block: SlateTypes.block.isRequired,
     editor: Types.object.isRequired,
     index: Types.number.isRequired,
-    leaves: SlateTypes.leaves.isRequired,
+    leaves: Types.object.isRequired,
     marks: SlateTypes.marks.isRequired,
     node: SlateTypes.node.isRequired,
     offset: Types.number.isRequired,
@@ -96,7 +96,9 @@ class Leaf extends React.Component {
       props.index !== this.props.index ||
       props.marks !== this.props.marks ||
       props.text !== this.props.text ||
-      props.parent !== this.props.parent
+      props.parent !== this.props.parent ||
+      !props.annotations.equals(this.props.annotations) ||
+      !props.decorations.equals(this.props.decorations)
     ) {
       return true
     }
@@ -114,53 +116,85 @@ class Leaf extends React.Component {
   render() {
     this.debug('render', this)
 
-    const { node, index } = this.props
+    const {
+      marks,
+      annotations,
+      decorations,
+      node,
+      index,
+      offset,
+      text,
+      editor,
+    } = this.props
+
     const offsetKey = OffsetKey.stringify({
       key: node.key,
       index,
     })
+
+    let children = this.renderText()
+
+    const props = {
+      editor,
+      marks,
+      annotations,
+      decorations,
+      node,
+      offset,
+      text,
+    }
+
+    for (const mark of marks) {
+      const ret = editor.run('renderMark', {
+        ...props,
+        mark,
+        children,
+        attributes: {
+          [DATA_ATTRS.OBJECT]: 'mark',
+        },
+      })
+
+      if (ret) {
+        children = ret
+      }
+    }
+
+    for (const decoration of decorations) {
+      const ret = editor.run('renderDecoration', {
+        ...props,
+        decoration,
+        children,
+        attributes: {
+          [DATA_ATTRS.OBJECT]: 'decoration',
+        },
+      })
+
+      if (ret) {
+        children = ret
+      }
+    }
+
+    for (const annotation of annotations) {
+      const ret = editor.run('renderAnnotation', {
+        ...props,
+        annotation,
+        children,
+        attributes: {
+          [DATA_ATTRS.OBJECT]: 'annotation',
+        },
+      })
+
+      if (ret) {
+        children = ret
+      }
+    }
 
     const attrs = {
       [DATA_ATTRS.LEAF]: true,
       [DATA_ATTRS.OFFSET_KEY]: offsetKey,
     }
 
-    return <span {...attrs}>{this.renderMarks()}</span>
-  }
-
-  /**
-   * Render all of the leaf's mark components.
-   *
-   * @return {Element}
-   */
-
-  renderMarks() {
-    const { marks, node, offset, text, editor } = this.props
-    const leaf = this.renderText()
-    const attributes = {
-      [DATA_ATTRS.OBJECT]: 'mark',
-    }
-
-    return marks.reduce((children, mark) => {
-      const element = editor.run('renderMark', {
-        editor,
-        mark,
-        marks,
-        node,
-        offset,
-        text,
-        children,
-        attributes,
-      })
-
-      // COMPAT: Choosing not to render a specific mark should result in the
-      // children continuing on without it.
-      if (!element) {
-        return children
-      }
-
-      return element
-    }, leaf)
+    return <span {...attrs}>{children}</span>
   }
 
   /**

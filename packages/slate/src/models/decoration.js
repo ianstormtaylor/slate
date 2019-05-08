@@ -3,6 +3,7 @@ import { List, Record } from 'immutable'
 
 import Mark from './mark'
 import Point from './point'
+import Data from './data'
 import Range from './range'
 
 /**
@@ -12,9 +13,10 @@ import Range from './range'
  */
 
 const DEFAULTS = {
+  type: undefined,
+  data: undefined,
   anchor: undefined,
   focus: undefined,
-  mark: undefined,
 }
 
 /**
@@ -77,6 +79,8 @@ class Decoration extends Record(DEFAULTS) {
   static createProperties(a = {}) {
     if (Decoration.isDecoration(a)) {
       return {
+        type: a.type,
+        data: a.data,
         anchor: Point.createProperties(a.anchor),
         focus: Point.createProperties(a.focus),
         mark: Mark.create(a.mark),
@@ -85,9 +89,10 @@ class Decoration extends Record(DEFAULTS) {
 
     if (isPlainObject(a)) {
       const p = {}
+      if ('type' in a) p.type = a.type
+      if ('data' in a) p.data = Data.create(a.data)
       if ('anchor' in a) p.anchor = Point.create(a.anchor)
       if ('focus' in a) p.focus = Point.create(a.focus)
-      if ('mark' in a) p.mark = Mark.create(a.mark)
       return p
     }
 
@@ -104,20 +109,21 @@ class Decoration extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const { anchor, focus, mark } = object
+    const { type, data, anchor, focus } = object
 
-    if (!mark) {
+    if (!type) {
       throw new Error(
-        `Decorations must be created with a \`mark\`, but you passed: ${JSON.stringify(
+        `Decorations must be created with a \`type\`, but you passed: ${JSON.stringify(
           object
         )}`
       )
     }
 
     const decoration = new Decoration({
+      type,
+      data: Data.create(data || {}),
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
-      mark: Mark.fromJSON(mark),
     })
 
     return decoration
@@ -132,22 +138,7 @@ class Decoration extends Record(DEFAULTS) {
 
   setProperties(properties) {
     properties = Decoration.createProperties(properties)
-    const { anchor, focus, mark } = properties
-    const props = {}
-
-    if (anchor) {
-      props.anchor = Point.create(anchor)
-    }
-
-    if (focus) {
-      props.focus = Point.create(focus)
-    }
-
-    if (mark) {
-      props.mark = Mark.create(mark)
-    }
-
-    const decoration = this.merge(props)
+    const decoration = this.merge(properties)
     return decoration
   }
 
@@ -161,9 +152,10 @@ class Decoration extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
+      type: this.type,
+      data: this.data.toJSON(),
       anchor: this.anchor.toJSON(options),
       focus: this.focus.toJSON(options),
-      mark: this.mark.toJSON(options),
     }
 
     return object

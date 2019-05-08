@@ -1,9 +1,9 @@
 import isPlainObject from 'is-plain-object'
 import { Map, Record } from 'immutable'
 
-import Mark from './mark'
 import Point from './point'
 import Range from './range'
+import Data from './data'
 
 /**
  * Default properties.
@@ -13,9 +13,10 @@ import Range from './range'
 
 const DEFAULTS = {
   key: undefined,
+  type: undefined,
+  data: undefined,
   anchor: undefined,
   focus: undefined,
-  mark: undefined,
 }
 
 /**
@@ -90,18 +91,20 @@ class Annotation extends Record(DEFAULTS) {
     if (Annotation.isAnnotation(a)) {
       return {
         key: a.key,
+        type: a.type,
+        data: a.data,
         anchor: Point.createProperties(a.anchor),
         focus: Point.createProperties(a.focus),
-        mark: Mark.create(a.mark),
       }
     }
 
     if (isPlainObject(a)) {
       const p = {}
       if ('key' in a) p.key = a.key
+      if ('type' in a) p.type = a.type
+      if ('data' in a) p.data = Data.create(a.data)
       if ('anchor' in a) p.anchor = Point.create(a.anchor)
       if ('focus' in a) p.focus = Point.create(a.focus)
-      if ('mark' in a) p.mark = Mark.create(a.mark)
       return p
     }
 
@@ -118,7 +121,7 @@ class Annotation extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const { key, anchor, focus, mark } = object
+    const { key, type, data, anchor, focus } = object
 
     if (!key) {
       throw new Error(
@@ -128,9 +131,9 @@ class Annotation extends Record(DEFAULTS) {
       )
     }
 
-    if (!mark) {
+    if (!type) {
       throw new Error(
-        `Annotations must be created with a \`mark\`, but you passed: ${JSON.stringify(
+        `Annotations must be created with a \`type\`, but you passed: ${JSON.stringify(
           object
         )}`
       )
@@ -138,9 +141,10 @@ class Annotation extends Record(DEFAULTS) {
 
     const annotation = new Annotation({
       key,
+      type,
+      data: Data.create(data || {}),
       anchor: Point.fromJSON(anchor || {}),
       focus: Point.fromJSON(focus || {}),
-      mark: Mark.fromJSON(mark),
     })
 
     return annotation
@@ -155,26 +159,7 @@ class Annotation extends Record(DEFAULTS) {
 
   setProperties(properties) {
     properties = Annotation.createProperties(properties)
-    const { key, anchor, focus, mark } = properties
-    const props = {}
-
-    if (key) {
-      props.key = key
-    }
-
-    if (anchor) {
-      props.anchor = Point.create(anchor)
-    }
-
-    if (focus) {
-      props.focus = Point.create(focus)
-    }
-
-    if (mark) {
-      props.mark = Mark.create(mark)
-    }
-
-    const annotation = this.merge(props)
+    const annotation = this.merge(properties)
     return annotation
   }
 
@@ -189,9 +174,10 @@ class Annotation extends Record(DEFAULTS) {
     const object = {
       object: this.object,
       key: this.key,
+      type: this.type,
+      data: this.data.toJSON(),
       anchor: this.anchor.toJSON(options),
       focus: this.focus.toJSON(options),
-      mark: this.mark.toJSON(options),
     }
 
     return object

@@ -89,7 +89,7 @@ class CodeHighlighting extends React.Component {
         defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
         renderBlock={this.renderBlock}
-        renderMark={this.renderMark}
+        renderDecoration={this.renderDecoration}
         decorateNode={this.decorateNode}
       />
     )
@@ -114,16 +114,16 @@ class CodeHighlighting extends React.Component {
   }
 
   /**
-   * Render a Slate mark.
+   * Render a Slate decoration.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderMark = (props, editor, next) => {
-    const { children, mark, attributes } = props
+  renderDecoration = (props, editor, next) => {
+    const { children, decoration, attributes } = props
 
-    switch (mark.type) {
+    switch (decoration.type) {
       case 'comment':
         return (
           <span {...attributes} style={{ opacity: '0.33' }}>
@@ -223,6 +223,7 @@ class CodeHighlighting extends React.Component {
 
       if (typeof token !== 'string') {
         const dec = {
+          type: token.type,
           anchor: {
             key: startText.key,
             path: startPath,
@@ -232,9 +233,6 @@ class CodeHighlighting extends React.Component {
             key: endText.key,
             path: endPath,
             offset: endOffset,
-          },
-          mark: {
-            type: token.type,
           },
         }
 

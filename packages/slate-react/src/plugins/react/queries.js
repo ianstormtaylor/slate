@@ -293,17 +293,23 @@ function QueriesPlugin() {
     // Calculate how far into the text node the `nearestNode` is, so that we can
     // determine what the offset relative to the text node is.
     if (leafNode) {
-      const range = window.document.createRange()
       textNode = leafNode.closest(SELECTORS.TEXT)
+      const range = window.document.createRange()
       range.setStart(textNode, 0)
       range.setEnd(nearestNode, nearestOffset)
-      node = textNode
+      const contents = range.cloneContents()
+      const zeroWidths = contents.querySelectorAll(SELECTORS.ZERO_WIDTH)
+
+      Array.from(zeroWidths).forEach(el => {
+        el.parentNode.removeChild(el)
+      })
 
       // COMPAT: Edge has a bug where Range.prototype.toString() will convert \n
       // into \r\n. The bug causes a loop when slate-react attempts to reposition
       // its cursor to match the native position. Use textContent.length instead.
       // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
-      offset = range.cloneContents().textContent.length
+      offset = contents.textContent.length
+      node = textNode
     } else {
       // For void nodes, the element with the offset key will be a cousin, not an
       // ancestor, so find it by going down from the nearest void parent.
@@ -337,7 +343,10 @@ function QueriesPlugin() {
 
     // Get the string value of the offset key attribute.
     const offsetKey = leafNode.getAttribute(DATA_ATTRS.OFFSET_KEY)
-    if (!offsetKey) return null
+
+    if (!offsetKey) {
+      return null
+    }
 
     const { key } = OffsetKey.parse(offsetKey)
 
@@ -345,7 +354,10 @@ function QueriesPlugin() {
     // select event fires twice, once for the old editor's `element` first, and
     // then afterwards for the correct `element`. (2017/03/03)
     const { value } = editor
-    if (!value.document.hasDescendant(key)) return null
+
+    if (!value.document.hasDescendant(key)) {
+      return null
+    }
 
     const point = value.document.createPoint({ key, offset })
     const path = editor.findPath(textNode)
