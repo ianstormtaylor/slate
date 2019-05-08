@@ -8,6 +8,7 @@ import { PathUtils } from 'slate'
 
 import Void from './void'
 import Text from './text'
+import DATA_ATTRS from '../constants/data-attributes'
 
 /**
  * Debug.
@@ -40,6 +41,24 @@ class Node extends React.Component {
     readOnly: Types.bool.isRequired,
     selection: SlateTypes.selection,
   }
+
+  /**
+   * Temporary values.
+   *
+   * @type {Object}
+   */
+
+  tmp = {
+    nodeRefs: {},
+  }
+
+  /**
+   * A ref for the contenteditable DOM node.
+   *
+   * @type {Object}
+   */
+
+  ref = React.createRef()
 
   /**
    * Debug.
@@ -77,6 +96,11 @@ class Node extends React.Component {
     // needs to be updated or not, return true if it returns true. If it returns
     // false, we need to ignore it, because it shouldn't be allowed it.
     if (shouldUpdate != null) {
+      warning(
+        false,
+        'As of slate-react@0.22 the `shouldNodeComponentUpdate` middleware is deprecated. You can pass specific values down the tree using React\'s built-in "context" construct instead.'
+      )
+
       if (shouldUpdate) {
         return true
       }
@@ -89,27 +113,40 @@ class Node extends React.Component {
 
     // If the `readOnly` status has changed, re-render in case there is any
     // user-land logic that depends on it, like nested editable contents.
-    if (n.readOnly !== p.readOnly) return true
+    if (n.readOnly !== p.readOnly) {
+      return true
+    }
 
     // If the node has changed, update. PERF: There are cases where it will have
     // changed, but it's properties will be exactly the same (eg. copy-paste)
     // which this won't catch. But that's rare and not a drag on performance, so
     // for simplicity we just let them through.
-    if (n.node !== p.node) return true
+    if (n.node !== p.node) {
+      return true
+    }
 
     // If the selection value of the node or of some of its children has changed,
     // re-render in case there is any user-land logic depends on it to render.
     // if the node is selected update it, even if it was already selected: the
     // selection value of some of its children could have been changed and they
     // need to be rendered again.
-    if (n.isSelected || p.isSelected) return true
-    if (n.isFocused || p.isFocused) return true
+    if (
+      (!n.selection && p.selection) ||
+      (n.selection && !p.selection) ||
+      (n.selection && p.selection && !n.selection.equals(p.selection))
+    ) {
+      return true
+    }
 
     // If the annotations have changed, update.
-    if (!n.annotations.equals(p.annotations)) return true
+    if (!n.annotations.equals(p.annotations)) {
+      return true
+    }
 
     // If the decorations have changed, update.
-    if (!n.decorations.equals(p.decorations)) return true
+    if (!n.decorations.equals(p.decorations)) {
+      return true
+    }
 
     // Otherwise, don't update.
     return false
@@ -159,29 +196,32 @@ class Node extends React.Component {
           node={child}
           parent={node}
           readOnly={readOnly}
+          // COMPAT: We use this map of refs to lookup a DOM node down the
+          // tree of components by path.
+          ref={ref => {
+            if (ref) {
+              this.tmp.nodeRefs[i] = ref
+            } else {
+              delete this.tmp.nodeRefs[i]
+            }
+          }}
         />
       )
     })
 
     // Attributes that the developer must mix into the element in their
     // custom node renderer component.
-    const attributes = { 'data-key': node.key }
+    const attributes = {
+      [DATA_ATTRS.OBJECT]: node.object,
+      [DATA_ATTRS.KEY]: node.key,
+      ref: this.ref,
+    }
 
     // If it's a block node with inline children, add the proper `dir` attribute
     // for text direction.
     if (node.isLeafBlock()) {
       const direction = node.getTextDirection()
       if (direction === 'rtl') attributes.dir = 'rtl'
-    }
-
-    const props = {
-      key: node.key,
-      editor,
-      isFocused: selection && selection.isFocused,
-      isSelected: selection,
-      node,
-      parent,
-      readOnly,
     }
 
     let render
@@ -195,13 +235,30 @@ class Node extends React.Component {
     }
 
     const element = editor.run(render, {
-      ...props,
       attributes,
       children,
+      editor,
+      isFocused: !!selection && selection.isFocused,
+      isSelected: !!selection,
+      key: node.key,
+      node,
+      parent,
+      readOnly,
     })
 
     return editor.isVoid(node) ? (
-      <Void {...this.props}>{element}</Void>
+      <Void
+        {...this.props}
+        textRef={ref => {
+          if (ref) {
+            this.tmp.nodeRefs[0] = ref
+          } else {
+            delete this.tmp.nodeRefs[0]
+          }
+        }}
+      >
+        {element}
+      </Void>
     ) : (
       element
     )
@@ -217,6 +274,10 @@ class Node extends React.Component {
  */
 
 function getRelativeRange(node, index, range) {
+  if (range.isUnset) {
+    return null
+  }
+
   const child = node.nodes.get(index)
   let { start, end } = range
   const { path: startPath } = start

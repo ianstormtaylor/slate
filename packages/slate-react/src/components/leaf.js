@@ -4,6 +4,7 @@ import Types from 'prop-types'
 import SlateTypes from 'slate-prop-types'
 
 import OffsetKey from '../utils/offset-key'
+import DATA_ATTRS from '../constants/data-attributes'
 
 /**
  * Debugger.
@@ -12,6 +13,39 @@ import OffsetKey from '../utils/offset-key'
  */
 
 const debug = Debug('slate:leaves')
+
+/**
+ * Components.
+ *
+ * @type {Component}
+ */
+
+const ZeroWidth = ({ length = 0, isLineBreak = false }) => {
+  const attrs = {
+    [DATA_ATTRS.ZERO_WIDTH]: isLineBreak ? 'n' : 'z',
+    [DATA_ATTRS.LENGTH]: length,
+  }
+
+  return (
+    <span {...attrs}>
+      {'\uFEFF'}
+      {isLineBreak ? <br /> : null}
+    </span>
+  )
+}
+
+const String = ({ text = '', isTrailing = false }) => {
+  const attrs = {
+    [DATA_ATTRS.STRING]: true,
+  }
+
+  return (
+    <span {...attrs}>
+      {text}
+      {isTrailing ? '\n' : null}
+    </span>
+  )
+}
 
 /**
  * Leaf.
@@ -86,11 +120,12 @@ class Leaf extends React.Component {
       index,
     })
 
-    return (
-      <span data-slate-leaf data-offset-key={offsetKey}>
-        {this.renderMarks()}
-      </span>
-    )
+    const attrs = {
+      [DATA_ATTRS.LEAF]: true,
+      [DATA_ATTRS.OFFSET_KEY]: offsetKey,
+    }
+
+    return <span {...attrs}>{this.renderMarks()}</span>
   }
 
   /**
@@ -103,11 +138,11 @@ class Leaf extends React.Component {
     const { marks, node, offset, text, editor } = this.props
     const leaf = this.renderText()
     const attributes = {
-      'data-slate-mark': true,
+      [DATA_ATTRS.OBJECT]: 'mark',
     }
 
     return marks.reduce((children, mark) => {
-      const props = {
+      const element = editor.run('renderMark', {
         editor,
         mark,
         marks,
@@ -116,9 +151,15 @@ class Leaf extends React.Component {
         text,
         children,
         attributes,
+      })
+
+      // COMPAT: Choosing not to render a specific mark should result in the
+      // children continuing on without it.
+      if (!element) {
+        return children
       }
-      const element = editor.run('renderMark', props)
-      return element || children
+
+      return element
     }, leaf)
   }
 
@@ -134,11 +175,7 @@ class Leaf extends React.Component {
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
     if (editor.query('isVoid', parent)) {
-      return (
-        <span data-slate-zero-width="z" data-slate-length={parent.text.length}>
-          {'\uFEFF'}
-        </span>
-      )
+      return <ZeroWidth length={parent.text.length} />
     }
 
     // COMPAT: If this is the last text node in an empty block, render a zero-
@@ -150,23 +187,14 @@ class Leaf extends React.Component {
       parent.text === '' &&
       parent.nodes.last() === node
     ) {
-      return (
-        <span data-slate-zero-width="n" data-slate-length={0}>
-          {'\uFEFF'}
-          <br />
-        </span>
-      )
+      return <ZeroWidth isLineBreak />
     }
 
     // COMPAT: If the text is empty, it's because it's on the edge of an inline
     // node, so we render a zero-width space so that the selection can be
     // inserted next to it still.
     if (text === '') {
-      return (
-        <span data-slate-zero-width="z" data-slate-length={0}>
-          {'\uFEFF'}
-        </span>
-      )
+      return <ZeroWidth />
     }
 
     // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
@@ -175,11 +203,13 @@ class Leaf extends React.Component {
     const lastChar = text.charAt(text.length - 1)
     const isLastText = node === lastText
     const isLastLeaf = index === leaves.size - 1
-    if (isLastText && isLastLeaf && lastChar === '\n')
-      return <span data-slate-content>{`${text}\n`}</span>
+
+    if (isLastText && isLastLeaf && lastChar === '\n') {
+      return <String isTrailing text={text} />
+    }
 
     // Otherwise, just return the content.
-    return <span data-slate-content>{text}</span>
+    return <String text={text} />
   }
 }
 

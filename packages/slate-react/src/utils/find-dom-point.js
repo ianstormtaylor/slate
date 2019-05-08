@@ -1,4 +1,8 @@
 import findDOMNode from './find-dom-node'
+import warning from 'tiny-warning'
+
+import DATA_ATTRS from '../constants/data-attributes'
+import SELECTORS from '../constants/selectors'
 
 /**
  * Find a native DOM selection point from a Slate `point`.
@@ -9,6 +13,11 @@ import findDOMNode from './find-dom-node'
  */
 
 function findDOMPoint(point, win = window) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `findDOMPoint(point)` helper is deprecated in favor of `editor.findDOMPoint(point)`.'
+  )
+
   const el = findDOMNode(point.key, win)
   let start = 0
 
@@ -16,7 +25,7 @@ function findDOMPoint(point, win = window) {
   // direct text and zero-width spans. (We have to filter out any other siblings
   // that may have been rendered alongside them.)
   const texts = Array.from(
-    el.querySelectorAll('[data-slate-content], [data-slate-zero-width]')
+    el.querySelectorAll(`${SELECTORS.STRING}, ${SELECTORS.ZERO_WIDTH}`)
   )
 
   for (const text of texts) {
@@ -24,8 +33,8 @@ function findDOMPoint(point, win = window) {
     const domLength = node.textContent.length
     let slateLength = domLength
 
-    if (text.hasAttribute('data-slate-length')) {
-      slateLength = parseInt(text.getAttribute('data-slate-length'), 10)
+    if (text.hasAttribute(DATA_ATTRS.LENGTH)) {
+      slateLength = parseInt(text.getAttribute(DATA_ATTRS.LENGTH), 10)
     }
 
     const end = start + slateLength

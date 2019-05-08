@@ -1,17 +1,10 @@
 import React from 'react'
-import styled from 'react-emotion'
-
-const WordCounter = styled('span')`
-  margin-top: 10px;
-  padding: 12px;
-  background-color: #ebebeb;
-  display: inline-block;
-`
+import { css } from 'emotion'
 
 export default function WordCount(options) {
   return {
     renderEditor(props, editor, next) {
-      const { value } = props
+      const { value } = editor
       const { document } = value
       const children = next()
       let wordCount = 0
@@ -24,7 +17,16 @@ export default function WordCount(options) {
       return (
         <div>
           <div>{children}</div>
-          <WordCounter>Word Count: {wordCount}</WordCounter>
+          <span
+            className={css`
+              margin-top: 10px;
+              padding: 12px;
+              background-color: #ebebeb;
+              display: inline-block;
+            `}
+          >
+            Word Count: {wordCount}
+          </span>
         </div>
       )
     },

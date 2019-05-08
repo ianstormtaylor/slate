@@ -1,9 +1,9 @@
+import React from 'react'
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
+import { css } from 'emotion'
 
-import React from 'react'
 import initialValueAsJson from './value.json'
-import styled from 'react-emotion'
 
 /**
  * Deserialize the initial editor value.
@@ -12,36 +12,6 @@ import styled from 'react-emotion'
  */
 
 const initialValue = Value.fromJSON(initialValueAsJson)
-
-/**
- * Create a few styling components.
- *
- * @type {Component}
- */
-
-const ItemWrapper = styled('div')`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  & + & {
-    margin-top: 0;
-  }
-`
-
-const CheckboxWrapper = styled('span')`
-  margin-right: 0.75em;
-`
-
-const ContentWrapper = styled('span')`
-  flex: 1;
-  opacity: ${props => (props.checked ? 0.666 : 1)};
-  text-decoration: ${props => (props.checked ? 'none' : 'line-through')};
-
-  &:focus {
-    outline: none;
-  }
-`
 
 /**
  * Check list item.
@@ -73,18 +43,42 @@ class CheckListItem extends React.Component {
     const { attributes, children, node, readOnly } = this.props
     const checked = node.data.get('checked')
     return (
-      <ItemWrapper {...attributes}>
-        <CheckboxWrapper contentEditable={false}>
+      <div
+        {...attributes}
+        className={css`
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          & + & {
+            margin-top: 0;
+          }
+        `}
+      >
+        <span
+          contentEditable={false}
+          className={css`
+            margin-right: 0.75em;
+          `}
+        >
           <input type="checkbox" checked={checked} onChange={this.onChange} />
-        </CheckboxWrapper>
-        <ContentWrapper
-          checked={checked}
+        </span>
+        <span
           contentEditable={!readOnly}
           suppressContentEditableWarning
+          className={css`
+            flex: 1;
+            opacity: ${checked ? 0.666 : 1};
+            text-decoration: ${checked ? 'none' : 'line-through'};
+
+            &:focus {
+              outline: none;
+            }
+          `}
         >
           {children}
-        </ContentWrapper>
-      </ItemWrapper>
+        </span>
+      </div>
     )
   }
 }

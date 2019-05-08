@@ -639,12 +639,16 @@ function normalizeNodeByPath(editor, path) {
  * Register a `plugin` with the editor.
  *
  * @param {Editor} editor
- * @param {Object|Array} plugin
+ * @param {Object|Array|Null} plugin
  */
 
 function registerPlugin(editor, plugin) {
   if (Array.isArray(plugin)) {
     plugin.forEach(p => registerPlugin(editor, p))
+    return
+  }
+
+  if (plugin == null) {
     return
   }
 

@@ -3,7 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValueAsJson from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Icon, Toolbar } from '../components'
 
 /**
@@ -32,21 +32,36 @@ const initialValue = Value.fromJSON(initialValueAsJson)
  * @type {Component}
  */
 
-const SearchWrapper = styled('div')`
-  position: relative;
-`
+const SearchWrapper = props => (
+  <div
+    {...props}
+    className={css`
+      position: relative;
+    `}
+  />
+)
 
-const SearchIcon = styled(Icon)`
-  position: absolute;
-  top: 0.5em;
-  left: 0.5em;
-  color: #ccc;
-`
+const SearchIcon = props => (
+  <Icon
+    {...props}
+    className={css`
+      position: absolute;
+      top: 0.5em;
+      left: 0.5em;
+      color: #ccc;
+    `}
+  />
+)
 
-const SearchInput = styled('input')`
-  padding-left: 2em;
-  width: 100%;
-`
+const SearchInput = props => (
+  <input
+    {...props}
+    className={css`
+      padding-left: 2em;
+      width: 100%;
+    `}
+  />
+)
 
 /**
  * The search highlighting example.
@@ -75,9 +90,7 @@ class SearchHighlighting extends React.Component {
    * @param {Editor} editor
    */
 
-  ref = editor => {
-    this.editor = editor
-  }
+  ref = React.createRef()
 
   /**
    * Render.
@@ -139,7 +152,7 @@ class SearchHighlighting extends React.Component {
    */
 
   onInputChange = event => {
-    const { editor } = this
+    const editor = this.ref.current
     const { value } = editor
     const { document, annotations } = value
     const string = event.target.value

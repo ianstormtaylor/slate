@@ -5,7 +5,6 @@ import pick from 'lodash/pick'
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
 import fixSelectionInZeroWidthBlock from './fix-selection-in-zero-width-block'
 import getSelectionFromDom from '../../utils/get-selection-from-dom'
-import setSelectionFromDom from '../../utils/set-selection-from-dom'
 import setTextFromDomNode from '../../utils/set-text-from-dom-node'
 import isInputDataEnter from './is-input-data-enter'
 import isInputDataLastChar from './is-input-data-last-char'
@@ -134,12 +133,13 @@ function AndroidPlugin() {
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
     const domSelection = window.getSelection()
+    const selection = getSelectionFromDom(window, editor, domSelection)
 
     nodes.forEach(node => {
       setTextFromDomNode(window, editor, node)
     })
 
-    setSelectionFromDom(window, editor, domSelection)
+    editor.select(selection)
     nodes.clear()
   }
 

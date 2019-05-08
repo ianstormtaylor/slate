@@ -5,15 +5,11 @@ import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
 import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 
-import cloneFragment from '../utils/clone-fragment'
-import findDOMNode from '../utils/find-dom-node'
-import findPath from '../utils/find-path'
-import findRange from '../utils/find-range'
-import getEventRange from '../utils/get-event-range'
-import getEventTransfer from '../utils/get-event-transfer'
-import setEventTransfer from '../utils/set-event-transfer'
-import setSelectionFromDom from '../utils/set-selection-from-dom'
-import setTextFromDomNode from '../utils/set-text-from-dom-node'
+import cloneFragment from '../../utils/clone-fragment'
+import getEventRange from '../../utils/get-event-range'
+import getEventTransfer from '../../utils/get-event-transfer'
+import setEventTransfer from '../../utils/set-event-transfer'
+import setTextFromDomNode from '../../utils/set-text-from-dom-node'
 
 /**
  * Debug.
@@ -65,7 +61,7 @@ function AfterPlugin(options = {}) {
     event.preventDefault()
 
     const { document, selection } = value
-    const range = findRange(targetRange, editor)
+    const range = editor.findRange(targetRange)
 
     switch (event.inputType) {
       case 'deleteByDrag':
@@ -171,7 +167,7 @@ function AfterPlugin(options = {}) {
 
     const { value } = editor
     const { document } = value
-    const path = findPath(event.target, editor)
+    const path = editor.findPath(event.target)
     if (!path) return next()
 
     debug('onClick', { event })
@@ -275,7 +271,7 @@ function AfterPlugin(options = {}) {
 
     const { value } = editor
     const { document } = value
-    const path = findPath(event.target, editor)
+    const path = editor.findPath(event.target)
     const node = document.getNode(path)
     const ancestors = document.getAncestors(path)
     const isVoid =
@@ -305,8 +301,11 @@ function AfterPlugin(options = {}) {
     const { value } = editor
     const { document, selection } = value
     const window = getWindow(event.target)
-    let target = getEventRange(event, editor)
-    if (!target) return next()
+    let target = editor.findEventRange(event)
+
+    if (!target) {
+      return next()
+    }
 
     debug('onDrop', { event })
 
@@ -373,7 +372,7 @@ function AfterPlugin(options = {}) {
     // has fired in a node: https://github.com/facebook/react/issues/11379.
     // Until this is fixed in React, we dispatch a mouseup event on that
     // DOM node, since that will make it go back to normal.
-    const el = findDOMNode(target.focus.path)
+    const el = editor.findDOMNode(target.focus.path)
 
     if (el) {
       el.dispatchEvent(
@@ -422,14 +421,20 @@ function AfterPlugin(options = {}) {
 
   function onInput(event, editor, next) {
     debug('onInput')
+
     const window = getWindow(event.target)
+    const domSelection = window.getSelection()
+    const selection = editor.findSelection(domSelection)
 
-    // Get the selection point.
-    const selection = window.getSelection()
-    const { anchorNode } = selection
+    if (selection) {
+      editor.select(selection)
+    } else {
+      editor.blur()
+    }
 
+    const { anchorNode } = domSelection
     setTextFromDomNode(window, editor, anchorNode)
-    setSelectionFromDom(window, editor, selection)
+
     next()
   }
 
@@ -658,8 +663,14 @@ function AfterPlugin(options = {}) {
   function onSelect(event, editor, next) {
     debug('onSelect', { event })
     const window = getWindow(event.target)
-    const selection = window.getSelection()
-    setSelectionFromDom(window, editor, selection)
+    const domSelection = window.getSelection()
+    const selection = editor.findSelection(domSelection)
+
+    if (selection) {
+      editor.select(selection)
+    } else {
+      editor.blur()
+    }
 
     // COMPAT: reset the `isMouseDown` state here in case a `mouseup` event
     // happens outside the editor. This is needed for `onFocus` handling.

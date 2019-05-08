@@ -3,7 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValueAsJson from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Button, Icon, Toolbar } from '../components'
 
 /**
@@ -13,16 +13,6 @@ import { Button, Icon, Toolbar } from '../components'
  */
 
 const initialValue = Value.fromJSON(initialValueAsJson)
-
-/**
- * A styled emoji inline component.
- *
- * @type {Component}
- */
-
-const Emoji = styled('span')`
-  outline: ${props => (props.selected ? '2px solid blue' : 'none')};
-`
 
 /**
  * Emojis.
@@ -49,14 +39,6 @@ const EMOJIS = [
   '🍑',
   '🔑',
 ]
-
-/**
- * No ops.
- *
- * @type {Function}
- */
-
-const noop = e => e.preventDefault()
 
 /**
  * The links example.
@@ -152,14 +134,16 @@ class Emojis extends React.Component {
     switch (node.type) {
       case 'emoji':
         return (
-          <Emoji
+          <span
             {...attributes}
-            selected={isFocused}
             contentEditable={false}
-            onDrop={noop}
+            onDrop={e => e.preventDefault()}
+            className={css`
+              outline: ${isFocused ? '2px solid blue' : 'none'};
+            `}
           >
             {node.data.get('code')}
-          </Emoji>
+          </span>
         )
       default:
         return next()

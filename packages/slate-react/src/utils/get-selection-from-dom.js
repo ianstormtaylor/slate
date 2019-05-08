@@ -1,6 +1,13 @@
+import warning from 'tiny-warning'
+
 import findRange from './find-range'
 
 export default function getSelectionFromDOM(window, editor, domSelection) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `getSelectionFromDOM(window, editor, domSelection)` helper is deprecated in favor of `editor.findSelection(domSelection)`.'
+  )
+
   const { value } = editor
   const { document } = value
 

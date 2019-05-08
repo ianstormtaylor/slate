@@ -1,5 +1,7 @@
 import getWindow from 'get-window'
 
+import DATA_ATTRS from '../../constants/data-attributes'
+
 /**
  * Is the given node a text node?
  *
@@ -91,7 +93,7 @@ function applyElementSnapshot(snapshot, window) {
   const key = dataset.key
   if (!key) return // if there's no `data-key`, don't remove it
   const dups = new window.Set(
-    Array.from(window.document.querySelectorAll(`[data-key='${key}']`))
+    Array.from(window.document.querySelectorAll(`[${DATA_ATTRS.KEY}="${key}"]`))
   )
   dups.delete(el)
   dups.forEach(dup => dup.parentElement.removeChild(dup))

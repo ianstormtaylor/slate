@@ -24,12 +24,12 @@ function SlateReactPlaceholder(options = {}) {
   const { placeholder, when, style = {} } = options
 
   invariant(
-    placeholder,
+    typeof placeholder === 'string',
     'You must pass `SlateReactPlaceholder` an `options.placeholder` string.'
   )
 
   invariant(
-    when,
+    typeof when === 'string' || typeof when === 'function',
     'You must pass `SlateReactPlaceholder` an `options.when` query.'
   )
 

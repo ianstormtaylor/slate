@@ -33,7 +33,6 @@
   "peerDependencies": {
     "immutable": ">=3.8.1 || >4.0.0-rc",
     "react": ">=0.14.0",
-    "react-dom": ">=0.14.0",
     "slate": ">=0.43.6"
   },
   "devDependencies": {
@@ -49,7 +48,6 @@
   "umdGlobals": {
     "immutable": "Immutable",
     "react": "React",
-    "react-dom": "ReactDOM",
     "slate": "Slate"
   },
   "keywords": [

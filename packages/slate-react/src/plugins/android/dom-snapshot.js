@@ -1,5 +1,6 @@
 import getSelectionFromDom from '../../utils/get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
+import SELECTORS from '../../constants/selectors'
 
 /**
  * Returns the closest element that matches the selector.
@@ -36,7 +37,7 @@ export default class DomSnapshot {
   constructor(window, editor, { before = false } = {}) {
     const domSelection = window.getSelection()
     const { anchorNode } = domSelection
-    const subrootEl = closest(anchorNode, '[data-slate-editor] > *')
+    const subrootEl = closest(anchorNode, `${SELECTORS.EDITOR} > *`)
     const elements = [subrootEl]
 
     // The before option is for when we need to take a snapshot of the current

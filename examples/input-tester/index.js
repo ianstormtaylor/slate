@@ -2,7 +2,7 @@ import { Editor, findRange } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import initialValueAsJson from './value.json'
 import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
@@ -17,72 +17,96 @@ const initialValue = Value.fromJSON(initialValueAsJson)
 
 const EventsValue = createArrayValue()
 
-const Wrapper = styled('div')`
-  position: relative;
-`
+const Wrapper = React.forwardRef((props, ref) => (
+  <div
+    {...props}
+    ref={ref}
+    className={css`
+      position: relative;
+    `}
+  />
+))
 
-const EventsWrapper = styled('div')`
-  position: fixed;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  max-height: 40vh;
-  height: 500px;
-  overflow: auto;
-  border-top: 1px solid #ccc;
-  background: white;
-`
+const EventsWrapper = props => (
+  <div
+    {...props}
+    className={css`
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      right: 0;
+      max-height: 40vh;
+      height: 500px;
+      overflow: auto;
+      border-top: 1px solid #ccc;
+      background: white;
+    `}
+  />
+)
 
-const EventsTable = styled('table')`
-  font-family: monospace;
-  font-size: 0.9em;
-  border-collapse: collapse;
-  border: none;
-  min-width: 100%;
+const EventsTable = props => (
+  <table
+    {...props}
+    className={css`
+      font-family: monospace;
+      font-size: 0.9em;
+      border-collapse: collapse;
+      border: none;
+      min-width: 100%;
 
-  & > * + * {
-    margin-top: 1px;
-  }
+      & > * + * {
+        margin-top: 1px;
+      }
 
-  tr,
-  th,
-  td {
-    border: none;
-  }
+      tr,
+      th,
+      td {
+        border: none;
+      }
 
-  th,
-  td {
-    text-align: left;
-    padding: 0.333em;
-  }
+      th,
+      td {
+        text-align: left;
+        padding: 0.333em;
+      }
 
-  th {
-    position: sticky;
-    top: 0;
-    background-color: #eee;
-    border-bottom: 1px solid #ccc;
-  }
+      th {
+        position: sticky;
+        top: 0;
+        background-color: #eee;
+        border-bottom: 1px solid #ccc;
+      }
 
-  td {
-    background-color: white;
-    border-top: 1px solid #eee;
-    border-bottom: 1px solid #eee;
-  }
-`
+      td {
+        background-color: white;
+        border-top: 1px solid #eee;
+        border-bottom: 1px solid #eee;
+      }
+    `}
+  />
+)
 
-const Pill = styled('span')`
-  display: inline-block;
-  padding: 0.25em 0.33em;
-  border-radius: 4px;
-  background-color: ${p => p.color};
-`
+const Pill = ({ color, ...props }) => (
+  <span
+    className={css`
+      display: inline-block;
+      padding: 0.25em 0.33em;
+      border-radius: 4px;
+      background-color: ${color};
+    `}
+  />
+)
 
-const I = styled(Icon)`
-  font-size: 0.9em;
-  color: ${p => p.color};
-`
+const I = ({ color, ...props }) => (
+  <Icon
+    className={css`
+      font-size: 0.9em;
+      color: ${color};
+    `}
+  />
+)
 
-const MissingCell = props => <I color="silver">texture</I>
+const MissingCell = () => <I color="silver">texture</I>
 
 const TypeCell = ({ event }) => {
   switch (event.constructor.name) {
@@ -220,7 +244,7 @@ class InputTester extends React.Component {
 
   render() {
     return (
-      <Wrapper innerRef={this.onRef}>
+      <Wrapper ref={this.onRef}>
         <Editor
           spellCheck
           placeholder="Enter some text..."
@@ -295,14 +319,14 @@ class InputTester extends React.Component {
 
     if (event.getTargetRanges) {
       const [nativeTargetRange] = event.getTargetRanges()
-      targetRange = nativeTargetRange && findRange(nativeTargetRange, editor)
+      targetRange = nativeTargetRange && editor.findRange(nativeTargetRange)
     }
 
     const nativeSelection = window.getSelection()
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, editor)
+    const selection = nativeRange && editor.findRange(nativeRange)
 
     EventsValue.push({
       event,
@@ -319,7 +343,7 @@ class InputTester extends React.Component {
     const nativeRange = nativeSelection.rangeCount
       ? nativeSelection.getRangeAt(0)
       : undefined
-    const selection = nativeRange && findRange(nativeRange, editor)
+    const selection = nativeRange && editor.findRange(nativeRange)
 
     const {
       type,
@@ -346,7 +370,7 @@ class InputTester extends React.Component {
         style += '; background-color: lightskyblue'
         const [nativeTargetRange] = event.getTargetRanges()
         const targetRange =
-          nativeTargetRange && findRange(nativeTargetRange, editor)
+          nativeTargetRange && editor.findRange(nativeTargetRange)
 
         details = {
           inputType,

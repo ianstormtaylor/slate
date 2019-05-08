@@ -5,6 +5,7 @@ import SlateTypes from 'slate-prop-types'
 import Types from 'prop-types'
 
 import Leaf from './leaf'
+import DATA_ATTRS from '../constants/data-attributes'
 
 /**
  * Debug.
@@ -46,6 +47,14 @@ class Text extends React.Component {
   static defaultProps = {
     style: null,
   }
+
+  /**
+   * A ref for the contenteditable DOM node.
+   *
+   * @type {Object}
+   */
+
+  ref = React.createRef()
 
   /**
    * Debug.
@@ -116,7 +125,7 @@ class Text extends React.Component {
       style,
     } = this.props
     const { key } = node
-    const markers = annotations.concat(decorations)
+    const markers = decorations.concat(annotations.toList())
 
     // PERF: Take advantage of cache by avoiding arguments.
     const leaves =
@@ -144,8 +153,13 @@ class Text extends React.Component {
       )
     })
 
+    const attrs = {
+      [DATA_ATTRS.OBJECT]: node.object,
+      [DATA_ATTRS.KEY]: key,
+    }
+
     return (
-      <span data-key={key} style={style}>
+      <span ref={this.ref} style={style} {...attrs}>
         {children}
       </span>
     )

@@ -148,8 +148,8 @@ class MarkdownPreview extends React.Component {
     const grammar = Prism.languages.markdown
     const tokens = Prism.tokenize(string, grammar)
     const decorations = []
-    let startText = texts.shift()
-    let endText = startText
+    let startEntry = texts.shift()
+    let endEntry = startEntry
     let startOffset = 0
     let endOffset = 0
     let start = 0
@@ -165,9 +165,10 @@ class MarkdownPreview extends React.Component {
     }
 
     for (const token of tokens) {
-      startText = endText
+      startEntry = endEntry
       startOffset = endOffset
 
+      const [startText, startPath] = startEntry
       const length = getLength(token)
       const end = start + length
 
@@ -177,20 +178,25 @@ class MarkdownPreview extends React.Component {
       endOffset = startOffset + remaining
 
       while (available < remaining) {
-        endText = texts.shift()
+        endEntry = texts.shift()
+        const [endText] = endEntry
         remaining = length - available
         available = endText.text.length
         endOffset = remaining
       }
 
+      const [endText, endPath] = endEntry
+
       if (typeof token !== 'string') {
         const dec = {
           anchor: {
             key: startText.key,
+            path: startPath,
             offset: startOffset,
           },
           focus: {
             key: endText.key,
+            path: endPath,
             offset: endOffset,
           },
           mark: {

@@ -4,7 +4,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValueAsJson from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 
 /**
  * Deserialize the initial editor value.
@@ -48,19 +48,6 @@ const MARK_TAGS = {
   s: 'strikethrough',
   code: 'code',
 }
-
-/**
- * A styled image block component.
- *
- * @type {Component}
- */
-
-const Image = styled('img')`
-  display: block;
-  max-width: 100%;
-  max-height: 20em;
-  box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
-`
 
 /**
  * Serializer rules.
@@ -233,7 +220,18 @@ class PasteHtml extends React.Component {
         return <ol {...attributes}>{children}</ol>
       case 'image':
         const src = node.data.get('src')
-        return <Image src={src} selected={isFocused} {...attributes} />
+        return (
+          <img
+            {...attributes}
+            src={src}
+            className={css`
+              display: block;
+              max-width: 100%;
+              max-height: 20em;
+              box-shadow: ${isFocused ? '0 0 0 2px blue;' : 'none'};
+            `}
+          />
+        )
       default:
         return next()
     }

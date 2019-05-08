@@ -2,7 +2,7 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Link, Redirect } from 'react-router-dom'
 import splitJoin from './split-join.js'
 import insert from './insert.js'
@@ -20,58 +20,87 @@ import { ANDROID_API_VERSION } from 'slate-dev-environment'
 const DEFAULT_NODE = 'paragraph'
 
 /**
- * Some styled components.
+ * Some components.
  *
  * @type {Component}
  */
 
-const Instruction = styled('div')`
-  white-space: pre-wrap;
-  margin: -1em -1em 1em;
-  padding: 0.5em;
-  background: #eee;
-`
+const Instruction = props => (
+  <div
+    {...props}
+    className={css`
+      white-space: pre-wrap;
+      margin: -1em -1em 1em;
+      padding: 0.5em;
+      background: #eee;
+    `}
+  />
+)
 
-const Tabs = styled('div')`
-  margin-bottom: 0.5em;
-`
+const Tabs = props => (
+  <div
+    {...props}
+    className={css`
+      margin-bottom: 0.5em;
+    `}
+  />
+)
 
-const TabLink = ({ active, ...props }) => <Link {...props} />
+const Tab = ({ active, ...props }) => (
+  <Link
+    {...props}
+    className={css`
+      display: inline-block;
+      text-decoration: none;
+      color: black;
+      background: ${active ? '#AAA' : '#DDD'};
+      padding: 0.25em 0.5em;
+      border-radius: 0.25em;
+      margin-right: 0.25em;
+    `}
+  />
+)
 
-const Tab = styled(TabLink)`
-  display: inline-block;
-  text-decoration: none;
-  color: black;
-  background: ${p => (p.active ? '#AAA' : '#DDD')};
-  padding: 0.25em 0.5em;
-  border-radius: 0.25em;
-  margin-right: 0.25em;
-`
+const Version = props => (
+  <div
+    {...props}
+    className={css`
+      float: right;
+      padding: 0.5em;
+      font-size: 75%;
+      color: #808080;
+    `}
+  />
+)
 
-const Version = styled('div')`
-  float: right;
-  padding: 0.5em;
-  font-size: 75%;
-  color: #808080;
-`
+const EditorText = props => (
+  <div
+    {...props}
+    className={css`
+      color: #808080;
+      background: #f0f0f0;
+      font: 12px monospace;
+      white-space: pre-wrap;
+      margin: 1em -1em;
+      padding: 0.5em;
 
-const EditorText = styled('div')`
-  color: #808080;
-  background: #f0f0f0;
-  font: 12px monospace;
-  white-space: pre-wrap;
-  margin: 1em -1em;
-  padding: 0.5em;
-  div {
-    margin: 0 0 0.5em;
-  }
-`
+      div {
+        margin: 0 0 0.5em;
+      }
+    `}
+  />
+)
 
-const EditorTextCaption = styled('div')`
-  color: white;
-  background: #808080;
-  padding: 0.5em;
-`
+const EditorTextCaption = props => (
+  <div
+    {...props}
+    className={css`
+      color: white;
+      background: #808080;
+      padding: 0.5em;
+    `}
+  />
+)
 
 /**
  * Extract lines of text from `Value`

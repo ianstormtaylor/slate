@@ -8,6 +8,7 @@ import warning from 'tiny-warning'
 import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import Content from './content'
 import ReactPlugin from '../plugins/react'
 
 /**
@@ -91,6 +92,7 @@ class Editor extends React.Component {
     change: null,
     resolves: 0,
     updates: 0,
+    contentRef: React.createRef(),
   }
 
   /**
@@ -140,25 +142,54 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-    const props = { ...this.props, editor: this }
 
     // Re-resolve the controller if needed based on memoized props.
-    const { commands, placeholder, plugins, queries, schema } = props
+    const { commands, placeholder, plugins, queries, schema } = this.props
     this.resolveController(plugins, schema, commands, queries, placeholder)
 
     // Set the current props on the controller.
-    const { options, readOnly, value: valueFromProps } = props
+    const { options, readOnly, value: valueFromProps } = this.props
     const { value: valueFromState } = this.state
     const value = valueFromProps || valueFromState
     this.controller.setReadOnly(readOnly)
     this.controller.setValue(value, options)
 
+    const {
+      autoCorrect,
+      className,
+      id,
+      role,
+      spellCheck,
+      tabIndex,
+      style,
+      tagName,
+    } = this.props
+
+    const children = (
+      <Content
+        ref={this.tmp.contentRef}
+        autoCorrect={autoCorrect}
+        className={className}
+        editor={this}
+        id={id}
+        onEvent={(handler, event) => this.run(handler, event)}
+        readOnly={readOnly}
+        role={role}
+        spellCheck={spellCheck}
+        style={style}
+        tabIndex={tabIndex}
+        tagName={tagName}
+      />
+    )
+
     // Render the editor's children with the controller.
-    const children = this.controller.run('renderEditor', {
-      ...props,
-      value,
+    const element = this.controller.run('renderEditor', {
+      ...this.props,
+      editor: this,
+      children,
     })
-    return children
+
+    return element
   }
 
   /**

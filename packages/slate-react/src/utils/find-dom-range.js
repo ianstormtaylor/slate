@@ -1,4 +1,5 @@
 import findDOMPoint from './find-dom-point'
+import warning from 'tiny-warning'
 
 /**
  * Find a native DOM range Slate `range`.
@@ -9,6 +10,11 @@ import findDOMPoint from './find-dom-point'
  */
 
 function findDOMRange(range, win = window) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `findDOMRange(range)` helper is deprecated in favor of `editor.findDOMRange(range)`.'
+  )
+
   const { anchor, focus, isBackward, isCollapsed } = range
   const domAnchor = findDOMPoint(anchor, win)
   const domFocus = isCollapsed ? domAnchor : findDOMPoint(focus, win)

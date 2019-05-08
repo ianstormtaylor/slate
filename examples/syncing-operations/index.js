@@ -3,21 +3,9 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
-
-/**
- * A spacer component.
- *
- * @type {Component}
- */
-
-const Spacer = styled('div')`
-  height: 20px;
-  background-color: #eee;
-  margin: 20px -20px;
-`
 
 /**
  * Hotkey matchers.
@@ -229,7 +217,13 @@ class SyncingOperationsExample extends React.Component {
           ref={one => (this.one = one)}
           onChange={this.onOneChange}
         />
-        <Spacer />
+        <div
+          className={css`
+            height: 20px;
+            background-color: #eee;
+            margin: 20px -20px;
+          `}
+        />
         <SyncingEditor
           ref={two => (this.two = two)}
           onChange={this.onTwoChange}
