@@ -77,7 +77,7 @@ class SearchHighlighting extends React.Component {
    */
 
   schema = {
-    marks: {
+    annotations: {
       highlight: {
         isAtomic: true,
       },
@@ -116,7 +116,7 @@ class SearchHighlighting extends React.Component {
           ref={this.ref}
           defaultValue={initialValue}
           schema={this.schema}
-          renderMark={this.renderMark}
+          renderAnnotation={this.renderAnnotation}
           spellCheck
         />
       </div>
@@ -124,16 +124,16 @@ class SearchHighlighting extends React.Component {
   }
 
   /**
-   * Render a Slate mark.
+   * Render a Slate annotation.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderMark = (props, editor, next) => {
-    const { children, mark, attributes } = props
+  renderAnnotation = (props, editor, next) => {
+    const { children, annotation, attributes } = props
 
-    switch (mark.type) {
+    switch (annotation.type) {
       case 'highlight':
         return (
           <span {...attributes} style={{ backgroundColor: '#ffeeba' }}>
@@ -161,7 +161,7 @@ class SearchHighlighting extends React.Component {
     // so that there isn't a confusing behavior when undoing.
     editor.withoutSaving(() => {
       annotations.forEach(ann => {
-        if (ann.mark.type === 'highlight') {
+        if (ann.type === 'highlight') {
           editor.removeAnnotation(ann)
         }
       })
@@ -175,9 +175,9 @@ class SearchHighlighting extends React.Component {
           if (i !== 0) {
             editor.addAnnotation({
               key: getHighlightKey(),
+              type: 'highlight',
               anchor: { path, key, offset: offset - string.length },
               focus: { path, key, offset },
-              mark: { type: 'highlight' },
             })
           }
 

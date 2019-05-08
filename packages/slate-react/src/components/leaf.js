@@ -144,6 +144,9 @@ class Leaf extends React.Component {
       text,
     }
 
+    // COMPAT: Having the `data-` attributes on these leaf elements ensures that
+    // in certain misbehaving browsers they aren't weirdly cloned/destroyed by
+    // contenteditable behaviors. (2019/05/08)
     for (const mark of marks) {
       const ret = editor.run('renderMark', {
         ...props,

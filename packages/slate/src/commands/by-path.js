@@ -114,8 +114,8 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
 
   editor.withoutNormalizing(() => {
     for (const annotation of annotations.values()) {
-      const { start, end, mark } = annotation
-      const isAtomic = editor.isAtomic(mark)
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
 
       if (!isAtomic) {
         continue
@@ -325,8 +325,8 @@ Commands.removeTextByPath = (editor, path, offset, length) => {
 
   editor.withoutNormalizing(() => {
     for (const annotation of annotations.values()) {
-      const { start, end, mark } = annotation
-      const isAtomic = editor.isAtomic(mark)
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
 
       if (!isAtomic) {
         continue

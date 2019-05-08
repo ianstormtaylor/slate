@@ -40,14 +40,14 @@ class MarkdownPreview extends React.Component {
       <Editor
         placeholder="Write some markdown..."
         defaultValue={initialValue}
-        renderMark={this.renderMark}
+        renderDecoration={this.renderDecoration}
         decorateNode={this.decorateNode}
       />
     )
   }
 
   /**
-   * Render a Slate mark.
+   * Render a Slate decoration.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -55,10 +55,10 @@ class MarkdownPreview extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, editor, next) => {
-    const { children, mark, attributes } = props
+  renderDecoration = (props, editor, next) => {
+    const { children, decoration, attributes } = props
 
-    switch (mark.type) {
+    switch (decoration.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
 
@@ -189,6 +189,7 @@ class MarkdownPreview extends React.Component {
 
       if (typeof token !== 'string') {
         const dec = {
+          type: token.type,
           anchor: {
             key: startText.key,
             path: startPath,
@@ -198,9 +199,6 @@ class MarkdownPreview extends React.Component {
             key: endText.key,
             path: endPath,
             offset: endOffset,
-          },
-          mark: {
-            type: token.type,
           },
         }
 
