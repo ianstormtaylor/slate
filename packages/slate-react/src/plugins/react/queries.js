@@ -34,7 +34,11 @@ function QueriesPlugin() {
       }
 
       if (!p.size) {
-        return instance.ref.current || null
+        if (instance.ref) {
+          return instance.ref.current || null
+        } else {
+          return instance || null
+        }
       }
 
       const index = p.first()
@@ -233,6 +237,14 @@ function QueriesPlugin() {
     }
 
     const search = (instance, p) => {
+      if (element === instance) {
+        return p
+      }
+
+      if (!instance.ref) {
+        return null
+      }
+
       if (element === instance.ref.current) {
         return p
       }

@@ -32,7 +32,7 @@
   },
   "peerDependencies": {
     "immutable": ">=3.8.1 || >4.0.0-rc",
-    "react": ">=0.14.0",
+    "react": ">=16.6.0",
     "slate": ">=0.43.6"
   },
   "devDependencies": {

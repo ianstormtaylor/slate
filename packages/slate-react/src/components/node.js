@@ -240,7 +240,6 @@ class Node extends React.Component {
       editor,
       isFocused: !!selection && selection.isFocused,
       isSelected: !!selection,
-      key: node.key,
       node,
       parent,
       readOnly,
@@ -328,5 +327,4 @@ function getRelativeRange(node, index, range) {
  * @type {Component}
  */
 
-Node.List = NodeList
 export default Node
