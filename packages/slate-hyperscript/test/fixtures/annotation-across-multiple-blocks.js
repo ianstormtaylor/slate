@@ -66,8 +66,8 @@ export const output = {
       },
     ],
   },
-  annotations: [
-    {
+  annotations: {
+    a: {
       object: 'annotation',
       key: 'a',
       type: 'highlight',
@@ -85,5 +85,5 @@ export const output = {
         offset: 2,
       },
     },
-  ],
+  },
 }

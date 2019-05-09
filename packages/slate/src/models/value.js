@@ -868,8 +868,8 @@ class Value extends Record(DEFAULTS) {
 
     if (options.preserveAnnotations) {
       object.annotations = this.annotations
-        .toArray()
         .map(a => a.toJSON(options))
+        .toObject()
     }
 
     if (options.preserveSelection) {
