@@ -35,7 +35,7 @@ element.ancestors(path, options)
 element.siblings(path, options)
 ```
 
-You can use them just like the native JavaScript iterables. For example, you can through the next text nodes after a specific node:
+You can use them just like the native JavaScript iterables. For example, you can loop through the text nodes after a specific node:
 
 ```js
 for (const next of document.texts({ path: start.path })) {
