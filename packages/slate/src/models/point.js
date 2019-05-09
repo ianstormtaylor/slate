@@ -419,6 +419,7 @@ class Point extends Record(DEFAULTS) {
     // enforce that if there is a following text node, we always move it there.
     if (point.offset === target.text.length) {
       const block = node.getClosestBlock(point.path)
+      // TODO: this next line is broken because `getNextText` takes a path
       const next = block.getNextText()
 
       if (next) {

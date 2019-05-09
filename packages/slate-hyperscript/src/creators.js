@@ -273,17 +273,17 @@ export function createValue(tagName, attributes, children) {
   // Search the document's texts to see if any of them have the anchor or
   // focus information saved, or decorations applied.
   if (document) {
-    document.getTexts().forEach(text => {
-      const { __anchor, __decorations, __focus } = text
+    for (const [node, path] of document.texts()) {
+      const { __anchor, __decorations, __focus } = node
 
       if (__anchor != null) {
-        anchor = Point.create({ key: text.key, offset: __anchor.offset })
+        anchor = Point.create({ path, key: node.key, offset: __anchor.offset })
         marks = __anchor.marks
         isFocused = __anchor.isFocused
       }
 
       if (__focus != null) {
-        focus = Point.create({ key: text.key, offset: __focus.offset })
+        focus = Point.create({ path, key: node.key, offset: __focus.offset })
         marks = __focus.marks
         isFocused = __focus.isFocused
       }
@@ -295,7 +295,7 @@ export function createValue(tagName, attributes, children) {
           delete partials[id]
 
           if (!partial) {
-            dec.key = text.key
+            dec.key = node.key
             partials[id] = dec
             continue
           }
@@ -306,7 +306,8 @@ export function createValue(tagName, attributes, children) {
               offset: partial.offset,
             },
             focus: {
-              key: text.key,
+              path,
+              key: node.key,
               offset: dec.offset,
             },
             mark: {
@@ -318,7 +319,7 @@ export function createValue(tagName, attributes, children) {
           decorations.push(decoration)
         }
       }
-    })
+    }
   }
 
   if (Object.keys(partials).length > 0) {

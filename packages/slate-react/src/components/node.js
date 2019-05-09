@@ -4,6 +4,7 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import warning from 'tiny-warning'
 import Types from 'prop-types'
+import { PathUtils } from 'slate'
 
 import Void from './void'
 import Text from './text'
@@ -130,14 +131,24 @@ class Node extends React.Component {
       readOnly,
     } = this.props
     const { value } = editor
-    const { selection } = value
-    const indexes = node.getSelectionIndexes(selection, isSelected)
+    const { document, selection } = value
+    const { start, end } = selection
+    const path = document.getPath(node.key)
+    const startPath = start.path.slice(0, path.size)
+    const endPath = end.path.slice(0, path.size)
+    const startComp = PathUtils.compare(path, startPath)
+    const endComp = PathUtils.compare(path, endPath)
     const decs = decorations.concat(node.getDecorations(editor))
     const childrenDecorations = getChildrenDecorations(node, decs)
     const children = []
 
     node.nodes.forEach((child, i) => {
-      const isChildSelected = !!indexes && indexes.start <= i && i < indexes.end
+      const isChildSelected =
+        isSelected &&
+        startComp != null &&
+        startComp > -1 &&
+        endComp != null &&
+        endComp < 1
 
       children.push(
         this.renderNode(child, isChildSelected, childrenDecorations[i])

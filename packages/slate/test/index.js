@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { fixtures } from 'slate-dev-test-utils'
 import { Node, Editor, Value } from 'slate'
+import { List } from 'immutable'
 
 const plugins = [
   {
@@ -67,7 +68,15 @@ describe('slate', () => {
       actual = actual.toJSON()
     }
 
+    if (List.isList(actual)) {
+      actual = actual.toJSON()
+    }
+
     if (Node.isNode(expected)) {
+      expected = expected.toJSON()
+    }
+
+    if (List.isList(expected)) {
       expected = expected.toJSON()
     }
 

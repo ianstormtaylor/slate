@@ -11,10 +11,16 @@ const WordCounter = styled('span')`
 export default function WordCount(options) {
   return {
     renderEditor(props, editor, next) {
+      const { value } = props
+      const { document } = value
       const children = next()
-      const wordCount = props.value.document
-        .getBlocks()
-        .reduce((memo, b) => memo + b.text.trim().split(/\s+/).length, 0)
+      let wordCount = 0
+
+      for (const [node] of document.blocks({ onlyLeaves: true })) {
+        const words = node.text.trim().split(/\s+/)
+        wordCount += words.length
+      }
+
       return (
         <div>
           <div>{children}</div>
