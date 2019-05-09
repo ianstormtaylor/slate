@@ -3,7 +3,6 @@ import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
-import { TextUtils } from 'slate'
 import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import cloneFragment from '../../utils/clone-fragment'
@@ -528,13 +527,7 @@ function AfterPlugin(options = {}) {
         return editor.moveToStart()
       }
 
-      const { start } = selection
-      const startBlock = document.getClosestBlock(start.key)
-      const offset = startBlock.getOffset(start.key)
-      const o = offset + start.offset
-      const { text } = startBlock
-      const n = TextUtils.getCharOffsetBackward(text, o)
-      return editor.moveBackward(n)
+      return editor.moveBackward()
     }
 
     if (Hotkeys.isMoveForward(event)) {
@@ -544,13 +537,7 @@ function AfterPlugin(options = {}) {
         return editor.moveToEnd()
       }
 
-      const { start } = selection
-      const startBlock = document.getClosestBlock(start.key)
-      const offset = startBlock.getOffset(start.key)
-      const o = offset + start.offset
-      const { text } = startBlock
-      const n = TextUtils.getCharOffsetForward(text, o)
-      return editor.moveForward(n)
+      return editor.moveForward()
     }
 
     if (Hotkeys.isMoveWordBackward(event)) {

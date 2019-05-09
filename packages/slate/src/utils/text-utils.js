@@ -138,136 +138,144 @@ function getCharLength(char) {
 }
 
 /**
- * Get the offset to the end of the first character in `text`.
- * This function is emoji aware and return correct offset for all cases.
+ * Get the offset to the end of the character(s) in `text`.
+ * This function is emoji aware and handles them correctly.
  *
  * @param {String} text
+ * @param {Number} chars
  * @param {Boolean} forward
  * @return {Number}
  */
 
-function getCharOffset(text, forward) {
-  // prev types (better ideas?):
-  // - SURR: surrogate pair
-  // - MOD: modifier (technically also surrogate pair)
-  // - ZWJ: zero width joiner
-  // - VAR: variation selector
-  // - BMP: sequenceable character from Basic Multilingual Plane
-  let prev = null
+function getCharOffset(text, chars, forward) {
   let offset = 0
-  let charCode = text.charCodeAt(0)
 
-  while (charCode) {
-    if (isSurrogate(charCode)) {
-      const modifier = isModifier(charCode, text, offset)
+  // Calculate the offset sum of each character
+  for (let i = 0; i < chars; i++) {
+    // `prev` types (better ideas?):
+    // - SURR: surrogate pair
+    // - MOD: modifier (technically also surrogate pair)
+    // - ZWJ: zero width joiner
+    // - VAR: variation selector
+    // - BMP: sequenceable character from Basic Multilingual Plane
+    let prev = null
+    let charCode = text.charCodeAt(offset)
 
-      // Early returns are the heart of this function,
-      // where we decide if previous and current codepoints
-      // should form a single character (in terms of
-      // how many of them should selection jump over).
-      if (forward) {
-        if (
-          (!modifier && prev && prev !== 'ZWJ') ||
-          (modifier && prev && prev !== 'SURR')
-        ) {
+    while (charCode) {
+      if (isSurrogate(charCode)) {
+        const modifier = isModifier(charCode, text, offset)
+
+        // Early returns are the heart of this loop where
+        // we decide if previous and current codepoints
+        // should form a single character (in other words:
+        // how many of them should selection jump over).
+        if (forward) {
+          if (
+            (!modifier && prev && prev !== 'ZWJ') ||
+            (modifier && prev && prev !== 'SURR')
+          ) {
+            break
+          }
+        } else if (prev === 'SURR' || prev === 'BMP') {
           break
         }
-      } else if (prev === 'SURR' || prev === 'BMP') {
-        break
+
+        offset += 2
+        prev = modifier ? 'MOD' : 'SURR'
+        charCode = text.charCodeAt(offset)
+        // It's okay to `continue` without checking
+        // because if `charCode` is NaN (which is
+        // the case when out of `text` range), next
+        // `while` loop won't execute and we're done.
+        continue
       }
 
-      offset += 2
-      prev = modifier ? 'MOD' : 'SURR'
-      charCode = text.charCodeAt(offset)
-      // It's okay to `continue` without checking
-      // because if `charCode` is NaN (which is
-      // the case when out of `text` range), next
-      // `while` loop won't execute and we're done.
-      continue
-    }
-
-    // If zero width joiner
-    if (charCode === 0x200d) {
-      offset += 1
-      prev = 'ZWJ'
-      charCode = text.charCodeAt(offset)
-      continue
-    }
-
-    if (isBMPEmoji(charCode)) {
-      if (
-        (forward && prev === 'VAR') ||
-        (prev && prev !== 'ZWJ' && prev !== 'VAR')
-      ) {
-        break
-      }
-
-      offset += 1
-      prev = 'BMP'
-      charCode = text.charCodeAt(offset)
-      continue
-    }
-
-    if (isVariationSelector(charCode)) {
-      if (!forward && prev && prev !== 'ZWJ') {
-        break
-      }
-
-      offset += 1
-      prev = 'VAR'
-      charCode = text.charCodeAt(offset)
-      continue
-    }
-
-    // Modifier "fuses" with what ever character is before
-    // that (even whitespace), need to look ahead in this case.
-    if (forward) {
-      const nextCharCode = text.charCodeAt(offset + 1)
-
-      if (isModifier(nextCharCode, text, offset + 1)) {
-        offset += 3
-        prev = 'MOD'
+      // If zero width joiner
+      if (charCode === 0x200d) {
+        offset += 1
+        prev = 'ZWJ'
         charCode = text.charCodeAt(offset)
         continue
       }
-    } else if (prev === 'MOD') {
-      offset += 1
+
+      if (isBMPEmoji(charCode)) {
+        if (
+          (forward && prev === 'VAR') ||
+          (prev && prev !== 'ZWJ' && prev !== 'VAR')
+        ) {
+          break
+        }
+
+        offset += 1
+        prev = 'BMP'
+        charCode = text.charCodeAt(offset)
+        continue
+      }
+
+      if (isVariationSelector(charCode)) {
+        if (!forward && prev && prev !== 'ZWJ') {
+          break
+        }
+
+        offset += 1
+        prev = 'VAR'
+        charCode = text.charCodeAt(offset)
+        continue
+      }
+
+      // Modifier "fuses" with what ever character is before that
+      // (even whitespace), need to look ahead if loop gets here.
+      if (forward) {
+        const nextCharCode = text.charCodeAt(offset + 1)
+
+        if (isModifier(nextCharCode, text, offset + 1)) {
+          offset += 3
+          prev = 'MOD'
+          charCode = text.charCodeAt(offset)
+          continue
+        }
+      } else if (prev === 'MOD') {
+        offset += 1
+        break
+      }
+
+      // If while loop ever gets here, we're
+      // done (e.g Latin characters, length 1).
+      if (prev === null) offset += 1
       break
     }
-
-    // If while loop ever gets here, we're
-    // done (e.g unicodes with length 1).
-    break
   }
 
-  return offset || 1
+  return offset
 }
 
 /**
- * Get the offset to the end of the character before an `offset` in `text`.
+ * Get the offset to the end of character(s) before an `offset` in `text`.
  *
  * @param {String} text
  * @param {Number} offset
+ * @param {Number} chars
  * @return {Number}
  */
 
-function getCharOffsetBackward(text, offset) {
+function getCharsOffsetBackward(text, offset, chars) {
   text = text.slice(0, offset)
   text = reverse(text)
-  return getCharOffset(text)
+  return getCharOffset(text, chars)
 }
 
 /**
- * Get the offset to the end of the character after an `offset` in `text`.
+ * Get the offset to the end of character(s) after an `offset` in `text`.
  *
  * @param {String} text
  * @param {Number} offset
+ * @param {Number} chars
  * @return {Number}
  */
 
-function getCharOffsetForward(text, offset) {
+function getCharsOffsetForward(text, offset, chars) {
   text = text.slice(offset)
-  return getCharOffset(text, true)
+  return getCharOffset(text, chars, true)
 }
 
 /**
@@ -341,8 +349,8 @@ function getWordOffsetForward(text, offset) {
 export default {
   getCharLength,
   getCharOffset,
-  getCharOffsetBackward,
-  getCharOffsetForward,
+  getCharsOffsetBackward,
+  getCharsOffsetForward,
   getWordOffset,
   getWordOffsetBackward,
   getWordOffsetForward,

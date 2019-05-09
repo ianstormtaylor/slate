@@ -413,7 +413,7 @@ Commands.deleteCharBackwardAtRange = (editor, range) => {
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
-  const n = TextUtils.getCharOffsetBackward(text, o)
+  const n = TextUtils.getCharsOffsetBackward(text, o, 1)
   editor.deleteBackwardAtRange(range, n)
 }
 
@@ -437,7 +437,7 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
-  const n = TextUtils.getCharOffsetForward(text, o)
+  const n = TextUtils.getCharsOffsetForward(text, o, 1)
   editor.deleteForwardAtRange(range, n)
 }
 
