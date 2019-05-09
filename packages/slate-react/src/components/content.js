@@ -15,7 +15,6 @@ import EVENT_HANDLERS from '../constants/event-handlers'
 import DATA_ATTRS from '../constants/data-attributes'
 import SELECTORS from '../constants/selectors'
 import Node from './node'
-import findRange from '../utils/find-range'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
 

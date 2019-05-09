@@ -6,7 +6,6 @@ import getWindow from 'get-window'
 import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 
 import cloneFragment from '../../utils/clone-fragment'
-import getEventRange from '../../utils/get-event-range'
 import getEventTransfer from '../../utils/get-event-transfer'
 import setEventTransfer from '../../utils/set-event-transfer'
 import setTextFromDomNode from '../../utils/set-text-from-dom-node'

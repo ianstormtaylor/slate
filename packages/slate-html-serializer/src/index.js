@@ -335,8 +335,21 @@ class Html {
 
   serializeNode = node => {
     if (node.object === 'text') {
-      const leaves = node.getLeaves()
-      return leaves.map(this.serializeLeaf)
+      const string = new String({ text: node.text })
+      const text = this.serializeString(string)
+
+      return node.marks.reduce((children, mark) => {
+        for (const rule of this.rules) {
+          if (!rule.serialize) continue
+          const ret = rule.serialize(mark, children)
+          if (ret === null) return
+          if (ret) return addKey(ret)
+        }
+
+        throw new Error(
+          `No serializer defined for mark of type "${mark.type}".`
+        )
+      }, text)
     }
 
     const children = node.nodes.map(this.serializeNode)
@@ -349,29 +362,6 @@ class Html {
     }
 
     throw new Error(`No serializer defined for node of type "${node.type}".`)
-  }
-
-  /**
-   * Serialize a `leaf`.
-   *
-   * @param {Leaf} leaf
-   * @return {String}
-   */
-
-  serializeLeaf = leaf => {
-    const string = new String({ text: leaf.text })
-    const text = this.serializeString(string)
-
-    return leaf.marks.reduce((children, mark) => {
-      for (const rule of this.rules) {
-        if (!rule.serialize) continue
-        const ret = rule.serialize(mark, children)
-        if (ret === null) return
-        if (ret) return addKey(ret)
-      }
-
-      throw new Error(`No serializer defined for mark of type "${mark.type}".`)
-    }, text)
   }
 
   /**

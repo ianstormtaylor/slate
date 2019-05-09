@@ -1,7 +1,6 @@
 import getWindow from 'get-window'
 import { PathUtils } from 'slate'
 
-import OffsetKey from '../../utils/offset-key'
 import DATA_ATTRS from '../../constants/data-attributes'
 import SELECTORS from '../../constants/selectors'
 
@@ -353,32 +352,18 @@ function QueriesPlugin() {
       offset--
     }
 
-    // Get the string value of the offset key attribute.
-    const offsetKey = leafNode.getAttribute(DATA_ATTRS.OFFSET_KEY)
-
-    if (!offsetKey) {
-      return null
-    }
-
-    const { key } = OffsetKey.parse(offsetKey)
-
     // COMPAT: If someone is clicking from one Slate editor into another, the
     // select event fires twice, once for the old editor's `element` first, and
     // then afterwards for the correct `element`. (2017/03/03)
-    const { value } = editor
+    const path = editor.findPath(textNode)
 
-    if (!value.document.hasDescendant(key)) {
+    if (!path) {
       return null
     }
 
-    const point = value.document.createPoint({ key, offset })
-    const path = editor.findPath(textNode)
-
-    if (!point.path.equals(path)) {
-      debugger
-      // TODO: broken
-    }
-
+    const { value } = editor
+    const { document } = value
+    const point = document.createPoint({ path, offset })
     return point
   }
 

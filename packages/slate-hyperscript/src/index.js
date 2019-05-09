@@ -4,7 +4,7 @@ import {
   createAnchor,
   createBlock,
   createCursor,
-  createDecoration,
+  createAnnotation,
   createDocument,
   createFocus,
   createInline,
@@ -27,9 +27,9 @@ function createHyperscript(options = {}) {
 
   const creators = {
     anchor: createAnchor,
+    annotation: createAnnotation,
     block: createBlock,
     cursor: createCursor,
-    decoration: createDecoration,
     document: createDocument,
     focus: createFocus,
     inline: createInline,
@@ -54,7 +54,7 @@ function createHyperscript(options = {}) {
   }
 
   for (const key in annotations) {
-    creators[key] = normalizeCreator(annotations[key], createDecoration)
+    creators[key] = normalizeCreator(annotations[key], createAnnotation)
   }
 
   function create(tagName, attributes, ...children) {

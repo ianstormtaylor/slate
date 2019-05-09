@@ -1,4 +1,4 @@
-import { Editor, findRange } from 'slate-react'
+import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'

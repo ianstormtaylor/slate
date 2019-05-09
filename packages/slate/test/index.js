@@ -26,14 +26,6 @@ const plugins = [
 ]
 
 describe('slate', () => {
-  fixtures(__dirname, 'models/leaf', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
-
   fixtures(__dirname, 'models/operation', ({ module }) => {
     const { input, output } = module
     const fn = module.default

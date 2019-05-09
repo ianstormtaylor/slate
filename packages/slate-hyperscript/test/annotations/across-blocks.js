@@ -6,7 +6,7 @@ const h = createHyperscript({
   blocks: {
     paragraph: 'paragraph',
   },
-  decorations: {
+  annotations: {
     highlight: 'highlight',
   },
 })
@@ -68,18 +68,13 @@ export const output = {
   },
 }
 
-export const expectDecorations = [
+export const expectAnnotations = [
   {
+    type: 'highlight',
+    data: {},
     anchorOffset: 12,
     focusOffset: 13,
     anchorKey: input.document.nodes.get(0).getFirstText().key,
     focusKey: input.document.nodes.get(1).getFirstText().key,
-    marks: [
-      {
-        object: 'mark',
-        type: 'highlight',
-        data: {},
-      },
-    ],
   },
 ]

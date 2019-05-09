@@ -6,7 +6,7 @@ const h = createHyperscript({
   blocks: {
     paragraph: 'paragraph',
   },
-  decorations: {
+  annotations: {
     highlight: 'highlight',
   },
 })
@@ -22,7 +22,7 @@ export const input = (
 )
 
 export const options = {
-  preserveDecorations: true,
+  preserveAnnotations: true,
   preserveKeys: true,
 }
 
@@ -49,9 +49,12 @@ export const output = {
       },
     ],
   },
-  decorations: [
+  annotations: [
     {
-      object: 'decoration',
+      key: '0',
+      object: 'annotation',
+      type: 'highlight',
+      data: {},
       anchor: {
         object: 'point',
         key: '1',
@@ -63,11 +66,6 @@ export const output = {
         key: '1',
         path: [0, 0],
         offset: 6,
-      },
-      mark: {
-        object: 'mark',
-        type: 'highlight',
-        data: {},
       },
     },
   ],

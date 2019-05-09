@@ -59,29 +59,29 @@ export function createCursor(tagName, attributes, children) {
 }
 
 /**
- * Create a decoration point, or wrap a list of leaves and set the decoration
+ * Create a annotation point, or wrap a list of leaves and set the annotation
  * point tracker on them.
  *
  * @param {String} tagName
  * @param {Object} attributes
  * @param {Array} children
- * @return {DecorationPoint|List<Leaf>}
+ * @return {AnnotationPoint|List<Leaf>}
  */
 
-export function createDecoration(tagName, attributes, children) {
+export function createAnnotation(tagName, attributes, children) {
   const { key, data } = attributes
   const type = tagName
 
   if (key) {
-    return new DecorationPoint({ id: key, type, data })
+    return new AnnotationPoint({ id: key, type, data })
   }
 
   const texts = createChildren(children)
   const first = texts.first()
   const last = texts.last()
-  const id = `__decoration_${uid++}__`
-  const start = new DecorationPoint({ id, type, data })
-  const end = new DecorationPoint({ id, type, data })
+  const id = `${uid++}`
+  const start = new AnnotationPoint({ id, type, data })
+  const end = new AnnotationPoint({ id, type, data })
   setPoint(first, start, 0)
   setPoint(last, end, last.text.length)
   return texts
@@ -267,7 +267,7 @@ export function createValue(tagName, attributes, children) {
   let focus
   let marks
   let isFocused
-  let annotations = []
+  let annotations = {}
   const partials = {}
 
   // Search the document's texts to see if any of them have the anchor or
@@ -300,9 +300,13 @@ export function createValue(tagName, attributes, children) {
             continue
           }
 
-          const decoration = Annotation.create({
+          const annotation = Annotation.create({
+            key: id,
+            type: ann.type,
+            data: ann.data,
             anchor: {
               key: partial.key,
+              path: document.getPath(partial.key),
               offset: partial.offset,
             },
             focus: {
@@ -310,13 +314,9 @@ export function createValue(tagName, attributes, children) {
               key: node.key,
               offset: ann.offset,
             },
-            mark: {
-              type: ann.type,
-              data: ann.data,
-            },
           })
 
-          annotations.push(decoration)
+          annotations[id] = annotation
         }
       }
     }
@@ -324,7 +324,7 @@ export function createValue(tagName, attributes, children) {
 
   if (Object.keys(partials).length > 0) {
     throw new Error(
-      `Slate hyperscript must have both a start and an end defined for each decoration using the \`key=\` prop.`
+      `Slate hyperscript must have both a start and an end defined for each annotation using the \`key=\` prop.`
     )
   }
 
@@ -485,7 +485,7 @@ class FocusPoint {
   }
 }
 
-class DecorationPoint {
+class AnnotationPoint {
   constructor(attrs) {
     const { id = null, data = {}, type } = attrs
     this.id = id
@@ -529,7 +529,7 @@ function isPoint(object) {
   return (
     object instanceof AnchorPoint ||
     object instanceof CursorPoint ||
-    object instanceof DecorationPoint ||
+    object instanceof AnnotationPoint ||
     object instanceof FocusPoint
   )
 }
@@ -574,7 +574,7 @@ function setPoint(object, point, offset) {
     object.__focus = point
   }
 
-  if (point instanceof DecorationPoint) {
+  if (point instanceof AnnotationPoint) {
     point.offset = offset
     object.__annotations = object.__annotations || []
     object.__annotations = object.__annotations.concat(point)
