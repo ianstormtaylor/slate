@@ -144,7 +144,7 @@ class MarkdownPreview extends React.Component {
     if (node.object !== 'block') return others
 
     const string = node.text
-    const texts = Array.from(node.texts())
+    const texts = node.getTexts().toArray()
     const grammar = Prism.languages.markdown
     const tokens = Prism.tokenize(string, grammar)
     const decorations = []

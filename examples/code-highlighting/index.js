@@ -186,7 +186,7 @@ class CodeHighlighting extends React.Component {
 
     const { document } = editor.value
     const language = node.data.get('language')
-    const texts = Array.from(node.texts())
+    const texts = node.getTexts().toArray()
     const string = texts.map(t => t.text).join('\n')
     const grammar = Prism.languages[language]
     const tokens = Prism.tokenize(string, grammar)

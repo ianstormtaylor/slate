@@ -2,7 +2,7 @@ import getWindow from 'get-window'
 import invariant from 'tiny-invariant'
 import { Value } from 'slate'
 
-import findPath from './find-node'
+import findNode from './find-node'
 import findRange from './find-range'
 
 /**
@@ -28,32 +28,32 @@ function getEventRange(event, editor) {
 
   const { value } = editor
   const { document } = value
-  const path = findPath(event.target, editor)
-  if (!path) return null
-
-  const node = document.getNode(path)
+  const node = findNode(target, editor)
+  if (!node) return null
 
   // If the drop target is inside a void node, move it into either the next or
   // previous node, depending on which side the `x` and `y` coordinates are
   // closest to.
-  if (editor.isVoid(node)) {
+  if (editor.query('isVoid', node)) {
     const rect = target.getBoundingClientRect()
     const isPrevious =
       node.object === 'inline'
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 
+    const text = node.getFirstText()
     const range = document.createRange()
-    const iterable = isPrevious ? 'previousTexts' : 'nextTexts'
-    const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
-    const entry = document[iterable](path)
 
-    if (entry) {
-      const [n] = entry
-      return range[move](n)
+    if (isPrevious) {
+      const previousText = document.getPreviousText(text.key)
+
+      if (previousText) {
+        return range.moveToEndOfNode(previousText)
+      }
     }
 
-    return null
+    const nextText = document.getNextText(text.key)
+    return nextText ? range.moveToStartOfNode(nextText) : null
   }
 
   // Else resolve a range from the caret position where the drop occured.

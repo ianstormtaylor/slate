@@ -57,7 +57,6 @@ function ReactPlugin(options = {}) {
   function renderEditor(props, editor, next) {
     return (
       <Content
-        ref={props.ref}
         autoCorrect={props.autoCorrect}
         className={props.className}
         editor={editor}
@@ -122,7 +121,7 @@ function ReactPlugin(options = {}) {
           node.object === 'document' &&
           node.text === '' &&
           node.nodes.size === 1 &&
-          Array.from(node.texts()).length === 1,
+          node.getTexts().size === 1,
       })
     )
   }

@@ -34,4 +34,4 @@ export default function({ document, selection }) {
   return document.getLeafInlinesAtRange(selection).map(n => n.key)
 }
 
-export const output = List(['d', 'g'])
+export const output = List(['d', 'g', 'f', 'b'])

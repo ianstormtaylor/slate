@@ -21,8 +21,8 @@ export default function setTextFromDomNode(window, editor, domNode) {
   // Get the text node and leaf in question.
   const { value } = editor
   const { document, selection } = value
-  const node = document.getDescendant(point.path)
-  const block = document.getClosestBlock(point.path)
+  const node = document.getDescendant(point.key)
+  const block = document.getClosestBlock(node.key)
   const leaves = node.getLeaves()
   const lastText = block.getLastText()
   const lastLeaf = leaves.last()
@@ -57,8 +57,8 @@ export default function setTextFromDomNode(window, editor, domNode) {
   // const delta = textContent.length - text.length
   // const corrected = selection.moveToEnd().moveForward(delta)
   let entire = selection
-    .moveAnchorTo(point.path, start)
-    .moveFocusTo(point.path, end)
+    .moveAnchorTo(point.key, start)
+    .moveFocusTo(point.key, end)
 
   entire = document.resolveRange(entire)
 

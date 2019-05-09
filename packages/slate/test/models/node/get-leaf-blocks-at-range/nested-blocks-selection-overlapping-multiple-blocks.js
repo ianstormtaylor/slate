@@ -1,10 +1,11 @@
 /** @jsx h */
 
+import { List } from 'immutable'
 import h from '../../../helpers/h'
 
 export const input = (
   <value>
-    <document key="zz">
+    <document>
       <paragraph key="a">
         <text key="b">
           <focus />
@@ -37,10 +38,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document
-    .getLeafBlocksAtRange(selection)
-    .map(n => n.key)
-    .toArray()
+  return document.getLeafBlocksAtRange(selection).map(n => n.key)
 }
 
-export const output = ['a', 'e', 'h', 'j']
+export const output = List(['a', 'e', 'h', 'j'])

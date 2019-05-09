@@ -459,14 +459,13 @@ class Content extends React.Component {
     const { value } = editor
     const Container = tagName
     const { document, selection, decorations } = value
-    const { start, end } = selection
-    const startIndex = start.path.first()
-    const endIndex = end.path.first() + 1
+    const indexes = document.getSelectionIndexes(selection)
     const decs = document.getDecorations(editor).concat(decorations)
     const childrenDecorations = getChildrenDecorations(document, decs)
 
     const children = document.nodes.toArray().map((child, i) => {
-      const isSelected = startIndex <= i && i < endIndex
+      const isSelected = !!indexes && indexes.start <= i && i < indexes.end
+
       return this.renderNode(child, isSelected, childrenDecorations[i])
     })
 
@@ -486,6 +485,14 @@ class Content extends React.Component {
     }
 
     debug('render', { props })
+
+    if (debug.enabled) {
+      debug.update('render', {
+        text: value.document.text,
+        selection: value.selection.toJSON(),
+        value: value.toJSON(),
+      })
+    }
 
     return (
       <Container

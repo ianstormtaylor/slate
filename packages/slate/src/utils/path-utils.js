@@ -177,20 +177,6 @@ function isOlder(path, target) {
 }
 
 /**
- * Is an `any` object a path?
- *
- * @param {Mixed} any
- * @return {Boolean}
- */
-
-function isPath(any) {
-  return (
-    (List.isList(any) || Array.isArray(any)) &&
-    any.every(n => typeof n === 'number')
-  )
-}
-
-/**
  * Is a `path` a sibling of a `target` path?
  *
  * @param {List} path
@@ -223,27 +209,26 @@ function isYounger(path, target) {
 }
 
 /**
- * Lift a `path` to refer to its `n`th ancestor.
+ * Lift a `path` to refer to its parent.
  *
  * @param {List} path
  * @return {List}
  */
 
-function lift(path, n = 1) {
-  const ancestor = path.slice(0, -1 * n)
-  return ancestor
+function lift(path) {
+  const parent = path.slice(0, -1)
+  return parent
 }
 
 /**
- * Drop a `path`, returning a relative path from a depth of `n`.
+ * Drop a `path`, returning the path from the first child.
  *
  * @param {List} path
- * @param {Number} n
  * @return {List}
  */
 
-function drop(path, n = 1) {
-  const relative = path.slice(n)
+function drop(path) {
+  const relative = path.slice(1)
   return relative
 }
 
@@ -415,7 +400,6 @@ export default {
   isBefore,
   isEqual,
   isOlder,
-  isPath,
   isSibling,
   isYounger,
   lift,
