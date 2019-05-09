@@ -150,7 +150,7 @@ function getCharLength(char) {
 function getCharOffset(text, chars, forward) {
   let offset = 0
 
-  // Calculate the offset sum of each character
+  // Calculate offset sum of each character
   for (let i = 0; i < chars; i++) {
     // `prev` types (better ideas?):
     // - SURR: surrogate pair

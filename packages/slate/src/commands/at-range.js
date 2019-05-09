@@ -410,11 +410,11 @@ Commands.deleteCharBackwardAtRange = (editor, range) => {
   const { document } = value
   const { start } = range
   const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
   const { text } = startBlock
-  const n = TextUtils.getCharsOffsetBackward(text, o, 1)
-  editor.deleteBackwardAtRange(range, n)
+  const charsOffset = TextUtils.getCharsOffsetBackward(text, offset, 1)
+  editor.deleteBackwardAtRange(range, charsOffset)
 }
 
 /**
@@ -434,11 +434,11 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
   const { document } = value
   const { start } = range
   const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
-  const o = offset + start.offset
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
   const { text } = startBlock
-  const n = TextUtils.getCharsOffsetForward(text, o, 1)
-  editor.deleteForwardAtRange(range, n)
+  const charsOffset = TextUtils.getCharsOffsetForward(text, offset, 1)
+  editor.deleteForwardAtRange(range, charsOffset)
 }
 
 /**
