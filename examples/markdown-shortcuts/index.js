@@ -64,13 +64,13 @@ class MarkdownShortcuts extends React.Component {
         placeholder="Write some markdown..."
         defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -78,7 +78,7 @@ class MarkdownShortcuts extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

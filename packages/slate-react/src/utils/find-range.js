@@ -1,5 +1,6 @@
 import getWindow from 'get-window'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { Value } from 'slate'
 
 import findPoint from './find-point'
@@ -13,6 +14,11 @@ import findPoint from './find-point'
  */
 
 function findRange(native, editor) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `findRange(selection)` helper is deprecated in favor of `editor.findRange(selection)`.'
+  )
+
   invariant(
     !Value.isValue(editor),
     'As of Slate 0.42.0, the `findNode` utility takes an `editor` instead of a `value`.'

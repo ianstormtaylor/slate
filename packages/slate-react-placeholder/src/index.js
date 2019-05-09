@@ -24,12 +24,12 @@ function SlateReactPlaceholder(options = {}) {
   const { placeholder, when, style = {} } = options
 
   invariant(
-    placeholder,
+    typeof placeholder === 'string',
     'You must pass `SlateReactPlaceholder` an `options.placeholder` string.'
   )
 
   invariant(
-    when,
+    typeof when === 'string' || typeof when === 'function',
     'You must pass `SlateReactPlaceholder` an `options.when` query.'
   )
 
@@ -48,15 +48,16 @@ function SlateReactPlaceholder(options = {}) {
     }
 
     const others = next()
-    const document = editor.value.document
-    const first = node.getFirstText()
-    const last = node.getLastText()
+    const [first] = node.texts()
+    const [last] = node.texts({ direction: 'backward' })
+    const [firstNode, firstPath] = first
+    const [lastNode, lastPath] = last
     const decoration = {
-      anchor: { key: first.key, offset: 0, path: document.getPath(first.key) },
+      anchor: { key: firstNode.key, offset: 0, path: firstPath },
       focus: {
-        key: last.key,
-        offset: last.text.length,
-        path: document.getPath(last.key),
+        key: lastNode.key,
+        offset: lastNode.text.length,
+        path: lastPath,
       },
       mark: placeholderMark,
     }

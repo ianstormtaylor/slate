@@ -1,4 +1,5 @@
 import isPlainObject from 'is-plain-object'
+import warning from 'tiny-warning'
 import { List, Record, Set } from 'immutable'
 
 import Mark from './mark'
@@ -29,6 +30,8 @@ class Leaf extends Record(DEFAULTS) {
    */
 
   static create(attrs = {}) {
+    warning(false, 'As of slate@0.47 the `Leaf` model is deprecated.')
+
     if (Leaf.isLeaf(attrs)) {
       return attrs
     }

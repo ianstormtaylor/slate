@@ -1,24 +1,32 @@
 import React from 'react'
-import styled from 'react-emotion'
-
-const WordCounter = styled('span')`
-  margin-top: 10px;
-  padding: 12px;
-  background-color: #ebebeb;
-  display: inline-block;
-`
+import { css } from 'emotion'
 
 export default function WordCount(options) {
   return {
     renderEditor(props, editor, next) {
+      const { value } = editor
+      const { document } = value
       const children = next()
-      const wordCount = props.value.document
-        .getBlocks()
-        .reduce((memo, b) => memo + b.text.trim().split(/\s+/).length, 0)
+      let wordCount = 0
+
+      for (const [node] of document.blocks({ onlyLeaves: true })) {
+        const words = node.text.trim().split(/\s+/)
+        wordCount += words.length
+      }
+
       return (
         <div>
           <div>{children}</div>
-          <WordCounter>Word Count: {wordCount}</WordCounter>
+          <span
+            className={css`
+              margin-top: 10px;
+              padding: 12px;
+              background-color: #ebebeb;
+              display: inline-block;
+            `}
+          >
+            Word Count: {wordCount}
+          </span>
         </div>
       )
     },

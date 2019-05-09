@@ -27,6 +27,7 @@
             "marks": [{ "type": "italic" }]
           },
           {
+            "object": "text",
             "text": ", or anything else you might want to do!"
           }
         ]

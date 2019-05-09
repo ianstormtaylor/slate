@@ -5,7 +5,7 @@ import React from 'react'
 import initialValueAsJson from './value.json'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Button, Icon, Toolbar } from '../components'
 
 /**
@@ -15,19 +15,6 @@ import { Button, Icon, Toolbar } from '../components'
  */
 
 const initialValue = Value.fromJSON(initialValueAsJson)
-
-/**
- * A styled image block component.
- *
- * @type {Component}
- */
-
-const Image = styled('img')`
-  display: block;
-  max-width: 100%;
-  max-height: 20em;
-  box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
-`
 
 /**
  * A function to determine whether a URL has an image extension.
@@ -133,26 +120,37 @@ class Images extends React.Component {
           schema={schema}
           onDrop={this.onDropOrPaste}
           onPaste={this.onDropOrPaste}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
         />
       </div>
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, node, isFocused } = props
 
     switch (node.type) {
       case 'image': {
         const src = node.data.get('src')
-        return <Image src={src} selected={isFocused} {...attributes} />
+        return (
+          <img
+            {...attributes}
+            src={src}
+            className={css`
+              display: block;
+              max-width: 100%;
+              max-height: 20em;
+              box-shadow: ${isFocused ? '0 0 0 2px blue;' : 'none'};
+            `}
+          />
+        )
       }
 
       default: {

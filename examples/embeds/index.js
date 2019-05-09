@@ -46,20 +46,20 @@ class Embeds extends React.Component {
         placeholder="Enter some text..."
         defaultValue={initialValue}
         schema={this.schema}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @param {Editor} editor
    * @param {Function} next
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'video':
         return <Video {...props} />

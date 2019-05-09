@@ -4,18 +4,10 @@
  * @type {Object}
  */
 
-const TRANSFER_TYPES = {
+export default {
   FRAGMENT: 'application/x-slate-fragment',
   HTML: 'text/html',
   NODE: 'application/x-slate-node',
   RICH: 'text/rtf',
   TEXT: 'text/plain',
 }
-
-/**
- * Export.
- *
- * @type {Object}
- */
-
-export default TRANSFER_TYPES

@@ -1,13 +1,15 @@
 import Base64 from 'slate-base64-serializer'
 import Plain from 'slate-plain-serializer'
-import TRANSFER_TYPES from '../constants/transfer-types'
-import findDOMNode from './find-dom-node'
 import getWindow from 'get-window'
 import invariant from 'tiny-invariant'
-import removeAllRanges from './remove-all-ranges'
 import { IS_IE } from 'slate-dev-environment'
 import { Value } from 'slate'
-import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
+
+import TRANSFER_TYPES from '../constants/transfer-types'
+import removeAllRanges from './remove-all-ranges'
+import findDOMNode from './find-dom-node'
+import DATA_ATTRS from '../constants/data-attributes'
+import SELECTORS from '../constants/selectors'
 
 const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
@@ -29,8 +31,8 @@ function cloneFragment(event, editor, callback = () => undefined) {
   const { value } = editor
   const { document, fragment, selection } = value
   const { start, end } = selection
-  const startVoid = document.getClosestVoid(start.key, editor)
-  const endVoid = document.getClosestVoid(end.key, editor)
+  const startVoid = document.getClosestVoid(start.path, editor)
+  const endVoid = document.getClosestVoid(end.path, editor)
 
   // If the selection is collapsed, and it isn't inside a void node, abort.
   if (native.isCollapsed && !startVoid) return
@@ -69,10 +71,12 @@ function cloneFragment(event, editor, callback = () => undefined) {
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  ;[].slice.call(contents.querySelectorAll(ZERO_WIDTH_SELECTOR)).forEach(zw => {
-    const isNewline = zw.getAttribute(ZERO_WIDTH_ATTRIBUTE) === 'n'
-    zw.textContent = isNewline ? '\n' : ''
-  })
+  ;[].slice
+    .call(contents.querySelectorAll(SELECTORS.ZERO_WIDTH))
+    .forEach(zw => {
+      const isNewline = zw.getAttribute(DATA_ATTRS.ZERO_WIDTH) === 'n'
+      zw.textContent = isNewline ? '\n' : ''
+    })
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
@@ -89,7 +93,7 @@ function cloneFragment(event, editor, callback = () => undefined) {
     attach = span
   }
 
-  attach.setAttribute('data-slate-fragment', encoded)
+  attach.setAttribute(DATA_ATTRS.FRAGMENT, encoded)
 
   //  Creates value from only the selected blocks
   //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
@@ -120,7 +124,7 @@ function cloneFragment(event, editor, callback = () => undefined) {
   // COMPAT: For browser that don't support the Clipboard API's setData method,
   // we must rely on the browser to natively copy what's selected.
   // So we add the div (containing our content) to the DOM, and select it.
-  const editorEl = event.target.closest('[data-slate-editor]')
+  const editorEl = event.target.closest(SELECTORS.EDITOR)
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
   div.style.left = '-9999px'

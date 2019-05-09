@@ -1,5 +1,5 @@
 import {
-  Decoration,
+  Annotation,
   Document,
   Mark,
   Node,
@@ -10,7 +10,7 @@ import {
 } from 'slate'
 
 /**
- * Auto-incrementing ID to keep track of paired decorations.
+ * Auto-incrementing ID to keep track of paired annotations.
  *
  * @type {Number}
  */
@@ -59,29 +59,29 @@ export function createCursor(tagName, attributes, children) {
 }
 
 /**
- * Create a decoration point, or wrap a list of leaves and set the decoration
+ * Create a annotation point, or wrap a list of leaves and set the annotation
  * point tracker on them.
  *
  * @param {String} tagName
  * @param {Object} attributes
  * @param {Array} children
- * @return {DecorationPoint|List<Leaf>}
+ * @return {AnnotationPoint|List<Leaf>}
  */
 
-export function createDecoration(tagName, attributes, children) {
+export function createAnnotation(tagName, attributes, children) {
   const { key, data } = attributes
   const type = tagName
 
   if (key) {
-    return new DecorationPoint({ id: key, type, data })
+    return new AnnotationPoint({ id: key, type, data })
   }
 
   const texts = createChildren(children)
   const first = texts.first()
   const last = texts.last()
-  const id = `__decoration_${uid++}__`
-  const start = new DecorationPoint({ id, type, data })
-  const end = new DecorationPoint({ id, type, data })
+  const id = `${uid++}`
+  const start = new AnnotationPoint({ id, type, data })
+  const end = new AnnotationPoint({ id, type, data })
   setPoint(first, start, 0)
   setPoint(last, end, last.text.length)
   return texts
@@ -267,63 +267,64 @@ export function createValue(tagName, attributes, children) {
   let focus
   let marks
   let isFocused
-  let decorations = []
+  let annotations = {}
   const partials = {}
 
   // Search the document's texts to see if any of them have the anchor or
-  // focus information saved, or decorations applied.
+  // focus information saved, or annotations applied.
   if (document) {
-    document.getTexts().forEach(text => {
-      const { __anchor, __decorations, __focus } = text
+    for (const [node, path] of document.texts()) {
+      const { __anchor, __annotations, __focus } = node
 
       if (__anchor != null) {
-        anchor = Point.create({ key: text.key, offset: __anchor.offset })
+        anchor = Point.create({ path, key: node.key, offset: __anchor.offset })
         marks = __anchor.marks
         isFocused = __anchor.isFocused
       }
 
       if (__focus != null) {
-        focus = Point.create({ key: text.key, offset: __focus.offset })
+        focus = Point.create({ path, key: node.key, offset: __focus.offset })
         marks = __focus.marks
         isFocused = __focus.isFocused
       }
 
-      if (__decorations != null) {
-        for (const dec of __decorations) {
-          const { id } = dec
+      if (__annotations != null) {
+        for (const ann of __annotations) {
+          const { id } = ann
           const partial = partials[id]
           delete partials[id]
 
           if (!partial) {
-            dec.key = text.key
-            partials[id] = dec
+            ann.key = node.key
+            partials[id] = ann
             continue
           }
 
-          const decoration = Decoration.create({
+          const annotation = Annotation.create({
+            key: id,
+            type: ann.type,
+            data: ann.data,
             anchor: {
               key: partial.key,
+              path: document.getPath(partial.key),
               offset: partial.offset,
             },
             focus: {
-              key: text.key,
-              offset: dec.offset,
-            },
-            mark: {
-              type: dec.type,
-              data: dec.data,
+              path,
+              key: node.key,
+              offset: ann.offset,
             },
           })
 
-          decorations.push(decoration)
+          annotations[id] = annotation
         }
       }
-    })
+    }
   }
 
   if (Object.keys(partials).length > 0) {
     throw new Error(
-      `Slate hyperscript must have both a start and an end defined for each decoration using the \`key=\` prop.`
+      `Slate hyperscript must have both a start and an end defined for each annotation using the \`key=\` prop.`
     )
   }
 
@@ -351,13 +352,13 @@ export function createValue(tagName, attributes, children) {
 
   selection = selection.normalize(document)
 
-  if (decorations.length > 0) {
-    decorations = decorations.map(d => d.normalize(document))
+  if (annotations.length > 0) {
+    annotations = annotations.map(a => a.normalize(document))
   }
 
   const value = Value.fromJSON({
     data,
-    decorations,
+    annotations,
     document,
     selection,
     ...attributes,
@@ -484,7 +485,7 @@ class FocusPoint {
   }
 }
 
-class DecorationPoint {
+class AnnotationPoint {
   constructor(attrs) {
     const { id = null, data = {}, type } = attrs
     this.id = id
@@ -502,7 +503,7 @@ class DecorationPoint {
  */
 
 function incrementPoints(object, n) {
-  const { __anchor, __focus, __decorations } = object
+  const { __anchor, __focus, __annotations } = object
 
   if (__anchor != null) {
     __anchor.offset += n
@@ -512,8 +513,8 @@ function incrementPoints(object, n) {
     __focus.offset += n
   }
 
-  if (__decorations != null) {
-    __decorations.forEach(d => (d.offset += n))
+  if (__annotations != null) {
+    __annotations.forEach(a => (a.offset += n))
   }
 }
 
@@ -528,7 +529,7 @@ function isPoint(object) {
   return (
     object instanceof AnchorPoint ||
     object instanceof CursorPoint ||
-    object instanceof DecorationPoint ||
+    object instanceof AnnotationPoint ||
     object instanceof FocusPoint
   )
 }
@@ -548,10 +549,10 @@ function preservePoints(object, updator) {
 }
 
 function copyPoints(object, other) {
-  const { __anchor, __focus, __decorations } = object
+  const { __anchor, __focus, __annotations } = object
   if (__anchor != null) other.__anchor = __anchor
   if (__focus != null) other.__focus = __focus
-  if (__decorations != null) other.__decorations = __decorations
+  if (__annotations != null) other.__annotations = __annotations
 }
 
 /**
@@ -573,9 +574,9 @@ function setPoint(object, point, offset) {
     object.__focus = point
   }
 
-  if (point instanceof DecorationPoint) {
+  if (point instanceof AnnotationPoint) {
     point.offset = offset
-    object.__decorations = object.__decorations || []
-    object.__decorations = object.__decorations.concat(point)
+    object.__annotations = object.__annotations || []
+    object.__annotations = object.__annotations.concat(point)
   }
 }

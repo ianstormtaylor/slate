@@ -9,7 +9,15 @@ import Queries from './queries'
  */
 
 function SchemaPlugin(schema) {
-  const { rules, document, blocks, inlines, marks } = schema
+  const {
+    rules,
+    document,
+    blocks,
+    inlines,
+    marks,
+    annotations,
+    decorations,
+  } = schema
   let schemaRules = []
 
   if (rules) {
@@ -50,17 +58,35 @@ function SchemaPlugin(schema) {
     }
   }
 
+  if (annotations) {
+    for (const key in annotations) {
+      schemaRules.push({
+        match: [{ object: 'annotation', type: key }],
+        ...annotations[key],
+      })
+    }
+  }
+
+  if (decorations) {
+    for (const key in decorations) {
+      schemaRules.push({
+        match: [{ object: 'decoration', type: key }],
+        ...decorations[key],
+      })
+    }
+  }
+
   /**
-   * Check if a `mark` is void based on the schema rules.
+   * Check if a `format` is atomic based on the schema rules.
    *
    * @param {Editor} editor
-   * @param {Mark} mark
+   * @param {Format} format
    * @return {Boolean}
    */
 
-  function isAtomic(editor, mark) {
+  function isAtomic(editor, format) {
     const rule = schemaRules.find(
-      r => 'isAtomic' in r && testRules(mark, r.match)
+      r => 'isAtomic' in r && testRules(format, r.match)
     )
 
     return rule && rule.isAtomic

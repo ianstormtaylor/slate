@@ -4,6 +4,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
+import { List } from 'immutable'
 import {
   IS_ANDROID,
   IS_FIREFOX,
@@ -11,10 +12,9 @@ import {
 } from 'slate-dev-environment'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import DATA_ATTRS from '../constants/data-attributes'
+import SELECTORS from '../constants/selectors'
 import Node from './node'
-import findDOMRange from '../utils/find-dom-range'
-import findRange from '../utils/find-range'
-import getChildrenDecorations from '../utils/get-children-decorations'
 import scrollToSelection from '../utils/scroll-to-selection'
 import removeAllRanges from '../utils/remove-all-ranges'
 
@@ -82,7 +82,17 @@ class Content extends React.Component {
 
   tmp = {
     isUpdatingSelection: false,
+    nodeRef: React.createRef(),
+    nodeRefs: {},
   }
+
+  /**
+   * A ref for the contenteditable DOM node.
+   *
+   * @type {Object}
+   */
+
+  ref = React.createRef()
 
   /**
    * Create a set of bound event handlers.
@@ -103,7 +113,7 @@ class Content extends React.Component {
    */
 
   componentDidMount() {
-    const window = getWindow(this.element)
+    const window = getWindow(this.ref.current)
 
     window.document.addEventListener(
       'selectionchange',
@@ -113,7 +123,10 @@ class Content extends React.Component {
     // COMPAT: Restrict scope of `beforeinput` to clients that support the
     // Input Events Level 2 spec, since they are preventable events.
     if (HAS_INPUT_EVENTS_LEVEL_2) {
-      this.element.addEventListener('beforeinput', this.handlers.onBeforeInput)
+      this.ref.current.addEventListener(
+        'beforeinput',
+        this.handlers.onBeforeInput
+      )
     }
 
     this.updateSelection()
@@ -124,7 +137,7 @@ class Content extends React.Component {
    */
 
   componentWillUnmount() {
-    const window = getWindow(this.element)
+    const window = getWindow(this.ref.current)
 
     if (window) {
       window.document.removeEventListener(
@@ -134,7 +147,7 @@ class Content extends React.Component {
     }
 
     if (HAS_INPUT_EVENTS_LEVEL_2) {
-      this.element.removeEventListener(
+      this.ref.current.removeEventListener(
         'beforeinput',
         this.handlers.onBeforeInput
       )
@@ -159,7 +172,7 @@ class Content extends React.Component {
     const { value } = editor
     const { selection } = value
     const { isBackward } = selection
-    const window = getWindow(this.element)
+    const window = getWindow(this.ref.current)
     const native = window.getSelection()
     const { activeElement } = window.document
 
@@ -178,8 +191,8 @@ class Content extends React.Component {
 
     // If the Slate selection is blurred, but the DOM's active element is still
     // the editor, we need to blur it.
-    if (selection.isBlurred && activeElement === this.element) {
-      this.element.blur()
+    if (selection.isBlurred && activeElement === this.ref.current) {
+      this.ref.current.blur()
       updated = true
     }
 
@@ -193,15 +206,15 @@ class Content extends React.Component {
     // If the Slate selection is focused, but the DOM's active element is not
     // the editor, we need to focus it. We prevent scrolling because we handle
     // scrolling to the correct selection.
-    if (selection.isFocused && activeElement !== this.element) {
-      this.element.focus({ preventScroll: true })
+    if (selection.isFocused && activeElement !== this.ref.current) {
+      this.ref.current.focus({ preventScroll: true })
       updated = true
     }
 
     // Otherwise, figure out which DOM nodes should be selected...
     if (selection.isFocused && selection.isSet) {
       const current = !!rangeCount && native.getRangeAt(0)
-      const range = findDOMRange(selection, window)
+      const range = editor.findDOMRange(selection)
 
       if (!range) {
         warning(
@@ -269,8 +282,8 @@ class Content extends React.Component {
       setTimeout(() => {
         // COMPAT: In Firefox, it's not enough to create a range, you also need
         // to focus the contenteditable element too. (2016/11/16)
-        if (IS_FIREFOX && this.element) {
-          this.element.focus()
+        if (IS_FIREFOX && this.ref.current) {
+          this.ref.current.focus()
         }
 
         this.tmp.isUpdatingSelection = false
@@ -284,16 +297,6 @@ class Content extends React.Component {
   }
 
   /**
-   * The React ref method to set the root content element locally.
-   *
-   * @param {Element} element
-   */
-
-  ref = element => {
-    this.element = element
-  }
-
-  /**
    * Check if an event `target` is fired from within the contenteditable
    * element. This should be false for edits happening in non-contenteditable
    * children, such as void nodes and other nested Slate editors.
@@ -303,8 +306,6 @@ class Content extends React.Component {
    */
 
   isInEditor = target => {
-    const { element } = this
-
     let el
 
     try {
@@ -331,7 +332,8 @@ class Content extends React.Component {
 
     return (
       el.isContentEditable &&
-      (el === element || el.closest('[data-slate-editor]') === element)
+      (el === this.ref.current ||
+        el.closest(SELECTORS.EDITOR) === this.ref.current)
     )
   }
 
@@ -369,8 +371,8 @@ class Content extends React.Component {
       const { value } = editor
       const { selection } = value
       const window = getWindow(event.target)
-      const native = window.getSelection()
-      const range = findRange(native, editor)
+      const domSelection = window.getSelection()
+      const range = editor.findRange(domSelection)
 
       if (range && range.equals(selection.toRange())) {
         this.updateSelection()
@@ -388,9 +390,9 @@ class Content extends React.Component {
       handler === 'onDragStart' ||
       handler === 'onDrop'
     ) {
-      const closest = event.target.closest('[data-slate-editor]')
+      const closest = event.target.closest(SELECTORS.EDITOR)
 
-      if (closest !== this.element) {
+      if (closest !== this.ref.current) {
         return
       }
     }
@@ -433,7 +435,7 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { activeElement } = window.document
-    if (activeElement !== this.element) return
+    if (activeElement !== this.ref.current) return
 
     this.props.onEvent('onSelect', event)
   }, 100)
@@ -458,16 +460,7 @@ class Content extends React.Component {
     } = props
     const { value } = editor
     const Container = tagName
-    const { document, selection, decorations } = value
-    const indexes = document.getSelectionIndexes(selection)
-    const decs = document.getDecorations(editor).concat(decorations)
-    const childrenDecorations = getChildrenDecorations(document, decs)
-
-    const children = document.nodes.toArray().map((child, i) => {
-      const isSelected = !!indexes && indexes.start <= i && i < indexes.end
-
-      return this.renderNode(child, isSelected, childrenDecorations[i])
-    })
+    const { document, selection } = value
 
     const style = {
       // Prevent the default outline styles.
@@ -486,20 +479,16 @@ class Content extends React.Component {
 
     debug('render', { props })
 
-    if (debug.enabled) {
-      debug.update('render', {
-        text: value.document.text,
-        selection: value.selection.toJSON(),
-        value: value.toJSON(),
-      })
+    const data = {
+      [DATA_ATTRS.EDITOR]: true,
+      [DATA_ATTRS.KEY]: document.key,
     }
 
     return (
       <Container
         {...handlers}
-        data-slate-editor
+        {...data}
         ref={this.ref}
-        data-key={document.key}
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
         id={id}
@@ -514,37 +503,18 @@ class Content extends React.Component {
         // so we have to disable it like this. (2017/04/24)
         data-gramm={false}
       >
-        {children}
+        <Node
+          annotations={value.annotations}
+          block={null}
+          decorations={List()}
+          editor={editor}
+          node={document}
+          parent={null}
+          readOnly={readOnly}
+          selection={selection}
+          ref={this.tmp.nodeRef}
+        />
       </Container>
-    )
-  }
-
-  /**
-   * Render a `child` node of the document.
-   *
-   * @param {Node} child
-   * @param {Boolean} isSelected
-   * @return {Element}
-   */
-
-  renderNode = (child, isSelected, decorations) => {
-    const { editor, readOnly } = this.props
-    const { value } = editor
-    const { document, selection } = value
-    const { isFocused } = selection
-
-    return (
-      <Node
-        block={null}
-        editor={editor}
-        decorations={decorations}
-        isSelected={isSelected}
-        isFocused={isFocused && isSelected}
-        key={child.key}
-        node={child}
-        parent={document}
-        readOnly={readOnly}
-      />
     )
   }
 }

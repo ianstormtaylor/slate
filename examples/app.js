@@ -1,5 +1,5 @@
 import React from 'react'
-import styled from 'react-emotion'
+import { cx, css } from 'emotion'
 import {
   HashRouter,
   Link as RouterLink,
@@ -72,126 +72,193 @@ const EXAMPLES = [
 ]
 
 /**
- * Some styled components.
+ * Some components.
  *
  * @type {Component}
  */
 
-const Header = styled('div')`
-  align-items: center;
-  background: #000;
-  color: #aaa;
-  display: flex;
-  height: 42px;
-  position: relative;
-  z-index: 1; /* To appear above the underlay */
-`
+const Header = props => (
+  <div
+    {...props}
+    className={css`
+      align-items: center;
+      background: #000;
+      color: #aaa;
+      display: flex;
+      height: 42px;
+      position: relative;
+      z-index: 1; /* To appear above the underlay */
+    `}
+  />
+)
 
-const Title = styled('span')`
-  margin-left: 1em;
-`
+const Title = props => (
+  <span
+    {...props}
+    className={css`
+      margin-left: 1em;
+    `}
+  />
+)
 
-const LinkList = styled('div')`
-  margin-left: auto;
-  margin-right: 1em;
-`
+const LinkList = props => (
+  <div
+    {...props}
+    className={css`
+      margin-left: auto;
+      margin-right: 1em;
+    `}
+  />
+)
 
-const Link = styled('a')`
-  margin-left: 1em;
-  color: #aaa;
-  text-decoration: none;
+const Link = props => (
+  <a
+    {...props}
+    className={css`
+      margin-left: 1em;
+      color: #aaa;
+      text-decoration: none;
 
-  &:hover {
-    color: #fff;
-    text-decoration: underline;
-  }
-`
+      &:hover {
+        color: #fff;
+        text-decoration: underline;
+      }
+    `}
+  />
+)
 
-const TabList = styled('div')`
-  background-color: #222;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  padding-top: 0.2em;
-  position: absolute;
-  transition: width 0.2s;
-  width: ${props => (props.isVisible ? '200px' : '0')};
-  white-space: nowrap;
-  z-index: 1; /* To appear above the underlay */
-`
+const TabList = ({ isVisible, ...props }) => (
+  <div
+    {...props}
+    className={css`
+      background-color: #222;
+      display: flex;
+      flex-direction: column;
+      overflow: auto;
+      padding-top: 0.2em;
+      position: absolute;
+      transition: width 0.2s;
+      width: ${isVisible ? '200px' : '0'};
+      white-space: nowrap;
+      max-height: 70vh;
+      z-index: 1; /* To appear above the underlay */
+    `}
+  />
+)
 
-const TabListUnderlay = styled('div')`
-  background-color: rgba(200, 200, 200, 0.8);
-  display: ${props => (props.isVisible ? 'block' : 'none')};
-  height: 100%;
-  top: 0;
-  position: fixed;
-  width: 100%;
-`
+const TabListUnderlay = ({ isVisible, ...props }) => (
+  <div
+    {...props}
+    className={css`
+      background-color: rgba(200, 200, 200, 0.8);
+      display: ${isVisible ? 'block' : 'none'};
+      height: 100%;
+      top: 0;
+      position: fixed;
+      width: 100%;
+    `}
+  />
+)
 
-const TabButton = styled('span')`
-  margin-left: 0.8em;
+const TabButton = props => (
+  <span
+    {...props}
+    className={css`
+      margin-left: 0.8em;
 
-  &:hover {
-    cursor: pointer;
-  }
+      &:hover {
+        cursor: pointer;
+      }
 
-  .material-icons {
-    color: #aaa;
-    font-size: 24px;
-  }
-`
+      .material-icons {
+        color: #aaa;
+        font-size: 24px;
+      }
+    `}
+  />
+)
 
-const MaskedRouterLink = ({ active, ...props }) => <RouterLink {...props} />
+const Tab = ({ active, ...props }) => (
+  <RouterLink
+    {...props}
+    className={css`
+      display: inline-block;
+      margin-bottom: 0.2em;
+      padding: 0.2em 1em;
+      border-radius: 0.2em;
+      text-decoration: none;
+      color: ${active ? 'white' : '#777'};
+      background: ${active ? '#333' : 'transparent'};
 
-const Tab = styled(MaskedRouterLink)`
-  display: inline-block;
-  margin-bottom: 0.2em;
-  padding: 0.2em 1em;
-  border-radius: 0.2em;
-  text-decoration: none;
-  color: ${p => (p.active ? 'white' : '#777')};
-  background: ${p => (p.active ? '#333' : 'transparent')};
+      &:hover {
+        background: #333;
+      }
+    `}
+  />
+)
 
-  &:hover {
-    background: #333;
-  }
-`
+const Wrapper = ({ className, ...props }) => (
+  <div
+    {...props}
+    className={cx(
+      className,
+      css`
+        max-width: 42em;
+        margin: 20px auto;
+        padding: 20px;
+      `
+    )}
+  />
+)
 
-const Wrapper = styled('div')`
-  max-width: 42em;
-  margin: 20px auto;
-  padding: 20px;
-`
+const ExampleHeader = props => (
+  <div
+    {...props}
+    className={css`
+      align-items: center;
+      background-color: #555;
+      color: #ddd;
+      display: flex;
+      height: 42px;
+      position: relative;
+      z-index: 1; /* To appear above the underlay */
+    `}
+  />
+)
 
-const ExampleHeader = styled('div')`
-  align-items: center;
-  background-color: #555;
-  color: #ddd;
-  display: flex;
-  height: 42px;
-  position: relative;
-  z-index: 1; /* To appear above the underlay */
-`
+const ExampleTitle = props => (
+  <span
+    {...props}
+    className={css`
+      margin-left: 1em;
+    `}
+  />
+)
 
-const ExampleTitle = styled('span')`
-  margin-left: 1em;
-`
+const ExampleContent = props => (
+  <Wrapper
+    {...props}
+    className={css`
+      background: #fff;
+    `}
+  />
+)
 
-const ExampleContent = styled(Wrapper)`
-  background: #fff;
-`
+const Warning = props => (
+  <Wrapper
+    {...props}
+    className={css`
+      background: #fffae0;
 
-const Warning = styled(Wrapper)`
-  background: #fffae0;
-
-  & > pre {
-    background: #fbf1bd;
-    white-space: pre;
-    overflow-x: scroll;
-    margin-bottom: 0;
-  }
-`
+      & > pre {
+        background: #fbf1bd;
+        white-space: pre;
+        overflow-x: scroll;
+        margin-bottom: 0;
+      }
+    `}
+  />
+)
 
 /**
  * App.

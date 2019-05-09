@@ -24,38 +24,26 @@ function invertOperation(op) {
   debug(type, op)
 
   switch (type) {
-    case 'insert_node': {
-      const inverse = op.set('type', 'remove_node')
-      return inverse
-    }
-
-    case 'remove_node': {
-      const inverse = op.set('type', 'insert_node')
-      return inverse
-    }
-
     case 'move_node': {
       const { newPath, path } = op
 
+      // PERF: this case can exit early.
       if (PathUtils.isEqual(newPath, path)) {
         return op
       }
 
-      // Get the true path that the moved node ended up at
       const inversePath = PathUtils.transform(path, op).first()
 
       // Get the true path we are trying to move back to
       // We transform the right-sibling of the path
       // This will end up at the operation.path most of the time
       // But if the newPath is a left-sibling or left-ancestor-sibling, this will account for it
-      const transformedSibling = PathUtils.transform(
+      const inverseNewPath = PathUtils.transform(
         PathUtils.increment(path),
         op
       ).first()
 
-      const inverse = op
-        .set('path', inversePath)
-        .set('newPath', transformedSibling)
+      const inverse = op.set('path', inversePath).set('newPath', inverseNewPath)
       return inverse
     }
 
@@ -73,6 +61,7 @@ function invertOperation(op) {
       return inverse
     }
 
+    case 'set_annotation':
     case 'set_node':
     case 'set_value':
     case 'set_selection':
@@ -84,23 +73,27 @@ function invertOperation(op) {
       return inverse
     }
 
+    case 'insert_node':
     case 'insert_text': {
-      const inverse = op.set('type', 'remove_text')
+      const inverse = op.set('type', type.replace('insert_', 'remove_'))
       return inverse
     }
 
+    case 'remove_node':
     case 'remove_text': {
-      const inverse = op.set('type', 'insert_text')
+      const inverse = op.set('type', type.replace('remove_', 'insert_'))
       return inverse
     }
 
+    case 'add_annotation':
     case 'add_mark': {
-      const inverse = op.set('type', 'remove_mark')
+      const inverse = op.set('type', type.replace('add_', 'remove_'))
       return inverse
     }
 
+    case 'remove_annotation':
     case 'remove_mark': {
-      const inverse = op.set('type', 'add_mark')
+      const inverse = op.set('type', type.replace('remove_', 'add_'))
       return inverse
     }
 

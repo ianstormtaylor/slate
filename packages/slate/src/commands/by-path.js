@@ -109,28 +109,28 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
 Commands.insertTextByPath = (editor, path, offset, text, marks) => {
   marks = Mark.createSet(marks)
   const { value } = editor
-  const { decorations, document } = value
-  const node = document.assertNode(path)
-  const { key } = node
-  let updated = false
-
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-    if (!isAtomic) return true
-    if (start.key !== key) return true
-
-    if (start.offset < offset && (end.key !== key || end.offset > offset)) {
-      updated = true
-      return false
-    }
-
-    return true
-  })
+  const { annotations, document } = value
+  document.assertNode(path)
 
   editor.withoutNormalizing(() => {
-    if (updated) {
-      editor.setDecorations(decs)
+    for (const annotation of annotations.values()) {
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
+
+      if (!isAtomic) {
+        continue
+      }
+
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
     editor.applyOperation({
@@ -275,12 +275,17 @@ Commands.removeAllMarksByPath = (editor, path) => {
   const { state } = editor
   const { document } = state
   const node = document.assertNode(path)
-  const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
-  texts.forEach(text => {
-    text.marks.forEach(mark => {
-      editor.removeMarkByKey(text.key, 0, text.text.length, mark)
-    })
+  editor.withoutNormalizing(() => {
+    if (node.object === 'text') {
+      editor.removeMarksByPath(path, 0, node.text.length, node.marks)
+      return
+    }
+
+    for (const [n, p] of node.texts()) {
+      const pth = path.concat(p)
+      editor.removeMarksByPath(pth, 0, n.text.length, n.marks)
+    }
   })
 }
 
@@ -314,45 +319,36 @@ Commands.removeNodeByPath = (editor, path) => {
 
 Commands.removeTextByPath = (editor, path, offset, length) => {
   const { value } = editor
-  const { document, decorations } = value
+  const { document, annotations } = value
   const node = document.assertNode(path)
-
-  const { text } = node
-  const string = text.slice(offset, offset + length)
-
-  const { key } = node
-  let updated = false
-
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-
-    if (!isAtomic) {
-      return true
-    }
-
-    if (start.key !== key) {
-      return true
-    }
-
-    if (start.offset < offset && (end.key !== key || end.offset > offset)) {
-      updated = true
-      return false
-    }
-
-    return true
-  })
+  const text = node.text.slice(offset, offset + length)
 
   editor.withoutNormalizing(() => {
-    if (updated) {
-      editor.setDecorations(decs)
+    for (const annotation of annotations.values()) {
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
+
+      if (!isAtomic) {
+        continue
+      }
+
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
     editor.applyOperation({
       type: 'remove_text',
       path,
       offset,
-      text: string,
+      text,
     })
   })
 }
@@ -528,24 +524,22 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 
   const { value } = editor
   const { document } = value
-  const node = document.assertNode(path)
-  const text = document.assertNode(textPath)
-  const ancestors = document.getAncestors(textPath)
-  const nodes = ancestors
-    .skipUntil(a => a.key === node.key)
-    .reverse()
-    .unshift(text)
-
-  let previous
-  let index
+  let index = textOffset
+  let lastPath = textPath
 
   editor.withoutNormalizing(() => {
-    nodes.forEach(n => {
-      const prevIndex = index == null ? null : index
-      index = previous ? n.nodes.indexOf(previous) + 1 : textOffset
-      previous = n
-      editor.splitNodeByKey(n.key, index, { target: prevIndex })
-    })
+    editor.splitNodeByKey(textPath, textOffset)
+
+    for (const [, ancestorPath] of document.ancestors(textPath)) {
+      const target = index
+      index = lastPath.last() + 1
+      lastPath = ancestorPath
+      editor.splitNodeByPath(ancestorPath, index, { target })
+
+      if (ancestorPath.equals(path)) {
+        break
+      }
+    }
   })
 }
 

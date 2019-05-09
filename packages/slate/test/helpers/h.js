@@ -22,7 +22,7 @@ const h = createHyperscript({
     u: 'underline',
     fontSize: 'font-size',
   },
-  decorations: {
+  annotations: {
     result: 'result',
     highlight: 'highlight',
   },
@@ -37,7 +37,7 @@ const h = createHyperscript({
         isVoid: true,
       },
     },
-    marks: {
+    annotations: {
       result: {
         isAtomic: true,
       },

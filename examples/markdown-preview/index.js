@@ -40,14 +40,14 @@ class MarkdownPreview extends React.Component {
       <Editor
         placeholder="Write some markdown..."
         defaultValue={initialValue}
-        renderMark={this.renderMark}
+        renderDecoration={this.renderDecoration}
         decorateNode={this.decorateNode}
       />
     )
   }
 
   /**
-   * Render a Slate mark.
+   * Render a Slate decoration.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -55,10 +55,10 @@ class MarkdownPreview extends React.Component {
    * @return {Element}
    */
 
-  renderMark = (props, editor, next) => {
-    const { children, mark, attributes } = props
+  renderDecoration = (props, editor, next) => {
+    const { children, decoration, attributes } = props
 
-    switch (mark.type) {
+    switch (decoration.type) {
       case 'bold':
         return <strong {...attributes}>{children}</strong>
 
@@ -144,12 +144,12 @@ class MarkdownPreview extends React.Component {
     if (node.object !== 'block') return others
 
     const string = node.text
-    const texts = node.getTexts().toArray()
+    const texts = Array.from(node.texts())
     const grammar = Prism.languages.markdown
     const tokens = Prism.tokenize(string, grammar)
     const decorations = []
-    let startText = texts.shift()
-    let endText = startText
+    let startEntry = texts.shift()
+    let endEntry = startEntry
     let startOffset = 0
     let endOffset = 0
     let start = 0
@@ -165,9 +165,10 @@ class MarkdownPreview extends React.Component {
     }
 
     for (const token of tokens) {
-      startText = endText
+      startEntry = endEntry
       startOffset = endOffset
 
+      const [startText, startPath] = startEntry
       const length = getLength(token)
       const end = start + length
 
@@ -177,24 +178,27 @@ class MarkdownPreview extends React.Component {
       endOffset = startOffset + remaining
 
       while (available < remaining) {
-        endText = texts.shift()
+        endEntry = texts.shift()
+        const [endText] = endEntry
         remaining = length - available
         available = endText.text.length
         endOffset = remaining
       }
 
+      const [endText, endPath] = endEntry
+
       if (typeof token !== 'string') {
         const dec = {
+          type: token.type,
           anchor: {
             key: startText.key,
+            path: startPath,
             offset: startOffset,
           },
           focus: {
             key: endText.key,
+            path: endPath,
             offset: endOffset,
-          },
-          mark: {
-            type: token.type,
           },
         }
 

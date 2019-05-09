@@ -90,14 +90,14 @@ class Links extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           onPaste={this.onPaste}
-          renderNode={this.renderNode}
+          renderInline={this.renderInline}
         />
       </div>
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate inline.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -105,7 +105,7 @@ class Links extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderInline = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
