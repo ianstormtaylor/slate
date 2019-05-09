@@ -16,7 +16,7 @@
     "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
-    "slate": ">=0.46.0"
+    "slate": ">=0.47.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",

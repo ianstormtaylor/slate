@@ -4,6 +4,74 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.47.0` — May 8, 2019
+
+###### NEW
+
+**Introducing the `Annotation` model.** This is very similar to what used to be stored in `value.decorations`, except they also contain a unique "key" to be identified by. They can be used for things like comments, suggestions, collaborative cursors, etc.
+
+```js
+{
+  object: 'annotation',
+  key: String,
+  type: String,
+  data: Map,
+  anchor: Point,
+  focus: Point,
+}
+```
+
+**There are three new `*_annotation` operations.** The set of operations now includes `add_annotation`, `remove_annotation` and `set_annotation`. They are similar to the existing `*_mark` operations.
+
+**Introducing "iterable" model methods.** This introduces several iteratable-producing methods on the `Element` interface, which `Document`, `Block` and `Inline` all implement. There are iterables for traversing the entire tree:
+
+```js
+element.blocks(options)
+element.descendants(options)
+element.inlines(options)
+element.texts(options)
+
+element.ancestors(path, options)
+element.siblings(path, options)
+```
+
+You can use them just like the native JavaScript iterables. For example, you can through the next text nodes after a specific node:
+
+```js
+for (const next of document.texts({ path: start.path })) {
+  const [node, path] = next
+  // do something with the text node or its path
+}
+```
+
+Or you can traverse all of the "leaf" blocks:
+
+```js
+for (const [block] of document.blocks({ onlyLeaves: true })) {
+  // ...
+}
+```
+
+And because these iterations use native `for/of` loops, you can easily `break` or `return` out of the loops directly—a much nicer DX than remembering to `return false`.
+
+###### BREAKING
+
+**The `value.decorations` property is now `value.annotations`.** Following with the split of decorations into annotations, this property was also renamed. They must now contain unique `key` properties, as they are stored as a `Map` instead of a `List`. This allows for much more performant updates.
+
+**The `Decoration` model no longer has a nested `mark` property.** Previously a real `Mark` object was used as a property on decorations, but now the `type` and `data` properties are first class properties instead.
+
+```js
+{
+  object: 'decoration',
+  type: String,
+  data: Map,
+  anchor: Point,
+  focus: Point,
+}
+```
+
+---
+
 ### `0.46.0` — May 1, 2019
 
 ###### BREAKING

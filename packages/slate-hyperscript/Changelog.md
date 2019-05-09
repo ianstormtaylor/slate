@@ -4,6 +4,16 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.13.0` — May 8, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.47`.** The hyperscript creators have been updated to work with the `Annotation` model introduced in the latest version of Slate.
+
+**The `slate-hyperscript` package now uses the "annotations" name.** All of the existing APIs that previously used the word "decorations" in `slate-hyperscript` have been updated.
+
+---
+
 ### `0.12.0` — May 1, 2019
 
 ###### BREAKING

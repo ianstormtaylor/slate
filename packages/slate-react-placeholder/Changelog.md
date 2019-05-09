@@ -4,6 +4,14 @@ This document maintains a list of changes to the `slate-react-placeholder` packa
 
 ---
 
+### `0.2.0` — May 8, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.47`.** The placeholder decorations have been updated to work alongside the new requirements for decorations in `slate@0.47` and `slate-react@0.22`.
+
+---
+
 ### `0.1.0` — November 2, 2017
 
 :tada:

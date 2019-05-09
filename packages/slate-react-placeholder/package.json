@@ -13,8 +13,9 @@
     "lib/"
   ],
   "peerDependencies": {
-    "react": ">=0.14.0",
-    "slate": ">=0.43.6"
+    "react": ">=16.0.0",
+    "slate": ">=0.47.0",
+    "slate-react": ">=0.22.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
