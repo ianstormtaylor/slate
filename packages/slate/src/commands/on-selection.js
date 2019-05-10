@@ -141,7 +141,7 @@ Commands.moveBackward = (editor, chars = 1) => {
   const o = startBlock.getOffset(start.key)
   const offset = o + start.offset
   const { text } = startBlock
-  const charsOffset = TextUtils.getCharsOffsetBackward(text, offset, chars)
+  const charsOffset = TextUtils.getCharOffsetBackward(text, offset, chars)
   editor.moveAnchorBackward(charsOffset).moveFocusBackward(charsOffset)
 }
 
@@ -375,7 +375,7 @@ Commands.moveForward = (editor, chars = 1) => {
   const o = startBlock.getOffset(start.key)
   const offset = o + start.offset
   const { text } = startBlock
-  const charsOffset = TextUtils.getCharsOffsetForward(text, offset, chars)
+  const charsOffset = TextUtils.getCharOffsetForward(text, offset, chars)
   editor.moveAnchorForward(charsOffset).moveFocusForward(charsOffset)
 }
 

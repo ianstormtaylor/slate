@@ -258,7 +258,7 @@ function getCharOffset(text, chars, forward) {
  * @return {Number}
  */
 
-function getCharsOffsetBackward(text, offset, chars) {
+function getCharOffsetBackward(text, offset, chars = 1) {
   text = text.slice(0, offset)
   text = reverse(text)
   return getCharOffset(text, chars)
@@ -273,7 +273,7 @@ function getCharsOffsetBackward(text, offset, chars) {
  * @return {Number}
  */
 
-function getCharsOffsetForward(text, offset, chars) {
+function getCharOffsetForward(text, offset, chars = 1) {
   text = text.slice(offset)
   return getCharOffset(text, chars, true)
 }
@@ -349,8 +349,8 @@ function getWordOffsetForward(text, offset) {
 export default {
   getCharLength,
   getCharOffset,
-  getCharsOffsetBackward,
-  getCharsOffsetForward,
+  getCharOffsetBackward,
+  getCharOffsetForward,
   getWordOffset,
   getWordOffsetBackward,
   getWordOffsetForward,
