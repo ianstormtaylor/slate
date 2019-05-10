@@ -21,7 +21,6 @@ function findDOMPoint(point, win = window) {
 
   for (const text of texts) {
     const node = text.childNodes[0]
-    if (!node) return null
     const domLength = node.textContent.length
     let slateLength = domLength
 
