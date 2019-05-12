@@ -40,11 +40,8 @@ const initialValue = Value.fromJSON({
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                text: 'A line of text in a paragraph.',
-              },
-            ],
+            marks: [],
+            text: 'A line of text in a paragraph.', 
           },
         ],
       },
@@ -70,11 +67,8 @@ const initialValue = Value.fromJSON({
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                text: 'A line of text in a paragraph.',
-              },
-            ],
+            marks: [],
+            text: 'A line of text in a paragraph.', 
           },
         ],
       },
