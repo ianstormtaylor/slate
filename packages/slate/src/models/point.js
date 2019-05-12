@@ -127,11 +127,13 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAfterPoint(point) {
-    if (this.isUnset) return false
-    const is =
-      (this.key === point.key && this.offset > point.offset) ||
-      PathUtils.compare(this.path, point.path) === 1
-    return is
+    if (this.isUnset || point.isUnset) {
+      return false
+    }
+
+    const result = PathUtils.compare(this.path, point.path)
+    const isAfter = (result === 0 && this.offset > point.offset) || result === 1
+    return isAfter
   }
 
   /**
@@ -141,9 +143,7 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAfterRange(range) {
-    if (this.isUnset) return false
-    const is = this.isAfterPoint(range.end)
-    return is
+    return this.isAfterPoint(range.end)
   }
 
   /**
@@ -153,7 +153,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtEndOfRange(range) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     const is = this.equals(range.end)
     return is
   }
@@ -165,7 +168,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtStartOfRange(range) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     const is = this.equals(range.start)
     return is
   }
@@ -177,11 +183,15 @@ class Point extends Record(DEFAULTS) {
    */
 
   isBeforePoint(point) {
-    if (this.isUnset) return false
-    const is =
-      (this.key === point.key && this.offset < point.offset) ||
-      PathUtils.compare(this.path, point.path) === -1
-    return is
+    if (this.isUnset) {
+      return false
+    }
+
+    const result = PathUtils.compare(this.path, point.path)
+    const isBefore =
+      (result === 0 && this.offset < point.offset) || result === -1
+
+    return isBefore
   }
 
   /**
@@ -191,7 +201,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isBeforeRange(range) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     const is = this.isBeforePoint(range.start)
     return is
   }
@@ -203,7 +216,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isInRange(range) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     const is =
       this.equals(range.start) ||
       this.equals(range.end) ||
@@ -219,7 +235,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtEndOfNode(node) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     const last = node.getLastText()
     const is = this.key === last.key && this.offset === last.text.length
     return is
@@ -233,7 +252,9 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtStartOfNode(node) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
 
     // PERF: Do a check for a `0` offset first since it's quickest.
     if (this.offset !== 0) return false
@@ -251,7 +272,10 @@ class Point extends Record(DEFAULTS) {
    */
 
   isInNode(node) {
-    if (this.isUnset) return false
+    if (this.isUnset) {
+      return false
+    }
+
     if (node.object === 'text' && node.key === this.key) return true
     if (node.hasNode(this.key)) return true
     return false
@@ -374,6 +398,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (!target) {
+      debugger
       warning(false, "A point's `path` or `key` invalid and was reset!")
 
       const text = node.getFirstText()

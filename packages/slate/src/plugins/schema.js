@@ -120,7 +120,10 @@ function SchemaPlugin(schema) {
 
   function normalizeNode(node, editor, next) {
     const error = validateNode(node, editor, () => {})
-    if (!error) return next()
+
+    if (!error) {
+      return next()
+    }
 
     return () => {
       const { rule } = error
@@ -152,7 +155,11 @@ function SchemaPlugin(schema) {
   function validateNode(node, editor, next) {
     const matches = schemaRules.filter(r => testRules(node, r.match))
     const failure = validateRules(node, matches, schemaRules, { every: true })
-    if (!failure) return next()
+
+    if (!failure) {
+      return next()
+    }
+
     const error = new SlateError(failure.code, failure)
     return error
   }

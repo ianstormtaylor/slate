@@ -21,10 +21,16 @@ class RangeInterface {
    */
 
   get isCollapsed() {
+    const { anchor, focus } = this
+
+    // PERF: If the points are actually equal we can abort faster.
+    if (anchor === focus) {
+      return true
+    }
+
     return (
-      this.anchor === this.focus ||
-      (this.anchor.key === this.focus.key &&
-        this.anchor.offset === this.focus.offset)
+      anchor.offset === focus.offset &&
+      PathUtils.isEqual(anchor.path, focus.path)
     )
   }
 
@@ -51,7 +57,7 @@ class RangeInterface {
       return null
     }
 
-    if (anchor.key === focus.key) {
+    if (anchor.path.equals(focus.path)) {
       return anchor.offset > focus.offset
     }
 

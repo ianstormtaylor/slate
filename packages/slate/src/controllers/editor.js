@@ -195,8 +195,11 @@ class Editor {
   normalize() {
     const { value, controller } = this
     let { document } = value
-    const table = document.getKeysToPathsTable()
-    const paths = Object.values(table).map(PathUtils.create)
+    const paths = Array.from(
+      document.descendants({ includeTarget: true, includeRoot: true }),
+      ([, path]) => path
+    )
+
     this.tmp.dirty = this.tmp.dirty.concat(paths)
     normalizeDirtyPaths(this)
 
@@ -505,8 +508,14 @@ function getDirtyPaths(operation) {
     }
 
     case 'insert_node': {
-      const table = node.getKeysToPathsTable()
-      const paths = Object.values(table).map(p => path.concat(p))
+      const paths =
+        node.object === 'text'
+          ? []
+          : Array.from(
+              node.descendants({ includeTarget: true, includeRoot: true }),
+              ([, p]) => path.concat(p)
+            )
+
       const ancestors = PathUtils.getAncestors(path).toArray()
       return [...ancestors, path, ...paths]
     }
@@ -580,58 +589,67 @@ function normalizeDirtyPaths(editor) {
  *
  * @param {Editor} editor
  * @param {Array} path
+ * @param {Number} iteration
  */
 
-function normalizeNodeByPath(editor, path) {
+function normalizeNodeByPath(
+  editor,
+  path,
+  iteration = 0,
+  maxIterations = null
+) {
   const { controller } = editor
-  let { value } = editor
-  let { document } = value
-  let node = document.assertNode(path)
-  let iterations = 0
-  const max = 100 + (node.object === 'text' ? 1 : node.nodes.size)
+  const { value } = editor
+  const { document } = value
+  const node = document.assertNode(path)
 
-  while (node) {
-    const fn = node.normalize(controller)
+  // Set a best estimate for maximum iterations.
+  if (!maxIterations) {
+    maxIterations = 100 + (node.object === 'text' ? 1 : node.nodes.size)
+  }
 
-    if (!fn) {
-      break
+  // Check to make sure that we haven't exceeded the max. Without this check,
+  // it's easy for a `normalize` function of a schema rule to be written
+  // incorrectly and for an infinite invalid loop to occur.
+  if (iteration > maxIterations) {
+    throw new Error(
+      'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
+    )
+  }
+
+  const fn = node.normalize(controller)
+
+  // A normalizing function is only returned when the node is invalid.
+  if (!fn) {
+    return
+  }
+
+  // Run the normalize `fn` to fix the node.
+  const opCount = editor.operations.size
+  fn(controller)
+
+  // Now that normalizing operations have been applied, we need to refind the
+  // path, transformed by all the new operations.
+  const newOps = editor.operations.slice(opCount)
+  let paths = [path]
+
+  for (const op of newOps) {
+    let next = []
+
+    // Transforming paths can sometimes result in multiple new paths, so we
+    // have to accoutn for that by collecting an array.
+    for (const p of paths) {
+      const transformed = PathUtils.transform(p, op)
+      next = next.concat(transformed.toArray())
     }
 
-    // Run the normalize `fn` to fix the node.
-    fn(controller)
+    paths = next
+  }
 
-    // Attempt to re-find the node by path, or by key if it has changed
-    // locations in the tree continue iterating.
-    value = editor.value
-    document = value.document
-    const { key } = node
-    let found = document.getDescendant(path)
-
-    if (found && found.key === key) {
-      node = found
-    } else {
-      found = document.getDescendant(key)
-
-      if (found) {
-        node = found
-        path = document.getPath(key)
-      } else {
-        // If it no longer exists by key, it was removed, so we're done.
-        break
-      }
-    }
-
-    // Increment the iterations counter, and check to make sure that we haven't
-    // exceeded the max. Without this check, it's easy for the `normalize`
-    // function of a schema rule to be written incorrectly and for an infinite
-    // invalid loop to occur.
-    iterations++
-
-    if (iterations > max) {
-      throw new Error(
-        'A schema rule could not be normalized after sufficient iterations. This is usually due to a `rule.normalize` or `plugin.normalizeNode` function of a schema being incorrectly written, causing an infinite loop.'
-      )
-    }
+  // For every updated path, we want to continue iterating to ensure that the
+  // node is fully normalized by all rules.
+  for (const p of paths) {
+    normalizeNodeByPath(editor, p, iteration + 1, maxIterations)
   }
 }
 

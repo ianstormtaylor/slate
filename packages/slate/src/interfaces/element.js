@@ -1483,7 +1483,7 @@ class ElementInterface {
 
     nodes.forEach((node, i) => {
       const ret = predicate(node, i, this.nodes)
-      if (ret !== node) nodes = nodes.set(ret.key, ret)
+      if (ret !== node) nodes = nodes.set(i, ret)
     })
 
     const ret = this.set('nodes', nodes)
@@ -1880,6 +1880,48 @@ class ElementInterface {
     })
 
     return iterable
+  }
+
+  previousText(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.firstText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [prev] = this.texts({ path, direction: 'backward' })
+    return prev
+  }
+
+  nextText(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.lastText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [next] = this.texts({ path })
+    return next
+  }
+
+  firstText() {
+    const [first] = this.texts()
+    return first
+  }
+
+  lastText() {
+    const [last] = this.texts({ direction: 'backward' })
+    return last
   }
 
   /**

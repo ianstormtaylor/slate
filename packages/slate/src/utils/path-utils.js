@@ -27,6 +27,19 @@ function compare(path, target) {
 }
 
 /**
+ * Does path `a` contain path `b`?
+ *
+ * @param {List} a
+ * @param {List} b
+ * @return {Boolean}
+ */
+
+function contains(a, b) {
+  ;[a, b] = crop(a, b)
+  return isEqual(a, b)
+}
+
+/**
  * Create a path from `attrs`.
  *
  * @param {Array|List} attrs
@@ -405,6 +418,7 @@ function transform(path, operation) {
 
 export default {
   compare,
+  contains,
   create,
   crop,
   decrement,

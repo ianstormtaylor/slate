@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { Record, Set, List } from 'immutable'
 
 import Annotation from './annotation'
@@ -119,8 +120,8 @@ class Value extends Record(DEFAULTS) {
 
   get startBlock() {
     return (
-      this.selection.start.key &&
-      this.document.getClosestBlock(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getClosestBlock(this.selection.start.path)
     )
   }
 
@@ -132,8 +133,8 @@ class Value extends Record(DEFAULTS) {
 
   get endBlock() {
     return (
-      this.selection.end.key &&
-      this.document.getClosestBlock(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getClosestBlock(this.selection.end.path)
     )
   }
 
@@ -145,8 +146,8 @@ class Value extends Record(DEFAULTS) {
 
   get anchorBlock() {
     return (
-      this.selection.anchor.key &&
-      this.document.getClosestBlock(this.selection.anchor.key)
+      this.selection.anchor.path &&
+      this.document.getClosestBlock(this.selection.anchor.path)
     )
   }
 
@@ -158,8 +159,8 @@ class Value extends Record(DEFAULTS) {
 
   get focusBlock() {
     return (
-      this.selection.focus.key &&
-      this.document.getClosestBlock(this.selection.focus.key)
+      this.selection.focus.path &&
+      this.document.getClosestBlock(this.selection.focus.path)
     )
   }
 
@@ -171,8 +172,8 @@ class Value extends Record(DEFAULTS) {
 
   get startInline() {
     return (
-      this.selection.start.key &&
-      this.document.getClosestInline(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getClosestInline(this.selection.start.path)
     )
   }
 
@@ -184,8 +185,8 @@ class Value extends Record(DEFAULTS) {
 
   get endInline() {
     return (
-      this.selection.end.key &&
-      this.document.getClosestInline(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getClosestInline(this.selection.end.path)
     )
   }
 
@@ -197,8 +198,8 @@ class Value extends Record(DEFAULTS) {
 
   get anchorInline() {
     return (
-      this.selection.anchor.key &&
-      this.document.getClosestInline(this.selection.anchor.key)
+      this.selection.anchor.path &&
+      this.document.getClosestInline(this.selection.anchor.path)
     )
   }
 
@@ -210,8 +211,8 @@ class Value extends Record(DEFAULTS) {
 
   get focusInline() {
     return (
-      this.selection.focus.key &&
-      this.document.getClosestInline(this.selection.focus.key)
+      this.selection.focus.path &&
+      this.document.getClosestInline(this.selection.focus.path)
     )
   }
 
@@ -223,8 +224,8 @@ class Value extends Record(DEFAULTS) {
 
   get startText() {
     return (
-      this.selection.start.key &&
-      this.document.getDescendant(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getDescendant(this.selection.start.path)
     )
   }
 
@@ -236,8 +237,8 @@ class Value extends Record(DEFAULTS) {
 
   get endText() {
     return (
-      this.selection.end.key &&
-      this.document.getDescendant(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getDescendant(this.selection.end.path)
     )
   }
 
@@ -249,8 +250,8 @@ class Value extends Record(DEFAULTS) {
 
   get anchorText() {
     return (
-      this.selection.anchor.key &&
-      this.document.getDescendant(this.selection.anchor.key)
+      this.selection.anchor.path &&
+      this.document.getDescendant(this.selection.anchor.path)
     )
   }
 
@@ -262,8 +263,8 @@ class Value extends Record(DEFAULTS) {
 
   get focusText() {
     return (
-      this.selection.focus.key &&
-      this.document.getDescendant(this.selection.focus.key)
+      this.selection.focus.path &&
+      this.document.getDescendant(this.selection.focus.path)
     )
   }
 
@@ -275,8 +276,8 @@ class Value extends Record(DEFAULTS) {
 
   get nextBlock() {
     return (
-      this.selection.end.key &&
-      this.document.getNextBlock(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getNextBlock(this.selection.end.path)
     )
   }
 
@@ -288,8 +289,8 @@ class Value extends Record(DEFAULTS) {
 
   get previousBlock() {
     return (
-      this.selection.start.key &&
-      this.document.getPreviousBlock(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getPreviousBlock(this.selection.start.path)
     )
   }
 
@@ -301,8 +302,8 @@ class Value extends Record(DEFAULTS) {
 
   get nextInline() {
     return (
-      this.selection.end.key &&
-      this.document.getNextInline(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getNextInline(this.selection.end.path)
     )
   }
 
@@ -314,8 +315,8 @@ class Value extends Record(DEFAULTS) {
 
   get previousInline() {
     return (
-      this.selection.start.key &&
-      this.document.getPreviousInline(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getPreviousInline(this.selection.start.path)
     )
   }
 
@@ -327,8 +328,8 @@ class Value extends Record(DEFAULTS) {
 
   get nextText() {
     return (
-      this.selection.end.key &&
-      this.document.getNextText(this.selection.end.key)
+      this.selection.end.path &&
+      this.document.getNextText(this.selection.end.path)
     )
   }
 
@@ -340,8 +341,8 @@ class Value extends Record(DEFAULTS) {
 
   get previousText() {
     return (
-      this.selection.start.key &&
-      this.document.getPreviousText(this.selection.start.key)
+      this.selection.start.path &&
+      this.document.getPreviousText(this.selection.start.path)
     )
   }
 
@@ -419,97 +420,79 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Add an `annotation` to the value.
+   * Return a JSON representation of the value.
    *
-   * @param {Annotation} annotation
-   * @param {Mark} mark
-   * @return {Value}
+   * @param {Object} options
+   * @return {Object}
    */
 
-  addAnnotation(annotation) {
-    annotation = Annotation.create(annotation)
-    let value = this
-    let { annotations } = value
-    const { key } = annotation
-    annotations = annotations.set(key, annotation)
-    value = value.set('annotations', annotations)
-    return value
+  toJSON(options = {}) {
+    const object = {
+      object: this.object,
+      document: this.document.toJSON(options),
+    }
+
+    if (options.preserveData) {
+      object.data = this.data.toJSON(options)
+    }
+
+    if (options.preserveAnnotations) {
+      object.annotations = this.annotations
+        .map(a => a.toJSON(options))
+        .toObject()
+    }
+
+    if (options.preserveSelection) {
+      object.selection = this.selection.toJSON(options)
+    }
+
+    return object
   }
 
   /**
-   * Add `mark` to text at `path`.
-   *
-   * @param {List|String} path
-   * @param {Mark} mark
-   * @return {Value}
+   * Deprecated.
    */
 
-  addMark(path, mark) {
-    mark = Mark.create(mark)
-    let value = this
-    let { document } = value
-    document = document.addMark(path, mark)
-    value = value.set('document', document)
-    return value
-  }
-
-  /**
-   * Insert a `node`.
-   *
-   * @param {List|String} path
-   * @param {Node} node
-   * @return {Value}
-   */
-
-  insertNode(path, node) {
-    let value = this
-    let { document } = value
-    document = document.insertNode(path, node)
-    value = value.set('document', document)
-
-    value = value.mapRanges(range =>
-      range.updatePoints(point => point.setPath(null))
+  mapRanges(iterator) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.mapRanges` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
-    return value
-  }
-
-  /**
-   * Insert `text` at `offset` in node by `path`.
-   *
-   * @param {List|String} path
-   * @param {Number} offset
-   * @param {String} text
-   * @return {Value}
-   */
-
-  insertText(path, offset, text) {
     let value = this
-    let { document } = value
-    let node = document.assertNode(path)
-    document = document.insertText(path, offset, text)
-    node = document.assertNode(path)
-    value = value.set('document', document)
+    const { document, selection, annotations } = value
 
-    value = value.mapPoints(point => {
-      if (point.key === node.key && point.offset >= offset) {
-        return point.setOffset(point.offset + text.length)
-      } else {
-        return point
-      }
+    let sel = selection.isSet ? iterator(selection) : selection
+    if (!sel) sel = selection.unset()
+    if (sel !== selection) sel = document.createSelection(sel)
+    value = value.set('selection', sel)
+
+    let anns = annotations.map(annotation => {
+      let n = annotation.isSet ? iterator(annotation) : annotation
+      if (n && n !== annotation) n = document.createAnnotation(n)
+      return n
     })
 
+    anns = anns.filter(annotation => !!annotation)
+    value = value.set('annotations', anns)
     return value
   }
 
-  /**
-   * Merge a node backwards its previous sibling.
-   *
-   * @param {List|Key} path
-   * @return {Value}
-   */
+  mapPoints(iterator) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.mapPoints` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
+    return this.mapRanges(range => range.updatePoints(iterator))
+  }
 
   mergeNode(path) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.mergeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     const { document } = value
     const newDocument = document.mergeNode(path)
@@ -540,75 +523,46 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Move a node by `path` to `newPath`.
-   *
-   * A `newIndex` can be provided when move nodes by `key`, to account for not
-   * being able to have a key for a location in the tree that doesn't exist yet.
-   *
-   * @param {List|Key} path
-   * @param {List|Key} newPath
-   * @param {Number} newIndex
-   * @return {Value}
-   */
+  splitNode(path, position, properties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.splitNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
 
-  moveNode(path, newPath, newIndex = 0) {
     let value = this
-    let { document } = value
+    const { document } = value
+    const newDocument = document.splitNode(path, position, properties)
+    const node = document.assertNode(path)
+    value = value.set('document', newDocument)
 
-    if (PathUtils.isEqual(path, newPath)) {
-      return value
-    }
+    value = value.mapRanges(range => {
+      const next = newDocument.getNextText(node.key)
+      const { start, end } = range
 
-    document = document.moveNode(path, newPath, newIndex)
-    value = value.set('document', document)
-    value = value.mapPoints(point => point.setPath(null))
+      // If the start was after the split, move it to the next node.
+      if (node.key === start.key && position <= start.offset) {
+        range = range.moveStartTo(next.key, start.offset - position)
+      }
+
+      // If the end was after the split, move it to the next node.
+      if (node.key === end.key && position <= end.offset) {
+        range = range.moveEndTo(next.key, end.offset - position)
+      }
+
+      range = range.updatePoints(point => point.setPath(null))
+
+      return range
+    })
+
     return value
   }
-
-  /**
-   * Remove an `annotation` from the value.
-   *
-   * @param {Annotation} annotation
-   * @param {Mark} mark
-   * @return {Value}
-   */
-
-  removeAnnotation(annotation) {
-    annotation = Annotation.create(annotation)
-    let value = this
-    let { annotations } = value
-    const { key } = annotation
-    annotations = annotations.delete(key)
-    value = value.set('annotations', annotations)
-    return value
-  }
-
-  /**
-   * Remove `mark` at `path`.
-   *
-   * @param {List|String} path
-   * @param {Mark} mark
-   * @return {Value}
-   */
-
-  removeMark(path, mark) {
-    mark = Mark.create(mark)
-    let value = this
-    let { document } = value
-    document = document.removeMark(path, mark)
-    value = value.set('document', document)
-    return value
-  }
-
-  /**
-   * Remove a node by `path`.
-   *
-   * @param {List|String} path
-   * @return {Value}
-   */
 
   removeNode(path) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.removeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     let { document } = value
     const node = document.assertNode(path)
@@ -643,16 +597,31 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Remove `text` at `offset` in node by `path`.
-   *
-   * @param {List|Key} path
-   * @param {Number} offset
-   * @param {String} text
-   * @return {Value}
-   */
+  moveNode(path, newPath, newIndex = 0) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.moveNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
+    let value = this
+    let { document } = value
+
+    if (PathUtils.isEqual(path, newPath)) {
+      return value
+    }
+
+    document = document.moveNode(path, newPath, newIndex)
+    value = value.set('document', document)
+    value = value.mapPoints(point => point.setPath(null))
+    return value
+  }
 
   removeText(path, offset, text) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.removeText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     let { document } = value
     const node = document.assertNode(path)
@@ -682,15 +651,25 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Add an `annotation` to the value.
-   *
-   * @param {Annotation} annotation
-   * @param {Mark} mark
-   * @return {Value}
-   */
+  setNode(path, properties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.setNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
+    let value = this
+    let { document } = value
+    document = document.setNode(path, properties)
+    value = value.set('document', document)
+    return value
+  }
 
   setAnnotation(properties, newProperties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.setAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     newProperties = Annotation.createProperties(newProperties)
     const annotation = Annotation.create(properties)
     const next = annotation.merge(newProperties)
@@ -702,32 +681,12 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Set `properties` on a node.
-   *
-   * @param {List|String} path
-   * @param {Object} properties
-   * @return {Value}
-   */
-
-  setNode(path, properties) {
-    let value = this
-    let { document } = value
-    document = document.setNode(path, properties)
-    value = value.set('document', document)
-    return value
-  }
-
-  /**
-   * Set `properties` on `mark` on text at `offset` and `length` in node.
-   *
-   * @param {List|String} path
-   * @param {Mark} mark
-   * @param {Object} properties
-   * @return {Value}
-   */
-
   setMark(path, mark, properties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.setMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     let { document } = value
     document = document.setMark(path, mark, properties)
@@ -735,14 +694,12 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Set `properties` on the value.
-   *
-   * @param {Object} properties
-   * @return {Value}
-   */
-
   setProperties(properties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.setProperties` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     const { document } = value
     const { data, annotations } = properties
@@ -762,15 +719,12 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Set `properties` on the selection.
-   *
-   * @param {Value} value
-   * @param {Operation} operation
-   * @return {Value}
-   */
-
   setSelection(properties) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.setSelection` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
     let value = this
     let { document, selection } = value
     const next = selection.setProperties(properties)
@@ -779,109 +733,103 @@ class Value extends Record(DEFAULTS) {
     return value
   }
 
-  /**
-   * Split a node by `path` at `position` with optional `properties` to apply
-   * to the newly split node.
-   *
-   * @param {List|String} path
-   * @param {Number} position
-   * @param {Object} properties
-   * @return {Value}
-   */
+  removeAnnotation(annotation) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.removeAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
 
-  splitNode(path, position, properties) {
+    annotation = Annotation.create(annotation)
     let value = this
-    const { document } = value
-    const newDocument = document.splitNode(path, position, properties)
-    const node = document.assertNode(path)
-    value = value.set('document', newDocument)
+    let { annotations } = value
+    const { key } = annotation
+    annotations = annotations.delete(key)
+    value = value.set('annotations', annotations)
+    return value
+  }
 
-    value = value.mapRanges(range => {
-      const next = newDocument.getNextText(node.key)
-      const { start, end } = range
+  removeMark(path, mark) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.removeMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
 
-      // If the start was after the split, move it to the next node.
-      if (node.key === start.key && position <= start.offset) {
-        range = range.moveStartTo(next.key, start.offset - position)
-      }
+    mark = Mark.create(mark)
+    let value = this
+    let { document } = value
+    document = document.removeMark(path, mark)
+    value = value.set('document', document)
+    return value
+  }
 
-      // If the end was after the split, move it to the next node.
-      if (node.key === end.key && position <= end.offset) {
-        range = range.moveEndTo(next.key, end.offset - position)
-      }
+  addAnnotation(annotation) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.addAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
 
-      range = range.updatePoints(point => point.setPath(null))
+    annotation = Annotation.create(annotation)
+    let value = this
+    let { annotations } = value
+    const { key } = annotation
+    annotations = annotations.set(key, annotation)
+    value = value.set('annotations', annotations)
+    return value
+  }
 
-      return range
-    })
+  addMark(path, mark) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.addMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
+    mark = Mark.create(mark)
+    let value = this
+    let { document } = value
+    document = document.addMark(path, mark)
+    value = value.set('document', document)
+    return value
+  }
+
+  insertNode(path, node) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.insertNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
+
+    let value = this
+    let { document } = value
+    document = document.insertNode(path, node)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range =>
+      range.updatePoints(point => point.setPath(null))
+    )
 
     return value
   }
 
-  /**
-   * Map all range objects to apply adjustments with an `iterator`.
-   *
-   * @param {Function} iterator
-   * @return {Value}
-   */
+  insertText(path, offset, text) {
+    warning(
+      false,
+      'As of slate@0.48 the `value.insertText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+    )
 
-  mapRanges(iterator) {
     let value = this
-    const { document, selection, annotations } = value
+    let { document } = value
+    document = document.insertText(path, offset, text)
+    value = value.set('document', document)
 
-    let sel = selection.isSet ? iterator(selection) : selection
-    if (!sel) sel = selection.unset()
-    if (sel !== selection) sel = document.createSelection(sel)
-    value = value.set('selection', sel)
-
-    let anns = annotations.map(annotation => {
-      let n = annotation.isSet ? iterator(annotation) : annotation
-      if (n && n !== annotation) n = document.createAnnotation(n)
-      return n
+    value = value.mapPoints(point => {
+      if (point.path.equals(path) && point.offset >= offset) {
+        return point.setOffset(point.offset + text.length)
+      } else {
+        return point
+      }
     })
 
-    anns = anns.filter(annotation => !!annotation)
-    value = value.set('annotations', anns)
     return value
   }
-
-  mapPoints(iterator) {
-    return this.mapRanges(range => range.updatePoints(iterator))
-  }
-
-  /**
-   * Return a JSON representation of the value.
-   *
-   * @param {Object} options
-   * @return {Object}
-   */
-
-  toJSON(options = {}) {
-    const object = {
-      object: this.object,
-      document: this.document.toJSON(options),
-    }
-
-    if (options.preserveData) {
-      object.data = this.data.toJSON(options)
-    }
-
-    if (options.preserveAnnotations) {
-      object.annotations = this.annotations
-        .map(a => a.toJSON(options))
-        .toObject()
-    }
-
-    if (options.preserveSelection) {
-      object.selection = this.selection.toJSON(options)
-    }
-
-    return object
-  }
-
-  /**
-   * Deprecated.
-   */
 
   get history() {
     invariant(

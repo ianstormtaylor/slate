@@ -235,7 +235,10 @@ Commands.insertBlock = (editor, block) => {
 
   // If the node was successfully inserted, update the selection.
   const node = editor.value.document.getNode(block.key)
-  if (node) editor.moveToEndOfNode(node)
+
+  if (node) {
+    editor.moveToEndOfNode(node)
+  }
 }
 
 /**

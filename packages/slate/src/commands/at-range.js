@@ -4,6 +4,7 @@ import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
 import TextUtils from '../utils/text-utils'
+import PathUtils from '../utils/path-utils'
 
 /**
  * Ensure that an expanded selection is deleted first, and return the updated
@@ -47,26 +48,33 @@ const Commands = {}
  */
 
 Commands.addMarkAtRange = (editor, range, mark) => {
-  if (range.isCollapsed) return
+  if (range.isCollapsed) {
+    return
+  }
 
   const { value } = editor
   const { document } = value
   const { start, end } = range
-  const texts = document.getTextsAtRange(range)
 
   editor.withoutNormalizing(() => {
-    texts.forEach(node => {
-      const { key } = node
+    for (const [node, path] of document.texts({ range })) {
       let index = 0
       let length = node.text.length
 
-      if (key === start.key) index = start.offset
-      if (key === end.key) length = end.offset
-      if (key === start.key && key === end.key)
-        length = end.offset - start.offset
+      if (path.equals(start.path)) {
+        index = start.offset
+      }
 
-      editor.addMarkByKey(key, index, length, mark)
-    })
+      if (path.equals(end.path)) {
+        length = end.offset
+      }
+
+      if (path.equals(start.path) && path.equals(end.path)) {
+        length = end.offset - start.offset
+      }
+
+      editor.addMarkByPath(path, index, length, mark)
+    }
   })
 }
 
@@ -869,16 +877,19 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
     const { value } = editor
     const { document } = value
     const { start } = range
-    const parent = document.getParent(start.path)
-    const startText = document.assertDescendant(start.path)
-    const index = parent.nodes.indexOf(startText)
+
+    document.assertDescendant(start.path)
+
+    const parentPath = PathUtils.lift(start.path)
+    const index = start.path.last()
+    const parent = document.getNode(parentPath)
 
     if (editor.isVoid(parent)) {
       return
     }
 
     editor.splitNodeByPath(start.path, start.offset)
-    editor.insertNodeByKey(parent.key, index + 1, inline)
+    editor.insertNodeByPath(parentPath, index + 1, inline)
   })
 }
 
@@ -918,26 +929,37 @@ Commands.insertTextAtRange = (editor, range, text, marks) => {
  */
 
 Commands.removeMarkAtRange = (editor, range, mark) => {
-  if (range.isCollapsed) return
+  if (range.isCollapsed) {
+    return
+  }
 
   const { value } = editor
   const { document } = value
-  const texts = document.getTextsAtRange(range)
   const { start, end } = range
 
   editor.withoutNormalizing(() => {
-    texts.forEach(node => {
-      const { key } = node
-      let index = 0
-      let length = node.text.length
+    for (const [node, path] of document.texts({ range })) {
+      const isStart = path.equals(start.path)
+      const isEnd = path.equals(end.path)
+      let index
+      let length
 
-      if (key === start.key) index = start.offset
-      if (key === end.key) length = end.offset
-      if (key === start.key && key === end.key)
+      if (isStart && isEnd) {
+        index = start.offset
         length = end.offset - start.offset
+      } else if (isStart) {
+        index = start.offset
+        length = node.text.length - start.offset
+      } else if (isEnd) {
+        index = 0
+        length = end.offset
+      } else {
+        index = 0
+        length = node.text.length
+      }
 
-      editor.removeMarkByKey(key, index, length, mark)
-    })
+      editor.removeMarkByPath(path, index, length, mark)
+    }
   })
 }
 
@@ -957,7 +979,7 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
   const { start, end, isCollapsed } = range
   const isStartVoid = document.hasVoidParent(start.path, editor)
   const startBlock = document.getClosestBlock(start.path)
-  const endBlock = document.getClosestBlock(end.key)
+  const endBlock = document.getClosestBlock(end.path)
 
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
@@ -991,12 +1013,11 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
 Commands.setInlinesAtRange = (editor, range, properties) => {
   const { value } = editor
   const { document } = value
-  const inlines = document.getLeafInlinesAtRange(range)
 
   editor.withoutNormalizing(() => {
-    inlines.forEach(inline => {
-      editor.setNodeByKey(inline.key, properties)
-    })
+    for (const [, path] of document.inlines({ range, onlyLeaves: true })) {
+      editor.setNodeByPath(path, properties)
+    }
   })
 }
 
@@ -1031,7 +1052,10 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
     document = value.document
 
     if (range.isExpanded) {
-      if (range.isBackward) range = range.flip()
+      if (range.isBackward) {
+        range = range.flip()
+      }
+
       const nextBlock = document.getNextBlock(node.key)
       range = range.moveAnchorToStartOfNode(nextBlock)
       range = range.setFocus(range.focus.setPath(null))
@@ -1256,7 +1280,9 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   }
 
   // If no shared parent could be found then the parent is the document.
-  if (parent == null) parent = document
+  if (parent == null) {
+    parent = document
+  }
 
   // Create a list of direct children siblings of parent that fall in the
   // selection.

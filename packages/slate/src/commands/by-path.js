@@ -38,6 +38,11 @@ Commands.addMarksByPath = (editor, path, offset, length, marks) => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
+  marks = marks.subtract(node.marks)
+
+  if (!marks.size) {
+    return
+  }
 
   editor.withoutNormalizing(() => {
     // If it ends before the end of the node, we'll need to split to create a new
@@ -236,6 +241,11 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
+  marks = marks.intersect(node.marks)
+
+  if (!marks.size) {
+    return
+  }
 
   editor.withoutNormalizing(() => {
     // If it ends before the end of the node, we'll need to split to create a new
