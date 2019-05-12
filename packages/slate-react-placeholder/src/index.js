@@ -74,7 +74,6 @@ function SlateReactPlaceholder(options = {}) {
     const { children, decoration: deco } = props
 
     if (deco.type === 'placeholder' && deco.data.get('key') === instanceId) {
-      console.log('[render placeholder]');
       const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
