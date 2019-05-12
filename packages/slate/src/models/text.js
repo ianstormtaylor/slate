@@ -186,6 +186,16 @@ class Text extends Record(DEFAULTS) {
           const offset = o
           o += length
 
+          // If `type` is `placeholder`, we can be sure that there
+          // are no other leaves and it's safe to bail out early.
+          // This step is necessary (for now), otherwise placeholder
+          // decoration won't be added to leaf and doesn't render.
+          if (format.type === 'placeholder') {
+            leaf[kind].push(format)
+            next.push(leaf)
+            continue
+          }
+
           // If the range starts after the leaf, or ends before it, continue.
           if (start.offset > offset + length || end.offset <= offset) {
             next.push(leaf)
