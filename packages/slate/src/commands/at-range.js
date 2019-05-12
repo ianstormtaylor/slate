@@ -417,11 +417,11 @@ Commands.deleteCharBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
-  const { text } = startBlock
-  const n = TextUtils.getCharOffsetBackward(text, o)
+  const n = TextUtils.getCharOffsetBackward(block.text, o)
   editor.deleteBackwardAtRange(range, n)
 }
 
@@ -441,11 +441,11 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
-  const { text } = startBlock
-  const n = TextUtils.getCharOffsetForward(text, o)
+  const n = TextUtils.getCharOffsetForward(block.text, o)
   editor.deleteForwardAtRange(range, n)
 }
 
@@ -458,7 +458,10 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
  */
 
 Commands.deleteForwardAtRange = (editor, range, n = 1) => {
-  if (n === 0) return
+  if (n === 0) {
+    return
+  }
+
   const { value } = editor
   const { document } = value
   const { start, focus } = range
@@ -571,8 +574,9 @@ Commands.deleteLineBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
   editor.deleteBackwardAtRange(range, o)
 }
@@ -593,10 +597,11 @@ Commands.deleteLineForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
-  editor.deleteForwardAtRange(range, startBlock.text.length - o)
+  editor.deleteForwardAtRange(range, block.text.length - o)
 }
 
 /**
@@ -615,11 +620,11 @@ Commands.deleteWordBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
-  const { text } = startBlock
-  const n = o === 0 ? 1 : TextUtils.getWordOffsetBackward(text, o)
+  const n = o === 0 ? 1 : TextUtils.getWordOffsetBackward(block.text, o)
   editor.deleteBackwardAtRange(range, n)
 }
 
@@ -639,11 +644,11 @@ Commands.deleteWordForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const offset = startBlock.getOffset(start.key)
+  const [block, path] = document.closestBlock(start.path)
+  const relativePath = start.path.slice(path.size)
+  const offset = block.getOffset(relativePath)
   const o = offset + start.offset
-  const { text } = startBlock
-  const wordOffset = TextUtils.getWordOffsetForward(text, o)
+  const wordOffset = TextUtils.getWordOffsetForward(block.text, o)
   const n = wordOffset === 0 ? 1 : wordOffset
   editor.deleteForwardAtRange(range, n)
 }
@@ -1080,21 +1085,22 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
 
 Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
   range = deleteExpandedAtRange(editor, range)
-
   const { start } = range
   const { value } = editor
   const { document } = value
-  let node = document.assertDescendant(start.path)
-  let parent = document.getClosestInline(node.key)
   let h = 0
+  let targetPath
 
-  while (parent && parent.object === 'inline' && h < height) {
-    node = parent
-    parent = document.getClosestInline(parent.key)
-    h++
+  for (const [node, path] of document.ancestors(start.path)) {
+    if (node.object === 'inline' && h < height) {
+      targetPath = path
+      h++
+    } else {
+      break
+    }
   }
 
-  editor.splitDescendantsByKey(node.key, start.path, start.offset)
+  editor.splitDescendantsByPath(targetPath, start.path, start.offset)
 }
 
 /**
