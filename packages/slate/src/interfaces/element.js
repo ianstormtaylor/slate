@@ -37,22 +37,6 @@ class ElementInterface {
   }
 
   /**
-   * Add `mark` to text at `path`.
-   *
-   * @param {List|String} path
-   * @param {Mark} mark
-   * @return {Node}
-   */
-
-  addMark(path, mark) {
-    path = this.resolvePath(path)
-    let node = this.assertDescendant(path)
-    node = node.addMark(mark)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
    * Create an iteratable for all of the ancestors of the node.
    *
    * @return {Iterable}
@@ -732,20 +716,37 @@ class ElementInterface {
 
     const { start, end } = range
     let node = this
-    let targetPath = end.path
-    let targetPosition = end.offset
-    let side = 'end'
+    let target = end
+    let path = target.path
+    let position = target.offset
 
-    while (targetPath.size) {
-      const index = targetPath.last()
-      node = node.splitNode(targetPath, targetPosition)
-      targetPosition = index + 1
-      targetPath = PathUtils.lift(targetPath)
+    while (path.size) {
+      const index = path.last()
+      const child = node.assertNode(path)
+      const parentPath = PathUtils.lift(path)
+      const parent = node.assertNode(parentPath)
+      let a
+      let b
 
-      if (!targetPath.size && side === 'end') {
-        targetPath = start.path
-        targetPosition = start.offset
-        side = 'start'
+      if (child.object === 'text') {
+        ;[a, b] = child.splitText(position)
+      } else {
+        const befores = child.nodes.take(position)
+        const afters = child.nodes.skip(position)
+        a = child.set('nodes', befores)
+        b = child.set('nodes', afters).regenerateKey()
+      }
+
+      const newParentNodes = parent.nodes.splice(index, 1, a, b)
+      const newParent = parent.set('nodes', newParentNodes)
+      node = node.replaceNode(parentPath, newParent)
+      position = index + 1
+      path = PathUtils.lift(path)
+
+      if (!path.size && target === end) {
+        target = start
+        path = target.path
+        position = target.offset
       }
     }
 
@@ -1377,42 +1378,6 @@ class ElementInterface {
   }
 
   /**
-   * Insert a `node`.
-   *
-   * @param {List|String} path
-   * @param {Node} node
-   * @return {Node}
-   */
-
-  insertNode(path, node) {
-    path = this.resolvePath(path)
-    const index = path.last()
-    const parentPath = PathUtils.lift(path)
-    let parent = this.assertNode(parentPath)
-    const nodes = parent.nodes.splice(index, 0, node)
-    parent = parent.set('nodes', nodes)
-    const ret = this.replaceNode(parentPath, parent)
-    return ret
-  }
-
-  /**
-   * Insert `text` at `offset` in node by `path`.
-   *
-   * @param {List|String} path
-   * @param {Number} offset
-   * @param {String} text
-   * @return {Node}
-   */
-
-  insertText(path, offset, text) {
-    path = this.resolvePath(path)
-    let node = this.assertDescendant(path)
-    node = node.insertText(offset, text)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
    * Check whether the node is a leaf block.
    *
    * @return {Boolean}
@@ -1562,127 +1527,6 @@ class ElementInterface {
   }
 
   /**
-   * Merge a node backwards its previous sibling.
-   *
-   * @param {List|Key} path
-   * @return {Node}
-   */
-
-  mergeNode(path) {
-    const b = this.assertNode(path)
-    path = this.resolvePath(path)
-
-    if (path.last() === 0) {
-      throw new Error(
-        `Unable to merge node because it has no previous sibling: ${b}`
-      )
-    }
-
-    const withPath = PathUtils.decrement(path)
-    const a = this.assertNode(withPath)
-
-    if (a.object !== b.object) {
-      throw new Error(
-        `Unable to merge two different kinds of nodes: ${a} and ${b}`
-      )
-    }
-
-    const newNode =
-      a.object === 'text'
-        ? a.mergeText(b)
-        : a.set('nodes', a.nodes.concat(b.nodes))
-
-    let ret = this
-    ret = ret.removeNode(path)
-    ret = ret.removeNode(withPath)
-    ret = ret.insertNode(withPath, newNode)
-    return ret
-  }
-
-  /**
-   * Move a node by `path` to `newPath`.
-   *
-   * A `newIndex` can be provided when move nodes by `key`, to account for not
-   * being able to have a key for a location in the tree that doesn't exist yet.
-   *
-   * @param {List|Key} path
-   * @param {List|Key} newPath
-   * @param {Number} newIndex
-   * @return {Node}
-   */
-
-  moveNode(path, newPath, newIndex = 0) {
-    const node = this.assertNode(path)
-    path = this.resolvePath(path)
-    newPath = this.resolvePath(newPath, newIndex)
-
-    const newParentPath = PathUtils.lift(newPath)
-    this.assertNode(newParentPath)
-
-    // TODO: this is a bit hacky, re-creating the operation that led to this method being called
-    // Alternative 1: pass the operation through from apply -> value.moveNode
-    // Alternative 2: add a third property to the operation called "transformedNewPath", pass that through
-    const op = Operation.create({
-      type: 'move_node',
-      path,
-      newPath,
-    })
-    newPath = PathUtils.transform(path, op).first()
-
-    let ret = this
-    ret = ret.removeNode(path)
-    ret = ret.insertNode(newPath, node)
-    return ret
-  }
-
-  /**
-   * Remove `mark` from text at `path`.
-   *
-   * @param {List} path
-   * @param {Mark} mark
-   * @return {Node}
-   */
-
-  removeMark(path, mark) {
-    path = this.resolvePath(path)
-    let node = this.assertDescendant(path)
-    node = node.removeMark(mark)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
-   * Remove a node.
-   *
-   * @param {List|String} path
-   * @return {Node}
-   */
-
-  removeNode(path) {
-    this.assertDescendant(path)
-    path = this.resolvePath(path)
-    const deep = path.flatMap(x => ['nodes', x])
-    const ret = this.deleteIn(deep)
-    return ret
-  }
-
-  /**
-   * Remove `text` at `offset` in node.
-   *
-   * @param {List|Key} path
-   * @param {Number} offset
-   * @param {String} text
-   * @return {Node}
-   */
-
-  removeText(path, offset, text) {
-    let node = this.assertDescendant(path)
-    node = node.removeText(offset, text.length)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
    * Replace a `node` in the tree.
    *
    * @param {List|Key} path
@@ -1777,40 +1621,6 @@ class ElementInterface {
   }
 
   /**
-   * Set `properties` on a node.
-   *
-   * @param {List|String} path
-   * @param {Object} properties
-   * @return {Node}
-   */
-
-  setNode(path, properties) {
-    let node = this.assertNode(path)
-    node = node.merge(properties)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
-   * Set `properties` on `mark` on text at `offset` and `length` in node.
-   *
-   * @param {List|String} path
-   * @param {Number} offset
-   * @param {Number} length
-   * @param {Mark} mark
-   * @param {Object} properties
-   * @return {Node}
-   */
-
-  setMark(path, properties, newProperties) {
-    path = this.resolvePath(path)
-    let node = this.assertDescendant(path)
-    node = node.setMark(properties, newProperties)
-    const ret = this.replaceNode(path, node)
-    return ret
-  }
-
-  /**
    * Create an iteratable for the siblings in the tree at `path`.
    *
    * @param {List|Array} path
@@ -1826,42 +1636,6 @@ class ElementInterface {
     })
 
     return iterable
-  }
-
-  /**
-   * Split a node by `path` at `position` with optional `properties` to apply
-   * to the newly split node.
-   *
-   * @param {List|String} path
-   * @param {Number} position
-   * @param {Object} properties
-   * @return {Node}
-   */
-
-  splitNode(path, position, properties) {
-    const child = this.assertNode(path)
-    path = this.resolvePath(path)
-    let a
-    let b
-
-    if (child.object === 'text') {
-      ;[a, b] = child.splitText(position)
-    } else {
-      const befores = child.nodes.take(position)
-      const afters = child.nodes.skip(position)
-      a = child.set('nodes', befores)
-      b = child.set('nodes', afters).regenerateKey()
-    }
-
-    if (properties && child.object !== 'text') {
-      b = b.merge(properties)
-    }
-
-    let ret = this
-    ret = ret.removeNode(path)
-    ret = ret.insertNode(path, b)
-    ret = ret.insertNode(path, a)
-    return ret
   }
 
   /**
@@ -1919,9 +1693,208 @@ class ElementInterface {
     return first
   }
 
+  firstBlock(options) {
+    const [first] = this.blocks(options)
+    return first
+  }
+
   lastText() {
     const [last] = this.texts({ direction: 'backward' })
     return last
+  }
+
+  closest(path, predicate) {
+    for (const [n, p] of this.ancestors(path)) {
+      if (predicate(n, p)) {
+        return [n, p]
+      }
+    }
+
+    return null
+  }
+
+  closestBlock(path) {
+    const closest = this.closest(path, n => n.object === 'block')
+    return closest
+  }
+
+  closestInline(path) {
+    const closest = this.closest(path, n => n.object === 'inline')
+    return closest
+  }
+
+  closestVoid(path, editor) {
+    const closest = this.closest(path, n => editor.isVoid(n))
+    return closest
+  }
+
+  furthest(path, predicate = identity) {
+    const iterable = this.ancestors(path)
+    const results = Array.from(iterable).reverse()
+
+    for (const [n, p] of results) {
+      if (predicate(n, p)) {
+        return [n, p]
+      }
+    }
+
+    return null
+  }
+
+  furthestBlock(path) {
+    const furthest = this.furthest(path, n => n.object === 'block')
+    return furthest
+  }
+
+  furthestInline(path) {
+    const furthest = this.furthest(path, n => n.object === 'inline')
+    return furthest
+  }
+
+  addMark(path, mark) {
+    path = this.resolvePath(path)
+    let node = this.assertDescendant(path)
+    node = node.addMark(mark)
+    const ret = this.replaceNode(path, node)
+    return ret
+  }
+
+  setNode(path, properties) {
+    let node = this.assertNode(path)
+    node = node.merge(properties)
+    const ret = this.replaceNode(path, node)
+    return ret
+  }
+
+  setMark(path, properties, newProperties) {
+    path = this.resolvePath(path)
+    let node = this.assertDescendant(path)
+    node = node.setMark(properties, newProperties)
+    const ret = this.replaceNode(path, node)
+    return ret
+  }
+
+  splitNode(path, position, properties) {
+    const child = this.assertNode(path)
+    path = this.resolvePath(path)
+    let a
+    let b
+
+    if (child.object === 'text') {
+      ;[a, b] = child.splitText(position)
+    } else {
+      const befores = child.nodes.take(position)
+      const afters = child.nodes.skip(position)
+      a = child.set('nodes', befores)
+      b = child.set('nodes', afters).regenerateKey()
+    }
+
+    if (properties && child.object !== 'text') {
+      b = b.merge(properties)
+    }
+
+    let ret = this
+    ret = ret.removeNode(path)
+    ret = ret.insertNode(path, b)
+    ret = ret.insertNode(path, a)
+    return ret
+  }
+
+  insertNode(path, node) {
+    path = this.resolvePath(path)
+    const index = path.last()
+    const parentPath = PathUtils.lift(path)
+    let parent = this.assertNode(parentPath)
+    const nodes = parent.nodes.splice(index, 0, node)
+    parent = parent.set('nodes', nodes)
+    const ret = this.replaceNode(parentPath, parent)
+    return ret
+  }
+
+  insertText(path, offset, text) {
+    path = this.resolvePath(path)
+    let node = this.assertDescendant(path)
+    node = node.insertText(offset, text)
+    const ret = this.replaceNode(path, node)
+    return ret
+  }
+
+  mergeNode(path) {
+    const b = this.assertNode(path)
+    path = this.resolvePath(path)
+
+    if (path.last() === 0) {
+      throw new Error(
+        `Unable to merge node because it has no previous sibling: ${b}`
+      )
+    }
+
+    const withPath = PathUtils.decrement(path)
+    const a = this.assertNode(withPath)
+
+    if (a.object !== b.object) {
+      throw new Error(
+        `Unable to merge two different kinds of nodes: ${a} and ${b}`
+      )
+    }
+
+    const newNode =
+      a.object === 'text'
+        ? a.mergeText(b)
+        : a.set('nodes', a.nodes.concat(b.nodes))
+
+    let ret = this
+    ret = ret.removeNode(path)
+    ret = ret.removeNode(withPath)
+    ret = ret.insertNode(withPath, newNode)
+    return ret
+  }
+
+  moveNode(path, newPath, newIndex = 0) {
+    const node = this.assertNode(path)
+    path = this.resolvePath(path)
+    newPath = this.resolvePath(newPath, newIndex)
+
+    const newParentPath = PathUtils.lift(newPath)
+    this.assertNode(newParentPath)
+
+    // TODO: this is a bit hacky, re-creating the operation that led to this method being called
+    // Alternative 1: pass the operation through from apply -> value.moveNode
+    // Alternative 2: add a third property to the operation called "transformedNewPath", pass that through
+    const op = Operation.create({
+      type: 'move_node',
+      path,
+      newPath,
+    })
+    newPath = PathUtils.transform(path, op).first()
+
+    let ret = this
+    ret = ret.removeNode(path)
+    ret = ret.insertNode(newPath, node)
+    return ret
+  }
+
+  removeMark(path, mark) {
+    path = this.resolvePath(path)
+    let node = this.assertDescendant(path)
+    node = node.removeMark(mark)
+    const ret = this.replaceNode(path, node)
+    return ret
+  }
+
+  removeNode(path) {
+    this.assertDescendant(path)
+    path = this.resolvePath(path)
+    const deep = path.flatMap(x => ['nodes', x])
+    const ret = this.deleteIn(deep)
+    return ret
+  }
+
+  removeText(path, offset, text) {
+    let node = this.assertDescendant(path)
+    node = node.removeText(offset, text.length)
+    const ret = this.replaceNode(path, node)
+    return ret
   }
 
   /**
