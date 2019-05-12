@@ -552,7 +552,7 @@ function AfterPlugin(options = {}) {
 
     if (Hotkeys.isExtendBackward(event)) {
       const startText = document.getNode(start.path)
-      const prevEntry = document.texts({
+      const [prevEntry] = document.texts({
         path: start.path,
         direction: 'backward',
       })
