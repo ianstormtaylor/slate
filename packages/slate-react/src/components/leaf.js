@@ -206,7 +206,10 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     next.parent === prev.parent &&
     next.block === prev.block &&
     next.annotations.equals(prev.annotations) &&
-    next.decorations.equals(prev.decorations)
+    next.decorations.equals(prev.decorations) &&
+    // This is necessary for rerendering leaves when only
+    // content changes, e.g first leaf on search highlight.
+    next.text === prev.text
   )
 })
 
