@@ -9,9 +9,7 @@ export default function(editor) {
         <quote>one</quote>
         <quote>two</quote>
       </quote>
-      <paragraph>
-        after quote
-      </paragraph>
+      <paragraph>after quote</paragraph>
     </document>
   )
 }
@@ -29,9 +27,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        word
-      </paragraph>
+      <paragraph>word</paragraph>
       <quote>
         <quote>one</quote>
         <quote>two</quote>

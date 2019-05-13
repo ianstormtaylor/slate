@@ -700,7 +700,7 @@ const getInsertionMode = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  let startKey = start.key
+  const startKey = start.key
   const startBlock = document.getClosestBlock(startKey)
   const startInline = document.getClosestInline(startKey)
 
@@ -771,6 +771,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
       const insertionMode = getInsertionMode(editor, range)
       const nodes =
         insertionMode === 'before' ? fragment.nodes : fragment.nodes.reverse()
+
       nodes.forEach(node => {
         editor.insertBlockAtRange(range, node)
       })
