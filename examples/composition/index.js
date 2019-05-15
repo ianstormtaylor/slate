@@ -8,7 +8,7 @@ import splitJoin from './split-join.js'
 import insert from './insert.js'
 import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Toolbar } from '../components'
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
@@ -72,45 +72,6 @@ const Version = props => (
     `}
   />
 )
-
-const EditorText = props => (
-  <div
-    {...props}
-    className={css`
-      color: #808080;
-      background: #f0f0f0;
-      font: 12px monospace;
-      white-space: pre-wrap;
-      margin: 1em -1em;
-      padding: 0.5em;
-
-      div {
-        margin: 0 0 0.5em;
-      }
-    `}
-  />
-)
-
-const EditorTextCaption = props => (
-  <div
-    {...props}
-    className={css`
-      color: white;
-      background: #808080;
-      padding: 0.5em;
-    `}
-  />
-)
-
-/**
- * Extract lines of text from `Value`
- *
- * @return {String[]}
- */
-
-function getTextLines(value) {
-  return value.document.nodes.map(node => node.text).toArray()
-}
 
 /**
  * Subpages which are each a smoke test.
@@ -210,7 +171,7 @@ class RichTextExample extends React.Component {
   render() {
     const { text } = this.state
     if (text == null) return <Redirect to="/composition/split-join" />
-    const textLines = getTextLines(this.state.value)
+    // const textLines = getTextLines(this.state.value)
     return (
       <div>
         <Instruction>
@@ -257,12 +218,7 @@ class RichTextExample extends React.Component {
           renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
-        <EditorText>
-          <EditorTextCaption>Text in Slate's `Value`</EditorTextCaption>
-          {textLines.map((line, index) => (
-            <div key={index}>{line.length > 0 ? line : ' '}</div>
-          ))}
-        </EditorText>
+        <EditorValue value={this.state.value} />
       </div>
     )
   }
