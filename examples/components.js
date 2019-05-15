@@ -19,6 +19,43 @@ export const Button = React.forwardRef(
   )
 )
 
+export const EditorValue = React.forwardRef(({ value, ...props }, ref) => {
+  const textLines = value.document.nodes
+    .map(node => node.text)
+    .toArray()
+    .join('\n')
+  return (
+    <div {...props}>
+      <div
+        className={css`
+          margin: 1em 0 0;
+          font-size: 14px;
+          padding: 0.5em 1em;
+          color: #404040;
+          background: #e0e0e0;
+        `}
+      >
+        Slate's value as text
+      </div>
+      <div
+        {...props}
+        className={css`
+          color: #404040;
+          background: #f0f0f0;
+          font: 12px monospace;
+          white-space: pre-wrap;
+          padding: 1em;
+          div {
+            margin: 0 0 0.5em;
+          }
+        `}
+      >
+        {textLines}
+      </div>
+    </div>
+  )
+})
+
 export const Icon = React.forwardRef(({ className, ...props }, ref) => (
   <span
     {...props}
