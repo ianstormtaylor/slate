@@ -53,6 +53,7 @@ class Content extends React.Component {
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
     className: Types.string,
+    contentKey: Types.number,
     editor: Types.object.isRequired,
     id: Types.string,
     readOnly: Types.bool.isRequired,
@@ -486,6 +487,7 @@ class Content extends React.Component {
 
     return (
       <Container
+        key={this.props.contentKey}
         {...handlers}
         {...data}
         ref={this.ref}
