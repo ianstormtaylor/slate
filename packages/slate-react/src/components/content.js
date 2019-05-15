@@ -93,7 +93,7 @@ class Content extends React.Component {
    */
 
   componentDidCatch(error, info) {
-    debug('componentDidCatch', error, info)
+    debug('componentDidCatch', { error, info })
     this.setState({ errorKey: this.state.errorKey + 1 })
   }
 
