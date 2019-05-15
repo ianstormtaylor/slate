@@ -59,6 +59,7 @@ class RestoreDOMExample extends React.Component {
           {this.renderHighlightButton('#ffffcc')}
           {this.renderHighlightButton('#ccffcc')}
           {this.renderHighlightButton('#ccffff')}
+          {this.renderCorruptButton()}
         </Toolbar>
         <Editor
           spellCheck
@@ -68,6 +69,7 @@ class RestoreDOMExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           renderBlock={this.renderBlock}
+          renderMark={this.renderMark}
         />
       </div>
     )
@@ -89,6 +91,25 @@ class RestoreDOMExample extends React.Component {
         style={{ backgroundColor: bgcolor }}
       >
         <Icon>format_paint</Icon>
+      </Button>
+    )
+  }
+
+  /**
+   * Render a button to corrupt the DOM
+   *
+   *@return {Element}
+   */
+
+  renderCorruptButton = () => {
+    function corrupt() {
+      const boldEl = document.querySelector('[data-bold]')
+      const el = boldEl.closest('[data-slate-object="text"]') //boldEl.parentNode.parentNode
+      el.parentNode.removeChild(el)
+    }
+    return (
+      <Button onMouseDown={corrupt}>
+        <Icon>error_outline</Icon>
       </Button>
     )
   }
@@ -122,6 +143,29 @@ class RestoreDOMExample extends React.Component {
           <p {...attributes} style={style}>
             {children}
           </p>
+        )
+      default:
+        return next()
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
+    switch (mark.type) {
+      case 'bold':
+        // Added `data-bold` so we can find bold text with `querySelector`
+        return (
+          <strong {...attributes} data-bold>
+            {children}
+          </strong>
         )
       default:
         return next()
