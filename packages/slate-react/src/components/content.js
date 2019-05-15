@@ -93,8 +93,7 @@ class Content extends React.Component {
    */
 
   componentDidCatch(error, info) {
-    console.error(error, info)
-    console.log('Encountered error above and will re-render from clean DOM')
+    debug('componentDidCatch', error, info)
     this.setState({ errorKey: this.state.errorKey + 1 })
   }
 

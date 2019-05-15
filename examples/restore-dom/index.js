@@ -102,9 +102,14 @@ class RestoreDOMExample extends React.Component {
    */
 
   renderCorruptButton = () => {
+    /**
+     * Corrupt the DOM by forcibly deleting the first instance we can find
+     * of the `bold` text in the DOM.
+     */
+
     function corrupt() {
-      const boldEl = document.querySelector('[data-bold]')
-      const el = boldEl.closest('[data-slate-object="text"]') //boldEl.parentNode.parentNode
+      const boldEl = window.document.querySelector('[data-bold]')
+      const el = boldEl.closest('[data-slate-object="text"]')
       el.parentNode.removeChild(el)
     }
     return (
