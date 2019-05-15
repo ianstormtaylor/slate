@@ -3,16 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
-import { isKeyHotkey } from 'is-hotkey'
 import { Button, Icon, Toolbar } from '../components'
-
-/**
- * Define the default node type.
- *
- * @type {String}
- */
-
-const DEFAULT_NODE = 'paragraph'
 
 /**
  * The Restore DOM example.

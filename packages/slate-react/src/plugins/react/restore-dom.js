@@ -6,6 +6,7 @@ function RestoreDOMPlugin() {
    *
    * @param {Editor} editor
    */
+
   function restoreDOM(editor) {
     editor.setState({ contentKey: editor.state.contentKey + 1 })
   }
