@@ -76,6 +76,29 @@ class Content extends React.Component {
   }
 
   /**
+   * Initial state.
+   *
+   * @type {Object}
+   */
+
+  state = { errorKey: 0 }
+
+  /**
+   * An error boundary. If there is a render error, we increment `errorKey`
+   * which is part of the container `key` which forces a re-render from
+   * scratch.
+   *
+   * @param {Error} error
+   * @param {String} info
+   */
+
+  componentDidCatch(error, info) {
+    console.error(error, info)
+    console.log('Encountered error above and will re-render from clean DOM')
+    this.setState({ errorKey: this.state.errorKey + 1 })
+  }
+
+  /**
    * Temporary values.
    *
    * @type {Object}
@@ -480,6 +503,8 @@ class Content extends React.Component {
 
     debug('render', { props })
 
+    const key = `${this.props.contentKey}:${this.state.errorKey}`
+
     const data = {
       [DATA_ATTRS.EDITOR]: true,
       [DATA_ATTRS.KEY]: document.key,
@@ -487,7 +512,7 @@ class Content extends React.Component {
 
     return (
       <Container
-        key={this.props.contentKey}
+        key={key}
         {...handlers}
         {...data}
         ref={this.ref}
