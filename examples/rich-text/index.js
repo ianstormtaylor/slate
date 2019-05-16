@@ -124,7 +124,7 @@ class RichTextExample extends React.Component {
 
     return (
       <Button
-        active={isActive}
+        active={isActive.toString()}
         onMouseDown={event => this.onClickMark(event, type)}
       >
         <Icon>{icon}</Icon>
@@ -154,7 +154,7 @@ class RichTextExample extends React.Component {
 
     return (
       <Button
-        active={isActive}
+        active={isActive.toString()}
         onMouseDown={event => this.onClickBlock(event, type)}
       >
         <Icon>{icon}</Icon>
