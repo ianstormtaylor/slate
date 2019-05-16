@@ -2,14 +2,14 @@ export function p(...leaves) {
   return {
     object: 'block',
     type: 'paragraph',
-    nodes: [{ object: 'text', leaves }],
+    nodes: leaves,
   }
 }
 
 export function text(textContent) {
-  return { text: textContent }
+  return { object: 'text', text: textContent }
 }
 
 export function bold(textContent) {
-  return { text: textContent, marks: [{ type: 'bold' }] }
+  return { object: 'text', text: textContent, marks: [{ type: 'bold' }] }
 }
