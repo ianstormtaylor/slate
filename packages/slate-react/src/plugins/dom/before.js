@@ -271,7 +271,7 @@ function BeforePlugin() {
     // default, and calling `preventDefault` hides the cursor.
     const node = editor.findNode(event.target)
 
-    if (editor.isVoid(node)) {
+    if (!node || editor.isVoid(node)) {
       event.preventDefault()
     }
 
