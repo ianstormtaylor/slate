@@ -3,7 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
-import { Button, EditorValue, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
 
 /**
  * The Restore DOM example.
@@ -53,6 +53,19 @@ class RestoreDOMExample extends React.Component {
   render() {
     return (
       <div>
+        <Instruction>
+          <ol>
+            <li>
+              Click a brush to change color in state. Use refresh button to
+              `restoreDOM` which renders changes.
+            </li>
+            <li>
+              Press `!` button to corrupt DOM by removing `bold`. Backspace from
+              start of `text` 5 times. Console will show error but Slate will
+              recover by restoring DOM.
+            </li>
+          </ol>
+        </Instruction>
         <Toolbar>
           {this.renderHighlightButton('#ffeecc')}
           {this.renderHighlightButton('#ffffcc')}
