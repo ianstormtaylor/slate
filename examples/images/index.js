@@ -181,7 +181,7 @@ class Images extends React.Component {
    */
 
   onDropOrPaste = (event, editor, next) => {
-    const target = getEventRange(event, editor)
+    const target = editor.findEventRange(event)
     if (!target && event.type === 'drop') return next()
 
     const transfer = getEventTransfer(event)
