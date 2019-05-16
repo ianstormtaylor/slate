@@ -178,7 +178,9 @@ function QueriesPlugin() {
 
       const range = document.createRange()
       const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
-      const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](path)
+      const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](
+        path
+      )
 
       if (entry) {
         return range[move](entry)
@@ -235,7 +237,8 @@ function QueriesPlugin() {
     if (!nodeElement.hasAttribute(DATA_ATTRS.KEY)) {
       nodeElement = nodeElement.closest(SELECTORS.KEY)
     }
-    if(!nodeElement || !nodeElement.getAttribute(DATA_ATTRS.KEY)) {
+
+    if (!nodeElement || !nodeElement.getAttribute(DATA_ATTRS.KEY)) {
       return null
     }
 
