@@ -8,7 +8,7 @@ import splitJoin from './split-join.js'
 import insert from './insert.js'
 import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
-import { Button, EditorValue, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
@@ -25,23 +25,11 @@ const DEFAULT_NODE = 'paragraph'
  * @type {Component}
  */
 
-const Instruction = props => (
-  <div
-    {...props}
-    className={css`
-      white-space: pre-wrap;
-      margin: -1em -1em 1em;
-      padding: 0.5em;
-      background: #eee;
-    `}
-  />
-)
-
 const Tabs = props => (
   <div
     {...props}
     className={css`
-      margin-bottom: 0.5em;
+      margin: -10px -10px 0;
     `}
   />
 )
@@ -52,11 +40,13 @@ const Tab = ({ active, ...props }) => (
     className={css`
       display: inline-block;
       text-decoration: none;
-      color: black;
-      background: ${active ? '#AAA' : '#DDD'};
-      padding: 0.25em 0.5em;
-      border-radius: 0.25em;
+      font-size: 14px;
+      color: ${active ? 'black' : '#808080'};
+      background: ${active ? '#f8f8e8' : '#fff'};
+      padding: 10px;
       margin-right: 0.25em;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
     `}
   />
 )
@@ -174,26 +164,20 @@ class RichTextExample extends React.Component {
     // const textLines = getTextLines(this.state.value)
     return (
       <div>
+        <Tabs>
+          {SUBPAGES.map(([name, Component, subpage]) => {
+            const active = subpage === this.props.params.subpage
+            return (
+              <Tab key={subpage} to={`/composition/${subpage}`} active={active}>
+                {name}
+              </Tab>
+            )
+          })}
+          <Version>
+            {ANDROID_API_VERSION ? `Android API ${ANDROID_API_VERSION}` : null}
+          </Version>
+        </Tabs>
         <Instruction>
-          <Tabs>
-            {SUBPAGES.map(([name, Component, subpage]) => {
-              const active = subpage === this.props.params.subpage
-              return (
-                <Tab
-                  key={subpage}
-                  to={`/composition/${subpage}`}
-                  active={active}
-                >
-                  {name}
-                </Tab>
-              )
-            })}
-            <Version>
-              {ANDROID_API_VERSION
-                ? `Android API ${ANDROID_API_VERSION}`
-                : null}
-            </Version>
-          </Tabs>
           <div>{this.state.text}</div>
         </Instruction>
         <Toolbar>
