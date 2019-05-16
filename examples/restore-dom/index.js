@@ -3,7 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
 
 /**
  * The Restore DOM example.
@@ -31,7 +31,7 @@ class RestoreDOMExample extends React.Component {
 
   state = {
     value: Value.fromJSON(initialValue),
-    bgcolor: '#ffffff',
+    bgcolor: '#ffeecc',
   }
 
   /**
@@ -53,12 +53,25 @@ class RestoreDOMExample extends React.Component {
   render() {
     return (
       <div>
+        <Instruction>
+          <ol>
+            <li>
+              Click a brush to change color in state. Use refresh button to
+              `restoreDOM` which renders changes.
+            </li>
+            <li>
+              Press `!` button to corrupt DOM by removing `bold`. Backspace from
+              start of `text` 5 times. Console will show error but Slate will
+              recover by restoring DOM.
+            </li>
+          </ol>
+        </Instruction>
         <Toolbar>
-          {this.renderHighlightButton('#ffffff')}
           {this.renderHighlightButton('#ffeecc')}
           {this.renderHighlightButton('#ffffcc')}
           {this.renderHighlightButton('#ccffcc')}
-          {this.renderHighlightButton('#ccffff')}
+          {this.renderCorruptButton()}
+          {this.renderRestoreButton()}
         </Toolbar>
         <Editor
           spellCheck
@@ -68,7 +81,9 @@ class RestoreDOMExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           renderBlock={this.renderBlock}
+          renderMark={this.renderMark}
         />
+        <EditorValue value={this.state.value} />
       </div>
     )
   }
@@ -94,15 +109,55 @@ class RestoreDOMExample extends React.Component {
   }
 
   /**
+   * Render restoreDOM button
+   */
+
+  renderRestoreButton = () => {
+    const { editor } = this
+
+    function restoreDOM() {
+      editor.restoreDOM()
+    }
+
+    return (
+      <Button onMouseDown={restoreDOM}>
+        <Icon>refresh</Icon>
+      </Button>
+    )
+  }
+
+  /**
+   * Render a button to corrupt the DOM
+   *
+   *@return {Element}
+   */
+
+  renderCorruptButton = () => {
+    /**
+     * Corrupt the DOM by forcibly deleting the first instance we can find
+     * of the `bold` text in the DOM.
+     */
+
+    function corrupt() {
+      const boldEl = window.document.querySelector('[data-bold]')
+      const el = boldEl.closest('[data-slate-object="text"]')
+      el.parentNode.removeChild(el)
+    }
+    return (
+      <Button onMouseDown={corrupt}>
+        <Icon>error_outline</Icon>
+      </Button>
+    )
+  }
+
+  /**
    * Highlight every block with a given background color
    *
    * @param {String} bgcolor
    */
 
   onClickHighlight = bgcolor => {
-    const { editor } = this
     this.setState({ bgcolor })
-    editor.restoreDOM()
   }
 
   /**
@@ -122,6 +177,29 @@ class RestoreDOMExample extends React.Component {
           <p {...attributes} style={style}>
             {children}
           </p>
+        )
+      default:
+        return next()
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
+    switch (mark.type) {
+      case 'bold':
+        // Added `data-bold` so we can find bold text with `querySelector`
+        return (
+          <strong {...attributes} data-bold>
+            {children}
+          </strong>
         )
       default:
         return next()

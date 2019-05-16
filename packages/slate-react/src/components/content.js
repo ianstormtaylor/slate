@@ -76,6 +76,22 @@ class Content extends React.Component {
   }
 
   /**
+   * An error boundary. If there is a render error, we increment `errorKey`
+   * which is part of the container `key` which forces a re-render from
+   * scratch.
+   *
+   * @param {Error} error
+   * @param {String} info
+   */
+
+  componentDidCatch(error, info) {
+    debug('componentDidCatch', { error, info })
+    // The call to `setState` is required despite not setting a value.
+    // Without this call, React will not try to recreate the component tree.
+    this.setState({})
+  }
+
+  /**
    * Temporary values.
    *
    * @type {Object}

@@ -9,7 +9,16 @@
         "nodes": [
           {
             "object": "text",
-            "text": "First block of text"
+            "text": "First block with "
+          },
+          {
+            "object": "text",
+            "text": "bold",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " text in it"
           }
         ]
       },
@@ -19,7 +28,16 @@
         "nodes": [
           {
             "object": "text",
-            "text": "Second block of text"
+            "text": "Second block with "
+          },
+          {
+            "object": "text",
+            "text": "bold",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " text in it"
           }
         ]
       },
@@ -29,7 +47,16 @@
         "nodes": [
           {
             "object": "text",
-            "text": "Third block of text"
+            "text": "Third block with "
+          },
+          {
+            "object": "text",
+            "text": "bold",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " text in it"
           }
         ]
       }
