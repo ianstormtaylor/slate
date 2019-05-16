@@ -538,8 +538,8 @@ Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. F
 
 ### `wrapNodeByKey/Path`
 
-`wraNodeByKey(key: String, parent: Node) => Editor` <br/>
-`wraNodeByPath(path: List, parent: Node) => Editor` <br/>
+`wrapNodeByKey(key: String, parent: Node) => Editor` <br/>
+`wrapNodeByPath(path: List, parent: Node) => Editor` <br/>
 
 Wrap the node with the specified key with the parent [`Node`](./node.md). This will clear all children of the parent.
 
