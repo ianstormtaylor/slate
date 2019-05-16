@@ -3,7 +3,7 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Toolbar } from '../components'
 
 /**
  * The Restore DOM example.
@@ -31,7 +31,7 @@ class RestoreDOMExample extends React.Component {
 
   state = {
     value: Value.fromJSON(initialValue),
-    bgcolor: '#ffffff',
+    bgcolor: '#ffeecc',
   }
 
   /**
@@ -54,12 +54,11 @@ class RestoreDOMExample extends React.Component {
     return (
       <div>
         <Toolbar>
-          {this.renderHighlightButton('#ffffff')}
           {this.renderHighlightButton('#ffeecc')}
           {this.renderHighlightButton('#ffffcc')}
           {this.renderHighlightButton('#ccffcc')}
-          {this.renderHighlightButton('#ccffff')}
           {this.renderCorruptButton()}
+          {this.renderRestoreButton()}
         </Toolbar>
         <Editor
           spellCheck
@@ -71,6 +70,7 @@ class RestoreDOMExample extends React.Component {
           renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
+        <EditorValue value={this.state.value} />
       </div>
     )
   }
@@ -91,6 +91,24 @@ class RestoreDOMExample extends React.Component {
         style={{ backgroundColor: bgcolor }}
       >
         <Icon>format_paint</Icon>
+      </Button>
+    )
+  }
+
+  /**
+   * Render restoreDOM button
+   */
+
+  renderRestoreButton = () => {
+    const { editor } = this
+
+    function restoreDOM() {
+      editor.restoreDOM()
+    }
+
+    return (
+      <Button onMouseDown={restoreDOM}>
+        <Icon>refresh</Icon>
       </Button>
     )
   }
@@ -128,7 +146,6 @@ class RestoreDOMExample extends React.Component {
   onClickHighlight = bgcolor => {
     const { editor } = this
     this.setState({ bgcolor })
-    editor.restoreDOM()
   }
 
   /**
