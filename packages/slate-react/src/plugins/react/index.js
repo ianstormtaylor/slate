@@ -4,6 +4,7 @@ import EditorPropsPlugin from './editor-props'
 import RenderingPlugin from './rendering'
 import QueriesPlugin from './queries'
 import DOMPlugin from '../dom'
+import RestoreDOMPlugin from './restore-dom'
 
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
@@ -20,7 +21,7 @@ function ReactPlugin(options = {}) {
   const domPlugin = DOMPlugin({
     plugins: [editorPropsPlugin, ...plugins],
   })
-
+  const restoreDomPlugin = RestoreDOMPlugin()
   const placeholderPlugin = PlaceholderPlugin({
     placeholder,
     when: (editor, node) =>
@@ -30,7 +31,13 @@ function ReactPlugin(options = {}) {
       Array.from(node.texts()).length === 1,
   })
 
-  return [domPlugin, placeholderPlugin, renderingPlugin, queriesPlugin]
+  return [
+    domPlugin,
+    restoreDomPlugin,
+    placeholderPlugin,
+    renderingPlugin,
+    queriesPlugin,
+  ]
 }
 
 /**

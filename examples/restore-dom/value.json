@@ -1,0 +1,38 @@
+{
+  "object": "value",
+  "document": {
+    "object": "document",
+    "nodes": [
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "text": "First block of text"
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Second block of text"
+          }
+        ]
+      },
+      {
+        "object": "block",
+        "type": "paragraph",
+        "nodes": [
+          {
+            "object": "text",
+            "text": "Third block of text"
+          }
+        ]
+      }
+    ]
+  }
+}
