@@ -1,3 +1,5 @@
+import pick from 'lodash/pick'
+import Annotation from '../models/annotation'
 import Value from '../models/value'
 
 /**
@@ -16,31 +18,43 @@ const Commands = {}
  */
 
 Commands.setData = (editor, data = {}) => {
-  const properties = Value.createProperties({ data })
   const { value } = editor
+  const newProperties = Value.createProperties({ data })
+  const prevProperties = pick(value, Object.keys(newProperties))
 
   editor.applyOperation({
     type: 'set_value',
-    properties,
-    value,
+    properties: prevProperties,
+    newProperties,
   })
 }
 
-/**
- * Set `properties` on the value.
- *
- * @param {Editor} editor
- * @param {Object|Value} properties
- */
-
-Commands.setDecorations = (editor, decorations = []) => {
-  const properties = Value.createProperties({ decorations })
-  const { value } = editor
+Commands.addAnnotation = (editor, annotation) => {
+  annotation = Annotation.create(annotation)
 
   editor.applyOperation({
-    type: 'set_value',
-    properties,
-    value,
+    type: 'add_annotation',
+    annotation,
+  })
+}
+
+Commands.removeAnnotation = (editor, annotation) => {
+  annotation = Annotation.create(annotation)
+
+  editor.applyOperation({
+    type: 'remove_annotation',
+    annotation,
+  })
+}
+
+Commands.setAnnotation = (editor, annotation, newProperties) => {
+  annotation = Annotation.create(annotation)
+  newProperties = Annotation.createProperties(newProperties)
+
+  editor.applyOperation({
+    type: 'set_annotation',
+    properties: annotation,
+    newProperties,
   })
 }
 

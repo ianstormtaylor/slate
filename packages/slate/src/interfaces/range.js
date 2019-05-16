@@ -1,4 +1,5 @@
 import mixin from '../utils/mixin'
+import Annotation from '../models/annotation'
 import Decoration from '../models/decoration'
 import PathUtils from '../utils/path-utils'
 import Point from '../models/point'
@@ -652,4 +653,4 @@ class RangeInterface {
  * @param {Record}
  */
 
-mixin(RangeInterface, [Decoration, Range, Selection])
+mixin(RangeInterface, [Annotation, Decoration, Range, Selection])

@@ -21,11 +21,13 @@ export const output = `
   <div style="position:relative">
     <span>
       <span data-slate-leaf="true">
-        <span contenteditable="false" style="pointer-events:none;display:inline-block;width:0;max-width:100%;white-space:nowrap;opacity:0.333">
-            placeholder text
-        </span>
-        <span data-slate-zero-width="n" data-slate-length="0">
-            <br>
+        <span>
+            <span contenteditable="false" style="pointer-events:none;display:inline-block;width:0;max-width:100%;white-space:nowrap;opacity:0.333">
+                placeholder text
+            </span>
+            <span data-slate-zero-width="n" data-slate-length="0">
+                <br>
+            </span>
         </span>
       </span>
     </span>

@@ -5,6 +5,7 @@ import mixin from '../utils/mixin'
 import Block from '../models/block'
 import Document from '../models/document'
 import Inline from '../models/inline'
+import Node from '../models/node'
 import KeyUtils from '../utils/key-utils'
 import memoize from '../utils/memoize'
 import PathUtils from '../utils/path-utils'
@@ -18,16 +19,6 @@ import Text from '../models/text'
  */
 
 class NodeInterface {
-  /**
-   * Get the concatenated text of the node.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getText()
-  }
-
   /**
    * Get the first text node of a node, or the node itself.
    *
@@ -95,7 +86,7 @@ class NodeInterface {
     let descendant = null
 
     const found = this.nodes.findLast(node => {
-      if (node.object == 'text') return true
+      if (node.object === 'text') return true
       descendant = node.getLastText()
       return descendant
     })
@@ -126,8 +117,18 @@ class NodeInterface {
    */
 
   getPath(key) {
-    // Handle the case of passing in a path directly, to match other methods.
-    if (List.isList(key)) return key
+    // COMPAT: Handle passing in a path, to match other methods.
+    if (List.isList(key)) {
+      return key
+    }
+
+    // COMPAT: Handle a node object by iterating the descendants tree, so that
+    // we avoid using keys for the future.
+    if (Node.isNode(key) && this.descendants) {
+      for (const [node, path] of this.descendants()) {
+        if (key === node) return path
+      }
+    }
 
     const dict = this.getKeysToPathsTable()
     const path = dict[key]
@@ -141,8 +142,11 @@ class NodeInterface {
    */
 
   getText() {
-    const children = this.object === 'text' ? this.leaves : this.nodes
-    const text = children.reduce((memo, c) => memo + c.text, '')
+    if (this.object === 'text') {
+      return this.text
+    }
+
+    const text = this.nodes.reduce((memo, c) => memo + c.text, '')
     return text
   }
 

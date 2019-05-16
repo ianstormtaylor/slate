@@ -4,9 +4,11 @@ import h from 'slate-hyperscript'
 
 export const input = (
   <block type="paragraph">
+    <mark type="bold">w</mark>
     <mark type="bold">
-      w<mark type="italic">or</mark>d
+      <mark type="italic">or</mark>
     </mark>
+    <mark type="bold">d</mark>
   </block>
 )
 
@@ -17,44 +19,39 @@ export const output = {
   nodes: [
     {
       object: 'text',
-      leaves: [
+      text: 'w',
+      marks: [
         {
-          object: 'leaf',
-          text: 'w',
-          marks: [
-            {
-              object: 'mark',
-              type: 'bold',
-              data: {},
-            },
-          ],
+          object: 'mark',
+          type: 'bold',
+          data: {},
+        },
+      ],
+    },
+    {
+      object: 'text',
+      text: 'or',
+      marks: [
+        {
+          object: 'mark',
+          type: 'italic',
+          data: {},
         },
         {
-          object: 'leaf',
-          text: 'or',
-          marks: [
-            {
-              object: 'mark',
-              type: 'italic',
-              data: {},
-            },
-            {
-              object: 'mark',
-              type: 'bold',
-              data: {},
-            },
-          ],
+          object: 'mark',
+          type: 'bold',
+          data: {},
         },
+      ],
+    },
+    {
+      object: 'text',
+      text: 'd',
+      marks: [
         {
-          object: 'leaf',
-          text: 'd',
-          marks: [
-            {
-              object: 'mark',
-              type: 'bold',
-              data: {},
-            },
-          ],
+          object: 'mark',
+          type: 'bold',
+          data: {},
         },
       ],
     },

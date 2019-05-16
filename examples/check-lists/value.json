@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,46 +9,30 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
-              }
-            ]
+            "text":
+              "With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!"
           }
         ]
       },
       {
         "object": "block",
         "type": "check-list-item",
-        "data": {
-          "checked": true
-        },
+        "data": { "checked": true },
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Slide to the left."
-              }
-            ]
+            "text": "Slide to the left."
           }
         ]
       },
       {
         "object": "block",
         "type": "check-list-item",
-        "data": {
-          "checked": true
-        },
+        "data": { "checked": true },
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Slide to the right."
-              }
-            ]
+            "text": "Slide to the right."
           }
         ]
       },
@@ -59,28 +45,18 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Criss-cross."
-              }
-            ]
+            "text": "Criss-cross."
           }
         ]
       },
       {
         "object": "block",
         "type": "check-list-item",
-        "data": {
-          "checked": true
-        },
+        "data": { "checked": true },
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Criss-cross!"
-              }
-            ]
+            "text": "Criss-cross!"
           }
         ]
       },
@@ -93,11 +69,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Cha cha real smooth…"
-              }
-            ]
+            "text": "Cha cha real smooth…"
           }
         ]
       },
@@ -110,11 +82,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Let's go to work!"
-              }
-            ]
+            "text": "Let's go to work!"
           }
         ]
       },
@@ -124,11 +92,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out for yourself!"
-              }
-            ]
+            "text": "Try it out for yourself!"
           }
         ]
       }

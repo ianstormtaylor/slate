@@ -1,21 +1,11 @@
 import getWindow from 'get-window'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { Value } from 'slate'
 
 import OffsetKey from './offset-key'
-
-/**
- * Constants.
- *
- * @type {String}
- */
-
-export const ZERO_WIDTH_ATTRIBUTE = 'data-slate-zero-width'
-export const ZERO_WIDTH_SELECTOR = `[${ZERO_WIDTH_ATTRIBUTE}]`
-const OFFSET_KEY_ATTRIBUTE = 'data-offset-key'
-const RANGE_SELECTOR = `[${OFFSET_KEY_ATTRIBUTE}]`
-const TEXT_SELECTOR = `[data-key]`
-const VOID_SELECTOR = '[data-slate-void]'
+import DATA_ATTRS from '../constants/data-attributes'
+import SELECTORS from '../constants/selectors'
 
 /**
  * Find a Slate point from a DOM selection's `nativeNode` and `nativeOffset`.
@@ -27,6 +17,11 @@ const VOID_SELECTOR = '[data-slate-void]'
  */
 
 function findPoint(nativeNode, nativeOffset, editor) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `findPoint(node, offset)` helper is deprecated in favor of `editor.findPoint(node, offset)`.'
+  )
+
   invariant(
     !Value.isValue(editor),
     'As of Slate 0.42.0, the `findPoint` utility takes an `editor` instead of a `value`.'
@@ -39,7 +34,7 @@ function findPoint(nativeNode, nativeOffset, editor) {
 
   const window = getWindow(nativeNode)
   const { parentNode } = nearestNode
-  let rangeNode = parentNode.closest(RANGE_SELECTOR)
+  let rangeNode = parentNode.closest(SELECTORS.LEAF)
   let offset
   let node
 
@@ -47,17 +42,22 @@ function findPoint(nativeNode, nativeOffset, editor) {
   // determine what the offset relative to the text node is.
   if (rangeNode) {
     const range = window.document.createRange()
-    const textNode = rangeNode.closest(TEXT_SELECTOR)
+    const textNode = rangeNode.closest(SELECTORS.TEXT)
     range.setStart(textNode, 0)
     range.setEnd(nearestNode, nearestOffset)
     node = textNode
-    offset = range.toString().length
+
+    // COMPAT: Edge has a bug where Range.prototype.toString() will convert \n
+    // into \r\n. The bug causes a loop when slate-react attempts to reposition
+    // its cursor to match the native position. Use textContent.length instead.
+    // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
+    offset = range.cloneContents().textContent.length
   } else {
     // For void nodes, the element with the offset key will be a cousin, not an
     // ancestor, so find it by going down from the nearest void parent.
-    const voidNode = parentNode.closest(VOID_SELECTOR)
+    const voidNode = parentNode.closest(SELECTORS.VOID)
     if (!voidNode) return null
-    rangeNode = voidNode.querySelector(RANGE_SELECTOR)
+    rangeNode = voidNode.querySelector(SELECTORS.LEAF)
     if (!rangeNode) return null
     node = rangeNode
     offset = node.textContent.length
@@ -68,14 +68,14 @@ function findPoint(nativeNode, nativeOffset, editor) {
   // ASCII characters will be prepended to the zero-width space, so subtract 1
   // from the offset to account for the zero-width space character.
   if (
-    offset == node.textContent.length &&
-    parentNode.hasAttribute(ZERO_WIDTH_ATTRIBUTE)
+    offset === node.textContent.length &&
+    parentNode.hasAttribute(DATA_ATTRS.ZERO_WIDTH)
   ) {
     offset--
   }
 
   // Get the string value of the offset key attribute.
-  const offsetKey = rangeNode.getAttribute(OFFSET_KEY_ATTRIBUTE)
+  const offsetKey = rangeNode.getAttribute(DATA_ATTRS.OFFSET_KEY)
   if (!offsetKey) return null
 
   const { key } = OffsetKey.parse(offsetKey)
@@ -102,15 +102,15 @@ function findPoint(nativeNode, nativeOffset, editor) {
 function normalizeNodeAndOffset(node, offset) {
   // If it's an element node, its offset refers to the index of its children
   // including comment nodes, so try to find the right text child node.
-  if (node.nodeType == 1 && node.childNodes.length) {
-    const isLast = offset == node.childNodes.length
+  if (node.nodeType === 1 && node.childNodes.length) {
+    const isLast = offset === node.childNodes.length
     const direction = isLast ? 'backward' : 'forward'
     const index = isLast ? offset - 1 : offset
     node = getEditableChild(node, index, direction)
 
     // If the node has children, traverse until we have a leaf node. Leaf nodes
     // can be either text nodes, or other void DOM nodes.
-    while (node.nodeType == 1 && node.childNodes.length) {
+    while (node.nodeType === 1 && node.childNodes.length) {
       const i = isLast ? node.childNodes.length - 1 : 0
       node = getEditableChild(node, i, direction)
     }
@@ -143,9 +143,9 @@ function getEditableChild(parent, index, direction) {
   // While the child is a comment node, or an element node with no children,
   // keep iterating to find a sibling non-void, non-comment node.
   while (
-    child.nodeType == 8 ||
-    (child.nodeType == 1 && child.childNodes.length == 0) ||
-    (child.nodeType == 1 && child.getAttribute('contenteditable') == 'false')
+    child.nodeType === 8 ||
+    (child.nodeType === 1 && child.childNodes.length === 0) ||
+    (child.nodeType === 1 && child.getAttribute('contenteditable') === 'false')
   ) {
     if (triedForward && triedBackward) break
 
@@ -164,8 +164,8 @@ function getEditableChild(parent, index, direction) {
     }
 
     child = childNodes[i]
-    if (direction == 'forward') i++
-    if (direction == 'backward') i--
+    if (direction === 'forward') i++
+    if (direction === 'backward') i--
   }
 
   return child || null

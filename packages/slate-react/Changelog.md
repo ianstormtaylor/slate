@@ -4,6 +4,34 @@ This document maintains a list of changes to the `slate-react` package with each
 
 ---
 
+### `0.22.0` — May 8, 2019
+
+###### BREAKING
+
+**The `anchor.path` and `focus.path` of decorations must be relative!** Previously they were optional, and they were calculated based on the path in the top-level document. Now they are paths relative to the node being decorated! See the code highlighting example for how this is achieved, it ends up being easier than before.
+
+**The `renderNode` middleware has been split into `renderBlock` and `renderInline`.** Previously the single middleware handled both node types. This change makes it easier to define the most common cases, and paves the way for similar serializers in the future. There is also a new `renderDocument` middleware, but most people don't need to concern themselves with it.
+
+**The `renderMark` middleware is no longer used for decorations!** Previously `renderMark` would be used for rendering both types of decorations. Now there are separate `renderAnnotation` and `renderDecoration` middleware functions to use instead.
+
+**You must now assign `attributes.ref` to a DOM node.** This new attribute that is passed to the rendering functions must be passed into a native DOM component (using `forwardRef` if necessary). This is required to eliminate our dependence on keys. If you are using libraries that don't implement `forwardRef` you may need to use `innerRef` or similar for this.
+
+###### DEPRECATED
+
+**The `find*` and `findDOM*` helpers are deprecated.** Previously you'd use these helpers to find a Slate object from a DOM object or vice versa. Now these helpers are all exposed as queries on the editor itself.
+
+```js
+// Before...
+findDOMNode(key, window)
+findNode(element, editor)
+
+// After...
+editor.findDOMNode(path)
+editor.findNode(element)
+```
+
+---
+
 ### `0.21.0` — November 2, 2018
 
 ###### NEW

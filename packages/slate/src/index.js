@@ -4,6 +4,7 @@ import './interfaces/node'
 import './interfaces/element'
 import './interfaces/range'
 
+import Annotation from './models/annotation'
 import Block from './models/block'
 import Change from './models/change'
 import Data from './models/data'
@@ -32,6 +33,7 @@ import { resetMemoization, useMemoization } from './utils/memoize'
  */
 
 export {
+  Annotation,
   Block,
   Change,
   Data,
@@ -56,6 +58,7 @@ export {
 }
 
 export default {
+  Annotation,
   Block,
   Change,
   Data,

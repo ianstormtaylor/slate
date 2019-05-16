@@ -15,29 +15,24 @@ export const input = {
         nodes: [
           {
             object: 'text',
-            leaves: [
+            text: 'o',
+            marks: [],
+          },
+          {
+            object: 'text',
+            text: 'n',
+            marks: [
               {
-                object: 'leaves',
-                text: 'o',
-                marks: [],
-              },
-              {
-                object: 'leaves',
-                text: 'n',
-                marks: [
-                  {
-                    object: 'mark',
-                    type: 'bold',
-                    data: {},
-                  },
-                ],
-              },
-              {
-                object: 'leaves',
-                text: 'e',
-                marks: [],
+                object: 'mark',
+                type: 'bold',
+                data: {},
               },
             ],
+          },
+          {
+            object: 'text',
+            text: 'e',
+            marks: [],
           },
         ],
       },

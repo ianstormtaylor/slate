@@ -159,6 +159,34 @@ class Editor {
   }
 
   /**
+   * Checks if a command by `type` has been registered.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasCommand(type) {
+    const { controller } = this
+    const has = type in controller && controller[type].__command
+
+    return has
+  }
+
+  /**
+   * Checks if a query by `type` has been registered.
+   *
+   * @param {String} type
+   * @return {Boolean}
+   */
+
+  hasQuery(type) {
+    const { controller } = this
+    const has = type in controller && controller[type].__query
+
+    return has
+  }
+
+  /**
    * Normalize all of the nodes in the document from scratch.
    *
    * @return {Editor}
@@ -496,29 +524,21 @@ function getDirtyPaths(operation) {
     }
 
     case 'move_node': {
-      let parentPath = PathUtils.lift(path)
-      let newParentPath = PathUtils.lift(newPath)
-
       if (PathUtils.isEqual(path, newPath)) {
         return []
       }
 
-      // HACK: this clause only exists because the `move_path` logic isn't
-      // consistent when it deals with siblings.
-      if (!PathUtils.isSibling(path, newPath)) {
-        if (newParentPath.size && PathUtils.isYounger(path, newPath)) {
-          newParentPath = PathUtils.decrement(newParentPath, 1, path.size - 1)
-        }
+      const oldAncestors = PathUtils.getAncestors(path).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
-        if (parentPath.size && PathUtils.isYounger(newPath, path)) {
-          parentPath = PathUtils.increment(parentPath, 1, newPath.size - 1)
-        }
-      }
+      const newAncestors = PathUtils.getAncestors(newPath).reduce((arr, p) => {
+        arr.push(...PathUtils.transform(p, operation).toArray())
+        return arr
+      }, [])
 
-      const oldAncestors = PathUtils.getAncestors(parentPath).toArray()
-      const newAncestors = PathUtils.getAncestors(newParentPath).toArray()
-
-      return [...oldAncestors, parentPath, ...newAncestors, newParentPath]
+      return [...oldAncestors, ...newAncestors]
     }
 
     case 'remove_node': {
@@ -619,12 +639,16 @@ function normalizeNodeByPath(editor, path) {
  * Register a `plugin` with the editor.
  *
  * @param {Editor} editor
- * @param {Object|Array} plugin
+ * @param {Object|Array|Null} plugin
  */
 
 function registerPlugin(editor, plugin) {
   if (Array.isArray(plugin)) {
     plugin.forEach(p => registerPlugin(editor, p))
+    return
+  }
+
+  if (plugin == null) {
     return
   }
 

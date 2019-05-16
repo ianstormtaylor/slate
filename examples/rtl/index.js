@@ -31,7 +31,7 @@ class RTL extends React.Component {
         placeholder="Enter some plain text..."
         defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
@@ -43,7 +43,7 @@ class RTL extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
@@ -62,7 +62,7 @@ class RTL extends React.Component {
    */
 
   onKeyDown = (event, editor, next) => {
-    if (event.key == 'Enter' && event.shiftKey) {
+    if (event.key === 'Enter' && event.shiftKey) {
       event.preventDefault()
       editor.insertText('\n')
       return

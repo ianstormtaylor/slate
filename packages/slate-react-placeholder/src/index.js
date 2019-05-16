@@ -1,6 +1,12 @@
 import invariant from 'tiny-invariant'
 import React from 'react'
 
+/*
+ * Instance counter to enable unique marks for multiple Placeholder instances.
+ */
+
+let instanceCounter = 0
+
 /**
  * A plugin that renders a React placeholder for a given Slate node.
  *
@@ -9,15 +15,16 @@ import React from 'react'
  */
 
 function SlateReactPlaceholder(options = {}) {
-  const { placeholder, when } = options
+  const instanceId = instanceCounter++
+  const { placeholder, when, style = {} } = options
 
   invariant(
-    placeholder,
+    typeof placeholder === 'string',
     'You must pass `SlateReactPlaceholder` an `options.placeholder` string.'
   )
 
   invariant(
-    when,
+    typeof when === 'string' || typeof when === 'function',
     'You must pass `SlateReactPlaceholder` an `options.when` query.'
   )
 
@@ -36,12 +43,19 @@ function SlateReactPlaceholder(options = {}) {
     }
 
     const others = next()
-    const first = node.getFirstText()
-    const last = node.getLastText()
+    const [first] = node.texts()
+    const [last] = node.texts({ direction: 'backward' })
+    const [firstNode, firstPath] = first
+    const [lastNode, lastPath] = last
     const decoration = {
-      anchor: { key: first.key, offset: 0 },
-      focus: { key: last.key, offset: last.text.length },
-      mark: { type: 'placeholder' },
+      type: 'placeholder',
+      data: { key: instanceId },
+      anchor: { key: firstNode.key, offset: 0, path: firstPath },
+      focus: {
+        key: lastNode.key,
+        offset: lastNode.text.length,
+        path: lastPath,
+      },
     }
 
     return [...others, decoration]
@@ -59,23 +73,24 @@ function SlateReactPlaceholder(options = {}) {
   function renderMark(props, editor, next) {
     const { children, mark } = props
 
-    if (mark.type === 'placeholder') {
-      const style = {
+    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
+      const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
         width: '0',
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
+        ...style,
       }
 
       return (
-        <React.Fragment>
-          <span contentEditable={false} style={style}>
+        <span>
+          <span contentEditable={false} style={placeHolderStyle}>
             {placeholder}
           </span>
           {children}
-        </React.Fragment>
+        </span>
       )
     }
 

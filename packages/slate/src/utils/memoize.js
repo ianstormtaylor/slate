@@ -1,3 +1,5 @@
+/* global WeakMap, Map, Symbol */
+
 /**
  * GLOBAL: True if memoization should is enabled.
  *
@@ -7,30 +9,31 @@
 let ENABLED = true
 
 /**
- * GLOBAL: Changing this cache key will clear all previous cached results.
- *
- * @type {Number}
- */
-
-let CACHE_KEY = 0
-
-/**
  * The leaf node of a cache tree. Used to support variable argument length. A
  * unique object, so that native Maps will key it by reference.
  *
- * @type {Object}
+ * @type {Symbol}
  */
 
-const LEAF = {}
+const LEAF = Symbol('LEAF')
 
 /**
- * A value to represent a memoized undefined value. Allows efficient value
- * retrieval using Map.get only.
+ * The node of a cache tree for a WeakMap to store cache visited by objects
  *
- * @type {Object}
+ * @type {Symbol}
  */
 
-const UNDEFINED = {}
+const STORE_KEY = Symbol('STORE_KEY')
+
+/**
+ * Values to represent a memoized undefined and null value. Allows efficient value
+ * retrieval using Map.get only.
+ *
+ * @type {Symbol}
+ */
+
+const UNDEFINED = Symbol('undefined')
+const NULL = Symbol('null')
 
 /**
  * Default value for unset keys in native Maps
@@ -39,6 +42,14 @@ const UNDEFINED = {}
  */
 
 const UNSET = undefined
+
+/**
+ * Global Store for all cached values
+ *
+ * @type {WeakMap}
+ */
+
+let memoizeStore = new WeakMap()
 
 /**
  * Memoize all of the `properties` on a `object`.
@@ -60,20 +71,14 @@ function memoize(object, properties) {
       // If memoization is disabled, call into the original method.
       if (!ENABLED) return original.apply(this, args)
 
-      // If the cache key is different, previous caches must be cleared.
-      if (CACHE_KEY !== this.__cache_key) {
-        this.__cache_key = CACHE_KEY
-        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-        this.__cache_no_args = {}
+      if (!memoizeStore.has(this)) {
+        memoizeStore.set(this, {
+          noArgs: {},
+          hasArgs: {},
+        })
       }
 
-      if (!this.__cache) {
-        this.__cache = new Map() // eslint-disable-line no-undef,no-restricted-globals
-      }
-
-      if (!this.__cache_no_args) {
-        this.__cache_no_args = {}
-      }
+      const { noArgs, hasArgs } = memoizeStore.get(this)
 
       const takesArguments = args.length !== 0
 
@@ -82,9 +87,9 @@ function memoize(object, properties) {
 
       if (takesArguments) {
         keys = [property, ...args]
-        cachedValue = getIn(this.__cache, keys)
+        cachedValue = getIn(hasArgs, keys)
       } else {
-        cachedValue = this.__cache_no_args[property]
+        cachedValue = noArgs[property]
       }
 
       // If we've got a result already, return it.
@@ -97,9 +102,9 @@ function memoize(object, properties) {
       const v = value === undefined ? UNDEFINED : value
 
       if (takesArguments) {
-        this.__cache = setIn(this.__cache, keys, v)
+        setIn(hasArgs, keys, v)
       } else {
-        this.__cache_no_args[property] = v
+        noArgs[property] = v
       }
 
       return value
@@ -119,12 +124,23 @@ function memoize(object, properties) {
  */
 
 function getIn(map, keys) {
-  for (const key of keys) {
-    map = map.get(key)
+  for (let key of keys) {
+    if (key === undefined) {
+      key = UNDEFINED
+    } else if (key == null) {
+      key = NULL
+    }
+
+    if (typeof key === 'object') {
+      map = map[STORE_KEY] && map[STORE_KEY].get(key)
+    } else {
+      map = map[key]
+    }
+
     if (map === UNSET) return UNSET
   }
 
-  return map.get(LEAF)
+  return map[LEAF]
 }
 
 /**
@@ -137,23 +153,40 @@ function getIn(map, keys) {
  */
 
 function setIn(map, keys, value) {
-  let parent = map
-  let child
+  let child = map
 
-  for (const key of keys) {
-    child = parent.get(key)
-
-    // If the path was not created yet...
-    if (child === UNSET) {
-      child = new Map() // eslint-disable-line no-undef,no-restricted-globals
-      parent.set(key, child)
+  for (let key of keys) {
+    if (key === undefined) {
+      key = UNDEFINED
+    } else if (key == null) {
+      key = NULL
     }
 
-    parent = child
+    if (typeof key !== 'object') {
+      if (!child[key]) {
+        child[key] = {}
+      }
+
+      child = child[key]
+      continue
+    }
+
+    if (!child[STORE_KEY]) {
+      child[STORE_KEY] = new WeakMap()
+    }
+
+    if (!child[STORE_KEY].has(key)) {
+      const newChild = {}
+      child[STORE_KEY].set(key, newChild)
+      child = newChild
+      continue
+    }
+
+    child = child[STORE_KEY].get(key)
   }
 
   // The whole path has been created, so set the value to the bottom most map.
-  child.set(LEAF, value)
+  child[LEAF] = value
   return map
 }
 
@@ -164,11 +197,7 @@ function setIn(map, keys, value) {
  */
 
 function resetMemoization() {
-  CACHE_KEY++
-
-  if (CACHE_KEY >= Number.MAX_SAFE_INTEGER) {
-    CACHE_KEY = 0
-  }
+  memoizeStore = new WeakMap()
 }
 
 /**

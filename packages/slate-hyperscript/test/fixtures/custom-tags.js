@@ -40,29 +40,24 @@ export const output = {
         nodes: [
           {
             object: 'text',
-            leaves: [
+            text: 'A string of ',
+            marks: [],
+          },
+          {
+            object: 'text',
+            text: 'bold',
+            marks: [
               {
-                object: 'leaf',
-                text: 'A string of ',
-                marks: [],
-              },
-              {
-                object: 'leaf',
-                text: 'bold',
-                marks: [
-                  {
-                    object: 'mark',
-                    type: 'bold',
-                    data: {},
-                  },
-                ],
-              },
-              {
-                object: 'leaf',
-                text: ' in a ',
-                marks: [],
+                object: 'mark',
+                type: 'bold',
+                data: {},
               },
             ],
+          },
+          {
+            object: 'text',
+            text: ' in a ',
+            marks: [],
           },
           {
             object: 'inline',
@@ -73,25 +68,15 @@ export const output = {
             nodes: [
               {
                 object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'Slate',
-                    marks: [],
-                  },
-                ],
+                text: 'Slate',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: ' editor!',
-                marks: [],
-              },
-            ],
+            text: ' editor!',
+            marks: [],
           },
         ],
       },

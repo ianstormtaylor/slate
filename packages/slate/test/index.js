@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { fixtures } from 'slate-dev-test-utils'
 import { Node, Editor, Value } from 'slate'
+import { List } from 'immutable'
 
 const plugins = [
   {
@@ -25,14 +26,6 @@ const plugins = [
 ]
 
 describe('slate', () => {
-  fixtures(__dirname, 'models/leaf', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
-
   fixtures(__dirname, 'models/operation', ({ module }) => {
     const { input, output } = module
     const fn = module.default
@@ -49,13 +42,13 @@ describe('slate', () => {
     assert.equal(actual, expected)
   })
 
-  fixtures(__dirname, 'models/text', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
+  // fixtures(__dirname, 'models/text', ({ module }) => {
+  //   const { input, output } = module
+  //   const fn = module.default
+  //   const actual = fn(input).toJSON()
+  //   const expected = output.toJSON()
+  //   assert.deepEqual(actual, expected)
+  // })
 
   fixtures(__dirname, 'models/node', ({ module }) => {
     const { input, output } = module
@@ -67,7 +60,15 @@ describe('slate', () => {
       actual = actual.toJSON()
     }
 
+    if (List.isList(actual)) {
+      actual = actual.toJSON()
+    }
+
     if (Node.isNode(expected)) {
+      expected = expected.toJSON()
+    }
+
+    if (List.isList(expected)) {
       expected = expected.toJSON()
     }
 
@@ -112,9 +113,11 @@ describe('slate', () => {
   // editor doesn't! It needs to live in the tests instead.
 
   fixtures(__dirname, 'commands', ({ module }) => {
-    const { input, output, options = {} } = module
+    const { input, output, options = {}, plugins: module_plugins } = module
     const fn = module.default
-    const editor = new Editor({ plugins })
+    const editor = new Editor({
+      plugins: module_plugins ? plugins.concat(module_plugins) : plugins,
+    })
     const opts = { preserveSelection: true, ...options }
 
     editor.setValue(input)
@@ -124,6 +127,15 @@ describe('slate', () => {
     editor.setValue(output)
     const expected = editor.value.toJSON(opts)
     assert.deepEqual(actual, expected)
+  })
+
+  fixtures(__dirname, 'controllers', ({ module }) => {
+    const { input, output, default: fn } = module
+
+    const actual = fn(input)
+    const expected = output
+
+    assert.equal(actual, expected)
   })
 
   fixtures(__dirname, 'schema', ({ module }) => {
@@ -148,5 +160,10 @@ describe('slate', () => {
     const expected = output.toJSON(opts)
 
     assert.deepEqual(actual, expected)
+  })
+
+  fixtures(__dirname, 'utils/path-utils', ({ module }) => {
+    const fn = module.default
+    fn()
   })
 })

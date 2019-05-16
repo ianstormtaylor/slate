@@ -21,10 +21,10 @@ function deleteExpandedAtRange(editor, range) {
   const { document } = value
   const { start, end } = range
 
-  if (document.hasDescendant(start.key)) {
+  if (document.hasDescendant(start.path)) {
     range = range.moveToStart()
   } else {
-    range = range.moveTo(end.key, 0).normalize(document)
+    range = range.moveTo(end.path, 0).normalize(document)
   }
 
   return range
@@ -60,9 +60,10 @@ Commands.addMarkAtRange = (editor, range, mark) => {
       let index = 0
       let length = node.text.length
 
-      if (key == start.key) index = start.offset
-      if (key == end.key) length = end.offset
-      if (key == start.key && key == end.key) length = end.offset - start.offset
+      if (key === start.key) index = start.offset
+      if (key === end.key) length = end.offset
+      if (key === start.key && key === end.key)
+        length = end.offset - start.offset
 
       editor.addMarkByKey(key, index, length, mark)
     })
@@ -109,11 +110,11 @@ Commands.deleteAtRange = (editor, range) => {
   // selection extends into the start of the end node, we actually want to
   // ignore that for UX reasons.
   const isHanging =
-    startOffset == 0 &&
-    endOffset == 0 &&
-    isStartVoid == false &&
-    startKey == startBlock.getFirstText().key &&
-    endKey == endBlock.getFirstText().key
+    startOffset === 0 &&
+    endOffset === 0 &&
+    isStartVoid === false &&
+    startKey === startBlock.getFirstText().key &&
+    endKey === endBlock.getFirstText().key
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {
@@ -133,7 +134,7 @@ Commands.deleteAtRange = (editor, range) => {
       editor.removeNodeByKey(startVoid.key)
 
       // If the start and end keys are the same, we're done.
-      if (startKey == endKey) return
+      if (startKey === endKey) return
 
       // If there is no next text node, we're done.
       if (!nextText) return
@@ -162,10 +163,10 @@ Commands.deleteAtRange = (editor, range) => {
 
     // If the start and end key are the same, and it was a hanging selection, we
     // can just remove the entire block.
-    if (startKey == endKey && isHanging) {
+    if (startKey === endKey && isHanging) {
       editor.removeNodeByKey(startBlock.key)
       return
-    } else if (startKey == endKey) {
+    } else if (startKey === endKey) {
       // Otherwise, if it wasn't hanging, we're inside a single text node, so we can
       // simply remove the text in the range.
       const index = startOffset
@@ -185,8 +186,8 @@ Commands.deleteAtRange = (editor, range) => {
       const endLength = endOffset
 
       const ancestor = document.getCommonAncestor(startKey, endKey)
-      const startChild = ancestor.getFurthestAncestor(startKey)
-      const endChild = ancestor.getFurthestAncestor(endKey)
+      const startChild = ancestor.getFurthestChild(startKey)
+      const endChild = ancestor.getFurthestChild(endKey)
 
       const startParent = document.getParent(startBlock.key)
       const startParentIndex = startParent.nodes.indexOf(startBlock)
@@ -198,7 +199,7 @@ Commands.deleteAtRange = (editor, range) => {
       // but inside the end child, and remove them.
       child = startText
 
-      while (child.key != startChild.key) {
+      while (child.key !== startChild.key) {
         const parent = document.getParent(child.key)
         const index = parent.nodes.indexOf(child)
         const afters = parent.nodes.slice(index + 1)
@@ -222,7 +223,7 @@ Commands.deleteAtRange = (editor, range) => {
       // Remove the nodes before the end text node in the tree.
       child = endText
 
-      while (child.key != endChild.key) {
+      while (child.key !== endChild.key) {
         const parent = document.getParent(child.key)
         const index = parent.nodes.indexOf(child)
         const befores = parent.nodes.slice(0, index)
@@ -235,22 +236,30 @@ Commands.deleteAtRange = (editor, range) => {
       }
 
       // Remove any overlapping text content from the leaf text nodes.
-      if (startLength != 0) {
+      if (startLength !== 0) {
         editor.removeTextByKey(startKey, startOffset, startLength)
       }
 
-      if (endLength != 0) {
+      if (endLength !== 0) {
         editor.removeTextByKey(endKey, 0, endOffset)
       }
 
       // If the start and end blocks aren't the same, move and merge the end block
       // into the start block.
-      if (startBlock.key != endBlock.key) {
+      if (startBlock.key !== endBlock.key) {
         document = editor.value.document
-        const lonely = document.getFurthestOnlyChildAncestor(endBlock.key)
+        let onlyChildAncestor
+
+        for (const [node] of document.ancestors(endBlock.key)) {
+          if (node.nodes.size > 1) {
+            break
+          } else {
+            onlyChildAncestor = node
+          }
+        }
 
         // Move the end block to be right after the start block.
-        if (endParentIndex != startParentIndex + 1) {
+        if (endParentIndex !== startParentIndex + 1) {
           editor.moveNodeByKey(
             endBlock.key,
             startParent.key,
@@ -267,8 +276,8 @@ Commands.deleteAtRange = (editor, range) => {
         }
 
         // If nested empty blocks are left over above the end block, remove them.
-        if (lonely) {
-          editor.removeNodeByKey(lonely.key)
+        if (onlyChildAncestor) {
+          editor.removeNodeByKey(onlyChildAncestor.key)
         }
       }
     }
@@ -295,7 +304,7 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
     return
   }
 
-  const voidParent = document.getClosestVoid(start.key, editor)
+  const voidParent = document.getClosestVoid(start.path, editor)
 
   // If there is a void parent, delete it.
   if (voidParent) {
@@ -308,7 +317,7 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
     return
   }
 
-  const block = document.getClosestBlock(start.key)
+  const block = document.getClosestBlock(start.path)
 
   // PERF: If the closest block is empty, remove it. This is just a shortcut,
   // since merging it would result in the same outcome.
@@ -324,7 +333,7 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 
   // If the range is at the start of the text node, we need to figure out what
   // is behind it to know how to delete...
-  const text = document.getDescendant(start.key)
+  const text = document.getDescendant(start.path)
 
   if (start.isAtStartOfNode(text)) {
     let prev = document.getPreviousText(text.key)
@@ -348,7 +357,7 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
-    if (n == 1 && prevBlock != block) {
+    if (n === 1 && prevBlock !== block) {
       range = range.moveAnchorTo(prev.key, prev.text.length)
       editor.deleteAtRange(range)
       return
@@ -400,7 +409,7 @@ Commands.deleteCharBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
@@ -424,7 +433,7 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
@@ -452,7 +461,7 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
     return
   }
 
-  const voidParent = document.getClosestVoid(start.key, editor)
+  const voidParent = document.getClosestVoid(start.path, editor)
 
   // If the node has a void parent, delete it.
   if (voidParent) {
@@ -460,7 +469,7 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
     return
   }
 
-  const block = document.getClosestBlock(start.key)
+  const block = document.getClosestBlock(start.path)
 
   // If the closest is not void, but empty, remove it
   if (
@@ -486,7 +495,7 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
 
   // If the range is at the start of the text node, we need to figure out what
   // is behind it to know how to delete...
-  const text = document.getDescendant(start.key)
+  const text = document.getDescendant(start.path)
 
   if (start.isAtEndOfNode(text)) {
     const next = document.getNextText(text.key)
@@ -501,7 +510,7 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
 
     // If we're deleting by one character and the previous text node is not
     // inside the current block, we need to merge the two blocks together.
-    if (n == 1 && nextBlock != block) {
+    if (n === 1 && nextBlock !== block) {
       range = range.moveFocusTo(next.key, 0)
       editor.deleteAtRange(range)
       return
@@ -554,7 +563,7 @@ Commands.deleteLineBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   editor.deleteBackwardAtRange(range, o)
@@ -576,7 +585,7 @@ Commands.deleteLineForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   editor.deleteForwardAtRange(range, startBlock.text.length - o)
@@ -598,7 +607,7 @@ Commands.deleteWordBackwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
@@ -622,7 +631,7 @@ Commands.deleteWordForwardAtRange = (editor, range) => {
   const { value } = editor
   const { document } = value
   const { start } = range
-  const startBlock = document.getClosestBlock(start.key)
+  const startBlock = document.getClosestBlock(start.path)
   const offset = startBlock.getOffset(start.key)
   const o = offset + start.offset
   const { text } = startBlock
@@ -709,9 +718,9 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     const { start } = range
     const { value } = editor
     let { document } = value
-    let startText = document.getDescendant(start.key)
+    let startText = document.getDescendant(start.path)
     let startBlock = document.getClosestBlock(startText.key)
-    let startChild = startBlock.getFurthestAncestor(startText.key)
+    let startChild = startBlock.getFurthestChild(startText.key)
     const isAtStart = start.isAtStartOfNode(startBlock)
     const parent = document.getParent(startBlock.key)
     const index = parent.nodes.indexOf(startBlock)
@@ -742,10 +751,10 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 
     // If the first and last block aren't the same, we need to insert all of the
     // nodes after the insertion node's first block at the index.
-    if (firstBlock != lastBlock) {
+    if (firstBlock !== lastBlock) {
       const lonelyParent = insertionNode.getFurthest(
         firstBlock.key,
-        p => p.nodes.size == 1
+        p => p.nodes.size === 1
       )
       const lonelyChild = lonelyParent || firstBlock
 
@@ -759,7 +768,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     }
 
     // Check if we need to split the node.
-    if (start.offset != 0) {
+    if (start.offset !== 0) {
       editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
     }
 
@@ -767,17 +776,17 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     document = editor.value.document
     startText = document.getDescendant(start.key)
     startBlock = document.getClosestBlock(start.key)
-    startChild = startBlock.getFurthestAncestor(startText.key)
+    startChild = startBlock.getFurthestChild(startText.key)
 
     // If the first and last block aren't the same, we need to move any of the
     // starting block's children after the split into the last block of the
     // fragment, which has already been inserted.
-    if (firstBlock != lastBlock) {
+    if (firstBlock !== lastBlock) {
       const nextChild = isAtStart
         ? startChild
         : startBlock.getNextSibling(startChild.key)
       const nextNodes = nextChild
-        ? startBlock.nodes.skipUntil(n => n.key == nextChild.key)
+        ? startBlock.nodes.skipUntil(n => n.key === nextChild.key)
         : List()
       const lastIndex = lastBlock.nodes.size
 
@@ -789,17 +798,21 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 
     // If the starting block is empty, we replace it entirely with the first block
     // of the fragment, since this leads to a more expected behavior for the user.
-    if (!editor.isVoid(startBlock) && startBlock.text === '') {
+    if (
+      !editor.isVoid(startBlock) &&
+      startBlock.text === '' &&
+      !startBlock.findDescendant(n => editor.isVoid(n))
+    ) {
       editor.removeNodeByKey(startBlock.key)
       editor.insertNodeByKey(parent.key, index, firstBlock)
     } else {
       // Otherwise, we maintain the starting block, and insert all of the first
       // block's inline nodes into it at the split point.
-      const inlineChild = startBlock.getFurthestAncestor(startText.key)
+      const inlineChild = startBlock.getFurthestChild(startText.key)
       const inlineIndex = startBlock.nodes.indexOf(inlineChild)
 
       firstBlock.nodes.forEach((inline, i) => {
-        const o = start.offset == 0 ? 0 : 1
+        const o = start.offset === 0 ? 0 : 1
         const newIndex = inlineIndex + i + o
         editor.insertNodeByKey(startBlock.key, newIndex, inline)
       })
@@ -808,7 +821,11 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 }
 
 const findInsertionNode = (fragment, document, startKey) => {
-  const hasSingleNode = object => object && object.nodes.size === 1
+  const hasSingleNode = object => {
+    if (!object || object.object === 'text') return
+    return object.nodes.size === 1
+  }
+
   const firstNode = object => object && object.nodes.first()
   let node = fragment
 
@@ -852,13 +869,15 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
     const { value } = editor
     const { document } = value
     const { start } = range
-    const parent = document.getParent(start.key)
-    const startText = document.assertDescendant(start.key)
+    const parent = document.getParent(start.path)
+    const startText = document.assertDescendant(start.path)
     const index = parent.nodes.indexOf(startText)
 
-    if (editor.isVoid(parent)) return
+    if (editor.isVoid(parent)) {
+      return
+    }
 
-    editor.splitNodeByKey(start.key, start.offset)
+    editor.splitNodeByPath(start.path, start.offset)
     editor.insertNodeByKey(parent.key, index + 1, inline)
   })
 }
@@ -873,19 +892,21 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
  */
 
 Commands.insertTextAtRange = (editor, range, text, marks) => {
-  range = deleteExpandedAtRange(editor, range)
+  editor.withoutNormalizing(() => {
+    range = deleteExpandedAtRange(editor, range)
 
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const offset = start.offset
-  const parent = document.getParent(start.key)
+    const { value } = editor
+    const { document } = value
+    const { start } = range
+    const offset = start.offset
+    const parent = document.getParent(start.path)
 
-  if (editor.isVoid(parent)) {
-    return
-  }
+    if (editor.isVoid(parent)) {
+      return
+    }
 
-  editor.insertTextByKey(start.key, offset, text, marks)
+    editor.insertTextByPath(start.path, offset, text, marks)
+  })
 }
 
 /**
@@ -910,9 +931,10 @@ Commands.removeMarkAtRange = (editor, range, mark) => {
       let index = 0
       let length = node.text.length
 
-      if (key == start.key) index = start.offset
-      if (key == end.key) length = end.offset
-      if (key == start.key && key == end.key) length = end.offset - start.offset
+      if (key === start.key) index = start.offset
+      if (key === end.key) length = end.offset
+      if (key === start.key && key === end.key)
+        length = end.offset - start.offset
 
       editor.removeMarkByKey(key, index, length, mark)
     })
@@ -933,20 +955,20 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
   const blocks = document.getLeafBlocksAtRange(range)
 
   const { start, end, isCollapsed } = range
-  const isStartVoid = document.hasVoidParent(start.key, editor)
-  const startBlock = document.getClosestBlock(start.key)
+  const isStartVoid = document.hasVoidParent(start.path, editor)
+  const startBlock = document.getClosestBlock(start.path)
   const endBlock = document.getClosestBlock(end.key)
 
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
   // ignore that for UX reasons.
   const isHanging =
-    isCollapsed == false &&
-    start.offset == 0 &&
-    end.offset == 0 &&
-    isStartVoid == false &&
-    start.key == startBlock.getFirstText().key &&
-    end.key == endBlock.getFirstText().key
+    isCollapsed === false &&
+    start.offset === 0 &&
+    end.offset === 0 &&
+    isStartVoid === false &&
+    start.key === startBlock.getFirstText().key &&
+    end.key === endBlock.getFirstText().key
 
   // If it's a hanging selection, ignore the last block.
   const sets = isHanging ? blocks.slice(0, -1) : blocks
@@ -992,18 +1014,18 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
   const { start, end } = range
   let { value } = editor
   let { document } = value
-  let node = document.assertDescendant(start.key)
+  let node = document.assertDescendant(start.path)
   let parent = document.getClosestBlock(node.key)
   let h = 0
 
-  while (parent && parent.object == 'block' && h < height) {
+  while (parent && parent.object === 'block' && h < height) {
     node = parent
     parent = document.getClosestBlock(parent.key)
     h++
   }
 
   editor.withoutNormalizing(() => {
-    editor.splitDescendantsByKey(node.key, start.key, start.offset)
+    editor.splitDescendantsByKey(node.key, start.path, start.offset)
 
     value = editor.value
     document = value.document
@@ -1014,7 +1036,7 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
       range = range.moveAnchorToStartOfNode(nextBlock)
       range = range.setFocus(range.focus.setPath(null))
 
-      if (start.key === end.key) {
+      if (start.path.equals(end.path)) {
         range = range.moveFocusTo(range.anchor.key, end.offset - start.offset)
       }
 
@@ -1038,17 +1060,17 @@ Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
   const { start } = range
   const { value } = editor
   const { document } = value
-  let node = document.assertDescendant(start.key)
+  let node = document.assertDescendant(start.path)
   let parent = document.getClosestInline(node.key)
   let h = 0
 
-  while (parent && parent.object == 'inline' && h < height) {
+  while (parent && parent.object === 'inline' && h < height) {
     node = parent
     parent = document.getClosestInline(parent.key)
     h++
   }
 
-  editor.splitDescendantsByKey(node.key, start.key, start.offset)
+  editor.splitDescendantsByKey(node.key, start.path, start.offset)
 }
 
 /**
@@ -1094,8 +1116,8 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
   const wrappers = blocks
     .map(block => {
       return document.getClosest(block.key, parent => {
-        if (parent.object != 'block') return false
-        if (properties.type != null && parent.type != properties.type)
+        if (parent.object !== 'block') return false
+        if (properties.type != null && parent.type !== properties.type)
           return false
         if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
@@ -1110,29 +1132,29 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
     wrappers.forEach(block => {
       const first = block.nodes.first()
       const last = block.nodes.last()
-      const parent = document.getParent(block.key)
+      const parent = editor.value.document.getParent(block.key)
       const index = parent.nodes.indexOf(block)
 
       const children = block.nodes.filter(child => {
-        return blocks.some(b => child == b || child.hasDescendant(b.key))
+        return blocks.some(b => child === b || child.hasDescendant(b.key))
       })
 
       const firstMatch = children.first()
       const lastMatch = children.last()
 
-      if (first == firstMatch && last == lastMatch) {
+      if (first === firstMatch && last === lastMatch) {
         block.nodes.forEach((child, i) => {
           editor.moveNodeByKey(child.key, parent.key, index + i)
         })
 
         editor.removeNodeByKey(block.key)
-      } else if (last == lastMatch) {
-        block.nodes.skipUntil(n => n == firstMatch).forEach((child, i) => {
+      } else if (last === lastMatch) {
+        block.nodes.skipUntil(n => n === firstMatch).forEach((child, i) => {
           editor.moveNodeByKey(child.key, parent.key, index + 1 + i)
         })
-      } else if (first == firstMatch) {
+      } else if (first === firstMatch) {
         block.nodes
-          .takeUntil(n => n == lastMatch)
+          .takeUntil(n => n === lastMatch)
           .push(lastMatch)
           .forEach((child, i) => {
             editor.moveNodeByKey(child.key, parent.key, index + i)
@@ -1145,7 +1167,7 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
         document = editor.value.document
 
         children.forEach((child, i) => {
-          if (i == 0) {
+          if (i === 0) {
             const extra = child
             child = document.getNextBlock(child.key)
             editor.removeNodeByKey(extra.key)
@@ -1175,8 +1197,8 @@ Commands.unwrapInlineAtRange = (editor, range, properties) => {
   const inlines = texts
     .map(text => {
       return document.getClosest(text.key, parent => {
-        if (parent.object != 'inline') return false
-        if (properties.type != null && parent.type != properties.type)
+        if (parent.object !== 'inline') return false
+        if (properties.type != null && parent.type !== properties.type)
           return false
         if (properties.data != null && !parent.data.isSuperset(properties.data))
           return false
@@ -1229,7 +1251,7 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   } else {
     // Determine closest shared parent to all blocks in selection.
     parent = document.getClosest(firstblock.key, p1 => {
-      return !!document.getClosest(lastblock.key, p2 => p1 == p2)
+      return !!document.getClosest(lastblock.key, p2 => p1 === p2)
     })
   }
 
@@ -1240,8 +1262,8 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   // selection.
   if (siblings == null) {
     const indexes = parent.nodes.reduce((ind, node, i) => {
-      if (node == firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
-      if (node == lastblock || node.hasDescendant(lastblock.key)) ind[1] = i
+      if (node === firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
+      if (node === lastblock || node.hasDescendant(lastblock.key)) ind[1] = i
       return ind
     }, [])
 
@@ -1280,7 +1302,7 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
 
   if (range.isCollapsed) {
     // Wrapping an inline void
-    const inlineParent = document.getClosestInline(start.key)
+    const inlineParent = document.getClosestInline(start.path)
 
     if (!inlineParent) {
       return
@@ -1297,15 +1319,15 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
   inline = inline.set('nodes', inline.nodes.clear())
 
   const blocks = document.getLeafBlocksAtRange(range)
-  let startBlock = document.getClosestBlock(start.key)
-  let endBlock = document.getClosestBlock(end.key)
-  const startInline = document.getClosestInline(start.key)
-  const endInline = document.getClosestInline(end.key)
-  let startChild = startBlock.getFurthestAncestor(start.key)
-  let endChild = endBlock.getFurthestAncestor(end.key)
+  let startBlock = document.getClosestBlock(start.path)
+  let endBlock = document.getClosestBlock(end.path)
+  const startInline = document.getClosestInline(start.path)
+  const endInline = document.getClosestInline(end.path)
+  let startChild = startBlock.getFurthestChild(start.key)
+  let endChild = endBlock.getFurthestChild(end.key)
 
   editor.withoutNormalizing(() => {
-    if (!startInline || startInline != endInline) {
+    if (!startInline || startInline !== endInline) {
       editor.splitDescendantsByKey(endChild.key, end.key, end.offset)
       editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
     }
@@ -1313,48 +1335,43 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
     document = editor.value.document
     startBlock = document.getDescendant(startBlock.key)
     endBlock = document.getDescendant(endBlock.key)
-    startChild = startBlock.getFurthestAncestor(start.key)
-    endChild = endBlock.getFurthestAncestor(end.key)
+    startChild = startBlock.getFurthestChild(start.key)
+    endChild = endBlock.getFurthestChild(end.key)
     const startIndex = startBlock.nodes.indexOf(startChild)
     const endIndex = endBlock.nodes.indexOf(endChild)
 
-    if (startInline && startInline == endInline) {
-      const text = startBlock
-        .getTextsAtRange(range)
-        .get(0)
-        .splitText(start.offset)[1]
-        .splitText(end.offset - start.offset)[0]
+    if (startInline && startInline === endInline) {
+      const texts = startBlock.getTextsAtRange(range).map(text => {
+        if (start.key === text.key && end.key === text.key) {
+          return text
+            .splitText(start.offset)[1]
+            .splitText(end.offset - start.offset)[0]
+            .regenerateKey()
+        } else if (start.key === text.key) {
+          return text.splitText(start.offset)[1].regenerateKey()
+        } else if (end.key === text.key) {
+          return text.splitText(end.offset)[0].regenerateKey()
+        } else {
+          return text.regenerateKey()
+        }
+      })
 
-      inline = inline.set('nodes', List([text]))
+      inline = inline.set('nodes', texts)
       editor.insertInlineAtRange(range, inline)
-
-      const inlinekey = inline.getFirstText().key
-      const rng = {
-        anchor: {
-          key: inlinekey,
-          offset: 0,
-        },
-        focus: {
-          key: inlinekey,
-          offset: end.offset - start.offset,
-        },
-        isFocused: true,
-      }
-      editor.select(rng)
-    } else if (startBlock == endBlock) {
+    } else if (startBlock === endBlock) {
       document = editor.value.document
       startBlock = document.getClosestBlock(start.key)
-      startChild = startBlock.getFurthestAncestor(start.key)
+      startChild = startBlock.getFurthestChild(start.key)
 
       const startInner = document.getNextSibling(startChild.key)
       const startInnerIndex = startBlock.nodes.indexOf(startInner)
       const endInner =
-        start.key == end.key
+        start.key === end.key
           ? startInner
-          : startBlock.getFurthestAncestor(end.key)
+          : startBlock.getFurthestChild(end.key)
       const inlines = startBlock.nodes
-        .skipUntil(n => n == startInner)
-        .takeUntil(n => n == endInner)
+        .skipUntil(n => n === startInner)
+        .takeUntil(n => n === endInner)
         .push(endInner)
 
       const node = inline.regenerateKey()
@@ -1407,13 +1424,13 @@ Commands.wrapTextAtRange = (editor, range, prefix, suffix = prefix) => {
   const startRange = range.moveToStart()
   let endRange = range.moveToEnd()
 
-  if (start.key == end.key) {
+  if (start.path.equals(end.path)) {
     endRange = endRange.moveForward(prefix.length)
   }
 
   editor.withoutNormalizing(() => {
-    editor.insertTextAtRange(startRange, prefix, [])
-    editor.insertTextAtRange(endRange, suffix, [])
+    editor.insertTextAtRange(startRange, prefix)
+    editor.insertTextAtRange(endRange, suffix)
   })
 }
 

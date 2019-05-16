@@ -40,13 +40,8 @@ function deserialize(string, options = {}) {
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  object: 'leaf',
-                  text: line,
-                  marks: defaultMarks,
-                },
-              ],
+              text: line,
+              marks: defaultMarks,
             },
           ],
         }
@@ -80,8 +75,8 @@ function serializeNode(node, options = {}) {
   const { delimiter = '\n' } = options
 
   if (
-    node.object == 'document' ||
-    (node.object == 'block' && Block.isBlockList(node.nodes))
+    node.object === 'document' ||
+    (node.object === 'block' && Block.isBlockList(node.nodes))
   ) {
     return node.nodes.map(serializeNode).join(delimiter)
   } else {

@@ -1,6 +1,6 @@
 /*
 This example is intended to be a super basic mentions implementation that
-people can work off of. What is show here is how to detect when a user starts
+people can work off of. What is shown here is how to detect when a user starts
 typing a mention, making a search query, and then inserting a mention when
 the user selects an item. There are a few improvements that can be made in a
 production implementation:
@@ -41,7 +41,7 @@ import Suggestions from './Suggestions'
 const USER_MENTION_NODE_TYPE = 'userMention'
 
 /**
- * The decoration mark type that the menu will position itself against. The
+ * The annotation mark type that the menu will position itself against. The
  * "context" is just the current text after the @ symbol.
  * @type {String}
  */
@@ -83,7 +83,7 @@ function getInput(value) {
   const textBefore = value.startText.text.slice(0, startOffset)
   const result = CAPTURE_REGEX.exec(textBefore)
 
-  return result === null ? null : result[1]
+  return result == null ? null : result[1]
 }
 
 /**
@@ -118,7 +118,7 @@ class MentionsExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           ref={this.editorRef}
-          renderNode={this.renderNode}
+          renderInline={this.renderInline}
           renderMark={this.renderMark}
           schema={schema}
         />
@@ -134,7 +134,7 @@ class MentionsExample extends React.Component {
   renderMark(props, editor, next) {
     if (props.mark.type === CONTEXT_MARK_TYPE) {
       return (
-        // Adding the className here is important so taht the `Suggestions`
+        // Adding the className here is important so that the `Suggestions`
         // component can find an anchor.
         <span {...props.attributes} className="mention-context">
           {props.children}
@@ -145,7 +145,7 @@ class MentionsExample extends React.Component {
     return next()
   }
 
-  renderNode(props, editor, next) {
+  renderInline(props, editor, next) {
     const { attributes, node } = props
 
     if (node.type === USER_MENTION_NODE_TYPE) {
@@ -215,12 +215,12 @@ class MentionsExample extends React.Component {
 
       const { selection } = change.value
 
-      let decorations = change.value.decorations.filter(
+      let annotations = change.value.annotations.filter(
         value => value.mark.type !== CONTEXT_MARK_TYPE
       )
 
       if (inputValue && hasValidAncestors(change.value)) {
-        decorations = decorations.push({
+        annotations = annotations.push({
           anchor: {
             key: selection.start.key,
             offset: selection.start.offset - inputValue.length,
@@ -236,8 +236,8 @@ class MentionsExample extends React.Component {
       }
 
       this.setState({ value: change.value }, () => {
-        // We need to set decorations after the value flushes into the editor.
-        this.editorRef.current.setDecorations(decorations)
+        // We need to set annotations after the value flushes into the editor.
+        this.editorRef.current.setannotations(annotations)
       })
       return
     }

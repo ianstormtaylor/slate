@@ -7,7 +7,7 @@ const { include } = require('./config')
 const categoryDir = resolve(__dirname)
 
 const categories = readdirSync(categoryDir).filter(
-  c => c[0] != '.' && c.match(/^slate/)
+  c => c[0] !== '.' && c.match(/^slate/)
 )
 
 categories.forEach(dir => {

@@ -27,26 +27,18 @@ const TEXT_RULE = {
     if (el.tagName && el.tagName.toLowerCase() === 'br') {
       return {
         object: 'text',
-        leaves: [
-          {
-            object: 'leaf',
-            text: '\n',
-          },
-        ],
+        text: '\n',
+        marks: [],
       }
     }
 
-    if (el.nodeName == '#text') {
+    if (el.nodeName === '#text') {
       if (el.nodeValue && el.nodeValue.match(/<!--.*?-->/)) return
 
       return {
         object: 'text',
-        leaves: [
-          {
-            object: 'leaf',
-            text: el.nodeValue,
-          },
-        ],
+        text: el.nodeValue,
+        marks: [],
       }
     }
   },
@@ -54,7 +46,7 @@ const TEXT_RULE = {
   serialize(obj, children) {
     if (obj.object === 'string') {
       return children.split('\n').reduce((array, text, i) => {
-        if (i != 0) array.push(<br key={i} />)
+        if (i !== 0) array.push(<br key={i} />)
         array.push(text)
         return array
       }, [])
@@ -70,7 +62,7 @@ const TEXT_RULE = {
  */
 
 function defaultParseHtml(html) {
-  if (typeof DOMParser === 'undefined') {
+  if (typeof DOMParser == 'undefined') {
     throw new Error(
       'The native `DOMParser` global which the `Html` serializer uses by default is not present in this environment. You must supply the `options.parseHtml` function instead.'
     )
@@ -130,12 +122,12 @@ class Html {
 
     // COMPAT: ensure that all top-level inline nodes are wrapped into a block.
     nodes = nodes.reduce((memo, node, i, original) => {
-      if (node.object == 'block') {
+      if (node.object === 'block') {
         memo.push(node)
         return memo
       }
 
-      if (i > 0 && original[i - 1].object != 'block') {
+      if (i > 0 && original[i - 1].object !== 'block') {
         const block = memo[memo.length - 1]
         block.nodes.push(node)
         return memo
@@ -153,7 +145,7 @@ class Html {
     }, [])
 
     // TODO: pretty sure this is no longer needed.
-    if (nodes.length == 0) {
+    if (nodes.length === 0) {
       nodes = [
         {
           object: 'block',
@@ -162,13 +154,8 @@ class Html {
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  object: 'leaf',
-                  text: '',
-                  marks: [],
-                },
-              ],
+              text: '',
+              marks: [],
             },
           ],
         },
@@ -229,7 +216,7 @@ class Html {
     }
 
     const next = elements => {
-      if (Object.prototype.toString.call(elements) == '[object NodeList]') {
+      if (Object.prototype.toString.call(elements) === '[object NodeList]') {
         elements = Array.from(elements)
       }
 
@@ -254,10 +241,10 @@ class Html {
       const type = typeOf(ret)
 
       if (
-        type != 'array' &&
-        type != 'object' &&
-        type != 'null' &&
-        type != 'undefined'
+        type !== 'array' &&
+        type !== 'object' &&
+        type !== 'null' &&
+        type !== 'undefined'
       ) {
         throw new Error(
           `A rule returned an invalid deserialized representation: "${node}".`
@@ -268,10 +255,18 @@ class Html {
         continue
       } else if (ret === null) {
         return null
-      } else if (ret.object == 'mark') {
+      } else if (ret.object === 'mark') {
         node = this.deserializeMark(ret)
       } else {
         node = ret
+      }
+
+      if (node.object === 'block' || node.object === 'inline') {
+        node.data = node.data || {}
+        node.nodes = node.nodes || []
+      } else if (node.object === 'text') {
+        node.marks = node.marks || []
+        node.text = node.text || ''
       }
 
       break
@@ -291,14 +286,12 @@ class Html {
     const { type, data } = mark
 
     const applyMark = node => {
-      if (node.object == 'mark') {
-        return this.deserializeMark(node)
-      } else if (node.object == 'text') {
-        node.leaves = node.leaves.map(leaf => {
-          leaf.marks = leaf.marks || []
-          leaf.marks.push({ type, data })
-          return leaf
-        })
+      if (node.object === 'mark') {
+        const ret = this.deserializeMark(node)
+        return ret
+      } else if (node.object === 'text') {
+        node.marks = node.marks || []
+        node.marks.push({ type, data })
       } else if (node.nodes) {
         node.nodes = node.nodes.map(applyMark)
       }
@@ -342,8 +335,21 @@ class Html {
 
   serializeNode = node => {
     if (node.object === 'text') {
-      const leaves = node.getLeaves()
-      return leaves.map(this.serializeLeaf)
+      const string = new String({ text: node.text })
+      const text = this.serializeString(string)
+
+      return node.marks.reduce((children, mark) => {
+        for (const rule of this.rules) {
+          if (!rule.serialize) continue
+          const ret = rule.serialize(mark, children)
+          if (ret === null) return
+          if (ret) return addKey(ret)
+        }
+
+        throw new Error(
+          `No serializer defined for mark of type "${mark.type}".`
+        )
+      }, text)
     }
 
     const children = node.nodes.map(this.serializeNode)
@@ -356,29 +362,6 @@ class Html {
     }
 
     throw new Error(`No serializer defined for node of type "${node.type}".`)
-  }
-
-  /**
-   * Serialize a `leaf`.
-   *
-   * @param {Leaf} leaf
-   * @return {String}
-   */
-
-  serializeLeaf = leaf => {
-    const string = new String({ text: leaf.text })
-    const text = this.serializeString(string)
-
-    return leaf.marks.reduce((children, mark) => {
-      for (const rule of this.rules) {
-        if (!rule.serialize) continue
-        const ret = rule.serialize(mark, children)
-        if (ret === null) return
-        if (ret) return addKey(ret)
-      }
-
-      throw new Error(`No serializer defined for mark of type "${mark.type}".`)
-    }, text)
   }
 
   /**
@@ -404,7 +387,7 @@ class Html {
    */
 
   cruftNewline = element => {
-    return !(element.nodeName === '#text' && element.nodeValue == '\n')
+    return !(element.nodeName === '#text' && element.nodeValue === '\n')
   }
 }
 

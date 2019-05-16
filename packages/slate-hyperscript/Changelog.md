@@ -4,6 +4,48 @@ This document maintains a list of changes to the `slate-hyperscript` package wit
 
 ---
 
+### `0.13.0` — May 8, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.47`.** The hyperscript creators have been updated to work with the `Annotation` model introduced in the latest version of Slate.
+
+**The `slate-hyperscript` package now uses the "annotations" name.** All of the existing APIs that previously used the word "decorations" in `slate-hyperscript` have been updated.
+
+---
+
+### `0.12.0` — May 1, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.46`.** The hyperscript creators have been updated to work alongside the new text data model in the latest version of slate.
+
+**The `<text>` and `<mark>` hyperscript tags must now return a single text node.** Previously they were more lenient, and might return an array of text nodes. This made it hard to be explicit in tests, and made certain configurations impossible. This new restriction makes it easier to reason about what the tags return, even if it makes certain cases slightly more verbose. For example:
+
+```jsx
+<paragraph>
+  <b>
+    a few <i>italic</i> and bold words.
+  </b>
+</paragraph>
+```
+
+Must now be written as:
+
+```jsx
+<paragraph>
+  <b>a few </b>
+  <b>
+    <i>italic</i>
+  </b>
+  <b> and bold words.</b>
+</paragraph>
+```
+
+Slightly more verbose, but with the benefit of being easy to tell exactly how many text nodes you will receive in your resulting document. And it allows setting `key=` values on the mark tags directly, since they map `1:1` to text nodes.
+
+---
+
 ### `0.11.0` — October 9, 2018
 
 ###### BREAKING

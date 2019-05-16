@@ -18,25 +18,25 @@ const input = {
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  text: 'This is editable ',
-                },
-                {
-                  text: 'rich',
-                  marks: [{ type: 'bold' }],
-                },
-                {
-                  text: ' text, ',
-                },
-                {
-                  text: 'much',
-                  marks: [{ type: 'italic' }],
-                },
-                {
-                  text: ' better than a textarea!',
-                },
-              ],
+              text: 'This is editable ',
+            },
+            {
+              object: 'text',
+              text: 'rich',
+              marks: [{ type: 'bold' }],
+            },
+            {
+              object: 'text',
+              text: ' text, ',
+            },
+            {
+              object: 'text',
+              text: 'much',
+              marks: [{ type: 'italic' }],
+            },
+            {
+              object: 'text',
+              text: ' better than a textarea!',
             },
           ],
         },

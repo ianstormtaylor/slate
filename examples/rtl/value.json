@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Slate supports both left-to-right text editing (English, French, etc.) and right-to-left text editing (Arabic, Hebrew, etc.) which it automatically detects. Here's an example featuring excerpts from Khalil Gibran:"
-              }
-            ]
+            "text":
+              "Slate supports both left-to-right text editing (English, French, etc.) and right-to-left text editing (Arabic, Hebrew, etc.) which it automatically detects. Here's an example featuring excerpts from Khalil Gibran:"
           }
         ]
       },
@@ -22,12 +20,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Et un jeune dit : parle-nous de l'amitié.\nEt il répondit, disant :\nVotre ami est votre besoin qui a trouvé une réponse.\nIl est le champ que vous semez avec amour et moissonnez avec reconnaissance.\nIl est votre table et votre foyer."
-              }
-            ]
+            "text":
+              "Et un jeune dit : parle-nous de l'amitié.\nEt il répondit, disant :\nVotre ami est votre besoin qui a trouvé une réponse.\nIl est le champ que vous semez avec amour et moissonnez avec reconnaissance.\nIl est votre table et votre foyer."
           }
         ]
       },
@@ -37,12 +31,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "ثم قال له شاب: هات حدثناعن الصداقة.\nفأجاب و قال:\nإن صديقك هو كفاية حاجاتك.\nهو حقك الذي تزرعه بالمحبة و تحصده بالشكر.\nهو مائدتك و موقدك."
-              }
-            ]
+            "text":
+              "ثم قال له شاب: هات حدثناعن الصداقة.\nفأجاب و قال:\nإن صديقك هو كفاية حاجاتك.\nهو حقك الذي تزرعه بالمحبة و تحصده بالشكر.\nهو مائدتك و موقدك."
           }
         ]
       },
@@ -52,12 +42,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "And a youth said, \"Speak to us of Friendship.\"\nYour friend is your needs answered.\nHe is your field which you sow with love and reap with thanksgiving.\nAnd he is your board and your fireside."
-              }
-            ]
+            "text":
+              "And a youth said, \"Speak to us of Friendship.\"\nYour friend is your needs answered.\nHe is your field which you sow with love and reap with thanksgiving.\nAnd he is your board and your fireside."
           }
         ]
       },
@@ -67,11 +53,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out for yourself!"
-              }
-            ]
+            "text": "Try it out for yourself!"
           }
         ]
       }

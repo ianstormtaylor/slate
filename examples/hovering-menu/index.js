@@ -4,92 +4,52 @@ import { Value } from 'slate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialValue from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Button, Icon, Menu } from '../components'
 
-/**
- * Give the menu some styles.
- *
- * @type {Component}
- */
-
-const StyledMenu = styled(Menu)`
-  padding: 8px 7px 6px;
-  position: absolute;
-  z-index: 1;
-  top: -10000px;
-  left: -10000px;
-  margin-top: -6px;
-  opacity: 0;
-  background-color: #222;
-  border-radius: 4px;
-  transition: opacity 0.75s;
-`
-
-/**
- * The hovering menu.
- *
- * @type {Component}
- */
-
-class HoverMenu extends React.Component {
-  /**
-   * Render.
-   *
-   * @return {Element}
-   */
-
-  render() {
-    const { className, innerRef } = this.props
-    const root = window.document.getElementById('root')
-
-    return ReactDOM.createPortal(
-      <StyledMenu className={className} innerRef={innerRef}>
-        {this.renderMarkButton('bold', 'format_bold')}
-        {this.renderMarkButton('italic', 'format_italic')}
-        {this.renderMarkButton('underlined', 'format_underlined')}
-        {this.renderMarkButton('code', 'code')}
-      </StyledMenu>,
-      root
-    )
-  }
-
-  /**
-   * Render a mark-toggling toolbar button.
-   *
-   * @param {String} type
-   * @param {String} icon
-   * @return {Element}
-   */
-
-  renderMarkButton(type, icon) {
-    const { editor } = this.props
-    const { value } = editor
-    const isActive = value.activeMarks.some(mark => mark.type == type)
-    return (
-      <Button
-        reversed
-        active={isActive}
-        onMouseDown={event => this.onClickMark(event, type)}
-      >
-        <Icon>{icon}</Icon>
-      </Button>
-    )
-  }
-
-  /**
-   * When a mark button is clicked, toggle the current mark.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  onClickMark(event, type) {
-    const { editor } = this.props
-    event.preventDefault()
-    editor.toggleMark(type)
-  }
+const MarkButton = ({ editor, type, icon }) => {
+  const { value } = editor
+  const isActive = value.activeMarks.some(mark => mark.type === type)
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+        editor.toggleMark(type)
+      }}
+    >
+      <Icon>{icon}</Icon>
+    </Button>
+  )
 }
+
+const HoverMenu = React.forwardRef(({ editor }, ref) => {
+  const root = window.document.getElementById('root')
+  return ReactDOM.createPortal(
+    <Menu
+      ref={ref}
+      className={css`
+        padding: 8px 7px 6px;
+        position: absolute;
+        z-index: 1;
+        top: -10000px;
+        left: -10000px;
+        margin-top: -6px;
+        opacity: 0;
+        background-color: #222;
+        border-radius: 4px;
+        transition: opacity 0.75s;
+      `}
+    >
+      <MarkButton editor={editor} type="bold" icon="format_bold" />
+      <MarkButton editor={editor} type="italic" icon="format_italic" />
+      <MarkButton editor={editor} type="underlined" icon="format_underlined" />
+      <MarkButton editor={editor} type="code" icon="code" />
+    </Menu>,
+    root
+  )
+})
 
 /**
  * The hovering menu example.
@@ -108,6 +68,8 @@ class HoveringMenu extends React.Component {
     value: Value.fromJSON(initialValue),
   }
 
+  menuRef = React.createRef()
+
   /**
    * On update, update the menu.
    */
@@ -125,7 +87,7 @@ class HoveringMenu extends React.Component {
    */
 
   updateMenu = () => {
-    const menu = this.menu
+    const menu = this.menuRef.current
     if (!menu) return
 
     const { value } = this.state
@@ -181,7 +143,7 @@ class HoveringMenu extends React.Component {
     return (
       <React.Fragment>
         {children}
-        <HoverMenu innerRef={menu => (this.menu = menu)} editor={editor} />
+        <HoverMenu ref={this.menuRef} editor={editor} />
       </React.Fragment>
     )
   }

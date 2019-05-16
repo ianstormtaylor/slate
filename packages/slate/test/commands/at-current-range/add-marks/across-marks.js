@@ -38,8 +38,9 @@ export const output = (
         <u>
           <i>ita</i>
         </u>
-        <focus />
-        <i>lic</i>
+        <i>
+          <focus />lic
+        </i>
       </paragraph>
     </document>
   </value>

@@ -44,13 +44,8 @@ export const output = {
           {
             object: 'text',
             key: '0',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
           {
             object: 'inline',
@@ -61,26 +56,16 @@ export const output = {
               {
                 object: 'text',
                 key: '1',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'one',
-                    marks: [],
-                  },
-                ],
+                text: 'one',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
             key: '3',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
         ],
       },
@@ -93,13 +78,8 @@ export const output = {
           {
             object: 'text',
             key: '5',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
           {
             object: 'inline',
@@ -110,26 +90,16 @@ export const output = {
               {
                 object: 'text',
                 key: '6',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'two',
-                    marks: [],
-                  },
-                ],
+                text: 'two',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
             key: '8',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
         ],
       },

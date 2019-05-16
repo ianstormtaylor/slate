@@ -18,14 +18,14 @@ export const input = (
   </value>
 )
 
+// TODO: this selection logic isn't right
 export const output = (
   <value>
     <document>
       <paragraph>
         <link>
-          he<hashtag>
-            <anchor />ll<focus />
-          </hashtag>o
+          he<hashtag>ll</hashtag>
+          <cursor />o
         </link>
       </paragraph>
     </document>

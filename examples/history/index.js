@@ -71,8 +71,8 @@ class History extends React.Component {
    * @param {Editor} editor
    */
 
-  onChange = ({ value }) => {
-    this.setState({ value })
+  onChange = change => {
+    this.setState({ value: change.value })
   }
 
   /**

@@ -9,7 +9,15 @@ import Queries from './queries'
  */
 
 function SchemaPlugin(schema) {
-  const { rules, document, blocks, inlines, marks } = schema
+  const {
+    rules,
+    document,
+    blocks,
+    inlines,
+    marks,
+    annotations,
+    decorations,
+  } = schema
   let schemaRules = []
 
   if (rules) {
@@ -50,17 +58,35 @@ function SchemaPlugin(schema) {
     }
   }
 
+  if (annotations) {
+    for (const key in annotations) {
+      schemaRules.push({
+        match: [{ object: 'annotation', type: key }],
+        ...annotations[key],
+      })
+    }
+  }
+
+  if (decorations) {
+    for (const key in decorations) {
+      schemaRules.push({
+        match: [{ object: 'decoration', type: key }],
+        ...decorations[key],
+      })
+    }
+  }
+
   /**
-   * Check if a `mark` is void based on the schema rules.
+   * Check if a `format` is atomic based on the schema rules.
    *
    * @param {Editor} editor
-   * @param {Mark} mark
+   * @param {Format} format
    * @return {Boolean}
    */
 
-  function isAtomic(editor, mark) {
+  function isAtomic(editor, format) {
     const rule = schemaRules.find(
-      r => 'isAtomic' in r && testRules(mark, r.match)
+      r => 'isAtomic' in r && testRules(format, r.match)
     )
 
     return rule && rule.isAtomic
@@ -243,7 +269,12 @@ function testRules(object, rules) {
  */
 
 function validateRules(object, rule, rules, options = {}) {
-  const { every = false } = options
+  const { every = false, match = null } = options
+
+  if (typeof rule === 'function') {
+    const valid = rule(object, match)
+    return valid ? null : fail('node_invalid', { rule, node: object })
+  }
 
   if (Array.isArray(rule)) {
     const array = rule.length ? rule : [{}]
@@ -306,7 +337,9 @@ function validateData(node, rule) {
 
 function validateMarks(node, rule) {
   if (rule.marks == null) return
-  const marks = node.getMarks().toArray()
+
+  const marks =
+    node.object === 'text' ? node.marks.toArray() : node.getMarks().toArray()
 
   for (const mark of marks) {
     const valid = rule.marks.some(
@@ -382,7 +415,7 @@ function validateNodes(node, rule, rules = []) {
 
   function nextChild() {
     index += 1
-    previous = child
+    previous = index ? children.get(index - 1) : null
     child = children.get(index)
     next = children.get(index + 1)
     if (!child) return false
@@ -569,7 +602,7 @@ function validateNext(node, child, next, index, rules) {
     if (rule.next == null) continue
     if (!testRules(child, rule.match)) continue
 
-    const error = validateRules(next, rule.next)
+    const error = validateRules(next, rule.next, [], { match: child })
     if (!error) continue
 
     error.rule = rule

@@ -5,6 +5,7 @@
  */
 
 export const TYPES = {
+  annotation: '@@__SLATE_ANNOTATION__@@',
   block: '@@__SLATE_BLOCK__@@',
   change: '@@__SLATE_CHANGE__@@',
   decoration: '@@__SLATE_DECORATION__@@',

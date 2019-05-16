@@ -26,8 +26,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
-        <b thing="value">w</b>
+        <b thing="value">
+          <anchor />w
+        </b>
         <focus />ord
       </paragraph>
     </document>

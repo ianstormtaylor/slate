@@ -92,6 +92,43 @@ if (isBrowser) {
 }
 
 /**
+ * Array of regular expression matchers and their API version
+ *
+ * @type {Array}
+ */
+
+const ANDROID_API_VERSIONS = [
+  [/^9([.]0|)/, 28],
+  [/^8[.]1/, 27],
+  [/^8([.]0|)/, 26],
+  [/^7[.]1/, 25],
+  [/^7([.]0|)/, 24],
+  [/^6([.]0|)/, 23],
+  [/^5[.]1/, 22],
+  [/^5([.]0|)/, 21],
+  [/^4[.]4/, 20],
+]
+
+/**
+ * get the Android API version from the userAgent
+ *
+ * @return {number} version
+ */
+
+function getAndroidApiVersion() {
+  if (os !== 'android') return null
+  const { userAgent } = window.navigator
+  const matchData = userAgent.match(/Android\s([0-9\.]+)/)
+  if (matchData == null) return null
+  const versionString = matchData[1]
+
+  for (const [regex, version] of ANDROID_API_VERSIONS) {
+    if (versionString.match(regex)) return version
+  }
+  return null
+}
+
+/**
  * Export.
  *
  * @type {Boolean}
@@ -109,5 +146,9 @@ export const IS_IOS = os === 'ios'
 export const IS_MAC = os === 'macos'
 export const IS_WINDOWS = os === 'windows'
 
+export const ANDROID_API_VERSION = getAndroidApiVersion()
+
 export const HAS_INPUT_EVENTS_LEVEL_1 = features.includes('inputeventslevel1')
-export const HAS_INPUT_EVENTS_LEVEL_2 = features.includes('inputeventslevel2')
+export const HAS_INPUT_EVENTS_LEVEL_2 =
+  features.includes('inputeventslevel2') ||
+  (IS_ANDROID && (ANDROID_API_VERSION === 28 || ANDROID_API_VERSION === null))

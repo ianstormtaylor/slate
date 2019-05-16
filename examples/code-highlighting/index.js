@@ -3,6 +3,7 @@ import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
+
 import initialValueAsJson from './value.json'
 
 /**
@@ -59,9 +60,9 @@ function CodeBlockLine(props) {
  */
 
 function getContent(token) {
-  if (typeof token == 'string') {
+  if (typeof token === 'string') {
     return token
-  } else if (typeof token.content == 'string') {
+  } else if (typeof token.content === 'string') {
     return token.content
   } else {
     return token.content.map(getContent).join('')
@@ -87,21 +88,21 @@ class CodeHighlighting extends React.Component {
         placeholder="Write some code..."
         defaultValue={initialValue}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
-        renderMark={this.renderMark}
+        renderBlock={this.renderBlock}
+        renderDecoration={this.renderDecoration}
         decorateNode={this.decorateNode}
       />
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeBlock {...props} />
@@ -113,16 +114,16 @@ class CodeHighlighting extends React.Component {
   }
 
   /**
-   * Render a Slate mark.
+   * Render a Slate decoration.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderMark = (props, editor, next) => {
-    const { children, mark, attributes } = props
+  renderDecoration = (props, editor, next) => {
+    const { children, decoration, attributes } = props
 
-    switch (mark.type) {
+    switch (decoration.type) {
       case 'comment':
         return (
           <span {...attributes} style={{ opacity: '0.33' }}>
@@ -181,24 +182,25 @@ class CodeHighlighting extends React.Component {
 
   decorateNode = (node, editor, next) => {
     const others = next() || []
-    if (node.type != 'code') return others
+    if (node.type !== 'code') return others
 
     const language = node.data.get('language')
-    const texts = node.getTexts().toArray()
-    const string = texts.map(t => t.text).join('\n')
+    const texts = Array.from(node.texts())
+    const string = texts.map(([n]) => n.text).join('\n')
     const grammar = Prism.languages[language]
     const tokens = Prism.tokenize(string, grammar)
     const decorations = []
-    let startText = texts.shift()
-    let endText = startText
+    let startEntry = texts.shift()
+    let endEntry = startEntry
     let startOffset = 0
     let endOffset = 0
     let start = 0
 
     for (const token of tokens) {
-      startText = endText
+      startEntry = endEntry
       startOffset = endOffset
 
+      const [startText, startPath] = startEntry
       const content = getContent(token)
       const newlines = content.split('\n').length - 1
       const length = content.length - newlines
@@ -210,24 +212,27 @@ class CodeHighlighting extends React.Component {
       endOffset = startOffset + remaining
 
       while (available < remaining && texts.length > 0) {
-        endText = texts.shift()
+        endEntry = texts.shift()
+        const [endText] = endEntry
         remaining = length - available
         available = endText.text.length
         endOffset = remaining
       }
 
-      if (typeof token != 'string') {
+      const [endText, endPath] = endEntry
+
+      if (typeof token !== 'string') {
         const dec = {
+          type: token.type,
           anchor: {
             key: startText.key,
+            path: startPath,
             offset: startOffset,
           },
           focus: {
             key: endText.key,
+            path: endPath,
             offset: endOffset,
-          },
-          mark: {
-            type: token.type,
           },
         }
 

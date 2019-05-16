@@ -2,9 +2,10 @@
 /* eslint-disable react/jsx-key */
 
 const h = require('../../helpers/h')
+const { Editor } = require('slate')
 
-module.exports.default = function({ change, text }) {
-  change
+module.exports.default = function(editor) {
+  editor
     .removeNodeByKey('T1')
     .removeNodeByKey('T2')
     .removeNodeByKey('T3')
@@ -20,9 +21,8 @@ const value = (
           <paragraph>
             <paragraph>
               <text key={`T${i}`}>
-                {i == 0 ? <cursor /> : ''}
-                This is editable <b>rich</b> text, <i>much</i> better than a
-                textarea!
+                {i === 0 ? <cursor /> : null}
+                This is editable rich text, much better than a textarea!
               </text>
             </paragraph>
           </paragraph>
@@ -34,6 +34,5 @@ const value = (
 const text = value.document.getLastText()
 
 module.exports.input = function() {
-  const change = value.change()
-  return { change, text }
+  return new Editor({ value })
 }

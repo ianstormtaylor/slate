@@ -1,3 +1,4 @@
+import Annotation from '../models/annotation'
 import Block from '../models/block'
 import Change from '../models/change'
 import Decoration from '../models/decoration'
@@ -48,18 +49,21 @@ function create(type) {
  * Mix in the object interfaces.
  */
 
-mixin(create('block'), [Block])
-mixin(create('change'), [Change])
-mixin(create('decoration'), [Decoration])
-mixin(create('document'), [Document])
-mixin(create('editor'), [Editor])
-mixin(create('inline'), [Inline])
-mixin(create('leaf'), [Leaf])
-mixin(create('mark'), [Mark])
-mixin(create('node'), [Node])
-mixin(create('operation'), [Operation])
-mixin(create('point'), [Point])
-mixin(create('range'), [Range])
-mixin(create('selection'), [Selection])
-mixin(create('text'), [Text])
-mixin(create('value'), [Value])
+Object.entries({
+  Annotation,
+  Block,
+  Change,
+  Decoration,
+  Document,
+  Editor,
+  Inline,
+  Leaf,
+  Mark,
+  Node,
+  Operation,
+  Point,
+  Range,
+  Selection,
+  Text,
+  Value,
+}).forEach(([camel, obj]) => mixin(create(camel.toLowerCase()), [obj]))

@@ -79,6 +79,26 @@ Synchronously flush the current changes to editor, calling `onChange`.
 
 > 🤖 In normal operation you never need to use this method! However, it can be helpful for writing tests to be able to keep the entire test synchronous.
 
+### `hasCommand`
+
+`hasCommand(type: String) => Boolean`
+
+```js
+editor.hasCommand('insertLink')
+```
+
+Checks if a command by `type` has been registered.
+
+### `hasQuery`
+
+`hasQuery(type: String) => Boolean`
+
+```js
+editor.hasQuery('isLinkActive')
+```
+
+Checks if a query by `type` has been registered.
+
 ### `query`
 
 `query(type: String, ...args) => Any`
