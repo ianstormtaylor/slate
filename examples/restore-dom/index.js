@@ -157,7 +157,6 @@ class RestoreDOMExample extends React.Component {
    */
 
   onClickHighlight = bgcolor => {
-    const { editor } = this
     this.setState({ bgcolor })
   }
 
