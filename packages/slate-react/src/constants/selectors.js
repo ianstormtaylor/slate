@@ -17,4 +17,5 @@ export default {
   TEXT: `[${DATA_ATTRS.OBJECT}="text"]`,
   VOID: `[${DATA_ATTRS.VOID}]`,
   ZERO_WIDTH: `[${DATA_ATTRS.ZERO_WIDTH}]`,
+  ANNOTATION: `[${DATA_ATTRS.OBJECT}="annotation"]`,
 }

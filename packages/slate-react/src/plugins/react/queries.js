@@ -309,9 +309,12 @@ function QueriesPlugin() {
       range.setStart(textNode, 0)
       range.setEnd(nearestNode, nearestOffset)
       const contents = range.cloneContents()
-      const zeroWidths = contents.querySelectorAll(SELECTORS.ZERO_WIDTH)
+      const utilityNodes = contents.querySelectorAll([
+        SELECTORS.ZERO_WIDTH,
+        SELECTORS.ANNOTATION,
+      ])
 
-      Array.from(zeroWidths).forEach(el => {
+      Array.from(utilityNodes).forEach(el => {
         el.parentNode.removeChild(el)
       })
 
