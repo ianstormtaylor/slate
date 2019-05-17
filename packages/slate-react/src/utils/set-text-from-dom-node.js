@@ -1,4 +1,5 @@
 import findPoint from './find-point'
+import { Point, Range } from 'slate'
 
 /**
  * setTextFromDomNode lets us take a domNode and reconcile the text in the
@@ -15,53 +16,37 @@ import findPoint from './find-point'
  */
 
 export default function setTextFromDomNode(window, editor, domNode) {
-  const point = findPoint(domNode, 0, editor)
-  if (!point) return
-
-  // Get the text node and leaf in question.
   const { value } = editor
   const { document, selection } = value
+  const domElement = domNode.parentElement.closest('[data-key]')
+  const point = editor.findPoint(domElement, 0)
   const node = document.getDescendant(point.path)
   const block = document.getClosestBlock(point.path)
-  const leaves = node.getLeaves()
-  const lastText = block.getLastText()
-  const lastLeaf = leaves.last()
-  let start = 0
-  let end = 0
 
-  const leaf =
-    leaves.find(r => {
-      start = end
-      end += r.text.length
-      if (end > point.offset) return true
-    }) || lastLeaf
+  // Get text information
+  const { text } = node
+  let { textContent: domText } = domElement
 
-  // Get the text information.
-  const { text } = leaf
-  let { textContent } = domNode
-  const isLastText = node === lastText
-  const isLastLeaf = leaf === lastLeaf
-  const lastChar = textContent.charAt(textContent.length - 1)
+  const isLastNode = block.nodes.last() === node
+  const lastChar = domText.charAt(domText.length - 1)
 
   // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
   // we will have added another new line in <Leaf>'s render method to account
   // for browsers collapsing a single trailing new lines, so remove it.
-  if (isLastText && isLastLeaf && lastChar === '\n') {
-    textContent = textContent.slice(0, -1)
+  if (isLastNode && lastChar === '\n') {
+    domText = domText.slice(0, -1)
   }
 
   // If the text is no different, abort.
-  if (textContent === text) return
+  if (text === domText) return
 
-  // Determine what the selection should be after changing the text.
-  // const delta = textContent.length - text.length
-  // const corrected = selection.moveToEnd().moveForward(delta)
   let entire = selection
-    .moveAnchorTo(point.path, start)
-    .moveFocusTo(point.path, end)
+    .moveAnchorTo(point.path, 0)
+    .moveFocusTo(point.path, text.length)
 
   entire = document.resolveRange(entire)
 
   // Change the current value to have the leaf's text replaced.
-  editor.insertTextAtRange(entire, textContent, leaf.marks)
+  editor.insertTextAtRange(entire, domText, node.marks)
+  return
 }

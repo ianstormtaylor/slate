@@ -2,6 +2,7 @@ import PlaceholderPlugin from 'slate-react-placeholder'
 
 import EditorPropsPlugin from './editor-props'
 import RenderingPlugin from './rendering'
+import CommandsPlugin from './commands'
 import QueriesPlugin from './queries'
 import DOMPlugin from '../dom'
 import RestoreDOMPlugin from './restore-dom'
@@ -16,6 +17,7 @@ import RestoreDOMPlugin from './restore-dom'
 function ReactPlugin(options = {}) {
   const { placeholder = '', plugins = [] } = options
   const renderingPlugin = RenderingPlugin(options)
+  const commandsPlugin = CommandsPlugin(options)
   const queriesPlugin = QueriesPlugin(options)
   const editorPropsPlugin = EditorPropsPlugin(options)
   const domPlugin = DOMPlugin({
@@ -36,6 +38,7 @@ function ReactPlugin(options = {}) {
     restoreDomPlugin,
     placeholderPlugin,
     renderingPlugin,
+    commandsPlugin,
     queriesPlugin,
   ]
 }

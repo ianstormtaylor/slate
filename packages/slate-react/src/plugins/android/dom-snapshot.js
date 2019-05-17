@@ -51,7 +51,8 @@ export default class DomSnapshot {
     }
 
     this.snapshot = new ElementSnapshot(elements)
-    this.selection = getSelectionFromDom(window, editor, domSelection)
+    // this.selection = getSelectionFromDom(window, editor, domSelection)
+    this.selection = editor.findSelection(domSelection)
   }
 
   /**
