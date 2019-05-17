@@ -106,8 +106,6 @@ Commands.deleteAtRange = (editor, range) => {
   let startBlock = document.getClosestBlock(startKey)
   let endBlock = document.getClosestBlock(endKey)
 
-  console.log({ range, start: range.start, end: range.end })
-
   // Check if we have a "hanging" selection case where the even though the
   // selection extends into the start of the end node, we actually want to
   // ignore that for UX reasons.
@@ -117,13 +115,6 @@ Commands.deleteAtRange = (editor, range) => {
     isStartVoid === false &&
     startKey === startBlock.getFirstText().key &&
     endKey === endBlock.getFirstText().key
-
-  console.log({
-    startKey,
-    endKey,
-    startBlockText: startBlock.getFirstText().toJS(),
-    endBlockText: endBlock.getFirstText().toJS(),
-  })
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {

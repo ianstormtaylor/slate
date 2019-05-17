@@ -1,4 +1,3 @@
-import getSelectionFromDom from '../../utils/get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
 import SELECTORS from '../../constants/selectors'
 

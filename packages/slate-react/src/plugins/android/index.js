@@ -132,7 +132,6 @@ function AndroidPlugin() {
   function reconcile(window, editor, { from }) {
     debug.reconcile({ from })
     const domSelection = window.getSelection()
-    // const selection = getSelectionFromDom(window, editor, domSelection)
     const selection = editor.findSelection(domSelection)
 
     nodes.forEach(node => {
@@ -159,7 +158,6 @@ function AndroidPlugin() {
 
   function onBeforeInput(event, editor, next) {
     const isNative = !event.nativeEvent
-    console.log(999999999999999999999999999)
 
     debug('onBeforeInput', {
       isNative,
