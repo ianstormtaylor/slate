@@ -311,7 +311,7 @@ function QueriesPlugin() {
       const contents = range.cloneContents()
       const utilityNodes = contents.querySelectorAll([
         SELECTORS.ZERO_WIDTH,
-        SELECTORS.ANNOTATION,
+        `${SELECTORS.ANNOTATION} *:not(${SELECTORS.STRING})`,
       ])
 
       Array.from(utilityNodes).forEach(el => {
