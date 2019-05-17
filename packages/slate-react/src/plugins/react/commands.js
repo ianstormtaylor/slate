@@ -16,7 +16,7 @@ function CommandsPlugin() {
   function reconcileNode(editor, node) {
     const { value } = editor
     const { document, selection } = value
-    const path = node.path || document.getPath(node.key)
+    const path = document.getPath(node.key)
 
     const domElement = editor.findDOMNode(path)
     const block = document.getClosestBlock(path)
