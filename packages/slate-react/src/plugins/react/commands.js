@@ -51,14 +51,11 @@ function CommandsPlugin() {
    * Takes text from the `domNode` and uses it to set the text in the matching
    * `node` in Slate.
    *
-   * @param {Window} window
    * @param {Editor} editor
    * @param {DOMNode} domNode
    */
 
   function reconcileDOMNode(editor, domNode) {
-    const { value } = editor
-    const { document, selection } = value
     const domElement = domNode.parentElement.closest('[data-key]')
     const node = editor.findNode(domElement)
     editor.reconcileNode(node)
