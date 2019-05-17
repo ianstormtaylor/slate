@@ -6,21 +6,20 @@
 
 function CommandsPlugin() {
   /**
-   * reconcileDOMNode takes text from inside the `domNode` and uses it to set
-   * the text inside the matching `node` in Slate.
+   * Takes a `node`, find the matching `domNode` and uses it to set the text
+   * in the `node`.
    *
-   * @param {Window} window
    * @param {Editor} editor
-   * @param {Node} domNode
+   * @param {Node} node
    */
 
-  function reconcileDOMNode(editor, domNode) {
+  function reconcileNode(editor, node) {
     const { value } = editor
     const { document, selection } = value
-    const domElement = domNode.parentElement.closest('[data-key]')
-    const point = editor.findPoint(domElement, 0)
-    const node = document.getDescendant(point.path)
-    const block = document.getClosestBlock(point.path)
+    const path = document.getPath(node.key)
+
+    const domElement = editor.findDOMNode(path)
+    const block = document.getClosestBlock(path)
 
     // Get text information
     const { text } = node
@@ -39,9 +38,7 @@ function CommandsPlugin() {
     // If the text is no different, abort.
     if (text === domText) return
 
-    let entire = selection
-      .moveAnchorTo(point.path, 0)
-      .moveFocusTo(point.path, text.length)
+    let entire = selection.moveAnchorTo(path, 0).moveFocusTo(path, text.length)
 
     entire = document.resolveRange(entire)
 
@@ -50,8 +47,23 @@ function CommandsPlugin() {
     return
   }
 
+  /**
+   * Takes text from the `domNode` and uses it to set the text in the matching
+   * `node` in Slate.
+   *
+   * @param {Editor} editor
+   * @param {DOMNode} domNode
+   */
+
+  function reconcileDOMNode(editor, domNode) {
+    const domElement = domNode.parentElement.closest('[data-key]')
+    const node = editor.findNode(domElement)
+    editor.reconcileNode(node)
+  }
+
   return {
     commands: {
+      reconcileNode,
       reconcileDOMNode,
     },
   }
