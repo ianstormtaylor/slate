@@ -67,9 +67,10 @@ function DebugBatchEventsPlugin() {
    */
 
   function pushEvent(event) {
-    if (events.length == 0) {
+    if (events.length === 0) {
       startDate = new Date()
     }
+
     const s = stringifyEvent(event)
     const now = new Date()
     events.push(`- ${now - startDate} - ${s}`)
