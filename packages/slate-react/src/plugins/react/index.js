@@ -1,3 +1,4 @@
+import Debug from 'debug'
 import PlaceholderPlugin from 'slate-react-placeholder'
 
 import EditorPropsPlugin from './editor-props'
@@ -6,6 +7,8 @@ import CommandsPlugin from './commands'
 import QueriesPlugin from './queries'
 import DOMPlugin from '../dom'
 import RestoreDOMPlugin from './restore-dom'
+import DebugEventsPlugin from '../debug/debug-events'
+import DebugBatchEventsPlugin from '../debug/debug-batch-events'
 
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
@@ -16,6 +19,12 @@ import RestoreDOMPlugin from './restore-dom'
 
 function ReactPlugin(options = {}) {
   const { placeholder = '', plugins = [] } = options
+  const debugEventsPlugin = Debug.enabled('slate:events')
+    ? DebugEventsPlugin(options)
+    : null
+  const debugBatchEventsPlugin = Debug.enabled('slate:batch-events')
+    ? DebugBatchEventsPlugin(options)
+    : null
   const renderingPlugin = RenderingPlugin(options)
   const commandsPlugin = CommandsPlugin(options)
   const queriesPlugin = QueriesPlugin(options)
@@ -34,6 +43,8 @@ function ReactPlugin(options = {}) {
   })
 
   return [
+    debugEventsPlugin,
+    debugBatchEventsPlugin,
     domPlugin,
     restoreDomPlugin,
     placeholderPlugin,
