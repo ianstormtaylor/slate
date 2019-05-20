@@ -201,15 +201,13 @@ Leaf.propTypes = {
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   return (
+    next.block === prev.block &&
     next.index === prev.index &&
     next.marks === prev.marks &&
     next.parent === prev.parent &&
-    next.block === prev.block &&
+    next.text === prev.text &&
     next.annotations.equals(prev.annotations) &&
-    next.decorations.equals(prev.decorations) &&
-    // This is necessary for rerendering leaves when only
-    // content changes, e.g first leaf on search highlight.
-    next.text === prev.text
+    next.decorations.equals(prev.decorations)
   )
 })
 
