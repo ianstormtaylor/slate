@@ -114,7 +114,8 @@ Commands.deleteAtRange = (editor, range) => {
     endOffset === 0 &&
     isStartVoid === false &&
     startKey === startBlock.getFirstText().key &&
-    endKey === endBlock.getFirstText().key
+    endKey === endBlock.getFirstText().key &&
+    startKey !== endKey
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {
