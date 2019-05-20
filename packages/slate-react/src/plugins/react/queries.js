@@ -483,11 +483,14 @@ function QueriesPlugin() {
       anchor.offset === anchorText.text.length
     ) {
       const block = document.getClosestBlock(anchor.path)
-      const [next] = block.texts({ path: anchor.path })
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(anchor.path, depth)
+      const [next] = block.texts({ path: relativePath })
 
       if (next) {
         const [, nextPath] = next
-        range = range.moveAnchorTo(nextPath, 0)
+        const absolutePath = anchor.path.slice(0, depth).concat(nextPath)
+        range = range.moveAnchorTo(absolutePath, 0)
       }
     }
 
@@ -497,11 +500,14 @@ function QueriesPlugin() {
       focus.offset === focusText.text.length
     ) {
       const block = document.getClosestBlock(focus.path)
-      const [next] = block.texts({ path: focus.path })
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(focus.path, depth)
+      const [next] = block.texts({ path: relativePath })
 
       if (next) {
         const [, nextPath] = next
-        range = range.moveFocusTo(nextPath, 0)
+        const absolutePath = focus.path.slice(0, depth).concat(nextPath)
+        range = range.moveFocusTo(absolutePath, 0)
       }
     }
 
