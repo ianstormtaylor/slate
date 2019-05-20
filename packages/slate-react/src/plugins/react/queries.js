@@ -23,6 +23,10 @@ function QueriesPlugin() {
     path = PathUtils.create(path)
     const content = editor.tmp.contentRef.current
 
+    if (!content) {
+      return null
+    }
+
     if (!path.size) {
       return content.ref.current || null
     }
