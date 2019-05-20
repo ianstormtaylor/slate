@@ -181,13 +181,13 @@ function QueriesPlugin() {
           : y - rect.top < rect.top + rect.height - y
 
       const range = document.createRange()
-      const iterable = isPrevious ? 'previousTexts' : 'nextTexts'
       const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
-      const entry = document[iterable](path)
+      const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](
+        path
+      )
 
       if (entry) {
-        const [n] = entry
-        return range[move](n)
+        return range[move](entry)
       }
 
       return null
@@ -234,13 +234,24 @@ function QueriesPlugin() {
 
   function findPath(editor, element) {
     const content = editor.tmp.contentRef.current
+    let nodeElement = element
 
-    if (element === content.ref.current) {
+    // If element does not have a key, it is likely a string or
+    // mark, return the closest parent Node that can be looked up.
+    if (!nodeElement.hasAttribute(DATA_ATTRS.KEY)) {
+      nodeElement = nodeElement.closest(SELECTORS.KEY)
+    }
+
+    if (!nodeElement || !nodeElement.getAttribute(DATA_ATTRS.KEY)) {
+      return null
+    }
+
+    if (nodeElement === content.ref.current) {
       return PathUtils.create([])
     }
 
     const search = (instance, p) => {
-      if (element === instance) {
+      if (nodeElement === instance) {
         return p
       }
 
@@ -248,7 +259,7 @@ function QueriesPlugin() {
         return null
       }
 
-      if (element === instance.ref.current) {
+      if (nodeElement === instance.ref.current) {
         return p
       }
 

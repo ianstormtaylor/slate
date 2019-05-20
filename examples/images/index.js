@@ -1,4 +1,4 @@
-import { Editor, getEventRange, getEventTransfer } from 'slate-react'
+import { Editor, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
 
 import React from 'react'
@@ -181,7 +181,7 @@ class Images extends React.Component {
    */
 
   onDropOrPaste = (event, editor, next) => {
-    const target = getEventRange(event, editor)
+    const target = editor.findEventRange(event)
     if (!target && event.type === 'drop') return next()
 
     const transfer = getEventTransfer(event)
