@@ -106,10 +106,10 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.insertTextByPath = (editor, path, offset, text, marks) => {
-  marks = Mark.createSet(marks)
+Commands.insertTextByPath = (editor, path, offset, text, marksArg) => {
   const { value } = editor
   const { annotations, document } = value
+  const marks = Mark.createSet(marksArg)
   document.assertNode(path)
 
   editor.withoutNormalizing(() => {
@@ -140,8 +140,12 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       text,
     })
 
+    // If there are marks, add them. If an empty Set is explicitly passed in,
+    // the intent is to insert text with no marks.
     if (marks.size) {
       editor.addMarksByPath(path, offset, text.length, marks)
+    } else if (marksArg && marks.size === 0) {
+      editor.removeAllMarksByPath(path, offset, text.length)
     }
   })
 }
@@ -269,16 +273,23 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
  *
  * @param {Editor} editor
  * @param {Array} path
+ * @param {Number} offset (optional)
+ * @param {Number} length (optional)
  */
 
-Commands.removeAllMarksByPath = (editor, path) => {
-  const { state } = editor
-  const { document } = state
+Commands.removeAllMarksByPath = (editor, path, offset, length) => {
+  const { value } = editor
+  const { document } = value
   const node = document.assertNode(path)
 
   editor.withoutNormalizing(() => {
     if (node.object === 'text') {
-      editor.removeMarksByPath(path, 0, node.text.length, node.marks)
+      editor.removeMarksByPath(
+        path,
+        offset || 0,
+        length || node.text.length,
+        node.marks
+      )
       return
     }
 

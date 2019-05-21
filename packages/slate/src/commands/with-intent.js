@@ -323,7 +323,12 @@ Commands.insertInline = (editor, inline) => {
  */
 
 Commands.insertText = (editor, text, marks) => {
-  deleteExpanded(editor)
+  // If no marks are received and the selection is expanded, apply marks from
+  // the replaced text to the inserted text.
+  if (editor.value.selection.isExpanded && (!marks || !marks.size)) {
+    marks = editor.value.document.getInsertMarksAtRange(editor.value.selection)
+    deleteExpanded(editor)
+  }
 
   const { value } = editor
   const { document, selection } = value
