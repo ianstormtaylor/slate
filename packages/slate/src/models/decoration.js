@@ -1,4 +1,5 @@
 import isPlainObject from 'is-plain-object'
+import warning from 'tiny-warning'
 import { List, Record } from 'immutable'
 
 import Mark from './mark'
@@ -109,7 +110,18 @@ class Decoration extends Record(DEFAULTS) {
    */
 
   static fromJSON(object) {
-    const { type, data, anchor, focus } = object
+    const { anchor, focus } = object
+    let { type, data } = object
+
+    if (object.mark && !type) {
+      warning(
+        false,
+        'As of slate@0.47 the `decoration.mark` property has been changed to `decoration.type` and `decoration.data` directly.'
+      )
+
+      type = object.mark.type
+      data = object.mark.data
+    }
 
     if (!type) {
       throw new Error(

@@ -258,7 +258,7 @@ class App extends React.Component {
         value={this.state.value}
         onChange={this.onChange}
         // Add the ability to render our nodes and marks...
-        renderNode={this.renderNode}
+        renderBlock={this.renderNode}
         renderMark={this.renderMark}
       />
     )

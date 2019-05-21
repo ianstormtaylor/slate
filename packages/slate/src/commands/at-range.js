@@ -122,7 +122,8 @@ Commands.deleteAtRange = (editor, range) => {
     endOffset === 0 &&
     isStartVoid === false &&
     startKey === startBlock.getFirstText().key &&
-    endKey === endBlock.getFirstText().key
+    endKey === endBlock.getFirstText().key &&
+    startKey !== endKey
 
   // If it's a hanging selection, nudge it back to end in the previous text.
   if (isHanging && isEndVoid) {
@@ -674,15 +675,11 @@ Commands.insertBlockAtRange = (editor, range, block) => {
   const startInline = document.getClosestInline(startKey)
   const parent = document.getParent(startBlock.key)
   const index = parent.nodes.indexOf(startBlock)
+  const insertionMode = getInsertionMode(editor, range)
 
-  if (editor.isVoid(startBlock)) {
-    const extra = start.isAtEndOfNode(startBlock) ? 1 : 0
-    editor.insertNodeByKey(parent.key, index + extra, block)
-  } else if (!startInline && startBlock.text === '') {
-    editor.insertNodeByKey(parent.key, index + 1, block)
-  } else if (start.isAtStartOfNode(startBlock)) {
+  if (insertionMode === 'before') {
     editor.insertNodeByKey(parent.key, index, block)
-  } else if (start.isAtEndOfNode(startBlock)) {
+  } else if (insertionMode === 'behind') {
     editor.insertNodeByKey(parent.key, index + 1, block)
   } else {
     if (startInline && editor.isVoid(startInline)) {
@@ -704,6 +701,34 @@ Commands.insertBlockAtRange = (editor, range, block) => {
       editor.insertNodeByKey(parent.key, index + 1, block)
     })
   }
+}
+
+/**
+ * Check if current block should be split or new block should be added before or behind it.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+const getInsertionMode = (editor, range) => {
+  const { value } = editor
+  const { document } = value
+  const { start } = range
+  const startKey = start.key
+  const startBlock = document.getClosestBlock(startKey)
+  const startInline = document.getClosestInline(startKey)
+
+  if (editor.isVoid(startBlock)) {
+    if (start.isAtEndOfNode(startBlock)) return 'behind'
+    else return 'before'
+  } else if (!startInline && startBlock.text === '') {
+    return 'behind'
+  } else if (start.isAtStartOfNode(startBlock)) {
+    return 'before'
+  } else if (start.isAtEndOfNode(startBlock)) {
+    return 'behind'
+  }
+  return 'split'
 }
 
 /**
@@ -756,7 +781,12 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
       insertionNode === fragment &&
       (firstChild.hasBlockChildren() || lastChild.hasBlockChildren())
     ) {
-      fragment.nodes.reverse().forEach(node => {
+      // check if reversal is necessary or not
+      const insertionMode = getInsertionMode(editor, range)
+      const nodes =
+        insertionMode === 'before' ? fragment.nodes : fragment.nodes.reverse()
+
+      nodes.forEach(node => {
         editor.insertBlockAtRange(range, node)
       })
       return

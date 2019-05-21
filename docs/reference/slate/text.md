@@ -11,6 +11,8 @@ A text node in a Slate [`Document`](./document.md). Text nodes are always the bo
 ```js
 Text({
   key: String,
+  text: String,
+  marks: Immutable.List<Mark>,
 })
 ```
 
@@ -20,19 +22,23 @@ Text({
 
 A unique identifier for the node.
 
+### `text`
+
+`String`
+
+The text contents of this node.
+
+### `marks`
+
+`Immutable.List<Mark>,`
+
+A list of marks for this node.
+
 ### `object`
 
 `String`
 
 An immutable string value of `'text'` for easily separating this node from [`Inline`](./inline.md) or [`Block`](./block.md) nodes.
-
-## Computed Properties
-
-### `text`
-
-`String`
-
-A concatenated string of all of the characters in the text node.
 
 ## Static Methods
 

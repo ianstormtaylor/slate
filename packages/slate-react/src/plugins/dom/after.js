@@ -8,7 +8,6 @@ import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
 import cloneFragment from '../../utils/clone-fragment'
 import getEventTransfer from '../../utils/get-event-transfer'
 import setEventTransfer from '../../utils/set-event-transfer'
-import setTextFromDomNode from '../../utils/set-text-from-dom-node'
 
 /**
  * Debug.
@@ -432,7 +431,7 @@ function AfterPlugin(options = {}) {
     }
 
     const { anchorNode } = domSelection
-    setTextFromDomNode(window, editor, anchorNode)
+    editor.reconcileDOMNode(anchorNode)
 
     next()
   }
@@ -552,7 +551,7 @@ function AfterPlugin(options = {}) {
 
     if (Hotkeys.isExtendBackward(event)) {
       const startText = document.getNode(start.path)
-      const prevEntry = document.texts({
+      const [prevEntry] = document.texts({
         path: start.path,
         direction: 'backward',
       })

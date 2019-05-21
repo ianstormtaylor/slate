@@ -53,6 +53,7 @@ class Content extends React.Component {
   static propTypes = {
     autoCorrect: Types.bool.isRequired,
     className: Types.string,
+    contentKey: Types.number,
     editor: Types.object.isRequired,
     id: Types.string,
     readOnly: Types.bool.isRequired,
@@ -72,6 +73,22 @@ class Content extends React.Component {
   static defaultProps = {
     style: {},
     tagName: 'div',
+  }
+
+  /**
+   * An error boundary. If there is a render error, we increment `errorKey`
+   * which is part of the container `key` which forces a re-render from
+   * scratch.
+   *
+   * @param {Error} error
+   * @param {String} info
+   */
+
+  componentDidCatch(error, info) {
+    debug('componentDidCatch', { error, info })
+    // The call to `setState` is required despite not setting a value.
+    // Without this call, React will not try to recreate the component tree.
+    this.setState({})
   }
 
   /**
@@ -486,6 +503,7 @@ class Content extends React.Component {
 
     return (
       <Container
+        key={this.props.contentKey}
         {...handlers}
         {...data}
         ref={this.ref}

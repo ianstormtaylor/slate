@@ -8,7 +8,7 @@ import splitJoin from './split-join.js'
 import insert from './insert.js'
 import special from './special.js'
 import { isKeyHotkey } from 'is-hotkey'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
@@ -25,23 +25,11 @@ const DEFAULT_NODE = 'paragraph'
  * @type {Component}
  */
 
-const Instruction = props => (
-  <div
-    {...props}
-    className={css`
-      white-space: pre-wrap;
-      margin: -1em -1em 1em;
-      padding: 0.5em;
-      background: #eee;
-    `}
-  />
-)
-
 const Tabs = props => (
   <div
     {...props}
     className={css`
-      margin-bottom: 0.5em;
+      margin: -10px -10px 0;
     `}
   />
 )
@@ -52,11 +40,13 @@ const Tab = ({ active, ...props }) => (
     className={css`
       display: inline-block;
       text-decoration: none;
-      color: black;
-      background: ${active ? '#AAA' : '#DDD'};
-      padding: 0.25em 0.5em;
-      border-radius: 0.25em;
+      font-size: 14px;
+      color: ${active ? 'black' : '#808080'};
+      background: ${active ? '#f8f8e8' : '#fff'};
+      padding: 10px;
       margin-right: 0.25em;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
     `}
   />
 )
@@ -72,45 +62,6 @@ const Version = props => (
     `}
   />
 )
-
-const EditorText = props => (
-  <div
-    {...props}
-    className={css`
-      color: #808080;
-      background: #f0f0f0;
-      font: 12px monospace;
-      white-space: pre-wrap;
-      margin: 1em -1em;
-      padding: 0.5em;
-
-      div {
-        margin: 0 0 0.5em;
-      }
-    `}
-  />
-)
-
-const EditorTextCaption = props => (
-  <div
-    {...props}
-    className={css`
-      color: white;
-      background: #808080;
-      padding: 0.5em;
-    `}
-  />
-)
-
-/**
- * Extract lines of text from `Value`
- *
- * @return {String[]}
- */
-
-function getTextLines(value) {
-  return value.document.nodes.map(node => node.text).toArray()
-}
 
 /**
  * Subpages which are each a smoke test.
@@ -210,29 +161,23 @@ class RichTextExample extends React.Component {
   render() {
     const { text } = this.state
     if (text == null) return <Redirect to="/composition/split-join" />
-    const textLines = getTextLines(this.state.value)
+    // const textLines = getTextLines(this.state.value)
     return (
       <div>
+        <Tabs>
+          {SUBPAGES.map(([name, Component, subpage]) => {
+            const active = subpage === this.props.params.subpage
+            return (
+              <Tab key={subpage} to={`/composition/${subpage}`} active={active}>
+                {name}
+              </Tab>
+            )
+          })}
+          <Version>
+            {ANDROID_API_VERSION ? `Android API ${ANDROID_API_VERSION}` : null}
+          </Version>
+        </Tabs>
         <Instruction>
-          <Tabs>
-            {SUBPAGES.map(([name, Component, subpage]) => {
-              const active = subpage === this.props.params.subpage
-              return (
-                <Tab
-                  key={subpage}
-                  to={`/composition/${subpage}`}
-                  active={active}
-                >
-                  {name}
-                </Tab>
-              )
-            })}
-            <Version>
-              {ANDROID_API_VERSION
-                ? `Android API ${ANDROID_API_VERSION}`
-                : null}
-            </Version>
-          </Tabs>
           <div>{this.state.text}</div>
         </Instruction>
         <Toolbar>
@@ -257,12 +202,7 @@ class RichTextExample extends React.Component {
           renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
-        <EditorText>
-          <EditorTextCaption>Text in Slate's `Value`</EditorTextCaption>
-          {textLines.map((line, index) => (
-            <div key={index}>{line.length > 0 ? line : ' '}</div>
-          ))}
-        </EditorText>
+        <EditorValue value={this.state.value} />
       </div>
     )
   }

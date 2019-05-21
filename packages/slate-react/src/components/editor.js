@@ -79,7 +79,7 @@ class Editor extends React.Component {
    * @type {Object}
    */
 
-  state = { value: this.props.defaultValue }
+  state = { value: this.props.defaultValue, contentKey: 0 }
 
   /**
    * Temporary values.
@@ -151,6 +151,7 @@ class Editor extends React.Component {
     const { options, readOnly, value: valueFromProps } = this.props
     const { value: valueFromState } = this.state
     const value = valueFromProps || valueFromState
+    const { contentKey } = this.state
     this.controller.setReadOnly(readOnly)
     this.controller.setValue(value, options)
 
@@ -170,6 +171,7 @@ class Editor extends React.Component {
         ref={this.tmp.contentRef}
         autoCorrect={autoCorrect}
         className={className}
+        contentKey={contentKey}
         editor={this}
         id={id}
         onEvent={(handler, event) => this.run(handler, event)}

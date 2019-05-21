@@ -16,11 +16,6 @@ let instanceCounter = 0
 
 function SlateReactPlaceholder(options = {}) {
   const instanceId = instanceCounter++
-  const placeholderMark = {
-    type: 'placeholder',
-    data: { key: instanceId },
-  }
-
   const { placeholder, when, style = {} } = options
 
   invariant(
@@ -53,13 +48,14 @@ function SlateReactPlaceholder(options = {}) {
     const [firstNode, firstPath] = first
     const [lastNode, lastPath] = last
     const decoration = {
+      type: 'placeholder',
+      data: { key: instanceId },
       anchor: { key: firstNode.key, offset: 0, path: firstPath },
       focus: {
         key: lastNode.key,
         offset: lastNode.text.length,
         path: lastPath,
       },
-      mark: placeholderMark,
     }
 
     return [...others, decoration]
