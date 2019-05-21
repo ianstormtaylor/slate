@@ -456,7 +456,7 @@ class Value extends Record(DEFAULTS) {
   mapRanges(iterator) {
     warning(
       false,
-      'As of slate@0.48 the `value.mapRanges` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.mapRanges` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -481,7 +481,7 @@ class Value extends Record(DEFAULTS) {
   mapPoints(iterator) {
     warning(
       false,
-      'As of slate@0.48 the `value.mapPoints` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.mapPoints` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     return this.mapRanges(range => range.updatePoints(iterator))
@@ -490,7 +490,7 @@ class Value extends Record(DEFAULTS) {
   mergeNode(path) {
     warning(
       false,
-      'As of slate@0.48 the `value.mergeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.mergeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -526,7 +526,7 @@ class Value extends Record(DEFAULTS) {
   splitNode(path, position, properties) {
     warning(
       false,
-      'As of slate@0.48 the `value.splitNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.splitNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -560,7 +560,7 @@ class Value extends Record(DEFAULTS) {
   removeNode(path) {
     warning(
       false,
-      'As of slate@0.48 the `value.removeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.removeNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -600,7 +600,7 @@ class Value extends Record(DEFAULTS) {
   moveNode(path, newPath, newIndex = 0) {
     warning(
       false,
-      'As of slate@0.48 the `value.moveNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.moveNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -619,7 +619,7 @@ class Value extends Record(DEFAULTS) {
   removeText(path, offset, text) {
     warning(
       false,
-      'As of slate@0.48 the `value.removeText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.removeText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -654,7 +654,7 @@ class Value extends Record(DEFAULTS) {
   setNode(path, properties) {
     warning(
       false,
-      'As of slate@0.48 the `value.setNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.setNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -667,7 +667,7 @@ class Value extends Record(DEFAULTS) {
   setAnnotation(properties, newProperties) {
     warning(
       false,
-      'As of slate@0.48 the `value.setAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.setAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     newProperties = Annotation.createProperties(newProperties)
@@ -684,7 +684,7 @@ class Value extends Record(DEFAULTS) {
   setMark(path, mark, properties) {
     warning(
       false,
-      'As of slate@0.48 the `value.setMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.setMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -697,7 +697,7 @@ class Value extends Record(DEFAULTS) {
   setProperties(properties) {
     warning(
       false,
-      'As of slate@0.48 the `value.setProperties` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.setProperties` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -722,7 +722,7 @@ class Value extends Record(DEFAULTS) {
   setSelection(properties) {
     warning(
       false,
-      'As of slate@0.48 the `value.setSelection` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.setSelection` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -736,7 +736,7 @@ class Value extends Record(DEFAULTS) {
   removeAnnotation(annotation) {
     warning(
       false,
-      'As of slate@0.48 the `value.removeAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.removeAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     annotation = Annotation.create(annotation)
@@ -751,7 +751,7 @@ class Value extends Record(DEFAULTS) {
   removeMark(path, mark) {
     warning(
       false,
-      'As of slate@0.48 the `value.removeMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.removeMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     mark = Mark.create(mark)
@@ -765,7 +765,7 @@ class Value extends Record(DEFAULTS) {
   addAnnotation(annotation) {
     warning(
       false,
-      'As of slate@0.48 the `value.addAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.addAnnotation` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     annotation = Annotation.create(annotation)
@@ -780,7 +780,7 @@ class Value extends Record(DEFAULTS) {
   addMark(path, mark) {
     warning(
       false,
-      'As of slate@0.48 the `value.addMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.addMark` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     mark = Mark.create(mark)
@@ -794,7 +794,7 @@ class Value extends Record(DEFAULTS) {
   insertNode(path, node) {
     warning(
       false,
-      'As of slate@0.48 the `value.insertNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.insertNode` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
@@ -812,7 +812,7 @@ class Value extends Record(DEFAULTS) {
   insertText(path, offset, text) {
     warning(
       false,
-      'As of slate@0.48 the `value.insertText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
+      'As of slate@0.47 the `value.insertText` method is deprecated. Use `Operations.apply` for low-level use cases instead.'
     )
 
     let value = this
