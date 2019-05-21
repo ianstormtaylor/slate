@@ -1,4 +1,3 @@
-import getSelectionFromDom from '../../utils/get-selection-from-dom'
 import ElementSnapshot from './element-snapshot'
 import SELECTORS from '../../constants/selectors'
 
@@ -51,7 +50,7 @@ export default class DomSnapshot {
     }
 
     this.snapshot = new ElementSnapshot(elements)
-    this.selection = getSelectionFromDom(window, editor, domSelection)
+    this.selection = editor.findSelection(domSelection)
   }
 
   /**

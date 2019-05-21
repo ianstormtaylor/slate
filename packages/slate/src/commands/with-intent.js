@@ -278,7 +278,19 @@ Commands.insertFragment = (editor, fragment) => {
   if (newText && (lastInline || isInserting)) {
     editor.moveToEndOfNode(newText)
   } else if (newText) {
-    editor.moveToStartOfNode(newText).moveForward(lastBlock.text.length)
+    // The position within the last text node needs to be calculated. This is the length
+    // of all text nodes within the last block, but if the last block contains inline nodes,
+    // these have to be skipped.
+    const { nodes } = lastBlock
+    const lastIndex = nodes.findLastIndex(
+      node => node && node.object === 'inline'
+    )
+    const remainingTexts = nodes.takeLast(nodes.size - lastIndex - 1)
+    const remainingTextLength = remainingTexts.reduce(
+      (acc, val) => acc + val.text.length,
+      0
+    )
+    editor.moveToStartOfNode(newText).moveForward(remainingTextLength)
   }
 }
 

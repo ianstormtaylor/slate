@@ -27,6 +27,7 @@ import PlainText from './plain-text'
 import Plugins from './plugins'
 import RTL from './rtl'
 import ReadOnly from './read-only'
+import RestoreDOM from './restore-dom'
 import RichText from './rich-text'
 import SearchHighlighting from './search-highlighting'
 import Composition from './composition'
@@ -63,6 +64,7 @@ const EXAMPLES = [
   ['Plain Text', PlainText, '/plain-text'],
   ['Plugins', Plugins, '/plugins'],
   ['Read-only', ReadOnly, '/read-only'],
+  ['Restore DOM', RestoreDOM, '/restore-dom'],
   ['Rich Text', RichText, '/rich-text'],
   ['RTL', RTL, '/rtl'],
   ['Search Highlighting', SearchHighlighting, '/search-highlighting'],

@@ -23,6 +23,10 @@ function QueriesPlugin() {
     path = PathUtils.create(path)
     const content = editor.tmp.contentRef.current
 
+    if (!content) {
+      return null
+    }
+
     if (!path.size) {
       return content.ref.current || null
     }
@@ -177,13 +181,13 @@ function QueriesPlugin() {
           : y - rect.top < rect.top + rect.height - y
 
       const range = document.createRange()
-      const iterable = isPrevious ? 'previousTexts' : 'nextTexts'
       const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
-      const entry = document[iterable](path)
+      const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](
+        path
+      )
 
       if (entry) {
-        const [n] = entry
-        return range[move](n)
+        return range[move](entry)
       }
 
       return null
@@ -230,13 +234,24 @@ function QueriesPlugin() {
 
   function findPath(editor, element) {
     const content = editor.tmp.contentRef.current
+    let nodeElement = element
 
-    if (element === content.ref.current) {
+    // If element does not have a key, it is likely a string or
+    // mark, return the closest parent Node that can be looked up.
+    if (!nodeElement.hasAttribute(DATA_ATTRS.KEY)) {
+      nodeElement = nodeElement.closest(SELECTORS.KEY)
+    }
+
+    if (!nodeElement || !nodeElement.getAttribute(DATA_ATTRS.KEY)) {
+      return null
+    }
+
+    if (nodeElement === content.ref.current) {
       return PathUtils.create([])
     }
 
     const search = (instance, p) => {
-      if (element === instance) {
+      if (nodeElement === instance) {
         return p
       }
 
@@ -244,7 +259,7 @@ function QueriesPlugin() {
         return null
       }
 
-      if (element === instance.ref.current) {
+      if (nodeElement === instance.ref.current) {
         return p
       }
 
@@ -483,11 +498,14 @@ function QueriesPlugin() {
       anchor.offset === anchorText.text.length
     ) {
       const block = document.getClosestBlock(anchor.path)
-      const [next] = block.texts({ path: anchor.path })
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(anchor.path, depth)
+      const [next] = block.texts({ path: relativePath })
 
       if (next) {
         const [, nextPath] = next
-        range = range.moveAnchorTo(nextPath, 0)
+        const absolutePath = anchor.path.slice(0, depth).concat(nextPath)
+        range = range.moveAnchorTo(absolutePath, 0)
       }
     }
 
@@ -497,11 +515,14 @@ function QueriesPlugin() {
       focus.offset === focusText.text.length
     ) {
       const block = document.getClosestBlock(focus.path)
-      const [next] = block.texts({ path: focus.path })
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(focus.path, depth)
+      const [next] = block.texts({ path: relativePath })
 
       if (next) {
         const [, nextPath] = next
-        range = range.moveFocusTo(nextPath, 0)
+        const absolutePath = focus.path.slice(0, depth).concat(nextPath)
+        range = range.moveFocusTo(absolutePath, 0)
       }
     }
 
