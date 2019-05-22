@@ -110,7 +110,7 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
   marks = Mark.createSet(marks)
   const { value } = editor
   const { annotations, document } = value
-  document.assertNode(path)
+  const node = document.assertNode(path)
 
   editor.withoutNormalizing(() => {
     for (const annotation of annotations.values()) {
@@ -140,8 +140,30 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       text,
     })
 
-    if (marks.size) {
-      editor.addMarksByPath(path, offset, text.length, marks)
+    if (!node.marks.equals(marks)) {
+      if (offset + text.length < node.text.length) {
+        editor.splitNodeByPath(path, offset + text.length)
+      }
+
+      if (offset > 0) {
+        editor.splitNodeByPath(path, offset)
+        path = PathUtils.increment(path)
+        offset = 0
+      }
+
+      // Remove all marks from Text node that was created by splitting.
+      // TODO: diff old and new marks and only remove/add based on that.
+      editor.removeAllMarksByPath(path)
+
+      if (marks.size) {
+        marks.forEach(mark => {
+          editor.applyOperation({
+            type: 'add_mark',
+            path,
+            mark,
+          })
+        })
+      }
     }
   })
 }
@@ -272,8 +294,8 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
  */
 
 Commands.removeAllMarksByPath = (editor, path) => {
-  const { state } = editor
-  const { document } = state
+  const { value } = editor
+  const { document } = value
   const node = document.assertNode(path)
 
   editor.withoutNormalizing(() => {
