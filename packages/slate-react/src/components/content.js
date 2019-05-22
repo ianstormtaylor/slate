@@ -112,6 +112,17 @@ class Content extends React.Component {
   ref = React.createRef()
 
   /**
+   * Set both `this.ref` and `editor.el`
+   *
+   * @type {DOMElement}
+   */
+
+  setRef = el => {
+    this.ref.current = el
+    this.props.editor.el = el
+  }
+
+  /**
    * Create a set of bound event handlers.
    *
    * @type {Object}
@@ -506,7 +517,7 @@ class Content extends React.Component {
         key={this.props.contentKey}
         {...handlers}
         {...data}
-        ref={this.ref}
+        ref={this.setRef}
         contentEditable={readOnly ? null : true}
         suppressContentEditableWarning
         id={id}
