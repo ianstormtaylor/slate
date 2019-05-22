@@ -70,10 +70,10 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Element}
    */
 
-  function renderMark(props, editor, next) {
-    const { children, mark } = props
+  function renderDecoration(props, editor, next) {
+    const { children, decoration: deco } = props
 
-    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
+    if (deco.type === 'placeholder' && deco.data.get('key') === instanceId) {
       const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
@@ -103,7 +103,7 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Object}
    */
 
-  return { decorateNode, renderMark }
+  return { decorateNode, renderDecoration }
 }
 
 /**
