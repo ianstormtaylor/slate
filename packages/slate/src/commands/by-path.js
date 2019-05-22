@@ -106,7 +106,9 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
  */
 
 Commands.insertTextByPath = (editor, path, offset, text, marks) => {
-  marks = Mark.createSet(marks)
+  // `marks` and `markSet` are different variables because we
+  // allow empty `marks` Set in order to insert text without any marks.
+  const markSet = Mark.createSet(marks)
   const { value } = editor
   const { annotations, document } = value
   const node = document.assertNode(path)
@@ -139,7 +141,7 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       text,
     })
 
-    if (!node.marks.equals(marks)) {
+    if (!node.marks.equals(markSet)) {
       if (offset + text.length < node.text.length) {
         editor.splitNodeByPath(path, offset + text.length)
       }
@@ -149,13 +151,14 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
         path = PathUtils.increment(path)
       }
 
-      // Remove all marks from Text node that was created by splitting.
-      // TODO: diff old and new marks and only remove/add based on that.
-      // Not sure if more performant, hints: Set.subtract(), Set.intersect().
-      editor.removeAllMarksByPath(path)
+      if (marks) {
+        // TODO: diff old and new marks and only remove/add based on that.
+        // Not sure if >performant, hints: Set.subtract(), Set.intersect().
+        editor.removeAllMarksByPath(path)
 
-      if (marks.size) {
-        editor.addMarksByPath(path, 0, text.length, marks)
+        if (markSet.size > 0) {
+          editor.addMarksByPath(path, 0, text.length, markSet)
+        }
       }
     }
   })
