@@ -178,7 +178,6 @@ class Text extends Record(DEFAULTS) {
 
       for (const format of formats) {
         const { start, end } = format
-        const zeroLength = start.offset === 0 && end.offset === 0
         const next = []
         let o = 0
 
@@ -187,9 +186,8 @@ class Text extends Record(DEFAULTS) {
           const offset = o
           o += length
 
-          // If `decoration` or `annotation` has zero length
-          // (start and end offset are both 0), add the format.
-          if (zeroLength) {
+          // If the range encompases the entire leaf, add the format.
+          if (start.offset <= offset && end.offset >= offset + length) {
             leaf[kind].push(format)
             next.push(leaf)
             continue
@@ -197,13 +195,6 @@ class Text extends Record(DEFAULTS) {
 
           // If the range starts after the leaf, or ends before it, continue.
           if (start.offset > offset + length || end.offset <= offset) {
-            next.push(leaf)
-            continue
-          }
-
-          // If the range encompases the entire leaf, add the format.
-          if (start.offset <= offset && end.offset >= offset + length) {
-            leaf[kind].push(format)
             next.push(leaf)
             continue
           }
