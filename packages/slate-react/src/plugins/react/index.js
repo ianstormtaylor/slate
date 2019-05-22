@@ -9,7 +9,6 @@ import DOMPlugin from '../dom'
 import RestoreDOMPlugin from './restore-dom'
 import DebugEventsPlugin from '../debug/debug-events'
 import DebugBatchEventsPlugin from '../debug/debug-batch-events'
-import DebugMutationsPlugin from '../debug/debug-mutations'
 import NoopPlugin from '../debug/noop'
 
 /**
@@ -26,9 +25,6 @@ function ReactPlugin(options = {}) {
     : null
   const debugBatchEventsPlugin = Debug.enabled('slate:batch-events')
     ? DebugBatchEventsPlugin(options)
-    : null
-  const debugMutationsPlugin = Debug.enabled('slate:mutations')
-    ? DebugMutationsPlugin(options)
     : null
   const noopPlugin = Debug.enabled('slate:noop') ? NoopPlugin(options) : null
   const renderingPlugin = RenderingPlugin(options)
@@ -51,7 +47,6 @@ function ReactPlugin(options = {}) {
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
-    debugMutationsPlugin,
     noopPlugin,
     domPlugin,
     restoreDomPlugin,
