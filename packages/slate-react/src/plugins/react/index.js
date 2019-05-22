@@ -9,7 +9,6 @@ import DOMPlugin from '../dom'
 import RestoreDOMPlugin from './restore-dom'
 import DebugEventsPlugin from '../debug/debug-events'
 import DebugBatchEventsPlugin from '../debug/debug-batch-events'
-import NoopPlugin from '../debug/noop'
 
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
@@ -26,7 +25,6 @@ function ReactPlugin(options = {}) {
   const debugBatchEventsPlugin = Debug.enabled('slate:batch-events')
     ? DebugBatchEventsPlugin(options)
     : null
-  const noopPlugin = Debug.enabled('slate:noop') ? NoopPlugin(options) : null
   const renderingPlugin = RenderingPlugin(options)
   const commandsPlugin = CommandsPlugin(options)
   const queriesPlugin = QueriesPlugin(options)
@@ -47,7 +45,6 @@ function ReactPlugin(options = {}) {
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
-    noopPlugin,
     domPlugin,
     restoreDomPlugin,
     placeholderPlugin,
