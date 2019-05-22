@@ -40,18 +40,17 @@ Commands.addMarksByPath = (editor, path, offset, length, marks) => {
   const node = document.assertNode(path)
 
   editor.withoutNormalizing(() => {
-    // If it ends before the end of the node, we'll need to split to create a new
-    // text with different marks.
+    // If it ends before the end of the node, we'll need to
+    // split to create a new text with different marks.
     if (offset + length < node.text.length) {
       editor.splitNodeByPath(path, offset + length)
     }
 
-    // Same thing if it starts after the start. But in that case, we need to
-    // update our path and offset to point to the new start.
+    // Same thing if it starts after the start. But in that case, we
+    // need to update our path and offset to point to the new start.
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
       path = PathUtils.increment(path)
-      offset = 0
     }
 
     marks.forEach(mark => {
@@ -148,21 +147,15 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       if (offset > 0) {
         editor.splitNodeByPath(path, offset)
         path = PathUtils.increment(path)
-        offset = 0
       }
 
       // Remove all marks from Text node that was created by splitting.
       // TODO: diff old and new marks and only remove/add based on that.
+      // Not sure if more performant, hints: Set.subtract(), Set.intersect().
       editor.removeAllMarksByPath(path)
 
       if (marks.size) {
-        marks.forEach(mark => {
-          editor.applyOperation({
-            type: 'add_mark',
-            path,
-            mark,
-          })
-        })
+        editor.addMarksByPath(path, 0, text.length, marks)
       }
     }
   })
@@ -260,26 +253,23 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
   const node = document.assertNode(path)
 
   editor.withoutNormalizing(() => {
-    // If it ends before the end of the node, we'll need to split to create a new
-    // text with different marks.
+    // If it ends before the end of the node, we'll need to
+    // split to create a new text with different marks.
     if (offset + length < node.text.length) {
       editor.splitNodeByPath(path, offset + length)
     }
 
-    // Same thing if it starts after the start. But in that case, we need to
-    // update our path and offset to point to the new start.
+    // Same thing if it starts after the start. But in that case, we
+    // need to update our path and offset to point to the new start.
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
       path = PathUtils.increment(path)
-      offset = 0
     }
 
     marks.forEach(mark => {
       editor.applyOperation({
         type: 'remove_mark',
         path,
-        offset,
-        length,
         mark,
       })
     })
@@ -450,7 +440,6 @@ Commands.setMarkByPath = (
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
       path = PathUtils.increment(path)
-      offset = 0
     }
 
     editor.applyOperation({
