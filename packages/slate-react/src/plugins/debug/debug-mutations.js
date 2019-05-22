@@ -39,6 +39,7 @@ const MUTATION_PROPERTIES = [
  */
 
 function DebugMutationsPlugin({ editor }) {
+  console.log('DebugMutationsPlugin', { editor })
   const observer = new window.MutationObserver(mutations => {
     const array = Array.from(mutations).map(mutationRecord => {
       const object = {}
