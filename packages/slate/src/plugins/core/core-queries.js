@@ -1,4 +1,5 @@
 import PathUtils from '../../utils/path-utils'
+import TextUtils from '../../utils/text-utils'
 import Queries from '../queries'
 
 /**
@@ -82,6 +83,37 @@ function CoreQueriesPlugin() {
     },
 
     /**
+     * Calculate the next word boundary from a `point`.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point}
+     */
+
+    getNextWordPoint(editor, point) {
+      const { value: { document } } = editor
+      const { path, offset } = point
+      const [block, blockPath] = document.closestBlock(path)
+      const relativePath = path.slice(blockPath.size)
+      const blockOffset = block.getOffset(relativePath)
+      const blockText = block.getText()
+
+      if (blockOffset + offset === blockText.length) {
+        return editor.getNextPoint(point)
+      }
+
+      const o = blockOffset + offset
+      const n = TextUtils.getWordOffsetForward(blockText, o)
+      let next = point
+
+      for (let i = 0; i < n; i++) {
+        next = editor.getNextPoint(next)
+      }
+
+      return next
+    },
+
+    /**
      * Calculate the previous point backward from a `point`.
      *
      * @param {Editor} editor
@@ -126,6 +158,37 @@ function CoreQueriesPlugin() {
       }
 
       return null
+    },
+
+    /**
+     * Calculate the previous word boundary from a `point`.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point}
+     */
+
+    getPreviousWordPoint(editor, point) {
+      const { value: { document } } = editor
+      const { path, offset } = point
+      const [block, blockPath] = document.closestBlock(path)
+      const relativePath = path.slice(blockPath.size)
+      const blockOffset = block.getOffset(relativePath)
+
+      if (blockOffset + offset === 0) {
+        return editor.getPreviousPoint(point)
+      }
+
+      const blockText = block.getText()
+      const o = blockOffset + offset
+      const n = TextUtils.getWordOffsetBackward(blockText, o)
+      let prev = point
+
+      for (let i = 0; i < n; i++) {
+        prev = editor.getPreviousPoint(prev)
+      }
+
+      return prev
     },
   })
 }

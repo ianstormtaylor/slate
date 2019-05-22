@@ -351,7 +351,9 @@ function AfterPlugin(options = {}) {
           hasVoidParent = document.hasVoidParent(p, editor)
         }
 
-        if (n) editor.moveToStartOfNode(n)
+        if (p) {
+          editor.moveToStartOfPath(p)
+        }
       }
 
       if (text) {

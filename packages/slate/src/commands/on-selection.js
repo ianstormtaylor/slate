@@ -3,7 +3,6 @@ import warning from 'tiny-warning'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
-import TextUtils from '../utils/text-utils'
 
 const Commands = {}
 
@@ -39,42 +38,6 @@ function getPreviousPoint(editor, point, n) {
   }
 
   return point
-}
-
-/**
- * Get word offset backward from a `point`.
- *
- * @param {Editor} editor
- * @param {Point} point
- * @return {Number}
- */
-
-function getWordOffsetBackward(editor, point) {
-  const { value: { document } } = editor
-  const { path, offset } = point
-  const [block, blockPath] = document.closestBlock(path)
-  const relativePath = path.slice(blockPath.size)
-  const blockOffset = block.getOffset(relativePath)
-  const o = blockOffset + offset
-  return TextUtils.getWordOffsetBackward(block.text, o)
-}
-
-/**
- * Get word offset forward from a `point`.
- *
- * @param {Editor} editor
- * @param {Point} point
- * @return {Number}
- */
-
-function getWordOffsetForward(editor, point) {
-  const { value: { document } } = editor
-  const { path, offset } = point
-  const [block, blockPath] = document.closestBlock(path)
-  const relativePath = path.slice(blockPath.size)
-  const blockOffset = block.getOffset(relativePath)
-  const o = blockOffset + offset
-  return TextUtils.getWordOffsetForward(block.text, o)
 }
 
 /**
@@ -129,7 +92,7 @@ Commands.flip = editor => {
 Commands.moveAnchorBackward = (editor, n = 1) => {
   const { value: { selection } } = editor
   const point = getPreviousPoint(editor, selection.anchor, n)
-  editor.moveAnchorTo(point.path, point.offset)
+  editor.setAnchor(point)
 }
 
 /**
@@ -142,7 +105,7 @@ Commands.moveAnchorBackward = (editor, n = 1) => {
 Commands.moveAnchorForward = (editor, n = 1) => {
   const { value: { selection } } = editor
   const point = getNextPoint(editor, selection.anchor, n)
-  editor.moveAnchorTo(point.path, point.offset)
+  editor.setAnchor(point)
 }
 
 /**
@@ -509,8 +472,8 @@ Commands.moveAnchorToStartOfText = editor => {
 
 Commands.moveAnchorWordBackward = editor => {
   const { value: { selection } } = editor
-  const n = getWordOffsetBackward(editor, selection.anchor)
-  editor.moveAnchorBackward(n)
+  const point = editor.getPreviousWordPoint(selection.anchor)
+  editor.setAnchor(point)
 }
 
 /**
@@ -521,8 +484,8 @@ Commands.moveAnchorWordBackward = editor => {
 
 Commands.moveAnchorWordForward = editor => {
   const { value: { selection } } = editor
-  const n = getWordOffsetForward(editor, selection.anchor)
-  editor.moveAnchorForward(n)
+  const point = editor.getNextWordPoint(selection.anchor)
+  editor.setAnchor(point)
 }
 
 /**
@@ -937,7 +900,7 @@ Commands.moveEndWordForward = (editor, ...args) => {
 Commands.moveFocusBackward = (editor, n = 1) => {
   const { value: { selection } } = editor
   const point = getPreviousPoint(editor, selection.focus, n)
-  editor.moveFocusTo(point.path, point.offset)
+  editor.setFocus(point)
 }
 
 /**
@@ -950,7 +913,7 @@ Commands.moveFocusBackward = (editor, n = 1) => {
 Commands.moveFocusForward = (editor, n = 1) => {
   const { value: { selection } } = editor
   const point = getNextPoint(editor, selection.focus, n)
-  editor.moveFocusTo(point.path, point.offset)
+  editor.setFocus(point)
 }
 
 /**
@@ -1317,8 +1280,8 @@ Commands.moveFocusToStartOfText = editor => {
 
 Commands.moveFocusWordBackward = editor => {
   const { value: { selection } } = editor
-  const n = getWordOffsetBackward(editor, selection.focus)
-  editor.moveFocusBackward(n)
+  const point = editor.getPreviousWordPoint(selection.focus)
+  editor.setFocus(point)
 }
 
 /**
@@ -1329,8 +1292,8 @@ Commands.moveFocusWordBackward = editor => {
 
 Commands.moveFocusWordForward = editor => {
   const { value: { selection } } = editor
-  const n = getWordOffsetForward(editor, selection.focus)
-  editor.moveFocusForward(n)
+  const point = editor.getNextWordPoint(selection.focus)
+  editor.setFocus(point)
 }
 
 /**
