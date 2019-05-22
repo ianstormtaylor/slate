@@ -178,6 +178,7 @@ class Text extends Record(DEFAULTS) {
 
       for (const format of formats) {
         const { start, end } = format
+        const zeroLength = start.offset === 0 && end.offset === 0
         const next = []
         let o = 0
 
@@ -186,11 +187,9 @@ class Text extends Record(DEFAULTS) {
           const offset = o
           o += length
 
-          // If `type` is `placeholder`, we can be sure that there
-          // are no other leaves and it's safe to bail out early.
-          // This step is necessary (for now), otherwise placeholder
-          // decoration won't be added to leaf and doesn't render.
-          if (format.type === 'placeholder') {
+          // If `decoration` or `annotation` has zero length
+          // (start and end offset are both 0), add the format.
+          if (zeroLength) {
             leaf[kind].push(format)
             next.push(leaf)
             continue
