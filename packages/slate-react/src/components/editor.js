@@ -219,6 +219,7 @@ class Editor extends React.Component {
       this.tmp.resolves++
       const react = ReactPlugin({
         ...this.props,
+        editor: this,
         value: this.props.value || this.state.value,
       })
 
