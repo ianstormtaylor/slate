@@ -186,15 +186,15 @@ class Text extends Record(DEFAULTS) {
           const offset = o
           o += length
 
-          // If the range starts after the leaf, or ends before it, continue.
-          if (start.offset > offset + length || end.offset <= offset) {
+          // If the range encompases the entire leaf, add the format.
+          if (start.offset <= offset && end.offset >= offset + length) {
+            leaf[kind].push(format)
             next.push(leaf)
             continue
           }
 
-          // If the range encompases the entire leaf, add the format.
-          if (start.offset <= offset && end.offset >= offset + length) {
-            leaf[kind].push(format)
+          // If the range starts after the leaf, or ends before it, continue.
+          if (start.offset > offset + length || end.offset <= offset) {
             next.push(leaf)
             continue
           }
