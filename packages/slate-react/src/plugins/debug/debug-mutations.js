@@ -1,5 +1,11 @@
 import Debug from 'debug'
 
+/**
+ * Debug mutations function.
+ *
+ * @type {Function}
+ */
+
 const debug = Debug('slate:mutations')
 
 /**
@@ -32,8 +38,8 @@ const MUTATION_PROPERTIES = [
  * @param {Object} options
  */
 
-function DebugMutationsPlugin({ __editor__ }) {
-  const observer = new window.MutationObserver(function(mutations) {
+function DebugMutationsPlugin({ editor }) {
+  const observer = new window.MutationObserver(mutations => {
     const array = Array.from(mutations).map(mutationRecord => {
       const object = {}
 
@@ -51,7 +57,8 @@ function DebugMutationsPlugin({ __editor__ }) {
 
   // `findDOMNode` does not exist until later so we use `setTimeout`
   setTimeout(() => {
-    const rootEl = __editor__.findDOMNode([])
+    const rootEl = editor.findDOMNode([])
+
     observer.observe(rootEl, {
       childList: true,
       characterData: true,
