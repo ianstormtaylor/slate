@@ -1,5 +1,5 @@
-import SlateError from '../utils/slate-error'
-import Queries from './queries'
+import SlateError from '../../utils/slate-error'
+import Queries from '../queries'
 
 /**
  * Create a plugin from a `schema` definition.

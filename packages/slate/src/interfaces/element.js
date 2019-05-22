@@ -1656,6 +1656,48 @@ class ElementInterface {
     return iterable
   }
 
+  previousBlock(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.firstText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [prev] = this.blocks({
+      path,
+      direction: 'backward',
+      onlyLeaves: true,
+    })
+
+    return prev
+  }
+
+  previousInline(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.firstText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [prev] = this.inlines({
+      path,
+      direction: 'backward',
+      onlyLeaves: true,
+    })
+
+    return prev
+  }
+
   previousText(path) {
     const node = this.assertNode(path)
 
@@ -1670,6 +1712,38 @@ class ElementInterface {
 
     const [prev] = this.texts({ path, direction: 'backward' })
     return prev
+  }
+
+  nextBlock(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.lastText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [next] = this.blocks({ path, onlyLeaves: true })
+    return next
+  }
+
+  nextInline(path) {
+    const node = this.assertNode(path)
+
+    if (node.object !== 'text') {
+      const entry = node.lastText()
+
+      if (entry) {
+        const [, entryPath] = entry
+        path = path.concat(entryPath)
+      }
+    }
+
+    const [next] = this.inlines({ path, onlyLeaves: true })
+    return next
   }
 
   nextText(path) {
@@ -1688,8 +1762,8 @@ class ElementInterface {
     return next
   }
 
-  firstText() {
-    const [first] = this.texts()
+  firstText(options) {
+    const [first] = this.texts({ includeTarget: true, ...options })
     return first
   }
 
@@ -1698,8 +1772,13 @@ class ElementInterface {
     return first
   }
 
-  lastText() {
-    const [last] = this.texts({ direction: 'backward' })
+  lastText(options) {
+    const [last] = this.texts({
+      direction: 'backward',
+      includeTarget: true,
+      ...options,
+    })
+
     return last
   }
 

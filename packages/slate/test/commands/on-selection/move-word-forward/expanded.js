@@ -21,7 +21,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one two three four<cursor /> five six
+        one two<anchor /> three four<focus /> five six
       </paragraph>
     </document>
   </value>

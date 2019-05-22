@@ -16,12 +16,11 @@ export const input = (
   </value>
 )
 
-// Should move to next word after focus and collapse
 export const output = (
   <value>
     <document>
       <paragraph>
-        one two three <cursor />four five six
+        <anchor />one two three <focus />four five six
       </paragraph>
     </document>
   </value>

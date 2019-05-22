@@ -1,57 +1,15 @@
-import AtRange from '../commands/at-range'
-import ByPath from '../commands/by-path'
-import Commands from './commands'
-import OnHistory from '../commands/on-history'
-import OnSelection from '../commands/on-selection'
-import OnValue from '../commands/on-value'
-import Queries from './queries'
-import Schema from './schema'
-import Text from '../models/text'
-import WithIntent from '../commands/with-intent'
+import Schema from '../schema'
+import Text from '../../models/text'
 
 /**
- * A plugin that defines the core Slate logic.
+ * A plugin that defines the core Slate schema.
  *
  * @param {Object} options
  * @return {Object}
  */
 
-function CorePlugin(options = {}) {
-  const { plugins = [] } = options
-
-  /**
-   * The core Slate commands.
-   *
-   * @type {Object}
-   */
-
-  const commands = Commands({
-    ...AtRange,
-    ...ByPath,
-    ...OnHistory,
-    ...OnSelection,
-    ...OnValue,
-    ...WithIntent,
-  })
-
-  /**
-   * The core Slate queries.
-   *
-   * @type {Object}
-   */
-
-  const queries = Queries({
-    isAtomic: () => false,
-    isVoid: () => false,
-  })
-
-  /**
-   * The core Slate schema.
-   *
-   * @type {Object}
-   */
-
-  const schema = Schema({
+function CoreSchemaPlugin(options = {}) {
+  return Schema({
     rules: [
       // Only allow block nodes in documents.
       {
@@ -190,14 +148,6 @@ function CorePlugin(options = {}) {
       },
     ],
   })
-
-  /**
-   * Return the plugins.
-   *
-   * @type {Array}
-   */
-
-  return [schema, ...plugins, commands, queries]
 }
 
 /**
@@ -206,4 +156,4 @@ function CorePlugin(options = {}) {
  * @type {Object}
  */
 
-export default CorePlugin
+export default CoreSchemaPlugin

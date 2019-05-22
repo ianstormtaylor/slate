@@ -1,4 +1,5 @@
 import { is } from 'immutable'
+import warning from 'tiny-warning'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
@@ -6,586 +7,2122 @@ import TextUtils from '../utils/text-utils'
 
 const Commands = {}
 
+/**
+ * Get the next point by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Point} point
+ * @param {Number} n
+ * @return {Point}
+ */
+
+function getNextPoint(editor, point, n) {
+  for (let i = 0; i < n; i++) {
+    point = editor.getNextPoint(point)
+  }
+
+  return point
+}
+
+/**
+ * Get the previous point by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Point} point
+ * @param {Number} n
+ * @return {Point}
+ */
+
+function getPreviousPoint(editor, point, n) {
+  for (let i = 0; i < n; i++) {
+    point = editor.getPreviousPoint(point)
+  }
+
+  return point
+}
+
+/**
+ * Get word offset backward from a `point`.
+ *
+ * @param {Editor} editor
+ * @param {Point} point
+ * @return {Number}
+ */
+
+function getWordOffsetBackward(editor, point) {
+  const { value: { document } } = editor
+  const { path, offset } = point
+  const [block, blockPath] = document.closestBlock(path)
+  const relativePath = path.slice(blockPath.size)
+  const blockOffset = block.getOffset(relativePath)
+  const o = blockOffset + offset
+  return TextUtils.getWordOffsetBackward(block.text, o)
+}
+
+/**
+ * Get word offset forward from a `point`.
+ *
+ * @param {Editor} editor
+ * @param {Point} point
+ * @return {Number}
+ */
+
+function getWordOffsetForward(editor, point) {
+  const { value: { document } } = editor
+  const { path, offset } = point
+  const [block, blockPath] = document.closestBlock(path)
+  const relativePath = path.slice(blockPath.size)
+  const blockOffset = block.getOffset(relativePath)
+  const o = blockOffset + offset
+  return TextUtils.getWordOffsetForward(block.text, o)
+}
+
+/**
+ * Blur the selection.
+ *
+ * @param {Editor} editor
+ */
+
 Commands.blur = editor => {
   editor.select({ isFocused: false })
 }
 
+/**
+ * Deselect the selection.
+ *
+ * @param {Editor} editor
+ */
+
 Commands.deselect = editor => {
-  const range = Selection.create()
-  editor.select(range)
+  editor.select(Selection.create())
 }
+
+/**
+ * Focus the selection.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.focus = editor => {
   editor.select({ isFocused: true })
 }
 
+/**
+ * Flip the selection's anchor and focus points.
+ *
+ * @param {Editor} editor
+ */
+
 Commands.flip = editor => {
-  editor.command(proxy, 'flip')
+  const { value: { selection } } = editor
+  const range = selection.flip()
+  editor.select(range)
 }
 
-Commands.moveAnchorBackward = (editor, ...args) => {
-  editor.command(pointBackward, 'anchor', ...args)
+/**
+ * Move the selection's anchor point backwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveAnchorBackward = (editor, n = 1) => {
+  const { value: { selection } } = editor
+  const point = getPreviousPoint(editor, selection.anchor, n)
+  editor.moveAnchorTo(point.path, point.offset)
 }
 
-Commands.moveAnchorWordBackward = (editor, ...args) => {
-  editor.command(pointWordBackward, 'anchor', ...args)
+/**
+ * Move the selection's anchor point forwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveAnchorForward = (editor, n = 1) => {
+  const { value: { selection } } = editor
+  const point = getNextPoint(editor, selection.anchor, n)
+  editor.moveAnchorTo(point.path, point.offset)
 }
 
-Commands.moveAnchorForward = (editor, ...args) => {
-  editor.command(pointForward, 'anchor', ...args)
+/**
+ * Move the selection's anchor point to a specific `path` and `offset`.
+ *
+ * @param {Editor} editor
+ * @param {Path} path
+ * @param {Number} offset
+ */
+
+Commands.moveAnchorTo = (editor, path, offset) => {
+  const { value: { selection } } = editor
+  const range = selection.moveAnchorTo(path, offset)
+  editor.select(range)
 }
 
-Commands.moveAnchorWordForward = (editor, ...args) => {
-  editor.command(pointWordForward, 'anchor', ...args)
-}
-
-Commands.moveAnchorTo = (editor, ...args) => {
-  editor.command(proxy, 'moveAnchorTo', ...args)
-}
+/**
+ * Move the selection's anchor point to the end of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfBlock = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'end', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.closestBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveAnchorToEndOfPath = (editor, path) => {
+  const { value: { document } } = editor
+  const entry = document.lastText({ path })
+
+  if (entry) {
+    const [targetNode, targetPath] = entry
+    editor.moveAnchorTo(targetPath, targetNode.text.length)
+  }
+}
+
+/**
+ * Move the selection's anchor point to the end of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfInline = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'end', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.closestInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfDocument = editor => {
-  editor.moveAnchorToEndOfNode(editor.value.document).moveToAnchor()
+  const { value: { document } } = editor
+  const entry = document.lastText()
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.nextBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.nextInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'next', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.nextText(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
 
-Commands.moveAnchorToEndOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveAnchorToEndOfNode', ...args)
-}
+/**
+ * Move the selection's anchor point to the end of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.previousBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.previousInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'end', 'previous', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.previousText(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the end of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToEndOfText = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'end', 'text')
+  const { value: { selection } } = editor
+  editor.moveAnchorToEndOfPath(selection.anchor.path)
 }
+
+/**
+ * Move the selection's anchor point to the start of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfBlock = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'start', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.closestBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
 
-Commands.moveAnchorToStartOfDocument = editor => {
-  editor.moveAnchorToStartOfNode(editor.value.document).moveToAnchor()
+/**
+ * Move the selection's anchor point to the start of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveAnchorToStartOfPath = (editor, path) => {
+  const { value: { document } } = editor
+  const entry = document.lastText({ path })
+
+  if (entry) {
+    const [, targetPath] = entry
+    editor.moveAnchorTo(targetPath, 0)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfInline = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'start', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.closestInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the document.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveAnchorToStartOfDocument = editor => {
+  const { value: { document } } = editor
+  const entry = document.firstText()
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
+}
+
+/**
+ * Move the selection's anchor point to the start of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.nextBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.nextInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'next', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.nextText(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
 
-Commands.moveAnchorToStartOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveAnchorToStartOfNode', ...args)
-}
+/**
+ * Move the selection's anchor point to the start of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.previousBlock(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.previousInline(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'anchor', 'start', 'previous', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.previousText(selection.anchor.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's anchor point to the start of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveAnchorToStartOfText = editor => {
-  editor.command(pointEdgeObject, 'anchor', 'start', 'text')
+  const { value: { selection } } = editor
+  editor.moveAnchorToStartOfPath(selection.anchor.path)
 }
 
-Commands.moveBackward = (editor, ...args) => {
-  editor.moveAnchorBackward(...args).moveFocusBackward(...args)
+/**
+ * Move the selection's anchor point backward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveAnchorWordBackward = editor => {
+  const { value: { selection } } = editor
+  const n = getWordOffsetBackward(editor, selection.anchor)
+  editor.moveAnchorBackward(n)
 }
 
-Commands.moveWordBackward = (editor, ...args) => {
-  editor.moveFocusWordBackward(...args).moveToFocus()
+/**
+ * Move the selection's anchor point forward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveAnchorWordForward = editor => {
+  const { value: { selection } } = editor
+  const n = getWordOffsetForward(editor, selection.anchor)
+  editor.moveAnchorForward(n)
 }
 
-Commands.moveEndBackward = (editor, ...args) => {
-  editor.command(pointBackward, 'end', ...args)
+/**
+ * Move the selection backward by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveBackward = (editor, n) => {
+  editor.moveAnchorBackward(n).moveFocusBackward(n)
 }
 
-Commands.moveEndWordBackward = (editor, ...args) => {
-  editor.command(pointWordBackward, 'end', ...args)
+/**
+ * Move the selection backward by `n` words.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveWordBackward = (editor, n) => {
+  editor.moveAnchorWordBackward(n).moveFocusWordBackward(n)
 }
 
-Commands.moveEndForward = (editor, ...args) => {
-  editor.command(pointForward, 'end', ...args)
+/**
+ * Move the selection's end point backwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveEndBackward = (editor, n = 1) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusBackward(n)
+  } else {
+    editor.moveAnchorBackward(n)
+  }
 }
 
-Commands.moveEndWordForward = (editor, ...args) => {
-  editor.command(pointWordForward, 'end', ...args)
+/**
+ * Move the selection's end point forwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveEndForward = (editor, n = 1) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusForward(n)
+  } else {
+    editor.moveAnchorForward()
+  }
 }
 
-Commands.moveEndTo = (editor, ...args) => {
-  editor.command(proxy, 'moveEndTo', ...args)
+/**
+ * Move the selection's end point to a specific `path` and `offset`.
+ *
+ * @param {Editor} editor
+ * @param {Array} path
+ * @param {Number} offset
+ */
+
+Commands.moveEndTo = (editor, path, offset) => {
+  const { value: { selection } } = editor
+  const range = selection.moveEndTo(path, offset)
+  editor.select(range)
 }
+
+/**
+ * Move the selection's end point to the end of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfBlock = editor => {
-  editor.command(pointEdgeObject, 'end', 'end', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfBlock()
+  } else {
+    editor.moveAnchorToEndOfBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfDocument = editor => {
-  editor.moveEndToEndOfNode(editor.value.document).moveToEnd()
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfDocument()
+  } else {
+    editor.moveAnchorToEndOfDocument()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfInline = editor => {
-  editor.command(pointEdgeObject, 'end', 'end', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfInline()
+  } else {
+    editor.moveAnchorToEndOfInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfNextBlock()
+  } else {
+    editor.moveAnchorToEndOfNextBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfNextInline()
+  } else {
+    editor.moveAnchorToEndOfNextInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'next', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfNextText()
+  } else {
+    editor.moveAnchorToEndOfNextText()
+  }
 }
 
-Commands.moveEndToEndOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveEndToEndOfNode', ...args)
+/**
+ * Move the selection's end point to the end of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveEndToEndOfPath = (editor, path) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfPath(path)
+  } else {
+    editor.moveAnchorToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfPreviousBlock()
+  } else {
+    editor.moveAnchorToEndOfPreviousBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfPreviousInline()
+  } else {
+    editor.moveAnchorToEndOfPreviousInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'end', 'previous', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfPreviousText()
+  } else {
+    editor.moveAnchorToEndOfPreviousText()
+  }
 }
+
+/**
+ * Move the selection's end point to the end of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToEndOfText = editor => {
-  editor.command(pointEdgeObject, 'end', 'end', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToEndOfText()
+  } else {
+    editor.moveAnchorToEndOfText()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfBlock = editor => {
-  editor.command(pointEdgeObject, 'end', 'start', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfBlock()
+  } else {
+    editor.moveAnchorToStartOfBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfDocument = editor => {
-  editor.moveEndToStartOfNode(editor.value.document).moveToEnd()
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfDocument()
+  } else {
+    editor.moveAnchorToStartOfDocument()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfInline = editor => {
-  editor.command(pointEdgeObject, 'end', 'start', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfInline()
+  } else {
+    editor.moveAnchorToStartOfInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfNextBlock()
+  } else {
+    editor.moveAnchorToStartOfNextBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfNextInline()
+  } else {
+    editor.moveAnchorToStartOfNextInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'next', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfNextText()
+  } else {
+    editor.moveAnchorToStartOfNextText()
+  }
 }
 
-Commands.moveEndToStartOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveEndToStartOfNode', ...args)
+/**
+ * Move the selection's end point to the start of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveEndToStartOfPath = (editor, path) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfPath(path)
+  } else {
+    editor.moveAnchorToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfPreviousBlock()
+  } else {
+    editor.moveAnchorToStartOfPreviousBlock()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfPreviousInline()
+  } else {
+    editor.moveAnchorToStartOfPreviousInline()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'end', 'start', 'previous', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfPreviousText()
+  } else {
+    editor.moveAnchorToStartOfPreviousText()
+  }
 }
+
+/**
+ * Move the selection's end point to the start of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveEndToStartOfText = editor => {
-  editor.command(pointEdgeObject, 'end', 'start', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveFocusToStartOfText()
+  } else {
+    editor.moveAnchorToStartOfText()
+  }
 }
 
-Commands.moveFocusBackward = (editor, ...args) => {
-  editor.command(pointBackward, 'focus', ...args)
+/**
+ * Move the selection's end point backward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveEndWordBackward = (editor, ...args) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusWordBackward()
+  } else {
+    editor.moveAnchorWordBackward()
+  }
 }
 
-Commands.moveFocusWordBackward = (editor, ...args) => {
-  editor.command(pointWordBackward, 'focus', ...args)
+/**
+ * Move the selection's end point forward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveEndWordForward = (editor, ...args) => {
+  if (editor.value.selection.isForward) {
+    editor.moveFocusWordForward()
+  } else {
+    editor.moveAnchorWordForward()
+  }
 }
 
-Commands.moveFocusForward = (editor, ...args) => {
-  editor.command(pointForward, 'focus', ...args)
+/**
+ * Move the selection's focus point backwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveFocusBackward = (editor, n = 1) => {
+  const { value: { selection } } = editor
+  const point = getPreviousPoint(editor, selection.focus, n)
+  editor.moveFocusTo(point.path, point.offset)
 }
 
-Commands.moveFocusWordForward = (editor, ...args) => {
-  editor.command(pointWordForward, 'focus', ...args)
+/**
+ * Move the selection's focus point forwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveFocusForward = (editor, n = 1) => {
+  const { value: { selection } } = editor
+  const point = getNextPoint(editor, selection.focus, n)
+  editor.moveFocusTo(point.path, point.offset)
 }
 
-Commands.moveFocusTo = (editor, ...args) => {
-  editor.command(proxy, 'moveFocusTo', ...args)
+/**
+ * Move the selection's focus point to a specific `path` and `offset`.
+ *
+ * @param {Path} path
+ * @param {Number} offset
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusTo = (editor, path, offset) => {
+  const { value: { selection } } = editor
+  const range = selection.moveFocusTo(path, offset)
+  editor.select(range)
 }
+
+/**
+ * Move the selection's focus point to the end of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfBlock = editor => {
-  editor.command(pointEdgeObject, 'focus', 'end', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.closestBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
 
-Commands.moveFocusToEndOfDocument = editor => {
-  editor.moveFocusToEndOfNode(editor.value.document).moveToFocus()
+/**
+ * Move the selection's focus point to the end of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusToEndOfPath = (editor, path) => {
+  const { value: { document } } = editor
+  const entry = document.lastText({ path })
+
+  if (entry) {
+    const [targetNode, targetPath] = entry
+    editor.moveFocusTo(targetPath, targetNode.text.length)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfInline = editor => {
-  editor.command(pointEdgeObject, 'focus', 'end', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.closestInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the document.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusToEndOfDocument = editor => {
+  const { value: { document } } = editor
+  const entry = document.lastText()
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
+}
+
+/**
+ * Move the selection's focus point to the end of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.nextBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.nextInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'next', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.nextText(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
 
-Commands.moveFocusToEndOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveFocusToEndOfNode', ...args)
-}
+/**
+ * Move the selection's focus point to the end of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.previousBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.previousInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'end', 'previous', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.previousText(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the end of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToEndOfText = editor => {
-  editor.command(pointEdgeObject, 'focus', 'end', 'text')
+  const { value: { selection } } = editor
+  editor.moveFocusToEndOfPath(selection.focus.path)
 }
+
+/**
+ * Move the selection's focus point to the start of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfBlock = editor => {
-  editor.command(pointEdgeObject, 'focus', 'start', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.closestBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
 
-Commands.moveFocusToStartOfDocument = editor => {
-  editor.moveFocusToStartOfNode(editor.value.document).moveToFocus()
+/**
+ * Move the selection's focus point to the start of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusToStartOfPath = (editor, path) => {
+  const { value: { document } } = editor
+  const entry = document.lastText({ path })
+
+  if (entry) {
+    const [, targetPath] = entry
+    editor.moveFocusTo(targetPath, 0)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfInline = editor => {
-  editor.command(pointEdgeObject, 'focus', 'start', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.closestInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the document.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusToStartOfDocument = editor => {
+  const { value: { document } } = editor
+  const entry = document.firstText()
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
+}
+
+/**
+ * Move the selection's focus point to the start of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.nextBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.nextInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'next', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.nextText(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
 
-Commands.moveFocusToStartOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveFocusToStartOfNode', ...args)
-}
+/**
+ * Move the selection's focus point to the start of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'block')
+  const { value: { document, selection } } = editor
+  const entry = document.previousBlock(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'inline')
+  const { value: { document, selection } } = editor
+  const entry = document.previousInline(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's focus point to the start of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveFocusToStartOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'focus', 'start', 'previous', 'text')
+  const { value: { document, selection } } = editor
+  const entry = document.previousText(selection.focus.path)
+
+  if (entry) {
+    const [, path] = entry
+    editor.moveFocusToStartOfPath(path)
+  }
 }
 
+/**
+ * Move the selection's focus point to the start of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
+
 Commands.moveFocusToStartOfText = editor => {
-  editor.command(pointEdgeObject, 'focus', 'start', 'text')
+  const { value: { selection } } = editor
+  editor.moveFocusToStartOfPath(selection.focus.path)
 }
+
+/**
+ * Move the selection's focus point backward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusWordBackward = editor => {
+  const { value: { selection } } = editor
+  const n = getWordOffsetBackward(editor, selection.focus)
+  editor.moveFocusBackward(n)
+}
+
+/**
+ * Move the selection's focus point forward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveFocusWordForward = editor => {
+  const { value: { selection } } = editor
+  const n = getWordOffsetForward(editor, selection.focus)
+  editor.moveFocusForward(n)
+}
+
+/**
+ * Move the selection's points each forward by one character.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveForward = (editor, ...args) => {
   editor.moveAnchorForward(...args).moveFocusForward(...args)
 }
 
-Commands.moveWordForward = (editor, ...args) => {
-  editor.moveFocusWordForward(...args).moveToFocus(...args)
+/**
+ * Move the selection's start point backwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveStartBackward = (editor, n = 1) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorBackward(n)
+  } else {
+    editor.moveFocusBackward(n)
+  }
 }
 
-Commands.moveStartBackward = (editor, ...args) => {
-  editor.command(pointBackward, 'start', ...args)
+/**
+ * Move the selection's start point forwards by `n`.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveStartForward = (editor, n = 1) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorForward(n)
+  } else {
+    editor.moveFocusForward(n)
+  }
 }
 
-Commands.moveStartWordBackward = (editor, ...args) => {
-  editor.command(pointWordBackward, 'start', ...args)
+/**
+ * Move the selection's start point to a specific `path` and `offset`.
+ *
+ * @param {Editor} editor
+ * @param {Array} path
+ * @param {Number} offset
+ */
+
+Commands.moveStartTo = (editor, path, offset) => {
+  const { value: { selection } } = editor
+  const range = selection.moveStartTo(path, offset)
+  editor.select(range)
 }
 
-Commands.moveStartForward = (editor, ...args) => {
-  editor.command(pointForward, 'start', ...args)
-}
-
-Commands.moveStartWordForward = (editor, ...args) => {
-  editor.command(pointWordForward, 'start', ...args)
-}
-
-Commands.moveStartTo = (editor, ...args) => {
-  editor.command(proxy, 'moveStartTo', ...args)
-}
+/**
+ * Move the selection's start point to the end of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfBlock = editor => {
-  editor.command(pointEdgeObject, 'start', 'end', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfBlock()
+  } else {
+    editor.moveFocusToEndOfBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfDocument = editor => {
-  editor.moveStartToEndOfNode(editor.value.document).moveToStart()
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfDocument()
+  } else {
+    editor.moveFocusToEndOfDocument()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfInline = editor => {
-  editor.command(pointEdgeObject, 'start', 'end', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfInline()
+  } else {
+    editor.moveFocusToEndOfInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfNextBlock()
+  } else {
+    editor.moveFocusToEndOfNextBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfNextInline()
+  } else {
+    editor.moveFocusToEndOfNextInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'next', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfNextText()
+  } else {
+    editor.moveFocusToEndOfNextText()
+  }
 }
 
-Commands.moveStartToEndOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveStartToEndOfNode', ...args)
+/**
+ * Move the selection's start point to the end of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveStartToEndOfPath = (editor, path) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfPath(path)
+  } else {
+    editor.moveFocusToEndOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfPreviousBlock()
+  } else {
+    editor.moveFocusToEndOfPreviousBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfPreviousInline()
+  } else {
+    editor.moveFocusToEndOfPreviousInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'end', 'previous', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfPreviousText()
+  } else {
+    editor.moveFocusToEndOfPreviousText()
+  }
 }
+
+/**
+ * Move the selection's start point to the end of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToEndOfText = editor => {
-  editor.command(pointEdgeObject, 'start', 'end', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToEndOfText()
+  } else {
+    editor.moveFocusToEndOfText()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the block it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfBlock = editor => {
-  editor.command(pointEdgeObject, 'start', 'start', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfBlock()
+  } else {
+    editor.moveFocusToStartOfBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfDocument = editor => {
-  editor.moveStartToStartOfNode(editor.value.document).moveToStart()
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfDocument()
+  } else {
+    editor.moveFocusToStartOfDocument()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the nearest inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfInline = editor => {
-  editor.command(pointEdgeObject, 'start', 'start', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfInline()
+  } else {
+    editor.moveFocusToStartOfInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfNextBlock = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfNextBlock()
+  } else {
+    editor.moveFocusToStartOfNextBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfNextInline = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfNextInline()
+  } else {
+    editor.moveFocusToStartOfNextInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfNextText = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'next', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfNextText()
+  } else {
+    editor.moveFocusToStartOfNextText()
+  }
 }
 
-Commands.moveStartToStartOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveStartToStartOfNode', ...args)
+/**
+ * Move the selection's start point to the start of the node at `path`.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveStartToStartOfPath = (editor, path) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfPath(path)
+  } else {
+    editor.moveFocusToStartOfPath(path)
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfPreviousBlock = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'block')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfPreviousBlock()
+  } else {
+    editor.moveFocusToStartOfPreviousBlock()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfPreviousInline = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'inline')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfPreviousInline()
+  } else {
+    editor.moveFocusToStartOfPreviousInline()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfPreviousText = editor => {
-  editor.command(pointEdgeSideObject, 'start', 'start', 'previous', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfPreviousText()
+  } else {
+    editor.moveFocusToStartOfPreviousText()
+  }
 }
+
+/**
+ * Move the selection's start point to the start of the text node it's in.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveStartToStartOfText = editor => {
-  editor.command(pointEdgeObject, 'start', 'start', 'text')
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorToStartOfText()
+  } else {
+    editor.moveFocusToStartOfText()
+  }
 }
 
-Commands.moveTo = (editor, ...args) => {
-  editor.command(proxy, 'moveTo', ...args)
+/**
+ * Move the selection's start point backward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveStartWordBackward = (editor, ...args) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorWordBackward()
+  } else {
+    editor.moveFocusWordBackward()
+  }
 }
+
+/**
+ * Move the selection's start point forward to the edge of the nearest word.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveStartWordForward = (editor, ...args) => {
+  if (editor.value.selection.isForward) {
+    editor.moveAnchorWordForward()
+  } else {
+    editor.moveFocusWordForward()
+  }
+}
+
+/**
+ * Move the cursor to a specific `path` and `offset`.
+ *
+ * @param {Editor} editor
+ * @param {Array} path
+ * @param {Number} offset
+ */
+
+Commands.moveTo = (editor, path, offset) => {
+  const { value: { selection } } = editor
+  const range = selection.moveTo(path, offset)
+  editor.select(range)
+}
+
+/**
+ * Collapse the cursor to the selection's anchor point.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToAnchor = editor => {
-  editor.command(proxy, 'moveToAnchor')
+  const { value: { selection } } = editor
+  const range = selection.moveToAnchor()
+  editor.select(range)
 }
+
+/**
+ * Collapse the cursor to the selection's end point.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEnd = editor => {
-  editor.command(proxy, 'moveToEnd')
+  const { value: { selection } } = editor
+  const range = selection.moveToEnd()
+  editor.select(range)
 }
+
+/**
+ * Collapse the cursor to the end of the current block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfBlock = editor => {
-  editor.moveEndToEndOfBlock().moveToEnd()
+  editor.moveEndToEndOfBlock()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the end of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfDocument = editor => {
-  editor.moveEndToEndOfNode(editor.value.document).moveToEnd()
+  editor.moveEndToEndOfDocument()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the end of the current inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfInline = editor => {
-  editor.moveEndToEndOfInline().moveToEnd()
+  editor.moveEndToEndOfInline()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the end of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfNextBlock = editor => {
-  editor.moveEndToEndOfNextBlock().moveToEnd()
+  editor.moveEndToEndOfNextBlock()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the end of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfNextInline = editor => {
-  editor.moveEndToEndOfNextInline().moveToEnd()
+  editor.moveEndToEndOfNextInline()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the end of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfNextText = editor => {
-  editor.moveEndToEndOfNextText().moveToEnd()
+  editor.moveEndToEndOfNextText()
+  editor.moveToEnd()
 }
 
-Commands.moveToEndOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveToEndOfNode', ...args)
+/**
+ * Collapse the cursor to the end of the node at `path`.
+ *
+ * @param {Editor}
+ * @param {Array} path
+ */
+
+Commands.moveToEndOfPath = (editor, path) => {
+  editor.moveAnchorToEndOfPath(path)
+  editor.moveToAnchor()
 }
+
+/**
+ * Collapse the cursor to the end of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfPreviousBlock = editor => {
-  editor.moveStartToEndOfPreviousBlock().moveToStart()
+  editor.moveStartToEndOfPreviousBlock()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the end of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfPreviousInline = editor => {
-  editor.moveStartToEndOfPreviousInline().moveToStart()
+  editor.moveStartToEndOfPreviousInline()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the end of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfPreviousText = editor => {
-  editor.moveStartToEndOfPreviousText().moveToStart()
+  editor.moveStartToEndOfPreviousText()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the end of the current text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToEndOfText = editor => {
-  editor.moveEndToEndOfText().moveToEnd()
+  editor.moveEndToEndOfText()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the selection's focus point.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToFocus = editor => {
-  editor.command(proxy, 'moveToFocus')
+  const { value: { selection } } = editor
+  const range = selection.moveToFocus()
+  editor.select(range)
 }
+
+/**
+ * Move the selection's anchor and focus points to the start and end of the
+ * document, respectively.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToRangeOfDocument = editor => {
-  editor.moveToRangeOfNode(editor.value.document)
+  editor.moveAnchorToStartOfDocument()
+  editor.moveFocusToEndOfDocument()
 }
 
-Commands.moveToRangeOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveToRangeOfNode', ...args)
+/**
+ * Move the selection's anchor and focus points to the start and end of the
+ * current block, respectively.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveToRangeOfBlock = editor => {
+  editor.moveToStart()
+  editor.moveAnchorToStartOfBlock()
+  editor.moveFocusToEndOfBlock()
 }
+
+/**
+ * Move the selection's anchor and focus points to the start and end of the
+ * current inline, respectively.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveToRangeOfInline = editor => {
+  editor.moveToStart()
+  editor.moveAnchorToStartOfBlock()
+  editor.moveFocusToEndOfBlock()
+}
+
+/**
+ * Move the selection's anchor and focus points to the start and end of the
+ * current text node, respectively.
+ *
+ * @param {Editor} editor
+ */
+
+Commands.moveToRangeOfInline = editor => {
+  editor.moveToStart()
+  editor.moveAnchorToStartOfText()
+  editor.moveFocusToEndOfText()
+}
+
+/**
+ * Collapse the cursor to the end of the node at `path`.
+ *
+ * @param {Editor}
+ * @param {Array} path
+ */
+
+Commands.moveToRangeOfPath = (editor, path) => {
+  editor.moveAnchorToStartOfPath(path)
+  editor.moveFocusToEndOfPath(path)
+}
+
+/**
+ * Collapse the cursor to the selection's start point.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStart = editor => {
-  editor.command(proxy, 'moveToStart')
+  const { value: { selection } } = editor
+  const range = selection.moveToStart()
+  editor.select(range)
 }
+
+/**
+ * Collapse the cursor to the start of the current block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfBlock = editor => {
-  editor.moveStartToStartOfBlock().moveToStart()
+  editor.moveStartToStartOfBlock()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the start of the document.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfDocument = editor => {
-  editor.moveStartToStartOfNode(editor.value.document).moveToStart()
+  editor.moveStartToStartOfDocument()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the start of the current inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfInline = editor => {
-  editor.moveStartToStartOfInline().moveToStart()
+  editor.moveStartToStartOfInline()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the start of the next block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfNextBlock = editor => {
-  editor.moveEndToStartOfNextBlock().moveToEnd()
+  editor.moveEndToStartOfNextBlock()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the start of the next inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfNextInline = editor => {
-  editor.moveEndToStartOfNextInline().moveToEnd()
+  editor.moveEndToStartOfNextInline()
+  editor.moveToEnd()
 }
+
+/**
+ * Collapse the cursor to the start of the next text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfNextText = editor => {
-  editor.moveEndToStartOfNextText().moveToEnd()
+  editor.moveEndToStartOfNextText()
+  editor.moveToEnd()
 }
 
-Commands.moveToStartOfNode = (editor, ...args) => {
-  editor.command(proxy, 'moveToStartOfNode', ...args)
+/**
+ * Collapse the cursor to the start of the node at `path`.
+ *
+ * @param {Editor} editor
+ * @param {Array} path
+ */
+
+Commands.moveToStartOfPath = (editor, path) => {
+  editor.moveAnchorToStartOfPath(path)
+  editor.moveToAnchor()
 }
+
+/**
+ * Collapse the cursor to the start of the previous block.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfPreviousBlock = editor => {
-  editor.moveStartToStartOfPreviousBlock().moveToStart()
+  editor.moveStartToStartOfPreviousBlock()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the start of the previous inline.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfPreviousInline = editor => {
-  editor.moveStartToStartOfPreviousInline().moveToStart()
+  editor.moveStartToStartOfPreviousInline()
+  editor.moveToStart()
 }
+
+/**
+ * Collapse the cursor to the start of the previous text node.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.moveToStartOfPreviousText = editor => {
-  editor.moveStartToStartOfPreviousText().moveToStart()
+  editor.moveStartToStartOfPreviousText()
+  editor.moveToStart()
 }
 
+/**
+ * Collapse the cursor to the start of the current text node.
+ *
+ * @param {Editor} editor
+ */
+
 Commands.moveToStartOfText = editor => {
-  editor.moveStartToStartOfText().moveToStart()
+  editor.moveStartToStartOfText()
+  editor.moveToStart()
 }
+
+/**
+ * Move the selection's points each backward by `n` words.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveWordBackward = (editor, n) => {
+  editor.moveAnchorWordBackward(n)
+  editor.moveFocusWordBackward(n)
+}
+
+/**
+ * Move the selection's points each forward by `n` words.
+ *
+ * @param {Editor} editor
+ * @param {Number} n
+ */
+
+Commands.moveWordForward = (editor, n) => {
+  editor.moveAnchorWordForward(n)
+  editor.moveFocusWordForward(n)
+}
+
+/**
+ * Set new `properties` on the selection.
+ *
+ * @param {Editor} editor
+ * @param {Object} properties
+ * @param {Object} options
+ */
 
 Commands.select = (editor, properties, options = {}) => {
   properties = Selection.createProperties(properties)
@@ -637,21 +2174,63 @@ Commands.select = (editor, properties, options = {}) => {
   )
 }
 
-Commands.setAnchor = (editor, ...args) => {
-  editor.command(proxy, 'setAnchor', ...args)
+/**
+ * Set the selection's anchor point to the return value of `fn`.
+ *
+ * @param {Editor} editor
+ * @param {Function} fn
+ */
+
+Commands.setAnchor = (editor, fn) => {
+  const { value: { selection } } = editor
+  const range = selection.setAnchor(fn)
+  editor.select(range)
 }
 
-Commands.setEnd = (editor, ...args) => {
-  editor.command(proxy, 'setEnd', ...args)
+/**
+ * Set the selection's end point to the return value of `fn`.
+ *
+ * @param {Editor} editor
+ * @param {Function} fn
+ */
+
+Commands.setEnd = (editor, fn) => {
+  const { value: { selection } } = editor
+  const range = selection.setEnd(fn)
+  editor.select(range)
 }
 
-Commands.setFocus = (editor, ...args) => {
-  editor.command(proxy, 'setFocus', ...args)
+/**
+ * Set the selection's focus point to the return value of `fn`.
+ *
+ * @param {Editor} editor
+ * @param {Function} fn
+ */
+
+Commands.setFocus = (editor, fn) => {
+  const { value: { selection } } = editor
+  const range = selection.setFocus(fn)
+  editor.select(range)
 }
 
-Commands.setStart = (editor, ...args) => {
-  editor.command(proxy, 'setStart', ...args)
+/**
+ * Set the selection's start point to the return value of `fn`.
+ *
+ * @param {Editor} editor
+ * @param {Function} fn
+ */
+
+Commands.setStart = (editor, fn) => {
+  const { value: { selection } } = editor
+  const range = selection.setStart(fn)
+  editor.select(range)
 }
+
+/**
+ * HACK: Snapshot the selection, saving an entry in the history.
+ *
+ * @param {Editor} editor
+ */
 
 Commands.snapshotSelection = editor => {
   editor.withoutMerging(() => {
@@ -660,134 +2239,128 @@ Commands.snapshotSelection = editor => {
 }
 
 /**
- * Helpers.
+ * Deprecated.
  */
 
-function proxy(editor, method, ...args) {
-  const range = editor.value.selection[method](...args)
+Commands.moveAnchorToEndOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveAnchorToEndOfNode(node) command is deprecated. Use the `editor.moveAnchorToEndOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveAnchorToEndOfNode(...args)
   editor.select(range)
 }
 
-function pointEdgeObject(editor, point, edge, object) {
-  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
-  const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
-  const method = `move${Point}To${Edge}OfNode`
-  const getNode = object === 'text' ? 'getNode' : `getClosest${Object}`
-  const { value } = editor
-  const { document, selection } = value
-  const p = selection[point]
-  const node = document[getNode](p.key)
-  if (!node) return
-  editor[method](node)
+Commands.moveAnchorToStartOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveAnchorToStartOfNode(node) command is deprecated. Use the `editor.moveAnchorToStartOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveAnchorToStartOfNode(...args)
+  editor.select(range)
 }
 
-function pointEdgeSideObject(editor, point, edge, side, object) {
-  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const Edge = edge.slice(0, 1).toUpperCase() + edge.slice(1)
-  const Side = side.slice(0, 1).toUpperCase() + side.slice(1)
-  const Object = object.slice(0, 1).toUpperCase() + object.slice(1)
-  const method = `move${Point}To${Edge}OfNode`
-  const getNode = object === 'text' ? 'getNode' : `getClosest${Object}`
-  const getDirectionNode = `get${Side}${Object}`
-  const { value } = editor
-  const { document, selection } = value
-  const p = selection[point]
-  const node = document[getNode](p.key)
-  if (!node) return
-  const target = document[getDirectionNode](node.key)
-  if (!target) return
-  editor[method](target)
+Commands.moveEndToEndOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveEndToEndOfNode(node) command is deprecated. Use the `editor.moveEndToEndOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveEndToEndOfNode(...args)
+  editor.select(range)
 }
 
-function pointBackward(editor, point, n = 1) {
-  if (n === 0) return
-  if (n < 0) return pointForward(editor, point, -n)
+Commands.moveEndToStartOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveEndToStartOfNode(node) command is deprecated. Use the `editor.moveEndToStartOfPath(path)` command instead.'
+  )
 
-  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { value } = editor
-  const { document, selection } = value
-  const p = selection[point]
-  const hasVoidParent = document.hasVoidParent(p.path, editor)
-
-  // what is this?
-  if (!hasVoidParent && p.offset - n >= 0) {
-    const range = selection[`move${Point}Backward`](n)
-    editor.select(range)
-    return
-  }
-
-  const previous = document.getPreviousText(p.path)
-  if (!previous) return
-
-  const block = document.getClosestBlock(p.path)
-  const isInBlock = block.hasNode(previous.key)
-  const isPreviousInVoid =
-    previous && document.hasVoidParent(previous.key, editor)
-  editor[`move${Point}ToEndOfNode`](previous)
-
-  // when is this called?
-  if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
-    const range = editor.value.selection[`move${Point}Backward`](n)
-    editor.select(range)
-  }
+  const { value: { selection } } = editor
+  const range = selection.moveEndToStartOfNode(...args)
+  editor.select(range)
 }
 
-function pointForward(editor, point, n = 1) {
-  if (n === 0) return
-  if (n < 0) return pointBackward(editor, point, -n)
+Commands.moveFocusToEndOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveFocusToEndOfNode(node) command is deprecated. Use the `editor.moveFocusToEndOfPath(path)` command instead.'
+  )
 
-  const Point = point.slice(0, 1).toUpperCase() + point.slice(1)
-  const { value } = editor
-  const { document, selection } = value
-  const p = selection[point]
-  const text = document.getNode(p.path)
-  const hasVoidParent = document.hasVoidParent(p.path, editor)
-
-  // what is this?
-  if (!hasVoidParent && p.offset + n <= text.text.length) {
-    const range = selection[`move${Point}Forward`](n)
-    editor.select(range)
-    return
-  }
-
-  const next = document.getNextText(p.path)
-  if (!next) return
-
-  const block = document.getClosestBlock(p.path)
-  const isInBlock = block.hasNode(next.key)
-  const isNextInVoid = document.hasVoidParent(next.key, editor)
-  editor[`move${Point}ToStartOfNode`](next)
-
-  // when is this called?
-  if (!hasVoidParent && !isNextInVoid && isInBlock) {
-    const range = editor.value.selection[`move${Point}Forward`](n)
-    editor.select(range)
-  }
+  const { value: { selection } } = editor
+  const range = selection.moveFocusToEndOfNode(...args)
+  editor.select(range)
 }
 
-function pointWordBackward(editor, pointName) {
-  const { value } = editor
-  const { document, selection } = value
-  const point = selection[pointName]
-  const block = document.getClosestBlock(point.key)
-  const offset = block.getOffset(point.key)
-  const o = offset + point.offset
-  const { text } = block
-  const n = TextUtils.getWordOffsetBackward(text, o)
-  editor.command(pointBackward, pointName, n > 0 ? n : 1)
+Commands.moveFocusToStartOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveFocusToStartOfNode(node) command is deprecated. Use the `editor.moveFocusToStartOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveFocusToStartOfNode(...args)
+  editor.select(range)
 }
 
-function pointWordForward(editor, pointName) {
-  const { value } = editor
-  const { document, selection } = value
-  const point = selection[pointName]
-  const block = document.getClosestBlock(point.key)
-  const offset = block.getOffset(point.key)
-  const o = offset + point.offset
-  const { text } = block
-  const n = TextUtils.getWordOffsetForward(text, o)
-  editor.command(pointForward, pointName, n > 0 ? n : 1)
+Commands.moveStartToEndOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveStartToEndOfNode(node) command is deprecated. Use the `editor.moveStartToEndOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveStartToEndOfNode(...args)
+  editor.select(range)
+}
+
+Commands.moveStartToStartOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveStartToStartOfNode(node) command is deprecated. Use the `editor.moveStartToStartOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveStartToStartOfNode(...args)
+  editor.select(range)
+}
+
+Commands.moveToEndOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveToEndOfNode(node) command is deprecated. Use the `editor.moveToEndOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveToEndOfNode(...args)
+  editor.select(range)
+}
+
+Commands.moveToRangeOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveToRangeOfNode(node) command is deprecated. Use the `editor.moveToRangeOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveToRangeOfNode(...args)
+  editor.select(range)
+}
+
+Commands.moveToStartOfNode = (editor, ...args) => {
+  warning(
+    false,
+    'As of slate@0.48 the `editor.moveToStartOfNode(node) command is deprecated. Use the `editor.moveToStartOfPath(path)` command instead.'
+  )
+
+  const { value: { selection } } = editor
+  const range = selection.moveToStartOfNode(...args)
+  editor.select(range)
 }
 
 export default Commands
