@@ -7,7 +7,7 @@ function MutationPlugin({ editor }) {
   // `findDOMNode` does not exist until later so we use `setTimeout`
   setTimeout(() => {
     const rootEl = editor.findDOMNode([])
-    observer = new DOMObserver(rootEl)
+    observer = new DOMObserver(editor, rootEl)
     observer.start()
   }, 20)
 

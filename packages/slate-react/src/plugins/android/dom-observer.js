@@ -1,7 +1,20 @@
+import Debug from 'debug'
+import ReactDOM from 'react-dom'
+
+import diffText from './diff-text'
+
+const debug = Debug('slate:dom-observer')
+
 function normalizeMutation(mut) {
   console.log(mut)
   return mut
 }
+
+/**
+ * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
+ */
+
+const flushControlled = ReactDOM.unstable_flushControlled
 
 /**
  * Based loosely on:
@@ -15,14 +28,14 @@ function normalizeMutation(mut) {
  * @param {} element
  */
 
-function DOMObserver(element) {
+function DOMObserver(editor, element) {
   const observer = new window.MutationObserver(flush)
 
   const mutations = []
 
   function start() {
-    console.log('STARTTTT!!!', element)
-    observer.observe(element, {
+    const rootEl = editor.findDOMNode([])
+    observer.observe(rootEl, {
       childList: true,
       characterData: true,
       attributes: true,
@@ -40,20 +53,28 @@ function DOMObserver(element) {
   }
 
   function flush(mutations) {
-    console.log('FLUSH THE MUTATIONS!!!')
     if (!mutations) mutations = observer.takeRecords()
+    stop()
 
-    let from = -1,
-      to = -1,
-      typeOver = false
-    for (let i = 0; i < mutations.length; i++) {
-      let result = register(mutations[i])
-      if (result) {
-        from = from < 0 ? result.from : Math.min(result.from, from)
-        to = to < 0 ? result.to : Math.max(result.to, to)
-        if (result.typeOver) typeOver = true
-      }
+    try {
+      flushControlled(() => {
+        let from = -1,
+          to = -1,
+          typeOver = false
+        for (let i = 0; i < mutations.length; i++) {
+          let result = register(mutations[i])
+          if (result) {
+            from = from < 0 ? result.from : Math.min(result.from, from)
+            to = to < 0 ? result.to : Math.max(result.to, to)
+            if (result.typeOver) typeOver = true
+          }
+        }
+      })
+    } finally {
+      // restart even if `render` crashes
+      start()
     }
+
     // if (from > -1 || newSel) {
     //   if (from > -1) this.view.docView.markDirty(from, to)
     //   this.handleDOMChange(from, to, typeOver)
@@ -62,8 +83,116 @@ function DOMObserver(element) {
     // }
   }
 
+  function removeNode(domNode) {
+    console.log('REMOVE NODE!!!')
+    const { value } = editor
+    const { document, selection } = value
+    const node = editor.findNode(domNode)
+    const nodeSelection = document.resolveRange(
+      selection.moveToRangeOfNode(node)
+    )
+    console.log('nodeSelection', nodeSelection.toJS())
+    editor.select(nodeSelection).delete()
+  }
+
   function register(m) {
-    console.log('REGISTERED', m)
+    switch (m.type) {
+      case 'childList':
+        m.removedNodes.forEach(domNode => removeNode(domNode))
+
+        break
+      case 'characterData':
+        const { value } = editor
+        const { document, selection } = value
+        const { target } = m
+        const prevText = m.oldValue
+        let nextText = target.textContent
+        const domElement = target.parentNode
+        const node = editor.findNode(domElement)
+        const path = document.getPath(node.key)
+        const block = document.getClosestBlock(node.key)
+        debug('characterData', {
+          prevText,
+          nextText,
+          node: node.toJS(),
+          path: path.toJS(),
+          block: block.toJS(),
+        })
+
+        const isLastNode = block.nodes.last() === node
+        const lastChar = nextText.charAt(nextText.length - 1)
+
+        // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
+        // we will have added another new line in <Leaf>'s render method to account
+        // for browsers collapsing a single trailing new lines, so remove it.
+        if (isLastNode && lastChar === '\n') {
+          nextText = nextText.slice(0, -1)
+        }
+
+        // If the text is no different, abort.
+        if (nextText === prevText) return
+
+        const diff = diffText(prevText, nextText)
+
+        let entire = selection
+          .moveAnchorTo(path, diff.start)
+          .moveFocusTo(path, diff.end)
+
+        entire = document.resolveRange(entire)
+
+        // Change the current value to have the leaf's text replaced.
+        editor.insertTextAtRange(entire, diff.insertText, node.marks)
+
+        entire = entire.moveTo(path, diff.cursor)
+
+        editor.select(entire)
+
+        // let entire = selection
+        //   .moveAnchorTo(path, 0)
+        //   .moveFocusTo(path, prevText.length)
+
+        // entire = document.resolveRange(entire)
+
+        // // Change the current value to have the leaf's text replaced.
+        // editor.insertTextAtRange(entire, nextText, node.marks)
+
+        break
+    }
+
+    // function reconcileNode(editor, node) {
+    //   const { value } = editor
+    //   const { document, selection } = value
+    //   const path = document.getPath(node.key)
+
+    //   const domElement = editor.findDOMNode(path)
+    //   const block = document.getClosestBlock(path)
+
+    //   // Get text information
+    //   const { text } = node
+    //   let { textContent: domText } = domElement
+
+    //   const isLastNode = block.nodes.last() === node
+    //   const lastChar = domText.charAt(domText.length - 1)
+
+    //   // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
+    //   // we will have added another new line in <Leaf>'s render method to account
+    //   // for browsers collapsing a single trailing new lines, so remove it.
+    //   if (isLastNode && lastChar === '\n') {
+    //     domText = domText.slice(0, -1)
+    //   }
+
+    //   // If the text is no different, abort.
+    //   if (text === domText) return
+
+    //   let entire = selection.moveAnchorTo(path, 0).moveFocusTo(path, text.length)
+
+    //   entire = document.resolveRange(entire)
+
+    //   // Change the current value to have the leaf's text replaced.
+    //   editor.insertTextAtRange(entire, domText, node.marks)
+    //   return
+    // }
+
     //   let desc = this.view.docView.nearestDesc(mut.target)
     //   if (
     //     mut.type == "attributes" &&
