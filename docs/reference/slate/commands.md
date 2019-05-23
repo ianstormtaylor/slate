@@ -426,7 +426,7 @@ Insert a [`Fragment`](./fragment.md) at `index` inside a parent [`Node`](./node.
 `insertTextByKey(key: String, offset: Number, text: String, [marks: Set]) => Editor`
 `insertTextByPath(path: List, offset: Number, text: String, [marks: Set]) => Editor`
 
-Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`.
+Insert `text` at an `offset` in a [`Text Node`](./text.md) by its `key` with optional `marks`. [`Text Node`](./text.md) marks apply to inserted `text`, you can avoid that by passing empty `Set` as `marks`.
 
 ### `mergeNodeByKey/Path`
 

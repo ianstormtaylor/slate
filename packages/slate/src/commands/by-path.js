@@ -106,8 +106,6 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
  */
 
 Commands.insertTextByPath = (editor, path, offset, text, marks) => {
-  // `marks` and `markSet` are different variables because we
-  // allow empty `marks` Set in order to insert text without any marks.
   const markSet = Mark.createSet(marks)
   const { value } = editor
   const { annotations, document } = value
@@ -141,25 +139,29 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       text,
     })
 
-    if (!node.marks.equals(markSet)) {
-      if (offset + text.length < node.text.length) {
-        editor.splitNodeByPath(path, offset + text.length)
+    if (marks && !node.marks.equals(markSet)) {
+      // If marks argument is empty Set, remove all marks.
+      if (markSet.size === 0) {
+        const remove = node.marks.union(markSet)
+        editor.removeMarksByPath(path, offset, text.length, remove)
+        return
       }
 
-      if (offset > 0) {
-        editor.splitNodeByPath(path, offset)
-        path = PathUtils.increment(path)
+      // If more incoming marks, marks were added.
+      if (markSet.size > node.marks.size) {
+        const add = markSet.subtract(node.marks)
+        editor.addMarksByPath(path, offset, text.length, add)
+        return
       }
 
-      if (marks) {
-        // TODO: diff old and new marks and only remove/add based on that.
-        // Not sure if >performant, hints: Set.subtract(), Set.intersect().
-        editor.removeAllMarksByPath(path)
-
-        if (markSet.size > 0) {
-          editor.addMarksByPath(path, 0, text.length, markSet)
-        }
+      // If more node marks, marks were removed.
+      if (node.marks.size > markSet.size) {
+        const remove = node.marks.subtract(markSet)
+        editor.removeMarksByPath(path, offset, text.length, remove)
       }
+
+      // If equal sizes but not equal marks, marks were added.
+      editor.addMarksByPath(path, offset, text.length, markSet)
     }
   })
 }
