@@ -145,6 +145,7 @@ class Editor extends React.Component {
 
     // Re-resolve the controller if needed based on memoized props.
     const { commands, placeholder, plugins, queries, schema } = this.props
+
     this.resolveController(
       plugins,
       schema,
@@ -215,7 +216,7 @@ class Editor extends React.Component {
    */
 
   resolveController = memoizeOne(
-    (plugins = [], schema, commands, queries, placeholder, ReactPlugin) => {
+    (plugins = [], schema, commands, queries, placeholder, TheReactPlugin) => {
       // If we've resolved a few times already, and it's exactly in line with
       // the updates, then warn the user that they may be doing something wrong.
       warning(
@@ -224,7 +225,7 @@ class Editor extends React.Component {
       )
 
       this.tmp.resolves++
-      const react = ReactPlugin({
+      const react = TheReactPlugin({
         ...this.props,
         editor: this,
         value: this.props.value || this.state.value,
