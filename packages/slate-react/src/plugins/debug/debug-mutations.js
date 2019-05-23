@@ -52,6 +52,9 @@ function DebugMutationsPlugin({ editor }) {
 
       return object
     })
+
+    // The first argument must not be the array as `debug` renders the first
+    // argument in a different way than the rest
     debug(`${array.length} Mutations`, ...array)
   })
 
