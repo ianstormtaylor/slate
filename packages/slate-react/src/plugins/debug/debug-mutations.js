@@ -39,7 +39,6 @@ const MUTATION_PROPERTIES = [
  */
 
 function DebugMutationsPlugin({ editor }) {
-  console.log('DebugMutationsPlugin', { editor })
   const observer = new window.MutationObserver(mutations => {
     const array = Array.from(mutations).map(mutationRecord => {
       const object = {}
@@ -53,7 +52,7 @@ function DebugMutationsPlugin({ editor }) {
 
       return object
     })
-    debug(...array)
+    debug(`${array.length} Mutations`, ...array)
   })
 
   // `findDOMNode` does not exist until later so we use `setTimeout`
