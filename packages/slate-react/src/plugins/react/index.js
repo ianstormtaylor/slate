@@ -11,6 +11,10 @@ import DebugEventsPlugin from '../debug/debug-events'
 import DebugBatchEventsPlugin from '../debug/debug-batch-events'
 import DebugMutationsPlugin from '../debug/debug-mutations'
 
+// NOPR:
+import MutationPlugin from '../android/mutation'
+import NoopPlugin from '../debug/noop'
+
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
  *
@@ -46,10 +50,19 @@ function ReactPlugin(options = {}) {
       Array.from(node.texts()).length === 1,
   })
 
+  // NOPR:
+  const mutationPlugin = new MutationPlugin(options)
+  const noopPlugin = new NoopPlugin(options)
+
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
     debugMutationsPlugin,
+
+    // NOPR:
+    mutationPlugin,
+    noopPlugin,
+
     domPlugin,
     restoreDomPlugin,
     placeholderPlugin,
