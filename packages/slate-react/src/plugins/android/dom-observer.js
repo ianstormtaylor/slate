@@ -14,7 +14,8 @@ function normalizeMutation(mut) {
  * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
  */
 
-const flushControlled = ReactDOM.unstable_flushControlled
+// const flushControlled = ReactDOM.unstable_flushControlled
+const flushControlled = ReactDOM.flushSync
 
 /**
  * Based loosely on:
@@ -57,19 +58,20 @@ function DOMObserver(editor, element) {
     stop()
 
     try {
-      flushControlled(() => {
-        let from = -1,
-          to = -1,
-          typeOver = false
-        for (let i = 0; i < mutations.length; i++) {
-          let result = register(mutations[i])
-          if (result) {
-            from = from < 0 ? result.from : Math.min(result.from, from)
-            to = to < 0 ? result.to : Math.max(result.to, to)
-            if (result.typeOver) typeOver = true
-          }
+      // flushControlled(() => {
+      let from = -1,
+        to = -1,
+        typeOver = false
+      for (let i = 0; i < mutations.length; i++) {
+        let result = register(mutations[i])
+        if (result) {
+          from = from < 0 ? result.from : Math.min(result.from, from)
+          to = to < 0 ? result.to : Math.max(result.to, to)
+          if (result.typeOver) typeOver = true
         }
-      })
+      }
+      // })
+      console.log('after flushControlled')
     } finally {
       // restart even if `render` crashes
       start()
@@ -84,15 +86,20 @@ function DOMObserver(editor, element) {
   }
 
   function removeNode(domNode) {
-    console.log('REMOVE NODE!!!')
+    console.log('removeNode')
+    // ReactDOM.flushSync(() => {
     const { value } = editor
     const { document, selection } = value
     const node = editor.findNode(domNode)
     const nodeSelection = document.resolveRange(
       selection.moveToRangeOfNode(node)
     )
-    console.log('nodeSelection', nodeSelection.toJS())
     editor.select(nodeSelection).delete()
+    editor.restoreDOM()
+    editor.controller.flush()
+    console.log('after flush sync?')
+    // })
+    // console.log('after flushSync')
   }
 
   function register(m) {

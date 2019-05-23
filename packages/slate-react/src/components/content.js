@@ -101,6 +101,7 @@ class Content extends React.Component {
     isUpdatingSelection: false,
     nodeRef: React.createRef(),
     nodeRefs: {},
+    contentKey: 0,
   }
 
   /**
@@ -505,6 +506,8 @@ class Content extends React.Component {
       ...props.style,
     }
 
+    console.log('rerender content', this.tmp.contentKey, document.text)
+
     debug('render', { props })
 
     const data = {
@@ -514,7 +517,7 @@ class Content extends React.Component {
 
     return (
       <Container
-        key={this.props.contentKey}
+        key={this.tmp.contentKey}
         {...handlers}
         {...data}
         ref={this.setRef}

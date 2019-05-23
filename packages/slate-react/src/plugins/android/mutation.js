@@ -1,15 +1,16 @@
-import DOMObserver from './dom-observer'
+// import DOMObserver from './dom-observer'
+import CompositionManager from './composition-manager'
 
 function MutationPlugin({ editor }) {
   let isComposing = false
   let observer
 
   // `findDOMNode` does not exist until later so we use `setTimeout`
-  setTimeout(() => {
-    const rootEl = editor.findDOMNode([])
-    observer = new DOMObserver(editor, rootEl)
-    observer.start()
-  }, 20)
+  // setTimeout(() => {
+  observer = new CompositionManager(editor)
+  observer.start()
+  //   observer.start()
+  // }, 20)
 
   // function flush(mutations) {
   //   console.log('MUTATIONS!!!', mutations)
@@ -29,7 +30,10 @@ function MutationPlugin({ editor }) {
   function onBeforeInput() {}
   function onInput() {}
   function onKeyDown() {}
-  function onSelect() {}
+  function onSelect(event) {
+    if (observer == null) return
+    observer.onSelect(event)
+  }
 
   return {
     onBeforeInput,
