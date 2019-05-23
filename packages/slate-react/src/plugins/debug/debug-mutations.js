@@ -43,6 +43,8 @@ function DebugMutationsPlugin({ editor }) {
     const array = Array.from(mutations).map(mutationRecord => {
       const object = {}
 
+      // Only add properties that provide meaningful values to the object
+      // to make the debug info easier to read
       MUTATION_PROPERTIES.forEach(key => {
         const value = mutationRecord[key]
         if (value == null) return
