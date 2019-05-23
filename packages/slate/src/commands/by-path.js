@@ -158,6 +158,7 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
       if (node.marks.size > markSet.size) {
         const remove = node.marks.subtract(markSet)
         editor.removeMarksByPath(path, offset, text.length, remove)
+        return
       }
 
       // If equal sizes but not equal marks, marks were added.
