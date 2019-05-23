@@ -9,6 +9,7 @@ import DOMPlugin from '../dom'
 import RestoreDOMPlugin from './restore-dom'
 import DebugEventsPlugin from '../debug/debug-events'
 import DebugBatchEventsPlugin from '../debug/debug-batch-events'
+import DebugMutationsPlugin from '../debug/debug-mutations'
 
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
@@ -24,6 +25,9 @@ function ReactPlugin(options = {}) {
     : null
   const debugBatchEventsPlugin = Debug.enabled('slate:batch-events')
     ? DebugBatchEventsPlugin(options)
+    : null
+  const debugMutationsPlugin = Debug.enabled('slate:mutations')
+    ? DebugMutationsPlugin(options)
     : null
   const renderingPlugin = RenderingPlugin(options)
   const commandsPlugin = CommandsPlugin(options)
@@ -45,6 +49,7 @@ function ReactPlugin(options = {}) {
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
+    debugMutationsPlugin,
     domPlugin,
     restoreDomPlugin,
     placeholderPlugin,
