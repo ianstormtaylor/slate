@@ -8,7 +8,7 @@ function MutationPlugin({ editor }) {
   // `findDOMNode` does not exist until later so we use `setTimeout`
   // setTimeout(() => {
   observer = new CompositionManager(editor)
-  observer.start()
+  // observer.start()
   //   observer.start()
   // }, 20)
 
@@ -18,15 +18,19 @@ function MutationPlugin({ editor }) {
 
   function onCompositionStart() {
     isComposing = true
+    observer.onCompositionStart()
   }
 
   function onCompositionEnd() {
     setTimeout(() => {
+      observer.onCompositionEnd()
       isComposing = false
     }, 20)
   }
 
-  function onCompositionUpdate() {}
+  function onCompositionUpdate() {
+    observer.onCompositionUpdate()
+  }
   function onBeforeInput() {}
   function onInput() {}
   function onKeyDown() {}

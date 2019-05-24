@@ -29,16 +29,20 @@ const flushControlled = ReactDOM.unstable_flushControlled
 function CompositionManager(editor) {
   const observer = new window.MutationObserver(flush)
 
+  let win = null
+
   const last = {
     diff: null, // {key, startPos, endPos, insertText}
     command: null, // {type, key, pos}
     selection: null, // {key, pos}
+    domNode: null, // last DOM node the cursor was in
   }
 
   function start() {
     // clear()
-    setTimeout(() => {
+    window.requestAnimationFrame(() => {
       const rootEl = editor.findDOMNode([])
+      win = getWindow(rootEl)
       observer.observe(rootEl, {
         childList: true,
         characterData: true,
@@ -53,8 +57,35 @@ function CompositionManager(editor) {
     observer.disconnect()
   }
 
+  function clear() {
+    last.diff = null
+    last.command = null
+    last.selection = null
+    last.domNode = null
+  }
+
+  function applyDiff() {
+    const { diff } = last
+    if (diff == null) return
+    console.log('applyDiff running')
+    const { document, selection } = editor.value
+
+    let entire = editor.value.selection
+      .moveAnchorTo(diff.path, diff.start)
+      .moveFocusTo(diff.path, diff.end)
+
+    entire = document.resolveRange(entire)
+
+    editor.insertTextAtRange(entire, diff.insertText)
+  }
+
+  function applySelection() {
+    editor.select(last.selection)
+  }
+
   function splitBlock() {
     flushControlled(() => {
+      applyDiff()
       editor
         .select(last.selection)
         .splitBlock()
@@ -64,6 +95,7 @@ function CompositionManager(editor) {
 
   function mergeBlock() {
     flushControlled(() => {
+      applyDiff()
       editor
         .select(last.selection)
         .deleteBackward(1)
@@ -77,38 +109,35 @@ function CompositionManager(editor) {
     let firstMutation = mutations[0]
 
     if (firstMutation.type === 'characterData') {
+      console.log('characterData', Array.from(mutations))
       resolveMutation(firstMutation)
     } else if (firstMutation.type === 'childList') {
-      if (mutations.length === 1) {
-        if (firstMutation.removedNodes.length > 0) {
-          // remove node when last character of a node is deleted
+      if (firstMutation.removedNodes.length > 0) {
+        if (mutations.length === 1) {
           removeNode(firstMutation.removedNodes[0])
-        }
-      } else {
-        if (firstMutation.removedNodes.length > 0) {
+        } else {
           // backspace
           mergeBlock()
-        } else if (firstMutation.addedNodes.length > 0) {
-          // hit enter in a block
-          splitBlock()
         }
+      } else if (firstMutation.addedNodes.length > 0) {
+        // hit enter in a block
+        splitBlock()
       }
     }
-
     start()
   }
 
   function resolveMutation(m) {
-    console.log('resolveMutation')
     const { value } = editor
     const { document, selection } = value
     const { target } = m
-    const prevText = m.oldValue
-    let nextText = target.textContent
     const domElement = target.parentNode
     const node = editor.findNode(domElement)
     const path = document.getPath(node.key)
     const block = document.getClosestBlock(node.key)
+    // const prevText = m.oldValue
+    const prevText = node.text
+    let nextText = target.textContent
     debug('characterData', {
       prevText,
       nextText,
@@ -132,23 +161,15 @@ function CompositionManager(editor) {
 
     const diff = diffText(prevText, nextText)
 
-    let entire = selection
-      .moveAnchorTo(path, diff.start)
-      .moveFocusTo(path, diff.end)
-
-    entire = document.resolveRange(entire)
-
-    // Change the current value to have the leaf's text replaced.
-    editor.insertTextAtRange(entire, diff.insertText, node.marks)
-
-    entire = entire.moveTo(path, diff.cursor)
-
-    editor.select(entire)
+    last.diff = {
+      path,
+      start: diff.start,
+      end: diff.end,
+      insertText: diff.insertText,
+    }
   }
 
   function removeNode(domNode) {
-    console.log('removeNode')
-    // ReactDOM.flushSync(() => {
     const { value } = editor
     const { document, selection } = value
     const node = editor.findNode(domNode)
@@ -158,166 +179,46 @@ function CompositionManager(editor) {
     editor.select(nodeSelection).delete()
     editor.restoreDOM()
     editor.controller.flush()
-    console.log('after flush sync?')
-    // })
-    // console.log('after flushSync')
   }
 
-  // function register(m) {
-  //   switch (m.type) {
-  //     case 'childList':
-  //       m.removedNodes.forEach(domNode => removeNode(domNode))
+  function onCompositionStart() {
+    debug('onCompositionStart')
+    start()
+  }
 
-  //       break
-  //     case 'characterData':
-  //       const { value } = editor
-  //       const { document, selection } = value
-  //       const { target } = m
-  //       const prevText = m.oldValue
-  //       let nextText = target.textContent
-  //       const domElement = target.parentNode
-  //       const node = editor.findNode(domElement)
-  //       const path = document.getPath(node.key)
-  //       const block = document.getClosestBlock(node.key)
-  //       debug('characterData', {
-  //         prevText,
-  //         nextText,
-  //         node: node.toJS(),
-  //         path: path.toJS(),
-  //         block: block.toJS(),
-  //       })
+  function onCompositionUpdate() {
+    debug('onCompositionUpdate')
+  }
 
-  //       const isLastNode = block.nodes.last() === node
-  //       const lastChar = nextText.charAt(nextText.length - 1)
+  function onCompositionEnd() {
+    debug('onCompositionEnd')
+    stop()
+    applyDiff()
+    clear()
+  }
 
-  //       // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
-  //       // we will have added another new line in <Leaf>'s render method to account
-  //       // for browsers collapsing a single trailing new lines, so remove it.
-  //       if (isLastNode && lastChar === '\n') {
-  //         nextText = nextText.slice(0, -1)
-  //       }
-
-  //       // If the text is no different, abort.
-  //       if (nextText === prevText) return
-
-  //       const diff = diffText(prevText, nextText)
-
-  //       let entire = selection
-  //         .moveAnchorTo(path, diff.start)
-  //         .moveFocusTo(path, diff.end)
-
-  //       entire = document.resolveRange(entire)
-
-  //       // Change the current value to have the leaf's text replaced.
-  //       editor.insertTextAtRange(entire, diff.insertText, node.marks)
-
-  //       entire = entire.moveTo(path, diff.cursor)
-
-  //       editor.select(entire)
-
-  //       // let entire = selection
-  //       //   .moveAnchorTo(path, 0)
-  //       //   .moveFocusTo(path, prevText.length)
-
-  //       // entire = document.resolveRange(entire)
-
-  //       // // Change the current value to have the leaf's text replaced.
-  //       // editor.insertTextAtRange(entire, nextText, node.marks)
-
-  //       break
-  //   }
-
-  //   // function reconcileNode(editor, node) {
-  //   //   const { value } = editor
-  //   //   const { document, selection } = value
-  //   //   const path = document.getPath(node.key)
-
-  //   //   const domElement = editor.findDOMNode(path)
-  //   //   const block = document.getClosestBlock(path)
-
-  //   //   // Get text information
-  //   //   const { text } = node
-  //   //   let { textContent: domText } = domElement
-
-  //   //   const isLastNode = block.nodes.last() === node
-  //   //   const lastChar = domText.charAt(domText.length - 1)
-
-  //   //   // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
-  //   //   // we will have added another new line in <Leaf>'s render method to account
-  //   //   // for browsers collapsing a single trailing new lines, so remove it.
-  //   //   if (isLastNode && lastChar === '\n') {
-  //   //     domText = domText.slice(0, -1)
-  //   //   }
-
-  //   //   // If the text is no different, abort.
-  //   //   if (text === domText) return
-
-  //   //   let entire = selection.moveAnchorTo(path, 0).moveFocusTo(path, text.length)
-
-  //   //   entire = document.resolveRange(entire)
-
-  //   //   // Change the current value to have the leaf's text replaced.
-  //   //   editor.insertTextAtRange(entire, domText, node.marks)
-  //   //   return
-  //   // }
-
-  //   //   let desc = this.view.docView.nearestDesc(mut.target)
-  //   //   if (
-  //   //     mut.type == "attributes" &&
-  //   //     (desc == this.view.docView || mut.attributeName == "contenteditable")
-  //   //   )
-  //   //     return null
-  //   //   if (!desc || desc.ignoreMutation(mut)) return null
-  //   //   if (mut.type == "childList") {
-  //   //     let fromOffset =
-  //   //       mut.previousSibling && mut.previousSibling.parentNode == mut.target
-  //   //         ? domIndex(mut.previousSibling) + 1
-  //   //         : 0
-  //   //     let from = desc.localPosFromDOM(mut.target, fromOffset, -1)
-  //   //     let toOffset =
-  //   //       mut.nextSibling && mut.nextSibling.parentNode == mut.target
-  //   //         ? domIndex(mut.nextSibling)
-  //   //         : mut.target.childNodes.length
-  //   //     let to = desc.localPosFromDOM(mut.target, toOffset, 1)
-  //   //     return { from, to }
-  //   //   } else if (mut.type == "attributes") {
-  //   //     return {
-  //   //       from: desc.posAtStart - desc.border,
-  //   //       to: desc.posAtEnd + desc.border,
-  //   //     }
-  //   //   } else {
-  //   //     // "characterData"
-  //   //     return {
-  //   //       from: desc.posAtStart,
-  //   //       to: desc.posAtEnd,
-  //   //       // An event was generated for a text change that didn't change
-  //   //       // any text. Mark the dom change to fall back to assuming the
-  //   //       // selection was typed over with an identical value if it can't
-  //   //       // find another change.
-  //   //       typeOver: mut.target.nodeValue == mut.oldValue,
-  //   //     }
-  // }
-
-  function onCompositionStart() {}
-  function onCompositionEnd() {}
   function onSelect(event) {
+    debug('onSelect')
     const domSelection = getWindow(event.target).getSelection()
-    // if (domSelection == null) return
     const range = editor.findRange(domSelection)
+    if (last.node !== domSelection.anchorNode && last.diff != null) {
+      debug('onSelect:applyDiff')
+      applyDiff()
+      editor.select(range)
+      clear()
+    }
     last.selection = range
+    last.node = domSelection.anchorNode
   }
 
-  /**
-   * Get mutations since last started or cleared
-   *
-   * @returns {Object[]}
-   */
-
-  function get() {
-    flush()
-    return mutations
+  return {
+    start,
+    stop,
+    onCompositionStart,
+    onCompositionEnd,
+    onCompositionUpdate,
+    onSelect,
   }
-  return { get, start, stop, onCompositionStart, onCompositionEnd, onSelect }
 }
 
 export default CompositionManager
