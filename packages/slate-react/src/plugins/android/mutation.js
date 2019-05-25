@@ -1,4 +1,6 @@
 // import DOMObserver from './dom-observer'
+import getWindow from 'get-window'
+import fixSelectionInZeroWidthBlock from './fix-selection-in-zero-width-block'
 import CompositionManager from './composition-manager'
 
 function MutationPlugin({ editor }) {
@@ -16,25 +18,28 @@ function MutationPlugin({ editor }) {
   //   console.log('MUTATIONS!!!', mutations)
   // }
 
-  function onCompositionStart() {
+  function onCompositionStart(event) {
     isComposing = true
-    observer.onCompositionStart()
+    observer.onCompositionStart(event)
   }
 
-  function onCompositionEnd() {
+  function onCompositionEnd(event) {
+    event.persist()
     setTimeout(() => {
-      observer.onCompositionEnd()
+      observer.onCompositionEnd(event)
       isComposing = false
     }, 20)
   }
 
-  function onCompositionUpdate() {
-    observer.onCompositionUpdate()
+  function onCompositionUpdate(event) {
+    observer.onCompositionUpdate(event)
   }
   function onBeforeInput() {}
   function onInput() {}
   function onKeyDown() {}
   function onSelect(event) {
+    const window = getWindow(event.target)
+    fixSelectionInZeroWidthBlock(window)
     if (observer == null) return
     observer.onSelect(event)
   }

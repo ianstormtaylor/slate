@@ -67,7 +67,7 @@ function CompositionManager(editor) {
   function applyDiff() {
     const { diff } = last
     if (diff == null) return
-    console.log('applyDiff running')
+    console.log('applyDiff:run')
     const { document, selection } = editor.value
 
     let entire = editor.value.selection
@@ -84,6 +84,8 @@ function CompositionManager(editor) {
   }
 
   function splitBlock() {
+    debug('splitBlock')
+
     flushControlled(() => {
       applyDiff()
       editor
@@ -94,6 +96,8 @@ function CompositionManager(editor) {
   }
 
   function mergeBlock() {
+    debug('mergeBlock')
+
     flushControlled(() => {
       applyDiff()
       editor
@@ -109,35 +113,31 @@ function CompositionManager(editor) {
     let firstMutation = mutations[0]
 
     if (firstMutation.type === 'characterData') {
-      console.log('characterData', Array.from(mutations))
       resolveMutation(firstMutation)
     } else if (firstMutation.type === 'childList') {
       if (firstMutation.removedNodes.length > 0) {
         if (mutations.length === 1) {
           removeNode(firstMutation.removedNodes[0])
         } else {
-          // backspace
           mergeBlock()
         }
       } else if (firstMutation.addedNodes.length > 0) {
-        // hit enter in a block
         splitBlock()
       }
     }
     start()
   }
 
-  function resolveMutation(m) {
+  function resolveDOMNode(domNode) {
     const { value } = editor
     const { document, selection } = value
-    const { target } = m
-    const domElement = target.parentNode
+    const domElement = domNode.parentNode
     const node = editor.findNode(domElement)
     const path = document.getPath(node.key)
     const block = document.getClosestBlock(node.key)
     // const prevText = m.oldValue
     const prevText = node.text
-    let nextText = target.textContent
+    let nextText = domNode.textContent
     debug('characterData', {
       prevText,
       nextText,
@@ -156,6 +156,22 @@ function CompositionManager(editor) {
       nextText = nextText.slice(0, -1)
     }
 
+    let cursorOffset = getDOMRange().startOffset
+
+    const firstCharCode = nextText.charCodeAt(0)
+    if (firstCharCode === 65279) {
+      nextText = nextText.slice(1)
+      cursorOffset--
+      debug('FOUND - ZERO WIDTH', {
+        prevText,
+        nextText,
+        prevLength: prevText.length,
+        nextLength: nextText.length,
+      })
+    } else {
+      debug('NO - ZERO WIDTH', { prevText, nextText })
+    }
+
     // If the text is no different, abort.
     if (nextText === prevText) return
 
@@ -166,10 +182,21 @@ function CompositionManager(editor) {
       start: diff.start,
       end: diff.end,
       insertText: diff.insertText,
+      cursorOffset,
+      startOffset: getDOMRange().startOffset,
+      range: getRange(),
     }
+    debug('resolveDOMNode:last.diff.range', last.diff)
+  }
+
+  function resolveMutation(m) {
+    debug('resolve')
+    const domNode = m.target.parentNode
+    resolveDOMNode(domNode)
   }
 
   function removeNode(domNode) {
+    debug('removeNode')
     const { value } = editor
     const { document, selection } = value
     const node = editor.findNode(domNode)
@@ -190,17 +217,62 @@ function CompositionManager(editor) {
     debug('onCompositionUpdate')
   }
 
-  function onCompositionEnd() {
+  function getDOMRange() {
+    return win.getSelection().getRangeAt(0)
+  }
+
+  function getRange() {
+    const domSelection = win.getSelection()
+    const range = editor.findRange(domSelection)
+    console.log('getRange', { domSelection, range })
+    return range
+  }
+
+  function onCompositionEnd(event) {
     debug('onCompositionEnd')
     stop()
-    applyDiff()
+
+    if (last.diff) {
+      applyDiff({ select: true })
+
+      const domRange = win.getSelection().getRangeAt(0)
+      const domText = domRange.startContainer.textContent
+      let offset = domRange.startOffset
+      // const hasZeroWidth = domText.charCodeAt(0) === 65279
+      // if (hasZeroWidth) {
+      //   offset--
+      // }
+      // debug('onCompositionEnd', {
+      //   domText,
+      //   hasZeroWidth,
+      //   offset,
+      // })
+
+      const range = editor
+        .findRange({
+          anchorNode: domRange.startContainer,
+          anchorOffset: 0,
+          focusNode: domRange.startContainer,
+          anchorOffset: 0,
+          isCollapsed: true,
+        })
+        .moveTo(offset)
+
+      // const range = editor.findRange(win.getSelection())
+      editor.select(range)
+    }
+
     clear()
+    // const range = getRange(event)
+    // applyDiff()
+    // editor.select(range)
+    // clear()
   }
 
   function onSelect(event) {
-    debug('onSelect')
     const domSelection = getWindow(event.target).getSelection()
     const range = editor.findRange(domSelection)
+    debug('onSelect', { domSelection, range: range.toJS() })
     if (last.node !== domSelection.anchorNode && last.diff != null) {
       debug('onSelect:applyDiff')
       applyDiff()
