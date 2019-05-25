@@ -42,6 +42,7 @@ function CompositionManager(editor) {
     // clear()
     window.requestAnimationFrame(() => {
       const rootEl = editor.findDOMNode([])
+      debug('start:rootEl', { rootEl })
       win = getWindow(rootEl)
       observer.observe(rootEl, {
         childList: true,
