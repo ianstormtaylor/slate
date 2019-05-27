@@ -31,6 +31,8 @@ function CompositionManager(editor) {
 
   let win = null
 
+  let isComposing = false
+
   const last = {
     diff: null, // {key, startPos, endPos, insertText}
     command: null, // {type, key, pos}
@@ -42,7 +44,7 @@ function CompositionManager(editor) {
     // clear()
     window.requestAnimationFrame(() => {
       const rootEl = editor.findDOMNode([])
-      debug('start:rootEl', { rootEl })
+      debug('start:run', { rootEl })
       win = getWindow(rootEl)
       observer.observe(rootEl, {
         childList: true,
@@ -53,6 +55,8 @@ function CompositionManager(editor) {
       })
     })
   }
+
+  start()
 
   function stop() {
     observer.disconnect()
@@ -94,6 +98,8 @@ function CompositionManager(editor) {
         .splitBlock()
         .restoreDOM()
     })
+
+    win.requestAnimationFrame(start)
   }
 
   function mergeBlock() {
@@ -106,11 +112,14 @@ function CompositionManager(editor) {
         .deleteBackward(1)
         .restoreDOM()
     })
+
+    win.requestAnimationFrame(start)
   }
 
   function flush(mutations) {
+    if (!isComposing) return
     if (!mutations) mutations = observer.takeRecords()
-    stop()
+    // stop()
     let firstMutation = mutations[0]
 
     if (firstMutation.type === 'characterData') {
@@ -126,7 +135,7 @@ function CompositionManager(editor) {
         splitBlock()
       }
     }
-    start()
+    // start()
   }
 
   function resolveDOMNode(domNode) {
@@ -158,6 +167,9 @@ function CompositionManager(editor) {
     }
 
     let cursorOffset = getDOMRange().startOffset
+
+    // FIXIT:
+    // Make sure the char 65279 (zero width space) is removed from the text.
 
     const firstCharCode = nextText.charCodeAt(0)
     if (firstCharCode === 65279) {
@@ -211,7 +223,7 @@ function CompositionManager(editor) {
 
   function onCompositionStart() {
     debug('onCompositionStart')
-    start()
+    isComposing = true
   }
 
   function onCompositionUpdate() {
@@ -231,7 +243,7 @@ function CompositionManager(editor) {
 
   function onCompositionEnd(event) {
     debug('onCompositionEnd')
-    stop()
+    isComposing = false
 
     if (last.diff) {
       applyDiff({ select: true })
