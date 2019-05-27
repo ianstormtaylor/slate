@@ -159,6 +159,8 @@ class Content extends React.Component {
     }
 
     this.updateSelection()
+
+    this.props.onEvent('onComponentDidMount', { target: this.ref.current })
   }
 
   /**
@@ -181,6 +183,8 @@ class Content extends React.Component {
         this.handlers.onBeforeInput
       )
     }
+
+    this.props.onEvent('onComponentWillUnmount', { target: this.ref.current })
   }
 
   /**
@@ -189,7 +193,10 @@ class Content extends React.Component {
 
   componentDidUpdate() {
     debug.update('componentDidUpdate')
+
     this.updateSelection()
+
+    this.props.onEvent('onComponentDidUpdate', { target: this.ref.current })
   }
 
   /**
