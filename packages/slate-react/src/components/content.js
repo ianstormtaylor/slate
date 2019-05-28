@@ -546,6 +546,8 @@ class Content extends React.Component {
     debug('render', { props })
     debug.update('render', this.tmp.contentKey, document.text)
 
+    this.props.onEvent('onRender', {})
+
     const data = {
       [DATA_ATTRS.EDITOR]: true,
       [DATA_ATTRS.KEY]: document.key,
