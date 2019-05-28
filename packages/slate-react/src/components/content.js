@@ -212,7 +212,7 @@ class Content extends React.Component {
     const native = window.getSelection()
     const { activeElement } = window.document
 
-    if (debug.enabled) {
+    if (debug.update.enabled) {
       debug.update('updateSelection', { selection: selection.toJSON() })
     }
 
@@ -287,6 +287,19 @@ class Content extends React.Component {
       this.tmp.isUpdatingSelection = true
       removeAllRanges(native)
 
+      const s = startContainer.textContent
+
+      console.log(
+        'range',
+        s,
+        s.charCodeAt(0),
+        s.charCodeAt(1),
+        s.charCodeAt(s.length - 1),
+        s.length,
+        range.startOffset,
+        range.endOffset
+      )
+
       // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
       if (native.setBaseAndExtent) {
         // COMPAT: Since the DOM range has no concept of backwards/forwards
@@ -323,12 +336,22 @@ class Content extends React.Component {
         }
 
         this.tmp.isUpdatingSelection = false
+
+        debug.update('updateSelection:setTimeout', {
+          anchorOffset: window.getSelection().anchorOffset,
+        })
       })
     }
 
-    if (updated && debug.enabled) {
+    if (updated && (debug.enabled || debug.update.enabled)) {
       debug('updateSelection', { selection, native, activeElement })
-      debug.update('updateSelection-applied', { selection })
+      debug.update('updateSelection:applied', {
+        selection: selection.toJSON(),
+        native: {
+          anchorOffset: native.anchorOffset,
+          focusOffset: native.focusOffset,
+        },
+      })
     }
   }
 
@@ -471,6 +494,9 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { activeElement } = window.document
+    debug.update('onNativeSelectionChange', {
+      anchorOffset: window.getSelection().anchorOffset,
+    })
     if (activeElement !== this.ref.current) return
 
     this.props.onEvent('onSelect', event)
@@ -513,9 +539,10 @@ class Content extends React.Component {
       ...props.style,
     }
 
-    console.log('rerender content', this.tmp.contentKey, document.text)
+    // console.log('rerender content', this.tmp.contentKey, document.text)
 
     debug('render', { props })
+    debug.update('render', this.tmp.contentKey, document.text)
 
     const data = {
       [DATA_ATTRS.EDITOR]: true,

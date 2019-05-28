@@ -33,6 +33,10 @@ function CompositionManager(editor) {
 
   let isComposing = false
 
+  let isListening = false
+
+  let lastEl = null
+
   const last = {
     diff: null, // {key, startPos, endPos, insertText}
     command: null, // {type, key, pos}
@@ -40,32 +44,49 @@ function CompositionManager(editor) {
     domNode: null, // last DOM node the cursor was in
   }
 
-  function start() {
-    // clear()
-    window.requestAnimationFrame(() => {
-      const rootEl = editor.findDOMNode([])
-      debug('start:run', { rootEl })
-      win = getWindow(rootEl)
-      observer.observe(rootEl, {
-        childList: true,
-        characterData: true,
-        attributes: true,
-        subtree: true,
-        characterDataOldValue: true,
-      })
+  function connect(el) {
+    if (lastEl === el) return
+    debug('connect')
+    win = getWindow(el)
+    observer.observe(el, {
+      childList: true,
+      characterData: true,
+      attributes: true,
+      subtree: true,
+      characterDataOldValue: true,
     })
+    isListening = true
   }
 
-  start()
-
-  function stop() {
+  function disconnect() {
+    debug('disconnect')
     observer.disconnect()
   }
+
+  // function start() {
+  //   // window.requestAnimationFrame(() => {
+  //   //   const rootEl = editor.findDOMNode([])
+  //   //   debug('start:run', { rootEl })
+  //   //   win = getWindow(rootEl)
+  //   //   observer.observe(rootEl, {
+  //   //     childList: true,
+  //   //     characterData: true,
+  //   //     attributes: true,
+  //   //     subtree: true,
+  //   //     characterDataOldValue: true,
+  //   //   })
+  //   // })
+  // }
+
+  // start()
+
+  // function stop() {
+  //   observer.disconnect()
+  // }
 
   function clear() {
     last.diff = null
     last.command = null
-    last.selection = null
     last.domNode = null
   }
 
@@ -91,34 +112,39 @@ function CompositionManager(editor) {
   function splitBlock() {
     debug('splitBlock')
 
+    disconnect()
+
     flushControlled(() => {
       applyDiff()
-      editor
-        .select(last.selection)
-        .splitBlock()
-        .restoreDOM()
+      if (last.selection) {
+        editor.select(last.selection)
+      } else {
+        debug('splitBlock:NO-SELECTION')
+      }
+      editor.splitBlock().restoreDOM()
     })
-
-    win.requestAnimationFrame(start)
   }
 
   function mergeBlock() {
     debug('mergeBlock')
 
-    flushControlled(() => {
+    disconnect()
+
+    const lastSelection = last.selection
+
+    win.requestAnimationFrame(() => {
+      console.log('selection at mergeBlock', last.selection.toJSON())
       applyDiff()
       editor
-        .select(last.selection)
-        .deleteBackward(1)
+        .select(lastSelection)
+        .deleteBackward()
         .restoreDOM()
     })
-
-    win.requestAnimationFrame(start)
   }
 
   function flush(mutations) {
-    if (!isComposing) return
     if (!mutations) mutations = observer.takeRecords()
+    debug('flush', mutations.length, mutations)
     // stop()
     let firstMutation = mutations[0]
 
@@ -292,13 +318,19 @@ function CompositionManager(editor) {
       editor.select(range)
       clear()
     }
+    debug('onSelect', {
+      editorSelection: editor.value.selection.toJSON(),
+      range: range.toJSON(),
+    })
     last.selection = range
     last.node = domSelection.anchorNode
   }
 
   return {
-    start,
-    stop,
+    // start,
+    // stop,
+    connect,
+    disconnect,
     onCompositionStart,
     onCompositionEnd,
     onCompositionUpdate,

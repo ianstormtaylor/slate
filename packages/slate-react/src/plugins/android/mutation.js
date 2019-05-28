@@ -1,7 +1,10 @@
 // import DOMObserver from './dom-observer'
+import Debug from 'debug'
 import getWindow from 'get-window'
 import fixSelectionInZeroWidthBlock from './fix-selection-in-zero-width-block'
 import CompositionManager from './composition-manager'
+
+const debug = Debug('slate:mutation-plugin')
 
 function MutationPlugin({ editor }) {
   let isComposing = false
@@ -58,14 +61,14 @@ function MutationPlugin({ editor }) {
   }
   function onBeforeInput() {}
   function onInput(event) {
-    if (event.nativeEvent.inputType === 'insertLineBreak') {
-      event.preventDefault()
-      const selection = editor.findRange(getWindow(event.target).getSelection())
-      editor.select(selection).splitBlock()
-    } else if (event.nativeEvent.inputType === 'deleteContentBackward') {
-      event.preventDefault()
-      editor.deleteBackward().restoreDOM()
-    }
+    // if (event.nativeEvent.inputType === 'insertLineBreak') {
+    //   event.preventDefault()
+    //   const selection = editor.findRange(getWindow(event.target).getSelection())
+    //   editor.select(selection).splitBlock()
+    // } else if (event.nativeEvent.inputType === 'deleteContentBackward') {
+    //   event.preventDefault()
+    //   editor.deleteBackward().restoreDOM()
+    // }
   }
   function onKeyDown() {}
   function onSelect(event, editor, next) {
@@ -76,8 +79,26 @@ function MutationPlugin({ editor }) {
     next()
   }
 
+  function onComponentDidMount(event) {
+    debug('onComponentDidMount')
+    observer.connect(event.target)
+  }
+
+  function onComponentDidUpdate(event) {
+    debug('onComponentDidUpdate')
+    observer.connect(event.target)
+  }
+
+  function onComponentWillUnmount(event) {
+    debug('onComponentWillUnmount')
+    observer.disconnect()
+  }
+
   return {
     onBeforeInput,
+    onComponentDidMount,
+    onComponentDidUpdate,
+    onComponentWillUnmount,
     onCompositionEnd,
     onCompositionStart,
     onCompositionUpdate,
