@@ -361,19 +361,29 @@ function CompositionManager(editor) {
     // The proper fix is to add an option to `findRange` like
     // `findRange(domSelection, {normalize: false})` that won't normalize.
 
-    let nextAnchorOffset = domSelection.anchorOffset
-    if (textEndsWithZeroWidth(domSelection.anchorNode.textContent)) {
-      nextAnchorOffset--
+    const anchorFix = fixTextAndOffset(
+      domSelection.anchorNode.textContent,
+      domSelection.anchorOffset
+    )
+
+    const focusFix = fixTextAndOffset(
+      domSelection.anchorNode.textContent,
+      domSelection.anchorOffset
+    )
+
+    // let nextAnchorOffset = domSelection.anchorOffset
+    // if (textEndsWithZeroWidth(domSelection.anchorNode.textContent)) {
+    //   nextAnchorOffset--
+    // }
+    // let nextFocusOffset = domSelection.focusOffset
+    // if (textEndsWithZeroWidth(domSelection.focusNode.textContent)) {
+    //   nextFocusOffset--
+    // }
+    if (range.anchor.offset !== anchorFix.offset) {
+      range = range.set('anchor', range.anchor.set('offset', anchorFix.offset))
     }
-    let nextFocusOffset = domSelection.focusOffset
-    if (textEndsWithZeroWidth(domSelection.focusNode.textContent)) {
-      nextFocusOffset--
-    }
-    if (range.anchor.offset !== nextAnchorOffset) {
-      range = range.set('anchor', range.anchor.set('offset', nextAnchorOffset))
-    }
-    if (range.focus.offset !== nextFocusOffset) {
-      range = range.set('focus', range.focus.set('offset', nextFocusOffset))
+    if (range.focus.offset !== focusFix.offset) {
+      range = range.set('focus', range.focus.set('offset', focusFix.offset))
     }
 
     debug('onSelect', {
@@ -383,7 +393,11 @@ function CompositionManager(editor) {
 
     // If the `domSelection` has moved into a new node, then reconcile with
     // `applyDiff`
-    if (last.node !== domSelection.anchorNode && last.diff != null) {
+    if (
+      domSelection.isCollapsed &&
+      last.node !== domSelection.anchorNode &&
+      last.diff != null
+    ) {
       debug('onSelect:applyDiff', last.diff)
       applyDiff()
       editor.select(range)
@@ -449,11 +463,23 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   let nextOffset = prevOffset
   let nextText = prevText
   let index = 0
+  console.log('fixTextAndOffset', {
+    nextText,
+    nextOffset,
+    type: typeof nextText,
+    length: nextText.length,
+  })
   while (index !== -1) {
     index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
     if (index === -1) break
     if (nextOffset > index) nextOffset--
-    nextText = nextText.splice(index, 1)
+    console.log('loop', {
+      nextText,
+      type: typeof nextText,
+      length: nextText.length,
+    })
+    // nextText = nextText.splice(index, 1)
+    nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
   }
   const maxOffset = nextText.length
   if (nextOffset > maxOffset) nextOffset = maxOffset

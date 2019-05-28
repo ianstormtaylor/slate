@@ -28,12 +28,12 @@ function MutationPlugin({ editor }) {
 
   function onCompositionEnd(event) {
     event.persist()
-    observer.onCompositionEnd(event)
-    isComposing = false
-    // setTimeout(() => {
-    //   observer.onCompositionEnd(event)
-    //   isComposing = false
-    // }, 20)
+    // observer.onCompositionEnd(event)
+    // isComposing = false
+    setTimeout(() => {
+      observer.onCompositionEnd(event)
+      isComposing = false
+    }, 20)
   }
 
   /**
