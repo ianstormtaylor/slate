@@ -8,6 +8,7 @@ import splitJoin from './split-join.js'
 import insert from './insert.js'
 import special from './special.js'
 import empty from './empty.js'
+import remove from './remove.js'
 import { isKeyHotkey } from 'is-hotkey'
 import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
 import { ANDROID_API_VERSION } from 'slate-dev-environment'
@@ -75,6 +76,7 @@ const SUBPAGES = [
   ['Insertion', insert, 'insert'],
   ['Special', special, 'special'],
   ['Empty', empty, 'empty'],
+  ['Remove', remove, 'remove'],
 ]
 
 /**
