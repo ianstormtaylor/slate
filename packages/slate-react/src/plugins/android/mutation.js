@@ -61,6 +61,7 @@ function MutationPlugin({ editor }) {
   }
   function onBeforeInput() {}
   function onInput(event) {
+    // observer.onInput(event)
     // if (event.nativeEvent.inputType === 'insertLineBreak') {
     //   event.preventDefault()
     //   const selection = editor.findRange(getWindow(event.target).getSelection())

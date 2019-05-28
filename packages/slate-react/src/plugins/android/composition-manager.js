@@ -35,6 +35,14 @@ function CompositionManager(editor) {
 
   let isListening = false
 
+  /**
+   * Range when the last `onInput` event occurred.
+   *
+   * @type {Range}
+   */
+
+  let lastLastRange = null
+
   let lastEl = null
 
   const last = {
@@ -132,6 +140,13 @@ function CompositionManager(editor) {
 
     const lastSelection = last.selection
 
+    // The delay is required because hitting `enter`, `enter` then `backspace`
+    // in a word results in the cursor being one position to the right. Slate
+    // correctly sets the position to `0` and we have even checked it
+    // immediately after setting it, but upon next read it will be in the
+    // wrong position. This happens only when using the virtual keyboard.
+    // Hitting enter on a hardware keyboard does not trigger this bug.
+
     win.requestAnimationFrame(() => {
       console.log('selection at mergeBlock', last.selection.toJSON())
       applyDiff()
@@ -145,7 +160,21 @@ function CompositionManager(editor) {
   function flush(mutations) {
     if (!mutations) mutations = observer.takeRecords()
     debug('flush', mutations.length, mutations)
-    // stop()
+
+    console.log('last.selection', last.selection, last.selection.toJSON())
+    if (lastLastRange && !lastLastRange.isCollapsed) {
+      console.log('delete selection')
+      flushControlled(() => {
+        editor
+          .select(lastLastRange)
+          .deleteBackward()
+          .restoreDOM()
+      })
+      return
+    } else {
+      console.log('do not delete selection')
+    }
+
     let firstMutation = mutations[0]
 
     if (firstMutation.type === 'characterData') {
@@ -311,10 +340,19 @@ function CompositionManager(editor) {
     // clear()
   }
 
+  // function onInput(event) {
+  //   const domSelection = getWindow(event.target).getSelection()
+  //   const range = editor.findRange(domSelection)
+  //   onInputRange = range
+  // }
+
   function onSelect(event) {
     const domSelection = getWindow(event.target).getSelection()
     const range = editor.findRange(domSelection)
     debug('onSelect', { domSelection, range: range.toJS() })
+
+    // If the `domSelection` has moved into a new node, then reconcile with
+    // `applyDiff`
     if (last.node !== domSelection.anchorNode && last.diff != null) {
       debug('onSelect:applyDiff', last.diff)
       applyDiff()
@@ -325,6 +363,7 @@ function CompositionManager(editor) {
       editorSelection: editor.value.selection.toJSON(),
       range: range.toJSON(),
     })
+    lastLastRange = last.selection
     last.selection = range
     last.node = domSelection.anchorNode
   }
@@ -337,6 +376,7 @@ function CompositionManager(editor) {
     onCompositionStart,
     onCompositionEnd,
     onCompositionUpdate,
+    // onInput,
     onSelect,
   }
 }
