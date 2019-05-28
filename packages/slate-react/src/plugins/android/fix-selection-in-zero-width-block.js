@@ -11,6 +11,7 @@
 export default function fixSelectionInZeroWidthBlock(window) {
   const domSelection = window.getSelection()
   const { anchorNode } = domSelection
+  if (anchorNode == null) return
   const { dataset } = anchorNode.parentElement
   const isZeroWidth = dataset ? dataset.slateZeroWidth === 'n' : false
 

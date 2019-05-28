@@ -7,6 +7,9 @@ import { tmpdir } from 'os'
 
 const debug = Debug('slate:composition-manager')
 
+const ZERO_WIDTH_SPACE = 65279
+const ZERO_WIDTH_SPACE_CHAR = String.fromCharCode(ZERO_WIDTH_SPACE)
+
 /**
  * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
  */
@@ -207,15 +210,27 @@ function CompositionManager(editor) {
       block: block.toJS(),
     })
 
-    const isLastNode = block.nodes.last() === node
-    const lastChar = nextText.charAt(nextText.length - 1)
-
     // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
+    const isLastNode = block.nodes.last() === node
+    const lastChar = nextText.charAt(nextText.length - 1)
     if (isLastNode && lastChar === '\n') {
       nextText = nextText.slice(0, -1)
     }
+
+    console.log({ nextText, length: nextText.length })
+
+    // nextText = fixDOMText(nextText)
+
+    // If the last character is a zero width then remove it. This is because
+    // the user started typing in an empty block.
+    const lastCharCode = nextText.charCodeAt(nextText.length - 1)
+    if (lastCharCode === ZERO_WIDTH_SPACE) {
+      nextText = nextText.slice(0, -1)
+    }
+
+    console.log({ lastCharCode, nextText, length: nextText.length })
 
     let cursorOffset = getDOMRange().startOffset
 
@@ -223,7 +238,7 @@ function CompositionManager(editor) {
     // Make sure the char 65279 (zero width space) is removed from the text.
 
     const firstCharCode = nextText.charCodeAt(0)
-    if (firstCharCode === 65279) {
+    if (firstCharCode === ZERO_WIDTH_SPACE) {
       nextText = nextText.slice(1)
       cursorOffset--
       debug('FOUND - ZERO WIDTH', {
@@ -305,15 +320,17 @@ function CompositionManager(editor) {
       const domRange = win.getSelection().getRangeAt(0)
       const domText = domRange.startContainer.textContent
       let offset = domRange.startOffset
-      // const hasZeroWidth = domText.charCodeAt(0) === 65279
-      // if (hasZeroWidth) {
-      //   offset--
-      // }
-      // debug('onCompositionEnd', {
-      //   domText,
-      //   hasZeroWidth,
-      //   offset,
-      // })
+
+      /**
+       * TODO:
+       *
+       * The next step I think is that we need to get a general `findRange`
+       * method that works with unresolved nodes. We need to remove the
+       * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
+       * keeping in mind that if the space is before, e need to offset the
+       * anchor and if the space is after we don't and the max offset is
+       * the length of the text after the spaces are removed.
+       */
 
       const range = editor
         .findRange({
@@ -325,22 +342,11 @@ function CompositionManager(editor) {
         })
         .moveTo(offset)
 
-      // const range = editor.findRange(win.getSelection())
       editor.select(range)
     }
 
     clear()
-    // const range = getRange(event)
-    // applyDiff()
-    // editor.select(range)
-    // clear()
   }
-
-  // function onInput(event) {
-  //   const domSelection = getWindow(event.target).getSelection()
-  //   const range = editor.findRange(domSelection)
-  //   onInputRange = range
-  // }
 
   function onSelect(event) {
     const domSelection = getWindow(event.target).getSelection()
@@ -355,17 +361,19 @@ function CompositionManager(editor) {
     // The proper fix is to add an option to `findRange` like
     // `findRange(domSelection, {normalize: false})` that won't normalize.
 
-    if (range.anchor.offset !== domSelection.anchorOffset) {
-      range = range.set(
-        'anchor',
-        range.anchor.set('offset', domSelection.anchorOffset)
-      )
+    let nextAnchorOffset = domSelection.anchorOffset
+    if (textEndsWithZeroWidth(domSelection.anchorNode.textContent)) {
+      nextAnchorOffset--
     }
-    if (range.focus.offset !== domSelection.focusOffset) {
-      range = range.set(
-        'focus',
-        range.focus.set('offset', domSelection.focusOffset)
-      )
+    let nextFocusOffset = domSelection.focusOffset
+    if (textEndsWithZeroWidth(domSelection.focusNode.textContent)) {
+      nextFocusOffset--
+    }
+    if (range.anchor.offset !== nextAnchorOffset) {
+      range = range.set('anchor', range.anchor.set('offset', nextAnchorOffset))
+    }
+    if (range.focus.offset !== nextFocusOffset) {
+      range = range.set('focus', range.focus.set('offset', nextFocusOffset))
     }
 
     debug('onSelect', {
@@ -391,14 +399,11 @@ function CompositionManager(editor) {
   }
 
   return {
-    // start,
-    // stop,
     connect,
     disconnect,
     onCompositionStart,
     onCompositionEnd,
     onCompositionUpdate,
-    // onInput,
     onSelect,
   }
 }
@@ -412,9 +417,47 @@ function normalizeDOMSelection(selection) {
   }
 }
 
-function nodeStartsWithZeroWidth(node) {
-  const { textContent } = node
-  return textContent.charCodeAt(0) === 65279
+function fixDOMText(text) {
+  if (text.charCodeAt(text.length - 1) === ZERO_WIDTH_SPACE) {
+    return text.slice(0, -1)
+  }
+  return text
+}
+
+function textStartsWithZeroWidth(s) {
+  return s.charCodeAt(0) === ZERO_WIDTH_SPACE
+}
+
+function textEndsWithZeroWidth(s) {
+  return s.charCodeAt(s - 1) === ZERO_WIDTH_SPACE
+}
+
+/**
+ * Takes text from a dom node and an offset within that text and returns an
+ * object with fixed text and fixed offset which removes zero width spaces
+ * and adjusts the offset.
+ *
+ * Optionally, if an `isLastNode` argument is passed in, it will also remove
+ * a trailing newline.
+ *
+ * @param {String} text
+ * @param {Number} offset
+ * @param {Boolean} isLastNode
+ */
+
+function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
+  let nextOffset = prevOffset
+  let nextText = prevText
+  let index = 0
+  while (index !== -1) {
+    index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
+    if (index === -1) break
+    if (nextOffset > index) nextOffset--
+    nextText = nextText.splice(index, 1)
+  }
+  const maxOffset = nextText.length
+  if (nextOffset > maxOffset) nextOffset = maxOffset
+  return { text: nextText, offset: nextOffset }
 }
 
 export default CompositionManager
