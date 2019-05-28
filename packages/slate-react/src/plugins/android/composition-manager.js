@@ -118,9 +118,7 @@ function CompositionManager(editor) {
   }
 
   function splitBlock() {
-    debug('splitBlock')
-
-    disconnect()
+    debug('splitBlock', { selection: last.selection.toJSON() })
 
     flushControlled(() => {
       applyDiff()
@@ -135,8 +133,6 @@ function CompositionManager(editor) {
 
   function mergeBlock() {
     debug('mergeBlock')
-
-    disconnect()
 
     const lastSelection = last.selection
 
@@ -348,8 +344,34 @@ function CompositionManager(editor) {
 
   function onSelect(event) {
     const domSelection = getWindow(event.target).getSelection()
-    const range = editor.findRange(domSelection)
-    debug('onSelect', { domSelection, range: range.toJS() })
+    let range = editor.findRange(domSelection)
+
+    // `findRange` makes sure that the cursor is within the node and adjusts;
+    // During composition, the cursor position can validly be outside the
+    // current text in Slate's `value` because the text hasn't been inserted
+    // into Slate yet. After we apply the text, the selection is valid.
+    //
+    // fixme:
+    // The proper fix is to add an option to `findRange` like
+    // `findRange(domSelection, {normalize: false})` that won't normalize.
+
+    if (range.anchor.offset !== domSelection.anchorOffset) {
+      range = range.set(
+        'anchor',
+        range.anchor.set('offset', domSelection.anchorOffset)
+      )
+    }
+    if (range.focus.offset !== domSelection.focusOffset) {
+      range = range.set(
+        'focus',
+        range.focus.set('offset', domSelection.focusOffset)
+      )
+    }
+
+    debug('onSelect', {
+      domSelection: normalizeDOMSelection(domSelection),
+      range: range.toJS(),
+    })
 
     // If the `domSelection` has moved into a new node, then reconcile with
     // `applyDiff`
@@ -379,6 +401,20 @@ function CompositionManager(editor) {
     // onInput,
     onSelect,
   }
+}
+
+function normalizeDOMSelection(selection) {
+  return {
+    anchorNode: selection.anchorNode,
+    anchorOffset: selection.anchorOffset,
+    focusNode: selection.focusNode,
+    focusOffset: selection.focusOffset,
+  }
+}
+
+function nodeStartsWithZeroWidth(node) {
+  const { textContent } = node
+  return textContent.charCodeAt(0) === 65279
 }
 
 export default CompositionManager

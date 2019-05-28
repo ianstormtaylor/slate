@@ -75,7 +75,7 @@ function MutationPlugin({ editor }) {
   function onSelect(event, editor, next) {
     const window = getWindow(event.target)
     fixSelectionInZeroWidthBlock(window)
-    if (observer == null) return
+    // if (observer == null) return
     observer.onSelect(event)
     next()
   }
