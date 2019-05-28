@@ -212,7 +212,10 @@ function CompositionManager(editor) {
     }
 
     // If the text is no different, abort.
-    if (nextText === prevText) return
+    if (nextText === prevText) {
+      last.diff = null
+      return
+    }
 
     const diff = diffText(prevText, nextText)
 
@@ -313,7 +316,7 @@ function CompositionManager(editor) {
     const range = editor.findRange(domSelection)
     debug('onSelect', { domSelection, range: range.toJS() })
     if (last.node !== domSelection.anchorNode && last.diff != null) {
-      debug('onSelect:applyDiff')
+      debug('onSelect:applyDiff', last.diff)
       applyDiff()
       editor.select(range)
       clear()
