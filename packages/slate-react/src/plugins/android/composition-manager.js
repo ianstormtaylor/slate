@@ -74,27 +74,6 @@ function CompositionManager(editor) {
     observer.disconnect()
   }
 
-  // function start() {
-  //   // window.requestAnimationFrame(() => {
-  //   //   const rootEl = editor.findDOMNode([])
-  //   //   debug('start:run', { rootEl })
-  //   //   win = getWindow(rootEl)
-  //   //   observer.observe(rootEl, {
-  //   //     childList: true,
-  //   //     characterData: true,
-  //   //     attributes: true,
-  //   //     subtree: true,
-  //   //     characterDataOldValue: true,
-  //   //   })
-  //   // })
-  // }
-
-  // start()
-
-  // function stop() {
-  //   observer.disconnect()
-  // }
-
   function clear() {
     last.diff = null
     last.command = null
@@ -131,6 +110,7 @@ function CompositionManager(editor) {
         debug('splitBlock:NO-SELECTION')
       }
       editor.splitBlock().restoreDOM()
+      clear()
     })
   }
 
@@ -153,6 +133,7 @@ function CompositionManager(editor) {
         .select(lastSelection)
         .deleteBackward()
         .restoreDOM()
+      clear()
     })
   }
 
@@ -214,6 +195,7 @@ function CompositionManager(editor) {
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
     const isLastNode = block.nodes.last() === node
+
     const lastChar = nextText.charAt(nextText.length - 1)
     if (isLastNode && lastChar === '\n') {
       nextText = nextText.slice(0, -1)
@@ -463,24 +445,31 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   let nextOffset = prevOffset
   let nextText = prevText
   let index = 0
-  console.log('fixTextAndOffset', {
-    nextText,
-    nextOffset,
-    type: typeof nextText,
-    length: nextText.length,
-  })
+  // console.log('fixTextAndOffset', {
+  //   nextText,
+  //   nextOffset,
+  //   type: typeof nextText,
+  //   length: nextText.length,
+  // })
   while (index !== -1) {
     index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
     if (index === -1) break
     if (nextOffset > index) nextOffset--
-    console.log('loop', {
-      nextText,
-      type: typeof nextText,
-      length: nextText.length,
-    })
+    // console.log('loop', {
+    //   nextText,
+    //   type: typeof nextText,
+    //   length: nextText.length,
+    // })
     // nextText = nextText.splice(index, 1)
     nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
   }
+
+  // remove the last newline if we are in the last node of a block
+  const lastChar = nextText.charAt(nextText.length - 1)
+  if (isLastNode && lastChar === '\n') {
+    nextText = nextText.slice(0, -1)
+  }
+
   const maxOffset = nextText.length
   if (nextOffset > maxOffset) nextOffset = maxOffset
   return { text: nextText, offset: nextOffset }
