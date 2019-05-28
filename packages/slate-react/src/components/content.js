@@ -539,8 +539,6 @@ class Content extends React.Component {
       ...props.style,
     }
 
-    this.props.onEvent('onRender', {})
-
     // console.log('rerender content', this.tmp.contentKey, document.text)
 
     debug('render', { props })
