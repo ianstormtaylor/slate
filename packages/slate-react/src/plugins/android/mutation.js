@@ -80,17 +80,18 @@ function MutationPlugin({ editor }) {
   }
 
   function onComponentDidMount(event) {
-    debug('onComponentDidMount')
     observer.connect(event.target)
   }
 
   function onComponentDidUpdate(event) {
-    debug('onComponentDidUpdate')
     observer.connect(event.target)
   }
 
   function onComponentWillUnmount(event) {
-    debug('onComponentWillUnmount')
+    observer.disconnect()
+  }
+
+  function onRender(event) {
     observer.disconnect()
   }
 
@@ -104,6 +105,7 @@ function MutationPlugin({ editor }) {
     onCompositionUpdate,
     onInput,
     onKeyDown,
+    onRender,
     onSelect,
   }
 }
