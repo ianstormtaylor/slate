@@ -81,6 +81,7 @@ function SlateReactPlaceholder(options = {}) {
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
+        verticalAlign: 'text-top',
         ...style,
       }
 
