@@ -191,12 +191,13 @@ function CompositionManager(editor) {
     debug('flush', mutations.length, mutations)
 
     console.log('last.selection', last.selection, last.selection.toJSON())
-    if (lastLastRange && !lastLastRange.isCollapsed) {
+    if (last.range && !last.range.isCollapsed) {
       console.log('delete selection')
       flushControlled(() => {
         editor
-          .select(lastLastRange)
+          .select(last.range)
           .deleteBackward()
+          .focus()
           .restoreDOM()
       })
       return
