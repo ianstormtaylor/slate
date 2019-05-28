@@ -53,6 +53,7 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   }
 
   const maxOffset = nextText.length
+
   if (nextOffset > maxOffset) nextOffset = maxOffset
   return { text: nextText, offset: nextOffset }
 }
@@ -394,7 +395,19 @@ function CompositionManager(editor) {
         })
         .moveTo(offset)
 
-      editor.select(range)
+      // We must call `restoreDOM` even though this is applying a `diff` which
+      // should not require it. But if you type `it me. no.` on a blank line
+      // with a block following it, the next line will merge with the this
+      // line. A mysterious `keydown` with `input` of backspace appears in the
+      // event stream which the user not React caused.
+      //
+      // `focus` is required as well because otherwise we lose focus on hitting
+      // `enter` in such a scenario.
+
+      editor
+        .select(range)
+        .focus()
+        .restoreDOM()
     }
 
     clear()
