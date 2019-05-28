@@ -324,21 +324,15 @@ function CompositionManager(editor) {
 
   function removeNode(domNode) {
     debug('removeNode')
-    console.log('nodeType', domNode.nodeType)
     if (domNode.nodeType !== ELEMENT_NODE) return
     const { value } = editor
     const { document, selection } = value
-    console.log(111)
     const node = editor.findNode(domNode)
-    console.log(222)
     const nodeSelection = document.resolveRange(
       selection.moveToRangeOfNode(node)
     )
-    console.log(333)
     editor.select(nodeSelection).delete()
-    console.log(444)
     editor.restoreDOM()
-    console.log(555)
     editor.controller.flush()
   }
 
