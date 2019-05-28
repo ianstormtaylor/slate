@@ -11,6 +11,53 @@ const ZERO_WIDTH_SPACE = 65279
 const ZERO_WIDTH_SPACE_CHAR = String.fromCharCode(ZERO_WIDTH_SPACE)
 
 /**
+ * Takes text from a dom node and an offset within that text and returns an
+ * object with fixed text and fixed offset which removes zero width spaces
+ * and adjusts the offset.
+ *
+ * Optionally, if an `isLastNode` argument is passed in, it will also remove
+ * a trailing newline.
+ *
+ * @param {String} text
+ * @param {Number} offset
+ * @param {Boolean} isLastNode
+ */
+
+function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
+  let nextOffset = prevOffset
+  let nextText = prevText
+  let index = 0
+  // console.log('fixTextAndOffset', {
+  //   nextText,
+  //   nextOffset,
+  //   type: typeof nextText,
+  //   length: nextText.length,
+  // })
+  while (index !== -1) {
+    index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
+    if (index === -1) break
+    if (nextOffset > index) nextOffset--
+    // console.log('loop', {
+    //   nextText,
+    //   type: typeof nextText,
+    //   length: nextText.length,
+    // })
+    // nextText = nextText.splice(index, 1)
+    nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
+  }
+
+  // remove the last newline if we are in the last node of a block
+  const lastChar = nextText.charAt(nextText.length - 1)
+  if (isLastNode && lastChar === '\n') {
+    nextText = nextText.slice(0, -1)
+  }
+
+  const maxOffset = nextText.length
+  if (nextOffset > maxOffset) nextOffset = maxOffset
+  return { text: nextText, offset: nextOffset }
+}
+
+/**
  * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
  */
 
@@ -81,9 +128,10 @@ function CompositionManager(editor) {
   }
 
   function applyDiff() {
+    debug('applyDiff')
     const { diff } = last
     if (diff == null) return
-    console.log('applyDiff:run')
+    debug('applyDiff:run')
     const { document, selection } = editor.value
 
     let entire = editor.value.selection
@@ -158,7 +206,7 @@ function CompositionManager(editor) {
     let firstMutation = mutations[0]
 
     if (firstMutation.type === 'characterData') {
-      resolveMutation(firstMutation)
+      resolveDOMNode(firstMutation.target.parentNode)
     } else if (firstMutation.type === 'childList') {
       if (firstMutation.removedNodes.length > 0) {
         if (mutations.length === 1) {
@@ -182,56 +230,67 @@ function CompositionManager(editor) {
     const block = document.getClosestBlock(node.key)
     // const prevText = m.oldValue
     const prevText = node.text
-    let nextText = domNode.textContent
-    debug('characterData', {
-      prevText,
-      nextText,
-      node: node.toJS(),
-      path: path.toJS(),
-      block: block.toJS(),
-    })
+    // let nextText = domNode.textContent
 
     // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
     // for browsers collapsing a single trailing new lines, so remove it.
     const isLastNode = block.nodes.last() === node
 
-    const lastChar = nextText.charAt(nextText.length - 1)
-    if (isLastNode && lastChar === '\n') {
-      nextText = nextText.slice(0, -1)
-    }
+    const fix = fixTextAndOffset(
+      domNode.textContent,
+      getDOMRange().startOffset,
+      isLastNode
+    )
 
-    console.log({ nextText, length: nextText.length })
+    const nextText = fix.text
+    const nextOffset = fix.offset
 
-    // nextText = fixDOMText(nextText)
+    debug('resolveDOMNode', {
+      prevText,
+      nextText,
+      nextOffset,
+      node: node.toJS(),
+      path: path.toJS(),
+      block: block.toJS(),
+    })
 
-    // If the last character is a zero width then remove it. This is because
-    // the user started typing in an empty block.
-    const lastCharCode = nextText.charCodeAt(nextText.length - 1)
-    if (lastCharCode === ZERO_WIDTH_SPACE) {
-      nextText = nextText.slice(0, -1)
-    }
+    // const lastChar = nextText.charAt(nextText.length - 1)
+    // if (isLastNode && lastChar === '\n') {
+    //   nextText = nextText.slice(0, -1)
+    // }
 
-    console.log({ lastCharCode, nextText, length: nextText.length })
+    // console.log({ nextText, length: nextText.length })
 
-    let cursorOffset = getDOMRange().startOffset
+    // // nextText = fixDOMText(nextText)
 
-    // FIXIT:
-    // Make sure the char 65279 (zero width space) is removed from the text.
+    // // If the last character is a zero width then remove it. This is because
+    // // the user started typing in an empty block.
+    // const lastCharCode = nextText.charCodeAt(nextText.length - 1)
+    // if (lastCharCode === ZERO_WIDTH_SPACE) {
+    //   nextText = nextText.slice(0, -1)
+    // }
 
-    const firstCharCode = nextText.charCodeAt(0)
-    if (firstCharCode === ZERO_WIDTH_SPACE) {
-      nextText = nextText.slice(1)
-      cursorOffset--
-      debug('FOUND - ZERO WIDTH', {
-        prevText,
-        nextText,
-        prevLength: prevText.length,
-        nextLength: nextText.length,
-      })
-    } else {
-      debug('NO - ZERO WIDTH', { prevText, nextText })
-    }
+    // console.log({ lastCharCode, nextText, length: nextText.length })
+
+    // let cursorOffset = getDOMRange().startOffset
+
+    // // FIXIT:
+    // // Make sure the char 65279 (zero width space) is removed from the text.
+
+    // const firstCharCode = nextText.charCodeAt(0)
+    // if (firstCharCode === ZERO_WIDTH_SPACE) {
+    //   nextText = nextText.slice(1)
+    //   cursorOffset--
+    //   debug('FOUND - ZERO WIDTH', {
+    //     prevText,
+    //     nextText,
+    //     prevLength: prevText.length,
+    //     nextLength: nextText.length,
+    //   })
+    // } else {
+    //   debug('NO - ZERO WIDTH', { prevText, nextText })
+    // }
 
     // If the text is no different, abort.
     if (nextText === prevText) {
@@ -246,29 +305,39 @@ function CompositionManager(editor) {
       start: diff.start,
       end: diff.end,
       insertText: diff.insertText,
-      cursorOffset,
-      startOffset: getDOMRange().startOffset,
-      range: getRange(),
+      // cursorOffset,
+      // startOffset: getDOMRange().startOffset,
+      // range: getRange(),
     }
     debug('resolveDOMNode:last.diff.range', last.diff)
   }
 
-  function resolveMutation(m) {
-    debug('resolve')
-    const domNode = m.target.parentNode
-    resolveDOMNode(domNode)
-  }
+  // function resolveMutation(m) {
+  //   debug('resolveMutation')
+  //   const domNode = m.target.parentNode
+  //   resolveDOMNode(domNode)
+  // }
+
+  const ELEMENT_NODE = 1
+  const TEXT_NODE = 3
 
   function removeNode(domNode) {
     debug('removeNode')
+    console.log('nodeType', domNode.nodeType)
+    if (domNode.nodeType !== ELEMENT_NODE) return
     const { value } = editor
     const { document, selection } = value
+    console.log(111)
     const node = editor.findNode(domNode)
+    console.log(222)
     const nodeSelection = document.resolveRange(
       selection.moveToRangeOfNode(node)
     )
+    console.log(333)
     editor.select(nodeSelection).delete()
+    console.log(444)
     editor.restoreDOM()
+    console.log(555)
     editor.controller.flush()
   }
 
@@ -297,6 +366,7 @@ function CompositionManager(editor) {
     isComposing = false
 
     if (last.diff) {
+      debug('onCompositionEnd:applyDiff')
       applyDiff({ select: true })
 
       const domRange = win.getSelection().getRangeAt(0)
@@ -334,15 +404,6 @@ function CompositionManager(editor) {
     const domSelection = getWindow(event.target).getSelection()
     let range = editor.findRange(domSelection)
 
-    // `findRange` makes sure that the cursor is within the node and adjusts;
-    // During composition, the cursor position can validly be outside the
-    // current text in Slate's `value` because the text hasn't been inserted
-    // into Slate yet. After we apply the text, the selection is valid.
-    //
-    // fixme:
-    // The proper fix is to add an option to `findRange` like
-    // `findRange(domSelection, {normalize: false})` that won't normalize.
-
     const anchorFix = fixTextAndOffset(
       domSelection.anchorNode.textContent,
       domSelection.anchorOffset
@@ -353,14 +414,6 @@ function CompositionManager(editor) {
       domSelection.anchorOffset
     )
 
-    // let nextAnchorOffset = domSelection.anchorOffset
-    // if (textEndsWithZeroWidth(domSelection.anchorNode.textContent)) {
-    //   nextAnchorOffset--
-    // }
-    // let nextFocusOffset = domSelection.focusOffset
-    // if (textEndsWithZeroWidth(domSelection.focusNode.textContent)) {
-    //   nextFocusOffset--
-    // }
     if (range.anchor.offset !== anchorFix.offset) {
       range = range.set('anchor', range.anchor.set('offset', anchorFix.offset))
     }
@@ -369,8 +422,10 @@ function CompositionManager(editor) {
     }
 
     debug('onSelect', {
+      editorSelection: editor.value.selection.toJS(),
       domSelection: normalizeDOMSelection(domSelection),
       range: range.toJS(),
+      last,
     })
 
     // If the `domSelection` has moved into a new node, then reconcile with
@@ -385,10 +440,7 @@ function CompositionManager(editor) {
       editor.select(range)
       clear()
     }
-    debug('onSelect', {
-      editorSelection: editor.value.selection.toJSON(),
-      range: range.toJSON(),
-    })
+
     lastLastRange = last.selection
     last.selection = range
     last.node = domSelection.anchorNode
@@ -413,66 +465,19 @@ function normalizeDOMSelection(selection) {
   }
 }
 
-function fixDOMText(text) {
-  if (text.charCodeAt(text.length - 1) === ZERO_WIDTH_SPACE) {
-    return text.slice(0, -1)
-  }
-  return text
-}
+// function fixDOMText(text) {
+//   if (text.charCodeAt(text.length - 1) === ZERO_WIDTH_SPACE) {
+//     return text.slice(0, -1)
+//   }
+//   return text
+// }
 
-function textStartsWithZeroWidth(s) {
-  return s.charCodeAt(0) === ZERO_WIDTH_SPACE
-}
+// function textStartsWithZeroWidth(s) {
+//   return s.charCodeAt(0) === ZERO_WIDTH_SPACE
+// }
 
-function textEndsWithZeroWidth(s) {
-  return s.charCodeAt(s - 1) === ZERO_WIDTH_SPACE
-}
-
-/**
- * Takes text from a dom node and an offset within that text and returns an
- * object with fixed text and fixed offset which removes zero width spaces
- * and adjusts the offset.
- *
- * Optionally, if an `isLastNode` argument is passed in, it will also remove
- * a trailing newline.
- *
- * @param {String} text
- * @param {Number} offset
- * @param {Boolean} isLastNode
- */
-
-function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
-  let nextOffset = prevOffset
-  let nextText = prevText
-  let index = 0
-  // console.log('fixTextAndOffset', {
-  //   nextText,
-  //   nextOffset,
-  //   type: typeof nextText,
-  //   length: nextText.length,
-  // })
-  while (index !== -1) {
-    index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
-    if (index === -1) break
-    if (nextOffset > index) nextOffset--
-    // console.log('loop', {
-    //   nextText,
-    //   type: typeof nextText,
-    //   length: nextText.length,
-    // })
-    // nextText = nextText.splice(index, 1)
-    nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
-  }
-
-  // remove the last newline if we are in the last node of a block
-  const lastChar = nextText.charAt(nextText.length - 1)
-  if (isLastNode && lastChar === '\n') {
-    nextText = nextText.slice(0, -1)
-  }
-
-  const maxOffset = nextText.length
-  if (nextOffset > maxOffset) nextOffset = maxOffset
-  return { text: nextText, offset: nextOffset }
-}
+// function textEndsWithZeroWidth(s) {
+//   return s.charCodeAt(s - 1) === ZERO_WIDTH_SPACE
+// }
 
 export default CompositionManager

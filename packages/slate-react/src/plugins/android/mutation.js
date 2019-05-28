@@ -30,10 +30,10 @@ function MutationPlugin({ editor }) {
     event.persist()
     // observer.onCompositionEnd(event)
     // isComposing = false
-    setTimeout(() => {
-      observer.onCompositionEnd(event)
-      isComposing = false
-    }, 20)
+    // setTimeout(() => {
+    observer.onCompositionEnd(event)
+    isComposing = false
+    // }, 20)
   }
 
   /**
@@ -61,6 +61,7 @@ function MutationPlugin({ editor }) {
   }
   function onBeforeInput() {}
   function onInput(event) {
+    event.preventDefault()
     // observer.onInput(event)
     // if (event.nativeEvent.inputType === 'insertLineBreak') {
     //   event.preventDefault()
