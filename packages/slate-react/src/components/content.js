@@ -517,6 +517,8 @@ class Content extends React.Component {
 
     debug('render', { props })
 
+    this.props.onEvent('onRender', {})
+
     const data = {
       [DATA_ATTRS.EDITOR]: true,
       [DATA_ATTRS.KEY]: document.key,
