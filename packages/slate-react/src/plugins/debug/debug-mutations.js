@@ -76,9 +76,24 @@ function DebugMutationsPlugin({ editor }) {
     debug(`${array.length} Mutations`, ...array)
   })
 
-  // `findDOMNode` does not exist until later so we use `setTimeout`
-  setTimeout(() => {
+  /**
+   * The previously observed DOM node
+   *
+   * @type {DOMNode}
+   */
+
+  let prevRootEl = null
+
+  /**
+   * Start observing the DOM node for mutations if it isn't being observed
+   */
+
+  function start() {
     const rootEl = editor.findDOMNode([])
+
+    if (rootEl === prevRootEl) return
+
+    debug('start')
 
     observer.observe(rootEl, {
       childList: true,
@@ -87,7 +102,26 @@ function DebugMutationsPlugin({ editor }) {
       subtree: true,
       characterDataOldValue: true,
     })
-  })
+
+    prevRootEl = rootEl
+  }
+
+  /**
+   * Stop observing the DOM node for mutations
+   */
+
+  function stop() {
+    debug('stop')
+
+    observer.disconnect()
+    prevRootEl = null
+  }
+
+  return {
+    onComponentDidMount: start,
+    onComponentDidUpdate: start,
+    onComponentWillUnmount: stop,
+  }
 }
 
 export default DebugMutationsPlugin

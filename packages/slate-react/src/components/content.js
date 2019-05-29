@@ -160,7 +160,7 @@ class Content extends React.Component {
 
     this.updateSelection()
 
-    this.props.onEvent('onComponentDidMount', { target: this.ref.current })
+    this.props.onEvent('onComponentDidMount')
   }
 
   /**
@@ -184,7 +184,7 @@ class Content extends React.Component {
       )
     }
 
-    this.props.onEvent('onComponentWillUnmount', { target: this.ref.current })
+    this.props.onEvent('onComponentWillUnmount')
   }
 
   /**
@@ -196,7 +196,7 @@ class Content extends React.Component {
 
     this.updateSelection()
 
-    this.props.onEvent('onComponentDidUpdate', { target: this.ref.current })
+    this.props.onEvent('onComponentDidUpdate')
   }
 
   /**
@@ -544,7 +544,7 @@ class Content extends React.Component {
     debug('render', { props })
     debug.update('render', this.tmp.contentKey, document.text)
 
-    this.props.onEvent('onRender', {})
+    this.props.onEvent('onRender')
 
     const data = {
       [DATA_ATTRS.EDITOR]: true,
