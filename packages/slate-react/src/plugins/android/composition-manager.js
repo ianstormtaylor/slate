@@ -3,7 +3,6 @@ import getWindow from 'get-window'
 import ReactDOM from 'react-dom'
 
 import diffText from './diff-text'
-import { tmpdir } from 'os'
 
 const debug = Debug('slate:composition-manager')
 
@@ -27,22 +26,10 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   let nextOffset = prevOffset
   let nextText = prevText
   let index = 0
-  // console.log('fixTextAndOffset', {
-  //   nextText,
-  //   nextOffset,
-  //   type: typeof nextText,
-  //   length: nextText.length,
-  // })
   while (index !== -1) {
     index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
     if (index === -1) break
     if (nextOffset > index) nextOffset--
-    // console.log('loop', {
-    //   nextText,
-    //   type: typeof nextText,
-    //   length: nextText.length,
-    // })
-    // nextText = nextText.splice(index, 1)
     nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
   }
 
@@ -63,7 +50,6 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
  */
 
 const flushControlled = ReactDOM.unstable_flushControlled
-// const flushControlled = ReactDOM.flushSync
 
 /**
  * Based loosely on:
@@ -363,46 +349,48 @@ function CompositionManager(editor) {
 
     if (last.diff) {
       debug('onCompositionEnd:applyDiff')
-      applyDiff({ select: true })
+      flushControlled(() => {
+        applyDiff({ select: true })
 
-      const domRange = win.getSelection().getRangeAt(0)
-      const domText = domRange.startContainer.textContent
-      let offset = domRange.startOffset
+        const domRange = win.getSelection().getRangeAt(0)
+        const domText = domRange.startContainer.textContent
+        let offset = domRange.startOffset
 
-      /**
-       * TODO:
-       *
-       * The next step I think is that we need to get a general `findRange`
-       * method that works with unresolved nodes. We need to remove the
-       * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
-       * keeping in mind that if the space is before, e need to offset the
-       * anchor and if the space is after we don't and the max offset is
-       * the length of the text after the spaces are removed.
-       */
+        /**
+         * TODO:
+         *
+         * The next step I think is that we need to get a general `findRange`
+         * method that works with unresolved nodes. We need to remove the
+         * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
+         * keeping in mind that if the space is before, e need to offset the
+         * anchor and if the space is after we don't and the max offset is
+         * the length of the text after the spaces are removed.
+         */
 
-      const range = editor
-        .findRange({
-          anchorNode: domRange.startContainer,
-          anchorOffset: 0,
-          focusNode: domRange.startContainer,
-          anchorOffset: 0,
-          isCollapsed: true,
-        })
-        .moveTo(offset)
+        const range = editor
+          .findRange({
+            anchorNode: domRange.startContainer,
+            anchorOffset: 0,
+            focusNode: domRange.startContainer,
+            anchorOffset: 0,
+            isCollapsed: true,
+          })
+          .moveTo(offset)
 
-      // We must call `restoreDOM` even though this is applying a `diff` which
-      // should not require it. But if you type `it me. no.` on a blank line
-      // with a block following it, the next line will merge with the this
-      // line. A mysterious `keydown` with `input` of backspace appears in the
-      // event stream which the user not React caused.
-      //
-      // `focus` is required as well because otherwise we lose focus on hitting
-      // `enter` in such a scenario.
+        // We must call `restoreDOM` even though this is applying a `diff` which
+        // should not require it. But if you type `it me. no.` on a blank line
+        // with a block following it, the next line will merge with the this
+        // line. A mysterious `keydown` with `input` of backspace appears in the
+        // event stream which the user not React caused.
+        //
+        // `focus` is required as well because otherwise we lose focus on hitting
+        // `enter` in such a scenario.
 
-      editor
-        .select(range)
-        .focus()
-        .restoreDOM()
+        editor
+          .select(range)
+          .focus()
+          .restoreDOM()
+      })
     }
 
     clear()
@@ -472,20 +460,5 @@ function normalizeDOMSelection(selection) {
     focusOffset: selection.focusOffset,
   }
 }
-
-// function fixDOMText(text) {
-//   if (text.charCodeAt(text.length - 1) === ZERO_WIDTH_SPACE) {
-//     return text.slice(0, -1)
-//   }
-//   return text
-// }
-
-// function textStartsWithZeroWidth(s) {
-//   return s.charCodeAt(0) === ZERO_WIDTH_SPACE
-// }
-
-// function textEndsWithZeroWidth(s) {
-//   return s.charCodeAt(s - 1) === ZERO_WIDTH_SPACE
-// }
 
 export default CompositionManager
