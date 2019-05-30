@@ -424,6 +424,17 @@ function CompositionManager(editor) {
     debug('onCompositionEnd')
     isComposing = false
 
+    /**
+     * The timing on the `setTimeout` with `20` ms is sensitive.
+     *
+     * It cannot use `requestAnimationFrame` because it is too short.
+     *
+     * Android 9, for example, when you type `it ` the space will first trigger
+     * a `compositionEnd` for the `it` part before the mutation for the ` `.
+     * This means that we end up with `it` if we trigger too soon because it
+     * is on the wrong value.
+     */
+
     window.setTimeout(() => {
       if (last.diff) {
         debug('onCompositionEnd:applyDiff')
@@ -501,7 +512,6 @@ function CompositionManager(editor) {
     }
 
     debug('onSelect', {
-      editorSelection: editor.value.selection.toJS(),
       domSelection: normalizeDOMSelection(domSelection),
       range: range.toJS(),
       last,
