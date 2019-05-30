@@ -26,6 +26,18 @@ const MUTATION_PROPERTIES = [
   'previousSibling',
 ]
 
+function normalizeNode(node) {
+  if (node.nodeType === Node.TEXT_NODE) {
+    return node.textContent
+  } else if (node.nodeType === Node.ELEMENT_NODE) {
+    const { outerHTML, innerHTML } = node
+    if (outerHTML == null) return JSON.stringify(node.textContent)
+    return outerHTML.slice(0, outerHTML.indexOf(innerHTML))
+  } else {
+    return `Node(type=${node.nodeType}`
+  }
+}
+
 /**
  * A plugin that sends short easy to digest debug info about each dom mutation
  * to browser.
@@ -46,7 +58,7 @@ function DebugMutationsPlugin() {
       // Only add properties that provide meaningful values to the object
       // to make the debug info easier to read
       MUTATION_PROPERTIES.forEach(key => {
-        const value = mutationRecord[key]
+        let value = mutationRecord[key]
         if (value == null) return
 
         // Make NodeList easier to read
@@ -54,13 +66,14 @@ function DebugMutationsPlugin() {
           if (value.length === 0) return
 
           object[key] = Array.from(value)
-            .map(node => {
-              const { outerHTML, innerHTML } = node
-              if (outerHTML == null) return JSON.stringify(node.textContent)
-              return outerHTML.slice(0, outerHTML.indexOf(innerHTML))
-            })
+            .map(normalizeNode)
             .join(', ')
           return
+        }
+
+        // Make Node easier to read
+        if (value instanceof window.Node) {
+          value = normalizeNode(value)
         }
 
         object[key] = value
