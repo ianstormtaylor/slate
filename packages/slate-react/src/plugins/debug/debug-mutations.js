@@ -26,10 +26,16 @@ const MUTATION_PROPERTIES = [
   'previousSibling',
 ]
 
+/**
+ * Takes a DOM node and returns an easily readable version of it.
+ *
+ * @param {DOMNode} node
+ */
+
 function normalizeNode(node) {
-  if (node.nodeType === Node.TEXT_NODE) {
+  if (node.nodeType === window.Node.TEXT_NODE) {
     return node.textContent
-  } else if (node.nodeType === Node.ELEMENT_NODE) {
+  } else if (node.nodeType === window.Node.ELEMENT_NODE) {
     const { outerHTML, innerHTML } = node
     if (outerHTML == null) return JSON.stringify(node.textContent)
     return outerHTML.slice(0, outerHTML.indexOf(innerHTML))
