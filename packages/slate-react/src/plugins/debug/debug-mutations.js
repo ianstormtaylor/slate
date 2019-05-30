@@ -26,12 +26,6 @@ const MUTATION_PROPERTIES = [
   'previousSibling',
 ]
 
-function normalizeNode(node) {
-  const { outerHTML, innerHTML } = node
-  if (outerHTML == null) return JSON.stringify(node.textContent)
-  return outerHTML.slice(0, outerHTML.indexOf(innerHTML))
-}
-
 /**
  * A plugin that sends short easy to digest debug info about each dom mutation
  * to browser.
@@ -44,7 +38,7 @@ function normalizeNode(node) {
  * @param {Object} options
  */
 
-function DebugMutationsPlugin({ editor }) {
+function DebugMutationsPlugin() {
   const observer = new window.MutationObserver(mutations => {
     const array = Array.from(mutations).map(mutationRecord => {
       const object = {}
@@ -54,17 +48,21 @@ function DebugMutationsPlugin({ editor }) {
       MUTATION_PROPERTIES.forEach(key => {
         const value = mutationRecord[key]
         if (value == null) return
+
+        // Make NodeList easier to read
         if (value instanceof window.NodeList) {
           if (value.length === 0) return
+
           object[key] = Array.from(value)
-            .map(normalizeNode)
+            .map(node => {
+              const { outerHTML, innerHTML } = node
+              if (outerHTML == null) return JSON.stringify(node.textContent)
+              return outerHTML.slice(0, outerHTML.indexOf(innerHTML))
+            })
             .join(', ')
           return
         }
-        // if (value instanceof window.Node) {
-        //   object[key] = normalizeNode(value)
-        //   return
-        // }
+
         object[key] = value
       })
 
@@ -88,10 +86,10 @@ function DebugMutationsPlugin({ editor }) {
    * Start observing the DOM node for mutations if it isn't being observed
    */
 
-  function start() {
+  function start(event, editor, next) {
     const rootEl = editor.findDOMNode([])
 
-    if (rootEl === prevRootEl) return
+    if (rootEl === prevRootEl) return next()
 
     debug('start')
 
@@ -104,17 +102,20 @@ function DebugMutationsPlugin({ editor }) {
     })
 
     prevRootEl = rootEl
+
+    next()
   }
 
   /**
    * Stop observing the DOM node for mutations
    */
 
-  function stop() {
+  function stop(event, editor, next) {
     debug('stop')
 
     observer.disconnect()
     prevRootEl = null
+    next()
   }
 
   return {
