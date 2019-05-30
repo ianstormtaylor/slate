@@ -6,8 +6,10 @@ import diffText from './diff-text'
 
 const debug = Debug('slate:composition-manager')
 
-const ZERO_WIDTH_SPACE = 65279
-const ZERO_WIDTH_SPACE_CHAR = String.fromCharCode(ZERO_WIDTH_SPACE)
+const ZERO_WIDTH_SPACE = String.fromCharCode(65279)
+
+const ELEMENT_NODE = 1
+const TEXT_NODE = 3
 
 /**
  * Takes text from a dom node and an offset within that text and returns an
@@ -27,7 +29,7 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   let nextText = prevText
   let index = 0
   while (index !== -1) {
-    index = nextText.indexOf(ZERO_WIDTH_SPACE_CHAR, index)
+    index = nextText.indexOf(ZERO_WIDTH_SPACE, index)
     if (index === -1) break
     if (nextOffset > index) nextOffset--
     nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
@@ -212,16 +214,6 @@ function CompositionManager(editor) {
 
     let firstMutation = mutations[0]
 
-    // In Android 8, the first mutation sent separately is a `characterData`.
-    // But later
-    // if (mutations.length > 1) {
-    //   const firstChildListMutation = mutations.find(m => m.type === 'childList')
-    //   if (firstChildListMutation.addedNodes.length > 0) {
-    //     splitBlock()
-    //     return
-    //   }
-    // }
-
     if (mutations.length > 1) {
       // check if one of the mutations matches the signature of an `enter`
       // which we use to signify a `splitBlock`
@@ -277,19 +269,6 @@ function CompositionManager(editor) {
     const { value } = editor
     const { document, selection } = value
 
-    // const domElement = domNode.parentNode
-    // const node = editor.findNode(domElement)
-    // debug('resolveDOMNode', { domElement, parent: domElement.parentNode, node })
-    // if (node == null) {
-    //   console.error(`Can't find the node which is bad`)
-    //   return
-    // }
-    // const path = document.getPath(node.key)
-    // const block = document.getClosestBlock(node.key)
-    // // const prevText = m.oldValue
-    // const prevText = node.text
-    // // let nextText = domNode.textContent
-
     const dataElement = domNode.closest(`[data-key]`)
     const key = dataElement.dataset.key
     const path = document.getPath(key)
@@ -320,43 +299,6 @@ function CompositionManager(editor) {
       block: block.toJS(),
     })
 
-    // const lastChar = nextText.charAt(nextText.length - 1)
-    // if (isLastNode && lastChar === '\n') {
-    //   nextText = nextText.slice(0, -1)
-    // }
-
-    // console.log({ nextText, length: nextText.length })
-
-    // // nextText = fixDOMText(nextText)
-
-    // // If the last character is a zero width then remove it. This is because
-    // // the user started typing in an empty block.
-    // const lastCharCode = nextText.charCodeAt(nextText.length - 1)
-    // if (lastCharCode === ZERO_WIDTH_SPACE) {
-    //   nextText = nextText.slice(0, -1)
-    // }
-
-    // console.log({ lastCharCode, nextText, length: nextText.length })
-
-    // let cursorOffset = getDOMRange().startOffset
-
-    // // FIXIT:
-    // // Make sure the char 65279 (zero width space) is removed from the text.
-
-    // const firstCharCode = nextText.charCodeAt(0)
-    // if (firstCharCode === ZERO_WIDTH_SPACE) {
-    //   nextText = nextText.slice(1)
-    //   cursorOffset--
-    //   debug('FOUND - ZERO WIDTH', {
-    //     prevText,
-    //     nextText,
-    //     prevLength: prevText.length,
-    //     nextLength: nextText.length,
-    //   })
-    // } else {
-    //   debug('NO - ZERO WIDTH', { prevText, nextText })
-    // }
-
     // If the text is no different, abort.
     if (nextText === prevText) {
       last.diff = null
@@ -370,21 +312,9 @@ function CompositionManager(editor) {
       start: diff.start,
       end: diff.end,
       insertText: diff.insertText,
-      // cursorOffset,
-      // startOffset: getDOMRange().startOffset,
-      // range: getRange(),
     }
     debug('resolveDOMNode:last.diff.range', last.diff)
   }
-
-  // function resolveMutation(m) {
-  //   debug('resolveMutation')
-  //   const domNode = m.target.parentNode
-  //   resolveDOMNode(domNode)
-  // }
-
-  const ELEMENT_NODE = 1
-  const TEXT_NODE = 3
 
   function removeNode(domNode) {
     debug('removeNode')
@@ -466,14 +396,16 @@ function CompositionManager(editor) {
             })
             .moveTo(offset)
 
-          // We must call `restoreDOM` even though this is applying a `diff` which
-          // should not require it. But if you type `it me. no.` on a blank line
-          // with a block following it, the next line will merge with the this
-          // line. A mysterious `keydown` with `input` of backspace appears in the
-          // event stream which the user not React caused.
-          //
-          // `focus` is required as well because otherwise we lose focus on hitting
-          // `enter` in such a scenario.
+          /**
+           * We must call `restoreDOM` even though this is applying a `diff` which
+           * should not require it. But if you type `it me. no.` on a blank line
+           * with a block following it, the next line will merge with the this
+           * line. A mysterious `keydown` with `input` of backspace appears in the
+           * event stream which the user not React caused.
+           *
+           * `focus` is required as well because otherwise we lose focus on hitting
+           * `enter` in such a scenario.
+           */
 
           editor
             .select(range)
