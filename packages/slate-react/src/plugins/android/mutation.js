@@ -82,18 +82,24 @@ function MutationPlugin({ editor }) {
   }
 
   function onComponentDidMount(event) {
-    observer.connect(event.target)
+    debug('onComponentDidMount')
+    const rootEl = editor.findDOMNode([])
+    observer.connect(rootEl)
   }
 
   function onComponentDidUpdate(event) {
-    observer.connect(event.target)
+    debug('onComponentDidUpdate')
+    const rootEl = editor.findDOMNode([])
+    observer.connect(rootEl)
   }
 
   function onComponentWillUnmount(event) {
+    debug('onComponentWillUnmount')
     observer.disconnect()
   }
 
   function onRender(event) {
+    debug('onRender')
     observer.disconnect()
   }
 

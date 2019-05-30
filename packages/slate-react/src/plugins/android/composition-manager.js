@@ -90,8 +90,9 @@ function CompositionManager(editor) {
   }
 
   function connect(el) {
+    debug('connect', { el })
     if (lastEl === el) return
-    debug('connect')
+    debug('connect:run')
     win = getWindow(el)
     observer.observe(el, {
       childList: true,
@@ -106,6 +107,7 @@ function CompositionManager(editor) {
   function disconnect() {
     debug('disconnect')
     observer.disconnect()
+    lastEl = null
   }
 
   function clear() {
@@ -172,9 +174,26 @@ function CompositionManager(editor) {
     })
   }
 
+  let bufferedMutations = []
+  let frameId = null
+  let isFlushing = false
+
   function flush(mutations) {
-    if (!mutations) mutations = observer.takeRecords()
-    debug('flush', mutations.length, mutations)
+    debug('flush')
+    isFlushing = true
+    if (frameId) window.cancelAnimationFrame(frameId)
+    bufferedMutations.push(...mutations)
+    frameId = window.requestAnimationFrame(() => {
+      flushAction(bufferedMutations)
+      frameId = null
+      bufferedMutations = []
+      isFlushing = false
+    })
+  }
+
+  function flushAction(mutations) {
+    // if (!mutations) mutations = observer.takeRecords()
+    debug('flushAction', mutations.length, mutations)
 
     console.log('last.selection', last.selection, last.selection.toJSON())
     if (last.range && !last.range.isCollapsed) {
@@ -193,6 +212,52 @@ function CompositionManager(editor) {
 
     let firstMutation = mutations[0]
 
+    // In Android 8, the first mutation sent separately is a `characterData`.
+    // But later
+    // if (mutations.length > 1) {
+    //   const firstChildListMutation = mutations.find(m => m.type === 'childList')
+    //   if (firstChildListMutation.addedNodes.length > 0) {
+    //     splitBlock()
+    //     return
+    //   }
+    // }
+
+    if (mutations.length > 1) {
+      // check if one of the mutations matches the signature of an `enter`
+      // which we use to signify a `splitBlock`
+      const splitBlockMutation = mutations.find(m => {
+        if (m.type !== 'childList') return false
+        if (m.addedNodes.length === 0) return false
+        const addedNode = m.addedNodes[0]
+
+        // If a text node is created anywhere with a newline in it, it's an
+        // enter
+        if (
+          addedNode.nodeType === window.Node.TEXT_NODE &&
+          addedNode.textContent === '\n'
+        )
+          return true
+
+        // If an element is created with a key that matches a block in our
+        // document, that means the mutation is splitting an existing block
+        // by creating a new element with the same key.
+        if (addedNode.nodeType !== window.Node.ELEMENT_NODE) return false
+        const dataset = addedNode.dataset
+        const key = dataset.key
+        if (key == null) return false
+        const block = editor.value.document.getClosestBlock(key)
+        return !!block
+      })
+      if (splitBlockMutation) {
+        splitBlock()
+        return
+      }
+    }
+
+    // If we haven't matched a more specific mutation already, these general
+    // mutation catchers will try and determine what the user was trying to
+    // do.
+
     if (firstMutation.type === 'characterData') {
       resolveDOMNode(firstMutation.target.parentNode)
     } else if (firstMutation.type === 'childList') {
@@ -206,19 +271,31 @@ function CompositionManager(editor) {
         splitBlock()
       }
     }
-    // start()
   }
 
   function resolveDOMNode(domNode) {
     const { value } = editor
     const { document, selection } = value
-    const domElement = domNode.parentNode
-    const node = editor.findNode(domElement)
-    const path = document.getPath(node.key)
-    const block = document.getClosestBlock(node.key)
-    // const prevText = m.oldValue
+
+    // const domElement = domNode.parentNode
+    // const node = editor.findNode(domElement)
+    // debug('resolveDOMNode', { domElement, parent: domElement.parentNode, node })
+    // if (node == null) {
+    //   console.error(`Can't find the node which is bad`)
+    //   return
+    // }
+    // const path = document.getPath(node.key)
+    // const block = document.getClosestBlock(node.key)
+    // // const prevText = m.oldValue
+    // const prevText = node.text
+    // // let nextText = domNode.textContent
+
+    const dataElement = domNode.closest(`[data-key]`)
+    const key = dataElement.dataset.key
+    const path = document.getPath(key)
+    const block = document.getClosestBlock(key)
+    const node = document.getDescendant(key)
     const prevText = node.text
-    // let nextText = domNode.textContent
 
     // COMPAT: If this is the last leaf, and the DOM text ends in a new line,
     // we will have added another new line in <Leaf>'s render method to account
@@ -347,56 +424,62 @@ function CompositionManager(editor) {
     debug('onCompositionEnd')
     isComposing = false
 
-    if (last.diff) {
-      debug('onCompositionEnd:applyDiff')
-      flushControlled(() => {
-        applyDiff({ select: true })
+    window.setTimeout(() => {
+      if (last.diff) {
+        debug('onCompositionEnd:applyDiff')
+        flushControlled(() => {
+          applyDiff({ select: true })
 
-        const domRange = win.getSelection().getRangeAt(0)
-        const domText = domRange.startContainer.textContent
-        let offset = domRange.startOffset
+          const domRange = win.getSelection().getRangeAt(0)
+          const domText = domRange.startContainer.textContent
+          let offset = domRange.startOffset
 
-        /**
-         * TODO:
-         *
-         * The next step I think is that we need to get a general `findRange`
-         * method that works with unresolved nodes. We need to remove the
-         * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
-         * keeping in mind that if the space is before, e need to offset the
-         * anchor and if the space is after we don't and the max offset is
-         * the length of the text after the spaces are removed.
-         */
+          /**
+           * TODO:
+           *
+           * The next step I think is that we need to get a general `findRange`
+           * method that works with unresolved nodes. We need to remove the
+           * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
+           * keeping in mind that if the space is before, e need to offset the
+           * anchor and if the space is after we don't and the max offset is
+           * the length of the text after the spaces are removed.
+           */
 
-        const range = editor
-          .findRange({
-            anchorNode: domRange.startContainer,
-            anchorOffset: 0,
-            focusNode: domRange.startContainer,
-            anchorOffset: 0,
-            isCollapsed: true,
-          })
-          .moveTo(offset)
+          const range = editor
+            .findRange({
+              anchorNode: domRange.startContainer,
+              anchorOffset: 0,
+              focusNode: domRange.startContainer,
+              anchorOffset: 0,
+              isCollapsed: true,
+            })
+            .moveTo(offset)
 
-        // We must call `restoreDOM` even though this is applying a `diff` which
-        // should not require it. But if you type `it me. no.` on a blank line
-        // with a block following it, the next line will merge with the this
-        // line. A mysterious `keydown` with `input` of backspace appears in the
-        // event stream which the user not React caused.
-        //
-        // `focus` is required as well because otherwise we lose focus on hitting
-        // `enter` in such a scenario.
+          // We must call `restoreDOM` even though this is applying a `diff` which
+          // should not require it. But if you type `it me. no.` on a blank line
+          // with a block following it, the next line will merge with the this
+          // line. A mysterious `keydown` with `input` of backspace appears in the
+          // event stream which the user not React caused.
+          //
+          // `focus` is required as well because otherwise we lose focus on hitting
+          // `enter` in such a scenario.
 
-        editor
-          .select(range)
-          .focus()
-          .restoreDOM()
-      })
-    }
+          editor
+            .select(range)
+            .focus()
+            .restoreDOM()
+        })
+      }
 
-    clear()
+      clear()
+    }, 20)
   }
 
   function onSelect(event) {
+    // Don't capture the last selection if the selection was made during the
+    // flushing of DOM mutations. This means it is all part of one user action.
+    if (isFlushing) return
+
     const domSelection = getWindow(event.target).getSelection()
     let range = editor.findRange(domSelection)
 

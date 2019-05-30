@@ -88,10 +88,10 @@ function DebugMutationsPlugin({ editor }) {
    * Start observing the DOM node for mutations if it isn't being observed
    */
 
-  function start() {
+  function start(event, editor, next) {
     const rootEl = editor.findDOMNode([])
 
-    if (rootEl === prevRootEl) return
+    if (rootEl === prevRootEl) return next()
 
     debug('start')
 
@@ -104,17 +104,20 @@ function DebugMutationsPlugin({ editor }) {
     })
 
     prevRootEl = rootEl
+
+    next()
   }
 
   /**
    * Stop observing the DOM node for mutations
    */
 
-  function stop() {
+  function stop(event, editor, next) {
     debug('stop')
 
     observer.disconnect()
     prevRootEl = null
+    next()
   }
 
   return {
