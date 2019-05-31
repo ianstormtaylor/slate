@@ -7,54 +7,32 @@ import CompositionManager from './composition-manager'
 const debug = Debug('slate:mutation-plugin')
 
 function MutationPlugin({ editor }) {
-  let isComposing = false
   let observer
 
-  // `findDOMNode` does not exist until later so we use `setTimeout`
-  // setTimeout(() => {
   observer = new CompositionManager(editor)
-  // observer.start()
-  //   observer.start()
-  // }, 20)
 
-  // function flush(mutations) {
-  //   console.log('MUTATIONS!!!', mutations)
-  // }
-
-  function onCompositionStart(event) {
-    isComposing = true
-    observer.onCompositionStart(event)
+  function onCompositionStart() {
+    observer.onCompositionStart()
   }
 
-  function onCompositionEnd(event) {
-    event.persist()
-    // observer.onCompositionEnd(event)
-    // isComposing = false
-    // setTimeout(() => {
-    observer.onCompositionEnd(event)
-    isComposing = false
-    // }, 20)
+  function onCompositionEnd() {
+    observer.onCompositionEnd()
   }
 
-  function onKeyDown() {}
-  function onSelect(event, editor, next) {
+  function onSelect(event) {
     const window = getWindow(event.target)
     fixSelectionInZeroWidthBlock(window)
-    // if (observer == null) return
     observer.onSelect(event)
-    next()
   }
 
-  function onComponentDidMount(event) {
+  function onComponentDidMount() {
     debug('onComponentDidMount')
-    const rootEl = editor.findDOMNode([])
-    observer.connect(rootEl)
+    observer.connect()
   }
 
-  function onComponentDidUpdate(event) {
+  function onComponentDidUpdate() {
     debug('onComponentDidUpdate')
-    const rootEl = editor.findDOMNode([])
-    observer.connect(rootEl)
+    observer.connect()
   }
 
   function onComponentWillUnmount(event) {
@@ -65,7 +43,10 @@ function MutationPlugin({ editor }) {
   function onRender(event) {
     debug('onRender')
     observer.disconnect()
-    observer.onRender()
+
+    // We don't want the `diff` from a previous render to apply to a
+    // potentially different value (e.g. when we switch examples)
+    observer.clearDiff()
   }
 
   return {
@@ -74,7 +55,6 @@ function MutationPlugin({ editor }) {
     onComponentWillUnmount,
     onCompositionEnd,
     onCompositionStart,
-    onKeyDown,
     onRender,
     onSelect,
   }

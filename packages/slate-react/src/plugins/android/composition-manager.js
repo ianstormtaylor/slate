@@ -108,11 +108,17 @@ function CompositionManager(editor) {
    * Connect the MutationObserver to a specific editor root element
    */
 
-  function connect(rootEl) {
+  function connect() {
     debug('connect', { rootEl })
+
+    const rootEl = editor.findDOMNode([])
+
     if (last.rootEl === rootEl) return
+
     debug('connect:run')
+
     win = getWindow(rootEl)
+
     observer.observe(rootEl, {
       childList: true,
       characterData: true,
@@ -126,6 +132,11 @@ function CompositionManager(editor) {
     debug('disconnect')
     observer.disconnect()
     last.rootEl = null
+  }
+
+  function clearDiff() {
+    debug('clearDIff')
+    last.diff = null
   }
 
   /**
@@ -279,9 +290,16 @@ function CompositionManager(editor) {
     startAction()
   }
 
+  /**
+   * Handle a `requestAnimationFrame` long batch of mutations.
+   *
+   * @param {Array} mutations
+   */
+
   function flushAction(mutations) {
     debug('flushAction', mutations.length, mutations)
 
+    // If there is an expanded collection, delete it
     if (last.range && !last.range.isCollapsed) {
       renderSync(editor, () => {
         editor
@@ -432,7 +450,7 @@ function CompositionManager(editor) {
    * handle `onCompositionEnd`
    */
 
-  function onCompositionEnd(event) {
+  function onCompositionEnd() {
     debug('onCompositionEnd')
     isComposing = false
 
@@ -563,29 +581,14 @@ function CompositionManager(editor) {
     })
   }
 
-  /**
-   * Handle `onRender`
-   *
-   * Sometimes a user is in a composition and then switches to a new example.
-   *
-   * Because the value has changed but the `last.diff` has not, it applies the
-   * changes from the old composition onto the new document.
-   *
-   * Setting `last.diff` to null fixes that.
-   */
-
-  function onRender() {
-    last.diff = null
-  }
-
   return {
+    clearDiff,
     connect,
     disconnect,
     onKeyDown: startAction,
     onCompositionStart,
     onCompositionEnd,
     onSelect,
-    onRender,
   }
 }
 
