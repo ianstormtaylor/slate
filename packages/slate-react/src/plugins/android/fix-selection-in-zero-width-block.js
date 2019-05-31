@@ -15,10 +15,6 @@ export default function fixSelectionInZeroWidthBlock(window) {
   const { dataset } = anchorNode.parentElement
   const isZeroWidth = dataset ? dataset.slateZeroWidth === 'n' : false
 
-  // We are doing three checks to see if we need to move the cursor.
-  // Is this a zero-width slate span?
-  // Is the current cursor position not at the start of it?
-  // Is there more than one character (i.e. the zero-width space char) in here?
   if (
     isZeroWidth &&
     anchorNode.textContent.length === 1 &&
