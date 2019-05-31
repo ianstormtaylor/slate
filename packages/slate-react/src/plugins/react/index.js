@@ -1,6 +1,5 @@
 import Debug from 'debug'
 import PlaceholderPlugin from 'slate-react-placeholder'
-import { IS_ANDROID } from 'slate-dev-environment'
 
 import EditorPropsPlugin from './editor-props'
 import RenderingPlugin from './rendering'
@@ -11,10 +10,6 @@ import RestoreDOMPlugin from './restore-dom'
 import DebugEventsPlugin from '../debug/debug-events'
 import DebugBatchEventsPlugin from '../debug/debug-batch-events'
 import DebugMutationsPlugin from '../debug/debug-mutations'
-
-// NOPR:
-import MutationPlugin from '../android/mutation'
-import NoopPlugin from '../debug/noop'
 
 /**
  * A plugin that adds the React-specific rendering logic to the editor.
@@ -38,9 +33,7 @@ function ReactPlugin(options = {}) {
   const commandsPlugin = CommandsPlugin(options)
   const queriesPlugin = QueriesPlugin(options)
   const editorPropsPlugin = EditorPropsPlugin(options)
-  const domPlugin = DOMPlugin({
-    plugins: [editorPropsPlugin, ...plugins],
-  })
+  const domPlugin = DOMPlugin(options)
   const restoreDomPlugin = RestoreDOMPlugin()
   const placeholderPlugin = PlaceholderPlugin({
     placeholder,
@@ -51,21 +44,11 @@ function ReactPlugin(options = {}) {
       Array.from(node.texts()).length === 1,
   })
 
-  let androidPlugins = []
-
-  if (IS_ANDROID) {
-    const mutationPlugin = new MutationPlugin(options)
-    const noopPlugin = new NoopPlugin(options)
-    androidPlugins = [mutationPlugin, noopPlugin]
-  }
-
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
     debugMutationsPlugin,
-
-    ...androidPlugins,
-
+    editorPropsPlugin,
     domPlugin,
     restoreDomPlugin,
     placeholderPlugin,
