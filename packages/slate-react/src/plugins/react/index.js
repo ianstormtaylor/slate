@@ -1,5 +1,6 @@
 import Debug from 'debug'
 import PlaceholderPlugin from 'slate-react-placeholder'
+import { IS_ANDROID } from 'slate-dev-environment'
 
 import EditorPropsPlugin from './editor-props'
 import RenderingPlugin from './rendering'
@@ -50,18 +51,20 @@ function ReactPlugin(options = {}) {
       Array.from(node.texts()).length === 1,
   })
 
-  // NOPR:
-  const mutationPlugin = new MutationPlugin(options)
-  const noopPlugin = new NoopPlugin(options)
+  let androidPlugins = []
+
+  if (IS_ANDROID) {
+    const mutationPlugin = new MutationPlugin(options)
+    const noopPlugin = new NoopPlugin(options)
+    androidPlugins = [mutationPlugin, noopPlugin]
+  }
 
   return [
     debugEventsPlugin,
     debugBatchEventsPlugin,
     debugMutationsPlugin,
 
-    // NOPR:
-    mutationPlugin,
-    noopPlugin,
+    ...androidPlugins,
 
     domPlugin,
     restoreDomPlugin,
