@@ -395,6 +395,12 @@ function CompositionManager(editor) {
     debug('resolveDOMNode:diff', last.diff)
   }
 
+  /**
+   * Remove an Inline DOM Node.
+   *
+   * Happens when you delete the last character in an Inline DOM Node
+   */
+
   function removeNode(domNode) {
     debug('removeNode')
     if (domNode.nodeType !== ELEMENT_NODE) return
@@ -406,8 +412,10 @@ function CompositionManager(editor) {
     )
 
     renderSync(editor, () => {
-      editor.select(nodeSelection).delete()
-      editor.restoreDOM()
+      editor
+        .select(nodeSelection)
+        .delete()
+        .restoreDOM()
     })
   }
 
