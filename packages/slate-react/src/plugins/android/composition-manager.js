@@ -12,6 +12,19 @@ const ELEMENT_NODE = 1
 const TEXT_NODE = 3
 
 /**
+ * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
+ */
+
+const flushControlled = ReactDOM.unstable_flushControlled
+
+function renderSync(editor, fn) {
+  flushControlled(() => {
+    fn()
+    editor.controller.flush()
+  })
+}
+
+/**
  * Takes text from a dom node and an offset within that text and returns an
  * object with fixed text and fixed offset which removes zero width spaces
  * and adjusts the offset.
@@ -46,12 +59,6 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   if (nextOffset > maxOffset) nextOffset = maxOffset
   return { text: nextText, offset: nextOffset }
 }
-
-/**
- * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
- */
-
-const flushControlled = ReactDOM.unstable_flushControlled
 
 /**
  * Based loosely on:
@@ -173,7 +180,7 @@ function CompositionManager(editor) {
   function splitBlock() {
     debug('splitBlock')
 
-    flushControlled(() => {
+    renderSync(editor, () => {
       applyDiff()
       if (last.range) {
         editor.select(last.range)
@@ -197,9 +204,12 @@ function CompositionManager(editor) {
 
     /**
      * The delay is required because hitting `enter`, `enter` then `backspace`
-     * in a word results in the cursor being one position to the right. Slate
-     * sets the position to `0` and we even check it immediately after setting
-     * it and it is correct, but somewhere Android moves it to the right.
+     * in a word results in the cursor being one position to the right in
+     * Android 9.
+     *
+     * Slate sets the position to `0` and we even check it immediately after
+     * setting it and it is correct, but somewhere Android moves it to the right.
+     *
      * This happens only when using the virtual keyboard. Hitting enter on a
      * hardware keyboard does not trigger this bug.
      *
@@ -208,13 +218,15 @@ function CompositionManager(editor) {
      */
 
     win.requestAnimationFrame(() => {
-      applyDiff()
-      editor
-        .select(last.range)
-        .deleteBackward()
-        .focus()
-        .restoreDOM()
-      clearAction()
+      renderSync(editor, () => {
+        applyDiff()
+        editor
+          .select(last.range)
+          .deleteBackward()
+          .focus()
+          .restoreDOM()
+        clearAction()
+      })
     })
   }
 
@@ -268,11 +280,10 @@ function CompositionManager(editor) {
   }
 
   function flushAction(mutations) {
-    // if (!mutations) mutations = observer.takeRecords()
     debug('flushAction', mutations.length, mutations)
 
     if (last.range && !last.range.isCollapsed) {
-      flushControlled(() => {
+      renderSync(editor, () => {
         editor
           .select(last.range)
           .deleteBackward()
@@ -345,6 +356,8 @@ function CompositionManager(editor) {
    */
 
   function resolveDOMNode(domNode) {
+    debug('resolveDOMNode')
+
     const { value } = editor
     const { document, selection } = value
 
@@ -360,25 +373,11 @@ function CompositionManager(editor) {
     // for browsers collapsing a single trailing new lines, so remove it.
     const isLastNode = block.nodes.last() === node
 
-    const fix = fixTextAndOffset(
-      domNode.textContent,
-      getDOMRange().startOffset,
-      isLastNode
-    )
+    const fix = fixTextAndOffset(domNode.textContent, 0, isLastNode)
 
     const nextText = fix.text
-    const nextOffset = fix.offset
 
-    debug('resolveDOMNode', {
-      prevText,
-      nextText,
-      nextOffset,
-      node: node.toJS(),
-      path: path.toJS(),
-      block: block.toJS(),
-    })
-
-    // If the text is no different, abort.
+    // If the text is no different, there is no diff.
     if (nextText === prevText) {
       last.diff = null
       return
@@ -393,7 +392,7 @@ function CompositionManager(editor) {
       insertText: diff.insertText,
     }
 
-    debug('resolveDOMNode:last.diff.range', last.diff)
+    debug('resolveDOMNode:diff', last.diff)
   }
 
   function removeNode(domNode) {
@@ -405,9 +404,11 @@ function CompositionManager(editor) {
     const nodeSelection = document.resolveRange(
       selection.moveToRangeOfNode(node)
     )
-    editor.select(nodeSelection).delete()
-    editor.restoreDOM()
-    editor.controller.flush()
+
+    renderSync(editor, () => {
+      editor.select(nodeSelection).delete()
+      editor.restoreDOM()
+    })
   }
 
   /**
@@ -425,13 +426,6 @@ function CompositionManager(editor) {
 
   function getDOMRange() {
     return win.getSelection().getRangeAt(0)
-  }
-
-  function getRange() {
-    const domSelection = win.getSelection()
-    const range = editor.findRange(domSelection)
-    console.log('getRange', { domSelection, range })
-    return range
   }
 
   /**
@@ -456,23 +450,14 @@ function CompositionManager(editor) {
     window.setTimeout(() => {
       if (last.diff) {
         debug('onCompositionEnd:applyDiff')
-        flushControlled(() => {
-          applyDiff({ select: true })
+        renderSync(editor, () => {
+          applyDiff()
 
           const domRange = win.getSelection().getRangeAt(0)
           const domText = domRange.startContainer.textContent
           let offset = domRange.startOffset
 
-          /**
-           * TODO:
-           *
-           * The next step I think is that we need to get a general `findRange`
-           * method that works with unresolved nodes. We need to remove the
-           * ZERO_WIDTH_SPACE at the appropriate points for the `textNode`
-           * keeping in mind that if the space is before, e need to offset the
-           * anchor and if the space is after we don't and the max offset is
-           * the length of the text after the spaces are removed.
-           */
+          const fix = fixTextAndOffset(domText, offset)
 
           const range = editor
             .findRange({
@@ -482,7 +467,7 @@ function CompositionManager(editor) {
               anchorOffset: 0,
               isCollapsed: true,
             })
-            .moveTo(offset)
+            .moveTo(fix.offset)
 
           /**
            * We must call `restoreDOM` even though this is applying a `diff` which
@@ -499,7 +484,6 @@ function CompositionManager(editor) {
             .select(range)
             .focus()
             .restoreDOM()
-            .controller.flush()
         })
       }
 
