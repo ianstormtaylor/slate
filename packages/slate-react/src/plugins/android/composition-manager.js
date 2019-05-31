@@ -1,14 +1,21 @@
 import Debug from 'debug'
 import getWindow from 'get-window'
 import ReactDOM from 'react-dom'
-
 import diffText from './diff-text'
+
+/**
+ * @type {Debug}
+ */
 
 const debug = Debug('slate:composition-manager')
 
-const ZERO_WIDTH_SPACE = String.fromCharCode(65279)
+/**
+ * Unicode String for a ZERO_WIDTH_SPACE
+ *
+ * @type {String}
+ */
 
-const ELEMENT_NODE = 1
+const ZERO_WIDTH_SPACE = String.fromCharCode(65279)
 
 /**
  * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
@@ -420,7 +427,7 @@ function CompositionManager(editor) {
 
   function removeNode(domNode) {
     debug('removeNode')
-    if (domNode.nodeType !== ELEMENT_NODE) return
+    if (domNode.nodeType !== window.Node.ELEMENT_NODE) return
     const { value } = editor
     const { document, selection } = value
     const node = editor.findNode(domNode)
