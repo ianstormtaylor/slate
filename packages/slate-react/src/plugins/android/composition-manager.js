@@ -428,14 +428,6 @@ function CompositionManager(editor) {
     isComposing = true
   }
 
-  function onCompositionUpdate() {
-    debug('onCompositionUpdate')
-  }
-
-  function getDOMRange() {
-    return win.getSelection().getRangeAt(0)
-  }
-
   /**
    * handle `onCompositionEnd`
    */
@@ -592,7 +584,6 @@ function CompositionManager(editor) {
     onKeyDown: startAction,
     onCompositionStart,
     onCompositionEnd,
-    onCompositionUpdate,
     onSelect,
     onRender,
   }
