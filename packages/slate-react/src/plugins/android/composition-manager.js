@@ -66,32 +66,47 @@ const flushControlled = ReactDOM.unstable_flushControlled
  */
 
 function CompositionManager(editor) {
+  /**
+   * A MutationObserver that flushes to the method `flush`
+   *
+   * @type {MutationObserver}
+   */
+
   const observer = new window.MutationObserver(flush)
 
   let win = null
 
+  /**
+   * Is the editor in the middle of a composition?
+   *
+   * @type {Boolean}
+   */
+
   let isComposing = false
 
   /**
-   * Range when the last `onInput` event occurred.
+   * Object that keeps track of the most recent state
    *
    * @type {Range}
    */
 
   const last = {
     rootEl: null, // root element that MutationObserver is attached to
-    diff: null, // {key, startPos, endPos, insertText}
-    command: null, // {type, key, pos}
-    selection: null, // {key, pos}
+    diff: null, // last text node diff between Slate and DOM
+    range: null, // last range selected
     domNode: null, // last DOM node the cursor was in
   }
 
-  function connect(el) {
-    debug('connect', { el })
-    if (last.rootEl === el) return
+  /**
+   * Connect the MutationObserver to a specific editor root element
+   */
+
+  function connect(rootEl) {
+    debug('connect', { rootEl })
+    if (last.rootEl === rootEl) return
     debug('connect:run')
-    win = getWindow(el)
-    observer.observe(el, {
+    win = getWindow(rootEl)
+    observer.observe(rootEl, {
       childList: true,
       characterData: true,
       attributes: true,
@@ -111,8 +126,8 @@ function CompositionManager(editor) {
    */
 
   function clearAction() {
+    debug('clearAction')
     last.diff = null
-    last.command = null
     last.domNode = null
   }
 
@@ -212,7 +227,7 @@ function CompositionManager(editor) {
   let onSelectTimeoutId = null
 
   let bufferedMutations = []
-  let frameId = null
+  let startActionFrameId = null
   let isFlushing = false
 
   function startAction() {
@@ -221,12 +236,12 @@ function CompositionManager(editor) {
       onSelectTimeoutId = null
     }
     isFlushing = true
-    if (frameId) window.cancelAnimationFrame(frameId)
-    frameId = window.requestAnimationFrame(() => {
+    if (startActionFrameId) window.cancelAnimationFrame(startActionFrameId)
+    startActionFrameId = window.requestAnimationFrame(() => {
       if (bufferedMutations.length > 0) {
         flushAction(bufferedMutations)
       }
-      frameId = null
+      startActionFrameId = null
       bufferedMutations = []
       isFlushing = false
     })
