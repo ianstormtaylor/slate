@@ -72,8 +72,6 @@ function CompositionManager(editor) {
 
   let isComposing = false
 
-  let isListening = false
-
   /**
    * Range when the last `onInput` event occurred.
    *
@@ -81,7 +79,7 @@ function CompositionManager(editor) {
    */
 
   const last = {
-    rootEl: null,
+    rootEl: null, // root element that MutationObserver is attached to
     diff: null, // {key, startPos, endPos, insertText}
     command: null, // {type, key, pos}
     selection: null, // {key, pos}
@@ -100,7 +98,6 @@ function CompositionManager(editor) {
       subtree: true,
       characterDataOldValue: true,
     })
-    isListening = true
   }
 
   function disconnect() {
