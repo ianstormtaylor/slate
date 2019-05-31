@@ -9,7 +9,6 @@ const debug = Debug('slate:composition-manager')
 const ZERO_WIDTH_SPACE = String.fromCharCode(65279)
 
 const ELEMENT_NODE = 1
-const TEXT_NODE = 3
 
 /**
  * https://github.com/facebook/draft-js/commit/cda13cb8ff9c896cdb9ff832d1edeaa470d3b871
@@ -41,6 +40,7 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
   let nextOffset = prevOffset
   let nextText = prevText
   let index = 0
+
   while (index !== -1) {
     index = nextText.indexOf(ZERO_WIDTH_SPACE, index)
     if (index === -1) break
@@ -50,6 +50,7 @@ function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
 
   // remove the last newline if we are in the last node of a block
   const lastChar = nextText.charAt(nextText.length - 1)
+
   if (isLastNode && lastChar === '\n') {
     nextText = nextText.slice(0, -1)
   }
@@ -82,14 +83,6 @@ function CompositionManager(editor) {
   const observer = new window.MutationObserver(flush)
 
   let win = null
-
-  /**
-   * Is the editor in the middle of a composition?
-   *
-   * @type {Boolean}
-   */
-
-  let isComposing = false
 
   /**
    * Object that keeps track of the most recent state
@@ -169,7 +162,7 @@ function CompositionManager(editor) {
     const { diff } = last
     if (diff == null) return
     debug('applyDiff:run')
-    const { document, selection } = editor.value
+    const { document } = editor.value
 
     let entire = editor.value.selection
       .moveAnchorTo(diff.path, diff.start)
@@ -178,10 +171,6 @@ function CompositionManager(editor) {
     entire = document.resolveRange(entire)
 
     editor.insertTextAtRange(entire, diff.insertText)
-  }
-
-  function applySelection() {
-    editor.select(last.range)
   }
 
   /**
@@ -193,15 +182,18 @@ function CompositionManager(editor) {
 
     renderSync(editor, () => {
       applyDiff()
+
       if (last.range) {
         editor.select(last.range)
       } else {
         debug('splitBlock:NO-SELECTION')
       }
+
       editor
         .splitBlock()
         .focus()
         .restoreDOM()
+
       clearAction()
     })
   }
@@ -231,11 +223,13 @@ function CompositionManager(editor) {
     win.requestAnimationFrame(() => {
       renderSync(editor, () => {
         applyDiff()
+
         editor
           .select(last.range)
           .deleteBackward()
           .focus()
           .restoreDOM()
+
         clearAction()
       })
     })
@@ -266,12 +260,16 @@ function CompositionManager(editor) {
       window.cancelAnimationFrame(onSelectTimeoutId)
       onSelectTimeoutId = null
     }
+
     isFlushing = true
+
     if (startActionFrameId) window.cancelAnimationFrame(startActionFrameId)
+
     startActionFrameId = window.requestAnimationFrame(() => {
       if (bufferedMutations.length > 0) {
         flushAction(bufferedMutations)
       }
+
       startActionFrameId = null
       bufferedMutations = []
       isFlushing = false
@@ -337,6 +335,7 @@ function CompositionManager(editor) {
         const block = editor.value.document.getClosestBlock(key)
         return !!block
       })
+
       if (splitBlockMutation) {
         splitBlock()
         return
@@ -377,7 +376,7 @@ function CompositionManager(editor) {
     debug('resolveDOMNode')
 
     const { value } = editor
-    const { document, selection } = value
+    const { document } = value
 
     const dataElement = domNode.closest(`[data-key]`)
     const key = dataElement.dataset.key
@@ -443,7 +442,6 @@ function CompositionManager(editor) {
 
   function onCompositionStart() {
     debug('onCompositionStart')
-    isComposing = true
   }
 
   /**
@@ -452,7 +450,6 @@ function CompositionManager(editor) {
 
   function onCompositionEnd() {
     debug('onCompositionEnd')
-    isComposing = false
 
     /**
      * The timing on the `setTimeout` with `20` ms is sensitive.
@@ -468,12 +465,13 @@ function CompositionManager(editor) {
     window.setTimeout(() => {
       if (last.diff) {
         debug('onCompositionEnd:applyDiff')
+
         renderSync(editor, () => {
           applyDiff()
 
           const domRange = win.getSelection().getRangeAt(0)
           const domText = domRange.startContainer.textContent
-          let offset = domRange.startOffset
+          const offset = domRange.startOffset
 
           const fix = fixTextAndOffset(domText, offset)
 

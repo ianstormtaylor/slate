@@ -8,9 +8,11 @@
 
 function getDiffStart(prev, next) {
   const length = Math.min(prev.length, next.length)
+
   for (let i = 0; i < length; i++) {
     if (prev.charAt(i) !== next.charAt(i)) return i
   }
+
   if (prev.length !== next.length) return length
   return null
 }
@@ -29,11 +31,13 @@ function getDiffEnd(prev, next, max) {
   const prevLength = prev.length
   const nextLength = next.length
   const length = Math.min(prevLength, nextLength, max)
+
   for (let i = 0; i < length; i++) {
     const prevChar = prev.charAt(prevLength - i - 1)
     const nextChar = next.charAt(nextLength - i - 1)
     if (prevChar !== nextChar) return i
   }
+
   if (prev.length !== next.length) return length
   return null
 }

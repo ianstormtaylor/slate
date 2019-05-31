@@ -287,19 +287,6 @@ class Content extends React.Component {
       this.tmp.isUpdatingSelection = true
       removeAllRanges(native)
 
-      const s = startContainer.textContent
-
-      console.log(
-        'range',
-        s,
-        s.charCodeAt(0),
-        s.charCodeAt(1),
-        s.charCodeAt(s.length - 1),
-        s.length,
-        range.startOffset,
-        range.endOffset
-      )
-
       // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
       if (native.setBaseAndExtent) {
         // COMPAT: Since the DOM range has no concept of backwards/forwards
@@ -345,6 +332,7 @@ class Content extends React.Component {
 
     if (updated && (debug.enabled || debug.update.enabled)) {
       debug('updateSelection', { selection, native, activeElement })
+
       debug.update('updateSelection:applied', {
         selection: selection.toJSON(),
         native: {
@@ -494,9 +482,11 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { activeElement } = window.document
+
     debug.update('onNativeSelectionChange', {
       anchorOffset: window.getSelection().anchorOffset,
     })
+
     if (activeElement !== this.ref.current) return
 
     this.props.onEvent('onSelect', event)
