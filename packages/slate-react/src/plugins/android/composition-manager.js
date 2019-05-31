@@ -551,6 +551,17 @@ function CompositionManager(editor) {
     })
   }
 
+  /**
+   * Handle `onRender`
+   *
+   * Sometimes a user is in a composition and then switches to a new example.
+   *
+   * Because the value has changed but the `last.diff` has not, it applies the
+   * changes from the old composition onto the new document.
+   *
+   * Setting `last.diff` to null fixes that.
+   */
+
   function onRender() {
     last.diff = null
   }
