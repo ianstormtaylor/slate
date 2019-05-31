@@ -80,8 +80,6 @@ function CompositionManager(editor) {
    * @type {Range}
    */
 
-  let lastLastRange = null
-
   let lastEl = null
 
   const last = {
@@ -175,6 +173,14 @@ function CompositionManager(editor) {
       clear()
     })
   }
+
+  /**
+   * The requestId used to the save selection
+   *
+   * @type {Any}
+   */
+
+  let onSelectTimeoutId = null
 
   let bufferedMutations = []
   let frameId = null
@@ -430,22 +436,20 @@ function CompositionManager(editor) {
   }
 
   /**
-   * TODO:
+   * Handle `onSelect` event
    *
-   * If an `onSelect` happens, we need to wait a moment in case mutations come
-   * in immediately after. This happens when you:
+   * Save the selection after a `requestAnimationFrame`
    *
-   * - select a range
-   * - press backspace
-   *
-   * The `onSelect` is called and collapses before the mutations start coming
-   * in.
+   * - If we're not in the middle of flushing mutations
+   * - and cancel save if a mutation runs before the `requestAnimationFrame`
    */
-
-  let onSelectTimeoutId = null
 
   function onSelect(event) {
     debug('onSelect:try')
+
+    // Event can be Synthetic React or native. Grab only the native one so
+    // that we don't have to call `event.perist` for performance.
+    event = event.nativeEvent ? event.nativeEvent : event
 
     window.cancelAnimationFrame(onSelectTimeoutId)
     onSelectTimeoutId = null
@@ -453,10 +457,6 @@ function CompositionManager(editor) {
     // Don't capture the last selection if the selection was made during the
     // flushing of DOM mutations. This means it is all part of one user action.
     if (isFlushing) return
-
-    if (event.persist) {
-      event.persist()
-    }
 
     onSelectTimeoutId = window.requestAnimationFrame(() => {
       debug('onSelect:save-selection')
@@ -502,7 +502,6 @@ function CompositionManager(editor) {
         clear()
       }
 
-      lastLastRange = last.selection
       last.selection = range
       last.node = domSelection.anchorNode
     })
