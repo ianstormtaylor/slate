@@ -110,7 +110,11 @@ function CompositionManager(editor) {
     lastEl = null
   }
 
-  function clear() {
+  /**
+   * Clear the `last` properties related to an action only
+   */
+
+  function clearAction() {
     last.diff = null
     last.command = null
     last.domNode = null
@@ -169,7 +173,7 @@ function CompositionManager(editor) {
         .splitBlock()
         .focus()
         .restoreDOM()
-      clear()
+      clearAction()
     })
   }
 
@@ -199,7 +203,7 @@ function CompositionManager(editor) {
         .deleteBackward()
         .focus()
         .restoreDOM()
-      clear()
+      clearAction()
     })
   }
 
@@ -460,7 +464,7 @@ function CompositionManager(editor) {
         })
       }
 
-      clear()
+      clearAction()
     }, 20)
   }
 
@@ -528,7 +532,7 @@ function CompositionManager(editor) {
         debug('onSelect:applyDiff', last.diff)
         applyDiff()
         editor.select(range)
-        clear()
+        clearAction()
       }
 
       last.range = range
