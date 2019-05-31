@@ -125,15 +125,12 @@ class Editor {
    */
 
   flush() {
-    console.log('controller flush')
     this.run('onChange')
     const { value, operations, controller } = this
     const change = { value, operations }
     this.operations = List()
     this.tmp.flushing = false
-    console.log('before onChange')
     this.onChange(change)
-    console.log('after onchange in controller flush')
     return controller
   }
 

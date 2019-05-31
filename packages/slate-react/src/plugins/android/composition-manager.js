@@ -230,6 +230,14 @@ function CompositionManager(editor) {
   let startActionFrameId = null
   let isFlushing = false
 
+  /**
+   * Mark the beginning of an action. The action happens when the
+   * `requestAnimationFrame` expires.
+   *
+   * If `startAction` is called again, it pushes the `action` to a new
+   * `requestAnimationFrame` and cancels the old one.
+   */
+
   function startAction() {
     if (onSelectTimeoutId) {
       window.cancelAnimationFrame(onSelectTimeoutId)
@@ -247,6 +255,12 @@ function CompositionManager(editor) {
     })
   }
 
+  /**
+   * Handle MutationObserver flush
+   *
+   * @param {MutationList} mutations
+   */
+
   function flush(mutations) {
     debug('flush')
     bufferedMutations.push(...mutations)
@@ -257,10 +271,7 @@ function CompositionManager(editor) {
     // if (!mutations) mutations = observer.takeRecords()
     debug('flushAction', mutations.length, mutations)
 
-    console.log('last.range', last.range.toJSON())
-
     if (last.range && !last.range.isCollapsed) {
-      console.log('delete selection')
       flushControlled(() => {
         editor
           .select(last.range)
@@ -269,11 +280,7 @@ function CompositionManager(editor) {
           .restoreDOM()
       })
       return
-    } else {
-      console.log('do not delete selection')
     }
-
-    let firstMutation = mutations[0]
 
     if (mutations.length > 1) {
       // check if one of the mutations matches the signature of an `enter`
@@ -311,6 +318,8 @@ function CompositionManager(editor) {
     // mutation catchers will try and determine what the user was trying to
     // do.
 
+    const firstMutation = mutations[0]
+
     if (firstMutation.type === 'characterData') {
       resolveDOMNode(firstMutation.target.parentNode)
     } else if (firstMutation.type === 'childList') {
@@ -325,6 +334,15 @@ function CompositionManager(editor) {
       }
     }
   }
+
+  /**
+   * Takes a DOM Node and resolves it against Slate's Document.
+   *
+   * Saves the changes to `last.diff` which can be applied later using
+   * `applyDiff()`
+   *
+   * @param {DOMNode} domNode
+   */
 
   function resolveDOMNode(domNode) {
     const { value } = editor
@@ -374,6 +392,7 @@ function CompositionManager(editor) {
       end: diff.end,
       insertText: diff.insertText,
     }
+
     debug('resolveDOMNode:last.diff.range', last.diff)
   }
 
@@ -390,6 +409,10 @@ function CompositionManager(editor) {
     editor.restoreDOM()
     editor.controller.flush()
   }
+
+  /**
+   * handle `onCompositionStart`
+   */
 
   function onCompositionStart() {
     debug('onCompositionStart')
@@ -410,6 +433,10 @@ function CompositionManager(editor) {
     console.log('getRange', { domSelection, range })
     return range
   }
+
+  /**
+   * handle `onCompositionEnd`
+   */
 
   function onCompositionEnd(event) {
     debug('onCompositionEnd')
@@ -472,6 +499,7 @@ function CompositionManager(editor) {
             .select(range)
             .focus()
             .restoreDOM()
+            .controller.flush()
         })
       }
 
