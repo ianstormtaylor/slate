@@ -142,7 +142,6 @@ class Editor extends React.Component {
 
   render() {
     debug('render', this)
-    console.log('rerender', this.state.contentKey)
 
     // Re-resolve the controller if needed based on memoized props.
     const { commands, placeholder, plugins, queries, schema } = this.props

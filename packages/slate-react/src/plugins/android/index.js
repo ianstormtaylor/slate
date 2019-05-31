@@ -40,13 +40,27 @@ function fixSelectionInZeroWidthBlock(window) {
 function AndroidPlugin({ editor }) {
   const observer = new CompositionManager(editor)
 
+  /**
+   * handle `onCompositionStart`
+   */
+
   function onCompositionStart() {
     observer.onCompositionStart()
   }
 
+  /**
+   * handle `onCompositionEnd`
+   */
+
   function onCompositionEnd() {
     observer.onCompositionEnd()
   }
+
+  /**
+   * handle `onSelect`
+   *
+   * @param {Event} event
+   */
 
   function onSelect(event) {
     const window = getWindow(event.target)
@@ -54,19 +68,39 @@ function AndroidPlugin({ editor }) {
     observer.onSelect(event)
   }
 
+  /**
+   * handle `onComponentDidMount`
+   */
+
   function onComponentDidMount() {
     observer.connect()
   }
+
+  /**
+   * handle `onComponentDidUpdate`
+   */
 
   function onComponentDidUpdate() {
     observer.connect()
   }
 
-  function onComponentWillUnmount(event) {
+  /**
+   * handle `onComponentWillUnmount`
+   *
+   * @param {Event} event
+   */
+
+  function onComponentWillUnmount() {
     observer.disconnect()
   }
 
-  function onRender(event) {
+  /**
+   * handle `onRender`
+   *
+   * @param {Event} event
+   */
+
+  function onRender() {
     observer.disconnect()
 
     // We don't want the `diff` from a previous render to apply to a

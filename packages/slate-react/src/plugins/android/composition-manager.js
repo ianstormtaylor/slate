@@ -482,7 +482,7 @@ function CompositionManager(editor) {
               anchorNode: domRange.startContainer,
               anchorOffset: 0,
               focusNode: domRange.startContainer,
-              anchorOffset: 0,
+              focusOffset: 0,
               isCollapsed: true,
             })
             .moveTo(fix.offset)
@@ -554,6 +554,7 @@ function CompositionManager(editor) {
           range.anchor.set('offset', anchorFix.offset)
         )
       }
+
       if (range.focus.offset !== focusFix.offset) {
         range = range.set('focus', range.focus.set('offset', focusFix.offset))
       }
