@@ -101,6 +101,7 @@ function MutationPlugin({ editor }) {
   function onRender(event) {
     debug('onRender')
     observer.disconnect()
+    observer.onRender()
   }
 
   return {

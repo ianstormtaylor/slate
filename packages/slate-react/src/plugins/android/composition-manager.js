@@ -551,6 +551,10 @@ function CompositionManager(editor) {
     })
   }
 
+  function onRender() {
+    last.diff = null
+  }
+
   return {
     connect,
     disconnect,
@@ -559,6 +563,7 @@ function CompositionManager(editor) {
     onCompositionEnd,
     onCompositionUpdate,
     onSelect,
+    onRender,
   }
 }
 
