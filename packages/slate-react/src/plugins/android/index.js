@@ -1,5 +1,3 @@
-// import DOMObserver from './dom-observer'
-import Debug from 'debug'
 import getWindow from 'get-window'
 import fixSelectionInZeroWidthBlock from './fix-selection-in-zero-width-block'
 import CompositionManager from './composition-manager'
