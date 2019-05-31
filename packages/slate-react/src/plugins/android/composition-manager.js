@@ -133,28 +133,29 @@ function CompositionManager(editor) {
   }
 
   function applySelection() {
-    editor.select(last.selection)
+    editor.select(last.range)
   }
 
   function splitBlock() {
-    debug('splitBlock', { selection: last.selection.toJSON() })
+    debug('splitBlock', { range: last.range.toJSON() })
 
     flushControlled(() => {
       applyDiff()
-      if (last.selection) {
-        editor.select(last.selection)
+      if (last.range) {
+        editor.select(last.range)
       } else {
         debug('splitBlock:NO-SELECTION')
       }
-      editor.splitBlock().restoreDOM()
+      editor
+        .splitBlock()
+        .focus()
+        .restoreDOM()
       clear()
     })
   }
 
   function mergeBlock() {
     debug('mergeBlock')
-
-    const lastSelection = last.selection
 
     // The delay is required because hitting `enter`, `enter` then `backspace`
     // in a word results in the cursor being one position to the right. Slate
@@ -164,11 +165,12 @@ function CompositionManager(editor) {
     // Hitting enter on a hardware keyboard does not trigger this bug.
 
     win.requestAnimationFrame(() => {
-      console.log('selection at mergeBlock', last.selection.toJSON())
+      console.log('selection at mergeBlock', last.range.toJSON())
       applyDiff()
       editor
-        .select(lastSelection)
+        .select(last.range)
         .deleteBackward()
+        .focus()
         .restoreDOM()
       clear()
     })
@@ -213,13 +215,13 @@ function CompositionManager(editor) {
     // if (!mutations) mutations = observer.takeRecords()
     debug('flushAction', mutations.length, mutations)
 
-    console.log('last.selection', last.selection.toJSON())
+    console.log('last.range', last.range.toJSON())
 
-    if (last.selection && !last.selection.isCollapsed) {
+    if (last.range && !last.range.isCollapsed) {
       console.log('delete selection')
       flushControlled(() => {
         editor
-          .select(last.selection)
+          .select(last.range)
           .deleteBackward()
           .focus()
           .restoreDOM()
@@ -502,7 +504,7 @@ function CompositionManager(editor) {
         clear()
       }
 
-      last.selection = range
+      last.range = range
       last.node = domSelection.anchorNode
     })
   }
