@@ -80,9 +80,8 @@ function CompositionManager(editor) {
    * @type {Range}
    */
 
-  let lastEl = null
-
   const last = {
+    rootEl: null,
     diff: null, // {key, startPos, endPos, insertText}
     command: null, // {type, key, pos}
     selection: null, // {key, pos}
@@ -91,7 +90,7 @@ function CompositionManager(editor) {
 
   function connect(el) {
     debug('connect', { el })
-    if (lastEl === el) return
+    if (last.rootEl === el) return
     debug('connect:run')
     win = getWindow(el)
     observer.observe(el, {
@@ -107,7 +106,7 @@ function CompositionManager(editor) {
   function disconnect() {
     debug('disconnect')
     observer.disconnect()
-    lastEl = null
+    last.rootEl = null
   }
 
   /**
