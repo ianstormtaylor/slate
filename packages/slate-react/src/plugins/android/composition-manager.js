@@ -180,29 +180,40 @@ function CompositionManager(editor) {
   let frameId = null
   let isFlushing = false
 
-  function flush(mutations) {
-    debug('flush')
+  function startAction() {
+    if (onSelectTimeoutId) {
+      window.cancelAnimationFrame(onSelectTimeoutId)
+      onSelectTimeoutId = null
+    }
     isFlushing = true
     if (frameId) window.cancelAnimationFrame(frameId)
-    bufferedMutations.push(...mutations)
     frameId = window.requestAnimationFrame(() => {
-      flushAction(bufferedMutations)
+      if (bufferedMutations.length > 0) {
+        flushAction(bufferedMutations)
+      }
       frameId = null
       bufferedMutations = []
       isFlushing = false
     })
   }
 
+  function flush(mutations) {
+    debug('flush')
+    bufferedMutations.push(...mutations)
+    startAction()
+  }
+
   function flushAction(mutations) {
     // if (!mutations) mutations = observer.takeRecords()
     debug('flushAction', mutations.length, mutations)
 
-    console.log('last.selection', last.selection, last.selection.toJSON())
-    if (last.range && !last.range.isCollapsed) {
+    console.log('last.selection', last.selection.toJSON())
+
+    if (last.selection && !last.selection.isCollapsed) {
       console.log('delete selection')
       flushControlled(() => {
         editor
-          .select(last.range)
+          .select(last.selection)
           .deleteBackward()
           .focus()
           .restoreDOM()
@@ -418,58 +429,89 @@ function CompositionManager(editor) {
     }, 20)
   }
 
+  /**
+   * TODO:
+   *
+   * If an `onSelect` happens, we need to wait a moment in case mutations come
+   * in immediately after. This happens when you:
+   *
+   * - select a range
+   * - press backspace
+   *
+   * The `onSelect` is called and collapses before the mutations start coming
+   * in.
+   */
+
+  let onSelectTimeoutId = null
+
   function onSelect(event) {
+    debug('onSelect:try')
+
+    window.cancelAnimationFrame(onSelectTimeoutId)
+    onSelectTimeoutId = null
+
     // Don't capture the last selection if the selection was made during the
     // flushing of DOM mutations. This means it is all part of one user action.
     if (isFlushing) return
 
-    const domSelection = getWindow(event.target).getSelection()
-    let range = editor.findRange(domSelection)
-
-    const anchorFix = fixTextAndOffset(
-      domSelection.anchorNode.textContent,
-      domSelection.anchorOffset
-    )
-
-    const focusFix = fixTextAndOffset(
-      domSelection.anchorNode.textContent,
-      domSelection.anchorOffset
-    )
-
-    if (range.anchor.offset !== anchorFix.offset) {
-      range = range.set('anchor', range.anchor.set('offset', anchorFix.offset))
-    }
-    if (range.focus.offset !== focusFix.offset) {
-      range = range.set('focus', range.focus.set('offset', focusFix.offset))
+    if (event.persist) {
+      event.persist()
     }
 
-    debug('onSelect', {
-      domSelection: normalizeDOMSelection(domSelection),
-      range: range.toJS(),
-      last,
+    onSelectTimeoutId = window.requestAnimationFrame(() => {
+      debug('onSelect:save-selection')
+
+      const domSelection = getWindow(event.target).getSelection()
+      let range = editor.findRange(domSelection)
+
+      const anchorFix = fixTextAndOffset(
+        domSelection.anchorNode.textContent,
+        domSelection.anchorOffset
+      )
+
+      const focusFix = fixTextAndOffset(
+        domSelection.focusNode.textContent,
+        domSelection.focusOffset
+      )
+
+      if (range.anchor.offset !== anchorFix.offset) {
+        range = range.set(
+          'anchor',
+          range.anchor.set('offset', anchorFix.offset)
+        )
+      }
+      if (range.focus.offset !== focusFix.offset) {
+        range = range.set('focus', range.focus.set('offset', focusFix.offset))
+      }
+
+      debug('onSelect:save-data', {
+        domSelection: normalizeDOMSelection(domSelection),
+        range: range.toJS(),
+      })
+
+      // If the `domSelection` has moved into a new node, then reconcile with
+      // `applyDiff`
+      if (
+        domSelection.isCollapsed &&
+        last.node !== domSelection.anchorNode &&
+        last.diff != null
+      ) {
+        debug('onSelect:applyDiff', last.diff)
+        applyDiff()
+        editor.select(range)
+        clear()
+      }
+
+      lastLastRange = last.selection
+      last.selection = range
+      last.node = domSelection.anchorNode
     })
-
-    // If the `domSelection` has moved into a new node, then reconcile with
-    // `applyDiff`
-    if (
-      domSelection.isCollapsed &&
-      last.node !== domSelection.anchorNode &&
-      last.diff != null
-    ) {
-      debug('onSelect:applyDiff', last.diff)
-      applyDiff()
-      editor.select(range)
-      clear()
-    }
-
-    lastLastRange = last.selection
-    last.selection = range
-    last.node = domSelection.anchorNode
   }
 
   return {
     connect,
     disconnect,
+    onKeyDown: startAction,
     onCompositionStart,
     onCompositionEnd,
     onCompositionUpdate,
