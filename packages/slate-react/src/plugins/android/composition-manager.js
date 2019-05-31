@@ -116,6 +116,21 @@ function CompositionManager(editor) {
     last.domNode = null
   }
 
+  /**
+   * Apply the last `diff`
+   *
+   * We don't want to apply the `diff` at the time it is created because we
+   * may be in a composition. There are a few things that trigger the applying
+   * of the saved diff. Sometimeson its own and sometimes immediately before
+   * doing something else with the Editor.
+   *
+   * - `onCompositionEnd` event
+   * - `onSelect` event only when the user has moved into a different node
+   * - The user hits `enter`
+   * - The user hits `backspace` and removes an inline node
+   * - The user hits `backspace` and merges two blocks
+   */
+
   function applyDiff() {
     debug('applyDiff')
     const { diff } = last
@@ -136,8 +151,12 @@ function CompositionManager(editor) {
     editor.select(last.range)
   }
 
+  /**
+   * Handle `enter` that splits block
+   */
+
   function splitBlock() {
-    debug('splitBlock', { range: last.range.toJSON() })
+    debug('splitBlock')
 
     flushControlled(() => {
       applyDiff()
@@ -154,18 +173,26 @@ function CompositionManager(editor) {
     })
   }
 
+  /**
+   * Handle `backspace` that merges blocks
+   */
+
   function mergeBlock() {
     debug('mergeBlock')
 
-    // The delay is required because hitting `enter`, `enter` then `backspace`
-    // in a word results in the cursor being one position to the right. Slate
-    // correctly sets the position to `0` and we have even checked it
-    // immediately after setting it, but upon next read it will be in the
-    // wrong position. This happens only when using the virtual keyboard.
-    // Hitting enter on a hardware keyboard does not trigger this bug.
+    /**
+     * The delay is required because hitting `enter`, `enter` then `backspace`
+     * in a word results in the cursor being one position to the right. Slate
+     * sets the position to `0` and we even check it immediately after setting
+     * it and it is correct, but somewhere Android moves it to the right.
+     * This happens only when using the virtual keyboard. Hitting enter on a
+     * hardware keyboard does not trigger this bug.
+     *
+     * The call to `focus` is required because when we switch examples then
+     * merge a block, we lose focus in Android 9 (possibly others).
+     */
 
     win.requestAnimationFrame(() => {
-      console.log('selection at mergeBlock', last.range.toJSON())
       applyDiff()
       editor
         .select(last.range)
