@@ -34,7 +34,7 @@ Changing values requires you to use the [`Immutable.Record` API](https://immutab
 
 Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc, which means we enjoy expressive methods like `filter`, `includes`, `take`, `skip`, `rest` and `last`.
 
-If you haven't used [`Immutable.js`](https://immutable-js.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://immutable-js.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is is well worth the investment!
+If you haven't used [`Immutable.js`](https://immutable-js.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://immutable-js.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is well worth the investment!
 
 ## The "Value"
 
