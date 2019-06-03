@@ -377,9 +377,10 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
   let node = text
   let offset = 0
   let traversed = focus.offset
+  let prevNode = document.getPreviousText(node.key)
 
-  while (n > traversed) {
-    node = document.getPreviousText(node.key)
+  while (prevNode && n > traversed) {
+    node = prevNode
     const next = traversed + node.text.length
 
     if (n <= next) {
@@ -388,6 +389,8 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
     } else {
       traversed = next
     }
+
+    prevNode = document.getPreviousText(node.key)
   }
 
   range = range.moveAnchorTo(node.key, offset)
