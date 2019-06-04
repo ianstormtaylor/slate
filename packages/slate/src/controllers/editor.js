@@ -377,11 +377,11 @@ class Editor {
     const { normalize = value !== this.value } = options
     this.value = value
 
+    this.run('onSetValue')
+
     if (normalize) {
       this.normalize()
     }
-
-    this.run('onSetValue')
 
     return this
   }
