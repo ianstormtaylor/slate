@@ -16,7 +16,7 @@ export const input = (
       </paragraph>
       <paragraph>
         <link>
-          <focus />another
+          another<focus />
         </link>
       </paragraph>
     </document>
@@ -33,7 +33,7 @@ export const output = (
       </code>
       <code>
         <link>
-          <focus />another
+          another<focus />
         </link>
       </code>
     </document>

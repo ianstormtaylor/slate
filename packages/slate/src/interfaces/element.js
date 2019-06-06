@@ -8,6 +8,7 @@ import Block from '../models/block'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
 import Inline from '../models/inline'
+import Node from '../models/node'
 import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
 import Point from '../models/point'
@@ -126,6 +127,7 @@ class ElementInterface {
       upward = true,
       includeBlocks = true,
       includeDocument = true,
+      includeHanging = true,
       includeInlines = true,
       includeRoot = false,
       includeTarget = !!options.range,
@@ -186,6 +188,31 @@ class ElementInterface {
 
           if (!includeTexts && node.object === 'text') {
             return next()
+          }
+
+          if (
+            !includeHanging &&
+            targetRange &&
+            targetRange.isExpanded &&
+            targetRange.end.offset === 0 &&
+            (PathUtils.isAbove(path, targetRange.end.path) ||
+              PathUtils.isEqual(path, targetRange.end.path))
+          ) {
+            const closestBlock = root.closestBlock(targetRange.end.path)
+
+            // We also need to ensure that not only is the point's offset zero,
+            // but that the point refers to the zero offset in the block itself.
+            // Otherwise it could be inside a nested inline, in which case it
+            // should not be considered hanging.
+            if (closestBlock) {
+              const [blockNode, blockPath] = closestBlock
+              const relativePath = targetRange.end.path.slice(blockPath.size)
+              const offset = blockNode.getOffset(relativePath)
+
+              if (offset === 0) {
+                return next()
+              }
+            }
           }
 
           if (match && !match(node, path)) {
@@ -1325,6 +1352,28 @@ class ElementInterface {
   hasDescendant(path) {
     const descendant = this.getDescendant(path)
     return !!descendant
+  }
+
+  /**
+   * Check if a node has `properties`.
+   *
+   * @param {Object} properties
+   * @return {Boolean}
+   */
+
+  hasProperties(properties) {
+    const node = this
+
+    if (node.object === 'text') {
+      return false
+    }
+
+    properties = Node.createProperties(properties)
+
+    return (
+      (properties.type == null || node.type === properties.type) &&
+      (properties.data == null || node.data.isSuperset(properties.data))
+    )
   }
 
   /**

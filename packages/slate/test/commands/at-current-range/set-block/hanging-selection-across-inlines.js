@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.splitInline(1)
+  editor.setBlocks({ type: 'code' })
 }
 
 export const input = (
@@ -11,9 +11,12 @@ export const input = (
     <document>
       <paragraph>
         <link>
-          <link>
-            wo<cursor />rd
-          </link>
+          <anchor />word
+        </link>
+      </paragraph>
+      <paragraph>
+        <link>
+          <focus />another
         </link>
       </paragraph>
     </document>
@@ -23,12 +26,14 @@ export const input = (
 export const output = (
   <value>
     <document>
+      <code>
+        <link>
+          <anchor />word
+        </link>
+      </code>
       <paragraph>
         <link>
-          <link>wo</link>
-          <link>
-            <cursor />rd
-          </link>
+          <focus />another
         </link>
       </paragraph>
     </document>

@@ -42,7 +42,8 @@ function CoreQueriesPlugin() {
      * @return {Point|Null}
      */
 
-    getNextPoint(editor, point) {
+    getNextPoint(editor, point, options = {}) {
+      const { allowZeroWidth = false } = options
       const { value } = editor
       const { document } = value
       const { path, offset } = point
@@ -52,10 +53,11 @@ function CoreQueriesPlugin() {
 
       // PERF: if we're not in a void and we have offset to gain, do it easily.
       if (!closestVoid && offset < node.text.length) {
-        return point.setOffset(offset + 1)
+        const next = point.setOffset(offset + 1)
+        return next.normalize(document)
       }
 
-      for (const [, nextPath] of document.nextTexts({ path })) {
+      for (const [nextNode, nextPath] of document.texts({ path })) {
         // If we're still inside the void node, keep going until we exit it.
         if (closestVoid) {
           const [, voidPath] = closestVoid
@@ -72,14 +74,86 @@ function CoreQueriesPlugin() {
           const [, blockPath] = closestBlock
 
           if (PathUtils.isAfter(nextPath, blockPath)) {
-            return point.moveTo(nextPath, 0)
+            const next = point.moveTo(nextPath, 0)
+            return next.normalize(document)
           }
         }
 
-        return point.moveTo(nextPath, 1)
+        // If the text node and we're still in the same block, continue onwards
+        // because we need to have moved one point forwards, and an empty text
+        // will be perceived as not moving.
+        if (nextNode.text.length === 0) {
+          if (allowZeroWidth) {
+            const next = point.moveTo(nextPath, 0)
+            return next.normalize(document)
+          } else {
+            continue
+          }
+        }
+
+        const next = point.moveTo(nextPath, 1)
+        return next.normalize(document)
       }
 
       return null
+    },
+
+    /**
+     * Calculate the next character boundary from a `point`.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point|Null}
+     */
+
+    getNextCharacterPoint(editor, point) {
+      const { value: { document } } = editor
+      const { path, offset } = point
+      const [block, blockPath] = document.closestBlock(path)
+      const relativePath = path.slice(blockPath.size)
+      const blockOffset = block.getOffset(relativePath)
+      const blockText = block.getText()
+
+      if (blockOffset + offset === blockText.length) {
+        return editor.getNextPoint(point)
+      }
+
+      const o = blockOffset + offset
+      const n = TextUtils.getCharOffsetForward(blockText, o)
+      let next = point
+
+      for (let i = 0; i < n; i++) {
+        next = editor.getNextPoint(next)
+
+        if (!next) {
+          break
+        }
+      }
+
+      return next
+    },
+
+    /**
+     * Get the next point in the document that is not inside a void node.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point|Null}
+     */
+
+    getNextNonVoidPoint(editor, point) {
+      const { value: { document } } = editor
+      let next = point
+
+      while (next) {
+        const closestVoid = document.closest(next.path, editor.isVoid)
+
+        if (closestVoid) {
+          next = editor.getNextPoint(next, { allowZeroWidth: true })
+        } else {
+          return next
+        }
+      }
     },
 
     /**
@@ -87,7 +161,7 @@ function CoreQueriesPlugin() {
      *
      * @param {Editor} editor
      * @param {Point} point
-     * @return {Point}
+     * @return {Point|Null}
      */
 
     getNextWordPoint(editor, point) {
@@ -108,6 +182,10 @@ function CoreQueriesPlugin() {
 
       for (let i = 0; i < n; i++) {
         next = editor.getNextPoint(next)
+
+        if (!next) {
+          break
+        }
       }
 
       return next
@@ -121,7 +199,8 @@ function CoreQueriesPlugin() {
      * @return {Point|Null}
      */
 
-    getPreviousPoint(editor, point) {
+    getPreviousPoint(editor, point, options = {}) {
+      const { allowZeroWidth = false } = options
       const { value } = editor
       const { document } = value
       const { path, offset } = point
@@ -130,10 +209,13 @@ function CoreQueriesPlugin() {
 
       // PERF: if we're not in a void and we have offset to lose, do it easily.
       if (!closestVoid && offset > 0) {
-        return point.setOffset(offset - 1)
+        const prev = point.setOffset(offset - 1)
+        return prev.normalize(document)
       }
 
-      for (const [prevNode, prevPath] of document.previousTexts({ path })) {
+      const iterable = document.texts({ path, direction: 'backward' })
+
+      for (const [prevNode, prevPath] of iterable) {
         // If we're still inside the void node, keep going until we exit it.
         if (closestVoid) {
           const [, voidPath] = closestVoid
@@ -150,14 +232,86 @@ function CoreQueriesPlugin() {
           const [, blockPath] = closestBlock
 
           if (PathUtils.isBefore(prevPath, blockPath)) {
-            return point.moveTo(prevPath, prevNode.text.length)
+            const prev = point.moveTo(prevPath, prevNode.text.length)
+            return prev.normalize(document)
           }
         }
 
-        return point.moveTo(prevPath, prevNode.text.length - 1)
+        // If the text node and we're still in the same block, continue onwards
+        // because we need to have moved one point backwards, and an empty text
+        // will be perceived as not moving.
+        if (prevNode.text.length === 0) {
+          if (allowZeroWidth) {
+            const prev = point.moveTo(prevPath, 0)
+            return prev.normalize(document)
+          } else {
+            continue
+          }
+        }
+
+        const prev = point.moveTo(prevPath, prevNode.text.length - 1)
+        return prev.normalize(document)
       }
 
       return null
+    },
+
+    /**
+     * Calculate the previous character boundary from a `point`.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point|Null}
+     */
+
+    getPreviousCharacterPoint(editor, point) {
+      const { value: { document } } = editor
+      const { path, offset } = point
+      const [block, blockPath] = document.closestBlock(path)
+      const relativePath = path.slice(blockPath.size)
+      const blockOffset = block.getOffset(relativePath)
+
+      if (blockOffset + offset === 0) {
+        return editor.getPreviousPoint(point)
+      }
+
+      const blockText = block.getText()
+      const o = blockOffset + offset
+      const n = TextUtils.getCharOffsetBackward(blockText, o)
+      let prev = point
+
+      for (let i = 0; i < n; i++) {
+        prev = editor.getPreviousPoint(prev)
+
+        if (!prev) {
+          break
+        }
+      }
+
+      return prev
+    },
+
+    /**
+     * Get the previous point in the document that is not inside a void node.
+     *
+     * @param {Editor} editor
+     * @param {Point} point
+     * @return {Point|Null}
+     */
+
+    getPreviousNonVoidPoint(editor, point) {
+      const { value: { document } } = editor
+      let prev = point
+
+      while (prev) {
+        const closestVoid = document.closest(prev.path, editor.isVoid)
+
+        if (closestVoid) {
+          prev = editor.getPreviousPoint(prev, { allowZeroWidth: true })
+        } else {
+          return prev
+        }
+      }
     },
 
     /**
@@ -165,7 +319,7 @@ function CoreQueriesPlugin() {
      *
      * @param {Editor} editor
      * @param {Point} point
-     * @return {Point}
+     * @return {Point|Null}
      */
 
     getPreviousWordPoint(editor, point) {
@@ -186,6 +340,10 @@ function CoreQueriesPlugin() {
 
       for (let i = 0; i < n; i++) {
         prev = editor.getPreviousPoint(prev)
+
+        if (!prev) {
+          break
+        }
       }
 
       return prev

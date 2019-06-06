@@ -11,8 +11,10 @@ export const input = (
     <document>
       <paragraph>
         one<link>two</link>
+        <text />
       </paragraph>
       <paragraph>
+        <text />
         <link>
           <cursor />three
         </link>four
@@ -26,6 +28,7 @@ export const output = (
     <document>
       <paragraph>
         one<link>two</link>
+        <text />
         <link>
           <cursor />three
         </link>four

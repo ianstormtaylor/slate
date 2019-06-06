@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.insertBlock('quote')
+  editor.splitInline(1)
 }
 
 export const input = (
@@ -11,9 +11,13 @@ export const input = (
     <document>
       <paragraph>
         <text />
-        <emoji>
-          <cursor />
-        </emoji>
+        <link>
+          <text />
+          <link>
+            wo<cursor />rd
+          </link>
+          <text />
+        </link>
         <text />
       </paragraph>
     </document>
@@ -25,13 +29,17 @@ export const output = (
     <document>
       <paragraph>
         <text />
-        <emoji />
+        <link>
+          <text />
+          <link>wo</link>
+          <text />
+          <link>
+            <cursor />rd
+          </link>
+          <text />
+        </link>
         <text />
       </paragraph>
-      <quote>
-        <cursor />
-      </quote>
-      <paragraph />
     </document>
   </value>
 )
