@@ -375,26 +375,38 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 
   // Otherwise, we need to see how many nodes backwards to go.
   let node = text
-  let offset = 0
   let traversed = focus.offset
-  let prevNode = document.getPreviousText(node.key)
+  const prevSibling = document.getPreviousSibling(node.key)
 
-  while (prevNode && n > traversed) {
-    node = prevNode
-    const next = traversed + node.text.length
+  // If the next sibling is an inline, has no text and the focus offset is 0,
+  // then delete the inline
+  if (
+    traversed === 0 &&
+    Inline.isInline(prevSibling) &&
+    prevSibling.text === ''
+  ) {
+    editor.removeNodeByKey(prevSibling.key)
+  } else {
+    let offset = 0
+    let prevNode = document.getPreviousText(node.key)
 
-    if (n <= next) {
-      offset = next - n
-      break
-    } else {
-      traversed = next
+    while (prevNode && n > traversed) {
+      node = prevNode
+      const next = traversed + node.text.length
+
+      if (n <= next) {
+        offset = next - n
+        break
+      } else {
+        traversed = next
+      }
+
+      prevNode = document.getPreviousText(node.key)
     }
 
-    prevNode = document.getPreviousText(node.key)
+    range = range.moveAnchorTo(node.key, offset)
+    editor.deleteAtRange(range)
   }
-
-  range = range.moveAnchorTo(node.key, offset)
-  editor.deleteAtRange(range)
 }
 
 /**
