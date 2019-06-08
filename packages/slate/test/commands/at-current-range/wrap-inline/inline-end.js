@@ -20,18 +20,20 @@ export const input = (
   </value>
 )
 
-// TODO: this selection logic isn't right
 export const output = (
   <value>
     <document>
       <paragraph>
         <text />
-        <link>
-          hel<hashtag>lo</hashtag>
-          <text>
-            <cursor />
-          </text>
-        </link>
+        <link>hel</link>
+        <text />
+        <hashtag>
+          <text />
+          <link>
+            <anchor />lo<focus />
+          </link>
+          <text />
+        </hashtag>
         <text />
       </paragraph>
     </document>

@@ -192,6 +192,28 @@ function CoreQueriesPlugin() {
     },
 
     /**
+     * Calculate a non-hanging range from a `range`.
+     *
+     * @param {Editor} editor
+     * @param {Range} range
+     * @return {Range}
+     */
+
+    getNonHangingRange(editor, range) {
+      const { value: { document } } = editor
+      const { isExpanded, start, end } = range
+
+      if (isExpanded && end.offset === 0 && !start.path.equals(end.path)) {
+        const [prevText, prevPath] = document.previousText(end.path)
+        const newEnd = end.moveTo(prevPath, prevText.text.length)
+        const nonHanging = range.setEnd(newEnd)
+        return nonHanging
+      } else {
+        return range
+      }
+    },
+
+    /**
      * Calculate the previous point backward from a `point`.
      *
      * @param {Editor} editor

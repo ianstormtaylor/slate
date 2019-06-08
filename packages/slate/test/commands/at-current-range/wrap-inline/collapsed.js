@@ -20,7 +20,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        w<cursor />d
+        w<hashtag>
+          <text />
+        </hashtag>
+        <cursor />d
       </paragraph>
     </document>
   </value>

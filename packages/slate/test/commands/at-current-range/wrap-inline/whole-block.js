@@ -21,9 +21,8 @@ export const output = (
     <document>
       <paragraph>
         <hashtag>
-          <anchor />word
+          <anchor />word<focus />
         </hashtag>
-        <focus />
       </paragraph>
     </document>
   </value>

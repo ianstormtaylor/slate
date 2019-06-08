@@ -12,10 +12,7 @@ export const input = (
       <paragraph>
         <text />
         <link>
-          <b>
-            h<anchor />ell
-          </b>
-          <focus />o
+          he<anchor />ll<focus />o
         </link>
         <text />
       </paragraph>
@@ -29,13 +26,15 @@ export const output = (
     <document>
       <paragraph>
         <text />
+        <link>he</link>
+        <text />
+        <hashtag>
+          <link>
+            <anchor />ll
+          </link>
+        </hashtag>
+        <text />
         <link>
-          <b>h</b>
-          <hashtag>
-            <b>
-              ell<anchor />
-            </b>
-          </hashtag>
           <focus />o
         </link>
         <text />

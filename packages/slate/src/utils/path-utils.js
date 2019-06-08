@@ -90,7 +90,7 @@ function decrement(path, n = 1, index = path.size - 1) {
 }
 
 /**
- * Get all ancestor paths of th given path.
+ * Get all ancestor paths of the given path.
  *
  * @param {List} path
  * @returns {List}

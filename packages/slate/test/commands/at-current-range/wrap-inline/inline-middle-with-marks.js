@@ -12,7 +12,9 @@ export const input = (
       <paragraph>
         <text />
         <link>
-          <anchor />hel<focus />lo
+          <b>
+            he<anchor />ll<focus />o
+          </b>
         </link>
         <text />
       </paragraph>
@@ -20,17 +22,28 @@ export const input = (
   </value>
 )
 
-// TODO: the selection logic here is wrong
+// TODO: this selection logic isn't right
 export const output = (
   <value>
     <document>
       <paragraph>
         <text />
         <link>
-          <text />
-          <hashtag>hel</hashtag>
-          <anchor />
-          <focus />lo
+          <b>he</b>
+        </link>
+        <text />
+        <hashtag>
+          <link>
+            <b>
+              <anchor />ll
+            </b>
+          </link>
+        </hashtag>
+        <text />
+        <link>
+          <b>
+            <focus />o
+          </b>
         </link>
         <text />
       </paragraph>

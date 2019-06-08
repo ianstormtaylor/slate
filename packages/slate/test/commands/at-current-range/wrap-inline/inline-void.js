@@ -3,9 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.wrapInline({
-    type: 'link',
-  })
+  editor.wrapInline('link')
 }
 
 export const input = (
@@ -13,7 +11,7 @@ export const input = (
     <document>
       <paragraph>
         <emoji>
-          <cursor />{' '}
+          <cursor />
         </emoji>
       </paragraph>
     </document>
@@ -26,7 +24,7 @@ export const output = (
       <paragraph>
         <link>
           <emoji>
-            <cursor />{' '}
+            <cursor />
           </emoji>
         </link>
       </paragraph>

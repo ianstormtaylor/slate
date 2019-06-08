@@ -32,6 +32,45 @@ function deleteExpandedAtRange(editor, range) {
 }
 
 /**
+ * Ensure that the edges of a range are split such that they are at the edge of
+ * all of the inline and text nodes they are in. This will split inline nodes
+ * and text nodes and update the range to be inside the split.
+ *
+ * @param {Editor}
+ */
+
+function splitInlinesAtRange(editor, range) {
+  if (range.isExpanded) {
+    editor.deleteAtRange(range)
+  }
+
+  const { value: { document } } = editor
+  const start = editor.getPreviousNonVoidPoint(range.start)
+  const startText = document.getNode(start.path)
+  const startInline = document.furthestInline(start.path)
+  const end = editor.getNextNonVoidPoint(range.end)
+  const endText = document.getNode(end.path)
+  const endInline = document.furthestInline(end.path)
+
+  if (end.offset !== 0 && end.offset !== endText.text.length) {
+    editor.splitNodeByPath(end.path, end.offset)
+  }
+
+  if (start.offset !== 0 && start.offset !== startText.text.length) {
+    editor.splitNodeByPath(start.path, start.offset)
+
+    const newStart = start
+      .setPath(PathUtils.increment(start.path))
+      .setOffset(0)
+      .normalize(document)
+
+    range = range.setStart(newStart)
+  }
+
+  return range
+}
+
+/**
  * Commands.
  *
  * @type {Object}
@@ -681,10 +720,11 @@ Commands.insertBlockAtRange = (editor, range, block) => {
 const getInsertionMode = (editor, range) => {
   const { value } = editor
   const { document } = value
+
+  range = range.normalize(document)
   const { start } = range
-  const startKey = start.key
-  const startBlock = document.getClosestBlock(startKey)
-  const startInline = document.getClosestInline(startKey)
+  const startBlock = document.getClosestBlock(start.path)
+  const startInline = document.getClosestInline(start.path)
 
   if (editor.isVoid(startBlock)) {
     if (start.isAtEndOfNode(startBlock)) return 'after'
@@ -725,7 +765,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
     const { value } = editor
     let { document } = value
     let startText = document.getDescendant(start.path)
-    let startBlock = document.getClosestBlock(startText.key)
+    let startBlock = document.getClosestBlock(start.path)
     let startChild = startBlock.getFurthestChild(startText.key)
     const isAtStart = start.isAtStartOfNode(startBlock)
     const parent = document.getParent(startBlock.key)
@@ -1159,57 +1199,25 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
-  const { value } = editor
-  const { document } = value
+  const { value: { document } } = editor
+  const { start, end } = range
+  const [, firstPath] = document.closestBlock(start.path)
+  const [, lastPath] = document.closestBlock(end.path)
+  const ancestorPath = firstPath.equals(lastPath)
+    ? PathUtils.lift(firstPath)
+    : PathUtils.relate(firstPath, lastPath)
 
-  const blocks = document.getLeafBlocksAtRange(range)
-  const firstblock = blocks.first()
-  const lastblock = blocks.last()
-  let parent, siblings, index
-
-  // If there is only one block in the selection then we know the parent and
-  // siblings.
-  if (blocks.length === 1) {
-    parent = document.getParent(firstblock.key)
-    siblings = blocks
-  } else {
-    // Determine closest shared parent to all blocks in selection.
-    parent = document.getClosest(firstblock.key, p1 => {
-      return !!document.getClosest(lastblock.key, p2 => p1 === p2)
-    })
-  }
-
-  // If no shared parent could be found then the parent is the document.
-  if (parent == null) {
-    parent = document
-  }
-
-  // Create a list of direct children siblings of parent that fall in the
-  // selection.
-  if (siblings == null) {
-    const indexes = parent.nodes.reduce((ind, node, i) => {
-      if (node === firstblock || node.hasDescendant(firstblock.key)) ind[0] = i
-      if (node === lastblock || node.hasDescendant(lastblock.key)) ind[1] = i
-      return ind
-    }, [])
-
-    index = indexes[0]
-    siblings = parent.nodes.slice(indexes[0], indexes[1] + 1)
-  }
-
-  // Get the index to place the new wrapped node at.
-  if (index == null) {
-    index = parent.nodes.indexOf(siblings.first())
-  }
+  const startIndex = firstPath.get(ancestorPath.size)
+  const endIndex = lastPath.get(ancestorPath.size)
 
   editor.withoutNormalizing(() => {
-    // Inject the new block node into the parent.
-    editor.insertNodeByKey(parent.key, index, block)
+    editor.insertNodeByPath(ancestorPath, startIndex, block)
 
-    // Move the sibling nodes into the new block node.
-    siblings.forEach((node, i) => {
-      editor.moveNodeByKey(node.key, block.key, i)
-    })
+    for (let i = 0; i <= endIndex - startIndex; i++) {
+      const path = ancestorPath.concat(startIndex + 1)
+      const newPath = ancestorPath.concat(startIndex)
+      editor.moveNodeByPath(path, newPath, i)
+    }
   })
 }
 
@@ -1222,116 +1230,110 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
  */
 
 Commands.wrapInlineAtRange = (editor, range, inline) => {
-  const { value } = editor
-  let { document } = value
-  const { start, end } = range
-
-  if (range.isCollapsed) {
-    // Wrapping an inline void
-    const inlineParent = document.getClosestInline(start.path)
-
-    if (!inlineParent) {
-      return
-    }
-
-    if (!editor.isVoid(inlineParent)) {
-      return
-    }
-
-    return editor.wrapInlineByKey(inlineParent.key, inline)
-  }
-
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
-  const blocks = document.getLeafBlocksAtRange(range)
-  let startBlock = document.getClosestBlock(start.path)
-  let endBlock = document.getClosestBlock(end.path)
-  const startInline = document.getClosestInline(start.path)
-  const endInline = document.getClosestInline(end.path)
-  let startChild = startBlock.getFurthestChild(start.key)
-  let endChild = endBlock.getFurthestChild(end.key)
-
   editor.withoutNormalizing(() => {
-    if (!startInline || startInline !== endInline) {
-      editor.splitDescendantsByKey(endChild.key, end.key, end.offset)
-      editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
+    const { value: { document } } = editor
+    let start = editor.getPreviousNonVoidPoint(range.start)
+    let end = editor.getNextNonVoidPoint(range.end)
+    const startText = document.getNode(start.path)
+    const endText = document.getNode(end.path)
+    const startFurthest = document.furthestInline(start.path)
+    const endFurthest = document.furthestInline(end.path)
+
+    if (endFurthest) {
+      const [furthestNode, furthestPath] = endFurthest
+      const [lastText, lastPath] = furthestNode.lastText()
+      const relativePath = end.path.slice(furthestPath.size)
+
+      if (
+        end.offset !== lastText.text.length ||
+        !relativePath.equals(lastPath)
+      ) {
+        editor.splitDescendantsByPath(furthestPath, end.path, end.offset)
+      }
+    } else if (end.offset !== 0 && end.offset !== endText.text.length) {
+      editor.splitNodeByPath(end.path, end.offset)
+
+      end = end
+        .setPath(PathUtils.increment(end.path))
+        .setOffset(0)
+        .setKey(null)
+        .normalize(editor.value.document)
     }
 
-    document = editor.value.document
-    startBlock = document.getDescendant(startBlock.key)
-    endBlock = document.getDescendant(endBlock.key)
-    startChild = startBlock.getFurthestChild(start.key)
-    endChild = endBlock.getFurthestChild(end.key)
-    const startIndex = startBlock.nodes.indexOf(startChild)
-    const endIndex = endBlock.nodes.indexOf(endChild)
+    if (startFurthest) {
+      const [furthestNode, furthestPath] = startFurthest
+      const [, firstPath] = furthestNode.firstText()
+      const relativePath = start.path.slice(furthestPath.size)
 
-    if (startInline && startInline === endInline) {
-      const texts = startBlock.getTextsAtRange(range).map(text => {
-        if (start.key === text.key && end.key === text.key) {
-          return text
-            .splitText(start.offset)[1]
-            .splitText(end.offset - start.offset)[0]
-            .regenerateKey()
-        } else if (start.key === text.key) {
-          return text.splitText(start.offset)[1].regenerateKey()
-        } else if (end.key === text.key) {
-          return text.splitText(end.offset)[0].regenerateKey()
-        } else {
-          return text.regenerateKey()
+      if (start.offset !== 0 || !relativePath.equals(firstPath)) {
+        editor.splitDescendantsByPath(furthestPath, start.path, start.offset)
+
+        if (
+          PathUtils.isYounger(furthestPath, end.path) ||
+          PathUtils.isAbove(furthestPath, end.path) ||
+          PathUtils.isEqual(furthestPath, end.path)
+        ) {
+          end = end
+            .setPath(PathUtils.increment(end.path, 1, furthestPath.size - 1))
+            .setKey(null)
+            .normalize(editor.value.document)
         }
-      })
 
-      inline = inline.set('nodes', texts)
-      editor.insertInlineAtRange(range, inline)
-    } else if (startBlock === endBlock) {
-      document = editor.value.document
-      startBlock = document.getClosestBlock(start.key)
-      startChild = startBlock.getFurthestChild(start.key)
+        start = start
+          .setPath(
+            PathUtils.increment(furthestPath).concat(relativePath.map(() => 0))
+          )
+          .setOffset(0)
+          .setKey(null)
+          .normalize(editor.value.document)
+      }
+    } else if (start.offset !== 0 && start.offset !== startText.text.length) {
+      editor.splitNodeByPath(start.path, start.offset)
 
-      const startInner = document.getNextSibling(startChild.key)
-      const startInnerIndex = startBlock.nodes.indexOf(startInner)
-      const endInner =
-        start.key === end.key
-          ? startInner
-          : startBlock.getFurthestChild(end.key)
-      const inlines = startBlock.nodes
-        .skipUntil(n => n === startInner)
-        .takeUntil(n => n === endInner)
-        .push(endInner)
+      if (
+        PathUtils.isYounger(start.path, end.path) ||
+        PathUtils.isAbove(start.path, end.path) ||
+        PathUtils.isEqual(start.path, end.path)
+      ) {
+        end = end
+          .setPath(PathUtils.increment(end.path, 1, start.path.size - 1))
+          .setKey(null)
+          .normalize(editor.value.document)
+      }
 
-      const node = inline.regenerateKey()
+      start = start
+        .setPath(PathUtils.increment(start.path))
+        .setOffset(0)
+        .setKey(null)
+        .normalize(editor.value.document)
+    }
 
-      editor.insertNodeByKey(startBlock.key, startInnerIndex, node)
+    range = range.setAnchor(start).setFocus(end)
+    range = editor.getNonHangingRange(range)
 
-      inlines.forEach((child, i) => {
-        editor.moveNodeByKey(child.key, node.key, i)
-      })
-    } else {
-      const startInlines = startBlock.nodes.slice(startIndex + 1)
-      const endInlines = endBlock.nodes.slice(0, endIndex + 1)
-      const startNode = inline.regenerateKey()
-      const endNode = inline.regenerateKey()
+    const iterable = editor.value.document.blocks({ range, onlyLeaves: true })
 
-      editor.insertNodeByKey(startBlock.key, startIndex + 1, startNode)
-      editor.insertNodeByKey(endBlock.key, endIndex, endNode)
+    for (const [block, blockPath] of iterable) {
+      const isStart = PathUtils.isAbove(blockPath, range.start.path)
+      const isEnd = PathUtils.isAbove(blockPath, range.end.path)
+      const startIndex = isStart ? range.start.path.get(blockPath.size) : 0
+      const endIndex = isEnd
+        ? range.end.path.get(blockPath.size)
+        : block.nodes.size - 1
 
-      startInlines.forEach((child, i) => {
-        editor.moveNodeByKey(child.key, startNode.key, i)
-      })
+      editor.insertNodeByPath(blockPath, startIndex, inline)
+      // HACK: need to regenerate the key to ensure that subsequent inserts
+      // don't re-use the same key.
+      inline = inline.regenerateKey()
 
-      endInlines.forEach((child, i) => {
-        editor.moveNodeByKey(child.key, endNode.key, i)
-      })
-
-      blocks.slice(1, -1).forEach(block => {
-        const node = inline.regenerateKey()
-        editor.insertNodeByKey(block.key, 0, node)
-
-        block.nodes.forEach((child, i) => {
-          editor.moveNodeByKey(child.key, node.key, i)
-        })
-      })
+      for (let i = 0; i <= endIndex - startIndex; i++) {
+        const path = blockPath.concat(startIndex + 1)
+        const newPath = blockPath.concat(startIndex)
+        editor.moveNodeByPath(path, newPath, i)
+      }
     }
   })
 }

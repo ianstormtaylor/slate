@@ -26,8 +26,10 @@ export const output = (
         wo<hashtag>
           <anchor />rd
         </hashtag>
+        <text />
       </paragraph>
       <paragraph>
+        <text />
         <hashtag>an</hashtag>
         <focus />other
       </paragraph>
