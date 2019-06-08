@@ -3,10 +3,9 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor
-    .addMark('bold')
-    .removeMark('bold')
-    .insertText('a')
+  editor.addMark('bold')
+  editor.removeMark('bold')
+  editor.insertText('a')
 }
 
 export const input = (

@@ -7,7 +7,8 @@ export default function(editor) {
     data: { thing: 'value' },
   })
 
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

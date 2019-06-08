@@ -8,7 +8,8 @@ const pathB = PathUtils.create([1])
 
 export default function(editor) {
   editor.moveNodeByPath(pathA, pathB, 1)
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

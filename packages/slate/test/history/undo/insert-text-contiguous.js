@@ -4,9 +4,12 @@ import h from '../../helpers/h'
 
 export default function(editor) {
   editor.insertText('t')
-  editor.flush().insertText('w')
-  editor.flush().insertText('o')
-  editor.flush().undo()
+  editor.flush()
+  editor.insertText('w')
+  editor.flush()
+  editor.insertText('o')
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

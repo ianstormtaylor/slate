@@ -496,7 +496,8 @@ Commands.moveAnchorWordForward = editor => {
  */
 
 Commands.moveBackward = (editor, n) => {
-  editor.moveAnchorBackward(n).moveFocusBackward(n)
+  editor.moveAnchorBackward(n)
+  editor.moveFocusBackward(n)
 }
 
 /**
@@ -507,7 +508,8 @@ Commands.moveBackward = (editor, n) => {
  */
 
 Commands.moveWordBackward = (editor, n) => {
-  editor.moveAnchorWordBackward(n).moveFocusWordBackward(n)
+  editor.moveAnchorWordBackward(n)
+  editor.moveFocusWordBackward(n)
 }
 
 /**
@@ -1303,7 +1305,8 @@ Commands.moveFocusWordForward = editor => {
  */
 
 Commands.moveForward = (editor, ...args) => {
-  editor.moveAnchorForward(...args).moveFocusForward(...args)
+  editor.moveAnchorForward(...args)
+  editor.moveFocusForward(...args)
 }
 
 /**

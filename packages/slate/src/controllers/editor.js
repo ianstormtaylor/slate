@@ -114,8 +114,6 @@ class Editor {
       this.tmp.flushing = true
       Promise.resolve().then(() => this.flush())
     }
-
-    return controller
   }
 
   /**
@@ -126,12 +124,11 @@ class Editor {
 
   flush() {
     this.run('onChange')
-    const { value, operations, controller } = this
+    const { value, operations } = this
     const change = { value, operations }
     this.operations = List()
     this.tmp.flushing = false
     this.onChange(change)
-    return controller
   }
 
   /**
@@ -153,9 +150,9 @@ class Editor {
 
     debug('command', { type, args })
     const obj = { type, args }
-    this.run('onCommand', obj)
+    const ret = this.run('onCommand', obj)
     normalizeDirtyPaths(this)
-    return controller
+    return ret
   }
 
   /**
@@ -207,8 +204,6 @@ class Editor {
     if (selection.isUnset && document.nodes.size) {
       controller.moveToStartOfDocument()
     }
-
-    return controller
   }
 
   /**
@@ -253,7 +248,6 @@ class Editor {
     const method = (...args) => this.command(type, ...args)
     controller[type] = method
     method.__command = true
-    return controller
   }
 
   /**
@@ -278,7 +272,6 @@ class Editor {
     const method = (...args) => this.query(type, ...args)
     controller[type] = method
     method.__query = true
-    return controller
   }
 
   /**
@@ -400,7 +393,6 @@ class Editor {
     fn(controller)
     this.tmp.normalize = value
     normalizeDirtyPaths(this)
-    return controller
   }
 
   /**

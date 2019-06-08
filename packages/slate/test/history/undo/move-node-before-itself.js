@@ -4,7 +4,8 @@ import h from '../../helpers/h'
 
 export default function(editor) {
   editor.moveNodeByKey('h', 'a', 0)
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

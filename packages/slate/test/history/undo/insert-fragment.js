@@ -24,10 +24,9 @@ const fragment = (
 )
 
 export default function(editor) {
-  editor
-    .insertFragment(fragment)
-    .flush()
-    .undo()
+  editor.insertFragment(fragment)
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

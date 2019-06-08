@@ -3,7 +3,8 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor.deleteBackward().undo()
+  editor.deleteBackward()
+  editor.undo()
 }
 
 export const input = (

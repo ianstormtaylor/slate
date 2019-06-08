@@ -3,12 +3,11 @@
 import h from '../../helpers/h'
 
 export default function(editor) {
-  editor
-    .moveAnchorForward(4)
-    .moveFocusForward(7)
-    .delete()
-
-  editor.flush().undo()
+  editor.moveAnchorForward(4)
+  editor.moveFocusForward(7)
+  editor.delete()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

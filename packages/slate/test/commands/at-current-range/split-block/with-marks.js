@@ -3,10 +3,9 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor
-    .addMark('italic')
-    .splitBlock()
-    .insertText('cat is cute')
+  editor.addMark('italic')
+  editor.splitBlock()
+  editor.insertText('cat is cute')
 }
 
 export const input = (

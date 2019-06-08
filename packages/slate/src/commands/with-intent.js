@@ -293,7 +293,8 @@ Commands.insertFragment = (editor, fragment) => {
       (acc, val) => acc + val.text.length,
       0
     )
-    editor.moveToStartOfNode(newText).moveForward(remainingTextLength)
+    editor.moveToStartOfNode(newText)
+    editor.moveForward(remainingTextLength)
   }
 }
 
@@ -314,7 +315,10 @@ Commands.insertInline = (editor, inline) => {
 
   // If the node was successfully inserted, update the selection.
   const node = editor.value.document.getNode(inline.key)
-  if (node) editor.moveToEndOfNode(node)
+
+  if (node) {
+    editor.moveToEndOfNode(node)
+  }
 }
 
 /**
@@ -420,7 +424,8 @@ Commands.splitBlock = (editor, depth = 1) => {
   const { value } = editor
   const { selection, document } = value
   const marks = selection.marks || document.getInsertMarksAtRange(selection)
-  editor.splitBlockAtRange(selection, depth).moveToEnd()
+  editor.splitBlockAtRange(selection, depth)
+  editor.moveToEnd()
 
   if (marks && marks.size !== 0) {
     editor.select({ marks })

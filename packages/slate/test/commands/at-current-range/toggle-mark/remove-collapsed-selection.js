@@ -3,10 +3,9 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor
-    .toggleMark('bold')
-    .toggleMark('bold')
-    .insertText('s')
+  editor.toggleMark('bold')
+  editor.toggleMark('bold')
+  editor.insertText('s')
 }
 
 export const input = (

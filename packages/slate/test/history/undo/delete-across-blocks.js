@@ -4,7 +4,8 @@ import h from '../../helpers/h'
 
 export default function(editor) {
   editor.delete()
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 // the paragraph and code blocks have some random data

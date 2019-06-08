@@ -5,17 +5,16 @@ import h from '../../helpers/h'
 export default function(editor) {
   editor.insertText('t')
 
-  editor
-    .flush()
-    .moveBackward(1)
-    .insertText('w')
+  editor.flush()
+  editor.moveBackward(1)
+  editor.insertText('w')
 
-  editor
-    .flush()
-    .moveBackward(1)
-    .insertText('o')
+  editor.flush()
+  editor.moveBackward(1)
+  editor.insertText('o')
 
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (

@@ -3,7 +3,8 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.addMarks(['bold', 'italic']).insertText('a')
+  editor.addMarks(['bold', 'italic'])
+  editor.insertText('a')
 }
 
 export const input = (

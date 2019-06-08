@@ -2,7 +2,9 @@
 
 import { Editor } from 'slate'
 
-export const input = new Editor().registerQuery('customQuery')
+export const input = new Editor()
+
+input.registerQuery('customQuery')
 
 export default function(editor) {
   return editor.hasQuery('otherQuery')

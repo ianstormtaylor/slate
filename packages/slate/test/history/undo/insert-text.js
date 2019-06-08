@@ -4,7 +4,8 @@ import h from '../../helpers/h'
 
 export default function(editor) {
   editor.insertText('text')
-  editor.flush().undo()
+  editor.flush()
+  editor.undo()
 }
 
 export const input = (
