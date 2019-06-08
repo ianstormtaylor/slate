@@ -16,19 +16,18 @@ const Commands = {}
 /**
  * Add mark to text at `offset` and `length` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Mixed} mark
  */
 
-Commands.addMarkByPath = (editor, path, offset, length, mark) => {
+Commands.addMarkByPath = (fn, editor) => (path, offset, length, mark) => {
   mark = Mark.create(mark)
   editor.addMarksByPath(path, offset, length, [mark])
 }
 
-Commands.addMarksByPath = (editor, path, offset, length, marks) => {
+Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
   marks = Mark.createSet(marks)
 
   if (!marks.size) {
@@ -72,13 +71,12 @@ Commands.addMarksByPath = (editor, path, offset, length, marks) => {
 /**
  * Insert a `fragment` at `index` in a node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} index
  * @param {Fragment} fragment
  */
 
-Commands.insertFragmentByPath = (editor, path, index, fragment) => {
+Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
   fragment.nodes.forEach((node, i) => {
     editor.insertNodeByPath(path, index + i, node)
   })
@@ -87,13 +85,12 @@ Commands.insertFragmentByPath = (editor, path, index, fragment) => {
 /**
  * Insert a `node` at `index` in a node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} index
  * @param {Node} node
  */
 
-Commands.insertNodeByPath = (editor, path, index, node) => {
+Commands.insertNodeByPath = (fn, editor) => (path, index, node) => {
   editor.applyOperation({
     type: 'insert_node',
     path: path.concat(index),
@@ -104,14 +101,13 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
 /**
  * Insert `text` at `offset` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.insertTextByPath = (editor, path, offset, text, marks) => {
+Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
   marks = Mark.createSet(marks)
   const { value } = editor
   const { annotations, document } = value
@@ -154,11 +150,10 @@ Commands.insertTextByPath = (editor, path, offset, text, marks) => {
 /**
  * Merge a node by `path` with the previous node.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.mergeNodeByPath = (editor, path) => {
+Commands.mergeNodeByPath = (fn, editor) => path => {
   const { value } = editor
   const { document } = value
   const original = document.getDescendant(path)
@@ -190,13 +185,12 @@ Commands.mergeNodeByPath = (editor, path) => {
 /**
  * Move a node by `path` to a new parent by `newParentPath` and `newIndex`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {String} newParentPath
  * @param {Number} newIndex
  */
 
-Commands.moveNodeByPath = (editor, path, newParentPath, newIndex) => {
+Commands.moveNodeByPath = (fn, editor) => (path, newParentPath, newIndex) => {
   // If the operation path and newParentPath are the same,
   // this should be considered a NOOP
   if (PathUtils.isEqual(path, newParentPath)) {
@@ -219,19 +213,18 @@ Commands.moveNodeByPath = (editor, path, newParentPath, newIndex) => {
 /**
  * Remove mark from text at `offset` and `length` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {Mark} mark
  */
 
-Commands.removeMarkByPath = (editor, path, offset, length, mark) => {
+Commands.removeMarkByPath = (fn, editor) => (path, offset, length, mark) => {
   mark = Mark.create(mark)
   editor.removeMarksByPath(path, offset, length, [mark])
 }
 
-Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
+Commands.removeMarksByPath = (fn, editor) => (path, offset, length, marks) => {
   marks = Mark.createSet(marks)
 
   if (!marks.size) {
@@ -277,11 +270,10 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
 /**
  * Remove all `marks` from node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.removeAllMarksByPath = (editor, path) => {
+Commands.removeAllMarksByPath = (fn, editor) => path => {
   const { state } = editor
   const { document } = state
   const node = document.assertNode(path)
@@ -302,11 +294,10 @@ Commands.removeAllMarksByPath = (editor, path) => {
 /**
  * Remove a node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.removeNodeByPath = (editor, path) => {
+Commands.removeNodeByPath = (fn, editor) => path => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
@@ -321,13 +312,12 @@ Commands.removeNodeByPath = (editor, path) => {
 /**
  * Remove text at `offset` and `length` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  */
 
-Commands.removeTextByPath = (editor, path, offset, length) => {
+Commands.removeTextByPath = (fn, editor) => (path, offset, length) => {
   const { value } = editor
   const { document, annotations } = value
   const node = document.assertNode(path)
@@ -366,12 +356,11 @@ Commands.removeTextByPath = (editor, path, offset, length) => {
 /**
 `* Replace a `node` with another `node`
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Object|Node} node
  */
 
-Commands.replaceNodeByPath = (editor, path, newNode) => {
+Commands.replaceNodeByPath = (fn, editor) => (path, newNode) => {
   newNode = Node.create(newNode)
   const index = path.last()
   const parentPath = PathUtils.lift(path)
@@ -385,7 +374,6 @@ Commands.replaceNodeByPath = (editor, path, newNode) => {
 /**
  * Replace a `length` of text at `offset` with new `text` and optional `marks`.
  *
- * @param {Editor} editor
  * @param {String} key
  * @param {Number} offset
  * @param {Number} length
@@ -393,7 +381,13 @@ Commands.replaceNodeByPath = (editor, path, newNode) => {
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.replaceTextByPath = (editor, path, offset, length, text, marks) => {
+Commands.replaceTextByPath = (fn, editor) => (
+  path,
+  offset,
+  length,
+  text,
+  marks
+) => {
   editor.withoutNormalizing(() => {
     editor.removeTextByPath(path, offset, length)
     editor.insertTextByPath(path, offset, text, marks)
@@ -403,7 +397,6 @@ Commands.replaceTextByPath = (editor, path, offset, length, text, marks) => {
 /**
  * Set `newProperties` on mark on text at `offset` and `length` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
@@ -411,8 +404,7 @@ Commands.replaceTextByPath = (editor, path, offset, length, text, marks) => {
  * @param {Object} newProperties
  */
 
-Commands.setMarkByPath = (
-  editor,
+Commands.setMarkByPath = (fn, editor) => (
   path,
   offset,
   length,
@@ -453,12 +445,11 @@ Commands.setMarkByPath = (
 /**
  * Set `properties` on a node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Object|String} newProperties
  */
 
-Commands.setNodeByPath = (editor, path, newProperties) => {
+Commands.setNodeByPath = (fn, editor) => (path, newProperties) => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
@@ -476,13 +467,12 @@ Commands.setNodeByPath = (editor, path, newProperties) => {
 /**
  * Insert `text` at `offset` in node by `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.setTextByPath = (editor, path, text, marks) => {
+Commands.setTextByPath = (fn, editor) => (path, text, marks) => {
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
@@ -493,13 +483,12 @@ Commands.setTextByPath = (editor, path, text, marks) => {
 /**
  * Split a node by `path` at `position`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} position
  * @param {Object} options
  */
 
-Commands.splitNodeByPath = (editor, path, position, options = {}) => {
+Commands.splitNodeByPath = (fn, editor) => (path, position, options = {}) => {
   const { target = null } = options
   const { value } = editor
   const { document } = value
@@ -520,13 +509,16 @@ Commands.splitNodeByPath = (editor, path, position, options = {}) => {
 /**
  * Split a node deeply down the tree by `path`, `textPath` and `textOffset`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Array} textPath
  * @param {Number} textOffset
  */
 
-Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
+Commands.splitDescendantsByPath = (fn, editor) => (
+  path,
+  textPath,
+  textOffset
+) => {
   if (path.equals(textPath)) {
     editor.splitNodeByPath(textPath, textOffset)
     return
@@ -556,12 +548,11 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 /**
  * Unwrap content from an inline parent with `properties`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Object|String} properties
  */
 
-Commands.unwrapInlineByPath = (editor, path, properties) => {
+Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
   const { value } = editor
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -574,12 +565,11 @@ Commands.unwrapInlineByPath = (editor, path, properties) => {
 /**
  * Unwrap content from a block parent with `properties`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Object|String} properties
  */
 
-Commands.unwrapBlockByPath = (editor, path, properties) => {
+Commands.unwrapBlockByPath = (fn, editor) => (path, properties) => {
   const { value } = editor
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -596,11 +586,10 @@ Commands.unwrapBlockByPath = (editor, path, properties) => {
  * split. If the node is the only child, the parent is removed, and
  * simply replaced by the node itself.  Cannot unwrap a root node.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.unwrapNodeByPath = (editor, path) => {
+Commands.unwrapNodeByPath = (fn, editor) => path => {
   const { value } = editor
   const { document } = value
   document.assertNode(path)
@@ -634,11 +623,10 @@ Commands.unwrapNodeByPath = (editor, path) => {
  * Unwrap all of the children of a node, by removing the node and replacing it
  * with the children in the tree.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.unwrapChildrenByPath = (editor, path) => {
+Commands.unwrapChildrenByPath = (fn, editor) => path => {
   path = PathUtils.create(path)
   const { value } = editor
   const { document } = value
@@ -661,12 +649,11 @@ Commands.unwrapChildrenByPath = (editor, path) => {
 /**
  * Wrap a node in a block with `properties`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Block|Object|String} block
  */
 
-Commands.wrapBlockByPath = (editor, path, block) => {
+Commands.wrapBlockByPath = (fn, editor) => (path, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
   const parentPath = PathUtils.lift(path)
@@ -682,12 +669,11 @@ Commands.wrapBlockByPath = (editor, path, block) => {
 /**
  * Wrap a node in an inline with `properties`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Block|Object|String} inline
  */
 
-Commands.wrapInlineByPath = (editor, path, inline) => {
+Commands.wrapInlineByPath = (fn, editor) => (path, inline) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
   const parentPath = PathUtils.lift(path)
@@ -703,12 +689,11 @@ Commands.wrapInlineByPath = (editor, path, inline) => {
 /**
  * Wrap a node by `path` with `node`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Node|Object} node
  */
 
-Commands.wrapNodeByPath = (editor, path, node) => {
+Commands.wrapNodeByPath = (fn, editor) => (path, node) => {
   node = Node.create(node)
 
   if (node.object === 'block') {
@@ -748,7 +733,7 @@ const COMMANDS = [
 ]
 
 for (const method of COMMANDS) {
-  Commands[`${method}ByKey`] = (editor, key, ...args) => {
+  Commands[`${method}ByKey`] = (fn, editor) => (key, ...args) => {
     const { value } = editor
     const { document } = value
     const path = document.assertPath(key)
@@ -757,7 +742,7 @@ for (const method of COMMANDS) {
 }
 
 // Moving nodes takes two keys, so it's slightly different.
-Commands.moveNodeByKey = (editor, key, newKey, ...args) => {
+Commands.moveNodeByKey = (fn, editor) => (key, newKey, ...args) => {
   const { value } = editor
   const { document } = value
   const path = document.assertPath(key)
@@ -766,7 +751,7 @@ Commands.moveNodeByKey = (editor, key, newKey, ...args) => {
 }
 
 // Splitting descendants takes two keys, so it's slightly different.
-Commands.splitDescendantsByKey = (editor, key, textKey, ...args) => {
+Commands.splitDescendantsByKey = (fn, editor) => (key, textKey, ...args) => {
   const { value } = editor
   const { document } = value
   const path = document.assertPath(key)

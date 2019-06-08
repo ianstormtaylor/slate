@@ -1,6 +1,5 @@
 import PathUtils from '../../utils/path-utils'
 import TextUtils from '../../utils/text-utils'
-import Queries from '../queries'
 
 /**
  * A plugin that defines the core Slate query logic.
@@ -9,40 +8,37 @@ import Queries from '../queries'
  */
 
 function CoreQueriesPlugin() {
-  return Queries({
+  return {
     /**
      * By default, no formats are atomic in Slate.
      *
-     * @param {Editor} editor
      * @param {Annotation|Decoration|Mark} object
      * @return {Boolean}
      */
 
-    isAtomic() {
+    isAtomic: (fn, editor) => () => {
       return false
     },
 
     /**
      * By default, no nodes are void in Slate.
      *
-     * @param {Editor} editor
      * @param {Node} node
      * @return {Boolean}
      */
 
-    isVoid() {
+    isVoid: (fn, editor) => () => {
       return false
     },
 
     /**
      * Calculate the next point forward from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getNextPoint(editor, point, options = {}) {
+    getNextPoint: (fn, editor) => (point, options = {}) => {
       const { allowZeroWidth = false } = options
       const { value } = editor
       const { document } = value
@@ -101,12 +97,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate the next character boundary from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getNextCharacterPoint(editor, point) {
+    getNextCharacterPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       const { path, offset } = point
       const [block, blockPath] = document.closestBlock(path)
@@ -136,12 +131,11 @@ function CoreQueriesPlugin() {
     /**
      * Get the next point in the document that is not inside a void node.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getNextNonVoidPoint(editor, point) {
+    getNextNonVoidPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       let next = point
 
@@ -159,12 +153,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate the next word boundary from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getNextWordPoint(editor, point) {
+    getNextWordPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       const { path, offset } = point
       const [block, blockPath] = document.closestBlock(path)
@@ -194,12 +187,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate a non-hanging range from a `range`.
      *
-     * @param {Editor} editor
      * @param {Range} range
      * @return {Range}
      */
 
-    getNonHangingRange(editor, range) {
+    getNonHangingRange: (fn, editor) => range => {
       const { value: { document } } = editor
       const { isExpanded, start, end } = range
 
@@ -216,12 +208,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate the previous point backward from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getPreviousPoint(editor, point, options = {}) {
+    getPreviousPoint: (fn, editor) => (point, options = {}) => {
       const { allowZeroWidth = false } = options
       const { value } = editor
       const { document } = value
@@ -281,12 +272,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate the previous character boundary from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getPreviousCharacterPoint(editor, point) {
+    getPreviousCharacterPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       const { path, offset } = point
       const [block, blockPath] = document.closestBlock(path)
@@ -316,12 +306,11 @@ function CoreQueriesPlugin() {
     /**
      * Get the previous point in the document that is not inside a void node.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getPreviousNonVoidPoint(editor, point) {
+    getPreviousNonVoidPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       let prev = point
 
@@ -339,12 +328,11 @@ function CoreQueriesPlugin() {
     /**
      * Calculate the previous word boundary from a `point`.
      *
-     * @param {Editor} editor
      * @param {Point} point
      * @return {Point|Null}
      */
 
-    getPreviousWordPoint(editor, point) {
+    getPreviousWordPoint: (fn, editor) => point => {
       const { value: { document } } = editor
       const { path, offset } = point
       const [block, blockPath] = document.closestBlock(path)
@@ -370,7 +358,7 @@ function CoreQueriesPlugin() {
 
       return prev
     },
-  })
+  }
 }
 
 /**

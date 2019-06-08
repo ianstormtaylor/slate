@@ -37,12 +37,13 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Array}
    */
 
-  function decorateNode(node, editor, next) {
+  const decorateNode = (fn, editor) => node => {
+    const others = fn(node)
+
     if (!editor.query(when, node)) {
-      return next()
+      return others
     }
 
-    const others = next()
     const [first] = node.texts()
     const [last] = node.texts({ direction: 'backward' })
     const [firstNode, firstPath] = first
@@ -70,7 +71,7 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Element}
    */
 
-  function renderMark(props, editor, next) {
+  const renderMark = (fn, editor) => props => {
     const { children, mark } = props
 
     if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
@@ -94,7 +95,7 @@ function SlateReactPlaceholder(options = {}) {
       )
     }
 
-    return next()
+    return fn(props)
   }
 
   /**

@@ -30,11 +30,10 @@ const Commands = {}
 /**
  * Add a `mark` to the characters in the current selection.
  *
- * @param {Editor} editor
  * @param {Mark} mark
  */
 
-Commands.addMark = (editor, mark) => {
+Commands.addMark = (fn, editor) => mark => {
   mark = Mark.create(mark)
   const { value } = editor
   const { document, selection } = value
@@ -55,21 +54,19 @@ Commands.addMark = (editor, mark) => {
 /**
  * Add a list of `marks` to the characters in the current selection.
  *
- * @param {Editor} editor
  * @param {Set<Mark>|Array<Object>} marks
  */
 
-Commands.addMarks = (editor, marks) => {
+Commands.addMarks = (fn, editor) => marks => {
   marks.forEach(mark => editor.addMark(mark))
 }
 
 /**
  * Delete at the current selection.
  *
- * @param {Editor} editor
  */
 
-Commands.delete = editor => {
+Commands.delete = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
   editor.deleteAtRange(selection)
@@ -83,11 +80,10 @@ Commands.delete = editor => {
 /**
  * Delete backward `n` characters.
  *
- * @param {Editor} editor
  * @param {Number} n (optional)
  */
 
-Commands.deleteBackward = (editor, n = 1) => {
+Commands.deleteBackward = (fn, editor) => (n = 1) => {
   const { value } = editor
   const { selection } = value
 
@@ -101,10 +97,9 @@ Commands.deleteBackward = (editor, n = 1) => {
 /**
  * Delete backward one character.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteCharBackward = editor => {
+Commands.deleteCharBackward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -118,10 +113,9 @@ Commands.deleteCharBackward = editor => {
 /**
  * Delete backward one line.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteLineBackward = editor => {
+Commands.deleteLineBackward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -135,10 +129,9 @@ Commands.deleteLineBackward = editor => {
 /**
  * Delete backward one word.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteWordBackward = editor => {
+Commands.deleteWordBackward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -152,11 +145,10 @@ Commands.deleteWordBackward = editor => {
 /**
  * Delete backward `n` characters.
  *
- * @param {Editor} editor
  * @param {Number} n (optional)
  */
 
-Commands.deleteForward = (editor, n = 1) => {
+Commands.deleteForward = (fn, editor) => (n = 1) => {
   const { value } = editor
   const { selection } = value
 
@@ -170,10 +162,9 @@ Commands.deleteForward = (editor, n = 1) => {
 /**
  * Delete backward one character.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteCharForward = editor => {
+Commands.deleteCharForward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -187,10 +178,9 @@ Commands.deleteCharForward = editor => {
 /**
  * Delete backward one line.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteLineForward = editor => {
+Commands.deleteLineForward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -204,10 +194,9 @@ Commands.deleteLineForward = editor => {
 /**
  * Delete backward one word.
  *
- * @param {Editor} editor
  */
 
-Commands.deleteWordForward = editor => {
+Commands.deleteWordForward = (fn, editor) => () => {
   const { value } = editor
   const { selection } = value
 
@@ -221,11 +210,10 @@ Commands.deleteWordForward = editor => {
 /**
  * Insert a `block` at the current selection.
  *
- * @param {Editor} editor
  * @param {String|Object|Block} block
  */
 
-Commands.insertBlock = (editor, block) => {
+Commands.insertBlock = (fn, editor) => block => {
   deleteExpanded(editor)
 
   block = Block.create(block)
@@ -244,11 +232,10 @@ Commands.insertBlock = (editor, block) => {
 /**
  * Insert a `fragment` at the current selection.
  *
- * @param {Editor} editor
  * @param {Document} fragment
  */
 
-Commands.insertFragment = (editor, fragment) => {
+Commands.insertFragment = (fn, editor) => fragment => {
   if (!fragment.nodes.size) return
 
   deleteExpanded(editor)
@@ -301,11 +288,10 @@ Commands.insertFragment = (editor, fragment) => {
 /**
  * Insert an `inline` at the current selection.
  *
- * @param {Editor} editor
  * @param {String|Object|Inline} inline
  */
 
-Commands.insertInline = (editor, inline) => {
+Commands.insertInline = (fn, editor) => inline => {
   deleteExpanded(editor)
 
   inline = Inline.create(inline)
@@ -324,12 +310,11 @@ Commands.insertInline = (editor, inline) => {
 /**
  * Insert a string of `text` with optional `marks` at the current selection.
  *
- * @param {Editor} editor
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.insertText = (editor, text, marks) => {
+Commands.insertText = (fn, editor) => (text, marks) => {
   deleteExpanded(editor)
 
   const { value } = editor
@@ -350,11 +335,10 @@ Commands.insertText = (editor, text, marks) => {
 /**
  * Remove a `mark` from the characters in the current selection.
  *
- * @param {Editor} editor
  * @param {Mark} mark
  */
 
-Commands.removeMark = (editor, mark) => {
+Commands.removeMark = (fn, editor) => mark => {
   mark = Mark.create(mark)
   const { value } = editor
   const { document, selection } = value
@@ -375,12 +359,11 @@ Commands.removeMark = (editor, mark) => {
 /**
  * Replace an `oldMark` with a `newMark` in the characters in the current selection.
  *
- * @param {Editor} editor
  * @param {Mark} oldMark
  * @param {Mark} newMark
  */
 
-Commands.replaceMark = (editor, oldMark, newMark) => {
+Commands.replaceMark = (fn, editor) => (oldMark, newMark) => {
   editor.removeMark(oldMark)
   editor.addMark(newMark)
 }
@@ -388,11 +371,10 @@ Commands.replaceMark = (editor, oldMark, newMark) => {
 /**
  * Set the `properties` of block nodes.
  *
- * @param {Editor} editor
  * @param {Object|String} properties
  */
 
-Commands.setBlocks = (editor, properties) => {
+Commands.setBlocks = (fn, editor) => properties => {
   const { value } = editor
   const { selection } = value
   editor.setBlocksAtRange(selection, properties)
@@ -401,11 +383,10 @@ Commands.setBlocks = (editor, properties) => {
 /**
  * Set the `properties` of inline nodes.
  *
- * @param {Editor} editor
  * @param {Object|String} properties
  */
 
-Commands.setInlines = (editor, properties) => {
+Commands.setInlines = (fn, editor) => properties => {
   const { value } = editor
   const { selection } = value
   editor.setInlinesAtRange(selection, properties)
@@ -414,11 +395,10 @@ Commands.setInlines = (editor, properties) => {
 /**
  * Split the block node at the current selection, to optional `depth`.
  *
- * @param {Editor} editor
  * @param {Number} depth (optional)
  */
 
-Commands.splitBlock = (editor, depth = 1) => {
+Commands.splitBlock = (fn, editor) => (depth = 1) => {
   deleteExpanded(editor)
 
   const { value } = editor
@@ -435,11 +415,10 @@ Commands.splitBlock = (editor, depth = 1) => {
 /**
  * Split the inline nodes to optional `height`.
  *
- * @param {Editor} editor
  * @param {Number} height (optional)
  */
 
-Commands.splitInline = (editor, height) => {
+Commands.splitInline = (fn, editor) => height => {
   deleteExpanded(editor)
   const { value } = editor
   const { selection } = value
@@ -450,11 +429,10 @@ Commands.splitInline = (editor, height) => {
  * Add or remove a `mark` from the characters in the current selection,
  * depending on whether it's already there.
  *
- * @param {Editor} editor
  * @param {Mark} mark
  */
 
-Commands.toggleMark = (editor, mark) => {
+Commands.toggleMark = (fn, editor) => mark => {
   mark = Mark.create(mark)
   const { value } = editor
   const exists = value.activeMarks.has(mark)
@@ -469,11 +447,10 @@ Commands.toggleMark = (editor, mark) => {
 /**
  * Unwrap nodes from a block with `properties`.
  *
- * @param {Editor} editor
  * @param {String|Object} properties
  */
 
-Commands.unwrapBlock = (editor, properties) => {
+Commands.unwrapBlock = (fn, editor) => properties => {
   const { value } = editor
   const { selection } = value
   editor.unwrapBlockAtRange(selection, properties)
@@ -482,11 +459,10 @@ Commands.unwrapBlock = (editor, properties) => {
 /**
  * Unwrap nodes from an inline with `properties`.
  *
- * @param {Editor} editor
  * @param {String|Object} properties
  */
 
-Commands.unwrapInline = (editor, properties) => {
+Commands.unwrapInline = (fn, editor) => properties => {
   const { value } = editor
   const { selection } = value
   editor.unwrapInlineAtRange(selection, properties)
@@ -495,11 +471,10 @@ Commands.unwrapInline = (editor, properties) => {
 /**
  * Wrap nodes in a new `block`.
  *
- * @param {Editor} editor
  * @param {Block|Object|String} block
  */
 
-Commands.wrapBlock = (editor, block) => {
+Commands.wrapBlock = (fn, editor) => block => {
   const { value } = editor
   const { selection } = value
   editor.wrapBlockAtRange(selection, block)
@@ -508,11 +483,10 @@ Commands.wrapBlock = (editor, block) => {
 /**
  * Wrap nodes in a new `inline`.
  *
- * @param {Editor} editor
  * @param {Inline|Object|String} inline
  */
 
-Commands.wrapInline = (editor, inline) => {
+Commands.wrapInline = (fn, editor) => inline => {
   const { value } = editor
   const { selection } = value
   editor.wrapInlineAtRange(selection, inline)
@@ -521,12 +495,11 @@ Commands.wrapInline = (editor, inline) => {
 /**
  * Wrap the current selection with prefix/suffix.
  *
- * @param {Editor} editor
  * @param {String} prefix
  * @param {String} suffix
  */
 
-Commands.wrapText = (editor, prefix, suffix = prefix) => {
+Commands.wrapText = (fn, editor) => (prefix, suffix = prefix) => {
   const { value } = editor
   const { selection } = value
   editor.wrapTextAtRange(selection, prefix, suffix)

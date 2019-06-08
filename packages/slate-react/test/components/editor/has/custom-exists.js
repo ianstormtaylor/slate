@@ -4,10 +4,16 @@ import Plain from 'slate-plain-serializer'
 
 const defaultValue = Plain.deserialize('')
 
-export const input = { defaultValue }
+const plugins = [
+  {
+    customCommand: () => {},
+  },
+]
+
+export const input = { defaultValue, plugins }
 
 export default function(editor) {
-  return editor.hasQuery('isVoid')
+  return editor.has('customCommand')
 }
 
 export const output = true

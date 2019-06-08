@@ -174,7 +174,7 @@ class Editor extends React.Component {
         contentKey={contentKey}
         editor={this}
         id={id}
-        onEvent={(handler, event) => this.run(handler, event)}
+        onEvent={(handler, event) => this.exec(handler, event)}
         readOnly={readOnly}
         role={role}
         spellCheck={spellCheck}
@@ -185,7 +185,7 @@ class Editor extends React.Component {
     )
 
     // Render the editor's children with the controller.
-    const element = this.controller.run('renderEditor', {
+    const element = this.controller.exec('renderEditor', {
       ...this.props,
       editor: this,
       children,
@@ -235,7 +235,7 @@ class Editor extends React.Component {
         { controller: this, construct: false }
       )
 
-      this.controller.run('onConstruct')
+      this.controller.exec('onConstruct')
     }
   )
 
@@ -272,36 +272,16 @@ class Editor extends React.Component {
     return this.controller.applyOperation(...args)
   }
 
-  command(...args) {
-    return this.controller.command(...args)
+  exec(...args) {
+    return this.controller.exec(...args)
   }
 
-  hasCommand(...args) {
-    return this.controller.hasCommand(...args)
-  }
-
-  hasQuery(...args) {
-    return this.controller.hasQuery(...args)
+  has(...args) {
+    return this.controller.has(...args)
   }
 
   normalize(...args) {
     return this.controller.normalize(...args)
-  }
-
-  query(...args) {
-    return this.controller.query(...args)
-  }
-
-  registerCommand(...args) {
-    return this.controller.registerCommand(...args)
-  }
-
-  registerQuery(...args) {
-    return this.controller.registerQuery(...args)
-  }
-
-  run(...args) {
-    return this.controller.run(...args)
   }
 
   withoutNormalizing(...args) {
@@ -360,6 +340,34 @@ class Editor extends React.Component {
 
   withoutNormalization(...args) {
     return this.controller.withoutNormalization(...args)
+  }
+
+  query(...args) {
+    return this.controller.query(...args)
+  }
+
+  registerCommand(...args) {
+    return this.controller.registerCommand(...args)
+  }
+
+  registerQuery(...args) {
+    return this.controller.registerQuery(...args)
+  }
+
+  run(...args) {
+    return this.controller.run(...args)
+  }
+
+  command(...args) {
+    return this.controller.command(...args)
+  }
+
+  hasCommand(...args) {
+    return this.controller.hasCommand(...args)
+  }
+
+  hasQuery(...args) {
+    return this.controller.hasQuery(...args)
   }
 }
 

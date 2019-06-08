@@ -4,11 +4,9 @@ import isPlainObject from 'is-plain-object'
 import warning from 'tiny-warning'
 import { List } from 'immutable'
 
-import CommandsPlugin from '../plugins/commands'
 import CorePlugin from '../plugins/core'
 import Operation from '../models/operation'
 import PathUtils from '../utils/path-utils'
-import QueriesPlugin from '../plugins/queries'
 import SchemaPlugin from '../plugins/schema'
 import Value from '../models/value'
 
@@ -44,11 +42,11 @@ class Editor {
     } = attrs
 
     this.controller = controller
-    this.middleware = {}
     this.onChange = onChange
     this.operations = List()
     this.readOnly = null
     this.value = null
+    this.handlers = {}
 
     this.tmp = {
       dirty: [],
@@ -59,10 +57,10 @@ class Editor {
     }
 
     const core = CorePlugin({ plugins })
-    registerPlugin(this, core)
+    registerPlugin(this, controller, core)
 
     if (construct) {
-      this.run('onConstruct')
+      this.exec('onConstruct')
       this.setReadOnly(readOnly)
       this.setValue(value, options)
     }
@@ -76,7 +74,7 @@ class Editor {
    */
 
   applyOperation(operation) {
-    const { operations, controller } = this
+    const { operations } = this
     let value = this.value
 
     // Add in the current `value` in case the operation was serialized.
@@ -89,7 +87,7 @@ class Editor {
     // Save the operation into the history. Since `save` is a command, we need
     // to do it without normalizing, since it would have side effects.
     this.withoutNormalizing(() => {
-      controller.save(operation)
+      this.save(operation)
       value = this.value
     })
 
@@ -117,13 +115,35 @@ class Editor {
   }
 
   /**
+   * Exec a handler of the editor by `name` with `...args`.
+   *
+   * @param {String} name
+   * @param {Any} ...args
+   * @return {Any}
+   */
+
+  exec(name, ...args) {
+    invariant(
+      typeof name === 'string',
+      'As of slate@0.48 the `editor.exec` method must take a name string, not a function.'
+    )
+
+    invariant(this.has(name), `No editor middleware found named "${name}"!`)
+
+    const fn = this.handlers[name]
+    const ret = fn(...args)
+    normalizeDirtyPaths(this)
+    return ret
+  }
+
+  /**
    * Flush the editor's current change.
    *
    * @return {Editor}
    */
 
   flush() {
-    this.run('onChange')
+    this.exec('onChange')
     const { value, operations } = this
     const change = { value, operations }
     this.operations = List()
@@ -132,53 +152,14 @@ class Editor {
   }
 
   /**
-   * Trigger a command by `type` with `...args`.
+   * Check if the editor has a handler by `name`.
    *
-   * @param {String|Function} type
-   * @param {Any} ...args
-   * @return {Editor}
-   */
-
-  command(type, ...args) {
-    const { controller } = this
-
-    if (typeof type === 'function') {
-      type(controller, ...args)
-      normalizeDirtyPaths(this)
-      return controller
-    }
-
-    debug('command', { type, args })
-    const obj = { type, args }
-    const ret = this.run('onCommand', obj)
-    normalizeDirtyPaths(this)
-    return ret
-  }
-
-  /**
-   * Checks if a command by `type` has been registered.
-   *
-   * @param {String} type
+   * @param {String} name
    * @return {Boolean}
    */
 
-  hasCommand(type) {
-    const { controller } = this
-    const has = type in controller && controller[type].__command
-    return has
-  }
-
-  /**
-   * Checks if a query by `type` has been registered.
-   *
-   * @param {String} type
-   * @return {Boolean}
-   */
-
-  hasQuery(type) {
-    const { controller } = this
-    const has = type in controller && controller[type].__query
-    return has
+  has(name) {
+    return name in this.handlers
   }
 
   /**
@@ -188,7 +169,7 @@ class Editor {
    */
 
   normalize() {
-    const { value, controller } = this
+    const { value } = this
     let { document } = value
     const paths = Array.from(
       document.descendants({ includeTarget: true, includeRoot: true }),
@@ -202,149 +183,8 @@ class Editor {
     document = value.document
 
     if (selection.isUnset && document.nodes.size) {
-      controller.moveToStartOfDocument()
+      this.moveToStartOfDocument()
     }
-  }
-
-  /**
-   * Ask a query by `type` with `...args`.
-   *
-   * @param {String|Function} type
-   * @param {Any} ...args
-   * @return {Any}
-   */
-
-  query(type, ...args) {
-    const { controller } = this
-
-    if (typeof type === 'function') {
-      return type(controller, ...args)
-    }
-
-    debug('query', { type, args })
-    const obj = { type, args }
-    return this.run('onQuery', obj)
-  }
-
-  /**
-   * Register a command `type` with the editor.
-   *
-   * @param {String} type
-   * @return {Editor}
-   */
-
-  registerCommand(type) {
-    const { controller } = this
-
-    if (type in controller && controller[type].__command) {
-      return controller
-    }
-
-    invariant(
-      !(type in controller),
-      `You cannot register a \`${type}\` command because it would overwrite an existing property of the \`Editor\`.`
-    )
-
-    const method = (...args) => this.command(type, ...args)
-    controller[type] = method
-    method.__command = true
-  }
-
-  /**
-   * Register a query `type` with the editor.
-   *
-   * @param {String} type
-   * @return {Editor}
-   */
-
-  registerQuery(type) {
-    const { controller } = this
-
-    if (type in controller && controller[type].__query) {
-      return controller
-    }
-
-    invariant(
-      !(type in controller),
-      `You cannot register a \`${type}\` query because it would overwrite an existing property of the \`Editor\`.`
-    )
-
-    const method = (...args) => this.query(type, ...args)
-    controller[type] = method
-    method.__query = true
-  }
-
-  /**
-   * Run through the middleware stack by `key` with `args`.
-   *
-   * @param {String} key
-   * @param {Any} ...args
-   * @return {Any}
-   */
-
-  run(key, ...args) {
-    const { controller, middleware } = this
-    const fns = middleware[key] || []
-    let i = 0
-
-    function next(...overrides) {
-      const fn = fns[i++]
-      if (!fn) return
-
-      if (overrides.length) {
-        args = overrides
-      }
-
-      const ret = fn(...args, controller, next)
-      return ret
-    }
-
-    Object.defineProperty(next, 'change', {
-      get() {
-        invariant(
-          false,
-          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
-        )
-      },
-    })
-
-    Object.defineProperty(next, 'onChange', {
-      get() {
-        invariant(
-          false,
-          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
-        )
-      },
-    })
-
-    Object.defineProperty(next, 'props', {
-      get() {
-        invariant(
-          false,
-          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
-        )
-      },
-    })
-
-    Object.defineProperty(next, 'schema', {
-      get() {
-        invariant(
-          false,
-          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
-        )
-      },
-    })
-
-    Object.defineProperty(next, 'stack', {
-      get() {
-        invariant(
-          false,
-          'As of Slate 0.42, the `editor` is no longer passed as the third argument to event handlers. You can access it via `change.editor` instead.'
-        )
-      },
-    })
-
-    return next()
   }
 
   /**
@@ -387,10 +227,9 @@ class Editor {
    */
 
   withoutNormalizing(fn) {
-    const { controller } = this
     const value = this.tmp.normalize
     this.tmp.normalize = false
-    fn(controller)
+    fn()
     this.tmp.normalize = value
     normalizeDirtyPaths(this)
   }
@@ -473,6 +312,70 @@ class Editor {
     )
 
     return this.withoutNormalizing(fn)
+  }
+
+  run(fn, ...args) {
+    warning(
+      false,
+      'As of slate@0.48 the `editor.run` method has been renamed to `editor.exec`.'
+    )
+
+    invariant(
+      typeof fn === 'string',
+      'As of slate@0.48 the `editor.run` method must take a middleware name string, not a function.'
+    )
+
+    return this.exec(fn, ...args)
+  }
+
+  command(type, ...args) {
+    warning(
+      false,
+      'As of slate@0.48 the `editor.command` method is deprecated. Please use `editor.exec` instead.'
+    )
+
+    return this.exec(type, ...args)
+  }
+
+  hasCommand(type) {
+    warning(
+      false,
+      'As of slate@0.48 the `editor.hasCommand` method is deprecated. Please use `editor.has` instead.'
+    )
+
+    return this.has(type)
+  }
+
+  hasQuery(type) {
+    warning(
+      false,
+      'As of slate@0.48 the `editor.hasQuery` method is deprecated. Please use `editor.has` instead.'
+    )
+
+    return this.has(type)
+  }
+
+  query(type, ...args) {
+    warning(
+      false,
+      'As of slate@0.48 the `editor.query` method is deprecated. Please use `editor.exec` instead.'
+    )
+
+    return this.exec(type, ...args)
+  }
+
+  registerCommand(type) {
+    invariant(
+      false,
+      'As of slate@0.48 the `editor.registerCommand` method has been removed.'
+    )
+  }
+
+  registerQuery(type) {
+    invariant(
+      false,
+      'As of slate@0.48 the `editor.registerQuery` method has been removed.'
+    )
   }
 }
 
@@ -616,7 +519,7 @@ function normalizeNodeByPath(
 
   // Run the normalize `fn` to fix the node.
   const opCount = editor.operations.size
-  fn(controller)
+  fn()
 
   // Now that normalizing operations have been applied, we need to refind the
   // path, transformed by all the new operations.
@@ -650,9 +553,13 @@ function normalizeNodeByPath(
  * @param {Object|Array|Null} plugin
  */
 
-function registerPlugin(editor, plugin) {
+function registerPlugin(editor, controller, plugin) {
   if (Array.isArray(plugin)) {
-    plugin.forEach(p => registerPlugin(editor, p))
+    plugin
+      .slice()
+      .reverse()
+      .forEach(p => registerPlugin(editor, controller, p))
+
     return
   }
 
@@ -663,26 +570,53 @@ function registerPlugin(editor, plugin) {
   const { commands, queries, schema, ...rest } = plugin
 
   if (commands) {
-    const commandsPlugin = CommandsPlugin(commands)
-    registerPlugin(editor, commandsPlugin)
+    warning(
+      false,
+      'As of slate@0.48 the `plugin.commands` dictionary is deprecated. Register the commands as top-level functions in the plugin instead.'
+    )
+
+    for (const key in commands) {
+      const command = commands[key]
+
+      registerHandler(editor, controller, key, () => (...args) =>
+        command(editor, ...args)
+      )
+    }
   }
 
   if (queries) {
-    const queriesPlugin = QueriesPlugin(queries)
-    registerPlugin(editor, queriesPlugin)
+    warning(
+      false,
+      'As of slate@0.48 the `plugin.queries` dictionary is deprecated. Register the queries as top-level functions in the plugin instead.'
+    )
+
+    for (const key in queries) {
+      const query = queries[key]
+
+      registerHandler(editor, controller, key, () => (...args) =>
+        query(editor, ...args)
+      )
+    }
   }
 
   if (schema) {
     const schemaPlugin = SchemaPlugin(schema)
-    registerPlugin(editor, schemaPlugin)
+    registerPlugin(editor, controller, schemaPlugin)
   }
 
   for (const key in rest) {
     const fn = rest[key]
-    const middleware = (editor.middleware[key] = editor.middleware[key] || [])
-    middleware.push(fn)
+    registerHandler(editor, controller, key, fn)
   }
 }
+
+function registerHandler(editor, controller, name, fn) {
+  const existing = editor.handlers[name] || noop
+  editor.handlers[name] = fn(existing, controller)
+  editor[name] = editor[name] || ((...args) => editor.exec(name, ...args))
+}
+
+function noop() {}
 
 /**
  * Export.

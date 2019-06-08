@@ -9,11 +9,10 @@ function CommandsPlugin() {
    * Takes a `node`, find the matching `domNode` and uses it to set the text
    * in the `node`.
    *
-   * @param {Editor} editor
    * @param {Node} node
    */
 
-  function reconcileNode(editor, node) {
+  const reconcileNode = (fn, editor) => node => {
     const { value } = editor
     const { document, selection } = value
     const path = document.getPath(node.key)
@@ -51,21 +50,18 @@ function CommandsPlugin() {
    * Takes text from the `domNode` and uses it to set the text in the matching
    * `node` in Slate.
    *
-   * @param {Editor} editor
    * @param {DOMNode} domNode
    */
 
-  function reconcileDOMNode(editor, domNode) {
+  const reconcileDOMNode = (fn, editor) => domNode => {
     const domElement = domNode.parentElement.closest('[data-key]')
     const node = editor.findNode(domElement)
     editor.reconcileNode(node)
   }
 
   return {
-    commands: {
-      reconcileNode,
-      reconcileDOMNode,
-    },
+    reconcileNode,
+    reconcileDOMNode,
   }
 }
 

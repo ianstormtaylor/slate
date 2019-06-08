@@ -152,11 +152,9 @@ function AndroidPlugin() {
    * not necessarily mean that the React version is cancelled.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
-  function onBeforeInput(event, editor, next) {
+  const onBeforeInput = (fn, editor) => event => {
     const isNative = !event.nativeEvent
 
     debug('onBeforeInput', {
@@ -241,7 +239,7 @@ function AndroidPlugin() {
 
         break
       default:
-        if (status !== COMPOSING) next()
+        if (status !== COMPOSING) fn(event)
     }
   }
 
@@ -254,11 +252,9 @@ function AndroidPlugin() {
    * Instead, we want the `delete` to take precedence.
    *
    * @param  {Event} event
-   * @param  {Editor} editor
-   * @param  {Function} next
    */
 
-  function onCompositionEnd(event, editor, next) {
+  const onCompositionEnd = (fn, editor) => event => {
     debug('onCompositionEnd', { event })
     const window = getWindow(event.target)
     const domSelection = window.getSelection()
@@ -292,11 +288,9 @@ function AndroidPlugin() {
    * On composition start.
    *
    * @param  {Event} event
-   * @param  {Editor} editor
-   * @param  {Function} next
    */
 
-  function onCompositionStart(event, editor, next) {
+  const onCompositionStart = (fn, editor) => event => {
     debug('onCompositionStart', { event })
     status = COMPOSING
     nodes.clear()
@@ -306,11 +300,9 @@ function AndroidPlugin() {
    * On composition update.
    *
    * @param  {Event} event
-   * @param  {Editor} editor
-   * @param  {Function} next
    */
 
-  function onCompositionUpdate(event, editor, next) {
+  const onCompositionUpdate = (fn, editor) => event => {
     debug('onCompositionUpdate', { event })
   }
 
@@ -318,11 +310,9 @@ function AndroidPlugin() {
    * On input.
    *
    * @param  {Event} event
-   * @param  {Editor} editor
-   * @param  {Function} next
    */
 
-  function onInput(event, editor, next) {
+  const onInput = (fn, editor) => event => {
     debug('onInput', {
       event,
       status,
@@ -435,7 +425,7 @@ function AndroidPlugin() {
         break
       default:
         if (status === COMPOSING) return
-        next()
+        fn(event)
     }
   }
 
@@ -443,11 +433,9 @@ function AndroidPlugin() {
    * On key down.
    *
    * @param  {Event} event
-   * @param  {Editor} editor
-   * @param  {Function} next
    */
 
-  function onKeyDown(event, editor, next) {
+  const onKeyDown = (fn, editor) => event => {
     debug('onKeyDown', {
       event,
       status,
@@ -486,7 +474,7 @@ function AndroidPlugin() {
           // const window = getWindow(event.target)
           // const selection = window.getSelection()
           // setSelectionFromDom(window, editor, selection)
-          next()
+          fn(event)
         }
 
         break
@@ -566,7 +554,7 @@ function AndroidPlugin() {
 
       default:
         if (status !== COMPOSING) {
-          next()
+          fn(event)
         }
     }
   }
@@ -575,11 +563,9 @@ function AndroidPlugin() {
    * On select.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
-  function onSelect(event, editor, next) {
+  const onSelect = (fn, editor) => event => {
     debug('onSelect', { event, status })
 
     switch (ANDROID_API_VERSION) {

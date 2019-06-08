@@ -8,15 +8,15 @@ import React from 'react'
 
 function Rendering() {
   return {
-    decorateNode() {
+    decorateNode: () => () => {
       return []
     },
 
-    renderAnnotation({ attributes, children }) {
+    renderAnnotation: () => ({ attributes, children }) => {
       return <span {...attributes}>{children}</span>
     },
 
-    renderBlock({ attributes, children }) {
+    renderBlock: () => ({ attributes, children }) => {
       return (
         <div {...attributes} style={{ position: 'relative' }}>
           {children}
@@ -24,19 +24,19 @@ function Rendering() {
       )
     },
 
-    renderDecoration({ attributes, children }) {
+    renderDecoration: () => ({ attributes, children }) => {
       return <span {...attributes}>{children}</span>
     },
 
-    renderDocument({ children }) {
+    renderDocument: () => ({ children }) => {
       return children
     },
 
-    renderEditor({ children }) {
+    renderEditor: () => ({ children }) => {
       return children
     },
 
-    renderInline({ attributes, children }) {
+    renderInline: () => ({ attributes, children }) => {
       return (
         <span {...attributes} style={{ position: 'relative' }}>
           {children}
@@ -44,7 +44,7 @@ function Rendering() {
       )
     },
 
-    renderMark({ attributes, children }) {
+    renderMark: () => ({ attributes, children }) => {
       return <span {...attributes}>{children}</span>
     },
   }

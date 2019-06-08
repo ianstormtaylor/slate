@@ -36,7 +36,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onBeforeInput(event, editor, next) {
+  const onBeforeInput = (fn, editor) => event => {
     const { value } = editor
     const isSynthetic = !!event.nativeEvent
 
@@ -46,13 +46,16 @@ function AfterPlugin(options = {}) {
     if (isSynthetic) {
       event.preventDefault()
       editor.insertText(event.data)
-      return next()
+      return fn(event)
     }
 
     // Otherwise, we can use the information in the `beforeinput` event to
     // figure out the exact change that will occur, and prevent it.
     const [targetRange] = event.getTargetRanges()
-    if (!targetRange) return next()
+
+    if (!targetRange) {
+      return fn(event)
+    }
 
     debug('onBeforeInput', { event })
 
@@ -135,7 +138,7 @@ function AfterPlugin(options = {}) {
       }
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -146,10 +149,10 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onBlur(event, editor, next) {
+  const onBlur = (fn, editor) => event => {
     debug('onBlur', { event })
     editor.blur()
-    next()
+    fn(event)
   }
 
   /**
@@ -160,13 +163,13 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onClick(event, editor, next) {
-    if (editor.readOnly) return next()
+  const onClick = (fn, editor) => event => {
+    if (editor.readOnly) return fn(event)
 
     const { value } = editor
     const { document } = value
     const path = editor.findPath(event.target)
-    if (!path) return next()
+    if (!path) return fn(event)
 
     debug('onClick', { event })
 
@@ -183,7 +186,7 @@ function AfterPlugin(options = {}) {
       editor.focus().moveToEndOfNode(node)
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -194,10 +197,10 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onCopy(event, editor, next) {
+  const onCopy = (fn, editor) => event => {
     debug('onCopy', { event })
     cloneFragment(event, editor)
-    next()
+    fn(event)
   }
 
   /**
@@ -208,7 +211,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onCut(event, editor, next) {
+  const onCut = (fn, editor) => event => {
     debug('onCut', { event })
 
     // Once the fake cut content has successfully been added to the clipboard,
@@ -237,7 +240,7 @@ function AfterPlugin(options = {}) {
       }
     })
 
-    next()
+    fn(event)
   }
 
   /**
@@ -248,10 +251,10 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onDragEnd(event, editor, next) {
+  const onDragEnd = (fn, editor) => event => {
     debug('onDragEnd', { event })
     isDraggingInternally = null
-    next()
+    fn(event)
   }
 
   /**
@@ -262,7 +265,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onDragStart(event, editor, next) {
+  const onDragStart = (fn, editor) => event => {
     debug('onDragStart', { event })
 
     isDraggingInternally = true
@@ -284,7 +287,7 @@ function AfterPlugin(options = {}) {
     const fragment = editor.value.fragment
     const encoded = Base64.serializeNode(fragment)
     setEventTransfer(event, 'fragment', encoded)
-    next()
+    fn(event)
   }
 
   /**
@@ -295,14 +298,14 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onDrop(event, editor, next) {
+  const onDrop = (fn, editor) => event => {
     const { value } = editor
     const { document, selection } = value
     const window = getWindow(event.target)
     let target = editor.findEventRange(event)
 
     if (!target) {
-      return next()
+      return fn(event)
     }
 
     debug('onDrop', { event })
@@ -338,7 +341,6 @@ function AfterPlugin(options = {}) {
 
       if (hasVoidParent) {
         let p = anchor.path
-        let n = document.getNode(anchor.path)
 
         while (hasVoidParent) {
           const [nxt] = document.texts({ path: p })
@@ -347,7 +349,7 @@ function AfterPlugin(options = {}) {
             break
           }
 
-          ;[n, p] = nxt
+          ;[, p] = nxt
           hasVoidParent = document.hasVoidParent(p, editor)
         }
 
@@ -384,7 +386,7 @@ function AfterPlugin(options = {}) {
       )
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -395,7 +397,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onFocus(event, editor, next) {
+  const onFocus = (fn, editor) => event => {
     debug('onFocus', { event })
 
     // COMPAT: If the focus event is a mouse-based one, it will be shortly
@@ -408,7 +410,7 @@ function AfterPlugin(options = {}) {
       editor.focus()
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -419,7 +421,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onInput(event, editor, next) {
+  const onInput = (fn, editor) => event => {
     debug('onInput')
 
     const window = getWindow(event.target)
@@ -434,8 +436,7 @@ function AfterPlugin(options = {}) {
 
     const { anchorNode } = domSelection
     editor.reconcileDOMNode(anchorNode)
-
-    next()
+    fn(event)
   }
 
   /**
@@ -446,7 +447,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onKeyDown(event, editor, next) {
+  const onKeyDown = (fn, editor) => event => {
     debug('onKeyDown', { event })
 
     const { value } = editor
@@ -587,7 +588,7 @@ function AfterPlugin(options = {}) {
       }
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -598,10 +599,10 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onMouseDown(event, editor, next) {
+  const onMouseDown = (fn, editor) => event => {
     debug('onMouseDown', { event })
     isMouseDown = true
-    next()
+    fn(event)
   }
 
   /**
@@ -612,10 +613,10 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onMouseUp(event, editor, next) {
+  const onMouseUp = (fn, editor) => event => {
     debug('onMouseUp', { event })
     isMouseDown = false
-    next()
+    fn(event)
   }
 
   /**
@@ -626,7 +627,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onPaste(event, editor, next) {
+  const onPaste = (fn, editor) => event => {
     debug('onPaste', { event })
 
     const { value } = editor
@@ -638,9 +639,9 @@ function AfterPlugin(options = {}) {
     }
 
     if (type === 'text' || type === 'html') {
-      if (!text) return next()
+      if (!text) return fn(event)
       const { document, selection, startBlock } = value
-      if (editor.isVoid(startBlock)) return next()
+      if (editor.isVoid(startBlock)) return fn(event)
 
       const defaultBlock = startBlock
       const defaultMarks = document.getInsertMarksAtRange(selection)
@@ -649,7 +650,7 @@ function AfterPlugin(options = {}) {
       editor.insertFragment(frag)
     }
 
-    next()
+    fn(event)
   }
 
   /**
@@ -660,7 +661,7 @@ function AfterPlugin(options = {}) {
    * @param {Function} next
    */
 
-  function onSelect(event, editor, next) {
+  const onSelect = (fn, editor) => event => {
     debug('onSelect', { event })
     const window = getWindow(event.target)
     const domSelection = window.getSelection()
@@ -676,7 +677,7 @@ function AfterPlugin(options = {}) {
     // happens outside the editor. This is needed for `onFocus` handling.
     isMouseDown = false
 
-    next()
+    fn(event)
   }
 
   /**

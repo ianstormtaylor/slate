@@ -19,7 +19,7 @@ function QueriesPlugin() {
    * @return {DOMNode|Null}
    */
 
-  function findDOMNode(editor, path) {
+  const findDOMNode = (fn, editor) => path => {
     path = PathUtils.create(path)
     const content = editor.tmp.contentRef.current
 
@@ -63,7 +63,7 @@ function QueriesPlugin() {
    * @return {Object|Null}
    */
 
-  function findDOMPoint(editor, point) {
+  const findDOMPoint = (fn, editor) => point => {
     const el = editor.findDOMNode(point.path)
     let start = 0
 
@@ -108,7 +108,7 @@ function QueriesPlugin() {
    * @return {DOMRange|Null}
    */
 
-  function findDOMRange(editor, range) {
+  const findDOMRange = (fn, editor) => range => {
     const { anchor, focus, isBackward, isCollapsed } = range
     const domAnchor = editor.findDOMPoint(anchor)
     const domFocus = isCollapsed ? domAnchor : editor.findDOMPoint(focus)
@@ -134,7 +134,7 @@ function QueriesPlugin() {
    * @return {List|Null}
    */
 
-  function findNode(editor, element) {
+  const findNode = (fn, editor) => element => {
     const path = editor.findPath(element)
 
     if (!path) {
@@ -155,7 +155,7 @@ function QueriesPlugin() {
    * @return {Range}
    */
 
-  function findEventRange(editor, event) {
+  const findEventRange = (fn, editor) => event => {
     if (event.nativeEvent) {
       event = event.nativeEvent
     }
@@ -232,7 +232,7 @@ function QueriesPlugin() {
    * @return {List|Null}
    */
 
-  function findPath(editor, element) {
+  const findPath = (fn, editor) => element => {
     const content = editor.tmp.contentRef.current
     let nodeElement = element
 
@@ -303,7 +303,7 @@ function QueriesPlugin() {
    * @return {Point}
    */
 
-  function findPoint(editor, nativeNode, nativeOffset) {
+  const findPoint = (fn, editor) => (nativeNode, nativeOffset) => {
     const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
       nativeNode,
       nativeOffset
@@ -390,7 +390,7 @@ function QueriesPlugin() {
    * @return {Range}
    */
 
-  function findRange(editor, domRange) {
+  const findRange = (fn, editor) => domRange => {
     const el = domRange.anchorNode || domRange.startContainer
 
     if (!el) {
@@ -447,7 +447,7 @@ function QueriesPlugin() {
    * @return {Range}
    */
 
-  function findSelection(editor, domSelection) {
+  const findSelection = (fn, editor) => domSelection => {
     const { value } = editor
     const { document } = value
 
@@ -540,17 +540,15 @@ function QueriesPlugin() {
   }
 
   return {
-    queries: {
-      findDOMNode,
-      findDOMPoint,
-      findDOMRange,
-      findEventRange,
-      findNode,
-      findPath,
-      findPoint,
-      findRange,
-      findSelection,
-    },
+    findDOMNode,
+    findDOMPoint,
+    findDOMRange,
+    findEventRange,
+    findNode,
+    findPath,
+    findPoint,
+    findRange,
+    findSelection,
   }
 }
 

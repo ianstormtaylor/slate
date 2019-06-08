@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 import { Block, Text } from 'slate'
 
-function normalizeNode(node, editor, next) {
+const normalizeNode = (fn, editor) => node => {
   if (node.type === 'container' && node.nodes.first().type === 'container') {
     return () =>
       editor.insertNodeByKey(
@@ -14,9 +14,9 @@ function normalizeNode(node, editor, next) {
           nodes: [Text.create()],
         })
       )
+  } else {
+    return fn(node)
   }
-
-  return next()
 }
 
 export const plugins = [{ normalizeNode }]

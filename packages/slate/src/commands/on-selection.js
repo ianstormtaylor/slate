@@ -9,7 +9,6 @@ const Commands = {}
 /**
  * Get the next point by `n`.
  *
- * @param {Editor} editor
  * @param {Point} point
  * @param {Number} n
  * @return {Point}
@@ -26,7 +25,6 @@ function getNextPoint(editor, point, n) {
 /**
  * Get the previous point by `n`.
  *
- * @param {Editor} editor
  * @param {Point} point
  * @param {Number} n
  * @return {Point}
@@ -42,41 +40,33 @@ function getPreviousPoint(editor, point, n) {
 
 /**
  * Blur the selection.
- *
- * @param {Editor} editor
  */
 
-Commands.blur = editor => {
+Commands.blur = (fn, editor) => () => {
   editor.select({ isFocused: false })
 }
 
 /**
  * Deselect the selection.
- *
- * @param {Editor} editor
  */
 
-Commands.deselect = editor => {
+Commands.deselect = (fn, editor) => () => {
   editor.select(Selection.create())
 }
 
 /**
  * Focus the selection.
- *
- * @param {Editor} editor
  */
 
-Commands.focus = editor => {
+Commands.focus = (fn, editor) => () => {
   editor.select({ isFocused: true })
 }
 
 /**
  * Flip the selection's anchor and focus points.
- *
- * @param {Editor} editor
  */
 
-Commands.flip = editor => {
+Commands.flip = (fn, editor) => () => {
   const { value: { selection } } = editor
   const range = selection.flip()
   editor.select(range)
@@ -85,11 +75,10 @@ Commands.flip = editor => {
 /**
  * Move the selection's anchor point backwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveAnchorBackward = (editor, n = 1) => {
+Commands.moveAnchorBackward = (fn, editor) => (n = 1) => {
   const { value: { selection } } = editor
   const point = getPreviousPoint(editor, selection.anchor, n)
   editor.setAnchor(point)
@@ -98,11 +87,10 @@ Commands.moveAnchorBackward = (editor, n = 1) => {
 /**
  * Move the selection's anchor point forwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveAnchorForward = (editor, n = 1) => {
+Commands.moveAnchorForward = (fn, editor) => (n = 1) => {
   const { value: { selection } } = editor
   const point = getNextPoint(editor, selection.anchor, n)
   editor.setAnchor(point)
@@ -111,12 +99,11 @@ Commands.moveAnchorForward = (editor, n = 1) => {
 /**
  * Move the selection's anchor point to a specific `path` and `offset`.
  *
- * @param {Editor} editor
  * @param {Path} path
  * @param {Number} offset
  */
 
-Commands.moveAnchorTo = (editor, path, offset) => {
+Commands.moveAnchorTo = (fn, editor) => (path, offset) => {
   const { value: { selection } } = editor
   const range = selection.moveAnchorTo(path, offset)
   editor.select(range)
@@ -124,11 +111,9 @@ Commands.moveAnchorTo = (editor, path, offset) => {
 
 /**
  * Move the selection's anchor point to the end of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfBlock = editor => {
+Commands.moveAnchorToEndOfBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestBlock(selection.anchor.path)
 
@@ -140,11 +125,9 @@ Commands.moveAnchorToEndOfBlock = editor => {
 
 /**
  * Move the selection's anchor point to the end of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfPath = (editor, path) => {
+Commands.moveAnchorToEndOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const entry = document.lastText({ path })
 
@@ -156,11 +139,9 @@ Commands.moveAnchorToEndOfPath = (editor, path) => {
 
 /**
  * Move the selection's anchor point to the end of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfInline = editor => {
+Commands.moveAnchorToEndOfInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestInline(selection.anchor.path)
 
@@ -172,11 +153,9 @@ Commands.moveAnchorToEndOfInline = editor => {
 
 /**
  * Move the selection's anchor point to the end of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfDocument = editor => {
+Commands.moveAnchorToEndOfDocument = (fn, editor) => () => {
   const { value: { document } } = editor
   const entry = document.lastText()
 
@@ -188,11 +167,9 @@ Commands.moveAnchorToEndOfDocument = editor => {
 
 /**
  * Move the selection's anchor point to the end of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfNextBlock = editor => {
+Commands.moveAnchorToEndOfNextBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextBlock(selection.anchor.path)
 
@@ -204,11 +181,9 @@ Commands.moveAnchorToEndOfNextBlock = editor => {
 
 /**
  * Move the selection's anchor point to the end of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfNextInline = editor => {
+Commands.moveAnchorToEndOfNextInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextInline(selection.anchor.path)
 
@@ -220,11 +195,9 @@ Commands.moveAnchorToEndOfNextInline = editor => {
 
 /**
  * Move the selection's anchor point to the end of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfNextText = editor => {
+Commands.moveAnchorToEndOfNextText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextText(selection.anchor.path)
 
@@ -236,11 +209,9 @@ Commands.moveAnchorToEndOfNextText = editor => {
 
 /**
  * Move the selection's anchor point to the end of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfPreviousBlock = editor => {
+Commands.moveAnchorToEndOfPreviousBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousBlock(selection.anchor.path)
 
@@ -252,11 +223,9 @@ Commands.moveAnchorToEndOfPreviousBlock = editor => {
 
 /**
  * Move the selection's anchor point to the end of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfPreviousInline = editor => {
+Commands.moveAnchorToEndOfPreviousInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousInline(selection.anchor.path)
 
@@ -268,11 +237,9 @@ Commands.moveAnchorToEndOfPreviousInline = editor => {
 
 /**
  * Move the selection's anchor point to the end of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfPreviousText = editor => {
+Commands.moveAnchorToEndOfPreviousText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousText(selection.anchor.path)
 
@@ -284,22 +251,18 @@ Commands.moveAnchorToEndOfPreviousText = editor => {
 
 /**
  * Move the selection's anchor point to the end of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToEndOfText = editor => {
+Commands.moveAnchorToEndOfText = (fn, editor) => () => {
   const { value: { selection } } = editor
   editor.moveAnchorToEndOfPath(selection.anchor.path)
 }
 
 /**
  * Move the selection's anchor point to the start of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfBlock = editor => {
+Commands.moveAnchorToStartOfBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestBlock(selection.anchor.path)
 
@@ -311,11 +274,9 @@ Commands.moveAnchorToStartOfBlock = editor => {
 
 /**
  * Move the selection's anchor point to the start of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfPath = (editor, path) => {
+Commands.moveAnchorToStartOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const entry = document.lastText({ path })
 
@@ -327,11 +288,9 @@ Commands.moveAnchorToStartOfPath = (editor, path) => {
 
 /**
  * Move the selection's anchor point to the start of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfInline = editor => {
+Commands.moveAnchorToStartOfInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestInline(selection.anchor.path)
 
@@ -343,11 +302,9 @@ Commands.moveAnchorToStartOfInline = editor => {
 
 /**
  * Move the selection's anchor point to the start of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfDocument = editor => {
+Commands.moveAnchorToStartOfDocument = (fn, editor) => () => {
   const { value: { document } } = editor
   const entry = document.firstText()
 
@@ -359,11 +316,9 @@ Commands.moveAnchorToStartOfDocument = editor => {
 
 /**
  * Move the selection's anchor point to the start of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfNextBlock = editor => {
+Commands.moveAnchorToStartOfNextBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextBlock(selection.anchor.path)
 
@@ -375,11 +330,9 @@ Commands.moveAnchorToStartOfNextBlock = editor => {
 
 /**
  * Move the selection's anchor point to the start of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfNextInline = editor => {
+Commands.moveAnchorToStartOfNextInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextInline(selection.anchor.path)
 
@@ -391,11 +344,9 @@ Commands.moveAnchorToStartOfNextInline = editor => {
 
 /**
  * Move the selection's anchor point to the start of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfNextText = editor => {
+Commands.moveAnchorToStartOfNextText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextText(selection.anchor.path)
 
@@ -407,11 +358,9 @@ Commands.moveAnchorToStartOfNextText = editor => {
 
 /**
  * Move the selection's anchor point to the start of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfPreviousBlock = editor => {
+Commands.moveAnchorToStartOfPreviousBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousBlock(selection.anchor.path)
 
@@ -423,11 +372,9 @@ Commands.moveAnchorToStartOfPreviousBlock = editor => {
 
 /**
  * Move the selection's anchor point to the start of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfPreviousInline = editor => {
+Commands.moveAnchorToStartOfPreviousInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousInline(selection.anchor.path)
 
@@ -439,11 +386,9 @@ Commands.moveAnchorToStartOfPreviousInline = editor => {
 
 /**
  * Move the selection's anchor point to the start of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfPreviousText = editor => {
+Commands.moveAnchorToStartOfPreviousText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousText(selection.anchor.path)
 
@@ -455,22 +400,18 @@ Commands.moveAnchorToStartOfPreviousText = editor => {
 
 /**
  * Move the selection's anchor point to the start of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorToStartOfText = editor => {
+Commands.moveAnchorToStartOfText = (fn, editor) => () => {
   const { value: { selection } } = editor
   editor.moveAnchorToStartOfPath(selection.anchor.path)
 }
 
 /**
  * Move the selection's anchor point backward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorWordBackward = editor => {
+Commands.moveAnchorWordBackward = (fn, editor) => () => {
   const { value: { selection } } = editor
   const point = editor.getPreviousWordPoint(selection.anchor)
   editor.setAnchor(point)
@@ -478,11 +419,9 @@ Commands.moveAnchorWordBackward = editor => {
 
 /**
  * Move the selection's anchor point forward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveAnchorWordForward = editor => {
+Commands.moveAnchorWordForward = (fn, editor) => () => {
   const { value: { selection } } = editor
   const point = editor.getNextWordPoint(selection.anchor)
   editor.setAnchor(point)
@@ -491,35 +430,21 @@ Commands.moveAnchorWordForward = editor => {
 /**
  * Move the selection backward by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveBackward = (editor, n) => {
+Commands.moveBackward = (fn, editor) => n => {
   editor.moveAnchorBackward(n)
   editor.moveFocusBackward(n)
 }
 
 /**
- * Move the selection backward by `n` words.
- *
- * @param {Editor} editor
- * @param {Number} n
- */
-
-Commands.moveWordBackward = (editor, n) => {
-  editor.moveAnchorWordBackward(n)
-  editor.moveFocusWordBackward(n)
-}
-
-/**
  * Move the selection's end point backwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveEndBackward = (editor, n = 1) => {
+Commands.moveEndBackward = (fn, editor) => (n = 1) => {
   if (editor.value.selection.isForward) {
     editor.moveFocusBackward(n)
   } else {
@@ -530,11 +455,10 @@ Commands.moveEndBackward = (editor, n = 1) => {
 /**
  * Move the selection's end point forwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveEndForward = (editor, n = 1) => {
+Commands.moveEndForward = (fn, editor) => (n = 1) => {
   if (editor.value.selection.isForward) {
     editor.moveFocusForward(n)
   } else {
@@ -545,12 +469,11 @@ Commands.moveEndForward = (editor, n = 1) => {
 /**
  * Move the selection's end point to a specific `path` and `offset`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  */
 
-Commands.moveEndTo = (editor, path, offset) => {
+Commands.moveEndTo = (fn, editor) => (path, offset) => {
   const { value: { selection } } = editor
   const range = selection.moveEndTo(path, offset)
   editor.select(range)
@@ -558,11 +481,9 @@ Commands.moveEndTo = (editor, path, offset) => {
 
 /**
  * Move the selection's end point to the end of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfBlock = editor => {
+Commands.moveEndToEndOfBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfBlock()
   } else {
@@ -572,11 +493,9 @@ Commands.moveEndToEndOfBlock = editor => {
 
 /**
  * Move the selection's end point to the end of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfDocument = editor => {
+Commands.moveEndToEndOfDocument = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfDocument()
   } else {
@@ -586,11 +505,9 @@ Commands.moveEndToEndOfDocument = editor => {
 
 /**
  * Move the selection's end point to the end of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfInline = editor => {
+Commands.moveEndToEndOfInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfInline()
   } else {
@@ -600,11 +517,9 @@ Commands.moveEndToEndOfInline = editor => {
 
 /**
  * Move the selection's end point to the end of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfNextBlock = editor => {
+Commands.moveEndToEndOfNextBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfNextBlock()
   } else {
@@ -614,11 +529,9 @@ Commands.moveEndToEndOfNextBlock = editor => {
 
 /**
  * Move the selection's end point to the end of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfNextInline = editor => {
+Commands.moveEndToEndOfNextInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfNextInline()
   } else {
@@ -628,11 +541,9 @@ Commands.moveEndToEndOfNextInline = editor => {
 
 /**
  * Move the selection's end point to the end of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfNextText = editor => {
+Commands.moveEndToEndOfNextText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfNextText()
   } else {
@@ -642,11 +553,9 @@ Commands.moveEndToEndOfNextText = editor => {
 
 /**
  * Move the selection's end point to the end of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfPath = (editor, path) => {
+Commands.moveEndToEndOfPath = (fn, editor) => path => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfPath(path)
   } else {
@@ -656,11 +565,9 @@ Commands.moveEndToEndOfPath = (editor, path) => {
 
 /**
  * Move the selection's end point to the end of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfPreviousBlock = editor => {
+Commands.moveEndToEndOfPreviousBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfPreviousBlock()
   } else {
@@ -670,11 +577,9 @@ Commands.moveEndToEndOfPreviousBlock = editor => {
 
 /**
  * Move the selection's end point to the end of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfPreviousInline = editor => {
+Commands.moveEndToEndOfPreviousInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfPreviousInline()
   } else {
@@ -684,11 +589,9 @@ Commands.moveEndToEndOfPreviousInline = editor => {
 
 /**
  * Move the selection's end point to the end of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfPreviousText = editor => {
+Commands.moveEndToEndOfPreviousText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfPreviousText()
   } else {
@@ -698,11 +601,9 @@ Commands.moveEndToEndOfPreviousText = editor => {
 
 /**
  * Move the selection's end point to the end of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToEndOfText = editor => {
+Commands.moveEndToEndOfText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToEndOfText()
   } else {
@@ -712,11 +613,9 @@ Commands.moveEndToEndOfText = editor => {
 
 /**
  * Move the selection's end point to the start of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfBlock = editor => {
+Commands.moveEndToStartOfBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfBlock()
   } else {
@@ -726,11 +625,9 @@ Commands.moveEndToStartOfBlock = editor => {
 
 /**
  * Move the selection's end point to the start of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfDocument = editor => {
+Commands.moveEndToStartOfDocument = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfDocument()
   } else {
@@ -740,11 +637,9 @@ Commands.moveEndToStartOfDocument = editor => {
 
 /**
  * Move the selection's end point to the start of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfInline = editor => {
+Commands.moveEndToStartOfInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfInline()
   } else {
@@ -754,11 +649,9 @@ Commands.moveEndToStartOfInline = editor => {
 
 /**
  * Move the selection's end point to the start of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfNextBlock = editor => {
+Commands.moveEndToStartOfNextBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfNextBlock()
   } else {
@@ -768,11 +661,9 @@ Commands.moveEndToStartOfNextBlock = editor => {
 
 /**
  * Move the selection's end point to the start of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfNextInline = editor => {
+Commands.moveEndToStartOfNextInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfNextInline()
   } else {
@@ -782,11 +673,9 @@ Commands.moveEndToStartOfNextInline = editor => {
 
 /**
  * Move the selection's end point to the start of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfNextText = editor => {
+Commands.moveEndToStartOfNextText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfNextText()
   } else {
@@ -796,11 +685,9 @@ Commands.moveEndToStartOfNextText = editor => {
 
 /**
  * Move the selection's end point to the start of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfPath = (editor, path) => {
+Commands.moveEndToStartOfPath = (fn, editor) => path => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfPath(path)
   } else {
@@ -810,11 +697,9 @@ Commands.moveEndToStartOfPath = (editor, path) => {
 
 /**
  * Move the selection's end point to the start of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfPreviousBlock = editor => {
+Commands.moveEndToStartOfPreviousBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfPreviousBlock()
   } else {
@@ -824,11 +709,9 @@ Commands.moveEndToStartOfPreviousBlock = editor => {
 
 /**
  * Move the selection's end point to the start of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfPreviousInline = editor => {
+Commands.moveEndToStartOfPreviousInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfPreviousInline()
   } else {
@@ -838,11 +721,9 @@ Commands.moveEndToStartOfPreviousInline = editor => {
 
 /**
  * Move the selection's end point to the start of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfPreviousText = editor => {
+Commands.moveEndToStartOfPreviousText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfPreviousText()
   } else {
@@ -852,11 +733,9 @@ Commands.moveEndToStartOfPreviousText = editor => {
 
 /**
  * Move the selection's end point to the start of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndToStartOfText = editor => {
+Commands.moveEndToStartOfText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveFocusToStartOfText()
   } else {
@@ -866,11 +745,9 @@ Commands.moveEndToStartOfText = editor => {
 
 /**
  * Move the selection's end point backward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndWordBackward = (editor, ...args) => {
+Commands.moveEndWordBackward = (fn, editor) => (...args) => {
   if (editor.value.selection.isForward) {
     editor.moveFocusWordBackward()
   } else {
@@ -880,11 +757,9 @@ Commands.moveEndWordBackward = (editor, ...args) => {
 
 /**
  * Move the selection's end point forward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveEndWordForward = (editor, ...args) => {
+Commands.moveEndWordForward = (fn, editor) => (...args) => {
   if (editor.value.selection.isForward) {
     editor.moveFocusWordForward()
   } else {
@@ -895,11 +770,10 @@ Commands.moveEndWordForward = (editor, ...args) => {
 /**
  * Move the selection's focus point backwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveFocusBackward = (editor, n = 1) => {
+Commands.moveFocusBackward = (fn, editor) => (n = 1) => {
   const { value: { selection } } = editor
   const point = getPreviousPoint(editor, selection.focus, n)
   editor.setFocus(point)
@@ -908,11 +782,10 @@ Commands.moveFocusBackward = (editor, n = 1) => {
 /**
  * Move the selection's focus point forwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveFocusForward = (editor, n = 1) => {
+Commands.moveFocusForward = (fn, editor) => (n = 1) => {
   const { value: { selection } } = editor
   const point = getNextPoint(editor, selection.focus, n)
   editor.setFocus(point)
@@ -923,10 +796,9 @@ Commands.moveFocusForward = (editor, n = 1) => {
  *
  * @param {Path} path
  * @param {Number} offset
- * @param {Editor} editor
  */
 
-Commands.moveFocusTo = (editor, path, offset) => {
+Commands.moveFocusTo = (fn, editor) => (path, offset) => {
   const { value: { selection } } = editor
   const range = selection.moveFocusTo(path, offset)
   editor.select(range)
@@ -934,11 +806,9 @@ Commands.moveFocusTo = (editor, path, offset) => {
 
 /**
  * Move the selection's focus point to the end of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfBlock = editor => {
+Commands.moveFocusToEndOfBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestBlock(selection.focus.path)
 
@@ -950,11 +820,9 @@ Commands.moveFocusToEndOfBlock = editor => {
 
 /**
  * Move the selection's focus point to the end of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfPath = (editor, path) => {
+Commands.moveFocusToEndOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const entry = document.lastText({ path })
 
@@ -966,11 +834,9 @@ Commands.moveFocusToEndOfPath = (editor, path) => {
 
 /**
  * Move the selection's focus point to the end of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfInline = editor => {
+Commands.moveFocusToEndOfInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestInline(selection.focus.path)
 
@@ -982,11 +848,9 @@ Commands.moveFocusToEndOfInline = editor => {
 
 /**
  * Move the selection's focus point to the end of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfDocument = editor => {
+Commands.moveFocusToEndOfDocument = (fn, editor) => () => {
   const { value: { document } } = editor
   const entry = document.lastText()
 
@@ -998,11 +862,9 @@ Commands.moveFocusToEndOfDocument = editor => {
 
 /**
  * Move the selection's focus point to the end of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfNextBlock = editor => {
+Commands.moveFocusToEndOfNextBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextBlock(selection.focus.path)
 
@@ -1014,11 +876,9 @@ Commands.moveFocusToEndOfNextBlock = editor => {
 
 /**
  * Move the selection's focus point to the end of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfNextInline = editor => {
+Commands.moveFocusToEndOfNextInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextInline(selection.focus.path)
 
@@ -1030,11 +890,9 @@ Commands.moveFocusToEndOfNextInline = editor => {
 
 /**
  * Move the selection's focus point to the end of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfNextText = editor => {
+Commands.moveFocusToEndOfNextText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextText(selection.focus.path)
 
@@ -1046,11 +904,9 @@ Commands.moveFocusToEndOfNextText = editor => {
 
 /**
  * Move the selection's focus point to the end of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfPreviousBlock = editor => {
+Commands.moveFocusToEndOfPreviousBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousBlock(selection.focus.path)
 
@@ -1062,11 +918,9 @@ Commands.moveFocusToEndOfPreviousBlock = editor => {
 
 /**
  * Move the selection's focus point to the end of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfPreviousInline = editor => {
+Commands.moveFocusToEndOfPreviousInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousInline(selection.focus.path)
 
@@ -1078,11 +932,9 @@ Commands.moveFocusToEndOfPreviousInline = editor => {
 
 /**
  * Move the selection's focus point to the end of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfPreviousText = editor => {
+Commands.moveFocusToEndOfPreviousText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousText(selection.focus.path)
 
@@ -1094,22 +946,18 @@ Commands.moveFocusToEndOfPreviousText = editor => {
 
 /**
  * Move the selection's focus point to the end of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToEndOfText = editor => {
+Commands.moveFocusToEndOfText = (fn, editor) => () => {
   const { value: { selection } } = editor
   editor.moveFocusToEndOfPath(selection.focus.path)
 }
 
 /**
  * Move the selection's focus point to the start of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfBlock = editor => {
+Commands.moveFocusToStartOfBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestBlock(selection.focus.path)
 
@@ -1121,11 +969,9 @@ Commands.moveFocusToStartOfBlock = editor => {
 
 /**
  * Move the selection's focus point to the start of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfPath = (editor, path) => {
+Commands.moveFocusToStartOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const entry = document.lastText({ path })
 
@@ -1137,11 +983,9 @@ Commands.moveFocusToStartOfPath = (editor, path) => {
 
 /**
  * Move the selection's focus point to the start of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfInline = editor => {
+Commands.moveFocusToStartOfInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.closestInline(selection.focus.path)
 
@@ -1153,11 +997,9 @@ Commands.moveFocusToStartOfInline = editor => {
 
 /**
  * Move the selection's focus point to the start of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfDocument = editor => {
+Commands.moveFocusToStartOfDocument = (fn, editor) => () => {
   const { value: { document } } = editor
   const entry = document.firstText()
 
@@ -1169,11 +1011,9 @@ Commands.moveFocusToStartOfDocument = editor => {
 
 /**
  * Move the selection's focus point to the start of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfNextBlock = editor => {
+Commands.moveFocusToStartOfNextBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextBlock(selection.focus.path)
 
@@ -1185,11 +1025,9 @@ Commands.moveFocusToStartOfNextBlock = editor => {
 
 /**
  * Move the selection's focus point to the start of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfNextInline = editor => {
+Commands.moveFocusToStartOfNextInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextInline(selection.focus.path)
 
@@ -1201,11 +1039,9 @@ Commands.moveFocusToStartOfNextInline = editor => {
 
 /**
  * Move the selection's focus point to the start of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfNextText = editor => {
+Commands.moveFocusToStartOfNextText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.nextText(selection.focus.path)
 
@@ -1217,11 +1053,9 @@ Commands.moveFocusToStartOfNextText = editor => {
 
 /**
  * Move the selection's focus point to the start of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfPreviousBlock = editor => {
+Commands.moveFocusToStartOfPreviousBlock = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousBlock(selection.focus.path)
 
@@ -1233,11 +1067,9 @@ Commands.moveFocusToStartOfPreviousBlock = editor => {
 
 /**
  * Move the selection's focus point to the start of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfPreviousInline = editor => {
+Commands.moveFocusToStartOfPreviousInline = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousInline(selection.focus.path)
 
@@ -1249,11 +1081,9 @@ Commands.moveFocusToStartOfPreviousInline = editor => {
 
 /**
  * Move the selection's focus point to the start of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfPreviousText = editor => {
+Commands.moveFocusToStartOfPreviousText = (fn, editor) => () => {
   const { value: { document, selection } } = editor
   const entry = document.previousText(selection.focus.path)
 
@@ -1265,22 +1095,18 @@ Commands.moveFocusToStartOfPreviousText = editor => {
 
 /**
  * Move the selection's focus point to the start of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusToStartOfText = editor => {
+Commands.moveFocusToStartOfText = (fn, editor) => () => {
   const { value: { selection } } = editor
   editor.moveFocusToStartOfPath(selection.focus.path)
 }
 
 /**
  * Move the selection's focus point backward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusWordBackward = editor => {
+Commands.moveFocusWordBackward = (fn, editor) => () => {
   const { value: { selection } } = editor
   const point = editor.getPreviousWordPoint(selection.focus)
   editor.setFocus(point)
@@ -1288,11 +1114,9 @@ Commands.moveFocusWordBackward = editor => {
 
 /**
  * Move the selection's focus point forward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveFocusWordForward = editor => {
+Commands.moveFocusWordForward = (fn, editor) => () => {
   const { value: { selection } } = editor
   const point = editor.getNextWordPoint(selection.focus)
   editor.setFocus(point)
@@ -1300,11 +1124,9 @@ Commands.moveFocusWordForward = editor => {
 
 /**
  * Move the selection's points each forward by one character.
- *
- * @param {Editor} editor
  */
 
-Commands.moveForward = (editor, ...args) => {
+Commands.moveForward = (fn, editor) => (...args) => {
   editor.moveAnchorForward(...args)
   editor.moveFocusForward(...args)
 }
@@ -1312,11 +1134,10 @@ Commands.moveForward = (editor, ...args) => {
 /**
  * Move the selection's start point backwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveStartBackward = (editor, n = 1) => {
+Commands.moveStartBackward = (fn, editor) => (n = 1) => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorBackward(n)
   } else {
@@ -1327,11 +1148,10 @@ Commands.moveStartBackward = (editor, n = 1) => {
 /**
  * Move the selection's start point forwards by `n`.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveStartForward = (editor, n = 1) => {
+Commands.moveStartForward = (fn, editor) => (n = 1) => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorForward(n)
   } else {
@@ -1342,12 +1162,11 @@ Commands.moveStartForward = (editor, n = 1) => {
 /**
  * Move the selection's start point to a specific `path` and `offset`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  */
 
-Commands.moveStartTo = (editor, path, offset) => {
+Commands.moveStartTo = (fn, editor) => (path, offset) => {
   const { value: { selection } } = editor
   const range = selection.moveStartTo(path, offset)
   editor.select(range)
@@ -1355,11 +1174,9 @@ Commands.moveStartTo = (editor, path, offset) => {
 
 /**
  * Move the selection's start point to the end of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfBlock = editor => {
+Commands.moveStartToEndOfBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfBlock()
   } else {
@@ -1369,11 +1186,9 @@ Commands.moveStartToEndOfBlock = editor => {
 
 /**
  * Move the selection's start point to the end of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfDocument = editor => {
+Commands.moveStartToEndOfDocument = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfDocument()
   } else {
@@ -1383,11 +1198,9 @@ Commands.moveStartToEndOfDocument = editor => {
 
 /**
  * Move the selection's start point to the end of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfInline = editor => {
+Commands.moveStartToEndOfInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfInline()
   } else {
@@ -1397,11 +1210,9 @@ Commands.moveStartToEndOfInline = editor => {
 
 /**
  * Move the selection's start point to the end of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfNextBlock = editor => {
+Commands.moveStartToEndOfNextBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfNextBlock()
   } else {
@@ -1411,11 +1222,9 @@ Commands.moveStartToEndOfNextBlock = editor => {
 
 /**
  * Move the selection's start point to the end of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfNextInline = editor => {
+Commands.moveStartToEndOfNextInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfNextInline()
   } else {
@@ -1425,11 +1234,9 @@ Commands.moveStartToEndOfNextInline = editor => {
 
 /**
  * Move the selection's start point to the end of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfNextText = editor => {
+Commands.moveStartToEndOfNextText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfNextText()
   } else {
@@ -1439,11 +1246,9 @@ Commands.moveStartToEndOfNextText = editor => {
 
 /**
  * Move the selection's start point to the end of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfPath = (editor, path) => {
+Commands.moveStartToEndOfPath = (fn, editor) => path => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfPath(path)
   } else {
@@ -1453,11 +1258,9 @@ Commands.moveStartToEndOfPath = (editor, path) => {
 
 /**
  * Move the selection's start point to the end of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfPreviousBlock = editor => {
+Commands.moveStartToEndOfPreviousBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfPreviousBlock()
   } else {
@@ -1467,11 +1270,9 @@ Commands.moveStartToEndOfPreviousBlock = editor => {
 
 /**
  * Move the selection's start point to the end of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfPreviousInline = editor => {
+Commands.moveStartToEndOfPreviousInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfPreviousInline()
   } else {
@@ -1481,11 +1282,9 @@ Commands.moveStartToEndOfPreviousInline = editor => {
 
 /**
  * Move the selection's start point to the end of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfPreviousText = editor => {
+Commands.moveStartToEndOfPreviousText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfPreviousText()
   } else {
@@ -1495,11 +1294,9 @@ Commands.moveStartToEndOfPreviousText = editor => {
 
 /**
  * Move the selection's start point to the end of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToEndOfText = editor => {
+Commands.moveStartToEndOfText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToEndOfText()
   } else {
@@ -1509,11 +1306,9 @@ Commands.moveStartToEndOfText = editor => {
 
 /**
  * Move the selection's start point to the start of the block it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfBlock = editor => {
+Commands.moveStartToStartOfBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfBlock()
   } else {
@@ -1523,11 +1318,9 @@ Commands.moveStartToStartOfBlock = editor => {
 
 /**
  * Move the selection's start point to the start of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfDocument = editor => {
+Commands.moveStartToStartOfDocument = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfDocument()
   } else {
@@ -1537,11 +1330,9 @@ Commands.moveStartToStartOfDocument = editor => {
 
 /**
  * Move the selection's start point to the start of the nearest inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfInline = editor => {
+Commands.moveStartToStartOfInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfInline()
   } else {
@@ -1551,11 +1342,9 @@ Commands.moveStartToStartOfInline = editor => {
 
 /**
  * Move the selection's start point to the start of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfNextBlock = editor => {
+Commands.moveStartToStartOfNextBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfNextBlock()
   } else {
@@ -1565,11 +1354,9 @@ Commands.moveStartToStartOfNextBlock = editor => {
 
 /**
  * Move the selection's start point to the start of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfNextInline = editor => {
+Commands.moveStartToStartOfNextInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfNextInline()
   } else {
@@ -1579,11 +1366,9 @@ Commands.moveStartToStartOfNextInline = editor => {
 
 /**
  * Move the selection's start point to the start of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfNextText = editor => {
+Commands.moveStartToStartOfNextText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfNextText()
   } else {
@@ -1593,11 +1378,9 @@ Commands.moveStartToStartOfNextText = editor => {
 
 /**
  * Move the selection's start point to the start of the node at `path`.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfPath = (editor, path) => {
+Commands.moveStartToStartOfPath = (fn, editor) => path => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfPath(path)
   } else {
@@ -1607,11 +1390,9 @@ Commands.moveStartToStartOfPath = (editor, path) => {
 
 /**
  * Move the selection's start point to the start of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfPreviousBlock = editor => {
+Commands.moveStartToStartOfPreviousBlock = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfPreviousBlock()
   } else {
@@ -1621,11 +1402,9 @@ Commands.moveStartToStartOfPreviousBlock = editor => {
 
 /**
  * Move the selection's start point to the start of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfPreviousInline = editor => {
+Commands.moveStartToStartOfPreviousInline = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfPreviousInline()
   } else {
@@ -1635,11 +1414,9 @@ Commands.moveStartToStartOfPreviousInline = editor => {
 
 /**
  * Move the selection's start point to the start of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfPreviousText = editor => {
+Commands.moveStartToStartOfPreviousText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfPreviousText()
   } else {
@@ -1649,11 +1426,9 @@ Commands.moveStartToStartOfPreviousText = editor => {
 
 /**
  * Move the selection's start point to the start of the text node it's in.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartToStartOfText = editor => {
+Commands.moveStartToStartOfText = (fn, editor) => () => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorToStartOfText()
   } else {
@@ -1663,11 +1438,9 @@ Commands.moveStartToStartOfText = editor => {
 
 /**
  * Move the selection's start point backward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartWordBackward = (editor, ...args) => {
+Commands.moveStartWordBackward = (fn, editor) => (...args) => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorWordBackward()
   } else {
@@ -1677,11 +1450,9 @@ Commands.moveStartWordBackward = (editor, ...args) => {
 
 /**
  * Move the selection's start point forward to the edge of the nearest word.
- *
- * @param {Editor} editor
  */
 
-Commands.moveStartWordForward = (editor, ...args) => {
+Commands.moveStartWordForward = (fn, editor) => (...args) => {
   if (editor.value.selection.isForward) {
     editor.moveAnchorWordForward()
   } else {
@@ -1692,12 +1463,11 @@ Commands.moveStartWordForward = (editor, ...args) => {
 /**
  * Move the cursor to a specific `path` and `offset`.
  *
- * @param {Editor} editor
  * @param {Array} path
  * @param {Number} offset
  */
 
-Commands.moveTo = (editor, path, offset) => {
+Commands.moveTo = (fn, editor) => (path, offset) => {
   const { value: { selection } } = editor
   const range = selection.moveTo(path, offset)
   editor.select(range)
@@ -1705,11 +1475,9 @@ Commands.moveTo = (editor, path, offset) => {
 
 /**
  * Collapse the cursor to the selection's anchor point.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToAnchor = editor => {
+Commands.moveToAnchor = (fn, editor) => () => {
   const { value: { selection } } = editor
   const range = selection.moveToAnchor()
   editor.select(range)
@@ -1717,11 +1485,9 @@ Commands.moveToAnchor = editor => {
 
 /**
  * Collapse the cursor to the selection's end point.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEnd = editor => {
+Commands.moveToEnd = (fn, editor) => () => {
   const { value: { selection } } = editor
   const range = selection.moveToEnd()
   editor.select(range)
@@ -1729,66 +1495,54 @@ Commands.moveToEnd = editor => {
 
 /**
  * Collapse the cursor to the end of the current block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfBlock = editor => {
+Commands.moveToEndOfBlock = (fn, editor) => () => {
   editor.moveEndToEndOfBlock()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the end of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfDocument = editor => {
+Commands.moveToEndOfDocument = (fn, editor) => () => {
   editor.moveEndToEndOfDocument()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the end of the current inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfInline = editor => {
+Commands.moveToEndOfInline = (fn, editor) => () => {
   editor.moveEndToEndOfInline()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the end of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfNextBlock = editor => {
+Commands.moveToEndOfNextBlock = (fn, editor) => () => {
   editor.moveEndToEndOfNextBlock()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the end of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfNextInline = editor => {
+Commands.moveToEndOfNextInline = (fn, editor) => () => {
   editor.moveEndToEndOfNextInline()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the end of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfNextText = editor => {
+Commands.moveToEndOfNextText = (fn, editor) => () => {
   editor.moveEndToEndOfNextText()
   editor.moveToEnd()
 }
@@ -1800,62 +1554,52 @@ Commands.moveToEndOfNextText = editor => {
  * @param {Array} path
  */
 
-Commands.moveToEndOfPath = (editor, path) => {
+Commands.moveToEndOfPath = (fn, editor) => path => {
   editor.moveAnchorToEndOfPath(path)
   editor.moveToAnchor()
 }
 
 /**
  * Collapse the cursor to the end of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfPreviousBlock = editor => {
+Commands.moveToEndOfPreviousBlock = (fn, editor) => () => {
   editor.moveStartToEndOfPreviousBlock()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the end of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfPreviousInline = editor => {
+Commands.moveToEndOfPreviousInline = (fn, editor) => () => {
   editor.moveStartToEndOfPreviousInline()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the end of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfPreviousText = editor => {
+Commands.moveToEndOfPreviousText = (fn, editor) => () => {
   editor.moveStartToEndOfPreviousText()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the end of the current text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToEndOfText = editor => {
+Commands.moveToEndOfText = (fn, editor) => () => {
   editor.moveEndToEndOfText()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the selection's focus point.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToFocus = editor => {
+Commands.moveToFocus = (fn, editor) => () => {
   const { value: { selection } } = editor
   const range = selection.moveToFocus()
   editor.select(range)
@@ -1864,11 +1608,9 @@ Commands.moveToFocus = editor => {
 /**
  * Move the selection's anchor and focus points to the start and end of the
  * document, respectively.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToRangeOfDocument = editor => {
+Commands.moveToRangeOfDocument = (fn, editor) => () => {
   editor.moveAnchorToStartOfDocument()
   editor.moveFocusToEndOfDocument()
 }
@@ -1876,24 +1618,9 @@ Commands.moveToRangeOfDocument = editor => {
 /**
  * Move the selection's anchor and focus points to the start and end of the
  * current block, respectively.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToRangeOfBlock = editor => {
-  editor.moveToStart()
-  editor.moveAnchorToStartOfBlock()
-  editor.moveFocusToEndOfBlock()
-}
-
-/**
- * Move the selection's anchor and focus points to the start and end of the
- * current inline, respectively.
- *
- * @param {Editor} editor
- */
-
-Commands.moveToRangeOfInline = editor => {
+Commands.moveToRangeOfBlock = (fn, editor) => () => {
   editor.moveToStart()
   editor.moveAnchorToStartOfBlock()
   editor.moveFocusToEndOfBlock()
@@ -1902,11 +1629,9 @@ Commands.moveToRangeOfInline = editor => {
 /**
  * Move the selection's anchor and focus points to the start and end of the
  * current text node, respectively.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToRangeOfInline = editor => {
+Commands.moveToRangeOfInline = (fn, editor) => () => {
   editor.moveToStart()
   editor.moveAnchorToStartOfText()
   editor.moveFocusToEndOfText()
@@ -1919,18 +1644,16 @@ Commands.moveToRangeOfInline = editor => {
  * @param {Array} path
  */
 
-Commands.moveToRangeOfPath = (editor, path) => {
+Commands.moveToRangeOfPath = (fn, editor) => path => {
   editor.moveAnchorToStartOfPath(path)
   editor.moveFocusToEndOfPath(path)
 }
 
 /**
  * Collapse the cursor to the selection's start point.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStart = editor => {
+Commands.moveToStart = (fn, editor) => () => {
   const { value: { selection } } = editor
   const range = selection.moveToStart()
   editor.select(range)
@@ -1938,66 +1661,54 @@ Commands.moveToStart = editor => {
 
 /**
  * Collapse the cursor to the start of the current block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfBlock = editor => {
+Commands.moveToStartOfBlock = (fn, editor) => () => {
   editor.moveStartToStartOfBlock()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the document.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfDocument = editor => {
+Commands.moveToStartOfDocument = (fn, editor) => () => {
   editor.moveStartToStartOfDocument()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the current inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfInline = editor => {
+Commands.moveToStartOfInline = (fn, editor) => () => {
   editor.moveStartToStartOfInline()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the next block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfNextBlock = editor => {
+Commands.moveToStartOfNextBlock = (fn, editor) => () => {
   editor.moveEndToStartOfNextBlock()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the start of the next inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfNextInline = editor => {
+Commands.moveToStartOfNextInline = (fn, editor) => () => {
   editor.moveEndToStartOfNextInline()
   editor.moveToEnd()
 }
 
 /**
  * Collapse the cursor to the start of the next text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfNextText = editor => {
+Commands.moveToStartOfNextText = (fn, editor) => () => {
   editor.moveEndToStartOfNextText()
   editor.moveToEnd()
 }
@@ -2005,55 +1716,46 @@ Commands.moveToStartOfNextText = editor => {
 /**
  * Collapse the cursor to the start of the node at `path`.
  *
- * @param {Editor} editor
  * @param {Array} path
  */
 
-Commands.moveToStartOfPath = (editor, path) => {
+Commands.moveToStartOfPath = (fn, editor) => path => {
   editor.moveAnchorToStartOfPath(path)
   editor.moveToAnchor()
 }
 
 /**
  * Collapse the cursor to the start of the previous block.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfPreviousBlock = editor => {
+Commands.moveToStartOfPreviousBlock = (fn, editor) => () => {
   editor.moveStartToStartOfPreviousBlock()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the previous inline.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfPreviousInline = editor => {
+Commands.moveToStartOfPreviousInline = (fn, editor) => () => {
   editor.moveStartToStartOfPreviousInline()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the previous text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfPreviousText = editor => {
+Commands.moveToStartOfPreviousText = (fn, editor) => () => {
   editor.moveStartToStartOfPreviousText()
   editor.moveToStart()
 }
 
 /**
  * Collapse the cursor to the start of the current text node.
- *
- * @param {Editor} editor
  */
 
-Commands.moveToStartOfText = editor => {
+Commands.moveToStartOfText = (fn, editor) => () => {
   editor.moveStartToStartOfText()
   editor.moveToStart()
 }
@@ -2061,11 +1763,10 @@ Commands.moveToStartOfText = editor => {
 /**
  * Move the selection's points each backward by `n` words.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveWordBackward = (editor, n) => {
+Commands.moveWordBackward = (fn, editor) => n => {
   editor.moveAnchorWordBackward(n)
   editor.moveFocusWordBackward(n)
 }
@@ -2073,11 +1774,10 @@ Commands.moveWordBackward = (editor, n) => {
 /**
  * Move the selection's points each forward by `n` words.
  *
- * @param {Editor} editor
  * @param {Number} n
  */
 
-Commands.moveWordForward = (editor, n) => {
+Commands.moveWordForward = (fn, editor) => n => {
   editor.moveAnchorWordForward(n)
   editor.moveFocusWordForward(n)
 }
@@ -2085,12 +1785,11 @@ Commands.moveWordForward = (editor, n) => {
 /**
  * Set new `properties` on the selection.
  *
- * @param {Editor} editor
  * @param {Object} properties
  * @param {Object} options
  */
 
-Commands.select = (editor, properties, options = {}) => {
+Commands.select = (fn, editor) => (properties, options = {}) => {
   properties = Selection.createProperties(properties)
   const { snapshot = false } = options
   const { value } = editor
@@ -2143,62 +1842,56 @@ Commands.select = (editor, properties, options = {}) => {
 /**
  * Set the selection's anchor point to the return value of `fn`.
  *
- * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.setAnchor = (editor, fn) => {
+Commands.setAnchor = (fn, editor) => value => {
   const { value: { selection } } = editor
-  const range = selection.setAnchor(fn)
+  const range = selection.setAnchor(value)
   editor.select(range)
 }
 
 /**
  * Set the selection's end point to the return value of `fn`.
  *
- * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.setEnd = (editor, fn) => {
+Commands.setEnd = (fn, editor) => value => {
   const { value: { selection } } = editor
-  const range = selection.setEnd(fn)
+  const range = selection.setEnd(value)
   editor.select(range)
 }
 
 /**
  * Set the selection's focus point to the return value of `fn`.
  *
- * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.setFocus = (editor, fn) => {
+Commands.setFocus = (fn, editor) => value => {
   const { value: { selection } } = editor
-  const range = selection.setFocus(fn)
+  const range = selection.setFocus(value)
   editor.select(range)
 }
 
 /**
  * Set the selection's start point to the return value of `fn`.
  *
- * @param {Editor} editor
  * @param {Function} fn
  */
 
-Commands.setStart = (editor, fn) => {
+Commands.setStart = (fn, editor) => value => {
   const { value: { selection } } = editor
-  const range = selection.setStart(fn)
+  const range = selection.setStart(value)
   editor.select(range)
 }
 
 /**
  * HACK: Snapshot the selection, saving an entry in the history.
- *
- * @param {Editor} editor
  */
 
-Commands.snapshotSelection = editor => {
+Commands.snapshotSelection = (fn, editor) => () => {
   editor.withoutMerging(() => {
     editor.select(editor.value.selection, { snapshot: true })
   })
@@ -2208,7 +1901,7 @@ Commands.snapshotSelection = editor => {
  * Deprecated.
  */
 
-Commands.moveAnchorToEndOfNode = (editor, ...args) => {
+Commands.moveAnchorToEndOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveAnchorToEndOfNode(node) command is deprecated. Use the `editor.moveAnchorToEndOfPath(path)` command instead.'
@@ -2219,7 +1912,7 @@ Commands.moveAnchorToEndOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveAnchorToStartOfNode = (editor, ...args) => {
+Commands.moveAnchorToStartOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveAnchorToStartOfNode(node) command is deprecated. Use the `editor.moveAnchorToStartOfPath(path)` command instead.'
@@ -2230,7 +1923,7 @@ Commands.moveAnchorToStartOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveEndToEndOfNode = (editor, ...args) => {
+Commands.moveEndToEndOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveEndToEndOfNode(node) command is deprecated. Use the `editor.moveEndToEndOfPath(path)` command instead.'
@@ -2241,7 +1934,7 @@ Commands.moveEndToEndOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveEndToStartOfNode = (editor, ...args) => {
+Commands.moveEndToStartOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveEndToStartOfNode(node) command is deprecated. Use the `editor.moveEndToStartOfPath(path)` command instead.'
@@ -2252,7 +1945,7 @@ Commands.moveEndToStartOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveFocusToEndOfNode = (editor, ...args) => {
+Commands.moveFocusToEndOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveFocusToEndOfNode(node) command is deprecated. Use the `editor.moveFocusToEndOfPath(path)` command instead.'
@@ -2263,7 +1956,7 @@ Commands.moveFocusToEndOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveFocusToStartOfNode = (editor, ...args) => {
+Commands.moveFocusToStartOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveFocusToStartOfNode(node) command is deprecated. Use the `editor.moveFocusToStartOfPath(path)` command instead.'
@@ -2274,7 +1967,7 @@ Commands.moveFocusToStartOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveStartToEndOfNode = (editor, ...args) => {
+Commands.moveStartToEndOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveStartToEndOfNode(node) command is deprecated. Use the `editor.moveStartToEndOfPath(path)` command instead.'
@@ -2285,7 +1978,7 @@ Commands.moveStartToEndOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveStartToStartOfNode = (editor, ...args) => {
+Commands.moveStartToStartOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveStartToStartOfNode(node) command is deprecated. Use the `editor.moveStartToStartOfPath(path)` command instead.'
@@ -2296,7 +1989,7 @@ Commands.moveStartToStartOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveToEndOfNode = (editor, ...args) => {
+Commands.moveToEndOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveToEndOfNode(node) command is deprecated. Use the `editor.moveToEndOfPath(path)` command instead.'
@@ -2307,7 +2000,7 @@ Commands.moveToEndOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveToRangeOfNode = (editor, ...args) => {
+Commands.moveToRangeOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveToRangeOfNode(node) command is deprecated. Use the `editor.moveToRangeOfPath(path)` command instead.'
@@ -2318,7 +2011,7 @@ Commands.moveToRangeOfNode = (editor, ...args) => {
   editor.select(range)
 }
 
-Commands.moveToStartOfNode = (editor, ...args) => {
+Commands.moveToStartOfNode = (fn, editor) => (...args) => {
   warning(
     false,
     'As of slate@0.48 the `editor.moveToStartOfNode(node) command is deprecated. Use the `editor.moveToStartOfPath(path)` command instead.'

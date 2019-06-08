@@ -664,7 +664,7 @@ class ElementInterface {
    */
 
   getDecorations(editor) {
-    let decorations = editor.run('decorateNode', this)
+    let decorations = editor.exec('decorateNode', this)
     decorations = Decoration.createList(decorations)
     return decorations
   }

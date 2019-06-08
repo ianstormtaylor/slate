@@ -4,18 +4,10 @@ import Plain from 'slate-plain-serializer'
 
 const defaultValue = Plain.deserialize('')
 
-const plugins = [
-  {
-    queries: {
-      customQuery: () => {},
-    },
-  },
-]
-
-export const input = { defaultValue, plugins }
+export const input = { defaultValue }
 
 export default function(editor) {
-  return editor.hasQuery('otherQuery')
+  return editor.has('unknownCommand')
 }
 
 export const output = false

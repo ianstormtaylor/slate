@@ -39,7 +39,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onBeforeInput(event, editor, next) {
+  const onBeforeInput = (fn, editor) => event => {
     const isSynthetic = !!event.nativeEvent
     if (editor.readOnly) return
 
@@ -49,7 +49,7 @@ function BeforePlugin() {
     if (isSynthetic && HAS_INPUT_EVENTS_LEVEL_2) return
 
     debug('onBeforeInput', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -60,7 +60,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onBlur(event, editor, next) {
+  const onBlur = (fn, editor) => event => {
     if (isCopying) return
     if (editor.readOnly) return
 
@@ -98,7 +98,7 @@ function BeforePlugin() {
     }
 
     debug('onBlur', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -109,7 +109,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onCompositionEnd(event, editor, next) {
+  const onCompositionEnd = (fn, editor) => event => {
     const n = compositionCount
 
     // The `count` check here ensures that if another composition starts
@@ -121,7 +121,7 @@ function BeforePlugin() {
     })
 
     debug('onCompositionEnd', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -132,9 +132,9 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onClick(event, editor, next) {
+  const onClick = (fn, editor) => event => {
     debug('onClick', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -145,7 +145,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onCompositionStart(event, editor, next) {
+  const onCompositionStart = (fn, editor) => event => {
     isComposing = true
     compositionCount++
 
@@ -164,7 +164,7 @@ function BeforePlugin() {
     }
 
     debug('onCompositionStart', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -175,13 +175,13 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onCopy(event, editor, next) {
+  const onCopy = (fn, editor) => event => {
     const window = getWindow(event.target)
     isCopying = true
     window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCopy', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -192,7 +192,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onCut(event, editor, next) {
+  const onCut = (fn, editor) => event => {
     if (editor.readOnly) return
 
     const window = getWindow(event.target)
@@ -200,7 +200,7 @@ function BeforePlugin() {
     window.requestAnimationFrame(() => (isCopying = false))
 
     debug('onCut', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -211,10 +211,10 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragEnd(event, editor, next) {
+  const onDragEnd = (fn, editor) => event => {
     isDragging = false
     debug('onDragEnd', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -225,9 +225,9 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragEnter(event, editor, next) {
+  const onDragEnter = (fn, editor) => event => {
     debug('onDragEnter', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -238,9 +238,9 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragExit(event, editor, next) {
+  const onDragExit = (fn, editor) => event => {
     debug('onDragExit', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -251,9 +251,9 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragLeave(event, editor, next) {
+  const onDragLeave = (fn, editor) => event => {
     debug('onDragLeave', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -264,7 +264,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragOver(event, editor, next) {
+  const onDragOver = (fn, editor) => event => {
     // If the target is inside a void node, and only in this case,
     // call `preventDefault` to signal that drops are allowed.
     // When the target is editable, dropping is already allowed by
@@ -295,7 +295,7 @@ function BeforePlugin() {
     }
 
     debug('onDragOver', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -306,10 +306,10 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDragStart(event, editor, next) {
+  const onDragStart = (fn, editor) => event => {
     isDragging = true
     debug('onDragStart', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -320,14 +320,14 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onDrop(event, editor, next) {
+  const onDrop = (fn, editor) => event => {
     if (editor.readOnly) return
 
     // Prevent default so the DOM's value isn't corrupted.
     event.preventDefault()
 
     debug('onDrop', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -338,7 +338,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onFocus(event, editor, next) {
+  const onFocus = (fn, editor) => event => {
     if (isCopying) return
     if (editor.readOnly) return
 
@@ -357,7 +357,7 @@ function BeforePlugin() {
     }
 
     debug('onFocus', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -368,11 +368,11 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onInput(event, editor, next) {
+  const onInput = (fn, editor) => event => {
     if (isComposing) return
     if (editor.value.selection.isBlurred) return
     debug('onInput', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -383,7 +383,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onKeyDown(event, editor, next) {
+  const onKeyDown = (fn, editor) => event => {
     if (editor.readOnly) return
 
     // When composing, we need to prevent all hotkeys from executing while
@@ -416,7 +416,7 @@ function BeforePlugin() {
     }
 
     debug('onKeyDown', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -427,14 +427,14 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onPaste(event, editor, next) {
+  const onPaste = (fn, editor) => event => {
     if (editor.readOnly) return
 
     // Prevent defaults so the DOM state isn't corrupted.
     event.preventDefault()
 
     debug('onPaste', { event })
-    next()
+    fn(event)
   }
 
   /**
@@ -445,7 +445,7 @@ function BeforePlugin() {
    * @param {Function} next
    */
 
-  function onSelect(event, editor, next) {
+  const onSelect = (fn, editor) => event => {
     if (isCopying) return
     if (isComposing) return
 
@@ -456,7 +456,7 @@ function BeforePlugin() {
     activeElement = window.document.activeElement
 
     debug('onSelect', { event })
-    next()
+    fn(event)
   }
 
   /**

@@ -1,5 +1,4 @@
 import SlateError from '../../utils/slate-error'
-import Queries from '../queries'
 
 /**
  * Create a plugin from a `schema` definition.
@@ -84,12 +83,12 @@ function SchemaPlugin(schema) {
    * @return {Boolean}
    */
 
-  function isAtomic(editor, format) {
+  const isAtomic = (fn, editor) => format => {
     const rule = schemaRules.find(
       r => 'isAtomic' in r && testRules(format, r.match)
     )
 
-    return rule && rule.isAtomic
+    return rule ? rule.isAtomic : fn(format)
   }
 
   /**
@@ -100,12 +99,12 @@ function SchemaPlugin(schema) {
    * @return {Boolean}
    */
 
-  function isVoid(editor, node) {
+  const isVoid = (fn, editor) => node => {
     const rule = schemaRules.find(
       r => 'isVoid' in r && testRules(node, r.match)
     )
 
-    return rule && rule.isVoid
+    return rule ? rule.isVoid : fn(node)
   }
 
   /**
@@ -118,11 +117,17 @@ function SchemaPlugin(schema) {
    * @return {Function|Void}
    */
 
-  function normalizeNode(node, editor, next) {
-    const error = validateNode(node, editor, () => {})
+  let validate
+
+  const normalizeNode = (fn, editor) => node => {
+    if (!validate) {
+      validate = validateNode(() => {}, editor)
+    }
+
+    const error = validate(node)
 
     if (!error) {
-      return next()
+      return fn(node)
     }
 
     return () => {
@@ -152,12 +157,12 @@ function SchemaPlugin(schema) {
    * @return {Error|Void}
    */
 
-  function validateNode(node, editor, next) {
+  const validateNode = (fn, editor) => node => {
     const matches = schemaRules.filter(r => testRules(node, r.match))
     const failure = validateRules(node, matches, schemaRules, { every: true })
 
     if (!failure) {
-      return next()
+      return fn(node)
     }
 
     const error = new SlateError(failure.code, failure)
@@ -165,21 +170,12 @@ function SchemaPlugin(schema) {
   }
 
   /**
-   * On schema-related queries, respond if we can.
-   *
-   * @param {Object} query
-   * @param {Function} next
-   */
-
-  const queries = Queries({ isAtomic, isVoid })
-
-  /**
-   * Return the plugins.
+   * Return the plugin.
    *
    * @type {Object}
    */
 
-  return [{ normalizeNode, validateNode }, queries]
+  return { normalizeNode, validateNode, isAtomic, isVoid }
 }
 
 /**

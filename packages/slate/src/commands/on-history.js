@@ -12,15 +12,17 @@ const Commands = {}
 /**
  * Save an `operation` into the history.
  *
- * @param {Editor} editor
  * @param {Object} operation
  */
 
-Commands.save = (editor, operation) => {
-  const { operations, value } = editor
+Commands.save = (fn, editor) => operation => {
+  const { operations, value, tmp } = editor
   const { data } = value
-  let { save, merge } = editor.tmp
-  if (save === false) return
+  let merge = tmp.merge
+
+  if (tmp.save === false) {
+    return
+  }
 
   let undos = data.get('undos') || List()
   const lastBatch = undos.last()
@@ -63,10 +65,9 @@ Commands.save = (editor, operation) => {
 /**
  * Redo to the next value in the history.
  *
- * @param {Editor} editor
  */
 
-Commands.redo = editor => {
+Commands.redo = (fn, editor) => () => {
   const { value } = editor
   const { data } = value
   let redos = data.get('redos') || List()
@@ -101,10 +102,9 @@ Commands.redo = editor => {
 /**
  * Undo the previous operations in the history.
  *
- * @param {Editor} editor
  */
 
-Commands.undo = editor => {
+Commands.undo = (fn, editor) => () => {
   const { value } = editor
   const { data } = value
   let redos = data.get('redos') || List()
@@ -144,14 +144,13 @@ Commands.undo = editor => {
  * Apply a series of changes inside a synchronous `fn`, without merging any of
  * the new operations into previous save point in the history.
  *
- * @param {Editor} editor
- * @param {Function} fn
+ * @param {Function} run
  */
 
-Commands.withoutMerging = (editor, fn) => {
+Commands.withoutMerging = (fn, editor) => run => {
   const value = editor.tmp.merge
   editor.tmp.merge = false
-  fn(editor)
+  run(editor)
   editor.tmp.merge = value
 }
 
@@ -159,14 +158,13 @@ Commands.withoutMerging = (editor, fn) => {
  * Apply a series of changes inside a synchronous `fn`, without saving any of
  * their operations into the history.
  *
- * @param {Editor} editor
- * @param {Function} fn
+ * @param {Function} run
  */
 
-Commands.withoutSaving = (editor, fn) => {
+Commands.withoutSaving = (fn, editor) => run => {
   const value = editor.tmp.save
   editor.tmp.save = false
-  fn(editor)
+  run(editor)
   editor.tmp.save = value
 }
 

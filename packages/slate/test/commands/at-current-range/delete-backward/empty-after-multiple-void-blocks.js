@@ -10,9 +10,13 @@ export const input = (
   <value>
     <document>
       <paragraph>
+        <text />
         <emoji />
+        <text />
         <emoji />
-        <cursor />
+        <text>
+          <cursor />
+        </text>
       </paragraph>
       <paragraph />
     </document>
@@ -23,8 +27,11 @@ export const output = (
   <value>
     <document>
       <paragraph>
+        <text />
         <emoji />
-        <cursor />
+        <text>
+          <cursor />
+        </text>
       </paragraph>
       <paragraph />
     </document>

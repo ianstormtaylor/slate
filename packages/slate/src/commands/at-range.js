@@ -30,45 +30,6 @@ function deleteExpandedAtRange(editor, range) {
 }
 
 /**
- * Ensure that the edges of a range are split such that they are at the edge of
- * all of the inline and text nodes they are in. This will split inline nodes
- * and text nodes and update the range to be inside the split.
- *
- * @param {Editor}
- */
-
-function splitInlinesAtRange(editor, range) {
-  if (range.isExpanded) {
-    editor.deleteAtRange(range)
-  }
-
-  const { value: { document } } = editor
-  const start = editor.getPreviousNonVoidPoint(range.start)
-  const startText = document.getNode(start.path)
-  const startInline = document.furthestInline(start.path)
-  const end = editor.getNextNonVoidPoint(range.end)
-  const endText = document.getNode(end.path)
-  const endInline = document.furthestInline(end.path)
-
-  if (end.offset !== 0 && end.offset !== endText.text.length) {
-    editor.splitNodeByPath(end.path, end.offset)
-  }
-
-  if (start.offset !== 0 && start.offset !== startText.text.length) {
-    editor.splitNodeByPath(start.path, start.offset)
-
-    const newStart = start
-      .setPath(PathUtils.increment(start.path))
-      .setOffset(0)
-      .normalize(document)
-
-    range = range.setStart(newStart)
-  }
-
-  return range
-}
-
-/**
  * Commands.
  *
  * @type {Object}
@@ -79,12 +40,11 @@ const Commands = {}
 /**
  * Add a new `mark` to the characters at `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Mixed} mark
  */
 
-Commands.addMarkAtRange = (editor, range, mark) => {
+Commands.addMarkAtRange = (fn, editor) => (range, mark) => {
   if (range.isCollapsed) {
     return
   }
@@ -118,23 +78,21 @@ Commands.addMarkAtRange = (editor, range, mark) => {
 /**
  * Add a list of `marks` to the characters at `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Array<Mixed>} mark
  */
 
-Commands.addMarksAtRange = (editor, range, marks) => {
+Commands.addMarksAtRange = (fn, editor) => (range, marks) => {
   marks.forEach(mark => editor.addMarkAtRange(range, mark))
 }
 
 /**
  * Delete everything in a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteAtRange = (editor, range) => {
+Commands.deleteAtRange = (fn, editor) => range => {
   // Snapshot the selection, which creates an extra undo save point, so that
   // when you undo a delete, the expanded selection will be retained.
   editor.snapshotSelection()
@@ -333,12 +291,11 @@ Commands.deleteAtRange = (editor, range) => {
 /**
  * Delete backward `n` characters at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Number} n (optional)
  */
 
-Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
+Commands.deleteBackwardAtRange = (fn, editor) => (range, n = 1) => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
     return
@@ -443,11 +400,10 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 /**
  * Delete backward until the character boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteCharBackwardAtRange = (editor, range) => {
+Commands.deleteCharBackwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
   } else {
@@ -463,11 +419,10 @@ Commands.deleteCharBackwardAtRange = (editor, range) => {
 /**
  * Delete forward until the character boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteCharForwardAtRange = (editor, range) => {
+Commands.deleteCharForwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
   } else {
@@ -483,12 +438,11 @@ Commands.deleteCharForwardAtRange = (editor, range) => {
 /**
  * Delete forward `n` characters at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Number} n (optional)
  */
 
-Commands.deleteForwardAtRange = (editor, range, n = 1) => {
+Commands.deleteForwardAtRange = (fn, editor) => (range, n = 1) => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
     return
@@ -590,11 +544,10 @@ Commands.deleteForwardAtRange = (editor, range, n = 1) => {
 /**
  * Delete backward until the line boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteLineBackwardAtRange = (editor, range) => {
+Commands.deleteLineBackwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
     return
@@ -613,11 +566,10 @@ Commands.deleteLineBackwardAtRange = (editor, range) => {
 /**
  * Delete forward until the line boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteLineForwardAtRange = (editor, range) => {
+Commands.deleteLineForwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
     return
@@ -636,11 +588,10 @@ Commands.deleteLineForwardAtRange = (editor, range) => {
 /**
  * Delete backward until the word boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteWordBackwardAtRange = (editor, range) => {
+Commands.deleteWordBackwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
   } else {
@@ -656,11 +607,10 @@ Commands.deleteWordBackwardAtRange = (editor, range) => {
 /**
  * Delete forward until the word boundary at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
-Commands.deleteWordForwardAtRange = (editor, range) => {
+Commands.deleteWordForwardAtRange = (fn, editor) => range => {
   if (range.isExpanded) {
     editor.deleteAtRange(range)
   } else {
@@ -676,12 +626,11 @@ Commands.deleteWordForwardAtRange = (editor, range) => {
 /**
  * Insert a `block` node at `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Block|String|Object} block
  */
 
-Commands.insertBlockAtRange = (editor, range, block) => {
+Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
   range = deleteExpandedAtRange(editor, range)
   block = Block.create(block)
 
@@ -711,7 +660,6 @@ Commands.insertBlockAtRange = (editor, range, block) => {
 /**
  * Check if current block should be split or new block should be added before or behind it.
  *
- * @param {Editor} editor
  * @param {Range} range
  */
 
@@ -740,12 +688,11 @@ const getInsertionMode = (editor, range) => {
 /**
  * Insert a `fragment` at a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Document} fragment
  */
 
-Commands.insertFragmentAtRange = (editor, range, fragment) => {
+Commands.insertFragmentAtRange = (fn, editor) => (range, fragment) => {
   editor.withoutNormalizing(() => {
     range = deleteExpandedAtRange(editor, range)
 
@@ -899,12 +846,11 @@ const findInsertionNode = (fragment, document, startKey) => {
 /**
  * Insert an `inline` node at `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Inline|String|Object} inline
  */
 
-Commands.insertInlineAtRange = (editor, range, inline) => {
+Commands.insertInlineAtRange = (fn, editor) => (range, inline) => {
   editor.withoutNormalizing(() => {
     inline = Inline.create(inline)
     range = deleteExpandedAtRange(editor, range)
@@ -926,13 +872,12 @@ Commands.insertInlineAtRange = (editor, range, inline) => {
 /**
  * Insert `text` at a `range`, with optional `marks`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {String} text
  * @param {Set<Mark>} marks (optional)
  */
 
-Commands.insertTextAtRange = (editor, range, text, marks) => {
+Commands.insertTextAtRange = (fn, editor) => (range, text, marks) => {
   editor.withoutNormalizing(() => {
     range = deleteExpandedAtRange(editor, range)
     const { value: { document } } = editor
@@ -950,12 +895,11 @@ Commands.insertTextAtRange = (editor, range, text, marks) => {
 /**
  * Remove an existing `mark` to the characters at `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Mark|String} mark (optional)
  */
 
-Commands.removeMarkAtRange = (editor, range, mark) => {
+Commands.removeMarkAtRange = (fn, editor) => (range, mark) => {
   if (range.isCollapsed) {
     return
   }
@@ -993,12 +937,11 @@ Commands.removeMarkAtRange = (editor, range, mark) => {
 /**
  * Set the `properties` of block nodes in a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Object|String} properties
  */
 
-Commands.setBlocksAtRange = (editor, range, properties) => {
+Commands.setBlocksAtRange = (fn, editor) => (range, properties) => {
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
     const iterable = document.blocks({
@@ -1016,12 +959,11 @@ Commands.setBlocksAtRange = (editor, range, properties) => {
 /**
  * Set the `properties` of inline nodes in a `range`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Object|String} properties
  */
 
-Commands.setInlinesAtRange = (editor, range, properties) => {
+Commands.setInlinesAtRange = (fn, editor) => (range, properties) => {
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
     const iterable = document.inlines({ range, onlyLeaves: true })
@@ -1035,12 +977,11 @@ Commands.setInlinesAtRange = (editor, range, properties) => {
 /**
  * Split the block nodes at a `range`, to optional `height`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Number} height (optional)
  */
 
-Commands.splitBlockAtRange = (editor, range, height = 1) => {
+Commands.splitBlockAtRange = (fn, editor) => (range, height = 1) => {
   editor.withoutNormalizing(() => {
     range = deleteExpandedAtRange(editor, range)
     const { start } = range
@@ -1066,12 +1007,11 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
 /**
  * Split the inline nodes at a `range`, to optional `height`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Number} height (optional)
  */
 
-Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
+Commands.splitInlineAtRange = (fn, editor) => (range, height = Infinity) => {
   editor.withoutNormalizing(() => {
     range = deleteExpandedAtRange(editor, range)
     const { start } = range
@@ -1098,12 +1038,11 @@ Commands.splitInlineAtRange = (editor, range, height = Infinity) => {
  * Add or remove a `mark` from the characters at `range`, depending on whether
  * it's already there.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Mixed} mark
  */
 
-Commands.toggleMarkAtRange = (editor, range, mark) => {
+Commands.toggleMarkAtRange = (fn, editor) => (range, mark) => {
   if (range.isCollapsed) return
 
   mark = Mark.create(mark)
@@ -1128,12 +1067,11 @@ Commands.toggleMarkAtRange = (editor, range, mark) => {
  * parent nodes in the range. I think we probably need to different concepts,
  * and then to allow each for blocks and inlines.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {String|Object} properties
  */
 
-Commands.unwrapBlockAtRange = (editor, range, properties) => {
+Commands.unwrapBlockAtRange = (fn, editor) => (range, properties) => {
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
     const iterable = document.blocks({
@@ -1162,12 +1100,11 @@ Commands.unwrapBlockAtRange = (editor, range, properties) => {
 /**
  * Unwrap the inline nodes in a `range` from an inline with `properties`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {String|Object} properties
  */
 
-Commands.unwrapInlineAtRange = (editor, range, properties) => {
+Commands.unwrapInlineAtRange = (fn, editor) => (range, properties) => {
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
     const iterable = document.inlines({
@@ -1188,12 +1125,11 @@ Commands.unwrapInlineAtRange = (editor, range, properties) => {
 /**
  * Wrap all of the blocks in a `range` in a new `block`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Block|Object|String} block
  */
 
-Commands.wrapBlockAtRange = (editor, range, block) => {
+Commands.wrapBlockAtRange = (fn, editor) => (range, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
 
@@ -1222,12 +1158,11 @@ Commands.wrapBlockAtRange = (editor, range, block) => {
 /**
  * Wrap the text and inlines in a `range` in a new `inline`.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {Inline|Object|String} inline
  */
 
-Commands.wrapInlineAtRange = (editor, range, inline) => {
+Commands.wrapInlineAtRange = (fn, editor) => (range, inline) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
 
@@ -1339,13 +1274,12 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
 /**
  * Wrap the text in a `range` in a prefix/suffix.
  *
- * @param {Editor} editor
  * @param {Range} range
  * @param {String} prefix
  * @param {String} suffix (optional)
  */
 
-Commands.wrapTextAtRange = (editor, range, prefix, suffix = prefix) => {
+Commands.wrapTextAtRange = (fn, editor) => (range, prefix, suffix = prefix) => {
   const { start, end } = range
   const startRange = range.moveToStart()
   let endRange = range.moveToEnd()

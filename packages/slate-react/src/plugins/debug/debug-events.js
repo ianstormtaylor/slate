@@ -27,10 +27,10 @@ function DebugEventsPlugin() {
   const plugin = {}
 
   for (const eventName of EVENT_HANDLERS) {
-    plugin[eventName] = function(event, editor, next) {
+    plugin[eventName] = (fn, editor) => event => {
       const s = stringifyEvent(event)
       debug(s)
-      next()
+      fn(event)
     }
   }
 

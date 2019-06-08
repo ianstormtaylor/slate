@@ -13,11 +13,10 @@ const Commands = {}
 /**
  * Set `properties` on the value.
  *
- * @param {Editor} editor
  * @param {Object|Value} properties
  */
 
-Commands.setData = (editor, data = {}) => {
+Commands.setData = (fn, editor) => (data = {}) => {
   const { value } = editor
   const newProperties = Value.createProperties({ data })
   const prevProperties = pick(value, Object.keys(newProperties))
@@ -29,7 +28,7 @@ Commands.setData = (editor, data = {}) => {
   })
 }
 
-Commands.addAnnotation = (editor, annotation) => {
+Commands.addAnnotation = (fn, editor) => annotation => {
   annotation = Annotation.create(annotation)
 
   editor.applyOperation({
@@ -38,7 +37,7 @@ Commands.addAnnotation = (editor, annotation) => {
   })
 }
 
-Commands.removeAnnotation = (editor, annotation) => {
+Commands.removeAnnotation = (fn, editor) => annotation => {
   annotation = Annotation.create(annotation)
 
   editor.applyOperation({
@@ -47,7 +46,7 @@ Commands.removeAnnotation = (editor, annotation) => {
   })
 }
 
-Commands.setAnnotation = (editor, annotation, newProperties) => {
+Commands.setAnnotation = (fn, editor) => (annotation, newProperties) => {
   annotation = Annotation.create(annotation)
   newProperties = Annotation.createProperties(newProperties)
 

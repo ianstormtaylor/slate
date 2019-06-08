@@ -87,9 +87,9 @@ function DebugBatchEventsPlugin() {
   const plugin = {}
 
   for (const eventName of EVENT_HANDLERS) {
-    plugin[eventName] = function(event, editor, next) {
+    plugin[eventName] = (fn, editor) => event => {
       pushEvent(event)
-      next()
+      fn(event)
     }
   }
 

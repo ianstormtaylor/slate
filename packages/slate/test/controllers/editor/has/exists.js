@@ -4,16 +4,14 @@ import { Editor } from 'slate'
 
 const plugins = [
   {
-    queries: {
-      customquery: () => {},
-    },
+    customCommand: () => () => {},
   },
 ]
 
 export const input = new Editor({ plugins })
 
 export default function(editor) {
-  return editor.hasQuery('otherquery')
+  return editor.has('customCommand')
 }
 
-export const output = false
+export const output = true
