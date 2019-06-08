@@ -168,7 +168,6 @@ class Editor {
   hasCommand(type) {
     const { controller } = this
     const has = type in controller && controller[type].__command
-
     return has
   }
 
@@ -182,7 +181,6 @@ class Editor {
   hasQuery(type) {
     const { controller } = this
     const has = type in controller && controller[type].__query
-
     return has
   }
 
