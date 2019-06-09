@@ -10,9 +10,9 @@ import TextUtils from '../../utils/text-utils'
 function CoreQueriesPlugin() {
   return {
     /**
-     * By default, no formats are atomic in Slate.
+     * Check whether a `format` is atomic, defaults to false.
      *
-     * @param {Annotation|Decoration|Mark} object
+     * @param {Annotation|Decoration|Mark} format
      * @return {Boolean}
      */
 
@@ -21,7 +21,60 @@ function CoreQueriesPlugin() {
     },
 
     /**
-     * By default, no nodes are void in Slate.
+     * Check whether a `range` is hanging.
+     *
+     * @param {Range} range
+     * @return {Boolean}
+     */
+
+    isHanging: (fn, editor) => range => {
+      const { isExpanded, start, end } = range
+      return isExpanded && end.offset === 0 && !start.path.equals(end.path)
+    },
+
+    isHangingBlock: (fn, editor) => range => {
+      const { value: { document } } = editor
+      const { isExpanded, start, end } = range
+      const [, endBlockPath] = document.closestBlock(end.path)
+      const [, firstTextPath] = document.firstText({ path: endBlockPath })
+
+      return (
+        isExpanded &&
+        end.offset === 0 &&
+        !start.path.equals(end.path) &&
+        end.path.equals(firstTextPath)
+      )
+    },
+
+    isAtStartOfBlock: (fn, editor) => point => {
+      const { value: { document } } = editor
+      const [, blockPath] = document.closestBlock(point.path)
+      const [, firstTextPath] = document.firstText({ path: blockPath })
+      return point.offset === 0 && point.path.equals(firstTextPath)
+    },
+
+    isAtStartOfPath: (fn, editor) => (point, path) => {
+      const { value: { document } } = editor
+      const [, firstPath] = document.firstText({ path })
+      return point.offset === 0 && point.path.equals(firstPath)
+    },
+
+    isAtEndOfPath: (fn, editor) => (point, path) => {
+      const { value: { document } } = editor
+      const [firstNode, firstPath] = document.firstText({ path })
+      return (
+        point.offset === firstNode.text.length && point.path.equals(firstPath)
+      )
+    },
+
+    isAtEdgeOfPath: (fn, editor) => (point, path) => {
+      return (
+        editor.isAtStartOfPath(point, path) || editor.isAtEndOfPath(point, path)
+      )
+    },
+
+    /**
+     * Check whether a `node` is void, defaults to false.
      *
      * @param {Node} node
      * @return {Boolean}
@@ -75,11 +128,15 @@ function CoreQueriesPlugin() {
           }
         }
 
+        // If the point is now inside a new void node, no matter if the void
+        // node is zero-width, we still count it as a new point.
+        const nextClosestVoid = document.closest(nextPath, editor.isVoid)
+
         // If the text node and we're still in the same block, continue onwards
         // because we need to have moved one point forwards, and an empty text
         // will be perceived as not moving.
         if (nextNode.text.length === 0) {
-          if (allowZeroWidth) {
+          if (nextClosestVoid || allowZeroWidth) {
             const next = point.moveTo(nextPath, 0)
             return next.normalize(document)
           } else {
@@ -193,12 +250,12 @@ function CoreQueriesPlugin() {
 
     getNonHangingRange: (fn, editor) => range => {
       const { value: { document } } = editor
-      const { isExpanded, start, end } = range
+      const { end } = range
 
-      if (isExpanded && end.offset === 0 && !start.path.equals(end.path)) {
+      if (editor.isHanging(range)) {
         const [prevText, prevPath] = document.previousText(end.path)
         const newEnd = end.moveTo(prevPath, prevText.text.length)
-        const nonHanging = range.setEnd(newEnd)
+        const nonHanging = range.setEnd(newEnd).normalize(document)
         return nonHanging
       } else {
         return range
@@ -250,11 +307,15 @@ function CoreQueriesPlugin() {
           }
         }
 
+        // If the point is now inside a new void node, no matter if the void
+        // node is zero-width, we still count it as a new point.
+        const prevClosestVoid = document.closest(prevPath, editor.isVoid)
+
         // If the text node and we're still in the same block, continue onwards
         // because we need to have moved one point backwards, and an empty text
         // will be perceived as not moving.
         if (prevNode.text.length === 0) {
-          if (allowZeroWidth) {
+          if (prevClosestVoid || allowZeroWidth) {
             const prev = point.moveTo(prevPath, 0)
             return prev.normalize(document)
           } else {

@@ -21,8 +21,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        one<link>two</link>
-        <cursor />
+        one<link>
+          two<cursor />
+        </link>
+        <text />
       </paragraph>
     </document>
   </value>

@@ -154,31 +154,64 @@ Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
  */
 
 Commands.mergeNodeByPath = (fn, editor) => path => {
-  const { value } = editor
-  const { document } = value
-  const original = document.getDescendant(path)
-  const previous = document.getPreviousSibling(path)
-
-  if (!previous) {
-    throw new Error(
-      `Unable to merge node with path "${path}", because it has no previous sibling.`
-    )
-  }
-
-  const position =
-    previous.object === 'text' ? previous.text.length : previous.nodes.size
+  const { value: { document } } = editor
+  const node = document.assertNode(path)
+  const prevPath = PathUtils.decrement(path)
+  const prev = document.assertNode(prevPath)
+  const position = prev.object === 'text' ? prev.text.length : prev.nodes.size
 
   editor.applyOperation({
     type: 'merge_node',
     path,
     position,
-    // for undos to succeed we only need the type and data because
-    // these are the only properties that get changed in the merge operation
-    properties: {
-      type: original.type,
-      data: original.data,
-    },
     target: null,
+    properties: {
+      type: node.type,
+      data: node.data,
+    },
+  })
+}
+
+Commands.mergeBlockByPath = (fn, editor) => path => {
+  editor.withoutNormalizing(() => {
+    const { value: { document } } = editor
+    document.assertNode(path)
+
+    const node = document.assertNode(path)
+    let blockPath
+
+    // HACK: this should not be required, but since `closest` doesn't match the
+    // current node first, we have to do this, since people can pass in the path
+    // of the block to merge.
+    if (node.object === 'block') {
+      blockPath = path
+    } else {
+      ;[, blockPath] = document.closestBlock(path)
+    }
+
+    const prevBlock = document.previousBlock(path, { onlyLeaves: true })
+
+    if (!prevBlock) {
+      return
+    }
+
+    const [, prevPath] = prevBlock
+    const newParentPath = PathUtils.lift(prevPath)
+    const newIndex = prevPath.last() + 1
+    const newPath = newParentPath.concat(newIndex)
+
+    editor.moveNodeByPath(blockPath, newParentPath, newIndex)
+    editor.mergeNodeByPath(newPath)
+
+    for (const [ancestor, ancestorPath] of document.ancestors(blockPath)) {
+      if (ancestorPath.equals(newParentPath)) {
+        break
+      }
+
+      if (ancestor.nodes.size === 1) {
+        editor.removeNodeByPath(ancestorPath)
+      }
+    }
   })
 }
 

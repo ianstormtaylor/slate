@@ -12,13 +12,10 @@ export const input = (
       <paragraph>
         <text />
         <emoji />
-        <text />
-        <emoji />
         <text>
           <cursor />
         </text>
       </paragraph>
-      <paragraph />
     </document>
   </value>
 )
@@ -27,13 +24,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <text />
-        <emoji />
         <text>
           <cursor />
         </text>
       </paragraph>
-      <paragraph />
     </document>
   </value>
 )

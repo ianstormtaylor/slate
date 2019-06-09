@@ -20,8 +20,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <link>word</link>
-        <cursor />
+        <link>
+          word<cursor />
+        </link>
       </paragraph>
     </document>
   </value>

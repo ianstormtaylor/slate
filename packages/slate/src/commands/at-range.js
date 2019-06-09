@@ -2,7 +2,7 @@ import { List } from 'immutable'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
-import PathUtils from '../utils/path-utils'
+import Path from '../utils/path-utils'
 
 /**
  * Ensure that an expanded selection is deleted first, and return the updated
@@ -93,197 +93,121 @@ Commands.addMarksAtRange = (fn, editor) => (range, marks) => {
  */
 
 Commands.deleteAtRange = (fn, editor) => range => {
-  // Snapshot the selection, which creates an extra undo save point, so that
-  // when you undo a delete, the expanded selection will be retained.
-  editor.snapshotSelection()
-
-  const { value } = editor
-  const { start, end } = range
-  let startKey = start.key
-  let startOffset = start.offset
-  let endKey = end.key
-  let endOffset = end.offset
-  let { document } = value
-  let isStartVoid = document.hasVoidParent(startKey, editor)
-  let isEndVoid = document.hasVoidParent(endKey, editor)
-  let startBlock = document.getClosestBlock(startKey)
-  let endBlock = document.getClosestBlock(endKey)
-
-  // Check if we have a "hanging" selection case where the even though the
-  // selection extends into the start of the end node, we actually want to
-  // ignore that for UX reasons.
-  const isHanging =
-    startOffset === 0 &&
-    endOffset === 0 &&
-    isStartVoid === false &&
-    startKey === startBlock.getFirstText().key &&
-    endKey === endBlock.getFirstText().key &&
-    startKey !== endKey
-
-  // If it's a hanging selection, nudge it back to end in the previous text.
-  if (isHanging && isEndVoid) {
-    const prevText = document.getPreviousText(endKey)
-    endKey = prevText.key
-    endOffset = prevText.text.length
-    isEndVoid = document.hasVoidParent(endKey, editor)
-  }
-
   editor.withoutNormalizing(() => {
-    // If the start node is inside a void node, remove the void node and update
-    // the starting point to be right after it, continuously until the start point
-    // is not a void, or until the entire range is handled.
-    while (isStartVoid) {
-      const startVoid = document.getClosestVoid(startKey, editor)
-      const nextText = document.getNextText(startKey)
-      editor.removeNodeByKey(startVoid.key)
+    // HACK: Snapshot the selection, which creates an extra undo save point, so
+    // that when you undo a delete, the expanded selection will be retained. We
+    // should find a better way to do this...
+    editor.snapshotSelection()
 
-      // If the start and end keys are the same, we're done.
-      if (startKey === endKey) return
+    const { value: { document } } = editor
+    const iterable = document.descendants({ range })
+    const { start, end } = range
+    const [startBlock, startBlockPath] = document.closestBlock(start.path)
+    const [endBlock, endBlockPath] = document.closestBlock(end.path)
+    const isAcrossBlocks = !startBlockPath.equals(endBlockPath)
+    const isAcrossTexts = !start.path.equals(end.path)
+    const entries = Array.from(iterable).reverse()
+    let mergePath = endBlockPath
 
-      // If there is no next text node, we're done.
-      if (!nextText) return
+    // COMPAT: Rich text editors have a special behavior when triple-clicking
+    // which results in the end point being at the start of the next block. In
+    // this case, they preserve the end block instead of merging it.
+    const isHanging =
+      range.isExpanded &&
+      editor.isAtStartOfBlock(range.start) &&
+      editor.isAtStartOfBlock(range.end)
 
-      // Continue...
-      document = editor.value.document
-      startKey = nextText.key
-      startOffset = 0
-      isStartVoid = document.hasVoidParent(startKey, editor)
+    const isStartVoid = !!document.closest(
+      start.path,
+      n => n.object === 'block' && editor.isVoid(n)
+    )
+
+    const isEndVoid = !!document.closest(
+      end.path,
+      n => n.object === 'block' && editor.isVoid(n)
+    )
+
+    for (const [node, path] of entries) {
+      if (isHanging && Path.isIn(path, endBlockPath)) {
+        // Don't remove the end block's nodes if it's hanging.
+      } else if (editor.isVoid(node)) {
+        editor.removeNodeByPath(path)
+      } else if (document.closest(path, editor.isVoid)) {
+        // Don't bother removing children of voides.
+      } else if (
+        Path.isChild(path, startBlockPath) ||
+        Path.isChild(path, endBlockPath) ||
+        (!isAcrossTexts && path.equals(start.path))
+      ) {
+        const isAtStart = Path.isAt(path, start.path)
+        const isAtEnd = Path.isAt(path, end.path)
+        const splitEnd = isAtEnd && !editor.isAtEndOfPath(end, path)
+        const splitStart = isAtStart && !editor.isAtStartOfPath(start, path)
+        const splitLater = !isAcrossTexts && !path.equals(start.path)
+
+        if (
+          (isAtEnd && editor.isAtStartOfPath(end, path)) ||
+          (isAtStart && editor.isAtEndOfPath(start, path))
+        ) {
+          // Do nothing, since it's before/after.
+        } else if (splitLater) {
+          // Don't split yet, since we're too high up.
+        } else if (splitEnd && splitStart) {
+          const newPath = Path.increment(path)
+          editor.splitDescendantsByPath(path, end.path, end.offset)
+          editor.splitDescendantsByPath(path, start.path, start.offset)
+          editor.removeNodeByPath(newPath)
+        } else if (
+          splitEnd ||
+          (isAtEnd && !splitStart && endBlock.nodes.size === 1)
+        ) {
+          editor.splitDescendantsByPath(path, end.path, end.offset)
+          editor.removeNodeByPath(path)
+        } else if (
+          splitStart ||
+          (isAtStart && !splitEnd && startBlock.nodes.size === 1)
+        ) {
+          const newPath = Path.increment(path)
+          editor.splitDescendantsByPath(path, start.path, start.offset)
+          editor.removeNodeByPath(newPath)
+        } else if (
+          isAtStart ||
+          isAtEnd ||
+          Path.isBetween(path, start.path, end.path)
+        ) {
+          editor.removeNodeByPath(path)
+        }
+      } else if (Path.isBetween(path, startBlockPath, endBlockPath)) {
+        editor.removeNodeByPath(path)
+
+        if (Path.isYounger(path, mergePath)) {
+          mergePath = Path.decrement(mergePath, 1, path.size - 1)
+        }
+      }
     }
 
-    // If the end node is inside a void node, do the same thing but backwards. But
-    // we don't need any aborting checks because if we've gotten this far there
-    // must be a non-void node that will exit the loop.
-    while (isEndVoid) {
-      const endVoid = document.getClosestVoid(endKey, editor)
-      const prevText = document.getPreviousText(endKey)
-      editor.removeNodeByKey(endVoid.key)
-
-      // Continue...
-      document = editor.value.document
-      endKey = prevText.key
-      endOffset = prevText.text.length
-      isEndVoid = document.hasVoidParent(endKey, editor)
-    }
-
-    // If the start and end key are the same, and it was a hanging selection, we
-    // can just remove the entire block.
-    if (startKey === endKey && isHanging) {
-      editor.removeNodeByKey(startBlock.key)
-      return
-    } else if (startKey === endKey) {
-      // Otherwise, if it wasn't hanging, we're inside a single text node, so we can
-      // simply remove the text in the range.
-      const index = startOffset
-      const length = endOffset - startOffset
-      editor.removeTextByKey(startKey, index, length)
-      return
-    } else {
-      // Otherwise, we need to recursively remove text and nodes inside the start
-      // block after the start offset and inside the end block before the end
-      // offset. Then remove any blocks that are in between the start and end
-      // blocks. Then finally merge the start and end nodes.
-      startBlock = document.getClosestBlock(startKey)
-      endBlock = document.getClosestBlock(endKey)
-      const startText = document.getNode(startKey)
-      const endText = document.getNode(endKey)
-      const startLength = startText.text.length - startOffset
-      const endLength = endOffset
-
-      const ancestor = document.getCommonAncestor(startKey, endKey)
-      const startChild = ancestor.getFurthestChild(startKey)
-      const endChild = ancestor.getFurthestChild(endKey)
-
-      const startParent = document.getParent(startBlock.key)
-      const startParentIndex = startParent.nodes.indexOf(startBlock)
-      const endParentIndex = startParent.nodes.indexOf(endBlock)
-
-      let child
-
-      // Iterate through all of the nodes in the tree after the start text node
-      // but inside the end child, and remove them.
-      child = startText
-
-      while (child.key !== startChild.key) {
-        const parent = document.getParent(child.key)
-        const index = parent.nodes.indexOf(child)
-        const afters = parent.nodes.slice(index + 1)
-
-        afters.reverse().forEach(node => {
-          editor.removeNodeByKey(node.key)
-        })
-
-        child = parent
-      }
-
-      // Remove all of the middle children.
-      const startChildIndex = ancestor.nodes.indexOf(startChild)
-      const endChildIndex = ancestor.nodes.indexOf(endChild)
-      const middles = ancestor.nodes.slice(startChildIndex + 1, endChildIndex)
-
-      middles.reverse().forEach(node => {
-        editor.removeNodeByKey(node.key)
-      })
-
-      // Remove the nodes before the end text node in the tree.
-      child = endText
-
-      while (child.key !== endChild.key) {
-        const parent = document.getParent(child.key)
-        const index = parent.nodes.indexOf(child)
-        const befores = parent.nodes.slice(0, index)
-
-        befores.reverse().forEach(node => {
-          editor.removeNodeByKey(node.key)
-        })
-
-        child = parent
-      }
-
-      // Remove any overlapping text content from the leaf text nodes.
-      if (startLength !== 0) {
-        editor.removeTextByKey(startKey, startOffset, startLength)
-      }
-
-      if (endLength !== 0) {
-        editor.removeTextByKey(endKey, 0, endOffset)
-      }
-
-      // If the start and end blocks aren't the same, move and merge the end block
-      // into the start block.
-      if (startBlock.key !== endBlock.key) {
-        document = editor.value.document
-        let onlyChildAncestor
-
-        for (const [node] of document.ancestors(endBlock.key)) {
-          if (node.nodes.size > 1) {
-            break
-          } else {
-            onlyChildAncestor = node
-          }
-        }
-
-        // Move the end block to be right after the start block.
-        if (endParentIndex !== startParentIndex + 1) {
-          editor.moveNodeByKey(
-            endBlock.key,
-            startParent.key,
-            startParentIndex + 1
-          )
-        }
-
-        // If the selection is hanging, just remove the start block, otherwise
-        // merge the end block into it.
-        if (isHanging) {
-          editor.removeNodeByKey(startBlock.key)
-        } else {
-          editor.mergeNodeByKey(endBlock.key)
-        }
-
-        // If nested empty blocks are left over above the end block, remove them.
-        if (onlyChildAncestor) {
-          editor.removeNodeByKey(onlyChildAncestor.key)
-        }
-      }
+    // TODO: this `isHanging` logic could probably be simplified by editing the
+    // range before iterating, instead of trying to handle each edge case here.
+    if (isHanging && isStartVoid && !isEndVoid) {
+      // If the selection is hanging, and the start block was a void, it will
+      // have already been removed, so we do nothing.
+    } else if (isHanging && (isStartVoid || isEndVoid)) {
+      editor.removeNodeByPath(startBlockPath)
+    } else if (isStartVoid || isEndVoid) {
+      // If the selection wasn't hanging, and it started or ended in a void node
+      // they will have already been removed, so we're done.
+    } else if (isHanging) {
+      // If the selection was hanging, we want to remove the start block
+      // entirely instead of merging it with the end block. This is a rich text
+      // editor behavior that's fairly standard.
+      const newParentPath = Path.lift(startBlockPath)
+      const newIndex = startBlockPath.last() + 1
+      editor.moveNodeByPath(mergePath, newParentPath, newIndex)
+      editor.removeNodeByPath(startBlockPath)
+    } else if (isAcrossBlocks) {
+      // If the selection wasn't hanging, but we were across blocks, we need to
+      // merge the block into the previous one.
+      editor.mergeBlockByPath(mergePath)
     }
   })
 }
@@ -297,66 +221,7 @@ Commands.deleteAtRange = (fn, editor) => range => {
 
 Commands.deleteBackwardAtRange = (fn, editor) => (range, n = 1) => {
   if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    return
-  }
-
-  if (n === 0) {
-    return
-  }
-
-  const { value } = editor
-  const { document } = value
-  const { start } = range
-  const closestVoid = document.closest(start.path, editor.isVoid)
-
-  if (closestVoid) {
-    const [, voidPath] = closestVoid
-    editor.removeNodeByPath(voidPath)
-    return
-  }
-
-  // If the range is at the start of the document, abort.
-  if (start.isAtStartOfNode(document)) {
-    return
-  }
-
-  const block = document.getClosestBlock(start.path)
-
-  // PERF: If the closest block is empty, remove it. This is just a shortcut,
-  // since merging it would result in the same outcome.
-  if (
-    document.nodes.size !== 1 &&
-    block &&
-    block.text === '' &&
-    block.nodes.size === 1
-  ) {
-    editor.removeNodeByKey(block.key)
-    return
-  }
-
-  // If the range is at the start of the text node, we need to figure out what
-  // is behind it to know how to delete...
-  const text = document.getDescendant(start.path)
-
-  if (start.isAtStartOfNode(text)) {
-    let prev = document.getPreviousText(text.key)
-    const inline = document.getClosestInline(text.key)
-
-    // If the range is at the start of the inline node, and previous text node
-    // is empty, take the text node before that, or "prevBlock" would be the
-    // same node as "block"
-    if (inline && prev.text === '') {
-      prev = document.getPreviousText(prev.key)
-    }
-
-    const prevVoid = document.getClosestVoid(prev.key, editor)
-
-    // If the previous text node has a void parent, remove it.
-    if (prevVoid) {
-      editor.removeNodeByKey(prevVoid.key)
-      return
-    }
+    return editor.deleteAtRange(range)
   }
 
   let point = range.start
@@ -372,30 +237,8 @@ Commands.deleteBackwardAtRange = (fn, editor) => (range, n = 1) => {
   }
 
   range = range.setStart(point)
-  editor.deleteAtRange(range)
-  return
+  return editor.deleteAtRange(range)
 }
-
-// Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
-//   if (range.isExpanded) {
-//     editor.deleteAtRange(range)
-//   } else {
-//     let point = range.start
-
-//     for (let i = 0; i < n; i++) {
-//       const next = editor.getPreviousPoint(point)
-
-//       if (!next) {
-//         break
-//       } else {
-//         point = next
-//       }
-//     }
-
-//     range = range.setStart(point)
-//     editor.deleteAtRange(range)
-//   }
-// }
 
 /**
  * Delete backward until the character boundary at a `range`.
@@ -444,101 +287,23 @@ Commands.deleteCharForwardAtRange = (fn, editor) => range => {
 
 Commands.deleteForwardAtRange = (fn, editor) => (range, n = 1) => {
   if (range.isExpanded) {
-    editor.deleteAtRange(range)
-    return
+    return editor.deleteAtRange(range)
   }
 
-  if (n === 0) {
-    return
-  }
+  let point = range.start
 
-  const { value } = editor
-  const { document } = value
-  const { start, focus } = range
-  const voidParent = document.getClosestVoid(start.path, editor)
+  for (let i = 0; i < n; i++) {
+    const next = editor.getNextPoint(point)
 
-  // If the node has a void parent, delete it.
-  if (voidParent) {
-    editor.removeNodeByKey(voidParent.key)
-    return
-  }
-
-  const block = document.getClosestBlock(start.path)
-
-  // If the closest is not void, but empty, remove it
-  if (
-    block &&
-    !editor.isVoid(block) &&
-    block.text === '' &&
-    document.nodes.size !== 1
-  ) {
-    const nextBlock = document.getNextBlock(block.key)
-    editor.removeNodeByKey(block.key)
-
-    if (nextBlock && nextBlock.key) {
-      editor.moveToStartOfNode(nextBlock)
-    }
-
-    return
-  }
-
-  // If the range is at the start of the document, abort.
-  if (start.isAtEndOfNode(document)) {
-    return
-  }
-
-  // If the range is at the start of the text node, we need to figure out what
-  // is behind it to know how to delete...
-  const text = document.getDescendant(start.path)
-
-  if (start.isAtEndOfNode(text)) {
-    const next = document.getNextText(text.key)
-    const nextBlock = document.getClosestBlock(next.key)
-    const nextVoid = document.getClosestVoid(next.key, editor)
-
-    // If the next text node has a void parent, remove it.
-    if (nextVoid) {
-      editor.removeNodeByKey(nextVoid.key)
-      return
-    }
-
-    // If we're deleting by one character and the previous text node is not
-    // inside the current block, we need to merge the two blocks together.
-    if (n === 1 && nextBlock !== block) {
-      range = range.moveFocusTo(next.key, 0)
-      editor.deleteAtRange(range)
-      return
-    }
-  }
-
-  // If the remaining characters to the end of the node is greater than or equal
-  // to the number of characters to delete, just remove the characters forwards
-  // inside the current node.
-  if (n <= text.text.length - focus.offset) {
-    range = range.moveFocusForward(n)
-    editor.deleteAtRange(range)
-    return
-  }
-
-  // Otherwise, we need to see how many nodes forwards to go.
-  let node = text
-  let offset = focus.offset
-  let traversed = text.text.length - focus.offset
-
-  while (n > traversed) {
-    node = document.getNextText(node.key)
-    const next = traversed + node.text.length
-
-    if (n <= next) {
-      offset = n - traversed
+    if (!next) {
       break
     } else {
-      traversed = next
+      point = next
     }
   }
 
-  range = range.moveFocusTo(node.key, offset)
-  editor.deleteAtRange(range)
+  range = range.setStart(point)
+  return editor.deleteAtRange(range)
 }
 
 /**
@@ -638,7 +403,7 @@ Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
   const { document } = value
   const { start } = range
   const [, blockPath] = document.closestBlock(start.path)
-  const parentPath = PathUtils.lift(blockPath)
+  const parentPath = Path.lift(blockPath)
   const index = blockPath.last()
   const insertionMode = getInsertionMode(editor, range)
 
@@ -857,7 +622,7 @@ Commands.insertInlineAtRange = (fn, editor) => (range, inline) => {
     const { value: { document } } = editor
     const { start } = range
     const closestVoid = document.closest(start.path, editor.isVoid)
-    const parentPath = PathUtils.lift(start.path)
+    const parentPath = Path.lift(start.path)
     const index = start.path.last()
 
     if (closestVoid) {
@@ -1034,6 +799,91 @@ Commands.splitInlineAtRange = (fn, editor) => (range, height = Infinity) => {
   })
 }
 
+Commands.splitInlineEdgesAtRange = (fn, editor) => range => {
+  editor.withoutNormalizing(() => {
+    const { value: { document } } = editor
+    let start = editor.getPreviousNonVoidPoint(range.start)
+    let end = editor.getNextNonVoidPoint(range.end)
+    const startText = document.getNode(start.path)
+    const endText = document.getNode(end.path)
+    const startFurthest = document.furthestInline(start.path)
+    const endFurthest = document.furthestInline(end.path)
+
+    if (endFurthest) {
+      const [furthestNode, furthestPath] = endFurthest
+      const [lastText, lastPath] = furthestNode.lastText()
+      const relativePath = end.path.slice(furthestPath.size)
+
+      if (
+        end.offset !== lastText.text.length ||
+        !relativePath.equals(lastPath)
+      ) {
+        editor.splitDescendantsByPath(furthestPath, end.path, end.offset)
+      }
+    } else if (end.offset !== 0 && end.offset !== endText.text.length) {
+      editor.splitNodeByPath(end.path, end.offset)
+
+      end = end
+        .setPath(Path.increment(end.path))
+        .setOffset(0)
+        .setKey(null)
+        .normalize(editor.value.document)
+    }
+
+    if (startFurthest) {
+      const [furthestNode, furthestPath] = startFurthest
+      const [, firstPath] = furthestNode.firstText()
+      const relativePath = start.path.slice(furthestPath.size)
+
+      if (start.offset !== 0 || !relativePath.equals(firstPath)) {
+        editor.splitDescendantsByPath(furthestPath, start.path, start.offset)
+
+        if (
+          Path.isYounger(furthestPath, end.path) ||
+          Path.isAbove(furthestPath, end.path) ||
+          Path.isEqual(furthestPath, end.path)
+        ) {
+          end = end
+            .setPath(Path.increment(end.path, 1, furthestPath.size - 1))
+            .setKey(null)
+            .normalize(editor.value.document)
+        }
+
+        start = start
+          .setPath(
+            Path.increment(furthestPath).concat(relativePath.map(() => 0))
+          )
+          .setOffset(0)
+          .setKey(null)
+          .normalize(editor.value.document)
+      }
+    } else if (start.offset !== 0 && start.offset !== startText.text.length) {
+      editor.splitNodeByPath(start.path, start.offset)
+
+      if (
+        Path.isYounger(start.path, end.path) ||
+        Path.isAbove(start.path, end.path) ||
+        Path.isEqual(start.path, end.path)
+      ) {
+        end = end
+          .setPath(Path.increment(end.path, 1, start.path.size - 1))
+          .setKey(null)
+          .normalize(editor.value.document)
+      }
+
+      start = start
+        .setPath(Path.increment(start.path))
+        .setOffset(0)
+        .setKey(null)
+        .normalize(editor.value.document)
+    }
+
+    range = range.setAnchor(start).setFocus(end)
+  })
+
+  return range
+}
+
 /**
  * Add or remove a `mark` from the characters at `range`, depending on whether
  * it's already there.
@@ -1080,7 +930,7 @@ Commands.unwrapBlockAtRange = (fn, editor) => (range, properties) => {
         if (block.hasProperties(properties)) {
           return false
         } else {
-          const parentPath = PathUtils.lift(path)
+          const parentPath = Path.lift(path)
           const parent = document.getNode(parentPath)
           return parent && parent.hasProperties(properties)
         }
@@ -1138,8 +988,8 @@ Commands.wrapBlockAtRange = (fn, editor) => (range, block) => {
   const [, firstPath] = document.closestBlock(start.path)
   const [, lastPath] = document.closestBlock(end.path)
   const ancestorPath = firstPath.equals(lastPath)
-    ? PathUtils.lift(firstPath)
-    : PathUtils.relate(firstPath, lastPath)
+    ? Path.lift(firstPath)
+    : Path.relate(firstPath, lastPath)
 
   const startIndex = firstPath.get(ancestorPath.size)
   const endIndex = lastPath.get(ancestorPath.size)
@@ -1167,91 +1017,13 @@ Commands.wrapInlineAtRange = (fn, editor) => (range, inline) => {
   inline = inline.set('nodes', inline.nodes.clear())
 
   editor.withoutNormalizing(() => {
-    const { value: { document } } = editor
-    let start = editor.getPreviousNonVoidPoint(range.start)
-    let end = editor.getNextNonVoidPoint(range.end)
-    const startText = document.getNode(start.path)
-    const endText = document.getNode(end.path)
-    const startFurthest = document.furthestInline(start.path)
-    const endFurthest = document.furthestInline(end.path)
-
-    if (endFurthest) {
-      const [furthestNode, furthestPath] = endFurthest
-      const [lastText, lastPath] = furthestNode.lastText()
-      const relativePath = end.path.slice(furthestPath.size)
-
-      if (
-        end.offset !== lastText.text.length ||
-        !relativePath.equals(lastPath)
-      ) {
-        editor.splitDescendantsByPath(furthestPath, end.path, end.offset)
-      }
-    } else if (end.offset !== 0 && end.offset !== endText.text.length) {
-      editor.splitNodeByPath(end.path, end.offset)
-
-      end = end
-        .setPath(PathUtils.increment(end.path))
-        .setOffset(0)
-        .setKey(null)
-        .normalize(editor.value.document)
-    }
-
-    if (startFurthest) {
-      const [furthestNode, furthestPath] = startFurthest
-      const [, firstPath] = furthestNode.firstText()
-      const relativePath = start.path.slice(furthestPath.size)
-
-      if (start.offset !== 0 || !relativePath.equals(firstPath)) {
-        editor.splitDescendantsByPath(furthestPath, start.path, start.offset)
-
-        if (
-          PathUtils.isYounger(furthestPath, end.path) ||
-          PathUtils.isAbove(furthestPath, end.path) ||
-          PathUtils.isEqual(furthestPath, end.path)
-        ) {
-          end = end
-            .setPath(PathUtils.increment(end.path, 1, furthestPath.size - 1))
-            .setKey(null)
-            .normalize(editor.value.document)
-        }
-
-        start = start
-          .setPath(
-            PathUtils.increment(furthestPath).concat(relativePath.map(() => 0))
-          )
-          .setOffset(0)
-          .setKey(null)
-          .normalize(editor.value.document)
-      }
-    } else if (start.offset !== 0 && start.offset !== startText.text.length) {
-      editor.splitNodeByPath(start.path, start.offset)
-
-      if (
-        PathUtils.isYounger(start.path, end.path) ||
-        PathUtils.isAbove(start.path, end.path) ||
-        PathUtils.isEqual(start.path, end.path)
-      ) {
-        end = end
-          .setPath(PathUtils.increment(end.path, 1, start.path.size - 1))
-          .setKey(null)
-          .normalize(editor.value.document)
-      }
-
-      start = start
-        .setPath(PathUtils.increment(start.path))
-        .setOffset(0)
-        .setKey(null)
-        .normalize(editor.value.document)
-    }
-
-    range = range.setAnchor(start).setFocus(end)
+    range = editor.splitInlineEdgesAtRange(range)
     range = editor.getNonHangingRange(range)
-
     const iterable = editor.value.document.blocks({ range, onlyLeaves: true })
 
     for (const [block, blockPath] of iterable) {
-      const isStart = PathUtils.isAbove(blockPath, range.start.path)
-      const isEnd = PathUtils.isAbove(blockPath, range.end.path)
+      const isStart = Path.isAbove(blockPath, range.start.path)
+      const isEnd = Path.isAbove(blockPath, range.end.path)
       const startIndex = isStart ? range.start.path.get(blockPath.size) : 0
       const endIndex = isEnd
         ? range.end.path.get(blockPath.size)

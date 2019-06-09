@@ -131,7 +131,12 @@ function increment(path, n = 1, index = path.size - 1) {
 
 function isAbove(path, target) {
   const [p, t] = crop(path, target)
-  return path.size < target.size && compare(p, t) === 0
+  return path.size < target.size && isEqual(p, t)
+}
+
+function isUnder(path, target) {
+  const [p, t] = crop(path, target)
+  return path.size > target.size && isEqual(p, t)
 }
 
 /**
@@ -161,6 +166,23 @@ function isBefore(path, target) {
 }
 
 /**
+ * Is a `path` a chidl of `target` path?
+ *
+ * @param {List} path
+ * @param {List} target
+ * @return {Boolean}
+ */
+
+function isChild(path, target) {
+  if (path.size !== target.size + 1) {
+    return false
+  }
+
+  const [p, t] = crop(path, target)
+  return p.equals(t)
+}
+
+/**
  * Is a `path` equal to another `target` path in a document?
  *
  * @param {List} path
@@ -187,6 +209,10 @@ function isOlder(path, target) {
   const pl = path.get(index)
   const tl = target.get(index)
   return isEqual(p, t) && pl > tl
+}
+
+function isOlderSibling(path, target) {
+  return isSibling(path, target) && isOlder(path, target)
 }
 
 /**
@@ -233,6 +259,10 @@ function isYounger(path, target) {
   const pl = path.get(index)
   const tl = target.get(index)
   return isEqual(p, t) && pl < tl
+}
+
+function isYoungerSibling(path, target) {
+  return isSibling(path, target) && isYounger(path, target)
 }
 
 /**
@@ -416,6 +446,18 @@ function transform(path, operation) {
  * @type {Object}
  */
 
+function isAt(path, target) {
+  return isEqual(path, target) || isAbove(path, target)
+}
+
+function isBetween(path, start, end) {
+  return isAfter(path, start) && isBefore(path, end)
+}
+
+function isIn(path, target) {
+  return isEqual(path, target) || isUnder(path, target)
+}
+
 export default {
   compare,
   contains,
@@ -438,4 +480,11 @@ export default {
   min,
   relate,
   transform,
+  isChild,
+  isOlderSibling,
+  isAt,
+  isYoungerSibling,
+  isBetween,
+  isUnder,
+  isIn,
 }

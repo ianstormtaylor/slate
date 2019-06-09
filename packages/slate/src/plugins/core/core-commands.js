@@ -1,3 +1,4 @@
+import AtPoint from '../../commands/at-point'
 import AtRange from '../../commands/at-range'
 import ByPath from '../../commands/by-path'
 import OnHistory from '../../commands/on-history'
@@ -15,6 +16,7 @@ function CoreCommandsPlugin() {
   return {
     onConstruct: () => () => {},
     onChange: () => () => {},
+    ...AtPoint,
     ...AtRange,
     ...ByPath,
     ...OnHistory,

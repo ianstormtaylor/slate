@@ -20,9 +20,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <image>
+      <paragraph>
         <cursor />
-      </image>
+      </paragraph>
     </document>
   </value>
 )

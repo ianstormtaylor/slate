@@ -3,21 +3,17 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.insertText('a')
-  editor.insertText('b')
+  editor.delete()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <b>
-          <anchor />lorem
-        </b>
-        ipsum
+        wo<anchor />rd
       </paragraph>
       <paragraph>
-        ipsum<focus />
+        an<focus />other
       </paragraph>
     </document>
   </value>
@@ -27,7 +23,7 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        ab<cursor />
+        wo<cursor />other
       </paragraph>
     </document>
   </value>
