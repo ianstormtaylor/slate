@@ -10,8 +10,8 @@ export default () => {
   const op = Operation.create({ path, newPath, type: 'move_node' })
 
   const moved_node_result = PathUtils.transform(path, op).first()
-  assertEqualPaths(moved_node_result, newPath)
+  assertEqualPaths(moved_node_result, PathUtils.create([0]))
 
   const sibling_result = PathUtils.transform(newPath, op).first()
-  assertEqualPaths(sibling_result, path)
+  assertEqualPaths(sibling_result, PathUtils.create([1]))
 }

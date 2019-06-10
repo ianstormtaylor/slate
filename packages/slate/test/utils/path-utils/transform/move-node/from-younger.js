@@ -26,5 +26,5 @@ export default () => {
 
   const after_new = PathUtils.create([0, 1, 2, 0, 2])
   const result_after_new = PathUtils.transform(after_new, op).first()
-  assertEqualPaths(result_after_new, PathUtils.create([0, 1, 1, 0, 2]))
+  assertEqualPaths(result_after_new, PathUtils.create([0, 1, 1, 0, 3]))
 }

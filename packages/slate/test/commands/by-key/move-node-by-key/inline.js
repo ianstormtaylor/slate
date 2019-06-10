@@ -3,7 +3,8 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.moveNodeByKey('a', 'b', 3)
+  // It's 4, because every link node is surrounded by empty text nodes
+  editor.moveNodeByKey('a', 'b', 4)
 }
 
 export const input = (

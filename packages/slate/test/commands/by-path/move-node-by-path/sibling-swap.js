@@ -8,7 +8,7 @@ const pathA = PathUtils.create([0, 0])
 const pathB = PathUtils.create([0])
 
 export default function(editor) {
-  editor.moveNodeByPath(pathA, pathB, 1)
+  editor.moveNodeByPath(pathA, pathB, 2)
   assert(editor.operations.size >= 1)
 }
 

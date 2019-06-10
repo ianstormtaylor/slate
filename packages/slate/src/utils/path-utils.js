@@ -375,19 +375,23 @@ function transform(path, operation) {
     if (pAbove || pEqual) {
       // We are comparing something that was moved
       // The new path is unaffected unless the old path was the left-sibling of an ancestor
-      if (isYounger(p, np) && p.size < np.size) {
+      if (isYounger(p, np) && p.size <= np.size) {
         path = decrement(np, 1, min(np, p) - 1).concat(path.slice(p.size))
       } else {
         path = np.concat(path.slice(p.size))
       }
     } else {
+      const npYounger = isYounger(np, path)
+      const npEqual = isEqual(np, path)
+      const npAbove = isAbove(np, path)
+
       // This is equivalent logic to remove_node for path
       if (pYounger) {
         path = decrement(path, 1, pIndex)
       }
 
       // This is the equivalent logic to insert_node for newPath
-      if (isYounger(np, path) || isEqual(np, path) || isAbove(np, path)) {
+      if (npYounger || npEqual || npAbove) {
         path = increment(path, 1, np.size - 1)
       }
     }

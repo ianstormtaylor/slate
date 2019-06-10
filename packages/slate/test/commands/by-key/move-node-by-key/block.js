@@ -3,7 +3,7 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.moveNodeByKey('a', 'b', 1)
+  editor.moveNodeByKey('a', 'b', 2)
 }
 
 export const input = (
