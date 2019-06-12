@@ -13,7 +13,7 @@ uses events to determine how to modify the Editor `value`.
 ## How It Works
 
 We try to avoid an Editor `render` in the middle of a composition. At the same
-time we want to make sure all mutations are eventuallyreflected in the Editor
+time we want to make sure all mutations are eventually reflected in the Editor
 `value`.
 
 ### Actions
