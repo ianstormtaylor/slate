@@ -101,6 +101,7 @@ class Content extends React.Component {
     isUpdatingSelection: false,
     nodeRef: React.createRef(),
     nodeRefs: {},
+    contentKey: 0,
   }
 
   /**
@@ -211,7 +212,7 @@ class Content extends React.Component {
     const native = window.getSelection()
     const { activeElement } = window.document
 
-    if (debug.enabled) {
+    if (debug.update.enabled) {
       debug.update('updateSelection', { selection: selection.toJSON() })
     }
 
@@ -322,12 +323,23 @@ class Content extends React.Component {
         }
 
         this.tmp.isUpdatingSelection = false
+
+        debug.update('updateSelection:setTimeout', {
+          anchorOffset: window.getSelection().anchorOffset,
+        })
       })
     }
 
-    if (updated && debug.enabled) {
+    if (updated && (debug.enabled || debug.update.enabled)) {
       debug('updateSelection', { selection, native, activeElement })
-      debug.update('updateSelection-applied', { selection })
+
+      debug.update('updateSelection:applied', {
+        selection: selection.toJSON(),
+        native: {
+          anchorOffset: native.anchorOffset,
+          focusOffset: native.focusOffset,
+        },
+      })
     }
   }
 
@@ -470,6 +482,11 @@ class Content extends React.Component {
 
     const window = getWindow(event.target)
     const { activeElement } = window.document
+
+    debug.update('onNativeSelectionChange', {
+      anchorOffset: window.getSelection().anchorOffset,
+    })
+
     if (activeElement !== this.ref.current) return
 
     this.props.onEvent('onSelect', event)
@@ -512,7 +529,10 @@ class Content extends React.Component {
       ...props.style,
     }
 
+    // console.log('rerender content', this.tmp.contentKey, document.text)
+
     debug('render', { props })
+    debug.update('render', this.tmp.contentKey, document.text)
 
     this.props.onEvent('onRender')
 
@@ -523,7 +543,7 @@ class Content extends React.Component {
 
     return (
       <Container
-        key={this.props.contentKey}
+        key={this.tmp.contentKey}
         {...handlers}
         {...data}
         ref={this.setRef}

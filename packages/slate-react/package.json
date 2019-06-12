@@ -33,6 +33,7 @@
   "peerDependencies": {
     "immutable": ">=3.8.1 || >4.0.0-rc",
     "react": ">=16.6.0",
+    "react-dom": ">=16.6.0",
     "slate": ">=0.47.0"
   },
   "devDependencies": {

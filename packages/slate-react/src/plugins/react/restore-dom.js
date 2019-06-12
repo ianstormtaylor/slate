@@ -8,7 +8,8 @@ function RestoreDOMPlugin() {
    */
 
   function restoreDOM(editor) {
-    editor.setState({ contentKey: editor.state.contentKey + 1 })
+    const tmp = editor.tmp.contentRef.current.tmp
+    tmp.contentKey = tmp.contentKey + 1
   }
 
   return {
