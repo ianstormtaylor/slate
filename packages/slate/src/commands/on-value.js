@@ -58,6 +58,18 @@ Commands.setAnnotation = (editor, annotation, newProperties) => {
   })
 }
 
+Commands.setAnnotations = (editor, annotations = []) => {
+  const { value } = editor
+  const newProperties = Value.createProperties({ annotations })
+  const prevProperties = pick(value, Object.keys(newProperties))
+
+  editor.applyOperation({
+    type: 'set_value',
+    properties: prevProperties,
+    newProperties,
+  })
+}
+
 /**
  * Export.
  *
