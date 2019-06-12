@@ -68,7 +68,7 @@ class Value extends Record(DEFAULTS) {
     if (isPlainObject(a)) {
       const p = {}
       if ('annotations' in a)
-        p.annotations = Annotation.createList(a.annotations)
+        p.annotations = Annotation.createMap(a.annotations)
       if ('data' in a) p.data = Data.create(a.data)
       return p
     }
