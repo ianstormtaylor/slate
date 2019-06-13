@@ -194,7 +194,11 @@ class Text extends Record(DEFAULTS) {
           }
 
           // If the range starts after the leaf, or ends before it, continue.
-          if (start.offset > offset + length || end.offset <= offset) {
+          if (
+            start.offset > offset + length ||
+            end.offset < offset ||
+            (end.offset === offset && offset !== 0)
+          ) {
             next.push(leaf)
             continue
           }
