@@ -4,6 +4,7 @@ import Types from 'prop-types'
 import getWindow from 'get-window'
 import warning from 'tiny-warning'
 import throttle from 'lodash/throttle'
+import omit from 'lodash/omit'
 import { List } from 'immutable'
 import {
   IS_ANDROID,
@@ -541,8 +542,11 @@ class Content extends React.Component {
       [DATA_ATTRS.KEY]: document.key,
     }
 
+    const domProps = omit(this.props, Object.keys(Content.propTypes))
+
     return (
       <Container
+        {...domProps}
         key={this.tmp.contentKey}
         {...handlers}
         {...data}
@@ -559,7 +563,9 @@ class Content extends React.Component {
         // COMPAT: The Grammarly Chrome extension works by changing the DOM out
         // from under `contenteditable` elements, which leads to weird behaviors
         // so we have to disable it like this. (2017/04/24)
-        data-gramm={false}
+
+        // just the existence of the flag is disabling the extension irrespective of its value
+        data-gramm={domProps['data-gramm'] ? undefined : false}
       >
         <Node
           annotations={value.annotations}
