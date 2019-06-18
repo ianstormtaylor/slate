@@ -288,7 +288,7 @@ function getRelativeRange(node, index, range) {
     start = start.setPath(startPath.rest())
   } else if (startIndex < index && index <= endIndex) {
     if (child.object === 'text') {
-      start = start.moveTo(PathUtils.create([index]), 0).setKey(child.key)
+      start = start.moveTo(PathUtils.create([]), 0).setKey(child.key)
     } else {
       const [first] = child.texts()
       const [firstNode, firstPath] = first
@@ -303,7 +303,7 @@ function getRelativeRange(node, index, range) {
   } else if (startIndex <= index && index < endIndex) {
     if (child.object === 'text') {
       const length = child.text.length
-      end = end.moveTo(PathUtils.create([index]), length).setKey(child.key)
+      end = end.moveTo(PathUtils.create([]), length).setKey(child.key)
     } else {
       const [last] = child.texts({ direction: 'backward' })
       const [lastNode, lastPath] = last
