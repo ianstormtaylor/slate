@@ -104,7 +104,7 @@
     "lint:eslint": "eslint benchmark packages/*/src packages/*/test examples/*/*.js examples/dev/*/*.js",
     "lint:prettier": "prettier --list-different '**/*.{md,json,css}'",
     "open": "open http://localhost:8080",
-    "prettier": "prettier --write '**/*.{js,jsx,md,json,css}'",
+    "prettier": "prettier --write \"**/*.{js,jsx,md,json,css}\"",
     "release": "yarn build:production && yarn test && yarn lint && lerna publish && yarn gh-pages",
     "server": "webpack-dev-server --config ./support/webpack/config.js",
     "start": "npm-run-all --parallel --print-label watch server",

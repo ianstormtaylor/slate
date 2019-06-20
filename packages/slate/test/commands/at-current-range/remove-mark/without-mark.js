@@ -14,9 +14,7 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        Text
-      </paragraph>
+      <paragraph>Text</paragraph>
     </document>
   </value>
 )
