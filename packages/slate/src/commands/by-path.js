@@ -229,13 +229,19 @@ Commands.removeMarkByPath = (editor, path, offset, length, mark) => {
 Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
   marks = Mark.createSet(marks)
 
-  if (!marks.size) {
-    return
-  }
-
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
+
+  // filter out marks that this node does not have
+  // otherwise, this will create an inverse operation to add the mark in the undo stack
+  marks = marks.filter(mark => {
+    return node.marks.has(mark)
+  })
+
+  if (!marks.size) {
+    return
+  }
 
   editor.withoutNormalizing(() => {
     // If it ends before the end of the node, we'll need to split to create a new
