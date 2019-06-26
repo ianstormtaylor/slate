@@ -23,7 +23,7 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
   onSelect: Function,
   renderEditor: Function,
   renderMark: Function,
-  renderNode: Function,
+  renderBlock: Function,
   shouldNodeComponentUpdate: Function,
 }
 ```
@@ -144,9 +144,9 @@ Render a `Mark` with `props`. The `props` object contains:
 
 You must spread the `props.attributes` onto the top-level DOM node you use to render the mark.
 
-### `renderNode`
+### `renderBlock`
 
-`Function renderNode(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+`Function renderBlock(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
 Render a `Node` with `props`. The `props` object contains:
 
@@ -163,7 +163,7 @@ Render a `Node` with `props`. The `props` object contains:
 }
 ```
 
-You must spread the `props.attributes` onto the top-level DOM node you use to render the node.
+You must spread the `props.attributes` onto the top-level DOM node you use to render the block.
 
 ### `shouldNodeComponentUpdate`
 
