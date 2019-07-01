@@ -1393,10 +1393,13 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
       startBlock = document.getClosestBlock(start.key)
       startChild = startBlock.getFurthestChild(start.key)
 
-      const startInner = document.getNextSibling(startChild.key)
+      const startInner =
+        editor.isVoid(startChild)
+        ? startChild
+        : document.getNextSibling(startChild.key);
       const startInnerIndex = startBlock.nodes.indexOf(startInner)
       const endInner =
-        start.key === end.key
+        start.key === end.key || editor.isVoid(endChild)
           ? startInner
           : startBlock.getFurthestChild(end.key)
       const inlines = startBlock.nodes

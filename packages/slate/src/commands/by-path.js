@@ -495,16 +495,18 @@ Commands.splitNodeByPath = (editor, path, position, options = {}) => {
   const { document } = value
   const node = document.getDescendant(path)
 
-  editor.applyOperation({
-    type: 'split_node',
-    path,
-    position,
-    target,
-    properties: {
-      type: node.type,
-      data: node.data,
-    },
-  })
+  if(!editor.isVoid(node)) {
+    editor.applyOperation({
+      type: 'split_node',
+      path,
+      position,
+      target,
+      properties: {
+        type: node.type,
+        data: node.data,
+      },
+    })
+  }
 }
 
 /**
@@ -524,17 +526,18 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 
   const { value } = editor
   const { document } = value
-  let index = textOffset
+  const textNode = document.getDescendant(textPath)
+  const textNodeIsVoid = editor.isVoid(textNode);
+  let index = textNodeIsVoid ? textPath.last() : textPath.last() + 1
   let lastPath = textPath
 
   editor.withoutNormalizing(() => {
-    editor.splitNodeByKey(textPath, textOffset)
+    editor.splitNodeByPath(textPath, textOffset)
 
     for (const [, ancestorPath] of document.ancestors(textPath)) {
-      const target = index
+      editor.splitNodeByPath(ancestorPath, index)
       index = lastPath.last() + 1
       lastPath = ancestorPath
-      editor.splitNodeByPath(ancestorPath, index, { target })
 
       if (ancestorPath.equals(path)) {
         break
