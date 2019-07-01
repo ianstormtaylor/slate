@@ -107,7 +107,18 @@ class Editor {
       return memo
     }, newDirtyPaths)
 
-    this.tmp.dirty = dirty
+    const pathIndex = {}
+    this.tmp.dirty = []
+
+    dirty.forEach(dirtyPath => {
+      const key = dirtyPath.join(',')
+
+      if (!pathIndex[key]) {
+        this.tmp.dirty.push(dirtyPath)
+      }
+
+      pathIndex[key] = true
+    })
 
     // If we're not already, queue the flushing process on the next tick.
     if (!this.tmp.flushing) {
