@@ -1399,9 +1399,11 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
         : document.getNextSibling(startChild.key);
       const startInnerIndex = startBlock.nodes.indexOf(startInner)
       const endInner =
-        start.key === end.key || editor.isVoid(endChild)
+        start.key === end.key
           ? startInner
-          : startBlock.getFurthestChild(end.key)
+          : editor.isVoid(endChild)
+            ? document.getPreviousSibling(endChild.key)
+            : startBlock.getFurthestChild(end.key)
       const inlines = startBlock.nodes
         .skipUntil(n => n === startInner)
         .takeUntil(n => n === endInner)
