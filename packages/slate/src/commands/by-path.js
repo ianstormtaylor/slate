@@ -529,15 +529,13 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
   const textNode = document.getDescendant(textPath)
   const textNodeIsVoid = editor.isVoid(textNode);
   let index = textNodeIsVoid ? textPath.last() : textPath.last() + 1
-  let lastPath = textPath
 
   editor.withoutNormalizing(() => {
     editor.splitNodeByPath(textPath, textOffset)
 
     for (const [, ancestorPath] of document.ancestors(textPath)) {
       editor.splitNodeByPath(ancestorPath, index)
-      index = lastPath.last() + 1
-      lastPath = ancestorPath
+      index = ancestorPath.last() + 1
 
       if (ancestorPath.equals(path)) {
         break
