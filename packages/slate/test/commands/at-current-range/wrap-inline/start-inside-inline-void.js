@@ -15,6 +15,7 @@ export const input = (
           <emoji>
             <anchor />
           </emoji>
+          word
         <focus />
       </paragraph>
     </document>
@@ -29,6 +30,7 @@ export const output = (
           <emoji>
             <anchor />
           </emoji>
+          word
         </link>
         <focus />
       </paragraph>
