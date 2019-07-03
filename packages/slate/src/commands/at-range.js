@@ -1358,8 +1358,13 @@ Commands.wrapInlineAtRange = (editor, range, inline) => {
 
   editor.withoutNormalizing(() => {
     if (!startInline || startInline !== endInline) {
-      editor.splitDescendantsByKey(endChild.key, end.key, end.offset)
-      editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
+      if (!editor.isVoid(endChild)) {
+        editor.splitDescendantsByKey(endChild.key, end.key, end.offset)
+      }
+
+      if (!editor.isVoid(startChild)) {
+        editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
+      }
     }
 
     document = editor.value.document

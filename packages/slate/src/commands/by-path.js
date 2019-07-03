@@ -495,10 +495,6 @@ Commands.splitNodeByPath = (editor, path, position, options = {}) => {
   const { document } = value
   const node = document.getDescendant(path)
 
-  if (editor.isVoid(node)) {
-    return
-  }
-
   editor.applyOperation({
     type: 'split_node',
     path,
@@ -528,8 +524,7 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 
   const { value } = editor
   const { document } = value
-  const textNode = document.getDescendant(textPath)
-  let index = editor.isVoid(textNode) ? textPath.last() : textPath.last() + 1
+  let index = textPath.last() + 1
 
   editor.withoutNormalizing(() => {
     editor.splitNodeByPath(textPath, textOffset)
