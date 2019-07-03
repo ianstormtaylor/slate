@@ -100,8 +100,8 @@ class Suggestions extends React.PureComponent {
     const anchorRect = anchor.getBoundingClientRect()
 
     this.setState({
-      top: anchorRect.bottom,
-      left: anchorRect.left,
+      top: anchorRect.bottom + window.pageYOffset,
+      left: anchorRect.left + window.pageXOffset,
     })
   }
 }
