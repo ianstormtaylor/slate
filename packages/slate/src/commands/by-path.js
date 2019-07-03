@@ -495,18 +495,20 @@ Commands.splitNodeByPath = (editor, path, position, options = {}) => {
   const { document } = value
   const node = document.getDescendant(path)
 
-  if(!editor.isVoid(node)) {
-    editor.applyOperation({
-      type: 'split_node',
-      path,
-      position,
-      target,
-      properties: {
-        type: node.type,
-        data: node.data,
-      },
-    })
+  if (editor.isVoid(node)) {
+    return
   }
+
+  editor.applyOperation({
+    type: 'split_node',
+    path,
+    position,
+    target,
+    properties: {
+      type: node.type,
+      data: node.data,
+    },
+  })
 }
 
 /**

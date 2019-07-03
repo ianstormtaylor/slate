@@ -19,8 +19,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-      </paragraph>
+      <paragraph />
       <paragraph>
         <emoji />
       </paragraph>

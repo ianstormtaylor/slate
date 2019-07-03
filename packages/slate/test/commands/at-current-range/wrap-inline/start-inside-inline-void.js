@@ -12,10 +12,10 @@ export const input = (
   <value>
     <document>
       <paragraph>
-          <emoji>
-            <anchor />
-          </emoji>
-          word
+        <emoji>
+          <anchor />
+        </emoji>
+        word
         <focus />
       </paragraph>
     </document>
