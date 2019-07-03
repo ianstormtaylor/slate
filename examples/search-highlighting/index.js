@@ -117,6 +117,7 @@ class SearchHighlighting extends React.Component {
           defaultValue={initialValue}
           schema={this.schema}
           renderAnnotation={this.renderAnnotation}
+          renderMark={this.renderMark}
           spellCheck
         />
       </div>
@@ -140,6 +141,24 @@ class SearchHighlighting extends React.Component {
             {children}
           </span>
         )
+      default:
+        return next()
+    }
+  }
+
+  /**
+   * Render a Slate mark.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
+    switch (mark.type) {
+      case 'bold':
+        return <strong {...attributes}>{children}</strong>
       default:
         return next()
     }

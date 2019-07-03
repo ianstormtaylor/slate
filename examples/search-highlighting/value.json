@@ -10,7 +10,16 @@
           {
             "object": "text",
             "text":
-              "This is editable text that you can search. As you search, it looks for matching strings of text, and adds \"annotation\" marks to them in realtime."
+              "This is editable text that you can search. As you search, it looks for matching strings of text, and adds "
+          },
+          {
+            "object": "text",
+            "text": "annotation",
+            "marks": [{ "object": "mark", "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " marks to them in realtime."
           }
         ]
       },
