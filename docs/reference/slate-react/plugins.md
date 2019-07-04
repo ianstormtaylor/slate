@@ -125,6 +125,27 @@ renderEditor: (props, editor, next) => {
 }
 ```
 
+### `renderMark`
+
+`Function renderMark(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render a `Mark` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  mark: Mark,
+  marks: Set<Mark>,
+  node: Node,
+  offset: Number,
+  text: String,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the mark.
+
 ### `renderDecoration`
 
 `Function renderDecoration(props: Object, editor: Editor, next: Function) => ReactNode|Void`
@@ -136,7 +157,7 @@ Render a `Decoration` with `props`. The `props` object contains:
   attributes: Object,
   children: ReactNode,
   editor: Editor,
-  mark: Mark,
+  decoration: Decoration,
   marks: Set<Mark>,
   node: Node,
   offset: Number,
@@ -157,7 +178,7 @@ Render an `Annotation` with `props`. The `props` object contains:
   attributes: Object,
   children: ReactNode,
   editor: Editor,
-  mark: Mark,
+  annotation: Annotation,
   marks: Set<Mark>,
   node: Node,
   offset: Number,
