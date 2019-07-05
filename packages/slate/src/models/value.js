@@ -429,8 +429,9 @@ class Value extends Record(DEFAULTS) {
   addAnnotation(annotation) {
     annotation = Annotation.create(annotation)
     let value = this
-    let { annotations } = value
+    let { annotations, document } = value
     const { key } = annotation
+    annotation = annotation.updatePoints(point => point.normalize(document))
     annotations = annotations.set(key, annotation)
     value = value.set('annotations', annotations)
     return value
