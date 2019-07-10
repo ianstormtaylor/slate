@@ -250,7 +250,7 @@ class Content extends React.Component {
 
     // Otherwise, figure out which DOM nodes should be selected...
     if (selection.isFocused && selection.isSet) {
-      const current = !!rangeCount && native.getRangeAt(0)
+      const current = !!native.rangeCount && native.getRangeAt(0)
       const range = editor.findDOMRange(selection)
 
       if (!range) {
