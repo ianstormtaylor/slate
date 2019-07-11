@@ -592,7 +592,7 @@ Commands.select = (editor, properties, options = {}) => {
   const { snapshot = false } = options
   const { value } = editor
   const { document, selection } = value
-  const props = {}
+  const newProperties = {}
   let next = selection.setProperties(properties)
   next = document.resolveSelection(next)
 
@@ -604,27 +604,34 @@ Commands.select = (editor, properties, options = {}) => {
   // are being changed, for the inverse operation.
   for (const k in properties) {
     if (snapshot === true || !is(properties[k], selection[k])) {
-      props[k] = properties[k]
+      newProperties[k] = properties[k]
     }
   }
 
   // If the selection moves, clear any marks, unless the new selection
-  // properties editor the marks in some way.
-  if (selection.marks && !props.marks && (props.anchor || props.focus)) {
-    props.marks = null
+  // properties change the marks in some way.
+  if (
+    selection.marks &&
+    !newProperties.marks &&
+    (newProperties.anchor || newProperties.focus)
+  ) {
+    newProperties.marks = null
   }
 
   // If there are no new properties to set, abort to avoid extra operations.
-  if (Object.keys(props).length === 0) {
+  if (Object.keys(newProperties).length === 0) {
     return
   }
+
+  // TODO: for some reason toJSON() is required here (it breaks selections between blocks)? - 2018-10-10
+  const prevProperties = pick(selection.toJSON(), Object.keys(newProperties))
 
   editor.applyOperation(
     {
       type: 'set_selection',
       value,
-      properties: props,
-      selection: selection.toJSON(),
+      properties: prevProperties,
+      newProperties,
     },
     snapshot ? { skip: false, merge: false } : {}
   )

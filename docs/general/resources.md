@@ -13,7 +13,7 @@ These libraries are helpful when developing with Slate:
 
 These tools are helpful when developing with Slate:
 
-* [Immutable.js Console Extension](https://github.com/mattzeunert/immutable-object-formatter-extension) greatly improves the `console.log` output when working with [Immutable.js](https://facebook.github.io/immutable-js/) objects, which Slate's data model is based on.
+* [Immutable.js Console Extension](https://github.com/mattzeunert/immutable-object-formatter-extension) greatly improves the `console.log` output when working with [Immutable.js](https://immutable-js.github.io/immutable-js/) objects, which Slate's data model is based on.
 
 ## Products
 

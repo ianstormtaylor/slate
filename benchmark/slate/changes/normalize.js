@@ -4,8 +4,8 @@
 const h = require('../../helpers/h')
 const { Editor } = require('slate')
 
-module.exports.default = function(change) {
-  change
+module.exports.default = function(editor) {
+  editor
     .normalize()
     .moveForward(5)
     .normalize()

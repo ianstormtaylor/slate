@@ -1,3 +1,4 @@
+import pick from 'lodash/pick'
 import Value from '../models/value'
 
 /**
@@ -16,13 +17,14 @@ const Commands = {}
  */
 
 Commands.setData = (editor, data = {}) => {
-  const properties = Value.createProperties({ data })
   const { value } = editor
+  const newProperties = Value.createProperties({ data })
+  const prevProperties = pick(value, Object.keys(newProperties))
 
   editor.applyOperation({
     type: 'set_value',
-    properties,
-    value,
+    properties: prevProperties,
+    newProperties,
   })
 }
 
@@ -34,13 +36,14 @@ Commands.setData = (editor, data = {}) => {
  */
 
 Commands.setDecorations = (editor, decorations = []) => {
-  const properties = Value.createProperties({ decorations })
   const { value } = editor
+  const newProperties = Value.createProperties({ decorations })
+  const prevProperties = pick(value, Object.keys(newProperties))
 
   editor.applyOperation({
     type: 'set_value',
-    properties,
-    value,
+    properties: prevProperties,
+    newProperties,
   })
 }
 
