@@ -264,8 +264,8 @@ class Content extends React.Component {
       // Scroll to the selection, in case it's out of view.
       scrollToSelection(native)
 
-      // Then unset the `isUpdatingSelection` flag after a delay.
       setTimeout(() => {
+        // Then unset the `isUpdatingSelection` flag after a delay.
         this.tmp.isUpdatingSelection = false
       })
     }
