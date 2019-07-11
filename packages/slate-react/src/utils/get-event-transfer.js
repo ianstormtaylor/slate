@@ -1,6 +1,8 @@
 import Base64 from 'slate-base64-serializer'
 import { IS_IE } from 'slate-dev-environment'
+
 import TRANSFER_TYPES from '../constants/transfer-types'
+import DATA_ATTRS from '../constants/data-attributes'
 
 /**
  * Transfer types.
@@ -43,7 +45,7 @@ function getEventTransfer(event) {
 
   // If there isn't a fragment, but there is HTML, check to see if the HTML is
   // actually an encoded fragment.
-  if (!fragment && html && ~html.indexOf(' data-slate-fragment="')) {
+  if (!fragment && html && ~html.indexOf(` ${DATA_ATTRS.FRAGMENT}="`)) {
     const matches = FRAGMENT_MATCHER.exec(html)
     const [full, encoded] = matches // eslint-disable-line no-unused-vars
     if (encoded) fragment = encoded

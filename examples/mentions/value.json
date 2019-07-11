@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,11 +9,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try mentioning some users, like Luke or Leia."
-              }
-            ]
+            "text": "Try mentioning some users, like Luke or Leia."
           }
         ]
       }

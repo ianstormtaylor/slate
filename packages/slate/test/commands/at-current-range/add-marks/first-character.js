@@ -20,9 +20,10 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <anchor />
         <i>
-          <b>w</b>
+          <b>
+            <anchor />w
+          </b>
         </i>
         <focus />ord
       </paragraph>

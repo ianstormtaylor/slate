@@ -11,9 +11,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />
-        <b>one</b>
-        <focus />
+        <b>
+          <anchor />one<focus />
+        </b>
       </paragraph>
     </document>
   </value>

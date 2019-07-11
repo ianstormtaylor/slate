@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "By default, pasting content into a Slate editor will use the content's plain text representation. This is fine for some use cases, but sometimes you want to actually be able to paste in content and have it parsed into blocks and links and things. To do this, you need to add a parser that triggers on paste. This is an example of doing exactly that!"
-              }
-            ]
+            "text":
+              "By default, pasting content into a Slate editor will use the content's plain text representation. This is fine for some use cases, but sometimes you want to actually be able to paste in content and have it parsed into blocks and links and things. To do this, you need to add a parser that triggers on paste. This is an example of doing exactly that!"
           }
         ]
       },
@@ -22,12 +20,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Try it out for yourself! Copy and paste some rendered HTML content (not the source code) from another site into this editor."
-              }
-            ]
+            "text":
+              "Try it out for yourself! Copy and paste some rendered HTML content (not the source code) from another site into this editor."
           }
         ]
       }

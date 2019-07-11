@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,11 +9,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Enforce Your Layout!"
-              }
-            ]
+            "text": "Enforce Your Layout!"
           }
         ]
       },
@@ -21,12 +19,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!"
-              }
-            ]
+            "text":
+              "This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!"
           }
         ]
       }

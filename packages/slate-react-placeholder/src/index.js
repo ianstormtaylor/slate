@@ -16,20 +16,15 @@ let instanceCounter = 0
 
 function SlateReactPlaceholder(options = {}) {
   const instanceId = instanceCounter++
-  const placeholderMark = {
-    type: 'placeholder',
-    data: { key: instanceId },
-  }
-
   const { placeholder, when, style = {} } = options
 
   invariant(
-    placeholder,
+    typeof placeholder === 'string',
     'You must pass `SlateReactPlaceholder` an `options.placeholder` string.'
   )
 
   invariant(
-    when,
+    typeof when === 'string' || typeof when === 'function',
     'You must pass `SlateReactPlaceholder` an `options.when` query.'
   )
 
@@ -48,12 +43,19 @@ function SlateReactPlaceholder(options = {}) {
     }
 
     const others = next()
-    const first = node.getFirstText()
-    const last = node.getLastText()
+    const [first] = node.texts()
+    const [last] = node.texts({ direction: 'backward' })
+    const [firstNode, firstPath] = first
+    const [lastNode, lastPath] = last
     const decoration = {
-      anchor: { key: first.key, offset: 0 },
-      focus: { key: last.key, offset: last.text.length },
-      mark: placeholderMark,
+      type: 'placeholder',
+      data: { key: instanceId },
+      anchor: { key: firstNode.key, offset: 0, path: firstPath },
+      focus: {
+        key: lastNode.key,
+        offset: lastNode.text.length,
+        path: lastPath,
+      },
     }
 
     return [...others, decoration]
@@ -68,10 +70,10 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Element}
    */
 
-  function renderMark(props, editor, next) {
-    const { children, mark } = props
+  function renderDecoration(props, editor, next) {
+    const { children, decoration: deco } = props
 
-    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
+    if (deco.type === 'placeholder' && deco.data.get('key') === instanceId) {
       const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
@@ -79,6 +81,7 @@ function SlateReactPlaceholder(options = {}) {
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
+        verticalAlign: 'text-top',
         ...style,
       }
 
@@ -101,7 +104,7 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Object}
    */
 
-  return { decorateNode, renderMark }
+  return { decorateNode, renderDecoration }
 }
 
 /**

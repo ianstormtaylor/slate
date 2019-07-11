@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,12 +9,17 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "This is editable text that you can search. As you search, it looks for matching strings of text, and adds \"decoration\" marks to them in realtime."
-              }
-            ]
+            "text":
+              "This is editable text that you can search. As you search, it looks for matching strings of text, and adds "
+          },
+          {
+            "object": "text",
+            "text": "annotation",
+            "marks": [{ "object": "mark", "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " marks to them in realtime."
           }
         ]
       },
@@ -22,12 +29,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Try it out for yourself by typing in the search box above!"
-              }
-            ]
+            "text": "Try it out for yourself by typing in the search box above!"
           }
         ]
       }

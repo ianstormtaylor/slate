@@ -1,7 +1,6 @@
 import {
-  Decoration,
+  Annotation,
   Document,
-  Leaf,
   Mark,
   Node,
   Point,
@@ -11,7 +10,7 @@ import {
 } from 'slate'
 
 /**
- * Auto-incrementing ID to keep track of paired decorations.
+ * Auto-incrementing ID to keep track of paired annotations.
  *
  * @type {Number}
  */
@@ -42,7 +41,7 @@ export function createAnchor(tagName, attributes, children) {
 
 export function createBlock(tagName, attributes, children) {
   const attrs = { ...attributes, object: 'block' }
-  const block = createNode('node', attrs, children)
+  const block = createNode(null, attrs, children)
   return block
 }
 
@@ -60,32 +59,32 @@ export function createCursor(tagName, attributes, children) {
 }
 
 /**
- * Create a decoration point, or wrap a list of leaves and set the decoration
+ * Create a annotation point, or wrap a list of leaves and set the annotation
  * point tracker on them.
  *
  * @param {String} tagName
  * @param {Object} attributes
  * @param {Array} children
- * @return {DecorationPoint|List<Leaf>}
+ * @return {AnnotationPoint|List<Leaf>}
  */
 
-export function createDecoration(tagName, attributes, children) {
+export function createAnnotation(tagName, attributes, children) {
   const { key, data } = attributes
   const type = tagName
 
   if (key) {
-    return new DecorationPoint({ id: key, type, data })
+    return new AnnotationPoint({ id: key, type, data })
   }
 
-  const leaves = createLeaves('leaves', {}, children)
-  const first = leaves.first()
-  const last = leaves.last()
-  const id = `__decoration_${uid++}__`
-  const start = new DecorationPoint({ id, type, data })
-  const end = new DecorationPoint({ id, type, data })
+  const texts = createChildren(children)
+  const first = texts.first()
+  const last = texts.last()
+  const id = `${uid++}`
+  const start = new AnnotationPoint({ id, type, data })
+  const end = new AnnotationPoint({ id, type, data })
   setPoint(first, start, 0)
   setPoint(last, end, last.text.length)
-  return leaves
+  return texts
 }
 
 /**
@@ -99,7 +98,7 @@ export function createDecoration(tagName, attributes, children) {
 
 export function createDocument(tagName, attributes, children) {
   const attrs = { ...attributes, object: 'document' }
-  const document = createNode('node', attrs, children)
+  const document = createNode(null, attrs, children)
   return document
 }
 
@@ -127,63 +126,8 @@ export function createFocus(tagName, attributes, children) {
 
 export function createInline(tagName, attributes, children) {
   const attrs = { ...attributes, object: 'inline' }
-  const inline = createNode('node', attrs, children)
+  const inline = createNode(null, attrs, children)
   return inline
-}
-
-/**
- * Create a list of leaves.
- *
- * @param {String} tagName
- * @param {Object} attributes
- * @param {Array} children
- * @return {List<Leaf>}
- */
-
-export function createLeaves(tagName, attributes, children) {
-  const { marks = Mark.createSet() } = attributes
-  let length = 0
-  let leaves = Leaf.createList([])
-  let leaf
-
-  children.forEach(child => {
-    if (Leaf.isLeafList(child)) {
-      if (leaf) {
-        leaves = leaves.push(leaf)
-        leaf = null
-      }
-
-      child.forEach(l => {
-        l = preservePoint(l, obj => obj.addMarks(marks))
-        leaves = leaves.push(l)
-      })
-    } else {
-      if (!leaf) {
-        leaf = Leaf.create({ marks, text: '' })
-        length = 0
-      }
-
-      if (typeof child === 'string') {
-        const offset = leaf.text.length
-        leaf = preservePoint(leaf, obj => obj.insertText(offset, child))
-        length += child.length
-      }
-
-      if (isPoint(child)) {
-        setPoint(leaf, child, length)
-      }
-    }
-  })
-
-  if (!leaves.size && !leaf) {
-    leaf = Leaf.create({ marks, text: '' })
-  }
-
-  if (leaf) {
-    leaves = leaves.push(leaf)
-  }
-
-  return leaves
 }
 
 /**
@@ -196,9 +140,28 @@ export function createLeaves(tagName, attributes, children) {
  */
 
 export function createMark(tagName, attributes, children) {
-  const marks = Mark.createSet([attributes])
-  const leaves = createLeaves('leaves', { marks }, children)
-  return leaves
+  const { key, ...mark } = attributes
+  const marks = Mark.createSet([mark])
+  const list = createChildren(children)
+  let node
+
+  if (list.size > 1) {
+    throw new Error(
+      `The <mark> hyperscript tag must only contain a single node's worth of children.`
+    )
+  } else if (list.size === 0) {
+    node = Text.create({ key, marks })
+  } else {
+    node = list.first()
+
+    node = preservePoints(node, n => {
+      if (key) n = n.set('key', key)
+      if (marks) n = n.set('marks', n.marks.union(marks))
+      return n
+    })
+  }
+
+  return node
 }
 
 /**
@@ -214,31 +177,11 @@ export function createNode(tagName, attributes, children) {
   const { object } = attributes
 
   if (object === 'text') {
-    return createText('text', {}, children)
+    const text = createText(null, attributes, children)
+    return text
   }
 
-  const nodes = []
-  let others = []
-
-  children.forEach(child => {
-    if (Node.isNode(child)) {
-      if (others.length) {
-        const text = createText('text', {}, others)
-        nodes.push(text)
-      }
-
-      nodes.push(child)
-      others = []
-    } else {
-      others.push(child)
-    }
-  })
-
-  if (others.length) {
-    const text = createText('text', {}, others)
-    nodes.push(text)
-  }
-
+  const nodes = createChildren(children)
   const node = Node.create({ ...attributes, nodes })
   return node
 }
@@ -284,18 +227,27 @@ export function createSelection(tagName, attributes, children) {
  */
 
 export function createText(tagName, attributes, children) {
-  const { key } = attributes
-  const leaves = createLeaves('leaves', {}, children)
-  const text = Text.create({ key, leaves })
-  let length = 0
+  const { key, marks } = attributes
+  const list = createChildren(children)
+  let node
 
-  leaves.forEach(leaf => {
-    incrementPoint(leaf, length)
-    preservePoint(leaf, () => text)
-    length += leaf.text.length
-  })
+  if (list.size > 1) {
+    throw new Error(
+      `The <text> hyperscript tag must only contain a single node's worth of children.`
+    )
+  } else if (list.size === 0) {
+    node = Text.create({ key })
+  } else {
+    node = list.first()
 
-  return text
+    node = preservePoints(node, n => {
+      if (key) n = n.set('key', key)
+      if (marks) n = n.set('marks', Mark.createSet(marks))
+      return n
+    })
+  }
+
+  return node
 }
 
 /**
@@ -315,63 +267,64 @@ export function createValue(tagName, attributes, children) {
   let focus
   let marks
   let isFocused
-  let decorations = []
+  let annotations = {}
   const partials = {}
 
   // Search the document's texts to see if any of them have the anchor or
-  // focus information saved, or decorations applied.
+  // focus information saved, or annotations applied.
   if (document) {
-    document.getTexts().forEach(text => {
-      const { __anchor, __decorations, __focus } = text
+    for (const [node, path] of document.texts()) {
+      const { __anchor, __annotations, __focus } = node
 
       if (__anchor != null) {
-        anchor = Point.create({ key: text.key, offset: __anchor.offset })
+        anchor = Point.create({ path, key: node.key, offset: __anchor.offset })
         marks = __anchor.marks
         isFocused = __anchor.isFocused
       }
 
       if (__focus != null) {
-        focus = Point.create({ key: text.key, offset: __focus.offset })
+        focus = Point.create({ path, key: node.key, offset: __focus.offset })
         marks = __focus.marks
         isFocused = __focus.isFocused
       }
 
-      if (__decorations != null) {
-        for (const dec of __decorations) {
-          const { id } = dec
+      if (__annotations != null) {
+        for (const ann of __annotations) {
+          const { id } = ann
           const partial = partials[id]
           delete partials[id]
 
           if (!partial) {
-            dec.key = text.key
-            partials[id] = dec
+            ann.key = node.key
+            partials[id] = ann
             continue
           }
 
-          const decoration = Decoration.create({
+          const annotation = Annotation.create({
+            key: id,
+            type: ann.type,
+            data: ann.data,
             anchor: {
               key: partial.key,
+              path: document.getPath(partial.key),
               offset: partial.offset,
             },
             focus: {
-              key: text.key,
-              offset: dec.offset,
-            },
-            mark: {
-              type: dec.type,
-              data: dec.data,
+              path,
+              key: node.key,
+              offset: ann.offset,
             },
           })
 
-          decorations.push(decoration)
+          annotations[id] = annotation
         }
       }
-    })
+    }
   }
 
   if (Object.keys(partials).length > 0) {
     throw new Error(
-      `Slate hyperscript must have both a start and an end defined for each decoration using the \`key=\` prop.`
+      `Slate hyperscript must have both a start and an end defined for each annotation using the \`key=\` prop.`
     )
   }
 
@@ -399,19 +352,87 @@ export function createValue(tagName, attributes, children) {
 
   selection = selection.normalize(document)
 
-  if (decorations.length > 0) {
-    decorations = decorations.map(d => d.normalize(document))
+  if (annotations.length > 0) {
+    annotations = annotations.map(a => a.normalize(document))
   }
 
   const value = Value.fromJSON({
     data,
-    decorations,
+    annotations,
     document,
     selection,
     ...attributes,
   })
 
   return value
+}
+
+/**
+ * Create a list of text nodes.
+ *
+ * @param {Array} children
+ * @return {List<Leaf>}
+ */
+
+export function createChildren(children) {
+  let nodes = Node.createList()
+
+  const push = node => {
+    const last = nodes.last()
+    const isString = typeof node === 'string'
+
+    if (last && last.__string && (isString || node.__string)) {
+      const text = isString ? node : node.text
+      const { length } = last.text
+      const next = preservePoints(last, l => l.insertText(length, text))
+      incrementPoints(node, length)
+      copyPoints(node, next)
+      next.__string = true
+      nodes = nodes.pop().push(next)
+    } else if (isString) {
+      node = Text.create({ text: node })
+      node.__string = true
+      nodes = nodes.push(node)
+    } else {
+      nodes = nodes.push(node)
+    }
+  }
+
+  children.forEach(child => {
+    if (Node.isNodeList(child)) {
+      child.forEach(c => push(c))
+    }
+
+    if (Node.isNode(child)) {
+      push(child)
+    }
+
+    if (typeof child === 'string') {
+      push(child)
+    }
+
+    if (isPoint(child)) {
+      if (!nodes.size) {
+        push('')
+      }
+
+      let last = nodes.last()
+
+      if (last.object !== 'text') {
+        push('')
+        last = nodes.last()
+      }
+
+      if (!last || !last.__string) {
+        push('')
+        last = nodes.last()
+      }
+
+      setPoint(last, child, last.text.length)
+    }
+  })
+
+  return nodes
 }
 
 /**
@@ -464,7 +485,7 @@ class FocusPoint {
   }
 }
 
-class DecorationPoint {
+class AnnotationPoint {
   constructor(attrs) {
     const { id = null, data = {}, type } = attrs
     this.id = id
@@ -481,8 +502,8 @@ class DecorationPoint {
  * @param {Number} n
  */
 
-function incrementPoint(object, n) {
-  const { __anchor, __focus, __decorations } = object
+function incrementPoints(object, n) {
+  const { __anchor, __focus, __annotations } = object
 
   if (__anchor != null) {
     __anchor.offset += n
@@ -492,8 +513,8 @@ function incrementPoint(object, n) {
     __focus.offset += n
   }
 
-  if (__decorations != null) {
-    __decorations.forEach(d => (d.offset += n))
+  if (__annotations != null) {
+    __annotations.forEach(a => (a.offset += n))
   }
 }
 
@@ -508,7 +529,7 @@ function isPoint(object) {
   return (
     object instanceof AnchorPoint ||
     object instanceof CursorPoint ||
-    object instanceof DecorationPoint ||
+    object instanceof AnnotationPoint ||
     object instanceof FocusPoint
   )
 }
@@ -521,13 +542,17 @@ function isPoint(object) {
  * @return {Any}
  */
 
-function preservePoint(object, updator) {
-  const { __anchor, __focus, __decorations } = object
+function preservePoints(object, updator) {
   const next = updator(object)
-  if (__anchor != null) next.__anchor = __anchor
-  if (__focus != null) next.__focus = __focus
-  if (__decorations != null) next.__decorations = __decorations
+  copyPoints(object, next)
   return next
+}
+
+function copyPoints(object, other) {
+  const { __anchor, __focus, __annotations } = object
+  if (__anchor != null) other.__anchor = __anchor
+  if (__focus != null) other.__focus = __focus
+  if (__annotations != null) other.__annotations = __annotations
 }
 
 /**
@@ -549,9 +574,9 @@ function setPoint(object, point, offset) {
     object.__focus = point
   }
 
-  if (point instanceof DecorationPoint) {
+  if (point instanceof AnnotationPoint) {
     point.offset = offset
-    object.__decorations = object.__decorations || []
-    object.__decorations = object.__decorations.concat(point)
+    object.__annotations = object.__annotations || []
+    object.__annotations = object.__annotations.concat(point)
   }
 }

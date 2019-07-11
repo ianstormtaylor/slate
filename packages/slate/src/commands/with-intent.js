@@ -259,7 +259,7 @@ Commands.insertFragment = (editor, fragment) => {
   const lastBlock = fragment.getClosestBlock(lastText.key)
   const firstChild = fragment.nodes.first()
   const lastChild = fragment.nodes.last()
-  const keys = document.getTexts().map(text => text.key)
+  const keys = Array.from(document.texts(), ([text]) => text.key)
   const isAppending =
     !startInline ||
     (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||
@@ -278,7 +278,19 @@ Commands.insertFragment = (editor, fragment) => {
   if (newText && (lastInline || isInserting)) {
     editor.moveToEndOfNode(newText)
   } else if (newText) {
-    editor.moveToStartOfNode(newText).moveForward(lastBlock.text.length)
+    // The position within the last text node needs to be calculated. This is the length
+    // of all text nodes within the last block, but if the last block contains inline nodes,
+    // these have to be skipped.
+    const { nodes } = lastBlock
+    const lastIndex = nodes.findLastIndex(
+      node => node && node.object === 'inline'
+    )
+    const remainingTexts = nodes.takeLast(nodes.size - lastIndex - 1)
+    const remainingTextLength = remainingTexts.reduce(
+      (acc, val) => acc + val.text.length,
+      0
+    )
+    editor.moveToStartOfNode(newText).moveForward(remainingTextLength)
   }
 }
 
@@ -316,13 +328,16 @@ Commands.insertText = (editor, text, marks) => {
   const { value } = editor
   const { document, selection } = value
   marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
-  editor.insertTextAtRange(selection, text, marks)
 
-  // If the text was successfully inserted, and the selection had marks on it,
-  // unset the selection's marks.
-  if (selection.marks && document !== editor.value.document) {
-    editor.select({ marks: null })
-  }
+  editor.withoutNormalizing(() => {
+    editor.insertTextAtRange(selection, text, marks)
+
+    // If the text was successfully inserted, and the selection had marks on it,
+    // unset the selection's marks.
+    if (selection.marks && document !== editor.value.document) {
+      editor.select({ marks: null })
+    }
+  })
 }
 
 /**

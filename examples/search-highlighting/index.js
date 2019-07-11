@@ -3,8 +3,20 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValueAsJson from './value.json'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Icon, Toolbar } from '../components'
+
+/**
+ * Get a unique key for the search highlight annotations.
+ *
+ * @return {String}
+ */
+
+let n = 0
+
+function getHighlightKey() {
+  return `highlight_${n++}`
+}
 
 /**
  * Deserialize the initial editor value.
@@ -20,21 +32,36 @@ const initialValue = Value.fromJSON(initialValueAsJson)
  * @type {Component}
  */
 
-const SearchWrapper = styled('div')`
-  position: relative;
-`
+const SearchWrapper = props => (
+  <div
+    {...props}
+    className={css`
+      position: relative;
+    `}
+  />
+)
 
-const SearchIcon = styled(Icon)`
-  position: absolute;
-  top: 0.5em;
-  left: 0.5em;
-  color: #ccc;
-`
+const SearchIcon = props => (
+  <Icon
+    {...props}
+    className={css`
+      position: absolute;
+      top: 0.5em;
+      left: 0.5em;
+      color: #ccc;
+    `}
+  />
+)
 
-const SearchInput = styled('input')`
-  padding-left: 2em;
-  width: 100%;
-`
+const SearchInput = props => (
+  <input
+    {...props}
+    className={css`
+      padding-left: 2em;
+      width: 100%;
+    `}
+  />
+)
 
 /**
  * The search highlighting example.
@@ -50,7 +77,7 @@ class SearchHighlighting extends React.Component {
    */
 
   schema = {
-    marks: {
+    annotations: {
       highlight: {
         isAtomic: true,
       },
@@ -63,9 +90,7 @@ class SearchHighlighting extends React.Component {
    * @param {Editor} editor
    */
 
-  ref = editor => {
-    this.editor = editor
-  }
+  ref = React.createRef()
 
   /**
    * Render.
@@ -91,11 +116,34 @@ class SearchHighlighting extends React.Component {
           ref={this.ref}
           defaultValue={initialValue}
           schema={this.schema}
+          renderAnnotation={this.renderAnnotation}
           renderMark={this.renderMark}
           spellCheck
         />
       </div>
     )
+  }
+
+  /**
+   * Render a Slate annotation.
+   *
+   * @param {Object} props
+   * @return {Element}
+   */
+
+  renderAnnotation = (props, editor, next) => {
+    const { children, annotation, attributes } = props
+
+    switch (annotation.type) {
+      case 'highlight':
+        return (
+          <span {...attributes} style={{ backgroundColor: '#ffeeba' }}>
+            {children}
+          </span>
+        )
+      default:
+        return next()
+    }
   }
 
   /**
@@ -109,52 +157,52 @@ class SearchHighlighting extends React.Component {
     const { children, mark, attributes } = props
 
     switch (mark.type) {
-      case 'highlight':
-        return (
-          <span {...attributes} style={{ backgroundColor: '#ffeeba' }}>
-            {children}
-          </span>
-        )
+      case 'bold':
+        return <strong {...attributes}>{children}</strong>
       default:
         return next()
     }
   }
 
   /**
-   * On input change, update the decorations.
+   * On input change, update the annotations.
    *
    * @param {Event} event
    */
 
   onInputChange = event => {
-    const { editor } = this
+    const editor = this.ref.current
     const { value } = editor
+    const { document, annotations } = value
     const string = event.target.value
-    const texts = value.document.getTexts()
-    const decorations = []
 
-    texts.forEach(node => {
-      const { key, text } = node
-      const parts = text.split(string)
-      let offset = 0
-
-      parts.forEach((part, i) => {
-        if (i !== 0) {
-          decorations.push({
-            anchor: { key, offset: offset - string.length },
-            focus: { key, offset },
-            mark: { type: 'highlight' },
-          })
-        }
-
-        offset = offset + part.length + string.length
-      })
-    })
-
-    // Make the change to decorations without saving it into the undo history,
+    // Make the change to annotations without saving it into the undo history,
     // so that there isn't a confusing behavior when undoing.
     editor.withoutSaving(() => {
-      editor.setDecorations(decorations)
+      annotations.forEach(ann => {
+        if (ann.type === 'highlight') {
+          editor.removeAnnotation(ann)
+        }
+      })
+
+      for (const [node, path] of document.texts()) {
+        const { key, text } = node
+        const parts = text.split(string)
+        let offset = 0
+
+        parts.forEach((part, i) => {
+          if (i !== 0) {
+            editor.addAnnotation({
+              key: getHighlightKey(),
+              type: 'highlight',
+              anchor: { path, key, offset: offset - string.length },
+              focus: { path, key, offset },
+            })
+          }
+
+          offset = offset + part.length + string.length
+        })
+      }
     })
   }
 }

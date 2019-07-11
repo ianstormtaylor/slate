@@ -25,42 +25,43 @@ const Commands = {}
 
 Commands.addMarkByPath = (editor, path, offset, length, mark) => {
   mark = Mark.create(mark)
+  editor.addMarksByPath(path, offset, length, [mark])
+}
+
+Commands.addMarksByPath = (editor, path, offset, length, marks) => {
+  marks = Mark.createSet(marks)
+
+  if (!marks.size) {
+    return
+  }
+
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
-  const leaves = node.getLeaves()
 
-  const operations = []
-  const bx = offset
-  const by = offset + length
-  let o = 0
+  editor.withoutNormalizing(() => {
+    // If it ends before the end of the node, we'll need to split to create a new
+    // text with different marks.
+    if (offset + length < node.text.length) {
+      editor.splitNodeByPath(path, offset + length)
+    }
 
-  leaves.forEach(leaf => {
-    const ax = o
-    const ay = ax + leaf.text.length
+    // Same thing if it starts after the start. But in that case, we need to
+    // update our path and offset to point to the new start.
+    if (offset > 0) {
+      editor.splitNodeByPath(path, offset)
+      path = PathUtils.increment(path)
+      offset = 0
+    }
 
-    o += leaf.text.length
-
-    // If the leaf doesn't overlap with the operation, continue on.
-    if (ay < bx || by < ax) return
-
-    // If the leaf already has the mark, continue on.
-    if (leaf.marks.has(mark)) return
-
-    // Otherwise, determine which offset and characters overlap.
-    const start = Math.max(ax, bx)
-    const end = Math.min(ay, by)
-
-    operations.push({
-      type: 'add_mark',
-      path,
-      offset: start,
-      length: end - start,
-      mark,
+    marks.forEach(mark => {
+      editor.applyOperation({
+        type: 'add_mark',
+        path,
+        mark: Mark.create(mark),
+      })
     })
   })
-
-  operations.forEach(op => editor.applyOperation(op))
 }
 
 /**
@@ -106,38 +107,42 @@ Commands.insertNodeByPath = (editor, path, index, node) => {
  */
 
 Commands.insertTextByPath = (editor, path, offset, text, marks) => {
+  marks = Mark.createSet(marks)
   const { value } = editor
-  const { decorations, document } = value
-  const node = document.assertNode(path)
-  marks = marks || node.getMarksAtIndex(offset)
+  const { annotations, document } = value
+  document.assertNode(path)
 
-  let updated = false
-  const { key } = node
+  editor.withoutNormalizing(() => {
+    for (const annotation of annotations.values()) {
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
 
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-    if (!isAtomic) return true
-    if (start.key !== key) return true
+      if (!isAtomic) {
+        continue
+      }
 
-    if (start.offset < offset && (end.key !== key || end.offset > offset)) {
-      updated = true
-      return false
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
-    return true
-  })
+    editor.applyOperation({
+      type: 'insert_text',
+      path,
+      offset,
+      text,
+    })
 
-  if (updated) {
-    editor.setDecorations(decs)
-  }
-
-  editor.applyOperation({
-    type: 'insert_text',
-    path,
-    offset,
-    text,
-    marks,
+    if (marks.size) {
+      editor.addMarksByPath(path, offset, text.length, marks)
+    }
   })
 }
 
@@ -218,42 +223,45 @@ Commands.moveNodeByPath = (editor, path, newParentPath, newIndex) => {
 
 Commands.removeMarkByPath = (editor, path, offset, length, mark) => {
   mark = Mark.create(mark)
+  editor.removeMarksByPath(path, offset, length, [mark])
+}
+
+Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
+  marks = Mark.createSet(marks)
+
+  if (!marks.size) {
+    return
+  }
+
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
-  const leaves = node.getLeaves()
 
-  const operations = []
-  const bx = offset
-  const by = offset + length
-  let o = 0
+  editor.withoutNormalizing(() => {
+    // If it ends before the end of the node, we'll need to split to create a new
+    // text with different marks.
+    if (offset + length < node.text.length) {
+      editor.splitNodeByPath(path, offset + length)
+    }
 
-  leaves.forEach(leaf => {
-    const ax = o
-    const ay = ax + leaf.text.length
+    // Same thing if it starts after the start. But in that case, we need to
+    // update our path and offset to point to the new start.
+    if (offset > 0) {
+      editor.splitNodeByPath(path, offset)
+      path = PathUtils.increment(path)
+      offset = 0
+    }
 
-    o += leaf.text.length
-
-    // If the leaf doesn't overlap with the operation, continue on.
-    if (ay < bx || by < ax) return
-
-    // If the leaf already has the mark, continue on.
-    if (!leaf.marks.has(mark)) return
-
-    // Otherwise, determine which offset and characters overlap.
-    const start = Math.max(ax, bx)
-    const end = Math.min(ay, by)
-
-    operations.push({
-      type: 'remove_mark',
-      path,
-      offset: start,
-      length: end - start,
-      mark,
+    marks.forEach(mark => {
+      editor.applyOperation({
+        type: 'remove_mark',
+        path,
+        offset,
+        length,
+        mark,
+      })
     })
   })
-
-  operations.forEach(op => editor.applyOperation(op))
 }
 
 /**
@@ -267,12 +275,17 @@ Commands.removeAllMarksByPath = (editor, path) => {
   const { state } = editor
   const { document } = state
   const node = document.assertNode(path)
-  const texts = node.object === 'text' ? [node] : node.getTextsAsArray()
 
-  texts.forEach(text => {
-    text.getMarksAsArray().forEach(mark => {
-      editor.removeMarkByKey(text.key, 0, text.text.length, mark)
-    })
+  editor.withoutNormalizing(() => {
+    if (node.object === 'text') {
+      editor.removeMarksByPath(path, 0, node.text.length, node.marks)
+      return
+    }
+
+    for (const [n, p] of node.texts()) {
+      const pth = path.concat(p)
+      editor.removeMarksByPath(pth, 0, n.text.length, n.marks)
+    }
   })
 }
 
@@ -306,69 +319,38 @@ Commands.removeNodeByPath = (editor, path) => {
 
 Commands.removeTextByPath = (editor, path, offset, length) => {
   const { value } = editor
-  const { decorations, document } = value
+  const { document, annotations } = value
   const node = document.assertNode(path)
-  const leaves = node.getLeaves()
-  const { text } = node
+  const text = node.text.slice(offset, offset + length)
 
-  let updated = false
-  const { key } = node
-  const from = offset
-  const to = offset + length
+  editor.withoutNormalizing(() => {
+    for (const annotation of annotations.values()) {
+      const { start, end } = annotation
+      const isAtomic = editor.isAtomic(annotation)
 
-  const decs = decorations.filter(dec => {
-    const { start, end, mark } = dec
-    const isAtomic = editor.isAtomic(mark)
-    if (!isAtomic) return true
-    if (start.key !== key) return true
+      if (!isAtomic) {
+        continue
+      }
 
-    if (start.offset < from && (end.key !== key || end.offset > from)) {
-      updated = true
-      return false
+      if (!start.path.equals(path)) {
+        continue
+      }
+
+      if (
+        start.offset < offset &&
+        (!end.path.equals(path) || end.offset > offset)
+      ) {
+        editor.removeAnnotation(annotation)
+      }
     }
 
-    if (start.offset < to && (end.key !== key || end.offset > to)) {
-      updated = true
-      return null
-    }
-
-    return true
-  })
-
-  if (updated) {
-    editor.setDecorations(decs)
-  }
-
-  const removals = []
-  const bx = offset
-  const by = offset + length
-  let o = 0
-
-  leaves.forEach(leaf => {
-    const ax = o
-    const ay = ax + leaf.text.length
-
-    o += leaf.text.length
-
-    // If the leaf doesn't overlap with the removal, continue on.
-    if (ay < bx || by < ax) return
-
-    // Otherwise, determine which offset and characters overlap.
-    const start = Math.max(ax, bx)
-    const end = Math.min(ay, by)
-    const string = text.slice(start, end)
-
-    removals.push({
+    editor.applyOperation({
       type: 'remove_text',
       path,
-      offset: start,
-      text: string,
-      marks: leaf.marks,
+      offset,
+      text,
     })
   })
-
-  // Apply in reverse order, so subsequent removals don't impact previous ones.
-  removals.reverse().forEach(op => editor.applyOperation(op))
 }
 
 /**
@@ -391,7 +373,8 @@ Commands.replaceNodeByPath = (editor, path, newNode) => {
 }
 
 /**
- * Replace A Length of Text with another string or text
+ * Replace a `length` of text at `offset` with new `text` and optional `marks`.
+ *
  * @param {Editor} editor
  * @param {String} key
  * @param {Number} offset
@@ -401,36 +384,8 @@ Commands.replaceNodeByPath = (editor, path, newNode) => {
  */
 
 Commands.replaceTextByPath = (editor, path, offset, length, text, marks) => {
-  const { document } = editor.value
-  const node = document.assertNode(path)
-
-  if (length + offset > node.text.length) {
-    length = node.text.length - offset
-  }
-
-  const range = document.createRange({
-    anchor: { path, offset },
-    focus: { path, offset: offset + length },
-  })
-
-  let activeMarks = document.getActiveMarksAtRange(range)
-
   editor.withoutNormalizing(() => {
     editor.removeTextByPath(path, offset, length)
-
-    if (!marks) {
-      // Do not use mark at index when marks and activeMarks are both empty
-      marks = activeMarks ? activeMarks : []
-    } else if (activeMarks) {
-      // Do not use `has` because we may want to reset marks like font-size with
-      // an updated data;
-      activeMarks = activeMarks.filter(
-        activeMark => !marks.find(m => activeMark.type === m.type)
-      )
-
-      marks = activeMarks.merge(marks)
-    }
-
     editor.insertTextByPath(path, offset, text, marks)
   })
 }
@@ -454,17 +409,34 @@ Commands.setMarkByPath = (
   properties,
   newProperties
 ) => {
-  // we call Mark.create() here because we need the complete previous mark instance
   properties = Mark.create(properties)
   newProperties = Mark.createProperties(newProperties)
 
-  editor.applyOperation({
-    type: 'set_mark',
-    path,
-    offset,
-    length,
-    properties,
-    newProperties,
+  const { value } = editor
+  const { document } = value
+  const node = document.assertNode(path)
+
+  editor.withoutNormalizing(() => {
+    // If it ends before the end of the node, we'll need to split to create a new
+    // text with different marks.
+    if (offset + length < node.text.length) {
+      editor.splitNodeByPath(path, offset + length)
+    }
+
+    // Same thing if it starts after the start. But in that case, we need to
+    // update our path and offset to point to the new start.
+    if (offset > 0) {
+      editor.splitNodeByPath(path, offset)
+      path = PathUtils.increment(path)
+      offset = 0
+    }
+
+    editor.applyOperation({
+      type: 'set_mark',
+      path,
+      properties,
+      newProperties,
+    })
   })
 }
 
@@ -552,24 +524,22 @@ Commands.splitDescendantsByPath = (editor, path, textPath, textOffset) => {
 
   const { value } = editor
   const { document } = value
-  const node = document.assertNode(path)
-  const text = document.assertNode(textPath)
-  const ancestors = document.getAncestors(textPath)
-  const nodes = ancestors
-    .skipUntil(a => a.key === node.key)
-    .reverse()
-    .unshift(text)
-
-  let previous
-  let index
+  let index = textOffset
+  let lastPath = textPath
 
   editor.withoutNormalizing(() => {
-    nodes.forEach(n => {
-      const prevIndex = index == null ? null : index
-      index = previous ? n.nodes.indexOf(previous) + 1 : textOffset
-      previous = n
-      editor.splitNodeByKey(n.key, index, { target: prevIndex })
-    })
+    editor.splitNodeByKey(textPath, textOffset)
+
+    for (const [, ancestorPath] of document.ancestors(textPath)) {
+      const target = index
+      index = lastPath.last() + 1
+      lastPath = ancestorPath
+      editor.splitNodeByPath(ancestorPath, index, { target })
+
+      if (ancestorPath.equals(path)) {
+        break
+      }
+    }
   })
 }
 

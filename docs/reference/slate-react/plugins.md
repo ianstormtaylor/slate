@@ -22,8 +22,10 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
   onPaste: Function,
   onSelect: Function,
   renderEditor: Function,
-  renderMark: Function,
-  renderNode: Function,
+  renderAnnotation: Function,
+  renderDecoration: Function,
+  renderBlock: Function,
+  renderInline: Function,
   shouldNodeComponentUpdate: Function,
 }
 ```
@@ -144,11 +146,53 @@ Render a `Mark` with `props`. The `props` object contains:
 
 You must spread the `props.attributes` onto the top-level DOM node you use to render the mark.
 
-### `renderNode`
+### `renderDecoration`
 
-`Function renderNode(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+`Function renderDecoration(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
-Render a `Node` with `props`. The `props` object contains:
+Render a `Decoration` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  decoration: Decoration,
+  marks: Set<Mark>,
+  node: Node,
+  offset: Number,
+  text: String,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the annotation.
+
+### `renderAnnotation`
+
+`Function renderAnnotation(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render an `Annotation` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  annotation: Annotation,
+  marks: Set<Mark>,
+  node: Node,
+  offset: Number,
+  text: String,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the annotation.
+
+### `renderBlock`
+
+`Function renderBlock(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render a Block `Node` with `props`. The `props` object contains:
 
 ```js
 {
@@ -163,7 +207,28 @@ Render a `Node` with `props`. The `props` object contains:
 }
 ```
 
-You must spread the `props.attributes` onto the top-level DOM node you use to render the node.
+You must spread the `props.attributes` onto the top-level DOM node you use to render the node. You must also be sure to assign `attributes.ref` to the native DOM component being rendered (using `forwardRef` or `innerRef` if necessary).
+
+### `renderInline`
+
+`Function renderInline(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render an Inline `Node` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  isFocused: Boolean,
+  isSelected: BOolean,
+  node: Node,
+  parent: Node,
+  readOnly: Boolean,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the node. You must also be sure to assign `attributes.ref` to the native DOM component being rendered (using `forwardRef` or `innerRef` if necessary).
 
 ### `shouldNodeComponentUpdate`
 

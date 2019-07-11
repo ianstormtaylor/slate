@@ -28,13 +28,8 @@ export const output = {
           {
             object: 'text',
             key: '0',
-            leaves: [
-              {
-                text: 'one',
-                object: 'leaf',
-                marks: [],
-              },
-            ],
+            text: 'one',
+            marks: [],
           },
         ],
       },

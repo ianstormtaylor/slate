@@ -3,25 +3,21 @@
 import React from 'react'
 import h from '../../helpers/h'
 
-function Image(props) {
-  return React.createElement('img', {
-    className: props.isFocused ? 'focused' : '',
-    src: props.node.data.get('src'),
-    ...props.attributes,
-  })
-}
-
-function renderNode(props, editor, next) {
+function renderBlock(props, editor, next) {
   switch (props.node.type) {
     case 'image':
-      return Image(props)
+      return React.createElement('img', {
+        className: props.isFocused ? 'focused' : '',
+        src: props.node.data.get('src'),
+        ...props.attributes,
+      })
     default:
       return next()
   }
 }
 
 export const props = {
-  renderNode,
+  renderBlock,
   schema: {
     blocks: {
       image: {
@@ -36,7 +32,7 @@ export const value = (
     <document>
       <paragraph>
         <text key="a">
-          <anchor />
+          <anchor isFocused={false} />
         </text>
       </paragraph>
       <image src="https://example.com/image.png">
@@ -44,34 +40,30 @@ export const value = (
       </image>
       <paragraph>
         <text key="b">
-          <focus />
+          <focus isFocused={false} />
         </text>
       </paragraph>
       <image src="https://example.com/image2.png">
         <text />
       </image>
     </document>
-    <selection isFocused={false}>
-      <anchor key="a" offset={0} />
-      <focus key="b" offset={0} />
-    </selection>
   </value>
 )
 
 export const output = `
-<div data-slate-editor="true" contenteditable="true" role="textbox">
-   <div style="position:relative">
+<div contenteditable="true">
+   <div>
     <span>
-      <span data-slate-leaf="true">
-        <span data-slate-zero-width="n" data-slate-length="0">&#xFEFF;<br /></span>
+      <span>
+        <span>&#xFEFF;<br /></span>
       </span>
     </span>
   </div>
-  <div data-slate-void="true">
-    <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
+  <div>
+    <div>
       <span>
-        <span data-slate-leaf="true">
-          <span data-slate-zero-width="z" data-slate-length="0">&#xFEFF;</span>
+        <span>
+          <span>&#xFEFF;</span>
         </span>
       </span>
     </div>
@@ -81,16 +73,16 @@ export const output = `
   </div>
   <div style="position:relative">
     <span>
-      <span data-slate-leaf="true">
-        <span data-slate-zero-width="n" data-slate-length="0">&#xFEFF;<br /></span>
+      <span>
+        <span>&#xFEFF;<br /></span>
       </span>
     </span>
   </div>
-  <div data-slate-void="true">
-    <div data-slate-spacer="true" style="height:0;color:transparent;outline:none;position:absolute">
+  <div>
+    <div>
       <span>
-        <span data-slate-leaf="true">
-          <span data-slate-zero-width="z" data-slate-length="0">&#xFEFF;</span>
+        <span>
+          <span>&#xFEFF;</span>
         </span>
       </span>
     </div>

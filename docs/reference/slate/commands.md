@@ -26,6 +26,8 @@ Delete everything in the current selection.
 `insertBlock(properties: Object) => Editor` <br/>
 `insertBlock(type: String) => Editor`
 
+Insert a new block at the same level as the current block, splitting the current block to make room if it is non-empty. If the selection is expanded, it will be deleted first.
+
 ### `deleteBackward`
 
 `deleteBackward(n: Number) => Editor`
@@ -37,8 +39,6 @@ Delete backward `n` characters at the current cursor. If the selection is expand
 `deleteForward(n: Number) => Editor`
 
 Delete forward `n` characters at the current cursor. If the selection is expanded, this method is equivalent to a regular [`delete()`](#delete). `n` defaults to `1`.
-
-Insert a new block at the same level as the current block, splitting the current block to make room if it is non-empty. If the selection is expanded, it will be deleted first.
 
 ### `insertFragment`
 
@@ -538,8 +538,8 @@ Wrap the given node in a [`Inline`](./inline.md) node that match `properties`. F
 
 ### `wrapNodeByKey/Path`
 
-`wraNodeByKey(key: String, parent: Node) => Editor` <br/>
-`wraNodeByPath(path: List, parent: Node) => Editor` <br/>
+`wrapNodeByKey(key: String, parent: Node) => Editor` <br/>
+`wrapNodeByPath(path: List, parent: Node) => Editor` <br/>
 
 Wrap the node with the specified key with the parent [`Node`](./node.md). This will clear all children of the parent.
 

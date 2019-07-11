@@ -1,6 +1,14 @@
+import warning from 'tiny-warning'
+import { PathUtils } from 'slate'
+
 import findRange from './find-range'
 
 export default function getSelectionFromDOM(window, editor, domSelection) {
+  warning(
+    false,
+    'As of slate-react@0.22 the `getSelectionFromDOM(window, editor, domSelection)` helper is deprecated in favor of `editor.findSelection(domSelection)`.'
+  )
+
   const { value } = editor
   const { document } = value
 
@@ -18,12 +26,12 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
   }
 
   const { anchor, focus } = range
-  const anchorText = document.getNode(anchor.key)
-  const focusText = document.getNode(focus.key)
-  const anchorInline = document.getClosestInline(anchor.key)
-  const focusInline = document.getClosestInline(focus.key)
-  const focusBlock = document.getClosestBlock(focus.key)
-  const anchorBlock = document.getClosestBlock(anchor.key)
+  const anchorText = document.getNode(anchor.path)
+  const focusText = document.getNode(focus.path)
+  const anchorInline = document.getClosestInline(anchor.path)
+  const focusInline = document.getClosestInline(focus.path)
+  const focusBlock = document.getClosestBlock(focus.path)
+  const anchorBlock = document.getClosestBlock(anchor.path)
 
   // COMPAT: If the anchor point is at the start of a non-void, and the
   // focus point is inside a void node with an offset that isn't `0`, set
@@ -51,9 +59,16 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
     !editor.isVoid(anchorInline) &&
     anchor.offset === anchorText.text.length
   ) {
-    const block = document.getClosestBlock(anchor.key)
-    const nextText = block.getNextText(anchor.key)
-    if (nextText) range = range.moveAnchorTo(nextText.key, 0)
+    const block = document.getClosestBlock(anchor.path)
+    const depth = document.getDepth(block.key)
+    const relativePath = PathUtils.drop(anchor.path, depth)
+    const [next] = block.texts({ path: relativePath })
+
+    if (next) {
+      const [, nextPath] = next
+      const absolutePath = anchor.path.slice(0, depth).concat(nextPath)
+      range = range.moveAnchorTo(absolutePath, 0)
+    }
   }
 
   if (
@@ -61,9 +76,16 @@ export default function getSelectionFromDOM(window, editor, domSelection) {
     !editor.isVoid(focusInline) &&
     focus.offset === focusText.text.length
   ) {
-    const block = document.getClosestBlock(focus.key)
-    const nextText = block.getNextText(focus.key)
-    if (nextText) range = range.moveFocusTo(nextText.key, 0)
+    const block = document.getClosestBlock(focus.path)
+    const depth = document.getDepth(block.key)
+    const relativePath = PathUtils.drop(focus.path, depth)
+    const [next] = block.texts({ path: relativePath })
+
+    if (next) {
+      const [, nextPath] = next
+      const absolutePath = focus.path.slice(0, depth).concat(nextPath)
+      range = range.moveFocusTo(absolutePath, 0)
+    }
   }
 
   let selection = document.createSelection(range)

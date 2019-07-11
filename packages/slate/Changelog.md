@@ -4,6 +4,128 @@ A list of changes to the `slate` package with each new version. Until `1.0.0` is
 
 ---
 
+### `0.47.0` — May 8, 2019
+
+###### NEW
+
+**Introducing the `Annotation` model.** This is very similar to what used to be stored in `value.decorations`, except they also contain a unique "key" to be identified by. They can be used for things like comments, suggestions, collaborative cursors, etc.
+
+```js
+{
+  object: 'annotation',
+  key: String,
+  type: String,
+  data: Map,
+  anchor: Point,
+  focus: Point,
+}
+```
+
+**There are three new `*_annotation` operations.** The set of operations now includes `add_annotation`, `remove_annotation` and `set_annotation`. They are similar to the existing `*_mark` operations.
+
+**Introducing "iterable" model methods.** This introduces several iteratable-producing methods on the `Element` interface, which `Document`, `Block` and `Inline` all implement. There are iterables for traversing the entire tree:
+
+```js
+element.blocks(options)
+element.descendants(options)
+element.inlines(options)
+element.texts(options)
+
+element.ancestors(path, options)
+element.siblings(path, options)
+```
+
+You can use them just like the native JavaScript iterables. For example, you can loop through the text nodes after a specific node:
+
+```js
+for (const next of document.texts({ path: start.path })) {
+  const [node, path] = next
+  // do something with the text node or its path
+}
+```
+
+Or you can traverse all of the "leaf" blocks:
+
+```js
+for (const [block] of document.blocks({ onlyLeaves: true })) {
+  // ...
+}
+```
+
+And because these iterations use native `for/of` loops, you can easily `break` or `return` out of the loops directly—a much nicer DX than remembering to `return false`.
+
+###### BREAKING
+
+**The `value.decorations` property is now `value.annotations`.** Following with the split of decorations into annotations, this property was also renamed. They must now contain unique `key` properties, as they are stored as a `Map` instead of a `List`. This allows for much more performant updates.
+
+**The `Decoration` model no longer has a nested `mark` property.** Previously a real `Mark` object was used as a property on decorations, but now the `type` and `data` properties are first class properties instead.
+
+```js
+{
+  object: 'decoration',
+  type: String,
+  data: Map,
+  anchor: Point,
+  focus: Point,
+}
+```
+
+---
+
+### `0.46.0` — May 1, 2019
+
+###### BREAKING
+
+**Mark operations no longer have `offset` or `length` properties.** Since text nodes now contain a unique set of marks, it wouldn't make sense for a single mark-related operation to result in a splitting of nodes. Instead, when a mark is added to only part of a text node, it will result in a `split_node` operation as well as an `add_mark` operation.
+
+**Text operations no longer have a `marks` property.** Previously it was used to add text with a specific set of marks. However this is no longer necessary, and when text is added with marks it will result in an `insert_text` operation as well as an `add_mark` operation.
+
+**Using `Text.create` or `Text.createList` with a `leaves` property will error.** Now that text nodes no longer have leaves, you will need to pass in the `text` string and `marks` directly when creating a new text node. (However, you can still create entire values using `Value.create` in a backwards compatible way for convenience while migrating.)
+
+```js
+// This works, although deprecated, which is the common case...
+Value.create(oldValueJson)
+
+// ...but this will error!
+Text.create(oldTextJson)
+```
+
+**`Value.toJSON` returns the new data model format, without leaves.** Although `Value.fromJSON` and `Value.create` allow the old format in deprecated mode, calling `Value.toJSON` will return the new data format. If you still need the old one you'll need to iterate the document tree converting text nodes yourself.
+
+**The low-level `Value.*` and `Node.*` mutation methods have changed.** These changes follow the operation signature changes, since the methods take the same arguments as the operations themselves. For example:
+
+```js
+// Previously...
+value.addMark(path, offset, length, mark)
+
+// ...is now:
+value.addMark(path, mark)
+```
+
+These are low-level methods, so this change shouldn't affect the majority of use cases.
+
+###### DEPRECATED
+
+**Initializing editors with `Text` nodes with a `leaves` property is deprecated.** In this new version of Slate, creating a new value with `Value.create` with the old leaf data model is still allowed for convenience in migration, but it will be removed in a coming version. (However, using the low-level `Text.create` will throw an error!)
+
+```js
+// This works, although deprecated, which is the common case...
+Value.create(oldValueJson)
+
+// ...but this will error!
+Text.create(oldTextJson)
+```
+
+---
+
+### `0.45.0` — April 2, 2019
+
+###### BREAKING
+
+**A few properties of `Operation` objects have changed.** In an effort to standardize and streamline operations, their properties have changed. This **won't** affect 90% of use cases, since operations are usually low-level concerns. However, if you are using operational transform or some other low-level parts of Slate, this may affect you. The `value`, `selection`, `node`, and `mark` properties—which contained references to Immutable.js objects—have all been removed. In their place, we have standardized a `properties` and `newProperties` pair. This will greatly reduce the size of operations stored in memory, and makes dealing with them easier when serialized as well.
+
+---
+
 ### `0.44.0` — November 8, 2018
 
 ###### NEW

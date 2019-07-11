@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,45 +9,35 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "This Slate editor records all of the "
-              },
-              {
-                "text": "keyboard",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text": ", "
-              },
-              {
-                "text": "input",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text": " and "
-              },
-              {
-                "text": "selection",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text":
-                  " event that occur while using it, so you can debug the exact combination of events that is firing for particular editing behaviors."
-              }
-            ]
+            "text": "This Slate editor records all of the "
+          },
+          {
+            "object": "text",
+            "text": "keyboard",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": ", "
+          },
+          {
+            "object": "text",
+            "text": "input",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " and "
+          },
+          {
+            "object": "text",
+            "text": "selection",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text":
+              " event that occur while using it, so you can debug the exact combination of events that is firing for particular editing behaviors."
           }
         ]
       },
@@ -55,12 +47,8 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "And this is a quote in case you need to try testing across block types."
-              }
-            ]
+            "text":
+              "And this is a quote in case you need to try testing across block types."
           }
         ]
       },
@@ -70,11 +58,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out!"
-              }
-            ]
+            "text": "Try it out!"
           }
         ]
       }

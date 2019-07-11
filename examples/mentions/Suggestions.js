@@ -1,34 +1,44 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { css } from 'emotion'
 
-import styled from 'react-emotion'
+const SuggestionList = React.forwardRef((props, ref) => (
+  <ul
+    {...props}
+    ref={ref}
+    className={css`
+      background: #fff;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      position: absolute;
+    `}
+  />
+))
 
-const SuggestionList = styled('ul')`
-  background: #fff;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  position: absolute;
-`
+const Suggestion = props => (
+  <li
+    {...props}
+    className={css`
+      align-items: center;
+      border-left: 1px solid #ddd;
+      border-right: 1px solid #ddd;
+      border-top: 1px solid #ddd;
 
-const Suggestion = styled('li')`
-  align-items: center;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-top: 1px solid #ddd;
+      display: flex;
+      height: 32px;
+      padding: 4px 8px;
 
-  display: flex;
-  height: 32px;
-  padding: 4px 8px;
+      &:hover {
+        background: #87cefa;
+      }
 
-  &:hover {
-    background: #87cefa;
-  }
-
-  &:last-of-type {
-    border-bottom: 1px solid #ddd;
-  }
-`
+      &:last-of-type {
+        border-bottom: 1px solid #ddd;
+      }
+    `}
+  />
+)
 
 const DEFAULT_POSITION = {
   top: -10000,
@@ -90,8 +100,8 @@ class Suggestions extends React.PureComponent {
     const anchorRect = anchor.getBoundingClientRect()
 
     this.setState({
-      top: anchorRect.bottom,
-      left: anchorRect.left,
+      top: anchorRect.bottom + window.pageYOffset,
+      left: anchorRect.left + window.pageXOffset,
     })
   }
 }

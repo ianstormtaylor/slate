@@ -40,13 +40,8 @@ function deserialize(string, options = {}) {
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  object: 'leaf',
-                  text: line,
-                  marks: defaultMarks,
-                },
-              ],
+              text: line,
+              marks: defaultMarks,
             },
           ],
         }

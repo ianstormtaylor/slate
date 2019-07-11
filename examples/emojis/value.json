@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,27 +9,17 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "In addition to block nodes, you can create inline void nodes, like "
-              }
-            ]
+            "text":
+              "In addition to block nodes, you can create inline void nodes, like "
           },
           {
             "object": "inline",
             "type": "emoji",
-            "data": {
-              "code": "😃"
-            }
+            "data": { "code": "😃" }
           },
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "!"
-              }
-            ]
+            "text": "!"
           }
         ]
       },
@@ -38,9 +30,7 @@
           {
             "object": "inline",
             "type": "emoji",
-            "data": {
-              "code": "🍔"
-            }
+            "data": { "code": "🍔" }
           }
         ]
       },
@@ -50,11 +40,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "This example shows emojis in action."
-              }
-            ]
+            "text": "This example shows emojis in action."
           }
         ]
       }

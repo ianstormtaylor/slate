@@ -20,13 +20,8 @@ export const input = {
             nodes: [
               {
                 object: 'text',
-                leaves: [
-                  {
-                    text: 'one',
-                    object: 'leaf',
-                    marks: [],
-                  },
-                ],
+                text: 'one',
+                marks: [],
               },
             ],
           },

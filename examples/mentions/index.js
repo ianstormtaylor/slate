@@ -41,12 +41,24 @@ import Suggestions from './Suggestions'
 const USER_MENTION_NODE_TYPE = 'userMention'
 
 /**
- * The decoration mark type that the menu will position itself against. The
+ * The annotation type that the menu will position itself against. The
  * "context" is just the current text after the @ symbol.
  * @type {String}
  */
 
-const CONTEXT_MARK_TYPE = 'mentionContext'
+const CONTEXT_ANNOTATION_TYPE = 'mentionContext'
+
+/**
+ * Get a unique key for the search highlight annotations.
+ *
+ * @return {String}
+ */
+
+let n = 0
+
+function getMentionKey() {
+  return `highlight_${n++}`
+}
 
 const schema = {
   inlines: {
@@ -118,8 +130,9 @@ class MentionsExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           ref={this.editorRef}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
+          renderInline={this.renderInline}
+          renderBlock={this.renderBlock}
+          renderAnnotation={this.renderAnnotation}
           schema={schema}
         />
         <Suggestions
@@ -131,8 +144,8 @@ class MentionsExample extends React.Component {
     )
   }
 
-  renderMark(props, editor, next) {
-    if (props.mark.type === CONTEXT_MARK_TYPE) {
+  renderAnnotation(props, editor, next) {
+    if (props.annotation.type === CONTEXT_ANNOTATION_TYPE) {
       return (
         // Adding the className here is important so that the `Suggestions`
         // component can find an anchor.
@@ -145,7 +158,17 @@ class MentionsExample extends React.Component {
     return next()
   }
 
-  renderNode(props, editor, next) {
+  renderBlock(props, editor, next) {
+    const { attributes, node } = props
+
+    if (node.type === 'paragraph') {
+      return <p {...attributes}>{props.children}</p>
+    }
+
+    return next()
+  }
+
+  renderInline(props, editor, next) {
     const { attributes, node } = props
 
     if (node.type === USER_MENTION_NODE_TYPE) {
@@ -215,12 +238,14 @@ class MentionsExample extends React.Component {
 
       const { selection } = change.value
 
-      let decorations = change.value.decorations.filter(
-        value => value.mark.type !== CONTEXT_MARK_TYPE
+      let annotations = change.value.annotations.filter(
+        annotation => annotation.type !== CONTEXT_ANNOTATION_TYPE
       )
 
       if (inputValue && hasValidAncestors(change.value)) {
-        decorations = decorations.push({
+        const key = getMentionKey()
+
+        annotations = annotations.set(key, {
           anchor: {
             key: selection.start.key,
             offset: selection.start.offset - inputValue.length,
@@ -229,15 +254,14 @@ class MentionsExample extends React.Component {
             key: selection.start.key,
             offset: selection.start.offset,
           },
-          mark: {
-            type: CONTEXT_MARK_TYPE,
-          },
+          type: CONTEXT_ANNOTATION_TYPE,
+          key: getMentionKey(),
         })
       }
 
       this.setState({ value: change.value }, () => {
-        // We need to set decorations after the value flushes into the editor.
-        this.editorRef.current.setDecorations(decorations)
+        // We need to set annotations after the value flushes into the editor.
+        this.editorRef.current.setAnnotations(annotations)
       })
       return
     }
@@ -292,14 +316,9 @@ class MentionsExample extends React.Component {
 function hasValidAncestors(value) {
   const { document, selection } = value
 
-  const invalidParent = document.getClosest(
-    selection.start.key,
-    // In this simple case, we only want mentions to live inside a paragraph.
-    // This check can be adjusted for more complex rich text implementations.
-    node => node.type !== 'paragraph'
-  )
-
-  return !invalidParent
+  // In this simple case, we only want mentions to live inside a paragraph.
+  // This check can be adjusted for more complex rich text implementations.
+  return document.getParent(selection.start.key).type === 'paragraph'
 }
 
 export default MentionsExample

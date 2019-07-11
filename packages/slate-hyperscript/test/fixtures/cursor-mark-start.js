@@ -26,40 +26,37 @@ export const output = {
   document: {
     object: 'document',
     data: {},
-    key: '2',
+    key: '4',
     nodes: [
       {
         object: 'block',
-        key: '1',
+        key: '3',
         type: 'paragraph',
         data: {},
         nodes: [
           {
             object: 'text',
+            key: '1',
+            text: 'one',
+            marks: [],
+          },
+          {
+            object: 'text',
             key: '0',
-            leaves: [
+            text: 'two',
+            marks: [
               {
-                object: 'leaf',
-                text: 'one',
-                marks: [],
-              },
-              {
-                object: 'leaf',
-                text: 'two',
-                marks: [
-                  {
-                    object: 'mark',
-                    type: 'bold',
-                    data: {},
-                  },
-                ],
-              },
-              {
-                object: 'leaf',
-                text: 'three',
-                marks: [],
+                object: 'mark',
+                type: 'bold',
+                data: {},
               },
             ],
+          },
+          {
+            object: 'text',
+            key: '2',
+            text: 'three',
+            marks: [],
           },
         ],
       },
@@ -70,14 +67,14 @@ export const output = {
     anchor: {
       object: 'point',
       key: '0',
-      path: [0, 0],
-      offset: 3,
+      path: [0, 1],
+      offset: 0,
     },
     focus: {
       object: 'point',
       key: '0',
-      path: [0, 0],
-      offset: 3,
+      path: [0, 1],
+      offset: 0,
     },
     isFocused: true,
     marks: null,

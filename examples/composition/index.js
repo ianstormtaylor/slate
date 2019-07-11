@@ -2,13 +2,16 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import styled from 'react-emotion'
+import { css } from 'emotion'
 import { Link, Redirect } from 'react-router-dom'
 import splitJoin from './split-join.js'
 import insert from './insert.js'
 import special from './special.js'
+import empty from './empty.js'
+import remove from './remove.js'
 import { isKeyHotkey } from 'is-hotkey'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, EditorValue, Icon, Instruction, Toolbar } from '../components'
+import { ANDROID_API_VERSION } from 'slate-dev-environment'
 
 /**
  * Define the default node type.
@@ -19,33 +22,48 @@ import { Button, Icon, Toolbar } from '../components'
 const DEFAULT_NODE = 'paragraph'
 
 /**
- * Some styled components.
+ * Some components.
  *
  * @type {Component}
  */
 
-const Instruction = styled('div')`
-  white-space: pre-wrap;
-  margin: -1em -1em 1em;
-  padding: 0.5em;
-  background: #eee;
-`
+const Tabs = props => (
+  <div
+    {...props}
+    className={css`
+      margin: -10px -10px 0;
+    `}
+  />
+)
 
-const Tabs = styled('div')`
-  margin-bottom: 0.5em;
-`
+const Tab = ({ active, ...props }) => (
+  <Link
+    {...props}
+    className={css`
+      display: inline-block;
+      text-decoration: none;
+      font-size: 14px;
+      color: ${active ? 'black' : '#808080'};
+      background: ${active ? '#f8f8e8' : '#fff'};
+      padding: 10px;
+      margin-right: 0.25em;
+      border-top-left-radius: 5px;
+      border-top-right-radius: 5px;
+    `}
+  />
+)
 
-const TabLink = ({ active, ...props }) => <Link {...props} />
-
-const Tab = styled(TabLink)`
-  display: inline-block;
-  text-decoration: none;
-  color: black;
-  background: ${p => (p.active ? '#AAA' : '#DDD')};
-  padding: 0.25em 0.5em;
-  border-radius: 0.25em;
-  margin-right: 0.25em;
-`
+const Version = props => (
+  <div
+    {...props}
+    className={css`
+      float: right;
+      padding: 0.5em;
+      font-size: 75%;
+      color: #808080;
+    `}
+  />
+)
 
 /**
  * Subpages which are each a smoke test.
@@ -57,6 +75,8 @@ const SUBPAGES = [
   ['Split/Join', splitJoin, 'split-join'],
   ['Insertion', insert, 'insert'],
   ['Special', special, 'special'],
+  ['Empty', empty, 'empty'],
+  ['Remove', remove, 'remove'],
 ]
 
 /**
@@ -145,23 +165,23 @@ class RichTextExample extends React.Component {
   render() {
     const { text } = this.state
     if (text == null) return <Redirect to="/composition/split-join" />
+    // const textLines = getTextLines(this.state.value)
     return (
       <div>
+        <Tabs>
+          {SUBPAGES.map(([name, Component, subpage]) => {
+            const active = subpage === this.props.params.subpage
+            return (
+              <Tab key={subpage} to={`/composition/${subpage}`} active={active}>
+                {name}
+              </Tab>
+            )
+          })}
+          <Version>
+            {ANDROID_API_VERSION ? `Android API ${ANDROID_API_VERSION}` : null}
+          </Version>
+        </Tabs>
         <Instruction>
-          <Tabs>
-            {SUBPAGES.map(([name, Component, subpage]) => {
-              const active = subpage === this.props.params.subpage
-              return (
-                <Tab
-                  key={subpage}
-                  to={`/composition/${subpage}`}
-                  active={active}
-                >
-                  {name}
-                </Tab>
-              )
-            })}
-          </Tabs>
           <div>{this.state.text}</div>
         </Instruction>
         <Toolbar>
@@ -183,9 +203,10 @@ class RichTextExample extends React.Component {
           value={this.state.value}
           onChange={this.onChange}
           onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
+          renderBlock={this.renderBlock}
           renderMark={this.renderMark}
         />
+        <EditorValue value={this.state.value} />
       </div>
     )
   }
@@ -242,13 +263,13 @@ class RichTextExample extends React.Component {
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

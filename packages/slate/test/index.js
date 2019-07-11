@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { fixtures } from 'slate-dev-test-utils'
 import { Node, Editor, Value } from 'slate'
+import { List } from 'immutable'
 
 const plugins = [
   {
@@ -25,14 +26,6 @@ const plugins = [
 ]
 
 describe('slate', () => {
-  fixtures(__dirname, 'models/leaf', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
-
   fixtures(__dirname, 'models/operation', ({ module }) => {
     const { input, output } = module
     const fn = module.default
@@ -49,13 +42,13 @@ describe('slate', () => {
     assert.equal(actual, expected)
   })
 
-  fixtures(__dirname, 'models/text', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
+  // fixtures(__dirname, 'models/text', ({ module }) => {
+  //   const { input, output } = module
+  //   const fn = module.default
+  //   const actual = fn(input).toJSON()
+  //   const expected = output.toJSON()
+  //   assert.deepEqual(actual, expected)
+  // })
 
   fixtures(__dirname, 'models/node', ({ module }) => {
     const { input, output } = module
@@ -67,7 +60,15 @@ describe('slate', () => {
       actual = actual.toJSON()
     }
 
+    if (List.isList(actual)) {
+      actual = actual.toJSON()
+    }
+
     if (Node.isNode(expected)) {
+      expected = expected.toJSON()
+    }
+
+    if (List.isList(expected)) {
       expected = expected.toJSON()
     }
 

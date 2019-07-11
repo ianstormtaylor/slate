@@ -89,18 +89,18 @@ class App extends React.Component {
 
   render() {
     return (
-      // Pass in the `renderNode` prop...
+      // Pass in the `renderBlock` prop...
       <Editor
         value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
-  // Add a `renderNode` method to render a `CodeNode` for code blocks.
-  renderNode = (props, editor, next) => {
+  // Add a `renderBlock` method to render a `CodeNode` for code blocks.
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
@@ -148,12 +148,12 @@ class App extends React.Component {
         value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />
@@ -206,12 +206,12 @@ class App extends React.Component {
         value={this.state.value}
         onChange={this.onChange}
         onKeyDown={this.onKeyDown}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
       />
     )
   }
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeNode {...props} />

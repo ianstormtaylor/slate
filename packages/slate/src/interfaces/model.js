@@ -1,4 +1,5 @@
 import mixin from '../utils/mixin'
+import Annotation from '../models/annotation'
 import Block from '../models/block'
 import Decoration from '../models/decoration'
 import Document from '../models/document'
@@ -44,6 +45,7 @@ class ModelInterface {
  */
 
 mixin(ModelInterface, [
+  Annotation,
   Block,
   Decoration,
   Document,

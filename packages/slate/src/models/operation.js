@@ -1,6 +1,7 @@
 import isPlainObject from 'is-plain-object'
 import { List, Record, Map } from 'immutable'
 
+import Annotation from './annotation'
 import Mark from './mark'
 import Node from './node'
 import PathUtils from '../utils/path-utils'
@@ -16,15 +17,18 @@ import invert from '../operations/invert'
  */
 
 const OPERATION_ATTRIBUTES = {
-  add_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  add_mark: ['path', 'mark', 'data'],
+  add_annotation: ['annotation', 'data'],
   insert_node: ['path', 'node', 'data'],
-  insert_text: ['path', 'offset', 'text', 'marks', 'data'],
+  insert_text: ['path', 'offset', 'text', 'data'],
   merge_node: ['path', 'position', 'properties', 'target', 'data'],
   move_node: ['path', 'newPath', 'data'],
-  remove_mark: ['path', 'offset', 'length', 'mark', 'data'],
+  remove_annotation: ['annotation', 'data'],
+  remove_mark: ['path', 'mark', 'data'],
   remove_node: ['path', 'node', 'data'],
-  remove_text: ['path', 'offset', 'text', 'marks', 'data'],
-  set_mark: ['path', 'offset', 'length', 'properties', 'newProperties', 'data'],
+  remove_text: ['path', 'offset', 'text', 'data'],
+  set_annotation: ['properties', 'newProperties', 'data'],
+  set_mark: ['path', 'properties', 'newProperties', 'data'],
   set_node: ['path', 'properties', 'newProperties', 'data'],
   set_selection: ['properties', 'newProperties', 'data'],
   set_value: ['properties', 'newProperties', 'data'],
@@ -38,20 +42,21 @@ const OPERATION_ATTRIBUTES = {
  */
 
 const DEFAULTS = {
+  annotation: undefined,
+  data: undefined,
   length: undefined,
   mark: undefined,
   marks: undefined,
   newPath: undefined,
+  newProperties: undefined,
   node: undefined,
   offset: undefined,
   path: undefined,
   position: undefined,
   properties: undefined,
-  newProperties: undefined,
   target: undefined,
   text: undefined,
   type: undefined,
-  data: undefined,
 }
 
 /**
@@ -136,6 +141,10 @@ class Operation extends Record(DEFAULTS) {
         )
       }
 
+      if (key === 'annotation') {
+        v = Annotation.create(v)
+      }
+
       if (key === 'path' || key === 'newPath') {
         v = PathUtils.create(v)
       }
@@ -144,16 +153,15 @@ class Operation extends Record(DEFAULTS) {
         v = Mark.create(v)
       }
 
-      if (key === 'marks' && v != null) {
-        v = Mark.createSet(v)
-      }
-
       if (key === 'node') {
         v = Node.create(v)
       }
 
-      if (key === 'properties' && type === 'merge_node') {
-        v = Node.createProperties(v)
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_annotation'
+      ) {
+        v = Annotation.createProperties(v)
       }
 
       if (
@@ -165,7 +173,7 @@ class Operation extends Record(DEFAULTS) {
 
       if (
         (key === 'properties' || key === 'newProperties') &&
-        type === 'set_node'
+        (type === 'set_node' || type === 'merge_node' || type === 'split_node')
       ) {
         v = Node.createProperties(v)
       }
@@ -184,10 +192,6 @@ class Operation extends Record(DEFAULTS) {
         v = Value.createProperties(v)
       }
 
-      if (key === 'properties' && type === 'split_node') {
-        v = Node.createProperties(v)
-      }
-
       if (key === 'data') {
         v = Map(v)
       }
@@ -195,8 +199,8 @@ class Operation extends Record(DEFAULTS) {
       attrs[key] = v
     }
 
-    const node = new Operation(attrs)
-    return node
+    const op = new Operation(attrs)
+    return op
   }
 
   /**
@@ -249,6 +253,7 @@ class Operation extends Record(DEFAULTS) {
       let value = this[key]
 
       if (
+        key === 'annotation' ||
         key === 'mark' ||
         key === 'marks' ||
         key === 'node' ||
@@ -262,6 +267,18 @@ class Operation extends Record(DEFAULTS) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
+        value = v
+      }
+
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_annotation'
+      ) {
+        const v = {}
+        if ('anchor' in value) v.anchor = value.anchor.toJS()
+        if ('focus' in value) v.focus = value.focus.toJS()
+        if ('key' in value) v.key = value.key
+        if ('mark' in value) v.mark = value.mark.toJS()
         value = v
       }
 
@@ -303,7 +320,6 @@ class Operation extends Record(DEFAULTS) {
       ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
-        if ('decorations' in value) v.decorations = value.decorations.toJS()
         value = v
       }
 

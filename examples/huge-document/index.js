@@ -23,14 +23,14 @@ for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
     object: 'block',
     type: 'heading',
-    nodes: [{ object: 'text', leaves: [{ text: faker.lorem.sentence() }] }],
+    nodes: [{ object: 'text', text: faker.lorem.sentence() }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
       object: 'block',
       type: 'paragraph',
-      nodes: [{ object: 'text', leaves: [{ text: faker.lorem.paragraph() }] }],
+      nodes: [{ object: 'text', text: faker.lorem.paragraph() }],
     })
   }
 }
@@ -62,14 +62,14 @@ class HugeDocument extends React.Component {
         placeholder="Enter some text..."
         spellCheck={false}
         defaultValue={initialValue}
-        renderNode={this.renderNode}
+        renderBlock={this.renderBlock}
         renderMark={this.renderMark}
       />
     )
   }
 
   /**
-   * Render a Slate node.
+   * Render a Slate block.
    *
    * @param {Object} props
    * @param {Editor} editor
@@ -77,7 +77,7 @@ class HugeDocument extends React.Component {
    * @return {Element}
    */
 
-  renderNode = (props, editor, next) => {
+  renderBlock = (props, editor, next) => {
     const { attributes, children, node } = props
 
     switch (node.type) {

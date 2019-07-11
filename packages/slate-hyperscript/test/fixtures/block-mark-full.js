@@ -15,17 +15,12 @@ export const output = {
   nodes: [
     {
       object: 'text',
-      leaves: [
+      text: 'word',
+      marks: [
         {
-          object: 'leaf',
-          text: 'word',
-          marks: [
-            {
-              object: 'mark',
-              type: 'bold',
-              data: {},
-            },
-          ],
+          object: 'mark',
+          type: 'bold',
+          data: {},
         },
       ],
     },
