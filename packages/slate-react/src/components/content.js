@@ -57,7 +57,7 @@ class Content extends React.Component {
     contentKey: Types.number,
     editor: Types.object.isRequired,
     id: Types.string,
-    onEvent: Types.func,
+    onEvent: Types.func.isRequired,
     readOnly: Types.bool.isRequired,
     role: Types.string,
     spellCheck: Types.bool.isRequired,
