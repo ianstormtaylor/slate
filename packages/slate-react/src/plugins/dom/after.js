@@ -570,19 +570,8 @@ function AfterPlugin(options = {}) {
     }
 
     if (Hotkeys.isExtendForward(event)) {
-      const startText = document.getNode(start.path)
-      const [nextEntry] = document.texts({ path: start.path })
-      let isNextInVoid = false
-
-      if (nextEntry) {
-        const [, nextPath] = nextEntry
-        isNextInVoid = document.hasVoidParent(nextPath, editor)
-      }
-
-      if (hasVoidParent || isNextInVoid || startText.text === '') {
-        event.preventDefault()
-        return editor.moveFocusForward()
-      }
+      event.preventDefault()
+      return editor.moveFocusForward()
     }
 
     next()
