@@ -193,7 +193,7 @@ class PasteHtml extends React.Component {
 
     switch (node.type) {
       case 'paragraph':
-        return <p {...attributes}>{children}</p>;
+        return <p {...attributes}>{children}</p>
       case 'quote':
         return <blockquote {...attributes}>{children}</blockquote>
       case 'code':
