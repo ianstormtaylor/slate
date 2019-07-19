@@ -798,16 +798,16 @@ class Value extends Record(DEFAULTS) {
 
     value = value.mapRanges(range => {
       const next = newDocument.getNextText(node.key)
-      const { start, end } = range
+      const { anchor, focus } = range
 
-      // If the start was after the split, move it to the next node.
-      if (node.key === start.key && position <= start.offset) {
-        range = range.moveStartTo(next.key, start.offset - position)
+      // If the anchor was after the split, move it to the next node.
+      if (node.key === anchor.key && position <= anchor.offset) {
+        range = range.moveAnchorTo(next.key, anchor.offset - position)
       }
 
-      // If the end was after the split, move it to the next node.
-      if (node.key === end.key && position <= end.offset) {
-        range = range.moveEndTo(next.key, end.offset - position)
+      // If the focus was after the split, move it to the next node.
+      if (node.key === focus.key && position <= focus.offset) {
+        range = range.moveFocusTo(next.key, focus.offset - position)
       }
 
       range = range.updatePoints(point => point.setPath(null))
