@@ -79,7 +79,13 @@ Get a subset of the [`Marks`](./mark.md) that are present in _all_ the character
 
 `List`
 
-Get a list of the lowest-depth [`Block`](./block.md) nodes in the current selection.
+Get a list of the [`Block`](./block.md) nodes in the current selection.
+
+### `leafBlocks`
+
+`List`
+
+Get a list of any leaf [`Block`](./block.md) nodes in the current selection.
 
 ### `fragment`
 
@@ -91,7 +97,13 @@ Get a [`Document`](./document.md) fragment of the current selection.
 
 `List`
 
-Get a list of the lowest-depth [`Inline`](./inline.md) nodes in the current selection.
+Get a list of the [`Inline`](./inline.md) nodes in the current selection.
+
+### `leafInlines`
+
+`List`
+
+Get a list of any leaf [`Inline`](./inline.md) nodes in the current selection.
 
 ### `texts`
 

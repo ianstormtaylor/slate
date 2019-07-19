@@ -65,7 +65,7 @@ Get all of the bottom-most [`Block`](./block.md) node descendants.
 
 `getLeafBlocksAtRange(range: Range) => List`
 
-Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
+Get all of the leaf [`Block`](./block.md) nodes in a `range`.
 
 ### `getBlocksByType`
 
@@ -186,7 +186,7 @@ Get all of the top-most [`Inline`](./inline.md) nodes in a node.
 
 `getLeafInlinesAtRange(range: Range) => List`
 
-Get all of the bottom-most [`Inline`](./inline.md) nodes in a `range`.
+Get all of the leaf [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getInlinesByType`
 
