@@ -1887,12 +1887,10 @@ class ElementInterface {
    */
 
   getBlocksAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getBlocksAtRange` method has been renamed to `getLeafBlocksAtRange`.'
-    )
-
-    return this.getLeafBlocksAtRange(range)
+    const iterable = this.blocks({ range })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
   }
 
   getBlocksAtRangeAsArray(range) {
@@ -1905,12 +1903,10 @@ class ElementInterface {
   }
 
   getInlinesAtRange(range) {
-    warning(
-      false,
-      'As of slate@0.44 the `node.getInlinesAtRange` method has been renamed to `getLeafInlinesAtRange`.'
-    )
-
-    return this.getLeafInlinesAtRange(range)
+    const iterable = this.inlines({ range })
+    const array = Array.from(iterable, ([node]) => node)
+    const list = List(array)
+    return list
   }
 
   getInlinesAtRangeAsArray(range) {
