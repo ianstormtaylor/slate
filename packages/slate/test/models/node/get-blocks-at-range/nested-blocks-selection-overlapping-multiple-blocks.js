@@ -43,4 +43,4 @@ export default function({ document, selection }) {
     .toArray()
 }
 
-export const output = [ 'a', 'c', 'd', 'e', 'g', 'h', 'j']
+export const output = ['a', 'c', 'd', 'e', 'g', 'h', 'j']
