@@ -173,7 +173,10 @@ class Tables extends React.Component {
       if (prevBlock.type === 'table-cell') {
         if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
           event.preventDefault()
-          if(value.startBlock.type != 'table-cell' && previous.text.length == 0)
+          if (
+            value.startBlock.type !== 'table-cell' &&
+            previous.text.length === 0
+          )
             editor.setNodeByKey(value.startBlock.key, 'table-cell')
         } else {
           return next()
