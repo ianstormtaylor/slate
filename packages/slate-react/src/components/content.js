@@ -11,6 +11,7 @@ import {
   IS_FIREFOX,
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
+import Hotkeys from 'slate-hotkeys'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
 import DATA_ATTRS from '../constants/data-attributes'
@@ -395,10 +396,15 @@ class Content extends React.Component {
   onEvent(handler, event) {
     debug('onEvent', handler)
 
+    const nativeEvent = event.nativeEvent || event
+    const isUndoRedo =
+      event.type === 'keydown' &&
+      (Hotkeys.isUndo(nativeEvent) || Hotkeys.isRedo(nativeEvent))
+
     // Ignore `onBlur`, `onFocus` and `onSelect` events generated
     // programmatically while updating selection.
     if (
-      this.tmp.isUpdatingSelection &&
+      (this.tmp.isUpdatingSelection || isUndoRedo) &&
       (handler === 'onSelect' || handler === 'onBlur' || handler === 'onFocus')
     ) {
       return
