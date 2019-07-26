@@ -237,6 +237,10 @@ Commands.removeMarksByPath = (editor, path, offset, length, marks) => {
   const { document } = value
   const node = document.assertNode(path)
 
+  if (marks.intersect(node.marks).isEmpty()) {
+    return
+  }
+
   editor.withoutNormalizing(() => {
     // If it ends before the end of the node, we'll need to split to create a new
     // text with different marks.
