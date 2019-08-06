@@ -103,7 +103,10 @@ class Editor {
     const dirty = this.tmp.dirty.reduce((memo, path) => {
       path = PathUtils.create(path)
       const transformed = PathUtils.transform(path, operation)
-      memo = memo.concat(transformed.toArray())
+
+      transformed.forEach(newPath => {
+        memo.push(newPath)
+      })
       return memo
     }, newDirtyPaths)
 
