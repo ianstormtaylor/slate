@@ -4,11 +4,11 @@
 const h = require('../../helpers/h')
 
 module.exports.default = function(document) {
-  document.getFurthestAncestor('T1')
-  document.getFurthestAncestor('T2')
-  document.getFurthestAncestor('T3')
-  document.getFurthestAncestor('T4')
-  document.getFurthestAncestor('T5')
+  document.getFurthestChild('T1')
+  document.getFurthestChild('T2')
+  document.getFurthestChild('T3')
+  document.getFurthestChild('T4')
+  document.getFurthestChild('T5')
 }
 
 const value = (
