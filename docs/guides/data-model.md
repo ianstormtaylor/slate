@@ -103,7 +103,7 @@ Marks are how Slate represents formatting data that is attached to the character
 
 There are multiple techniques you might choose to format or style text. You can implement styling based on inlines or marks. Unlike inlines, marks do not affect the structure of the nodes in the document. Marks simply attach themselves to the characters.
 
-Marks may be easier to reason about and manipulate because marks do not affect the structure of the document and are associated to the characters. Marks an be applied to characters no matter how the characters are nested in the document. If you can express it as a `Range`, you can add marks to it. Working with marks instead of inlines does not require you to edit the document's structure, split existing nodes, determine where nodes are in the hierarchy, or other more complex interactions.
+Marks may be easier to reason about and manipulate because marks do not affect the structure of the document and are associated to the characters. Marks can be applied to characters no matter how the characters are nested in the document. If you can express it as a `Range`, you can add marks to it. Working with marks instead of inlines does not require you to edit the document's structure, split existing nodes, determine where nodes are in the hierarchy, or other more complex interactions.
 
 When marks are rendered, the characters are grouped into "leaves" of text that each contain the same set of marks applied to them. One disadvantage of marks is that you cannot guarantee how a set of marks will be ordered.
 
