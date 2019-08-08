@@ -87,6 +87,7 @@ A dictionary of inlines by type, each with its own set of validation rules.
   nodes: Array,
   normalize: Function,
   parent: Object|Array,
+  previous: Object|Array,
   text: RegExp,
 }
 ```
