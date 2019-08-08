@@ -22,6 +22,7 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
   onPaste: Function,
   onSelect: Function,
   renderEditor: Function,
+  renderMark: Function,
   renderAnnotation: Function,
   renderDecoration: Function,
   renderBlock: Function,
