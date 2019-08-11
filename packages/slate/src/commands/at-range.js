@@ -367,7 +367,7 @@ Commands.deleteBackwardAtRange = (editor, range, n = 1) => {
 
   // If the focus offset is farther than the number of characters to delete,
   // just remove the characters backwards inside the current node.
-  if (n < focus.offset) {
+  if (n <= focus.offset) {
     range = range.moveFocusBackward(n)
     editor.deleteAtRange(range)
     return
