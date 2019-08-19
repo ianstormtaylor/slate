@@ -110,6 +110,7 @@ class Editor {
     const pathIndex = {}
     this.tmp.dirty = []
 
+    // PERF: De-dupe the paths so we don't do extra normalization.
     dirty.forEach(dirtyPath => {
       const key = dirtyPath.join(',')
 
