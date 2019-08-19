@@ -107,7 +107,20 @@ class Editor {
       return transformed.toArray()
     })
 
-    this.tmp.dirty = Array.prototype.concat.apply(newDirtyPaths, dirty)
+    const pathIndex = {}
+    const dirtyPaths = Array.prototype.concat.apply(newDirtyPaths, dirty)
+    this.tmp.dirty = []
+
+    // PERF: De-dupe the paths so we don't do extra normalization.
+    dirtyPaths.forEach(dirtyPath => {
+      const key = dirtyPath.join(',')
+
+      if (!pathIndex[key]) {
+        this.tmp.dirty.push(dirtyPath)
+      }
+
+      pathIndex[key] = true
+    })
 
     // If we're not already, queue the flushing process on the next tick.
     if (!this.tmp.flushing) {
