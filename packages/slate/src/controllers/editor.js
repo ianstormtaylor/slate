@@ -100,18 +100,19 @@ class Editor {
 
     // Get the paths of the affected nodes, and mark them as dirty.
     const newDirtyPaths = getDirtyPaths(operation)
-    const dirty = this.tmp.dirty.reduce((memo, path) => {
+
+    const dirty = this.tmp.dirty.map(path => {
       path = PathUtils.create(path)
       const transformed = PathUtils.transform(path, operation)
-      memo = memo.concat(transformed.toArray())
-      return memo
-    }, newDirtyPaths)
+      return transformed.toArray()
+    })
 
     const pathIndex = {}
+    const dirtyPaths = Array.prototype.concat.apply(newDirtyPaths, dirty)
     this.tmp.dirty = []
 
     // PERF: De-dupe the paths so we don't do extra normalization.
-    dirty.forEach(dirtyPath => {
+    dirtyPaths.forEach(dirtyPath => {
       const key = dirtyPath.join(',')
 
       if (!pathIndex[key]) {

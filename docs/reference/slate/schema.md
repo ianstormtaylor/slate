@@ -81,11 +81,13 @@ A dictionary of inlines by type, each with its own set of validation rules.
   first: Object|Array,
   isVoid: Boolean,
   last: Object|Array,
+  next: Object|Array,
   marks: Array,
   match: Object|Array,
   nodes: Array,
   normalize: Function,
   parent: Object|Array,
+  previous: Object|Array,
   text: RegExp,
 }
 ```

@@ -3,20 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  const { anchor } = editor.value.selection
-
-  editor.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute', [
-    { type: 'italic' },
-  ])
+  editor.removeMark('bold')
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        Meow,{' '}
         <b>
-          <cursor />word.
+          wor<anchor />d<focus />
         </b>
       </paragraph>
     </document>
@@ -27,10 +22,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        Meow, <i>cat is cute</i>
-        <b>
-          <cursor />d.
-        </b>
+        <b>wor</b>
+        <anchor />d<focus />
       </paragraph>
     </document>
   </value>

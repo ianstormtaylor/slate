@@ -1,23 +1,18 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../../helpers/h'
 
 export default function(editor) {
-  const { anchor } = editor.value.selection
-
-  editor.replaceTextByKey(anchor.key, anchor.offset, 3, 'cat is cute', [
-    { type: 'italic' },
-  ])
+  editor.addMark('bold')
+  editor.flush().removeMark('bold')
+  editor.flush().undo()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        Meow,{' '}
-        <b>
-          <cursor />word.
-        </b>
+        one <anchor />two<focus /> three
       </paragraph>
     </document>
   </value>
@@ -27,10 +22,11 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        Meow, <i>cat is cute</i>
+        one{' '}
         <b>
-          <cursor />d.
+          <anchor />two
         </b>
+        <focus /> three
       </paragraph>
     </document>
   </value>
