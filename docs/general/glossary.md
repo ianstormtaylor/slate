@@ -66,6 +66,10 @@ A _"keys"_ is a unique identifier assigned to a node in Slate and is used to ref
 
 A _"mark"_ represents formatting data that is attached to characters within text. Standard formatting such as **bold**, _italic_, `code`, or custom formatting for your application can be implemented using marks.
 
+### Match
+
+A `match`, is an object with possible fields of `type` and `object` that are used to _match_ `Nodes` when defining rules in a [Schema](../reference/slate/schema.md). An example of `match` could be `{type: 'paragraph'}`, `{objet: 'inline', type: '@-tag'}`, etc.
+
 ### Merge
 
 ### Model
