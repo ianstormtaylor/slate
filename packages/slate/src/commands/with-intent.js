@@ -252,19 +252,16 @@ Commands.insertFragment = (editor, fragment) => {
 
   let { value } = editor
   let { document, selection } = value
-  const { start, end } = selection
-  const { startText, endText, startInline } = value
+  const { start } = selection
+  const { startText, startInline } = value
   const lastText = fragment.getLastText()
   const lastInline = fragment.getClosestInline(lastText.key)
   const lastBlock = fragment.getClosestBlock(lastText.key)
   const firstChild = fragment.nodes.first()
   const lastChild = fragment.nodes.last()
   const keys = Array.from(document.texts(), ([text]) => text.key)
-  const isAppending =
-    !startInline ||
-    (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||
-    (start.isAtEndOfNode(endText) || end.isAtEndOfNode(endText))
 
+  const isAppending = !startInline || start.isAtStartOfNode(startText)
   const isInserting =
     firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
 

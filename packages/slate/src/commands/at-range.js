@@ -735,7 +735,7 @@ Commands.insertFragmentAtRange = (editor, range, fragment) => {
 
     // Regenerate the keys for all of the fragments nodes, so that they're
     // guaranteed not to collide with the existing keys in the document. Otherwise
-    // they will be rengerated automatically and we won't have an easy way to
+    // they will be regenerated automatically and we won't have an easy way to
     // reference them.
     fragment = fragment.mapDescendants(child => child.regenerateKey())
 
