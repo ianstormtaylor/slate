@@ -253,42 +253,40 @@ Commands.insertFragment = (editor, fragment) => {
   let { value } = editor
   let { document, selection } = value
   const { start } = selection
-  const { startText, startInline } = value
-  const lastText = fragment.getLastText()
-  const lastInline = fragment.getClosestInline(lastText.key)
-  const lastBlock = fragment.getClosestBlock(lastText.key)
-  const firstChild = fragment.nodes.first()
-  const lastChild = fragment.nodes.last()
   const keys = Array.from(document.texts(), ([text]) => text.key)
-
-  const isAppending = !startInline || start.isAtStartOfNode(startText)
-  const isInserting =
-    firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
 
   editor.insertFragmentAtRange(selection, fragment)
   value = editor.value
   document = value.document
 
   const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
-  const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
+  if (newTexts.size === 0) return
+  const fragmentLength = fragment.text.length
 
-  if (newText && (lastInline || isInserting)) {
-    editor.moveToEndOfNode(newText)
-  } else if (newText) {
-    // The position within the last text node needs to be calculated. This is the length
-    // of all text nodes within the last block, but if the last block contains inline nodes,
-    // these have to be skipped.
-    const { nodes } = lastBlock
-    const lastIndex = nodes.findLastIndex(
-      node => node && node.object === 'inline'
-    )
-    const remainingTexts = nodes.takeLast(nodes.size - lastIndex - 1)
-    const remainingTextLength = remainingTexts.reduce(
-      (acc, val) => acc + val.text.length,
-      0
-    )
-    editor.moveToStartOfNode(newText).moveForward(remainingTextLength)
+  // Either startText is still here, or we want the first un-previously known text
+  const startText = document.getNode(start.key) || newTexts.first()
+  // We want the last un-previously known text
+  let endText = newTexts.last() || startText
+
+  if (startText === endText) {
+    editor.moveTo(endText.key, fragmentLength)
+    return
   }
+
+  // Everything will be calculated relative to the first common ancestor to optimize speed
+  const parent = document.getCommonAncestor(startText.key, endText.key)
+
+  const startOffset =
+    parent.getOffset(startText.key) +
+    (start.key === startText.key ? start.offset : 0)
+
+  // endText might not be the last un-previously known text node, so we precisely pick it by offset
+  endText = parent.getTextAtOffset(startOffset + fragmentLength - 1) || endText
+
+  editor.moveTo(
+    endText.key,
+    startOffset + fragmentLength - parent.getOffset(endText.key)
+  )
 }
 
 /**

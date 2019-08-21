@@ -29,8 +29,9 @@ export const output = (
     <document>
       <paragraph>
         <link>wo</link>
-        <hashtag>fragment</hashtag>
-        <cursor />
+        <hashtag>
+          fragment<cursor />
+        </hashtag>
         <link>rd</link>
       </paragraph>
     </document>
