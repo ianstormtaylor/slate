@@ -49,7 +49,7 @@ const initialValue = Value.fromJSON({
 })
 ```
 
-And now that we've our initial value, we define our `App` and pass it into Slate's `Editor` component, like so:
+And now that we've created our initial value, we define our `App` and pass it into Slate's `Editor` component, like so:
 
 ```js
 // Import React!
