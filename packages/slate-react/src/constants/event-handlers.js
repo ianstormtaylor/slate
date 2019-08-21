@@ -28,6 +28,14 @@ const EVENT_HANDLERS = [
   'onMouseUp',
   'onPaste',
   'onSelect',
+  'renderAnnotation',
+  'renderBlock',
+  'renderDecoration',
+  'renderDocument',
+  'renderEditor',
+  'renderInline',
+  'renderMark',
+  'decorateNode',
 ]
 
 /**
