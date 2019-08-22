@@ -5,14 +5,14 @@
  */
 
 const OTHER_HANDLERS = [
-    'decorateNode',
-    'renderAnnotation',
-    'renderBlock',
-    'renderDecoration',
-    'renderDocument',
-    'renderEditor',
-    'renderInline',
-    'renderMark',
+  'decorateNode',
+  'renderAnnotation',
+  'renderBlock',
+  'renderDecoration',
+  'renderDocument',
+  'renderEditor',
+  'renderInline',
+  'renderMark',
 ]
 
 /**
