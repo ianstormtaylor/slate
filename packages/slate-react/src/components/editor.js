@@ -56,8 +56,8 @@ class Editor extends React.Component {
       return obj
     }, {}),
     ...OTHER_HANDLERS.reduce((obj, handler) => {
-        obj[handler] = Types.func
-        return obj
+      obj[handler] = Types.func
+      return obj
     }, {}),
   }
 
