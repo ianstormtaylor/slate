@@ -177,9 +177,9 @@ class Node extends React.Component {
       const sel = selection && getRelativeRange(node, i, selection)
 
       const decs = newDecorations
+        .concat(decorations)
         .map(d => getRelativeRange(node, i, d))
         .filter(d => d)
-        .concat(decorations)
 
       const anns = annotations
         .map(a => getRelativeRange(node, i, a))
