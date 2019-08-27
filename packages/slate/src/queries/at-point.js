@@ -20,8 +20,8 @@ const Queries = {}
  * @return {Point}
  */
 
-Queries.getInsertionPoint = (editor, point, node) => {
-  let resolvedPoint = point.resolveToTextNode(node || editor.value.document)
+Queries.getInsertionPoint = (editor, point, node = editor.value.document) => {
+  let resolvedPoint = point.resolveToTextNode(node)
   if (resolvedPoint.path == null) return resolvedPoint
 
   let closestInline = node.getClosestInline(resolvedPoint.path)

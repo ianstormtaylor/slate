@@ -324,7 +324,7 @@ class ElementInterface {
 
   createPoint(properties) {
     properties = Point.createProperties(properties)
-    const point = Point.create(properties).resolveToTextNodes(this)
+    const point = Point.create(properties).resolveToTextNode(this)
     return point
   }
 

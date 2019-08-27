@@ -378,9 +378,9 @@ function QueriesPlugin() {
 
     const { value } = editor
     const { document } = value
-    const point = document
-      .createPoint({ path, offset })
-      .normalize(document, editor)
+    const point = editor.getInsertionPoint(
+      document.createPoint({ path, offset })
+    )
     return point
   }
 

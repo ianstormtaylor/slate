@@ -130,6 +130,7 @@ class RichTextExample extends React.Component {
    */
 
   hasMark = type => {
+    if (!this.editor) return false
     const { value } = this.state
     return value.getActiveMarks(this.editor).some(mark => mark.type === type)
   }
