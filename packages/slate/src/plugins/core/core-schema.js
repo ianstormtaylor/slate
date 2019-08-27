@@ -1,5 +1,6 @@
 import Schema from '../schema'
 import Text from '../../models/text'
+import Path from '../../utils/path-utils'
 
 /**
  * A plugin that defines the core Slate schema.
@@ -56,10 +57,11 @@ function CoreSchemaPlugin(options = {}) {
         match: [{ object: 'block' }, { object: 'inline' }],
         nodes: [{ min: 1 }],
         normalize: (editor, error) => {
-          const { code, node } = error
+          const { code, path } = error
 
-          if (code === 'child_min_invalid' && node.nodes.isEmpty()) {
-            editor.insertNodeByKey(node.key, 0, Text.create())
+          if (code === 'child_min_invalid') {
+            const text = Text.create()
+            editor.insertNodeByPath(path, text)
           }
         },
       },
@@ -70,19 +72,19 @@ function CoreSchemaPlugin(options = {}) {
         first: [{ object: 'block' }, { object: 'text' }],
         last: [{ object: 'block' }, { object: 'text' }],
         normalize: (editor, error) => {
-          const { code, node } = error
-          const text = Text.create()
-          let i
+          const { code, path } = error
+          let targetPath
 
           if (code === 'first_child_object_invalid') {
-            i = 0
+            targetPath = path
           } else if (code === 'last_child_object_invalid') {
-            i = node.nodes.size
+            targetPath = Path.increment(path)
           } else {
             return
           }
 
-          editor.insertNodeByKey(node.key, i, text)
+          const text = Text.create()
+          editor.insertNodeByPath(targetPath, text)
         },
       },
       {
@@ -92,23 +94,25 @@ function CoreSchemaPlugin(options = {}) {
         previous: [{ object: 'block' }, { object: 'text' }],
         next: [{ object: 'block' }, { object: 'text' }],
         normalize: (editor, error) => {
-          const { code, node, index } = error
-          const text = Text.create()
-          let i
+          const { code, path } = error
+          let targetPath
 
-          if (code === 'first_child_object_invalid') {
-            i = 0
-          } else if (code === 'last_child_object_invalid') {
-            i = node.nodes.size
-          } else if (code === 'previous_sibling_object_invalid') {
-            i = index
-          } else if (code === 'next_sibling_object_invalid') {
-            i = index + 1
+          if (
+            code === 'first_child_object_invalid' ||
+            code === 'next_sibling_object_invalid'
+          ) {
+            targetPath = path
+          } else if (
+            code === 'last_child_object_invalid' ||
+            code === 'previous_sibling_object_invalid'
+          ) {
+            targetPath = Path.increment(path)
           } else {
             return
           }
 
-          editor.insertNodeByKey(node.key, i, text)
+          const text = Text.create()
+          editor.insertNodeByPath(targetPath, text)
         },
       },
 
@@ -119,10 +123,10 @@ function CoreSchemaPlugin(options = {}) {
           return next.object !== 'text' || !match.marks.equals(next.marks)
         },
         normalize: (editor, error) => {
-          const { code, next } = error
+          const { code, path } = error
 
           if (code === 'next_sibling_invalid') {
-            editor.mergeNodeByKey(next.key)
+            editor.mergeNodeByPath(path)
           }
         },
       },
@@ -137,12 +141,13 @@ function CoreSchemaPlugin(options = {}) {
           return next.object !== 'text' || next.text !== ''
         },
         normalize: (editor, error) => {
-          const { code, next, previous } = error
+          const { code, path } = error
 
-          if (code === 'next_sibling_invalid') {
-            editor.removeNodeByKey(next.key)
-          } else if (code === 'previous_sibling_invalid') {
-            editor.removeNodeByKey(previous.key)
+          if (
+            code === 'next_sibling_invalid' ||
+            code === 'previous_sibling_invalid'
+          ) {
+            editor.removeNodeByPath(path)
           }
         },
       },

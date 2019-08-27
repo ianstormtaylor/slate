@@ -12,16 +12,9 @@ export const schema = {
           max: 1,
         },
       ],
-      normalize: (editor, { code, node, child }) => {
+      normalize: (editor, { code, path }) => {
         if (code === 'child_unknown') {
-          const previous = node.getPreviousSibling(child.key)
-          const offset = previous.nodes.size
-
-          child.nodes.forEach((n, i) =>
-            editor.moveNodeByKey(n.key, previous.key, offset + i)
-          )
-
-          editor.removeNodeByKey(child.key)
+          editor.mergeNodeByPath(path)
         }
       },
     },

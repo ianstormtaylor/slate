@@ -1,9 +1,10 @@
 /** @jsx h */
 
 import h from '../../helpers/h'
+import { PathUtils } from 'slate'
 
 export default function(editor) {
-  editor.moveNodeByKey('h', 'a', 0)
+  editor.moveNodeByPath(PathUtils.create([1, 1, 2]), PathUtils.create([0]))
   editor.flush()
   editor.undo()
 }

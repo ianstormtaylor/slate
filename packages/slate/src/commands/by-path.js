@@ -1,4 +1,6 @@
 import pick from 'lodash/pick'
+import warning from 'tiny-warning'
+
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -77,8 +79,25 @@ Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
  */
 
 Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
+  if (typeof index === 'number' && fragment) {
+    warning(
+      false,
+      `As of slate@0.48 the \`editor.insertFragmentByPath\` command takes \`(targetPath, fragment)\`, instead of a \`(parentPath, index, fragment)\`.`
+    )
+
+    path = path.concat(index)
+    index = null
+  } else {
+    fragment = index
+    index = null
+  }
+
+  const parentPath = PathUtils.lift(path)
+  const start = path.last()
+
   fragment.nodes.forEach((node, i) => {
-    editor.insertNodeByPath(path, index + i, node)
+    const targetPath = parentPath.concat([start + i])
+    editor.insertNodeByPath(targetPath, node)
   })
 }
 
@@ -91,9 +110,22 @@ Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
  */
 
 Commands.insertNodeByPath = (fn, editor) => (path, index, node) => {
+  if (typeof index === 'number' && node) {
+    warning(
+      false,
+      `As of slate@0.48 the \`editor.insertNodeByPath\` command takes \`(targetPath, node)\`, instead of a \`(parentPath, index, node)\`.`
+    )
+
+    path = path.concat(index)
+    index = null
+  } else {
+    node = index
+    index = null
+  }
+
   editor.applyOperation({
     type: 'insert_node',
-    path: path.concat(index),
+    path,
     node,
   })
 }
@@ -223,14 +255,22 @@ Commands.mergeBlockByPath = (fn, editor) => path => {
  * @param {Number} newIndex
  */
 
-Commands.moveNodeByPath = (fn, editor) => (path, newParentPath, newIndex) => {
-  // If the operation path and newParentPath are the same,
-  // this should be considered a NOOP
-  if (PathUtils.isEqual(path, newParentPath)) {
-    return editor
+Commands.moveNodeByPath = (fn, editor) => (path, newPath, index) => {
+  if (typeof index === 'number') {
+    warning(
+      false,
+      `As of slate@0.48 the \`editor.moveNodeByPath\` command takes \`(oldPath, newPath)\`, instead of a \`(oldPath, newParentPath, index)\`.`
+    )
+
+    newPath = newPath.concat(index)
+    index = null
   }
 
-  const newPath = newParentPath.concat(newIndex)
+  // It doesn't make sense to move a node into itself, so abort.
+  // TODO: This should probably throw an error instead?
+  if (PathUtils.isAbove(path, newPath)) {
+    return editor
+  }
 
   if (PathUtils.isEqual(path, newPath)) {
     return editor
@@ -342,6 +382,20 @@ Commands.removeNodeByPath = (fn, editor) => path => {
   })
 }
 
+Commands.removeChildrenByPath = (fn, editor) => path => {
+  const { value: { document } } = editor
+  const node = document.assertNode(path)
+
+  editor.withoutNormalizing(() => {
+    const { size } = node.nodes
+    const childPath = path.concat([0])
+
+    for (let i = 0; i < size; i++) {
+      editor.removeNodeByPath(childPath)
+    }
+  })
+}
+
 /**
  * Remove text at `offset` and `length` in node by `path`.
  *
@@ -393,14 +447,12 @@ Commands.removeTextByPath = (fn, editor) => (path, offset, length) => {
  * @param {Object|Node} node
  */
 
-Commands.replaceNodeByPath = (fn, editor) => (path, newNode) => {
-  newNode = Node.create(newNode)
-  const index = path.last()
-  const parentPath = PathUtils.lift(path)
+Commands.replaceNodeByPath = (fn, editor) => (path, node) => {
+  node = Node.create(node)
 
   editor.withoutNormalizing(() => {
     editor.removeNodeByPath(path)
-    editor.insertNodeByPath(parentPath, index, newNode)
+    editor.insertNodeByPath(path, node)
   })
 }
 
@@ -563,7 +615,7 @@ Commands.splitDescendantsByPath = (fn, editor) => (
   let lastPath = textPath
 
   editor.withoutNormalizing(() => {
-    editor.splitNodeByKey(textPath, textOffset)
+    editor.splitNodeByPath(textPath, textOffset)
 
     for (const [, ancestorPath] of document.ancestors(textPath)) {
       const target = index
@@ -689,12 +741,10 @@ Commands.unwrapChildrenByPath = (fn, editor) => path => {
 Commands.wrapBlockByPath = (fn, editor) => (path, block) => {
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
-  const parentPath = PathUtils.lift(path)
-  const index = path.last()
   const newPath = PathUtils.increment(path)
 
   editor.withoutNormalizing(() => {
-    editor.insertNodeByPath(parentPath, index, block)
+    editor.insertNodeByPath(path, block)
     editor.moveNodeByPath(newPath, path, 0)
   })
 }
@@ -709,12 +759,10 @@ Commands.wrapBlockByPath = (fn, editor) => (path, block) => {
 Commands.wrapInlineByPath = (fn, editor) => (path, inline) => {
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
-  const parentPath = PathUtils.lift(path)
-  const index = path.last()
   const newPath = PathUtils.increment(path)
 
   editor.withoutNormalizing(() => {
-    editor.insertNodeByPath(parentPath, index, inline)
+    editor.insertNodeByPath(path, inline)
     editor.moveNodeByPath(newPath, path, 0)
   })
 }
@@ -767,6 +815,11 @@ const COMMANDS = [
 
 for (const method of COMMANDS) {
   Commands[`${method}ByKey`] = (fn, editor) => (key, ...args) => {
+    warning(
+      false,
+      `As of slate@0.48 the \`editor.${method}ByKey\` command is deprecated. Use the \`editor.${method}ByPath\` command instead.`
+    )
+
     const { value } = editor
     const { document } = value
     const path = document.assertPath(key)
@@ -776,6 +829,11 @@ for (const method of COMMANDS) {
 
 // Moving nodes takes two keys, so it's slightly different.
 Commands.moveNodeByKey = (fn, editor) => (key, newKey, ...args) => {
+  warning(
+    false,
+    `As of slate@0.48 the \`editor.moveNodeByKey\` command is deprecated. Use the \`editor.moveNodeByPath\` command instead.`
+  )
+
   const { value } = editor
   const { document } = value
   const path = document.assertPath(key)
@@ -785,6 +843,11 @@ Commands.moveNodeByKey = (fn, editor) => (key, newKey, ...args) => {
 
 // Splitting descendants takes two keys, so it's slightly different.
 Commands.splitDescendantsByKey = (fn, editor) => (key, textKey, ...args) => {
+  warning(
+    false,
+    `As of slate@0.48 the \`editor.splitDescendantsByKey\` command is deprecated. Use the \`editor.splitDescendantsByPath\` command instead.`
+  )
+
   const { value } = editor
   const { document } = value
   const path = document.assertPath(key)

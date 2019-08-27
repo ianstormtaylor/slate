@@ -221,12 +221,8 @@ Commands.insertBlock = (fn, editor) => block => {
   const { selection } = value
   editor.insertBlockAtRange(selection, block)
 
-  // If the node was successfully inserted, update the selection.
-  const node = editor.value.document.getNode(block.key)
-
-  if (node) {
-    editor.moveToEndOfNode(node)
-  }
+  const path = editor.value.document.getPath(block.key)
+  editor.moveToEndOfPath(path)
 }
 
 /**
@@ -299,12 +295,8 @@ Commands.insertInline = (fn, editor) => inline => {
   const { selection } = value
   editor.insertInlineAtRange(selection, inline)
 
-  // If the node was successfully inserted, update the selection.
-  const node = editor.value.document.getNode(inline.key)
-
-  if (node) {
-    editor.moveToEndOfNode(node)
-  }
+  const path = editor.value.document.getPath(inline.key)
+  editor.moveToEndOfPath(path)
 }
 
 /**

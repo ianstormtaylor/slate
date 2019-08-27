@@ -7,9 +7,9 @@ export const schema = {
     paragraph: {},
     quote: {
       first: [{ type: 'paragraph' }],
-      normalize: (editor, { code, child }) => {
+      normalize: (editor, { code, path }) => {
         if (code === 'first_child_type_invalid') {
-          editor.wrapBlockByKey(child.key, 'paragraph')
+          editor.wrapBlockByPath(path, 'paragraph')
         }
       },
     },

@@ -403,21 +403,20 @@ Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
   const { document } = value
   const { start } = range
   const [, blockPath] = document.closestBlock(start.path)
-  const parentPath = Path.lift(blockPath)
-  const index = blockPath.last()
+  const afterPath = Path.increment(blockPath)
   const insertionMode = getInsertionMode(editor, range)
 
   if (insertionMode === 'before') {
-    editor.insertNodeByPath(parentPath, index, block)
+    editor.insertNodeByPath(blockPath, block)
   } else if (insertionMode === 'after') {
-    editor.insertNodeByPath(parentPath, index + 1, block)
+    editor.insertNodeByPath(afterPath, block)
   } else {
     const point =
       editor.getNextNonVoidPoint(start) || editor.getPreviousNonVoidPoint(start)
 
     editor.withoutNormalizing(() => {
       editor.splitDescendantsByPath(blockPath, point.path, point.offset)
-      editor.insertNodeByPath(parentPath, index + 1, block)
+      editor.insertNodeByPath(afterPath, block)
     })
   }
 }
@@ -620,17 +619,16 @@ Commands.insertInlineAtRange = (fn, editor) => (range, inline) => {
     inline = Inline.create(inline)
     range = deleteExpandedAtRange(editor, range)
     const { value: { document } } = editor
-    const { start } = range
-    const closestVoid = document.closest(start.path, editor.isVoid)
-    const parentPath = Path.lift(start.path)
-    const index = start.path.last()
+    const { start: { path, offset } } = range
+    const insertPath = Path.increment(path)
+    const closestVoid = document.closest(path, editor.isVoid)
 
     if (closestVoid) {
       return
     }
 
-    editor.splitNodeByPath(start.path, start.offset)
-    editor.insertNodeByPath(parentPath, index + 1, inline)
+    editor.splitNodeByPath(path, offset)
+    editor.insertNodeByPath(insertPath, inline)
   })
 }
 
@@ -764,7 +762,7 @@ Commands.splitBlockAtRange = (fn, editor) => (range, height = 1) => {
     }
 
     if (targetPath) {
-      editor.splitDescendantsByKey(targetPath, start.path, start.offset)
+      editor.splitDescendantsByPath(targetPath, start.path, start.offset)
     }
   })
 }
@@ -995,7 +993,8 @@ Commands.wrapBlockAtRange = (fn, editor) => (range, block) => {
   const endIndex = lastPath.get(ancestorPath.size)
 
   editor.withoutNormalizing(() => {
-    editor.insertNodeByPath(ancestorPath, startIndex, block)
+    const targetPath = ancestorPath.concat([startIndex])
+    editor.insertNodeByPath(targetPath, block)
 
     for (let i = 0; i <= endIndex - startIndex; i++) {
       const path = ancestorPath.concat(startIndex + 1)
@@ -1029,7 +1028,8 @@ Commands.wrapInlineAtRange = (fn, editor) => (range, inline) => {
         ? range.end.path.get(blockPath.size)
         : block.nodes.size - 1
 
-      editor.insertNodeByPath(blockPath, startIndex, inline)
+      const targetPath = blockPath.concat([startIndex])
+      editor.insertNodeByPath(targetPath, inline)
       // HACK: need to regenerate the key to ensure that subsequent inserts
       // don't re-use the same key.
       inline = inline.regenerateKey()

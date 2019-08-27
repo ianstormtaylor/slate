@@ -4,16 +4,14 @@ import { Editor } from 'slate'
 
 const plugins = [
   {
-    commands: {
-      customCommand: () => {},
-    },
+    customCommand: () => {},
   },
 ]
 
 export const input = new Editor({ plugins })
 
 export default function(editor) {
-  return editor.hasCommand('otherCommand')
+  return editor.has('otherCommand')
 }
 
 export const output = false

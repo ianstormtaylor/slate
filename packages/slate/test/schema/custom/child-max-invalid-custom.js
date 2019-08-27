@@ -15,9 +15,9 @@ export const schema = {
           match: [{ type: 'paragraph' }],
         },
       ],
-      normalize: (editor, { code, node, index }) => {
+      normalize: (editor, { code, path }) => {
         if (code === 'child_max_invalid') {
-          editor.mergeNodeByKey(node.nodes.get(index).key)
+          editor.mergeNodeByPath(path)
         }
       },
     },

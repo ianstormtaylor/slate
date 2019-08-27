@@ -125,8 +125,14 @@ class NodeInterface {
     // COMPAT: Handle a node object by iterating the descendants tree, so that
     // we avoid using keys for the future.
     if (Node.isNode(key) && this.descendants) {
+      if (key === this) {
+        return List([])
+      }
+
       for (const [node, path] of this.descendants()) {
-        if (key === node) return path
+        if (key === node) {
+          return path
+        }
       }
     }
 
