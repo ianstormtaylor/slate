@@ -1,6 +1,7 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
+import { Editor } from 'slate'
 
 export const input = (
   <value>
@@ -10,7 +11,8 @@ export const input = (
       </paragraph>
       <paragraph key="c">
         <text key="d">
-          tw<anchor />o
+          tw
+          <anchor />o
         </text>
       </paragraph>
       <image key="e" src="https://example.com/image2.png">
@@ -21,15 +23,18 @@ export const input = (
           <text key="i">three</text>
         </inline>
         <text key="j">
-          <focus />four
+          <focus />
+          four
         </text>
       </paragraph>
     </document>
   </value>
 )
 
-export default function({ document, selection }) {
-  return document.isInRange('b', selection)
+export default function(value) {
+  const editor = new Editor({ value })
+  const { document, selection } = value
+  return document.isInRange('b', selection, editor)
 }
 
 export const output = false

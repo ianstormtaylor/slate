@@ -347,7 +347,7 @@ class Point extends Record(DEFAULTS) {
    * @return {Point}
    */
 
-  normalize(node) {
+  resolveToTextNode(node) {
     // If both the key and path are null, there's no reference to a node, so
     // make sure it is entirely unset.
     if (this.key == null && this.path == null) {
@@ -374,7 +374,7 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (!target) {
-      warning(false, "A point's `path` or `key` invalid and was reset!")
+      warning(false, "A point's `path` or `key` was invalid and was reset!")
 
       const text = node.getFirstText()
       if (!text) return Point.create()
@@ -408,31 +408,26 @@ class Point extends Record(DEFAULTS) {
       // TODO: if we look up by path above and it differs by key, do we want to reset it to looking up by key?
     }
 
-    let point = this.merge({
+    const point = this.merge({
       key: target.key,
       path: path == null ? node.getPath(target.key) : path,
       offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
 
-    // COMPAT: There is an ambiguity, since a point can exist at the end of a
-    // text node, or at the start of the following one. To eliminate it we
-    // enforce that if there is a following text node, we always move it there.
-    if (point.offset === target.text.length) {
-      const block = node.getClosestBlock(point.path)
-      const depth = node.getDepth(block.key)
-      const relativePath = PathUtils.drop(point.path, depth)
-      const next = block.getNextText(relativePath)
-
-      if (next) {
-        point = point.merge({
-          key: next.key,
-          path: node.getPath(next.key),
-          offset: 0,
-        })
-      }
-    }
-
     return point
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  normalize(point) {
+    warning(
+      false,
+      'As of slate@0.48 the `normalize` method has been deprecated. Use the `getInsertionPoint` editor query instead.'
+    )
+
+    return this.resolveToTextNode(point)
   }
 
   /**

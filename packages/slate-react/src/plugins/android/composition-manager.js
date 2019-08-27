@@ -175,7 +175,7 @@ function CompositionManager(editor) {
       .moveAnchorTo(diff.path, diff.start)
       .moveFocusTo(diff.path, diff.end)
 
-    entire = document.resolveRange(entire)
+    entire = document.resolveRange(entire, editor)
 
     editor.insertTextAtRange(entire, diff.insertText)
   }
@@ -432,7 +432,8 @@ function CompositionManager(editor) {
     const { document, selection } = value
     const node = editor.findNode(domNode)
     const nodeSelection = document.resolveRange(
-      selection.moveToRangeOfNode(node)
+      selection.moveToRangeOfNode(node),
+      editor
     )
 
     renderSync(editor, () => {

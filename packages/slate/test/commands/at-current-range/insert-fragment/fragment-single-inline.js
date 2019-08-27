@@ -17,7 +17,9 @@ export const input = (
     <document>
       <code>
         <paragraph>
-          Foo<cursor />baz
+          Foo
+          <cursor />
+          baz
         </paragraph>
       </code>
     </document>
@@ -30,9 +32,8 @@ export const output = (
       <code>
         <paragraph>
           Foo
-          <inline type="link">
-            bar<cursor />
-          </inline>
+          <inline type="link">bar</inline>
+          <cursor />
           baz
         </paragraph>
       </code>

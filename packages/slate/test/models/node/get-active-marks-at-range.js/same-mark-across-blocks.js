@@ -3,13 +3,17 @@
 import h from '../../../helpers/h'
 import { Set } from 'immutable'
 import { Mark } from 'slate'
+import { Editor } from 'slate'
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        wo<anchor />
-        <mark type="a">rd</mark>
+        wo
+        <mark type="a">
+          <anchor />
+          rd
+        </mark>
       </paragraph>
       <paragraph>
         <paragraph>
@@ -19,7 +23,9 @@ export const input = (
       </paragraph>
       <paragraph>
         <mark type="a">
-          an<focus />other
+          an
+          <focus />
+          other
         </mark>
         <mark type="b">unselected marked text</mark>
       </paragraph>
@@ -27,8 +33,10 @@ export const input = (
   </value>
 )
 
-export default function({ document, selection }) {
-  return document.getActiveMarksAtRange(selection)
+export default function(value) {
+  const editor = new Editor({ value })
+  const { document, selection } = value
+  return document.getActiveMarksAtRange(selection, editor)
 }
 
 export const output = Set.of(Mark.create('a'))

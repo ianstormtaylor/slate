@@ -3,13 +3,15 @@
 import h from '../../../helpers/h'
 import { Set } from 'immutable'
 import { Mark } from 'slate'
+import { Editor } from 'slate'
 
 export const input = (
   <value>
     <document>
       <paragraph>
         <i>
-          C<cursor />at{' '}
+          C<cursor />
+          at{' '}
         </i>
         is
         <b> Cute</b>
@@ -18,8 +20,10 @@ export const input = (
   </value>
 )
 
-export default function({ document, selection }) {
-  return document.getInsertMarksAtPoint(selection.start)
+export default function(value) {
+  const editor = new Editor({ value })
+  const { document, selection } = value
+  return document.getInsertMarksAtPoint(selection.start, editor)
 }
 
 export const output = Set.of(Mark.create('italic'))

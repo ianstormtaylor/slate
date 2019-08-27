@@ -24,7 +24,7 @@ function deleteExpandedAtRange(editor, range) {
   if (document.hasDescendant(start.path)) {
     range = range.moveToStart()
   } else {
-    range = range.moveTo(end.path, 0).normalize(document)
+    range = editor.getInsertionPoint(range.moveTo(end.path, 0))
   }
 
   return range
@@ -1119,7 +1119,7 @@ Commands.toggleMarkAtRange = (editor, range, mark) => {
 
   const { value } = editor
   const { document } = value
-  const marks = document.getActiveMarksAtRange(range)
+  const marks = document.getActiveMarksAtRange(range, editor)
   const exists = marks.some(m => m.equals(mark))
 
   if (exists) {

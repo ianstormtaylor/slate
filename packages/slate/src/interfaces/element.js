@@ -111,7 +111,7 @@ class ElementInterface {
 
   createAnnotation(properties) {
     properties = Annotation.createProperties(properties)
-    const annotation = this.resolveAnnotation(properties)
+    const annotation = Annotation.create(properties).resolveToTextNodes(this)
     return annotation
   }
 
@@ -124,7 +124,7 @@ class ElementInterface {
 
   createDecoration(properties) {
     properties = Decoration.createProperties(properties)
-    const decoration = this.resolveDecoration(properties)
+    const decoration = Decoration.create(properties).resolveToTextNodes(this)
     return decoration
   }
 
@@ -156,7 +156,7 @@ class ElementInterface {
 
     // You can iterate over either a range or a path, but not both.
     if (options.range) {
-      targetRange = root.resolveRange(options.range)
+      targetRange = options.range.resolveToTextNodes(root)
       targetPath = root.resolvePath(targetRange.start.path)
     } else if (options.path) {
       targetPath = root.resolvePath(options.path)
@@ -324,7 +324,7 @@ class ElementInterface {
 
   createPoint(properties) {
     properties = Point.createProperties(properties)
-    const point = this.resolvePoint(properties)
+    const point = Point.create(properties).resolveToTextNodes(this)
     return point
   }
 
@@ -337,7 +337,7 @@ class ElementInterface {
 
   createRange(properties) {
     properties = Range.createProperties(properties)
-    const range = this.resolveRange(properties)
+    const range = Range.create(properties).resolveToTextNodes(this)
     return range
   }
 
@@ -350,7 +350,7 @@ class ElementInterface {
 
   createSelection(properties) {
     properties = Selection.createProperties(properties)
-    const selection = this.resolveSelection(properties)
+    const selection = Selection.create(properties).resolveToTextNodes(this)
     return selection
   }
 
@@ -427,11 +427,12 @@ class ElementInterface {
    * probably doing unnecessary work.
    *
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getActiveMarksAtRange(range) {
-    range = this.resolveRange(range)
+  getActiveMarksAtRange(range, editor) {
+    range = this.resolveRange(range, editor)
 
     if (range.isUnset) {
       return Set()
@@ -439,7 +440,7 @@ class ElementInterface {
 
     if (range.isCollapsed) {
       const { start } = range
-      return this.getInsertMarksAtPoint(start)
+      return this.getInsertMarksAtPoint(start, editor)
     }
 
     const { start, end } = range
@@ -720,11 +721,12 @@ class ElementInterface {
    * Get a fragment of the node at a `range`.
    *
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Document}
    */
 
-  getFragmentAtRange(range) {
-    range = this.resolveRange(range)
+  getFragmentAtRange(range, editor) {
+    range = this.resolveRange(range, editor)
 
     if (range.isUnset) {
       return Document.create()
@@ -851,11 +853,12 @@ class ElementInterface {
    * node. This mimics expected rich text editing behaviors of mark contiuation.
    *
    * @param {Point} point
+   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getInsertMarksAtPoint(point) {
-    point = this.resolvePoint(point)
+  getInsertMarksAtPoint(point, editor) {
+    point = this.resolvePoint(point, editor)
     const { path, offset } = point
     const text = this.getDescendant(path)
 
@@ -898,11 +901,12 @@ class ElementInterface {
    * This mimics expected rich text editing behaviors of mark contiuation.
    *
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getInsertMarksAtRange(range) {
-    range = this.resolveRange(range)
+  getInsertMarksAtRange(range, editor) {
+    range = this.resolveRange(range, editor)
     const { start } = range
 
     if (range.isUnset) {
@@ -910,7 +914,7 @@ class ElementInterface {
     }
 
     if (range.isCollapsed) {
-      return this.getInsertMarksAtPoint(start)
+      return this.getInsertMarksAtPoint(start, editor)
     }
 
     const text = this.getDescendant(start.path)
@@ -1087,11 +1091,12 @@ class ElementInterface {
    * Get the offset from a `range`.
    *
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Number}
    */
 
-  getOffsetAtRange(range) {
-    range = this.resolveRange(range)
+  getOffsetAtRange(range, editor) {
+    range = this.resolveRange(range, editor)
 
     if (range.isUnset) {
       throw new Error('The range cannot be unset to calculcate its offset.')
@@ -1453,12 +1458,13 @@ class ElementInterface {
    *
    * @param {List|String} path
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Node}
    */
 
-  isInRange(path, range) {
+  isInRange(path, range, editor) {
     path = this.resolvePath(path)
-    range = this.resolveRange(range)
+    range = this.resolveRange(range, editor)
 
     if (range.isUnset) {
       return false
@@ -1711,12 +1717,13 @@ class ElementInterface {
    * offsets in the annotation exist and that they are synced with the paths.
    *
    * @param {Annotation|Object} annotation
+   * @param {Editor} editor
    * @return {Annotation}
    */
 
-  resolveAnnotation(annotation) {
+  resolveAnnotation(annotation, editor) {
     annotation = Annotation.create(annotation)
-    annotation = annotation.normalize(this)
+    annotation = annotation.normalize(this, editor)
     return annotation
   }
 
@@ -1725,12 +1732,13 @@ class ElementInterface {
    * offsets in the decoration exist and that they are synced with the paths.
    *
    * @param {Decoration|Object} decoration
+   * @param {Editor} editor
    * @return {Decoration}
    */
 
-  resolveDecoration(decoration) {
+  resolveDecoration(decoration, editor) {
     decoration = Decoration.create(decoration)
-    decoration = decoration.normalize(this)
+    decoration = decoration.normalize(this, editor)
     return decoration
   }
 
@@ -1739,12 +1747,24 @@ class ElementInterface {
    * offsets in the point exist and that they are synced with the paths.
    *
    * @param {Point|Object} point
+   * @param {Editor} editor
    * @return {Point}
    */
 
-  resolvePoint(point) {
+  resolvePoint(point, editor) {
     point = Point.create(point)
-    point = point.normalize(this)
+
+    if (editor == null) {
+      warning(
+        false,
+        'As of slate@0.48 the `resolvePoint` method takes an `Editor` as an argument. You should use the `getInsertionPoint` Editor query instead.'
+      )
+
+      point = point.resolveToTextNode(this)
+    } else {
+      point = editor.getInsertionPoint(point, this)
+    }
+
     return point
   }
 
@@ -1753,12 +1773,13 @@ class ElementInterface {
    * offsets in the range exist and that they are synced with the paths.
    *
    * @param {Range|Object} range
+   * @param {Editor} editor
    * @return {Range}
    */
 
-  resolveRange(range) {
+  resolveRange(range, editor) {
     range = Range.create(range)
-    range = range.normalize(this)
+    range = range.normalize(this, editor)
     return range
   }
 
@@ -1767,12 +1788,13 @@ class ElementInterface {
    * offsets in the selection exist and that they are synced with the paths.
    *
    * @param {Selection|Object} selection
+   * @param {Editor} editor
    * @return {Selection}
    */
 
-  resolveSelection(selection) {
+  resolveSelection(selection, editor) {
     selection = Selection.create(selection)
-    selection = selection.normalize(this)
+    selection = selection.normalize(this, editor)
     return selection
   }
 

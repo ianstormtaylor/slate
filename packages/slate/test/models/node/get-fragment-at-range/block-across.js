@@ -1,23 +1,28 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
+import { Editor } from 'slate'
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        on<anchor />e
+        on
+        <anchor />e
       </paragraph>
       <paragraph>two</paragraph>
       <paragraph>
-        th<focus /> ree
+        th
+        <focus /> ree
       </paragraph>
     </document>
   </value>
 )
 
-export default function({ document, selection }) {
-  return document.getFragmentAtRange(selection)
+export default function(value) {
+  const editor = new Editor({ value })
+  const { document, selection } = value
+  return document.getFragmentAtRange(selection, editor)
 }
 
 export const output = (

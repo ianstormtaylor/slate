@@ -594,7 +594,7 @@ Commands.select = (editor, properties, options = {}) => {
   const { document, selection } = value
   const newProperties = {}
   let next = selection.setProperties(properties)
-  next = document.resolveSelection(next)
+  next = document.resolveSelection(next, editor)
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -735,6 +735,7 @@ function pointBackward(editor, point, n = 1) {
   if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
     range = range[`move${Point}Backward`](n)
   }
+
   editor.select(range)
 }
 

@@ -95,7 +95,7 @@ class Editor {
 
     // Apply the operation to the value.
     debug('apply', { operation })
-    this.value = operation.apply(value)
+    this.value = operation.apply(value).resolveRanges(this.controller)
     this.operations = operations.push(operation)
 
     // Get the paths of the affected nodes, and mark them as dirty.
@@ -388,7 +388,7 @@ class Editor {
 
   setValue(value, options = {}) {
     const { normalize = value !== this.value } = options
-    this.value = value
+    this.value = value.resolveRanges(this.controller)
 
     if (normalize) {
       this.normalize()

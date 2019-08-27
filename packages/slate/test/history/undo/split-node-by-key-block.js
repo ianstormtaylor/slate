@@ -13,10 +13,11 @@ export const input = (
       <paragraph key="a">
         <text />
         <link>one</link>
-        <text>
+        <text />
+        <link>
           <cursor />
-        </text>
-        <link>two</link>
+          two
+        </link>
         <text />
       </paragraph>
     </document>

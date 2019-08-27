@@ -57,7 +57,7 @@ class SyncingEditor extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type === type)
+    return value.getActiveMarks(this.editor).some(mark => mark.type === type)
   }
 
   /**

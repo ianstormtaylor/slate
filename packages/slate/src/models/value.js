@@ -346,24 +346,28 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the marks of the current selection.
-   *
-   * @return {Set<Mark>}
+   * Deprecated.
    */
 
   get marks() {
+    invariant(
+      false,
+      'As of Slate 0.48, the `value.marks` property no longer exists. Use `value.getMarks(editor)` instead.'
+    )
     return this.selection.isUnset
       ? new Set()
       : this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
   /**
-   * Get the active marks of the current selection.
-   *
-   * @return {Set<Mark>}
+   * Deprecated.
    */
 
   get activeMarks() {
+    invariant(
+      false,
+      'As of Slate 0.48, the `value.activeMarks` property no longer exists. Use `value.getActiveMarks(editor)` instead.'
+    )
     return this.selection.isUnset
       ? new Set()
       : this.selection.marks ||
@@ -389,6 +393,11 @@ class Value extends Record(DEFAULTS) {
    */
 
   get fragment() {
+    invariant(
+      false,
+      'As of Slate 0.48, the `value.fragment` property no longer exists. Use `value.getFragment(editor)` instead.'
+    )
+
     return this.selection.isUnset
       ? Document.create()
       : this.document.getFragmentAtRange(this.selection)
@@ -431,7 +440,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { annotations, document } = value
     const { key } = annotation
-    annotation = annotation.updatePoints(point => point.normalize(document))
+    annotation = annotation.normalize(document)
     annotations = annotations.set(key, annotation)
     value = value.set('annotations', annotations)
     return value
@@ -452,6 +461,47 @@ class Value extends Record(DEFAULTS) {
     document = document.addMark(path, mark)
     value = value.set('document', document)
     return value
+  }
+
+  /**
+   * Get the marks of the current selection.
+   *
+   * @param {Editor} editor
+   * @return {Set<Mark>}
+   */
+
+  getMarks(editor) {
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks ||
+          this.document.getMarksAtRange(this.selection, editor)
+  }
+
+  /**
+   * Get the active marks of the current selection.
+   *
+   * @param {Editor} editor
+   * @return {Set<Mark>}
+   */
+
+  getActiveMarks(editor) {
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks ||
+          this.document.getActiveMarksAtRange(this.selection, editor)
+  }
+
+  /**
+   * Get the fragment of the current selection.
+   *
+   * @param {Editor} editor
+   * @return {Document}
+   */
+
+  getFragment(editor) {
+    return this.selection.isUnset
+      ? Document.create()
+      : this.document.getFragmentAtRange(this.selection, editor)
   }
 
   /**
@@ -564,6 +614,30 @@ class Value extends Record(DEFAULTS) {
     document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
     value = value.mapPoints(point => point.setPath(null))
+    return value
+  }
+
+  /**
+   * Resolve all ranges, ensuring that the keys and offsets in the
+   * range exist, refer to leaf text nodes, and that they are synced
+   * with the paths.
+   *
+   * @param {Editor} editor
+   * @returns {Value}
+   */
+
+  resolveRanges(editor) {
+    let value = this
+    const { document, selection, annotations } = value
+
+    value = value.set('selection', selection.normalize(document, editor))
+
+    const anns = annotations.map(annotation =>
+      annotation.normalize(document, editor)
+    )
+
+    value = value.set('annotations', anns)
+
     return value
   }
 
@@ -755,7 +829,7 @@ class Value extends Record(DEFAULTS) {
 
     if (annotations) {
       props.annotations = annotations.map(a => {
-        return a.isSet ? a : document.resolveAnnotation(a)
+        return a.isSet ? a : document.createAnnotation(a)
       })
     }
 
@@ -775,7 +849,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { document, selection } = value
     const next = selection.setProperties(properties)
-    selection = document.resolveSelection(next)
+    selection = document.createSelection(next)
     value = value.set('selection', selection)
     return value
   }
