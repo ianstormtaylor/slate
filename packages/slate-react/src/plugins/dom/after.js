@@ -123,7 +123,11 @@ function AfterPlugin(options = {}) {
 
         if (text == null) break
 
-        editor.insertTextAtRange(range, text, selection.marks)
+        const marks =
+          selection.marks ||
+          value.document.getInsertMarksAtRange(value.selection, editor)
+
+        editor.insertTextAtRange(range, text, marks)
 
         // If the text was successfully inserted, and the selection had marks
         // on it, unset the selection's marks.
