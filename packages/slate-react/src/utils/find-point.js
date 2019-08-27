@@ -52,7 +52,9 @@ function findPoint(nativeNode, nativeOffset, editor) {
     // its cursor to match the native position. Use textContent.length instead.
     // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
     const fragment = range.cloneContents()
-    const zeroWidthNodes = fragment.querySelectorAll(`[${DATA_ATTRS.ZERO_WIDTH}]`)
+    const zeroWidthNodes = fragment.querySelectorAll(
+      `[${DATA_ATTRS.ZERO_WIDTH}]`
+    )
     offset = fragment.textContent.length - zeroWidthNodes.length
   } else {
     // For void nodes, the element with the offset key will be a cousin, not an
