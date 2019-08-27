@@ -200,9 +200,8 @@ Commands.deleteAtRange = (fn, editor) => range => {
       // If the selection was hanging, we want to remove the start block
       // entirely instead of merging it with the end block. This is a rich text
       // editor behavior that's fairly standard.
-      const newParentPath = Path.lift(startBlockPath)
-      const newIndex = startBlockPath.last() + 1
-      editor.moveNodeByPath(mergePath, newParentPath, newIndex)
+      const newPath = Path.increment(startBlockPath)
+      editor.moveNodeByPath(mergePath, newPath)
       editor.removeNodeByPath(startBlockPath)
     } else if (isAcrossBlocks) {
       // If the selection wasn't hanging, but we were across blocks, we need to
@@ -998,8 +997,8 @@ Commands.wrapBlockAtRange = (fn, editor) => (range, block) => {
 
     for (let i = 0; i <= endIndex - startIndex; i++) {
       const path = ancestorPath.concat(startIndex + 1)
-      const newPath = ancestorPath.concat(startIndex)
-      editor.moveNodeByPath(path, newPath, i)
+      const newPath = ancestorPath.concat([startIndex, i])
+      editor.moveNodeByPath(path, newPath)
     }
   })
 }
@@ -1036,8 +1035,8 @@ Commands.wrapInlineAtRange = (fn, editor) => (range, inline) => {
 
       for (let i = 0; i <= endIndex - startIndex; i++) {
         const path = blockPath.concat(startIndex + 1)
-        const newPath = blockPath.concat(startIndex)
-        editor.moveNodeByPath(path, newPath, i)
+        const newPath = blockPath.concat([startIndex, i])
+        editor.moveNodeByPath(path, newPath)
       }
     }
   })

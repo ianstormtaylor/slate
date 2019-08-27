@@ -1,19 +1,23 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { PathUtils } from 'slate'
 
 export default function(editor) {
-  editor.moveNodeByPath(PathUtils.create([0]), PathUtils.create([1]))
+  editor.removeTextByPath([0, 0], 0, 1)
+}
+
+export const options = {
+  preserveDecorations: true,
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <cursor />one
+        <text key="a">
+          w<result>or</result>d
+        </text>
       </paragraph>
-      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -21,9 +25,8 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>two</paragraph>
       <paragraph>
-        <cursor />one
+        <result>or</result>d
       </paragraph>
     </document>
   </value>

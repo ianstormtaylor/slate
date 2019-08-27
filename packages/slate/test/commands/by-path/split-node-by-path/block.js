@@ -1,19 +1,18 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { PathUtils } from 'slate'
 
 export default function(editor) {
-  editor.moveNodeByPath(PathUtils.create([0]), PathUtils.create([1]))
+  editor.splitNodeByPath([0], 2)
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <cursor />one
+      <paragraph key="a">
+        <link>one</link>
+        <link>two</link>
       </paragraph>
-      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -21,9 +20,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>two</paragraph>
       <paragraph>
-        <cursor />one
+        <link>one</link>
+      </paragraph>
+      <paragraph>
+        <link>two</link>
       </paragraph>
     </document>
   </value>

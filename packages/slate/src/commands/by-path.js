@@ -5,7 +5,7 @@ import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
 import Node from '../models/node'
-import PathUtils from '../utils/path-utils'
+import Path from '../utils/path-utils'
 
 /**
  * Commands.
@@ -25,11 +25,13 @@ const Commands = {}
  */
 
 Commands.addMarkByPath = (fn, editor) => (path, offset, length, mark) => {
+  path = Path.create(path)
   mark = Mark.create(mark)
   editor.addMarksByPath(path, offset, length, [mark])
 }
 
 Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
+  path = Path.create(path)
   marks = Mark.createSet(marks)
 
   if (!marks.size) {
@@ -56,7 +58,7 @@ Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
     // update our path and offset to point to the new start.
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
-      path = PathUtils.increment(path)
+      path = Path.increment(path)
       offset = 0
     }
 
@@ -79,6 +81,8 @@ Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
  */
 
 Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
+  path = Path.create(path)
+
   if (typeof index === 'number' && fragment) {
     warning(
       false,
@@ -92,7 +96,7 @@ Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
     index = null
   }
 
-  const parentPath = PathUtils.lift(path)
+  const parentPath = Path.lift(path)
   const start = path.last()
 
   fragment.nodes.forEach((node, i) => {
@@ -110,6 +114,8 @@ Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
  */
 
 Commands.insertNodeByPath = (fn, editor) => (path, index, node) => {
+  path = Path.create(path)
+
   if (typeof index === 'number' && node) {
     warning(
       false,
@@ -140,6 +146,7 @@ Commands.insertNodeByPath = (fn, editor) => (path, index, node) => {
  */
 
 Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
+  path = Path.create(path)
   marks = Mark.createSet(marks)
   const { value } = editor
   const { annotations, document } = value
@@ -186,9 +193,10 @@ Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
  */
 
 Commands.mergeNodeByPath = (fn, editor) => path => {
+  path = Path.create(path)
   const { value: { document } } = editor
   const node = document.assertNode(path)
-  const prevPath = PathUtils.decrement(path)
+  const prevPath = Path.decrement(path)
   const prev = document.assertNode(prevPath)
   const position = prev.object === 'text' ? prev.text.length : prev.nodes.size
 
@@ -205,6 +213,8 @@ Commands.mergeNodeByPath = (fn, editor) => path => {
 }
 
 Commands.mergeBlockByPath = (fn, editor) => path => {
+  path = Path.create(path)
+
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
     document.assertNode(path)
@@ -228,11 +238,10 @@ Commands.mergeBlockByPath = (fn, editor) => path => {
     }
 
     const [, prevPath] = prevBlock
-    const newParentPath = PathUtils.lift(prevPath)
-    const newIndex = prevPath.last() + 1
-    const newPath = newParentPath.concat(newIndex)
+    const newPath = Path.increment(prevPath)
+    const newParentPath = Path.lift(prevPath)
 
-    editor.moveNodeByPath(blockPath, newParentPath, newIndex)
+    editor.moveNodeByPath(blockPath, newPath)
     editor.mergeNodeByPath(newPath)
 
     for (const [ancestor, ancestorPath] of document.ancestors(blockPath)) {
@@ -256,6 +265,9 @@ Commands.mergeBlockByPath = (fn, editor) => path => {
  */
 
 Commands.moveNodeByPath = (fn, editor) => (path, newPath, index) => {
+  path = Path.create(path)
+  newPath = Path.create(newPath)
+
   if (typeof index === 'number') {
     warning(
       false,
@@ -268,11 +280,11 @@ Commands.moveNodeByPath = (fn, editor) => (path, newPath, index) => {
 
   // It doesn't make sense to move a node into itself, so abort.
   // TODO: This should probably throw an error instead?
-  if (PathUtils.isAbove(path, newPath)) {
+  if (Path.isAbove(path, newPath)) {
     return editor
   }
 
-  if (PathUtils.isEqual(path, newPath)) {
+  if (Path.isEqual(path, newPath)) {
     return editor
   }
 
@@ -293,11 +305,13 @@ Commands.moveNodeByPath = (fn, editor) => (path, newPath, index) => {
  */
 
 Commands.removeMarkByPath = (fn, editor) => (path, offset, length, mark) => {
+  path = Path.create(path)
   mark = Mark.create(mark)
   editor.removeMarksByPath(path, offset, length, [mark])
 }
 
 Commands.removeMarksByPath = (fn, editor) => (path, offset, length, marks) => {
+  path = Path.create(path)
   marks = Mark.createSet(marks)
 
   if (!marks.size) {
@@ -324,7 +338,7 @@ Commands.removeMarksByPath = (fn, editor) => (path, offset, length, marks) => {
     // update our path and offset to point to the new start.
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
-      path = PathUtils.increment(path)
+      path = Path.increment(path)
       offset = 0
     }
 
@@ -347,6 +361,7 @@ Commands.removeMarksByPath = (fn, editor) => (path, offset, length, marks) => {
  */
 
 Commands.removeAllMarksByPath = (fn, editor) => path => {
+  path = Path.create(path)
   const { state } = editor
   const { document } = state
   const node = document.assertNode(path)
@@ -371,6 +386,7 @@ Commands.removeAllMarksByPath = (fn, editor) => path => {
  */
 
 Commands.removeNodeByPath = (fn, editor) => path => {
+  path = Path.create(path)
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
@@ -383,6 +399,7 @@ Commands.removeNodeByPath = (fn, editor) => path => {
 }
 
 Commands.removeChildrenByPath = (fn, editor) => path => {
+  path = Path.create(path)
   const { value: { document } } = editor
   const node = document.assertNode(path)
 
@@ -405,6 +422,7 @@ Commands.removeChildrenByPath = (fn, editor) => path => {
  */
 
 Commands.removeTextByPath = (fn, editor) => (path, offset, length) => {
+  path = Path.create(path)
   const { value } = editor
   const { document, annotations } = value
   const node = document.assertNode(path)
@@ -448,6 +466,7 @@ Commands.removeTextByPath = (fn, editor) => (path, offset, length) => {
  */
 
 Commands.replaceNodeByPath = (fn, editor) => (path, node) => {
+  path = Path.create(path)
   node = Node.create(node)
 
   editor.withoutNormalizing(() => {
@@ -496,6 +515,7 @@ Commands.setMarkByPath = (fn, editor) => (
   properties,
   newProperties
 ) => {
+  path = Path.create(path)
   properties = Mark.create(properties)
   newProperties = Mark.createProperties(newProperties)
 
@@ -514,7 +534,7 @@ Commands.setMarkByPath = (fn, editor) => (
     // update our path and offset to point to the new start.
     if (offset > 0) {
       editor.splitNodeByPath(path, offset)
-      path = PathUtils.increment(path)
+      path = Path.increment(path)
       offset = 0
     }
 
@@ -535,10 +555,11 @@ Commands.setMarkByPath = (fn, editor) => (
  */
 
 Commands.setNodeByPath = (fn, editor) => (path, newProperties) => {
+  path = Path.create(path)
+  newProperties = Node.createProperties(newProperties)
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
-  newProperties = Node.createProperties(newProperties)
   const prevProperties = pick(node, Object.keys(newProperties))
 
   editor.applyOperation({
@@ -558,6 +579,7 @@ Commands.setNodeByPath = (fn, editor) => (path, newProperties) => {
  */
 
 Commands.setTextByPath = (fn, editor) => (path, text, marks) => {
+  path = Path.create(path)
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
@@ -574,6 +596,7 @@ Commands.setTextByPath = (fn, editor) => (path, text, marks) => {
  */
 
 Commands.splitNodeByPath = (fn, editor) => (path, position, options = {}) => {
+  path = Path.create(path)
   const { target = null } = options
   const { value } = editor
   const { document } = value
@@ -604,6 +627,9 @@ Commands.splitDescendantsByPath = (fn, editor) => (
   textPath,
   textOffset
 ) => {
+  path = Path.create(path)
+  textPath = Path.create(textPath)
+
   if (path.equals(textPath)) {
     editor.splitNodeByPath(textPath, textOffset)
     return
@@ -638,6 +664,7 @@ Commands.splitDescendantsByPath = (fn, editor) => (
  */
 
 Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
+  path = Path.create(path)
   const { value } = editor
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -655,6 +682,7 @@ Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
  */
 
 Commands.unwrapBlockByPath = (fn, editor) => (path, properties) => {
+  path = Path.create(path)
   const { value } = editor
   const { document, selection } = value
   const node = document.assertNode(path)
@@ -675,31 +703,32 @@ Commands.unwrapBlockByPath = (fn, editor) => (path, properties) => {
  */
 
 Commands.unwrapNodeByPath = (fn, editor) => path => {
+  path = Path.create(path)
   const { value } = editor
   const { document } = value
   document.assertNode(path)
 
-  const parentPath = PathUtils.lift(path)
+  const parentPath = Path.lift(path)
   const parent = document.assertNode(parentPath)
   const index = path.last()
   const parentIndex = parentPath.last()
-  const grandPath = PathUtils.lift(parentPath)
+  const grandPath = Path.lift(parentPath)
   const isFirst = index === 0
   const isLast = index === parent.nodes.size - 1
 
   editor.withoutNormalizing(() => {
     if (parent.nodes.size === 1) {
-      editor.moveNodeByPath(path, grandPath, parentIndex + 1)
+      editor.moveNodeByPath(path, grandPath.concat(parentIndex + 1))
       editor.removeNodeByPath(parentPath)
     } else if (isFirst) {
-      editor.moveNodeByPath(path, grandPath, parentIndex)
+      editor.moveNodeByPath(path, grandPath.concat(parentIndex))
     } else if (isLast) {
-      editor.moveNodeByPath(path, grandPath, parentIndex + 1)
+      editor.moveNodeByPath(path, grandPath.concat(parentIndex + 1))
     } else {
-      let updatedPath = PathUtils.increment(path, 1, parentPath.size - 1)
+      let updatedPath = Path.increment(path, 1, parentPath.size - 1)
       updatedPath = updatedPath.set(updatedPath.size - 1, 0)
       editor.splitNodeByPath(parentPath, index)
-      editor.moveNodeByPath(updatedPath, grandPath, parentIndex + 1)
+      editor.moveNodeByPath(updatedPath, grandPath.concat(parentIndex + 1))
     }
   })
 }
@@ -712,19 +741,18 @@ Commands.unwrapNodeByPath = (fn, editor) => path => {
  */
 
 Commands.unwrapChildrenByPath = (fn, editor) => path => {
-  path = PathUtils.create(path)
+  path = Path.create(path)
   const { value } = editor
   const { document } = value
   const node = document.assertNode(path)
-  const parentPath = PathUtils.lift(path)
-  const index = path.last()
+  const newPath = Path.increment(path)
   const { nodes } = node
 
   editor.withoutNormalizing(() => {
     nodes.reverse().forEach((child, i) => {
       const childIndex = nodes.size - i - 1
       const childPath = path.push(childIndex)
-      editor.moveNodeByPath(childPath, parentPath, index + 1)
+      editor.moveNodeByPath(childPath, newPath)
     })
 
     editor.removeNodeByPath(path)
@@ -739,13 +767,14 @@ Commands.unwrapChildrenByPath = (fn, editor) => path => {
  */
 
 Commands.wrapBlockByPath = (fn, editor) => (path, block) => {
+  path = Path.create(path)
   block = Block.create(block)
   block = block.set('nodes', block.nodes.clear())
-  const newPath = PathUtils.increment(path)
+  const newPath = Path.increment(path)
 
   editor.withoutNormalizing(() => {
     editor.insertNodeByPath(path, block)
-    editor.moveNodeByPath(newPath, path, 0)
+    editor.moveNodeByPath(newPath, path.concat(0))
   })
 }
 
@@ -757,13 +786,14 @@ Commands.wrapBlockByPath = (fn, editor) => (path, block) => {
  */
 
 Commands.wrapInlineByPath = (fn, editor) => (path, inline) => {
+  path = Path.create(path)
   inline = Inline.create(inline)
   inline = inline.set('nodes', inline.nodes.clear())
-  const newPath = PathUtils.increment(path)
+  const newPath = Path.increment(path)
 
   editor.withoutNormalizing(() => {
     editor.insertNodeByPath(path, inline)
-    editor.moveNodeByPath(newPath, path, 0)
+    editor.moveNodeByPath(newPath, path.concat(0))
   })
 }
 
@@ -775,6 +805,7 @@ Commands.wrapInlineByPath = (fn, editor) => (path, inline) => {
  */
 
 Commands.wrapNodeByPath = (fn, editor) => (path, node) => {
+  path = Path.create(path)
   node = Node.create(node)
 
   if (node.object === 'block') {

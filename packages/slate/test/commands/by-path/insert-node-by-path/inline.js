@@ -1,19 +1,18 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { PathUtils } from 'slate'
+import { Inline } from 'slate'
 
 export default function(editor) {
-  editor.moveNodeByPath(PathUtils.create([0]), PathUtils.create([1]))
+  editor.insertNodeByPath([0, 0], Inline.create('emoji'))
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <cursor />one
+        <cursor />word
       </paragraph>
-      <paragraph>two</paragraph>
     </document>
   </value>
 )
@@ -21,9 +20,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>two</paragraph>
       <paragraph>
-        <cursor />one
+        <emoji />
+        <cursor />word
       </paragraph>
     </document>
   </value>

@@ -10,10 +10,12 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>one</paragraph>
-      <paragraph>
-        <cursor />two
-      </paragraph>
+      <quote>
+        <paragraph>one</paragraph>
+      </quote>
+      <quote>
+        <paragraph>two</paragraph>
+      </quote>
     </document>
   </value>
 )
@@ -21,10 +23,11 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
-      <paragraph>
-        one<cursor />two
-      </paragraph>
+      <quote />
+      <quote>
+        <paragraph>one</paragraph>
+        <paragraph>two</paragraph>
+      </quote>
     </document>
   </value>
 )
