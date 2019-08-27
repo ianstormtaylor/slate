@@ -51,7 +51,9 @@ function findPoint(nativeNode, nativeOffset, editor) {
     // into \r\n. The bug causes a loop when slate-react attempts to reposition
     // its cursor to match the native position. Use textContent.length instead.
     // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
-    offset = range.cloneContents().textContent.length
+    const fragment = range.cloneContents()
+    const zeroWidthStringNodes = fragment.querySelectorAll(`[${DATA_ATTRS.ZERO_WIDTH}]`)
+    offset = fragment.textContent.length - zeroWidthStringNodes.length
   } else {
     // For void nodes, the element with the offset key will be a cousin, not an
     // ancestor, so find it by going down from the nearest void parent.
