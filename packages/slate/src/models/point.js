@@ -235,6 +235,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `point.isAtEndOfNode` method is deprecated.'
+    )
+
     if (this.isUnset) {
       return false
     }
@@ -252,6 +257,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   isAtStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `point.isAtStartOfNode` method is deprecated.'
+    )
+
     if (this.isUnset) {
       return false
     }
@@ -272,6 +282,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   isInNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `point.isInNode` method is deprecated.'
+    )
+
     if (this.isUnset) {
       return false
     }
@@ -342,6 +357,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   moveToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `point.moveToStartOfNode` method is deprecated.'
+    )
+
     const first = node.getFirstText()
     const point = this.moveTo(first.key, 0)
     return point
@@ -355,6 +375,11 @@ class Point extends Record(DEFAULTS) {
    */
 
   moveToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `point.moveToEndOfNode` method is deprecated.'
+    )
+
     const last = node.getLastText()
     const point = this.moveTo(last.key, last.text.length)
     return point
@@ -384,7 +409,7 @@ class Point extends Record(DEFAULTS) {
     if (!target && key) {
       warning(
         false,
-        'As of slate@0.48 a point cannot be created with a `key` but without a `path`.'
+        'As of slate@0.48 a point cannot be created with a `key` but without a `path`, and this line will fail in a future version.'
       )
 
       target = node.getNode(key)
@@ -400,7 +425,10 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (!target) {
-      warning(false, "A point's `path` or `key` invalid and was reset!")
+      warning(
+        false,
+        "A point's `path` or `key` invalid and was reset! This will fail in a future version."
+      )
 
       const text = node.getFirstText()
       if (!text) return Point.create()
@@ -415,7 +443,10 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target.object !== 'text') {
-      warning(false, 'A point should not reference a non-text node!')
+      warning(
+        false,
+        'A point should not reference a non-text node! This will fail in a future version.'
+      )
 
       const text = target.getTextAtOffset(offset)
       const before = target.getOffset(text.key)
@@ -429,7 +460,10 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (target && path && key && key !== target.key) {
-      warning(false, "A point's `key` did not match its `path`!")
+      warning(
+        false,
+        "A point's `key` did not match its `path`! This will fail in a future version."
+      )
 
       // TODO: if we look up by path above and it differs by key, do we want to reset it to looking up by key?
     }

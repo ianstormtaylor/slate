@@ -1,3 +1,5 @@
+import warning from 'tiny-warning'
+
 import mixin from '../utils/mixin'
 import Annotation from '../models/annotation'
 import Decoration from '../models/decoration'
@@ -197,6 +199,11 @@ class RangeInterface {
    */
 
   moveAnchorToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveAnchorToStartOfNode` method is deprecated.'
+    )
+
     const range = this.setAnchor(this.anchor.moveToStartOfNode(node))
     return range
   }
@@ -209,6 +216,11 @@ class RangeInterface {
    */
 
   moveAnchorToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveAnchorToEndOfNode` method is deprecated.'
+    )
+
     const range = this.setAnchor(this.anchor.moveToEndOfNode(node))
     return range
   }
@@ -258,6 +270,11 @@ class RangeInterface {
    */
 
   moveEndToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveEndToStartOfNode` method is deprecated.'
+    )
+
     const range = this.setEnd(this.end.moveToStartOfNode(node))
     return range
   }
@@ -270,6 +287,11 @@ class RangeInterface {
    */
 
   moveEndToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveEndToEndOfNode` method is deprecated.'
+    )
+
     const range = this.setEnd(this.end.moveToEndOfNode(node))
     return range
   }
@@ -319,6 +341,11 @@ class RangeInterface {
    */
 
   moveFocusToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveFocusToStartOfNode` method is deprecated.'
+    )
+
     const range = this.setFocus(this.focus.moveToStartOfNode(node))
     return range
   }
@@ -331,6 +358,11 @@ class RangeInterface {
    */
 
   moveFocusToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveFocusToEndOfNode` method is deprecated.'
+    )
+
     const range = this.setFocus(this.focus.moveToEndOfNode(node))
     return range
   }
@@ -380,6 +412,11 @@ class RangeInterface {
    */
 
   moveStartToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveStartToStartOfNode` method is deprecated.'
+    )
+
     const range = this.setStart(this.start.moveToStartOfNode(node))
     return range
   }
@@ -392,6 +429,11 @@ class RangeInterface {
    */
 
   moveStartToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveStartToEndOfNode` method is deprecated.'
+    )
+
     const range = this.setStart(this.start.moveToEndOfNode(node))
     return range
   }
@@ -437,6 +479,11 @@ class RangeInterface {
    */
 
   moveToEndOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveToEndOfNode` method is deprecated.'
+    )
+
     return this.updatePoints(point => point.moveToEndOfNode(node))
   }
 
@@ -460,6 +507,11 @@ class RangeInterface {
    */
 
   moveToRangeOfNode(start, end = start) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveToRangeOfNode` method is deprecated.'
+    )
+
     const range = this.setPoints([
       this.anchor.moveToStartOfNode(start),
       this.focus.moveToEndOfNode(end),
@@ -487,6 +539,11 @@ class RangeInterface {
    */
 
   moveToStartOfNode(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `range.moveToStartOfNode` method is deprecated.'
+    )
+
     return this.updatePoints(point => point.moveToStartOfNode(node))
   }
 
