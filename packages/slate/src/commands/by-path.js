@@ -134,6 +134,8 @@ Commands.insertNodeByPath = (fn, editor) => (path, index, node) => {
     path,
     node,
   })
+
+  return path
 }
 
 /**
@@ -190,6 +192,7 @@ Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
  * Merge a node by `path` with the previous node.
  *
  * @param {Array} path
+ * @return {List}
  */
 
 Commands.mergeNodeByPath = (fn, editor) => path => {
@@ -210,6 +213,8 @@ Commands.mergeNodeByPath = (fn, editor) => path => {
       data: node.data,
     },
   })
+
+  return prevPath
 }
 
 Commands.mergeBlockByPath = (fn, editor) => path => {
@@ -217,8 +222,6 @@ Commands.mergeBlockByPath = (fn, editor) => path => {
 
   editor.withoutNormalizing(() => {
     const { value: { document } } = editor
-    document.assertNode(path)
-
     const node = document.assertNode(path)
     let blockPath
 
@@ -239,21 +242,26 @@ Commands.mergeBlockByPath = (fn, editor) => path => {
 
     const [, prevPath] = prevBlock
     const newPath = Path.increment(prevPath)
-    const newParentPath = Path.lift(prevPath)
+    const commonAncestorPath = Path.relate(blockPath, prevPath)
 
     editor.moveNodeByPath(blockPath, newPath)
-    editor.mergeNodeByPath(newPath)
+    path = editor.mergeNodeByPath(newPath)
 
     for (const [ancestor, ancestorPath] of document.ancestors(blockPath)) {
-      if (ancestorPath.equals(newParentPath)) {
-        break
-      }
+      if (ancestor.object === 'block') {
+        if (
+          ancestorPath.equals(commonAncestorPath) ||
+          ancestor.nodes.size !== 1
+        ) {
+          break
+        }
 
-      if (ancestor.nodes.size === 1) {
         editor.removeNodeByPath(ancestorPath)
       }
     }
   })
+
+  return path
 }
 
 /**
@@ -612,6 +620,8 @@ Commands.splitNodeByPath = (fn, editor) => (path, position, options = {}) => {
       data: node.data,
     },
   })
+
+  return Path.increment(path)
 }
 
 /**
@@ -631,8 +641,7 @@ Commands.splitDescendantsByPath = (fn, editor) => (
   textPath = Path.create(textPath)
 
   if (path.equals(textPath)) {
-    editor.splitNodeByPath(textPath, textOffset)
-    return
+    return editor.splitNodeByPath(textPath, textOffset)
   }
 
   const { value } = editor

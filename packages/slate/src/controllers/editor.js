@@ -10,6 +10,8 @@ import PathUtils from '../utils/path-utils'
 import SchemaPlugin from '../plugins/schema'
 import Value from '../models/value'
 
+let refIds = 0
+
 /**
  * Debug.
  *
@@ -50,6 +52,8 @@ class Editor {
 
     this.tmp = {
       dirty: [],
+      pathRefs: [],
+      pointRefs: [],
       flushing: false,
       merge: null,
       normalize: true,
@@ -107,11 +111,66 @@ class Editor {
 
     this.tmp.dirty = dirty
 
+    // Iterate all of the path refs to update them. If the operation results in
+    // the path being destroyed, unref them since they'll never change.
+    for (const id in this.tmp.pathRefs) {
+      const ref = this.tmp.pathRefs[id]
+      const path = PathUtils.transform(ref.path, operation).last()
+
+      if (!path) {
+        ref.path = null
+        ref.unref()
+      } else {
+        ref.path = path
+      }
+    }
+
+    // Do the same with any point refs.
+    for (const id in this.tmp.pointRefs) {
+      const ref = this.tmp.pointRefs[id]
+      const point = ref.point.transform(operation)
+
+      if (!point) {
+        ref.point = null
+        ref.unref()
+      } else {
+        ref.point = point.normalize(this.value.document)
+      }
+    }
+
     // If we're not already, queue the flushing process on the next tick.
     if (!this.tmp.flushing) {
       this.tmp.flushing = true
       Promise.resolve().then(() => this.flush())
     }
+  }
+
+  createPathRef(path) {
+    const id = refIds++
+    const ref = {
+      path,
+      unref: () => delete this.tmp.pathRefs[id],
+    }
+
+    if (path) {
+      this.tmp.pathRefs[id] = ref
+    }
+
+    return ref
+  }
+
+  createPointRef(point) {
+    const id = refIds++
+    const ref = {
+      point,
+      unref: () => delete this.tmp.pointRefs[id],
+    }
+
+    if (point) {
+      this.tmp.pointRefs[id] = ref
+    }
+
+    return ref
   }
 
   /**

@@ -215,14 +215,11 @@ Commands.deleteWordForward = (fn, editor) => () => {
 
 Commands.insertBlock = (fn, editor) => block => {
   deleteExpanded(editor)
-
   block = Block.create(block)
   const { value } = editor
   const { selection } = value
-  editor.insertBlockAtRange(selection, block)
-
-  const path = editor.value.document.getPath(block.key)
-  editor.moveToEndOfPath(path)
+  const blockPath = editor.insertBlockAtRange(selection, block)
+  editor.moveToEndOfPath(blockPath)
 }
 
 /**
@@ -232,6 +229,15 @@ Commands.insertBlock = (fn, editor) => block => {
  */
 
 Commands.insertFragment = (fn, editor) => fragment => {
+  editor.withoutNormalizing(() => {
+    const { value: { selection } } = editor
+    const range = editor.insertFragmentAtRange(selection, fragment)
+    debugger
+    editor.select(range)
+  })
+
+  return
+
   if (!fragment.nodes.size) return
 
   deleteExpanded(editor)
@@ -289,14 +295,14 @@ Commands.insertFragment = (fn, editor) => fragment => {
 
 Commands.insertInline = (fn, editor) => inline => {
   deleteExpanded(editor)
-
   inline = Inline.create(inline)
   const { value } = editor
   const { selection } = value
-  editor.insertInlineAtRange(selection, inline)
+  const path = editor.insertInlineAtRange(selection, inline)
 
-  const path = editor.value.document.getPath(inline.key)
-  editor.moveToEndOfPath(path)
+  if (path) {
+    editor.moveToEndOfPath(path)
+  }
 }
 
 /**

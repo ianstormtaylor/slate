@@ -261,6 +261,20 @@ function isYounger(path, target) {
   return isEqual(p, t) && pl < tl
 }
 
+function endsBefore(path, target) {
+  return isYounger(path, target)
+}
+
+function endsAfter(path, target) {
+  return isOlder(path, target)
+}
+
+function endsAt(path, target) {
+  const index = path.size
+  const [p, t] = crop(path, target, index)
+  return isEqual(p, t)
+}
+
 function isYoungerSibling(path, target) {
   return isSibling(path, target) && isYounger(path, target)
 }
@@ -487,4 +501,7 @@ export default {
   isBetween,
   isUnder,
   isIn,
+  endsAt,
+  endsAfter,
+  endsBefore,
 }

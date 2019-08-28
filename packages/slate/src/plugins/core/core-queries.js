@@ -74,6 +74,37 @@ function CoreQueriesPlugin() {
       )
     },
 
+    getPointAtStartOfPath: (fn, editor) => path => {
+      const { value: { document } } = editor
+      const [, firstPath] = document.firstText({ path })
+      const point = document.createPoint({ path: firstPath, offset: 0 })
+      return point
+    },
+
+    getPointAtEndOfPath: (fn, editor) => path => {
+      const { value: { document } } = editor
+      const [lastNode, lastPath] = document.lastText({ path })
+      const point = document.createPoint({
+        path: lastPath,
+        offset: lastNode.text.length,
+      })
+
+      return point
+    },
+
+    getRangeAtEndOfPath: (fn, editor) => path => {
+      const { value: { document } } = editor
+      const point = editor.getPointAtEndOfPath(path)
+      const range = document.createRange({ anchor: point, focus: point })
+      return range
+    },
+
+    createPoint: (fn, editor) => props => {
+      const { value: { document } } = editor
+      const point = document.createPoint(props)
+      return point
+    },
+
     /**
      * Check whether a `node` is void, defaults to false.
      *

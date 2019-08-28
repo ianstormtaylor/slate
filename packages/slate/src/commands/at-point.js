@@ -6,32 +6,25 @@
 
 const Commands = {}
 
-/**
- * Split all of the text and inline nodes at a `point`.
- *
- * @param {Point} point
- * @return {Point}
- */
+Commands.splitBlockAtPoint = (fn, editor) => (point, height = 1) => {
+  editor.withoutNormalizing(() => {
+    const { value: { document } } = editor
+    let h = 0
+    let blockPath
 
-Commands.splitInlineAtPoint = (fn, editor) => point => {
-  let { value: { document } } = editor
-  const furthestInline = document.furthestInline(point.path)
-  let targetPath = point.path
+    for (const [node, path] of document.ancestors(point.path)) {
+      if (h >= height) {
+        break
+      } else if (node.object === 'block') {
+        blockPath = path
+        h++
+      }
+    }
 
-  if (furthestInline) {
-    ;[, targetPath] = furthestInline
-  }
-
-  editor.splitDescendantsByPath(targetPath, point.path, point.offset)
-
-  document = editor.value.document
-  const [, nextPath] = document.nextText(point.path)
-  const newPoint = point
-    .moveTo(nextPath, 0)
-    .setKey(null)
-    .normalize(document)
-
-  return newPoint
+    if (blockPath) {
+      editor.splitDescendantsByPath(blockPath, point.path, point.offset)
+    }
+  })
 }
 
 /**

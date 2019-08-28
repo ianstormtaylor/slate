@@ -5,12 +5,14 @@ import h from '../../../helpers/h'
 export default function(editor) {
   editor.insertFragment(
     <document>
-      <code>
-        <quote>
+      <list>
+        <item>
           <paragraph>2</paragraph>
+        </item>
+        <item>
           <paragraph>3</paragraph>
-        </quote>
-      </code>
+        </item>
+      </list>
     </document>
   )
 }
@@ -18,15 +20,13 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <code>
-          <quote>
-            <paragraph>
-              1<cursor />
-            </paragraph>
-          </quote>
-        </code>
-      </paragraph>
+      <list>
+        <item>
+          <paragraph>
+            1<cursor />
+          </paragraph>
+        </item>
+      </list>
     </document>
   </value>
 )
@@ -34,16 +34,16 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        <code>
-          <quote>
-            <paragraph>12</paragraph>
-            <paragraph>
-              3<cursor />
-            </paragraph>
-          </quote>
-        </code>
-      </paragraph>
+      <list>
+        <item>
+          <paragraph>12</paragraph>
+        </item>
+        <item>
+          <paragraph>
+            3<cursor />
+          </paragraph>
+        </item>
+      </list>
     </document>
   </value>
 )

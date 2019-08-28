@@ -2,6 +2,7 @@ import { List } from 'immutable'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
+import Node from '../models/node'
 import Path from '../utils/path-utils'
 
 /**
@@ -397,64 +398,44 @@ Commands.deleteWordForwardAtRange = (fn, editor) => range => {
 Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
   range = deleteExpandedAtRange(editor, range)
   block = Block.create(block)
-
-  const { value } = editor
-  const { document } = value
+  const { value: { document } } = editor
   const { start } = range
-  const [, blockPath] = document.closestBlock(start.path)
-  const afterPath = Path.increment(blockPath)
-  const insertionMode = getInsertionMode(editor, range)
+  const [closestBlock, closestBlockPath] = document.closestBlock(start.path)
+  const closestInline = document.closestInline(start.path)
   let targetPath
+  let pathRef
 
   editor.withoutNormalizing(() => {
-    if (insertionMode === 'before') {
-      targetPath = blockPath
-    } else if (insertionMode === 'after') {
-      targetPath = afterPath
+    if (
+      (!closestInline && closestBlock.text === '') ||
+      editor.isAtEndOfPath(start, closestBlockPath)
+    ) {
+      targetPath = Path.increment(closestBlockPath)
+    } else if (
+      editor.isAtStartOfPath(start, closestBlockPath) ||
+      editor.isVoid(closestBlock)
+    ) {
+      targetPath = closestBlockPath
     } else {
       const splitPoint =
         editor.getNextNonVoidPoint(start) ||
         editor.getPreviousNonVoidPoint(start)
 
       editor.splitDescendantsByPath(
-        blockPath,
+        closestBlockPath,
         splitPoint.path,
         splitPoint.offset
       )
 
-      targetPath = afterPath
+      targetPath = Path.increment(closestBlockPath)
     }
 
     editor.insertNodeByPath(targetPath, block)
+    pathRef = editor.createPathRef(targetPath)
   })
-}
 
-/**
- * Check if current block should be split or new block should be added before or behind it.
- *
- * @param {Range} range
- */
-
-const getInsertionMode = (editor, range) => {
-  const { value } = editor
-  const { document } = value
-
-  range = range.normalize(document)
-  const { start } = range
-  const startBlock = document.getClosestBlock(start.path)
-  const startInline = document.getClosestInline(start.path)
-
-  if (editor.isVoid(startBlock)) {
-    if (start.isAtEndOfNode(startBlock)) return 'after'
-    else return 'before'
-  } else if (!startInline && startBlock.text === '') {
-    return 'after'
-  } else if (start.isAtStartOfNode(startBlock)) {
-    return 'before'
-  } else if (start.isAtEndOfNode(startBlock)) {
-    return 'after'
-  }
-  return 'split'
+  pathRef.unref()
+  return pathRef.path
 }
 
 /**
@@ -464,12 +445,141 @@ const getInsertionMode = (editor, range) => {
  * @param {Document} fragment
  */
 
+Commands.getBackwardMostPoint = (fn, editor) => point => {
+  if (point.offset === 0) {
+    return point
+  } else {
+    return editor.getPreviousPoint(point, { allowZeroWidth: true })
+  }
+}
+
+Commands.getForwardMostPoint = (fn, editor) => point => {
+  const { value: { document } } = editor
+  const node = document.getNode(point.path)
+
+  if (point.offset === node.text.length) {
+    return point
+  } else {
+    return editor.getNextPoint(point, { allowZeroWidth: true })
+  }
+}
+
+Commands.getInnerMostRange = (fn, editor) => range => {
+  const start = editor.getForwardMostPoint(range.start)
+  const end = editor.getBackwardMostPoint(range.end)
+  return range.setPoints([start, end])
+}
+
+Commands.ensureSplitBlockAtRange = (fn, editor) => range => {
+  const { value: { document } } = editor
+  const { isExpanded, start, end } = range
+  const [, startBlockPath] = document.closestBlock(start.path)
+  const [, endBlockPath] = document.closestBlock(end.path)
+
+  // if (!editor.isAtEdgeOfPath(end, endBlockPath)) {
+  editor.splitDescendantsByPath(endBlockPath, end.path, end.offset)
+  // }
+
+  if (isExpanded && !editor.isAtEdgeOfPath(start, startBlockPath)) {
+    editor.splitDescendantsByPath(startBlockPath, start.path, start.offset)
+  }
+}
+
 Commands.insertFragmentAtRange = (fn, editor) => (range, fragment) => {
   editor.withoutNormalizing(() => {
     range = deleteExpandedAtRange(editor, range)
 
+    if (!fragment.nodes.size) {
+      return
+    }
+
+    const point = range.start
+    const { value: { document } } = editor
+    const [, fragTextPath] = fragment.firstText()
+    let fragBlock = fragment.closestBlock(fragTextPath)
+    let height = 0
+    let splitPath
+
+    // Get a list of the nodes in the fragment that are top-level ancestors that
+    // only have a single child. Because sometimes, if the target point has
+    // matching ancestors then we avoid inserting them again. And instead insert
+    // just their children nodes.
+    const fragSingleAncestors = []
+    const fragAncestors = Array.from(fragment.ancestors(fragTextPath))
+      .reverse()
+      .map(([n]) => n)
+
+    for (const ancestor of fragAncestors) {
+      fragSingleAncestors.push(ancestor)
+
+      if (ancestor.nodes.size !== 1) {
+        break
+      }
+    }
+
+    for (const [node, path] of document.ancestors(point.path)) {
+      debugger
+
+      if (node.object === 'document') {
+        break
+      }
+
+      if (node.object === 'block' && fragBlock) {
+        const [fragBlockNode, fragBlockPath] = fragBlock
+        debugger
+
+        if (fragSingleAncestors.some(a => a.isSimilar(node))) {
+          fragment = fragment.set('nodes', fragBlockNode.nodes)
+          break
+        }
+
+        if (fragBlockNode.isSimilar(node)) {
+          height++
+          splitPath = path
+          fragBlock = fragment.closestBlock(fragBlockPath)
+        }
+      }
+    }
+
+    debugger
+    editor.splitBlockAtPoint(point, height)
+
+    const firstPath = Path.increment(splitPath)
+    const afterPathRef = editor.createPathRef(firstPath)
+
+    fragment = fragment.mapDescendants(child => child.regenerateKey())
+
+    for (const node of fragment.nodes) {
+      const { path } = afterPathRef
+      const parentPath = Path.lift(path)
+      const index = path.last()
+      editor.insertNodeByPath(parentPath, index, node)
+    }
+
+    const lastPath = Path.decrement(afterPathRef.path)
+    const firstPoint = editor.getPointAtStartOfPath(firstPath)
+    const afterPoint = editor.getPointAtStartOfPath(afterPathRef.path)
+    const lastPoint = editor.getPointAtEndOfPath(lastPath)
+    const lastPointRef = editor.createPointRef(lastPoint)
+    debugger
+    editor.mergeBlockByPath(afterPoint.path)
+    debugger
+    editor.mergeBlockByPath(firstPoint.path)
+
+    range = range.setPoints([lastPointRef.point, lastPointRef.point])
+    afterPathRef.unref()
+    lastPointRef.unref()
+  })
+
+  return range
+
+  editor.withoutNormalizing(() => {
+    range = deleteExpandedAtRange(editor, range)
+
     // If the fragment is empty, there's nothing to do after deleting.
-    if (!fragment.nodes.size) return
+    if (!fragment.nodes.size) {
+      return
+    }
 
     // Regenerate the keys for all of the fragments nodes, so that they're
     // guaranteed not to collide with the existing keys in the document. Otherwise
@@ -477,110 +587,276 @@ Commands.insertFragmentAtRange = (fn, editor) => (range, fragment) => {
     // reference them.
     fragment = fragment.mapDescendants(child => child.regenerateKey())
 
-    // Calculate a few things...
+    const { value: { document } } = editor
     const { start } = range
-    const { value } = editor
-    let { document } = value
-    let startText = document.getDescendant(start.path)
-    let startBlock = document.getClosestBlock(start.path)
-    let startChild = startBlock.getFurthestChild(startText.key)
-    const isAtStart = start.isAtStartOfNode(startBlock)
-    const parent = document.getParent(startBlock.key)
-    const index = parent.nodes.indexOf(startBlock)
-    const blocks = fragment.getBlocks()
-    const firstChild = fragment.nodes.first()
-    const lastChild = fragment.nodes.last()
-    const firstBlock = blocks.first()
-    const lastBlock = blocks.last()
-    const insertionNode = findInsertionNode(fragment, document, startBlock.key)
+    const [startBlock, startBlockPath] = document.closestBlock(start.path)
+    const hasMultipleBlocks = fragment.nodes.size !== 1
+    let insertPath = Path.increment(startBlockPath)
+    let parentPath = Path.lift(insertPath)
+    let startBlockInsertIndex = startBlock.nodes.size
+    let endBlockInsertIndex = 0
+    let splitStart = false
+    let splitEnd = false
 
-    // If the fragment only contains a void block, use `insertBlock` instead.
-    if (firstBlock === lastBlock && editor.isVoid(firstBlock)) {
-      editor.insertBlockAtRange(range, firstBlock)
-      return
-    }
+    for (const [node, path] of fragment.descendants()) {
+      const index = path.last()
+      const isChild = path.size === 1
+      const isFirst = index === 0
+      const isLast = index === fragment.nodes.size - 1
 
-    // If inserting the entire fragment and it starts or ends with a single
-    // nested block, e.g. a table, we do not merge it with existing blocks.
-    if (
-      insertionNode === fragment &&
-      (firstChild.hasBlockChildren() || lastChild.hasBlockChildren())
-    ) {
-      fragment.nodes.reverse().forEach(node => {
-        editor.insertBlockAtRange(range, node)
-      })
-      return
-    }
+      if (Path.isAt(path, [0]) && hasMultipleBlocks) {
+        if (Path.isChild(path, startBlockPath)) {
+          // Before the first child, we might need to split the start block.
+          if (path.last() === 0) {
+            if (editor.isAtStartOfPath(start, startBlockPath)) {
+              insertPath = startBlockPath
+            } else if (!editor.isAtEndOfPath(start, startBlockPath)) {
+              editor.splitDescendantsByPath(
+                startBlockPath,
+                start.path,
+                start.offset
+              )
+              insertPath = Path.increment(insertPath)
+              startBlockInsertIndex = start.path.get(startBlockPath.size)
+            }
+          }
 
-    // If the first and last block aren't the same, we need to insert all of the
-    // nodes after the insertion node's first block at the index.
-    if (firstBlock !== lastBlock) {
-      const lonelyParent = insertionNode.getFurthest(
-        firstBlock.key,
-        p => p.nodes.size === 1
-      )
-      const lonelyChild = lonelyParent || firstBlock
+          editor.insertNodeByPath(startBlockPath, startBlockInsertIndex, node)
+          startBlockInsertIndex++
+        } else {
+          // Do nothing, since these will get merged in.
+        }
+      } else if (Path.isAt(path, [fragment.nodes.size - 1])) {
+        if (Path.isChild(path, endBlockPath)) {
+          // Before the first child, we might need to split the end block.
+          if (path.last() === 0) {
+            if (editor.isAtStartOfPath(end, endBlockPath)) {
+              insertPath = endBlockPath
+            } else if (!editor.isAtEndOfPath(end, endBlockPath)) {
+              editor.splitDescendantsByPath(endBlockPath, end.path, end.offset)
+              insertPath = Path.increment(insertPath)
+              endBlockInsertIndex = end.path.get(endBlockPath.size)
+            }
+          }
 
-      const startIndex = parent.nodes.indexOf(startBlock)
-      const excludingLonelyChild = insertionNode.removeNode(lonelyChild.key)
+          editor.insertNodeByPath(endBlockPath, endBlockInsertIndex, node)
+          endBlockInsertIndex++
+        } else {
+          // Do nothing, since these will get merged in.
+        }
+      } else {
+        const parentPath = Path.lift(insertPath)
+        const index = insertPath.last() + 1
+        editor.insertNodeByPath(parentPath, index, node)
+        insertPath = Path.increment(insertPath)
+      }
 
-      excludingLonelyChild.nodes.forEach((node, i) => {
-        const newIndex = startIndex + i + 1
-        editor.insertNodeByKey(parent.key, newIndex, node)
-      })
-    }
+      if (path.equals(startBlockPath)) {
+      } else if (Path.isChild(path, startBlockPath)) {
+        editor.insertNodeByPath(startBlockPath, startBlockInsertIndex, node)
+        startBlockInsertIndex++
+      } else if (path.equals(endBlockPath)) {
+      } else {
+        const parentPath = Path.lift(insertPath)
+        const index = insertPath.last()
+        editor.insertNodeByPath(parentPath, index, node)
+      }
 
-    // Check if we need to split the node.
-    if (start.offset !== 0) {
-      editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
-    }
-
-    // Update our variables with the new value.
-    document = editor.value.document
-    startText = document.getDescendant(start.key)
-    startBlock = document.getClosestBlock(start.key)
-    startChild = startBlock.getFurthestChild(startText.key)
-
-    // If the first and last block aren't the same, we need to move any of the
-    // starting block's children after the split into the last block of the
-    // fragment, which has already been inserted.
-    if (firstBlock !== lastBlock) {
-      const nextChild = isAtStart
-        ? startChild
-        : startBlock.getNextSibling(startChild.key)
-      const nextNodes = nextChild
-        ? startBlock.nodes.skipUntil(n => n.key === nextChild.key)
-        : List()
-      const lastIndex = lastBlock.nodes.size
-
-      nextNodes.forEach((node, i) => {
-        const newIndex = lastIndex + i
-        editor.moveNodeByKey(node.key, lastBlock.key, newIndex)
-      })
-    }
-
-    // If the starting block is empty, we replace it entirely with the first block
-    // of the fragment, since this leads to a more expected behavior for the user.
-    if (
-      !editor.isVoid(startBlock) &&
-      startBlock.text === '' &&
-      !startBlock.findDescendant(n => editor.isVoid(n))
-    ) {
-      editor.removeNodeByKey(startBlock.key)
-      editor.insertNodeByKey(parent.key, index, firstBlock)
-    } else {
-      // Otherwise, we maintain the starting block, and insert all of the first
-      // block's inline nodes into it at the split point.
-      const inlineChild = startBlock.getFurthestChild(startText.key)
-      const inlineIndex = startBlock.nodes.indexOf(inlineChild)
-
-      firstBlock.nodes.forEach((inline, i) => {
-        const o = start.offset === 0 ? 0 : 1
-        const newIndex = inlineIndex + i + o
-        editor.insertNodeByKey(startBlock.key, newIndex, inline)
-      })
+      // if is start, and not merging, insert it
+      // if is middle, insert it
+      // if is end, and not merging, insert it
+      // if is end and merge, insert its children
+      // if is end parent and merging, remove
     }
   })
+
+  return range
+
+  editor.withoutNormalizing(() => {
+    range = deleteExpandedAtRange(editor, range)
+
+    // If the fragment is empty, there's nothing to do after deleting.
+    if (!fragment.nodes.size) {
+      return
+    }
+
+    // Regenerate the keys for all of the fragments nodes, so that they're
+    // guaranteed not to collide with the existing keys in the document. Otherwise
+    // they will be rengerated automatically and we won't have an easy way to
+    // reference them.
+    fragment = fragment.mapDescendants(child => child.regenerateKey())
+
+    const { value: { document } } = editor
+    const { start } = range
+    const [, startBlockPath] = document.closestBlock(start.path)
+    const prevBlock = document.previousBlock(start.path)
+    const nextBlock = document.nextBlock(start.path)
+    const parentPath = Path.lift(startBlockPath)
+    let prevPath = prevBlock ? prevBlock[1] : null
+    let nextPath = nextBlock ? nextBlock[1] : null
+    let insertPath = Path.increment(startBlockPath)
+
+    if (editor.isAtStartOfPath(start, startBlockPath)) {
+      nextPath = startBlockPath
+      insertPath = startBlockPath
+    } else if (editor.isAtEndOfPath(start, startBlockPath)) {
+      prevPath = startBlockPath
+    } else {
+      editor.splitDescendantsByPath(startBlockPath, start.path, start.offset)
+      prevPath = startBlockPath
+      nextPath = Path.increment(startBlockPath)
+    }
+
+    const firstPath = insertPath
+
+    for (const [node] of fragment.blocks({ onlyRoots: true })) {
+      const index = insertPath.last()
+      editor.insertNodeByPath(parentPath, index, node)
+
+      if (
+        nextPath &&
+        (Path.endsBefore(insertPath, nextPath) ||
+          Path.endsAt(insertPath, nextPath))
+      ) {
+        nextPath = Path.increment(nextPath, 1, insertPath.size - 1)
+      }
+
+      insertPath = Path.increment(insertPath)
+    }
+
+    const lastPath = Path.decrement(insertPath)
+    const lastText = fragment.lastText()
+    const [textNode, textPath] = lastText
+    const [, blockPath] = fragment.closestBlock(textPath)
+    const relativePath = textPath.slice(blockPath.size)
+    const path = lastPath.concat(relativePath)
+    const pathRef = editor.createPathRef(path)
+
+    if (nextPath) {
+      nextPath = editor.mergeBlockByPath(nextPath)
+    }
+
+    if (prevPath) {
+      if (
+        nextPath &&
+        (Path.endsBefore(firstPath, nextPath) ||
+          Path.endsAt(firstPath, nextPath))
+      ) {
+        nextPath = Path.decrement(nextPath, 1, firstPath.size - 1)
+      }
+
+      editor.mergeBlockByPath(firstPath)
+    }
+
+    const offset = textNode.text.length
+    const point = editor.createPoint({ path: pathRef.path, offset })
+    range = range.setPoints([point, point])
+    pathRef.unref()
+  })
+
+  // Calculate a few things...
+  const { start } = range
+  const { value } = editor
+  let { document } = value
+  let startText = document.getDescendant(start.path)
+  let startBlock = document.getClosestBlock(start.path)
+  let startChild = startBlock.getFurthestChild(startText.key)
+  const isAtStart = start.isAtStartOfNode(startBlock)
+  const parent = document.getParent(startBlock.key)
+  const index = parent.nodes.indexOf(startBlock)
+  const blocks = fragment.getBlocks()
+  const firstChild = fragment.nodes.first()
+  const lastChild = fragment.nodes.last()
+  const firstBlock = blocks.first()
+  const lastBlock = blocks.last()
+  const insertionNode = findInsertionNode(fragment, document, startBlock.key)
+
+  // If the fragment only contains a void block, use `insertBlock` instead.
+  if (firstBlock === lastBlock && editor.isVoid(firstBlock)) {
+    editor.insertBlockAtRange(range, firstBlock)
+    return
+  }
+
+  // If inserting the entire fragment and it starts or ends with a single
+  // nested block, e.g. a table, we do not merge it with existing blocks.
+  if (
+    insertionNode === fragment &&
+    (firstChild.hasBlockChildren() || lastChild.hasBlockChildren())
+  ) {
+    fragment.nodes.reverse().forEach(node => {
+      editor.insertBlockAtRange(range, node)
+    })
+    return
+  }
+
+  // If the first and last block aren't the same, we need to insert all of the
+  // nodes after the insertion node's first block at the index.
+  if (firstBlock !== lastBlock) {
+    const lonelyParent = insertionNode.getFurthest(
+      firstBlock.key,
+      p => p.nodes.size === 1
+    )
+    const lonelyChild = lonelyParent || firstBlock
+
+    const startIndex = parent.nodes.indexOf(startBlock)
+    const excludingLonelyChild = insertionNode.removeNode(lonelyChild.key)
+
+    excludingLonelyChild.nodes.forEach((node, i) => {
+      const newIndex = startIndex + i + 1
+      editor.insertNodeByKey(parent.key, newIndex, node)
+    })
+  }
+
+  // Check if we need to split the node.
+  if (start.offset !== 0) {
+    editor.splitDescendantsByKey(startChild.key, start.key, start.offset)
+  }
+
+  // Update our variables with the new value.
+  document = editor.value.document
+  startText = document.getDescendant(start.key)
+  startBlock = document.getClosestBlock(start.key)
+  startChild = startBlock.getFurthestChild(startText.key)
+
+  // If the first and last block aren't the same, we need to move any of the
+  // starting block's children after the split into the last block of the
+  // fragment, which has already been inserted.
+  if (firstBlock !== lastBlock) {
+    const nextChild = isAtStart
+      ? startChild
+      : startBlock.getNextSibling(startChild.key)
+    const nextNodes = nextChild
+      ? startBlock.nodes.skipUntil(n => n.key === nextChild.key)
+      : List()
+    const lastIndex = lastBlock.nodes.size
+
+    nextNodes.forEach((node, i) => {
+      const newIndex = lastIndex + i
+      editor.moveNodeByKey(node.key, lastBlock.key, newIndex)
+    })
+  }
+
+  // If the starting block is empty, we replace it entirely with the first block
+  // of the fragment, since this leads to a more expected behavior for the user.
+  if (
+    !editor.isVoid(startBlock) &&
+    startBlock.text === '' &&
+    !startBlock.findDescendant(n => editor.isVoid(n))
+  ) {
+    editor.removeNodeByKey(startBlock.key)
+    editor.insertNodeByKey(parent.key, index, firstBlock)
+  } else {
+    // Otherwise, we maintain the starting block, and insert all of the first
+    // block's inline nodes into it at the split point.
+    const inlineChild = startBlock.getFurthestChild(startText.key)
+    const inlineIndex = startBlock.nodes.indexOf(inlineChild)
+
+    firstBlock.nodes.forEach((inline, i) => {
+      const o = start.offset === 0 ? 0 : 1
+      const newIndex = inlineIndex + i + o
+      editor.insertNodeByKey(startBlock.key, newIndex, inline)
+    })
+  }
 }
 
 const findInsertionNode = (fragment, document, startKey) => {
@@ -589,16 +865,21 @@ const findInsertionNode = (fragment, document, startKey) => {
     return object.nodes.size === 1
   }
 
-  const firstNode = object => object && object.nodes.first()
+  const firstNode = object => {
+    return object && object.nodes.first()
+  }
+
   let node = fragment
 
   if (hasSingleNode(fragment)) {
     let fragmentInner = firstNode(fragment)
+    let documentInner = document.getFurthest(startKey, documentNode => {
+      return documentNode.type === fragmentInner.type
+    })
 
-    const matches = documentNode => documentNode.type === fragmentInner.type
-    let documentInner = document.getFurthest(startKey, matches)
-
-    if (documentInner === document.getParent(startKey)) node = fragmentInner
+    if (documentInner === document.getParent(startKey)) {
+      node = fragmentInner
+    }
 
     while (hasSingleNode(fragmentInner) && hasSingleNode(documentInner)) {
       fragmentInner = firstNode(fragmentInner)
@@ -623,21 +904,30 @@ const findInsertionNode = (fragment, document, startKey) => {
  */
 
 Commands.insertInlineAtRange = (fn, editor) => (range, inline) => {
+  inline = Inline.create(inline)
+  let pathRef
+
   editor.withoutNormalizing(() => {
-    inline = Inline.create(inline)
     range = deleteExpandedAtRange(editor, range)
     const { value: { document } } = editor
-    const { start: { path, offset } } = range
-    const insertPath = Path.increment(path)
+    let { start: { path, offset } } = range
     const closestVoid = document.closest(path, editor.isVoid)
 
     if (closestVoid) {
       return
     }
 
-    editor.splitNodeByPath(path, offset)
-    editor.insertNodeByPath(insertPath, inline)
+    path = editor.splitNodeByPath(path, offset)
+    path = editor.insertNodeByPath(path, inline)
+    pathRef = editor.createPathRef(path)
   })
+
+  if (!pathRef) {
+    return null
+  }
+
+  pathRef.unref()
+  return pathRef.path
 }
 
 /**

@@ -1376,6 +1376,18 @@ class ElementInterface {
     )
   }
 
+  isSimilar(other) {
+    // HACK: this shouldn't need to be special-cased.
+    if (other.object === 'document' && this.object === 'document') {
+      return true
+    } else if (other.object === 'document' || this.object === 'document') {
+      return false
+    }
+
+    const props = Node.createProperties(this)
+    return other.hasProperties(props)
+  }
+
   /**
    * Check if a node has a void parent.
    *
@@ -1825,6 +1837,15 @@ class ElementInterface {
     const [last] = this.texts({
       direction: 'backward',
       includeTarget: true,
+      ...options,
+    })
+
+    return last
+  }
+
+  lastBlock(options) {
+    const [last] = this.blocks({
+      direction: 'backward',
       ...options,
     })
 

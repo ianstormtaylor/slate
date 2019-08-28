@@ -3,7 +3,7 @@ import warning from 'tiny-warning'
 import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
-import PathUtils from '../utils/path-utils'
+import Path from '../utils/path-utils'
 
 /**
  * Default properties.
@@ -65,7 +65,7 @@ class Point extends Record(DEFAULTS) {
       const p = {}
       if ('key' in a) p.key = a.key
       if ('offset' in a) p.offset = a.offset
-      if ('path' in a) p.path = PathUtils.create(a.path)
+      if ('path' in a) p.path = Path.create(a.path)
 
       // If only a path is set, or only a key is set, ensure that the other is
       // set to null so that it can be normalized back to the right value.
@@ -94,7 +94,7 @@ class Point extends Record(DEFAULTS) {
     const point = new Point({
       key,
       offset,
-      path: PathUtils.create(path),
+      path: Path.create(path),
     })
 
     return point
@@ -131,7 +131,7 @@ class Point extends Record(DEFAULTS) {
       return false
     }
 
-    const result = PathUtils.compare(this.path, point.path)
+    const result = Path.compare(this.path, point.path)
     const isAfter = (result === 0 && this.offset > point.offset) || result === 1
     return isAfter
   }
@@ -187,7 +187,7 @@ class Point extends Record(DEFAULTS) {
       return false
     }
 
-    const result = PathUtils.compare(this.path, point.path)
+    const result = Path.compare(this.path, point.path)
     const isBefore =
       (result === 0 && this.offset < point.offset) || result === -1
 
@@ -531,7 +531,7 @@ class Point extends Record(DEFAULTS) {
 
   setPath(path) {
     if (path != null) {
-      path = PathUtils.create(path)
+      path = Path.create(path)
     }
 
     const point = this.set('path', path)
@@ -572,6 +572,66 @@ class Point extends Record(DEFAULTS) {
       offset: null,
       path: null,
     })
+  }
+
+  transform(op) {
+    const point = this
+    const { path, offset } = point
+
+    if (op.type === 'insert_text') {
+      if (Path.isEqual(op.path, path) && op.offset <= offset) {
+        const newOffset = offset + op.text.length
+        return point.setOffset(newOffset)
+      }
+    }
+
+    if (op.type === 'remove_text') {
+      if (Path.isEqual(op.path, path) && op.offset <= offset) {
+        const newOffset = offset + op.text.length
+        return point.setOffset(newOffset)
+      }
+    }
+
+    if (op.type === 'remove_node') {
+      if (Path.isEqual(op.path, path)) {
+        return null
+      }
+    }
+
+    if (op.type === 'split_node') {
+      if (Path.isEqual(op.path, path) && op.position <= offset) {
+        const newPath = Path.increment(path)
+        const newOffset = offset - op.position
+        return point
+          .setPath(newPath)
+          .setOffset(newOffset)
+          .setKey(null)
+      }
+    }
+
+    if (op.type === 'merge_node') {
+      if (Path.isEqual(op.path, path)) {
+        const newPath = Path.decrement(path)
+        const newOffset = offset + op.position
+        return point
+          .setPath(newPath)
+          .setOffset(newOffset)
+          .setKey(null)
+      }
+    }
+
+    if (
+      op.type === 'insert_node' ||
+      op.type === 'merge_node' ||
+      op.type === 'move_node' ||
+      op.type === 'remove_node' ||
+      op.type === 'split_node'
+    ) {
+      const [first] = Path.transform(path, op)
+      return point.setPath(first).setKey(null)
+    }
+
+    return point
   }
 }
 
