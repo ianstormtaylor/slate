@@ -1,3 +1,4 @@
+import Range from '../../models/range'
 import PathUtils from '../../utils/path-utils'
 import TextUtils from '../../utils/text-utils'
 
@@ -82,6 +83,37 @@ function CoreQueriesPlugin() {
 
     isVoid: (fn, editor) => () => {
       return false
+    },
+
+    getFirstPoint: (fn, editor) => path => {
+      const { value: { document } } = editor
+      const [firstText, firstPath] = document.firstText({ path })
+      const firstPoint = document.createPoint({
+        key: firstText.key,
+        path: firstPath,
+        offset: 0,
+      })
+
+      return firstPoint
+    },
+
+    getLastPoint: (fn, editor) => path => {
+      const { value: { document } } = editor
+      const [lastText, lastPath] = document.lastText({ path })
+      const lastPoint = document.createPoint({
+        key: lastText.key,
+        path: lastPath,
+        offset: lastText.text.length,
+      })
+
+      return lastPoint
+    },
+
+    getRange: (fn, editor) => path => {
+      const anchor = editor.getFirstPoint(path)
+      const focus = editor.getLastPoint(path)
+      const range = Range.create({ anchor, focus })
+      return range
     },
 
     /**

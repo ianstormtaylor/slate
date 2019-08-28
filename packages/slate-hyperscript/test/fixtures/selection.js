@@ -10,8 +10,8 @@ export const input = (
       </block>
     </document>
     <selection>
-      <anchor key="a" offset={1} />
-      <focus key="a" offset={2} />
+      <anchor key="a" path={[0, 0]} offset={1} />
+      <focus key="a" path={[0, 0]} offset={2} />
     </selection>
   </value>
 )

@@ -16,11 +16,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document.getClosestBlock(selection.end.key)
+  return document.getNextBlock(selection.end.path)
 }
 
-export const output = (
-  <paragraph>
-    <anchor />two<focus />
-  </paragraph>
-)
+export const output = <paragraph>three</paragraph>

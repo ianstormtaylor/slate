@@ -124,17 +124,27 @@ class NodeInterface {
 
     // COMPAT: Handle a node object by iterating the descendants tree, so that
     // we avoid using keys for the future.
-    if (Node.isNode(key) && this.descendants) {
+    if (Node.isNode(key)) {
       if (key === this) {
         return List([])
       }
 
-      for (const [node, path] of this.descendants()) {
-        if (key === node) {
-          return path
+      if (this.descendants) {
+        for (const [node, path] of this.descendants()) {
+          if (key === node) {
+            return path
+          }
         }
       }
+
+      return null
     }
+
+    // console.trace()
+    warning(
+      false,
+      'As of slate@0.48 passing a `key` string to `node.getPath` is deprecated. You can pass in a `node` instance instead to iterate the entire tree for a specific node.'
+    )
 
     const dict = this.getKeysToPathsTable()
     const path = dict[key]

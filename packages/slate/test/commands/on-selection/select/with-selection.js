@@ -3,20 +3,23 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  const { value } = editor
-  const { selection, startText } = value
-  const range = selection.setProperties({
+  const { value: { document, selection } } = editor
+  const [[node]] = document.texts()
+
+  const next = selection.setProperties({
     anchor: {
-      key: startText.key,
+      path: [0, 0],
+      key: node.key,
       offset: 0,
     },
     focus: {
-      key: startText.key,
-      offset: startText.text.length,
+      path: [0, 0],
+      key: node.key,
+      offset: node.text.length,
     },
   })
 
-  editor.select(range)
+  editor.select(next)
 }
 
 export const input = (

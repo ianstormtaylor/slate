@@ -97,8 +97,19 @@ class Value extends Record(DEFAULTS) {
     annotations = Annotation.createMap(annotations)
 
     if (selection.isUnset) {
-      const text = document.getFirstText()
-      if (text) selection = selection.moveToStartOfNode(text)
+      const first = document.firstText()
+
+      if (first) {
+        const [firstText, firstPath] = first
+        const start = document.createPoint({
+          key: firstText.key,
+          path: firstPath,
+          offset: 0,
+        })
+
+        selection = selection.setPoints([start, start])
+      }
+
       selection = document.createSelection(selection)
     }
 

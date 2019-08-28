@@ -478,7 +478,7 @@ Commands.replaceNodeByPath = (fn, editor) => (path, node) => {
 /**
  * Replace a `length` of text at `offset` with new `text` and optional `marks`.
  *
- * @param {String} key
+ * @param {Array} path
  * @param {Number} offset
  * @param {Number} length
  * @param {string} text
@@ -665,12 +665,7 @@ Commands.splitDescendantsByPath = (fn, editor) => (
 
 Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
   path = Path.create(path)
-  const { value } = editor
-  const { document, selection } = value
-  const node = document.assertNode(path)
-  const first = node.getFirstText()
-  const last = node.getLastText()
-  const range = selection.moveToRangeOfNode(first, last)
+  const range = editor.getRange(path)
   editor.unwrapInlineAtRange(range, properties)
 }
 
@@ -683,12 +678,7 @@ Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
 
 Commands.unwrapBlockByPath = (fn, editor) => (path, properties) => {
   path = Path.create(path)
-  const { value } = editor
-  const { document, selection } = value
-  const node = document.assertNode(path)
-  const first = node.getFirstText()
-  const last = node.getLastText()
-  const range = selection.moveToRangeOfNode(first, last)
+  const range = editor.getRange(path)
   editor.unwrapBlockAtRange(range, properties)
 }
 

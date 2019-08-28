@@ -3,17 +3,19 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  const { value } = editor
-  const { startText } = value
+  const { value: { document } } = editor
+  const [[node]] = document.texts()
 
   editor.select({
     anchor: {
-      key: startText.key,
+      path: [0, 0],
+      key: node.key,
       offset: 0,
     },
     focus: {
-      key: startText.key,
-      offset: startText.text.length,
+      path: [0, 0],
+      key: node.key,
+      offset: node.text.length,
     },
   })
 }

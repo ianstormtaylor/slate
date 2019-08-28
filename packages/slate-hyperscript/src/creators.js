@@ -296,6 +296,7 @@ export function createValue(tagName, attributes, children) {
 
           if (!partial) {
             ann.key = node.key
+            ann.path = path
             partials[id] = ann
             continue
           }
@@ -306,7 +307,7 @@ export function createValue(tagName, attributes, children) {
             data: ann.data,
             anchor: {
               key: partial.key,
-              path: document.getPath(partial.key),
+              path: partial.path,
               offset: partial.offset,
             },
             focus: {

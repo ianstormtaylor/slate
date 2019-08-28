@@ -16,7 +16,7 @@ export const input = (
 )
 
 export default function({ document, selection }) {
-  return document.getPreviousBlock(selection.end.key)
+  return document.getPreviousBlock(selection.end.path)
 }
 
 export const output = <paragraph>one</paragraph>

@@ -312,9 +312,6 @@ class Point extends Record(DEFAULTS) {
   /**
    * Move the point's anchor point to a new `path` and `offset`.
    *
-   * Optionally, the `path` can be a key string, or omitted entirely in which
-   * case it would be the offset number.
-   *
    * @param {List|String|Number} path
    * @param {Number} offset
    * @return {Point}
@@ -384,13 +381,18 @@ class Point extends Record(DEFAULTS) {
     // to avoid creating the key -> path lookup table, we attempt to look up by path first.
     let target = path && node.getNode(path)
 
-    if (!target) {
+    if (!target && key) {
+      warning(
+        false,
+        'As of slate@0.48 a point cannot be created with a `key` but without a `path`.'
+      )
+
       target = node.getNode(key)
 
       if (target) {
         // There is a misalignment of path and key
         const point = this.merge({
-          path: node.getPath(key),
+          path: node.getPath(target),
         })
 
         return point
@@ -398,7 +400,6 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (!target) {
-      debugger
       warning(false, "A point's `path` or `key` invalid and was reset!")
 
       const text = node.getFirstText()
@@ -407,7 +408,7 @@ class Point extends Record(DEFAULTS) {
       const point = this.merge({
         key: text.key,
         offset: 0,
-        path: node.getPath(text.key),
+        path: node.getPath(text),
       })
 
       return point
@@ -421,7 +422,7 @@ class Point extends Record(DEFAULTS) {
       const point = this.merge({
         offset: offset - before,
         key: text.key,
-        path: node.getPath(text.key),
+        path: node.getPath(text),
       })
 
       return point
@@ -435,7 +436,7 @@ class Point extends Record(DEFAULTS) {
 
     let point = this.merge({
       key: target.key,
-      path: path == null ? node.getPath(target.key) : path,
+      path: path == null ? node.getPath(target) : path,
       offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
 
@@ -450,7 +451,7 @@ class Point extends Record(DEFAULTS) {
       if (next) {
         point = point.merge({
           key: next.key,
-          path: node.getPath(next.key),
+          path: node.getPath(next),
           offset: 0,
         })
       }

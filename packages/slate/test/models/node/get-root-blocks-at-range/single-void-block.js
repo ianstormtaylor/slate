@@ -11,8 +11,8 @@ export const input = (
       </image>
     </document>
     <selection isFocused={false}>
-      <anchor key="b" offset={0} />
-      <focus key="b" offset={0} />
+      <anchor key="b" path={[0, 0]} offset={0} />
+      <focus key="b" path={[0, 0]} offset={0} />
     </selection>
   </value>
 )

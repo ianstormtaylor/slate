@@ -179,9 +179,6 @@ class RangeInterface {
   /**
    * Move the range's anchor point to a new `path` and `offset`.
    *
-   * Optionally, the `path` can be a key string, or omitted entirely in which
-   * case it would be the offset number.
-   *
    * @param {List|String} path
    * @param {Number} offset
    * @return {Range}
@@ -242,9 +239,6 @@ class RangeInterface {
 
   /**
    * Move the range's end point to a new `path` and `offset`.
-   *
-   * Optionally, the `path` can be a key string, or omitted entirely in which
-   * case it would be the offset number.
    *
    * @param {List|String} path
    * @param {Number} offset
@@ -307,9 +301,6 @@ class RangeInterface {
   /**
    * Move the range's focus point to a new `path` and `offset`.
    *
-   * Optionally, the `path` can be a key string, or omitted entirely in which
-   * case it would be the offset number.
-   *
    * @param {List|String} path
    * @param {Number} offset
    * @return {Range}
@@ -370,9 +361,6 @@ class RangeInterface {
 
   /**
    * Move the range's start point to a new `path` and `offset`.
-   *
-   * Optionally, the `path` can be a key string, or omitted entirely in which
-   * case it would be the offset number.
    *
    * @param {List|String} path
    * @param {Number} offset
