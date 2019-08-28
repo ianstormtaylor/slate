@@ -232,59 +232,9 @@ Commands.insertFragment = (fn, editor) => fragment => {
   editor.withoutNormalizing(() => {
     const { value: { selection } } = editor
     const range = editor.insertFragmentAtRange(selection, fragment)
-    debugger
     editor.select(range)
+    editor.moveToEnd()
   })
-
-  return
-
-  if (!fragment.nodes.size) return
-
-  deleteExpanded(editor)
-
-  let { value } = editor
-  let { document, selection } = value
-  const { start, end } = selection
-  const { startText, endText, startInline } = value
-  const lastText = fragment.getLastText()
-  const lastInline = fragment.getClosestInline(lastText.key)
-  const lastBlock = fragment.getClosestBlock(lastText.key)
-  const firstChild = fragment.nodes.first()
-  const lastChild = fragment.nodes.last()
-  const keys = Array.from(document.texts(), ([text]) => text.key)
-  const isAppending =
-    !startInline ||
-    (start.isAtStartOfNode(startText) || end.isAtStartOfNode(startText)) ||
-    (start.isAtEndOfNode(endText) || end.isAtEndOfNode(endText))
-
-  const isInserting =
-    firstChild.hasBlockChildren() || lastChild.hasBlockChildren()
-
-  editor.insertFragmentAtRange(selection, fragment)
-  value = editor.value
-  document = value.document
-
-  const newTexts = document.getTexts().filter(n => !keys.includes(n.key))
-  const newText = isAppending ? newTexts.last() : newTexts.takeLast(2).first()
-
-  if (newText && (lastInline || isInserting)) {
-    editor.moveToEndOfNode(newText)
-  } else if (newText) {
-    // The position within the last text node needs to be calculated. This is the length
-    // of all text nodes within the last block, but if the last block contains inline nodes,
-    // these have to be skipped.
-    const { nodes } = lastBlock
-    const lastIndex = nodes.findLastIndex(
-      node => node && node.object === 'inline'
-    )
-    const remainingTexts = nodes.takeLast(nodes.size - lastIndex - 1)
-    const remainingTextLength = remainingTexts.reduce(
-      (acc, val) => acc + val.text.length,
-      0
-    )
-    editor.moveToStartOfNode(newText)
-    editor.moveForward(remainingTextLength)
-  }
 }
 
 /**

@@ -99,6 +99,8 @@ Commands.insertFragmentByPath = (fn, editor) => (path, index, fragment) => {
   const parentPath = Path.lift(path)
   const start = path.last()
 
+  fragment = fragment.mapDescendants(child => child.regenerateKey())
+
   fragment.nodes.forEach((node, i) => {
     const targetPath = parentPath.concat([start + i])
     editor.insertNodeByPath(targetPath, node)
