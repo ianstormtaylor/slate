@@ -71,10 +71,10 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Element}
    */
 
-  const renderMark = (fn, editor) => props => {
-    const { children, mark } = props
+  const renderDecoration = (fn, editor) => props => {
+    const { children, decoration: deco } = props
 
-    if (mark.type === 'placeholder' && mark.data.get('key') === instanceId) {
+    if (deco.type === 'placeholder' && deco.data.get('key') === instanceId) {
       const placeHolderStyle = {
         pointerEvents: 'none',
         display: 'inline-block',
@@ -82,6 +82,7 @@ function SlateReactPlaceholder(options = {}) {
         maxWidth: '100%',
         whiteSpace: 'nowrap',
         opacity: '0.333',
+        verticalAlign: 'text-top',
         ...style,
       }
 
@@ -104,7 +105,7 @@ function SlateReactPlaceholder(options = {}) {
    * @return {Object}
    */
 
-  return { decorateNode, renderMark }
+  return { decorateNode, renderDecoration }
 }
 
 /**

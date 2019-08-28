@@ -73,6 +73,62 @@ Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
 }
 
 /**
+ * Sets specific set of marks on the path
+ * @param {Editor} editor
+ * @param {Array} path
+ * @param {Number} offset
+ * @param {Number} length
+ * @param {Array<Object|Mark>} marks
+ */
+
+Commands.replaceMarksByPath = (editor, path, offset, length, marks) => {
+  const marksSet = Mark.createSet(marks)
+
+  const { value } = editor
+  const { document } = value
+  const node = document.assertNode(path)
+
+  if (node.marks.equals(marksSet)) {
+    return
+  }
+
+  editor.withoutNormalizing(() => {
+    // If it ends before the end of the node, we'll need to split to create a new
+    // text with different marks.
+    if (offset + length < node.text.length) {
+      editor.splitNodeByPath(path, offset + length)
+    }
+
+    // Same thing if it starts after the start. But in that case, we need to
+    // update our path and offset to point to the new start.
+    if (offset > 0) {
+      editor.splitNodeByPath(path, offset)
+      path = Path.increment(path)
+      offset = 0
+    }
+
+    const marksToApply = marksSet.subtract(node.marks)
+    const marksToRemove = node.marks.subtract(marksSet)
+
+    marksToRemove.forEach(mark => {
+      editor.applyOperation({
+        type: 'remove_mark',
+        path,
+        mark: Mark.create(mark),
+      })
+    })
+
+    marksToApply.forEach(mark => {
+      editor.applyOperation({
+        type: 'add_mark',
+        path,
+        mark: Mark.create(mark),
+      })
+    })
+  })
+}
+
+/**
  * Insert a `fragment` at `index` in a node by `path`.
  *
  * @param {Array} path
@@ -184,8 +240,8 @@ Commands.insertTextByPath = (fn, editor) => (path, offset, text, marks) => {
       text,
     })
 
-    if (marks.size) {
-      editor.addMarksByPath(path, offset, text.length, marks)
+    if (marks) {
+      editor.replaceMarksByPath(path, offset, text.length, marks)
     }
   })
 }
@@ -334,6 +390,10 @@ Commands.removeMarksByPath = (fn, editor) => (path, offset, length, marks) => {
   marks = marks.intersect(node.marks)
 
   if (!marks.size) {
+    return
+  }
+
+  if (marks.intersect(node.marks).isEmpty()) {
     return
   }
 
@@ -830,6 +890,7 @@ const COMMANDS = [
   'removeMark',
   'removeNode',
   'removeText',
+  'replaceMarks',
   'replaceNode',
   'replaceText',
   'setMark',

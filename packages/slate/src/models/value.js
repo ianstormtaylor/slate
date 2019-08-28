@@ -69,7 +69,7 @@ class Value extends Record(DEFAULTS) {
     if (isPlainObject(a)) {
       const p = {}
       if ('annotations' in a)
-        p.annotations = Annotation.createList(a.annotations)
+        p.annotations = Annotation.createMap(a.annotations)
       if ('data' in a) p.data = Data.create(a.data)
       return p
     }
@@ -586,18 +586,18 @@ class Value extends Record(DEFAULTS) {
     value = value.set('document', document)
 
     value = value.mapRanges(range => {
-      const { start, end } = range
+      const { anchor, focus } = range
 
-      if (node.hasNode(start.key)) {
+      if (node.hasNode(anchor.key)) {
         range = prev
-          ? range.moveStartTo(prev.key, prev.text.length)
-          : next ? range.moveStartTo(next.key, 0) : range.unset()
+          ? range.moveAnchorTo(prev.key, prev.text.length)
+          : next ? range.moveAnchorTo(next.key, 0) : range.unset()
       }
 
-      if (node.hasNode(end.key)) {
+      if (node.hasNode(focus.key)) {
         range = prev
-          ? range.moveEndTo(prev.key, prev.text.length)
-          : next ? range.moveEndTo(next.key, 0) : range.unset()
+          ? range.moveFocusTo(prev.key, prev.text.length)
+          : next ? range.moveFocusTo(next.key, 0) : range.unset()
       }
 
       range = range.updatePoints(point => point.setPath(null))
@@ -783,6 +783,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { annotations } = value
     const { key } = annotation
+    annotation = annotation.updatePoints(point => point.normalize(document))
     annotations = annotations.set(key, annotation)
     value = value.set('annotations', annotations)
     return value

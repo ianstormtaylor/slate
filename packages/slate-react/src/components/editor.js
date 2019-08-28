@@ -5,9 +5,11 @@ import Types from 'prop-types'
 import invariant from 'tiny-invariant'
 import memoizeOne from 'memoize-one'
 import warning from 'tiny-warning'
+import omit from 'lodash/omit'
 import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import OTHER_HANDLERS from '../constants/other-handlers'
 import Content from './content'
 import ReactPlugin from '../plugins/react'
 
@@ -50,6 +52,10 @@ class Editor extends React.Component {
     tabIndex: Types.number,
     value: SlateTypes.value,
     ...EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = Types.func
+      return obj
+    }, {}),
+    ...OTHER_HANDLERS.reduce((obj, handler) => {
       obj[handler] = Types.func
       return obj
     }, {}),
@@ -145,7 +151,15 @@ class Editor extends React.Component {
 
     // Re-resolve the controller if needed based on memoized props.
     const { commands, placeholder, plugins, queries, schema } = this.props
-    this.resolveController(plugins, schema, commands, queries, placeholder)
+
+    this.resolveController(
+      plugins,
+      schema,
+      commands,
+      queries,
+      placeholder,
+      ReactPlugin
+    )
 
     // Set the current props on the controller.
     const { options, readOnly, value: valueFromProps } = this.props
@@ -166,8 +180,11 @@ class Editor extends React.Component {
       tagName,
     } = this.props
 
+    const domProps = omit(this.props, Object.keys(Editor.propTypes))
+
     const children = (
       <Content
+        {...domProps}
         ref={this.tmp.contentRef}
         autoCorrect={autoCorrect}
         className={className}
@@ -208,7 +225,7 @@ class Editor extends React.Component {
    */
 
   resolveController = memoizeOne(
-    (plugins = [], schema, commands, queries, placeholder) => {
+    (plugins = [], schema, commands, queries, placeholder, TheReactPlugin) => {
       // If we've resolved a few times already, and it's exactly in line with
       // the updates, then warn the user that they may be doing something wrong.
       warning(
@@ -217,8 +234,9 @@ class Editor extends React.Component {
       )
 
       this.tmp.resolves++
-      const react = ReactPlugin({
+      const react = TheReactPlugin({
         ...this.props,
+        editor: this,
         value: this.props.value || this.state.value,
       })
 

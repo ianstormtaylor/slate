@@ -3,7 +3,7 @@ import invariant from 'tiny-invariant'
 import warning from 'tiny-warning'
 import { Value } from 'slate'
 
-import findPath from './find-node'
+import findPath from './find-path'
 import findRange from './find-range'
 
 /**
@@ -50,13 +50,11 @@ function getEventRange(event, editor) {
         : y - rect.top < rect.top + rect.height - y
 
     const range = document.createRange()
-    const iterable = isPrevious ? 'previousTexts' : 'nextTexts'
     const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
-    const entry = document[iterable](path)
+    const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](path)
 
     if (entry) {
-      const [n] = entry
-      return range[move](n)
+      return range[move](entry)
     }
 
     return null

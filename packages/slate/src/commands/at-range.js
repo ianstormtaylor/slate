@@ -1,4 +1,3 @@
-import { List } from 'immutable'
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'

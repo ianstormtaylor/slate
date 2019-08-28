@@ -376,6 +376,9 @@ function transform(path, operation) {
     type === 'set_node' ||
     type === 'set_selection' ||
     type === 'set_value' ||
+    type === 'add_annotation' ||
+    type === 'remove_annotation' ||
+    type === 'set_annotation' ||
     path.size === 0
   ) {
     return List([path])

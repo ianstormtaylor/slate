@@ -177,9 +177,9 @@ class Node extends React.Component {
       const sel = selection && getRelativeRange(node, i, selection)
 
       const decs = newDecorations
+        .concat(decorations)
         .map(d => getRelativeRange(node, i, d))
         .filter(d => d)
-        .concat(decorations)
 
       const anns = annotations
         .map(a => getRelativeRange(node, i, a))
@@ -288,11 +288,11 @@ function getRelativeRange(node, index, range) {
     start = start.setPath(startPath.rest())
   } else if (startIndex < index && index <= endIndex) {
     if (child.object === 'text') {
-      start = start.moveTo(PathUtils.create([index]), 0)
+      start = start.moveTo(PathUtils.create([index]), 0).setKey(child.key)
     } else {
       const [first] = child.texts()
-      const [, firstPath] = first
-      start = start.moveTo(firstPath, 0)
+      const [firstNode, firstPath] = first
+      start = start.moveTo(firstPath, 0).setKey(firstNode.key)
     }
   } else {
     start = null
@@ -302,11 +302,12 @@ function getRelativeRange(node, index, range) {
     end = end.setPath(endPath.rest())
   } else if (startIndex <= index && index < endIndex) {
     if (child.object === 'text') {
-      end = end.moveTo(PathUtils.create([index]), child.text.length)
+      const length = child.text.length
+      end = end.moveTo(PathUtils.create([index]), length).setKey(child.key)
     } else {
       const [last] = child.texts({ direction: 'backward' })
       const [lastNode, lastPath] = last
-      end = end.moveTo(lastPath, lastNode.text.length)
+      end = end.moveTo(lastPath, lastNode.text.length).setKey(lastNode.key)
     }
   } else {
     end = null
@@ -316,8 +317,8 @@ function getRelativeRange(node, index, range) {
     return null
   }
 
-  range = range.setStart(start)
-  range = range.setEnd(end)
+  range = range.setAnchor(start)
+  range = range.setFocus(end)
   return range
 }
 

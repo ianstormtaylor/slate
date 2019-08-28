@@ -34,7 +34,7 @@ Changing values requires you to use the [`Immutable.Record` API](https://immutab
 
 Collections of Slate objects are represented as immutable `Lists`, `Sets`, `Stacks`, etc, which means we enjoy expressive methods like `filter`, `includes`, `take`, `skip`, `rest` and `last`.
 
-If you haven't used [`Immutable.js`](https://immutable-js.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://immutable-js.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is is well worth the investment!
+If you haven't used [`Immutable.js`](https://immutable-js.github.io/immutable-js/) before, there is definitely a learning curve. Before you dive into Slate, you are encouraged to become familiar the [Immutable.js documentation](https://immutable-js.github.io/immutable-js/docs/#/). Once you get the hang of the Immutable JS API you'll be quite productive. It might take a few days to get used to Immutable JS. And, you might write some suboptimal code at first. Don't let this discourage you! Learning Immutable JS is well worth the investment!
 
 ## The "Value"
 
@@ -103,7 +103,7 @@ Marks are how Slate represents formatting data that is attached to the character
 
 There are multiple techniques you might choose to format or style text. You can implement styling based on inlines or marks. Unlike inlines, marks do not affect the structure of the nodes in the document. Marks simply attach themselves to the characters.
 
-Marks may be easier to reason about and manipulate because marks do not affect the structure of the document and are associated to the characters. Marks an be applied to characters no matter how the characters are nested in the document. If you can express it as a `Range`, you can add marks to it. Working with marks instead of inlines does not require you to edit the document's structure, split existing nodes, determine where nodes are in the hierarchy, or other more complex interactions.
+Marks may be easier to reason about and manipulate because marks do not affect the structure of the document and are associated to the characters. Marks can be applied to characters no matter how the characters are nested in the document. If you can express it as a `Range`, you can add marks to it. Working with marks instead of inlines does not require you to edit the document's structure, split existing nodes, determine where nodes are in the hierarchy, or other more complex interactions.
 
 When marks are rendered, the characters are grouped into "leaves" of text that each contain the same set of marks applied to them. One disadvantage of marks is that you cannot guarantee how a set of marks will be ordered.
 

@@ -7,7 +7,7 @@
 function RestoreDOMPlugin() {
   return {
     restoreDOM: (fn, editor) => () => {
-      editor.setState({ contentKey: editor.state.contentKey + 1 })
+      editor.tmp.contentRef.current.tmp++
     },
   }
 }
