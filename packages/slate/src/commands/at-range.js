@@ -404,20 +404,29 @@ Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
   const [, blockPath] = document.closestBlock(start.path)
   const afterPath = Path.increment(blockPath)
   const insertionMode = getInsertionMode(editor, range)
+  let targetPath
 
-  if (insertionMode === 'before') {
-    editor.insertNodeByPath(blockPath, block)
-  } else if (insertionMode === 'after') {
-    editor.insertNodeByPath(afterPath, block)
-  } else {
-    const point =
-      editor.getNextNonVoidPoint(start) || editor.getPreviousNonVoidPoint(start)
+  editor.withoutNormalizing(() => {
+    if (insertionMode === 'before') {
+      targetPath = blockPath
+    } else if (insertionMode === 'after') {
+      targetPath = afterPath
+    } else {
+      const splitPoint =
+        editor.getNextNonVoidPoint(start) ||
+        editor.getPreviousNonVoidPoint(start)
 
-    editor.withoutNormalizing(() => {
-      editor.splitDescendantsByPath(blockPath, point.path, point.offset)
-      editor.insertNodeByPath(afterPath, block)
-    })
-  }
+      editor.splitDescendantsByPath(
+        blockPath,
+        splitPoint.path,
+        splitPoint.offset
+      )
+
+      targetPath = afterPath
+    }
+
+    editor.insertNodeByPath(targetPath, block)
+  })
 }
 
 /**
