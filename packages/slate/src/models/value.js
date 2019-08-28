@@ -124,313 +124,6 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the current start text node's closest block parent.
-   *
-   * @return {Block}
-   */
-
-  get startBlock() {
-    return (
-      this.selection.start.path &&
-      this.document.getClosestBlock(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the current end text node's closest block parent.
-   *
-   * @return {Block}
-   */
-
-  get endBlock() {
-    return (
-      this.selection.end.path &&
-      this.document.getClosestBlock(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the current anchor text node's closest block parent.
-   *
-   * @return {Block}
-   */
-
-  get anchorBlock() {
-    return (
-      this.selection.anchor.path &&
-      this.document.getClosestBlock(this.selection.anchor.path)
-    )
-  }
-
-  /**
-   * Get the current focus text node's closest block parent.
-   *
-   * @return {Block}
-   */
-
-  get focusBlock() {
-    return (
-      this.selection.focus.path &&
-      this.document.getClosestBlock(this.selection.focus.path)
-    )
-  }
-
-  /**
-   * Get the current start text node's closest inline parent.
-   *
-   * @return {Inline}
-   */
-
-  get startInline() {
-    return (
-      this.selection.start.path &&
-      this.document.getClosestInline(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the current end text node's closest inline parent.
-   *
-   * @return {Inline}
-   */
-
-  get endInline() {
-    return (
-      this.selection.end.path &&
-      this.document.getClosestInline(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the current anchor text node's closest inline parent.
-   *
-   * @return {Inline}
-   */
-
-  get anchorInline() {
-    return (
-      this.selection.anchor.path &&
-      this.document.getClosestInline(this.selection.anchor.path)
-    )
-  }
-
-  /**
-   * Get the current focus text node's closest inline parent.
-   *
-   * @return {Inline}
-   */
-
-  get focusInline() {
-    return (
-      this.selection.focus.path &&
-      this.document.getClosestInline(this.selection.focus.path)
-    )
-  }
-
-  /**
-   * Get the current start text node.
-   *
-   * @return {Text}
-   */
-
-  get startText() {
-    return (
-      this.selection.start.path &&
-      this.document.getDescendant(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the current end node.
-   *
-   * @return {Text}
-   */
-
-  get endText() {
-    return (
-      this.selection.end.path &&
-      this.document.getDescendant(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the current anchor node.
-   *
-   * @return {Text}
-   */
-
-  get anchorText() {
-    return (
-      this.selection.anchor.path &&
-      this.document.getDescendant(this.selection.anchor.path)
-    )
-  }
-
-  /**
-   * Get the current focus node.
-   *
-   * @return {Text}
-   */
-
-  get focusText() {
-    return (
-      this.selection.focus.path &&
-      this.document.getDescendant(this.selection.focus.path)
-    )
-  }
-
-  /**
-   * Get the next block node.
-   *
-   * @return {Block}
-   */
-
-  get nextBlock() {
-    return (
-      this.selection.end.path &&
-      this.document.getNextBlock(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the previous block node.
-   *
-   * @return {Block}
-   */
-
-  get previousBlock() {
-    return (
-      this.selection.start.path &&
-      this.document.getPreviousBlock(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the next inline node.
-   *
-   * @return {Inline}
-   */
-
-  get nextInline() {
-    return (
-      this.selection.end.path &&
-      this.document.getNextInline(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the previous inline node.
-   *
-   * @return {Inline}
-   */
-
-  get previousInline() {
-    return (
-      this.selection.start.path &&
-      this.document.getPreviousInline(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the next text node.
-   *
-   * @return {Text}
-   */
-
-  get nextText() {
-    return (
-      this.selection.end.path &&
-      this.document.getNextText(this.selection.end.path)
-    )
-  }
-
-  /**
-   * Get the previous text node.
-   *
-   * @return {Text}
-   */
-
-  get previousText() {
-    return (
-      this.selection.start.path &&
-      this.document.getPreviousText(this.selection.start.path)
-    )
-  }
-
-  /**
-   * Get the marks of the current selection.
-   *
-   * @return {Set<Mark>}
-   */
-
-  get marks() {
-    return this.selection.isUnset
-      ? new Set()
-      : this.selection.marks || this.document.getMarksAtRange(this.selection)
-  }
-
-  /**
-   * Get the active marks of the current selection.
-   *
-   * @return {Set<Mark>}
-   */
-
-  get activeMarks() {
-    return this.selection.isUnset
-      ? new Set()
-      : this.selection.marks ||
-          this.document.getActiveMarksAtRange(this.selection)
-  }
-
-  /**
-   * Get the block nodes in the current selection.
-   *
-   * @return {List<Block>}
-   */
-
-  get blocks() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getLeafBlocksAtRange(this.selection)
-  }
-
-  /**
-   * Get the fragment of the current selection.
-   *
-   * @return {Document}
-   */
-
-  get fragment() {
-    return this.selection.isUnset
-      ? Document.create()
-      : this.document.getFragmentAtRange(this.selection)
-  }
-
-  /**
-   * Get the bottom-most inline nodes in the current selection.
-   *
-   * @return {List<Inline>}
-   */
-
-  get inlines() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getLeafInlinesAtRange(this.selection)
-  }
-
-  /**
-   * Get the text nodes in the current selection.
-   *
-   * @return {List<Text>}
-   */
-
-  get texts() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getTextsAtRange(this.selection)
-  }
-
-  /**
    * Return a JSON representation of the value.
    *
    * @param {Object} options
@@ -463,6 +156,289 @@ class Value extends Record(DEFAULTS) {
   /**
    * Deprecated.
    */
+
+  get startBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.startBlock` property is depreacted. Use `document.closestBlock()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getClosestBlock(this.selection.start.path)
+    )
+  }
+
+  get endBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.endBlock` property is depreacted. Use `document.closestBlock()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getClosestBlock(this.selection.end.path)
+    )
+  }
+
+  get anchorBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.anchorBlock` property is depreacted. Use `document.closestBlock()` instead.'
+    )
+
+    return (
+      this.selection.anchor.path &&
+      this.document.getClosestBlock(this.selection.anchor.path)
+    )
+  }
+
+  get focusBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.focusBlock` property is depreacted. Use `document.closestBlock()` instead.'
+    )
+
+    return (
+      this.selection.focus.path &&
+      this.document.getClosestBlock(this.selection.focus.path)
+    )
+  }
+
+  get startInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.startInline` property is depreacted. Use `document.closestInline()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getClosestInline(this.selection.start.path)
+    )
+  }
+
+  get endInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.endInline` property is depreacted. Use `document.closestInline()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getClosestInline(this.selection.end.path)
+    )
+  }
+
+  get anchorInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.anchorInline` property is depreacted. Use `document.closestInline()` instead.'
+    )
+
+    return (
+      this.selection.anchor.path &&
+      this.document.getClosestInline(this.selection.anchor.path)
+    )
+  }
+
+  get focusInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.focusInline` property is depreacted. Use `document.closestInline()` instead.'
+    )
+
+    return (
+      this.selection.focus.path &&
+      this.document.getClosestInline(this.selection.focus.path)
+    )
+  }
+
+  get startText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.startText` property is depreacted. Use `document.getNode()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getDescendant(this.selection.start.path)
+    )
+  }
+
+  get endText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.endText` property is depreacted. Use `document.getNode()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getDescendant(this.selection.end.path)
+    )
+  }
+
+  get anchorText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.anchorText` property is depreacted. Use `document.getNode()` instead.'
+    )
+
+    return (
+      this.selection.anchor.path &&
+      this.document.getDescendant(this.selection.anchor.path)
+    )
+  }
+
+  get focusText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.focusText` property is depreacted. Use `document.getNode()` instead.'
+    )
+
+    return (
+      this.selection.focus.path &&
+      this.document.getDescendant(this.selection.focus.path)
+    )
+  }
+
+  get nextBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.nextBlock` property is depreacted. Use `document.nextBlock()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getNextBlock(this.selection.end.path)
+    )
+  }
+
+  get previousBlock() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.previousBlock` property is depreacted. Use `document.previousBlock()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getPreviousBlock(this.selection.start.path)
+    )
+  }
+
+  get nextInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.nextInline` property is depreacted. Use `document.nextInline()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getNextInline(this.selection.end.path)
+    )
+  }
+
+  get previousInline() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.previousInline` property is depreacted. Use `document.previousInline()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getPreviousInline(this.selection.start.path)
+    )
+  }
+
+  get nextText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.nextText` property is depreacted. Use `document.nextText()` instead.'
+    )
+
+    return (
+      this.selection.end.path &&
+      this.document.getNextText(this.selection.end.path)
+    )
+  }
+
+  get previousText() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.previousText` property is depreacted. Use `document.previousText()` instead.'
+    )
+
+    return (
+      this.selection.start.path &&
+      this.document.getPreviousText(this.selection.start.path)
+    )
+  }
+
+  get marks() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.marks` property is depreacted. Use `document.marks()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks || this.document.getMarksAtRange(this.selection)
+  }
+
+  get activeMarks() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.activeMarks` property is depreacted. Use `document.getActiveMarksAtRange()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? new Set()
+      : this.selection.marks ||
+          this.document.getActiveMarksAtRange(this.selection)
+  }
+
+  get blocks() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.blocks` property is depreacted. Use `document.blocks()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getLeafBlocksAtRange(this.selection)
+  }
+
+  get fragment() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.fragment` property is depreacted. Use `document.getFragmentAtRange()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? Document.create()
+      : this.document.getFragmentAtRange(this.selection)
+  }
+
+  get inlines() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.inline` property is depreacted. Use `document.inline()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getLeafInlinesAtRange(this.selection)
+  }
+
+  get texts() {
+    warning(
+      false,
+      'As of slate@0.48, the `value.texts` property is depreacted. Use `document.texts()` instead.'
+    )
+
+    return this.selection.isUnset
+      ? new List()
+      : this.document.getTextsAtRange(this.selection)
+  }
 
   mapRanges(iterator) {
     warning(
@@ -781,7 +757,7 @@ class Value extends Record(DEFAULTS) {
 
     annotation = Annotation.create(annotation)
     let value = this
-    let { annotations } = value
+    let { annotations, document } = value
     const { key } = annotation
     annotation = annotation.updatePoints(point => point.normalize(document))
     annotations = annotations.set(key, annotation)

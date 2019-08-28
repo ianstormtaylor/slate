@@ -1,7 +1,6 @@
 import Debug from 'debug'
 
 import Annotation from '../models/annotation'
-import Node from '../models/node'
 import Operation from '../models/operation'
 import Mark from '../models/mark'
 import PathUtils from '../utils/path-utils'
