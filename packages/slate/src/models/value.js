@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { Record, Set, List } from 'immutable'
 
 import Annotation from './annotation'
@@ -350,7 +351,7 @@ class Value extends Record(DEFAULTS) {
    */
 
   get marks() {
-    invariant(
+    warning(
       false,
       'As of Slate 0.48, the `value.marks` property no longer exists. Use `value.getMarks(editor)` instead.'
     )
@@ -364,7 +365,7 @@ class Value extends Record(DEFAULTS) {
    */
 
   get activeMarks() {
-    invariant(
+    warning(
       false,
       'As of Slate 0.48, the `value.activeMarks` property no longer exists. Use `value.getActiveMarks(editor)` instead.'
     )
@@ -393,7 +394,7 @@ class Value extends Record(DEFAULTS) {
    */
 
   get fragment() {
-    invariant(
+    warning(
       false,
       'As of Slate 0.48, the `value.fragment` property no longer exists. Use `value.getFragment(editor)` instead.'
     )
