@@ -9,18 +9,18 @@ import PathUtils from '../utils/path-utils'
 const Queries = {}
 
 /**
- * Returns the point closest to a point where text can be
- * inserted. When the point is ambiguous (for example, in between two
- * nodes), it will be normalized to the beginning of the following
+ * Returns the point closest to a point, under a node, where text can
+ * be inserted. When the point is ambiguous (for example, in between
+ * two nodes), it will be normalized to the beginning of the following
  * node.
  *
  * @param {Editor} editor
  * @param {Point} point
- * @param {Node} node (optional)
+ * @param {Node} node
  * @return {Point}
  */
 
-Queries.getInsertionPoint = (editor, point, node = editor.value.document) => {
+Queries.getInsertPoint = (editor, point, node) => {
   let resolvedPoint = point.resolveToTextNode(node)
   if (resolvedPoint.path == null) return resolvedPoint
 

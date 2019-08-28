@@ -24,7 +24,7 @@ function deleteExpandedAtRange(editor, range) {
   if (document.hasDescendant(start.path)) {
     range = range.moveToStart()
   } else {
-    range = editor.getInsertionPoint(range.moveTo(end.path, 0))
+    range = editor.getInsertPoint(range.moveTo(end.path, 0), document)
   }
 
   return range

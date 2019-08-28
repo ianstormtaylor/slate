@@ -424,7 +424,7 @@ class Point extends Record(DEFAULTS) {
   normalize(point) {
     warning(
       false,
-      'As of slate@0.48 the `normalize` method has been deprecated. Use the `getInsertionPoint` editor query instead.'
+      'As of slate@0.48 the `normalize` method has been deprecated. Use the `getInsertPoint` editor query instead.'
     )
 
     return this.resolveToTextNode(point)

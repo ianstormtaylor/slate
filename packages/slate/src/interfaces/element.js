@@ -1757,12 +1757,12 @@ class ElementInterface {
     if (editor == null) {
       warning(
         false,
-        'As of slate@0.48 the `resolvePoint` method takes an `Editor` as an argument. You should use the `getInsertionPoint` Editor query instead.'
+        'As of slate@0.48 the `resolvePoint` method takes an `Editor` as an argument. You should use the `getInsertPoint` Editor query instead.'
       )
 
       point = point.resolveToTextNode(this)
     } else {
-      point = editor.getInsertionPoint(point, this)
+      point = editor.getInsertPoint(point, this)
     }
 
     return point
