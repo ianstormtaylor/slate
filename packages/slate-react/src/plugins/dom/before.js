@@ -35,8 +35,6 @@ function BeforePlugin() {
    * On before input.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onBeforeInput = (fn, editor) => event => {
@@ -56,8 +54,6 @@ function BeforePlugin() {
    * On blur.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onBlur = (fn, editor) => event => {
@@ -105,8 +101,6 @@ function BeforePlugin() {
    * On composition end.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onCompositionEnd = (fn, editor) => event => {
@@ -128,8 +122,6 @@ function BeforePlugin() {
    * On click.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onClick = (fn, editor) => event => {
@@ -141,8 +133,6 @@ function BeforePlugin() {
    * On composition start.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onCompositionStart = (fn, editor) => event => {
@@ -171,8 +161,6 @@ function BeforePlugin() {
    * On copy.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onCopy = (fn, editor) => event => {
@@ -188,8 +176,6 @@ function BeforePlugin() {
    * On cut.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onCut = (fn, editor) => event => {
@@ -207,8 +193,6 @@ function BeforePlugin() {
    * On drag end.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragEnd = (fn, editor) => event => {
@@ -221,8 +205,6 @@ function BeforePlugin() {
    * On drag enter.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragEnter = (fn, editor) => event => {
@@ -234,8 +216,6 @@ function BeforePlugin() {
    * On drag exit.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragExit = (fn, editor) => event => {
@@ -247,8 +227,6 @@ function BeforePlugin() {
    * On drag leave.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragLeave = (fn, editor) => event => {
@@ -260,8 +238,6 @@ function BeforePlugin() {
    * On drag over.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragOver = (fn, editor) => event => {
@@ -302,8 +278,6 @@ function BeforePlugin() {
    * On drag start.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDragStart = (fn, editor) => event => {
@@ -316,8 +290,6 @@ function BeforePlugin() {
    * On drop.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onDrop = (fn, editor) => event => {
@@ -334,8 +306,6 @@ function BeforePlugin() {
    * On focus.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onFocus = (fn, editor) => event => {
@@ -364,8 +334,6 @@ function BeforePlugin() {
    * On input.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onInput = (fn, editor) => event => {
@@ -379,8 +347,6 @@ function BeforePlugin() {
    * On key down.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onKeyDown = (fn, editor) => event => {
@@ -420,11 +386,20 @@ function BeforePlugin() {
   }
 
   /**
+   * On key up.
+   *
+   * @param {Event} event
+   */
+
+  const onKeyUp = (fn, editor) => event => {
+    debug('onKeyUp', { event })
+    fn(event)
+  }
+
+  /**
    * On paste.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onPaste = (fn, editor) => event => {
@@ -441,8 +416,6 @@ function BeforePlugin() {
    * On select.
    *
    * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
    */
 
   const onSelect = (fn, editor) => event => {
@@ -483,6 +456,7 @@ function BeforePlugin() {
     onFocus,
     onInput,
     onKeyDown,
+    onKeyUp,
     onPaste,
     onSelect,
   }

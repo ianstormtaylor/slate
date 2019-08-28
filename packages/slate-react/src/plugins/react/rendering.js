@@ -47,6 +47,12 @@ function Rendering() {
     renderMark: () => ({ attributes, children }) => {
       return <span {...attributes}>{children}</span>
     },
+
+    onRender: () => () => {},
+    onComponentDidMount: () => () => {},
+    onComponentDidUpdate: () => () => {},
+    onComponentWillUnmount: () => () => {},
+    shouldNodeComponentUpdate: () => () => {},
   }
 }
 

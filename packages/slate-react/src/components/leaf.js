@@ -73,7 +73,7 @@ const Leaf = props => {
 
   let children
 
-  if (editor.query('isVoid', parent)) {
+  if (editor.exec('isVoid', parent)) {
     // COMPAT: Render text inside void nodes with a zero-width space.
     // So the node can contain selection but the text is not visible.
     children = <ZeroWidthString length={parent.text.length} />
@@ -121,7 +121,7 @@ const Leaf = props => {
   // in certain misbehaving browsers they aren't weirdly cloned/destroyed by
   // contenteditable behaviors. (2019/05/08)
   for (const mark of marks) {
-    const ret = editor.run('renderMark', {
+    const ret = editor.exec('renderMark', {
       ...renderProps,
       mark,
       children,
@@ -136,7 +136,7 @@ const Leaf = props => {
   }
 
   for (const decoration of decorations) {
-    const ret = editor.run('renderDecoration', {
+    const ret = editor.exec('renderDecoration', {
       ...renderProps,
       decoration,
       children,
@@ -151,7 +151,7 @@ const Leaf = props => {
   }
 
   for (const annotation of annotations) {
-    const ret = editor.run('renderAnnotation', {
+    const ret = editor.exec('renderAnnotation', {
       ...renderProps,
       annotation,
       children,

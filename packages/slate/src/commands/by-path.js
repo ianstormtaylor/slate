@@ -81,7 +81,7 @@ Commands.addMarksByPath = (fn, editor) => (path, offset, length, marks) => {
  * @param {Array<Object|Mark>} marks
  */
 
-Commands.replaceMarksByPath = (editor, path, offset, length, marks) => {
+Commands.replaceMarksByPath = (fn, editor) => (path, offset, length, marks) => {
   const marksSet = Mark.createSet(marks)
 
   const { value } = editor

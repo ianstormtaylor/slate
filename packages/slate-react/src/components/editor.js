@@ -110,7 +110,7 @@ class Editor extends React.Component {
     this.tmp.updates++
 
     if (this.props.autoFocus) {
-      this.focus()
+      this.exec('focus')
     }
 
     if (this.tmp.change) {
@@ -234,6 +234,7 @@ class Editor extends React.Component {
       )
 
       this.tmp.resolves++
+
       const react = TheReactPlugin({
         ...this.props,
         editor: this,

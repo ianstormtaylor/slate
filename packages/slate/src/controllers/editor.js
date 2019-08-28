@@ -686,6 +686,7 @@ function registerHandler(editor, controller, name, fn) {
   const existing = editor.handlers[name] || noop
   editor.handlers[name] = fn(existing, controller)
   editor[name] = editor[name] || ((...args) => editor.exec(name, ...args))
+  controller[name] = editor[name]
 }
 
 function noop() {}

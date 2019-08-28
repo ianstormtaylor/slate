@@ -57,7 +57,7 @@ Commands.setAnnotation = (fn, editor) => (annotation, newProperties) => {
   })
 }
 
-Commands.setAnnotations = (editor, annotations = []) => {
+Commands.setAnnotations = (fn, editor) => (annotations = []) => {
   const { value } = editor
   const newProperties = Value.createProperties({ annotations })
   const prevProperties = pick(value, Object.keys(newProperties))

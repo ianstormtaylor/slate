@@ -24,8 +24,8 @@ function SlateReactPlaceholder(options = {}) {
   )
 
   invariant(
-    typeof when === 'string' || typeof when === 'function',
-    'You must pass `SlateReactPlaceholder` an `options.when` query.'
+    typeof when === 'function',
+    'You must pass `SlateReactPlaceholder` an `options.when` matching function.'
   )
 
   /**
@@ -40,7 +40,7 @@ function SlateReactPlaceholder(options = {}) {
   const decorateNode = (fn, editor) => node => {
     const others = fn(node)
 
-    if (!editor.query(when, node)) {
+    if (!when(editor, node)) {
       return others
     }
 

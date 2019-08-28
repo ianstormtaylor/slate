@@ -84,7 +84,7 @@ class Node extends React.Component {
   shouldComponentUpdate(nextProps) {
     const { props } = this
     const { editor } = props
-    const shouldUpdate = editor.run(
+    const shouldUpdate = editor.exec(
       'shouldNodeComponentUpdate',
       props,
       nextProps
@@ -234,7 +234,7 @@ class Node extends React.Component {
       render = 'renderInline'
     }
 
-    const element = editor.run(render, {
+    const element = editor.exec(render, {
       attributes,
       children,
       editor,
@@ -245,7 +245,7 @@ class Node extends React.Component {
       readOnly,
     })
 
-    return editor.isVoid(node) ? (
+    return editor.exec('isVoid', node) ? (
       <Void
         {...this.props}
         textRef={ref => {
