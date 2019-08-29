@@ -1,3 +1,5 @@
+import { Set } from 'immutable'
+
 import Block from '../models/block'
 import Inline from '../models/inline'
 import Mark from '../models/mark'
@@ -382,10 +384,12 @@ Commands.splitInline = (fn, editor) => height => {
 
 Commands.toggleMark = (fn, editor) => mark => {
   mark = Mark.create(mark)
-  const { value } = editor
-  const exists = value.activeMarks.has(mark)
+  const { value: { document, selection } } = editor
+  const activeMarks = selection.isUnset
+    ? new Set()
+    : selection.marks || document.getActiveMarksAtRange(selection)
 
-  if (exists) {
+  if (activeMarks.has(mark)) {
     editor.removeMark(mark)
   } else {
     editor.addMark(mark)

@@ -24,9 +24,7 @@ export const output = (
     <document>
       <paragraph>
         one
-        <i>
-          <b>three</b>
-        </i>
+        <i>three</i>
         <b>
           <cursor />wo
         </b>

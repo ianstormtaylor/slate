@@ -5,11 +5,10 @@ import { Point, Range } from 'slate'
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  const { key } = editor.value.document.getFirstText()
-  const range = new Range({
-    anchor: new Point({ key, offset: 2, path: [key] }),
-    focus: new Point({ key, offset: 2, path: [key] }),
-  })
+  const { value: { document } } = editor
+  const [firstText, firstPath] = document.firstText()
+  const point = Point.create({ key: firstText.key, offset: 2, path: firstPath })
+  const range = Range.create({ anchor: point, focus: point })
   editor.deleteBackwardAtRange(range, 2)
 }
 
@@ -18,7 +17,7 @@ export const input = (
     <document>
       <paragraph>
         <paragraph>
-          Sample <cursor />Text
+          one<cursor />two
         </paragraph>
       </paragraph>
     </document>
@@ -30,7 +29,7 @@ export const output = (
     <document>
       <paragraph>
         <paragraph>
-          mple <cursor />Text
+          e<cursor />two
         </paragraph>
       </paragraph>
     </document>

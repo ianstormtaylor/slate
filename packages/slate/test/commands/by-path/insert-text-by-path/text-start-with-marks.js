@@ -10,9 +10,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <text key="a" marks={[{ type: 'bold' }]}>
+        <b>
           wo<cursor />rd
-        </text>
+        </b>
       </paragraph>
     </document>
   </value>
@@ -22,8 +22,8 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        <b>
-          awo<cursor />rd
+        a<b>
+          wo<cursor />rd
         </b>
       </paragraph>
     </document>
