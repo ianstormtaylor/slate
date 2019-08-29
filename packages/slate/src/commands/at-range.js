@@ -153,21 +153,21 @@ Commands.deleteAtRange = (fn, editor) => range => {
           // Don't split yet, since we're too high up.
         } else if (splitEnd && splitStart) {
           const newPath = Path.increment(path)
-          editor.splitDescendantsByPath(path, end.path, end.offset)
-          editor.splitDescendantsByPath(path, start.path, start.offset)
+          editor.splitNodeAtPoint(end, path)
+          editor.splitNodeAtPoint(start, path)
           editor.removeNodeByPath(newPath)
         } else if (
           splitEnd ||
           (isAtEnd && !splitStart && endBlock.nodes.size === 1)
         ) {
-          editor.splitDescendantsByPath(path, end.path, end.offset)
+          editor.splitNodeAtPoint(end, path)
           editor.removeNodeByPath(path)
         } else if (
           splitStart ||
           (isAtStart && !splitEnd && startBlock.nodes.size === 1)
         ) {
           const newPath = Path.increment(path)
-          editor.splitDescendantsByPath(path, start.path, start.offset)
+          editor.splitNodeAtPoint(start, path)
           editor.removeNodeByPath(newPath)
         } else if (
           isAtStart ||
@@ -419,12 +419,7 @@ Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
         editor.getNextNonVoidPoint(start) ||
         editor.getPreviousNonVoidPoint(start)
 
-      editor.splitDescendantsByPath(
-        closestBlockPath,
-        splitPoint.path,
-        splitPoint.offset
-      )
-
+      editor.splitNodeAtPoint(splitPoint, closestBlockPath)
       targetPath = Path.increment(closestBlockPath)
     }
 
@@ -648,7 +643,7 @@ Commands.splitBlockAtRange = (fn, editor) => (range, height = 1) => {
     }
 
     if (targetPath) {
-      editor.splitDescendantsByPath(targetPath, start.path, start.offset)
+      editor.splitNodeAtPoint(start, targetPath)
     }
   })
 }
@@ -678,7 +673,7 @@ Commands.splitInlineAtRange = (fn, editor) => (range, height = Infinity) => {
     }
 
     if (targetPath) {
-      editor.splitDescendantsByPath(targetPath, start.path, start.offset)
+      editor.splitNodeAtPoint(start, targetPath)
     }
   })
 }
@@ -702,7 +697,7 @@ Commands.splitInlineEdgesAtRange = (fn, editor) => range => {
         end.offset !== lastText.text.length ||
         !relativePath.equals(lastPath)
       ) {
-        editor.splitDescendantsByPath(furthestPath, end.path, end.offset)
+        editor.splitNodeAtPoint(end, furthestPath)
       }
     } else if (end.offset !== 0 && end.offset !== endText.text.length) {
       editor.splitNodeByPath(end.path, end.offset)
@@ -720,7 +715,7 @@ Commands.splitInlineEdgesAtRange = (fn, editor) => range => {
       const relativePath = start.path.slice(furthestPath.size)
 
       if (start.offset !== 0 || !relativePath.equals(firstPath)) {
-        editor.splitDescendantsByPath(furthestPath, start.path, start.offset)
+        editor.splitNodeAtPoint(start, furthestPath)
 
         if (
           Path.isYounger(furthestPath, end.path) ||

@@ -3,14 +3,16 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.splitDescendantsByPath([0], [0, 0], 2)
+  const { value: { document } } = editor
+  const point = document.createPoint({ path: [0, 0], offset: 2 })
+  editor.splitNodeAtPoint(point, [0])
 }
 
 export const input = (
   <value>
     <document>
-      <paragraph key="a">
-        <text key="b">word</text>
+      <paragraph>
+        <text>word</text>
       </paragraph>
     </document>
   </value>

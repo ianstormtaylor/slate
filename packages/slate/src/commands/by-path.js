@@ -699,6 +699,11 @@ Commands.splitDescendantsByPath = (fn, editor) => (
   textPath,
   textOffset
 ) => {
+  warning(
+    false,
+    'As of slate@0.48, the `editor.splitDescendantsByPath` command is deprecated. Use `editor.splitNodeAtPoint` instead.'
+  )
+
   path = Path.create(path)
   textPath = Path.create(textPath)
 
