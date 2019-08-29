@@ -40,11 +40,11 @@ Queries.getInsertPoint = (editor, point, node) => {
     const [next] = block.texts({ path: relativePath })
 
     if (next) {
-      const [, nextPath] = next
+      const [nextText, nextPath] = next
       const absolutePath = resolvedPoint.path.slice(0, depth).concat(nextPath)
 
       resolvedPoint = resolvedPoint.merge({
-        key: next.key,
+        key: nextText.key,
         path: absolutePath,
         offset: 0,
       })
