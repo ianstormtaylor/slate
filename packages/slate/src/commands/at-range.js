@@ -443,46 +443,6 @@ Commands.insertBlockAtRange = (fn, editor) => (range, block) => {
  * @param {Document} fragment
  */
 
-Commands.getBackwardMostPoint = (fn, editor) => point => {
-  if (point.offset === 0) {
-    return point
-  } else {
-    return editor.getPreviousPoint(point, { allowZeroWidth: true })
-  }
-}
-
-Commands.getForwardMostPoint = (fn, editor) => point => {
-  const { value: { document } } = editor
-  const node = document.getNode(point.path)
-
-  if (point.offset === node.text.length) {
-    return point
-  } else {
-    return editor.getNextPoint(point, { allowZeroWidth: true })
-  }
-}
-
-Commands.getInnerMostRange = (fn, editor) => range => {
-  const start = editor.getForwardMostPoint(range.start)
-  const end = editor.getBackwardMostPoint(range.end)
-  return range.setPoints([start, end])
-}
-
-Commands.ensureSplitBlockAtRange = (fn, editor) => range => {
-  const { value: { document } } = editor
-  const { isExpanded, start, end } = range
-  const [, startBlockPath] = document.closestBlock(start.path)
-  const [, endBlockPath] = document.closestBlock(end.path)
-
-  // if (!editor.isAtEdgeOfPath(end, endBlockPath)) {
-  editor.splitDescendantsByPath(endBlockPath, end.path, end.offset)
-  // }
-
-  if (isExpanded && !editor.isAtEdgeOfPath(start, startBlockPath)) {
-    editor.splitDescendantsByPath(startBlockPath, start.path, start.offset)
-  }
-}
-
 Commands.insertFragmentAtRange = (fn, editor) => (range, fragment) => {
   let startPointRef
   let endPointRef
@@ -507,9 +467,9 @@ Commands.insertFragmentAtRange = (fn, editor) => (range, fragment) => {
 
     const afterPath = afterPathRef.path
     const endPath = Path.decrement(afterPath)
-    const startPoint = editor.getPointAtStartOfPath(startPath)
-    const endPoint = editor.getPointAtEndOfPath(endPath)
-    const afterPoint = editor.getPointAtStartOfPath(afterPath)
+    const startPoint = editor.getStartOfPath(startPath)
+    const endPoint = editor.getEndOfPath(endPath)
+    const afterPoint = editor.getStartOfPath(afterPath)
     startPointRef = editor.createPointRef(startPoint)
     endPointRef = editor.createPointRef(endPoint)
     editor.mergeBlockByPath(afterPoint.path)

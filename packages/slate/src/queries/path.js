@@ -7,7 +7,7 @@ import { Range } from '..'
  * @return {Point}
  */
 
-export const getPointAtStartOfPath = (fn, editor) => path => {
+export const getStartOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const [, firstPath] = document.firstText({ path })
   const point = document.createPoint({ path: firstPath, offset: 0 })
@@ -21,7 +21,7 @@ export const getPointAtStartOfPath = (fn, editor) => path => {
  * @return {Point}
  */
 
-export const getPointAtEndOfPath = (fn, editor) => path => {
+export const getEndOfPath = (fn, editor) => path => {
   const { value: { document } } = editor
   const [lastNode, lastPath] = document.lastText({ path })
   const point = document.createPoint({
@@ -33,46 +33,15 @@ export const getPointAtEndOfPath = (fn, editor) => path => {
 }
 
 /**
- * Get a range at the end of a `path`.
+ * Get the range of a node at `path`.
  *
  * @param {Path} path
- * @return {Point}
+ * @return {Range}
  */
 
-export const getRangeAtEndOfPath = (fn, editor) => path => {
-  const { value: { document } } = editor
-  const point = editor.getPointAtEndOfPath(path)
-  const range = document.createRange({ anchor: point, focus: point })
-  return range
-}
-
-export const getFirstPoint = (fn, editor) => path => {
-  const { value: { document } } = editor
-  const [firstText, firstPath] = document.firstText({ path })
-  const firstPoint = document.createPoint({
-    key: firstText.key,
-    path: firstPath,
-    offset: 0,
-  })
-
-  return firstPoint
-}
-
-export const getLastPoint = (fn, editor) => path => {
-  const { value: { document } } = editor
-  const [lastText, lastPath] = document.lastText({ path })
-  const lastPoint = document.createPoint({
-    key: lastText.key,
-    path: lastPath,
-    offset: lastText.text.length,
-  })
-
-  return lastPoint
-}
-
-export const getRange = (fn, editor) => path => {
-  const anchor = editor.getFirstPoint(path)
-  const focus = editor.getLastPoint(path)
+export const getRangeOfPath = (fn, editor) => path => {
+  const anchor = editor.getStartOfPath(path)
+  const focus = editor.getEndOfPath(path)
   const range = Range.create({ anchor, focus })
   return range
 }

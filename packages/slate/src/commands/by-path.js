@@ -736,7 +736,7 @@ Commands.splitDescendantsByPath = (fn, editor) => (
 
 Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
   path = Path.create(path)
-  const range = editor.getRange(path)
+  const range = editor.getRangeOfPath(path)
   editor.unwrapInlineAtRange(range, properties)
 }
 
@@ -749,7 +749,7 @@ Commands.unwrapInlineByPath = (fn, editor) => (path, properties) => {
 
 Commands.unwrapBlockByPath = (fn, editor) => (path, properties) => {
   path = Path.create(path)
-  const range = editor.getRange(path)
+  const range = editor.getRangeOfPath(path)
   editor.unwrapBlockAtRange(range, properties)
 }
 

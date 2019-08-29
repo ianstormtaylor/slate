@@ -1,4 +1,3 @@
-import * as Creators from '../../queries/creators'
 import * as Format from '../../queries/format'
 import * as Node from '../../queries/node'
 import * as Path from '../../queries/path'
@@ -13,7 +12,6 @@ import * as Range from '../../queries/range'
 
 function CoreQueriesPlugin() {
   return {
-    ...Creators,
     ...Format,
     ...Node,
     ...Path,
