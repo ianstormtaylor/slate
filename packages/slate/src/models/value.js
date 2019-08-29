@@ -353,7 +353,7 @@ class Value extends Record(DEFAULTS) {
   get marks() {
     warning(
       false,
-      'As of Slate 0.48, the `value.marks` property no longer exists. Use `value.getMarks(editor)` instead.'
+      'As of Slate 0.48, the `value.marks` property no longer exists. Use the `getMarks()` query instead.'
     )
     return this.selection.isUnset
       ? new Set()
@@ -367,7 +367,7 @@ class Value extends Record(DEFAULTS) {
   get activeMarks() {
     warning(
       false,
-      'As of Slate 0.48, the `value.activeMarks` property no longer exists. Use `value.getActiveMarks(editor)` instead.'
+      'As of Slate 0.48, the `value.activeMarks` property no longer exists. Use the `getActiveMarks()` query instead.'
     )
     return this.selection.isUnset
       ? new Set()
@@ -396,7 +396,7 @@ class Value extends Record(DEFAULTS) {
   get fragment() {
     warning(
       false,
-      'As of Slate 0.48, the `value.fragment` property no longer exists. Use `value.getFragment(editor)` instead.'
+      'As of Slate 0.48, the `value.fragment` property no longer exists. Use the `getFragment()` query instead.'
     )
 
     return this.selection.isUnset
@@ -462,47 +462,6 @@ class Value extends Record(DEFAULTS) {
     document = document.addMark(path, mark)
     value = value.set('document', document)
     return value
-  }
-
-  /**
-   * Get the marks of the current selection.
-   *
-   * @param {Editor} editor
-   * @return {Set<Mark>}
-   */
-
-  getMarks(editor) {
-    return this.selection.isUnset
-      ? new Set()
-      : this.selection.marks ||
-          this.document.getMarksAtRange(this.selection, editor)
-  }
-
-  /**
-   * Get the active marks of the current selection.
-   *
-   * @param {Editor} editor
-   * @return {Set<Mark>}
-   */
-
-  getActiveMarks(editor) {
-    return this.selection.isUnset
-      ? new Set()
-      : this.selection.marks ||
-          this.document.getActiveMarksAtRange(this.selection, editor)
-  }
-
-  /**
-   * Get the fragment of the current selection.
-   *
-   * @param {Editor} editor
-   * @return {Document}
-   */
-
-  getFragment(editor) {
-    return this.selection.isUnset
-      ? Document.create()
-      : this.document.getFragmentAtRange(this.selection, editor)
   }
 
   /**

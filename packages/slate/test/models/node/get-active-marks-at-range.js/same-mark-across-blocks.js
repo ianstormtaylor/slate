@@ -36,7 +36,7 @@ export const input = (
 export default function(value) {
   const editor = new Editor({ value })
   const { document, selection } = value
-  return document.getActiveMarksAtRange(selection, editor)
+  return editor.getActiveMarksAtRange(selection, document)
 }
 
 export const output = Set.of(Mark.create('a'))

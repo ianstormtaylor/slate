@@ -427,12 +427,16 @@ class ElementInterface {
    * probably doing unnecessary work.
    *
    * @param {Range} range
-   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getActiveMarksAtRange(range, editor) {
-    range = this.resolveRange(range, editor)
+  getActiveMarksAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getActiveMarksAtRange` method is deprecated. You should use the `getActiveMarksAtRange` editor query instead.'
+    )
+
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       return Set()
@@ -440,7 +444,7 @@ class ElementInterface {
 
     if (range.isCollapsed) {
       const { start } = range
-      return this.getInsertMarksAtPoint(start, editor)
+      return this.getInsertMarksAtPoint(start)
     }
 
     const { start, end } = range
@@ -721,12 +725,16 @@ class ElementInterface {
    * Get a fragment of the node at a `range`.
    *
    * @param {Range} range
-   * @param {Editor} editor
    * @return {Document}
    */
 
-  getFragmentAtRange(range, editor) {
-    range = this.resolveRange(range, editor)
+  getFragmentAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getFragmentAtRange` method is deprecated. You should use the `getFragmentAtRange` editor query instead.'
+    )
+
+    range = this.resolveRange(range)
 
     if (range.isUnset) {
       return Document.create()
@@ -853,12 +861,11 @@ class ElementInterface {
    * node. This mimics expected rich text editing behaviors of mark contiuation.
    *
    * @param {Point} point
-   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getInsertMarksAtPoint(point, editor) {
-    point = this.resolvePoint(point, editor)
+  getInsertMarksAtPoint(point) {
+    point = this.resolvePoint(point)
     const { path, offset } = point
     const text = this.getDescendant(path)
 
@@ -901,12 +908,16 @@ class ElementInterface {
    * This mimics expected rich text editing behaviors of mark contiuation.
    *
    * @param {Range} range
-   * @param {Editor} editor
    * @return {Set<Mark>}
    */
 
-  getInsertMarksAtRange(range, editor) {
-    range = this.resolveRange(range, editor)
+  getInsertMarksAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getInsertMarksAtRange` method is deprecated. You should use the `getInsertMarksAtRange` editor query instead.'
+    )
+
+    range = this.resolveRange(range)
     const { start } = range
 
     if (range.isUnset) {
@@ -914,7 +925,7 @@ class ElementInterface {
     }
 
     if (range.isCollapsed) {
-      return this.getInsertMarksAtPoint(start, editor)
+      return this.getInsertMarksAtPoint(start)
     }
 
     const text = this.getDescendant(start.path)
@@ -1096,7 +1107,7 @@ class ElementInterface {
    */
 
   getOffsetAtRange(range, editor) {
-    range = this.resolveRange(range, editor)
+    range = editor.getInsertRange(range, this)
 
     if (range.isUnset) {
       throw new Error('The range cannot be unset to calculcate its offset.')
@@ -1464,7 +1475,7 @@ class ElementInterface {
 
   isInRange(path, range, editor) {
     path = this.resolvePath(path)
-    range = this.resolveRange(range, editor)
+    range = editor.getInsertRange(range, this)
 
     if (range.isUnset) {
       return false
@@ -1773,13 +1784,17 @@ class ElementInterface {
    * offsets in the range exist and that they are synced with the paths.
    *
    * @param {Range|Object} range
-   * @param {Editor} editor
    * @return {Range}
    */
 
-  resolveRange(range, editor) {
+  resolveRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `resolveRange` method is deprecated. You should use the `getInsertRange` editor query instead.'
+    )
+
     range = Range.create(range)
-    range = range.normalize(this, editor)
+    range = range.normalize(this)
     return range
   }
 

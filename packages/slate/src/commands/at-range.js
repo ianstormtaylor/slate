@@ -1070,7 +1070,7 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
         range = range.moveFocusTo(range.anchor.key, end.offset - start.offset)
       }
 
-      range = document.resolveRange(range)
+      range = editor.getResolvedRange(range, document)
       editor.deleteAtRange(range)
     }
   })
@@ -1119,7 +1119,7 @@ Commands.toggleMarkAtRange = (editor, range, mark) => {
 
   const { value } = editor
   const { document } = value
-  const marks = document.getActiveMarksAtRange(range, editor)
+  const marks = editor.getActiveMarksAtRange(range, document)
   const exists = marks.some(m => m.equals(mark))
 
   if (exists) {

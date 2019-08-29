@@ -20,7 +20,7 @@ export const input = (
 export default function(value) {
   const editor = new Editor({ value })
   const { document, selection } = value
-  return document.getInsertMarksAtPoint(selection.start, editor)
+  return editor.getInsertMarksAtPoint(selection.start, document)
 }
 
 export const output = Set.of()

@@ -4,8 +4,8 @@
 const h = require('../../helpers/h')
 const { Editor } = require('slate')
 
-module.exports.default = function(value) {
-  value.document.getActiveMarksAtRange(value.selection)
+module.exports.default = function(editor) {
+  editor.getActiveMarksAtRange(editor.value.selection, editor.value.document)
 }
 
 let value = (
@@ -32,5 +32,5 @@ editor.moveToRangeOfDocument()
 value = editor.value
 
 module.exports.input = function() {
-  return value
+  return editor
 }
