@@ -39,21 +39,25 @@ Queries.getInsertPoint = (editor, point, node) => {
     const relativePath = PathUtils.drop(resolvedPoint.path, depth)
     const [next] = block.texts({ path: relativePath })
 
-    if (next) {
-      const [nextText, nextPath] = next
-      const absolutePath = resolvedPoint.path.slice(0, depth).concat(nextPath)
+    if (!next) break
 
-      resolvedPoint = resolvedPoint.merge({
-        key: nextText.key,
-        path: absolutePath,
-        offset: 0,
-      })
-    } else {
-      break
-    }
+    const [nextText, nextPath] = next
+    const absolutePath = resolvedPoint.path.slice(0, depth).concat(nextPath)
+    closestInline = node.getClosestInline(absolutePath)
 
-    closestInline = node.getClosestInline(resolvedPoint.path)
-    resolvedNode = node.getNode(resolvedPoint.path)
+    // If we would move the cursor into a void node, leave it
+    // alone. Otherwise, it becomes impossible to navigate left
+    // across voids, since the cursor will always move back into
+    // the void.
+    if (closestInline && editor.isVoid(closestInline)) break
+
+    resolvedNode = node.getNode(absolutePath)
+
+    resolvedPoint = resolvedPoint.merge({
+      key: nextText.key,
+      path: absolutePath,
+      offset: 0,
+    })
   }
 
   return resolvedPoint

@@ -20,13 +20,17 @@ export const input = (
   </value>
 )
 
+// Normalization runs after positioning the cursor, so we need to
+// manually add the text node inside the emoji void -- otherwise the
+// cursor will move into the wrong node.
 export const output = (
   <value>
     <document>
       <paragraph>
         word
+        <cursor />
         <emoji>
-          <cursor />
+          <text />
         </emoji>
       </paragraph>
     </document>
