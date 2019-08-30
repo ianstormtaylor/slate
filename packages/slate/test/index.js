@@ -163,6 +163,19 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
+  fixtures(__dirname, 'queries', ({ module }) => {
+    const { input, output, plugins: module_plugins } = module
+    const fn = module.default
+    const editor = new Editor({
+      plugins: module_plugins ? plugins.concat(module_plugins) : plugins,
+    })
+
+    editor.setValue(input)
+    const actual = fn(editor)
+    const expected = output
+    assert.deepEqual(actual, expected)
+  })
+
   fixtures(__dirname, 'utils/path-utils', ({ module }) => {
     const fn = module.default
     fn()
