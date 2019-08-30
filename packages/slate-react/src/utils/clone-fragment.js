@@ -28,8 +28,9 @@ function cloneFragment(event, editor, callback = () => undefined) {
 
   const window = getWindow(event.target)
   const native = window.getSelection()
+  const fragment = editor.getFragment()
   const { value } = editor
-  const { document, fragment, selection } = value
+  const { document, selection } = value
   const { start, end } = selection
   const startVoid = document.getClosestVoid(start.path, editor)
   const endVoid = document.getClosestVoid(end.path, editor)
