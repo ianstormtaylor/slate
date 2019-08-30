@@ -288,39 +288,43 @@ class Content extends React.Component {
       // Otherwise, set the `isUpdatingSelection` flag and update the selection.
       updated = true
       this.tmp.isUpdatingSelection = true
+      removeAllRanges(native)
 
-      if (!IS_FIREFOX) {
-        removeAllRanges(native)
-
-        // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
-        if (native.setBaseAndExtent) {
-          // COMPAT: Since the DOM range has no concept of backwards/forwards
-          // we need to check and do the right thing here.
-          if (isBackward) {
-            native.setBaseAndExtent(
-              range.endContainer,
-              range.endOffset,
-              range.startContainer,
-              range.startOffset
-            )
-          } else {
-            native.setBaseAndExtent(
-              range.startContainer,
-              range.startOffset,
-              range.endContainer,
-              range.endOffset
-            )
-          }
+      // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
+      if (native.setBaseAndExtent) {
+        // COMPAT: Since the DOM range has no concept of backwards/forwards
+        // we need to check and do the right thing here.
+        if (isBackward) {
+          native.setBaseAndExtent(
+            range.endContainer,
+            range.endOffset,
+            range.startContainer,
+            range.startOffset
+          )
         } else {
-          native.addRange(range)
+          native.setBaseAndExtent(
+            range.startContainer,
+            range.startOffset,
+            range.endContainer,
+            range.endOffset
+          )
         }
+      } else {
+        native.addRange(range)
       }
 
       // Scroll to the selection, in case it's out of view.
       scrollToSelection(native)
 
-      // Then unset the `isUpdatingSelection` flag after a delay.
+      // Then unset the `isUpdatingSelection` flag after a delay, to ensure that
+      // it is still set when selection-related events from updating it fire.
       setTimeout(() => {
+        // COMPAT: In Firefox, it's not enough to create a range, you also need
+        // to focus the contenteditable element too. (2016/11/16)
+        if (IS_FIREFOX && this.ref.current) {
+          this.ref.current.focus()
+        }
+
         this.tmp.isUpdatingSelection = false
 
         debug.update('updateSelection:setTimeout', {
@@ -355,6 +359,12 @@ class Content extends React.Component {
     let el
 
     try {
+      // COMPAT: In Firefox, sometimes the node can be comment which doesn't
+      // have .closest and it crashes.
+      if (target.nodeType === 8) {
+        return false
+      }
+
       // COMPAT: Text nodes don't have `isContentEditable` property. So, when
       // `target` is a text node use its parent node for check.
       el = target.nodeType === 3 ? target.parentNode : target
