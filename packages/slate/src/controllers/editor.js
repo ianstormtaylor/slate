@@ -138,6 +138,7 @@ class Editor {
    */
 
   flush() {
+    this.normalizeSelection()
     this.run('onChange')
     const { value, operations, controller } = this
     const change = { value, operations }
@@ -420,6 +421,7 @@ class Editor {
 
     if (normalize) {
       this.normalize()
+      this.normalizeSelection()
     }
 
     return this
@@ -603,8 +605,6 @@ function normalizeDirtyPaths(editor) {
   if (!editor.tmp.normalize) {
     return
   }
-
-  editor.normalizeSelection()
 
   if (!editor.tmp.dirty.length) {
     return

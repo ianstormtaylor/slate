@@ -40,8 +40,6 @@ Queries.getActiveMarks = editor => {
  */
 
 Queries.getActiveMarksAtRange = (editor, range, node) => {
-  range = editor.getInsertRange(range, node)
-
   if (range.isUnset) {
     return Set()
   }
@@ -138,8 +136,6 @@ Queries.getFragment = editor => {
  */
 
 Queries.getFragmentAtRange = (editor, range, node) => {
-  range = editor.getInsertRange(range, node)
-
   if (range.isUnset) {
     return Document.create()
   }
@@ -180,7 +176,6 @@ Queries.getFragmentAtRange = (editor, range, node) => {
  */
 
 Queries.getInsertMarksAtPoint = (editor, point, node) => {
-  point = editor.getInsertPoint(point, node)
   const { path, offset } = point
   const text = node.getDescendant(path)
 
@@ -229,7 +224,6 @@ Queries.getInsertMarksAtPoint = (editor, point, node) => {
  */
 
 Queries.getInsertMarksAtRange = (editor, range, node) => {
-  range = editor.getInsertRange(range, node)
   const { start } = range
 
   if (range.isUnset) {

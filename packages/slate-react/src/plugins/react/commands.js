@@ -38,7 +38,9 @@ function CommandsPlugin() {
     // If the text is no different, abort.
     if (text === domText) return
 
-    let entire = selection.moveAnchorTo(path, 0).moveFocusTo(path, text.length)
+    const entire = selection
+      .moveAnchorTo(path, 0)
+      .moveFocusTo(path, text.length)
 
     // Change the current value to have the leaf's text replaced.
     editor.insertTextAtRange(entire, domText, node.marks)

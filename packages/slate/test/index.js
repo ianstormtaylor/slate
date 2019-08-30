@@ -122,6 +122,7 @@ describe('slate', () => {
 
     editor.setValue(input)
     fn(editor)
+    editor.flush()
     const actual = editor.value.toJSON(opts)
 
     editor.setValue(output)
