@@ -10,22 +10,21 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
-          word<cursor />
-        </link>
+        <link>word</link>
+        <cursor />
       </paragraph>
     </document>
   </value>
 )
 
+// The cursor is normalized to the next text node, so splitInline has
+// no effect.
 export const output = (
   <value>
     <document>
       <paragraph>
         <link>word</link>
-        <link>
-          <cursor />
-        </link>
+        <cursor />
       </paragraph>
     </document>
   </value>

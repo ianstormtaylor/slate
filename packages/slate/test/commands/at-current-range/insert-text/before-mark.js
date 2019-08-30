@@ -10,8 +10,12 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        w<cursor />
-        <b>or</b>d
+        w
+        <b>
+          <cursor />
+          or
+        </b>
+        d
       </paragraph>
     </document>
   </value>
@@ -21,8 +25,12 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        wa<cursor />
-        <b>or</b>d
+        wa
+        <b>
+          <cursor />
+          or
+        </b>
+        d
       </paragraph>
     </document>
   </value>

@@ -475,7 +475,7 @@ class Content extends React.Component {
    * @param {Event} event
    */
 
-  onNativeSelectionChange = throttle(event => {
+  throttledOnNativeSelectionChange = throttle(event => {
     if (this.props.readOnly) return
 
     const window = getWindow(event.target)
@@ -489,6 +489,11 @@ class Content extends React.Component {
 
     this.props.onEvent('onSelect', event)
   }, 100)
+
+  onNativeSelectionChange = event => {
+    if (this.tmp.isUpdatingSelection) return
+    this.throttledOnNativeSelectionChange(event)
+  }
 
   /**
    * Render the editor content.

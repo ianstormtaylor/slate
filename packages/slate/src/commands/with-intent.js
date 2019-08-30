@@ -46,7 +46,7 @@ Commands.addMark = (editor, mark) => {
     const sel = selection.set('marks', marks)
     editor.select(sel)
   } else {
-    const marks = document.getActiveMarksAtRange(selection).add(mark)
+    const marks = editor.getActiveMarksAtRange(selection, document).add(mark)
     const sel = selection.set('marks', marks)
     editor.select(sel)
   }
@@ -322,7 +322,11 @@ Commands.insertText = (editor, text, marks) => {
 
   const { value } = editor
   const { document, selection } = value
-  marks = marks || selection.marks || document.getInsertMarksAtRange(selection)
+
+  marks =
+    marks ||
+    selection.marks ||
+    editor.getInsertMarksAtRange(selection, document)
 
   editor.withoutNormalizing(() => {
     editor.insertTextAtRange(selection, text, marks)
@@ -354,7 +358,7 @@ Commands.removeMark = (editor, mark) => {
     const sel = selection.set('marks', marks)
     editor.select(sel)
   } else {
-    const marks = document.getActiveMarksAtRange(selection).remove(mark)
+    const marks = editor.getActiveMarksAtRange(selection, document).remove(mark)
     const sel = selection.set('marks', marks)
     editor.select(sel)
   }
@@ -411,7 +415,8 @@ Commands.splitBlock = (editor, depth = 1) => {
 
   const { value } = editor
   const { selection, document } = value
-  const marks = selection.marks || document.getInsertMarksAtRange(selection)
+  const marks =
+    selection.marks || editor.getInsertMarksAtRange(selection, document)
   editor.splitBlockAtRange(selection, depth).moveToEnd()
 
   if (marks && marks.size !== 0) {
@@ -443,8 +448,7 @@ Commands.splitInline = (editor, height) => {
 
 Commands.toggleMark = (editor, mark) => {
   mark = Mark.create(mark)
-  const { value } = editor
-  const exists = value.activeMarks.has(mark)
+  const exists = editor.getActiveMarks().has(mark)
 
   if (exists) {
     editor.removeMark(mark)

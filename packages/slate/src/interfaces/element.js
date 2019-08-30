@@ -111,7 +111,7 @@ class ElementInterface {
 
   createAnnotation(properties) {
     properties = Annotation.createProperties(properties)
-    const annotation = this.resolveAnnotation(properties)
+    const annotation = Annotation.create(properties).resolveToTextNodes(this)
     return annotation
   }
 
@@ -124,7 +124,7 @@ class ElementInterface {
 
   createDecoration(properties) {
     properties = Decoration.createProperties(properties)
-    const decoration = this.resolveDecoration(properties)
+    const decoration = Decoration.create(properties).resolveToTextNodes(this)
     return decoration
   }
 
@@ -156,7 +156,7 @@ class ElementInterface {
 
     // You can iterate over either a range or a path, but not both.
     if (options.range) {
-      targetRange = root.resolveRange(options.range)
+      targetRange = options.range.resolveToTextNodes(root)
       targetPath = root.resolvePath(targetRange.start.path)
     } else if (options.path) {
       targetPath = root.resolvePath(options.path)
@@ -324,7 +324,7 @@ class ElementInterface {
 
   createPoint(properties) {
     properties = Point.createProperties(properties)
-    const point = this.resolvePoint(properties)
+    const point = Point.create(properties).resolveToTextNode(this)
     return point
   }
 
@@ -337,7 +337,7 @@ class ElementInterface {
 
   createRange(properties) {
     properties = Range.createProperties(properties)
-    const range = this.resolveRange(properties)
+    const range = Range.create(properties).resolveToTextNodes(this)
     return range
   }
 
@@ -350,7 +350,7 @@ class ElementInterface {
 
   createSelection(properties) {
     properties = Selection.createProperties(properties)
-    const selection = this.resolveSelection(properties)
+    const selection = Selection.create(properties).resolveToTextNodes(this)
     return selection
   }
 
@@ -431,6 +431,11 @@ class ElementInterface {
    */
 
   getActiveMarksAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getActiveMarksAtRange` method is deprecated. You should use the `getActiveMarksAtRange` editor query instead.'
+    )
+
     range = this.resolveRange(range)
 
     if (range.isUnset) {
@@ -724,6 +729,11 @@ class ElementInterface {
    */
 
   getFragmentAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getFragmentAtRange` method is deprecated. You should use the `getFragmentAtRange` editor query instead.'
+    )
+
     range = this.resolveRange(range)
 
     if (range.isUnset) {
@@ -902,6 +912,11 @@ class ElementInterface {
    */
 
   getInsertMarksAtRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `getInsertMarksAtRange` method is deprecated. You should use the `getInsertMarksAtRange` editor query instead.'
+    )
+
     range = this.resolveRange(range)
     const { start } = range
 
@@ -1087,11 +1102,12 @@ class ElementInterface {
    * Get the offset from a `range`.
    *
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Number}
    */
 
-  getOffsetAtRange(range) {
-    range = this.resolveRange(range)
+  getOffsetAtRange(range, editor) {
+    range = editor.getInsertRange(range, this)
 
     if (range.isUnset) {
       throw new Error('The range cannot be unset to calculcate its offset.')
@@ -1453,12 +1469,13 @@ class ElementInterface {
    *
    * @param {List|String} path
    * @param {Range} range
+   * @param {Editor} editor
    * @return {Node}
    */
 
-  isInRange(path, range) {
+  isInRange(path, range, editor) {
     path = this.resolvePath(path)
-    range = this.resolveRange(range)
+    range = editor.getInsertRange(range, this)
 
     if (range.isUnset) {
       return false
@@ -1711,12 +1728,13 @@ class ElementInterface {
    * offsets in the annotation exist and that they are synced with the paths.
    *
    * @param {Annotation|Object} annotation
+   * @param {Editor} editor
    * @return {Annotation}
    */
 
-  resolveAnnotation(annotation) {
+  resolveAnnotation(annotation, editor) {
     annotation = Annotation.create(annotation)
-    annotation = annotation.normalize(this)
+    annotation = annotation.normalize(this, editor)
     return annotation
   }
 
@@ -1725,12 +1743,13 @@ class ElementInterface {
    * offsets in the decoration exist and that they are synced with the paths.
    *
    * @param {Decoration|Object} decoration
+   * @param {Editor} editor
    * @return {Decoration}
    */
 
-  resolveDecoration(decoration) {
+  resolveDecoration(decoration, editor) {
     decoration = Decoration.create(decoration)
-    decoration = decoration.normalize(this)
+    decoration = decoration.normalize(this, editor)
     return decoration
   }
 
@@ -1739,12 +1758,24 @@ class ElementInterface {
    * offsets in the point exist and that they are synced with the paths.
    *
    * @param {Point|Object} point
+   * @param {Editor} editor
    * @return {Point}
    */
 
-  resolvePoint(point) {
+  resolvePoint(point, editor) {
     point = Point.create(point)
-    point = point.normalize(this)
+
+    if (editor == null) {
+      warning(
+        false,
+        'As of slate@0.48 the `resolvePoint` method takes an `Editor` as an argument. You should use the `getInsertPoint` Editor query instead.'
+      )
+
+      point = point.resolveToTextNode(this)
+    } else {
+      point = editor.getInsertPoint(point, this)
+    }
+
     return point
   }
 
@@ -1757,6 +1788,11 @@ class ElementInterface {
    */
 
   resolveRange(range) {
+    warning(
+      false,
+      'As of slate@0.48 the `resolveRange` method is deprecated. You should use the `getInsertRange` editor query instead.'
+    )
+
     range = Range.create(range)
     range = range.normalize(this)
     return range
@@ -1767,12 +1803,13 @@ class ElementInterface {
    * offsets in the selection exist and that they are synced with the paths.
    *
    * @param {Selection|Object} selection
+   * @param {Editor} editor
    * @return {Selection}
    */
 
-  resolveSelection(selection) {
+  resolveSelection(selection, editor) {
     selection = Selection.create(selection)
-    selection = selection.normalize(this)
+    selection = selection.normalize(this, editor)
     return selection
   }
 

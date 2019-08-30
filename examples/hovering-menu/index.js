@@ -8,8 +8,7 @@ import { css } from 'emotion'
 import { Button, Icon, Menu } from '../components'
 
 const MarkButton = ({ editor, type, icon }) => {
-  const { value } = editor
-  const isActive = value.activeMarks.some(mark => mark.type === type)
+  const isActive = editor.getActiveMarks().some(mark => mark.type === type)
   return (
     <Button
       reversed

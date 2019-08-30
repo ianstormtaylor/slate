@@ -10,9 +10,8 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        he<hashtag>ll</hashtag>o <anchor />w<hashtag>
-          or<focus />
-        </hashtag>d
+        he<hashtag>ll</hashtag>o <anchor />w<hashtag>or</hashtag>
+        <focus />d
       </paragraph>
     </document>
   </value>
@@ -22,7 +21,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
-        he<hashtag>ll</hashtag>o <anchor />wor<focus />d
+        he<hashtag>ll</hashtag>o <anchor />
+        wor
+        <focus />d
       </paragraph>
     </document>
   </value>

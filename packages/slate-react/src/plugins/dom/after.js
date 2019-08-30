@@ -123,7 +123,11 @@ function AfterPlugin(options = {}) {
 
         if (text == null) break
 
-        editor.insertTextAtRange(range, text, selection.marks)
+        const marks =
+          selection.marks ||
+          editor.getInsertMarksAtRange(value.selection, value.document)
+
+        editor.insertTextAtRange(range, text, marks)
 
         // If the text was successfully inserted, and the selection had marks
         // on it, unset the selection's marks.
@@ -281,7 +285,7 @@ function AfterPlugin(options = {}) {
       editor.moveToRangeOfNode(node)
     }
 
-    const fragment = editor.value.fragment
+    const fragment = editor.getFragment()
     const encoded = Base64.serializeNode(fragment)
     setEventTransfer(event, 'fragment', encoded)
     next()
@@ -641,7 +645,7 @@ function AfterPlugin(options = {}) {
       if (editor.isVoid(startBlock)) return next()
 
       const defaultBlock = startBlock
-      const defaultMarks = document.getInsertMarksAtRange(selection)
+      const defaultMarks = editor.getInsertMarksAtRange(selection, document)
       const frag = Plain.deserialize(text, { defaultBlock, defaultMarks })
         .document
       editor.insertFragment(frag)

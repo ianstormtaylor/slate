@@ -27,10 +27,9 @@ export const output = (
     <document>
       <paragraph>
         <link>
-          <hashtag>
-            <cursor />
-          </hashtag>
+          <hashtag />
         </link>
+        <cursor />
       </paragraph>
     </document>
   </value>

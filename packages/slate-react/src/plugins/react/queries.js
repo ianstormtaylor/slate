@@ -180,14 +180,14 @@ function QueriesPlugin() {
           ? x - rect.left < rect.left + rect.width - x
           : y - rect.top < rect.top + rect.height - y
 
-      const range = document.createRange()
+      const range = document.createRange().normalize(document, editor)
       const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
       const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](
         path
       )
 
       if (entry) {
-        return range[move](entry)
+        return range[move](entry).normalize(editor)
       }
 
       return null
@@ -378,7 +378,10 @@ function QueriesPlugin() {
 
     const { value } = editor
     const { document } = value
-    const point = document.createPoint({ path, offset })
+    const point = editor.getInsertPoint(
+      document.createPoint({ path, offset }),
+      document
+    )
     return point
   }
 
@@ -431,10 +434,12 @@ function QueriesPlugin() {
     }
 
     const { document } = value
-    const range = document.createRange({
-      anchor,
-      focus,
-    })
+    const range = document
+      .createRange({
+        anchor,
+        focus,
+      })
+      .normalize(document, editor)
 
     return range
   }
@@ -464,10 +469,6 @@ function QueriesPlugin() {
     }
 
     const { anchor, focus } = range
-    const anchorText = document.getNode(anchor.path)
-    const focusText = document.getNode(focus.path)
-    const anchorInline = document.getClosestInline(anchor.path)
-    const focusInline = document.getClosestInline(focus.path)
     const focusBlock = document.getClosestBlock(focus.path)
     const anchorBlock = document.getClosestBlock(anchor.path)
 
@@ -489,44 +490,7 @@ function QueriesPlugin() {
       range = range.setFocus(focus.setOffset(0))
     }
 
-    // COMPAT: If the selection is at the end of a non-void inline node, and
-    // there is a node after it, put it in the node after instead. This
-    // standardizes the behavior, since it's indistinguishable to the user.
-    if (
-      anchorInline &&
-      !editor.isVoid(anchorInline) &&
-      anchor.offset === anchorText.text.length
-    ) {
-      const block = document.getClosestBlock(anchor.path)
-      const depth = document.getDepth(block.key)
-      const relativePath = PathUtils.drop(anchor.path, depth)
-      const [next] = block.texts({ path: relativePath })
-
-      if (next) {
-        const [, nextPath] = next
-        const absolutePath = anchor.path.slice(0, depth).concat(nextPath)
-        range = range.moveAnchorTo(absolutePath, 0)
-      }
-    }
-
-    if (
-      focusInline &&
-      !editor.isVoid(focusInline) &&
-      focus.offset === focusText.text.length
-    ) {
-      const block = document.getClosestBlock(focus.path)
-      const depth = document.getDepth(block.key)
-      const relativePath = PathUtils.drop(focus.path, depth)
-      const [next] = block.texts({ path: relativePath })
-
-      if (next) {
-        const [, nextPath] = next
-        const absolutePath = focus.path.slice(0, depth).concat(nextPath)
-        range = range.moveFocusTo(absolutePath, 0)
-      }
-    }
-
-    let selection = document.createSelection(range)
+    let selection = document.createSelection(range).normalize(document, editor)
 
     // COMPAT: Ensure that the `isFocused` argument is set.
     selection = selection.setIsFocused(true)

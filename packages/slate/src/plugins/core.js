@@ -1,3 +1,4 @@
+import AtPoint from '../queries/at-point'
 import AtRange from '../commands/at-range'
 import ByPath from '../commands/by-path'
 import Commands from './commands'
@@ -43,6 +44,7 @@ function CorePlugin(options = {}) {
   const queries = Queries({
     isAtomic: () => false,
     isVoid: () => false,
+    ...AtPoint,
   })
 
   /**

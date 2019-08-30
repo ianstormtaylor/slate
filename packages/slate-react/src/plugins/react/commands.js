@@ -40,7 +40,7 @@ function CommandsPlugin() {
 
     let entire = selection.moveAnchorTo(path, 0).moveFocusTo(path, text.length)
 
-    entire = document.resolveRange(entire)
+    entire = editor.getInsertRange(entire, document)
 
     // Change the current value to have the leaf's text replaced.
     editor.insertTextAtRange(entire, domText, node.marks)

@@ -594,7 +594,7 @@ Commands.select = (editor, properties, options = {}) => {
   const { document, selection } = value
   const newProperties = {}
   let next = selection.setProperties(properties)
-  next = document.resolveSelection(next)
+  next = document.resolveSelection(next, editor)
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))
@@ -710,7 +710,8 @@ function pointBackward(editor, point, n = 1) {
   const p = selection[point]
   const hasVoidParent = document.hasVoidParent(p.path, editor)
 
-  // what is this?
+  // If point is simply moving to another position within the node,
+  // just adjust the offset.
   if (!hasVoidParent && p.offset - n >= 0) {
     const range = selection[`move${Point}Backward`](n)
     editor.select(range)
@@ -724,13 +725,18 @@ function pointBackward(editor, point, n = 1) {
   const isInBlock = block.hasNode(previous.key)
   const isPreviousInVoid =
     previous && document.hasVoidParent(previous.key, editor)
-  editor[`move${Point}ToEndOfNode`](previous)
+  let range = editor.value.selection[`move${Point}ToEndOfNode`](previous)
 
-  // when is this called?
+  // If point is moving from a text / non-void node into a text /
+  // non-void node under the same parent, move the point backward one
+  // more step. Otherwise point will move from the first position of a
+  // node to the last position of the previous node, which means the
+  // cursor doesn't actually move.
   if (!hasVoidParent && !isPreviousInVoid && isInBlock) {
-    const range = editor.value.selection[`move${Point}Backward`](n)
-    editor.select(range)
+    range = range[`move${Point}Backward`](n)
   }
+
+  editor.select(range)
 }
 
 function pointForward(editor, point, n = 1) {
@@ -744,7 +750,8 @@ function pointForward(editor, point, n = 1) {
   const text = document.getNode(p.path)
   const hasVoidParent = document.hasVoidParent(p.path, editor)
 
-  // what is this?
+  // If point is simply moving to another position within the node,
+  // just adjust the offset.
   if (!hasVoidParent && p.offset + n <= text.text.length) {
     const range = selection[`move${Point}Forward`](n)
     editor.select(range)

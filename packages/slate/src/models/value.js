@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import invariant from 'tiny-invariant'
+import warning from 'tiny-warning'
 import { Record, Set, List } from 'immutable'
 
 import Annotation from './annotation'
@@ -346,24 +347,28 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the marks of the current selection.
-   *
-   * @return {Set<Mark>}
+   * Deprecated.
    */
 
   get marks() {
+    warning(
+      false,
+      'As of Slate 0.48, the `value.marks` property no longer exists. Use the `getMarks()` query instead.'
+    )
     return this.selection.isUnset
       ? new Set()
       : this.selection.marks || this.document.getMarksAtRange(this.selection)
   }
 
   /**
-   * Get the active marks of the current selection.
-   *
-   * @return {Set<Mark>}
+   * Deprecated.
    */
 
   get activeMarks() {
+    warning(
+      false,
+      'As of Slate 0.48, the `value.activeMarks` property no longer exists. Use the `getActiveMarks()` query instead.'
+    )
     return this.selection.isUnset
       ? new Set()
       : this.selection.marks ||
@@ -389,6 +394,11 @@ class Value extends Record(DEFAULTS) {
    */
 
   get fragment() {
+    warning(
+      false,
+      'As of Slate 0.48, the `value.fragment` property no longer exists. Use the `getFragment()` query instead.'
+    )
+
     return this.selection.isUnset
       ? Document.create()
       : this.document.getFragmentAtRange(this.selection)
@@ -431,7 +441,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { annotations, document } = value
     const { key } = annotation
-    annotation = annotation.updatePoints(point => point.normalize(document))
+    annotation = annotation.normalize(document)
     annotations = annotations.set(key, annotation)
     value = value.set('annotations', annotations)
     return value
@@ -564,6 +574,30 @@ class Value extends Record(DEFAULTS) {
     document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
     value = value.mapPoints(point => point.setPath(null))
+    return value
+  }
+
+  /**
+   * Resolve all ranges, ensuring that the keys and offsets in the
+   * range exist, refer to leaf text nodes, and that they are synced
+   * with the paths.
+   *
+   * @param {Editor} editor
+   * @returns {Value}
+   */
+
+  resolveRanges(editor) {
+    let value = this
+    const { document, selection, annotations } = value
+
+    value = value.set('selection', selection.normalize(document, editor))
+
+    const anns = annotations.map(annotation =>
+      annotation.normalize(document, editor)
+    )
+
+    value = value.set('annotations', anns)
+
     return value
   }
 
@@ -755,7 +789,7 @@ class Value extends Record(DEFAULTS) {
 
     if (annotations) {
       props.annotations = annotations.map(a => {
-        return a.isSet ? a : document.resolveAnnotation(a)
+        return a.isSet ? a : document.createAnnotation(a)
       })
     }
 
@@ -775,7 +809,7 @@ class Value extends Record(DEFAULTS) {
     let value = this
     let { document, selection } = value
     const next = selection.setProperties(properties)
-    selection = document.resolveSelection(next)
+    selection = document.createSelection(next)
     value = value.set('selection', selection)
     return value
   }
