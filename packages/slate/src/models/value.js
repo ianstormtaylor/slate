@@ -437,11 +437,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   addAnnotation(annotation) {
-    annotation = Annotation.create(annotation)
     let value = this
     let { annotations, document } = value
     const { key } = annotation
-    annotation = annotation.normalize(document)
+    annotation = document.createAnnotation(annotation)
     annotations = annotations.set(key, annotation)
     value = value.set('annotations', annotations)
     return value
@@ -574,30 +573,6 @@ class Value extends Record(DEFAULTS) {
     document = document.moveNode(path, newPath, newIndex)
     value = value.set('document', document)
     value = value.mapPoints(point => point.setPath(null))
-    return value
-  }
-
-  /**
-   * Resolve all ranges, ensuring that the keys and offsets in the
-   * range exist, refer to leaf text nodes, and that they are synced
-   * with the paths.
-   *
-   * @param {Editor} editor
-   * @returns {Value}
-   */
-
-  resolveRanges(editor) {
-    let value = this
-    const { document, selection, annotations } = value
-
-    value = value.set('selection', selection.normalize(document, editor))
-
-    const anns = annotations.map(annotation =>
-      annotation.normalize(document, editor)
-    )
-
-    value = value.set('annotations', anns)
-
     return value
   }
 

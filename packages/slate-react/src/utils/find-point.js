@@ -86,9 +86,7 @@ function findPoint(nativeNode, nativeOffset, editor) {
   const { value } = editor
   if (!value.document.hasDescendant(key)) return null
 
-  const point = value.document
-    .createPoint({ key, offset })
-    .normalize(value.document, editor)
+  const point = value.document.createPoint({ key, offset })
   return point
 }
 

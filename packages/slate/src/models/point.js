@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import warning from 'tiny-warning'
+import invariant from 'tiny-invariant'
 import { Record } from 'immutable'
 
 import KeyUtils from '../utils/key-utils'
@@ -374,7 +375,63 @@ class Point extends Record(DEFAULTS) {
     }
 
     if (!target) {
-      warning(false, "A point's `path` or `key` was invalid and was reset!")
+      invariant(false, "A point's `path` or `key` was invalid and was reset!")
+    }
+
+    if (target.object !== 'text') {
+      invariant(false, 'A point should not reference a non-text node!')
+    }
+
+    if (target && path && key && key !== target.key) {
+      invariant(false, "A point's `key` did not match its `path`!")
+    }
+
+    const point = this.merge({
+      key: target.key,
+      path: path == null ? node.getPath(target.key) : path,
+      offset: offset == null ? 0 : Math.min(offset, target.text.length),
+    })
+
+    return point
+  }
+
+  /**
+   * Deprecated.
+   */
+
+  normalize(node) {
+    warning(
+      false,
+      'As of slate@0.48 the `normalize` method has been deprecated. Use the `getInsertPoint` editor query instead.'
+    )
+
+    // If both the key and path are null, there's no reference to a node, so
+    // make sure it is entirely unset.
+    if (this.key == null && this.path == null) {
+      return this.setOffset(null)
+    }
+
+    const { key, offset, path } = this
+
+    // PERF: this function gets called a lot.
+    // to avoid creating the key -> path lookup table, we attempt to look up by path first.
+    let target = path && node.getNode(path)
+
+    if (!target) {
+      target = node.getNode(key)
+
+      if (target) {
+        // There is a misalignment of path and key
+        const point = this.merge({
+          path: node.getPath(key),
+        })
+
+        return point
+      }
+    }
+
+    if (!target) {
+      warning(false, "A point's `path` or `key` invalid and was reset!")
 
       const text = node.getFirstText()
       if (!text) return Point.create()
@@ -408,26 +465,30 @@ class Point extends Record(DEFAULTS) {
       // TODO: if we look up by path above and it differs by key, do we want to reset it to looking up by key?
     }
 
-    const point = this.merge({
+    let point = this.merge({
       key: target.key,
       path: path == null ? node.getPath(target.key) : path,
       offset: offset == null ? 0 : Math.min(offset, target.text.length),
     })
 
+    // COMPAT: There is an ambiguity, since a point can exist at the end of a
+    // text node, or at the start of the following one. To eliminate it we
+    // enforce that if there is a following text node, we always move it there.
+    if (point.offset === target.text.length) {
+      const block = node.getClosestBlock(point.path)
+      // TODO: this next line is broken because `getNextText` takes a path
+      const next = block.getNextText()
+
+      if (next) {
+        point = point.merge({
+          key: next.key,
+          path: node.getPath(next.key),
+          offset: 0,
+        })
+      }
+    }
+
     return point
-  }
-
-  /**
-   * Deprecated.
-   */
-
-  normalize(point) {
-    warning(
-      false,
-      'As of slate@0.48 the `normalize` method has been deprecated. Use the `getInsertPoint` editor query instead.'
-    )
-
-    return this.resolveToTextNode(point)
   }
 
   /**

@@ -594,7 +594,7 @@ Commands.select = (editor, properties, options = {}) => {
   const { document, selection } = value
   const newProperties = {}
   let next = selection.setProperties(properties)
-  next = document.resolveSelection(next, editor)
+  next = document.createSelection(next)
 
   // Re-compute the properties, to ensure that we get their normalized values.
   properties = pick(next, Object.keys(properties))

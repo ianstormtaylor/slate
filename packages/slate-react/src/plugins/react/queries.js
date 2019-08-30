@@ -1,5 +1,5 @@
 import getWindow from 'get-window'
-import { PathUtils } from 'slate'
+import { Range, PathUtils } from 'slate'
 
 import DATA_ATTRS from '../../constants/data-attributes'
 import SELECTORS from '../../constants/selectors'
@@ -180,14 +180,14 @@ function QueriesPlugin() {
           ? x - rect.left < rect.left + rect.width - x
           : y - rect.top < rect.top + rect.height - y
 
-      const range = document.createRange().normalize(document, editor)
+      const range = editor.getInsertRange(document.createRange(), document)
       const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
       const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](
         path
       )
 
       if (entry) {
-        return range[move](entry).normalize(editor)
+        return range[move](entry)
       }
 
       return null
@@ -434,12 +434,10 @@ function QueriesPlugin() {
     }
 
     const { document } = value
-    const range = document
-      .createRange({
-        anchor,
-        focus,
-      })
-      .normalize(document, editor)
+    const range = editor.getInsertRange(
+      Range.create({ anchor, focus }),
+      document
+    )
 
     return range
   }
@@ -490,7 +488,10 @@ function QueriesPlugin() {
       range = range.setFocus(focus.setOffset(0))
     }
 
-    let selection = document.createSelection(range).normalize(document, editor)
+    let selection = editor.getInsertRange(
+      document.createSelection(range),
+      document
+    )
 
     // COMPAT: Ensure that the `isFocused` argument is set.
     selection = selection.setIsFocused(true)

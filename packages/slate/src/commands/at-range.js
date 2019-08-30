@@ -24,7 +24,7 @@ function deleteExpandedAtRange(editor, range) {
   if (document.hasDescendant(start.path)) {
     range = range.moveToStart()
   } else {
-    range = editor.getInsertPoint(range.moveTo(end.path, 0), document)
+    range = range.moveTo(end.path, 0)
   }
 
   return range
@@ -1070,7 +1070,6 @@ Commands.splitBlockAtRange = (editor, range, height = 1) => {
         range = range.moveFocusTo(range.anchor.key, end.offset - start.offset)
       }
 
-      range = editor.getResolvedRange(range, document)
       editor.deleteAtRange(range)
     }
   })

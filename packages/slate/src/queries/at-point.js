@@ -2,7 +2,6 @@ import { Set } from 'immutable'
 
 import Document from '../models/document'
 import PathUtils from '../utils/path-utils'
-import Range from '../models/range'
 
 /**
  * Queries.
@@ -305,15 +304,13 @@ Queries.getInsertPoint = (editor, point, node) => {
  * offsets in the range exist and that they are synced with the paths.
  *
  * @param {Editor} editor
- * @param {Range|Object} range
+ * @param {Range} range
  * @param {Node} node
  * @return {Range}
  */
 
 Queries.getInsertRange = (editor, range, node) => {
-  range = Range.create(range)
-  range = range.normalize(node, editor)
-  return range
+  return range.updatePoints(point => editor.getInsertPoint(point, node))
 }
 
 /**

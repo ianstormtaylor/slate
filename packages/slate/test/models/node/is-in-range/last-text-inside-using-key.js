@@ -1,7 +1,6 @@
 /** @jsx h */
 
 import h from '../../../helpers/h'
-import { Editor } from 'slate'
 
 export const input = (
   <value>
@@ -31,10 +30,8 @@ export const input = (
   </value>
 )
 
-export default function(value) {
-  const editor = new Editor({ value })
-  const { document, selection } = value
-  return document.isInRange('j', selection, editor)
+export default function({ document, selection }) {
+  return document.isInRange('j', selection)
 }
 
 export const output = true
