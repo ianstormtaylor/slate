@@ -56,12 +56,10 @@ function findRange(native, editor) {
   if (!anchor || !focus) return null
 
   const { document } = value
-  const range = document
-    .createRange({
-      anchor,
-      focus,
-    })
-    .normalize(document, editor)
+  const range = document.createRange({
+    anchor,
+    focus,
+  })
 
   return range
 }

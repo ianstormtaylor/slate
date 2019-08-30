@@ -350,10 +350,10 @@ export function createValue(tagName, attributes, children) {
     selection = Selection.create()
   }
 
-  selection = selection.resolveToTextNodes(document)
+  selection = document.createSelection(selection)
 
   if (annotations.length > 0) {
-    annotations = annotations.map(a => a.resolveToTextNodes(document))
+    annotations = annotations.map(a => document.createAnnotation(a))
   }
 
   const value = Value.fromJSON({

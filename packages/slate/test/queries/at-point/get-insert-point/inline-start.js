@@ -3,24 +3,15 @@
 import h from '../../../helpers/h'
 
 export default function(editor) {
-  editor.deleteCharForward()
+  const { document, selection } = editor.value
+  return editor.getInsertPoint(selection.anchor, document).toJSON()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <cursor />
-        📛<link>word</link>
-      </paragraph>
-    </document>
-  </value>
-)
-
-export const output = (
-  <value>
-    <document>
-      <paragraph>
+        a
         <link>
           <cursor />
           word
@@ -29,3 +20,9 @@ export const output = (
     </document>
   </value>
 )
+
+export const output = {
+  object: 'point',
+  path: [0, 1, 0],
+  offset: 0,
+}

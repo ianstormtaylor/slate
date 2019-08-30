@@ -122,6 +122,7 @@ describe('slate', () => {
 
     editor.setValue(input)
     fn(editor)
+    editor.flush()
     const actual = editor.value.toJSON(opts)
 
     editor.setValue(output)
@@ -159,6 +160,19 @@ describe('slate', () => {
     editor.setValue(output)
     const expected = output.toJSON(opts)
 
+    assert.deepEqual(actual, expected)
+  })
+
+  fixtures(__dirname, 'queries', ({ module }) => {
+    const { input, output, plugins: module_plugins } = module
+    const fn = module.default
+    const editor = new Editor({
+      plugins: module_plugins ? plugins.concat(module_plugins) : plugins,
+    })
+
+    editor.setValue(input)
+    const actual = fn(editor)
+    const expected = output
     assert.deepEqual(actual, expected)
   })
 

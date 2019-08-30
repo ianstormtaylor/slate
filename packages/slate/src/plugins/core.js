@@ -1,5 +1,6 @@
-import AtPoint from '../queries/at-point'
-import AtRange from '../commands/at-range'
+import AtPointQueries from '../queries/at-point'
+import AtRangeCommands from '../commands/at-range'
+import AtRangeQueries from '../queries/at-range'
 import ByPath from '../commands/by-path'
 import Commands from './commands'
 import OnHistory from '../commands/on-history'
@@ -8,7 +9,8 @@ import OnValue from '../commands/on-value'
 import Queries from './queries'
 import Schema from './schema'
 import Text from '../models/text'
-import WithIntent from '../commands/with-intent'
+import WithIntentCommands from '../commands/with-intent'
+import WithIntentQueries from '../queries/with-intent'
 
 /**
  * A plugin that defines the core Slate logic.
@@ -27,12 +29,12 @@ function CorePlugin(options = {}) {
    */
 
   const commands = Commands({
-    ...AtRange,
+    ...AtRangeCommands,
     ...ByPath,
     ...OnHistory,
     ...OnSelection,
     ...OnValue,
-    ...WithIntent,
+    ...WithIntentCommands,
   })
 
   /**
@@ -44,7 +46,9 @@ function CorePlugin(options = {}) {
   const queries = Queries({
     isAtomic: () => false,
     isVoid: () => false,
-    ...AtPoint,
+    ...AtPointQueries,
+    ...AtRangeQueries,
+    ...WithIntentQueries,
   })
 
   /**

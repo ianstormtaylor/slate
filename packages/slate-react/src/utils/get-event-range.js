@@ -49,7 +49,7 @@ function getEventRange(event, editor) {
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 
-    const range = document.createRange().normalize(document, editor)
+    const range = document.createRange()
     const move = isPrevious ? 'moveToEndOfNode' : 'moveToStartOfNode'
     const entry = document[isPrevious ? 'getPreviousText' : 'getNextText'](path)
 

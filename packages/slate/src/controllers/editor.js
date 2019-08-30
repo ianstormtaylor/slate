@@ -95,7 +95,7 @@ class Editor {
 
     // Apply the operation to the value.
     debug('apply', { operation })
-    this.value = operation.apply(value).resolveRanges(this.controller)
+    this.value = operation.apply(value)
     this.operations = operations.push(operation)
 
     // Get the paths of the affected nodes, and mark them as dirty.
@@ -138,6 +138,7 @@ class Editor {
    */
 
   flush() {
+    this.normalizeSelection()
     this.run('onChange')
     const { value, operations, controller } = this
     const change = { value, operations }
@@ -219,6 +220,34 @@ class Editor {
     if (selection.isUnset && document.nodes.size) {
       controller.moveToStartOfDocument()
     }
+
+    return controller
+  }
+
+  /**
+   * Check the selection and annotations for errors and disambiguate
+   * ambiguous positions (at the end of nodes, for example)
+   *
+   * @return {Editor}
+   */
+
+  normalizeSelection() {
+    let { value } = this
+    const { controller } = this
+    const { document, selection, annotations } = value
+
+    value = value.set(
+      'selection',
+      controller.getInsertRange(selection, document)
+    )
+
+    const anns = annotations.map(annotation =>
+      controller.getInsertRange(annotation, document)
+    )
+
+    value = value.set('annotations', anns)
+
+    this.value = value
 
     return controller
   }
@@ -388,10 +417,11 @@ class Editor {
 
   setValue(value, options = {}) {
     const { normalize = value !== this.value } = options
-    this.value = value.resolveRanges(this.controller)
+    this.value = value
 
     if (normalize) {
       this.normalize()
+      this.normalizeSelection()
     }
 
     return this

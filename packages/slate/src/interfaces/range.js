@@ -501,12 +501,11 @@ class RangeInterface {
    * and focus nodes of the range always refer to leaf text nodes.
    *
    * @param {Node} node
-   * @param {Editor} editor
    * @return {Range}
    */
 
-  normalize(node, editor) {
-    return this.updatePoints(point => node.resolvePoint(point, editor))
+  normalize(node) {
+    return this.updatePoints(point => point.normalize(node))
   }
 
   /**
