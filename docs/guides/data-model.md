@@ -12,10 +12,10 @@ Because it mirrors the DOM, Slate's data model features a [`Document`](../refere
 
 > The following content on Mozilla's Developer Network may help you learn more about the corresponding DOM concepts:
 >
-> - [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document)
-> - [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements)
-> - [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
-> - [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
+> * [Document](https://developer.mozilla.org/en-US/docs/Web/API/Document)
+> * [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements)
+> * [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
+> * [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
 
 ## Immutable Objects
 
@@ -81,15 +81,15 @@ A Slate document is a nested and recursive structure. In a document block nodes 
 
 Unlike the DOM, Slate offers some constraints to prevent "impossible" situations from occurring. Slate's constraints include:
 
-- **Documents must have block nodes as direct children.** This constraint mirrors how rich-text editors work. The top-most elements are blocks that may be split when pressing <kbd>Enter</kbd>.
+* **Documents must have block nodes as direct children.** This constraint mirrors how rich-text editors work. The top-most elements are blocks that may be split when pressing <kbd>Enter</kbd>.
 
-- **Blocks may contain either only block nodes, or a combination of inline and text nodes.** This constraint helps you avoid boilerplate `if` statements. You can trust blocks either wrap (a) exclusively blocks, or (b) a combination of non-block nodes made up of inline and/or text nodes.
+* **Blocks may contain either only block nodes, or a combination of inline and text nodes.** This constraint helps you avoid boilerplate `if` statements. You can trust blocks either wrap (a) exclusively blocks, or (b) a combination of non-block nodes made up of inline and/or text nodes.
 
-- **Inlines can only contain inline or text nodes.** This constraint helps you avoid boilerplate code. When working within the context of an inline you can trust the contents do not contain blocks.
+* **Inlines can only contain inline or text nodes.** This constraint helps you avoid boilerplate code. When working within the context of an inline you can trust the contents do not contain blocks.
 
-- **Text nodes cannot be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one by Slate which prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you may have an inline node surrounded by two texts.
+* **Text nodes cannot be adjacent to other text nodes.** Any two adjacent text nodes will automatically be merged into one by Slate which prevents ambiguous cases where a cursor could be at the end of one text node or at the start of the next. However, you may have an inline node surrounded by two texts.
 
-- **Blocks and inlines must always contain at least one text node.** This constraint ensures that the user's cursor can always "enter" the nodes and that ranges can be created referencing them.
+* **Blocks and inlines must always contain at least one text node.** This constraint ensures that the user's cursor can always "enter" the nodes and that ranges can be created referencing them.
 
 Slate enforces all of these constraints for you automatically. As you [run commands](./commands-and-queries.md) to manipulate the document, Slate will normalize the value if it determines the document violates any of these constraints.
 
@@ -124,8 +124,8 @@ If you happened to add another overlapping section of `<strike>` to that text, y
 
 Of course, this mark ordering stuff sounds pretty complex. But, you do not have to think about it much, as long as you use marks and inlines for their intended purposes:
 
-- Marks represent **unordered**, character-level formatting.
-- Inlines represent **contiguous**, semantic elements in the document.
+* Marks represent **unordered**, character-level formatting.
+* Inlines represent **contiguous**, semantic elements in the document.
 
 ## Ranges, Points and "The Selection"
 
@@ -133,8 +133,8 @@ Just like the DOM, you can reference a part of the document using a `Range`. Sla
 
 Ranges are defined by two `Point`s:
 
-- **Anchor point** is where the range starts
-- **Focus point** is where the range ends
+* **Anchor point** is where the range starts
+* **Focus point** is where the range ends
 
 > Note: The terms "anchor" and "focus" are borrowed from the DOM API (see [anchor](https://developer.mozilla.org/en-US/docs/Web/API/Selection/anchorNode) and [focus](https://developer.mozilla.org/en-US/docs/Web/API/Selection/focusNode)).
 
