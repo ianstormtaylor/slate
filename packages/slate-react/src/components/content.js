@@ -22,6 +22,26 @@ import removeAllRanges from '../utils/remove-all-ranges'
 
 const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "nodeType"/
 
+const selectionsEqual = (sel1, sel2) => {
+  const propsToCompare = [
+    'anchorNode',
+    'anchorOffset',
+    'focusNode',
+    'focusOffset',
+    'isCollapsed',
+    'rangeCount',
+    'type',
+  ]
+
+  for (const prop of propsToCompare) {
+    if (sel1[prop] !== sel2[prop]) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  * Debug.
  *
@@ -77,6 +97,8 @@ class Content extends React.Component {
     style: {},
     tagName: 'div',
   }
+
+  nativeSelection = {}
 
   /**
    * An error boundary. If there is a render error, we increment `errorKey`
@@ -237,7 +259,12 @@ class Content extends React.Component {
 
     // If the Slate selection is unset, but the DOM selection has a range
     // selected in the editor, we need to remove the range.
-    if (selection.isUnset && rangeCount && this.isInEditor(anchorNode)) {
+    if (
+      selection.isUnset &&
+      rangeCount &&
+      this.isInEditor(anchorNode) &&
+      selectionsEqual(this.nativeSelection, native)
+    ) {
       removeAllRanges(native)
       updated = true
     }
@@ -491,11 +518,23 @@ class Content extends React.Component {
     const window = getWindow(event.target)
     const { activeElement } = window.document
 
+    const native = window.getSelection()
+
     debug.update('onNativeSelectionChange', {
-      anchorOffset: window.getSelection().anchorOffset,
+      anchorOffset: native.anchorOffset,
     })
 
     if (activeElement !== this.ref.current) return
+
+    this.nativeSelection = {
+      anchorNode: native.anchorNode,
+      anchorOffset: native.anchorOffset,
+      focusNode: native.focusNode,
+      focusOffset: native.focusOffset,
+      isCollapsed: native.isCollapsed,
+      rangeCount: native.rangeCount,
+      type: native.type,
+    }
 
     this.props.onEvent('onSelect', event)
   }, 100)
