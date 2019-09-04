@@ -151,7 +151,7 @@ Move the `{Point}` of the range to a new `key`, `path` and `offset`. The `{Point
 
 Move the `{Point}` to the end of a `node`. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
+> 🤖 This method may need to be followed by `range.normalize(document)`, like [`move{Point}To`](#movepointto).
 
 ### `move{Point}ToStartOfNode`
 
@@ -159,7 +159,7 @@ Move the `{Point}` to the end of a `node`. The `{Point}` can be one of: `Anchor`
 
 Move the `{Point}` to the start of a `node`. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
+> 🤖 This method may need to be followed by `range.normalize(document)`, like [`move{Point}To`](#movepointto).
 
 ### `moveTo{Point}`
 
@@ -173,7 +173,7 @@ Move both points of the range to `{Point}`, collapsing it. The `{Point}` can be 
 
 Move the range to be spanning the entirity of a `node`, by placing its `anchor` point at the start of the node and its `focus` point at the end of the node.
 
-> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
+> 🤖 This method may need to be followed by `range.normalize(document)`, like [`move{Point}To`](#movepointto).
 
 ### `normalize`
 
