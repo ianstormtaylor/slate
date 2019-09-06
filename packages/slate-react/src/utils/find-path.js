@@ -23,7 +23,7 @@ function findPath(element, editor) {
 
   const { value } = editor
   const { document } = value
-  const path = document.getPath(node)
+  const path = document.getPath(node.key)
   return path
 }
 
