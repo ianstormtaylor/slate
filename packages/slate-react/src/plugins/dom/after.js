@@ -299,7 +299,7 @@ function AfterPlugin(options = {}) {
     const { value } = editor
     const { document, selection } = value
     const window = getWindow(event.target)
-    let target = editor.findEventRange(event)
+    const target = editor.findEventRange(event)
 
     if (!target) {
       return next()
@@ -312,25 +312,29 @@ function AfterPlugin(options = {}) {
 
     editor.focus()
 
-    // If the drag is internal and the target is after the selection, it
-    // needs to account for the selection's content being deleted.
-    if (
-      isDraggingInternally &&
-      selection.end.offset < target.end.offset &&
-      selection.end.path.equals(target.end.path)
-    ) {
-      target = target.moveForward(
-        selection.start.path.equals(selection.end.path)
-          ? 0 - selection.end.offset + selection.start.offset
-          : 0 - selection.end.offset
+    // COMPAT: React's onSelect event breaks after an onDrop event
+    // has fired in a node: https://github.com/facebook/react/issues/11379.
+    // Until this is fixed in React, we dispatch a mouseup event on that
+    // DOM node, since that will make it go back to normal.
+    const el = editor.findDOMNode(target.focus.path)
+
+    if (el) {
+      el.dispatchEvent(
+        new MouseEvent('mouseup', {
+          view: window,
+          bubbles: true,
+          cancelable: true,
+        })
       )
     }
 
-    if (isDraggingInternally) {
-      editor.delete()
-    }
+    const draggedRange = selection
 
     editor.select(target)
+
+    if (isDraggingInternally) {
+      editor.deleteAtRange(draggedRange)
+    }
 
     if (type === 'text' || type === 'html') {
       const { anchor } = target
@@ -364,22 +368,6 @@ function AfterPlugin(options = {}) {
 
     if (type === 'fragment') {
       editor.insertFragment(fragment)
-    }
-
-    // COMPAT: React's onSelect event breaks after an onDrop event
-    // has fired in a node: https://github.com/facebook/react/issues/11379.
-    // Until this is fixed in React, we dispatch a mouseup event on that
-    // DOM node, since that will make it go back to normal.
-    const el = editor.findDOMNode(target.focus.path)
-
-    if (el) {
-      el.dispatchEvent(
-        new MouseEvent('mouseup', {
-          view: window,
-          bubbles: true,
-          cancelable: true,
-        })
-      )
     }
 
     next()
