@@ -83,7 +83,7 @@ Unlike the DOM, Slate offers some constraints to prevent "impossible" situations
 
 * **Documents must have block nodes as direct children.** This constraint mirrors how rich-text editors work. The top-most elements are blocks that may be split when pressing <kbd>Enter</kbd>.
 
-* **Blocks may contain either other block nodes, or inlines and text nodes.** This constraint helps you avoid boilerplate `if` statements. You can trust blocks either wrap other blocks, or contain actual content.
+* **Blocks may contain either only block nodes, or a combination of inline and text nodes.** This constraint helps you avoid boilerplate `if` statements. You can trust blocks either wrap (a) exclusively blocks, or (b) a combination of non-block nodes made up of inline and/or text nodes.
 
 * **Inlines can only contain inline or text nodes.** This constraint helps you avoid boilerplate code. When working within the context of an inline you can trust the contents do not contain blocks.
 
