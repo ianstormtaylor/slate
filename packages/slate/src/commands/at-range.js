@@ -60,10 +60,12 @@ Commands.addMarkAtRange = (editor, range, mark) => {
       let index = 0
       let length = node.text.length
 
-      if (key === start.key) index = start.offset
       if (key === end.key) length = end.offset
-      if (key === start.key && key === end.key)
-        length = end.offset - start.offset
+
+      if (key === start.key) {
+        index = start.offset
+        length -= start.offset
+      }
 
       editor.addMarkByKey(key, index, length, mark)
     })

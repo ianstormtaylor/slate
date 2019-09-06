@@ -39,6 +39,12 @@ Commands.addMarksByPath = (editor, path, offset, length, marks) => {
   const { document } = value
   const node = document.assertNode(path)
 
+  // Adding zero-length mark makes only sense on zero-length node, otherwise
+  // it will be pruned by normalization anyway.
+  if (length === 0 && node.text.length > 0) {
+    return
+  }
+
   editor.withoutNormalizing(() => {
     // If it ends before the end of the node, we'll need to split to create a new
     // text with different marks.
