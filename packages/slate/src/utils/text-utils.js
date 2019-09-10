@@ -150,6 +150,13 @@ function getCharLength(char) {
 function getCharOffset(text, chars, forward) {
   let offset = 0
 
+  // Handle end/beginning of node: we have to return 1 in order not to
+  // break cursor's jumping to next/previous node. We need to return early
+  // because otherwise, ''.charCodeAt(0) returned NaN and, the default
+  // handling 'latin characters' at the end of the while loop would
+  // would never be reached an we returned '0' as offset.
+  if (text === '') return 1
+
   // Calculate offset sum of each character
   for (let i = 0; i < chars; i++) {
     // `prev` types (better ideas?):
