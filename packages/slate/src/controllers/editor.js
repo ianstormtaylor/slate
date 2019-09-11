@@ -234,20 +234,10 @@ class Editor {
   normalizeSelection() {
     let { value } = this
     const { controller } = this
-    const { document, selection, annotations } = value
 
-    value = value.set(
-      'selection',
-      controller.getInsertRange(selection, document)
+    this.value = value.mapRanges(range =>
+      controller.getInsertRange(range, value.document)
     )
-
-    const anns = annotations.map(annotation =>
-      controller.getInsertRange(annotation, document)
-    )
-
-    value = value.set('annotations', anns)
-
-    this.value = value
 
     return controller
   }
