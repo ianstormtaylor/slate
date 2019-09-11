@@ -125,15 +125,15 @@ class Video extends React.Component {
 
 const VideoUrlInput = props => {
   const [val, setVal] = React.useState(props.defaultValue)
-  
+
   const onChange = React.useCallback(
     e => {
-      setVal(e.target.value);
-      props.onChange(e.target.value);
+      setVal(e.target.value)
+      props.onChange(e.target.value)
     },
     [props.onChange]
   )
-  
+
   return (
     <input
       value={val}
@@ -141,7 +141,7 @@ const VideoUrlInput = props => {
       onClick={props.onClick}
       style={props.style}
     />
-   )
+  )
 }
 
 /**
