@@ -123,13 +123,16 @@ class Video extends React.Component {
  * @type {Component}
  */
 
-const VideoUrlInput = (props) => {
+const VideoUrlInput = props => {
   const [val, setVal] = React.useState(props.defaultValue)
   
-  const onChange = React.useCallback(e => {
-    setVal(e.target.value)
-    props.onChange(e.target.value)
-  }, [props.onChange])
+  const onChange = React.useCallback(
+    e => {
+      setVal(e.target.value);
+      props.onChange(e.target.value);
+    },
+    [props.onChange]
+  )
   
   return (
     <input
