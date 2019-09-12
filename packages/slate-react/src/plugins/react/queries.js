@@ -526,6 +526,35 @@ function QueriesPlugin() {
       }
     }
 
+    // COMPAT: If the selection is at the start of a non-void inline node, and
+    // there is a node before it, put it in the node before instead. This
+    // standardizes the behavior, since it's indistinguishable to the user.
+    if (anchorInline && !editor.isVoid(anchorInline) && anchor.offset === 0) {
+      const block = document.getClosestBlock(anchor.path)
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(anchor.path, depth)
+      const [prev] = block.texts({ path: relativePath, direction: 'backward' })
+
+      if (prev) {
+        const [prevText, prevPath] = prev
+        const absolutePath = anchor.path.slice(0, depth).concat(prevPath)
+        range = range.moveAnchorTo(absolutePath, prevText.text.length)
+      }
+    }
+
+    if (focusInline && !editor.isVoid(focusInline) && focus.offset === 0) {
+      const block = document.getClosestBlock(focus.path)
+      const depth = document.getDepth(block.key)
+      const relativePath = PathUtils.drop(focus.path, depth)
+      const [prev] = block.texts({ path: relativePath, direction: 'backward' })
+
+      if (prev) {
+        const [prevText, prevPath] = prev
+        const absolutePath = focus.path.slice(0, depth).concat(prevPath)
+        range = range.moveFocusTo(absolutePath, prevText.text.length)
+      }
+    }
+
     let selection = document.createSelection(range)
 
     // COMPAT: Ensure that the `isFocused` argument is set.
