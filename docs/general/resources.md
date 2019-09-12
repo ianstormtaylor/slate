@@ -32,6 +32,7 @@ These products use Slate, and can give you an idea of what's possible:
 * [Sanity.io](https://www.sanity.io)
 * [Taskade](https://www.taskade.com/)
 * [Yuque](https://www.yuque.com/)
+* [Thoughts](https://thoughts.teambition.com)
 
 ## Editors
 
