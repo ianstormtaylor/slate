@@ -232,7 +232,7 @@ class Editor {
    */
 
   normalizeSelection() {
-    let { value } = this
+    const { value } = this
     const { controller } = this
 
     this.value = value.mapRanges(range =>
