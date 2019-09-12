@@ -20,7 +20,7 @@ Commands.save = (editor, operation) => {
   const { operations, value } = editor
   const { data } = value
   let { save, merge } = editor.tmp
-  if (save === false) return
+  if (save === false || !isValidOperation(operation)) return
 
   let undos = data.get('undos') || List()
   const lastBatch = undos.last()
@@ -78,12 +78,12 @@ Commands.redo = editor => {
     editor.withoutNormalizing(() => {
       // Replay the batch of operations.
       batch.forEach(op => {
-        const { type, properties } = op
+        const { type, newProperties } = op
 
         // When the operation mutates the selection, omit its `isFocused` value to
         // prevent the editor focus from changing during redoing.
         if (type === 'set_selection') {
-          op = op.set('properties', omit(properties, 'isFocused'))
+          op = op.set('newProperties', omit(newProperties, 'isFocused'))
         }
 
         editor.applyOperation(op)
@@ -120,12 +120,15 @@ Commands.undo = editor => {
         .reverse()
         .map(op => op.invert())
         .forEach(inverse => {
-          const { type, properties } = inverse
+          const { type, newProperties } = inverse
 
           // When the operation mutates the selection, omit its `isFocused` value to
           // prevent the editor focus from changing during undoing.
           if (type === 'set_selection') {
-            inverse = inverse.set('properties', omit(properties, 'isFocused'))
+            inverse = inverse.set(
+              'newProperties',
+              omit(newProperties, 'isFocused')
+            )
           }
 
           editor.applyOperation(inverse)
@@ -193,6 +196,24 @@ function shouldMerge(o, p) {
       o.path.equals(p.path))
 
   return merge
+}
+
+/**
+ * Check weather an operation needs to be saved to the history
+ * @param {Object} o - operation
+ * @returns {Boolean}
+ */
+
+function isValidOperation(o) {
+  if (o.type === 'set_selection') {
+    const { isFocused, anchor, focus } = o.newProperties
+
+    // this is blur/focus operation, dont need to store it into the history
+    if (isFocused !== undefined && !anchor && !focus) {
+      return false
+    }
+  }
+  return true
 }
 
 /**

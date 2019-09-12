@@ -9,6 +9,7 @@ import omit from 'lodash/omit'
 import { Editor as Controller } from 'slate'
 
 import EVENT_HANDLERS from '../constants/event-handlers'
+import OTHER_HANDLERS from '../constants/other-handlers'
 import Content from './content'
 import ReactPlugin from '../plugins/react'
 
@@ -51,6 +52,10 @@ class Editor extends React.Component {
     tabIndex: Types.number,
     value: SlateTypes.value,
     ...EVENT_HANDLERS.reduce((obj, handler) => {
+      obj[handler] = Types.func
+      return obj
+    }, {}),
+    ...OTHER_HANDLERS.reduce((obj, handler) => {
       obj[handler] = Types.func
       return obj
     }, {}),
