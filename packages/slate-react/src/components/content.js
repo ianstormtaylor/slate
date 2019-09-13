@@ -198,6 +198,7 @@ class Content extends React.Component {
     debug.update('componentDidUpdate')
 
     this.updateSelection()
+    this.props.editor.clearUserActionPerformed()
 
     this.props.onEvent('onComponentDidUpdate')
   }
@@ -316,8 +317,11 @@ class Content extends React.Component {
         }
       }
 
-      // Scroll to the selection, in case it's out of view.
-      scrollToSelection(native)
+      // Only scroll to selection when a user action is performed
+      if (editor.userActionPerformed() === true) {
+        // Scroll to the selection, in case it's out of view.
+        scrollToSelection(native)
+      }
 
       // Then unset the `isUpdatingSelection` flag after a delay.
       setTimeout(() => {
