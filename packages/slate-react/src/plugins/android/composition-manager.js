@@ -582,6 +582,36 @@ function CompositionManager(editor) {
         clearAction()
       }
 
+      const isPointsEqual = (point1, point2) => {
+        if (point1.path.size !== point2.path.size) {
+          return false
+        }
+
+        if (point1.offset !== point2.offset) {
+          return false
+        }
+
+        return point1.key === point2.key
+      }
+
+      const isRangesEqual = (range1, range2) => {
+        return (
+          isPointsEqual(range1.anchor, range2.anchor) &&
+          isPointsEqual(range1.focus, range2.focus)
+        )
+      }
+
+      // It's important that we don't run the select middleware or commit the
+      // selection to the value when the diff has a value. When the diff is
+      // non-null, the text structure in the value is different compared to the DOM.
+      if (
+        range.isSet &&
+        last.diff === null &&
+        !isRangesEqual(editor.value.selection, range)
+      ) {
+        editor.select(range)
+      }
+
       last.range = range
       last.node = domSelection.anchorNode
     })
