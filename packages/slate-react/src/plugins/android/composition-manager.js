@@ -583,15 +583,7 @@ function CompositionManager(editor) {
       }
 
       const isPointsEqual = (point1, point2) => {
-        if (point1.path.size !== point2.path.size) {
-          return false
-        }
-
-        if (point1.offset !== point2.offset) {
-          return false
-        }
-
-        return point1.key === point2.key
+        return point1.offset === point2.offset && point1.key === point2.key
       }
 
       const isRangesEqual = (range1, range2) => {
