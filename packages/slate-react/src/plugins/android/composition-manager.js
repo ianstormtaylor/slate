@@ -31,6 +31,20 @@ function renderSync(editor, fn) {
 }
 
 /**
+ * Takes a the range and the editor. It will take the selection from the editor
+ * and apply the range's anchor and focus on it.
+ *
+ * @param {Editor} editor
+ * @param {Range} range
+ */
+
+function selectionFromRange(editor, range) {
+  return editor.value.selection
+    .moveAnchorTo(range.anchor)
+    .moveFocusTo(range.focus)
+}
+
+/**
  * Takes text from a dom node and an offset within that text and returns an
  * object with fixed text and fixed offset which removes zero width spaces
  * and adjusts the offset.
@@ -191,7 +205,7 @@ function CompositionManager(editor) {
       applyDiff()
 
       if (last.range) {
-        editor.select(last.range)
+        editor.select(selectionFromRange(editor, last.range))
       } else {
         debug('splitBlock:NO-SELECTION')
       }
@@ -232,7 +246,7 @@ function CompositionManager(editor) {
         applyDiff()
 
         editor
-          .select(last.range)
+          .select(selectionFromRange(editor, last.range))
           .deleteBackward()
           .focus()
           .restoreDOM()
@@ -308,7 +322,7 @@ function CompositionManager(editor) {
     if (last.range && !last.range.isCollapsed) {
       renderSync(editor, () => {
         editor
-          .select(last.range)
+          .select(selectionFromRange(editor, last.range))
           .deleteBackward()
           .focus()
           .restoreDOM()
@@ -437,7 +451,7 @@ function CompositionManager(editor) {
 
     renderSync(editor, () => {
       editor
-        .select(nodeSelection)
+        .select(selectionFromRange(editor, nodeSelection))
         .delete()
         .restoreDOM()
     })
@@ -504,7 +518,7 @@ function CompositionManager(editor) {
            */
 
           editor
-            .select(range)
+            .select(selectionFromRange(editor, range))
             .focus()
             .restoreDOM()
         })
@@ -601,7 +615,7 @@ function CompositionManager(editor) {
         last.diff === null &&
         !isRangesEqual(editor.value.selection, range)
       ) {
-        editor.select(range)
+        editor.select(selectionFromRange(editor, range))
       }
 
       last.range = range
