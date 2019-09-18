@@ -273,13 +273,15 @@ function CompositionManager(editor) {
     if (startActionFrameId) window.cancelAnimationFrame(startActionFrameId)
 
     startActionFrameId = window.requestAnimationFrame(() => {
-      if (bufferedMutations.length > 0) {
-        flushAction(bufferedMutations)
+      try {
+        if (bufferedMutations.length > 0) {
+          flushAction(bufferedMutations)
+        }
+      } finally {
+        startActionFrameId = null
+        bufferedMutations = []
+        isFlushing = false
       }
-
-      startActionFrameId = null
-      bufferedMutations = []
-      isFlushing = false
     })
   }
 
