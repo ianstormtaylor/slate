@@ -39,9 +39,7 @@ function renderSync(editor, fn) {
  */
 
 function selectionFromRange(editor, range) {
-  return editor.value.selection
-    .moveAnchorTo(range.anchor)
-    .moveFocusTo(range.focus)
+  return editor.value.selection.setAnchor(range.anchor).setFocus(range.focus)
 }
 
 /**
