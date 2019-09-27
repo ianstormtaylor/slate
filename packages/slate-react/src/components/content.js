@@ -221,7 +221,7 @@ class Content extends React.Component {
 
     // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
-    if (!native) {
+    if (!native || editor.isComposing()) {
       return
     }
 
