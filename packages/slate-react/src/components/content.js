@@ -452,7 +452,8 @@ class Content extends React.Component {
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
     //
-    // SAFARI: The updateSelection causes a premature onCompositionEnd to fire.
+    // SAFARI: When composing, the updateSelection causes a premature
+    // onCompositionEnd to fire. (2019/09/28)
     if (!IS_ANDROID && !IS_SAFARI && handler === 'onSelect') {
       const { editor } = this.props
       const { value } = editor
