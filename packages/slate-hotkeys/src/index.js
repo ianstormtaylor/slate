@@ -38,6 +38,7 @@ const APPLE_HOTKEYS = {
   extendLineForward: 'opt+shift+down',
   redo: 'cmd+shift+z',
   transposeCharacter: 'ctrl+t',
+  longPressSelect: ['1', '2', '3', '4', '5', '6', '7', '8', '9'],
 }
 
 const WINDOWS_HOTKEYS = {

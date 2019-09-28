@@ -3,7 +3,13 @@ import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
-import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
+import {
+  IS_MAC,
+  IS_SAFARI,
+  IS_IOS,
+  IS_IE,
+  IS_EDGE,
+} from 'slate-dev-environment'
 
 import cloneFragment from '../../utils/clone-fragment'
 import getEventTransfer from '../../utils/get-event-transfer'
@@ -27,6 +33,7 @@ const debug = Debug('slate:after')
 function AfterPlugin(options = {}) {
   let isDraggingInternally = null
   let isMouseDown = false
+  let lastKeyDown = null
 
   /**
    * On before input.
@@ -45,7 +52,35 @@ function AfterPlugin(options = {}) {
     // gets triggered for character insertions, so we can just insert directly.
     if (isSynthetic) {
       event.preventDefault()
-      editor.insertText(event.data)
+
+      if (IS_MAC && !IS_SAFARI) {
+        // On MacOS you can long press certain character to display a
+        // popover with different accented versions of that character.
+        // When selecting an accented character from the popover, you will
+        // key down a number between 1-9 (isLongPressSelect). This will trigger
+        // an `onKeyDown` event, followed by an `onBeforeInput` event with
+        // the accented character. The data from the `onBeforeInput` event
+        // will be different from the last `onKeyDown` event.
+        //
+        // https://support.apple.com/en-us/HT201586
+
+        const text = typeof event.data !== 'string' ? '0' : event.data
+        const charCodeOfText = text.charCodeAt(0)
+
+        if (
+          Hotkeys.isLongPressSelect({ key: lastKeyDown }) &&
+          lastKeyDown !== text &&
+          charCodeOfText >= 192 && // Unicode range of accented latin chars
+          charCodeOfText <= 669
+        ) {
+          const { selection } = value
+          const range = selection.moveFocusBackward(1)
+          editor.insertTextAtRange(range, text, selection.marks)
+        } else {
+          editor.insertText(event.data)
+        }
+      }
+
       return next()
     }
 
@@ -439,6 +474,8 @@ function AfterPlugin(options = {}) {
     const { document, selection } = value
     const { start } = selection
     const hasVoidParent = document.hasVoidParent(start.path, editor)
+
+    lastKeyDown = event.key
 
     // COMPAT: In iOS, some of these hotkeys are handled in the
     // `onNativeBeforeInput` handler of the `<Content>` component in order to
