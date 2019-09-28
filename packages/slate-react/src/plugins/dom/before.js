@@ -115,7 +115,14 @@ function BeforePlugin() {
     // The `count` check here ensures that if another composition starts
     // before the timeout has closed out this one, we will abort unsetting the
     // `isComposing` flag, since a composition is still in affect.
-    window.requestAnimationFrame(() => {
+    //
+    // COMPAT: Safari: When selecting a composition by pressing 'enter',
+    // we want to prevent the default behavior of inserting a new line.
+    // However using requestAnimationFrame here will set isComposing to false
+    // *before* the onKeyDown event for 'enter' is fired. So when the onKeyDown
+    // event is fired for 'enter', it will think that composition has already
+    // ended and will insert a new line.
+    setTimeout(() => {
       if (compositionCount > n) return
       isComposing = false
     })
