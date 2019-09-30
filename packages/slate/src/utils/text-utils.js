@@ -183,8 +183,7 @@ function getCharOffset(text, chars, forward) {
           ) {
             break
           }
-        }
-        else if (prev === 'SURR' || prev === 'BMP') {
+        } else if (prev === 'SURR' || prev === 'BMP') {
           break
         }
 
@@ -242,8 +241,7 @@ function getCharOffset(text, chars, forward) {
           charCode = text.charCodeAt(offset)
           continue
         }
-      }
-      else if (prev === 'MOD') {
+      } else if (prev === 'MOD') {
         offset += 1
         break
       }
