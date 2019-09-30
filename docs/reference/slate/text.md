@@ -30,7 +30,7 @@ The text contents of this node.
 
 ### `marks`
 
-`Immutable.List<Mark>,`
+`Immutable.Set<Mark>,`
 
 A list of marks for this node.
 
