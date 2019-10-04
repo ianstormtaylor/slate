@@ -43,10 +43,19 @@ function renderSync(editor, fn) {
  * @param {Boolean} isLastNode
  */
 
-function fixTextAndOffset(prevText, prevOffset = 0, isLastNode = false) {
+function fixTextAndOffset(prevNode, prevOffset = 0, isLastNode = false) {
+  const prevText = prevNode.textContent
   let nextOffset = prevOffset
   let nextText = prevText
   let index = 0
+
+  // We must account for previous sibling text nodes. The fact that dom text nodes
+  // may be adjacent to each other must not influence slate coordinate system.
+  while (prevNode.previousSibling != null) {
+    prevNode = prevNode.previousSibling
+    nextText = prevNode.textContent + nextText
+    nextOffset += prevNode.textContent.length
+  }
 
   while (index !== -1) {
     index = nextText.indexOf(ZERO_WIDTH_SPACE, index)
@@ -150,6 +159,19 @@ function CompositionManager(editor) {
   }
 
   /**
+   * Compute the selection at the cursor inside a diff
+   */
+
+  function endDiffSelection() {
+    const { diff } = last
+    if (diff == null) return null
+
+    return editor.value.selection
+      .moveFocusTo(diff.path, diff.cursor + diff.start)
+      .moveToFocus()
+  }
+
+  /**
    * Apply the last `diff`
    *
    * We don't want to apply the `diff` at the time it is created because we
@@ -188,10 +210,12 @@ function CompositionManager(editor) {
     debug('splitBlock')
 
     renderSync(editor, () => {
+      const nextSelection = last.range != null ? last.range : endDiffSelection()
+
       applyDiff()
 
-      if (last.range) {
-        editor.select(last.range)
+      if (nextSelection != null) {
+        editor.select(nextSelection)
       } else {
         debug('splitBlock:NO-SELECTION')
       }
@@ -397,7 +421,7 @@ function CompositionManager(editor) {
     // for browsers collapsing a single trailing new lines, so remove it.
     const isLastNode = block.nodes.last() === node
 
-    const fix = fixTextAndOffset(domNode.textContent, 0, isLastNode)
+    const fix = fixTextAndOffset(domNode, 0, isLastNode)
 
     const nextText = fix.text
 
@@ -414,7 +438,10 @@ function CompositionManager(editor) {
       start: diff.start,
       end: diff.end,
       insertText: diff.insertText,
+      cursor: diff.cursor,
     }
+
+    last.range = null
 
     debug('resolveDOMNode:diff', last.diff)
   }
@@ -477,10 +504,9 @@ function CompositionManager(editor) {
           applyDiff()
 
           const domRange = win.getSelection().getRangeAt(0)
-          const domText = domRange.startContainer.textContent
           const offset = domRange.startOffset
 
-          const fix = fixTextAndOffset(domText, offset)
+          const fix = fixTextAndOffset(domRange.startContainer, offset)
 
           const range = editor
             .findRange({
@@ -544,12 +570,12 @@ function CompositionManager(editor) {
       let range = editor.findRange(domSelection)
 
       const anchorFix = fixTextAndOffset(
-        domSelection.anchorNode.textContent,
+        domSelection.anchorNode,
         domSelection.anchorOffset
       )
 
       const focusFix = fixTextAndOffset(
-        domSelection.focusNode.textContent,
+        domSelection.focusNode,
         domSelection.focusOffset
       )
 
