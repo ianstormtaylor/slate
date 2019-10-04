@@ -30,6 +30,17 @@ function renderSync(editor, fn) {
   })
 }
 
+function isPointsEqual(point1, point2) {
+  return point1.offset === point2.offset && point1.key === point2.key
+}
+
+function isRangesEqual(range1, range2) {
+  return (
+    isPointsEqual(range1.anchor, range2.anchor) &&
+    isPointsEqual(range1.focus, range2.focus)
+  )
+}
+
 /**
  * Takes text from a dom node and an offset within that text and returns an
  * object with fixed text and fixed offset which removes zero width spaces
@@ -578,30 +589,21 @@ function CompositionManager(editor) {
       ) {
         debug('onSelect:applyDiff', last.diff)
         applyDiff()
-        editor.select(range)
         clearAction()
-      }
-
-      const isPointsEqual = (point1, point2) => {
-        return point1.offset === point2.offset && point1.key === point2.key
-      }
-
-      const isRangesEqual = (range1, range2) => {
-        return (
-          isPointsEqual(range1.anchor, range2.anchor) &&
-          isPointsEqual(range1.focus, range2.focus)
-        )
       }
 
       // It's important that we don't run the select middleware or commit the
       // selection to the value when the diff has a value. When the diff is
       // non-null, the text structure in the value is different compared to the DOM.
-      if (
-        range.isSet &&
-        last.diff === null &&
-        !isRangesEqual(editor.value.selection, range)
-      ) {
-        editor.select(range)
+      if (last.diff === null && !isRangesEqual(editor.value.selection, range)) {
+        debug('onSelect:applySelection', range.toJS())
+
+        // The editor might not be focused when receiving this selection event, we assume focus
+        editor.select({
+          anchor: range.anchor,
+          focus: range.focus,
+          isFocused: true,
+        })
       }
 
       last.range = range
