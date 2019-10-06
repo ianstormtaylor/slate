@@ -12,7 +12,7 @@ These commands act on the `document` based on the current `selection`. They are 
 `addMark(properties: Object) => Editor` <br/>
 `addMark(type: String) => Editor`
 
-Add a [`mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Add a [`Mark`](./mark.md) to the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `delete`
 
@@ -91,7 +91,7 @@ Split the [`Inline`](./inline.md) node in the current selection by `depth` level
 `removeMark(properties: Object) => Editor` <br/>
 `removeMark(type: String) => Editor`
 
-Remove a [`mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Remove a [`Mark`](./mark.md) from the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `replaceMark`
 
@@ -99,7 +99,7 @@ Remove a [`mark`](./mark.md) from the characters in the current selection. For c
 `replaceMark(oldProperties: Object, newProperties: Object) => Editor` <br/>
 `replaceMark(oldType: String, newType: String) => Editor`
 
-Replace a [`mark`](./mark.md) in the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Replace a [`Mark`](./mark.md) in the characters in the current selection. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `toggleMark`
 
@@ -107,7 +107,7 @@ Replace a [`mark`](./mark.md) in the characters in the current selection. For co
 `toggleMark(properties: Object) => Editor` <br/>
 `toggleMark(type: String) => Editor`
 
-Add or remove a [`mark`](./mark.md) from the characters in the current selection, depending on it already exists on any or not. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Add or remove a [`Mark`](./mark.md) from the characters in the current selection, depending on it already exists on any or not. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlock`
 
@@ -273,7 +273,7 @@ These commands act on a specific [`Range`](./range.md) of the document.
 `addMarkAtRange(range: Range, properties: Object) => Editor` <br/>
 `addMarkAtRange(range: Range, type: String) => Editor`
 
-Add a [`mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Add a [`Mark`](./mark.md) to the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `deleteAtRange`
 
@@ -352,7 +352,7 @@ Split the [`Inline`](./inline.md) node in a `range` by `depth` levels. If the se
 `removeMarkAtRange(range: Range, properties: Object) => Editor` <br/>
 `removeMarkAtRange(range: Range, type: String) => Editor`
 
-Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Remove a [`Mark`](./mark.md) from the characters in a `range`. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `toggleMarkAtRange`
 
@@ -360,7 +360,7 @@ Remove a [`mark`](./mark.md) from the characters in a `range`. For convenience, 
 `toggleMarkAtRange(range: Range, properties: Object) => Editor` <br/>
 `toggleMarkAtRange(range: Range, type: String) => Editor`
 
-Add or remove a [`mark`](./mark.md) from the characters in a `range`, depending on whether any of them already have the mark. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
+Add or remove a [`Mark`](./mark.md) from the characters in a `range`, depending on whether any of them already have the mark. For convenience, you can pass a `type` string or `properties` object to implicitly create a [`Mark`](./mark.md) of that type.
 
 ### `unwrapBlockAtRange`
 
@@ -475,7 +475,7 @@ Remove `length` characters of text starting at an `offset` in a [`Node`](./node.
 `setMarkByKey(key: String, offset: Number, length: Number, properties: Object, newProperties: Object) => Editor`
 `setMarkByPath(path: List, offset: Number, length: Number, properties: Object, newProperties: Object) => Editor`
 
-Set a dictionary of `newProperties` on a [`mark`](./mark.md) on a [`Node`](./node.md) by its `key` or `path`.
+Set a dictionary of `newProperties` on a [`Mark`](./mark.md) on a [`Node`](./node.md) by its `key` or `path`.
 
 ### `setNodeByKey/Path`
 
