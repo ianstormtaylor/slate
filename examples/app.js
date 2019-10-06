@@ -59,7 +59,7 @@ const EXAMPLES = [
   ['Markdown Shortcuts', MarkdownShortcuts, '/markdown-shortcuts'],
   ['Mentions', Mentions, '/mentions'],
   ['Paste HTML', PasteHtml, '/paste-html'],
-  ['Placeholders', Placeholder, '/placeholders'],
+  ['Placeholders', Placeholder, '/placeholder'],
   ['Plain Text', PlainText, '/plain-text'],
   ['Plugins', Plugins, '/plugins'],
   ['Read-only', ReadOnly, '/read-only'],
