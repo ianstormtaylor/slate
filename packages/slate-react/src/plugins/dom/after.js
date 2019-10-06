@@ -79,6 +79,8 @@ function AfterPlugin(options = {}) {
         } else {
           editor.insertText(event.data)
         }
+      } else {
+        editor.insertText(event.data)
       }
 
       return next()
