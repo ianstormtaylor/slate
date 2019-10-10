@@ -355,8 +355,21 @@ function CompositionManager(editor) {
 
     const firstMutation = mutations[0]
 
+    const matchCharacterDataParent = () => {
+      if (firstMutation.target.parentNode !== null) {
+        return firstMutation.target.parentNode
+      } else {
+        const mutationRemoveTarget = mutations.find(m => {
+          if (m.type !== 'childList') return false
+          return m.removedNodes[0] === firstMutation.target
+        })
+
+        return mutationRemoveTarget && mutationRemoveTarget.target
+      }
+    }
+
     if (firstMutation.type === 'characterData') {
-      resolveDOMNode(firstMutation.target.parentNode)
+      resolveDOMNode(matchCharacterDataParent())
     } else if (firstMutation.type === 'childList') {
       if (firstMutation.removedNodes.length > 0) {
         if (mutations.length === 1) {
