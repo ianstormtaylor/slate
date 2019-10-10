@@ -9,6 +9,7 @@ import { List } from 'immutable'
 import {
   IS_ANDROID,
   IS_FIREFOX,
+  IS_IE,
   HAS_INPUT_EVENTS_LEVEL_2,
 } from 'slate-dev-environment'
 import Hotkeys from 'slate-hotkeys'
@@ -492,6 +493,30 @@ class Content extends React.Component {
 
   onNativeSelectionChange = event => {
     if (this.tmp.isUpdatingSelection) return
+
+    // COMPAT: IE11 will send onNativeSelection changes even before
+    // activeElement changes. That puts the browser selection and
+    // activeElement out of sync. The throttle means we can sometimes
+    // only handle the out-of-sync events and skip the in-sync events,
+    // depending on timing. When this happens, it will take two clicks
+    // to enter a field and two clicks to exit it.
+    //
+    // We should skip calling the throttled function if we detect that
+    // the nativeSelection is inside the editor while the
+    // activeSelection is not the editor, and vice versa.
+    if (IS_IE) {
+      const activeElement = window.document.activeElement
+      const native = window.getSelection()
+
+      if (
+        native.focusNode &&
+        (activeElement === this.ref.current) !==
+          this.isInEditor(native.focusNode)
+      ) {
+        return
+      }
+    }
+
     this.throttledOnNativeSelectionChange(event)
   }
 
