@@ -7,7 +7,6 @@ import { Value } from 'slate'
 
 import TRANSFER_TYPES from '../constants/transfer-types'
 import removeAllRanges from './remove-all-ranges'
-import findDOMNode from './find-dom-node'
 import DATA_ATTRS from '../constants/data-attributes'
 import SELECTORS from '../constants/selectors'
 
@@ -56,9 +55,13 @@ function cloneFragment(event, editor, callback = () => undefined) {
   // content, since the spacer is before void's content in the DOM.
   if (endVoid) {
     const r = range.cloneRange()
-    const node = findDOMNode(endVoid, window)
-    r.setEndAfter(node)
-    contents = r.cloneContents()
+    const path = document.getPath(endVoid.key)
+
+    if (path) {
+      const node = editor.findDOMNode(path)
+      r.setEndAfter(node)
+      contents = r.cloneContents()
+    }
   }
 
   // COMPAT: If the start node is a void node, we need to attach the encoded

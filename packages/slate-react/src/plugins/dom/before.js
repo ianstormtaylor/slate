@@ -30,6 +30,7 @@ function BeforePlugin() {
   let isComposing = false
   let isCopying = false
   let isDragging = false
+  let isUserActionPerformed = false
 
   /**
    * On before input.
@@ -40,6 +41,7 @@ function BeforePlugin() {
   const onBeforeInput = (fn, editor) => event => {
     const isSynthetic = !!event.nativeEvent
     if (editor.readOnly) return
+    isUserActionPerformed = true
 
     // COMPAT: If the browser supports Input Events Level 2, we will have
     // attached a custom handler for the real `beforeinput` events, instead of
@@ -105,6 +107,7 @@ function BeforePlugin() {
 
   const onCompositionEnd = (fn, editor) => event => {
     const n = compositionCount
+    isUserActionPerformed = true
 
     // The `count` check here ensures that if another composition starts
     // before the timeout has closed out this one, we will abort unsetting the
@@ -126,6 +129,7 @@ function BeforePlugin() {
 
   const onClick = (fn, editor) => event => {
     debug('onClick', { event })
+    isUserActionPerformed = true
     fn(event)
   }
 
@@ -141,6 +145,7 @@ function BeforePlugin() {
 
     const { value } = editor
     const { selection } = value
+    isUserActionPerformed = true
 
     if (!selection.isCollapsed) {
       // https://github.com/ianstormtaylor/slate/issues/1879
@@ -294,6 +299,7 @@ function BeforePlugin() {
 
   const onDrop = (fn, editor) => event => {
     if (editor.readOnly) return
+    isUserActionPerformed = true
 
     // Prevent default so the DOM's value isn't corrupted.
     event.preventDefault()
@@ -339,6 +345,7 @@ function BeforePlugin() {
   const onInput = (fn, editor) => event => {
     if (isComposing) return
     if (editor.value.selection.isBlurred) return
+    isUserActionPerformed = true
     debug('onInput', { event })
     fn(event)
   }
@@ -381,6 +388,7 @@ function BeforePlugin() {
       event.preventDefault()
     }
 
+    isUserActionPerformed = true
     debug('onKeyDown', { event })
     fn(event)
   }
@@ -404,6 +412,7 @@ function BeforePlugin() {
 
   const onPaste = (fn, editor) => event => {
     if (editor.readOnly) return
+    isUserActionPerformed = true
 
     // Prevent defaults so the DOM state isn't corrupted.
     event.preventDefault()
@@ -427,9 +436,19 @@ function BeforePlugin() {
     // Save the new `activeElement`.
     const window = getWindow(event.target)
     activeElement = window.document.activeElement
+    isUserActionPerformed = true
 
     debug('onSelect', { event })
     fn(event)
+  }
+
+  function userActionPerformed() {
+    return isUserActionPerformed
+  }
+
+  function clearUserActionPerformed() {
+    isUserActionPerformed = false
+    return null
   }
 
   /**
@@ -459,6 +478,8 @@ function BeforePlugin() {
     onKeyUp,
     onPaste,
     onSelect,
+    queries: { userActionPerformed },
+    commands: { clearUserActionPerformed },
   }
 }
 

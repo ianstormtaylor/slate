@@ -68,7 +68,7 @@ These are behaviors that all rich-text editors exhibit, and that don't make sens
 
 For the most part you don't need to worry about the core plugins.
 
-_To learn more, check out the [Core Plugin reference](../reference/slate-react/core-plugins.md)._
+_To learn more, check out the [Core Plugin reference](../reference/slate/plugins.md)._
 
 ## The "Editor" Plugin
 

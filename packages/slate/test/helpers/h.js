@@ -9,6 +9,10 @@ const h = createHyperscript({
     list: 'list',
     item: 'item',
     image: 'image',
+    table: 'table',
+    table_body: 'table_body',
+    table_row: 'table_row',
+    table_cell: 'table_cell',
   },
   inlines: {
     link: 'link',

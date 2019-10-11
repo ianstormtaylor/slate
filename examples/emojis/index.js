@@ -37,7 +37,8 @@ const EMOJIS = [
   '👻',
   '🍔',
   '🍑',
-  '🔑',
+  '👩‍❤️‍👩',
+  '👨‍👩‍👦',
 ]
 
 /**
@@ -158,11 +159,16 @@ class Emojis extends React.Component {
 
   onClickEmoji = (e, code) => {
     e.preventDefault()
+    const { editor } = this
 
-    this.editor
-      .insertInline({ type: 'emoji', data: { code } })
-      .moveToStartOfNextText()
-      .focus()
+    if (e.shiftKey) {
+      editor.insertText(code)
+    } else {
+      editor.insertInline({ type: 'emoji', data: { code } })
+      editor.moveToStartOfNextText()
+    }
+
+    editor.focus()
   }
 }
 

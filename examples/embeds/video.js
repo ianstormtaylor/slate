@@ -13,8 +13,7 @@ class Video extends React.Component {
    * @param {Event} e
    */
 
-  onChange = e => {
-    const video = e.target.value
+  onChange = video => {
     const { node, editor } = this.props
     editor.setNodeByKey(node.key, { data: { video } })
   }
@@ -108,14 +107,41 @@ class Video extends React.Component {
     }
 
     return (
-      <input
-        value={video}
+      <VideoUrlInput
+        defaultValue={video}
         onChange={this.onChange}
         onClick={this.onClick}
         style={style}
       />
     )
   }
+}
+
+/**
+ * The video URL input as controlled input to avoid loosing cursor position.
+ *
+ * @type {Component}
+ */
+
+const VideoUrlInput = props => {
+  const [val, setVal] = React.useState(props.defaultValue)
+
+  const onChange = React.useCallback(
+    e => {
+      setVal(e.target.value)
+      props.onChange(e.target.value)
+    },
+    [props.onChange]
+  )
+
+  return (
+    <input
+      value={val}
+      onChange={onChange}
+      onClick={props.onClick}
+      style={props.style}
+    />
+  )
 }
 
 /**

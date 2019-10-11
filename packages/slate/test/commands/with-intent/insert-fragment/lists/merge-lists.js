@@ -1,17 +1,13 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from '../../../../helpers/h'
 
 export default function(editor) {
   editor.insertFragment(
     <document>
       <list>
-        <item>
-          <paragraph>2</paragraph>
-        </item>
-        <item>
-          <paragraph>3</paragraph>
-        </item>
+        <item>3</item>
+        <item>4</item>
       </list>
     </document>
   )
@@ -21,10 +17,9 @@ export const input = (
   <value>
     <document>
       <list>
+        <item>1</item>
         <item>
-          <paragraph>
-            1<cursor />
-          </paragraph>
+          2<cursor />
         </item>
       </list>
     </document>
@@ -35,13 +30,10 @@ export const output = (
   <value>
     <document>
       <list>
+        <item>1</item>
+        <item>23</item>
         <item>
-          <paragraph>12</paragraph>
-        </item>
-        <item>
-          <paragraph>
-            3<cursor />
-          </paragraph>
+          4<cursor />
         </item>
       </list>
     </document>

@@ -3,6 +3,7 @@ import warning from 'tiny-warning'
 import pick from 'lodash/pick'
 
 import Selection from '../models/selection'
+import TextUtils from '../utils/text-utils'
 
 const Commands = {}
 
@@ -433,9 +434,18 @@ Commands.moveAnchorWordForward = (fn, editor) => () => {
  * @param {Number} n
  */
 
-Commands.moveBackward = (fn, editor) => n => {
-  editor.moveAnchorBackward(n)
-  editor.moveFocusBackward(n)
+Commands.moveBackward = (fn, editor) => (n = 1) => {
+  if (n === 0) return
+  const { value } = editor
+  const { document, selection } = value
+  const { start } = selection
+  const startBlock = document.getClosestBlock(start.key)
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
+  const { text } = startBlock
+  const charsOffset = TextUtils.getCharOffsetBackward(text, offset, n)
+  editor.moveAnchorBackward(charsOffset)
+  editor.moveFocusBackward(charsOffset)
 }
 
 /**
@@ -1126,9 +1136,18 @@ Commands.moveFocusWordForward = (fn, editor) => () => {
  * Move the selection's points each forward by one character.
  */
 
-Commands.moveForward = (fn, editor) => (...args) => {
-  editor.moveAnchorForward(...args)
-  editor.moveFocusForward(...args)
+Commands.moveForward = (fn, editor) => (n = 1) => {
+  if (n === 0) return
+  const { value } = editor
+  const { document, selection } = value
+  const { start } = selection
+  const startBlock = document.getClosestBlock(start.path)
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
+  const { text } = startBlock
+  const charsOffset = TextUtils.getCharOffsetForward(text, offset, n)
+  editor.moveAnchorForward(charsOffset)
+  editor.moveFocusForward(charsOffset)
 }
 
 /**
