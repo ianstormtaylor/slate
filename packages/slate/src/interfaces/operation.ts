@@ -1,17 +1,17 @@
 import { Annotation, Mark, Node, Path } from '..'
 import isPlainObject from 'is-plain-object'
 
-interface AddMarkOperation {
-  type: 'add_mark'
-  path: Path
-  mark: Mark
-  [key: string]: any
-}
-
 interface AddAnnotationOperation {
   type: 'add_annotation'
   key: string
   annotation: Annotation
+  [key: string]: any
+}
+
+interface AddMarkOperation {
+  type: 'add_mark'
+  path: Path
+  mark: Mark
   [key: string]: any
 }
 
