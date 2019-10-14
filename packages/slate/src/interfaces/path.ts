@@ -134,7 +134,7 @@ namespace Path {
    */
 
   export const isAncestor = (path: Path, another: Path): boolean => {
-    return path.length > another.length && Path.compare(path, another) === 0
+    return path.length < another.length && Path.compare(path, another) === 0
   }
 
   /**
@@ -160,7 +160,7 @@ namespace Path {
    */
 
   export const isDescendant = (path: Path, another: Path): boolean => {
-    return path.length < another.length && Path.compare(path, another) === 0
+    return path.length > another.length && Path.compare(path, another) === 0
   }
 
   /**
@@ -195,7 +195,9 @@ namespace Path {
 
     const as = path.slice(0, -1)
     const bs = another.slice(0, -1)
-    return Path.equals(as, bs)
+    const al = path[path.length - 1]
+    const bl = another[another.length - 1]
+    return al !== bl && Path.equals(as, bs)
   }
 
   /**
@@ -266,7 +268,7 @@ namespace Path {
 
     const last = path[path.length - 1]
 
-    if (last >= 0) {
+    if (last <= 0) {
       throw new Error(
         `Cannot get the previous path of a first child path ${path} because it would result in a negative index.`
       )

@@ -7,7 +7,9 @@ import { Path, Text } from '..'
  * annotations on the root value object.
  */
 
-interface Mark {}
+interface Mark {
+  [key: string]: any
+}
 
 /**
  * `MarkEntry` tuples are returned when iterating through the marks in a text
@@ -31,12 +33,7 @@ namespace Mark {
    */
 
   export const isMark = (value: any): value is Mark => {
-    return (
-      isPlainObject(value) &&
-      value.key == null && // not an `Annotation`
-      (value.anchor == null && value.focus == null) && // not a `Decoration`
-      typeof value.type === 'string'
-    )
+    return isPlainObject(value)
   }
 
   /**

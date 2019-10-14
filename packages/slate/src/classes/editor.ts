@@ -45,11 +45,13 @@ class Editor {
   [POINT_REFS]: { [key: number]: PointRef };
   [RANGE_REFS]: { [key: number]: RangeRef }
 
-  constructor(props: {
-    onChange?(change: Change): void
-    readOnly?: boolean
-    value?: Value
-  }) {
+  constructor(
+    props: {
+      onChange?(change: Change): void
+      readOnly?: boolean
+      value?: Value
+    } = {}
+  ) {
     const {
       onChange = () => {},
       readOnly = false,
@@ -86,20 +88,29 @@ interface Editor
     RangeQueries,
     ValueQueries {}
 
-Object.assign(
-  Editor.prototype,
-  AnnotationCommands.prototype,
-  PathCommands.prototype,
-  PointCommands.prototype,
-  RangeCommands.prototype,
-  SelectionCommands.prototype,
-  ValueCommands.prototype,
-  MarkQueries.prototype,
-  NodeQueries.prototype,
-  PathQueries.prototype,
-  PointQueries.prototype,
-  RangeQueries.prototype,
-  ValueQueries.prototype
-)
+const mixin = (Mixins: Array<new () => any>) => {
+  for (const Mixin of Mixins) {
+    for (const key of Object.getOwnPropertyNames(Mixin.prototype)) {
+      if (key !== 'constructor') {
+        Editor.prototype[key] = Mixin.prototype[key]
+      }
+    }
+  }
+}
+
+mixin([
+  AnnotationCommands,
+  PathCommands,
+  PointCommands,
+  RangeCommands,
+  SelectionCommands,
+  ValueCommands,
+  MarkQueries,
+  NodeQueries,
+  PathQueries,
+  PointQueries,
+  RangeQueries,
+  ValueQueries,
+])
 
 export { Editor, EditorConstructor }

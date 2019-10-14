@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Mark, Point, Range } from '..'
+import { Mark, Point, PointKey, Range } from '..'
 
 /**
  * `Selection` objects represent the range in a document that a user has
@@ -10,6 +10,7 @@ import { Mark, Point, Range } from '..'
 interface Selection extends Range {
   isFocused: boolean
   marks: Mark[] | null
+  [key: string]: any
 }
 
 /**
@@ -17,7 +18,7 @@ interface Selection extends Range {
  * objects that belong to an `Selection`.
  */
 
-type SelectionPointEntry = [Point, Selection]
+type SelectionPointEntry = [Point, PointKey, Selection]
 
 namespace Selection {
   /**

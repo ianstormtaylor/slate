@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Mark, Point, Range } from '..'
+import { Mark, Point, PointKey, Range } from '..'
 
 /**
  * `Annotation` objects are a type of formatting that are applied at the
@@ -15,7 +15,7 @@ interface Annotation extends Mark, Range {}
  * objects that belong to an `Annotation`.
  */
 
-type AnnotationPointEntry = [Point, Annotation, string]
+type AnnotationPointEntry = [Point, PointKey, Annotation, string]
 
 namespace Annotation {
   /**

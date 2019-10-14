@@ -11,6 +11,7 @@ import { Operation, Path, Point } from '..'
 interface Range {
   anchor: Point
   focus: Point
+  [key: string]: any
 }
 
 namespace Range {

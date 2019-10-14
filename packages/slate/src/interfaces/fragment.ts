@@ -8,6 +8,7 @@ import { Node } from '..'
 
 interface Fragment {
   nodes: Node[]
+  [key: string]: any
 }
 
 namespace Fragment {

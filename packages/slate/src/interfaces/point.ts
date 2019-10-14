@@ -12,7 +12,14 @@ import { Operation, Path } from '..'
 interface Point {
   path: Path
   offset: number
+  [key: string]: any
 }
+
+/**
+ * `PointKey` is either an "anchor" or "focus" point string.
+ */
+
+type PointKey = 'anchor' | 'focus'
 
 namespace Point {
   /**
@@ -45,7 +52,7 @@ namespace Point {
    */
 
   export const isBefore = (point: Point, another: Point): boolean => {
-    return Point.compare(point, another) === 1
+    return Point.compare(point, another) === -1
   }
 
   /**
@@ -146,4 +153,4 @@ namespace Point {
   }
 }
 
-export { Point }
+export { Point, PointKey }

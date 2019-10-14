@@ -5,18 +5,21 @@ interface AddMarkOperation {
   type: 'add_mark'
   path: Path
   mark: Mark
+  [key: string]: any
 }
 
 interface AddAnnotationOperation {
   type: 'add_annotation'
   key: string
   annotation: Annotation
+  [key: string]: any
 }
 
 interface InsertNodeOperation {
   type: 'insert_node'
   path: Path
   node: Node
+  [key: string]: any
 }
 
 interface InsertTextOperation {
@@ -24,6 +27,7 @@ interface InsertTextOperation {
   path: Path
   offset: number
   text: string
+  [key: string]: any
 }
 
 interface MergeNodeOperation {
@@ -32,30 +36,35 @@ interface MergeNodeOperation {
   position: number
   target: number | null
   properties: {}
+  [key: string]: any
 }
 
 interface MoveNodeOperation {
   type: 'move_node'
   path: Path
   newPath: Path
+  [key: string]: any
 }
 
 interface RemoveAnnotationOperation {
   type: 'remove_annotation'
   key: string
   annotation: Annotation
+  [key: string]: any
 }
 
 interface RemoveMarkOperation {
   type: 'remove_mark'
   path: Path
   mark: Mark
+  [key: string]: any
 }
 
 interface RemoveNodeOperation {
   type: 'remove_node'
   path: Path
   node: Node
+  [key: string]: any
 }
 
 interface RemoveTextOperation {
@@ -63,6 +72,7 @@ interface RemoveTextOperation {
   path: Path
   offset: number
   text: string
+  [key: string]: any
 }
 
 interface SetAnnotationOperation {
@@ -70,6 +80,7 @@ interface SetAnnotationOperation {
   key: string
   properties: {}
   newProperties: {}
+  [key: string]: any
 }
 
 interface SetMarkOperation {
@@ -77,6 +88,7 @@ interface SetMarkOperation {
   path: Path
   properties: {}
   newProperties: {}
+  [key: string]: any
 }
 
 interface SetNodeOperation {
@@ -84,18 +96,21 @@ interface SetNodeOperation {
   path: Path
   properties: {}
   newProperties: {}
+  [key: string]: any
 }
 
 interface SetSelectionOperation {
   type: 'set_selection'
   properties: {} | null
   newProperties: {} | null
+  [key: string]: any
 }
 
 interface SetValueOperation {
   type: 'set_value'
   properties: {}
   newProperties: {}
+  [key: string]: any
 }
 
 interface SplitNodeOperation {
@@ -104,6 +119,7 @@ interface SplitNodeOperation {
   position: number
   target: number | null
   properties: {}
+  [key: string]: any
 }
 
 /**

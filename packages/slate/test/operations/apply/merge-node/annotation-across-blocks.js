@@ -1,8 +1,19 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default [
+export const input = (
+  <value>
+    <block>
+      o<annotation key="a" />ne
+    </block>
+    <block>
+      tw<annotation key="a" />o
+    </block>
+  </value>
+)
+
+export const operations = [
   {
     type: 'merge_node',
     path: [1],
@@ -13,31 +24,16 @@ export default [
   {
     type: 'merge_node',
     path: [0, 1],
-    position: 1,
+    position: 3,
     properties: {},
     target: null,
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>
-        o<highlight key="a" />ne
-      </paragraph>
-      <paragraph>
-        tw<highlight key="a" />o
-      </paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        o<highlight>netw</highlight>o
-      </paragraph>
-    </document>
+    <block>
+      o<annotation key="a">netw</annotation>o
+    </block>
   </value>
 )

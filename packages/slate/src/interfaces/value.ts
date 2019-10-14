@@ -22,6 +22,7 @@ import {
 interface Value extends Element {
   selection: Selection | null
   annotations: Record<string, Annotation>
+  [key: string]: any
 }
 
 /**
@@ -55,14 +56,14 @@ namespace Value {
     const { selection, annotations } = value
 
     if (selection != null) {
-      yield [selection.anchor, selection]
-      yield [selection.focus, selection]
+      yield [selection.anchor, 'anchor', selection]
+      yield [selection.focus, 'focus', selection]
     }
 
     for (const key in annotations) {
       const annotation = annotations[key]
-      yield [annotation.anchor, annotation, key]
-      yield [annotation.focus, annotation, key]
+      yield [annotation.anchor, 'anchor', annotation, key]
+      yield [annotation.focus, 'focus', annotation, key]
     }
   }
 
@@ -96,8 +97,8 @@ namespace Value {
           const index = path[path.length - 1]
           parent.nodes[index] = node
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break
@@ -110,8 +111,8 @@ namespace Value {
           const after = node.text.slice(offset)
           node.text = before + text + after
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break
@@ -136,8 +137,8 @@ namespace Value {
 
           parent.nodes.splice(index, 1)
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break
@@ -160,8 +161,8 @@ namespace Value {
           const newIndex = newPath[newPath.length - 1]
           newParent.nodes.splice(newIndex, 0, node)
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break
@@ -202,7 +203,7 @@ namespace Value {
 
           // Transform all of the points in the value, but if the point was in the
           // node that was removed we need to update the range or remove it.
-          for (const [point, range, key] of Value.points(v)) {
+          for (const [point, k, range, key] of Value.points(v)) {
             const result = Point.transform(point, op)
 
             if (result == null) {
@@ -233,8 +234,8 @@ namespace Value {
           const after = node.text.slice(offset + text.length)
           node.text = before + after
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break
@@ -308,8 +309,8 @@ namespace Value {
 
           parent.nodes.splice(index + 1, 0, newNode)
 
-          for (const [point] of Value.points(v)) {
-            Point.transform(point, op)
+          for (const [point, key, range] of Value.points(v)) {
+            range[key] = Point.transform(point, op)!
           }
 
           break

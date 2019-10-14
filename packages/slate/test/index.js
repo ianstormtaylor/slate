@@ -1,6 +1,7 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { Editor } from 'slate'
+import { TestPlugin } from './helpers'
 
 const plugins = [
   {
@@ -32,23 +33,16 @@ describe('slate', () => {
   })
 
   fixtures(__dirname, 'operations', ({ module }) => {
-    const { input, output } = module
-    const operations = module.default
-    const editor = new Editor({ plugins })
+    const { input, operations, output } = module
+    const TestEditor = TestPlugin(Editor)
+    const editor = new TestEditor({ value: input })
+    editor.normalize({ force: true })
 
-    const opts = {
-      preserveSelection: true,
-      preserveDecorations: true,
+    for (const op of operations) {
+      editor.apply(op)
     }
 
-    editor.setValue(input)
-    operations.forEach(op => editor.applyOperation(op))
-
-    const actual = editor.value.toJSON(opts)
-
-    editor.setValue(output)
-    const expected = editor.value.toJSON(opts)
-    assert.deepEqual(actual, expected)
+    assert.deepEqual(editor.value, output)
   })
 
   // The hyperscript editor has the schema, but the test

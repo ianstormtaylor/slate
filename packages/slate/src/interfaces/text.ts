@@ -10,6 +10,7 @@ import { Mark, Path } from '..'
 interface Text {
   text: string
   marks: Mark[]
+  [key: string]: any
 }
 
 /**

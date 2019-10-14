@@ -1,8 +1,17 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default [
+export const input = (
+  <value>
+    <block>
+      w<cursor />
+      <annotation key="a">or</annotation>d
+    </block>
+  </value>
+)
+
+export const operations = [
   {
     type: 'insert_text',
     path: [0, 0],
@@ -11,24 +20,11 @@ export default [
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>
-        w<cursor />
-        <highlight>or</highlight>d
-      </paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        wx<cursor />
-        <highlight>or</highlight>d
-      </paragraph>
-    </document>
+    <block>
+      wx<cursor />
+      <annotation key="a">or</annotation>d
+    </block>
   </value>
 )

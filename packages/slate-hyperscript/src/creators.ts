@@ -238,7 +238,6 @@ export function createValue(
 
     if (anchor != null) {
       const [offset, token] = anchor
-      debugger
       selection.anchor = { path, offset }
       selection.isFocused = token.focused
       selection.marks = token.marks
@@ -246,7 +245,6 @@ export function createValue(
 
     if (focus != null) {
       const [offset, token] = focus
-      debugger
       selection.focus = { path, offset }
       selection.isFocused = token.focused
       selection.marks = token.marks

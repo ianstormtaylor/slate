@@ -10,6 +10,7 @@ import { Value, Operation } from '..'
 interface Change {
   value: Value
   operations: Operation[]
+  [key: string]: any
 }
 
 namespace Change {

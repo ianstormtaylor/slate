@@ -10,6 +10,7 @@ import { Node, Path, Text } from '..'
 
 interface Element {
   nodes: Node[]
+  [key: string]: any
 }
 
 /**
