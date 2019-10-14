@@ -4,3 +4,4 @@ package.json
 packages/*/dist/
 packages/*/lib/
 tmp/
+.babelrc

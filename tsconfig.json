@@ -1,0 +1,13 @@
+{
+  "extends": "./config/typescript/tsconfig.json",
+  "references": [{ "path": "./packages/slate" }],
+  "files": [],
+  "typedocOptions": {
+    "excludeExternals": true,
+    "hideGenerator": true,
+    "mode": "file",
+    "name": "Slate API Reference",
+    "out": "./site",
+    "readme": null
+  }
+}

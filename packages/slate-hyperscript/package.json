@@ -4,8 +4,9 @@
   "version": "0.13.8",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/slate-hyperscript.js",
-  "module": "lib/slate-hyperscript.es.js",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "types": "lib/index.d.ts",
   "umd": "dist/slate-hyperscript.js",
   "umdMin": "dist/slate-hyperscript.min.js",
   "files": [
@@ -19,11 +20,7 @@
     "slate": ">=0.47.0"
   },
   "devDependencies": {
-    "mocha": "^2.5.3",
     "slate": "^0.47.8"
-  },
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "slate": "Slate"

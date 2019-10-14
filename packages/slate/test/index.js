@@ -1,7 +1,6 @@
 import assert from 'assert'
-import { fixtures } from 'slate-dev-test-utils'
-import { Node, Editor, Value } from 'slate'
-import { List } from 'immutable'
+import { fixtures } from '../../../support/fixtures'
+import { Editor } from 'slate'
 
 const plugins = [
   {
@@ -26,67 +25,10 @@ const plugins = [
 ]
 
 describe('slate', () => {
-  fixtures(__dirname, 'models/operation', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input).toJSON()
-    const expected = output
-    assert.deepEqual(actual, expected)
-  })
-
-  fixtures(__dirname, 'models/point', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    const actual = fn(input)
-    const expected = output
-    assert.equal(actual, expected)
-  })
-
-  // fixtures(__dirname, 'models/text', ({ module }) => {
-  //   const { input, output } = module
-  //   const fn = module.default
-  //   const actual = fn(input).toJSON()
-  //   const expected = output.toJSON()
-  //   assert.deepEqual(actual, expected)
-  // })
-
-  fixtures(__dirname, 'models/node', ({ module }) => {
-    const { input, output } = module
-    const fn = module.default
-    let actual = fn(input)
-    let expected = output
-
-    if (Node.isNode(actual)) {
-      actual = actual.toJSON()
-    }
-
-    if (List.isList(actual)) {
-      actual = actual.toJSON()
-    }
-
-    if (Node.isNode(expected)) {
-      expected = expected.toJSON()
-    }
-
-    if (List.isList(expected)) {
-      expected = expected.toJSON()
-    }
-
-    assert.deepEqual(actual, expected)
-  })
-
-  fixtures(__dirname, 'serializers/raw/deserialize', ({ module }) => {
-    const { input, output, options } = module
-    const actual = Value.fromJSON(input, options).toJSON()
-    const expected = output.toJSON()
-    assert.deepEqual(actual, expected)
-  })
-
-  fixtures(__dirname, 'serializers/raw/serialize', ({ module }) => {
-    const { input, output, options } = module
-    const actual = input.toJSON(options)
-    const expected = output
-    assert.deepEqual(actual, expected)
+  fixtures(__dirname, 'interfaces', ({ module }) => {
+    const { input, test, output } = module
+    const result = test(input)
+    assert.deepEqual(result, output)
   })
 
   fixtures(__dirname, 'operations', ({ module }) => {
@@ -129,15 +71,6 @@ describe('slate', () => {
     assert.deepEqual(actual, expected)
   })
 
-  fixtures(__dirname, 'controllers', ({ module }) => {
-    const { input, output, default: fn } = module
-
-    const actual = fn(input)
-    const expected = output
-
-    assert.equal(actual, expected)
-  })
-
   fixtures(__dirname, 'schema', ({ module }) => {
     const { input, output, schema } = module
     const editor = new Editor({ value: input, plugins: [{ schema }] })
@@ -160,10 +93,5 @@ describe('slate', () => {
     const expected = output.toJSON(opts)
 
     assert.deepEqual(actual, expected)
-  })
-
-  fixtures(__dirname, 'utils/path-utils', ({ module }) => {
-    const fn = module.default
-    fn()
   })
 })

@@ -9,7 +9,6 @@ export const input = (
 )
 
 export const output = {
-  object: 'text',
   text: 'word',
   marks: [],
 }

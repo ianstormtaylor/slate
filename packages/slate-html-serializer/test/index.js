@@ -2,7 +2,7 @@ import Html from 'slate-html-serializer'
 import assert from 'assert'
 import { JSDOM } from 'jsdom'
 import { Value } from 'slate'
-import { fixtures } from 'slate-dev-test-utils'
+import { fixtures } from '../../../support/fixtures'
 
 describe('slate-html-serializer', () => {
   fixtures(__dirname, 'deserialize', ({ module }) => {

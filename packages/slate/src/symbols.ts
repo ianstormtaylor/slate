@@ -1,0 +1,6 @@
+export const DIRTY_PATHS = Symbol('dirtyPaths')
+export const NORMALIZING = Symbol('normalizing')
+export const FLUSHING = Symbol('flushing')
+export const PATH_REFS = Symbol('pathRefs')
+export const POINT_REFS = Symbol('pointRefs')
+export const RANGE_REFS = Symbol('rangeRefs')
