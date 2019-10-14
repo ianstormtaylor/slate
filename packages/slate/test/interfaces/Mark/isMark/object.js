@@ -1,9 +1,9 @@
-import { Annotation } from 'slate'
+import { Mark } from 'slate'
 
 export const input = {}
 
 export const test = value => {
-  return Annotation.isAnnotationRecord(value)
+  return Mark.isMark(value)
 }
 
 export const output = true

@@ -40,9 +40,9 @@ namespace Value {
   export const isValue = (value: any): value is Value => {
     return (
       isPlainObject(value) &&
-      Selection.isSelection(value.selection) &&
+      (value.selection === null || Selection.isSelection(value.selection)) &&
       Node.isNodeList(value.nodes) &&
-      Annotation.isAnnotationRecord(value.annotations)
+      Annotation.isAnnotationMap(value.annotations)
     )
   }
 

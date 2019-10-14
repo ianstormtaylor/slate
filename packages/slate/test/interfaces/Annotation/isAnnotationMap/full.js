@@ -14,7 +14,7 @@ export const input = {
 }
 
 export const test = value => {
-  return Annotation.isAnnotationRecord(value)
+  return Annotation.isAnnotationMap(value)
 }
 
 export const output = true

@@ -30,7 +30,7 @@ namespace Annotation {
    * Check if a value is a map of `Annotation` objects.
    */
 
-  export const isAnnotationRecord = (
+  export const isAnnotationMap = (
     value: any
   ): value is Record<string, Annotation> => {
     if (!isPlainObject(value)) {

@@ -29,7 +29,7 @@ namespace Selection {
     return (
       isPlainObject(value) &&
       typeof value.isFocused === 'boolean' &&
-      (value.marks == null || Mark.isMarkList(value.marks)) &&
+      (value.marks === null || Mark.isMarkSet(value.marks)) &&
       Range.isRange(value)
     )
   }

@@ -40,7 +40,7 @@ namespace Mark {
    * Check if a value is an array of `Mark` objects.
    */
 
-  export const isMarkList = (value: any): value is Mark[] => {
+  export const isMarkSet = (value: any): value is Mark[] => {
     return Array.isArray(value) && (value.length === 0 || Mark.isMark(value[0]))
   }
 
