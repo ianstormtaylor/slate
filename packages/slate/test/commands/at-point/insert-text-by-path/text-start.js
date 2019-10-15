@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertTextAtPath([0, 0], 0, 'a')
+  editor.insertTextAtPoint({ path: [0, 0], offset: 0 }, 'a')
 }
 
 export const input = (

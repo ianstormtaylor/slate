@@ -198,11 +198,12 @@ class PathCommands {
     }
 
     // Determine whether the node should have block or inline children.
-    const hasBlockChildren =
-      Value.isValue(node) ||
-      (this.isBlock(node) &&
-        node.nodes.length !== 0 &&
-        this.isBlock(node.nodes[0]))
+    const shouldHaveInlines =
+      Element.isElement(node) &&
+      (this.isInline(node) ||
+        node.nodes.length === 0 ||
+        Text.isText(node.nodes[0]) ||
+        this.isInline(node.nodes[0]))
 
     // Since we'll be applying operations while iterating, keep track of an
     // index that accounts for any added/removed nodes.
@@ -210,44 +211,47 @@ class PathCommands {
 
     for (let i = 0; i < node.nodes.length; i++, n++) {
       const child = node.nodes[i] as Descendant
+      const prev: Descendant | undefined = node.nodes[i - 1]
       const isLast = i === node.nodes.length - 1
 
-      // Only allow block nodes in the top-level value and parent blocks that
-      // only contain block nodes. Similarly, only allow inline nodes in other
-      // inline nodes, or parent blocks that only contain inlines and text.
-      if (this.isBlock(child) !== hasBlockChildren) {
-        this.removeNodeAtPath(path.concat(n))
-        n--
-        continue
-      }
+      if (Element.isElement(child)) {
+        const isInline = this.isInline(child)
 
-      const prev: Descendant | undefined = node.nodes[i - 1]
-
-      // Ensure that inline nodes are surrounded by text nodes.
-      if (this.isInline(child)) {
-        if (prev == null || !Text.isText(prev)) {
-          this.insertNodeAtPath(path.concat(n), { text: '', marks: [] })
-          n++
-          continue
-        }
-
-        if (isLast) {
-          this.insertNodeAtPath(path.concat(n + 1), { text: '', marks: [] })
-          n++
-          continue
-        }
-      }
-
-      // Merge adjacent text nodes that are empty or have matching marks.
-      if (prev != null && Text.isText(child) && Text.isText(prev)) {
-        if (
-          prev.text === '' ||
-          child.text === '' ||
-          Text.matches(child, prev)
-        ) {
-          this.mergeNodeAtPath(path.concat(n))
+        // Only allow block nodes in the top-level value and parent blocks that
+        // only contain block nodes. Similarly, only allow inline nodes in other
+        // inline nodes, or parent blocks that only contain inlines and text.
+        if (isInline !== shouldHaveInlines) {
+          this.removeNodeAtPath(path.concat(n))
           n--
           continue
+        }
+
+        // Ensure that inline nodes are surrounded by text nodes.
+        if (isInline) {
+          if (prev == null || !Text.isText(prev)) {
+            this.insertNodeAtPath(path.concat(n), { text: '', marks: [] })
+            n++
+            continue
+          }
+
+          if (isLast) {
+            this.insertNodeAtPath(path.concat(n + 1), { text: '', marks: [] })
+            n++
+            continue
+          }
+        }
+      } else {
+        // Merge adjacent text nodes that are empty or have matching marks.
+        if (prev != null && Text.isText(prev)) {
+          if (
+            prev.text === '' ||
+            child.text === '' ||
+            Text.matches(child, prev)
+          ) {
+            this.mergeNodeAtPath(path.concat(n))
+            n--
+            continue
+          }
         }
       }
     }

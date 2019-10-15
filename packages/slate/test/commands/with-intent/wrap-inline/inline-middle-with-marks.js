@@ -32,13 +32,13 @@ export const output = (
           <b>he</b>
         </inline>
         <text />
-        <hashtag>
+        <inline>
           <inline>
             <b>
               <anchor />ll
             </b>
           </inline>
-        </hashtag>
+        </inline>
         <text />
         <inline>
           <b>

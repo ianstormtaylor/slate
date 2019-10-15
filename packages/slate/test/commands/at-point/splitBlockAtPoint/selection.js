@@ -3,14 +3,14 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertTextAtPath([0, 0], 2, 'x', [{ type: 'bold' }])
+  editor.splitBlockAtPoint({ path: [0, 0], offset: 2 })
 }
 
 export const input = (
   <value>
     <block>
       <text>
-        wor<cursor />d
+        w<anchor />or<focus />d
       </text>
     </block>
   </value>
@@ -19,7 +19,10 @@ export const input = (
 export const output = (
   <value>
     <block>
-      wo<b>x</b>r<cursor />d
+      w<anchor />o
+    </block>
+    <block>
+      r<focus />d
     </block>
   </value>
 )

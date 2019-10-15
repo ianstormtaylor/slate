@@ -28,11 +28,11 @@ export const output = (
         <text />
         <inline>he</inline>
         <text />
-        <hashtag>
+        <inline>
           <inline>
             <anchor />ll
           </inline>
-        </hashtag>
+        </inline>
         <text />
         <inline>
           <focus />o

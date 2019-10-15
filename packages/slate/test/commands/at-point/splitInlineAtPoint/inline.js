@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.removeTextAtPoint({ path: [0, 1, 0], offset: 3 }, 1)
+  editor.splitInlineAtPoint({ path: [0, 1, 0], offset: 2 })
 }
 
 export const input = (
@@ -22,7 +22,13 @@ export const output = (
   <value>
     <block>
       <text />
-      <inline>wor</inline>
+      <inline>
+        <text>wo</text>
+      </inline>
+      <text />
+      <inline>
+        <text>rd</text>
+      </inline>
       <text />
     </block>
   </value>

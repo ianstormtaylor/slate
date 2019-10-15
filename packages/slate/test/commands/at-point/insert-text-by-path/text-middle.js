@@ -2,10 +2,6 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.insertTextAtPath([0, 0], 2, 'x')
-}
-
 export const input = (
   <value>
     <block>
@@ -13,6 +9,10 @@ export const input = (
     </block>
   </value>
 )
+
+export const run = editor => {
+  editor.insertTextAtPoint({ path: [0, 0], offset: 2 }, 'x')
+}
 
 export const output = (
   <value>

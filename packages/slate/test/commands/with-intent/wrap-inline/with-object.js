@@ -25,7 +25,7 @@ export const output = (
       <block>
         w<hashtag thing="value">
           <anchor />or
-        </hashtag>
+        </inline>
         <focus />d
       </block>
     

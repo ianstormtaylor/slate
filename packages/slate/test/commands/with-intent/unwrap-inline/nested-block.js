@@ -12,9 +12,9 @@ export const input = (
       <block>
         <block>
           w<anchor />
-          <hashtag>
+          <inline>
             or<focus />
-          </hashtag>d
+          </inline>d
         </block>
       </block>
     

@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.removeTextAtPath([0, 1, 1, 0], 0, 1)
+  editor.removeTextAtPoint({ path: [0, 1, 1, 0], offset: 0 }, 1)
 }
 
 export const input = (
@@ -12,11 +12,11 @@ export const input = (
       <text />
       <inline>
         <text />
-        <hashtag>
+        <inline>
           <text>
             <cursor />a
           </text>
-        </hashtag>
+        </inline>
         <text />
       </inline>
       <text />
@@ -30,9 +30,9 @@ export const output = (
       <text />
       <inline>
         <text />
-        <hashtag>
+        <inline>
           <cursor />
-        </hashtag>
+        </inline>
         <text />
       </inline>
       <text />

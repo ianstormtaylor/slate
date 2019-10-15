@@ -10,11 +10,11 @@ export const input = (
   <value>
 
       <block>
-        <hashtag>
+        <inline>
           <inline>
             <cursor />word
           </inline>
-        </hashtag>
+        </inline>
       </block>
 
   </value>
@@ -24,11 +24,11 @@ export const output = (
   <value>
 
       <block>
-        <hashtag>
+        <inline>
           <comment>
             <cursor />word
           </comment>
-        </hashtag>
+        </inline>
       </block>
 
   </value>

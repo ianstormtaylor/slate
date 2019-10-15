@@ -8,22 +8,18 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <block>
-        he<hashtag>ll</hashtag>o <anchor />w<hashtag>
-          or<focus />
-        </hashtag>d
-      </block>
-    
+    <block>
+      he<inline>ll</inline>o <anchor />w<inline>
+        or<focus />
+      </inline>d
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        he<hashtag>ll</hashtag>o <anchor />wor<focus />d
-      </block>
-    
+    <block>
+      he<inline>ll</inline>o <anchor />wor<focus />d
+    </block>
   </value>
 )

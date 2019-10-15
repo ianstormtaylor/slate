@@ -6,7 +6,7 @@ export const run = editor => {
   editor.insertFragment(
     
       <block>
-        <hashtag>fragment</hashtag>
+        <inline>fragment</inline>
       </block>
     
   )
@@ -29,9 +29,9 @@ export const output = (
     
       <block>
         <inline>wo</inline>
-        <hashtag>
+        <inline>
           fragment<cursor />
-        </hashtag>
+        </inline>
         <inline>rd</inline>
       </block>
     

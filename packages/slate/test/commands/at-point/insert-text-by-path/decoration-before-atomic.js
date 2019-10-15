@@ -2,28 +2,28 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.insertTextAtPath([0, 0], 1, 'x')
-}
-
-export const options = {
-  preserveDecorations: true,
-}
-
 export const input = (
   <value>
     <block>
       <text>
-        w<result>or</result>d
+        w<annotation atomic key="a">
+          or
+        </annotation>d
       </text>
     </block>
   </value>
 )
 
+export const run = editor => {
+  editor.insertTextAtPoint({ path: [0, 0], offset: 1 }, 'x')
+}
+
 export const output = (
   <value>
     <block>
-      wx<result>or</result>d
+      wx<annotation atomic key="a">
+        or
+      </annotation>d
     </block>
   </value>
 )

@@ -18,9 +18,9 @@ export const input = (
       </block>
       <block>
         <text />
-        <hashtag>
+        <inline>
           an<focus />other
-        </hashtag>
+        </inline>
         <text />
       </block>
     
@@ -34,16 +34,16 @@ export const output = (
         <text />
         <inline>wo</inline>
         <text />
-        <hashtag>
+        <inline>
           <text />
-        </hashtag>
+        </inline>
         <text />
       </block>
       <block>
         <text />
-        <hashtag>
+        <inline>
           <cursor />other
-        </hashtag>
+        </inline>
         <text />
       </block>
     

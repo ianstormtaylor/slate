@@ -223,10 +223,10 @@ class PointCommands {
       // Ensure that the height isn't higher than the furthest inline, since
       // this command should never split any block nodes.
       const h = Math.max(furthestRelPath.length, height)
-      totalHeight = h + 1
+      totalHeight = h
     } else {
       // If there are no inline ancestors, just split the text node.
-      totalHeight = 1
+      totalHeight = 0
     }
 
     this.splitNodeAtPoint(point, { height: totalHeight, ...rest })
@@ -250,14 +250,15 @@ class PointCommands {
     const { path, offset } = point
     const { height = 0, always = true } = options
 
-    if (height < path.length) {
+    if (height > path.length) {
       throw new Error(
-        `Cannot split the leaf node at path ${path} to a height of ${height} because it does not have that many ancestors.`
+        `Cannot split the leaf node at path [${path}] to a height of \`${height}\` because it does not have that many ancestors.`
       )
     }
 
     this.withoutNormalizing(() => {
       let position = offset
+      let target: number | undefined
       let h = 0
 
       // Create a ref that tracks the split point as we move up the ancestors.
@@ -266,39 +267,27 @@ class PointCommands {
       const pointRef = this.createPointRef(point, { stick: 'backward' })
 
       // Iterate up the ancestors, splitting each until the right depth.
-      while (h < height) {
+      while (h <= height) {
+        debugger
         const depth = path.length - h
-        const index = depth - 1
-        const parentPath = path.slice(0, index)
-        const target = position
-        position = path[index]
-        h++
+        const p = path.slice(0, depth)
 
         // With the `always: false` option, we will instead split the nodes only
         // when the point isn't already at it's edge.
         if (
           !always &&
           pointRef.current != null &&
-          this.isAtEdgeOfPath(pointRef.current, parentPath)
+          this.isAtEdgeOfPath(pointRef.current, Path.parent(p))
         ) {
           continue
         }
 
-        this.splitNodeAtPath(parentPath, position, { target })
+        this.splitNodeAtPath(p, position, { target })
+        target = position
+        position = path[depth - 1] + 1
+        h++
       }
     })
-  }
-
-  /**
-   * Split the text node at a point.
-   */
-
-  splitTextAtPoint(
-    this: Editor,
-    point: Point,
-    options: { always?: boolean } = {}
-  ): void {
-    this.splitNodeAtPoint(point, { height: 0, ...options })
   }
 }
 

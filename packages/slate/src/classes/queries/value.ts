@@ -20,7 +20,7 @@ class ValueQueries {
 
   *blocks(this: Editor, options: {} = {}): Iterable<ElementEntry> {
     for (const [n, p] of Node.elements(this.value, options)) {
-      if (this.isBlock(n)) {
+      if (!this.isInline(n)) {
         yield [n, p]
       }
     }
@@ -136,7 +136,7 @@ class ValueQueries {
 
   *leafBlocks(this: Editor, options: {} = {}): Iterable<ElementEntry> {
     for (const [n, p] of this.blocks(options)) {
-      if (this.isLeafBlock(n)) {
+      if (this.hasInlines(n)) {
         yield [n, p]
       }
     }
@@ -148,7 +148,7 @@ class ValueQueries {
 
   *leafInlines(this: Editor, options: {} = {}): Iterable<ElementEntry> {
     for (const [n, p] of this.inlines(options)) {
-      if (this.isLeafInline(n)) {
+      if (this.hasTexts(n)) {
         yield [n, p]
       }
     }
@@ -310,7 +310,7 @@ class ValueQueries {
     for (const [n, p] of this.inlines(options)) {
       const parent = Node.parent(this.value, p)
 
-      if (this.isBlock(parent)) {
+      if (!this.isInline(parent)) {
         yield [n, p]
       }
     }

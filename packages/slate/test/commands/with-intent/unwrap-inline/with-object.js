@@ -14,10 +14,10 @@ export const input = (
     
       <block>
         w<hashtag thing="value">
-          <hashtag>
+          <inline>
             <cursor />or
-          </hashtag>
-        </hashtag>d
+          </inline>
+        </inline>d
       </block>
     
   </value>
@@ -27,9 +27,9 @@ export const output = (
   <value>
     
       <block>
-        w<hashtag>
+        w<inline>
           <cursor />or
-        </hashtag>d
+        </inline>d
       </block>
     
   </value>

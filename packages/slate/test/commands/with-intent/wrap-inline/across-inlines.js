@@ -26,12 +26,12 @@ export const output = (
     
       <block>
         <inline>wo</inline>
-        <hashtag>
+        <inline>
           <inline>
             <anchor />rd
           </inline>
           <inline>an</inline>
-        </hashtag>
+        </inline>
         <inline>
           <focus />other
         </inline>

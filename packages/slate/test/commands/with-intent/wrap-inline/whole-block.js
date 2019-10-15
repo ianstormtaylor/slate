@@ -20,9 +20,9 @@ export const output = (
   <value>
     
       <block>
-        <hashtag>
+        <inline>
           <anchor />word<focus />
-        </hashtag>
+        </inline>
       </block>
     
   </value>

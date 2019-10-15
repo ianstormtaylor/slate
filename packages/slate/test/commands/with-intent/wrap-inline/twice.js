@@ -22,13 +22,13 @@ export const output = (
     
       <block>
         w
-        <hashtag>
+        <inline>
           <text />
           <inline>
             <anchor />or
           </inline>
           <text />
-        </hashtag>
+        </inline>
         <focus />d
       </block>
     

@@ -10,9 +10,9 @@ export const input = (
   <value>
     <block>
       <text />
-      <emoji>
+      <inline void>
         <cursor />
-      </emoji>
+      </inline>
       <text />
     </block>
   </value>
@@ -22,7 +22,9 @@ export const output = (
   <value>
     <block>
       <text />
-      <emoji />
+      <inline void>
+        <text />
+      </inline>
       <text />
     </block>
     <block>

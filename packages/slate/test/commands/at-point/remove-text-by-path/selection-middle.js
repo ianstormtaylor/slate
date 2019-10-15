@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.removeTextAtPath([0, 0], 2, 1)
+  editor.removeTextAtPoint({ path: [0, 0], offset: 2 }, 1)
 }
 
 export const input = (

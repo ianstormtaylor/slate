@@ -25,13 +25,13 @@ export const output = (
     
       <block>
         <text />
-        <hashtag>
+        <inline>
           <text />
           <inline>
             <anchor />hel
           </inline>
           <text />
-        </hashtag>
+        </inline>
         <text />
         <inline>
           <focus />lo

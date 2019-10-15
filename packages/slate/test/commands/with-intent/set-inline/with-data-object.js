@@ -27,7 +27,7 @@ export const output = (
       <block>
         <hashtag thing="value">
           <cursor />word
-        </hashtag>
+        </inline>
       </block>
     
   </value>

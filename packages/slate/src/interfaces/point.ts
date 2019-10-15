@@ -93,11 +93,26 @@ namespace Point {
       const { path, offset } = p
 
       switch (op.type) {
+        case 'insert_node':
+        case 'move_node': {
+          p.path = Path.transform(path, op, options)!
+          break
+        }
+
         case 'insert_text': {
           if (Path.equals(op.path, path) && op.offset <= offset) {
             p.offset += op.text.length
           }
 
+          break
+        }
+
+        case 'merge_node': {
+          if (Path.equals(op.path, path)) {
+            p.offset += op.position
+          }
+
+          p.path = Path.transform(path, op, options)!
           break
         }
 
@@ -127,25 +142,12 @@ namespace Point {
               (op.position === offset && stick === 'forward')
             ) {
               p.offset -= op.position
+              p.path = Path.transform(path, op, options)!
             }
+          } else {
+            p.path = Path.transform(path, op, options)!
           }
 
-          p.path = Path.transform(path, op, options)!
-          break
-        }
-
-        case 'merge_node': {
-          if (Path.equals(op.path, path)) {
-            p.offset += op.position
-          }
-
-          p.path = Path.transform(path, op, options)!
-          break
-        }
-
-        case 'insert_node':
-        case 'move_node': {
-          p.path = Path.transform(path, op, options)!
           break
         }
       }

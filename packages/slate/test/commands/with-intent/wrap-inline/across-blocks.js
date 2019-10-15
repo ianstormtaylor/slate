@@ -23,14 +23,14 @@ export const output = (
   <value>
     
       <block>
-        wo<hashtag>
+        wo<inline>
           <anchor />rd
-        </hashtag>
+        </inline>
         <text />
       </block>
       <block>
         <text />
-        <hashtag>an</hashtag>
+        <inline>an</inline>
         <focus />other
       </block>
     

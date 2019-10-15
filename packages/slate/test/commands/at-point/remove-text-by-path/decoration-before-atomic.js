@@ -3,18 +3,16 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.removeTextAtPath([0, 0], 0, 1)
-}
-
-export const options = {
-  preserveDecorations: true,
+  editor.removeTextAtPoint({ path: [0, 0], offset: 0 }, 1)
 }
 
 export const input = (
   <value>
     <block>
       <text>
-        w<result>or</result>d
+        w<annotation atomic key="a">
+          or
+        </annotation>d
       </text>
     </block>
   </value>
@@ -23,7 +21,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <result>or</result>d
+      <annotation atomic key="a">
+        or
+      </annotation>d
     </block>
   </value>
 )

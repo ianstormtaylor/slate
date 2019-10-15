@@ -23,9 +23,9 @@ export const output = (
     
       <block>
         <block>
-          w<hashtag>
+          w<inline>
             <anchor />or
-          </hashtag>
+          </inline>
           <focus />d
         </block>
       </block>

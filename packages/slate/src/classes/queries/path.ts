@@ -1,6 +1,7 @@
 import { produce } from 'immer'
 import {
   Editor,
+  Element,
   ElementEntry,
   Node,
   Operation,
@@ -41,7 +42,7 @@ class PathQueries {
 
   getClosestBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path)) {
-      if (this.isBlock(n)) {
+      if (Element.isElement(n) && !this.isInline(n)) {
         return [n, p]
       }
     }
@@ -53,7 +54,7 @@ class PathQueries {
 
   getClosestInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path)) {
-      if (this.isInline(n)) {
+      if (Element.isElement(n) && this.isInline(n)) {
         return [n, p]
       }
     }
@@ -65,7 +66,7 @@ class PathQueries {
 
   getClosestVoid(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path)) {
-      if (this.isVoid(n)) {
+      if (Element.isElement(n) && this.isVoid(n)) {
         return [n, p]
       }
     }
@@ -110,7 +111,7 @@ class PathQueries {
 
   getFurthestBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
-      if (this.isBlock(n)) {
+      if (Element.isElement(n) && !this.isInline(n)) {
         return [n, p]
       }
     }
@@ -122,7 +123,7 @@ class PathQueries {
 
   getFurthestInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
-      if (this.isInline(n)) {
+      if (Element.isElement(n) && this.isInline(n)) {
         return [n, p]
       }
     }
@@ -134,7 +135,7 @@ class PathQueries {
 
   getFurthestVoid(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
-      if (this.isVoid(n)) {
+      if (Element.isElement(n) && this.isVoid(n)) {
         return [n, p]
       }
     }
@@ -169,7 +170,7 @@ class PathQueries {
 
   getNextLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path })) {
-      if (this.isLeafBlock(n)) {
+      if (!this.isInline(n) && this.hasInlines(n)) {
         return [n, p]
       }
     }
@@ -181,7 +182,7 @@ class PathQueries {
 
   getNextLeafInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path })) {
-      if (this.isLeafInline(n)) {
+      if (this.isInline(n) && this.hasTexts(n)) {
         return [n, p]
       }
     }
@@ -193,7 +194,7 @@ class PathQueries {
 
   getNextRootBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path })) {
-      if (this.isBlock(n) && p.length === 1) {
+      if (!this.isInline(n) && p.length === 1) {
         return [n, p]
       }
     }
@@ -205,10 +206,10 @@ class PathQueries {
 
   getNextRootInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path })) {
-      if (this.isInline(n)) {
+      if (Element.isElement(n) && this.isInline(n)) {
         const parent = Node.parent(this.value, p)
 
-        if (this.isBlock(parent)) {
+        if (Element.isElement(parent) && !this.isInline(parent)) {
           return [n, p]
         }
       }
@@ -231,7 +232,7 @@ class PathQueries {
 
   getPreviousLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (this.isLeafBlock(n)) {
+      if (!this.isInline(n) && this.hasInlines(n)) {
         return [n, p]
       }
     }
@@ -243,7 +244,7 @@ class PathQueries {
 
   getPreviousLeafInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (this.isLeafInline(n)) {
+      if (this.isInline(n) && this.hasTexts(n)) {
         return [n, p]
       }
     }
@@ -255,7 +256,7 @@ class PathQueries {
 
   getPreviousRootBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (this.isBlock(n) && p.length === 1) {
+      if (!this.isInline(n) && p.length === 1) {
         return [n, p]
       }
     }
@@ -267,10 +268,10 @@ class PathQueries {
 
   getPreviousRootInline(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (this.isInline(n)) {
+      if (Element.isElement(n) && this.isInline(n)) {
         const parent = Node.parent(this.value, p)
 
-        if (this.isBlock(parent)) {
+        if (Element.isElement(parent) && !this.isInline(parent)) {
           return [n, p]
         }
       }

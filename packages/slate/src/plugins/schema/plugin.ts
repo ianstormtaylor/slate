@@ -83,40 +83,10 @@ const SchemaPlugin = (
       }
 
       /**
-       * Check if a node is block based on the schema rules.
-       */
-
-      isBlock(this: Editor, node: Node): node is Element {
-        if (!Element.isElement(node)) {
-          return false
-        }
-
-        // HACK: The node-checking logic needs a path for creating an error with
-        // details. But we don't care about the error, so we use a fake path.
-        const path: Path = []
-
-        for (const rule of rules) {
-          if (
-            rule.define != null &&
-            rule.define.isInline != null &&
-            checkNode(node, path, rule.match, rules) == null
-          ) {
-            return !rule.define.isInline
-          }
-        }
-
-        return super.isBlock(node)
-      }
-
-      /**
        * Check if a node is inline based on the schema rules.
        */
 
-      isInline(this: Editor, node: Node): node is Element {
-        if (!Element.isElement(node)) {
-          return false
-        }
-
+      isInline(this: Editor, element: Element): boolean {
         // HACK: The node-checking logic needs a path for creating an error with
         // details. But we don't care about the error, so we use a fake path.
         const path: Path = []
@@ -125,24 +95,20 @@ const SchemaPlugin = (
           if (
             rule.define != null &&
             rule.define.isInline != null &&
-            checkNode(node, path, rule.match, rules) == null
+            checkNode(element, path, rule.match, rules) == null
           ) {
             return rule.define.isInline
           }
         }
 
-        return super.isInline(node)
+        return super.isInline(element)
       }
 
       /**
        * Check if a node is void based on the schema rules.
        */
 
-      isVoid(this: Editor, node: Node): node is Element {
-        if (!Element.isElement(node)) {
-          return false
-        }
-
+      isVoid(this: Editor, element: Element): boolean {
         // HACK: The node-checking logic needs a path for creating an error with
         // details. But we don't care about the error, so we use a fake path.
         const path: Path = []
@@ -151,13 +117,13 @@ const SchemaPlugin = (
           if (
             rule.define != null &&
             rule.define.isVoid != null &&
-            checkNode(node, path, rule.match, rules) == null
+            checkNode(element, path, rule.match, rules) == null
           ) {
             return rule.define.isVoid
           }
         }
 
-        return super.isVoid(node)
+        return super.isVoid(element)
       }
 
       /**

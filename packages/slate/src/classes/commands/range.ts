@@ -10,8 +10,8 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const rangeRef = this.createRangeRef(range, { stick: 'inward' })
       const [start, end] = Range.points(range)
-      this.splitTextAtPoint(end, { always: false })
-      this.splitTextAtPoint(start, { always: false })
+      this.splitNodeAtPoint(end, { always: false })
+      this.splitNodeAtPoint(start, { always: false })
       range = rangeRef.unref()!
 
       for (const [node, path] of this.texts({ range })) {
@@ -320,7 +320,7 @@ class RangeCommands {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
       for (const [element, path] of this.blocks({ range, reverse: true })) {
         if (Element.matches(element, props)) {
-          this.unwrapChildrenAtPath(path)
+          this.pluckNodeAtPath(path)
         }
       }
     })
@@ -335,7 +335,7 @@ class RangeCommands {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
       for (const [element, path] of this.inlines({ range, reverse: true })) {
         if (Element.matches(element, props)) {
-          this.unwrapChildrenAtPath(path)
+          this.pluckNodeAtPath(path)
         }
       }
     })

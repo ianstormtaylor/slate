@@ -15,7 +15,7 @@ export const input = (
 )
 
 export const run = editor => {
-  editor.removeTextAtPath([0, 2], 0, 1)
+  editor.removeTextAtPoint({ path: [0, 2], offset: 0 }, 1)
 }
 
 export const output = (

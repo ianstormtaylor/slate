@@ -542,25 +542,17 @@ const getDirtyPaths = (op: Operation) => {
     case 'set_mark':
     case 'set_node': {
       const { path } = op
-      const ancestors = Path.ancestors(path)
-      return [...ancestors, path]
+      return Path.levels(path)
     }
 
     case 'insert_node': {
       const { node, path } = op
+      const levels = Path.levels(path)
       const descendants = Text.isText(node)
         ? []
         : Array.from(Node.entries(node), ([, p]) => path.concat(p))
 
-      const ancestors = Path.ancestors(path)
-      return [...ancestors, path, ...descendants]
-    }
-
-    case 'split_node': {
-      const { path } = op
-      const ancestors = Path.ancestors(path)
-      const nextPath = Path.next(path)
-      return [...ancestors, path, nextPath]
+      return [...levels, ...descendants]
     }
 
     case 'merge_node': {
@@ -597,6 +589,13 @@ const getDirtyPaths = (op: Operation) => {
       const { path } = op
       const ancestors = Path.ancestors(path)
       return [...ancestors]
+    }
+
+    case 'split_node': {
+      const { path } = op
+      const levels = Path.levels(path)
+      const nextPath = Path.next(path)
+      return [...levels, nextPath]
     }
 
     default: {

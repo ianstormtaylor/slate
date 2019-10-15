@@ -27,14 +27,14 @@ export const output = (
   <value>
     
       <block>
-        <hashtag>
+        <inline>
           <anchor />word
-        </hashtag>
+        </inline>
       </block>
       <block>
-        <hashtag>
+        <inline>
           <focus />another
-        </hashtag>
+        </inline>
       </block>
     
   </value>

@@ -9,7 +9,6 @@ import {
   Text,
   Value,
 } from 'slate'
-import { resolveDescendants } from './resolve-descendants'
 import {
   AnchorToken,
   AnnotationToken,
