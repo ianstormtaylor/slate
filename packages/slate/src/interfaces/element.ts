@@ -1,6 +1,5 @@
-import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
-import { Node, Path, Text } from '..'
+import { Node, Path, Value } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -26,7 +25,11 @@ namespace Element {
    */
 
   export const isElement = (value: any): value is Element => {
-    return isPlainObject(value) && Node.isNodeList(value.nodes)
+    return (
+      isPlainObject(value) &&
+      Node.isNodeList(value.nodes) &&
+      !Value.isValue(value)
+    )
   }
 
   /**
@@ -38,6 +41,30 @@ namespace Element {
       Array.isArray(value) &&
       (value.length === 0 || Element.isElement(value[0]))
     )
+  }
+
+  /**
+   * Check if an element matches set of properties.
+   *
+   * Note: the is for checking custom properties, and it does not ensure that
+   * any children in the `nodes` property are equal.
+   */
+
+  export const matches = (
+    element: Element,
+    props: Partial<Element>
+  ): boolean => {
+    for (const key in props) {
+      if (key === 'nodes') {
+        continue
+      }
+
+      if (element[key] !== props[key]) {
+        return false
+      }
+    }
+
+    return true
   }
 }
 

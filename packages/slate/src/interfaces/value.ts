@@ -121,7 +121,8 @@ namespace Value {
         case 'merge_node': {
           const { path } = op
           const node = Node.get(v, path)
-          const prev = Node.previous(v, path)
+          const prevPath = Path.previous(path)
+          const prev = Node.get(v, prevPath)
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
 
@@ -194,12 +195,8 @@ namespace Value {
           const parent = Node.parent(v, path)
           parent.nodes.splice(index, 1)
 
-          const [next] = Node.texts(v, { path, inclusive: false })
-          const [prev] = Node.texts(v, {
-            path,
-            inclusive: false,
-            reverse: true,
-          })
+          const [, next] = Node.texts(v, { path })
+          const [, prev] = Node.texts(v, { path, reverse: true })
 
           // Transform all of the points in the value, but if the point was in the
           // node that was removed we need to update the range or remove it.

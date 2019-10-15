@@ -66,7 +66,7 @@ namespace Node {
 
     if (Text.isText(node)) {
       throw new Error(
-        `Cannot get the ancestor node at ${path} because it refers to a text node instead: ${node}`
+        `Cannot get the ancestor node at path [${path}] because it refers to a text node instead: ${node}`
       )
     }
 
@@ -106,7 +106,7 @@ namespace Node {
     const c = root.nodes[index] as Descendant
 
     if (c == null) {
-      throw new Error(`Cannot get child at index ${index} in node: ${root}`)
+      throw new Error(`Cannot get child at index \`${index}\` in node: ${root}`)
     }
 
     return c
@@ -137,7 +137,7 @@ namespace Node {
 
     if (Value.isValue(node)) {
       throw new Error(
-        `Cannot get the descendant node at ${path} because it refers to a value node instead: ${node}`
+        `Cannot get the descendant node at path [${path}] because it refers to a value node instead: ${node}`
       )
     }
 
@@ -154,7 +154,6 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
-      inclusive?: boolean
     } = {}
   ): Iterable<DescendantEntry> {
     for (const [node, path] of Node.entries(root, options)) {
@@ -178,7 +177,6 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
-      inclusive?: boolean
     } = {}
   ): Iterable<ElementEntry> {
     for (const [node, path] of Node.entries(root, options)) {
@@ -200,10 +198,9 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
-      inclusive?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { path, range, reverse = false, inclusive = true } = options
+    const { path, range, reverse = false } = options
     let startPath: Path = []
     let endPath: Path | null = null
 
@@ -226,11 +223,6 @@ namespace Node {
       // When iterating over a range, we need to include the specific
       // ancestors in the start path of the range manually.
       if (!includedStart) {
-        if (!inclusive) {
-          visited.add(n)
-          continue
-        }
-
         if (!includingStart) {
           includingStart = true
           p = []
@@ -309,7 +301,7 @@ namespace Node {
   export const fragment = (root: Node, range: Range): Fragment => {
     if (Text.isText(root)) {
       throw new Error(
-        `Cannot get a fragment start from a root text node: ${root}`
+        `Cannot get a fragment starting from a root text node: ${root}`
       )
     }
 
@@ -365,7 +357,7 @@ namespace Node {
 
       if (Text.isText(node) || !node.nodes[p]) {
         throw new Error(
-          `Could not find a descedant at path ${path} in node: ${root}`
+          `Cannot find a descedant at path [${path}] in node: ${root}`
         )
       }
 
@@ -422,7 +414,7 @@ namespace Node {
 
     if (!Text.isText(node)) {
       throw new Error(
-        `Cannot get the leaf node at ${path} because it refers to a non-leaf node: ${node}`
+        `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${node}`
       )
     }
 
@@ -459,7 +451,6 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
-      inclusive?: boolean
     } = {}
   ): Iterable<MarkEntry> {
     for (const [node, path] of Node.texts(root, options)) {
@@ -468,20 +459,6 @@ namespace Node {
         yield [mark, i, node, path]
       }
     }
-  }
-
-  /**
-   * Check if a node matches set of properties.
-   */
-
-  export const matches = (node: Node, props: Partial<Node>): boolean => {
-    for (const key in props) {
-      if (node[key] !== props[key]) {
-        return false
-      }
-    }
-
-    return true
   }
 
   /**
@@ -495,7 +472,7 @@ namespace Node {
     }
 
     if (Text.isText(root)) {
-      throw new Error(`Cannot get the offset into a text node: ${root}`)
+      throw new Error(`Cannot get the offset into a root text node: ${root}`)
     }
 
     const [index] = path
@@ -506,7 +483,7 @@ namespace Node {
       o += Node.text(node).length
     }
 
-    const child = root.nodes[index]
+    const child = Node.child(root, index)
     const relPath = Path.relative(path, [index])
     o += Node.offset(child, relPath)
     return o
@@ -522,20 +499,11 @@ namespace Node {
 
     if (Text.isText(parent)) {
       throw new Error(
-        `Cannot get the parent of path ${path} because it does not exist in the document.`
+        `Cannot get the parent of path [${path}] because it does not exist in the root.`
       )
     }
 
     return parent
-  }
-
-  /**
-   * Get the previous node at a specific path.
-   */
-
-  export const previous = (root: Node, path: Path): Node => {
-    const prevPath = Path.previous(path)
-    return Node.get(root, prevPath)
   }
 
   /**
@@ -564,7 +532,6 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
-      inclusive?: boolean
     } = {}
   ): Iterable<TextEntry> {
     for (const [node, path] of Node.entries(root, options)) {

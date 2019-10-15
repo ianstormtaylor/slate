@@ -235,7 +235,7 @@ namespace Path {
   export const next = (path: Path): Path => {
     if (path.length === 0) {
       throw new Error(
-        `Cannot get the next path of a root path ${path}, because it has no next index.`
+        `Cannot get the next path of a root path [${path}], because it has no next index.`
       )
     }
 
@@ -249,7 +249,7 @@ namespace Path {
 
   export const parent = (path: Path): Path => {
     if (path.length === 0) {
-      throw new Error(`Cannot get the parent path of the root path ${path}.`)
+      throw new Error(`Cannot get the parent path of the root path [${path}].`)
     }
 
     return path.slice(0, -1)
@@ -262,7 +262,7 @@ namespace Path {
   export const previous = (path: Path): Path => {
     if (path.length === 0) {
       throw new Error(
-        `Cannot get the previous path of a root path ${path}, because it has no previous index.`
+        `Cannot get the previous path of a root path [${path}], because it has no previous index.`
       )
     }
 
@@ -270,7 +270,7 @@ namespace Path {
 
     if (last <= 0) {
       throw new Error(
-        `Cannot get the previous path of a first child path ${path} because it would result in a negative index.`
+        `Cannot get the previous path of a first child path [${path}] because it would result in a negative index.`
       )
     }
 
@@ -282,9 +282,9 @@ namespace Path {
    */
 
   export const relative = (path: Path, ancestor: Path): Path => {
-    if (!isAncestor(ancestor, path)) {
+    if (!Path.isAncestor(ancestor, path) && !Path.equals(path, ancestor)) {
       throw new Error(
-        `Cannot get the relative path of ${path} inside ancestor ${ancestor}, because it is not an ancestor of the path.`
+        `Cannot get the relative path of [${path}] inside ancestor [${ancestor}], because it is not above or equal to the path.`
       )
     }
 

@@ -1,8 +1,8 @@
 import { Mark } from 'slate'
 
 export const input = {
-  mark: { type: 'bold' },
-  props: { type: 'bold' },
+  element: { nodes: [], type: 'bold' },
+  props: {},
 }
 
 export const test = ({ mark, props }) => {

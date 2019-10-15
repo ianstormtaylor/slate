@@ -221,8 +221,8 @@ class PathQueries {
 
   getNextText(this: Editor, path: Path): TextEntry | undefined {
     const { value } = this
-    const [entry] = Node.texts(value, { path })
-    return entry
+    const [, next] = Node.texts(value, { path })
+    return next
   }
 
   /**
@@ -283,8 +283,8 @@ class PathQueries {
 
   getPreviousText(this: Editor, path: Path): TextEntry | undefined {
     const { value } = this
-    const [entry] = Node.texts(value, { path, reverse: true })
-    return entry
+    const [, prev] = Node.texts(value, { path, reverse: true })
+    return prev
   }
 
   /**

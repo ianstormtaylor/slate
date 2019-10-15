@@ -1,4 +1,4 @@
-import { Editor, Fragment, Mark, Element, Node, Path, Range } from '../..'
+import { Editor, Fragment, Mark, Element, Path, Range } from '../..'
 
 class RangeCommands {
   /**
@@ -301,9 +301,9 @@ class RangeCommands {
 
   toggleMarkAtRange(this: Editor, range: Range, mark: Mark): void {
     this.withoutNormalizing(() => {
-      for (const [node, path] of this.texts({ range })) {
+      for (const [text, path] of this.texts({ range })) {
         this.apply({
-          type: Mark.exists(mark, node.marks) ? 'remove_mark' : 'add_mark',
+          type: Mark.exists(mark, text.marks) ? 'remove_mark' : 'add_mark',
           path,
           mark,
         })
@@ -318,8 +318,8 @@ class RangeCommands {
   unwrapBlockAtRange(this: Editor, range: Range, props: {}) {
     this.withoutNormalizing(() => {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [node, path] of this.blocks({ range, reverse: true })) {
-        if (Node.matches(node, props)) {
+      for (const [element, path] of this.blocks({ range, reverse: true })) {
+        if (Element.matches(element, props)) {
           this.unwrapChildrenAtPath(path)
         }
       }
@@ -333,8 +333,8 @@ class RangeCommands {
   unwrapInlineAtRange(this: Editor, range: Range, props: {}) {
     this.withoutNormalizing(() => {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [node, path] of this.inlines({ range, reverse: true })) {
-        if (Node.matches(node, props)) {
+      for (const [element, path] of this.inlines({ range, reverse: true })) {
+        if (Element.matches(element, props)) {
           this.unwrapChildrenAtPath(path)
         }
       }

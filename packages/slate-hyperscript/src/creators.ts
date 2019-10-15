@@ -190,8 +190,9 @@ export function createText(
     The <text> hyperscript tag can only contain text content as children.`)
   }
 
-  Object.assign(node, attributes)
-  return node
+  // COMPAT: Re-create the node, because if they used the <text> tag we want to
+  // guarantee that it won't be merge with other string children.
+  return { ...node, ...attributes }
 }
 
 /**

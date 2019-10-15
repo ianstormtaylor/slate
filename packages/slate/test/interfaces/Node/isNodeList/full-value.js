@@ -1,4 +1,4 @@
-import { Element } from 'slate'
+import { Node } from 'slate'
 
 export const input = [
   {
@@ -9,7 +9,7 @@ export const input = [
 ]
 
 export const test = value => {
-  return Element.isElementList(value)
+  return Node.isNodeList(value)
 }
 
-export const output = false
+export const output = true

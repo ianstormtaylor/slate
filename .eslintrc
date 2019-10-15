@@ -120,7 +120,6 @@
     "prettier/prettier": "error",
     "radix": "error",
     "react/jsx-boolean-value": ["error", "never"],
-    "react/jsx-key": "error",
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-undef": "error",
