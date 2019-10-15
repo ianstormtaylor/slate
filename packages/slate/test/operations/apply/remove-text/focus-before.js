@@ -1,33 +1,28 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from 'slate-hyperscript'
 
-export default [
+export const input = (
+  <value>
+    <element>
+      <anchor />w<focus />ord
+    </element>
+  </value>
+)
+
+export const operations = [
   {
     type: 'remove_text',
     path: [0, 0],
     offset: 1,
     text: 'or',
-    marks: [],
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>
-        <anchor />w<focus />ord
-      </paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <anchor />w<focus />d
-      </paragraph>
-    </document>
+    <element>
+      <anchor />w<focus />d
+    </element>
   </value>
 )

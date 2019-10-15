@@ -40,6 +40,52 @@ namespace Text {
   export const isTextList = (value: any): value is Text[] => {
     return Array.isArray(value) && (value.length === 0 || Text.isText(value[0]))
   }
+
+  /**
+   * Check if an text matches set of properties.
+   *
+   * Note: this is for matching custom properties, and it does not ensure that
+   * the `text` property are two nodes equal. However, if `marks` are passed it
+   * will ensure that the set of marks is exactly equal.
+   */
+
+  export const matches = (text: Text, props: Partial<Text>): boolean => {
+    for (const key in props) {
+      if (key === 'text') {
+        continue
+      }
+
+      if (key === 'marks' && props.marks != null) {
+        const existing = text.marks
+        const { marks } = props
+
+        // PERF: If the lengths aren't the same, we know it's not a match.
+        if (existing.length !== marks.length) {
+          return false
+        }
+
+        for (const m of existing) {
+          if (!Mark.exists(m, marks)) {
+            return false
+          }
+        }
+
+        for (const m of marks) {
+          if (!Mark.exists(m, existing)) {
+            return false
+          }
+        }
+
+        continue
+      }
+
+      if (text[key] !== props[key]) {
+        return false
+      }
+    }
+
+    return true
+  }
 }
 
 export { Text, TextEntry }

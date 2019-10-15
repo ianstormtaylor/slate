@@ -36,12 +36,19 @@ describe('slate', () => {
     const { input, operations, output } = module
     const TestEditor = TestPlugin(Editor)
     const editor = new TestEditor({ value: input })
-    editor.normalize({ force: true })
 
     for (const op of operations) {
       editor.apply(op)
     }
 
+    assert.deepEqual(editor.value, output)
+  })
+
+  fixtures(__dirname, 'normalization', ({ module }) => {
+    const { input, output } = module
+    const TestEditor = TestPlugin(Editor)
+    const editor = new TestEditor({ value: input })
+    editor.normalize({ force: true })
     assert.deepEqual(editor.value, output)
   })
 

@@ -110,11 +110,11 @@ namespace Point {
         }
 
         case 'remove_node': {
-          if (Path.equals(op.path, path)) {
+          if (Path.equals(op.path, path) || Path.isAncestor(op.path, path)) {
             return null
           }
 
-          Path.transform(path, op, options)
+          p.path = Path.transform(path, op, options)!
           break
         }
 
@@ -130,7 +130,7 @@ namespace Point {
             }
           }
 
-          Path.transform(path, op, options)
+          p.path = Path.transform(path, op, options)!
           break
         }
 
@@ -139,13 +139,13 @@ namespace Point {
             p.offset += op.position
           }
 
-          Path.transform(path, op, options)
+          p.path = Path.transform(path, op, options)!
           break
         }
 
         case 'insert_node':
         case 'move_node': {
-          Path.transform(path, op, options)
+          p.path = Path.transform(path, op, options)!
           break
         }
       }

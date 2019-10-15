@@ -1,8 +1,15 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from 'slate-hyperscript'
 
-export default [
+export const input = (
+  <value>
+    <element>1</element>
+    <element>2</element>
+  </value>
+)
+
+export const operations = [
   {
     type: 'move_node',
     path: [0],
@@ -10,20 +17,9 @@ export default [
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>1</paragraph>
-      <paragraph>2</paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>1</paragraph>
-      <paragraph>2</paragraph>
-    </document>
+    <element>1</element>
+    <element>2</element>
   </value>
 )

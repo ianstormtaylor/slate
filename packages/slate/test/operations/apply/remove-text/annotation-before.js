@@ -1,8 +1,16 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from 'slate-hyperscript'
 
-export default [
+export const input = (
+  <value>
+    <element>
+      <annotation key="a">w</annotation>ord
+    </element>
+  </value>
+)
+
+export const operations = [
   {
     type: 'remove_text',
     path: [0, 0],
@@ -12,22 +20,10 @@ export default [
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>
-        <highlight>w</highlight>ord
-      </paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <highlight>w</highlight>d
-      </paragraph>
-    </document>
+    <element>
+      <annotation key="a">w</annotation>d
+    </element>
   </value>
 )

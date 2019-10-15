@@ -95,7 +95,7 @@ namespace Value {
           const { path, node } = op
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
-          parent.nodes[index] = node
+          parent.nodes.splice(index, 0, node)
 
           for (const [point, key, range] of Value.points(v)) {
             range[key] = Point.transform(point, op)!
@@ -193,10 +193,10 @@ namespace Value {
           const { path } = op
           const index = path[path.length - 1]
           const parent = Node.parent(v, path)
-          parent.nodes.splice(index, 1)
-
           const [, next] = Node.texts(v, { path })
           const [, prev] = Node.texts(v, { path, reverse: true })
+
+          parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
           // node that was removed we need to update the range or remove it.
@@ -218,6 +218,8 @@ namespace Value {
               } else if (Annotation.isAnnotation(range)) {
                 delete v.annotations[key!]
               }
+            } else {
+              range[k] = result
             }
           }
 

@@ -1,13 +1,13 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import h from 'slate-hyperscript'
 
 export const input = (
   <value>
-    <block>
+    <element>
       w<cursor />
       <annotation key="a">or</annotation>d
-    </block>
+    </element>
   </value>
 )
 
@@ -22,9 +22,9 @@ export const operations = [
 
 export const output = (
   <value>
-    <block>
+    <element>
       wx<cursor />
       <annotation key="a">or</annotation>d
-    </block>
+    </element>
   </value>
 )

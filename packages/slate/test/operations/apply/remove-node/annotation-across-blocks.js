@@ -1,38 +1,34 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import h from 'slate-hyperscript'
 
-export default [
+export const input = (
+  <value>
+    <element>
+      o<annotation key="a" />ne
+    </element>
+    <element>
+      tw<annotation key="a" />o
+    </element>
+  </value>
+)
+
+export const operations = [
   {
     type: 'remove_node',
     path: [0],
     node: (
-      <paragraph>
-        o<highlight key="a" />ne
-      </paragraph>
+      <element>
+        o<annotation key="a" />ne
+      </element>
     ),
   },
 ]
 
-export const input = (
-  <value>
-    <document>
-      <paragraph>
-        o<highlight key="a" />ne
-      </paragraph>
-      <paragraph>
-        tw<highlight key="a" />o
-      </paragraph>
-    </document>
-  </value>
-)
-
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <highlight>tw</highlight>o
-      </paragraph>
-    </document>
+    <element>
+      <annotation key="a">tw</annotation>o
+    </element>
   </value>
 )

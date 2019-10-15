@@ -1,15 +1,15 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import h from 'slate-hyperscript'
 
 export const input = (
   <value>
-    <block>
+    <element>
       o<annotation key="a" />ne
-    </block>
-    <block>
+    </element>
+    <element>
       tw<annotation key="a" />o
-    </block>
+    </element>
   </value>
 )
 
@@ -32,8 +32,8 @@ export const operations = [
 
 export const output = (
   <value>
-    <block>
+    <element>
       o<annotation key="a">netw</annotation>o
-    </block>
+    </element>
   </value>
 )

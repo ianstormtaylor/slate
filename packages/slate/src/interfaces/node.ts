@@ -100,13 +100,19 @@ namespace Node {
 
   export const child = (root: Node, index: number): Descendant => {
     if (Text.isText(root)) {
-      throw new Error(`Cannot get the child of a text node: ${root}`)
+      throw new Error(
+        `Cannot get the child of a text node: ${JSON.stringify(root)}`
+      )
     }
 
     const c = root.nodes[index] as Descendant
 
     if (c == null) {
-      throw new Error(`Cannot get child at index \`${index}\` in node: ${root}`)
+      throw new Error(
+        `Cannot get child at index \`${index}\` in node: ${JSON.stringify(
+          root
+        )}`
+      )
     }
 
     return c
@@ -301,7 +307,9 @@ namespace Node {
   export const fragment = (root: Node, range: Range): Fragment => {
     if (Text.isText(root)) {
       throw new Error(
-        `Cannot get a fragment starting from a root text node: ${root}`
+        `Cannot get a fragment starting from a root text node: ${JSON.stringify(
+          root
+        )}`
       )
     }
 
@@ -357,7 +365,9 @@ namespace Node {
 
       if (Text.isText(node) || !node.nodes[p]) {
         throw new Error(
-          `Cannot find a descedant at path [${path}] in node: ${root}`
+          `Cannot find a descendant at path [${path}] in node: ${JSON.stringify(
+            root
+          )}`
         )
       }
 
@@ -472,7 +482,9 @@ namespace Node {
     }
 
     if (Text.isText(root)) {
-      throw new Error(`Cannot get the offset into a root text node: ${root}`)
+      throw new Error(
+        `Cannot get the offset into a root text node: ${JSON.stringify(root)}`
+      )
     }
 
     const [index] = path

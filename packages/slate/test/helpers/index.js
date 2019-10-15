@@ -3,20 +3,24 @@ import { createHyperscript } from 'slate-hyperscript'
 
 const h = createHyperscript({
   elements: {
-    block: {},
-    inline: {},
-    void_block: {},
-    void_inline: {},
+    block: { type: 'block' },
+    inline: { type: 'inline' },
+    void_block: { type: 'void_block' },
+    void_inline: { type: 'void_inline' },
   },
   annotations: {
-    atomic_annotation: {},
+    atomic_annotation: { type: 'atomic_annotation' },
   },
 })
 
 const TestPlugin = Editor => {
   return class extends Editor {
+    isBlock(node) {
+      return Element.isElement(node) && node.type.endsWith('block')
+    }
+
     isInline(node) {
-      return Element.isElement(node) && node.type === 'inline'
+      return Element.isElement(node) && node.type.endsWith('inline')
     }
 
     isVoid(node) {
