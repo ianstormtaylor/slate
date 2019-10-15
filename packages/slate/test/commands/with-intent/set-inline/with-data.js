@@ -1,9 +1,9 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 import { Data } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   editor.setInlines({
     type: 'hashtag',
     data: Data.create({ thing: 'value' }),
@@ -12,24 +12,20 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
-          <cursor />word
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <inline>
+        <cursor />word
+      </inline>
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <hashtag thing="value">
-          <cursor />word
-        </hashtag>
-      </paragraph>
-    </document>
+    <block>
+      <hashtag thing="value">
+        <cursor />word
+      </hashtag>
+    </block>
   </value>
 )

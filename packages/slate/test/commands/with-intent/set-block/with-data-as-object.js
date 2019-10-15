@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.setBlocks({
     type: 'code',
     data: { thing: 'value' },
@@ -11,20 +11,20 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <cursor />word
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
+    
       <code thing="value">
         <cursor />word
       </code>
-    </document>
+    
   </value>
 )

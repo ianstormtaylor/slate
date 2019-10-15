@@ -1,34 +1,34 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.splitBlock()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
+    
+      <block>
+        <inline>
           wo<cursor />rd
-        </link>
-      </paragraph>
-    </document>
+        </inline>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <link>wo</link>
-      </paragraph>
-      <paragraph>
-        <link>
+    
+      <block>
+        <inline>wo</inline>
+      </block>
+      <block>
+        <inline>
           <cursor />rd
-        </link>
-      </paragraph>
-    </document>
+        </inline>
+      </block>
+    
   </value>
 )

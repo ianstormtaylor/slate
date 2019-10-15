@@ -1,30 +1,30 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 import { Mark } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   const marks = Mark.createSet([{ type: 'bold' }])
   editor.insertText('a', marks)
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         word<cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         word<b>a</b>
         <cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

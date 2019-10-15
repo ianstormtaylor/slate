@@ -1,33 +1,33 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.moveToRangeOfDocument()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <cursor />one
-      </paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>three</paragraph>
-    </document>
+      </block>
+      <block>two</block>
+      <block>three</block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />one
-      </paragraph>
-      <paragraph>two</paragraph>
-      <paragraph>
+      </block>
+      <block>two</block>
+      <block>
         three<focus />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

@@ -1,57 +1,57 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.replaceMark('italic', 'bold')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <text />
-        <link>
+        <inline>
           wo
           <i>
             <anchor />rd
           </i>
-        </link>
+        </inline>
         <text />
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         <text />
-        <link>
+        <inline>
           <i>an</i>
           <focus />other
-        </link>
+        </inline>
         <text />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <text />
-        <link>
+        <inline>
           wo
           <b>
             <anchor />rd
           </b>
-        </link>
+        </inline>
         <b />
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         <b />
-        <link>
+        <inline>
           <b>an</b>
           <focus />other
-        </link>
+        </inline>
         <text />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

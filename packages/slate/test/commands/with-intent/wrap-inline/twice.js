@@ -1,36 +1,36 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.wrapInline('link')
   editor.wrapInline('hashtag')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         w<anchor />or<focus />d
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         w
         <hashtag>
           <text />
-          <link>
+          <inline>
             <anchor />or
-          </link>
+          </inline>
           <text />
         </hashtag>
         <focus />d
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

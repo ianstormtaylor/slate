@@ -2,43 +2,41 @@
 
 import h from '../../../../helpers/h'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(
-    <document>
-      <table>
-        <table_body>
-          <table_row>
-            <table_cell>
-              <paragraph>1</paragraph>
-            </table_cell>
-            <table_cell>
-              <paragraph>2</paragraph>
-            </table_cell>
-          </table_row>
-        </table_body>
-      </table>
-    </document>
+    <table>
+      <table_body>
+        <table_row>
+          <table_cell>
+            <block>1</block>
+          </table_cell>
+          <table_cell>
+            <block>2</block>
+          </table_cell>
+        </table_row>
+      </table_body>
+    </table>
   )
 }
 
 export const input = (
   <value>
-    <document>
-      <table>
-        <table_body>
-          <table_row>
-            <table_cell>
-              <paragraph>
-                <cursor />
-              </paragraph>
-            </table_cell>
-            <table_cell>
-              <paragraph />
-            </table_cell>
-          </table_row>
-        </table_body>
-      </table>
-    </document>
+    <table>
+      <table_body>
+        <table_row>
+          <table_cell>
+            <block>
+              <cursor />
+            </block>
+          </table_cell>
+          <table_cell>
+            <block>
+              <text />
+            </block>
+          </table_cell>
+        </table_row>
+      </table_body>
+    </table>
   </value>
 )
 
@@ -46,25 +44,25 @@ export const input = (
 // ideally, paragraph with "2" goes into second cell
 export const output = (
   <value>
-    <document>
-      <table>
-        <table_body>
-          <table_row>
+    <table>
+      <table_body>
+        <table_row>
+          <table_cell>
+            <block>1</block>
             <table_cell>
-              <paragraph>1</paragraph>
-              <table_cell>
-                <paragraph>
-                  2<cursor />
-                </paragraph>
-              </table_cell>
+              <block>
+                2<cursor />
+              </block>
             </table_cell>
-            <table_cell>
-              <paragraph />
-            </table_cell>
-          </table_row>
-        </table_body>
-      </table>
-    </document>
+          </table_cell>
+          <table_cell>
+            <block>
+              <text />
+            </block>
+          </table_cell>
+        </table_row>
+      </table_body>
+    </table>
   </value>
 )
 

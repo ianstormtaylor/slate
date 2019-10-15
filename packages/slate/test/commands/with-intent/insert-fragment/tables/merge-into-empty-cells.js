@@ -2,9 +2,9 @@
 
 import h from '../../../../helpers/h'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(
-    <document>
+    
       <table>
         <table_body>
           <table_row>
@@ -13,13 +13,13 @@ export default function(editor) {
           </table_row>
         </table_body>
       </table>
-    </document>
+    
   )
 }
 
 export const input = (
   <value>
-    <document>
+    
       <table>
         <table_body>
           <table_row>
@@ -30,14 +30,14 @@ export const input = (
           </table_row>
         </table_body>
       </table>
-    </document>
+    
   </value>
 )
 
 // TODO: paste "2" into second cell instead of creating new one?
 export const output = (
   <value>
-    <document>
+    
       <table>
         <table_body>
           <table_row>
@@ -49,7 +49,7 @@ export const output = (
           </table_row>
         </table_body>
       </table>
-    </document>
+    
   </value>
 )
 

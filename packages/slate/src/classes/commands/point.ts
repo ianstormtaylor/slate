@@ -162,7 +162,7 @@ class PointCommands {
       }
 
       this.apply({
-        type: 'insert_text',
+        type: 'remove_text',
         path,
         offset,
         text,

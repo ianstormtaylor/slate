@@ -1,30 +1,28 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.deleteCharBackward()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
-          📛<cursor />
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <inline>
+        📛<cursor />
+      </inline>
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <cursor />
-        <link />
-      </paragraph>
-    </document>
+    <block>
+      <cursor />
+      <inline>
+        <text />
+      </inline>
+    </block>
   </value>
 )

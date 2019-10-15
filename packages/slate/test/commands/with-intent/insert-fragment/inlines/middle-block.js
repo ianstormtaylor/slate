@@ -2,40 +2,40 @@
 
 import h from '../../../../helpers/h'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(
-    <document>
-      <paragraph>
-        <link>bar</link>
-      </paragraph>
-    </document>
+    
+      <block>
+        <inline>bar</inline>
+      </block>
+    
   )
 }
 
 export const input = (
   <value>
-    <document>
+    
       <code>
-        <paragraph>
+        <block>
           Foo<cursor />baz
-        </paragraph>
+        </block>
       </code>
-    </document>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
+    
       <code>
-        <paragraph>
+        <block>
           Foo
-          <link>
+          <inline>
             bar<cursor />
-          </link>
+          </inline>
           baz
-        </paragraph>
+        </block>
       </code>
-    </document>
+    
   </value>
 )

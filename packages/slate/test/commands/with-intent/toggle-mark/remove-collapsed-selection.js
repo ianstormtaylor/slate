@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.toggleMark('bold')
   editor.toggleMark('bold')
   editor.insertText('s')
@@ -10,20 +10,20 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         word<cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         words<cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

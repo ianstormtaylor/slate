@@ -1,31 +1,31 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.unwrapInline('link')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
+    
+      <block>
+        <inline>
           <anchor />one
-        </link>two<link>
+        </inline>two<inline>
           three<focus />
-        </link>
-      </paragraph>
-    </document>
+        </inline>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />onetwothree<focus />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

@@ -1,27 +1,27 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.wrapText('[[', ']]')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         w<focus />or<anchor />d
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         w[[<focus />or<anchor />]]d
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

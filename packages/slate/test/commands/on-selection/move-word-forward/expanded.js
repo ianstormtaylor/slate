@@ -1,28 +1,28 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.moveWordForward()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         one <anchor />two three f<focus />our five six
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 // Should move to next word after focus and collapse
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         one two<anchor /> three four<focus /> five six
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

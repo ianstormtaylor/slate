@@ -1,32 +1,28 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.deleteForward()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <anchor />one<link>
-          t<focus />wo
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <anchor />one<inline>
+        t<focus />wo
+      </inline>
+    </block>
   </value>
 )
 
 // TODO: this output selection seems bad
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <link>
-          <cursor />wo
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <inline>
+        <cursor />wo
+      </inline>
+    </block>
   </value>
 )

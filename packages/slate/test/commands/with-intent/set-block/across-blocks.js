@@ -1,33 +1,33 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.setBlocks({ type: 'code' })
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />word
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         a<focus />nother
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
+    
       <code>
         <anchor />word
       </code>
       <code>
         a<focus />nother
       </code>
-    </document>
+    
   </value>
 )

@@ -1,15 +1,15 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.addMarks(['underline'])
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         Some{' '}
         <b>
           <anchor />bold
@@ -18,15 +18,15 @@ export const input = (
         <i>
           ita<focus />lic
         </i>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         Some{' '}
         <u>
           <b>
@@ -41,7 +41,7 @@ export const output = (
         <i>
           <focus />lic
         </i>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

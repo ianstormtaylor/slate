@@ -2,9 +2,9 @@
 
 import { Point, Range } from 'slate'
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   const { value: { document } } = editor
   const [firstText, firstPath] = document.firstText()
   const point = Point.create({ key: firstText.key, offset: 2, path: firstPath })
@@ -14,24 +14,24 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <paragraph>
+    
+      <block>
+        <block>
           one<cursor />two
-        </paragraph>
-      </paragraph>
-    </document>
+        </block>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <paragraph>
+    
+      <block>
+        <block>
           e<cursor />two
-        </paragraph>
-      </paragraph>
-    </document>
+        </block>
+      </block>
+    
   </value>
 )

@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.addMark({
     type: 'bold',
     data: { thing: 'value' },
@@ -11,23 +11,23 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />w<focus />ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <b thing="value">
           <anchor />w
         </b>
         <focus />ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

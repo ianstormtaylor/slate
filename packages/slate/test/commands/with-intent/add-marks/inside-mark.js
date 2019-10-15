@@ -1,27 +1,27 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.addMarks(['bold', 'underline'])
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <i>
           <anchor />wo<focus />rd
         </i>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <u>
           <b>
             <i>
@@ -32,7 +32,7 @@ export const output = (
         <i>
           <focus />rd
         </i>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

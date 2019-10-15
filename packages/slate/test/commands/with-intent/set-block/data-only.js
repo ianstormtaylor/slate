@@ -1,29 +1,29 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
 import { Data } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   editor.setBlocks({ data: Data.create({ thing: 'value' }) })
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <cursor />word
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
+    
       <paragraph thing="value">
         <cursor />word
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

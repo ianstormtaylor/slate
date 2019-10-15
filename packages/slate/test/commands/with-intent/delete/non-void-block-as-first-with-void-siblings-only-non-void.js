@@ -1,32 +1,32 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.delete()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />one
-      </paragraph>
+      </block>
       <image>
         <focus />
       </image>
-      <paragraph>two</paragraph>
-    </document>
+      <block>two</block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
+    
       <image>
         <cursor />
       </image>
-      <paragraph>two</paragraph>
-    </document>
+      <block>two</block>
+    
   </value>
 )

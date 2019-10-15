@@ -1,9 +1,9 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 import { Mark } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   editor.toggleMark(
     Mark.create({
       type: 'bold',
@@ -14,23 +14,23 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <b thing="value">
           <anchor />w<focus />
         </b>
         ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />w<focus />ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

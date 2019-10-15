@@ -2,36 +2,30 @@
 
 import h from '../../../../helpers/h'
 
-export default function(editor) {
-  editor.insertFragment(
-    <document>
-      <quote>fragment</quote>
-    </document>
-  )
+export const run = editor => {
+  editor.insertFragment(<block>fragment</block>)
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
-          {'word '}
-          <cursor />
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <inline>
+        {'word '}
+        <cursor />
+      </inline>
+    </block>
   </value>
 )
 
 // TODO: argument to made that fragment should go into the inline
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <link>{'word '}</link>
-        fragment<cursor />
-        <link />
-      </paragraph>
-    </document>
+    <block>
+      <inline>{'word '}</inline>
+      fragment<cursor />
+      <inline>
+        <text />
+      </inline>
+    </block>
   </value>
 )

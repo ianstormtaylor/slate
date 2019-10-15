@@ -6,6 +6,7 @@ import {
   Element,
   Text,
   Node,
+  NodeEntry,
   Path,
   Descendant,
   Value,
@@ -62,13 +63,13 @@ class PathCommands {
 
       if (!closestBlock) {
         throw new Error(
-          `Cannot merge the leaf block above path ${path} because there isn't one.`
+          `Cannot merge the leaf block above path [${path}] because there isn't one.`
         )
       }
 
       if (!prevBlock) {
         throw new Error(
-          `Cannot merge the block above path ${path} with the previous leaf block because there isn't one.`
+          `Cannot merge the block above path [${path}] with the previous leaf block because there isn't one.`
         )
       }
 
@@ -104,7 +105,7 @@ class PathCommands {
 
     if (path[path.length - 1] === 0) {
       throw new Error(
-        `Cannot merge the node at path ${path} with the previous sibling because there isn't one.`
+        `Cannot merge the node at path [${path}] with the previous sibling because there isn't one.`
       )
     }
 
@@ -135,7 +136,9 @@ class PathCommands {
       })
     } else {
       throw new Error(
-        `Cannot merge the node at path ${path} with the previous sibling because it is not the same kind: ${node} ${prevNode}`
+        `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
+          node
+        )} ${JSON.stringify(prevNode)}`
       )
     }
   }
@@ -146,25 +149,24 @@ class PathCommands {
 
   moveNodeAtPath(this: Editor, path: Path, newPath: Path): void {
     const { value } = this
-    const prevPath = Path.previous(path)
     const parentPath = Path.parent(path)
     const newIndex = newPath[newPath.length - 1]
 
     if (!Node.has(value, path)) {
       throw new Error(
-        `Cannot move the node at path ${path} because it does not exist.`
+        `Cannot move the node at path [${path}] because it does not exist.`
       )
     }
 
     if (!Node.has(value, parentPath)) {
       throw new Error(
-        `Cannot move the node at path ${path} to the new parent at path ${parentPath} because the parent does not exist.`
+        `Cannot move the node at path [${path}] to the new parent at path [${parentPath}] because the parent does not exist.`
       )
     }
 
-    if (newIndex !== 0 && !Node.has(value, prevPath)) {
+    if (newIndex !== 0 && !Node.has(value, Path.previous(newPath))) {
       throw new Error(
-        `Cannot move the node at path ${path} to ${newPath} because the index is out of range.`
+        `Cannot move the node at path [${path}] to new path [${newPath}] because the index is out of range.`
       )
     }
 
@@ -303,6 +305,17 @@ class PathCommands {
   }
 
   /**
+   * Replace a mark on the text node at a path.
+   */
+
+  replaceMarkAtPath(this: Editor, path: Path, before: Mark, after: Mark): void {
+    this.withoutNormalizing(() => {
+      this.removeMarkAtPath(path, before)
+      this.addMarkAtPath(path, after)
+    })
+  }
+
+  /**
    * Replace the node at a path with a new node.
    */
 
@@ -314,59 +327,16 @@ class PathCommands {
   }
 
   /**
-   * Set new properties on the node at a path.
+   * Replace all of the text in a node at a path.
    */
 
-  setNodeAtPath(this: Editor, path: Path, props: {}): void {
-    if (path.length === 0) {
-      this.setValue(props)
-      return
-    }
-
-    const { value } = this
-    const node = Node.get(value, path)
-    const newProps = {}
-    const oldProps = {}
-    let isChange = true
-
-    for (const k in props) {
-      // Disallow setting restricted properties that should use the editor
-      // methods that result in more semantic operations being applied.
-      if (Element.isElement(node) && k === 'nodes') {
-        throw new Error(
-          `Cannot set the \`nodes\` property of an element node at path ${path}. You must use the node-specific editor methods instead like \`editor.insertNodeAtPath\`, \`editor.removeNodeAtPath\`, etc.`
-        )
-      }
-
-      if (Text.isText(node) && k === 'text') {
-        throw new Error(
-          `Cannot set the \`text\` property of a text node at path ${path}. You must use the text-specific editor methods instead like \`editor.insertTextAtPath\`, \`editor.removeTextAtPath\`, etc.`
-        )
-      }
-
-      if (Text.isText(node) && k === 'marks') {
-        throw new Error(
-          `Cannot set the \`marks\` property of a text node at path ${path}. You must use the text-specific editor methods instead like \`editor.addMarkAtPath\`, \`editor.removeMarkAtPath\`, etc.`
-        )
-      }
-
-      if (props[k] !== node[k]) {
-        isChange = true
-        newProps[k] = props[k]
-        oldProps[k] = node[k]
-      }
-    }
-
-    // PERF: If no properties have changed don't apply an operation at all.
-    if (!isChange) {
-      return
-    }
-
-    this.apply({
-      type: 'set_node',
-      path,
-      properties: oldProps,
-      newProperties: newProps,
+  replaceTextAtPath(this: Editor, path: Path, text: string): void {
+    this.withoutNormalizing(() => {
+      const { value } = this
+      const node = Node.leaf(value, path)
+      const point = { path, offset: 0 }
+      this.removeTextAtPoint(point, node.text.length)
+      this.insertTextAtPoint(point, text)
     })
   }
 
@@ -386,7 +356,9 @@ class PathCommands {
 
     if (match == null) {
       throw new Error(
-        `Cannot set new properties on mark ${mark} at path ${path} because the mark does not exist.`
+        `Cannot set new properties on mark ${JSON.stringify(
+          mark
+        )} at path [${path}] because the mark does not exist.`
       )
     }
 
@@ -414,27 +386,59 @@ class PathCommands {
   }
 
   /**
-   * Replace a mark on the text node at a path.
+   * Set new properties on the node at a path.
    */
 
-  replaceMarkAtPath(this: Editor, path: Path, before: Mark, after: Mark): void {
-    this.withoutNormalizing(() => {
-      this.removeMarkAtPath(path, before)
-      this.addMarkAtPath(path, after)
-    })
-  }
+  setNodeAtPath(this: Editor, path: Path, props: {}): void {
+    if (path.length === 0) {
+      this.setValue(props)
+      return
+    }
 
-  /**
-   * Replace all of the text in a node at a path.
-   */
+    const { value } = this
+    const node = Node.get(value, path)
+    const newProps = {}
+    const oldProps = {}
+    let isChange = true
 
-  replaceTextAtPath(this: Editor, path: Path, text: string): void {
-    this.withoutNormalizing(() => {
-      const { value } = this
-      const node = Node.leaf(value, path)
-      const point = { path, offset: 0 }
-      this.removeTextAtPoint(point, node.text.length)
-      this.insertTextAtPoint(point, text)
+    for (const k in props) {
+      // Disallow setting restricted properties that should use the editor
+      // methods that result in more semantic operations being applied.
+      if (Element.isElement(node) && k === 'nodes') {
+        throw new Error(
+          `Cannot set the \`nodes\` property of an element node at path [${path}]. You must use the node-specific editor methods instead like \`editor.insertNodeAtPath\`, \`editor.removeNodeAtPath\`, etc.`
+        )
+      }
+
+      if (Text.isText(node) && k === 'text') {
+        throw new Error(
+          `Cannot set the \`text\` property of a text node at path [${path}]. You must use the text-specific editor methods instead like \`editor.insertTextAtPath\`, \`editor.removeTextAtPath\`, etc.`
+        )
+      }
+
+      if (Text.isText(node) && k === 'marks') {
+        throw new Error(
+          `Cannot set the \`marks\` property of a text node at path [${path}]. You must use the text-specific editor methods instead like \`editor.addMarkAtPath\`, \`editor.removeMarkAtPath\`, etc.`
+        )
+      }
+
+      if (props[k] !== node[k]) {
+        isChange = true
+        newProps[k] = props[k]
+        oldProps[k] = node[k]
+      }
+    }
+
+    // PERF: If no properties have changed don't apply an operation at all.
+    if (!isChange) {
+      return
+    }
+
+    this.apply({
+      type: 'set_node',
+      path,
+      properties: oldProps,
+      newProperties: newProps,
     })
   }
 
@@ -454,7 +458,7 @@ class PathCommands {
     options: { target?: number } = {}
   ): void {
     if (path.length === 0) {
-      throw new Error(`Cannot split the top-level node in the document.`)
+      throw new Error(`Cannot split the root node.`)
     }
 
     const { target = null } = options
@@ -480,17 +484,16 @@ class PathCommands {
   }
 
   /**
-   * Unwrap all of the children of a node, by removing the node and replacing it
-   * in the tree with its children.
+   * Removing a node at a path, replacing it with its children.
    */
 
-  unwrapChildrenAtPath(this: Editor, path: Path): void {
+  pluckNodeAtPath(this: Editor, path: Path): void {
     const { value } = this
     const node = Node.get(value, path)
 
     if (Text.isText(node)) {
       throw new Error(
-        `Cannot unwrap children from the node at ${path} because it is a text node and has no children.`
+        `Cannot pluck a node at [${path}] because it is a text node and has no children.`
       )
     }
 
@@ -499,8 +502,8 @@ class PathCommands {
       const index = path[path.length - 1]
 
       for (let i = 0; i < node.nodes.length; i++) {
-        const targetPath = path.concat(i)
-        const newPath = parentPath.concat(index + i)
+        const targetPath = path.concat(0)
+        const newPath = parentPath.concat(index + i + 1)
         this.moveNodeAtPath(targetPath, newPath)
       }
 
@@ -516,7 +519,7 @@ class PathCommands {
    * node itself.
    */
 
-  unwrapNodeAtPath(this: Editor, path: Path): void {
+  liftNodeAtPath(this: Editor, path: Path): void {
     const { value } = this
     const parent = Node.parent(value, path)
     const parentPath = Path.parent(path)

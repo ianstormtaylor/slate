@@ -398,8 +398,10 @@ namespace Path {
               onp[i] -= 1
             }
 
+            onp.concat(p.slice(op.length))
+
             // Retain any indices past the move point in the original path.
-            onp.push(...p.slice(op.length))
+            p.splice(0, op.length, ...onp)
           } else {
             if (Path.endsBefore(op, p)) {
               p[op.length - 1] -= 1

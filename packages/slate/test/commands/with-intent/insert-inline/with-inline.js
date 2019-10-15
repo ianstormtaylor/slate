@@ -1,30 +1,30 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 import { Inline } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertInline(Inline.create('emoji'))
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         wo<cursor />rd
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         wo<emoji>
           <cursor />
         </emoji>rd
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

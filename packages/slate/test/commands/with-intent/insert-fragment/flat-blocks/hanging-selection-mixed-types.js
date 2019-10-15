@@ -3,41 +3,41 @@
 import h from '../../../../helpers/h'
 
 const fragment = (
-  <document>
-    <paragraph>fragment zero</paragraph>
-    <paragraph>fragment one</paragraph>
-    <paragraph>fragment two</paragraph>
-  </document>
+  
+    <block>fragment zero</block>
+    <block>fragment one</block>
+    <block>fragment two</block>
+  
 )
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(fragment)
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>zero</paragraph>
-      <paragraph>
+    
+      <block>zero</block>
+      <block>
         <anchor />one
-      </paragraph>
-      <quote>
+      </block>
+      <block>
         <focus />two
-      </quote>
-    </document>
+      </block>
+    
   </value>
 )
 
 // TODO: is this the right behavior?
 export const output = (
   <value>
-    <document>
-      <paragraph>zero</paragraph>
-      <quote>fragment zero</quote>
-      <paragraph>fragment one</paragraph>
-      <paragraph>
+    
+      <block>zero</block>
+      <block>fragment zero</block>
+      <block>fragment one</block>
+      <block>
         fragment two<cursor />two
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

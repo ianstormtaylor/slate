@@ -132,7 +132,7 @@ namespace Value {
             prev.nodes = prev.nodes.concat(node.nodes)
           } else {
             throw new Error(
-              `Cannot apply a "merge_node" operation at path ${path} to nodes of different interaces: ${node} ${prev}`
+              `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
             )
           }
 
@@ -146,20 +146,28 @@ namespace Value {
         }
 
         case 'move_node': {
-          const { path } = op
+          const { path, newPath } = op
+
+          if (Path.isAncestor(path, newPath)) {
+            throw new Error(
+              `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`
+            )
+          }
+
           const node = Node.get(v, path)
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
           parent.nodes.splice(index, 1)
 
-          // This is tricky, but since the `path` and `newPath` both refer to the
-          // same snapshot in time, after either inserting or removing as the
-          // first step, the second step's path can be out of date. So instead of
-          // using the `op.newPath` directly, we transform `op.path` to ascertain
-          // what the `newPath` would be after the operation was applied.
-          const newPath = Path.transform(path, op)!
-          const newParent = Node.parent(v, newPath)
-          const newIndex = newPath[newPath.length - 1]
+          // This is tricky, but since the `path` and `newPath` both refer to
+          // the same snapshot in time, there's a mismatch. After either
+          // removing the original position, the second step's path can be out
+          // of date. So instead of using the `op.newPath` directly, we
+          // transform `op.path` to ascertain what the `newPath` would be after
+          // the operation was applied.
+          const truePath = Path.transform(path, op)!
+          const newParent = Node.parent(v, truePath)
+          const newIndex = truePath[truePath.length - 1]
           newParent.nodes.splice(newIndex, 0, node)
 
           for (const [point, key, range] of Value.points(v)) {
@@ -195,7 +203,6 @@ namespace Value {
           const parent = Node.parent(v, path)
           const [, next] = Node.texts(v, { path })
           const [, prev] = Node.texts(v, { path, reverse: true })
-
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
@@ -285,7 +292,7 @@ namespace Value {
 
           if (path.length === 0) {
             throw new Error(
-              `Cannot apply a "split_node" operation at path ${path} because the top-level value cannot be split.`
+              `Cannot apply a "split_node" operation at path [${path}] because the top-level value cannot be split.`
             )
           }
 

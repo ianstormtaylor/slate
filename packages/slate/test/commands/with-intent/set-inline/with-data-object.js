@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.setInlines({
     type: 'hashtag',
     data: { thing: 'value' },
@@ -11,24 +11,24 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
+    
+      <block>
+        <inline>
           <cursor />word
-        </link>
-      </paragraph>
-    </document>
+        </inline>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <hashtag thing="value">
           <cursor />word
         </hashtag>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

@@ -1,45 +1,45 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.unwrapBlock('quote')
 }
 
 export const input = (
   <value>
-    <document>
-      <quote>
-        <paragraph>
+    
+      <block>
+        <block>
           <anchor />one
-        </paragraph>
-        <paragraph>
+        </block>
+        <block>
           <focus />two
-        </paragraph>
-        <paragraph>three</paragraph>
-        <paragraph>four</paragraph>
-        <paragraph>five</paragraph>
-        <paragraph>six</paragraph>
-      </quote>
-    </document>
+        </block>
+        <block>three</block>
+        <block>four</block>
+        <block>five</block>
+        <block>six</block>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />one
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         <focus />two
-      </paragraph>
-      <quote>
-        <paragraph>three</paragraph>
-        <paragraph>four</paragraph>
-        <paragraph>five</paragraph>
-        <paragraph>six</paragraph>
-      </quote>
-    </document>
+      </block>
+      <block>
+        <block>three</block>
+        <block>four</block>
+        <block>five</block>
+        <block>six</block>
+      </block>
+    
   </value>
 )

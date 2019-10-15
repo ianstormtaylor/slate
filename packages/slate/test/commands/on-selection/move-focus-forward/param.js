@@ -1,27 +1,27 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.moveFocusForward(4)
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         one <anchor />tw<focus />o three
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         one <anchor />two th<focus />ree
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

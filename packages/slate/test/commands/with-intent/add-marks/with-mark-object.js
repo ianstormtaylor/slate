@@ -1,10 +1,10 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
 import { Mark } from 'slate'
 
-export default function(editor) {
+export const run = editor => {
   editor.addMarks([
     Mark.create({
       type: 'bold',
@@ -19,25 +19,25 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />w<focus />ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <i thing2="value2">
           <b thing="value">
             <anchor />w
           </b>
         </i>
         <focus />ord
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

@@ -1,44 +1,44 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.wrapInline('hashtag')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <text />
-        <link>
+        <inline>
           he<anchor />ll<focus />o
-        </link>
+        </inline>
         <text />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 // TODO: this selection logic isn't right
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <text />
-        <link>he</link>
+        <inline>he</inline>
         <text />
         <hashtag>
-          <link>
+          <inline>
             <anchor />ll
-          </link>
+          </inline>
         </hashtag>
         <text />
-        <link>
+        <inline>
           <focus />o
-        </link>
+        </inline>
         <text />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

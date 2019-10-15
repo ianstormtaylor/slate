@@ -1,18 +1,18 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.delete()
 }
 
 export const input = (
   <value>
-    <document>
+    
       <image>
         <anchor /> <focus />
       </image>
-    </document>
+    
   </value>
 )
 

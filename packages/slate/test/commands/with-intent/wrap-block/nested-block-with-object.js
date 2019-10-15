@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.wrapBlock({
     type: 'quote',
     data: { thing: 'value' },
@@ -11,26 +11,26 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <quote>
-        <paragraph>
+    
+      <block>
+        <block>
           <cursor />word
-        </paragraph>
-      </quote>
-    </document>
+        </block>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <quote>
+    
+      <block>
         <quote thing="value">
-          <paragraph>
+          <block>
             <cursor />word
-          </paragraph>
-        </quote>
-      </quote>
-    </document>
+          </block>
+        </block>
+      </block>
+    
   </value>
 )

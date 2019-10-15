@@ -1,41 +1,37 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.setBlocks({ type: 'code' })
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>
-          <anchor />word
-        </link>
-      </paragraph>
-      <paragraph>
-        <link>
-          another<focus />
-        </link>
-      </paragraph>
-    </document>
+    <block>
+      <inline>
+        <anchor />word
+      </inline>
+    </block>
+    <block>
+      <inline>
+        another<focus />
+      </inline>
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <code>
-        <link>
-          <anchor />word
-        </link>
-      </code>
-      <code>
-        <link>
-          another<focus />
-        </link>
-      </code>
-    </document>
+    <code>
+      <inline>
+        <anchor />word
+      </inline>
+    </code>
+    <code>
+      <inline>
+        another<focus />
+      </inline>
+    </code>
   </value>
 )

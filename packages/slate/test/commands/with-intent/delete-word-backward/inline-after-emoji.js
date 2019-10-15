@@ -1,27 +1,23 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.deleteWordBackward()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        <link>word</link>📛<cursor />
-      </paragraph>
-    </document>
+    <block>
+      <inline>word</inline>📛<cursor />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        <cursor />
-      </paragraph>
-    </document>
+    <block>
+      <cursor />
+    </block>
   </value>
 )

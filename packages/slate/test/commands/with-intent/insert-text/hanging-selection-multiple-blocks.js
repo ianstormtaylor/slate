@@ -1,31 +1,31 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertText('a')
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <anchor />one
-      </paragraph>
-      <paragraph>two</paragraph>
-      <quote>
+      </block>
+      <block>two</block>
+      <block>
         <focus />three
-      </quote>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <quote>
+    
+      <block>
         a<cursor />three
-      </quote>
-    </document>
+      </block>
+    
   </value>
 )

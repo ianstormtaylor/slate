@@ -1,33 +1,33 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(
-    <document>
-      <quote>one</quote>
-      <quote>two</quote>
-    </document>
+    
+      <block>one</block>
+      <block>two</block>
+    
   )
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         wo<cursor />rd
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>woone</paragraph>
-      <quote>
+    
+      <block>woone</block>
+      <block>
         two<cursor />rd
-      </quote>
-    </document>
+      </block>
+    
   </value>
 )

@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.unwrapBlock({
     type: 'quote',
     data: { thing: 'value' },
@@ -11,18 +11,18 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
+    
       <quote thing="value">
-        <paragraph>word</paragraph>
-      </quote>
-    </document>
+        <block>word</block>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>word</paragraph>
-    </document>
+    
+      <block>word</block>
+    
   </value>
 )

@@ -1,35 +1,35 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.setInlines({ type: 'comment' })
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+
+      <block>
         <hashtag>
-          <link>
+          <inline>
             <cursor />word
-          </link>
+          </inline>
         </hashtag>
-      </paragraph>
-    </document>
+      </block>
+
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+
+      <block>
         <hashtag>
           <comment>
             <cursor />word
           </comment>
         </hashtag>
-      </paragraph>
-    </document>
+      </block>
+
   </value>
 )

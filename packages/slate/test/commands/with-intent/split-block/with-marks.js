@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.addMark('italic')
   editor.splitBlock()
   editor.insertText('cat is cute')
@@ -10,28 +10,28 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <b>word</b>
         <cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <b>word</b>
         <cursor />
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         <i>
           <b>cat is cute</b>
         </i>
         <cursor />
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

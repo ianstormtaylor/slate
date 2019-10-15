@@ -2,39 +2,39 @@
 
 import h from '../../../../helpers/h'
 
-export default function(editor) {
+export const run = editor => {
   editor.insertFragment(
-    <document>
-      <quote>
-        <quote>one</quote>
-        <quote>two</quote>
-      </quote>
-    </document>
+    
+      <block>
+        <block>one</block>
+        <block>two</block>
+      </block>
+    
   )
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         wo<cursor />rd
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>wo</paragraph>
-      <quote>
-        <quote>one</quote>
-        <quote>
+    
+      <block>wo</block>
+      <block>
+        <block>one</block>
+        <block>
           two<cursor />
-        </quote>
-      </quote>
-      <paragraph>rd</paragraph>
-    </document>
+        </block>
+      </block>
+      <block>rd</block>
+    
   </value>
 )
 

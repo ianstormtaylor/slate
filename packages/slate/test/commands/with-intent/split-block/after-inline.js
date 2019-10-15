@@ -1,31 +1,31 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.splitBlock()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
-        word<link href="website.com">hyperlink</link>
+    
+      <block>
+        word<link href="website.com">hyperlink</inline>
         <cursor />word
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>
-        word<link href="website.com">hyperlink</link>
-      </paragraph>
-      <paragraph>
+    
+      <block>
+        word<link href="website.com">hyperlink</inline>
+      </block>
+      <block>
         <cursor />word
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )

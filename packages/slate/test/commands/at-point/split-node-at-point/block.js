@@ -1,8 +1,8 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   const { value: { document } } = editor
   const point = document.createPoint({ path: [0, 0], offset: 2 })
   editor.splitNodeAtPoint(point, [0])
@@ -10,19 +10,19 @@ export default function(editor) {
 
 export const input = (
   <value>
-    <document>
-      <paragraph>
+    
+      <block>
         <text>word</text>
-      </paragraph>
-    </document>
+      </block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>wo</paragraph>
-      <paragraph>rd</paragraph>
-    </document>
+    
+      <block>wo</block>
+      <block>rd</block>
+    
   </value>
 )

@@ -3,32 +3,32 @@ import { createHyperscript } from 'slate-hyperscript'
 
 const h = createHyperscript({
   elements: {
-    block: { type: 'block' },
-    inline: { type: 'inline' },
-    void_block: { type: 'void_block' },
-    void_inline: { type: 'void_inline' },
+    block: { kind: 'block' },
+    inline: { kind: 'inline' },
+    void_block: { kind: 'void_block' },
+    void_inline: { kind: 'void_inline' },
   },
   annotations: {
-    atomic_annotation: { type: 'atomic_annotation' },
+    atomic_annotation: { kind: 'atomic_annotation' },
   },
 })
 
 const TestPlugin = Editor => {
   return class extends Editor {
     isBlock(node) {
-      return Element.isElement(node) && node.type.endsWith('block')
+      return Element.isElement(node) && node.kind.endsWith('block')
     }
 
     isInline(node) {
-      return Element.isElement(node) && node.type.endsWith('inline')
+      return Element.isElement(node) && node.kind.endsWith('inline')
     }
 
     isVoid(node) {
-      return Element.isElement(node) && node.type.startsWith('void_')
+      return Element.isElement(node) && node.kind.startsWith('void_')
     }
 
     isAtomic(mark) {
-      return mark.type.startsWith('atomic_')
+      return mark.kind.startsWith('atomic_')
     }
   }
 }

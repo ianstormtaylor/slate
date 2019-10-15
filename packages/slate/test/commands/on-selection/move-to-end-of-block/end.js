@@ -1,31 +1,31 @@
 /** @jsx h */
 
-import h from '../../../helpers/h'
+import { h } from '../../../helpers'
 
-export default function(editor) {
+export const run = editor => {
   editor.moveToEndOfBlock()
 }
 
 export const input = (
   <value>
-    <document>
-      <paragraph>one</paragraph>
-      <paragraph>
+    
+      <block>one</block>
+      <block>
         two<cursor />
-      </paragraph>
-      <paragraph>three</paragraph>
-    </document>
+      </block>
+      <block>three</block>
+    
   </value>
 )
 
 export const output = (
   <value>
-    <document>
-      <paragraph>one</paragraph>
-      <paragraph>
+    
+      <block>one</block>
+      <block>
         two<cursor />
-      </paragraph>
-      <paragraph>three</paragraph>
-    </document>
+      </block>
+      <block>three</block>
+    
   </value>
 )
