@@ -185,23 +185,25 @@ class SearchHighlighting extends React.Component {
         }
       })
 
-      for (const [node, path] of document.texts()) {
-        const { key, text } = node
-        const parts = text.split(string)
-        let offset = 0
+      if (string) {
+        for (const [node, path] of document.texts()) {
+          const { key, text } = node
+          const parts = text.split(string)
+          let offset = 0
 
-        parts.forEach((part, i) => {
-          if (i !== 0) {
-            editor.addAnnotation({
-              key: getHighlightKey(),
-              type: 'highlight',
-              anchor: { path, key, offset: offset - string.length },
-              focus: { path, key, offset },
-            })
-          }
+          parts.forEach((part, i) => {
+            if (i !== 0) {
+              editor.addAnnotation({
+                key: getHighlightKey(),
+                type: 'highlight',
+                anchor: { path, key, offset: offset - string.length },
+                focus: { path, key, offset },
+              })
+            }
 
-          offset = offset + part.length + string.length
-        })
+            offset = offset + part.length + string.length
+          })
+        }
       }
     })
   }
