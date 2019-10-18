@@ -487,22 +487,6 @@ function CompositionManager(editor) {
         renderSync(editor, () => {
           applyDiff()
 
-          const domRange = win.getSelection().getRangeAt(0)
-          const domText = domRange.startContainer.textContent
-          const offset = domRange.startOffset
-
-          const fix = fixTextAndOffset(domText, offset)
-
-          const range = editor
-            .findRange({
-              anchorNode: domRange.startContainer,
-              anchorOffset: 0,
-              focusNode: domRange.startContainer,
-              focusOffset: 0,
-              isCollapsed: true,
-            })
-            .moveTo(fix.offset)
-
           /**
            * We must call `restoreDOM` even though this is applying a `diff` which
            * should not require it. But if you type `it me. no.` on a blank line
@@ -514,10 +498,7 @@ function CompositionManager(editor) {
            * `enter` in such a scenario.
            */
 
-          editor
-            .select(range)
-            .focus()
-            .restoreDOM()
+          editor.restoreDOM()
         })
       }
 
