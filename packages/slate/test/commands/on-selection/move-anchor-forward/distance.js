@@ -3,13 +3,13 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveAnchor({ reverse: true, distance: 8 })
+  editor.moveAnchor({ distance: 3 })
 }
 
 export const input = (
   <value>
     <block>
-      one <focus />two th<anchor />ree
+      one <anchor />two thr<focus />ee
     </block>
   </value>
 )
@@ -17,7 +17,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      on<anchor />e <focus />two three
+      one two<anchor /> thr<focus />ee
     </block>
   </value>
 )

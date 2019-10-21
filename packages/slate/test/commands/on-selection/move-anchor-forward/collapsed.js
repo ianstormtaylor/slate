@@ -3,26 +3,21 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveToEnd()
+  editor.moveAnchor()
 }
 
 export const input = (
   <value>
-    
-      <image>
-        <anchor /> <focus />
-      </image>
-    
+    <block>
+      one two t<cursor />hree
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <image>
-        {' '}
-        <cursor />
-      </image>
-    
+    <block>
+      one two t<focus />h<anchor />ree
+    </block>
   </value>
 )

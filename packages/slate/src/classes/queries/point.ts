@@ -40,7 +40,7 @@ class PointQueries {
     let target
 
     for (const p of this.positions({ ...options, point })) {
-      if (d >= distance) {
+      if (d > distance) {
         break
       }
 
@@ -71,7 +71,7 @@ class PointQueries {
     let target
 
     for (const p of this.positions({ ...options, point, reverse: true })) {
-      if (d >= distance) {
+      if (d > distance) {
         break
       }
 

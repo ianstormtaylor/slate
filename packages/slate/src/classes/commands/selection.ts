@@ -186,7 +186,7 @@ class SelectionCommands {
    */
 
   moveFocusTo(this: Editor, point: Point) {
-    this.setSelection({ anchor: point })
+    this.setSelection({ focus: point })
   }
 
   /**

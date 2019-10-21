@@ -3,25 +3,21 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveStartForward()
+  editor.moveStart()
 }
 
 export const input = (
   <value>
-    
-      <block>
-        one <focus />two t<anchor />hree
-      </block>
-    
+    <block>
+      one <focus />two t<anchor />hree
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        one t<focus />wo t<anchor />hree
-      </block>
-    
+    <block>
+      one t<focus />wo t<anchor />hree
+    </block>
   </value>
 )
