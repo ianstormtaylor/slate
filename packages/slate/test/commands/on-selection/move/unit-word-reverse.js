@@ -3,25 +3,21 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveWordForward()
+  editor.move({ reverse: true, unit: 'word' })
 }
 
 export const input = (
   <value>
-    
-      <block>
-        one <cursor />two three
-      </block>
-    
+    <block>
+      one tw<cursor />o three
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        one two<cursor /> three
-      </block>
-    
+    <block>
+      one <cursor />two three
+    </block>
   </value>
 )
