@@ -30,6 +30,14 @@ describe('slate', () => {
     assert.deepEqual(editor.value, output)
   })
 
+  fixtures(__dirname, 'queries', ({ module }) => {
+    const { input, run, output } = module
+    const TestEditor = TestPlugin(Editor)
+    const editor = new TestEditor({ value: input })
+    const result = run(editor)
+    assert.deepEqual(result, output)
+  })
+
   fixtures(__dirname, 'commands', ({ module }) => {
     const { input, run, output } = module
     const TestEditor = TestPlugin(Editor)

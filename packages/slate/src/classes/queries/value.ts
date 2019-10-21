@@ -3,13 +3,16 @@ import { reverse as reverseText } from 'esrever'
 import {
   Ancestor,
   Editor,
+  Element,
   ElementEntry,
   Mark,
   Node,
+  NodeEntry,
   Path,
   Point,
   Range,
   String,
+  Text,
   TextEntry,
 } from '../..'
 
@@ -18,12 +21,37 @@ class ValueQueries {
    * Iterate through all of the block nodes in the editor.
    */
 
-  *blocks(this: Editor, options: {} = {}): Iterable<ElementEntry> {
-    for (const [n, p] of Node.elements(this.value, options)) {
-      if (!this.isInline(n)) {
-        yield [n, p]
-      }
-    }
+  *blocks(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
+    yield* Node.elements(this.value, {
+      ...options,
+      pass: ([n]) =>
+        Element.isElement(n) && (this.isVoid(n) || this.hasInlines(n)),
+    })
+  }
+
+  /**
+   * Iterate through all of the nodes in the editor.
+   */
+
+  *entries(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    yield* Node.entries(this.value, {
+      ...options,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
   }
 
   /**
@@ -59,29 +87,27 @@ class ValueQueries {
     let range: Range = selection
     let result: Mark[] = []
     let first = true
+    const { anchor } = range
 
     // If the range is collapsed at the start of a text node, it should carry
     // over the marks from the previous text node in the same block.
     if (
       Range.isCollapsed(range) &&
       // PERF: If the offset isn't zero we know it's not at the start.
-      range.anchor.offset === 0
+      anchor.offset === 0 &&
+      // PERF: If it's the first sibling, we know it can't carry over.
+      anchor.path[anchor.path.length - 1] !== 0
     ) {
-      const { anchor } = range
-      const closestBlock = this.getClosestBlock(anchor.path)
-      const prevText = this.getPreviousText(anchor.path)
+      const prevPath = Path.previous(anchor.path)
+      const prevNode = Node.get(value, prevPath)
 
-      if (closestBlock && prevText) {
-        const [, blockPath] = closestBlock
-        const [, prevPath] = prevText
-
-        if (Path.isAncestor(blockPath, prevPath)) {
-          range = this.getRange(prevPath)
-        }
+      if (Text.isText(prevNode)) {
+        range = this.getRange(prevPath)
       }
     }
 
-    for (const [node] of Node.texts(value, { range })) {
+    for (const [node] of this.texts({ range })) {
+      debugger
       const { marks } = node
 
       if (first) {
@@ -98,13 +124,12 @@ class ValueQueries {
 
       if (union) {
         for (const mark of marks) {
-          if (!Mark.exists(mark, marks)) {
+          if (!Mark.exists(mark, result)) {
             result.push(mark)
           }
         }
       } else {
-        // When intersecting, iterate backwards so that removing marks doesn't
-        // impact indexing.
+        // Iterate backwards so that removing marks doesn't impact indexing.
         for (let i = result.length - 1; i >= 0; i--) {
           const existing = result[i]
 
@@ -123,7 +148,12 @@ class ValueQueries {
    */
 
   *inlines(this: Editor, options: {} = {}): Iterable<ElementEntry> {
-    for (const [n, p] of Node.elements(this.value, options)) {
+    const iterable = Node.elements(this.value, {
+      ...options,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+
+    for (const [n, p] of iterable) {
       if (this.isInline(n)) {
         yield [n, p]
       }
@@ -134,9 +164,16 @@ class ValueQueries {
    * Iterate through all of the leaf block nodes in the editor.
    */
 
-  *leafBlocks(this: Editor, options: {} = {}): Iterable<ElementEntry> {
+  *leafBlocks(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
     for (const [n, p] of this.blocks(options)) {
-      if (this.hasInlines(n)) {
+      if (this.hasInlines(n) || this.isVoid(n)) {
         yield [n, p]
       }
     }
@@ -146,9 +183,16 @@ class ValueQueries {
    * Iterate through all of the leaf inline nodes in the editor.
    */
 
-  *leafInlines(this: Editor, options: {} = {}): Iterable<ElementEntry> {
+  *leafInlines(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
     for (const [n, p] of this.inlines(options)) {
-      if (this.hasTexts(n)) {
+      if (this.hasTexts(n) || this.isVoid(n)) {
         yield [n, p]
       }
     }
@@ -170,121 +214,83 @@ class ValueQueries {
     this: Editor,
     options: {
       point?: Point
-      unit?: 'offset' | 'character' | 'word' | 'line'
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
       allowZeroWidth?: boolean
     } = {}
   ): Iterable<Point> {
-    const { unit = 'offset', reverse = false } = options
-    const { value } = this
-    let { point } = options
+    const {
+      unit = 'offset',
+      reverse = false,
+      point = reverse ? this.getEnd([]) : this.getStart([]),
+    } = options
 
-    if (point == null) {
-      const [entry] = Node.texts(value, { reverse })
-      const [textNode, textPath] = entry
-      const textOffset = reverse ? textNode.text.length : 0
-      point = { path: textPath, offset: textOffset }
+    if (unit !== 'offset') {
+      yield point
     }
 
-    while (true) {
-      const { path, offset } = point
-      const furthestVoid = this.getFurthestVoid(path)
-      const closestBlock = this.getClosestBlock(path)
-      let skipPath: Path | void
+    const { path, offset } = point
+    let string = ''
+    let distance = 0
 
-      if (furthestVoid) {
-        const [, voidPath] = furthestVoid
-        skipPath = voidPath
-      } else if (closestBlock) {
-        const [, blockPath] = closestBlock
-
-        if (
-          (!reverse && this.isAtEndOfPath(point, blockPath)) ||
-          (reverse && this.isAtStartOfPath(point, blockPath))
-        ) {
-          skipPath = blockPath
-        }
-      }
-
-      if (skipPath) {
-        const textEntry = reverse
-          ? this.getPreviousText(skipPath)
-          : this.getNextText(skipPath)
-
-        if (!textEntry) {
-          break
-        }
-
-        const [textNode, textPath] = textEntry
-        const textOffset = reverse ? textNode.text.length : 0
-        point = produce(point, p => {
-          p.path = textPath
-          p.offset = textOffset
-        })
-
-        yield point
-      }
-
-      const node = Node.leaf(value, path)
-      let root: Ancestor = value
-      let rootPath: Path = []
-
-      if (closestBlock) {
-        const [block, blockPath] = closestBlock
-        root = block
-        rootPath = blockPath
-      }
-
-      const rootText = Node.text(root)
-      const relPath = Path.relative(path, rootPath)
-      const relOffset = Node.offset(root, relPath)
-      const rootOffset = relOffset + offset
-      const remainingText = reverse
-        ? reverseText(rootText.slice(0, rootOffset))
-        : rootText.slice(rootOffset)
-
-      let d = 1
-
+    const advance = () => {
       if (unit === 'character') {
-        d = String.getCharacterDistance(remainingText)
+        distance = String.getCharacterDistance(string)
       } else if (unit === 'word') {
-        d = String.getWordDistance(remainingText)
-      } else if (unit === 'line') {
-        // COMPAT: If we're moving by line, we approximate it in core by moving
-        // by the entire block. This can be overriden in environments where you
-        // have rendered lines that can be calculated.
-        d = remainingText.length
+        distance = String.getWordDistance(string)
+      } else if (unit === 'line' || unit === 'block') {
+        // COMPAT: We equate 'line' in core to 'block'. This can be overriden in
+        // environments with rendered lines that can be calculated.
+        distance = string.length
+      } else {
+        distance = Math.min(string.length, 1)
       }
 
-      const newOffset = reverse ? offset - d : offset + d
+      string = string.slice(distance)
+    }
 
-      // If the travel distance is all inside the current text node, just
-      // move the existing point's offset.
-      if (
-        (!reverse && newOffset <= node.text.length) ||
-        (reverse && newOffset >= 0)
-      ) {
-        point = produce(point, p => {
-          p.offset = newOffset
-        })
+    for (const [n, p] of this.entries({
+      path,
+      reverse,
+    })) {
+      if (Element.isElement(n)) {
+        if (this.isVoid(n)) {
+          yield this.getStart(p)
+          continue
+        }
 
-        yield point
+        if (!this.isInline(n) && this.hasInlines(n)) {
+          let text = this.getText(p)
+
+          if (Path.isAncestor(p, path)) {
+            const before = this.getOffset(path, { depth: p.length })
+            const o = before + offset
+            text = reverse ? text.slice(0, o) : text.slice(o)
+          }
+
+          string = reverse ? reverseText(text) : text
+          distance = 0
+
+          if (unit !== 'offset') {
+            advance()
+          }
+        }
       }
 
-      let t = reverse ? offset : node.text.length - offset
+      if (Text.isText(n)) {
+        let remaining = n.text.length
+        let o = reverse ? remaining : 0
 
-      // Otherwise, we need to iterate the text nodes of the block until we've
-      // traveled the correct offset amount.
-      for (const [textNode, textPath] of this.texts({ path, reverse })) {
-        const { length } = textNode.text
+        if (Path.equals(p, path)) {
+          remaining = reverse ? offset : remaining - offset
+          o = offset
+        }
 
-        if (t + length >= d) {
-          point = produce(point, p => {
-            p.path = textPath
-            p.offset = reverse ? length - (d - t) : d - t
-          })
-
-          yield point
+        while (remaining > 0) {
+          o = reverse ? o - distance : o + distance
+          remaining -= distance
+          yield { path: p, offset: o }
+          advance()
         }
       }
     }
@@ -294,7 +300,14 @@ class ValueQueries {
    * Iterate through all of the root block nodes in the editor.
    */
 
-  *rootBlocks(this: Editor, options: {} = {}): Iterable<ElementEntry> {
+  *rootBlocks(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
     for (const [n, p] of this.blocks(options)) {
       if (p.length === 1) {
         yield [n, p]
@@ -306,7 +319,14 @@ class ValueQueries {
    * Iterate through all of the root inline nodes in the editor.
    */
 
-  *rootInlines(this: Editor, options: {} = {}): Iterable<ElementEntry> {
+  *rootInlines(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
     for (const [n, p] of this.inlines(options)) {
       const parent = Node.parent(this.value, p)
 
@@ -320,8 +340,18 @@ class ValueQueries {
    * Iterate through all of the text nodes in the editor.
    */
 
-  *texts(this: Editor, options: {} = {}): Iterable<TextEntry> {
-    yield* Node.texts(this.value, options)
+  *texts(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<TextEntry> {
+    yield* Node.texts(this.value, {
+      ...options,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
   }
 }
 

@@ -15,6 +15,69 @@ import {
 import { PATH_REFS } from '../../symbols'
 
 class PathQueries {
+  hasVoidAncestor(this: Editor, path: Path): boolean {
+    const furthestVoid = this.getFurthestVoid(path)
+
+    if (furthestVoid) {
+      const [, voidPath] = furthestVoid
+      return Path.isAncestor(voidPath, path)
+    }
+
+    return false
+  }
+
+  getText(this: Editor, path: Path): string {
+    const { value } = this
+    const node = Node.get(value, path)
+
+    if (this.hasVoidAncestor(path)) {
+      return ''
+    } else if (Element.isElement(node) && this.isVoid(node)) {
+      return ''
+    } else if (Text.isText(node)) {
+      return node.text
+    } else {
+      return node.nodes.map((n, i) => this.getText(path.concat(i))).join('')
+    }
+  }
+
+  getOffset(
+    this: Editor,
+    path: Path,
+    options: {
+      depth?: number
+    } = {}
+  ): number {
+    const { value } = this
+    const { depth = 0 } = options
+
+    if (path.length === depth) {
+      return 0
+    }
+
+    const rootPath = path.slice(0, depth)
+    const root = Node.get(value, rootPath)
+    const relPath = Path.relative(path, rootPath)
+
+    if (Text.isText(root)) {
+      throw new Error(
+        `Cannot get the offset into a root text node: ${JSON.stringify(root)}`
+      )
+    }
+
+    const [index] = relPath
+    let o = 0
+
+    for (let i = 0; i < index; i++) {
+      const text = this.getText(rootPath.concat(i))
+      o += text.length
+    }
+
+    const relOffset = this.getOffset(path, { depth: depth + 1 })
+    o += relOffset
+    return o
+  }
+
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the this.
@@ -316,8 +379,8 @@ class PathQueries {
    */
 
   getStart(this: Editor, path: Path): Point {
-    const [firstNode, firstPath] = this.getFirstText(path)
-    const point = { path: firstPath, offset: firstNode.text.length }
+    const [, firstPath] = this.getFirstText(path)
+    const point = { path: firstPath, offset: 0 }
     return point
   }
 }

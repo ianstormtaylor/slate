@@ -1,28 +1,28 @@
-import { Annotation, Mark, Node, Path } from '..'
+import { Annotation, Mark, Node, Path, Selection, Value } from '..'
 import isPlainObject from 'is-plain-object'
 
-interface AddAnnotationOperation {
+type AddAnnotationOperation = {
   type: 'add_annotation'
   key: string
   annotation: Annotation
   [key: string]: any
 }
 
-interface AddMarkOperation {
+type AddMarkOperation = {
   type: 'add_mark'
   path: Path
   mark: Mark
   [key: string]: any
 }
 
-interface InsertNodeOperation {
+type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
   [key: string]: any
 }
 
-interface InsertTextOperation {
+type InsertTextOperation = {
   type: 'insert_text'
   path: Path
   offset: number
@@ -30,44 +30,44 @@ interface InsertTextOperation {
   [key: string]: any
 }
 
-interface MergeNodeOperation {
+type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
   target: number | null
-  properties: {}
+  properties: Partial<Node>
   [key: string]: any
 }
 
-interface MoveNodeOperation {
+type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
   [key: string]: any
 }
 
-interface RemoveAnnotationOperation {
+type RemoveAnnotationOperation = {
   type: 'remove_annotation'
   key: string
   annotation: Annotation
   [key: string]: any
 }
 
-interface RemoveMarkOperation {
+type RemoveMarkOperation = {
   type: 'remove_mark'
   path: Path
   mark: Mark
   [key: string]: any
 }
 
-interface RemoveNodeOperation {
+type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
   [key: string]: any
 }
 
-interface RemoveTextOperation {
+type RemoveTextOperation = {
   type: 'remove_text'
   path: Path
   offset: number
@@ -75,50 +75,63 @@ interface RemoveTextOperation {
   [key: string]: any
 }
 
-interface SetAnnotationOperation {
+type SetAnnotationOperation = {
   type: 'set_annotation'
   key: string
-  properties: {}
-  newProperties: {}
+  properties: Partial<Annotation>
+  newProperties: Partial<Annotation>
   [key: string]: any
 }
 
-interface SetMarkOperation {
+type SetMarkOperation = {
   type: 'set_mark'
   path: Path
-  properties: {}
-  newProperties: {}
+  properties: Partial<Mark>
+  newProperties: Partial<Mark>
   [key: string]: any
 }
 
-interface SetNodeOperation {
+type SetNodeOperation = {
   type: 'set_node'
   path: Path
-  properties: {}
-  newProperties: {}
+  properties: Partial<Node>
+  newProperties: Partial<Node>
   [key: string]: any
 }
 
-interface SetSelectionOperation {
-  type: 'set_selection'
-  properties: {} | null
-  newProperties: {} | null
-  [key: string]: any
-}
+type SetSelectionOperation =
+  | {
+      type: 'set_selection'
+      [key: string]: any
+      properties: null
+      newProperties: Selection
+    }
+  | {
+      type: 'set_selection'
+      [key: string]: any
+      properties: Partial<Selection>
+      newProperties: Partial<Selection>
+    }
+  | {
+      type: 'set_selection'
+      [key: string]: any
+      properties: Selection
+      newProperties: null
+    }
 
-interface SetValueOperation {
+type SetValueOperation = {
   type: 'set_value'
-  properties: {}
-  newProperties: {}
+  properties: Partial<Value>
+  newProperties: Partial<Value>
   [key: string]: any
 }
 
-interface SplitNodeOperation {
+type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
   target: number | null
-  properties: {}
+  properties: Partial<Node>
   [key: string]: any
 }
 
@@ -412,7 +425,22 @@ namespace Operation {
 
       case 'set_selection': {
         const { properties, newProperties } = op
-        return { ...op, properties: newProperties, newProperties: properties }
+
+        if (properties == null) {
+          return {
+            ...op,
+            properties: newProperties as Selection,
+            newProperties: null,
+          }
+        } else if (newProperties == null) {
+          return {
+            ...op,
+            properties: null,
+            newProperties: properties as Selection,
+          }
+        } else {
+          return { ...op, properties: newProperties, newProperties: properties }
+        }
       }
 
       case 'split_node': {

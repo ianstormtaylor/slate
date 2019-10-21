@@ -160,6 +160,7 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<DescendantEntry> {
     for (const [node, path] of Node.entries(root, options)) {
@@ -183,6 +184,7 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<ElementEntry> {
     for (const [node, path] of Node.entries(root, options)) {
@@ -204,100 +206,104 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
+      pass?: (entry: NodeEntry) => boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { path, range, reverse = false } = options
-    let startPath: Path = []
-    let endPath: Path | null = null
+    const { path = [], range, reverse = false, pass = () => false } = options
+    let fromPath
+    let toPath
 
     if (range != null) {
-      const [start, end] = Range.points(range)
-      startPath = start.path
-      endPath = end.path
-    } else if (path != null) {
-      startPath = path
+      const [s, e] = Range.points(range)
+      fromPath = reverse ? e.path : s.path
+      toPath = reverse ? s.path : e.path
+    } else {
+      const [, f] = reverse ? Node.last(root, path) : Node.first(root, path)
+      fromPath = f
+      toPath = null
     }
 
-    const startNode = Node.get(root, startPath)
     const visited = new Set()
-    let p = startPath
-    let n = startNode
-    let includedStart = false
-    let includingStart = false
+    let p: Path = []
+    let n = root
+    yield [n, p]
 
     while (true) {
-      // When iterating over a range, we need to include the specific
-      // ancestors in the start path of the range manually.
-      if (!includedStart) {
-        if (!includingStart) {
-          includingStart = true
-          p = []
-          n = root
-          yield [n, p]
-          continue
-        }
-
-        if (p.length === startPath.length) {
-          includedStart = true
-          continue
-        }
-
-        p = startPath.slice(0, p.length + 1)
-        n = Node.get(root, p)
-        yield [n, p]
-        continue
-      }
-
-      // When iterating over a range, if we get to the end path then exit.
-      if (endPath && Path.equals(p, endPath)) {
+      if (toPath != null && Path.equals(p, toPath)) {
         break
       }
 
       // If we're allowed to go downward and we haven't decsended yet, do.
-      if (!Text.isText(n) && n.nodes.length && !visited.has(n)) {
+      if (
+        !visited.has(n) &&
+        !Text.isText(n) &&
+        n.nodes.length !== 0 &&
+        !pass([n, p])
+      ) {
         visited.add(n)
-        const nextIndex = reverse ? n.nodes.length - 1 : 0
+        let nextIndex = reverse ? n.nodes.length - 1 : 0
+
+        if (Path.isAncestor(p, fromPath)) {
+          nextIndex = fromPath[p.length]
+        }
+
         p = p.concat(nextIndex)
         n = Node.get(root, p)
         yield [n, p]
         continue
       }
 
-      // To go forward, backward or upward we can't be at the root already.
-      if (p.length !== 0) {
-        // If we're going forward...
-        if (!reverse) {
-          const newPath = Path.next(p)
+      // If we're at the root and we can't go down, we're done.
+      if (p.length === 0) {
+        break
+      }
 
-          if (Node.has(root, newPath)) {
-            p = newPath
-            n = Node.get(root, newPath)
-            yield [n, p]
-            continue
-          }
+      // If we're going forward...
+      if (!reverse) {
+        const newPath = Path.next(p)
+
+        if (Node.has(root, newPath)) {
+          p = newPath
+          n = Node.get(root, p)
+          yield [n, p]
+          continue
         }
+      }
 
-        // If we're going backward...
-        if (reverse && p[p.length - 1] !== 0) {
-          const newPath = Path.previous(p)
-
-          if (Node.has(root, newPath)) {
-            p = newPath
-            n = Node.get(root, newPath)
-            yield [n, p]
-            continue
-          }
-        }
-
-        // Otherwise we're going upward...
-        p = Path.parent(p)
+      // If we're going backward...
+      if (reverse && p[p.length - 1] !== 0) {
+        const newPath = Path.previous(p)
+        p = newPath
         n = Node.get(root, p)
-        visited.add(n)
+        yield [n, p]
         continue
       }
 
-      break
+      // Otherwise we're going upward...
+      p = Path.parent(p)
+      n = Node.get(root, p)
+      visited.add(n)
     }
+  }
+
+  /**
+   * Get the first node entry in a root node from a path.
+   */
+
+  export const first = (root: Node, path: Path): NodeEntry => {
+    const p = path.slice()
+    let n = Node.get(root, p)
+
+    while (n) {
+      if (Text.isText(n) || n.nodes.length === 0) {
+        break
+      } else {
+        n = n.nodes[0]
+        p.push(0)
+      }
+    }
+
+    return [n, p]
   }
 
   /**
@@ -416,6 +422,27 @@ namespace Node {
   }
 
   /**
+   * Get the lash node entry in a root node from a path.
+   */
+
+  export const last = (root: Node, path: Path): NodeEntry => {
+    const p = path.slice()
+    let n = Node.get(root, p)
+
+    while (n) {
+      if (Text.isText(n) || n.nodes.length === 0) {
+        break
+      } else {
+        const i = n.nodes.length - 1
+        n = n.nodes[i]
+        p.push(i)
+      }
+    }
+
+    return [n, p]
+  }
+
+  /**
    * Get the node at a specific path, ensuring it's a leaf text node.
    */
 
@@ -461,6 +488,7 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<MarkEntry> {
     for (const [node, path] of Node.texts(root, options)) {
@@ -477,7 +505,7 @@ namespace Node {
 
   export const offset = (root: Node, path: Path): number => {
     // PERF: We can exit early if the path is empty.
-    if (!path.length) {
+    if (path.length === 0) {
       return 0
     }
 
@@ -530,7 +558,7 @@ namespace Node {
     if (Text.isText(node)) {
       return node.text
     } else {
-      return node.nodes.map(text).join('')
+      return node.nodes.map(Node.text).join('')
     }
   }
 
@@ -544,6 +572,7 @@ namespace Node {
       path?: Path
       range?: Range
       reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<TextEntry> {
     for (const [node, path] of Node.entries(root, options)) {

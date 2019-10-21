@@ -9,6 +9,10 @@ export const input = (
       <text key="a" />
       <text key="b" />
     </element>
+    <element>
+      <text key="c" />
+      <text key="d" />
+    </element>
   </value>
 )
 
@@ -23,9 +27,22 @@ export const output = [
         <text key="a" />
         <text key="b" />
       </element>
+      <element>
+        <text key="c" />
+        <text key="d" />
+      </element>
     </value>,
     [],
   ],
+  [
+    <element>
+      <text key="c" />
+      <text key="d" />
+    </element>,
+    [1],
+  ],
+  [<text key="d" />, [1, 1]],
+  [<text key="c" />, [1, 0]],
   [
     <element>
       <text key="a" />

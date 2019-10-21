@@ -277,7 +277,23 @@ namespace Value {
 
         case 'set_selection': {
           const { newProperties } = op
-          Object.assign(v.selection, newProperties)
+
+          if (newProperties == null) {
+            v.selection = newProperties
+          } else if (v.selection == null) {
+            if (!Selection.isSelection(newProperties)) {
+              throw new Error(
+                `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
+                  newProperties
+                )} when there is no current selection.`
+              )
+            }
+
+            v.selection = newProperties
+          } else {
+            Object.assign(v.selection, newProperties)
+          }
+
           break
         }
 

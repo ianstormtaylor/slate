@@ -367,17 +367,15 @@ class PathCommands {
     }
 
     const newProps = {}
-    let isChange = true
 
     for (const k in props) {
       if (props[k] !== match[k]) {
-        isChange = true
         newProps[k] = props[k]
       }
     }
 
-    // PERF: If no properties have changed don't apply an operation at all.
-    if (!isChange) {
+    // If no properties have changed don't apply an operation at all.
+    if (Object.keys(newProps).length !== 0) {
       return
     }
 
@@ -403,38 +401,20 @@ class PathCommands {
     const node = Node.get(value, path)
     const newProps = {}
     const oldProps = {}
-    let isChange = true
 
     for (const k in props) {
-      // Disallow setting restricted properties that should use the editor
-      // methods that result in more semantic operations being applied.
-      if (Element.isElement(node) && k === 'nodes') {
-        throw new Error(
-          `Cannot set the \`nodes\` property of an element node at path [${path}]. You must use the node-specific editor methods instead like \`editor.insertNodeAtPath\`, \`editor.removeNodeAtPath\`, etc.`
-        )
-      }
-
-      if (Text.isText(node) && k === 'text') {
-        throw new Error(
-          `Cannot set the \`text\` property of a text node at path [${path}]. You must use the text-specific editor methods instead like \`editor.insertTextAtPath\`, \`editor.removeTextAtPath\`, etc.`
-        )
-      }
-
-      if (Text.isText(node) && k === 'marks') {
-        throw new Error(
-          `Cannot set the \`marks\` property of a text node at path [${path}]. You must use the text-specific editor methods instead like \`editor.addMarkAtPath\`, \`editor.removeMarkAtPath\`, etc.`
-        )
+      if (k === 'nodes' || k === 'text' || k === 'marks') {
+        continue
       }
 
       if (props[k] !== node[k]) {
-        isChange = true
-        newProps[k] = props[k]
         oldProps[k] = node[k]
+        newProps[k] = props[k]
       }
     }
 
-    // PERF: If no properties have changed don't apply an operation at all.
-    if (!isChange) {
+    // If no properties have changed don't apply an operation at all.
+    if (Object.keys(newProps).length !== 0) {
       return
     }
 

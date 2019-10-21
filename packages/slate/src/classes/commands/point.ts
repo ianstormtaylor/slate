@@ -268,7 +268,6 @@ class PointCommands {
 
       // Iterate up the ancestors, splitting each until the right depth.
       while (h <= height) {
-        debugger
         const depth = path.length - h
         const p = path.slice(0, depth)
 

@@ -6,7 +6,11 @@ class SelectionCommands {
    */
 
   blur(this: Editor) {
-    this.select({ isFocused: false })
+    const { selection } = this.value
+
+    if (selection != null) {
+      this.select({ isFocused: false })
+    }
   }
 
   /**
@@ -14,7 +18,15 @@ class SelectionCommands {
    */
 
   deselect(this: Editor) {
-    this.select(null)
+    const { selection } = this.value
+
+    if (selection != null) {
+      this.apply({
+        type: 'set_selection',
+        properties: selection,
+        newProperties: null,
+      })
+    }
   }
 
   /**
@@ -22,7 +34,11 @@ class SelectionCommands {
    */
 
   focus(this: Editor) {
-    this.select({ isFocused: true })
+    const { selection } = this.value
+
+    if (selection != null) {
+      this.select({ isFocused: true })
+    }
   }
 
   /**
@@ -32,12 +48,10 @@ class SelectionCommands {
   flip(this: Editor) {
     const { selection } = this.value
 
-    if (selection == null) {
-      return
+    if (selection != null) {
+      const { anchor, focus } = selection
+      this.setSelection({ anchor: focus, focus: anchor })
     }
-
-    const { anchor, focus } = selection
-    this.select({ anchor: focus, focus: anchor })
   }
 
   /**
@@ -94,7 +108,7 @@ class SelectionCommands {
    */
 
   moveAnchorTo(this: Editor, point: Point) {
-    this.select({ anchor: point })
+    this.setSelection({ anchor: point })
   }
 
   /**
@@ -172,7 +186,7 @@ class SelectionCommands {
    */
 
   moveFocusTo(this: Editor, point: Point) {
-    this.select({ anchor: point })
+    this.setSelection({ anchor: point })
   }
 
   /**
@@ -219,69 +233,85 @@ class SelectionCommands {
    */
 
   moveTo(this: Editor, point: Point) {
-    this.select({ anchor: point, focus: point })
+    this.setSelection({ anchor: point, focus: point })
   }
 
   /**
-   * Set new properties on the selection.
+   * Set the selection to a new value.
    */
 
-  select(this: Editor, properties: Partial<Selection> | null) {
+  select(this: Editor, props: Partial<Selection>) {
     const { selection } = this.value
-    let prevProps: Partial<Selection> | null = {}
-    let newProps: Partial<Selection> | null = {}
 
-    if (selection == null && properties == null) {
+    if (selection != null) {
+      this.setSelection(props)
       return
-    } else if (properties == null) {
-      newProps = null
-      prevProps = selection
-    } else if (selection == null) {
-      newProps = { isFocused: false, ...properties }
-      prevProps = null
+    }
 
-      if (!Selection.isSelection(newProps)) {
-        throw new Error(
-          `When setting new selection properties and the current selection is \`null\` you must provide a full selection, but you passed: ${properties}`
-        )
-      }
-    } else {
-      let isChange = false
-
-      // Remove any properties that aren't different from the existing selection.
-      for (const k in properties) {
-        const isPoint = k === 'anchor' || k === 'focus'
-
-        if (
-          (isPoint && !Point.equals(properties[k], selection[k])) ||
-          (!isPoint && properties[k] !== selection[k])
-        ) {
-          isChange = true
-          newProps[k] = properties[k]
-          prevProps[k] = selection[k]
-        }
-      }
-
-      // If the selection moves, clear any marks, unless the new selection
-      // properties change the marks in some way.
-      if (
-        selection.marks &&
-        !newProps.marks &&
-        (newProps.anchor || newProps.focus)
-      ) {
-        isChange = true
-        newProps.marks = null
-        prevProps.marks = selection.marks
-      }
-
-      if (!isChange) {
-        return
-      }
+    if (!Range.isRange(props)) {
+      throw new Error(
+        `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${JSON.stringify(
+          props
+        )}`
+      )
     }
 
     this.apply({
       type: 'set_selection',
-      properties: prevProps,
+      properties: selection,
+      newProperties: { isFocused: false, marks: null, ...props },
+    })
+  }
+
+  /**
+   * Set new props on the selection.
+   */
+
+  setSelection(this: Editor, props: Partial<Selection>) {
+    const { selection } = this.value
+    let oldProps: Partial<Selection> | null = {}
+    let newProps: Partial<Selection> = {}
+
+    if (selection == null) {
+      this.select(props)
+      return
+    }
+
+    // Remove any props that aren't different from the existing selection.
+    for (const k in props) {
+      if (
+        (k === 'anchor' &&
+          props.anchor != null &&
+          !Point.equals(props.anchor, selection.anchor)) ||
+        (k === 'focus' &&
+          props.focus != null &&
+          !Point.equals(props.focus, selection.focus)) ||
+        props[k] !== selection[k]
+      ) {
+        oldProps[k] = selection[k]
+        newProps[k] = props[k]
+      }
+    }
+
+    // If the selection moves, clear any marks, unless the new selection
+    // props change the marks in some way.
+    if (
+      selection.marks != null &&
+      newProps.marks === undefined &&
+      (newProps.anchor || newProps.focus)
+    ) {
+      newProps.marks = null
+      oldProps.marks = selection.marks
+    }
+
+    // If nothing has changed, don't apply any operations.
+    if (Object.keys(oldProps).length === 0) {
+      return
+    }
+
+    this.apply({
+      type: 'set_selection',
+      properties: oldProps,
       newProperties: newProps,
     })
   }
