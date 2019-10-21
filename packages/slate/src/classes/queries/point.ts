@@ -24,12 +24,73 @@ class PointQueries {
   }
 
   /**
+   * Calculate the next point forward in the document from a starting point.
+   */
+
+  getNextPoint(
+    this: Editor,
+    point: Point,
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, point })) {
+      if (d >= distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
+  }
+
+  /**
+   * Calculate the previous point backward from a starting point.
+   */
+
+  getPreviousPoint(
+    this: Editor,
+    point: Point,
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, point, reverse: true })) {
+      if (d >= distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
+  }
+
+  /**
    * Check if a point is at the start of a path.
    */
 
-  isAtStartOfPath(this: Editor, point: Point, path: Path): boolean {
-    const { value } = this
-    const [first] = Node.texts(value, { path })
+  isAtStart(this: Editor, point: Point, path: Path): boolean {
+    const first = this.getFirstText(path)
 
     if (!first) {
       return false
@@ -43,9 +104,8 @@ class PointQueries {
    * Check if a point is at the end of a path.
    */
 
-  isAtEndOfPath(this: Editor, point: Point, path: Path): boolean {
-    const { value } = this
-    const [last] = Node.texts(value, { path, reverse: true })
+  isAtEnd(this: Editor, point: Point, path: Path): boolean {
+    const last = this.getLastText(path)
 
     if (!last) {
       return false
@@ -61,102 +121,8 @@ class PointQueries {
    * Check if a point is at either edge of a path.
    */
 
-  isAtEdgeOfPath(this: Editor, point: Point, path: Path): boolean {
-    return this.isAtStartOfPath(point, path) || this.isAtEndOfPath(point, path)
-  }
-
-  /**
-   * Calculate the next point forward in the document from a starting point.
-   */
-
-  getNextPoint(
-    this: Editor,
-    point: Point,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      allowZeroWidth?: boolean
-    } = {}
-  ): Point | undefined {
-    const { distance = 1 } = options
-    let d = 0
-    let target: Point | undefined
-
-    for (const p of this.positions({ ...options, point })) {
-      if (d >= distance) {
-        break
-      }
-
-      target = p
-      d++
-    }
-
-    return target
-  }
-
-  /**
-   * Get the next point in the document that is not inside a void node.
-   */
-
-  getNextNonVoidPoint(this: Editor, point: Point): Point | undefined {
-    let next: Point | undefined = point
-
-    while (next) {
-      const closestVoid = this.getClosestVoid(next.path)
-
-      if (closestVoid) {
-        next = this.getNextPoint(next, { allowZeroWidth: true })
-      } else {
-        return next
-      }
-    }
-  }
-
-  /**
-   * Calculate the previous point backward from a starting point.
-   */
-
-  getPreviousPoint(
-    this: Editor,
-    point: Point,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      allowZeroWidth?: boolean
-    } = {}
-  ): Point | undefined {
-    const { distance = 1 } = options
-    let d = 0
-    let target: Point | undefined
-
-    for (const p of this.positions({ ...options, point, reverse: true })) {
-      if (d >= distance) {
-        break
-      }
-
-      target = p
-      d++
-    }
-
-    return target
-  }
-
-  /**
-   * Get the previous point in the document that is not inside a void node.
-   */
-
-  getPreviousNonVoidPoint(this: Editor, point: Point): Point | undefined {
-    let prev: Point | undefined = point
-
-    while (prev) {
-      const closestVoid = this.getClosestVoid(prev.path)
-
-      if (closestVoid) {
-        prev = this.getPreviousPoint(prev, { allowZeroWidth: true })
-      } else {
-        return prev
-      }
-    }
+  isAtEdge(this: Editor, point: Point, path: Path): boolean {
+    return this.isAtStart(point, path) || this.isAtEnd(point, path)
   }
 }
 

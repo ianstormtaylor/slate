@@ -1,4 +1,3 @@
-import { Element } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
 
 const h = createHyperscript({
@@ -14,22 +13,12 @@ const TestPlugin = Editor => {
       return mark.atomic === true ? true : super.isAtomic(mark)
     }
 
-    isBlock(node) {
-      return Element.isElement(node) && node.inline !== true
-        ? true
-        : super.isBlock(node)
-    }
-
     isInline(node) {
-      return Element.isElement(node) && node.inline === true
-        ? true
-        : super.isInline(node)
+      return node.inline === true ? true : super.isInline(node)
     }
 
     isVoid(node) {
-      return Element.isElement(node) && node.void === true
-        ? true
-        : super.isVoid(node)
+      return node.void === true ? true : super.isVoid(node)
     }
   }
 }

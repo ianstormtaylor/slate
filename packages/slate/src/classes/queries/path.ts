@@ -4,7 +4,6 @@ import {
   Element,
   ElementEntry,
   Node,
-  Operation,
   Point,
   Path,
   PathRef,
@@ -15,69 +14,6 @@ import {
 import { PATH_REFS } from '../../symbols'
 
 class PathQueries {
-  hasVoidAncestor(this: Editor, path: Path): boolean {
-    const furthestVoid = this.getFurthestVoid(path)
-
-    if (furthestVoid) {
-      const [, voidPath] = furthestVoid
-      return Path.isAncestor(voidPath, path)
-    }
-
-    return false
-  }
-
-  getText(this: Editor, path: Path): string {
-    const { value } = this
-    const node = Node.get(value, path)
-
-    if (this.hasVoidAncestor(path)) {
-      return ''
-    } else if (Element.isElement(node) && this.isVoid(node)) {
-      return ''
-    } else if (Text.isText(node)) {
-      return node.text
-    } else {
-      return node.nodes.map((n, i) => this.getText(path.concat(i))).join('')
-    }
-  }
-
-  getOffset(
-    this: Editor,
-    path: Path,
-    options: {
-      depth?: number
-    } = {}
-  ): number {
-    const { value } = this
-    const { depth = 0 } = options
-
-    if (path.length === depth) {
-      return 0
-    }
-
-    const rootPath = path.slice(0, depth)
-    const root = Node.get(value, rootPath)
-    const relPath = Path.relative(path, rootPath)
-
-    if (Text.isText(root)) {
-      throw new Error(
-        `Cannot get the offset into a root text node: ${JSON.stringify(root)}`
-      )
-    }
-
-    const [index] = relPath
-    let o = 0
-
-    for (let i = 0; i < index; i++) {
-      const text = this.getText(rootPath.concat(i))
-      o += text.length
-    }
-
-    const relOffset = this.getOffset(path, { depth: depth + 1 })
-    o += relOffset
-    return o
-  }
-
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the this.
@@ -139,32 +75,22 @@ class PathQueries {
    * Get the end point of the node at path.
    */
 
-  getEnd(this: Editor, path: Path): Point {
-    const [lastNode, lastPath] = this.getLastText(path)
-    const point = { path: lastPath, offset: lastNode.text.length }
-    return point
+  getEnd(this: Editor, path: Path): Point | undefined {
+    const last = this.getLastText(path)
+
+    if (last) {
+      const [node, path] = last
+      const point = { path, offset: node.text.length }
+      return point
+    }
   }
 
   /**
    * Get the first text node from a node at path.
    */
 
-  getFirstText(this: Editor, path: Path): TextEntry {
-    const { value } = this
-    const node = Node.get(value, path)
-
-    if (Text.isText(node)) {
-      return [node, path]
-    }
-
-    const [first] = Node.texts(value, { path })
-
-    if (!first) {
-      throw new Error(
-        `Unable to get the first text node of a node at path ${path} because it has no text nodes.`
-      )
-    }
-
+  getFirstText(this: Editor, path: Path): TextEntry | undefined {
+    const [first] = this.texts({ path })
     return first
   }
 
@@ -208,22 +134,8 @@ class PathQueries {
    * Get the last text node from a node at path.
    */
 
-  getLastText(this: Editor, path: Path): TextEntry {
-    const { value } = this
-    const node = Node.get(value, path)
-
-    if (Text.isText(node)) {
-      return [node, path]
-    }
-
-    const [last] = Node.texts(value, { path, reverse: true })
-
-    if (!last) {
-      throw new Error(
-        `Unable to get the last text node of a node at path ${path} because it has no text nodes.`
-      )
-    }
-
+  getLastText(this: Editor, path: Path): TextEntry | undefined {
+    const [last] = this.texts({ path, reverse: true })
     return last
   }
 
@@ -232,8 +144,8 @@ class PathQueries {
    */
 
   getNextLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path })) {
-      if (!this.isInline(n) && this.hasInlines(n)) {
+    for (const [n, p] of this.leafBlocks({ path })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -244,8 +156,8 @@ class PathQueries {
    */
 
   getNextLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path })) {
-      if (this.isInline(n) && this.hasTexts(n)) {
+    for (const [n, p] of this.leafInlines({ path })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -256,8 +168,8 @@ class PathQueries {
    */
 
   getNextRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path })) {
-      if (!this.isInline(n) && p.length === 1) {
+    for (const [n, p] of this.rootBlocks({ path })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -268,13 +180,9 @@ class PathQueries {
    */
 
   getNextRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path })) {
-      if (Element.isElement(n) && this.isInline(n)) {
-        const parent = Node.parent(this.value, p)
-
-        if (Element.isElement(parent) && !this.isInline(parent)) {
-          return [n, p]
-        }
+    for (const [n, p] of this.rootInlines({ path })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
+        return [n, p]
       }
     }
   }
@@ -284,9 +192,52 @@ class PathQueries {
    */
 
   getNextText(this: Editor, path: Path): TextEntry | undefined {
-    const { value } = this
-    const [, next] = Node.texts(value, { path })
+    const [, next] = this.texts({ path })
     return next
+  }
+
+  /**
+   * Get the relative offset to a node at a path in the document.
+   *
+   * Note: this ignores void nodes in calculating the offset, as their text
+   * content is presumed to be an empty string.
+   */
+
+  getOffset(
+    this: Editor,
+    path: Path,
+    options: {
+      depth?: number
+    } = {}
+  ): number {
+    const { value } = this
+    const { depth = 0 } = options
+
+    if (path.length === depth) {
+      return 0
+    }
+
+    const rootPath = path.slice(0, depth)
+    const root = Node.get(value, rootPath)
+    const relPath = Path.relative(path, rootPath)
+
+    if (Text.isText(root)) {
+      throw new Error(
+        `Cannot get the offset into a root text node: ${JSON.stringify(root)}`
+      )
+    }
+
+    const [index] = relPath
+    let o = 0
+
+    for (let i = 0; i < index; i++) {
+      const text = this.getText(rootPath.concat(i))
+      o += text.length
+    }
+
+    const relOffset = this.getOffset(path, { depth: depth + 1 })
+    o += relOffset
+    return o
   }
 
   /**
@@ -294,8 +245,8 @@ class PathQueries {
    */
 
   getPreviousLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (!this.isInline(n) && this.hasInlines(n)) {
+    for (const [n, p] of this.leafBlocks({ path, reverse: true })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -306,8 +257,8 @@ class PathQueries {
    */
 
   getPreviousLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (this.isInline(n) && this.hasTexts(n)) {
+    for (const [n, p] of this.leafInlines({ path, reverse: true })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -318,8 +269,8 @@ class PathQueries {
    */
 
   getPreviousRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (!this.isInline(n) && p.length === 1) {
+    for (const [n, p] of this.rootBlocks({ path, reverse: true })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
     }
@@ -330,13 +281,9 @@ class PathQueries {
    */
 
   getPreviousRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.elements(this.value, { path, reverse: true })) {
-      if (Element.isElement(n) && this.isInline(n)) {
-        const parent = Node.parent(this.value, p)
-
-        if (Element.isElement(parent) && !this.isInline(parent)) {
-          return [n, p]
-        }
+    for (const [n, p] of this.rootInlines({ path, reverse: true })) {
+      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
+        return [n, p]
       }
     }
   }
@@ -346,8 +293,7 @@ class PathQueries {
    */
 
   getPreviousText(this: Editor, path: Path): TextEntry | undefined {
-    const { value } = this
-    const [, prev] = Node.texts(value, { path, reverse: true })
+    const [, prev] = this.texts({ path, reverse: true })
     return prev
   }
 
@@ -356,13 +302,12 @@ class PathQueries {
    */
 
   getRange(this: Editor, path: Path): Range {
-    const { value } = this
-    const [first] = Node.texts(value, { path })
-    const [last] = Node.texts(value, { path, reverse: true })
+    const first = this.getFirstText(path)
+    const last = this.getLastText(path)
 
     if (!first || !last) {
       throw new Error(
-        `Unable to get a range for the node at path ${path} because it has not text nodes.`
+        `Unable to get a range for the node at path ${path} because it has no text nodes.`
       )
     }
 
@@ -370,18 +315,41 @@ class PathQueries {
     const [lastNode, lastPath] = last
     const anchor = { path: firstPath, offset: 0 }
     const focus = { path: lastPath, offset: lastNode.text.length }
-    const range = produce({ anchor, focus }, () => {})
-    return range
+    return { anchor, focus }
   }
 
   /**
    * Get the start point of the node at path.
    */
 
-  getStart(this: Editor, path: Path): Point {
-    const [, firstPath] = this.getFirstText(path)
-    const point = { path: firstPath, offset: 0 }
-    return point
+  getStart(this: Editor, path: Path): Point | undefined {
+    const first = this.getLastText(path)
+
+    if (first) {
+      const [node, path] = first
+      const point = { path, offset: 0 }
+      return point
+    }
+  }
+  /**
+   * Get the text content of a node at path.
+   *
+   * Note: the text of void nodes is presumed to be an empty string, regardless
+   * of what their actual content is.
+   */
+
+  getText(this: Editor, path: Path): string {
+    const { value } = this
+    const node = Node.get(value, path)
+    const furthestVoid = this.getFurthestVoid(path)
+
+    if (furthestVoid) {
+      return ''
+    } else if (Text.isText(node)) {
+      return node.text
+    } else {
+      return node.nodes.map((n, i) => this.getText(path.concat(i))).join('')
+    }
   }
 }
 

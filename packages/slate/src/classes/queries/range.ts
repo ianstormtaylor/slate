@@ -107,7 +107,7 @@ class RangeQueries {
     }
 
     const [, endBlockPath] = closestBlock
-    return this.isAtStartOfPath(end, endBlockPath)
+    return this.isAtStart(end, endBlockPath)
   }
 
   /**
@@ -127,7 +127,7 @@ class RangeQueries {
     }
 
     const [, endInlinePath] = closestInline
-    return this.isAtStartOfPath(end, endInlinePath)
+    return this.isAtStart(end, endInlinePath)
   }
 
   /**

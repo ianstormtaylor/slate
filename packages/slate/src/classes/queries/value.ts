@@ -1,13 +1,12 @@
-import { produce } from 'immer'
 import { reverse as reverseText } from 'esrever'
 import {
-  Ancestor,
   Editor,
   Element,
   ElementEntry,
   Mark,
   Node,
   NodeEntry,
+  MarkEntry,
   Path,
   Point,
   Range,
@@ -107,7 +106,6 @@ class ValueQueries {
     }
 
     for (const [node] of this.texts({ range })) {
-      debugger
       const { marks } = node
 
       if (first) {
@@ -158,6 +156,24 @@ class ValueQueries {
         yield [n, p]
       }
     }
+  }
+
+  /**
+   * Iterate through all of the text nodes in the editor.
+   */
+
+  *marks(
+    this: Editor,
+    options: {
+      path?: Path
+      range?: Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<MarkEntry> {
+    yield* Node.marks(this.value, {
+      ...options,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
   }
 
   /**
@@ -216,7 +232,6 @@ class ValueQueries {
       point?: Point
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
-      allowZeroWidth?: boolean
     } = {}
   ): Iterable<Point> {
     const {
@@ -224,6 +239,10 @@ class ValueQueries {
       reverse = false,
       point = reverse ? this.getEnd([]) : this.getStart([]),
     } = options
+
+    if (point == null) {
+      return
+    }
 
     if (unit !== 'offset') {
       yield point
@@ -255,7 +274,12 @@ class ValueQueries {
     })) {
       if (Element.isElement(n)) {
         if (this.isVoid(n)) {
-          yield this.getStart(p)
+          const start = this.getStart(p)
+
+          if (start) {
+            yield start
+          }
+
           continue
         }
 
