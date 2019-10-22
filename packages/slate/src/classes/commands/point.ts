@@ -28,7 +28,6 @@ class PointCommands {
       ? this.getPreviousPoint(point, { unit, ...rest })
       : this.getNextPoint(point, { unit, ...rest })
 
-    debugger
     if (target) {
       this.deleteAtRange({ anchor: point, focus: target })
     }

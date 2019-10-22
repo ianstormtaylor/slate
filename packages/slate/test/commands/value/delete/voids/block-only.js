@@ -14,6 +14,4 @@ export const input = (
   </value>
 )
 
-export const output = (
-  <value />
-)
+export const output = <value />

@@ -1,6 +1,6 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
   editor.delete()
@@ -9,10 +9,13 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      one<cursor />
-    </block>
-    <block>
-      two<inline>three</inline>four
+      <text>
+        <cursor />
+      </text>
+      <inline void>
+        <text />
+      </inline>
+      <text />
     </block>
   </value>
 )
@@ -20,7 +23,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      one<cursor />two<inline>three</inline>four
+      <text>
+        <cursor />
+      </text>
     </block>
   </value>
 )

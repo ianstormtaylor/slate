@@ -9,23 +9,20 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      on<cursor />e
+      <cursor />
     </block>
     <block void>
       <text />
     </block>
-    <block>three</block>
   </value>
 )
 
 export const output = (
   <value>
-    <block>
-      on<cursor />
-    </block>
     <block void>
-      <text />
+      <cursor />
     </block>
-    <block>three</block>
   </value>
 )
+
+export const skip = true
