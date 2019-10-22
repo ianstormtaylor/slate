@@ -244,77 +244,96 @@ class ValueQueries {
       return
     }
 
-    if (unit !== 'offset') {
-      yield point
-    }
-
-    const { path, offset } = point
     let string = ''
-    let distance = 0
+    let available = 0
+    let offset = 0
+    let distance: number | null = null
 
     const advance = () => {
-      if (unit === 'character') {
-        distance = String.getCharacterDistance(string)
-      } else if (unit === 'word') {
-        distance = String.getWordDistance(string)
-      } else if (unit === 'line' || unit === 'block') {
-        // COMPAT: We equate 'line' in core to 'block'. This can be overriden in
-        // environments with rendered lines that can be calculated.
-        distance = string.length
-      } else {
-        distance = Math.min(string.length, 1)
+      if (distance == null) {
+        if (unit === 'character') {
+          distance = String.getCharacterDistance(string)
+        } else if (unit === 'word') {
+          distance = String.getWordDistance(string)
+        } else if (unit === 'line' || unit === 'block') {
+          distance = string.length
+        } else {
+          distance = 1
+        }
+
+        string = string.slice(distance)
       }
 
-      string = string.slice(distance)
+      // Add or substract the offset.
+      offset = reverse ? offset - distance : offset + distance
+      // Subtract the distance traveled from the available text.
+      available = available - distance!
+      // If the available had room to spare, reset the distance so that it will
+      // advance again next time. Otherwise, set it to the overflow amount.
+      distance = available >= 0 ? null : 0 - available
     }
 
-    for (const [n, p] of this.entries({
-      path,
+    for (const [node, path] of this.entries({
+      path: point.path,
       reverse,
     })) {
-      if (Element.isElement(n)) {
-        if (this.isVoid(n)) {
-          const start = this.getStart(p)
+      if (Element.isElement(node)) {
+        // Void nodes are a special case, since we don't want to iterate over
+        // their content. We instead always just yield their first point.
+        if (this.isVoid(node)) {
+          const first = this.getFirstText(path)
 
-          if (start) {
-            yield start
+          if (first) {
+            const [, firstPath] = first
+            yield { path: firstPath, offset: 0 }
           }
 
           continue
         }
 
-        if (!this.isInline(n) && this.hasInlines(n)) {
-          let text = this.getText(p)
+        if (!this.isInline(node) && this.hasInlines(node)) {
+          let text = this.getText(path)
 
-          if (Path.isAncestor(p, path)) {
-            const before = this.getOffset(path, { depth: p.length })
-            const o = before + offset
+          if (Path.isAncestor(path, point.path)) {
+            const before = this.getOffset(point.path, { depth: path.length })
+            const o = before + point.offset
             text = reverse ? text.slice(0, o) : text.slice(o)
           }
 
           string = reverse ? reverseText(text) : text
-          distance = 0
-
-          if (unit !== 'offset') {
-            advance()
-          }
         }
       }
 
-      if (Text.isText(n)) {
-        let remaining = n.text.length
-        let o = reverse ? remaining : 0
+      if (Text.isText(node)) {
+        const isStart = Path.equals(path, point.path)
+        available = node.text.length
+        offset = reverse ? available : 0
 
-        if (Path.equals(p, path)) {
-          remaining = reverse ? offset : remaining - offset
-          o = offset
+        if (isStart) {
+          available = reverse ? point.offset : available - point.offset
+          offset = point.offset
         }
 
-        while (remaining > 0) {
-          o = reverse ? o - distance : o + distance
-          remaining -= distance
-          yield { path: p, offset: o }
-          advance()
+        // Always yield the start point. When advancing by offset, yield every
+        // text's start point before advancing, to get every potential point.
+        if (isStart || unit === 'offset') {
+          yield { path, offset }
+        }
+
+        while (true) {
+          if (string === '') {
+            break
+          } else {
+            advance()
+          }
+
+          // If the available space hasn't overflow, we have another point to
+          // yield in the current text node.
+          if (available >= 0) {
+            yield { path, offset }
+          } else {
+            break
+          }
         }
       }
     }

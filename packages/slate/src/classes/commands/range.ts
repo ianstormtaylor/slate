@@ -40,27 +40,17 @@ class RangeCommands {
     range: Range,
     options: {
       amount?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
       hanging?: boolean
     } = {}
   ): void {
-    const { hanging = false } = options
-
-    // If the range is collapsed, the delete functions like a backspace button
-    // or delete button would, by deleting in a direction.
     if (Range.isCollapsed(range)) {
       this.deleteAtPoint(range.anchor, options)
       return
     }
 
     this.withoutNormalizing(() => {
-      // To obey common rich text editor behavior, if the range is "hanging"
-      // into the end block, we move it backwards so that it's not.
-      // if (hanging === false) {
-      //   range = this.getNonHangingRange(range)
-      // }
-
       const [start, end] = Range.points(range)
       const beforeRef = this.createPointRef(start, { stick: 'backward' })
       const startRef = this.createPointRef(start)

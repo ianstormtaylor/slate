@@ -3,25 +3,21 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.deleteForward()
+  editor.delete()
 }
 
 export const input = (
   <value>
-    
-      <block>
-        w<cursor />ord
-      </block>
-    
+    <block>
+      w<cursor />ord
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        w<cursor />rd
-      </block>
-    
+    <block>
+      w<cursor />rd
+    </block>
   </value>
 )

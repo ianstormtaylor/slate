@@ -1,9 +1,9 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
-  editor.delete()
+  editor.delete({ unit: 'character' })
 }
 
 export const input = (

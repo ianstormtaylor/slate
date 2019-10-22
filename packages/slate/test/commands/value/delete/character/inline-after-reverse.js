@@ -1,29 +1,27 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
-  editor.deleteBackward()
+  editor.delete({ unit: 'character', reverse: true })
 }
 
 export const input = (
   <value>
-    
-      <block>
-        one<inline>two</inline>a<cursor />
-      </block>
-    
+    <block>
+      one
+      <inline>two</inline>
+      a<cursor />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        one<inline>
-          two<cursor />
-        </inline>
-      </block>
-    
+    <block>
+      one
+      <inline>two</inline>
+      <cursor />
+    </block>
   </value>
 )

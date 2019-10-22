@@ -1,9 +1,9 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
-  editor.deleteBackward()
+  editor.delete({ reverse: true })
 }
 
 export const input = (

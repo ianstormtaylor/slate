@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.deleteForward()
+  editor.delete()
 }
 
 export const input = (

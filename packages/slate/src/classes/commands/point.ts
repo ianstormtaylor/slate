@@ -11,7 +11,7 @@ class PointCommands {
     point: Point,
     options: {
       distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
   ): void {
@@ -23,10 +23,12 @@ class PointCommands {
       return
     }
 
-    const { reverse = false, ...rest } = options
+    const { reverse = false, unit = 'offset', ...rest } = options
     const target = reverse
-      ? this.getPreviousPoint(point, rest)
-      : this.getNextPoint(point, rest)
+      ? this.getPreviousPoint(point, { unit, ...rest })
+      : this.getNextPoint(point, { unit, ...rest })
+
+    debugger
 
     if (target) {
       this.deleteAtRange({ anchor: point, focus: target })
@@ -271,7 +273,7 @@ class PointCommands {
       let h = 0
       debugger
 
-      // If the point it inside a void node, we still want to split up to a 
+      // If the point it inside a void node, we still want to split up to a
       // `height`, but we need to start after the void node in the tree.
       if (furthestVoid) {
         const [, voidPath] = furthestVoid
@@ -279,7 +281,6 @@ class PointCommands {
         h = relPath.length + 1
         position = voidPath[voidPath.length - 1]
       }
-
 
       // Create a ref that tracks the split point as we move up the ancestors.
       // Stick backwards because we're splitting and we want to remain inside
@@ -313,7 +314,6 @@ class PointCommands {
 
       pointRef.unref()
     })
-
   }
 }
 

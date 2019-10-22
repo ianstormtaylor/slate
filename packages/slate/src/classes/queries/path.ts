@@ -323,10 +323,10 @@ class PathQueries {
    */
 
   getStart(this: Editor, path: Path): Point | undefined {
-    const first = this.getLastText(path)
+    const first = this.getFirstText(path)
 
     if (first) {
-      const [node, path] = first
+      const [, path] = first
       const point = { path, offset: 0 }
       return point
     }

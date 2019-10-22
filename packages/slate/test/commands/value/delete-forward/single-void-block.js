@@ -3,16 +3,14 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.deleteForward()
+  editor.delete()
 }
 
 export const input = (
   <value>
-    
-      <block void>
-        <cursor />{' '}
-      </block>
-    
+    <block void>
+      <cursor />{' '}
+    </block>
   </value>
 )
 
