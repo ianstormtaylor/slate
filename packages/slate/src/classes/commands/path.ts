@@ -122,7 +122,7 @@ class PathCommands {
       }
 
       const [, blockPath] = closestBlock
-      const [, prevPath] = prevBlock
+      const [prev, prevPath] = prevBlock
       const newPath = Path.next(prevPath)
       const commonPath = Path.common(blockPath, prevPath)
       const furthest = Node.furthest(value, blockPath, ([n, p]) => {
@@ -148,7 +148,7 @@ class PathCommands {
       // rich text editor common behavior to prevent losing block formatting
       // when deleting the entire previous block (with a hanging selection).
       debugger
-      if (this.getText(prevPath) === '') {
+      if (this.isEmpty(prev)) {
         this.removeNodeAtPath(prevPath)
       } else {
         this.mergeNodeAtPath(newPath)
@@ -271,7 +271,7 @@ class PathCommands {
     // index that accounts for any added/removed nodes.
     let n = 0
 
-    for (let i = 0; i < node.nodes.length; i++ , n++) {
+    for (let i = 0; i < node.nodes.length; i++, n++) {
       const child = node.nodes[i] as Descendant
       const prev = node.nodes[i - 1]
       const isLast = i === node.nodes.length - 1

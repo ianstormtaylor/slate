@@ -8,14 +8,11 @@ export const run = editor => {
 
 export const input = (
   <value>
-    <block>
+    <block void>
       <text />
-      <inline void>
-        <text />
-      </inline>
-      <text>
-        <cursor />
-      </text>
+    </block>
+    <block>
+      <cursor />
     </block>
   </value>
 )
@@ -23,9 +20,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <text>
-        <cursor />
-      </text>
+      <cursor />
     </block>
   </value>
 )
+
+export const skip = true

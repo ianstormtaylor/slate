@@ -11,10 +11,11 @@ class PointCommands {
     point: Point,
     options: {
       distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      unit?: 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
   ): void {
+    const { reverse = false, unit = 'character', ...rest } = options
     const furthestVoid = this.getFurthestVoid(point.path)
 
     if (furthestVoid) {
@@ -23,13 +24,11 @@ class PointCommands {
       return
     }
 
-    const { reverse = false, unit = 'offset', ...rest } = options
     const target = reverse
       ? this.getPreviousPoint(point, { unit, ...rest })
       : this.getNextPoint(point, { unit, ...rest })
 
     debugger
-
     if (target) {
       this.deleteAtRange({ anchor: point, focus: target })
     }

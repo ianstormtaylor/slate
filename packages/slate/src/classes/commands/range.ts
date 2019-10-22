@@ -40,7 +40,7 @@ class RangeCommands {
     range: Range,
     options: {
       amount?: number
-      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      unit?: 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
       hanging?: boolean
     } = {}

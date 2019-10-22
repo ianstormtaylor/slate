@@ -248,6 +248,7 @@ class ValueQueries {
     let available = 0
     let offset = 0
     let distance: number | null = null
+    let isBlockStart = true
 
     const advance = () => {
       if (distance == null) {
@@ -301,6 +302,7 @@ class ValueQueries {
           }
 
           string = reverse ? reverseText(text) : text
+          isBlockStart = true
         }
       }
 
@@ -314,13 +316,16 @@ class ValueQueries {
           offset = point.offset
         }
 
-        // Always yield the start point. When advancing by offset, yield every
-        // text's start point before advancing, to get every potential point.
-        if (isStart || unit === 'offset') {
+        if (
+          isStart ||
+          unit === 'offset' ||
+          (unit === 'character' && isBlockStart)
+        ) {
           yield { path, offset }
         }
 
         while (true) {
+          // If there's no more string, continue to the next block.
           if (string === '') {
             break
           } else {
@@ -335,6 +340,8 @@ class ValueQueries {
             break
           }
         }
+
+        isBlockStart = false
       }
     }
   }

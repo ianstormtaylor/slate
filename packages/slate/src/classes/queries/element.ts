@@ -28,6 +28,21 @@ class ElementQueries {
   }
 
   /**
+   * Check if an element is empty, accounting for void nodes.
+   */
+
+  isEmpty(this: Editor, element: Element): boolean {
+    const { nodes } = element
+    const [first] = nodes
+    return (
+      nodes.length === 1 &&
+      Text.isText(first) &&
+      first.text === '' &&
+      !this.isVoid(element)
+    )
+  }
+
+  /**
    * Check if a node is an inline, meaning that it lives intermixed with text
    * nodes in the document tree.
    */
