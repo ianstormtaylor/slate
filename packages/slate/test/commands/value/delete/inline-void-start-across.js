@@ -9,9 +9,14 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      one<inline>
-        <anchor />a<focus />
-      </inline>two
+      one
+      <inline void>
+        <anchor />
+      </inline>
+      two
+    </block>
+    <block>
+      <focus />three
     </block>
   </value>
 )
@@ -19,10 +24,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      one
-      <inline>
-        <cursor />
-      </inline>two
+      one<cursor />three
     </block>
   </value>
 )
+
+export const skip = true
