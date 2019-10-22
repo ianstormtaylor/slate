@@ -11,9 +11,9 @@ export const input = (
   <value>
     
       <block>
-        <b>
+        <mark key="a">
           <anchor />lorem
-        </b>
+        </mark>
         ipsum
       </block>
       <block>

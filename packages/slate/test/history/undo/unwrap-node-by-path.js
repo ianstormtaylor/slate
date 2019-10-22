@@ -3,7 +3,7 @@
 import h from '../../helpers/h'
 import { PathUtils } from 'slate'
 
-export default function(editor) {
+export default function (editor) {
   editor.unwrapNodeByPath(PathUtils.create([0, 0]))
   editor.flush()
   editor.undo()
@@ -13,11 +13,11 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>
+        <block>
           <cursor />one
-        </paragraph>
-        <paragraph>two</paragraph>
-        <paragraph>three</paragraph>
+        </block>
+        <block>two</block>
+        <block>three</block>
       </quote>
     </document>
   </value>

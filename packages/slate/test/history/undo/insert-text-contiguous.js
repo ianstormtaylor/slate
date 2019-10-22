@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.insertText('t')
   editor.flush()
   editor.insertText('w')
@@ -15,9 +15,9 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         one<cursor />
-      </paragraph>
+      </block>
     </document>
   </value>
 )

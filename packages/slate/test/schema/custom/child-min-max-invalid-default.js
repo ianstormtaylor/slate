@@ -31,9 +31,9 @@ export const input = (
         <block type="title">
           <text />
         </block>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>
@@ -46,9 +46,9 @@ export const output = (
         <block type="title">
           <text />
         </block>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>

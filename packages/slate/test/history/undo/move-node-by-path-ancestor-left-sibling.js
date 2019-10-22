@@ -3,7 +3,7 @@
 import h from '../../helpers/h'
 import { PathUtils } from 'slate'
 
-export default function(editor) {
+export default function (editor) {
   editor.moveNodeByPath(PathUtils.create([0]), PathUtils.create([1, 1]))
   editor.flush()
   editor.undo()
@@ -12,12 +12,12 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <cursor />I am gonna move
-      </paragraph>
-      <paragraph>
-        <paragraph>I am an existing node in newParent</paragraph>
-      </paragraph>
+      </block>
+      <block>
+        <block>I am an existing node in newParent</block>
+      </block>
     </document>
   </value>
 )

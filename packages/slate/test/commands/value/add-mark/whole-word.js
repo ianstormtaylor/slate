@@ -3,27 +3,23 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.addMark('bold')
+  editor.addMarks([{ key: 'a' }])
 }
 
 export const input = (
   <value>
-    
-      <block>
-        <anchor />word<focus />
-      </block>
-    
+    <block>
+      <anchor />word<focus />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        <b>
-          <anchor />word<focus />
-        </b>
-      </block>
-    
+    <block>
+      <mark key="a">
+        <anchor />word<focus />
+      </mark>
+    </block>
   </value>
 )

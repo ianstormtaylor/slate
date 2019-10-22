@@ -11,9 +11,9 @@ export const input = (
     
       <block>
         w
-        <b>
+        <mark key="a">
           <anchor />o
-        </b>
+        </mark>
         <focus />rd
       </block>
     

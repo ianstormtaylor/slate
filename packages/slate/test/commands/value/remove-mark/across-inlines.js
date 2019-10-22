@@ -12,12 +12,12 @@ export const input = (
       <block>
         <inline>
           wo<anchor />
-          <b>rd</b>
+          <mark key="a">rd</mark>
         </inline>
       </block>
       <block>
         <inline>
-          <b>an</b>
+          <mark key="a">an</mark>
           <focus />other
         </inline>
       </block>

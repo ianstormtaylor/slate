@@ -30,9 +30,9 @@ export const input = (
       <quote>
         <block type="title">One</block>
         <block type="title">Two</block>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>
@@ -43,9 +43,9 @@ export const output = (
     <document>
       <quote>
         <block type="title">OneTwo</block>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>

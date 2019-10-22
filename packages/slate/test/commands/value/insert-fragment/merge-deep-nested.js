@@ -4,47 +4,47 @@ import { h } from '../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-    
-      <list>
-        <item>
-          <block>2</block>
-        </item>
-        <item>
-          <block>3</block>
-        </item>
-      </list>
-    
+
+    <block>
+      <block>
+        <block>2</block>
+      </block>
+      <block>
+        <block>3</block>
+      </block>
+    </block>
+
   )
 }
 
 export const input = (
   <value>
-    
-      <list>
-        <item>
-          <block>
-            1<cursor />
-          </block>
-        </item>
-      </list>
-    
+
+    <block>
+      <block>
+        <block>
+          1<cursor />
+        </block>
+      </block>
+    </block>
+
   </value>
 )
 
 export const output = (
   <value>
-    
-      <list>
-        <item>
-          <block>12</block>
-        </item>
-        <item>
-          <block>
-            3<cursor />
-          </block>
-        </item>
-      </list>
-    
+
+    <block>
+      <block>
+        <block>12</block>
+      </block>
+      <block>
+        <block>
+          3<cursor />
+        </block>
+      </block>
+    </block>
+
   </value>
 )
 

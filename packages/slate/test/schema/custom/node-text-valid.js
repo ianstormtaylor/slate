@@ -13,7 +13,7 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>123</paragraph>
+      <block>123</block>
     </document>
   </value>
 )
@@ -21,7 +21,7 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>123</paragraph>
+      <block>123</block>
     </document>
   </value>
 )

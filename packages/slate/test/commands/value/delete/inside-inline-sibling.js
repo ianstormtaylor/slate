@@ -19,9 +19,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      one<cursor />
+      one
       <inline>
-        <text />
+        <cursor />
       </inline>two
     </block>
   </value>

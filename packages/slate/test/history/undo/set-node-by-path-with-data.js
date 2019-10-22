@@ -3,7 +3,7 @@
 import h from '../../helpers/h'
 import { PathUtils } from 'slate'
 
-export default function(editor) {
+export default function (editor) {
   editor.setNodeByPath(PathUtils.create([0]), {
     data: { thing: 'value' },
   })
@@ -15,7 +15,7 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph key="a">one</paragraph>
+      <paragraph key="a">one</block>
     </document>
   </value>
 )

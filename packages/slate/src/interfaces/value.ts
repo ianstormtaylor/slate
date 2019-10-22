@@ -9,8 +9,9 @@ import {
   Operation,
   Path,
   Point,
-  Selection,
-  SelectionPointEntry,
+  PointKey,
+  Range,
+  Descendant,
   Text,
 } from '..'
 
@@ -20,7 +21,7 @@ import {
  */
 
 interface Value extends Element {
-  selection: Selection | null
+  selection: Range | null
   annotations: Record<string, Annotation>
   [key: string]: any
 }
@@ -32,6 +33,13 @@ interface Value extends Element {
 
 type ValueEntry = [Value, Path]
 
+/**
+ * `SelectionPointEntry` objects are returned when iterating over `Point`
+ * objects that belong to a selection.
+ */
+
+type SelectionPointEntry = [Point, PointKey, Range]
+
 namespace Value {
   /**
    * Check if a value implements the `Value` interface.
@@ -40,7 +48,7 @@ namespace Value {
   export const isValue = (value: any): value is Value => {
     return (
       isPlainObject(value) &&
-      (value.selection === null || Selection.isSelection(value.selection)) &&
+      (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.nodes) &&
       Annotation.isAnnotationMap(value.annotations)
     )
@@ -139,6 +147,7 @@ namespace Value {
           parent.nodes.splice(index, 1)
 
           for (const [point, key, range] of Value.points(v)) {
+            debugger
             range[key] = Point.transform(point, op)!
           }
 
@@ -201,8 +210,10 @@ namespace Value {
           const { path } = op
           const index = path[path.length - 1]
           const parent = Node.parent(v, path)
-          const [, next] = Node.texts(v, { path })
-          const [, prev] = Node.texts(v, { path, reverse: true })
+          const [, first] = Node.first(v, path)
+          const [, last] = Node.last(v, path)
+          const [, prev] = Node.texts(v, { path: first, reverse: true })
+          const [, next] = Node.texts(v, { path: last })
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
@@ -220,7 +231,7 @@ namespace Value {
                 const newNextPath = Path.transform(nextPath, op)!
                 point.path = newNextPath
                 point.offset = 0
-              } else if (Selection.isSelection(range)) {
+              } else if (Range.isRange(range)) {
                 v.selection = null
               } else if (Annotation.isAnnotation(range)) {
                 delete v.annotations[key!]
@@ -281,7 +292,7 @@ namespace Value {
           if (newProperties == null) {
             v.selection = newProperties
           } else if (v.selection == null) {
-            if (!Selection.isSelection(newProperties)) {
+            if (!Range.isRange(newProperties)) {
               throw new Error(
                 `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
                   newProperties
@@ -315,18 +326,22 @@ namespace Value {
           const node = Node.get(v, path)
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
-          let newNode: Node
+          let newNode: Descendant
 
           if (Text.isText(node)) {
             const before = node.text.slice(0, position)
             const after = node.text.slice(position)
             node.text = before
-            newNode = { ...node, ...properties, text: after }
+            newNode = { ...node, ...(properties as Partial<Text>), text: after }
           } else {
             const before = node.nodes.slice(0, position)
             const after = node.nodes.slice(position)
             node.nodes = before
-            newNode = { ...node, ...properties, nodes: after }
+            newNode = {
+              ...node,
+              ...(properties as Partial<Element>),
+              nodes: after,
+            }
           }
 
           parent.nodes.splice(index + 1, 0, newNode)

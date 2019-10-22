@@ -12,20 +12,20 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <block>
-        <cursor />word
+
+    <block>
+      <cursor />word
       </block>
-    
+
   </value>
 )
 
 export const output = (
   <value>
-    
-      <code thing="value">
-        <cursor />word
-      </code>
-    
+
+    <code thing="value">
+      <cursor />word
+      </block>
+
   </value>
 )

@@ -12,9 +12,9 @@ export const input = (
       <block>
         on<anchor />e
       </block>
-      <image>
+      <block void>
         <focus />
-      </image>
+      </block>
       <block>three</block>
     
   </value>

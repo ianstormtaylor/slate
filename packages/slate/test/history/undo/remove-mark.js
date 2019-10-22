@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.removeMark('bold')
   editor.flush()
   editor.undo()
@@ -11,11 +11,11 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        <b>
+      <block>
+        <mark key="a">
           <anchor />one<focus />
-        </b>
-      </paragraph>
+        </mark>
+      </block>
     </document>
   </value>
 )

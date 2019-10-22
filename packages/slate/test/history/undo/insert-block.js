@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.insertBlock('quote')
   editor.flush()
   editor.undo()
@@ -11,9 +11,9 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <cursor />one
-      </paragraph>
+      </block>
     </document>
   </value>
 )

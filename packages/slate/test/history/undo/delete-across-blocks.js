@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.delete()
   editor.flush()
   editor.undo()
@@ -15,10 +15,10 @@ export const input = (
     <document>
       <paragraph data={{ key: 'value' }}>
         o<anchor />ne
-      </paragraph>
+      </block>
       <code data={{ key2: 'value2' }}>
         tw<focus />o
-      </code>
+      </block>
     </document>
   </value>
 )

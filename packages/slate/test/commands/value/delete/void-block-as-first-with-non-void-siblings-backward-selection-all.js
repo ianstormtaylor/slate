@@ -9,9 +9,9 @@ export const run = editor => {
 export const input = (
   <value>
     
-      <image>
+      <block void>
         <focus />
-      </image>
+      </block>
       <block>one</block>
       <block>
         two<anchor />

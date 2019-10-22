@@ -5,25 +5,25 @@ import h from '../../helpers/h'
 const fragment = (
   <document>
     <block type="d">
-      <paragraph>A</paragraph>
+      <block>A</block>
       <block type="c">
         <block type="d">
-          <paragraph>B</paragraph>
-          <paragraph>
+          <block>B</block>
+          <block>
             <block type="d">
-              <paragraph>C</paragraph>
+              <block>C</block>
             </block>
-          </paragraph>
+          </block>
         </block>
         <block type="d">
-          <paragraph>D</paragraph>
+          <block>D</block>
         </block>
       </block>
     </block>
   </document>
 )
 
-export default function(editor) {
+export default function (editor) {
   editor.insertFragment(fragment)
   editor.flush()
   editor.undo()
@@ -33,11 +33,11 @@ export const input = (
   <value>
     <document>
       <block type="d">
-        <paragraph>
+        <block>
           <text>
             <cursor />
           </text>
-        </paragraph>
+        </block>
       </block>
     </document>
   </value>

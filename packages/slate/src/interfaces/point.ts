@@ -142,7 +142,10 @@ namespace Point {
               (op.position === offset && stick === 'forward')
             ) {
               p.offset -= op.position
-              p.path = Path.transform(path, op, options)!
+              p.path = Path.transform(path, op, {
+                ...options,
+                stick: 'forward',
+              })!
             }
           } else {
             p.path = Path.transform(path, op, options)!

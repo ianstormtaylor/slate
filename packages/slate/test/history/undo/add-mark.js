@@ -2,8 +2,8 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
-  editor.addMark('bold')
+export default function (editor) {
+  editor.addMarks([{ key: 'a' }])
   editor.flush()
   editor.undo()
 }
@@ -11,9 +11,9 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <anchor />wo<focus />rd
-      </paragraph>
+      </block>
     </document>
   </value>
 )

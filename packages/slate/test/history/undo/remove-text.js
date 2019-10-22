@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.moveAnchorForward(4)
   editor.moveFocusForward(7)
   editor.delete()
@@ -13,9 +13,9 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <cursor />one two
-      </paragraph>
+      </block>
     </document>
   </value>
 )
@@ -23,9 +23,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
+      <block>
         one <anchor />two<focus />
-      </paragraph>
+      </block>
     </document>
   </value>
 )

@@ -20,9 +20,9 @@ export const output = (
   <value>
     
       <block>
-        <b>
+        <mark key="a">
           <anchor />w
-        </b>
+        </mark>
         <focus />ord
       </block>
     

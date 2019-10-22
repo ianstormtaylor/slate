@@ -1,12 +1,21 @@
-import { Editor, Fragment, Mark, Element, Path, Range } from '../..'
+import {
+  Value,
+  Editor,
+  Fragment,
+  Mark,
+  Node,
+  Element,
+  Path,
+  Range,
+} from '../..'
 
 class RangeCommands {
   /**
-   * Add a mark to all of the spans of text in a range, splitting the individual
+   * Add a set of marks to all of the spans of text in a range, splitting the individual
    * text nodes if the range intersects them.
    */
 
-  addMarkAtRange(this: Editor, range: Range, mark: Mark): void {
+  addMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
     this.withoutNormalizing(() => {
       const rangeRef = this.createRangeRef(range, { stick: 'inward' })
       const [start, end] = Range.points(range)
@@ -14,9 +23,9 @@ class RangeCommands {
       this.splitNodeAtPoint(start, { always: false })
       range = rangeRef.unref()!
 
-      for (const [node, path] of this.texts({ range })) {
-        if (!Mark.exists(mark, node.marks)) {
-          this.apply({ type: 'add_mark', path, mark })
+      for (const [, path] of this.texts({ range })) {
+        for (const mark of marks) {
+          this.addMarkAtPath(path, mark)
         }
       }
     })
@@ -46,31 +55,56 @@ class RangeCommands {
     }
 
     this.withoutNormalizing(() => {
-      if (hanging === false) {
-        // To obey common rich text editor behavior, if the range is "hanging"
-        // into the end block, we move it backwards so that it's not.
-        range = this.getNonHangingRange(range)
-      }
+      // To obey common rich text editor behavior, if the range is "hanging"
+      // into the end block, we move it backwards so that it's not.
+      // if (hanging === false) {
+      //   range = this.getNonHangingRange(range)
+      // }
 
       const [start, end] = Range.points(range)
+      const beforeRef = this.createPointRef(start, { stick: 'backward' })
       const startRef = this.createPointRef(start)
       const endRef = this.createPointRef(end, { stick: 'backward' })
       const afterRef = this.createPointRef(end)
+      let commonPath = Path.common(start.path, end.path)
+      let startHeight = start.path.length - commonPath.length - 1
+      let endHeight = end.path.length - commonPath.length - 1
 
-      this.splitBlockAtRange(range, { height: Infinity })
-
-      const startIndex = startRef.current!.path[0]
-      const endIndex = endRef.current!.path[0]
-
-      for (let i = endIndex; i <= startIndex; i--) {
-        this.removeNodeAtPath([i])
+      if (Path.equals(start.path, end.path)) {
+        commonPath = Path.parent(commonPath)
+        startHeight = 0
+        endHeight = 0
       }
 
-      const afterClosest = this.getClosestBlock(afterRef.current!.path)
+      debugger
+      this.splitNodeAtPoint(end, { height: Math.max(0, endHeight) })
+      this.splitNodeAtPoint(start, { height: Math.max(0, startHeight) })
 
-      if (afterClosest) {
-        const [, afterBlockPath] = afterClosest
-        this.mergeBlockAtPath(afterBlockPath)
+      const startIndex = startRef.unref()!.path[commonPath.length]
+      const endIndex = endRef.unref()!.path[commonPath.length]
+      debugger
+
+      for (let i = endIndex; i >= startIndex; i--) {
+        debugger
+        this.removeNodeAtPath(commonPath.concat(i))
+      }
+
+      const beforePoint = beforeRef.unref()
+      const afterPoint = afterRef.unref()
+
+      if (beforePoint == null || afterPoint == null) {
+        return
+      }
+
+      debugger
+      const ancestor = Node.get(this.value, commonPath)
+      debugger
+
+      if (
+        (Value.isValue(ancestor) || Element.isElement(ancestor)) &&
+        this.hasBlocks(ancestor)
+      ) {
+        this.mergeBlockAtPath(afterPoint.path)
       }
     })
   }
@@ -83,7 +117,11 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [start] = Range.points(range)
       const pointRef = this.createPointRef(start)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       this.insertBlockAtPoint(pointRef.current!, block)
       pointRef.unref()
     })
@@ -97,7 +135,11 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [start] = Range.points(range)
       const pointRef = this.createPointRef(start)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       this.insertFragmentAtPoint(pointRef.current!, fragment)
       pointRef.unref()
     })
@@ -111,7 +153,11 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [start] = Range.points(range)
       const pointRef = this.createPointRef(start)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       this.insertInlineAtPoint(pointRef.current!, inline)
       pointRef.unref()
     })
@@ -125,21 +171,25 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [start] = Range.points(range)
       const pointRef = this.createPointRef(start)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       this.insertTextAtPoint(pointRef.current!, text)
       pointRef.unref()
     })
   }
 
   /**
-   * Remove a mark from all of the spans of text in a range.
+   * Remove a set of marks from all of the spans of text in a range.
    */
 
-  removeMarkAtRange(this: Editor, range: Range, mark: Mark): void {
+  removeMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
     this.withoutNormalizing(() => {
-      for (const [node, path] of this.texts({ range })) {
-        if (Mark.exists(mark, node.marks)) {
-          this.apply({ type: 'remove_mark', path, mark })
+      for (const [, path] of this.texts({ range })) {
+        for (const mark of marks) {
+          this.removeMarkAtPath(path, mark)
         }
       }
     })
@@ -268,7 +318,11 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [, end] = Range.points(range)
       const pointRef = this.createPointRef(end)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       const point = pointRef.unref()
       this.splitBlockAtPoint(point!, options)
     })
@@ -289,7 +343,11 @@ class RangeCommands {
     this.withoutNormalizing(() => {
       const [, end] = Range.points(range)
       const pointRef = this.createPointRef(end)
-      this.deleteAtRange(range)
+
+      if (Range.isExpanded(range)) {
+        this.deleteAtRange(range)
+      }
+
       const point = pointRef.unref()
       this.splitInlineAtPoint(point!, options)
     })
@@ -299,14 +357,18 @@ class RangeCommands {
    * Toggle a mark on or off for all of the spans of text in a range.
    */
 
-  toggleMarkAtRange(this: Editor, range: Range, mark: Mark): void {
+  toggleMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
     this.withoutNormalizing(() => {
-      for (const [text, path] of this.texts({ range })) {
-        this.apply({
-          type: Mark.exists(mark, text.marks) ? 'remove_mark' : 'add_mark',
-          path,
-          mark,
-        })
+      const rangeRef = this.createRangeRef(range, { stick: 'inward' })
+      const [start, end] = Range.points(range)
+      this.splitNodeAtPoint(end, { always: false })
+      this.splitNodeAtPoint(start, { always: false })
+      range = rangeRef.unref()!
+
+      for (const [, path] of this.texts({ range })) {
+        for (const mark of marks) {
+          this.toggleMarkAtPath(path, mark)
+        }
       }
     })
   }

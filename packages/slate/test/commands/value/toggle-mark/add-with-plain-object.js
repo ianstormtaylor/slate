@@ -25,7 +25,7 @@ export const output = (
       <block>
         <b thing="value">
           <anchor />w
-        </b>
+        </mark>
         <focus />ord
       </block>
     

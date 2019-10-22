@@ -18,7 +18,7 @@ export const input = (
       <block>
         <b thing="value">
           <anchor />w<focus />
-        </b>
+        </mark>
         ord
       </block>
     

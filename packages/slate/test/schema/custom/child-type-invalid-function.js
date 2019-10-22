@@ -19,9 +19,9 @@ export const input = (
   <value>
     <document>
       <quote>
-        <image>
+        <block void>
           <text />
-        </image>
+        </block>
       </quote>
     </document>
   </value>

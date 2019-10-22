@@ -35,7 +35,7 @@ export const fixtures = (...args) => {
         const name = basename(file, extname(file))
 
         // This needs to be a non-arrow function to use `this.skip()`.
-        it(name, function() {
+        it(`${name} `, function() {
           const module = require(p)
 
           if (module.skip) {

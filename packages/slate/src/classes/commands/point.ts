@@ -15,6 +15,14 @@ class PointCommands {
       reverse?: boolean
     } = {}
   ): void {
+    const furthestVoid = this.getFurthestVoid(point.path)
+
+    if (furthestVoid) {
+      const [, voidPath] = furthestVoid
+      this.removeNodeAtPath(voidPath)
+      return
+    }
+
     const { reverse = false, ...rest } = options
     const target = reverse
       ? this.getPreviousPoint(point, rest)
@@ -250,16 +258,28 @@ class PointCommands {
     const { path, offset } = point
     const { height = 0, always = true } = options
 
-    if (height > path.length) {
+    if (height < 0) {
       throw new Error(
-        `Cannot split the leaf node at path [${path}] to a height of \`${height}\` because it does not have that many ancestors.`
+        `Cannot split the node at path [${path}] to a negative height of \`${height}\`.`
       )
     }
 
     this.withoutNormalizing(() => {
+      const furthestVoid = this.getFurthestVoid(point.path)
       let position = offset
       let target: number | undefined
       let h = 0
+      debugger
+
+      // If the point it inside a void node, we still want to split up to a 
+      // `height`, but we need to start after the void node in the tree.
+      if (furthestVoid) {
+        const [, voidPath] = furthestVoid
+        const relPath = Path.relative(point.path, voidPath)
+        h = relPath.length + 1
+        position = voidPath[voidPath.length - 1]
+      }
+
 
       // Create a ref that tracks the split point as we move up the ancestors.
       // Stick backwards because we're splitting and we want to remain inside
@@ -270,13 +290,18 @@ class PointCommands {
       while (h <= height) {
         const depth = path.length - h
         const p = path.slice(0, depth)
+        h++
+
+        if (p.length === 0) {
+          break
+        }
 
         // With the `always: false` option, we will instead split the nodes only
         // when the point isn't already at it's edge.
         if (
           !always &&
           pointRef.current != null &&
-          this.isAtEdgeOfPath(pointRef.current, Path.parent(p))
+          this.isAtEdge(pointRef.current, Path.parent(p))
         ) {
           continue
         }
@@ -284,9 +309,11 @@ class PointCommands {
         this.splitNodeAtPath(p, position, { target })
         target = position
         position = path[depth - 1] + 1
-        h++
       }
+
+      pointRef.unref()
     })
+
   }
 }
 

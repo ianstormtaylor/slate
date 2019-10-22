@@ -20,7 +20,7 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>one</paragraph>
+        <block>one</block>
         <block type="title">two</block>
       </quote>
     </document>
@@ -31,7 +31,7 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>one</paragraph>
+        <block>one</block>
       </quote>
     </document>
   </value>

@@ -1,4 +1,4 @@
-import { Annotation, Mark, Node, Path, Selection, Value } from '..'
+import { Annotation, Mark, Node, Path, Range, Value } from '..'
 import isPlainObject from 'is-plain-object'
 
 type AddAnnotationOperation = {
@@ -104,18 +104,18 @@ type SetSelectionOperation =
       type: 'set_selection'
       [key: string]: any
       properties: null
-      newProperties: Selection
+      newProperties: Range
     }
   | {
       type: 'set_selection'
       [key: string]: any
-      properties: Partial<Selection>
-      newProperties: Partial<Selection>
+      properties: Partial<Range>
+      newProperties: Partial<Range>
     }
   | {
       type: 'set_selection'
       [key: string]: any
-      properties: Selection
+      properties: Range
       newProperties: null
     }
 
@@ -429,14 +429,14 @@ namespace Operation {
         if (properties == null) {
           return {
             ...op,
-            properties: newProperties as Selection,
+            properties: newProperties as Range,
             newProperties: null,
           }
         } else if (newProperties == null) {
           return {
             ...op,
             properties: null,
-            newProperties: properties as Selection,
+            newProperties: properties as Range,
           }
         } else {
           return { ...op, properties: newProperties, newProperties: properties }

@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.deleteBackward()
   editor.undo()
 }
@@ -10,10 +10,10 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>Hello</paragraph>
-      <paragraph>
+      <block>Hello</block>
+      <block>
         <cursor />world!
-      </paragraph>
+      </block>
     </document>
   </value>
 )
@@ -21,10 +21,10 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>Hello</paragraph>
-      <paragraph>
+      <block>Hello</block>
+      <block>
         <cursor />world!
-      </paragraph>
+      </block>
     </document>
   </value>
 )

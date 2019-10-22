@@ -10,9 +10,9 @@ export const input = (
   <value>
     
       <block>
-        w<b>
+        w<mark key="a">
           o<cursor />r
-        </b>d
+        </mark>d
       </block>
     
   </value>
@@ -22,9 +22,9 @@ export const output = (
   <value>
     
       <block>
-        w<b>
+        w<mark key="a">
           oa<cursor />r
-        </b>d
+        </mark>d
       </block>
     
   </value>

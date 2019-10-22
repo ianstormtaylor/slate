@@ -38,7 +38,7 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>text</paragraph>
+        <block>text</block>
       </quote>
     </document>
   </value>

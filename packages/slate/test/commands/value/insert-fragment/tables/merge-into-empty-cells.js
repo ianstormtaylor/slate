@@ -4,52 +4,52 @@ import h from '../../../../helpers/h'
 
 export const run = editor => {
   editor.insertFragment(
-    
-      <table>
-        <table_body>
-          <table_row>
-            <table_cell>1</table_cell>
-            <table_cell>2</table_cell>
-          </table_row>
-        </table_body>
-      </table>
-    
+
+    <block>
+      <block>
+        <block>
+          <block>1</block>
+          <block>2</block>
+        </block>
+      </block>
+    </block>
+
   )
 }
 
 export const input = (
   <value>
-    
-      <table>
-        <table_body>
-          <table_row>
-            <table_cell>
-              <cursor />
-            </table_cell>
-            <table_cell />
-          </table_row>
-        </table_body>
-      </table>
-    
+
+    <block>
+      <block>
+        <block>
+          <block>
+            <cursor />
+          </block>
+          <block><text /></block>
+        </block>
+      </block>
+    </block>
+
   </value>
 )
 
 // TODO: paste "2" into second cell instead of creating new one?
 export const output = (
   <value>
-    
-      <table>
-        <table_body>
-          <table_row>
-            <table_cell>1</table_cell>
-            <table_cell>
-              2<cursor />
-            </table_cell>
-            <table_cell />
-          </table_row>
-        </table_body>
-      </table>
-    
+
+    <block>
+      <block>
+        <block>
+          <block>1</block>
+          <block>
+            2<cursor />
+          </block>
+          <block><text /></block>
+        </block>
+      </block>
+    </block>
+
   </value>
 )
 

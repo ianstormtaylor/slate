@@ -3,35 +3,31 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.addMark('italic')
+  editor.addMarks([{ key: 'b' }])
   editor.splitBlock()
   editor.insertText('cat is cute')
 }
 
 export const input = (
   <value>
-    
-      <block>
-        <b>word</b>
-        <cursor />
-      </block>
-    
+    <block>
+      <mark key="a">word</mark>
+      <cursor />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        <b>word</b>
-        <cursor />
-      </block>
-      <block>
-        <i>
-          <b>cat is cute</b>
-        </i>
-        <cursor />
-      </block>
-    
+    <block>
+      <mark key="a">word</mark>
+      <cursor />
+    </block>
+    <block>
+      <mark key="b">
+        <mark key="a">cat is cute</mark>
+      </mark>
+      <cursor />
+    </block>
   </value>
 )

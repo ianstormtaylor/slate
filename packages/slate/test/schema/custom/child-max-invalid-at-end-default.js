@@ -20,12 +20,12 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
-        <paragraph>
+        </block>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>
@@ -35,9 +35,9 @@ export const output = (
   <value>
     <document>
       <quote>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>

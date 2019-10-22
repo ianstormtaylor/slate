@@ -19,9 +19,9 @@ export const input = (
 export const output = (
   <value>
     
-      <image>
+      <block void>
         <cursor />word
-      </image>
+      </block>
     
   </value>
 )

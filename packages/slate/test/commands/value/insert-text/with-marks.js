@@ -22,7 +22,7 @@ export const output = (
   <value>
     
       <block>
-        word<b>a</b>
+        word<mark key="a">a</mark>
         <cursor />
       </block>
     

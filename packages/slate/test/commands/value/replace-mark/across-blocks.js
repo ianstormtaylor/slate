@@ -8,34 +8,30 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <block>
-        wo
-        <i>
-          <anchor />rd
-        </i>
-      </block>
-      <block>
-        <i>an</i>
-        <focus />other
-      </block>
-    
+    <block>
+      wo
+      <mark key="b">
+        <anchor />rd
+      </mark>
+    </block>
+    <block>
+      <mark key="b">an</mark>
+      <focus />other
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        wo
-        <b>
-          <anchor />rd
-        </b>
-      </block>
-      <block>
-        <b>an</b>
-        <focus />other
-      </block>
-    
+    <block>
+      wo
+      <mark key="a">
+        <anchor />rd
+      </mark>
+    </block>
+    <block>
+      <mark key="a">an</mark>
+      <focus />other
+    </block>
   </value>
 )

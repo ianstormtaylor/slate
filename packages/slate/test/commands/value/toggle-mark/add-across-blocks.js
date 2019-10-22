@@ -24,12 +24,12 @@ export const output = (
     
       <block>
         wo
-        <b>
+        <mark key="a">
           <anchor />rd
-        </b>
+        </mark>
       </block>
       <block>
-        <b>an</b>
+        <mark key="a">an</mark>
         <focus />other
       </block>
     

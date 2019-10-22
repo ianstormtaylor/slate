@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.delete()
   editor.flush()
   editor.undo()
@@ -11,20 +11,20 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <text />
         <link data={{ url: 'https://www.google.com' }}>
           o<anchor />ne
-        </link>
+        </inline>
         <text />
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         <text />
         <link data={{ url: 'https://www.github.com' }}>
           tw<focus />o
-        </link>
+        </inline>
         <text />
-      </paragraph>
+      </block>
     </document>
   </value>
 )

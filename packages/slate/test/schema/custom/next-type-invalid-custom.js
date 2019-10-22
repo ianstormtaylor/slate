@@ -18,12 +18,12 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <text />
-      </paragraph>
-      <image>
+      </block>
+      <block void>
         <text />
-      </image>
+      </block>
     </document>
   </value>
 )
@@ -31,14 +31,14 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <text />
-      </paragraph>
-      <paragraph>
-        <image>
+      </block>
+      <block>
+        <block void>
           <text />
-        </image>
-      </paragraph>
+        </block>
+      </block>
     </document>
   </value>
 )

@@ -13,12 +13,12 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <image>
+      <block void>
         <text />
-      </image>
-      <paragraph>
+      </block>
+      <block>
         <text />
-      </paragraph>
+      </block>
     </document>
   </value>
 )
@@ -26,9 +26,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
+      <block>
         <text />
-      </paragraph>
+      </block>
     </document>
   </value>
 )

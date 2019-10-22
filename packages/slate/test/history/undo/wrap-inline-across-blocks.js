@@ -2,7 +2,7 @@
 
 import h from '../../helpers/h'
 
-export default function(editor) {
+export default function (editor) {
   editor.wrapInline('hashtag')
   editor.flush()
   editor.undo()
@@ -11,12 +11,12 @@ export default function(editor) {
 export const input = (
   <value>
     <document>
-      <paragraph>
+      <block>
         wo<anchor />rd
-      </paragraph>
-      <paragraph>
+      </block>
+      <block>
         an<focus />other
-      </paragraph>
+      </block>
     </document>
   </value>
 )

@@ -99,15 +99,17 @@ class RangeQueries {
       return false
     }
 
-    const [, end] = Range.points(range)
-    const closestBlock = this.getClosestBlock(end.path)
+    const [start, end] = Range.points(range)
+    const startClosest = this.getClosestBlock(start.path)
+    const endClosest = this.getClosestBlock(end.path)
 
-    if (!closestBlock) {
+    if (!startClosest || !endClosest) {
       return false
     }
 
-    const [, endBlockPath] = closestBlock
-    return this.isAtStart(end, endBlockPath)
+    const [, startPath] = startClosest
+    const [, endPath] = endClosest
+    return this.isAtStart(start, startPath) && this.isAtStart(end, endPath)
   }
 
   /**

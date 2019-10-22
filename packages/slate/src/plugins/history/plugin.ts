@@ -211,20 +211,15 @@ const shouldMerge = (op: Operation, into: Operation | null): boolean => {
  */
 
 const shouldSave = (op: Operation): boolean => {
-  if (op.type === 'set_selection') {
-    const { newProperties } = op
+  switch (op.type) {
+    case 'set_selection': {
+      return op.newProperties != null
+    }
 
-    if (
-      newProperties != null &&
-      'isFocused' in newProperties &&
-      !('anchor' in newProperties) &&
-      !('focus' in newProperties)
-    ) {
-      return false
+    default: {
+      return true
     }
   }
-
-  return true
 }
 
 export { HistoryPlugin }

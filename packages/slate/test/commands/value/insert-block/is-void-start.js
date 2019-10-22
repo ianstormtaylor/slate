@@ -9,9 +9,9 @@ export const run = editor => {
 export const input = (
   <value>
     
-      <image>
+      <block void>
         <cursor />text
-      </image>
+      </block>
       <block>text</block>
     
   </value>
@@ -23,7 +23,7 @@ export const output = (
       <block>
         <cursor />
       </block>
-      <image>text</image>
+      <block void>text</block>
       <block>text</block>
     
   </value>

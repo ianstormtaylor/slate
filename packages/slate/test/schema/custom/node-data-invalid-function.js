@@ -15,10 +15,10 @@ export const input = (
     <document>
       <paragraph thing="valid">
         <text />
-      </paragraph>
+      </block>
       <paragraph thing="invalid">
         <text />
-      </paragraph>
+      </block>
     </document>
   </value>
 )
@@ -28,7 +28,7 @@ export const output = (
     <document>
       <paragraph thing="valid">
         <text />
-      </paragraph>
+      </block>
     </document>
   </value>
 )

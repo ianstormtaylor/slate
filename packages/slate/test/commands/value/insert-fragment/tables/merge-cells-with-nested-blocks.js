@@ -4,39 +4,39 @@ import h from '../../../../helpers/h'
 
 export const run = editor => {
   editor.insertFragment(
-    <table>
-      <table_body>
-        <table_row>
-          <table_cell>
+    <block>
+      <block>
+        <block>
+          <block>
             <block>1</block>
-          </table_cell>
-          <table_cell>
+          </block>
+          <block>
             <block>2</block>
-          </table_cell>
-        </table_row>
-      </table_body>
-    </table>
+          </block>
+        </block>
+      </block>
+    </block>
   )
 }
 
 export const input = (
   <value>
-    <table>
-      <table_body>
-        <table_row>
-          <table_cell>
+    <block>
+      <block>
+        <block>
+          <block>
             <block>
               <cursor />
             </block>
-          </table_cell>
-          <table_cell>
+          </block>
+          <block>
             <block>
               <text />
             </block>
-          </table_cell>
-        </table_row>
-      </table_body>
-    </table>
+          </block>
+        </block>
+      </block>
+    </block>
   </value>
 )
 
@@ -44,25 +44,25 @@ export const input = (
 // ideally, paragraph with "2" goes into second cell
 export const output = (
   <value>
-    <table>
-      <table_body>
-        <table_row>
-          <table_cell>
+    <block>
+      <block>
+        <block>
+          <block>
             <block>1</block>
-            <table_cell>
+            <block>
               <block>
                 2<cursor />
               </block>
-            </table_cell>
-          </table_cell>
-          <table_cell>
+            </block>
+          </block>
+          <block>
             <block>
               <text />
             </block>
-          </table_cell>
-        </table_row>
-      </table_body>
-    </table>
+          </block>
+        </block>
+      </block>
+    </block>
   </value>
 )
 

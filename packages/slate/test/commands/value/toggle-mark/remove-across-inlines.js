@@ -11,16 +11,16 @@ export const input = (
     <block>
       <text />
       <inline>
-        wo<b>
+        wo<mark key="a">
           <anchor />rd
-        </b>
+        </mark>
       </inline>
       <text />
     </block>
     <block>
       <text />
       <inline>
-        <b>an</b>
+        <mark key="a">an</mark>
         <focus />other
       </inline>
       <text />

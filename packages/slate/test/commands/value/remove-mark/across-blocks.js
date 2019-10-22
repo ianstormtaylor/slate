@@ -11,10 +11,10 @@ export const input = (
     
       <block>
         wo<anchor />
-        <b>rd</b>
+        <mark key="a">rd</mark>
       </block>
       <block>
-        <b>an</b>
+        <mark key="a">an</mark>
         <focus />other
       </block>
     

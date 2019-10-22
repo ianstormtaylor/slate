@@ -31,16 +31,16 @@ export const output = (
       <text />
       <inline>
         wo
-        <b>
+        <mark key="a">
           <anchor />rd
-        </b>
+        </mark>
       </inline>
-      <b />
+      <mark key="a" />
     </block>
     <block>
-      <b />
+      <mark key="a" />
       <inline>
-        <b>an</b>
+        <mark key="a">an</mark>
         <focus />other
       </inline>
       <text />

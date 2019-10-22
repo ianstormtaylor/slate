@@ -4,38 +4,38 @@ import { h } from '../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-    
-      <block>
-        <inline type="link">bar</inline>
-      </block>
-    
+
+    <block>
+      <inline type="link">bar</inline>
+    </block>
+
   )
 }
 
 export const input = (
   <value>
-    
-      <code>
-        <block>
-          Foo<cursor />baz
+
+    <block>
+      <block>
+        Foo<cursor />baz
         </block>
-      </code>
-    
+    </block>
+
   </value>
 )
 
 export const output = (
   <value>
-    
-      <code>
-        <block>
-          Foo
+
+    <block>
+      <block>
+        Foo
           <inline type="link">
-            bar<cursor />
-          </inline>
-          baz
+          bar<cursor />
+        </inline>
+        baz
         </block>
-      </code>
-    
+    </block>
+
   </value>
 )

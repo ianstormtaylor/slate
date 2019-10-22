@@ -21,9 +21,9 @@ export const output = (
     
       <block>
         wor
-        <b>
+        <mark key="a">
           <anchor />d<focus />
-        </b>
+        </mark>
       </block>
     
   </value>

@@ -12,9 +12,9 @@ export const input = (
       <block>
         <text />
         <inline>
-          <b>
+          <mark key="a">
             he<anchor />ll<focus />o
-          </b>
+          </mark>
         </inline>
         <text />
       </block>
@@ -29,21 +29,21 @@ export const output = (
       <block>
         <text />
         <inline>
-          <b>he</b>
+          <mark key="a">he</mark>
         </inline>
         <text />
         <inline>
           <inline>
-            <b>
+            <mark key="a">
               <anchor />ll
-            </b>
+            </mark>
           </inline>
         </inline>
         <text />
         <inline>
-          <b>
+          <mark key="a">
             <focus />o
-          </b>
+          </mark>
         </inline>
         <text />
       </block>

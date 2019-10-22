@@ -25,23 +25,14 @@ const RESTRICTED_PROPERTIES = ['annotations', 'history', 'nodes', 'selection']
 
 class ValueCommands {
   /**
-   * Add a mark to the span of text that is currently selected.
+   * Add a set of marks to the span of text that is currently selected.
    */
 
-  addMark(this: Editor, mark: Mark): void {
+  addMarks(this: Editor, marks: Mark[]): void {
     const { selection } = this.value
 
-    if (selection == null) {
-      return
-    } else if (Range.isExpanded(selection)) {
-      this.addMarkAtRange(selection, mark)
-    } else {
-      const activeMarks = this.getActiveMarks()
-
-      if (!Mark.exists(mark, activeMarks)) {
-        const marks = activeMarks.concat(mark)
-        this.select({ marks })
-      }
+    if (selection != null) {
+      this.addMarksAtRange(selection, marks)
     }
   }
 
@@ -117,11 +108,11 @@ class ValueCommands {
       return
     }
 
-    const [start] = Range.points(selection)
-    const pointRef = this.createPointRef(start)
     this.deleteAtRange(selection, options)
-    this.moveTo(pointRef.current!)
-    pointRef.unref()
+    // After deleting, the selection can end up still expanded across a
+    // zero-width offset if it had one edge in an inline node. So to ensure that
+    // it's always collapsed after deleting, we collapse it to the end point.
+    this.collapse({ edge: 'end' })
   }
 
   /**
@@ -207,8 +198,13 @@ class ValueCommands {
     const [start] = Range.points(selection)
     const pointRef = this.createPointRef(start)
     this.insertTextAtRange(selection, text)
-    this.moveTo(pointRef.current!)
-    pointRef.unref()
+    const end = pointRef.unref()!
+    this.moveTo(end)
+
+    if (selection.marks) {
+      const range = { anchor: start, focus: end }
+      this.addMarksAtRange(range, selection.marks)
+    }
   }
 
   /**
@@ -256,24 +252,14 @@ class ValueCommands {
   }
 
   /**
-   * Remove a mark from all of the spans of text in the current selection.
+   * Remove a set of marks from all of the spans of text in the current selection.
    */
 
-  removeMark(this: Editor, mark: Mark): void {
-    const { value } = this
-    const { selection } = value
+  removeMarks(this: Editor, marks: Mark[]): void {
+    const { selection } = this.value
 
-    if (selection == null) {
-      return
-    } else if (Range.isExpanded(selection)) {
-      this.removeMarkAtRange(selection, mark)
-    } else {
-      const activeMarks = this.getActiveMarks()
-
-      if (Mark.exists(mark, activeMarks)) {
-        const marks = activeMarks.filter(m => !Mark.matches(m, mark))
-        this.select({ marks })
-      }
+    if (selection != null) {
+      this.removeMarksAtRange(selection, marks)
     }
   }
 
@@ -281,10 +267,10 @@ class ValueCommands {
    * Replace a mark on all of the spans of text in the selection with a new one.
    */
 
-  replaceMark(this: Editor, oldMark: Mark, newMark: Mark): void {
+  replaceMarks(this: Editor, oldMarks: Mark[], newMarks: Mark[]): void {
     this.withoutNormalizing(() => {
-      this.removeMark(oldMark)
-      this.addMark(newMark)
+      this.removeMarks(oldMarks)
+      this.addMarks(newMarks)
     })
   }
 
@@ -437,13 +423,11 @@ class ValueCommands {
    * Toggle a mark on or off for all the spans of text in the selection.
    */
 
-  toggleMark(this: Editor, mark: Mark): void {
-    const activeMarks = this.getActiveMarks()
+  toggleMarks(this: Editor, marks: Mark[]): void {
+    const { selection } = this.value
 
-    if (Mark.exists(mark, activeMarks)) {
-      this.removeMark(mark)
-    } else {
-      this.addMark(mark)
+    if (selection != null) {
+      this.toggleMarksAtRange(selection, marks)
     }
   }
 
@@ -460,8 +444,8 @@ class ValueCommands {
 
     const rangeRef = this.createRangeRef(selection)
     this.unwrapBlockAtRange(selection, props)
-    this.select(rangeRef.current)
-    rangeRef.unref()
+    const range = rangeRef.unref()!
+    this.select(range)
   }
 
   /**
@@ -477,8 +461,8 @@ class ValueCommands {
 
     const rangeRef = this.createRangeRef(selection)
     this.unwrapInlineAtRange(selection, props)
-    this.select(rangeRef.current)
-    rangeRef.unref()
+    const range = rangeRef.unref()!
+    this.select(range)
   }
 
   /**
@@ -507,8 +491,8 @@ class ValueCommands {
 
     const rangeRef = this.createRangeRef(selection)
     this.wrapBlockAtRange(selection, block)
-    this.select(rangeRef.current)
-    rangeRef.unref()
+    const range = rangeRef.unref()!
+    this.select(range)
   }
 
   /**
@@ -524,8 +508,8 @@ class ValueCommands {
 
     const rangeRef = this.createRangeRef(selection)
     this.wrapInlineAtRange(selection, inline)
-    this.select(rangeRef.current)
-    rangeRef.unref()
+    const range = rangeRef.unref()!
+    this.select(range)
   }
 }
 

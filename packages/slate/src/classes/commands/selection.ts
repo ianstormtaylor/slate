@@ -1,15 +1,31 @@
-import { Editor, Point, Range, Selection } from '../..'
+import { Editor, Point, Range } from '../..'
 
 class SelectionCommands {
   /**
-   * Blur the selection.
+   * Collapse the selection.
    */
 
-  blur(this: Editor) {
+  collapse(
+    this: Editor,
+    options: {
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
+    } = {}
+  ) {
+    const { edge = 'anchor' } = options
     const { selection } = this.value
 
-    if (selection != null) {
-      this.select({ isFocused: false })
+    if (selection == null) {
+      return
+    } else if (edge === 'anchor') {
+      this.moveTo(selection.anchor)
+    } else if (edge === 'focus') {
+      this.moveTo(selection.focus)
+    } else if (edge === 'start') {
+      const [start] = Range.points(selection)
+      this.moveTo(start)
+    } else if (edge === 'end') {
+      const [, end] = Range.points(selection)
+      this.moveTo(end)
     }
   }
 
@@ -26,18 +42,6 @@ class SelectionCommands {
         properties: selection,
         newProperties: null,
       })
-    }
-  }
-
-  /**
-   * Focus the selection.
-   */
-
-  focus(this: Editor) {
-    const { selection } = this.value
-
-    if (selection != null) {
-      this.select({ isFocused: true })
     }
   }
 
@@ -240,7 +244,7 @@ class SelectionCommands {
    * Set the selection to a new value.
    */
 
-  select(this: Editor, props: Partial<Selection>) {
+  select(this: Editor, props: Partial<Range>) {
     const { selection } = this.value
 
     if (selection != null) {
@@ -259,7 +263,7 @@ class SelectionCommands {
     this.apply({
       type: 'set_selection',
       properties: selection,
-      newProperties: { isFocused: false, marks: null, ...props },
+      newProperties: props,
     })
   }
 
@@ -267,10 +271,10 @@ class SelectionCommands {
    * Set new props on the selection.
    */
 
-  setSelection(this: Editor, props: Partial<Selection>) {
+  setSelection(this: Editor, props: Partial<Range>) {
     const { selection } = this.value
-    let oldProps: Partial<Selection> | null = {}
-    let newProps: Partial<Selection> = {}
+    let oldProps: Partial<Range> | null = {}
+    let newProps: Partial<Range> = {}
 
     if (selection == null) {
       this.select(props)
@@ -291,17 +295,6 @@ class SelectionCommands {
         oldProps[k] = selection[k]
         newProps[k] = props[k]
       }
-    }
-
-    // If the selection moves, clear any marks, unless the new selection
-    // props change the marks in some way.
-    if (
-      selection.marks != null &&
-      newProps.marks === undefined &&
-      (newProps.anchor || newProps.focus)
-    ) {
-      newProps.marks = null
-      oldProps.marks = selection.marks
     }
 
     // If nothing has changed, don't apply any operations.

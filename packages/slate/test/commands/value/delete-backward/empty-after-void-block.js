@@ -8,21 +8,19 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <image />
-      <block>
-        <cursor />
-      </block>
-    
+    <block void>
+      <text />
+    </block>
+    <block>
+      <cursor />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        <cursor />
-      </block>
-    
+    <block>
+      <cursor />
+    </block>
   </value>
 )

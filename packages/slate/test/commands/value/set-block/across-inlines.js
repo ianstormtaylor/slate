@@ -23,15 +23,15 @@ export const input = (
 
 export const output = (
   <value>
-    <code>
+    <block>
       <inline>
         <anchor />word
       </inline>
-    </code>
-    <code>
+    </block>
+    <block>
       <inline>
         another<focus />
       </inline>
-    </code>
+    </block>
   </value>
 )

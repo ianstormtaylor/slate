@@ -5,7 +5,7 @@ import {
   Mark,
   Node,
   Path,
-  Selection,
+  Range,
   Text,
   Value,
 } from 'slate'
@@ -217,7 +217,7 @@ export function createSelection(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Selection {
+): Range {
   const anchor: AnchorToken = children.find(c => c instanceof AnchorToken)
   const focus: FocusToken = children.find(c => c instanceof FocusToken)
 
@@ -242,8 +242,7 @@ export function createSelection(
       offset: focus.offset,
       path: focus.path,
     },
-    isFocused: 'focused' in attributes ? attributes.focused : false,
-    marks: 'marks' in attributes ? attributes.marks : null,
+    ...attributes,
   }
 }
 
@@ -293,10 +292,10 @@ export function createValue(
   children: any[]
 ) {
   const otherChildren: any[] = []
-  let selectionChild: Selection | undefined
+  let selectionChild: Range | undefined
 
   for (const child of children) {
-    if (Selection.isSelection(child)) {
+    if (Range.isRange(child)) {
       selectionChild = child
     } else {
       otherChildren.push(child)
@@ -380,7 +379,7 @@ export function createValue(
 
   if (selectionChild != null) {
     value.selection = selectionChild
-  } else if (Selection.isSelection(selection)) {
+  } else if (Range.isRange(selection)) {
     value.selection = selection
   }
 

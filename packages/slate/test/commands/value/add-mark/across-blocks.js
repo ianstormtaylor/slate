@@ -3,35 +3,33 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.addMark('bold')
+  editor.addMarks([{ key: 'a' }])
 }
 
 export const input = (
   <value>
-    
-      <block>
-        wo<anchor />rd
-      </block>
-      <block>
-        an<focus />other
-      </block>
-    
+    <block>
+      wo<anchor />rd
+    </block>
+    <block>
+      an<focus />other
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        wo
-        <b>
-          <anchor />rd
-        </b>
-      </block>
-      <block>
-        <b>an</b>
+    <block>
+      wo
+      <mark key="a">
+        <anchor />rd
+      </mark>
+    </block>
+    <block>
+      <mark key="a">an</mark>
+      <text>
         <focus />other
-      </block>
-    
+      </text>
+    </block>
   </value>
 )

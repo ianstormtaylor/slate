@@ -11,7 +11,7 @@ export const input = (
     
       <block>
         <anchor />
-        <b>word</b>
+        <mark key="a">word</mark>
         <focus />
       </block>
     

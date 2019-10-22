@@ -19,7 +19,7 @@ export const input = (
   <value>
     <document>
       <quote>
-        <link>text</link>
+        <inline>text</inline>
       </quote>
     </document>
   </value>

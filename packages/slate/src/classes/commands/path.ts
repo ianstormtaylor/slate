@@ -52,6 +52,54 @@ class PathCommands {
   }
 
   /**
+   * Unwrap a single node from its parent.
+   *
+   * If the node is surrounded with siblings, its parent will be split. If the
+   * node is the only child, the parent is removed, and simply replaced by the
+   * node itself.
+   */
+
+  liftNodeAtPath(this: Editor, path: Path): void {
+    const { value } = this
+    const parent = Node.parent(value, path)
+    const parentPath = Path.parent(path)
+    const index = path[path.length - 1]
+    const parentIndex = parentPath[parentPath.length - 1]
+    const grandPath = Path.parent(parentPath)
+    const isFirst = index === 0
+    const isLast = index === parent.nodes.length - 1
+
+    this.withoutNormalizing(() => {
+      let targetPath = path
+      let newPath = grandPath.concat(parentIndex + 1)
+
+      // If the parent has multiple nodes and we're unwrapping the first one, we
+      // will just move it before the parent instead.
+      if (parent.nodes.length > 1 && isFirst) {
+        newPath = grandPath.concat(parentIndex)
+      }
+
+      // If there are multiple children, and we're unwrapping one of the middle
+      // children, we need to split the parent in half first.
+      if (parent.nodes.length > 1 && !isFirst && !isLast) {
+        targetPath = produce(path, p => {
+          p[parentPath.length - 1] += 1
+          p[targetPath.length - 1] = 0
+        })
+
+        this.splitNodeAtPath(parentPath, index)
+      }
+
+      this.moveNodeAtPath(targetPath, newPath)
+
+      // If there was only one child, the parent gets removed.
+      if (parent.nodes.length === 1) {
+        this.removeNodeAtPath(parentPath)
+      }
+    })
+  }
+
+  /**
    * Merge the leaf block at a path with the previous leaf block.
    */
 
@@ -76,20 +124,34 @@ class PathCommands {
       const [, blockPath] = closestBlock
       const [, prevPath] = prevBlock
       const newPath = Path.next(prevPath)
-      const commonAncestorPath = Path.common(blockPath, prevPath)
+      const commonPath = Path.common(blockPath, prevPath)
+      const furthest = Node.furthest(value, blockPath, ([n, p]) => {
+        return (
+          Path.isDescendant(p, commonPath) &&
+          Path.isAncestor(p, blockPath) &&
+          Element.isElement(n) &&
+          n.nodes.length === 1
+        )
+      })
 
+      const furthestRef = furthest ? this.createPathRef(furthest[1]) : null
+
+      debugger
       this.moveNodeAtPath(blockPath, newPath)
-      this.mergeNodeAtPath(newPath)
 
-      for (const [ancestor, ancestorPath] of Node.ancestors(value, blockPath)) {
-        if (
-          Path.equals(ancestorPath, commonAncestorPath) ||
-          ancestor.nodes.length !== 1
-        ) {
-          break
-        }
+      debugger
+      if (furthestRef) {
+        this.removeNodeAtPath(furthestRef.unref()!)
+      }
 
-        this.removeNodeAtPath(ancestorPath)
+      // If the target block is empty, remove it instead of merging. This is a
+      // rich text editor common behavior to prevent losing block formatting
+      // when deleting the entire previous block (with a hanging selection).
+      debugger
+      if (this.getText(prevPath) === '') {
+        this.removeNodeAtPath(prevPath)
+      } else {
+        this.mergeNodeAtPath(newPath)
       }
     })
   }
@@ -209,9 +271,9 @@ class PathCommands {
     // index that accounts for any added/removed nodes.
     let n = 0
 
-    for (let i = 0; i < node.nodes.length; i++, n++) {
+    for (let i = 0; i < node.nodes.length; i++ , n++) {
       const child = node.nodes[i] as Descendant
-      const prev: Descendant | undefined = node.nodes[i - 1]
+      const prev = node.nodes[i - 1]
       const isLast = i === node.nodes.length - 1
 
       if (Element.isElement(child)) {
@@ -243,18 +305,50 @@ class PathCommands {
       } else {
         // Merge adjacent text nodes that are empty or have matching marks.
         if (prev != null && Text.isText(prev)) {
-          if (
-            prev.text === '' ||
-            child.text === '' ||
-            Text.matches(child, prev)
-          ) {
+          if (Text.matches(child, prev)) {
             this.mergeNodeAtPath(path.concat(n))
+            n--
+            continue
+          } else if (prev.text === '') {
+            this.removeNodeAtPath(path.concat(n - 1))
+            n--
+            continue
+          } else if (isLast && child.text === '') {
+            this.removeNodeAtPath(path.concat(n))
             n--
             continue
           }
         }
       }
     }
+  }
+
+  /**
+   * Removing a node at a path, replacing it with its children.
+   */
+
+  pluckNodeAtPath(this: Editor, path: Path): void {
+    const { value } = this
+    const node = Node.get(value, path)
+
+    if (Text.isText(node)) {
+      throw new Error(
+        `Cannot pluck a node at [${path}] because it is a text node and has no children.`
+      )
+    }
+
+    this.withoutNormalizing(() => {
+      const parentPath = Path.parent(path)
+      const index = path[path.length - 1]
+
+      for (let i = 0; i < node.nodes.length; i++) {
+        const targetPath = path.concat(0)
+        const newPath = parentPath.concat(index + i + 1)
+        this.moveNodeAtPath(targetPath, newPath)
+      }
+
+      this.removeNodeAtPath(path)
+    })
   }
 
   /**
@@ -312,10 +406,15 @@ class PathCommands {
    * Replace a mark on the text node at a path.
    */
 
-  replaceMarkAtPath(this: Editor, path: Path, before: Mark, after: Mark): void {
+  replaceMarkAtPath(
+    this: Editor,
+    path: Path,
+    oldMark: Mark,
+    newMark: Mark
+  ): void {
     this.withoutNormalizing(() => {
-      this.removeMarkAtPath(path, before)
-      this.addMarkAtPath(path, after)
+      this.removeMarkAtPath(path, oldMark)
+      this.addMarkAtPath(path, newMark)
     })
   }
 
@@ -345,7 +444,7 @@ class PathCommands {
   }
 
   /**
-   * Set new properties on the node at a path.
+   * Set new properties on the mark at a path.
    */
 
   setMarkAtPath(
@@ -445,6 +544,10 @@ class PathCommands {
       throw new Error(`Cannot split the root node.`)
     }
 
+    if (this.getFurthestVoid(path)) {
+      return
+    }
+
     const { target = null } = options
     const { value } = this
     const node = Node.get(value, path)
@@ -468,79 +571,18 @@ class PathCommands {
   }
 
   /**
-   * Removing a node at a path, replacing it with its children.
+   * Toggle a mark on or off on the text node at a path.
    */
 
-  pluckNodeAtPath(this: Editor, path: Path): void {
+  toggleMarkAtPath(this: Editor, path: Path, mark: Mark): void {
     const { value } = this
     const node = Node.get(value, path)
 
-    if (Text.isText(node)) {
-      throw new Error(
-        `Cannot pluck a node at [${path}] because it is a text node and has no children.`
-      )
+    if (Mark.exists(mark, node.marks)) {
+      this.removeMarkAtPath(path, mark)
+    } else {
+      this.addMarkAtPath(path, mark)
     }
-
-    this.withoutNormalizing(() => {
-      const parentPath = Path.parent(path)
-      const index = path[path.length - 1]
-
-      for (let i = 0; i < node.nodes.length; i++) {
-        const targetPath = path.concat(0)
-        const newPath = parentPath.concat(index + i + 1)
-        this.moveNodeAtPath(targetPath, newPath)
-      }
-
-      this.removeNodeAtPath(path)
-    })
-  }
-
-  /**
-   * Unwrap a single node from its parent.
-   *
-   * If the node is surrounded with siblings, its parent will be split. If the
-   * node is the only child, the parent is removed, and simply replaced by the
-   * node itself.
-   */
-
-  liftNodeAtPath(this: Editor, path: Path): void {
-    const { value } = this
-    const parent = Node.parent(value, path)
-    const parentPath = Path.parent(path)
-    const index = path[path.length - 1]
-    const parentIndex = parentPath[parentPath.length - 1]
-    const grandPath = Path.parent(parentPath)
-    const isFirst = index === 0
-    const isLast = index === parent.nodes.length - 1
-
-    this.withoutNormalizing(() => {
-      let targetPath = path
-      let newPath = grandPath.concat(parentIndex + 1)
-
-      // If the parent has multiple nodes and we're unwrapping the first one, we
-      // will just move it before the parent instead.
-      if (parent.nodes.length > 1 && isFirst) {
-        newPath = grandPath.concat(parentIndex)
-      }
-
-      // If there are multiple children, and we're unwrapping one of the middle
-      // children, we need to split the parent in half first.
-      if (parent.nodes.length > 1 && !isFirst && !isLast) {
-        targetPath = produce(path, p => {
-          p[parentPath.length - 1] += 1
-          p[targetPath.length - 1] = 0
-        })
-
-        this.splitNodeAtPath(parentPath, index)
-      }
-
-      this.moveNodeAtPath(targetPath, newPath)
-
-      // If there was only one child, the parent gets removed.
-      if (parent.nodes.length === 1) {
-        this.removeNodeAtPath(parentPath)
-      }
-    })
   }
 
   /**

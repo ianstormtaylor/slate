@@ -13,9 +13,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph>
-        one <i>two</i> <u>three</u>
-      </paragraph>
+      <block>
+        one <mark key="b">two</mark> <mark key="c">three</mark>
+      </block>
     </document>
   </value>
 )
@@ -23,9 +23,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph>
-        one two <u>three</u>
-      </paragraph>
+      <block>
+        one two <mark key="c">three</mark>
+      </block>
     </document>
   </value>
 )

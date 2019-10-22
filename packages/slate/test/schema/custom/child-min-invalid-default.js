@@ -24,9 +24,9 @@ export const input = (
   <value>
     <document>
       <quote>
-        <paragraph>
+        <block>
           <text />
-        </paragraph>
+        </block>
       </quote>
     </document>
   </value>

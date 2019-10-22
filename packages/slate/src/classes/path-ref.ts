@@ -55,7 +55,9 @@ class PathRef {
 
   unref(): Path | null {
     this.onUnref()
-    return this.current
+    const { current } = this
+    this.current = null
+    return current
   }
 }
 
