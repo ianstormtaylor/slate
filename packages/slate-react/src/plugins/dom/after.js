@@ -44,8 +44,34 @@ function AfterPlugin(options = {}) {
     // isn't a true `beforeinput` event with meaningful information. It only
     // gets triggered for character insertions, so we can just insert directly.
     if (isSynthetic) {
-      event.preventDefault()
-      editor.insertText(event.data)
+      // Single character inserts can be handled natively. Allows native rendering
+      // which preserves the native browser spell check handling.
+      let canNativelyEdit = true
+
+      // Don't allow native rendering unless the selection is collapsed.
+      canNativelyEdit = editor.value.selection.isCollapsed
+
+      if (canNativelyEdit) {
+        const startTextNode = editor.value.startText
+        const selectionStartPoint = editor.value.selection.start
+
+        // Chrome seems to have issues correctly editing the start of nodes.
+        // I see this when there is an inline element, like a link, and you select
+        // right after it (the start of the next node).
+        if (selectionStartPoint.isAtStartOfNode(startTextNode)) {
+          canNativelyEdit = false
+        }
+      }
+
+      if (canNativelyEdit) {
+        editor.controller.asNativeOperation(() => {
+          editor.insertText(event.data, null, false)
+        })
+      } else {
+        event.preventDefault()
+        editor.insertText(event.data, null, false)
+      }
+
       return next()
     }
 

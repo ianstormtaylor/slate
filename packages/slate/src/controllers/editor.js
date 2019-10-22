@@ -56,6 +56,8 @@ class Editor {
       merge: null,
       normalize: true,
       save: true,
+      asNativeOperation: false,
+      nativeOperationQueue: List(),
     }
 
     const core = CorePlugin({ plugins })
@@ -85,6 +87,14 @@ class Editor {
     }
 
     operation = Operation.create(operation)
+
+    // Queue operations being handled natively until they are flushed.
+    if (this.tmp.asNativeOperation) {
+      this.tmp.nativeOperationQueue = this.tmp.nativeOperationQueue.push(
+        operation
+      )
+      return
+    }
 
     // Save the operation into the history. Since `save` is a command, we need
     // to do it without normalizing, since it would have side effects.
@@ -145,6 +155,21 @@ class Editor {
     this.tmp.flushing = false
     this.onChange(change)
     return controller
+  }
+
+  /**
+   * Flush the queue of pending native operations. Applying them.
+   */
+
+  flushQueuedNativeOperations() {
+    if (!this.tmp.nativeOperationQueue.count()) return
+
+    this.tmp.nativeOperationQueue.forEach(operation => {
+      this.applyOperation(operation)
+    })
+
+    this.tmp.nativeOperationQueue = List()
+    this.flush()
   }
 
   /**
@@ -412,6 +437,23 @@ class Editor {
     fn(controller)
     this.tmp.normalize = value
     normalizeDirtyPaths(this)
+    return controller
+  }
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, deferring
+   * applying all operations to the editor's `value` until they are flushed.
+   *
+   * @param {Function} fn
+   * @return {Editor}
+   */
+
+  asNativeOperation(fn) {
+    const { controller } = this
+    const value = this.tmp.asNativeOperation
+    this.tmp.asNativeOperation = true
+    fn(controller)
+    this.tmp.asNativeOperation = value
     return controller
   }
 

@@ -379,6 +379,9 @@ function BeforePlugin() {
     if (editor.value.selection.isBlurred) return
     isUserActionPerformed = true
     debug('onInput', { event })
+    // Native operations are applied to the DOM at this point.
+    // Apply the operations to the editor's `value`.
+    editor.controller.flushQueuedNativeOperations()
     next()
   }
 

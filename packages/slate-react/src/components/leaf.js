@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { createRef } from 'react'
 import Types from 'prop-types'
 import SlateTypes from 'slate-prop-types'
 import ImmutableTypes from 'react-immutable-proptypes'
@@ -12,17 +12,43 @@ import DATA_ATTRS from '../constants/data-attributes'
  * @type {Component}
  */
 
-const TextString = ({ text = '', isTrailing = false }) => {
-  return (
-    <span
-      {...{
-        [DATA_ATTRS.STRING]: true,
-      }}
-    >
-      {text}
-      {isTrailing ? '\n' : null}
-    </span>
-  )
+class TextString extends React.Component {
+  constructor(props) {
+    super(props)
+    this.ref = createRef()
+    // This component may have skipped rendering due to native operations being
+    // applied. If an undo is performed React will see the old and new shadow DOM
+    // match and not apply an update. Forces each render to actually reconcile.
+    this.forceUpdateFlag = false
+  }
+
+  shouldComponentUpdate(nextProps) {
+    // If a native operation has made the text content the same as what
+    // we are going to make it, skip. Maintains the native spell check handling.
+    return this.ref.current.textContent !== nextProps.children
+  }
+
+  componentDidMount() {
+    this.forceUpdateFlag = !this.forceUpdateFlag
+  }
+
+  componentDidUpdate() {
+    this.forceUpdateFlag = !this.forceUpdateFlag
+  }
+
+  render() {
+    return (
+      <span
+        key={this.forceUpdateFlag ? 'A' : 'B'}
+        ref={this.ref}
+        {...{
+          [DATA_ATTRS.STRING]: true,
+        }}
+      >
+        {this.props.children}
+      </span>
+    )
+  }
 }
 
 /**
@@ -101,9 +127,9 @@ const Leaf = props => {
     const isLastLeaf = index === leaves.size - 1
 
     if (isLastText && isLastLeaf && lastChar === '\n') {
-      children = <TextString isTrailing text={text} />
+      children = <TextString>{`${text}\n`}</TextString>
     } else {
-      children = <TextString text={text} />
+      children = <TextString>{text}</TextString>
     }
   }
 
