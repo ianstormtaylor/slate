@@ -1,15 +1,15 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
-  editor.deleteLineBackward()
+  editor.delete({ unit: 'word', reverse: true })
 }
 
 export const input = (
   <value>
     <block>
-      <inline void>😊</inline>one two three<cursor />
+      one two thr<cursor />ee
     </block>
   </value>
 )
@@ -17,7 +17,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <cursor />
+      one two <cursor />ee
     </block>
   </value>
 )

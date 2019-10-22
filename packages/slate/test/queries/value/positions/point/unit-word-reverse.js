@@ -24,6 +24,7 @@ export const output = [
   { path: [1, 0], offset: 10 },
   { path: [1, 0], offset: 5 },
   { path: [1, 0], offset: 0 },
+  { path: [0, 0], offset: 13 },
   { path: [0, 0], offset: 8 },
   { path: [0, 0], offset: 4 },
   { path: [0, 0], offset: 0 },

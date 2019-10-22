@@ -316,11 +316,7 @@ class ValueQueries {
           offset = point.offset
         }
 
-        if (
-          isStart ||
-          unit === 'offset' ||
-          (unit === 'character' && isBlockStart)
-        ) {
+        if (isStart || isBlockStart || unit === 'offset') {
           yield { path, offset }
         }
 

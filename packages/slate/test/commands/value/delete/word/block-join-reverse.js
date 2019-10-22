@@ -1,15 +1,16 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../../../helpers'
 
 export const run = editor => {
-  editor.deleteWordBackward()
+  editor.delete({ unit: 'word', reverse: true })
 }
 
 export const input = (
   <value>
+    <block>word</block>
     <block>
-      <inline>word</inline>📛<cursor />
+      <cursor />another
     </block>
   </value>
 )
@@ -17,7 +18,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <cursor />
+      word<cursor />another
     </block>
   </value>
 )
