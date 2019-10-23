@@ -1,5 +1,6 @@
 import { reverse as reverseText } from 'esrever'
 import {
+  AnnotationEntry,
   Editor,
   Element,
   ElementEntry,
@@ -17,14 +18,45 @@ import {
 
 class ValueQueries {
   /**
+   * Iterate through all of the annotations in the editor.
+   */
+
+  *annotations(
+    this: Editor,
+    options: {
+      at?: Path | Point | Range
+    } = {}
+  ): Iterable<AnnotationEntry> {
+    const { annotations } = this.value
+    let { at } = options
+
+    if (Path.isPath(at)) {
+      at = this.getRange(at)
+    }
+
+    if (Point.isPoint(at)) {
+      at = { anchor: at, focus: at }
+    }
+
+    for (const key in annotations) {
+      const annotation = annotations[key]
+
+      if (at && !Range.includes(at, annotation)) {
+        continue
+      }
+
+      yield [annotation, key]
+    }
+  }
+
+  /**
    * Iterate through all of the block nodes in the editor.
    */
 
   *blocks(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -42,8 +74,7 @@ class ValueQueries {
   *entries(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
@@ -54,7 +85,7 @@ class ValueQueries {
   }
 
   /**
-   * Get the marks that are "active" in the current selection. These are the
+   * Get the marks that are "active" at a location. These are the
    * marks that will be added to any text that is inserted.
    *
    * The `union: true` option can be passed to create a union of marks across
@@ -65,87 +96,102 @@ class ValueQueries {
    * the start of a text node and there are previous text nodes in the same
    * block, it will carry those marks forward from the previous text node. This
    * allows for continuation of marks from previous words.
-   *
-   * Note: when `selection.marks` is not null, it is always returned.
    */
 
-  getActiveMarks(this: Editor, options: { union?: boolean } = {}): Mark[] {
-    const { union = false } = options
+  getActiveMarks(
+    this: Editor,
+    options: {
+      at?: Path | Point | Range
+      union?: boolean
+    } = {}
+  ): Mark[] {
     const { value } = this
-    const { selection } = value
+    const { selection } = this.value
+    let { at, union = false } = options
+    let isSelection = false
 
-    if (selection == null) {
-      return []
+    if (!at && selection) {
+      at = selection
+      isSelection = true
     }
 
-    // If the selection has explicitly defined marks, those override everything.
-    if (selection.marks != null) {
-      return selection.marks
+    if (Path.isPath(at)) {
+      at = this.getRange(at)
     }
 
-    let range: Range = selection
-    let result: Mark[] = []
+    if (Range.isRange(at) && Range.isCollapsed(at)) {
+      at = at.anchor
+    }
+
+    if (Point.isPoint(at)) {
+      let { path, offset } = at
+
+      // If the range is collapsed at the start of a text node, it should carry
+      // over the marks from the previous text node in the same block.
+      if (offset === 0 && path[path.length - 1] !== 0) {
+        const prevPath = Path.previous(path)
+        const prevNode = Node.get(value, prevPath)
+
+        if (Text.isText(prevNode)) {
+          path = prevPath
+        }
+      }
+
+      at = this.getRange(path)
+    }
+
+    const marks: Mark[] = []
     let first = true
-    const { anchor } = range
 
-    // If the range is collapsed at the start of a text node, it should carry
-    // over the marks from the previous text node in the same block.
-    if (
-      Range.isCollapsed(range) &&
-      // PERF: If the offset isn't zero we know it's not at the start.
-      anchor.offset === 0 &&
-      // PERF: If it's the first sibling, we know it can't carry over.
-      anchor.path[anchor.path.length - 1] !== 0
-    ) {
-      const prevPath = Path.previous(anchor.path)
-      const prevNode = Node.get(value, prevPath)
+    if (Range.isRange(at)) {
+      at = this.getNonHangingRange(at)
 
-      if (Text.isText(prevNode)) {
-        range = this.getRange(prevPath)
-      }
-    }
-
-    for (const [node] of this.texts({ range })) {
-      const { marks } = node
-
-      if (first) {
-        result = marks
-        first = false
-        continue
-      }
-
-      // PERF: If we're doing an intersection and the result hits zero it can
-      // never increase again, so we can exit early.
-      if (!union && result.length === 0) {
-        break
-      }
-
-      if (union) {
-        for (const mark of marks) {
-          if (!Mark.exists(mark, result)) {
-            result.push(mark)
-          }
+      for (const [node] of this.texts({ at })) {
+        if (first) {
+          marks.push(...node.marks)
+          first = false
+          continue
         }
-      } else {
-        // Iterate backwards so that removing marks doesn't impact indexing.
-        for (let i = result.length - 1; i >= 0; i--) {
-          const existing = result[i]
 
-          if (!Mark.exists(existing, marks)) {
-            result.splice(i, 1)
+        if (union) {
+          for (const mark of node.marks) {
+            if (!Mark.exists(mark, marks)) {
+              marks.push(mark)
+            }
+          }
+        } else {
+          // PERF: If we're doing an intersection and the result hits zero it can
+          // never increase again, so we can exit early.
+          if (marks.length === 0) {
+            break
+          }
+
+          // Iterate backwards so that removing marks doesn't impact indexing.
+          for (let i = marks.length - 1; i >= 0; i--) {
+            const existing = marks[i]
+
+            if (!Mark.exists(existing, node.marks)) {
+              marks.splice(i, 1)
+            }
           }
         }
       }
     }
 
-    return result
+    return marks
   }
 
   /**
    * Iterate through all of the inline nodes in the editor.
    */
 
-  *inlines(this: Editor, options: {} = {}): Iterable<ElementEntry> {
+  *inlines(
+    this: Editor,
+    options: {
+      at?: Path | Range
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
     const iterable = Node.elements(this.value, {
       ...options,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
@@ -165,8 +211,7 @@ class ValueQueries {
   *marks(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
@@ -183,8 +228,7 @@ class ValueQueries {
   *leafBlocks(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -202,8 +246,7 @@ class ValueQueries {
   *leafInlines(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -229,7 +272,7 @@ class ValueQueries {
   *positions(
     this: Editor,
     options: {
-      point?: Point
+      at?: Point
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
@@ -237,10 +280,10 @@ class ValueQueries {
     const {
       unit = 'offset',
       reverse = false,
-      point = reverse ? this.getEnd([]) : this.getStart([]),
+      at = reverse ? this.getEnd([]) : this.getStart([]),
     } = options
 
-    if (point == null) {
+    if (at == null) {
       return
     }
 
@@ -275,7 +318,7 @@ class ValueQueries {
     }
 
     for (const [node, path] of this.entries({
-      path: point.path,
+      at: at.path,
       reverse,
     })) {
       if (Element.isElement(node)) {
@@ -295,9 +338,9 @@ class ValueQueries {
         if (!this.isInline(node) && this.hasInlines(node)) {
           let text = this.getText(path)
 
-          if (Path.isAncestor(path, point.path)) {
-            const before = this.getOffset(point.path, { depth: path.length })
-            const o = before + point.offset
+          if (Path.isAncestor(path, at.path)) {
+            const before = this.getOffset(at.path, { depth: path.length })
+            const o = before + at.offset
             text = reverse ? text.slice(0, o) : text.slice(o)
           }
 
@@ -307,13 +350,13 @@ class ValueQueries {
       }
 
       if (Text.isText(node)) {
-        const isStart = Path.equals(path, point.path)
+        const isStart = Path.equals(path, at.path)
         available = node.text.length
         offset = reverse ? available : 0
 
         if (isStart) {
-          available = reverse ? point.offset : available - point.offset
-          offset = point.offset
+          available = reverse ? at.offset : available - at.offset
+          offset = at.offset
         }
 
         if (isStart || isBlockStart || unit === 'offset') {
@@ -349,8 +392,7 @@ class ValueQueries {
   *rootBlocks(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -368,8 +410,7 @@ class ValueQueries {
   *rootInlines(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -389,8 +430,7 @@ class ValueQueries {
   *texts(
     this: Editor,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {

@@ -14,19 +14,6 @@ import {
 
 class PathCommands {
   /**
-   * Add a mark to the node at a path.
-   */
-
-  addMarkAtPath(this: Editor, path: Path, mark: Mark): void {
-    const { value } = this
-    const leaf = Node.leaf(value, path)
-
-    if (!Mark.exists(mark, leaf.marks)) {
-      this.apply({ type: 'add_mark', path, mark })
-    }
-  }
-
-  /**
    * Insert a fragment starting at a path.
    */
 
@@ -136,10 +123,8 @@ class PathCommands {
 
       const furthestRef = furthest ? this.createPathRef(furthest[1]) : null
 
-      debugger
       this.moveNodeAtPath(blockPath, newPath)
 
-      debugger
       if (furthestRef) {
         this.removeNodeAtPath(furthestRef.unref()!)
       }
@@ -147,7 +132,6 @@ class PathCommands {
       // If the target block is empty, remove it instead of merging. This is a
       // rich text editor common behavior to prevent losing block formatting
       // when deleting the entire previous block (with a hanging selection).
-      debugger
       if (this.isEmpty(prev)) {
         this.removeNodeAtPath(prevPath)
       } else {
@@ -369,19 +353,6 @@ class PathCommands {
   }
 
   /**
-   * Remove a mark on the node at a path.
-   */
-
-  removeMarkAtPath(this: Editor, path: Path, mark: Mark): void {
-    const { value } = this
-    const leaf = Node.leaf(value, path)
-
-    if (Mark.exists(mark, leaf.marks)) {
-      this.apply({ type: 'remove_mark', path, mark })
-    }
-  }
-
-  /**
    * Remove the node at a path.
    */
 
@@ -403,22 +374,6 @@ class PathCommands {
   }
 
   /**
-   * Replace a mark on the text node at a path.
-   */
-
-  replaceMarkAtPath(
-    this: Editor,
-    path: Path,
-    oldMark: Mark,
-    newMark: Mark
-  ): void {
-    this.withoutNormalizing(() => {
-      this.removeMarkAtPath(path, oldMark)
-      this.addMarkAtPath(path, newMark)
-    })
-  }
-
-  /**
    * Replace the node at a path with a new node.
    */
 
@@ -426,63 +381,6 @@ class PathCommands {
     this.withoutNormalizing(() => {
       this.removeNodeAtPath(path)
       this.insertNodeAtPath(path, node)
-    })
-  }
-
-  /**
-   * Replace all of the text in a node at a path.
-   */
-
-  replaceTextAtPath(this: Editor, path: Path, text: string): void {
-    this.withoutNormalizing(() => {
-      const { value } = this
-      const node = Node.leaf(value, path)
-      const point = { path, offset: 0 }
-      this.removeTextAtPoint(point, node.text.length)
-      this.insertTextAtPoint(point, text)
-    })
-  }
-
-  /**
-   * Set new properties on the mark at a path.
-   */
-
-  setMarkAtPath(
-    this: Editor,
-    path: Path,
-    mark: Partial<Mark>,
-    props: {}
-  ): void {
-    const { value } = this
-    const node = Node.leaf(value, path)
-    const match = node.marks.find(m => Mark.matches(m, mark))
-
-    if (match == null) {
-      throw new Error(
-        `Cannot set new properties on mark ${JSON.stringify(
-          mark
-        )} at path [${path}] because the mark does not exist.`
-      )
-    }
-
-    const newProps = {}
-
-    for (const k in props) {
-      if (props[k] !== match[k]) {
-        newProps[k] = props[k]
-      }
-    }
-
-    // If no properties have changed don't apply an operation at all.
-    if (Object.keys(newProps).length !== 0) {
-      return
-    }
-
-    this.apply({
-      type: 'set_mark',
-      path,
-      properties: match,
-      newProperties: newProps,
     })
   }
 
@@ -568,21 +466,6 @@ class PathCommands {
       target,
       properties,
     })
-  }
-
-  /**
-   * Toggle a mark on or off on the text node at a path.
-   */
-
-  toggleMarkAtPath(this: Editor, path: Path, mark: Mark): void {
-    const { value } = this
-    const node = Node.get(value, path)
-
-    if (Mark.exists(mark, node.marks)) {
-      this.removeMarkAtPath(path, mark)
-    } else {
-      this.addMarkAtPath(path, mark)
-    }
   }
 
   /**

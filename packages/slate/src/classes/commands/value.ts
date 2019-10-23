@@ -9,6 +9,7 @@ import {
   Path,
   Text,
   Range,
+  Point,
   Value,
 } from '../..'
 import {
@@ -20,20 +21,63 @@ import {
   NORMALIZING,
 } from '../../symbols'
 
-// Properties that are restricted, and that can't be set directly on a `Value`.
-const RESTRICTED_PROPERTIES = ['annotations', 'history', 'nodes', 'selection']
-
 class ValueCommands {
   /**
-   * Add a set of marks to the span of text that is currently selected.
+   * Add a set of marks at a location. You can add them to the content of
+   * specific node at a path, or to all of the text content in a range.
    */
 
-  addMarks(this: Editor, marks: Mark[]): void {
-    const { selection } = this.value
+  addMarks(
+    this: Editor,
+    marks: Mark[],
+    options: {
+      at?: Path | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      let { at } = options
+      let isSelection = false
 
-    if (selection != null) {
-      this.addMarksAtRange(selection, marks)
-    }
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
+
+      if (Path.isPath(at)) {
+        at = this.getRange(at)
+      }
+
+      if (Range.isRange(at)) {
+        // Split the text nodes at the range's edges if necessary.
+        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const [start, end] = Range.points(at)
+        this.splitNodeAtPoint(end, { always: false })
+        this.splitNodeAtPoint(start, { always: false })
+        at = rangeRef.unref()!
+
+        // De-dupe the marks being added to ensure the set is unique.
+        const set: Mark[] = []
+
+        for (const mark of marks) {
+          if (!Mark.exists(mark, set)) {
+            set.push(mark)
+          }
+        }
+
+        for (const [node, path] of this.texts({ at })) {
+          for (const mark of set) {
+            if (!Mark.exists(mark, node.marks)) {
+              this.apply({ type: 'add_mark', path, mark })
+            }
+          }
+        }
+
+        if (isSelection) {
+          this.select(at)
+        }
+      }
+    })
   }
 
   /**
@@ -97,22 +141,103 @@ class ValueCommands {
   delete(
     this: Editor,
     options: {
-      amount?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
+      at?: Path | Point | Range
+      distance?: number
+      unit?: 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
   ) {
-    const { selection } = this.value
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      const { reverse = false, unit = 'character', distance = 1 } = options
+      let { at } = options
+      let isSelection = false
+      let ancestorPath: Path = []
+      let ancestor: Node = this.value
 
-    if (selection == null) {
-      return
-    }
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
 
-    this.deleteAtRange(selection, options)
-    // After deleting, the selection can end up still expanded across a
-    // zero-width offset if it had one edge in an inline node. So to ensure that
-    // it's always collapsed after deleting, we collapse it to the end point.
-    this.collapse({ edge: 'end' })
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
+
+      if (Point.isPoint(at)) {
+        const furthestVoid = this.getFurthestVoid(at.path)
+
+        if (furthestVoid) {
+          const [, voidPath] = furthestVoid
+          at = voidPath
+        } else {
+          const opts = { unit, distance }
+          const target = reverse
+            ? this.getPreviousPoint(at, opts)
+            : this.getNextPoint(at, opts)
+
+          if (target) {
+            at = { anchor: at, focus: target }
+          }
+        }
+      }
+
+      if (Range.isRange(at)) {
+        const [start, end] = Range.points(at)
+        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const [common, commonPath] = this.getCommon(start.path, end.path)
+        let startHeight = start.path.length - commonPath.length - 1
+        let endHeight = end.path.length - commonPath.length - 1
+
+        if (Path.equals(start.path, end.path)) {
+          ancestorPath = Path.parent(commonPath)
+          ancestor = Node.get(this.value, ancestorPath)
+          startHeight = 0
+          endHeight = 0
+        } else {
+          ancestorPath = commonPath
+          ancestor = common
+        }
+
+        this.splitNodeAtPoint(end, { height: Math.max(0, endHeight) })
+        this.splitNodeAtPoint(start, { height: Math.max(0, startHeight) })
+        at = rangeRef.unref()!
+      }
+
+      if (Path.isPath(at)) {
+        const node = Node.get(this.value, at)
+        this.apply({ type: 'remove_node', path: at, node })
+      }
+
+      if (Range.isRange(at)) {
+        const [start, end] = Range.points(at)
+        const after = this.getNextPoint(end)!
+        const afterRef = this.createPointRef(after)
+        const l = ancestorPath.length
+        const startIndex = start.path[l]
+        const endIndex = end.path[l]
+        const hasBlocks =
+          Value.isValue(ancestor) ||
+          (Element.isElement(ancestor) && this.hasBlocks(ancestor))
+
+        // Iterate backwards so the paths are unaffected.
+        for (let i = endIndex; i >= startIndex; i--) {
+          const path = ancestorPath.concat(i)
+          const node = Node.get(this.value, path)
+          this.apply({ type: 'remove_node', path, node })
+        }
+
+        if (hasBlocks) {
+          this.mergeBlockAtPath(afterRef.current!.path)
+        }
+
+        if (isSelection) {
+          this.select(afterRef.current!)
+        }
+
+        afterRef.unref()
+      }
+    })
   }
 
   /**
@@ -134,18 +259,55 @@ class ValueCommands {
    * Insert a block node at the cursor.
    */
 
-  insertBlock(this: Editor, block: Element) {
-    const { selection } = this.value
+  insertBlock(
+    this: Editor,
+    block: Element,
+    options: {
+      at?: Path | Point | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      let { at } = options
+      let isSelection = false
+      let isAtEnd = false
 
-    if (selection == null) {
-      return
-    }
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
 
-    const [start] = Range.points(selection)
-    const pointRef = this.createPointRef(start)
-    this.insertBlockAtRange(selection, block)
-    this.moveTo(pointRef.current!)
-    pointRef.unref()
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
+
+      if (Range.isRange(at)) {
+        const [, end] = Range.points(at)
+        const pointRef = this.createPointRef(end)
+        this.delete({ at })
+        at = pointRef.unref()!
+      }
+
+      if (Point.isPoint(at)) {
+        const [, blockPath] = this.getClosestBlock(at.path)!
+        isAtEnd = this.isAtEnd(at, blockPath)
+        const pointRef = this.createPointRef(at)
+        this.splitBlockAtPoint(at, { always: false })
+        const point = pointRef.unref()!
+        at = point.path
+      }
+
+      if (Path.isPath(at)) {
+        const [, blockPath] = this.getClosestBlock(at)!
+        const path = isAtEnd ? Path.next(blockPath) : blockPath
+        this.insertNodeAtPath(path, block)
+
+        if (isSelection) {
+          const point = this.getStart(path)!
+          this.select(point)
+        }
+      }
+    })
   }
 
   /**
@@ -162,7 +324,7 @@ class ValueCommands {
     const [start] = Range.points(selection)
     const pointRef = this.createPointRef(start)
     this.insertFragmentAtRange(selection, fragment)
-    this.moveTo(pointRef.current!)
+    this.select(pointRef.current!)
     pointRef.unref()
   }
 
@@ -180,7 +342,7 @@ class ValueCommands {
     const [start] = Range.points(selection)
     const pointRef = this.createPointRef(start)
     this.insertInlineAtRange(selection, inline)
-    this.moveTo(pointRef.current!)
+    this.select(pointRef.current!)
     pointRef.unref()
   }
 
@@ -188,23 +350,43 @@ class ValueCommands {
    * Insert a string of text at the current selection.
    */
 
-  insertText(this: Editor, text: string) {
-    const { selection } = this.value
+  insertText(
+    this: Editor,
+    text: string,
+    options: {
+      at?: Point | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      let { at } = options
 
-    if (selection == null) {
-      return
-    }
+      if (!at && selection) {
+        at = selection
+      }
 
-    const [start] = Range.points(selection)
-    const pointRef = this.createPointRef(start)
-    this.insertTextAtRange(selection, text)
-    const end = pointRef.unref()!
-    this.moveTo(end)
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
 
-    if (selection.marks) {
-      const range = { anchor: start, focus: end }
-      this.addMarksAtRange(range, selection.marks)
-    }
+      if (Range.isRange(at)) {
+        const [, end] = Range.points(at)
+        const pointRef = this.createPointRef(end)
+        this.delete({ at })
+        at = pointRef.unref()!
+      }
+
+      if (Point.isPoint(at) && !this.getFurthestVoid(at.path)) {
+        for (const [annotation, key] of this.annotations({ at })) {
+          if (this.isAtomic(annotation)) {
+            this.removeAnnotation(key)
+          }
+        }
+
+        const { path, offset } = at
+        this.apply({ type: 'insert_text', path, offset, text })
+      }
+    })
   }
 
   /**
@@ -251,26 +433,44 @@ class ValueCommands {
     })
   }
 
-  /**
-   * Remove a set of marks from all of the spans of text in the current selection.
-   */
-
-  removeMarks(this: Editor, marks: Mark[]): void {
-    const { selection } = this.value
-
-    if (selection != null) {
-      this.removeMarksAtRange(selection, marks)
-    }
-  }
-
-  /**
-   * Replace a mark on all of the spans of text in the selection with a new one.
-   */
-
-  replaceMarks(this: Editor, oldMarks: Mark[], newMarks: Mark[]): void {
+  removeMarks(
+    this: Editor,
+    marks: Mark[],
+    options: {
+      at?: Path | Range
+    } = {}
+  ) {
     this.withoutNormalizing(() => {
-      this.removeMarks(oldMarks)
-      this.addMarks(newMarks)
+      const { selection } = this.value
+      let { at } = options
+      let isSelection = false
+
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
+
+      if (Path.isPath(at)) {
+        at = this.getRange(at)
+      }
+
+      if (Range.isRange(at)) {
+        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const [start, end] = Range.points(at)
+        this.splitNodeAtPoint(end, { always: false })
+        this.splitNodeAtPoint(start, { always: false })
+        at = rangeRef.unref()!
+
+        for (const [mark, i, node, path] of this.marks({ at })) {
+          if (Mark.exists(mark, marks)) {
+            this.apply({ type: 'remove_mark', path, mark })
+          }
+        }
+
+        if (isSelection) {
+          this.select(at)
+        }
+      }
     })
   }
 
@@ -334,29 +534,25 @@ class ValueCommands {
    * Set new properties on the top-level `Value` object.
    */
 
-  setValue(this: Editor, props: {}) {
+  setValue(this: Editor, props: Partial<Value>) {
     const { value } = this
     const newProps = {}
     const oldProps = {}
-    let isChange = false
 
     // Dedupe new and old properties to avoid unnecessary sets.
     for (const k in props) {
-      if (RESTRICTED_PROPERTIES.includes(k)) {
-        throw new Error(
-          `Cannot set the restricted property "${k}" on a value. You must use one of the purpose-built editor methods instead.`
-        )
+      if (k === 'annotations' || k === 'nodes' || k === 'selection') {
+        continue
       }
 
       if (props[k] !== value[k]) {
-        isChange = true
         newProps[k] = props[k]
         oldProps[k] = value[k]
       }
     }
 
     // PERF: If no properties have changed don't apply an operation at all.
-    if (!isChange) {
+    if (Object.keys(newProps).length === 0) {
       return
     }
 
@@ -364,6 +560,77 @@ class ValueCommands {
       type: 'set_value',
       properties: oldProps,
       newProperties: newProps,
+    })
+  }
+
+  /**
+   * Set new properties on a set of marks.
+   */
+
+  setMarks(
+    this: Editor,
+    marks: Mark[],
+    props: Partial<Mark>,
+    options: {
+      at?: Path | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      let { at } = options
+      let isSelection = false
+
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
+
+      // PERF: Do this before the path coercion logic since we're guaranteed not
+      // to need to split in that case.
+      if (Range.isRange(at)) {
+        // Split the text nodes at the range's edges if necessary.
+        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const [start, end] = Range.points(at)
+        this.splitNodeAtPoint(end, { always: false })
+        this.splitNodeAtPoint(start, { always: false })
+        at = rangeRef.unref()!
+      }
+
+      if (Path.isPath(at)) {
+        at = this.getRange(at)
+      }
+
+      if (Range.isRange(at)) {
+        for (const [mark, i, node, path] of this.marks({ at })) {
+          if (!Mark.exists(mark, marks)) {
+            continue
+          }
+
+          const newProps = {}
+
+          for (const k in props) {
+            if (props[k] !== mark[k]) {
+              newProps[k] = props[k]
+            }
+          }
+
+          // If no properties have changed don't apply an operation at all.
+          if (Object.keys(newProps).length === 0) {
+            continue
+          }
+
+          this.apply({
+            type: 'set_mark',
+            path,
+            properties: mark,
+            newProperties: newProps,
+          })
+        }
+
+        if (isSelection) {
+          this.select(at)
+        }
+      }
     })
   }
 
@@ -388,7 +655,7 @@ class ValueCommands {
       const [, end] = Range.points(selection)
       const pointRef = this.createPointRef(end)
       this.splitBlockAtRange(selection, options)
-      this.moveTo(pointRef.current!)
+      this.select(pointRef.current!)
       pointRef.unref()
     })
   }
@@ -414,7 +681,7 @@ class ValueCommands {
       const [, end] = Range.points(selection)
       const pointRef = this.createPointRef(end)
       this.splitInlineAtRange(selection, options)
-      this.moveTo(pointRef.current!)
+      this.select(pointRef.current!)
       pointRef.unref()
     })
   }
@@ -423,12 +690,24 @@ class ValueCommands {
    * Toggle a mark on or off for all the spans of text in the selection.
    */
 
-  toggleMarks(this: Editor, marks: Mark[]): void {
-    const { selection } = this.value
+  toggleMarks(
+    this: Editor,
+    marks: Mark[],
+    options: {
+      at?: Path | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { at } = options
+      const existing = this.getActiveMarks({ at })
+      const exists = marks.every(m => Mark.exists(m, existing))
 
-    if (selection != null) {
-      this.toggleMarksAtRange(selection, marks)
-    }
+      if (exists) {
+        this.removeMarks(marks, { at })
+      } else {
+        this.addMarks(marks, { at })
+      }
+    })
   }
 
   /**

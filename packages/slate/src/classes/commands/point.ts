@@ -34,22 +34,6 @@ class PointCommands {
   }
 
   /**
-   * Insert a block node at a point.
-   */
-
-  insertBlockAtPoint(this: Editor, point: Point, block: Element): void {
-    this.withoutNormalizing(() => {
-      const pointRef = this.createPointRef(point)
-      this.splitBlockAtPoint(point, { always: false })
-
-      if (pointRef.current != null) {
-        this.insertNodeAtPath(pointRef.current.path, block)
-        pointRef.unref()
-      }
-    })
-  }
-
-  /**
    * Insert a fragment of nodes at a point.
    */
 
@@ -97,46 +81,6 @@ class PointCommands {
         this.insertNodeAtPath(pointRef.current.path, inline)
         pointRef.unref()
       }
-    })
-  }
-
-  /**
-   * Insert a string of text at a specific point in the document.
-   */
-
-  insertTextAtPoint(this: Editor, point: Point, text: string): Point {
-    const { value } = this
-    const { annotations } = value
-    const { path, offset } = point
-
-    this.withoutNormalizing(() => {
-      for (const key in annotations) {
-        const annotation = annotations[key]
-
-        if (this.isAtomic(annotation)) {
-          const [start] = Range.points(annotation)
-          const [, end] = Range.points(annotation)
-
-          if (
-            start.offset < offset &&
-            Path.equals(start.path, path) &&
-            (!Path.equals(end.path, path) || offset < end.offset)
-          ) {
-            this.removeAnnotation(key)
-          }
-        }
-      }
-
-      this.apply({
-        type: 'insert_text',
-        path,
-        offset,
-        text,
-      })
-    })
-
-    return produce(point, p => {
-      p.offset += text.length
     })
   }
 
@@ -269,7 +213,6 @@ class PointCommands {
       let position = offset
       let target: number | undefined
       let h = 0
-      debugger
 
       // If the point it inside a void node, we still want to split up to a
       // `height`, but we need to start after the void node in the tree.
@@ -300,7 +243,7 @@ class PointCommands {
         if (
           !always &&
           pointRef.current != null &&
-          this.isAtEdge(pointRef.current, Path.parent(p))
+          this.isAtEdge(pointRef.current, p)
         ) {
           continue
         }

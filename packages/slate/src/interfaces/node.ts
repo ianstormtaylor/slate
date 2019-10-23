@@ -135,6 +135,16 @@ namespace Node {
   }
 
   /**
+   * Get an entry for the common ancesetor node of two paths.
+   */
+
+  export const common = (root: Node, path: Path, another: Path): NodeEntry => {
+    const p = Path.common(path, another)
+    const n = Node.get(root, p)
+    return [n, p]
+  }
+
+  /**
    * Get the node at a specific path, asserting that it's a descendant node.
    */
 
@@ -157,8 +167,7 @@ namespace Node {
   export function* descendants(
     root: Node,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -181,8 +190,7 @@ namespace Node {
   export function* elements(
     root: Node,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -203,22 +211,21 @@ namespace Node {
   export function* entries(
     root: Node,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { path = [], range, reverse = false, pass = () => false } = options
+    const { at = [], reverse = false, pass = () => false } = options
     let fromPath
     let toPath
 
-    if (range != null) {
-      const [s, e] = Range.points(range)
+    if (Range.isRange(at)) {
+      const [s, e] = Range.points(at)
       fromPath = reverse ? e.path : s.path
       toPath = reverse ? s.path : e.path
     } else {
-      const [, f] = reverse ? Node.last(root, path) : Node.first(root, path)
+      const [, f] = reverse ? Node.last(root, at) : Node.first(root, at)
       fromPath = f
       toPath = null
     }
@@ -485,8 +492,7 @@ namespace Node {
   export function* marks(
     root: Node,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -569,8 +575,7 @@ namespace Node {
   export function* texts(
     root: Node,
     options: {
-      path?: Path
-      range?: Range
+      at?: Path | Range
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}

@@ -3,7 +3,11 @@ export { PathRef } from './classes/path-ref'
 export { PointRef } from './classes/point-ref'
 export { RangeRef } from './classes/range-ref'
 
-export { Annotation, AnnotationPointEntry } from './interfaces/annotation'
+export {
+  Annotation,
+  AnnotationEntry,
+  AnnotationPointEntry,
+} from './interfaces/annotation'
 export * from './interfaces/change'
 export * from './interfaces/element'
 export * from './interfaces/fragment'

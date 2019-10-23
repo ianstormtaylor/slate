@@ -53,7 +53,7 @@ class RangeQueries {
   }
 
   /**
-   * Get a range, ensuring that it is not hanging into an inline node.
+   * Get a range, ensuring that it is not hanging into an inline or text node.
    *
    * @param {Range} range
    * @return {Range}
@@ -113,7 +113,7 @@ class RangeQueries {
   }
 
   /**
-   * Check whether a range is hanging in an inline.
+   * Check whether a range is hanging in an inline or text node.
    */
 
   isInlineHanging(this: Editor, range: Range): boolean {
@@ -124,12 +124,12 @@ class RangeQueries {
     const [, end] = Range.points(range)
     const closestInline = this.getClosestInline(end.path)
 
-    if (!closestInline) {
-      return false
+    if (closestInline) {
+      const [, endInlinePath] = closestInline
+      return this.isAtStart(end, endInlinePath)
+    } else {
+      return end.offset === 0
     }
-
-    const [, endInlinePath] = closestInline
-    return this.isAtStart(end, endInlinePath)
   }
 
   /**

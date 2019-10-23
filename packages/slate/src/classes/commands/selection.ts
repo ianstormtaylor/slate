@@ -14,29 +14,29 @@ class SelectionCommands {
     const { edge = 'anchor' } = options
     const { selection } = this.value
 
-    if (selection == null) {
+    if (!selection) {
       return
     } else if (edge === 'anchor') {
-      this.moveTo(selection.anchor)
+      this.select(selection.anchor)
     } else if (edge === 'focus') {
-      this.moveTo(selection.focus)
+      this.select(selection.focus)
     } else if (edge === 'start') {
       const [start] = Range.points(selection)
-      this.moveTo(start)
+      this.select(start)
     } else if (edge === 'end') {
       const [, end] = Range.points(selection)
-      this.moveTo(end)
+      this.select(end)
     }
   }
 
   /**
-   * Deselect the selection.
+   * Unset the selection.
    */
 
   deselect(this: Editor) {
     const { selection } = this.value
 
-    if (selection != null) {
+    if (selection) {
       this.apply({
         type: 'set_selection',
         properties: selection,
@@ -46,22 +46,7 @@ class SelectionCommands {
   }
 
   /**
-   * Flip the selection's anchor and focus points.
-   */
-
-  flip(this: Editor) {
-    const { selection } = this.value
-
-    if (selection != null) {
-      const { anchor, focus } = selection
-      this.setSelection({ anchor: focus, focus: anchor })
-    }
-  }
-
-  /**
-   * Move the selection.
-   *
-   * @param {Number} n
+   * Move the selection's point forward or backward.
    */
 
   move(
@@ -70,192 +55,75 @@ class SelectionCommands {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line'
       reverse?: boolean
-    } = {}
-  ) {
-    this.moveAnchor(options)
-    this.moveFocus(options)
-  }
-
-  /**
-   * Move the selection's anchor point.
-   *
-   * @param {Number} n
-   */
-
-  moveAnchor(
-    this: Editor,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
   ) {
     const { selection } = this.value
+    const { distance = 1, unit = 'character', reverse = false } = options
+    let { edge = null } = options
 
-    if (selection == null) {
+    if (!selection) {
       return
     }
 
-    const { anchor } = selection
-    const { reverse = false, ...rest } = options
-    const point = reverse
-      ? this.getPreviousPoint(anchor, rest)
-      : this.getNextPoint(anchor, rest)
-
-    if (point) {
-      this.moveAnchorTo(point)
-    }
-  }
-
-  /**
-   * Move the selection's anchor point to a new point.
-   */
-
-  moveAnchorTo(this: Editor, point: Point) {
-    this.setSelection({ anchor: point })
-  }
-
-  /**
-   * Move the selection's end point.
-   */
-
-  moveEnd(
-    this: Editor,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      allowZeroWidth?: boolean
-    } = {}
-  ) {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    } else if (Range.isForward(selection)) {
-      this.moveFocus(options)
-    } else {
-      this.moveAnchor(options)
-    }
-  }
-
-  /**
-   * Move the selection's end point to a new point.
-   */
-
-  moveEndTo(this: Editor, point: Point) {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    } else if (Range.isForward(selection)) {
-      this.moveFocusTo(point)
-    } else {
-      this.moveAnchorTo(point)
-    }
-  }
-
-  /**
-   * Move the selection's focus point.
-   *
-   * @param {Number} n
-   */
-
-  moveFocus(
-    this: Editor,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
-    } = {}
-  ) {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
+    if (edge === 'start') {
+      edge = Range.isBackward(selection) ? 'focus' : 'anchor'
     }
 
-    const { focus } = selection
-    const { reverse = false, ...rest } = options
-    const point = reverse
-      ? this.getPreviousPoint(focus, rest)
-      : this.getNextPoint(focus, rest)
-
-    if (point) {
-      this.moveFocusTo(point)
+    if (edge === 'end') {
+      edge = Range.isBackward(selection) ? 'anchor' : 'focus'
     }
-  }
 
-  /**
-   * Move the selection's focus point to a new point.
-   */
+    const { anchor, focus } = selection
+    const opts = { distance, unit }
+    const props: Partial<Range> = {}
 
-  moveFocusTo(this: Editor, point: Point) {
-    this.setSelection({ focus: point })
-  }
+    if (edge == null || edge === 'anchor') {
+      const point = reverse
+        ? this.getPreviousPoint(anchor, opts)
+        : this.getNextPoint(anchor, opts)
 
-  /**
-   * Move the selection's start point.
-   */
-
-  moveStart(
-    this: Editor,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
-    } = {}
-  ) {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    } else if (Range.isForward(selection)) {
-      this.moveAnchor(options)
-    } else {
-      this.moveFocus(options)
+      if (point) {
+        props.anchor = point
+      }
     }
-  }
 
-  /**
-   * Move the selection's start point to a new point.
-   */
+    if (edge == null || edge === 'focus') {
+      const point = reverse
+        ? this.getPreviousPoint(focus, opts)
+        : this.getNextPoint(focus, opts)
 
-  moveStartTo(this: Editor, point: Point) {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    } else if (Range.isForward(selection)) {
-      this.moveAnchorTo(point)
-    } else {
-      this.moveFocusTo(point)
+      if (point) {
+        props.focus = point
+      }
     }
-  }
 
-  /**
-   * Move the cursor to a specific point.
-   */
-
-  moveTo(this: Editor, point: Point) {
-    this.setSelection({ anchor: point, focus: point })
+    this.setSelection(props)
   }
 
   /**
    * Set the selection to a new value.
    */
 
-  select(this: Editor, props: Partial<Range>) {
+  select(this: Editor, target: Point | Range | Partial<Range>) {
     const { selection } = this.value
 
-    if (selection != null) {
-      this.setSelection(props)
+    if (Point.isPoint(target)) {
+      target = {
+        anchor: target,
+        focus: target,
+      }
+    }
+
+    if (selection) {
+      this.setSelection(target)
       return
     }
 
-    if (!Range.isRange(props)) {
+    if (!Range.isRange(target)) {
       throw new Error(
         `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${JSON.stringify(
-          props
+          target
         )}`
       )
     }
@@ -263,21 +131,57 @@ class SelectionCommands {
     this.apply({
       type: 'set_selection',
       properties: selection,
-      newProperties: props,
+      newProperties: target,
     })
   }
 
   /**
-   * Set new props on the selection.
+   * Set new properties on one of the selection's points.
+   */
+
+  setPoint(
+    this: Editor,
+    props: Partial<Point>,
+    options: {
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
+    }
+  ) {
+    const { selection } = this.value
+    let { edge = 'both' } = options
+
+    if (!selection) {
+      return
+    }
+
+    if (edge === 'start') {
+      edge = Range.isBackward(selection) ? 'focus' : 'anchor'
+    }
+
+    if (edge === 'end') {
+      edge = Range.isBackward(selection) ? 'anchor' : 'focus'
+    }
+
+    const { anchor, focus } = selection
+    const point = edge === 'anchor' ? anchor : focus
+    const newPoint = Object.assign(point, props)
+
+    if (edge === 'anchor') {
+      this.setSelection({ anchor: newPoint })
+    } else {
+      this.setSelection({ focus: newPoint })
+    }
+  }
+
+  /**
+   * Set new properties on the selection.
    */
 
   setSelection(this: Editor, props: Partial<Range>) {
     const { selection } = this.value
-    let oldProps: Partial<Range> | null = {}
-    let newProps: Partial<Range> = {}
+    const oldProps: Partial<Range> | null = {}
+    const newProps: Partial<Range> = {}
 
-    if (selection == null) {
-      this.select(props)
+    if (!selection) {
       return
     }
 

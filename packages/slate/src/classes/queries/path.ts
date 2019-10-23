@@ -1,9 +1,10 @@
-import { produce } from 'immer'
 import {
+  Ancestor,
   Editor,
   Element,
   ElementEntry,
   Node,
+  NodeEntry,
   Point,
   Path,
   PathRef,
@@ -14,6 +15,18 @@ import {
 import { PATH_REFS } from '../../symbols'
 
 class PathQueries {
+  getCommon(this: Editor, path: Path, another: Path): NodeEntry {
+    return Node.common(this.value, path, another)
+  }
+
+  getLeaf(this: Editor, path: Path): Text {
+    return Node.leaf(this.value, path)
+  }
+
+  getNode(this: Editor, path: Path): Node {
+    return Node.get(this.value, path)
+  }
+
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the this.
@@ -90,7 +103,7 @@ class PathQueries {
    */
 
   getFirstText(this: Editor, path: Path): TextEntry | undefined {
-    const [first] = this.texts({ path })
+    const [first] = this.texts({ at: path })
     return first
   }
 
@@ -135,7 +148,7 @@ class PathQueries {
    */
 
   getLastText(this: Editor, path: Path): TextEntry | undefined {
-    const [last] = this.texts({ path, reverse: true })
+    const [last] = this.texts({ at: path, reverse: true })
     return last
   }
 
@@ -144,7 +157,7 @@ class PathQueries {
    */
 
   getNextLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafBlocks({ path })) {
+    for (const [n, p] of this.leafBlocks({ at: path })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -156,7 +169,7 @@ class PathQueries {
    */
 
   getNextLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafInlines({ path })) {
+    for (const [n, p] of this.leafInlines({ at: path })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -168,7 +181,7 @@ class PathQueries {
    */
 
   getNextRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootBlocks({ path })) {
+    for (const [n, p] of this.rootBlocks({ at: path })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -180,7 +193,7 @@ class PathQueries {
    */
 
   getNextRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootInlines({ path })) {
+    for (const [n, p] of this.rootInlines({ at: path })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -192,7 +205,7 @@ class PathQueries {
    */
 
   getNextText(this: Editor, path: Path): TextEntry | undefined {
-    const [, next] = this.texts({ path })
+    const [, next] = this.texts({ at: path })
     return next
   }
 
@@ -245,7 +258,7 @@ class PathQueries {
    */
 
   getPreviousLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafBlocks({ path, reverse: true })) {
+    for (const [n, p] of this.leafBlocks({ at: path, reverse: true })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -257,7 +270,7 @@ class PathQueries {
    */
 
   getPreviousLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafInlines({ path, reverse: true })) {
+    for (const [n, p] of this.leafInlines({ at: path, reverse: true })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -269,7 +282,7 @@ class PathQueries {
    */
 
   getPreviousRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootBlocks({ path, reverse: true })) {
+    for (const [n, p] of this.rootBlocks({ at: path, reverse: true })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -281,7 +294,7 @@ class PathQueries {
    */
 
   getPreviousRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootInlines({ path, reverse: true })) {
+    for (const [n, p] of this.rootInlines({ at: path, reverse: true })) {
       if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
         return [n, p]
       }
@@ -293,7 +306,7 @@ class PathQueries {
    */
 
   getPreviousText(this: Editor, path: Path): TextEntry | undefined {
-    const [, prev] = this.texts({ path, reverse: true })
+    const [, prev] = this.texts({ at: path, reverse: true })
     return prev
   }
 

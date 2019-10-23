@@ -11,6 +11,13 @@ import { Mark, Point, PointKey, Range } from '..'
 interface Annotation extends Mark, Range {}
 
 /**
+ * `AnnotationEntry` objects are returned when iterating over `Annotation`
+ * objects in the top-level value.
+ */
+
+type AnnotationEntry = [Annotation, string]
+
+/**
  * `AnnotationPointEntry` objects are returned when iterating over `Point`
  * objects that belong to an `Annotation`.
  */
@@ -45,4 +52,4 @@ namespace Annotation {
   }
 }
 
-export { Annotation, AnnotationPointEntry }
+export { Annotation, AnnotationEntry, AnnotationPointEntry }

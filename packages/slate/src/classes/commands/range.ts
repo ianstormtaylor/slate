@@ -11,27 +11,6 @@ import {
 
 class RangeCommands {
   /**
-   * Add a set of marks to all of the spans of text in a range, splitting the individual
-   * text nodes if the range intersects them.
-   */
-
-  addMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
-    this.withoutNormalizing(() => {
-      const rangeRef = this.createRangeRef(range, { stick: 'inward' })
-      const [start, end] = Range.points(range)
-      this.splitNodeAtPoint(end, { always: false })
-      this.splitNodeAtPoint(start, { always: false })
-      range = rangeRef.unref()!
-
-      for (const [, path] of this.texts({ range })) {
-        for (const mark of marks) {
-          this.addMarkAtPath(path, mark)
-        }
-      }
-    })
-  }
-
-  /**
    * Delete the content in a range.
    */
 
@@ -66,16 +45,13 @@ class RangeCommands {
         endHeight = 0
       }
 
-      debugger
       this.splitNodeAtPoint(end, { height: Math.max(0, endHeight) })
       this.splitNodeAtPoint(start, { height: Math.max(0, startHeight) })
 
       const startIndex = startRef.unref()!.path[commonPath.length]
       const endIndex = endRef.unref()!.path[commonPath.length]
-      debugger
 
       for (let i = endIndex; i >= startIndex; i--) {
-        debugger
         this.removeNodeAtPath(commonPath.concat(i))
       }
 
@@ -86,9 +62,7 @@ class RangeCommands {
         return
       }
 
-      debugger
       const ancestor = Node.get(this.value, commonPath)
-      debugger
 
       if (
         (Value.isValue(ancestor) || Element.isElement(ancestor)) &&
@@ -96,24 +70,6 @@ class RangeCommands {
       ) {
         this.mergeBlockAtPath(afterPoint.path)
       }
-    })
-  }
-
-  /**
-   * Insert a block node at a range.
-   */
-
-  insertBlockAtRange(this: Editor, range: Range, block: Element): void {
-    this.withoutNormalizing(() => {
-      const [start] = Range.points(range)
-      const pointRef = this.createPointRef(start)
-
-      if (Range.isExpanded(range)) {
-        this.deleteAtRange(range)
-      }
-
-      this.insertBlockAtPoint(pointRef.current!, block)
-      pointRef.unref()
     })
   }
 
@@ -154,38 +110,6 @@ class RangeCommands {
   }
 
   /**
-   * Insert a string of text at a range.
-   */
-
-  insertTextAtRange(this: Editor, range: Range, text: string): void {
-    this.withoutNormalizing(() => {
-      const [start] = Range.points(range)
-      const pointRef = this.createPointRef(start)
-
-      if (Range.isExpanded(range)) {
-        this.deleteAtRange(range)
-      }
-
-      this.insertTextAtPoint(pointRef.current!, text)
-      pointRef.unref()
-    })
-  }
-
-  /**
-   * Remove a set of marks from all of the spans of text in a range.
-   */
-
-  removeMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
-    this.withoutNormalizing(() => {
-      for (const [, path] of this.texts({ range })) {
-        for (const mark of marks) {
-          this.removeMarkAtPath(path, mark)
-        }
-      }
-    })
-  }
-
-  /**
    * Set new properties on all of the leaf blocks in a range.
    */
 
@@ -206,7 +130,7 @@ class RangeCommands {
         range = this.getNonHangingRange(range)
       }
 
-      for (const [, path] of this.leafBlocks({ range })) {
+      for (const [, path] of this.leafBlocks({ at: range })) {
         this.setNodeAtPath(path, props)
       }
     })
@@ -233,7 +157,7 @@ class RangeCommands {
         range = this.getNonHangingRange(range)
       }
 
-      for (const [, path] of this.leafInlines({ range })) {
+      for (const [, path] of this.leafInlines({ at: range })) {
         this.setNodeAtPath(path, props)
       }
     })
@@ -260,7 +184,7 @@ class RangeCommands {
         range = this.getNonHangingRange(range)
       }
 
-      for (const [, path] of this.rootBlocks({ range })) {
+      for (const [, path] of this.rootBlocks({ at: range })) {
         this.setNodeAtPath(path, props)
       }
     })
@@ -287,7 +211,7 @@ class RangeCommands {
         range = this.getNonHangingRange(range)
       }
 
-      for (const [, path] of this.rootInlines({ range })) {
+      for (const [, path] of this.rootInlines({ at: range })) {
         this.setNodeAtPath(path, props)
       }
     })
@@ -344,33 +268,13 @@ class RangeCommands {
   }
 
   /**
-   * Toggle a mark on or off for all of the spans of text in a range.
-   */
-
-  toggleMarksAtRange(this: Editor, range: Range, marks: Mark[]): void {
-    this.withoutNormalizing(() => {
-      const rangeRef = this.createRangeRef(range, { stick: 'inward' })
-      const [start, end] = Range.points(range)
-      this.splitNodeAtPoint(end, { always: false })
-      this.splitNodeAtPoint(start, { always: false })
-      range = rangeRef.unref()!
-
-      for (const [, path] of this.texts({ range })) {
-        for (const mark of marks) {
-          this.toggleMarkAtPath(path, mark)
-        }
-      }
-    })
-  }
-
-  /**
    * Unwrap the block nodes in a range that match a set of properties.
    */
 
   unwrapBlockAtRange(this: Editor, range: Range, props: {}) {
     this.withoutNormalizing(() => {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [element, path] of this.blocks({ range, reverse: true })) {
+      for (const [element, path] of this.blocks({ at: range, reverse: true })) {
         if (Element.matches(element, props)) {
           this.pluckNodeAtPath(path)
         }
@@ -385,7 +289,10 @@ class RangeCommands {
   unwrapInlineAtRange(this: Editor, range: Range, props: {}) {
     this.withoutNormalizing(() => {
       // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [element, path] of this.inlines({ range, reverse: true })) {
+      for (const [element, path] of this.inlines({
+        at: range,
+        reverse: true,
+      })) {
         if (Element.matches(element, props)) {
           this.pluckNodeAtPath(path)
         }
@@ -437,7 +344,7 @@ class RangeCommands {
       range = rangeRef.current!
       const [start, end] = Range.points(range)
 
-      for (const [block, blockPath] of this.leafBlocks({ range })) {
+      for (const [block, blockPath] of this.leafBlocks({ at: range })) {
         const isStart = Path.isAncestor(blockPath, start.path)
         const isEnd = Path.isAncestor(blockPath, end.path)
         const startIndex = isStart ? start.path[blockPath.length] : 0

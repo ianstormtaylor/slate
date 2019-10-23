@@ -310,11 +310,7 @@ export function createValue(
     ...attributes,
   }
 
-  const selection: any = {
-    isFocused: false,
-    marks: null,
-  }
-
+  const selection: Partial<Range> = {}
   const partials: Record<string, [Path, number, AnnotationToken]> = {}
 
   // Search the document's texts to see if any of them have tokens associated
@@ -325,17 +321,13 @@ export function createValue(
     const anns = getAnnotationOffsets(node)
 
     if (anchor != null) {
-      const [offset, token] = anchor
+      const [offset] = anchor
       selection.anchor = { path, offset }
-      selection.isFocused = token.focused
-      selection.marks = token.marks
     }
 
     if (focus != null) {
-      const [offset, token] = focus
+      const [offset] = focus
       selection.focus = { path, offset }
-      selection.isFocused = token.focused
-      selection.marks = token.marks
     }
 
     for (const o in anns) {

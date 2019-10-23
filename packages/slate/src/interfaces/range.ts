@@ -27,23 +27,33 @@ namespace Range {
   }
 
   /**
-   * Check if a range includes a path or a point.
+   * Check if a range includes a path, a point or part of another range.
    */
 
-  export const includes = (range: Range, target: Path | Point): boolean => {
-    const [start, end] = Range.points(range)
-
-    if (Point.isPoint(target)) {
+  export const includes = (
+    range: Range,
+    target: Path | Point | Range
+  ): boolean => {
+    if (Range.isRange(target)) {
       return (
-        (Point.equals(target, start) || Point.isAfter(target, start)) &&
-        (Point.equals(target, end) || Point.isBefore(target, end))
-      )
-    } else {
-      return (
-        (Path.equals(target, start.path) || Path.isAfter(target, start.path)) &&
-        (Path.equals(target, end.path) || Path.isBefore(target, end.path))
+        Range.includes(range, target.anchor) ||
+        Range.includes(range, target.focus)
       )
     }
+
+    const [start, end] = Range.points(range)
+    let isAfterStart = false
+    let isBeforeEnd = false
+
+    if (Point.isPoint(target)) {
+      isAfterStart = Point.compare(target, start) >= 0
+      isBeforeEnd = Point.compare(target, end) <= 0
+    } else {
+      isAfterStart = Path.compare(target, start.path) >= 0
+      isBeforeEnd = Path.compare(target, end.path) <= 0
+    }
+
+    return isAfterStart && isBeforeEnd
   }
 
   /**

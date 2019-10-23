@@ -147,7 +147,6 @@ namespace Value {
           parent.nodes.splice(index, 1)
 
           for (const [point, key, range] of Value.points(v)) {
-            debugger
             range[key] = Point.transform(point, op)!
           }
 
@@ -212,8 +211,8 @@ namespace Value {
           const parent = Node.parent(v, path)
           const [, first] = Node.first(v, path)
           const [, last] = Node.last(v, path)
-          const [, prev] = Node.texts(v, { path: first, reverse: true })
-          const [, next] = Node.texts(v, { path: last })
+          const [, prev] = Node.texts(v, { at: first, reverse: true })
+          const [, next] = Node.texts(v, { at: last })
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
