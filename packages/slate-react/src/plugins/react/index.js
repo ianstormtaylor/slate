@@ -40,16 +40,17 @@ function ReactPlugin(options = {}) {
   // Disable placeholder for Android because it messes with reconciliation
   // and doesn't disappear until composition is complete.
   // e.g. In empty, type "h" and autocomplete on Android 9 and deletes all text.
-  const placeholderPlugin = IS_ANDROID || placeholder === null
-    ? null
-    : PlaceholderPlugin({
-        placeholder,
-        when: (editor, node) =>
-          node.object === 'document' &&
-          node.text === '' &&
-          node.nodes.size === 1 &&
-          Array.from(node.texts()).length === 1,
-      })
+  const placeholderPlugin =
+    IS_ANDROID || placeholder === null
+      ? null
+      : PlaceholderPlugin({
+          placeholder,
+          when: (editor, node) =>
+            node.object === 'document' &&
+            node.text === '' &&
+            node.nodes.size === 1 &&
+            Array.from(node.texts()).length === 1,
+        })
 
   return [
     debugEventsPlugin,
