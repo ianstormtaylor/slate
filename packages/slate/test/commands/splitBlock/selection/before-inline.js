@@ -8,27 +8,29 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <block>
-        word<link href="website.com">
-          <cursor />hyperlink
-        </inline>word
-      </block>
-    
+    <block>
+      word<inline>
+        <cursor />hyperlink
+      </inline>word
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        word<link href="website.com" />
-      </block>
-      <block>
-        <link href="website.com">
-          <cursor />hyperlink
-        </inline>word
-      </block>
-    
+    <block>
+      word
+      <inline>
+        <text />
+      </inline>
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline>
+        <cursor />hyperlink
+      </inline>
+      word
+    </block>
   </value>
 )

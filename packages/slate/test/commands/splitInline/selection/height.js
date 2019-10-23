@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitInline(1)
+  editor.splitInline({ height: 1 })
 }
 
 export const input = (
@@ -29,6 +29,10 @@ export const output = (
       <inline>
         <text />
         <inline>wo</inline>
+        <text />
+      </inline>
+      <text />
+      <inline>
         <text />
         <inline>
           <cursor />rd

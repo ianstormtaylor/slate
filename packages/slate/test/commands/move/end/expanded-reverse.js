@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveEnd({ reverse: true })
+  editor.move({ edge: 'end', reverse: true })
 }
 
 export const input = (

@@ -1,16 +1,19 @@
 /** @jsx h */
 
 import { h } from '../../../helpers'
-import { Inline } from 'slate'
 
 export const run = editor => {
-  editor.insertInline(Inline.create('emoji'))
+  editor.insertInline(
+    <inline void>
+      <text />
+    </inline>
+  )
 }
 
 export const input = (
   <value>
     <block>
-      wo<cursor />rd
+      <cursor />
     </block>
   </value>
 )
@@ -18,9 +21,11 @@ export const input = (
 export const output = (
   <value>
     <block>
-      wo<inline void>
+      <text />
+      <inline void>
         <cursor />
-      </inline>rd
+      </inline>
+      <text />
     </block>
   </value>
 )

@@ -3,15 +3,21 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertInline('emoji')
+  editor.insertInline(
+    <inline void>
+      <text />
+    </inline>
+  )
 }
 
 export const input = (
   <value>
     <block>
+      <text />
       <inline>
         wo<cursor />rd
       </inline>
+      <text />
     </block>
   </value>
 )
@@ -19,11 +25,15 @@ export const input = (
 export const output = (
   <value>
     <block>
+      <text />
       <inline>
-        wo<inline void>
+        wo
+        <inline void>
           <cursor />
-        </inline>rd
+        </inline>
+        rd
       </inline>
+      <text />
     </block>
   </value>
 )

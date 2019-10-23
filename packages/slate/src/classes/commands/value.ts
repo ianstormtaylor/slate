@@ -48,34 +48,36 @@ class ValueCommands {
         at = this.getRange(at)
       }
 
-      if (Range.isRange(at)) {
-        // Split the text nodes at the range's edges if necessary.
-        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-        const [start, end] = Range.points(at)
-        this.splitNodeAtPoint(end, { always: false })
-        this.splitNodeAtPoint(start, { always: false })
-        at = rangeRef.unref()!
+      if (!Range.isRange(at)) {
+        return
+      }
 
-        // De-dupe the marks being added to ensure the set is unique.
-        const set: Mark[] = []
+      // Split the text nodes at the range's edges if necessary.
+      const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+      const [start, end] = Range.points(at)
+      this.splitNodeAtPoint(end, { always: false })
+      this.splitNodeAtPoint(start, { always: false })
+      at = rangeRef.unref()!
 
-        for (const mark of marks) {
-          if (!Mark.exists(mark, set)) {
-            set.push(mark)
+      // De-dupe the marks being added to ensure the set is unique.
+      const set: Mark[] = []
+
+      for (const mark of marks) {
+        if (!Mark.exists(mark, set)) {
+          set.push(mark)
+        }
+      }
+
+      for (const [node, path] of this.texts({ at })) {
+        for (const mark of set) {
+          if (!Mark.exists(mark, node.marks)) {
+            this.apply({ type: 'add_mark', path, mark })
           }
         }
+      }
 
-        for (const [node, path] of this.texts({ at })) {
-          for (const mark of set) {
-            if (!Mark.exists(mark, node.marks)) {
-              this.apply({ type: 'add_mark', path, mark })
-            }
-          }
-        }
-
-        if (isSelection) {
-          this.select(at)
-        }
+      if (isSelection) {
+        this.select(at)
       }
     })
   }
@@ -297,13 +299,18 @@ class ValueCommands {
         at = point.path
       }
 
-      if (Path.isPath(at)) {
-        const [, blockPath] = this.getClosestBlock(at)!
-        const path = isAtEnd ? Path.next(blockPath) : blockPath
-        this.insertNodeAtPath(path, block)
+      if (!Path.isPath(at)) {
+        return
+      }
 
-        if (isSelection) {
-          const point = this.getStart(path)!
+      const [, blockPath] = this.getClosestBlock(at)!
+      const path = isAtEnd ? Path.next(blockPath) : blockPath
+      this.insertNodeAtPath(path, block)
+
+      if (isSelection) {
+        const point = this.getEnd(path)
+
+        if (point) {
           this.select(point)
         }
       }
@@ -332,18 +339,64 @@ class ValueCommands {
    * Insert an inline node at the cursor.
    */
 
-  insertInline(this: Editor, inline: Element) {
-    const { selection } = this.value
+  insertInline(
+    this: Editor,
+    inline: Element,
+    options: {
+      at?: Path | Point | Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      let { at } = options
+      let isSelection = false
+      let isAtEnd = false
 
-    if (selection == null) {
-      return
-    }
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
 
-    const [start] = Range.points(selection)
-    const pointRef = this.createPointRef(start)
-    this.insertInlineAtRange(selection, inline)
-    this.select(pointRef.current!)
-    pointRef.unref()
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
+
+      if (Range.isRange(at)) {
+        const [, end] = Range.points(at)
+        const pointRef = this.createPointRef(end)
+        this.delete({ at })
+        at = pointRef.unref()!
+      }
+
+      if (Point.isPoint(at)) {
+        isAtEnd = this.isAtEnd(at, at.path)
+        const pointRef = this.createPointRef(at)
+        this.splitNodeAtPoint(at, { always: false })
+        const point = pointRef.unref()!
+        at = point.path
+      }
+
+      if (!Path.isPath(at)) {
+        return
+      }
+
+      const [, blockPath] = this.getClosestBlock(at)!
+
+      if (this.getFurthestVoid(blockPath)) {
+        return
+      }
+
+      const path = isAtEnd ? Path.next(at) : at
+      this.insertNodeAtPath(path, inline)
+
+      if (isSelection) {
+        const point = this.getEnd(path)
+
+        if (point) {
+          this.select(point)
+        }
+      }
+    })
   }
 
   /**
@@ -641,21 +694,57 @@ class ValueCommands {
   splitBlock(
     this: Editor,
     options: {
+      at?: Point | Range
       always?: boolean
       height?: number
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
+      const { height = 0, always = true } = options
+      let { at } = options
+      let isSelection = false
 
-      if (selection == null) {
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
+
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
+
+      if (Range.isRange(at)) {
+        const [, end] = Range.points(at)
+        const pointRef = this.createPointRef(end)
+        this.delete({ at })
+        at = pointRef.unref()!
+      }
+
+      if (!Point.isPoint(at)) {
         return
       }
 
-      const [, end] = Range.points(selection)
-      const pointRef = this.createPointRef(end)
-      this.splitBlockAtRange(selection, options)
-      this.select(pointRef.current!)
+      const { path } = at
+      const closestBlock = this.getClosestBlock(path)
+      let totalHeight: number
+
+      if (closestBlock) {
+        const [, blockPath] = closestBlock
+        const relPath = Path.relative(path, blockPath)
+        totalHeight = relPath.length + height
+      } else {
+        totalHeight = path.length
+      }
+
+      const pointRef = this.createPointRef(at)
+      this.splitNodeAtPoint(at, { height: totalHeight, always })
+
+      if (isSelection) {
+        const point = pointRef.current!
+        this.select(point)
+      }
+
       pointRef.unref()
     })
   }
@@ -667,21 +756,61 @@ class ValueCommands {
   splitInline(
     this: Editor,
     options: {
+      at?: Point | Range
       always?: boolean
       height?: number
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
+      const { height = 0, always = true } = options
+      let { at } = options
+      let isSelection = false
 
-      if (selection == null) {
+      if (!at && selection) {
+        at = selection
+        isSelection = true
+      }
+
+      if (Range.isRange(at) && Range.isCollapsed(at)) {
+        at = at.anchor
+      }
+
+      if (Range.isRange(at)) {
+        const [, end] = Range.points(at)
+        const pointRef = this.createPointRef(end)
+        this.delete({ at })
+        at = pointRef.unref()!
+      }
+
+      if (!Point.isPoint(at)) {
         return
       }
 
-      const [, end] = Range.points(selection)
-      const pointRef = this.createPointRef(end)
-      this.splitInlineAtRange(selection, options)
-      this.select(pointRef.current!)
+      const { path } = at
+      const furthestInline = this.getFurthestInline(path)
+      let totalHeight: number
+
+      if (furthestInline) {
+        const [, furthestPath] = furthestInline
+        const furthestRelPath = Path.relative(path, furthestPath)
+        // Ensure that the height isn't higher than the furthest inline, since
+        // this command should never split any block nodes.
+        const h = Math.max(furthestRelPath.length, height)
+        totalHeight = h
+      } else {
+        // If there are no inline ancestors, just split the text node.
+        totalHeight = 0
+      }
+
+      const pointRef = this.createPointRef(at)
+      this.splitNodeAtPoint(at, { height: totalHeight, always })
+
+      if (isSelection) {
+        const point = pointRef.current!
+        this.select(point)
+      }
+
       pointRef.unref()
     })
   }

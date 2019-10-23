@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveAnchor({ distance: 3 })
+  editor.move({ edge: 'anchor', distance: 3 })
 }
 
 export const input = (

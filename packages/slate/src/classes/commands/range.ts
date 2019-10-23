@@ -11,69 +11,6 @@ import {
 
 class RangeCommands {
   /**
-   * Delete the content in a range.
-   */
-
-  deleteAtRange(
-    this: Editor,
-    range: Range,
-    options: {
-      amount?: number
-      unit?: 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
-      hanging?: boolean
-    } = {}
-  ): void {
-    if (Range.isCollapsed(range)) {
-      this.deleteAtPoint(range.anchor, options)
-      return
-    }
-
-    this.withoutNormalizing(() => {
-      const [start, end] = Range.points(range)
-      const beforeRef = this.createPointRef(start, { stick: 'backward' })
-      const startRef = this.createPointRef(start)
-      const endRef = this.createPointRef(end, { stick: 'backward' })
-      const afterRef = this.createPointRef(end)
-      let commonPath = Path.common(start.path, end.path)
-      let startHeight = start.path.length - commonPath.length - 1
-      let endHeight = end.path.length - commonPath.length - 1
-
-      if (Path.equals(start.path, end.path)) {
-        commonPath = Path.parent(commonPath)
-        startHeight = 0
-        endHeight = 0
-      }
-
-      this.splitNodeAtPoint(end, { height: Math.max(0, endHeight) })
-      this.splitNodeAtPoint(start, { height: Math.max(0, startHeight) })
-
-      const startIndex = startRef.unref()!.path[commonPath.length]
-      const endIndex = endRef.unref()!.path[commonPath.length]
-
-      for (let i = endIndex; i >= startIndex; i--) {
-        this.removeNodeAtPath(commonPath.concat(i))
-      }
-
-      const beforePoint = beforeRef.unref()
-      const afterPoint = afterRef.unref()
-
-      if (beforePoint == null || afterPoint == null) {
-        return
-      }
-
-      const ancestor = Node.get(this.value, commonPath)
-
-      if (
-        (Value.isValue(ancestor) || Element.isElement(ancestor)) &&
-        this.hasBlocks(ancestor)
-      ) {
-        this.mergeBlockAtPath(afterPoint.path)
-      }
-    })
-  }
-
-  /**
    * Insert a fragment of nodes at a range.
    */
 
@@ -87,24 +24,6 @@ class RangeCommands {
       }
 
       this.insertFragmentAtPoint(pointRef.current!, fragment)
-      pointRef.unref()
-    })
-  }
-
-  /**
-   * Insert an inline node at a range.
-   */
-
-  insertInlineAtRange(this: Editor, range: Range, inline: Element): void {
-    this.withoutNormalizing(() => {
-      const [start] = Range.points(range)
-      const pointRef = this.createPointRef(start)
-
-      if (Range.isExpanded(range)) {
-        this.deleteAtRange(range)
-      }
-
-      this.insertInlineAtPoint(pointRef.current!, inline)
       pointRef.unref()
     })
   }
@@ -214,56 +133,6 @@ class RangeCommands {
       for (const [, path] of this.rootInlines({ at: range })) {
         this.setNodeAtPath(path, props)
       }
-    })
-  }
-
-  /**
-   * Split the block at a range, up to a height.
-   */
-
-  splitBlockAtRange(
-    this: Editor,
-    range: Range,
-    options: {
-      always?: boolean
-      height?: number
-    } = {}
-  ) {
-    this.withoutNormalizing(() => {
-      const [, end] = Range.points(range)
-      const pointRef = this.createPointRef(end)
-
-      if (Range.isExpanded(range)) {
-        this.deleteAtRange(range)
-      }
-
-      const point = pointRef.unref()
-      this.splitBlockAtPoint(point!, options)
-    })
-  }
-
-  /**
-   * Split the inline at a range, up to a height.
-   */
-
-  splitInlineAtRange(
-    this: Editor,
-    range: Range,
-    options: {
-      always?: boolean
-      height?: number
-    } = {}
-  ) {
-    this.withoutNormalizing(() => {
-      const [, end] = Range.points(range)
-      const pointRef = this.createPointRef(end)
-
-      if (Range.isExpanded(range)) {
-        this.deleteAtRange(range)
-      }
-
-      const point = pointRef.unref()
-      this.splitInlineAtPoint(point!, options)
     })
   }
 

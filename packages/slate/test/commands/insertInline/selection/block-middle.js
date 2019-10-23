@@ -3,7 +3,11 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertInline('emoji')
+  editor.insertInline(
+    <inline void>
+      <text />
+    </inline>
+  )
 }
 
 export const input = (

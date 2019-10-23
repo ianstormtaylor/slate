@@ -3,37 +3,6 @@ import { Editor, Element, Fragment, Node, Path, Point, Range } from '../..'
 
 class PointCommands {
   /**
-   * Delete a span of content starting from a point.
-   */
-
-  deleteAtPoint(
-    this: Editor,
-    point: Point,
-    options: {
-      distance?: number
-      unit?: 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
-    } = {}
-  ): void {
-    const { reverse = false, unit = 'character', ...rest } = options
-    const furthestVoid = this.getFurthestVoid(point.path)
-
-    if (furthestVoid) {
-      const [, voidPath] = furthestVoid
-      this.removeNodeAtPath(voidPath)
-      return
-    }
-
-    const target = reverse
-      ? this.getPreviousPoint(point, { unit, ...rest })
-      : this.getNextPoint(point, { unit, ...rest })
-
-    if (target) {
-      this.deleteAtRange({ anchor: point, focus: target })
-    }
-  }
-
-  /**
    * Insert a fragment of nodes at a point.
    */
 
@@ -64,22 +33,6 @@ class PointCommands {
             this.mergeBlockAtPath(startPath)
           }
         }
-      }
-    })
-  }
-
-  /**
-   * Insert an inline node at a point.
-   */
-
-  insertInlineAtPoint(this: Editor, point: Point, inline: Element): void {
-    this.withoutNormalizing(() => {
-      const pointRef = this.createPointRef(point)
-      this.splitInlineAtPoint(point, { always: false })
-
-      if (pointRef.current != null) {
-        this.insertNodeAtPath(pointRef.current.path, inline)
-        pointRef.unref()
       }
     })
   }
@@ -122,66 +75,6 @@ class PointCommands {
     })
 
     return point
-  }
-
-  /**
-   * Split the block node at a specific point, up to a certain block height.
-   */
-
-  splitBlockAtPoint(
-    this: Editor,
-    point: Point,
-    options: {
-      always?: boolean
-      height?: number
-    } = {}
-  ): void {
-    const { height = 0, ...rest } = options
-    const { path } = point
-    const closestBlock = this.getClosestBlock(path)
-    let totalHeight: number
-
-    if (closestBlock) {
-      const [, blockPath] = closestBlock
-      const relPath = Path.relative(path, blockPath)
-      totalHeight = relPath.length + height
-    } else {
-      totalHeight = path.length
-    }
-
-    this.splitNodeAtPoint(point, { height: totalHeight, ...rest })
-  }
-
-  /**
-   * Split the inline node at a specific point, up to a certain inline height.
-   */
-
-  splitInlineAtPoint(
-    this: Editor,
-    point: Point,
-    options: {
-      always?: boolean
-      height?: number
-    } = {}
-  ): void {
-    const { height = 0, ...rest } = options
-    const { path } = point
-    const furthestInline = this.getFurthestInline(path)
-    let totalHeight: number
-
-    if (furthestInline) {
-      const [, furthestPath] = furthestInline
-      const furthestRelPath = Path.relative(path, furthestPath)
-      // Ensure that the height isn't higher than the furthest inline, since
-      // this command should never split any block nodes.
-      const h = Math.max(furthestRelPath.length, height)
-      totalHeight = h
-    } else {
-      // If there are no inline ancestors, just split the text node.
-      totalHeight = 0
-    }
-
-    this.splitNodeAtPoint(point, { height: totalHeight, ...rest })
   }
 
   /**

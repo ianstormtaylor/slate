@@ -3,7 +3,11 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertInline('emoji')
+  editor.insertInline(
+    <inline void>
+      <text />
+    </inline>
+  )
 }
 
 export const input = (
@@ -17,9 +21,11 @@ export const input = (
 export const output = (
   <value>
     <block>
+      <text />
       <inline void>
         <cursor />
-      </inline>word
+      </inline>
+      word
     </block>
   </value>
 )

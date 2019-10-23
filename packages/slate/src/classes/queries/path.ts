@@ -103,8 +103,14 @@ class PathQueries {
    */
 
   getFirstText(this: Editor, path: Path): TextEntry | undefined {
-    const [first] = this.texts({ at: path })
-    return first
+    const first = Node.first(this.value, path)
+
+    if (!first) {
+      return
+    }
+
+    const [n, p] = first
+    return Text.isText(n) ? [n, p] : undefined
   }
 
   /**
@@ -148,8 +154,14 @@ class PathQueries {
    */
 
   getLastText(this: Editor, path: Path): TextEntry | undefined {
-    const [last] = this.texts({ at: path, reverse: true })
-    return last
+    const last = Node.last(this.value, path)
+
+    if (!last) {
+      return
+    }
+
+    const [n, p] = last
+    return Text.isText(n) ? [n, p] : undefined
   }
 
   /**
