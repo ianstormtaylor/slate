@@ -27,7 +27,7 @@ class PathQueries {
     return Node.leaf(this.value, path)
   }
 
-  hasNode(this: Editor, path: Path): Node {
+  hasNode(this: Editor, path: Path): boolean {
     return Node.has(this.value, path)
   }
 

@@ -179,7 +179,7 @@ class NodeCommands {
       const endIndex = end.path[parentPath.length]
       const { length } = parent.nodes
 
-      if (length === 1) {
+      if (endIndex - startIndex + 1 === length) {
         this.pluckNodes({ at: parentPath })
       } else if (startIndex === 0) {
         this.moveNodes({ at, depth, to: parentPath })
@@ -248,12 +248,14 @@ class NodeCommands {
       const parentPath = commonPath.slice(0, depth - 1)
       const startIndex = start.path[parentPath.length]
       const endIndex = end.path[parentPath.length]
+      const toRef = this.createPathRef(to)
+      const parentRef = this.createPathRef(parentPath)
 
       for (let i = endIndex; i >= startIndex; i--) {
         this.apply({
           type: 'move_node',
-          path: parentPath.concat(i),
-          newPath: to,
+          path: parentRef.current!.concat(startIndex),
+          newPath: toRef.current!,
         })
       }
 
@@ -639,11 +641,7 @@ class NodeCommands {
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      let { at, match = () => true } = options
-
-      if (!at && selection) {
-        at = selection
-      }
+      let { at = selection, match = () => true } = options
 
       if (Path.isPath(at)) {
         const path = at
@@ -662,20 +660,25 @@ class NodeCommands {
         )
       }
 
-      const rangeRefs: RangeRef[] = []
+      if (!Range.isRange(at)) {
+        return
+      }
+
+      const matches: [RangeRef, number][] = []
 
       for (const [node, path] of this.elements({ at })) {
         if (match([node, path])) {
           const range = this.getRange(path)
           const intersection = Range.intersection(at, range)
           const rangeRef = this.createRangeRef(intersection)
-          rangeRefs.push(rangeRef)
+          const depth = path.length + 1
+          matches.push([rangeRef, depth])
         }
       }
 
-      for (const rangeRef of rangeRefs) {
+      for (const [rangeRef, depth] of matches) {
         if (rangeRef.current) {
-          this.liftNodes({ at: rangeRef.current })
+          this.liftNodes({ at: rangeRef.current, depth })
         }
 
         rangeRef.unref()
