@@ -9,8 +9,10 @@ import {
   RANGE_REFS,
 } from '../symbols'
 import AnnotationCommands from './commands/annotation'
+import TextCommands from './commands/text'
+import NodeCommands from './commands/node'
+import MarkCommands from './commands/mark'
 import PathCommands from './commands/path'
-import PointCommands from './commands/point'
 import RangeCommands from './commands/range'
 import SelectionCommands from './commands/selection'
 import ValueCommands from './commands/value'
@@ -76,8 +78,10 @@ class Editor {
 
 interface Editor
   extends AnnotationCommands,
+    TextCommands,
+    NodeCommands,
+    MarkCommands,
     PathCommands,
-    PointCommands,
     RangeCommands,
     SelectionCommands,
     ValueCommands,
@@ -100,8 +104,10 @@ const mixin = (Mixins: Array<new () => any>) => {
 
 mixin([
   AnnotationCommands,
+  TextCommands,
+  NodeCommands,
+  MarkCommands,
   PathCommands,
-  PointCommands,
   RangeCommands,
   SelectionCommands,
   ValueCommands,

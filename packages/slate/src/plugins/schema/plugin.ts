@@ -131,14 +131,20 @@ const SchemaPlugin = (
        * valid state if it is currently invalid.
        */
 
-      normalizeNodeAtPath(this: Editor, path: Path): void {
-        const node = Node.get(this.value, path)
+      normalizeNodeAtPath(this: Editor, options: { at?: Path } = {}): void {
+        const { at } = options
+
+        if (!Path.isPath(at)) {
+          return super.normalizeNodes(options)
+        }
+
+        const node = this.getNode(at)
         let error: SchemaError | undefined
         let rule: SchemaRule | undefined
 
         for (const r of rules) {
           if ('validate' in r) {
-            const e = checkNode(node, path, r.match, rules)
+            const e = checkNode(node, at, r.match, rules)
 
             if (e) {
               error = e
@@ -149,7 +155,7 @@ const SchemaPlugin = (
         }
 
         if (error == null) {
-          return super.normalizeNodeAtPath(path)
+          return super.normalizeNodes(options)
         }
 
         const prevLength = this.operations.length

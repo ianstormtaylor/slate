@@ -3,11 +3,8 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  debugger
   editor.insertText('a')
-  debugger
   editor.insertText('b')
-  debugger
 }
 
 export const input = (

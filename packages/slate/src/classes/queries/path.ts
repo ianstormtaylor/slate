@@ -19,12 +19,52 @@ class PathQueries {
     return Node.common(this.value, path, another)
   }
 
+  getParent(this: Editor, path: Path): Ancestor {
+    return Node.parent(this.value, path)
+  }
+
   getLeaf(this: Editor, path: Path): Text {
     return Node.leaf(this.value, path)
   }
 
+  hasNode(this: Editor, path: Path): Node {
+    return Node.has(this.value, path)
+  }
+
   getNode(this: Editor, path: Path): Node {
     return Node.get(this.value, path)
+  }
+
+  getHeight(this: Editor, path: Path, height: number | 'inline' | 'block') {
+    if (height === 'block') {
+      const closestBlock = this.getClosestBlock(path)
+
+      if (closestBlock) {
+        const [, blockPath] = closestBlock
+        const relPath = Path.relative(path, blockPath)
+        return relPath.length
+      } else {
+        return 0
+      }
+    }
+
+    if (height === 'inline') {
+      const furthestInline = this.getFurthestInline(path)
+
+      if (furthestInline) {
+        const [, inlinePath] = furthestInline
+        const relPath = Path.relative(path, inlinePath)
+        return relPath.length
+      } else {
+        return 0
+      }
+    }
+
+    if (height > path.length) {
+      height = path.length
+    }
+
+    return height
   }
 
   /**

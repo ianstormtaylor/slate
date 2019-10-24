@@ -68,6 +68,26 @@ class ValueQueries {
   }
 
   /**
+   * Iterate through all of the elements in the editor.
+   */
+
+  *elements(
+    this: Editor,
+    options: {
+      at?: Path | Range
+      reverse?: boolean
+      pass?: (entry: ElementEntry) => boolean
+    } = {}
+  ): Iterable<ElementEntry> {
+    const { pass = () => false } = options
+    yield* Node.elements(this.value, {
+      ...options,
+      pass: ([n, p]) =>
+        Element.isElement(n) && (this.isVoid(n) || pass([n, p])),
+    })
+  }
+
+  /**
    * Iterate through all of the nodes in the editor.
    */
 

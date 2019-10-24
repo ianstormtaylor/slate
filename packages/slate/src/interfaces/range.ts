@@ -15,6 +15,22 @@ interface Range {
 }
 
 namespace Range {
+  export const intersection = (range: Range, another: Range): Range => {
+    if (!Range.includes(range, another)) {
+      throw new Error(
+        `Cannot get the intersection of ranges ${JSON.stringify(
+          range
+        )} and ${JSON.stringify(another)} because they do not overlap.`
+      )
+    }
+
+    const [s1, e1] = Range.points(range)
+    const [s2, e2] = Range.points(another)
+    const start = Point.isBefore(s1, s2) ? s2 : s1
+    const end = Point.isBefore(e1, e2) ? e1 : e2
+    return { anchor: start, focus: end }
+  }
+
   /**
    * Check if a range is exactly equal to another.
    */
