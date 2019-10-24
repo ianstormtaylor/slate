@@ -127,40 +127,6 @@ class ValueCommands {
   }
 
   /**
-   * Unwrap the block nodes in the selection that match a set of properties.
-   */
-
-  unwrapBlock(this: Editor, props: {}): void {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    }
-
-    const rangeRef = this.createRangeRef(selection)
-    this.unwrapBlockAtRange(selection, props)
-    const range = rangeRef.unref()!
-    this.select(range)
-  }
-
-  /**
-   * Unwrap the inline nodes in the selection that match a set of properties.
-   */
-
-  unwrapInline(this: Editor, props: {}): void {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    }
-
-    const rangeRef = this.createRangeRef(selection)
-    this.unwrapInlineAtRange(selection, props)
-    const range = rangeRef.unref()!
-    this.select(range)
-  }
-
-  /**
    * Wrap the block nodes in the selection in a new block.
    */
 
@@ -192,35 +158,6 @@ class ValueCommands {
     this.wrapInlineAtRange(selection, inline)
     const range = rangeRef.unref()!
     this.select(range)
-  }
-
-  setValue(this: Editor, props: Partial<Value>) {
-    const { value } = this
-    const newProps = {}
-    const oldProps = {}
-
-    // Dedupe new and old properties to avoid unnecessary sets.
-    for (const k in props) {
-      if (k === 'annotations' || k === 'nodes' || k === 'selection') {
-        continue
-      }
-
-      if (props[k] !== value[k]) {
-        newProps[k] = props[k]
-        oldProps[k] = value[k]
-      }
-    }
-
-    // PERF: If no properties have changed don't apply an operation at all.
-    if (Object.keys(newProps).length === 0) {
-      return
-    }
-
-    this.apply({
-      type: 'set_value',
-      properties: oldProps,
-      newProperties: newProps,
-    })
   }
 }
 

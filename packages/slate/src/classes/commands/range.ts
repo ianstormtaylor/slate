@@ -11,39 +11,6 @@ import {
 
 class RangeCommands {
   /**
-   * Unwrap the block nodes in a range that match a set of properties.
-   */
-
-  unwrapBlockAtRange(this: Editor, range: Range, props: {}) {
-    this.withoutNormalizing(() => {
-      // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [element, path] of this.blocks({ at: range, reverse: true })) {
-        if (Element.matches(element, props)) {
-          this.pluckNodeAtPath(path)
-        }
-      }
-    })
-  }
-
-  /**
-   * Unwrap the inline nodes in a range that match a set of properties.
-   */
-
-  unwrapInlineAtRange(this: Editor, range: Range, props: {}) {
-    this.withoutNormalizing(() => {
-      // Iterate in reverse to ensure unwrapping doesn't affect path lookups.
-      for (const [element, path] of this.inlines({
-        at: range,
-        reverse: true,
-      })) {
-        if (Element.matches(element, props)) {
-          this.pluckNodeAtPath(path)
-        }
-      }
-    })
-  }
-
-  /**
    * Wrap the blocks in a range in a new block parent.
    */
 
