@@ -35,6 +35,22 @@ class PathQueries {
     return Node.get(this.value, path)
   }
 
+  getDepth(
+    this: Editor,
+    path: Path,
+    depth: 'block' | 'inline' | number | undefined
+  ): number {
+    if (depth === 'block') {
+      const closestBlock = this.getClosestBlock(path)
+      depth = closestBlock && closestBlock[1].length
+    } else if (depth === 'inline') {
+      const closestInline = this.getClosestInline(path)
+      depth = closestInline && closestInline[1].length
+    }
+
+    return depth == null || depth === -1 ? path.length : depth
+  }
+
   getHeight(this: Editor, path: Path, height: number | 'inline' | 'block') {
     if (height === 'block') {
       const closestBlock = this.getClosestBlock(path)
@@ -128,7 +144,7 @@ class PathQueries {
    * Get the end point of the node at path.
    */
 
-  getEnd(this: Editor, path: Path): Point | undefined {
+  getEnd(this: Editor, path: Path = []): Point | undefined {
     const last = this.getLastText(path)
 
     if (last) {
@@ -387,7 +403,7 @@ class PathQueries {
    * Get the start point of the node at path.
    */
 
-  getStart(this: Editor, path: Path): Point | undefined {
+  getStart(this: Editor, path: Path = []): Point | undefined {
     const first = this.getFirstText(path)
 
     if (first) {

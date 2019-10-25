@@ -3,20 +3,25 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ at: { path: [0, 0], offset: 2 }, depth: 1 })
+  editor.surroundNodes(<inline a />)
 }
 
 export const input = (
   <value>
     <block>
-      <text>word</text>
+      <cursor />word
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block>wo</block>
-    <block>rd</block>
+    <block>
+      <text />
+      <inline a>
+        <cursor />word
+      </inline>
+      <text />
+    </block>
   </value>
 )

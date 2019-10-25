@@ -16,7 +16,6 @@ interface Range {
 
 namespace Range {
   export const intersection = (range: Range, another: Range): Range => {
-    debugger
     if (!Range.includes(range, another)) {
       throw new Error(
         `Cannot get the intersection of ranges ${JSON.stringify(

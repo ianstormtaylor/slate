@@ -1,19 +1,6 @@
-import {
-  Value,
-  Editor,
-  Fragment,
-  Mark,
-  Node,
-  Element,
-  Path,
-  Range,
-} from '../..'
+import { Editor, Element, Path, Range } from '../..'
 
 class RangeCommands {
-  /**
-   * Wrap the blocks in a range in a new block parent.
-   */
-
   wrapBlockAtRange(this: Editor, range: Range, block: Element) {
     this.withoutNormalizing(() => {
       const [start] = Range.points(range)
@@ -39,10 +26,6 @@ class RangeCommands {
       }
     })
   }
-
-  /**
-   * Wrap the text and inline nodes in a range in a new inline parent.
-   */
 
   wrapInlineAtRange(this: Editor, range: Range, inline: Element) {
     this.withoutNormalizing(() => {

@@ -10,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  editor.mergeNodes({ at: [1] })
+  editor.mergeNodes({ at: [1, 0] })
 }
 
 export const output = (

@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ at: { path: [0, 1, 0], offset: 2 }, depth: 2 })
+  editor.splitNodes({ depth: 'block' })
 }
 
 export const input = (
@@ -11,7 +11,14 @@ export const input = (
     <block>
       <text />
       <inline>
-        <text>word</text>
+        wo<anchor />rd
+      </inline>
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline>
+        an<focus />other
       </inline>
       <text />
     </block>
@@ -22,14 +29,21 @@ export const output = (
   <value>
     <block>
       <text />
-      <inline>
-        <text>wo</text>
-      </inline>
+      <inline>wo</inline>
       <text />
       <inline>
-        <text>rd</text>
+        <text />
+      </inline>
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline>
+        <cursor />other
       </inline>
       <text />
     </block>
   </value>
 )
+
+export const skip = true

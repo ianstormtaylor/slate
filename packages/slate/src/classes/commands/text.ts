@@ -104,7 +104,7 @@ class DeletingCommands {
         }
 
         if (hasBlocks) {
-          this.mergeBlockAtPath(afterRef.current!.path)
+          this.mergeNodes({ at: afterRef.current!.path })
         }
 
         if (isSelection) {
@@ -153,7 +153,7 @@ class DeletingCommands {
       }
 
       const pointRef = this.createPointRef(at)
-      this.splitNodes({ at, height: 'block' })
+      this.splitNodes({ at, depth: 'block' })
 
       if (pointRef.current) {
         const [, insertPath] = this.getClosestBlock(pointRef.current.path)!
@@ -166,8 +166,8 @@ class DeletingCommands {
           const [, afterPath] = afterClosest
           const [, beforePath] = beforeClosest
           const startPath = Path.next(beforePath)
-          this.mergeBlockAtPath(afterPath)
-          this.mergeBlockAtPath(startPath)
+          this.mergeNodes({ at: afterPath })
+          this.mergeNodes({ at: startPath })
         }
       }
 

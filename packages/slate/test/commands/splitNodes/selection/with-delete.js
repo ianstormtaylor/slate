@@ -3,20 +3,24 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ at: { path: [0, 0], offset: 2 }, depth: 1 })
+  editor.splitNodes({ depth: 'block' })
 }
 
 export const input = (
   <value>
     <block>
-      <text>word</text>
+      w<anchor />or<focus />d
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block>wo</block>
-    <block>rd</block>
+    <block>w</block>
+    <block>
+      <cursor />d
+    </block>
   </value>
 )
+
+export const skip = true
