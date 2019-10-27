@@ -15,6 +15,7 @@ import MarkCommands from './commands/mark'
 import SelectionCommands from './commands/selection'
 import GeneralCommands from './commands/general'
 import ElementQueries from './queries/element'
+import LocationQueries from './queries/location'
 import PathQueries from './queries/path'
 import PointQueries from './queries/point'
 import RangeQueries from './queries/range'
@@ -81,6 +82,7 @@ interface Editor
     SelectionCommands,
     GeneralCommands,
     ElementQueries,
+    LocationQueries,
     PathQueries,
     PointQueries,
     RangeQueries,
@@ -104,6 +106,7 @@ mixin([
   SelectionCommands,
   GeneralCommands,
   ElementQueries,
+  LocationQueries,
   PathQueries,
   PointQueries,
   RangeQueries,

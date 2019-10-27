@@ -84,7 +84,7 @@ class NodeCommands {
         if (atMatch) {
           const [, matchPath] = atMatch
           const pathRef = this.createPathRef(matchPath)
-          const isAtEnd = this.isAtEnd(at, matchPath)
+          const isAtEnd = this.isEnd(at, matchPath)
           this.splitNodes({ at, match, always: false })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
@@ -148,8 +148,7 @@ class NodeCommands {
           )
         }
 
-        const parentPath = Path.parent(path)
-        const parent = this.getParent(path)
+        const [parent, parentPath] = this.getParent(path)
         const index = path[path.length - 1]
         const { length } = parent.nodes
 
@@ -360,7 +359,7 @@ class NodeCommands {
 
   normalizeNodes(this: Editor, options: { at: Path }): void {
     const { at } = options
-    const node = this.getNode(at)
+    const [node] = this.getNode(at)
 
     // There are no core normalizations for text nodes.
     if (Text.isText(node)) {
@@ -507,7 +506,7 @@ class NodeCommands {
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const node = this.getNode(path)
+        const [node] = this.getNode(path)
         this.apply({ type: 'remove_node', path, node })
       }
     })
@@ -637,12 +636,12 @@ class NodeCommands {
             !always &&
             edgeRef &&
             edgeRef.current &&
-            this.isAtEdge(edgeRef.current, p)
+            this.isEdge(edgeRef.current, p)
           ) {
             continue
           }
 
-          const node = this.getNode(p)
+          const [node] = this.getNode(p)
           const { text, marks, nodes, ...properties } = node
 
           this.apply({
@@ -682,16 +681,13 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { match = this.isInline(element) ? 'inline' : 'block' } = options
-      let { at } = options
+      const {
+        at = this.value.selection,
+        match = this.isInline(element) ? 'inline' : 'block',
+      } = options
 
       if (!at) {
-        if (selection) {
-          at = selection
-        } else {
-          return
-        }
+        return
       }
 
       const roots: NodeEntry[] = this.isInline(element)
@@ -699,6 +695,7 @@ class NodeCommands {
         : [[this.value, []]]
 
       for (const [, rootPath] of roots) {
+        debugger
         const a = Range.isRange(at)
           ? Range.intersection(at, this.getRange(rootPath))!
           : at

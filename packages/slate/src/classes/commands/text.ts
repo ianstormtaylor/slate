@@ -61,17 +61,8 @@ class DeletingCommands {
 
       if (Range.isRange(at)) {
         const [start, end] = Range.points(at)
-        const [common, commonPath] = this.getCommon(start.path, end.path)
-        let ancestorPath = commonPath
-        let ancestor = common
-        let d: number | 'text' = commonPath.length
-
-        if (Path.equals(start.path, end.path)) {
-          ancestorPath = Path.parent(commonPath)
-          ancestor = Node.get(this.value, ancestorPath)
-          d = 'text'
-        }
-
+        const [, ancestorPath] = this.getAncestor(at)
+        const d = Range.isCollapsed(at) ? 'text' : ancestorPath.length
         const rangeRef = this.createRangeRef(at, { stick: 'inward' })
         this.splitNodes({ at: end, match: d })
         this.splitNodes({ at: start, match: d })

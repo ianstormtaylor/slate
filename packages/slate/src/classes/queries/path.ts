@@ -1,40 +1,16 @@
 import {
-  Ancestor,
   Editor,
   Element,
   ElementEntry,
   Node,
-  NodeEntry,
-  Point,
   Path,
   PathRef,
-  Range,
   Text,
   TextEntry,
 } from '../..'
 import { PATH_REFS } from '../../symbols'
 
 class PathQueries {
-  getCommon(this: Editor, path: Path, another: Path): NodeEntry {
-    return Node.common(this.value, path, another)
-  }
-
-  getParent(this: Editor, path: Path): Ancestor {
-    return Node.parent(this.value, path)
-  }
-
-  getLeaf(this: Editor, path: Path): Text {
-    return Node.leaf(this.value, path)
-  }
-
-  hasNode(this: Editor, path: Path): boolean {
-    return Node.has(this.value, path)
-  }
-
-  getNode(this: Editor, path: Path): Node {
-    return Node.get(this.value, path)
-  }
-
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the this.
@@ -81,59 +57,6 @@ class PathQueries {
   }
 
   /**
-   * Get the closest void node entry at a path.
-   */
-
-  getClosestVoid(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.levels(this.value, path)) {
-      if (Element.isElement(n) && this.isVoid(n)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the end point of the node at path.
-   */
-
-  getEnd(this: Editor, path: Path = []): Point | undefined {
-    const last = this.getLastText(path)
-
-    if (last) {
-      const [node, path] = last
-      const point = { path, offset: node.text.length }
-      return point
-    }
-  }
-
-  /**
-   * Get the first text node from a node at path.
-   */
-
-  getFirstText(this: Editor, path: Path): TextEntry | undefined {
-    const first = Node.first(this.value, path)
-
-    if (!first) {
-      return
-    }
-
-    const [n, p] = first
-    return Text.isText(n) ? [n, p] : undefined
-  }
-
-  /**
-   * Get the furthest block node at a path.
-   */
-
-  getFurthestBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
-      if (Element.isElement(n) && !this.isInline(n)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
    * Get the furthest inline node entry at a path.
    */
 
@@ -155,30 +78,6 @@ class PathQueries {
         return [n, p]
       }
     }
-  }
-
-  /**
-   * Get the last text node from a node at path.
-   */
-
-  getLastText(this: Editor, path: Path): TextEntry | undefined {
-    const last = Node.last(this.value, path)
-
-    if (!last) {
-      return
-    }
-
-    const [n, p] = last
-    return Text.isText(n) ? [n, p] : undefined
-  }
-
-  /**
-   * Get the next text node entry starting from a path.
-   */
-
-  getNextText(this: Editor, path: Path): TextEntry | undefined {
-    const [, next] = this.texts({ from: path })
-    return next
   }
 
   /**
@@ -232,47 +131,6 @@ class PathQueries {
   getPreviousText(this: Editor, path: Path): TextEntry | undefined {
     const [, prev] = this.texts({ from: path, reverse: true })
     return prev
-  }
-
-  /**
-   * Get the full range of a node at path.
-   */
-
-  getRange(this: Editor, startPath: Path, endPath: Path = startPath): Range {
-    const first = this.getFirstText(startPath)
-    const last = this.getLastText(endPath)
-
-    if (!first) {
-      throw new Error(
-        `Unable to get a range for the node at path [${startPath}] because it has no text nodes.`
-      )
-    }
-
-    if (!last) {
-      throw new Error(
-        `Unable to get a range for the node at path [${endPath}] because it has no text nodes.`
-      )
-    }
-
-    const [, firstPath] = first
-    const [lastNode, lastPath] = last
-    const anchor = { path: firstPath, offset: 0 }
-    const focus = { path: lastPath, offset: lastNode.text.length }
-    return { anchor, focus }
-  }
-
-  /**
-   * Get the start point of the node at path.
-   */
-
-  getStart(this: Editor, path: Path = []): Point | undefined {
-    const first = this.getFirstText(path)
-
-    if (first) {
-      const [, path] = first
-      const point = { path, offset: 0 }
-      return point
-    }
   }
 
   /**

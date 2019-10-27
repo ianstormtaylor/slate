@@ -84,46 +84,6 @@ class PointQueries {
 
     return target
   }
-
-  /**
-   * Check if a point is at the start of a path.
-   */
-
-  isAtStart(this: Editor, point: Point, path: Path): boolean {
-    const first = this.getFirstText(path)
-
-    if (!first) {
-      return false
-    }
-
-    const [, firstPath] = first
-    return point.offset === 0 && Path.equals(point.path, firstPath)
-  }
-
-  /**
-   * Check if a point is at the end of a path.
-   */
-
-  isAtEnd(this: Editor, point: Point, path: Path): boolean {
-    const last = this.getLastText(path)
-
-    if (!last) {
-      return false
-    }
-
-    const [lastNode, lastPath] = last
-    return (
-      point.offset === lastNode.text.length && Path.equals(point.path, lastPath)
-    )
-  }
-
-  /**
-   * Check if a point is at either edge of a path.
-   */
-
-  isAtEdge(this: Editor, point: Point, path: Path): boolean {
-    return this.isAtStart(point, path) || this.isAtEnd(point, path)
-  }
 }
 
 export default PointQueries

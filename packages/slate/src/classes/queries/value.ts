@@ -118,6 +118,10 @@ class ValueQueries {
     yield* Node.levels(this.value, path, options)
   }
 
+  /**
+   * Get the matching node in a single branch of the document at a path.
+   */
+
   getMatch(this: Editor, path: Path, match: NodeMatch): NodeEntry | undefined {
     for (const entry of this.levels(path, { reverse: true })) {
       if (this.isMatch(entry, match)) {
@@ -130,7 +134,7 @@ class ValueQueries {
     this: Editor,
     options: {
       match: NodeMatch
-      at: Range | Point | Path
+      at: Location
       hanging?: boolean
       reverse?: boolean
     }
@@ -141,8 +145,7 @@ class ValueQueries {
 
     // PERF: If the target is a path, we don't need to traverse at all.
     if (Path.isPath(at)) {
-      const node = this.getNode(at)
-      yield [node, at]
+      yield this.getNode(at)
       return
     }
 
@@ -398,13 +401,7 @@ class ValueQueries {
         // Void nodes are a special case, since we don't want to iterate over
         // their content. We instead always just yield their first point.
         if (this.isVoid(node)) {
-          const first = this.getFirstText(path)
-
-          if (first) {
-            const [, firstPath] = first
-            yield { path: firstPath, offset: 0 }
-          }
-
+          yield this.getStart(path)
           continue
         }
 

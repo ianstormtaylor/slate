@@ -107,7 +107,7 @@ class RangeQueries {
 
     const [, startPath] = startClosest
     const [, endPath] = endClosest
-    return this.isAtStart(start, startPath) && this.isAtStart(end, endPath)
+    return this.isStart(start, startPath) && this.isStart(end, endPath)
   }
 
   /**
@@ -124,7 +124,7 @@ class RangeQueries {
 
     if (closestInline) {
       const [, endInlinePath] = closestInline
-      return this.isAtStart(end, endInlinePath)
+      return this.isStart(end, endInlinePath)
     } else {
       return end.offset === 0
     }
