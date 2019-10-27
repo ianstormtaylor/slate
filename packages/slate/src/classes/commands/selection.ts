@@ -1,4 +1,4 @@
-import { Editor, Point, Range } from '../..'
+import { Editor, Point, Range, Path } from '../..'
 
 class SelectionCommands {
   /**
@@ -105,14 +105,13 @@ class SelectionCommands {
    * Set the selection to a new value.
    */
 
-  select(this: Editor, target: Point | Range | Partial<Range>) {
+  select(this: Editor, target: Range | Point | Path) {
     const { selection } = this.value
 
     if (Point.isPoint(target)) {
-      target = {
-        anchor: target,
-        focus: target,
-      }
+      target = { anchor: target, focus: target }
+    } else if (Path.isPath(target)) {
+      target = this.getRange(target)
     }
 
     if (selection) {
@@ -185,7 +184,6 @@ class SelectionCommands {
       return
     }
 
-    // Remove any props that aren't different from the existing selection.
     for (const k in props) {
       if (
         (k === 'anchor' &&
@@ -201,16 +199,13 @@ class SelectionCommands {
       }
     }
 
-    // If nothing has changed, don't apply any operations.
-    if (Object.keys(oldProps).length === 0) {
-      return
+    if (Object.keys(oldProps).length > 0) {
+      this.apply({
+        type: 'set_selection',
+        properties: oldProps,
+        newProperties: newProps,
+      })
     }
-
-    this.apply({
-      type: 'set_selection',
-      properties: oldProps,
-      newProperties: newProps,
-    })
   }
 }
 

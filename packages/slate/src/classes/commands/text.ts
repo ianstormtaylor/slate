@@ -72,8 +72,8 @@ class DeletingCommands {
         }
 
         const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-        this.splitNodes({ at: end, depth: d })
-        this.splitNodes({ at: start, depth: d })
+        this.splitNodes({ at: end, match: d })
+        this.splitNodes({ at: start, match: d })
         at = rangeRef.unref()!
       }
 
@@ -150,7 +150,7 @@ class DeletingCommands {
       }
 
       const pointRef = this.createPointRef(at)
-      this.splitNodes({ at, depth: 'block' })
+      this.splitNodes({ at })
 
       if (pointRef.current) {
         const [, insertPath] = this.getClosestBlock(pointRef.current.path)!
@@ -195,15 +195,14 @@ class DeletingCommands {
         at = selection
       }
 
-      if (Range.isRange(at) && Range.isCollapsed(at)) {
-        at = at.anchor
-      }
-
       if (Range.isRange(at)) {
-        const [, end] = Range.points(at)
-        const pointRef = this.createPointRef(end)
-        this.delete({ at })
-        at = pointRef.unref()!
+        if (Range.isCollapsed(at)) {
+          at = at.anchor
+        } else {
+          const pointRef = this.createPointRef(Range.end(at))
+          this.delete({ at })
+          at = pointRef.unref()!
+        }
       }
 
       if (Point.isPoint(at) && !this.getFurthestVoid(at.path)) {

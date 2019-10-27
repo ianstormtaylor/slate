@@ -15,6 +15,16 @@ interface Range {
 }
 
 namespace Range {
+  export const start = (range: Range): Point => {
+    const [start] = Range.points(range)
+    return start
+  }
+
+  export const end = (range: Range): Point => {
+    const [, end] = Range.points(range)
+    return end
+  }
+
   export const intersection = (range: Range, another: Range): Range | null => {
     if (!Range.includes(range, another)) {
       return null

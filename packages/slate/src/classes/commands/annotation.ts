@@ -51,9 +51,7 @@ class AnnotationCommands {
     const annotation = annotations[key]
     const newProps = {}
     const prevProps = {}
-    let isChange = false
 
-    // Dedupe new and old properties to avoid unnecessary sets.
     for (const k in props) {
       const isPoint = k === 'anchor' || k === 'focus'
 
@@ -61,23 +59,19 @@ class AnnotationCommands {
         (isPoint && !Point.equals(props[k], annotation[k])) ||
         (!isPoint && props[k] !== annotation[k])
       ) {
-        isChange = true
         newProps[k] = props[k]
         prevProps[k] = annotation[k]
       }
     }
 
-    // If no properties have actually changed, don't apply an operation at all.
-    if (!isChange) {
-      return
+    if (Object.keys(newProps).length > 0) {
+      this.apply({
+        type: 'set_annotation',
+        key,
+        properties: prevProps,
+        newProperties: newProps,
+      })
     }
-
-    this.apply({
-      type: 'set_annotation',
-      key,
-      properties: prevProps,
-      newProperties: newProps,
-    })
   }
 }
 

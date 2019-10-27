@@ -1,6 +1,6 @@
 import { Editor, Mark, Path, Range } from '../..'
 
-class MarkingCommands {
+class MarkCommands {
   addMarks(
     this: Editor,
     marks: Mark[],
@@ -9,29 +9,19 @@ class MarkingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at } = options
-      let isSelection = false
+      let { at = this.value.selection } = options
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      }
+      if (!at) {
+        return
+      } else if (Range.isRange(at)) {
+        at = splitRange(this, at)
 
-      if (Path.isPath(at)) {
+        if (options.at == null) {
+          this.select(at)
+        }
+      } else if (Path.isPath(at)) {
         at = this.getRange(at)
       }
-
-      if (!Range.isRange(at)) {
-        return
-      }
-
-      // Split the text nodes at the range's edges if necessary.
-      const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-      const [start, end] = Range.points(at)
-      this.splitNodes({ at: end, always: false })
-      this.splitNodes({ at: start, always: false })
-      at = rangeRef.unref()!
 
       // De-dupe the marks being added to ensure the set is unique.
       const set: Mark[] = []
@@ -49,10 +39,6 @@ class MarkingCommands {
           }
         }
       }
-
-      if (isSelection) {
-        this.select(at)
-      }
     })
   }
 
@@ -64,34 +50,23 @@ class MarkingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at } = options
-      let isSelection = false
+      let { at = this.value.selection } = options
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      }
+      if (!at) {
+        return
+      } else if (Range.isRange(at)) {
+        at = splitRange(this, at)
 
-      if (Path.isPath(at)) {
+        if (options.at == null) {
+          this.select(at)
+        }
+      } else if (Path.isPath(at)) {
         at = this.getRange(at)
       }
 
-      if (Range.isRange(at)) {
-        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-        const [start, end] = Range.points(at)
-        this.splitNodes({ at: end, always: false })
-        this.splitNodes({ at: start, always: false })
-        at = rangeRef.unref()!
-
-        for (const [mark, i, node, path] of this.marks({ at })) {
-          if (Mark.exists(mark, marks)) {
-            this.apply({ type: 'remove_mark', path, mark })
-          }
-        }
-
-        if (isSelection) {
-          this.select(at)
+      for (const [mark, i, node, path] of this.marks({ at })) {
+        if (Mark.exists(mark, marks)) {
+          this.apply({ type: 'remove_mark', path, mark })
         }
       }
     })
@@ -106,36 +81,22 @@ class MarkingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at } = options
-      let isSelection = false
+      let { at = this.value.selection } = options
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      }
+      if (!at) {
+        return
+      } else if (Range.isRange(at)) {
+        at = splitRange(this, at)
 
-      // PERF: Do this before the path coercion logic since we're guaranteed not
-      // to need to split in that case.
-      if (Range.isRange(at)) {
-        // Split the text nodes at the range's edges if necessary.
-        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-        const [start, end] = Range.points(at)
-        this.splitNodes({ at: end, always: false })
-        this.splitNodes({ at: start, always: false })
-        at = rangeRef.unref()!
-      }
-
-      if (Path.isPath(at)) {
+        if (options.at == null) {
+          this.select(at)
+        }
+      } else if (Path.isPath(at)) {
         at = this.getRange(at)
       }
 
-      if (Range.isRange(at)) {
-        for (const [mark, i, node, path] of this.marks({ at })) {
-          if (!Mark.exists(mark, marks)) {
-            continue
-          }
-
+      for (const [mark, i, node, path] of this.marks({ at })) {
+        if (Mark.exists(mark, marks)) {
           const newProps = {}
 
           for (const k in props) {
@@ -144,21 +105,14 @@ class MarkingCommands {
             }
           }
 
-          // If no properties have changed don't apply an operation at all.
-          if (Object.keys(newProps).length === 0) {
-            continue
+          if (Object.keys(newProps).length > 0) {
+            this.apply({
+              type: 'set_mark',
+              path,
+              properties: mark,
+              newProperties: newProps,
+            })
           }
-
-          this.apply({
-            type: 'set_mark',
-            path,
-            properties: mark,
-            newProperties: newProps,
-          })
-        }
-
-        if (isSelection) {
-          this.select(at)
         }
       }
     })
@@ -172,17 +126,28 @@ class MarkingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { at } = options
-      const existing = this.getActiveMarks({ at })
+      const existing = this.getActiveMarks(options)
       const exists = marks.every(m => Mark.exists(m, existing))
 
       if (exists) {
-        this.removeMarks(marks, { at })
+        this.removeMarks(marks, options)
       } else {
-        this.addMarks(marks, { at })
+        this.addMarks(marks, options)
       }
     })
   }
 }
 
-export default MarkingCommands
+/**
+ * Split the text nodes at a range's edges to prepare for adding/removing marks.
+ */
+
+const splitRange = (editor: Editor, range: Range): Range => {
+  const rangeRef = editor.createRangeRef(range, { stick: 'inward' })
+  const [start, end] = Range.points(range)
+  editor.splitNodes({ at: end, match: 'text', always: false })
+  editor.splitNodes({ at: start, match: 'text', always: false })
+  return rangeRef.unref()!
+}
+
+export default MarkCommands

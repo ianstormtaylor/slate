@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertTextAtPoint({ path: [0, 0], offset: 0 }, 'a')
+  editor.insertText('x', { at: { path: [0, 0], offset: 0 } })
 }
 
 export const input = (
@@ -19,7 +19,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      awo<cursor />rd
+      xwo<cursor />rd
     </block>
   </value>
 )

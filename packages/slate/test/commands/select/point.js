@@ -1,15 +1,18 @@
 /** @jsx h */
 
-import { h } from '../../../helpers'
+import { h } from '../../helpers'
 
 export const run = editor => {
-  editor.setMarks([{ existing: true }], { key: true }, { at: [0, 0] })
+  editor.select({
+    path: [0, 0],
+    offset: 1,
+  })
 }
 
 export const input = (
   <value>
     <block>
-      <mark existing>word</mark>
+      <cursor />one
     </block>
   </value>
 )
@@ -17,9 +20,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <mark existing key>
-        word
-      </mark>
+      o<cursor />ne
     </block>
   </value>
 )
