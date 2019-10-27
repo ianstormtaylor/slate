@@ -4,6 +4,7 @@ import {
   Node,
   Fragment,
   Path,
+  Location,
   Range,
   Point,
   Value,
@@ -17,7 +18,7 @@ class DeletingCommands {
   delete(
     this: Editor,
     options: {
-      at?: Path | Point | Range
+      at?: Location
       distance?: number
       unit?: 'character' | 'word' | 'line' | 'block'
       reverse?: boolean

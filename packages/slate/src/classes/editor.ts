@@ -13,7 +13,7 @@ import TextCommands from './commands/text'
 import NodeCommands from './commands/node'
 import MarkCommands from './commands/mark'
 import SelectionCommands from './commands/selection'
-import ValueCommands from './commands/value'
+import GeneralCommands from './commands/general'
 import ElementQueries from './queries/element'
 import PathQueries from './queries/path'
 import PointQueries from './queries/point'
@@ -79,7 +79,7 @@ interface Editor
     NodeCommands,
     MarkCommands,
     SelectionCommands,
-    ValueCommands,
+    GeneralCommands,
     ElementQueries,
     PathQueries,
     PointQueries,
@@ -102,7 +102,7 @@ mixin([
   NodeCommands,
   MarkCommands,
   SelectionCommands,
-  ValueCommands,
+  GeneralCommands,
   ElementQueries,
   PathQueries,
   PointQueries,

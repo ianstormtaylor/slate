@@ -8,6 +8,7 @@ import {
   Range,
   Text,
   TextEntry,
+  Point,
   Value,
 } from '..'
 
@@ -175,7 +176,8 @@ namespace Node {
   export function* descendants(
     root: Node,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -198,7 +200,8 @@ namespace Node {
   export function* elements(
     root: Node,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -219,23 +222,32 @@ namespace Node {
   export function* entries(
     root: Node,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = [], reverse = false, pass = () => false } = options
-    let fromPath
+    const { at, from, pass, reverse = false } = options
+    let [, fromPath] = Node.first(root, [])
     let toPath
 
     if (Range.isRange(at)) {
       const [s, e] = Range.points(at)
       fromPath = reverse ? e.path : s.path
       toPath = reverse ? s.path : e.path
-    } else {
-      const [, f] = reverse ? Node.last(root, at) : Node.first(root, at)
+    } else if (Point.isPoint(at)) {
+      fromPath = toPath = at.path
+    } else if (Path.isPath(at)) {
+      const [, f] = Node.first(root, at)
+      const [, l] = Node.last(root, at)
+      fromPath = reverse ? l : f
+      toPath = reverse ? f : l
+    }
+
+    if (Path.isPath(from)) {
+      const [, f] = reverse ? Node.last(root, from) : Node.first(root, from)
       fromPath = f
-      toPath = null
     }
 
     const visited = new Set()
@@ -256,7 +268,7 @@ namespace Node {
         !visited.has(n) &&
         !Text.isText(n) &&
         n.nodes.length !== 0 &&
-        !pass([n, p])
+        (pass == null || pass([n, p]) === false)
       ) {
         visited.add(n)
         let nextIndex = reverse ? n.nodes.length - 1 : 0
@@ -500,7 +512,8 @@ namespace Node {
   export function* marks(
     root: Node,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -583,7 +596,8 @@ namespace Node {
   export function* texts(
     root: Node,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}

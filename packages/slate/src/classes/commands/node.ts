@@ -4,13 +4,12 @@ import {
   Node,
   NodeEntry,
   Element,
+  Location,
   Path,
   Text,
   Range,
   Point,
 } from '../..'
-
-type AtOption = Range | Point | Path
 
 type MatchOption =
   | number
@@ -30,7 +29,7 @@ class NodeCommands {
     this: Editor,
     nodes: Node | Node[],
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     } = {}
   ) {
@@ -125,7 +124,7 @@ class NodeCommands {
   liftNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     }
   ) {
@@ -176,7 +175,7 @@ class NodeCommands {
   mergeNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     } = {}
   ) {
@@ -306,7 +305,7 @@ class NodeCommands {
   moveNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
       to: Path
     }
@@ -448,7 +447,7 @@ class NodeCommands {
   uncoverNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     }
   ) {
@@ -486,7 +485,7 @@ class NodeCommands {
   removeNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     } = {}
   ) {
@@ -522,7 +521,7 @@ class NodeCommands {
     this: Editor,
     props: Partial<Node>,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
       hanging?: boolean
     } = {}
@@ -574,7 +573,7 @@ class NodeCommands {
   splitNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
       always?: boolean
       height?: number
@@ -678,7 +677,7 @@ class NodeCommands {
     this: Editor,
     element: Element,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     } = {}
   ) {
@@ -730,7 +729,7 @@ class NodeCommands {
   unwrapNodes(
     this: Editor,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     }
   ) {
@@ -765,7 +764,7 @@ class NodeCommands {
     this: Editor,
     element: Element,
     options: {
-      at?: AtOption
+      at?: Location
       match?: MatchOption
     } = {}
   ) {

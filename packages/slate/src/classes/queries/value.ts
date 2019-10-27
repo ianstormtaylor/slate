@@ -34,7 +34,7 @@ class ValueQueries {
   *annotations(
     this: Editor,
     options: {
-      at?: Path | Point | Range
+      at?: Range | Point | Path
     } = {}
   ): Iterable<AnnotationEntry> {
     const { annotations } = this.value
@@ -42,9 +42,7 @@ class ValueQueries {
 
     if (Path.isPath(at)) {
       at = this.getRange(at)
-    }
-
-    if (Point.isPoint(at)) {
+    } else if (Point.isPoint(at)) {
       at = { anchor: at, focus: at }
     }
 
@@ -66,7 +64,8 @@ class ValueQueries {
   *blocks(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -174,7 +173,6 @@ class ValueQueries {
     const { reverse, match, hanging = false } = options
     let { at } = options
     let prevPath: Path | undefined
-    let test = (entry: NodeEntry) => true
 
     // PERF: If the target is a path, we don't need to traverse at all.
     if (Path.isPath(at)) {
@@ -185,7 +183,9 @@ class ValueQueries {
 
     if (Point.isPoint(at)) {
       at = { anchor: at, focus: at }
-    } else if (!hanging) {
+    }
+
+    if (!hanging) {
       at = this.getNonHangingRange(at)
     }
 
@@ -208,7 +208,8 @@ class ValueQueries {
   *elements(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -225,7 +226,8 @@ class ValueQueries {
   *entries(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
@@ -252,18 +254,15 @@ class ValueQueries {
   getActiveMarks(
     this: Editor,
     options: {
-      at?: Path | Point | Range
+      at?: Range | Point | Path
       union?: boolean
     } = {}
   ): Mark[] {
     const { value } = this
-    const { selection } = this.value
-    let { at, union = false } = options
-    let isSelection = false
+    let { at = this.value.selection, union = false } = options
 
-    if (!at && selection) {
-      at = selection
-      isSelection = true
+    if (!at) {
+      return []
     }
 
     if (Path.isPath(at)) {
@@ -293,37 +292,34 @@ class ValueQueries {
 
     const marks: Mark[] = []
     let first = true
+    at = this.getNonHangingRange(at)
 
-    if (Range.isRange(at)) {
-      at = this.getNonHangingRange(at)
+    for (const [node] of this.texts({ at })) {
+      if (first) {
+        marks.push(...node.marks)
+        first = false
+        continue
+      }
 
-      for (const [node] of this.texts({ at })) {
-        if (first) {
-          marks.push(...node.marks)
-          first = false
-          continue
+      if (union) {
+        for (const mark of node.marks) {
+          if (!Mark.exists(mark, marks)) {
+            marks.push(mark)
+          }
+        }
+      } else {
+        // PERF: If we're doing an intersection and the result hits zero it can
+        // never increase again, so we can exit early.
+        if (marks.length === 0) {
+          break
         }
 
-        if (union) {
-          for (const mark of node.marks) {
-            if (!Mark.exists(mark, marks)) {
-              marks.push(mark)
-            }
-          }
-        } else {
-          // PERF: If we're doing an intersection and the result hits zero it can
-          // never increase again, so we can exit early.
-          if (marks.length === 0) {
-            break
-          }
+        // Iterate backwards so that removing marks doesn't impact indexing.
+        for (let i = marks.length - 1; i >= 0; i--) {
+          const existing = marks[i]
 
-          // Iterate backwards so that removing marks doesn't impact indexing.
-          for (let i = marks.length - 1; i >= 0; i--) {
-            const existing = marks[i]
-
-            if (!Mark.exists(existing, node.marks)) {
-              marks.splice(i, 1)
-            }
+          if (!Mark.exists(existing, node.marks)) {
+            marks.splice(i, 1)
           }
         }
       }
@@ -339,16 +335,12 @@ class ValueQueries {
   *inlines(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
-    const iterable = Node.elements(this.value, {
-      ...options,
-      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
-    })
-
-    for (const [n, p] of iterable) {
+    for (const [n, p] of this.elements(options)) {
       if (this.isInline(n)) {
         yield [n, p]
       }
@@ -362,7 +354,8 @@ class ValueQueries {
   *marks(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
@@ -395,7 +388,7 @@ class ValueQueries {
     const {
       unit = 'offset',
       reverse = false,
-      at = reverse ? this.getEnd([]) : this.getStart([]),
+      at = reverse ? this.getEnd() : this.getStart(),
     } = options
 
     if (at == null) {
@@ -507,7 +500,8 @@ class ValueQueries {
   *texts(
     this: Editor,
     options: {
-      at?: Path | Range
+      at?: Range | Point | Path
+      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {

@@ -246,8 +246,8 @@ namespace Value {
           const parent = Node.parent(v, path)
           const [, first] = Node.first(v, path)
           const [, last] = Node.last(v, path)
-          const [, prev] = Node.texts(v, { at: first, reverse: true })
-          const [, next] = Node.texts(v, { at: last })
+          const [, prev] = Node.texts(v, { from: first, reverse: true })
+          const [, next] = Node.texts(v, { from: last })
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the

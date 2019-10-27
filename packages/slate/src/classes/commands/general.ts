@@ -1,13 +1,4 @@
-import {
-  Change,
-  Operation,
-  Editor,
-  Element,
-  Node,
-  Path,
-  Text,
-  Value,
-} from '../..'
+import { Change, Operation, Editor, Node, Path, Text, Value } from '../..'
 import {
   DIRTY_PATHS,
   PATH_REFS,
@@ -17,7 +8,7 @@ import {
   NORMALIZING,
 } from '../../symbols'
 
-class ValueCommands {
+class GeneralCommands {
   apply(this: Editor, op: Operation): void {
     this.value = Value.transform(this.value, op)
     this.operations.push(op)
@@ -202,4 +193,4 @@ const getDirtyPaths = (op: Operation) => {
   }
 }
 
-export default ValueCommands
+export default GeneralCommands

@@ -35,57 +35,6 @@ class PathQueries {
     return Node.get(this.value, path)
   }
 
-  getDepth(
-    this: Editor,
-    path: Path,
-    depth: 'block' | 'inline' | 'text' | number | undefined
-  ): number {
-    if (depth === 'block') {
-      const closestBlock = this.getClosestBlock(path)
-      depth = closestBlock && closestBlock[1].length
-    } else if (depth === 'inline') {
-      const closestInline = this.getClosestInline(path)
-      depth = closestInline && closestInline[1].length
-    } else if (depth === 'text') {
-      const start = this.getStart(path)
-      depth = start && start.path.length
-    }
-
-    return depth == null ? path.length : depth
-  }
-
-  getHeight(this: Editor, path: Path, height: number | 'inline' | 'block') {
-    if (height === 'block') {
-      const closestBlock = this.getClosestBlock(path)
-
-      if (closestBlock) {
-        const [, blockPath] = closestBlock
-        const relPath = Path.relative(path, blockPath)
-        return relPath.length
-      } else {
-        return 0
-      }
-    }
-
-    if (height === 'inline') {
-      const furthestInline = this.getFurthestInline(path)
-
-      if (furthestInline) {
-        const [, inlinePath] = furthestInline
-        const relPath = Path.relative(path, inlinePath)
-        return relPath.length
-      } else {
-        return 0
-      }
-    }
-
-    if (height > path.length) {
-      height = path.length
-    }
-
-    return height
-  }
-
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the this.
@@ -228,7 +177,7 @@ class PathQueries {
    */
 
   getNextText(this: Editor, path: Path): TextEntry | undefined {
-    const [, next] = this.texts({ at: path })
+    const [, next] = this.texts({ from: path })
     return next
   }
 
@@ -281,7 +230,7 @@ class PathQueries {
    */
 
   getPreviousText(this: Editor, path: Path): TextEntry | undefined {
-    const [, prev] = this.texts({ at: path, reverse: true })
+    const [, prev] = this.texts({ from: path, reverse: true })
     return prev
   }
 

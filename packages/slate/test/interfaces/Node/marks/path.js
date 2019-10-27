@@ -13,7 +13,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.marks(value, { at: [0, 1] }))
+  return Array.from(Node.marks(value, { from: [0, 1] }))
 }
 
 export const output = [[{ key: 'b' }, 0, <mark key="b">two</mark>, [0, 1]]]

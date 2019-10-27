@@ -1,4 +1,4 @@
-import { Editor, Point, Range, Path } from '../..'
+import { Editor, Location, Point, Range, Path } from '../..'
 
 class SelectionCommands {
   /**
@@ -105,7 +105,7 @@ class SelectionCommands {
    * Set the selection to a new value.
    */
 
-  select(this: Editor, target: Range | Point | Path) {
+  select(this: Editor, target: Location) {
     const { selection } = this.value
 
     if (Point.isPoint(target)) {
