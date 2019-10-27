@@ -1,13 +1,4 @@
-import {
-  Editor,
-  Element,
-  ElementEntry,
-  Node,
-  Path,
-  PathRef,
-  Text,
-  TextEntry,
-} from '../..'
+import { Editor, Element, ElementEntry, Node, Path, PathRef, Text } from '../..'
 import { PATH_REFS } from '../../symbols'
 
 class PathQueries {
@@ -39,30 +30,6 @@ class PathQueries {
   getClosestBlock(this: Editor, path: Path): ElementEntry | undefined {
     for (const [n, p] of Node.levels(this.value, path)) {
       if (Element.isElement(n) && !this.isInline(n)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the closest inline node entry at a path.
-   */
-
-  getClosestInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.levels(this.value, path)) {
-      if (Element.isElement(n) && this.isInline(n)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the furthest inline node entry at a path.
-   */
-
-  getFurthestInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
-      if (Element.isElement(n) && this.isInline(n)) {
         return [n, p]
       }
     }
@@ -122,15 +89,6 @@ class PathQueries {
     const relOffset = this.getOffset(path, { depth: depth + 1 })
     o += relOffset
     return o
-  }
-
-  /**
-   * Get the previous text node entry starting from a path.
-   */
-
-  getPreviousText(this: Editor, path: Path): TextEntry | undefined {
-    const [, prev] = this.texts({ from: path, reverse: true })
-    return prev
   }
 
   /**

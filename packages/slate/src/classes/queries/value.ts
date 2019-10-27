@@ -122,7 +122,13 @@ class ValueQueries {
    * Get the matching node in a single branch of the document at a path.
    */
 
-  getMatch(this: Editor, path: Path, match: NodeMatch): NodeEntry | undefined {
+  getMatch(
+    this: Editor,
+    at: Location,
+    match: NodeMatch
+  ): NodeEntry | undefined {
+    const path = this.getPath(at)
+
     for (const entry of this.levels(path, { reverse: true })) {
       if (this.isMatch(entry, match)) {
         return entry

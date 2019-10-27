@@ -207,15 +207,14 @@ class NodeCommands {
       }
 
       for (const [node, path] of this.matches({ at, match })) {
-        const prevText = this.getPreviousText(path)
+        const prev = this.getPreviousPoint(path)
 
-        if (!prevText) {
+        if (!prev) {
           continue
         }
 
-        const [, prevTextPath] = prevText
         const prevMatcher = Path.isPath(at) ? at.length : match
-        const prevMatch = this.getMatch(prevTextPath, prevMatcher)
+        const prevMatch = this.getMatch(prev, prevMatcher)
 
         if (!prevMatch) {
           return
@@ -522,7 +521,6 @@ class NodeCommands {
     options: {
       at?: Location
       match?: MatchOption
-      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {

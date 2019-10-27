@@ -35,6 +35,55 @@ class LocationQueries {
   }
 
   /**
+   * Get the start and end points of a location.
+   */
+
+  getEdges(this: Editor, at: Location = []): [Point, Point] {
+    return [this.getStart(at), this.getEnd(at)]
+  }
+
+  /**
+   * Get the end point of a location.
+   */
+
+  getEnd(this: Editor, at: Location = []): Point {
+    return this.getPoint(at, { edge: 'end' })
+  }
+
+  /**
+   * Calculate the next point forward in the document from a starting point.
+   */
+
+  getNextPoint(
+    this: Editor,
+    at: Location,
+    options: {
+      distance?: number
+      edge?: 'start' | 'end'
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    at = this.getPoint(at, options)
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, at })) {
+      if (d > distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
+  }
+
+  /**
    * Get the node at a location.
    */
 
@@ -49,6 +98,32 @@ class LocationQueries {
     const path = this.getPath(at, options)
     const node = Node.get(this.value, path)
     return [node, path]
+  }
+
+  /**
+   * Get the relative offset to a node at a path in the document.
+   *
+   * Note: this ignores void nodes in calculating the offset, as their text
+   * content is presumed to be an empty string.
+   */
+
+  getOffset(this: Editor, at: Location = []): number {
+    const point = this.getPoint(at, { edge: 'start' })
+
+    if (this.isStart(point)) {
+      return 0
+    }
+
+    const start = this.getStart()
+    const end = this.getPreviousPoint(point)!
+    const range = { anchor: start, focus: end }
+    let offset = 0
+
+    for (const [node] of this.texts({ at: range })) {
+      offset += node.text.length
+    }
+
+    return offset
   }
 
   /**
@@ -164,6 +239,39 @@ class LocationQueries {
   }
 
   /**
+   * Calculate the previous point backward from a starting point.
+   */
+
+  getPreviousPoint(
+    this: Editor,
+    at: Location,
+    options: {
+      distance?: number
+      edge?: 'start' | 'end'
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    at = this.getPoint(at, options)
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, at, reverse: true })) {
+      if (d > distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
+  }
+
+  /**
    * Get a range of a location.
    */
 
@@ -221,27 +329,35 @@ class LocationQueries {
   }
 
   /**
-   * Get the start and end points of a location.
-   */
-
-  getEdges(this: Editor, at: Location = []): [Point, Point] {
-    return [this.getStart(at), this.getEnd(at)]
-  }
-
-  /**
-   * Get the end point of a location.
-   */
-
-  getEnd(this: Editor, at: Location = []): Point {
-    return this.getPoint(at, { edge: 'end' })
-  }
-
-  /**
    * Get the start point of a location.
    */
 
   getStart(this: Editor, at: Location = []): Point {
     return this.getPoint(at, { edge: 'start' })
+  }
+
+  /**
+   * Get the text content of a location.
+   *
+   * Note: the text of void nodes is presumed to be an empty string, regardless
+   * of what their actual content is.
+   */
+
+  getText(
+    this: Editor,
+    at: Location = [],
+    options: {
+      hanging?: boolean
+    } = {}
+  ): string {
+    const range = this.getRange(at, options)
+    let text = ''
+
+    for (const [node, path] of this.texts({ at: range })) {
+      text += node.text.length
+    }
+
+    return text
   }
 
   /**
@@ -265,7 +381,7 @@ class LocationQueries {
    * Check if a point the start point of a location.
    */
 
-  isStart(this: Editor, point: Point, at: Location): boolean {
+  isStart(this: Editor, point: Point, at: Location = []): boolean {
     // PERF: If the offset isn't `0` we know it's not the start.
     if (point.offset !== 0) {
       return false
@@ -279,7 +395,7 @@ class LocationQueries {
    * Check if a point is the end point of a location.
    */
 
-  isEnd(this: Editor, point: Point, at: Location): boolean {
+  isEnd(this: Editor, point: Point, at: Location = []): boolean {
     const end = this.getEnd(at)
     return Point.equals(point, end)
   }
@@ -288,7 +404,7 @@ class LocationQueries {
    * Check if a point is an edge of a location.
    */
 
-  isEdge(this: Editor, point: Point, at: Location): boolean {
+  isEdge(this: Editor, point: Point, at: Location = []): boolean {
     return this.isStart(point, at) || this.isEnd(point, at)
   }
 }
