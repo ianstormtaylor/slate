@@ -694,29 +694,37 @@ class NodeCommands {
         }
       }
 
-      for (const [, , matches] of this.batches({
-        element,
-        at,
-        match,
-      })) {
-        const [first] = matches
-        const last = matches[matches.length - 1]
-        const [, firstPath] = first
-        const [, lastPath] = last
-        const commonPath = Path.equals(firstPath, lastPath)
-          ? Path.parent(firstPath)
-          : Path.common(firstPath, lastPath)
+      const roots: NodeEntry[] = this.isInline(element)
+        ? Array.from(this.matches({ ...options, at, match: 'block' }))
+        : [[this.value, []]]
 
-        const range = this.getRange(firstPath, lastPath)
-        const depth = commonPath.length + 1
-        const wrapperPath = Path.next(lastPath).slice(0, depth)
-        const wrapper = { ...element, nodes: [] }
-        this.insertNodes(wrapper, { at: wrapperPath })
-        this.moveNodes({
-          at: range,
-          match: depth,
-          to: wrapperPath.concat(0),
-        })
+      for (const [, rootPath] of roots) {
+        const a = Range.isRange(at)
+          ? Range.intersection(at, this.getRange(rootPath))!
+          : at
+
+        const matches = Array.from(this.matches({ ...options, at: a, match }))
+
+        if (matches.length > 0) {
+          const [first] = matches
+          const last = matches[matches.length - 1]
+          const [, firstPath] = first
+          const [, lastPath] = last
+          const commonPath = Path.equals(firstPath, lastPath)
+            ? Path.parent(firstPath)
+            : Path.common(firstPath, lastPath)
+
+          const range = this.getRange(firstPath, lastPath)
+          const depth = commonPath.length + 1
+          const wrapperPath = Path.next(lastPath).slice(0, depth)
+          const wrapper = { ...element, nodes: [] }
+          this.insertNodes(wrapper, { at: wrapperPath })
+          this.moveNodes({
+            at: range,
+            match: depth,
+            to: wrapperPath.concat(0),
+          })
+        }
       }
     })
   }

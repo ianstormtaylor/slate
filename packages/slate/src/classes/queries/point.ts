@@ -1,12 +1,4 @@
-import {
-  Editor,
-  Node,
-  NodeEntry,
-  Operation,
-  Path,
-  Point,
-  PointRef,
-} from '../..'
+import { Editor, Path, Point, PointRef } from '../..'
 import { POINT_REFS } from '../../symbols'
 
 class PointQueries {

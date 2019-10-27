@@ -1,8 +1,6 @@
 import { produce } from 'immer'
-import { Editor, Path, Operation, Range, RangeRef } from '../..'
+import { Editor, Range, RangeRef } from '../..'
 import { RANGE_REFS } from '../../symbols'
-
-let rangeRefIds = 0
 
 class RangeQueries {
   /**

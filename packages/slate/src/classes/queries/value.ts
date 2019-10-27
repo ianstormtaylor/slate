@@ -6,6 +6,7 @@ import {
   ElementEntry,
   Mark,
   Node,
+  Location,
   NodeEntry,
   MarkEntry,
   Path,
@@ -34,7 +35,7 @@ class ValueQueries {
   *annotations(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
     } = {}
   ): Iterable<AnnotationEntry> {
     const { annotations } = this.value
@@ -64,7 +65,7 @@ class ValueQueries {
   *blocks(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}
@@ -74,42 +75,6 @@ class ValueQueries {
       pass: ([n]) =>
         Element.isElement(n) && (this.isVoid(n) || this.hasInlines(n)),
     })
-  }
-
-  *batches(
-    this: Editor,
-    options: {
-      element: Element
-      match: NodeMatch
-      at: Range | Point | Path
-      hanging?: boolean
-      reverse?: boolean
-    }
-  ): Iterable<[Node, Path, NodeEntry[]]> {
-    const { element, at, ...rest } = options
-    let roots: NodeEntry[] = []
-
-    if (this.isInline(element)) {
-      for (const [node, path] of this.blocks()) {
-        if (this.hasInlines(node)) {
-          roots.push([node, path])
-        }
-      }
-    } else {
-      roots.push([this.value, []])
-    }
-
-    for (const [node, path] of roots) {
-      const a = Range.isRange(at)
-        ? Range.intersection(at, this.getRange(path))!
-        : at
-
-      const matches = Array.from(this.matches({ at: a, ...rest }))
-
-      if (matches.length !== 0) {
-        yield [node, path, matches]
-      }
-    }
   }
 
   isMatch(this: Editor, entry: NodeEntry, match: NodeMatch) {
@@ -208,7 +173,7 @@ class ValueQueries {
   *elements(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}
@@ -226,7 +191,7 @@ class ValueQueries {
   *entries(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}
@@ -254,7 +219,7 @@ class ValueQueries {
   getActiveMarks(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       union?: boolean
     } = {}
   ): Mark[] {
@@ -335,7 +300,7 @@ class ValueQueries {
   *inlines(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}
@@ -354,7 +319,7 @@ class ValueQueries {
   *marks(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}
@@ -500,7 +465,7 @@ class ValueQueries {
   *texts(
     this: Editor,
     options: {
-      at?: Range | Point | Path
+      at?: Location
       from?: Path
       reverse?: boolean
     } = {}

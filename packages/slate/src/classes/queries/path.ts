@@ -274,6 +274,7 @@ class PathQueries {
       return point
     }
   }
+
   /**
    * Get the text content of a node at path.
    *
