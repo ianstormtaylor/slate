@@ -167,16 +167,54 @@ class LocationQueries {
    * Get a range of a location.
    */
 
-  getRange(this: Editor, at: Location = [], to: Location = at): Range {
+  getRange(
+    this: Editor,
+    at: Location = [],
+    options: {
+      to?: Location
+      hanging?: boolean
+    } = {}
+  ): Range {
+    const { to, hanging = false } = options
+
     if (Point.isPoint(at)) {
-      const end = this.getEnd(to)
-      return { anchor: at, focus: end }
+      const end = to ? this.getEnd(to) : at
+      at = { anchor: at, focus: end }
     }
 
     if (Path.isPath(at)) {
       const start = this.getStart(at)
-      const end = this.getEnd(to)
-      return { anchor: start, focus: end }
+      const end = this.getEnd(at || to)
+      at = { anchor: start, focus: end }
+    }
+
+    // PERF: exit early if we can guarantee that the range isn't hanging, or
+    // that they don't mind receiving hanging ranges.
+    if (
+      hanging ||
+      at.anchor.offset !== 0 ||
+      at.focus.offset !== 0 ||
+      Range.isCollapsed(at)
+    ) {
+      return at
+    }
+
+    let [start, end] = Range.points(at)
+    const closestBlock = this.getClosestBlock(end.path)
+    const blockPath = closestBlock ? closestBlock[1] : []
+    let skip = true
+
+    for (const [node, path] of this.texts({ from: end.path, reverse: true })) {
+      if (skip) {
+        skip = false
+        continue
+      }
+
+      if (node.text !== '' || Path.isBefore(path, blockPath)) {
+        const point = { path, offset: node.text.length }
+        at = { anchor: start, focus: point }
+        break
+      }
     }
 
     return at

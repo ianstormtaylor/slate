@@ -13,7 +13,14 @@ export const input = (
       <inline>
         <anchor />word
       </inline>
-      <focus />
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline>
+        <focus />another
+      </inline>
+      <text />
     </block>
   </value>
 )
@@ -25,7 +32,14 @@ export const output = (
       <inline key>
         <anchor />word
       </inline>
-      <focus />
+      <text key />
+    </block>
+    <block>
+      <text />
+      <inline>
+        <focus />another
+      </inline>
+      <text />
     </block>
   </value>
 )

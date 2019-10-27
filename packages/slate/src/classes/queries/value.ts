@@ -139,7 +139,7 @@ class ValueQueries {
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
-    const { reverse, match, hanging = false } = options
+    const { reverse, match, hanging } = options
     let { at } = options
     let prevPath: Path | undefined
 
@@ -149,13 +149,7 @@ class ValueQueries {
       return
     }
 
-    if (Point.isPoint(at)) {
-      at = { anchor: at, focus: at }
-    }
-
-    if (!hanging) {
-      at = this.getNonHangingRange(at)
-    }
+    at = this.getRange(at, { hanging })
 
     for (const [n, p] of this.entries({ at, reverse })) {
       if (prevPath && Path.compare(p, prevPath) === 0) {
@@ -226,41 +220,28 @@ class ValueQueries {
       union?: boolean
     } = {}
   ): Mark[] {
-    const { value } = this
-    let { at = this.value.selection, union = false } = options
+    const { union = false } = options
+    let { at = this.value.selection } = options
 
     if (!at) {
       return []
     }
 
-    if (Path.isPath(at)) {
-      at = this.getRange(at)
-    }
+    at = this.getRange(at)
 
-    if (Range.isRange(at) && Range.isCollapsed(at)) {
-      at = at.anchor
-    }
+    // If the range is collapsed at the start of a text node, it should carry
+    // over the marks from the previous text node in the same block.
+    if (Range.isCollapsed(at) && this.isStart(at.anchor, at.anchor.path)) {
+      const prevPath = Path.previous(at.anchor.path)
+      const [prevNode] = this.getNode(prevPath)
 
-    if (Point.isPoint(at)) {
-      let { path, offset } = at
-
-      // If the range is collapsed at the start of a text node, it should carry
-      // over the marks from the previous text node in the same block.
-      if (offset === 0 && path[path.length - 1] !== 0) {
-        const prevPath = Path.previous(path)
-        const prevNode = Node.get(value, prevPath)
-
-        if (Text.isText(prevNode)) {
-          path = prevPath
-        }
+      if (Text.isText(prevNode)) {
+        at = this.getRange(prevPath)
       }
-
-      at = this.getRange(path)
     }
 
     const marks: Mark[] = []
     let first = true
-    at = this.getNonHangingRange(at)
 
     for (const [node] of this.texts({ at })) {
       if (first) {

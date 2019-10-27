@@ -695,7 +695,6 @@ class NodeCommands {
         : [[this.value, []]]
 
       for (const [, rootPath] of roots) {
-        debugger
         const a = Range.isRange(at)
           ? Range.intersection(at, this.getRange(rootPath))!
           : at

@@ -113,7 +113,6 @@ namespace Value {
    */
 
   export const transform = (value: Value, op: Operation): Value => {
-    debugger
     return produce(value, v => {
       switch (op.type) {
         case 'add_annotation': {
