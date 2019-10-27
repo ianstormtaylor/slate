@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.surroundNodes(<inline a />)
+  editor.coverNodes(<block a />)
 }
 
 export const input = (
@@ -27,27 +27,21 @@ export const input = (
 
 export const output = (
   <value>
-    <block>
-      <text />
-      <inline a>
+    <block a>
+      <block>
         <text />
         <inline>
           wo<anchor />rd
         </inline>
         <text />
-      </inline>
-      <text />
-    </block>
-    <block>
-      <text />
-      <inline a>
+      </block>
+      <block>
         <text />
         <inline>
           an<focus />other
         </inline>
         <text />
-      </inline>
-      <text />
+      </block>
     </block>
   </value>
 )

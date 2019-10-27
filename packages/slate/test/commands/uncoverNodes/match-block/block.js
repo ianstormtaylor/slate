@@ -3,13 +3,15 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.surroundNodes(<inline a />)
+  editor.uncoverNodes({ match: { key: 'a' } })
 }
 
 export const input = (
   <value>
-    <block>
-      <cursor />word
+    <block key="a">
+      <block>
+        <cursor />word
+      </block>
     </block>
   </value>
 )
@@ -17,11 +19,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <text />
-      <inline a>
-        <cursor />word
-      </inline>
-      <text />
+      <cursor />word
     </block>
   </value>
 )

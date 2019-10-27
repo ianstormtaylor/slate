@@ -3,12 +3,12 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.pluckNodes({ match: { key: 'a' } })
+  editor.coverNodes(<block a />)
 }
 
 export const input = (
   <value>
-    <block key="a">
+    <block>
       <block>
         wo<anchor />rd
       </block>
@@ -22,10 +22,14 @@ export const input = (
 export const output = (
   <value>
     <block>
-      wo<anchor />rd
-    </block>
-    <block>
-      an<focus />other
+      <block a>
+        <block>
+          wo<anchor />rd
+        </block>
+        <block>
+          an<focus />other
+        </block>
+      </block>
     </block>
   </value>
 )

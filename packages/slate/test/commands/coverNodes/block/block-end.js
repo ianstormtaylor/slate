@@ -15,7 +15,7 @@ export const input = (
 )
 
 export const run = editor => {
-  editor.surroundNodes(<block a />)
+  editor.coverNodes(<block a />)
 }
 
 export const output = (

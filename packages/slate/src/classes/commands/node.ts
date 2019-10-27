@@ -155,7 +155,7 @@ class NodeCommands {
         const { length } = parent.nodes
 
         if (length === 1) {
-          this.pluckNodes({ at: parentPath })
+          this.uncoverNodes({ at: parentPath })
         } else if (index === 0) {
           this.moveNodes({ at: path, to: parentPath })
         } else if (index === length - 1) {
@@ -445,7 +445,7 @@ class NodeCommands {
    * Remove a node at a specific location, replacing it with its children.
    */
 
-  pluckNodes(
+  uncoverNodes(
     this: Editor,
     options: {
       at?: AtOption
@@ -674,7 +674,7 @@ class NodeCommands {
    * Surround the nodes at a location with a new parent node.
    */
 
-  surroundNodes(
+  coverNodes(
     this: Editor,
     element: Element,
     options: {
@@ -791,7 +791,7 @@ class NodeCommands {
         }
       }
 
-      this.surroundNodes(element, { at, match })
+      this.coverNodes(element, { at, match })
 
       if (rangeRef) {
         rangeRef.unref()

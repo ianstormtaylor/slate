@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.pluckNodes({ match: { key: 'a' } })
+  editor.uncoverNodes({ match: { key: 'a' } })
 }
 
 export const input = (

@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.pluckNodes({ at: [0] })
+  editor.uncoverNodes({ at: [0] })
 }
 
 export const input = (

@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.surroundNodes(<block new />)
+  editor.coverNodes(<block new />)
 }
 
 export const input = (
