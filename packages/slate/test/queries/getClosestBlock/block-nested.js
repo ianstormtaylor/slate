@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getClosestBlock([0, 0, 0])
+  return editor.getMatch([0, 0, 0], 'block')
 }
 
 export const output = [<block>one</block>, [0, 0]]

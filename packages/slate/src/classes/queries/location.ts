@@ -101,32 +101,6 @@ class LocationQueries {
   }
 
   /**
-   * Get the relative offset to a node at a path in the document.
-   *
-   * Note: this ignores void nodes in calculating the offset, as their text
-   * content is presumed to be an empty string.
-   */
-
-  getOffset(this: Editor, at: Location = []): number {
-    const point = this.getPoint(at, { edge: 'start' })
-
-    if (this.isStart(point)) {
-      return 0
-    }
-
-    const start = this.getStart()
-    const end = this.getPreviousPoint(point)!
-    const range = { anchor: start, focus: end }
-    let offset = 0
-
-    for (const [node] of this.texts({ at: range })) {
-      offset += node.text.length
-    }
-
-    return offset
-  }
-
-  /**
    * Get the parent node of a location.
    */
 
@@ -308,7 +282,7 @@ class LocationQueries {
     }
 
     let [start, end] = Range.edges(at)
-    const closestBlock = this.getClosestBlock(end.path)
+    const closestBlock = this.getMatch(end.path, 'block')
     const blockPath = closestBlock ? closestBlock[1] : []
     let skip = true
 
@@ -343,17 +317,11 @@ class LocationQueries {
    * of what their actual content is.
    */
 
-  getText(
-    this: Editor,
-    at: Location = [],
-    options: {
-      hanging?: boolean
-    } = {}
-  ): string {
-    const range = this.getRange(at, options)
+  getText(this: Editor, at: Location = []): string {
+    const range = this.getRange(at)
     let text = ''
 
-    for (const [node, path] of this.texts({ at: range })) {
+    for (const [node] of this.texts({ at: range })) {
       text += node.text.length
     }
 

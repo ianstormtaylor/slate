@@ -229,7 +229,7 @@ namespace Node {
     } = {}
   ): Iterable<NodeEntry> {
     const { at, from, pass, reverse = false } = options
-    let [, fromPath] = Node.first(root, [])
+    let [, fromPath] = reverse ? Node.last(root, []) : Node.first(root, [])
     let toPath
 
     if (Range.isRange(at)) {
@@ -524,36 +524,6 @@ namespace Node {
         yield [mark, i, node, path]
       }
     }
-  }
-
-  /**
-   * Calculate the string offset of all the nodes before a node at a given path.
-   */
-
-  export const offset = (root: Node, path: Path): number => {
-    // PERF: We can exit early if the path is empty.
-    if (path.length === 0) {
-      return 0
-    }
-
-    if (Text.isText(root)) {
-      throw new Error(
-        `Cannot get the offset into a root text node: ${JSON.stringify(root)}`
-      )
-    }
-
-    const [index] = path
-    const befores = root.nodes.slice(0, index)
-    let o = 0
-
-    for (const node of befores) {
-      o += Node.text(node).length
-    }
-
-    const child = Node.child(root, index)
-    const relPath = Path.relative(path, [index])
-    o += Node.offset(child, relPath)
-    return o
   }
 
   /**

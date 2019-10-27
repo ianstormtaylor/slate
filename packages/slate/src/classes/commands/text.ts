@@ -42,7 +42,7 @@ class DeletingCommands {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = this.getFurthestVoid(at.path)
+        const furthestVoid = this.getMatch(at.path, 'void')
 
         if (furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -137,7 +137,7 @@ class DeletingCommands {
         at = pointRef.unref()!
       }
 
-      if (!Point.isPoint(at) || this.getFurthestVoid(at.path)) {
+      if (!Point.isPoint(at) || this.getMatch(at.path, 'void')) {
         return
       }
 
@@ -145,11 +145,11 @@ class DeletingCommands {
       this.splitNodes({ at })
 
       if (pointRef.current) {
-        const [, insertPath] = this.getClosestBlock(pointRef.current.path)!
+        const [, insertPath] = this.getMatch(pointRef.current.path, 'block')!
         this.insertNodes(fragment.nodes, { at: insertPath })
 
-        const afterClosest = this.getClosestBlock(pointRef.current.path)
-        const beforeClosest = this.getClosestBlock(at.path)
+        const afterClosest = this.getMatch(pointRef.current.path, 'block')
+        const beforeClosest = this.getMatch(at.path, 'block')
 
         if (afterClosest && beforeClosest) {
           const [, afterPath] = afterClosest
@@ -197,7 +197,7 @@ class DeletingCommands {
         }
       }
 
-      if (Point.isPoint(at) && !this.getFurthestVoid(at.path)) {
+      if (Point.isPoint(at) && !this.getMatch(at.path, 'void')) {
         const { path, offset } = at
         this.apply({ type: 'insert_text', path, offset, text })
       }

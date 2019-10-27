@@ -17,6 +17,7 @@ type MatchOption =
   | 'block'
   | 'inline'
   | 'text'
+  | 'void'
   | Partial<Node>
   | ((entry: NodeEntry) => boolean)
 
@@ -61,7 +62,7 @@ class NodeCommands {
 
       // By default, use the selection as the target location. But if there is
       // no selection, insert at the end of the document since that is such a
-      // common use case when inserting from a non-focused state.
+      // common use case when inserting from a non-selected state.
       if (!at) {
         at = selection || this.getEnd() || [this.value.nodes.length]
         select = true
@@ -96,7 +97,7 @@ class NodeCommands {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (this.getFurthestVoid(parentPath)) {
+      if (this.getMatch(parentPath, 'void')) {
         return
       }
 
@@ -129,8 +130,7 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { at = selection, match = 'block' } = options
+      const { at = this.value.selection, match = 'block' } = options
 
       if (!at) {
         return
@@ -311,15 +311,8 @@ class NodeCommands {
     this.withoutNormalizing(() => {
       const { selection } = this.value
       const { to, match = 'block' } = options
-      const newIndex = to[to.length - 1]
       let { at } = options
       let selectRef
-
-      if (newIndex > 0 && !this.hasNode(Path.previous(to))) {
-        throw new Error(
-          `Cannot move nodes to new path [${to}] because the index is out of range.`
-        )
-      }
 
       if (!at) {
         if (selection) {
@@ -450,16 +443,10 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { match = 'block' } = options
-      let { at } = options
+      const { at = this.value.selection, match = 'block' } = options
 
       if (!at) {
-        if (selection) {
-          at = selection
-        } else {
-          return
-        }
+        return
       }
 
       const matches = this.matches({ at, match })
@@ -488,16 +475,10 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { match = 'block' } = options
-      let { at } = options
+      const { at = this.value.selection, match = 'block' } = options
 
       if (!at) {
-        if (selection) {
-          at = selection
-        } else {
-          return
-        }
+        return
       }
 
       const depths = this.matches({ at, match })

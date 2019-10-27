@@ -24,6 +24,7 @@ type NodeMatch =
   | 'block'
   | 'inline'
   | 'text'
+  | 'void'
   | Partial<Node>
   | ((entry: NodeEntry) => boolean)
 
@@ -96,6 +97,8 @@ class ValueQueries {
       return (
         Element.isElement(node) && !this.isInline(node) && this.hasInlines(node)
       )
+    } else if (match === 'void') {
+      return Element.isElement(node) && this.isVoid(node)
     } else {
       return Node.matches(node, match)
     }
@@ -108,14 +111,22 @@ class ValueQueries {
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
-    const furthestVoid = this.getFurthestVoid(path)
+    const { reverse = false } = options
+    const levels: NodeEntry[] = []
 
-    if (furthestVoid) {
-      const [, voidPath] = furthestVoid
-      path = voidPath
+    for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
+      levels.push([n, p])
+
+      if (Element.isElement(n) && this.isVoid(n)) {
+        break
+      }
     }
 
-    yield* Node.levels(this.value, path, options)
+    if (reverse === false) {
+      levels.reverse()
+    }
+
+    yield* levels
   }
 
   /**
@@ -346,7 +357,7 @@ class ValueQueries {
       at = reverse ? this.getEnd() : this.getStart(),
     } = options
 
-    if (at == null) {
+    if (!at) {
       return
     }
 
@@ -380,10 +391,7 @@ class ValueQueries {
       distance = available >= 0 ? null : 0 - available
     }
 
-    for (const [node, path] of this.entries({
-      at: at.path,
-      reverse,
-    })) {
+    for (const [node, path] of this.entries({ at, reverse })) {
       if (Element.isElement(node)) {
         // Void nodes are a special case, since we don't want to iterate over
         // their content. We instead always just yield their first point.
@@ -396,7 +404,16 @@ class ValueQueries {
           let text = this.getText(path)
 
           if (Path.isAncestor(path, at.path)) {
-            const before = this.getOffset(at.path, { depth: path.length })
+            let before = 0
+
+            for (const [n, p] of this.texts({ from: path })) {
+              if (Path.equals(p, at.path)) {
+                break
+              }
+
+              before += n.text.length
+            }
+
             const o = before + at.offset
             text = reverse ? text.slice(0, o) : text.slice(o)
           }

@@ -15,10 +15,8 @@ import MarkCommands from './commands/mark'
 import SelectionCommands from './commands/selection'
 import GeneralCommands from './commands/general'
 import ElementQueries from './queries/element'
+import GeneralQueries from './queries/general'
 import LocationQueries from './queries/location'
-import PathQueries from './queries/path'
-import PointQueries from './queries/point'
-import RangeQueries from './queries/range'
 import ValueQueries from './queries/value'
 
 /**
@@ -82,10 +80,8 @@ interface Editor
     SelectionCommands,
     GeneralCommands,
     ElementQueries,
+    GeneralQueries,
     LocationQueries,
-    PathQueries,
-    PointQueries,
-    RangeQueries,
     ValueQueries {}
 
 const mixin = (Mixins: Array<new () => any>) => {
@@ -106,10 +102,8 @@ mixin([
   SelectionCommands,
   GeneralCommands,
   ElementQueries,
+  GeneralQueries,
   LocationQueries,
-  PathQueries,
-  PointQueries,
-  RangeQueries,
   ValueQueries,
 ])
 
