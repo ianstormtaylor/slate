@@ -233,7 +233,7 @@ namespace Node {
     let toPath
 
     if (Range.isRange(at)) {
-      const [s, e] = Range.points(at)
+      const [s, e] = Range.edges(at)
       fromPath = reverse ? e.path : s.path
       toPath = reverse ? s.path : e.path
     } else if (Point.isPoint(at)) {
@@ -347,7 +347,7 @@ namespace Node {
     }
 
     return produce(root, r => {
-      const [start, end] = Range.points(range)
+      const [start, end] = Range.edges(range)
 
       for (const [, path] of Node.entries(r, { reverse: true })) {
         if (!Range.includes(range, path)) {

@@ -298,10 +298,10 @@ namespace Path {
   export const transform = (
     path: Path,
     operation: Operation,
-    options: { stick?: 'forward' | 'backward' | null } = {}
+    options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Path | null => {
     return produce(path, p => {
-      const { stick = 'forward' } = options
+      const { affinity = 'forward' } = options
 
       // PERF: Exit early if the operation is guaranteed not to have an effect.
       if (path.length === 0) {
@@ -367,9 +367,9 @@ namespace Path {
           const { path: op, position } = operation
 
           if (Path.equals(op, p)) {
-            if (stick === 'forward') {
+            if (affinity === 'forward') {
               p[p.length - 1] += 1
-            } else if (stick === 'backward') {
+            } else if (affinity === 'backward') {
               // Nothing, because it still refers to the right path.
             } else {
               return null

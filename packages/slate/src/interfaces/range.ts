@@ -16,12 +16,12 @@ interface Range {
 
 namespace Range {
   export const start = (range: Range): Point => {
-    const [start] = Range.points(range)
+    const [start] = Range.edges(range)
     return start
   }
 
   export const end = (range: Range): Point => {
-    const [, end] = Range.points(range)
+    const [, end] = Range.edges(range)
     return end
   }
 
@@ -30,8 +30,8 @@ namespace Range {
       return null
     }
 
-    const [s1, e1] = Range.points(range)
-    const [s2, e2] = Range.points(another)
+    const [s1, e1] = Range.edges(range)
+    const [s2, e2] = Range.edges(another)
     const start = Point.isBefore(s1, s2) ? s2 : s1
     const end = Point.isBefore(e1, e2) ? e1 : e2
     return { anchor: start, focus: end }
@@ -64,7 +64,7 @@ namespace Range {
       )
     }
 
-    const [start, end] = Range.points(range)
+    const [start, end] = Range.edges(range)
     let isAfterStart = false
     let isBeforeEnd = false
 
@@ -136,7 +136,7 @@ namespace Range {
    * in the document.
    */
 
-  export const points = (range: Range): [Point, Point] => {
+  export const edges = (range: Range): [Point, Point] => {
     const { anchor, focus } = range
     return Range.isBackward(range) ? [focus, anchor] : [anchor, focus]
   }
@@ -148,36 +148,36 @@ namespace Range {
   export const transform = (
     range: Range,
     op: Operation,
-    options: { stick: 'forward' | 'backward' | 'outward' | 'inward' | null }
+    options: { affinity: 'forward' | 'backward' | 'outward' | 'inward' | null }
   ): Range | null => {
-    const { stick = 'inward' } = options
-    let stickAnchor: 'forward' | 'backward' | null
-    let stickFocus: 'forward' | 'backward' | null
+    const { affinity = 'inward' } = options
+    let affinityAnchor: 'forward' | 'backward' | null
+    let affinityFocus: 'forward' | 'backward' | null
 
-    if (stick === 'inward') {
+    if (affinity === 'inward') {
       if (Range.isForward(range)) {
-        stickAnchor = 'forward'
-        stickFocus = 'backward'
+        affinityAnchor = 'forward'
+        affinityFocus = 'backward'
       } else {
-        stickAnchor = 'backward'
-        stickFocus = 'forward'
+        affinityAnchor = 'backward'
+        affinityFocus = 'forward'
       }
-    } else if (stick === 'outward') {
+    } else if (affinity === 'outward') {
       if (Range.isForward(range)) {
-        stickAnchor = 'backward'
-        stickFocus = 'forward'
+        affinityAnchor = 'backward'
+        affinityFocus = 'forward'
       } else {
-        stickAnchor = 'forward'
-        stickFocus = 'backward'
+        affinityAnchor = 'forward'
+        affinityFocus = 'backward'
       }
     } else {
-      stickAnchor = stick
-      stickFocus = stick
+      affinityAnchor = affinity
+      affinityFocus = affinity
     }
 
     return produce(range, r => {
-      const anchor = Point.transform(r.anchor, op, { stick: stickAnchor })
-      const focus = Point.transform(r.focus, op, { stick: stickFocus })
+      const anchor = Point.transform(r.anchor, op, { affinity: affinityAnchor })
+      const focus = Point.transform(r.focus, op, { affinity: affinityFocus })
 
       if (!anchor || !focus) {
         return null

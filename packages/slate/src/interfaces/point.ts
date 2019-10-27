@@ -86,10 +86,10 @@ namespace Point {
   export const transform = (
     point: Point,
     op: Operation,
-    options: { stick?: 'forward' | 'backward' | null } = {}
+    options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Point | null => {
     return produce(point, p => {
-      const { stick = 'forward' } = options
+      const { affinity = 'forward' } = options
       const { path, offset } = p
 
       switch (op.type) {
@@ -135,16 +135,16 @@ namespace Point {
 
         case 'split_node': {
           if (Path.equals(op.path, path)) {
-            if (op.position === offset && stick == null) {
+            if (op.position === offset && affinity == null) {
               return null
             } else if (
               op.position < offset ||
-              (op.position === offset && stick === 'forward')
+              (op.position === offset && affinity === 'forward')
             ) {
               p.offset -= op.position
               p.path = Path.transform(path, op, {
                 ...options,
-                stick: 'forward',
+                affinity: 'forward',
               })!
             }
           } else {

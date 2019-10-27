@@ -15,18 +15,18 @@ let id = 0
 class RangeRef {
   id: number
   current: Range | null
-  private stick: 'forward' | 'backward' | 'outward' | 'inward' | null
+  private affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
   private onUnref: () => void
 
   constructor(props: {
     range: Range | null
-    stick: 'forward' | 'backward' | 'outward' | 'inward' | null
+    affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
     onUnref: () => void
   }) {
-    const { range, stick, onUnref } = props
+    const { range, affinity, onUnref } = props
     this.id = id++
     this.current = range
-    this.stick = stick
+    this.affinity = affinity
     this.onUnref = onUnref
   }
 
@@ -35,13 +35,13 @@ class RangeRef {
    */
 
   transform(op: Operation): void {
-    const { current, stick } = this
+    const { current, affinity } = this
 
     if (current == null) {
       return
     }
 
-    const range = Range.transform(current, op, { stick })
+    const range = Range.transform(current, op, { affinity })
     this.current = range
 
     if (range == null) {

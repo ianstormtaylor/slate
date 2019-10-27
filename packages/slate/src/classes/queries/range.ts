@@ -11,13 +11,13 @@ class RangeQueries {
     this: Editor,
     range: Range,
     options: {
-      stick?: 'backward' | 'forward' | 'outward' | 'inward' | null
+      affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
     } = {}
   ): RangeRef {
-    const { stick = 'forward' } = options
+    const { affinity = 'forward' } = options
     const ref: RangeRef = new RangeRef({
       range,
-      stick,
+      affinity,
       onUnref: () => delete this[RANGE_REFS][ref.id],
     })
 

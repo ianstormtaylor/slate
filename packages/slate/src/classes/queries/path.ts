@@ -10,12 +10,12 @@ class PathQueries {
   createPathRef(
     this: Editor,
     path: Path,
-    options: { stick?: 'backward' | 'forward' | null } = {}
+    options: { affinity?: 'backward' | 'forward' | null } = {}
   ): PathRef {
-    const { stick = 'forward' } = options
+    const { affinity = 'forward' } = options
     const ref: PathRef = new PathRef({
       path,
-      stick,
+      affinity,
       onUnref: () => delete this[PATH_REFS][ref.id],
     })
 

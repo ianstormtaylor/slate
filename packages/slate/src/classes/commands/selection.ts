@@ -21,10 +21,10 @@ class SelectionCommands {
     } else if (edge === 'focus') {
       this.select(selection.focus)
     } else if (edge === 'start') {
-      const [start] = Range.points(selection)
+      const [start] = Range.edges(selection)
       this.select(start)
     } else if (edge === 'end') {
-      const [, end] = Range.points(selection)
+      const [, end] = Range.edges(selection)
       this.select(end)
     }
   }

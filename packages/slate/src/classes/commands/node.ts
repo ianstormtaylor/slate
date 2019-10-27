@@ -71,7 +71,7 @@ class NodeCommands {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.points(at)
+          const [, end] = Range.edges(at)
           const pointRef = this.createPointRef(end)
           this.delete({ at })
           at = pointRef.unref()!
@@ -195,7 +195,7 @@ class NodeCommands {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.points(at)
+          const [, end] = Range.edges(at)
           const pointRef = this.createPointRef(end)
           this.delete({ at })
           at = pointRef.unref()!
@@ -588,7 +588,7 @@ class NodeCommands {
 
       if (!at) {
         if (selection) {
-          const [, end] = Range.points(selection)
+          const [, end] = Range.edges(selection)
           selectRef = this.createPointRef(end)
           at = selection
         } else {
@@ -600,7 +600,7 @@ class NodeCommands {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.points(at)
+          const [, end] = Range.edges(at)
           const pointRef = this.createPointRef(end)
           this.delete({ at })
           at = pointRef.unref()!
@@ -618,7 +618,7 @@ class NodeCommands {
       } else {
         firstPath = at.path
         position = at.offset
-        edgeRef = this.createPointRef(at, { stick: 'backward' })
+        edgeRef = this.createPointRef(at, { affinity: 'backward' })
       }
 
       let d = firstPath.length - height
@@ -781,8 +781,8 @@ class NodeCommands {
       let rangeRef
 
       if (Range.isRange(at)) {
-        const [start, end] = Range.points(at)
-        rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const [start, end] = Range.edges(at)
+        rangeRef = this.createRangeRef(at, { affinity: 'inward' })
         this.splitNodes({ at: end, always: false, match })
         this.splitNodes({ at: start, always: false, match })
         at = rangeRef.current!

@@ -129,8 +129,8 @@ const splitLocation = (
   }
 
   if (Range.isRange(at)) {
-    const rangeRef = editor.createRangeRef(at, { stick: 'inward' })
-    const [start, end] = Range.points(at)
+    const rangeRef = editor.createRangeRef(at, { affinity: 'inward' })
+    const [start, end] = Range.edges(at)
     editor.splitNodes({ at: end, match: 'text', always: false })
     editor.splitNodes({ at: start, match: 'text', always: false })
     const range = rangeRef.unref()!

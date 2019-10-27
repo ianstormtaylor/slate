@@ -12,7 +12,7 @@ export const input = {
 }
 
 export const test = range => {
-  return Range.points(range)
+  return Range.edges(range)
 }
 
 export const output = [

@@ -15,18 +15,18 @@ let id = 0
 class PathRef {
   id: number
   current: Path | null
-  private stick: 'forward' | 'backward' | null
+  private affinity: 'forward' | 'backward' | null
   private onUnref: () => void
 
   constructor(props: {
     path: Path | null
-    stick: 'forward' | 'backward' | null
+    affinity: 'forward' | 'backward' | null
     onUnref: () => void
   }) {
-    const { path, stick, onUnref } = props
+    const { path, affinity, onUnref } = props
     this.id = id++
     this.current = path
-    this.stick = stick
+    this.affinity = affinity
     this.onUnref = onUnref
   }
 
@@ -35,13 +35,13 @@ class PathRef {
    */
 
   transform(op: Operation): void {
-    const { current, stick } = this
+    const { current, affinity } = this
 
     if (current == null) {
       return
     }
 
-    const path = Path.transform(current, op, { stick })
+    const path = Path.transform(current, op, { affinity })
     this.current = path
 
     if (path == null) {

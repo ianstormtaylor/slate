@@ -60,10 +60,10 @@ class DeletingCommands {
       }
 
       if (Range.isRange(at)) {
-        const [start, end] = Range.points(at)
+        const [start, end] = Range.edges(at)
         const [, ancestorPath] = this.getAncestor(at)
         const d = Range.isCollapsed(at) ? 'text' : ancestorPath.length
-        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
         this.splitNodes({ at: end, match: d })
         this.splitNodes({ at: start, match: d })
         at = rangeRef.unref()!
@@ -75,7 +75,7 @@ class DeletingCommands {
       }
 
       if (Range.isRange(at)) {
-        const [start, end] = Range.points(at)
+        const [start, end] = Range.edges(at)
         const after = this.getNextPoint(end)!
         const afterRef = this.createPointRef(after)
         const l = ancestorPath.length
@@ -131,7 +131,7 @@ class DeletingCommands {
       }
 
       if (Range.isRange(at)) {
-        const [, end] = Range.points(at)
+        const [, end] = Range.edges(at)
         const pointRef = this.createPointRef(end)
         this.delete({ at })
         at = pointRef.unref()!

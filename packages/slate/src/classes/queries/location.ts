@@ -307,7 +307,7 @@ class LocationQueries {
       return at
     }
 
-    let [start, end] = Range.points(at)
+    let [start, end] = Range.edges(at)
     const closestBlock = this.getClosestBlock(end.path)
     const blockPath = closestBlock ? closestBlock[1] : []
     let skip = true

@@ -10,12 +10,12 @@ class PointQueries {
   createPointRef(
     this: Editor,
     point: Point,
-    options: { stick?: 'backward' | 'forward' | null } = {}
+    options: { affinity?: 'backward' | 'forward' | null } = {}
   ): PointRef {
-    const { stick = 'forward' } = options
+    const { affinity = 'forward' } = options
     const ref: PointRef = new PointRef({
       point,
-      stick,
+      affinity,
       onUnref: () => delete this[POINT_REFS][ref.id],
     })
 

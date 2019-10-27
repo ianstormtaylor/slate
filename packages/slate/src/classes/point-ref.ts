@@ -15,18 +15,18 @@ let id = 0
 class PointRef {
   id: number
   current: Point | null
-  private stick: 'forward' | 'backward' | null
+  private affinity: 'forward' | 'backward' | null
   private onUnref: () => void
 
   constructor(props: {
     point: Point | null
-    stick: 'forward' | 'backward' | null
+    affinity: 'forward' | 'backward' | null
     onUnref: () => void
   }) {
-    const { point, stick, onUnref } = props
+    const { point, affinity, onUnref } = props
     this.id = id++
     this.current = point
-    this.stick = stick
+    this.affinity = affinity
     this.onUnref = onUnref
   }
 
@@ -35,13 +35,13 @@ class PointRef {
    */
 
   transform(op: Operation): void {
-    const { current, stick } = this
+    const { current, affinity } = this
 
     if (current == null) {
       return
     }
 
-    const point = Point.transform(current, op, { stick })
+    const point = Point.transform(current, op, { affinity })
     this.current = point
 
     if (point == null) {
