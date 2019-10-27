@@ -1,13 +1,4 @@
-import {
-  Ancestor,
-  Annotation,
-  Element,
-  Mark,
-  Node,
-  Path,
-  Text,
-  Value,
-} from '../..'
+import { Ancestor, Range, Element, Mark, Node, Path, Text, Value } from '../..'
 import { SchemaError } from './error'
 import { SchemaRule, SchemaCheck } from './rule'
 
@@ -16,7 +7,7 @@ import { SchemaRule, SchemaCheck } from './rule'
  */
 
 export const checkAnnotation = (
-  annotation: Annotation,
+  annotation: Range,
   key: string,
   check: SchemaCheck
 ): SchemaError | undefined => {
@@ -31,7 +22,7 @@ export const checkAnnotation = (
   if (
     'object' in check &&
     check.object === 'annotation' &&
-    !Annotation.isAnnotation(annotation)
+    !Range.isRange(annotation)
   ) {
     return { code: 'annotation_object_invalid', annotation, key }
   }

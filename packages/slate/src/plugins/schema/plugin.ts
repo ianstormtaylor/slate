@@ -1,7 +1,7 @@
 import {
   Editor,
   Mark,
-  Annotation,
+  Range,
   EditorConstructor,
   Element,
   Node,
@@ -56,32 +56,6 @@ const SchemaPlugin = (
 
   return (Base: EditorConstructor) => {
     return class extends Base {
-      /**
-       * Check if a mark is atomic based on the schema rules.
-       */
-
-      isAtomic(this: Editor, mark: Mark): boolean {
-        // HACK: The mark-checking logic needs a node and a path for creating an
-        // error with details. But we don't care about the error itself, so we
-        // use fake details here.
-        const index = 0
-        const [node, path] = this.getFirstText([])
-
-        for (const rule of rules) {
-          if (
-            rule.define != null &&
-            rule.define.isAtomic != null &&
-            ((Annotation.isAnnotation(mark) &&
-              checkAnnotation(mark, '', rule.match) == null) ||
-              checkMark(mark, index, node, path, rule.match) == null)
-          ) {
-            return rule.define.isAtomic
-          }
-        }
-
-        return super.isAtomic(mark)
-      }
-
       /**
        * Check if a node is inline based on the schema rules.
        */

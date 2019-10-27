@@ -1,8 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { produce } from 'immer'
 import {
-  Annotation,
-  AnnotationPointEntry,
   Element,
   Mark,
   Node,
@@ -22,7 +20,7 @@ import {
 
 interface Value extends Element {
   selection: Range | null
-  annotations: Record<string, Annotation>
+  annotations: Record<string, Range>
   [key: string]: any
 }
 
@@ -32,6 +30,20 @@ interface Value extends Element {
  */
 
 type ValueEntry = [Value, Path]
+
+/**
+ * `AnnotationEntry` objects are returned when iterating over annotations
+ * in the top-level value.
+ */
+
+type AnnotationEntry = [Range, string]
+
+/**
+ * `AnnotationPointEntry` objects are returned when iterating over `Point`
+ * objects that belong to an annotation.
+ */
+
+type AnnotationPointEntry = [Point, PointKey, Range, string]
 
 /**
  * `SelectionPointEntry` objects are returned when iterating over `Point`
@@ -50,7 +62,7 @@ namespace Value {
       isPlainObject(value) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.nodes) &&
-      Annotation.isAnnotationMap(value.annotations)
+      isAnnotationMap(value.annotations)
     )
   }
 
@@ -253,10 +265,10 @@ namespace Value {
                 const newNextPath = Path.transform(nextPath, op)!
                 point.path = newNextPath
                 point.offset = 0
-              } else if (Range.isRange(range)) {
-                v.selection = null
-              } else if (Annotation.isAnnotation(range)) {
+              } else if (key != null) {
                 delete v.annotations[key!]
+              } else {
+                v.selection = null
               }
             } else {
               range[k] = result
@@ -379,4 +391,26 @@ namespace Value {
   }
 }
 
-export { Value, ValueEntry }
+/**
+ * Check if a value is a map of `Annotation` objects.
+ */
+
+export const isAnnotationMap = (value: any): value is Record<string, Range> => {
+  if (!isPlainObject(value)) {
+    return false
+  }
+
+  for (const key in value) {
+    return Range.isRange(value[key])
+  }
+
+  return true
+}
+
+export {
+  Value,
+  ValueEntry,
+  AnnotationEntry,
+  AnnotationPointEntry,
+  SelectionPointEntry,
+}

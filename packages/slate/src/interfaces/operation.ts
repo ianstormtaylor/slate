@@ -1,10 +1,10 @@
-import { Annotation, Mark, Node, Path, Range, Value } from '..'
+import { Mark, Node, Path, Range, Value } from '..'
 import isPlainObject from 'is-plain-object'
 
 type AddAnnotationOperation = {
   type: 'add_annotation'
   key: string
-  annotation: Annotation
+  annotation: Range
   [key: string]: any
 }
 
@@ -49,7 +49,7 @@ type MoveNodeOperation = {
 type RemoveAnnotationOperation = {
   type: 'remove_annotation'
   key: string
-  annotation: Annotation
+  annotation: Range
   [key: string]: any
 }
 
@@ -78,8 +78,8 @@ type RemoveTextOperation = {
 type SetAnnotationOperation = {
   type: 'set_annotation'
   key: string
-  properties: Partial<Annotation>
-  newProperties: Partial<Annotation>
+  properties: Partial<Range>
+  newProperties: Partial<Range>
   [key: string]: any
 }
 
@@ -213,11 +213,9 @@ namespace Operation {
       }
 
       case 'add_annotation': {
-        return (
-          typeof value.key === 'string' &&
-          Annotation.isAnnotation(value.annotation)
-        )
+        return typeof value.key === 'string' && Range.isRange(value.annotation)
       }
+
       case 'insert_node': {
         return Path.isPath(value.path) && Node.isNode(value.node)
       }
@@ -244,10 +242,7 @@ namespace Operation {
       }
 
       case 'remove_annotation': {
-        return (
-          typeof value.key === 'string' &&
-          Annotation.isAnnotation(value.annotation)
-        )
+        return typeof value.key === 'string' && Range.isRange(value.annotation)
       }
 
       case 'remove_mark': {

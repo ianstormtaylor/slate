@@ -1,29 +1,20 @@
-import {
-  Ancestor,
-  Annotation,
-  Descendant,
-  Element,
-  Mark,
-  Node,
-  Path,
-  Text,
-} from '../..'
+import { Ancestor, Descendant, Range, Mark, Node, Path, Text } from '../..'
 
 interface AnnotationInvalidError {
   code: 'annotation_invalid'
-  annotation: Annotation
+  annotation: Range
   key: string
 }
 
 interface AnnotationObjectInvalidError {
   code: 'annotation_object_invalid'
-  annotation: Annotation
+  annotation: Range
   key: string
 }
 
 interface AnnotationPropertyInvalidError {
   code: 'annotation_property_invalid'
-  annotation: Annotation
+  annotation: Range
   key: string
   property: string
 }

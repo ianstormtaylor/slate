@@ -206,12 +206,6 @@ class DeletingCommands {
       }
 
       if (Point.isPoint(at) && !this.getFurthestVoid(at.path)) {
-        for (const [annotation, key] of this.annotations({ at })) {
-          if (this.isAtomic(annotation)) {
-            this.removeAnnotation(key)
-          }
-        }
-
         const { path, offset } = at
         this.apply({ type: 'insert_text', path, offset, text })
       }

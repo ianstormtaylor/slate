@@ -1,11 +1,11 @@
-import { Editor, Point, Annotation } from '../..'
+import { Editor, Point, Range } from '../..'
 
 class AnnotationCommands {
   /**
    * Add a new `annotation` object with a `key`.
    */
 
-  addAnnotation(this: Editor, key: string, annotation: Annotation) {
+  addAnnotation(this: Editor, key: string, annotation: Range) {
     this.apply({
       type: 'add_annotation',
       key,
@@ -39,7 +39,7 @@ class AnnotationCommands {
    * Set new properties on an annotation object with `key`.
    */
 
-  setAnnotation(this: Editor, key: string, props: Partial<Annotation>) {
+  setAnnotation(this: Editor, key: string, props: Partial<Range>) {
     const { annotations } = this.value
 
     if (!(key in annotations)) {

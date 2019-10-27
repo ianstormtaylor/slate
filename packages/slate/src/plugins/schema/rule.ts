@@ -65,7 +65,6 @@ interface SchemaFunctionCheck {
 }
 
 interface SchemaDefine {
-  isAtomic?: boolean
   isInline?: boolean
   isVoid?: boolean
 }
