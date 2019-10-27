@@ -11,12 +11,7 @@ production implementation:
 2. Linkifying the mentions - There isn't really a good place to link to for
    this example. But in most cases you would probably want to link to the
    user's profile on click.
-3. Keyboard accessibility - it adds quite a bit of complexity to the
-   implementation to add this, as it involves capturing keyboard events like up
-   / down / enter and proxying them into the `Suggestions` component using a
-   `ref`. I've left this out because this is already a pretty confusing use
-   case.
-4. Plugin Mentions - in reality, you will probably want to put mentions into a
+3. Plugin Mentions - in reality, you will probably want to put mentions into a
    plugin, and make them configurable to support more than one kind of mention,
    like users and hashtags. As you can see below it is a bit unweildy to bolt
    all this directly to the editor.
@@ -27,38 +22,40 @@ https://en.wikipedia.org/wiki/List_of_Star_Wars_characters
 
 import { Editor } from 'slate-react'
 import { Value } from 'slate'
-import _ from 'lodash'
 import React from 'react'
 
-import initialValue from './value.json'
 import users from './users.json'
-import Suggestions from './Suggestions'
+
+/**
+ * @typedef {Object} User
+ *   @property {string} username
+ *   @property {string} id
+ */
+
+const initialEditorValue = {
+  object: 'value',
+  document: {
+    object: 'document',
+    nodes: [
+      {
+        object: 'block',
+        type: 'paragraph',
+        nodes: [
+          {
+            object: 'text',
+            text: 'Try mentioning some users, like Luke or Leia.',
+          },
+        ],
+      },
+    ],
+  },
+}
 
 /**
  * @type {String}
  */
 
 const USER_MENTION_NODE_TYPE = 'userMention'
-
-/**
- * The annotation type that the menu will position itself against. The
- * "context" is just the current text after the @ symbol.
- * @type {String}
- */
-
-const CONTEXT_ANNOTATION_TYPE = 'mentionContext'
-
-/**
- * Get a unique key for the search highlight annotations.
- *
- * @return {String}
- */
-
-let n = 0
-
-function getMentionKey() {
-  return `highlight_${n++}`
-}
 
 const schema = {
   inlines: {
@@ -79,12 +76,12 @@ const schema = {
 const CAPTURE_REGEX = /@(\S*)$/
 
 /**
- * Get get the potential mention input.
+ * Get the potential mention input.
  *
- * @type {Value}
+ * @param {Value} value
  */
 
-function getInput(value) {
+function getMentionInput(value) {
   // In some cases, like if the node that was selected gets deleted,
   // `startText` can be null.
   if (!value.startText) {
@@ -99,6 +96,39 @@ function getInput(value) {
 }
 
 /**
+ * Determine if the current selection has valid ancestors for a context. In our
+ * case, we want to make sure that the mention is only a direct child of a
+ * paragraph. In this simple example it isn't that important, but in a complex
+ * editor you wouldn't want it to be a child of another inline like a link.
+ *
+ * @param {Value} value
+ */
+
+function hasValidAncestors(value) {
+  const { document, selection } = value
+
+  // In this simple case, we only want mentions to live inside a paragraph.
+  // This check can be adjusted for more complex rich text implementations.
+  return document.getParent(selection.start.key).type === 'paragraph'
+}
+
+/**
+ * Get an array of users that match the given search query
+ *
+ * @param {string} searchQuery
+ *
+ * @returns {User[]} array of users matching the `searchQuery`
+ */
+
+function searchUsers(searchQuery) {
+  if (!searchQuery) return
+
+  const regex = RegExp(`^${searchQuery}`, 'gi')
+
+  return users.filter(({ username }) => username.match(regex))
+}
+
+/**
  * @extends React.Component
  */
 
@@ -110,8 +140,7 @@ class MentionsExample extends React.Component {
    */
 
   state = {
-    users: [],
-    value: Value.fromJSON(initialValue),
+    value: Value.fromJSON(initialEditorValue),
   }
 
   /**
@@ -126,36 +155,15 @@ class MentionsExample extends React.Component {
         <Editor
           spellCheck
           autoFocus
-          placeholder="Try mentioning some people..."
           value={this.state.value}
           onChange={this.onChange}
           ref={this.editorRef}
           renderInline={this.renderInline}
           renderBlock={this.renderBlock}
-          renderAnnotation={this.renderAnnotation}
           schema={schema}
-        />
-        <Suggestions
-          anchor=".mention-context"
-          users={this.state.users}
-          onSelect={this.insertMention}
         />
       </div>
     )
-  }
-
-  renderAnnotation(props, editor, next) {
-    if (props.annotation.type === CONTEXT_ANNOTATION_TYPE) {
-      return (
-        // Adding the className here is important so that the `Suggestions`
-        // component can find an anchor.
-        <span {...props.attributes} className="mention-context">
-          {props.children}
-        </span>
-      )
-    }
-
-    return next()
   }
 
   renderBlock(props, editor, next) {
@@ -183,14 +191,12 @@ class MentionsExample extends React.Component {
   /**
    * Replaces the current "context" with a user mention node corresponding to
    * the given user.
-   * @param {Object} user
-   *   @param {string} user.id
-   *   @param {string} user.username
+   * @param {User} user
    */
 
-  insertMention = user => {
+  insertMention(user) {
     const value = this.state.value
-    const inputValue = getInput(value)
+    const inputValue = getMentionInput(value)
     const editor = this.editorRef.current
 
     // Delete the captured value, including the `@` symbol
@@ -221,104 +227,55 @@ class MentionsExample extends React.Component {
   }
 
   /**
-   * On change, save the new `value`.
+   * On change, save the new `value` and look for mentions.
    *
-   * @param {Editor} editor
+   * @param {Change} editor
    */
 
   onChange = change => {
-    const inputValue = getInput(change.value)
+    this.setState({ value: change.value })
 
-    if (inputValue !== this.lastInputValue) {
-      this.lastInputValue = inputValue
+    const mentionInputValue = getMentionInput(change.value)
 
-      if (hasValidAncestors(change.value)) {
-        this.search(inputValue)
-      }
-
-      const { selection } = change.value
-
-      let annotations = change.value.annotations.filter(
-        annotation => annotation.type !== CONTEXT_ANNOTATION_TYPE
-      )
-
-      if (inputValue && hasValidAncestors(change.value)) {
-        const key = getMentionKey()
-
-        annotations = annotations.set(key, {
-          anchor: {
-            key: selection.start.key,
-            offset: selection.start.offset - inputValue.length,
-          },
-          focus: {
-            key: selection.start.key,
-            offset: selection.start.offset,
-          },
-          type: CONTEXT_ANNOTATION_TYPE,
-          key: getMentionKey(),
-        })
-      }
-
-      this.setState({ value: change.value }, () => {
-        // We need to set annotations after the value flushes into the editor.
-        this.editorRef.current.setAnnotations(annotations)
-      })
+    if (!mentionInputValue || !hasValidAncestors(change.value)) {
       return
     }
 
-    this.setState({ value: change.value })
+    const searchResult = this.search(mentionInputValue)
+
+    if (!searchResult.length) {
+      return
+    }
+
+    if (searchResult.length === 1) {
+      this.insertMention(searchResult[0])
+    }
+
+    if (searchResult.length <= 5) {
+      const username = window.prompt(
+        `Type in the rest of the name, or just more of it. You can choose from these: ${searchResult
+          .map(u => u.username)
+          .join(', ')}`,
+        mentionInputValue
+      )
+
+      if (
+        !username ||
+        username === mentionInputValue ||
+        !username.startsWith(mentionInputValue)
+      ) {
+        return
+      }
+
+      const nextSearchResult = searchUsers(username)
+
+      if (nextSearchResult.length === 1) {
+        this.insertMention(nextSearchResult[0])
+      } else {
+        this.setState({ value: change.value })
+      }
+    }
   }
-
-  /**
-   * Get an array of users that match the given search query
-   *
-   * @type {String}
-   */
-
-  search(searchQuery) {
-    // We don't want to show the wrong users for the current search query, so
-    // wipe them out.
-    this.setState({
-      users: [],
-    })
-
-    if (!searchQuery) return
-
-    // In order to make this seem like an API call, add a set timeout for some
-    // async.
-    setTimeout(() => {
-      // WARNING: In a production environment you should escape the search query.
-      const regex = RegExp(`^${searchQuery}`, 'gi')
-
-      // If you want to get fancy here, you can add some emphasis to the part
-      // of the string that matches.
-      const result = _.filter(users, user => {
-        return user.username.match(regex)
-      })
-
-      this.setState({
-        // Only return the first 5 results
-        users: result.slice(0, 5),
-      })
-    }, 50)
-  }
-}
-
-/**
- * Determine if the current selection has valid ancestors for a context. In our
- * case, we want to make sure that the mention is only a direct child of a
- * paragraph. In this simple example it isn't that important, but in a complex
- * editor you wouldn't want it to be a child of another inline like a link.
- *
- * @param {Value} value
- */
-
-function hasValidAncestors(value) {
-  const { document, selection } = value
-
-  // In this simple case, we only want mentions to live inside a paragraph.
-  // This check can be adjusted for more complex rich text implementations.
-  return document.getParent(selection.start.key).type === 'paragraph'
 }
 
 export default MentionsExample
