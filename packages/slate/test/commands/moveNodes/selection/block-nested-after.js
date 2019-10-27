@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveNodes({ depth: 2, to: [1] })
+  editor.moveNodes({ match: 2, to: [1] })
 }
 
 export const input = (
@@ -14,7 +14,7 @@ export const input = (
         <anchor />two
       </block>
       <block>
-        <focus />three
+        three<focus />
       </block>
     </block>
   </value>
@@ -29,7 +29,7 @@ export const output = (
       <anchor />two
     </block>
     <block>
-      <focus />three
+      three<focus />
     </block>
   </value>
 )

@@ -393,24 +393,25 @@ namespace Path {
           }
 
           if (Path.isAncestor(op, p) || Path.equals(op, p)) {
+            let copy = onp.slice()
+
             if (Path.endsBefore(op, onp) && op.length < onp.length) {
               const i = Math.min(onp.length, op.length) - 1
-              onp[i] -= 1
+              copy[i] -= 1
             }
 
-            onp.concat(p.slice(op.length))
-
-            // Retain any indices past the move point in the original path.
-            p.splice(0, op.length, ...onp)
+            return copy.concat(p.slice(op.length))
           } else {
+            const copy = p.slice()
+
             if (Path.endsBefore(op, p)) {
               p[op.length - 1] -= 1
             }
 
             if (
-              Path.endsBefore(onp, p) ||
-              Path.equals(onp, p) ||
-              Path.isAncestor(onp, p)
+              Path.endsBefore(onp, copy) ||
+              Path.equals(onp, copy) ||
+              Path.isAncestor(onp, copy)
             ) {
               p[onp.length - 1] += 1
             }

@@ -1,6 +1,6 @@
 /** @jsx h  */
 
-import { h } from '../../../helpers'
+import { h } from '../../helpers'
 
 export const input = (
   <value>

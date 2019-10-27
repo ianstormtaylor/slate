@@ -17,7 +17,7 @@ export const input = (
         <anchor />five
       </block>
       <block>
-        <focus />six
+        six<focus />
       </block>
     </block>
   </value>
@@ -35,7 +35,7 @@ export const output = (
       <anchor />five
     </block>
     <block>
-      <focus />six
+      six<focus />
     </block>
   </value>
 )

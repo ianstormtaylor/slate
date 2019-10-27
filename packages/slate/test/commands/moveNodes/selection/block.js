@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  editor.moveNodes({ depth: 1, to: [1] })
+  editor.moveNodes({ match: 1, to: [1] })
 }
 
 export const output = (

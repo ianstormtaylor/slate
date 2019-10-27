@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.liftNodes({ depth: 3 })
+  editor.liftNodes({ match: 3 })
 }
 
 export const input = (

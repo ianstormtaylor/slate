@@ -2,28 +2,30 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.wrapBlock('quote')
-}
-
 export const input = (
   <value>
-    <block>
+    <block a>
       <block>
-        <cursor />word
+        w<anchor />or<focus />d
       </block>
     </block>
   </value>
 )
 
+export const run = editor => {
+  editor.wrapNodes(<block new />)
+}
+
 export const output = (
   <value>
-    <block>
-      <block>
+    <block a>
+      <block>w</block>
+      <block new>
         <block>
-          <cursor />word
+          <anchor />or<focus />
         </block>
       </block>
+      <block>d</block>
     </block>
   </value>
 )

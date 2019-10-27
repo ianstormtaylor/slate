@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.texts(value, { path: [0] }))
+  return Array.from(Node.texts(value, { at: [0] }))
 }
 
 export const output = [

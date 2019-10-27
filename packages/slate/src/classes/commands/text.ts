@@ -60,23 +60,20 @@ class DeletingCommands {
 
       if (Range.isRange(at)) {
         const [start, end] = Range.points(at)
-        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
         const [common, commonPath] = this.getCommon(start.path, end.path)
-        let startHeight = start.path.length - commonPath.length - 1
-        let endHeight = end.path.length - commonPath.length - 1
+        let ancestorPath = commonPath
+        let ancestor = common
+        let d: number | 'text' = commonPath.length
 
         if (Path.equals(start.path, end.path)) {
           ancestorPath = Path.parent(commonPath)
           ancestor = Node.get(this.value, ancestorPath)
-          startHeight = 0
-          endHeight = 0
-        } else {
-          ancestorPath = commonPath
-          ancestor = common
+          d = 'text'
         }
 
-        this.splitNodes({ at: end, height: Math.max(0, endHeight) })
-        this.splitNodes({ at: start, height: Math.max(0, startHeight) })
+        const rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        this.splitNodes({ at: end, depth: d })
+        this.splitNodes({ at: start, depth: d })
         at = rangeRef.unref()!
       }
 

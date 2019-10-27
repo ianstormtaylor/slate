@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.setNodes({ thing: true }, { match: 'inline' })
+  editor.setNodes({ key: true }, { match: 'inline' })
 }
 
 export const input = (
@@ -26,9 +26,9 @@ export const output = (
   <value>
     <block>
       <text />
-      <inline thing>
+      <inline key>
         <text />
-        <inline thing>
+        <inline>
           <cursor />word
         </inline>
         <text />

@@ -55,6 +55,27 @@ namespace Value {
   }
 
   /**
+   * Check if a value matches a set of properties.
+   *
+   * Note: the is for checking custom properties, and it does not ensure that
+   * any children in the `nodes` property are equal.
+   */
+
+  export const matches = (value: Value, props: Partial<Value>): boolean => {
+    for (const key in props) {
+      if (key === 'annotations' || key === 'nodes' || key === 'selection') {
+        continue
+      }
+
+      if (value[key] !== props[key]) {
+        return false
+      }
+    }
+
+    return true
+  }
+
+  /**
    * Iterate through all of the point objects in a value.
    */
 
@@ -80,6 +101,7 @@ namespace Value {
    */
 
   export const transform = (value: Value, op: Operation): Value => {
+    debugger
     return produce(value, v => {
       switch (op.type) {
         case 'add_annotation': {
@@ -165,7 +187,6 @@ namespace Value {
           const node = Node.get(v, path)
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
-          parent.nodes.splice(index, 1)
 
           // This is tricky, but since the `path` and `newPath` both refer to
           // the same snapshot in time, there's a mismatch. After either
@@ -173,9 +194,11 @@ namespace Value {
           // of date. So instead of using the `op.newPath` directly, we
           // transform `op.path` to ascertain what the `newPath` would be after
           // the operation was applied.
+          parent.nodes.splice(index, 1)
           const truePath = Path.transform(path, op)!
-          const newParent = Node.parent(v, truePath)
+          const newParent = Node.get(v, Path.parent(truePath))
           const newIndex = truePath[truePath.length - 1]
+
           newParent.nodes.splice(newIndex, 0, node)
 
           for (const [point, key, range] of Value.points(v)) {

@@ -125,40 +125,6 @@ class ValueCommands {
     this[NORMALIZING] = value
     this.normalize()
   }
-
-  /**
-   * Wrap the block nodes in the selection in a new block.
-   */
-
-  wrapBlock(this: Editor, block: Element): void {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    }
-
-    const rangeRef = this.createRangeRef(selection)
-    this.wrapBlockAtRange(selection, block)
-    const range = rangeRef.unref()!
-    this.select(range)
-  }
-
-  /**
-   * Wrap the inline nodes in the selection in a new inline.
-   */
-
-  wrapInline(this: Editor, inline: Element): void {
-    const { selection } = this.value
-
-    if (selection == null) {
-      return
-    }
-
-    const rangeRef = this.createRangeRef(selection)
-    this.wrapInlineAtRange(selection, inline)
-    const range = rangeRef.unref()!
-    this.select(range)
-  }
 }
 
 /**

@@ -15,13 +15,9 @@ interface Range {
 }
 
 namespace Range {
-  export const intersection = (range: Range, another: Range): Range => {
+  export const intersection = (range: Range, another: Range): Range | null => {
     if (!Range.includes(range, another)) {
-      throw new Error(
-        `Cannot get the intersection of ranges ${JSON.stringify(
-          range
-        )} and ${JSON.stringify(another)} because they do not overlap.`
-      )
+      return null
     }
 
     const [s1, e1] = Range.points(range)

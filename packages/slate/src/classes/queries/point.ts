@@ -1,7 +1,27 @@
-import { Editor, Node, Operation, Path, Point, PointRef } from '../..'
+import {
+  Editor,
+  Node,
+  NodeEntry,
+  Operation,
+  Path,
+  Point,
+  PointRef,
+} from '../..'
 import { POINT_REFS } from '../../symbols'
 
 class PointQueries {
+  getTarget(
+    this: Editor,
+    point: Point,
+    depth: number | 'block' | 'inline' | 'text'
+  ): NodeEntry | undefined {
+    const range = { anchor: point, focus: point }
+
+    for (const entry of this.depths(depth, { at: range })) {
+      return entry
+    }
+  }
+
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the this.

@@ -11,12 +11,12 @@ export const input = (
 )
 
 export const run = editor => {
-  editor.wrapNodes(<block a />)
+  editor.wrapNodes(<block new />)
 }
 
 export const output = (
   <value>
-    <block a>
+    <block new>
       <block>
         <cursor />word
       </block>

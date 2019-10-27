@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.entries(value, { path: [0, 1] }))
+  return Array.from(Node.entries(value, { at: [0, 1] }))
 }
 
 export const output = [

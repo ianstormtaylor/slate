@@ -5,27 +5,29 @@ import { h } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      <anchor />one
+      on<anchor />e
     </block>
     <block>
-      two<focus />
+      t<focus />wo
     </block>
   </value>
 )
 
 export const run = editor => {
-  editor.wrapNodes(<block a />)
+  editor.wrapNodes(<block new />)
 }
 
 export const output = (
   <value>
-    <block a>
+    <block>on</block>
+    <block new>
       <block>
-        <anchor />one
+        <anchor />e
       </block>
       <block>
-        two<focus />
+        t<focus />
       </block>
     </block>
+    <block>wo</block>
   </value>
 )

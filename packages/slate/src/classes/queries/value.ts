@@ -14,7 +14,17 @@ import {
   String,
   Text,
   TextEntry,
+  Value,
 } from '../..'
+
+type NodeMatch =
+  | number
+  | 'value'
+  | 'block'
+  | 'inline'
+  | 'text'
+  | Partial<Node>
+  | ((entry: NodeEntry) => boolean)
 
 class ValueQueries {
   /**
@@ -67,6 +77,130 @@ class ValueQueries {
     })
   }
 
+  *batches(
+    this: Editor,
+    options: {
+      element: Element
+      match: NodeMatch
+      at: Range | Point | Path
+      hanging?: boolean
+      reverse?: boolean
+    }
+  ): Iterable<[Node, Path, NodeEntry[]]> {
+    const { element, at, ...rest } = options
+    let roots: NodeEntry[] = []
+
+    if (this.isInline(element)) {
+      for (const [node, path] of this.blocks()) {
+        if (this.hasInlines(node)) {
+          roots.push([node, path])
+        }
+      }
+    } else {
+      roots.push([this.value, []])
+    }
+
+    for (const [node, path] of roots) {
+      const a = Range.isRange(at)
+        ? Range.intersection(at, this.getRange(path))!
+        : at
+
+      const matches = Array.from(this.matches({ at: a, ...rest }))
+
+      if (matches.length !== 0) {
+        yield [node, path, matches]
+      }
+    }
+  }
+
+  isMatch(this: Editor, entry: NodeEntry, match: NodeMatch) {
+    const [node, path] = entry
+
+    if (typeof match === 'function') {
+      return match(entry)
+    } else if (typeof match === 'number') {
+      return path.length === match
+    } else if (match === 'text') {
+      return Text.isText(node)
+    } else if (match === 'value') {
+      return Value.isValue(node)
+    } else if (match === 'inline') {
+      return (
+        (Element.isElement(node) && this.isInline(node)) || Text.isText(node)
+      )
+    } else if (match === 'block') {
+      return (
+        Element.isElement(node) && !this.isInline(node) && this.hasInlines(node)
+      )
+    } else {
+      return Node.matches(node, match)
+    }
+  }
+
+  *levels(
+    this: Editor,
+    path: Path,
+    options: {
+      reverse?: boolean
+    }
+  ): Iterable<NodeEntry> {
+    const furthestVoid = this.getFurthestVoid(path)
+
+    if (furthestVoid) {
+      const [, voidPath] = furthestVoid
+      path = voidPath
+    }
+
+    yield* Node.levels(this.value, path, options)
+  }
+
+  getMatch(this: Editor, path: Path, match: NodeMatch): NodeEntry | undefined {
+    for (const entry of this.levels(path, { reverse: true })) {
+      if (this.isMatch(entry, match)) {
+        return entry
+      }
+    }
+  }
+
+  *matches(
+    this: Editor,
+    options: {
+      match: NodeMatch
+      at: Range | Point | Path
+      hanging?: boolean
+      reverse?: boolean
+    }
+  ): Iterable<NodeEntry> {
+    const { reverse, match, hanging = false } = options
+    let { at } = options
+    let prevPath: Path | undefined
+    let test = (entry: NodeEntry) => true
+
+    // PERF: If the target is a path, we don't need to traverse at all.
+    if (Path.isPath(at)) {
+      const node = this.getNode(at)
+      yield [node, at]
+      return
+    }
+
+    if (Point.isPoint(at)) {
+      at = { anchor: at, focus: at }
+    } else if (!hanging) {
+      at = this.getNonHangingRange(at)
+    }
+
+    for (const [n, p] of this.entries({ at, reverse })) {
+      if (prevPath && Path.compare(p, prevPath) === 0) {
+        continue
+      }
+
+      if (this.isMatch([n, p], match)) {
+        prevPath = p
+        yield [n, p]
+      }
+    }
+  }
+
   /**
    * Iterate through all of the elements in the editor.
    */
@@ -76,14 +210,11 @@ class ValueQueries {
     options: {
       at?: Path | Range
       reverse?: boolean
-      pass?: (entry: ElementEntry) => boolean
     } = {}
   ): Iterable<ElementEntry> {
-    const { pass = () => false } = options
     yield* Node.elements(this.value, {
       ...options,
-      pass: ([n, p]) =>
-        Element.isElement(n) && (this.isVoid(n) || pass([n, p])),
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
   }
 
@@ -242,42 +373,6 @@ class ValueQueries {
   }
 
   /**
-   * Iterate through all of the leaf block nodes in the editor.
-   */
-
-  *leafBlocks(
-    this: Editor,
-    options: {
-      at?: Path | Range
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [n, p] of this.blocks(options)) {
-      if (this.hasInlines(n) || this.isVoid(n)) {
-        yield [n, p]
-      }
-    }
-  }
-
-  /**
-   * Iterate through all of the leaf inline nodes in the editor.
-   */
-
-  *leafInlines(
-    this: Editor,
-    options: {
-      at?: Path | Range
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [n, p] of this.inlines(options)) {
-      if (this.hasTexts(n) || this.isVoid(n)) {
-        yield [n, p]
-      }
-    }
-  }
-
-  /**
    * Iterate through all of the positions in the document where a `Point` can be
    * placed.
    *
@@ -401,44 +496,6 @@ class ValueQueries {
         }
 
         isBlockStart = false
-      }
-    }
-  }
-
-  /**
-   * Iterate through all of the root block nodes in the editor.
-   */
-
-  *rootBlocks(
-    this: Editor,
-    options: {
-      at?: Path | Range
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [n, p] of this.blocks(options)) {
-      if (p.length === 1) {
-        yield [n, p]
-      }
-    }
-  }
-
-  /**
-   * Iterate through all of the root inline nodes in the editor.
-   */
-
-  *rootInlines(
-    this: Editor,
-    options: {
-      at?: Path | Range
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [n, p] of this.inlines(options)) {
-      const parent = Node.parent(this.value, p)
-
-      if (!this.isInline(parent)) {
-        yield [n, p]
       }
     }
   }

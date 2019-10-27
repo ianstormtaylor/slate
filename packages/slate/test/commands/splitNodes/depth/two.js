@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ depth: 2 })
+  editor.splitNodes({ match: 2 })
 }
 
 export const input = (

@@ -57,6 +57,14 @@ type DescendantEntry = [Descendant, Path]
 type AncestorEntry = [Ancestor, Path]
 
 namespace Node {
+  export const matches = (node: Node, props: Partial<Node>): boolean => {
+    return (
+      (Value.isValue(node) && Value.matches(node, props)) ||
+      (Element.isElement(node) && Element.matches(node, props)) ||
+      (Text.isText(node) && Text.matches(node, props))
+    )
+  }
+
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
@@ -233,11 +241,14 @@ namespace Node {
     const visited = new Set()
     let p: Path = []
     let n = root
-    yield [n, p]
 
     while (true) {
-      if (toPath != null && Path.equals(p, toPath)) {
+      if (toPath != null && Path.isAfter(p, toPath)) {
         break
+      }
+
+      if (!visited.has(n)) {
+        yield [n, p]
       }
 
       // If we're allowed to go downward and we haven't decsended yet, do.
@@ -256,7 +267,6 @@ namespace Node {
 
         p = p.concat(nextIndex)
         n = Node.get(root, p)
-        yield [n, p]
         continue
       }
 
@@ -272,7 +282,6 @@ namespace Node {
         if (Node.has(root, newPath)) {
           p = newPath
           n = Node.get(root, p)
-          yield [n, p]
           continue
         }
       }
@@ -282,7 +291,6 @@ namespace Node {
         const newPath = Path.previous(p)
         p = newPath
         n = Node.get(root, p)
-        yield [n, p]
         continue
       }
 

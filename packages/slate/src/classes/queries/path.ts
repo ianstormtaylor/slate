@@ -38,7 +38,7 @@ class PathQueries {
   getDepth(
     this: Editor,
     path: Path,
-    depth: 'block' | 'inline' | number | undefined
+    depth: 'block' | 'inline' | 'text' | number | undefined
   ): number {
     if (depth === 'block') {
       const closestBlock = this.getClosestBlock(path)
@@ -46,9 +46,12 @@ class PathQueries {
     } else if (depth === 'inline') {
       const closestInline = this.getClosestInline(path)
       depth = closestInline && closestInline[1].length
+    } else if (depth === 'text') {
+      const start = this.getStart(path)
+      depth = start && start.path.length
     }
 
-    return depth == null || depth === -1 ? path.length : depth
+    return depth == null ? path.length : depth
   }
 
   getHeight(this: Editor, path: Path, height: number | 'inline' | 'block') {
@@ -221,54 +224,6 @@ class PathQueries {
   }
 
   /**
-   * Get the next leaf block node entry starting from a path.
-   */
-
-  getNextLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafBlocks({ at: path })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the next leaf inline node entry starting from a path.
-   */
-
-  getNextLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafInlines({ at: path })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the next root block node entry starting from a path.
-   */
-
-  getNextRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootBlocks({ at: path })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the next root inline node entry starting from a path.
-   */
-
-  getNextRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootInlines({ at: path })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
    * Get the next text node entry starting from a path.
    */
 
@@ -322,54 +277,6 @@ class PathQueries {
   }
 
   /**
-   * Get the previous leaf block node entry starting from a path.
-   */
-
-  getPreviousLeafBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafBlocks({ at: path, reverse: true })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the previous leaf inline node entry starting from a path.
-   */
-
-  getPreviousLeafInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.leafInlines({ at: path, reverse: true })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the previous root block node entry starting from a path.
-   */
-
-  getPreviousRootBlock(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootBlocks({ at: path, reverse: true })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
-   * Get the previous root inline node entry starting from a path.
-   */
-
-  getPreviousRootInline(this: Editor, path: Path): ElementEntry | undefined {
-    for (const [n, p] of this.rootInlines({ at: path, reverse: true })) {
-      if (!Path.isAncestor(p, path) && !Path.equals(p, path)) {
-        return [n, p]
-      }
-    }
-  }
-
-  /**
    * Get the previous text node entry starting from a path.
    */
 
@@ -382,13 +289,19 @@ class PathQueries {
    * Get the full range of a node at path.
    */
 
-  getRange(this: Editor, path: Path): Range {
-    const first = this.getFirstText(path)
-    const last = this.getLastText(path)
+  getRange(this: Editor, startPath: Path, endPath: Path = startPath): Range {
+    const first = this.getFirstText(startPath)
+    const last = this.getLastText(endPath)
 
-    if (!first || !last) {
+    if (!first) {
       throw new Error(
-        `Unable to get a range for the node at path ${path} because it has no text nodes.`
+        `Unable to get a range for the node at path [${startPath}] because it has no text nodes.`
+      )
+    }
+
+    if (!last) {
+      throw new Error(
+        `Unable to get a range for the node at path [${endPath}] because it has no text nodes.`
       )
     }
 

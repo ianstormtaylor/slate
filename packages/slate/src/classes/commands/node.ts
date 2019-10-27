@@ -1,52 +1,42 @@
-import { produce } from 'immer'
 import {
   Descendant,
-  ElementEntry,
-  PathRef,
   Editor,
-  Fragment,
   Node,
   NodeEntry,
-  RangeRef,
   Element,
   Path,
   Text,
   Range,
-  Value,
   Point,
 } from '../..'
 
+type AtOption = Range | Point | Path
+
+type MatchOption =
+  | number
+  | 'value'
+  | 'block'
+  | 'inline'
+  | 'text'
+  | Partial<Node>
+  | ((entry: NodeEntry) => boolean)
+
 class NodeCommands {
   /**
-   * Insert a node (or nodes) at a specific location in the editor.
-   *
-   * The `at` option can be:
-   *
-   * - Omitted and the editor's current selection will be used as a range.
-   *
-   * - A `Range` and the range's content will be deleted, and then the collapsed
-   *   range will be used as a point.
-   *
-   * - A `Point` and the nodes up to a certain height will be split, and then
-   *   the node will be inserted at the correct path. The height is determined
-   *   by what kind of node you insert. Blocks are inserted at as leaf blocks.
-   *   Inlines are inserted as root inlines. And texts are inserted at leaf
-   *   nodes. You can override the default by passing the `height` option.
-   *
-   * - A `Path` and the node will be inserted at the specific path.
+   * Insert nodes at a specific location in the editor.
    */
 
   insertNodes(
     this: Editor,
     nodes: Node | Node[],
     options: {
-      at?: Range | Point | Path
-      depth?: number | 'block' | 'inline'
+      at?: AtOption
+      match?: MatchOption
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      let { at, depth } = options
+      let { at, match } = options
       let select = false
 
       if (Node.isNode(nodes)) {
@@ -59,14 +49,14 @@ class NodeCommands {
 
       const [node] = nodes
 
-      // If the depth isn't explicitly set, infer it from the node.
-      if (depth == null) {
+      // If the match isn't explicitly set, infer it from the node.
+      if (match == null) {
         if (Text.isText(node)) {
-          depth = -1
+          match = 'text'
         } else if (this.isInline(node)) {
-          depth = 'inline'
+          match = 'inline'
         } else {
-          depth = 'block'
+          match = 'block'
         }
       }
 
@@ -90,14 +80,18 @@ class NodeCommands {
       }
 
       if (Point.isPoint(at)) {
-        depth = this.getDepth(at.path, depth)
-        const topPath = at.path.slice(0, depth)
-        const isAtEnd = this.isAtEnd(at, topPath)
-        const pointRef = this.createPointRef(at)
-        this.splitNodes({ at, depth, always: false })
-        const point = pointRef.unref()!
-        const path = point.path.slice(0, depth)
-        at = isAtEnd ? Path.next(path) : path
+        const atMatch = this.getMatch(at.path, match)
+
+        if (atMatch) {
+          const [, matchPath] = atMatch
+          const pathRef = this.createPathRef(matchPath)
+          const isAtEnd = this.isAtEnd(at, matchPath)
+          this.splitNodes({ at, match, always: false })
+          const path = pathRef.unref()!
+          at = isAtEnd ? Path.next(path) : path
+        } else {
+          return
+        }
       }
 
       const parentPath = Path.parent(at)
@@ -124,187 +118,183 @@ class NodeCommands {
   }
 
   /**
-   * Unwrap a single node from its parent.
-   *
-   * If the node is surrounded with siblings, its parent will be split. If the
-   * node is the only child, the parent is removed, and simply replaced by the
-   * node itself.
+   * Lift nodes at a specific location upwards in the document tree, splitting
+   * their parent in two if necessary.
    */
 
   liftNodes(
     this: Editor,
     options: {
-      at?: Range | Point | Path
-      depth?: number
+      at?: AtOption
+      match?: MatchOption
     }
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      let { at, depth = 2 } = options
+      const { at = selection, match = 'block' } = options
 
-      if (depth < 2) {
-        throw new Error(
-          `Cannot lift nodes at a depth of less than \`2\`, but you passed depth: \`${depth}\``
-        )
-      }
-
-      if (!at && selection) {
-        at = selection
-      }
-
-      if (Path.isPath(at)) {
-        depth = at.length
-        at = this.getRange(at)
-      }
-
-      if (Point.isPoint(at)) {
-        at = { anchor: at, focus: at }
-      }
-
-      if (!Range.isRange(at)) {
+      if (!at) {
         return
       }
 
-      const [start, end] = Range.points(at)
-      const [, commonPath] = this.getCommon(start.path, end.path)
-      const parentPath = commonPath.slice(0, depth - 1)
-      const parent = this.getNode(parentPath)
-      const startIndex = start.path[parentPath.length]
-      const endIndex = end.path[parentPath.length]
-      const { length } = parent.nodes
+      const matches = this.matches({ at, match })
+      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
 
-      if (endIndex - startIndex + 1 === length) {
-        this.pluckNodes({ at: parentPath })
-      } else if (startIndex === 0) {
-        this.moveNodes({ at, depth, to: parentPath })
-      } else if (endIndex === length - 1) {
-        this.moveNodes({ at, depth, to: Path.next(parentPath) })
-      } else {
-        const newPath = Path.next(parentPath)
-        this.splitNodes({ at: parentPath.concat(endIndex + 1) })
-        this.moveNodes({ at, depth: parentPath.length + 1, to: newPath })
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+
+        if (path.length < 2) {
+          throw new Error(
+            `Cannot lift node at a path [${path}] because it has a depth of less than \`2\`.`
+          )
+        }
+
+        const parentPath = Path.parent(path)
+        const parent = this.getParent(path)
+        const index = path[path.length - 1]
+        const { length } = parent.nodes
+
+        if (length === 1) {
+          this.pluckNodes({ at: parentPath })
+        } else if (index === 0) {
+          this.moveNodes({ at: path, to: parentPath })
+        } else if (index === length - 1) {
+          this.moveNodes({ at: path, to: Path.next(parentPath) })
+        } else {
+          this.splitNodes({ at: Path.next(path) })
+          this.moveNodes({ at: path, to: Path.next(parentPath) })
+        }
       }
     })
   }
 
   /**
-   * Merge the nodes at a specific location.
+   * Merge a node at a location with the previous node of the same depth,
+   * removing any empty containing nodes after the merge if necessary.
    */
 
   mergeNodes(
     this: Editor,
     options: {
-      at?: Path | Point | Range
-      depth?: number | 'block' | 'inline'
+      at?: AtOption
+      match?: MatchOption
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      let { at, depth } = options
+      const { match = 'block' } = options
+      let { at } = options
 
-      if (!at && selection) {
-        at = selection
+      if (!at) {
+        if (selection) {
+          at = selection
+        } else {
+          return
+        }
       }
 
-      if (Range.isRange(at) && Range.isCollapsed(at)) {
-        at = at.anchor
-      } else if (Range.isRange(at)) {
-        const [, end] = Range.points(at)
-        const pointRef = this.createPointRef(end)
-        this.delete({ at })
-        at = pointRef.unref()!
-      } else if (Path.isPath(at)) {
-        depth = at.length
-        at = this.getStart(at)
+      if (Range.isRange(at)) {
+        if (Range.isCollapsed(at)) {
+          at = at.anchor
+        } else {
+          const [, end] = Range.points(at)
+          const pointRef = this.createPointRef(end)
+          this.delete({ at })
+          at = pointRef.unref()!
+
+          if (options.at == null) {
+            this.select(at)
+          }
+        }
       }
 
-      if (!Point.isPoint(at)) {
-        return
-      }
+      for (const [node, path] of this.matches({ at, match })) {
+        const prevText = this.getPreviousText(path)
 
-      const fromDepth = this.getDepth(at.path, depth)
-      const path = at.path.slice(0, fromDepth)
-      const node = this.getNode(path)
-      const prevText = this.getPreviousText(path)
+        if (!prevText) {
+          continue
+        }
 
-      if (!prevText) {
-        return
-      }
+        const [, prevTextPath] = prevText
+        const prevMatcher = Path.isPath(at) ? at.length : match
+        const prevMatch = this.getMatch(prevTextPath, prevMatcher)
 
-      const [, prevTextPath] = prevText
-      const prevDepth = this.getDepth(prevTextPath, depth)
-      const prevPath = prevTextPath.slice(0, prevDepth)
-      const prevNode = this.getNode(prevPath)
-      const newPath = Path.next(prevPath)
-      const commonPath = Path.common(path, prevPath)
-      const isPreviousSibling = Path.isSibling(path, prevPath)
+        if (!prevMatch) {
+          return
+        }
 
-      // Determine if the merge will leave an ancestor of the path empty as a
-      // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Node.furthest(this.value, path, ([n, p]) => {
-        return (
-          Path.isDescendant(p, commonPath) &&
-          Path.isAncestor(p, path) &&
-          Element.isElement(n) &&
-          n.nodes.length === 1
-        )
-      })
+        const [prevNode, prevPath] = prevMatch
+        const newPath = Path.next(prevPath)
+        const commonPath = Path.common(path, prevPath)
+        const isPreviousSibling = Path.isSibling(path, prevPath)
 
-      const emptyRef = emptyAncestor && this.createPathRef(emptyAncestor[1])
-      let properties
-      let position
-
-      // Ensure that the nodes are equivalent, and figure out what the position
-      // and extra properties of the merge will be.
-      if (Text.isText(node) && Text.isText(prevNode)) {
-        const { text, marks, ...rest } = node
-        position = prevNode.text.length
-        properties = rest as Partial<Text>
-      } else if (Element.isElement(node) && Element.isElement(prevNode)) {
-        const { nodes, ...rest } = node
-        position = prevNode.nodes.length
-        properties = rest as Partial<Element>
-      } else {
-        throw new Error(
-          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
-            node
-          )} ${JSON.stringify(prevNode)}`
-        )
-      }
-
-      // If the node isn't already the next sibling of the previous node, move
-      // it so that it is before merging.
-      if (!isPreviousSibling) {
-        this.moveNodes({ at: path, to: newPath })
-      }
-
-      // If there was going to be an empty ancestor of the node that was merged,
-      // we remove it from the tree.
-      if (emptyRef) {
-        this.removeNodes({ at: emptyRef.current! })
-      }
-
-      // If the target node that we're merging with is empty, remove it instead
-      // of merging the two. This is a common rich text editor behavior to
-      // prevent losing formatting when deleting entire nodes when you have a
-      // hanging selection.
-      if (
-        (Element.isElement(prevNode) && this.isEmpty(prevNode)) ||
-        (Text.isText(prevNode) && prevNode.text === '')
-      ) {
-        this.removeNodes({ at: prevPath })
-      } else {
-        this.apply({
-          type: 'merge_node',
-          path: newPath,
-          position,
-          target: null,
-          properties,
+        // Determine if the merge will leave an ancestor of the path empty as a
+        // result, in which case we'll want to remove it after merging.
+        const emptyAncestor = Node.furthest(this.value, path, ([n, p]) => {
+          return (
+            Path.isDescendant(p, commonPath) &&
+            Path.isAncestor(p, path) &&
+            Element.isElement(n) &&
+            n.nodes.length === 1
+          )
         })
-      }
 
-      if (emptyRef) {
-        emptyRef.unref()
+        const emptyRef = emptyAncestor && this.createPathRef(emptyAncestor[1])
+        let properties
+        let position
+
+        // Ensure that the nodes are equivalent, and figure out what the position
+        // and extra properties of the merge will be.
+        if (Text.isText(node) && Text.isText(prevNode)) {
+          const { text, marks, ...rest } = node
+          position = prevNode.text.length
+          properties = rest as Partial<Text>
+        } else if (Element.isElement(node) && Element.isElement(prevNode)) {
+          const { nodes, ...rest } = node
+          position = prevNode.nodes.length
+          properties = rest as Partial<Element>
+        } else {
+          throw new Error(
+            `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
+              node
+            )} ${JSON.stringify(prevNode)}`
+          )
+        }
+
+        // If the node isn't already the next sibling of the previous node, move
+        // it so that it is before merging.
+        if (!isPreviousSibling) {
+          this.moveNodes({ at: path, to: newPath })
+        }
+
+        // If there was going to be an empty ancestor of the node that was merged,
+        // we remove it from the tree.
+        if (emptyRef) {
+          this.removeNodes({ at: emptyRef.current! })
+        }
+
+        // If the target node that we're merging with is empty, remove it instead
+        // of merging the two. This is a common rich text editor behavior to
+        // prevent losing formatting when deleting entire nodes when you have a
+        // hanging selection.
+        if (
+          (Element.isElement(prevNode) && this.isEmpty(prevNode)) ||
+          (Text.isText(prevNode) && prevNode.text === '')
+        ) {
+          this.removeNodes({ at: prevPath })
+        } else {
+          this.apply({
+            type: 'merge_node',
+            path: newPath,
+            position,
+            target: null,
+            properties,
+          })
+        }
+
+        if (emptyRef) {
+          emptyRef.unref()
+        }
       }
     })
   }
@@ -316,67 +306,51 @@ class NodeCommands {
   moveNodes(
     this: Editor,
     options: {
-      at?: Range | Point | Path
-      depth?: number
+      at?: AtOption
+      match?: MatchOption
       to: Path
     }
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      const { to } = options
+      const { to, match = 'block' } = options
       const newIndex = to[to.length - 1]
-      let { at, depth } = options
-      let isSelection = false
+      let { at } = options
+      let selectRef
 
       if (newIndex > 0 && !this.hasNode(Path.previous(to))) {
         throw new Error(
-          `Cannot move the node at path [${at}] to new path [${to}] because the index is out of range.`
-        )
-      } else if (depth != null && depth < 1) {
-        throw new Error(
-          `Cannot move nodes at a depth less than \`1\`, but you passed depth: \`${depth}\``
+          `Cannot move nodes to new path [${to}] because the index is out of range.`
         )
       }
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      } else if (Path.isPath(at)) {
-        depth = at.length
-        at = this.getRange(at)
-      } else if (Point.isPoint(at)) {
-        at = { anchor: at, focus: at }
-      } else if (!Range.isRange(at)) {
-        return
+      if (!at) {
+        if (selection) {
+          at = selection
+          selectRef = this.createRangeRef(at)
+        } else {
+          return
+        }
       }
 
-      const [start, end] = Range.points(at)
-      const rangeRef = this.createRangeRef(at)
-      const commonPath = Path.common(start.path, end.path)
-
-      if (depth == null) {
-        depth = commonPath.length + 1
-      }
-
-      const parentPath = commonPath.slice(0, depth - 1)
-      const startIndex = start.path[parentPath.length]
-      const endIndex = end.path[parentPath.length]
       const toRef = this.createPathRef(to)
-      const parentRef = this.createPathRef(parentPath)
+      const targets = this.matches({ at, match })
+      const pathRefs = Array.from(targets, ([, p]) => this.createPathRef(p))
 
-      for (let i = endIndex; i >= startIndex; i--) {
-        this.apply({
-          type: 'move_node',
-          path: parentRef.current!.concat(startIndex),
-          newPath: toRef.current!,
-        })
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        const newPath = toRef.current!
+
+        if (path.length !== 0) {
+          this.apply({ type: 'move_node', path, newPath })
+        }
       }
 
-      if (isSelection && rangeRef.current) {
-        this.select(rangeRef.current)
+      if (selectRef) {
+        this.select(selectRef.current!)
       }
 
-      rangeRef.unref()
+      toRef.unref()
     })
   }
 
@@ -468,117 +442,99 @@ class NodeCommands {
   }
 
   /**
-   * Removing a node at a path, replacing it with its children.
+   * Remove a node at a specific location, replacing it with its children.
    */
 
   pluckNodes(
     this: Editor,
     options: {
-      at?: Path | Range
-      match?: Partial<Element> | ((entry: ElementEntry) => boolean)
+      at?: AtOption
+      match?: MatchOption
     }
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      let { at, match = () => true } = options
+      const { match = 'block' } = options
+      let { at } = options
 
-      if (!at && selection) {
-        at = selection
-      }
-
-      if (Path.isPath(at)) {
-        const path = at
-        match = ([n, p]: NodeEntry) => Path.equals(p, path)
-        at = this.getRange(at)
-      }
-
-      if (typeof match === 'object') {
-        const props = match
-        match = ([n]: NodeEntry) =>
-          Element.isElement(n) && Element.matches(n, props)
-      }
-
-      if (typeof match !== 'function') {
-        throw new Error(
-          `The \`match\` option to \`editor.pluckNodes()\` should be a function or a properties object to match.`
-        )
-      }
-
-      for (const [node, path] of this.elements({ at })) {
-        if (!match([node, path])) {
-          continue
+      if (!at) {
+        if (selection) {
+          at = selection
+        } else {
+          return
         }
+      }
 
-        this.moveNodes({
-          at: this.getRange(path),
-          depth: path.length + 1,
-          to: Path.next(path),
-        })
+      const matches = this.matches({ at, match })
+      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
 
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        const range = this.getRange(path)
+        const depth = path.length + 1
+        const to = Path.next(path)
+        this.moveNodes({ at: range, match: depth, to })
         this.removeNodes({ at: path })
       }
     })
   }
 
   /**
-   * Remove the node at a path.
+   * Remove the nodes at a specific location in the document.
    */
 
-  removeNodes(this: Editor, options: { at: Path }) {
-    const { at } = options
-    const node = this.getNode(at)
-    this.apply({ type: 'remove_node', path: at, node })
+  removeNodes(
+    this: Editor,
+    options: {
+      at?: AtOption
+      match?: MatchOption
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      const { match = 'block' } = options
+      let { at } = options
+
+      if (!at) {
+        if (selection) {
+          at = selection
+        } else {
+          return
+        }
+      }
+
+      const depths = this.matches({ at, match })
+      const pathRefs = Array.from(depths, ([, p]) => this.createPathRef(p))
+
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        const node = this.getNode(path)
+        this.apply({ type: 'remove_node', path, node })
+      }
+    })
   }
 
   /**
-   * Set new properties on nodes in the editor.
+   * Set new properties on the nodes ...
    */
 
   setNodes(
     this: Editor,
     props: Partial<Node>,
     options: {
-      at?: Path | Point | Range
-      match?: 'block' | 'inline' | ((entry: NodeEntry) => boolean)
+      at?: AtOption
+      match?: MatchOption
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at, match = () => true } = options
+      const { at = this.value.selection, match = 'block' } = options
 
-      if (match === 'block') {
-        match = ([n]: NodeEntry) => Element.isElement(n) && !this.isInline(n)
-      } else if (match === 'inline') {
-        match = ([n]: NodeEntry) => Element.isElement(n) && this.isInline(n)
-      }
-
-      if (!at && selection) {
-        at = selection
-      }
-
-      if (Path.isPath(at)) {
-        const path = at
-        match = ([n, p]: NodeEntry) => Path.equals(p, path)
-        at = this.getRange(path)
-      }
-
-      if (Point.isPoint(at)) {
-        const point = at
-        match = ([n, p]: NodeEntry) => Path.equals(p, point.path)
-        at = { anchor: point, focus: point }
-      }
-
-      if (!Range.isRange(at)) {
+      if (!at) {
         return
       }
 
-      at = this.getNonHangingRange(at)
-
-      for (const [node, path] of this.entries({ at })) {
-        if (!match([node, path])) {
-          continue
-        }
-
+      for (const [node, path] of this.matches({ at, match })) {
         const properties: Partial<Node> = {}
         const newProperties: Partial<Node> = {}
 
@@ -599,17 +555,14 @@ class NodeCommands {
           }
         }
 
-        // If no properties have changed don't apply an operation at all.
-        if (Object.keys(newProperties).length === 0) {
-          continue
+        if (Object.keys(newProperties).length !== 0) {
+          this.apply({
+            type: 'set_node',
+            path,
+            properties,
+            newProperties,
+          })
         }
-
-        this.apply({
-          type: 'set_node',
-          path,
-          properties,
-          newProperties,
-        })
       }
     })
   }
@@ -621,284 +574,228 @@ class NodeCommands {
   splitNodes(
     this: Editor,
     options: {
-      at?: Path | Point | Range
+      at?: AtOption
+      match?: MatchOption
       always?: boolean
-      depth?: 'block' | 'inline' | number
       height?: number
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { selection } = this.value
-      const { always = true } = options
-      let { at, depth = -1, height = 0 } = options
-      let isSelection = false
-      let maxDepth = Infinity
-      let position: number | null = null
+      const { always = true, match = 'block' } = options
+      let { at, height = 0 } = options
+      let target: number | null = null
+      let position
+      let selectRef
+      let edgeRef
+      let firstPath
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      }
-
-      if (Range.isRange(at) && Range.isCollapsed(at)) {
-        at = at.anchor
+      if (!at) {
+        if (selection) {
+          const [, end] = Range.points(selection)
+          selectRef = this.createPointRef(end)
+          at = selection
+        } else {
+          return
+        }
       }
 
       if (Range.isRange(at)) {
-        const [, end] = Range.points(at)
-        const pointRef = this.createPointRef(end)
-        this.delete({ at })
-        at = pointRef.unref()!
-      }
-
-      if (Path.isPath(at)) {
-        const first = this.getFirstText(at)
-
-        if (!first) {
-          return
-        }
-
-        const [, firstPath] = first
-        debugger
-        height = firstPath.length - at.length + 1
-        position = at[at.length - 1]
-        maxDepth = at.length - 1
-        at = { path: firstPath, offset: 0 }
-        debugger
-      }
-
-      if (!Point.isPoint(at)) {
-        return
-      }
-
-      const { path, offset } = at
-      const furthestVoid = this.getFurthestVoid(path)
-      let pos = position == null ? offset : position
-      let target: number | null = null
-
-      // If the point it inside a void node, we still want to split up to a
-      // `height`, but we need to start after the void node in the tree.
-      if (furthestVoid) {
-        const [, voidPath] = furthestVoid
-        const relPath = Path.relative(path, voidPath)
-        height = Math.max(relPath.length + 1, height)
-        pos = voidPath[voidPath.length - 1]
-      }
-
-      const outsideRef = this.createPointRef(at)
-      const insideRef = this.createPointRef(at, { stick: 'backward' })
-      let d = path.length - height
-      depth = this.getDepth(path, depth)
-      depth = Math.min(depth, maxDepth)
-
-      while (d >= depth) {
-        debugger
-        const p = path.slice(0, d)
-        d--
-
-        if (p.length === 0) {
-          break
-        }
-
-        // With the `always: false` option, we will instead split the nodes only
-        // when the point isn't already at it's edge.
-        if (
-          !always &&
-          insideRef.current != null &&
-          this.isAtEdge(insideRef.current, p)
-        ) {
-          continue
-        }
-
-        const node = this.getNode(p)
-        let properties
-
-        if (Text.isText(node)) {
-          const { text, marks, ...rest } = node
-          properties = rest
+        if (Range.isCollapsed(at)) {
+          at = at.anchor
         } else {
-          const { nodes, ...rest } = node
-          properties = rest
+          const [, end] = Range.points(at)
+          const pointRef = this.createPointRef(end)
+          this.delete({ at })
+          at = pointRef.unref()!
         }
-
-        this.apply({
-          type: 'split_node',
-          path: p,
-          position: pos,
-          target,
-          properties,
-        })
-
-        target = pos
-        pos = path[d] + 1
       }
 
-      if (isSelection) {
-        const point = outsideRef.current!
-        this.select(point)
-      }
-
-      outsideRef.unref()
-    })
-  }
-
-  surroundNodes(
-    this: Editor,
-    element: Element,
-    options: {
-      at?: Path | Point | Range
-      depth?: 'block' | 'inline' | number
-    } = {}
-  ) {
-    this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at, depth } = options
-
-      // Convert the possibilities for `at` into a range.
-      if (!at && selection) {
-        at = selection
-      } else if (Path.isPath(at)) {
-        depth = at.length
-        at = this.getRange(at)
-      } else if (Point.isPoint(at)) {
-        at = { anchor: at, focus: at }
-      } else if (!Range.isRange(at)) {
-        return
-      }
-
-      const isInline = this.isInline(element)
-      let range = at
-      let minDepth = 0
-
-      if (depth == null) {
-        depth = isInline ? 'inline' : 'block'
-      }
-
-      const surround = () => {
-        const [start, end] = Range.points(range)
-        const startDepth = this.getDepth(start.path, depth)
-        const endDepth = this.getDepth(start.path, depth)
-        const commonPath = Path.common(start.path, end.path)
-        let d = Math.min(startDepth - 1, endDepth - 1, commonPath.length)
-        d = Math.max(minDepth, d)
-        const path = commonPath.slice(0, d)
-        const firstPath = path.concat(0)
-        const target = this.getRange(path)
-        const targetRef = this.createRangeRef(target)
-        const container = { ...element, nodes: [] }
-
-        this.insertNodes(container, { at: firstPath })
-
-        this.moveNodes({
-          at: targetRef.current!,
-          depth: path.length + 1,
-          to: firstPath.concat(0),
-        })
-
-        targetRef.unref()
-      }
-
-      if (!isInline) {
-        surround()
+      // If the target is a path, the default height-skipping and position
+      // counters need to account for us potentially splitting at a non-leaf.
+      if (Path.isPath(at)) {
+        const [, p] = Node.first(this.value, at)
+        firstPath = p
+        height = p.length - at.length + 1
+        position = at[at.length - 1]
+        at = at.slice(0, -1)
       } else {
-        for (const [, blockPath] of this.leafBlocks({ at })) {
-          range = Range.intersection(at, this.getRange(blockPath))
-          const [start, end] = Range.points(range)
-          const startDepth = this.getDepth(start.path, 'inline') - 1
-          const endDepth = this.getDepth(end.path, 'inline') - 1
-          minDepth = Math.min(startDepth, endDepth)
-          surround()
+        firstPath = at.path
+        position = at.offset
+        edgeRef = this.createPointRef(at, { stick: 'backward' })
+      }
+
+      let d = firstPath.length - height
+
+      for (const [, path] of this.matches({ at, match })) {
+        while (d >= path.length && d > 0) {
+          const p = firstPath.slice(0, d)
+          d--
+
+          // With the `always: false` option, we will instead split the nodes only
+          // when the point isn't already at it's edge.
+          if (
+            !always &&
+            edgeRef &&
+            edgeRef.current &&
+            this.isAtEdge(edgeRef.current, p)
+          ) {
+            continue
+          }
+
+          const node = this.getNode(p)
+          const { text, marks, nodes, ...properties } = node
+
+          this.apply({
+            type: 'split_node',
+            path: p,
+            position,
+            target,
+            properties,
+          })
+
+          target = position
+          position = firstPath[d] + 1
         }
+      }
+
+      if (selectRef) {
+        this.select(selectRef.current!)
+        selectRef.unref()
+      }
+
+      if (edgeRef) {
+        edgeRef.unref()
       }
     })
   }
 
   /**
-   * Unwrap the leaf nodes from the closest matching parent.
+   * Surround the nodes at a location with a new parent node.
+   */
+
+  surroundNodes(
+    this: Editor,
+    element: Element,
+    options: {
+      at?: AtOption
+      match?: MatchOption
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const { selection } = this.value
+      const { match = this.isInline(element) ? 'inline' : 'block' } = options
+      let { at } = options
+
+      if (!at) {
+        if (selection) {
+          at = selection
+        } else {
+          return
+        }
+      }
+
+      for (const [, , matches] of this.batches({
+        element,
+        at,
+        match,
+      })) {
+        const [first] = matches
+        const last = matches[matches.length - 1]
+        const [, firstPath] = first
+        const [, lastPath] = last
+        const commonPath = Path.equals(firstPath, lastPath)
+          ? Path.parent(firstPath)
+          : Path.common(firstPath, lastPath)
+
+        const range = this.getRange(firstPath, lastPath)
+        const depth = commonPath.length + 1
+        const wrapperPath = Path.next(lastPath).slice(0, depth)
+        const wrapper = { ...element, nodes: [] }
+        this.insertNodes(wrapper, { at: wrapperPath })
+        this.moveNodes({
+          at: range,
+          match: depth,
+          to: wrapperPath.concat(0),
+        })
+      }
+    })
+  }
+
+  /**
+   * Unwrap the nodes at a location from a parent node, splitting the parent if
+   * necessary to ensure that only the content in the range is unwrapped.
    */
 
   unwrapNodes(
     this: Editor,
     options: {
-      at?: Path | Range
-      match?: Partial<Element> | ((entry: ElementEntry) => boolean)
+      at?: AtOption
+      match?: MatchOption
     }
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at = selection, match = () => true } = options
+      const { at = this.value.selection, match = 'block' } = options
 
-      if (Path.isPath(at)) {
-        const path = at
-        match = ([n, p]: ElementEntry) => Path.equals(p, path)
-        at = this.getRange(at)
-      }
-
-      if (typeof match === 'object') {
-        const props = match
-        match = ([n]: ElementEntry) => Element.matches(n, props)
-      }
-
-      if (typeof match !== 'function') {
-        throw new Error(
-          `The \`match\` option to \`editor.pluckNodes()\` should be a function or a properties object to match.`
-        )
-      }
-
-      if (!Range.isRange(at)) {
+      if (!at) {
         return
       }
 
-      const matches: [RangeRef, number][] = []
+      const matches = this.matches({ at, match })
+      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
 
-      for (const [node, path] of this.elements({ at })) {
-        if (match([node, path])) {
-          const range = this.getRange(path)
-          const intersection = Range.intersection(at, range)
-          const rangeRef = this.createRangeRef(intersection)
-          const depth = path.length + 1
-          matches.push([rangeRef, depth])
-        }
-      }
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        const depth = path.length + 1
+        const a = Range.isRange(at)
+          ? Range.intersection(at, this.getRange(path))!
+          : at
 
-      for (const [rangeRef, depth] of matches) {
-        if (rangeRef.current) {
-          this.liftNodes({ at: rangeRef.current, depth })
-        }
-
-        rangeRef.unref()
+        this.liftNodes({ at: a, match: depth })
       }
     })
   }
+
+  /**
+   * Wrap the nodes at a location in a new container node, splitting the edges
+   * of the range first to ensure that only the content in the range is wrapped.
+   */
 
   wrapNodes(
     this: Editor,
     element: Element,
     options: {
-      at?: Path | Point | Range
-      depth?: 'block' | 'inline' | number
+      at?: AtOption
+      match?: MatchOption
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at, depth } = options
+      const { match = this.isInline(element) ? 'inline' : 'block' } = options
+      let { at = this.value.selection } = options
 
-      // Convert the possibilities for `at` into a range.
-      if (!at && selection) {
-        at = selection
-      } else if (Path.isPath(at)) {
-        depth = at.length
-        at = this.getRange(at)
-      } else if (Point.isPoint(at)) {
-        at = { anchor: at, focus: at }
-      } else if (!Range.isRange(at)) {
+      if (!at) {
         return
       }
 
-      const rangeRef = this.createRangeRef(at, { stick: 'inward' })
-      this.splitNodes({ at, always: false, depth })
-      const range = rangeRef.unref()!
-      this.surroundNodes(element, { at: range, depth })
+      let rangeRef
+
+      if (Range.isRange(at)) {
+        const [start, end] = Range.points(at)
+        rangeRef = this.createRangeRef(at, { stick: 'inward' })
+        this.splitNodes({ at: end, always: false, match })
+        this.splitNodes({ at: start, always: false, match })
+        at = rangeRef.current!
+
+        if (options.at == null) {
+          this.select(at)
+        }
+      }
+
+      this.surroundNodes(element, { at, match })
+
+      if (rangeRef) {
+        rangeRef.unref()
+      }
     })
   }
 }

@@ -12,8 +12,6 @@ import AnnotationCommands from './commands/annotation'
 import TextCommands from './commands/text'
 import NodeCommands from './commands/node'
 import MarkCommands from './commands/mark'
-import PathCommands from './commands/path'
-import RangeCommands from './commands/range'
 import SelectionCommands from './commands/selection'
 import ValueCommands from './commands/value'
 import ElementQueries from './queries/element'
@@ -81,8 +79,6 @@ interface Editor
     TextCommands,
     NodeCommands,
     MarkCommands,
-    PathCommands,
-    RangeCommands,
     SelectionCommands,
     ValueCommands,
     ElementQueries,
@@ -107,8 +103,6 @@ mixin([
   TextCommands,
   NodeCommands,
   MarkCommands,
-  PathCommands,
-  RangeCommands,
   SelectionCommands,
   ValueCommands,
   ElementQueries,

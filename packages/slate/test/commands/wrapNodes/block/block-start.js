@@ -5,25 +5,22 @@ import { h } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      <anchor />one
+      <anchor />wo<focus />rd
     </block>
-    <block>
-      two<focus />
-    </block>
-    <block>three</block>
   </value>
 )
 
 export const run = editor => {
-  editor.wrapNodes(<block a />)
+  editor.wrapNodes(<block new />)
 }
 
 export const output = (
   <value>
-    <block a>
+    <block new>
       <block>
-        <anchor />word<focus />
+        <anchor />wo<focus />
       </block>
     </block>
+    <block>rd</block>
   </value>
 )

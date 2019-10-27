@@ -17,7 +17,7 @@ export const input = (
 export const test = value => {
   return Array.from(
     Node.texts(value, {
-      range: {
+      at: {
         anchor: {
           path: [0, 1],
           offset: 0,

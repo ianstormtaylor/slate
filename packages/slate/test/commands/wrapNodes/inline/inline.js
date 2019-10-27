@@ -2,28 +2,28 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.wrapInline('link')
-}
-
 export const input = (
   <value>
     <block>
-      <inline void>
-        <cursor />
-      </inline>
+      one
+      <anchor />two<focus />
+      three
     </block>
   </value>
 )
 
+export const run = editor => {
+  editor.wrapNodes(<inline new />)
+}
+
 export const output = (
   <value>
     <block>
-      <inline>
-        <inline void>
-          <cursor />
-        </inline>
+      one
+      <inline new>
+        <anchor />two<focus />
       </inline>
+      three
     </block>
   </value>
 )
