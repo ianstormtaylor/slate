@@ -249,6 +249,7 @@ class MentionsExample extends React.Component {
 
     if (searchResult.length === 1) {
       this.insertMention(searchResult[0])
+      return
     }
 
     if (searchResult.length <= 5) {
