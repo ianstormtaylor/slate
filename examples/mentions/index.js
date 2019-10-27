@@ -241,7 +241,7 @@ class MentionsExample extends React.Component {
       return
     }
 
-    const searchResult = this.search(mentionInputValue)
+    const searchResult = searchUsers(mentionInputValue)
 
     if (!searchResult.length) {
       return
