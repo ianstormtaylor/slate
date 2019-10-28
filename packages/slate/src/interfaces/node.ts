@@ -3,6 +3,7 @@ import {
   Element,
   ElementEntry,
   Fragment,
+  Location,
   MarkEntry,
   Path,
   Range,
@@ -176,8 +177,7 @@ namespace Node {
   export function* descendants(
     root: Node,
     options: {
-      at?: Range | Point | Path
-      from?: Path
+      at?: Location
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -200,8 +200,7 @@ namespace Node {
   export function* elements(
     root: Node,
     options: {
-      at?: Range | Point | Path
-      from?: Path
+      at?: Location
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -214,6 +213,15 @@ namespace Node {
   }
 
   /**
+   * Get the end point of a location inside the root node.
+   */
+
+  export const end = (root: Node, at: Location): Point => {
+    const end = Node.point(root, at, { edge: 'end' })
+    return end
+  }
+
+  /**
    * Return an iterable of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
@@ -222,40 +230,25 @@ namespace Node {
   export function* entries(
     root: Node,
     options: {
-      at?: Range | Point | Path
-      from?: Path
+      at?: Location
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at, from, pass, reverse = false } = options
-    let [, fromPath] = reverse ? Node.last(root, []) : Node.first(root, [])
-    let toPath
-
-    if (Range.isRange(at)) {
-      const [s, e] = Range.edges(at)
-      fromPath = reverse ? e.path : s.path
-      toPath = reverse ? s.path : e.path
-    } else if (Point.isPoint(at)) {
-      fromPath = toPath = at.path
-    } else if (Path.isPath(at)) {
-      const [, f] = Node.first(root, at)
-      const [, l] = Node.last(root, at)
-      fromPath = reverse ? l : f
-      toPath = reverse ? f : l
-    }
-
-    if (Path.isPath(from)) {
-      const [, f] = reverse ? Node.last(root, from) : Node.first(root, from)
-      fromPath = f
-    }
-
+    const { at = [], pass, reverse = false } = options
+    const startPath = Node.path(root, at, { edge: 'start' })
+    const endPath = Node.path(root, at, { edge: 'end' })
+    const fromPath = reverse ? endPath : startPath
+    const toPath = reverse ? startPath : endPath
     const visited = new Set()
     let p: Path = []
     let n = root
 
     while (true) {
-      if (toPath != null && Path.isAfter(p, toPath)) {
+      if (
+        (!reverse && Path.isAfter(p, toPath)) ||
+        (reverse && Path.isBefore(p, toPath))
+      ) {
         break
       }
 
@@ -512,8 +505,7 @@ namespace Node {
   export function* marks(
     root: Node,
     options: {
-      at?: Range | Point | Path
-      from?: Path
+      at?: Location
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
@@ -544,6 +536,110 @@ namespace Node {
   }
 
   /**
+   * Get the path of a location inside the root node.
+   */
+
+  export const path = (
+    root: Node,
+    at: Location,
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ): Path => {
+    const { depth, edge } = options
+
+    if (Path.isPath(at)) {
+      if (edge === 'start') {
+        const [, firstPath] = Node.first(root, at)
+        at = firstPath
+      } else if (edge === 'end') {
+        const [, lastPath] = Node.last(root, at)
+        at = lastPath
+      }
+    }
+
+    if (Range.isRange(at)) {
+      if (edge === 'start') {
+        at = Range.start(at)
+      } else if (edge === 'end') {
+        at = Range.end(at)
+      } else {
+        at = Path.common(at.anchor.path, at.focus.path)
+      }
+    }
+
+    if (Point.isPoint(at)) {
+      at = at.path
+    }
+
+    if (depth != null) {
+      at = at.slice(0, depth)
+    }
+
+    return at
+  }
+
+  /**
+   * Get the start of end point of a location inside the root node.
+   */
+
+  export const point = (
+    root: Node,
+    at: Location,
+    options: {
+      edge?: 'start' | 'end'
+    }
+  ): Point => {
+    const { edge = 'start' } = options
+
+    if (Path.isPath(at)) {
+      debugger
+      const path = Node.path(root, at, { edge })
+      const node = Node.get(root, path)
+
+      if (!Text.isText(node)) {
+        debugger
+        throw new Error(
+          `Cannot get the ${edge} point in the node at path [${at}] because it has no ${edge} text node.`
+        )
+      }
+
+      return { path, offset: edge === 'start' ? 0 : node.text.length }
+    }
+
+    if (Range.isRange(at)) {
+      const [start, end] = Range.edges(at)
+      return edge === 'start' ? start : end
+    }
+
+    return at
+  }
+
+  /**
+   * Get the range from one location to another inside the root node.
+   */
+
+  export const range = (
+    root: Node,
+    from: Location,
+    to: Location = from
+  ): Range => {
+    const anchor = Node.start(root, from)
+    const focus = Node.end(root, to)
+    return { anchor, focus }
+  }
+
+  /**
+   * Get the start point of a location inside the root node.
+   */
+
+  export const start = (root: Node, at: Location): Point => {
+    const start = Node.point(root, at, { edge: 'start' })
+    return start
+  }
+
+  /**
    * Get the concatenated text string of a node's content.
    *
    * Note that this will not include spaces or line breaks between block nodes.
@@ -566,8 +662,7 @@ namespace Node {
   export function* texts(
     root: Node,
     options: {
-      at?: Range | Point | Path
-      from?: Path
+      at?: Location
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}

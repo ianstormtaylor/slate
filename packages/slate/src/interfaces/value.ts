@@ -243,10 +243,14 @@ namespace Value {
           const { path } = op
           const index = path[path.length - 1]
           const parent = Node.parent(v, path)
-          const [, first] = Node.first(v, path)
-          const [, last] = Node.last(v, path)
-          const [, prev] = Node.texts(v, { from: first, reverse: true })
-          const [, next] = Node.texts(v, { from: last })
+          const rootStart = Node.start(v, [])
+          const rootEnd = Node.end(v, [])
+          const nodeStart = Node.start(v, path)
+          const nodeEnd = Node.end(v, path)
+          const before = { anchor: rootStart, focus: nodeStart }
+          const after = { anchor: nodeEnd, focus: rootEnd }
+          const [, prev] = Node.texts(v, { at: before, reverse: true })
+          const [, next] = Node.texts(v, { at: after })
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the

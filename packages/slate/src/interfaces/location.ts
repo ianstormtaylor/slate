@@ -1,4 +1,3 @@
-import isPlainObject from 'is-plain-object'
 import { Path, Point, Range } from '..'
 
 /**

@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.blocks({ from: [1] }))
+  return Array.from(editor.blocks({ at: [1] }))
 }
 
-export const output = [[<block>two</block>, [1]], [<block>three</block>, [2]]]
+export const output = [[<block>two</block>, [1]]]

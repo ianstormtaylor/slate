@@ -58,7 +58,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -166,7 +165,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -184,7 +182,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
@@ -226,12 +223,16 @@ class ValueQueries {
 
     // If the range is collapsed at the start of a text node, it should carry
     // over the marks from the previous text node in the same block.
-    if (Range.isCollapsed(at) && this.isStart(at.anchor, at.anchor.path)) {
-      const prevPath = Path.previous(at.anchor.path)
-      const [prevNode] = this.getNode(prevPath)
+    if (Range.isCollapsed(at) && at.anchor.offset === 0) {
+      const { anchor } = at
+      const prev = this.getPrevious(anchor, 'text')
 
-      if (Text.isText(prevNode)) {
-        at = this.getRange(prevPath)
+      if (prev && Path.isSibling(anchor.path, prev[1])) {
+        const [prevNode, prevPath] = prev
+
+        if (Text.isText(prevNode)) {
+          at = this.getRange(prevPath)
+        }
       }
     }
 
@@ -280,7 +281,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
@@ -299,7 +299,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
@@ -324,26 +323,20 @@ class ValueQueries {
   *positions(
     this: Editor,
     options: {
-      at?: Point
+      at?: Location
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
   ): Iterable<Point> {
-    const {
-      unit = 'offset',
-      reverse = false,
-      at = reverse ? this.getEnd() : this.getStart(),
-    } = options
-
-    if (!at) {
-      return
-    }
-
+    const { at = [], unit = 'offset', reverse = false } = options
+    const range = this.getRange(at)
+    const [start, end] = Range.edges(range)
+    const first = reverse ? end : start
     let string = ''
     let available = 0
     let offset = 0
     let distance: number | null = null
-    let isBlockStart = true
+    let isNewBlock = false
 
     const advance = () => {
       if (distance == null) {
@@ -378,40 +371,33 @@ class ValueQueries {
           continue
         }
 
-        if (!this.isInline(node) && this.hasInlines(node)) {
-          let text = this.getText(path)
+        if (this.isInline(node)) {
+          continue
+        }
 
-          if (Path.isAncestor(path, at.path)) {
-            let before = 0
+        if (this.hasInlines(node)) {
+          let e = Path.isAncestor(path, end.path) ? end : this.getEnd(path)
+          let s = Path.isAncestor(path, start.path)
+            ? start
+            : this.getStart(path)
 
-            for (const [n, p] of this.texts({ from: path })) {
-              if (Path.equals(p, at.path)) {
-                break
-              }
-
-              before += n.text.length
-            }
-
-            const o = before + at.offset
-            text = reverse ? text.slice(0, o) : text.slice(o)
-          }
-
+          const text = this.getText({ anchor: s, focus: e })
           string = reverse ? reverseText(text) : text
-          isBlockStart = true
+          isNewBlock = true
         }
       }
 
       if (Text.isText(node)) {
-        const isStart = Path.equals(path, at.path)
+        const isFirst = Path.equals(path, first.path)
         available = node.text.length
         offset = reverse ? available : 0
 
-        if (isStart) {
-          available = reverse ? at.offset : available - at.offset
-          offset = at.offset
+        if (isFirst) {
+          available = reverse ? first.offset : available - first.offset
+          offset = first.offset
         }
 
-        if (isStart || isBlockStart || unit === 'offset') {
+        if (isFirst || isNewBlock || unit === 'offset') {
           yield { path, offset }
         }
 
@@ -432,7 +418,7 @@ class ValueQueries {
           }
         }
 
-        isBlockStart = false
+        isNewBlock = false
       }
     }
   }
@@ -445,7 +431,6 @@ class ValueQueries {
     this: Editor,
     options: {
       at?: Location
-      from?: Path
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {

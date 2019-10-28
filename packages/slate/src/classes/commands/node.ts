@@ -390,9 +390,7 @@ class NodeCommands {
         // Merge adjacent text nodes that are empty or have matching marks.
         if (prev != null && Text.isText(prev)) {
           if (Text.matches(child, prev)) {
-            debugger
             this.mergeNodes({ at: at.concat(n) })
-            debugger
             n--
             continue
           } else if (prev.text === '') {

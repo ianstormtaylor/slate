@@ -23,7 +23,7 @@ export const test = value => {
           offset: 0,
         },
         focus: {
-          path: [0, 2],
+          path: [0, 1],
           offset: 0,
         },
       },
@@ -42,5 +42,4 @@ export const output = [
     [0],
   ],
   [<text key="b" />, [0, 1]],
-  [<text key="c" />, [0, 2]],
 ]

@@ -11,7 +11,6 @@ export const input = (
       </inline>
       three
     </block>
-    <block />
   </value>
 )
 

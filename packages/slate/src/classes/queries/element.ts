@@ -6,7 +6,7 @@ class ElementQueries {
    */
 
   hasBlocks(this: Editor, element: Element): boolean {
-    return element.nodes.every(n => Element.isElement(n) && !this.isInline(n))
+    return element.nodes.some(n => Element.isElement(n) && !this.isInline(n))
   }
 
   /**
@@ -14,7 +14,7 @@ class ElementQueries {
    */
 
   hasInlines(this: Editor, element: Element): boolean {
-    return element.nodes.every(
+    return element.nodes.some(
       n => Text.isText(n) || (Element.isElement(n) && this.isInline(n))
     )
   }
@@ -35,10 +35,11 @@ class ElementQueries {
     const { nodes } = element
     const [first] = nodes
     return (
-      nodes.length === 1 &&
-      Text.isText(first) &&
-      first.text === '' &&
-      !this.isVoid(element)
+      nodes.length === 0 ||
+      (nodes.length === 1 &&
+        Text.isText(first) &&
+        first.text === '' &&
+        !this.isVoid(element))
     )
   }
 

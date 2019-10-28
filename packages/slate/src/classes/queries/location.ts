@@ -25,12 +25,14 @@ class LocationQueries {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
     } = {}
   ): Point | undefined {
-    at = this.getPoint(at, { edge: 'end' })
+    const anchor = this.getPoint(at, { edge: 'end' })
+    const focus = this.getEnd()
+    const range = { anchor, focus }
     const { distance = 1 } = options
     let d = 0
     let target
 
-    for (const p of this.positions({ ...options, at })) {
+    for (const p of this.positions({ ...options, at: range })) {
       if (d > distance) {
         break
       }
@@ -62,7 +64,10 @@ class LocationQueries {
     }
 
     const path = this.getPath(at, options)
-    const ancestorPath = Range.isCollapsed(at) ? Path.parent(path) : path
+    const ancestorPath = Path.equals(at.anchor.path, at.focus.path)
+      ? Path.parent(path)
+      : path
+
     const ancestor = Node.get(this.value, ancestorPath) as Ancestor
     return [ancestor, ancestorPath]
   }
@@ -79,14 +84,14 @@ class LocationQueries {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
     } = {}
   ): Point | undefined {
-    debugger
-    at = this.getPoint(at, { edge: 'start' })
-    debugger
+    const focus = this.getPoint(at, { edge: 'start' })
+    const anchor = this.getStart()
+    const range = { anchor, focus }
     const { distance = 1 } = options
     let d = 0
     let target
 
-    for (const p of this.positions({ ...options, at, reverse: true })) {
+    for (const p of this.positions({ ...options, at: range, reverse: true })) {
       if (d > distance) {
         break
       }
@@ -187,7 +192,7 @@ class LocationQueries {
   }
 
   /**
-   * Get the path from a location, at a specific depth.
+   * Get the path of a location.
    */
 
   getPath(
@@ -198,36 +203,8 @@ class LocationQueries {
       edge?: 'start' | 'end'
     } = {}
   ): Path {
-    const { edge, depth } = options
-
-    if (Range.isRange(at)) {
-      if (edge != null) {
-        const point = this.getPoint(at, options)
-        at = point.path
-      } else {
-        const { anchor, focus } = at
-        const common = Path.common(anchor.path, focus.path)
-        return common
-      }
-    }
-
-    if (Point.isPoint(at)) {
-      at = at.path
-
-      if (depth != null) {
-        if (depth > at.length) {
-          throw new Error(
-            `Cannot get a path for point ${JSON.stringify(
-              at
-            )} at depth \`${depth}\` because it is not that deep.`
-          )
-        }
-
-        at = at.slice(0, depth)
-      }
-    }
-
-    return at
+    const path = Node.path(this.value, at, options)
+    return path
   }
 
   /**
@@ -241,43 +218,8 @@ class LocationQueries {
       edge?: 'start' | 'end'
     } = {}
   ): Point {
-    const { edge } = options
-
-    if (Path.isPath(at)) {
-      if (edge === 'end') {
-        const [lastNode, lastPath] = Node.last(this.value, at)
-
-        if (!Text.isText(lastNode)) {
-          throw new Error(
-            `Cannot get the end point of the node at path [${at}] because it has no ending text node.`
-          )
-        }
-
-        return { path: lastPath, offset: lastNode.text.length }
-      } else {
-        const [firstNode, firstPath] = Node.first(this.value, at)
-
-        if (!Text.isText(firstNode)) {
-          throw new Error(
-            `Cannot get the start point of the node at path [${at}] because it has no starting text node.`
-          )
-        }
-
-        return { path: firstPath, offset: 0 }
-      }
-    }
-
-    if (Range.isRange(at)) {
-      switch (edge) {
-        default:
-        case 'start':
-          return Range.start(at)
-        case 'end':
-          return Range.end(at)
-      }
-    }
-
-    return at
+    const point = Node.point(this.value, at, options)
+    return point
   }
 
   /**
@@ -307,35 +249,27 @@ class LocationQueries {
     } = {}
   ): Range {
     const { to, hanging = false } = options
-
-    if (Point.isPoint(at)) {
-      const end = to ? this.getEnd(to) : at
-      at = { anchor: at, focus: end }
-    }
-
-    if (Path.isPath(at)) {
-      const start = this.getStart(at)
-      const end = this.getEnd(to || at)
-      at = { anchor: start, focus: end }
-    }
+    const range = Node.range(this.value, at, to)
 
     // PERF: exit early if we can guarantee that the range isn't hanging, or
     // that they don't mind receiving hanging ranges.
     if (
       hanging ||
-      at.anchor.offset !== 0 ||
-      at.focus.offset !== 0 ||
-      Range.isCollapsed(at)
+      range.anchor.offset !== 0 ||
+      range.focus.offset !== 0 ||
+      Range.isCollapsed(range)
     ) {
-      return at
+      return range
     }
 
-    let [start, end] = Range.edges(at)
+    let [start, end] = Range.edges(range)
     const closestBlock = this.getMatch(end.path, 'block')
     const blockPath = closestBlock ? closestBlock[1] : []
+    const last = this.getEnd()
+    const rest = { anchor: end, focus: last }
     let skip = true
 
-    for (const [node, path] of this.texts({ from: end.path, reverse: true })) {
+    for (const [node, path] of this.texts({ at: rest, reverse: true })) {
       if (skip) {
         skip = false
         continue
@@ -343,12 +277,11 @@ class LocationQueries {
 
       if (node.text !== '' || Path.isBefore(path, blockPath)) {
         const point = { path, offset: node.text.length }
-        at = { anchor: start, focus: point }
-        break
+        return { anchor: start, focus: point }
       }
     }
 
-    return at
+    return range
   }
 
   /**
@@ -368,10 +301,21 @@ class LocationQueries {
 
   getText(this: Editor, at: Location = []): string {
     const range = this.getRange(at)
+    const [start, end] = Range.edges(range)
     let text = ''
 
-    for (const [node] of this.texts({ at: range })) {
-      text += node.text
+    for (const [node, path] of this.texts({ at: range })) {
+      let t = node.text
+
+      if (Path.equals(path, end.path)) {
+        t = t.slice(0, end.offset)
+      }
+
+      if (Path.equals(path, start.path)) {
+        t = t.slice(start.offset)
+      }
+
+      text += t
     }
 
     return text
