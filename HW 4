@@ -1,0 +1,40 @@
+$ Title data for HW model
+
+Sets
+i "Types of oil" /1-WTI, 2-Brent/,
+j "Location" /1-Cushing,2-Houston,3-NewOrleans/,
+
+Parameters
+m_i " Amount of oil has the low price (barrel)",
+
+h_i" Am Low price for purchasing type i oil (dollar/barrel)",
+l_i "Low price for purchasing type i oil (dollar/barrel)",
+s_(i,j) "Storage of type i oil at location j (barrel)",
+c_j "Cost of shipping from location j (dollar/barrel)",
+t "Demand of oil (barrel)",
+
+Positive Variables
+x(i) "The amount of type i oil purchased (barrel)",
+Y(i,j) "The amount of type i oil purchased at location j (barrel)",
+
+Equations
+ObjFn "computed objective function value",
+Stdoo "Satisfy the demand of oil",
+Apwe "Amount of purchasing within or equals to the storage in each location)
+
+objFn..
+ Z =e=sum(L_i)*m_i+h_i*(x_i-m_i)+c_j*a_(i,j)   ;
+
+stdoo..
+ sum(x_i) =g= t;
+ sum(a(i,j))=x_i;
+
+ Apwe..
+a_(i,j) =l=S_(i,j);
+
+Model workshop /all/;
+solve workshop using lp minimizing z;
+
+
+oil_Limit "200 unit WIT oil and 300 unit Brent oil",
+Transfer_plan "170 unit from Houston and 280 unit from New Orleans",
