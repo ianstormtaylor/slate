@@ -56,6 +56,12 @@ class LocationQueries {
    */
 
   getMatch(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    // PERF: If the target is a path and the match is a depth, don't traverse.
+    if (Path.isPath(at) && typeof match === 'number' && match <= at.length) {
+      const p = at.slice(0, match)
+      return this.getNode(p)
+    }
+
     const path = this.getPath(at)
 
     for (const entry of this.levels(path)) {

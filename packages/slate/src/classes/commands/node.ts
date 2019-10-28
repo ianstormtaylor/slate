@@ -40,14 +40,15 @@ class NodeCommands {
 
       const [node] = nodes
 
-      // If the match isn't explicitly set, infer it from the node.
       if (match == null) {
-        if (Text.isText(node)) {
+        if (Path.isPath(at)) {
+          match = at.length
+        } else if (Text.isText(node)) {
           match = 'text'
         } else if (this.isInline(node)) {
           match = 'inline'
         } else {
-          match = 'block'
+          match = Path.isPath(at) ? at.length : 'block'
         }
       }
 
@@ -121,7 +122,10 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const { at = this.value.selection, match = 'block' } = options
+      const {
+        at = this.value.selection,
+        match = Path.isPath(at) ? at.length : 'block',
+      } = options
 
       if (!at) {
         return
@@ -171,16 +175,11 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { match = 'block' } = options
-      let { at } = options
+      let { at = this.value.selection } = options
+      const { match = Path.isPath(at) ? at.length : 'block' } = options
 
       if (!at) {
-        if (selection) {
-          at = selection
-        } else {
-          return
-        }
+        return
       }
 
       if (Range.isRange(at)) {
@@ -301,18 +300,14 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { to, match = 'block' } = options
-      let { at } = options
-      let selectRef
+      const {
+        to,
+        at = this.value.selection,
+        match = Path.isPath(at) ? at.length : 'block',
+      } = options
 
       if (!at) {
-        if (selection) {
-          at = selection
-          selectRef = this.createRangeRef(at)
-        } else {
-          return
-        }
+        return
       }
 
       const toRef = this.createPathRef(to)
@@ -326,10 +321,6 @@ class NodeCommands {
         if (path.length !== 0) {
           this.apply({ type: 'move_node', path, newPath })
         }
-      }
-
-      if (selectRef) {
-        this.select(selectRef.current!)
       }
 
       toRef.unref()
@@ -435,7 +426,10 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { at = this.value.selection, match = 'block' } = options
+      const {
+        at = this.value.selection,
+        match = Path.isPath(at) ? at.length : 'block',
+      } = options
 
       if (!at) {
         return
@@ -465,7 +459,10 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { at = this.value.selection, match = 'block' } = options
+      const {
+        at = this.value.selection,
+        match = Path.isPath(at) ? at.length : 'block',
+      } = options
 
       if (!at) {
         return
@@ -518,22 +515,21 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      const { always = true, match = 'block' } = options
-      let { at, height = 0 } = options
+      const { always = true } = options
+      let { at = this.value.selection, match, height = 0 } = options
       let target: number | null = null
       let position
-      let selectRef
       let edgeRef
-      let firstPath
 
       if (!at) {
-        if (selection) {
-          const [, end] = Range.edges(selection)
-          selectRef = this.createPointRef(end)
-          at = selection
+        return
+      }
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          match = at.length
         } else {
-          return
+          match = 'block'
         }
       }
 
@@ -545,60 +541,49 @@ class NodeCommands {
           const pointRef = this.createPointRef(end)
           this.delete({ at })
           at = pointRef.unref()!
+
+          if (options.at == null) {
+            this.select(at)
+          }
         }
       }
 
       // If the target is a path, the default height-skipping and position
       // counters need to account for us potentially splitting at a non-leaf.
       if (Path.isPath(at)) {
-        const [, p] = Node.first(this.value, at)
-        firstPath = p
-        height = p.length - at.length + 1
+        const point = this.getPoint(at)
+        match = at.length - 1
         position = at[at.length - 1]
-        at = at.slice(0, -1)
+        height = point.path.length - at.length + 1
+        at = point
       } else {
-        firstPath = at.path
         position = at.offset
         edgeRef = this.createPointRef(at, { affinity: 'backward' })
       }
 
-      let d = firstPath.length - height
+      const highest = this.getMatch(at, match)
 
-      for (const [, path] of this.matches({ at, match })) {
-        while (d >= path.length && d > 0) {
-          const p = firstPath.slice(0, d)
-          d--
-
-          // With the `always: false` option, we will instead split the nodes only
-          // when the point isn't already at it's edge.
-          if (
-            !always &&
-            edgeRef &&
-            edgeRef.current &&
-            this.isEdge(edgeRef.current, p)
-          ) {
-            continue
-          }
-
-          const [node] = this.getNode(p)
-          const { text, marks, nodes, ...properties } = node
-
-          this.apply({
-            type: 'split_node',
-            path: p,
-            position,
-            target,
-            properties,
-          })
-
-          target = position
-          position = firstPath[d] + 1
-        }
+      if (!highest) {
+        return
       }
 
-      if (selectRef) {
-        this.select(selectRef.current!)
-        selectRef.unref()
+      const [, highestPath] = highest
+      const lowestPath = at.path.slice(0, at.path.length - height)
+
+      for (const [n, path] of this.levels(lowestPath, { reverse: true })) {
+        if (path.length < highestPath.length || path.length === 0) {
+          break
+        }
+
+        // With `always: false`, split only when not at the edge already.
+        if (!always && edgeRef && this.isEdge(edgeRef.current!, path)) {
+          continue
+        }
+
+        const { text, marks, nodes, ...properties } = n
+        this.apply({ type: 'split_node', path, position, target, properties })
+        target = position
+        position = path[path.length - 1] + 1
       }
 
       if (edgeRef) {
@@ -623,7 +608,7 @@ class NodeCommands {
     this.withoutNormalizing(() => {
       const {
         at = this.value.selection,
-        match = 'block',
+        match = Path.isPath(at) ? at.length : 'block',
         split = false,
       } = options
 
@@ -663,14 +648,21 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const {
-        match = this.isInline(element) ? 'inline' : 'block',
-        split = false,
-      } = options
-      let { at = this.value.selection } = options
+      const { split = false } = options
+      let { match, at = this.value.selection } = options
 
       if (!at) {
         return
+      }
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          match = at.length
+        } else if (this.isInline(element)) {
+          match = 'inline'
+        } else {
+          match = 'block'
+        }
       }
 
       if (split && Range.isRange(at)) {

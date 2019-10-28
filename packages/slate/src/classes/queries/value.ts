@@ -133,10 +133,9 @@ class ValueQueries {
     let { at } = options
     let prevPath: Path | undefined
 
-    // PERF: If the target is a path, we don't need to traverse at all.
+    // PERF: If the target is a path, don't traverse.
     if (Path.isPath(at)) {
-      yield this.getNode(at)
-      return
+      return this.getMatch(at, match)
     }
 
     at = this.getRange(at, { hanging })
