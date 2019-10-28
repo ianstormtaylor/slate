@@ -3,28 +3,26 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ match: 'block' })
+  editor.splitNodes({ match: 'block', always: true })
 }
 
 export const input = (
   <value>
+    <block>word</block>
     <block>
-      word
-      <inline>hyperlink</inline>
-      <cursor />word
+      <cursor />another
     </block>
   </value>
 )
 
 export const output = (
   <value>
+    <block>word</block>
     <block>
-      word
-      <inline>hyperlink</inline>
       <text />
     </block>
     <block>
-      <cursor />word
+      <cursor />another
     </block>
   </value>
 )

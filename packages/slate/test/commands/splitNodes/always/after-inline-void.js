@@ -3,15 +3,17 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ match: 'block' })
+  editor.splitNodes({ match: 'block', always: true })
 }
 
 export const input = (
   <value>
     <block>
-      word<inline>
-        <cursor />hyperlink
-      </inline>word
+      one
+      <inline void>
+        <text />
+      </inline>
+      <cursor />two
     </block>
   </value>
 )
@@ -19,18 +21,14 @@ export const input = (
 export const output = (
   <value>
     <block>
-      word
-      <inline>
+      one
+      <inline void>
         <text />
       </inline>
       <text />
     </block>
     <block>
-      <text />
-      <inline>
-        <cursor />hyperlink
-      </inline>
-      word
+      <cursor />two
     </block>
   </value>
 )

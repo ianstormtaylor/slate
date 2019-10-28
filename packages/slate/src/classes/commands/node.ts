@@ -78,7 +78,7 @@ class NodeCommands {
           const [, matchPath] = atMatch
           const pathRef = this.createPathRef(matchPath)
           const isAtEnd = this.isEnd(at, matchPath)
-          this.splitNodes({ at, match, always: false })
+          this.splitNodes({ at, match })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
         } else {
@@ -515,7 +515,7 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { always = true } = options
+      const { always = false } = options
       let { at = this.value.selection, match, height = 0 } = options
       let target: number | null = null
       let position
@@ -571,19 +571,20 @@ class NodeCommands {
       const lowestPath = at.path.slice(0, at.path.length - height)
 
       for (const [n, path] of this.levels(lowestPath, { reverse: true })) {
+        let split = false
+
         if (path.length < highestPath.length || path.length === 0) {
           break
         }
 
-        // With `always: false`, split only when not at the edge already.
-        if (!always && edgeRef && this.isEdge(edgeRef.current!, path)) {
-          continue
+        if (always || !edgeRef || !this.isEdge(edgeRef.current!, path)) {
+          const { text, marks, nodes, ...properties } = n
+          this.apply({ type: 'split_node', path, position, target, properties })
+          split = true
         }
 
-        const { text, marks, nodes, ...properties } = n
-        this.apply({ type: 'split_node', path, position, target, properties })
         target = position
-        position = path[path.length - 1] + 1
+        position = path[path.length - 1] + (split ? 1 : 0)
       }
 
       if (edgeRef) {
@@ -668,8 +669,8 @@ class NodeCommands {
       if (split && Range.isRange(at)) {
         const [start, end] = Range.edges(at)
         const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-        this.splitNodes({ at: end, always: false, match })
-        this.splitNodes({ at: start, always: false, match })
+        this.splitNodes({ at: end, match })
+        this.splitNodes({ at: start, match })
         at = rangeRef.unref()!
 
         if (options.at == null) {

@@ -64,8 +64,8 @@ class DeletingCommands {
         const [, ancestorPath] = this.getAncestor(at)
         const d = Range.isCollapsed(at) ? 'text' : ancestorPath.length
         const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-        this.splitNodes({ at: end, match: d })
-        this.splitNodes({ at: start, match: d })
+        this.splitNodes({ at: end, match: d, always: true })
+        this.splitNodes({ at: start, match: d, always: true })
         at = rangeRef.unref()!
       }
 
@@ -142,7 +142,7 @@ class DeletingCommands {
       }
 
       const pointRef = this.createPointRef(at)
-      this.splitNodes({ at })
+      this.splitNodes({ at, always: true })
 
       if (pointRef.current) {
         const [, insertPath] = this.getMatch(pointRef.current.path, 'block')!
