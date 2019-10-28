@@ -14,6 +14,38 @@ import { Match } from '../utils'
 
 class LocationQueries {
   /**
+   * Get the point after a location.
+   */
+
+  getAfter(
+    this: Editor,
+    at: Location,
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    at = this.getPoint(at, { edge: 'end' })
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, at })) {
+      if (d > distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
+  }
+
+  /**
    * Get the common ancestor node of a location.
    */
 
@@ -33,6 +65,40 @@ class LocationQueries {
     const ancestorPath = Range.isCollapsed(at) ? Path.parent(path) : path
     const ancestor = Node.get(this.value, ancestorPath) as Ancestor
     return [ancestor, ancestorPath]
+  }
+
+  /**
+   * Get the point before a location.
+   */
+
+  getBefore(
+    this: Editor,
+    at: Location,
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    } = {}
+  ): Point | undefined {
+    debugger
+    at = this.getPoint(at, { edge: 'start' })
+    debugger
+    const { distance = 1 } = options
+    let d = 0
+    let target
+
+    for (const p of this.positions({ ...options, at, reverse: true })) {
+      if (d > distance) {
+        break
+      }
+
+      if (d !== 0) {
+        target = p
+      }
+
+      d++
+    }
+
+    return target
   }
 
   /**
@@ -72,36 +138,17 @@ class LocationQueries {
   }
 
   /**
-   * Calculate the next point forward in the document from a starting point.
+   * Get the matching node in the branch of the document after a location.
    */
 
-  getNextPoint(
-    this: Editor,
-    at: Location,
-    options: {
-      distance?: number
-      edge?: 'start' | 'end'
-      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
-    } = {}
-  ): Point | undefined {
-    at = this.getPoint(at, options)
-    const { distance = 1 } = options
-    let d = 0
-    let target
+  getNext(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    const point = this.getAfter(at)
 
-    for (const p of this.positions({ ...options, at })) {
-      if (d > distance) {
-        break
-      }
-
-      if (d !== 0) {
-        target = p
-      }
-
-      d++
+    if (!point) {
+      return
     }
 
-    return target
+    return this.getMatch(point, match)
   }
 
   /**
@@ -234,36 +281,17 @@ class LocationQueries {
   }
 
   /**
-   * Calculate the previous point backward from a starting point.
+   * Get the matching node in the branch of the document before a location.
    */
 
-  getPreviousPoint(
-    this: Editor,
-    at: Location,
-    options: {
-      distance?: number
-      edge?: 'start' | 'end'
-      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
-    } = {}
-  ): Point | undefined {
-    at = this.getPoint(at, options)
-    const { distance = 1 } = options
-    let d = 0
-    let target
+  getPrevious(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    const point = this.getBefore(at)
 
-    for (const p of this.positions({ ...options, at, reverse: true })) {
-      if (d > distance) {
-        break
-      }
-
-      if (d !== 0) {
-        target = p
-      }
-
-      d++
+    if (!point) {
+      return
     }
 
-    return target
+    return this.getMatch(point, match)
   }
 
   /**
@@ -343,7 +371,7 @@ class LocationQueries {
     let text = ''
 
     for (const [node] of this.texts({ at: range })) {
-      text += node.text.length
+      text += node.text
     }
 
     return text

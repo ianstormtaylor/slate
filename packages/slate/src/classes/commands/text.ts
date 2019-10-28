@@ -50,8 +50,8 @@ class DeletingCommands {
         } else {
           const opts = { unit, distance }
           const target = reverse
-            ? this.getPreviousPoint(at, opts)
-            : this.getNextPoint(at, opts)
+            ? this.getBefore(at, opts)
+            : this.getAfter(at, opts)
 
           if (target) {
             at = { anchor: at, focus: target }
@@ -76,7 +76,7 @@ class DeletingCommands {
 
       if (Range.isRange(at)) {
         const [start, end] = Range.edges(at)
-        const after = this.getNextPoint(end)!
+        const after = this.getAfter(end)!
         const afterRef = this.createPointRef(after)
         const l = ancestorPath.length
         const startIndex = start.path[l]

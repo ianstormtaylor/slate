@@ -198,20 +198,13 @@ class NodeCommands {
       }
 
       for (const [node, path] of this.matches({ at, match })) {
-        const prev = this.getPreviousPoint(path)
+        const prev = this.getPrevious(at, match)
 
         if (!prev) {
-          continue
-        }
-
-        const prevMatcher = Path.isPath(at) ? at.length : match
-        const prevMatch = this.getMatch(prev, prevMatcher)
-
-        if (!prevMatch) {
           return
         }
 
-        const [prevNode, prevPath] = prevMatch
+        const [prevNode, prevPath] = prev
         const newPath = Path.next(prevPath)
         const commonPath = Path.common(path, prevPath)
         const isPreviousSibling = Path.isSibling(path, prevPath)
@@ -397,7 +390,9 @@ class NodeCommands {
         // Merge adjacent text nodes that are empty or have matching marks.
         if (prev != null && Text.isText(prev)) {
           if (Text.matches(child, prev)) {
+            debugger
             this.mergeNodes({ at: at.concat(n) })
+            debugger
             n--
             continue
           } else if (prev.text === '') {

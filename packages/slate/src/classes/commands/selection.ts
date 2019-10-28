@@ -80,8 +80,8 @@ class SelectionCommands {
 
     if (edge == null || edge === 'anchor') {
       const point = reverse
-        ? this.getPreviousPoint(anchor, opts)
-        : this.getNextPoint(anchor, opts)
+        ? this.getBefore(anchor, opts)
+        : this.getAfter(anchor, opts)
 
       if (point) {
         props.anchor = point
@@ -90,8 +90,8 @@ class SelectionCommands {
 
     if (edge == null || edge === 'focus') {
       const point = reverse
-        ? this.getPreviousPoint(focus, opts)
-        : this.getNextPoint(focus, opts)
+        ? this.getBefore(focus, opts)
+        : this.getAfter(focus, opts)
 
       if (point) {
         props.focus = point

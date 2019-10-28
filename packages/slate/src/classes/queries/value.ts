@@ -135,7 +135,13 @@ class ValueQueries {
 
     // PERF: If the target is a path, don't traverse.
     if (Path.isPath(at)) {
-      return this.getMatch(at, match)
+      const m = this.getMatch(at, match)
+
+      if (m) {
+        yield m
+      }
+
+      return
     }
 
     at = this.getRange(at, { hanging })
