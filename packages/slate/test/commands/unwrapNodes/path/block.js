@@ -3,23 +3,19 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.wrapNodes(<block a />)
+  editor.unwrapNodes({ at: [0] })
 }
 
 export const input = (
   <value>
     <block>
-      <cursor />word
+      <block>word</block>
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block a>
-      <block>
-        <cursor />word
-      </block>
-    </block>
+    <block>word</block>
   </value>
 )

@@ -11,7 +11,14 @@ export const input = (
     <block>
       <text />
       <inline>
-        <cursor />word
+        wo<anchor />rd
+      </inline>
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline>
+        an<focus />other
       </inline>
       <text />
     </block>
@@ -25,7 +32,18 @@ export const output = (
       <inline a>
         <text />
         <inline>
-          <cursor />word
+          wo<anchor />rd
+        </inline>
+        <text />
+      </inline>
+      <text />
+    </block>
+    <block>
+      <text />
+      <inline a>
+        <text />
+        <inline>
+          an<focus />other
         </inline>
         <text />
       </inline>

@@ -2,10 +2,6 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.wrapNodes(<block a />)
-}
-
 export const input = (
   <value>
     <block>
@@ -14,9 +10,13 @@ export const input = (
   </value>
 )
 
+export const run = editor => {
+  editor.wrapNodes(<block new />, { split: true })
+}
+
 export const output = (
   <value>
-    <block a>
+    <block new>
       <block>
         <cursor />word
       </block>

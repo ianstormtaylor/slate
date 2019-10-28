@@ -10,6 +10,7 @@ import {
   Range,
   Text,
 } from '../..'
+import { Match } from '../utils'
 
 class LocationQueries {
   /**
@@ -48,6 +49,20 @@ class LocationQueries {
 
   getEnd(this: Editor, at: Location = []): Point {
     return this.getPoint(at, { edge: 'end' })
+  }
+
+  /**
+   * Get the first matching node in a single branch of the document.
+   */
+
+  getMatch(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    const path = this.getPath(at)
+
+    for (const entry of this.levels(path, { reverse: true })) {
+      if (this.isMatch(entry, match)) {
+        return entry
+      }
+    }
   }
 
   /**
@@ -114,8 +129,8 @@ class LocationQueries {
   ): AncestorEntry {
     const path = this.getPath(at, options)
     const parentPath = Path.parent(path)
-    const parent = Node.get(this.value, path) as Ancestor
-    return [parent, parentPath]
+    const entry = this.getNode(parentPath)
+    return entry as AncestorEntry
   }
 
   /**
@@ -266,7 +281,7 @@ class LocationQueries {
 
     if (Path.isPath(at)) {
       const start = this.getStart(at)
-      const end = this.getEnd(at || to)
+      const end = this.getEnd(to || at)
       at = { anchor: start, focus: end }
     }
 

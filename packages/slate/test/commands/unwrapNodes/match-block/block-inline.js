@@ -10,15 +10,19 @@ export const input = (
   <value>
     <block key="a">
       <block>
-        <anchor />one
+        <text />
+        <inline>
+          wo<anchor />rd
+        </inline>
+        <text />
       </block>
       <block>
-        <focus />two
+        <text />
+        <inline>
+          an<focus />other
+        </inline>
+        <text />
       </block>
-      <block>three</block>
-      <block>four</block>
-      <block>five</block>
-      <block>six</block>
     </block>
   </value>
 )
@@ -26,14 +30,18 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <anchor />one
+      <text />
+      <inline>
+        wo<anchor />rd
+      </inline>
+      <text />
     </block>
     <block>
-      <focus />two
+      <text />
+      <inline>
+        an<focus />other
+      </inline>
+      <text />
     </block>
-    <block>three</block>
-    <block>four</block>
-    <block>five</block>
-    <block>six</block>
   </value>
 )

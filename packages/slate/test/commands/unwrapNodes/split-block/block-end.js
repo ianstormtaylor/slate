@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.unwrapNodes({ match: { key: 'a' } })
+  editor.unwrapNodes({ match: { key: 'a' }, split: true })
 }
 
 export const input = (
@@ -11,29 +11,31 @@ export const input = (
     <block key="a">
       <block>one</block>
       <block>two</block>
+      <block>three</block>
+      <block>four</block>
       <block>
-        <anchor />three
+        <anchor />five
       </block>
       <block>
-        <focus />four
+        six<focus />
       </block>
-      <block>five</block>
-      <block>six</block>
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block>one</block>
-    <block>two</block>
-    <block>
-      <anchor />three
+    <block key="a">
+      <block>one</block>
+      <block>two</block>
+      <block>three</block>
+      <block>four</block>
     </block>
     <block>
-      <focus />four
+      <anchor />five
     </block>
-    <block>five</block>
-    <block>six</block>
+    <block>
+      six<focus />
+    </block>
   </value>
 )

@@ -2,23 +2,24 @@
 
 import { h } from '../../../helpers'
 
-export const run = editor => {
-  editor.wrapNodes(<block a />)
-}
-
 export const input = (
   <value>
     <block>
-      <cursor />word
+      wo<anchor />rd<focus />
     </block>
   </value>
 )
 
+export const run = editor => {
+  editor.wrapNodes(<block new />, { split: true })
+}
+
 export const output = (
   <value>
-    <block a>
+    <block>wo</block>
+    <block new>
       <block>
-        <cursor />word
+        <anchor />rd<focus />
       </block>
     </block>
   </value>

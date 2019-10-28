@@ -17,16 +17,7 @@ import {
   TextEntry,
   Value,
 } from '../..'
-
-type NodeMatch =
-  | number
-  | 'value'
-  | 'block'
-  | 'inline'
-  | 'text'
-  | 'void'
-  | Partial<Node>
-  | ((entry: NodeEntry) => boolean)
+import { Match } from '../utils'
 
 class ValueQueries {
   /**
@@ -78,7 +69,7 @@ class ValueQueries {
     })
   }
 
-  isMatch(this: Editor, entry: NodeEntry, match: NodeMatch) {
+  isMatch(this: Editor, entry: NodeEntry, match: Match) {
     const [node, path] = entry
 
     if (typeof match === 'function') {
@@ -129,28 +120,10 @@ class ValueQueries {
     yield* levels
   }
 
-  /**
-   * Get the matching node in a single branch of the document at a path.
-   */
-
-  getMatch(
-    this: Editor,
-    at: Location,
-    match: NodeMatch
-  ): NodeEntry | undefined {
-    const path = this.getPath(at)
-
-    for (const entry of this.levels(path, { reverse: true })) {
-      if (this.isMatch(entry, match)) {
-        return entry
-      }
-    }
-  }
-
   *matches(
     this: Editor,
     options: {
-      match: NodeMatch
+      match: Match
       at: Location
       hanging?: boolean
       reverse?: boolean

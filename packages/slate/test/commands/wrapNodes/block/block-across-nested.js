@@ -9,16 +9,26 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      <cursor />word
+      <block>
+        wo<anchor />rd
+      </block>
+      <block>
+        an<focus />other
+      </block>
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block a>
-      <block>
-        <cursor />word
+    <block>
+      <block a>
+        <block>
+          wo<anchor />rd
+        </block>
+        <block>
+          an<focus />other
+        </block>
       </block>
     </block>
   </value>

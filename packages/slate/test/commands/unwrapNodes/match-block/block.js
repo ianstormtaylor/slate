@@ -10,7 +10,7 @@ export const input = (
   <value>
     <block key="a">
       <block>
-        <cursor />one
+        <cursor />word
       </block>
     </block>
   </value>
@@ -19,7 +19,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <cursor />one
+      <cursor />word
     </block>
   </value>
 )

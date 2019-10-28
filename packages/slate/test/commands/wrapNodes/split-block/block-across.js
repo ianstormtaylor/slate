@@ -4,30 +4,30 @@ import { h } from '../../../helpers'
 
 export const input = (
   <value>
-    <block>one</block>
     <block>
-      <anchor />two
+      on<anchor />e
     </block>
     <block>
-      three<focus />
+      t<focus />wo
     </block>
   </value>
 )
 
 export const run = editor => {
-  editor.wrapNodes(<block a />)
+  editor.wrapNodes(<block new />, { split: true })
 }
 
 export const output = (
   <value>
-    <block>one</block>
-    <block a>
+    <block>on</block>
+    <block new>
       <block>
-        <anchor />two
+        <anchor />e
       </block>
       <block>
-        three<focus />
+        t<focus />
       </block>
     </block>
+    <block>wo</block>
   </value>
 )

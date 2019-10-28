@@ -10,16 +10,7 @@ import {
   Range,
   Point,
 } from '../..'
-
-type MatchOption =
-  | number
-  | 'value'
-  | 'block'
-  | 'inline'
-  | 'text'
-  | 'void'
-  | Partial<Node>
-  | ((entry: NodeEntry) => boolean)
+import { Match } from '../utils'
 
 class NodeCommands {
   /**
@@ -31,7 +22,7 @@ class NodeCommands {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -126,7 +117,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
     }
   ) {
     this.withoutNormalizing(() => {
@@ -148,12 +139,13 @@ class NodeCommands {
           )
         }
 
-        const [parent, parentPath] = this.getParent(path)
+        const [parent, parentPath] = this.getNode(Path.parent(path))
         const index = path[path.length - 1]
         const { length } = parent.nodes
 
         if (length === 1) {
-          this.uncoverNodes({ at: parentPath })
+          this.moveNodes({ at: path, to: Path.next(parentPath) })
+          this.removeNodes({ at: parentPath })
         } else if (index === 0) {
           this.moveNodes({ at: path, to: parentPath })
         } else if (index === length - 1) {
@@ -175,7 +167,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -304,7 +296,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
       to: Path
     }
   ) {
@@ -432,38 +424,6 @@ class NodeCommands {
   }
 
   /**
-   * Remove a node at a specific location, replacing it with its children.
-   */
-
-  uncoverNodes(
-    this: Editor,
-    options: {
-      at?: Location
-      match?: MatchOption
-    }
-  ) {
-    this.withoutNormalizing(() => {
-      const { at = this.value.selection, match = 'block' } = options
-
-      if (!at) {
-        return
-      }
-
-      const matches = this.matches({ at, match })
-      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
-
-      for (const pathRef of pathRefs) {
-        const path = pathRef.unref()!
-        const range = this.getRange(path)
-        const depth = path.length + 1
-        const to = Path.next(path)
-        this.moveNodes({ at: range, match: depth, to })
-        this.removeNodes({ at: path })
-      }
-    })
-  }
-
-  /**
    * Remove the nodes at a specific location in the document.
    */
 
@@ -471,7 +431,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -501,7 +461,7 @@ class NodeCommands {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -552,7 +512,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: MatchOption
+      match?: Match
       always?: boolean
       height?: number
     } = {}
@@ -648,25 +608,81 @@ class NodeCommands {
   }
 
   /**
-   * Surround the nodes at a location with a new parent node.
+   * Unwrap the nodes at a location from a parent node, splitting the parent if
+   * necessary to ensure that only the content in the range is unwrapped.
    */
 
-  coverNodes(
+  unwrapNodes(
     this: Editor,
-    element: Element,
     options: {
       at?: Location
-      match?: MatchOption
-    } = {}
+      match?: Match
+      split?: boolean
+    }
   ) {
     this.withoutNormalizing(() => {
       const {
         at = this.value.selection,
-        match = this.isInline(element) ? 'inline' : 'block',
+        match = 'block',
+        split = false,
       } = options
 
       if (!at) {
         return
+      }
+
+      const matches = this.matches({ at, match })
+      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
+
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        const depth = path.length + 1
+        let range = this.getRange(path)
+
+        if (split && Range.isRange(at)) {
+          range = Range.intersection(at, range)!
+        }
+
+        this.liftNodes({ at: range, match: depth })
+      }
+    })
+  }
+
+  /**
+   * Wrap the nodes at a location in a new container node, splitting the edges
+   * of the range first to ensure that only the content in the range is wrapped.
+   */
+
+  wrapNodes(
+    this: Editor,
+    element: Element,
+    options: {
+      at?: Location
+      match?: Match
+      split?: boolean
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      const {
+        match = this.isInline(element) ? 'inline' : 'block',
+        split = false,
+      } = options
+      let { at = this.value.selection } = options
+
+      if (!at) {
+        return
+      }
+
+      if (split && Range.isRange(at)) {
+        const [start, end] = Range.edges(at)
+        const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
+        this.splitNodes({ at: end, always: false, match })
+        this.splitNodes({ at: start, always: false, match })
+        at = rangeRef.unref()!
+
+        if (options.at == null) {
+          this.select(at)
+        }
       }
 
       const roots: NodeEntry[] = this.isInline(element)
@@ -689,7 +705,7 @@ class NodeCommands {
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
 
-          const range = this.getRange(firstPath, lastPath)
+          const range = this.getRange(firstPath, { to: lastPath })
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, nodes: [] }
@@ -700,83 +716,6 @@ class NodeCommands {
             to: wrapperPath.concat(0),
           })
         }
-      }
-    })
-  }
-
-  /**
-   * Unwrap the nodes at a location from a parent node, splitting the parent if
-   * necessary to ensure that only the content in the range is unwrapped.
-   */
-
-  unwrapNodes(
-    this: Editor,
-    options: {
-      at?: Location
-      match?: MatchOption
-    }
-  ) {
-    this.withoutNormalizing(() => {
-      const { at = this.value.selection, match = 'block' } = options
-
-      if (!at) {
-        return
-      }
-
-      const matches = this.matches({ at, match })
-      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
-
-      for (const pathRef of pathRefs) {
-        const path = pathRef.unref()!
-        const depth = path.length + 1
-        const a = Range.isRange(at)
-          ? Range.intersection(at, this.getRange(path))!
-          : at
-
-        this.liftNodes({ at: a, match: depth })
-      }
-    })
-  }
-
-  /**
-   * Wrap the nodes at a location in a new container node, splitting the edges
-   * of the range first to ensure that only the content in the range is wrapped.
-   */
-
-  wrapNodes(
-    this: Editor,
-    element: Element,
-    options: {
-      at?: Location
-      match?: MatchOption
-    } = {}
-  ) {
-    this.withoutNormalizing(() => {
-      const { match = this.isInline(element) ? 'inline' : 'block' } = options
-      let { at = this.value.selection } = options
-
-      if (!at) {
-        return
-      }
-
-      let rangeRef
-
-      if (Range.isRange(at)) {
-        const [start, end] = Range.edges(at)
-        rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-        this.splitNodes({ at: end, always: false, match })
-        this.splitNodes({ at: start, always: false, match })
-        at = rangeRef.current!
-
-        if (options.at == null) {
-          this.select(at)
-        }
-      }
-
-      this.coverNodes(element, { at, match })
-
-      if (rangeRef) {
-        rangeRef.unref()
       }
     })
   }
