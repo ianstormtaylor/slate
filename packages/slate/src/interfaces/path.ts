@@ -25,9 +25,9 @@ namespace Path {
     let paths = Path.levels(path, options)
 
     if (reverse) {
-      paths = paths.slice(0, -1)
-    } else {
       paths = paths.slice(1)
+    } else {
+      paths = paths.slice(0, -1)
     }
 
     return paths
@@ -217,7 +217,7 @@ namespace Path {
     const { reverse = false } = options
     const list: Path[] = []
 
-    for (let i = path.length; i >= 0; i--) {
+    for (let i = 0; i <= path.length; i++) {
       list.push(path.slice(0, i))
     }
 

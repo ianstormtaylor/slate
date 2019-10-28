@@ -6,4 +6,4 @@ export const test = path => {
   return Path.ancestors(path, { reverse: true })
 }
 
-export const output = [[], [0], [0, 1]]
+export const output = [[0, 1], [0], []]

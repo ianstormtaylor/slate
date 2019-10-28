@@ -136,7 +136,7 @@ namespace Node {
     path: Path,
     predicate: (entry: NodeEntry) => boolean
   ): NodeEntry | undefined => {
-    for (const entry of Node.levels(root, path)) {
+    for (const entry of Node.levels(root, path, { reverse: true })) {
       if (predicate(entry)) {
         return entry
       }
@@ -378,7 +378,7 @@ namespace Node {
     path: Path,
     predicate: (entry: NodeEntry) => boolean
   ): NodeEntry | undefined => {
-    for (const entry of Node.levels(root, path, { reverse: true })) {
+    for (const entry of Node.levels(root, path)) {
       if (predicate(entry)) {
         return entry
       }

@@ -58,7 +58,7 @@ class LocationQueries {
   getMatch(this: Editor, at: Location, match: Match): NodeEntry | undefined {
     const path = this.getPath(at)
 
-    for (const entry of this.levels(path, { reverse: true })) {
+    for (const entry of this.levels(path)) {
       if (this.isMatch(entry, match)) {
         return entry
       }

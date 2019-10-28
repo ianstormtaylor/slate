@@ -100,12 +100,12 @@ class ValueQueries {
     path: Path,
     options: {
       reverse?: boolean
-    }
+    } = {}
   ): Iterable<NodeEntry> {
     const { reverse = false } = options
     const levels: NodeEntry[] = []
 
-    for (const [n, p] of Node.levels(this.value, path, { reverse: true })) {
+    for (const [n, p] of Node.levels(this.value, path)) {
       levels.push([n, p])
 
       if (Element.isElement(n) && this.isVoid(n)) {
@@ -113,7 +113,7 @@ class ValueQueries {
       }
     }
 
-    if (reverse === false) {
+    if (reverse) {
       levels.reverse()
     }
 
