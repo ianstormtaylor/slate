@@ -136,9 +136,17 @@ namespace Range {
    * in the document.
    */
 
-  export const edges = (range: Range): [Point, Point] => {
+  export const edges = (
+    range: Range,
+    options: {
+      reverse?: boolean
+    } = {}
+  ): [Point, Point] => {
+    const { reverse = false } = options
     const { anchor, focus } = range
-    return Range.isBackward(range) ? [focus, anchor] : [anchor, focus]
+    return Range.isBackward(range) === reverse
+      ? [anchor, focus]
+      : [focus, anchor]
   }
 
   /**

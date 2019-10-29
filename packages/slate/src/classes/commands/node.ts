@@ -172,14 +172,22 @@ class NodeCommands {
     options: {
       at?: Location
       match?: Match
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
       let { at = this.value.selection } = options
-      const { match = Path.isPath(at) ? at.length : 'block' } = options
+      const {
+        match = Path.isPath(at) ? at.length : 'block',
+        hanging = false,
+      } = options
 
       if (!at) {
         return
+      }
+
+      if (!hanging && Range.isRange(at)) {
+        at = unhangRange(this, at)
       }
 
       if (Range.isRange(at)) {
@@ -197,85 +205,87 @@ class NodeCommands {
         }
       }
 
-      for (const [node, path] of this.matches({ at, match })) {
-        const prev = this.getPrevious(at, match)
+      const current = this.getMatch(at, match)
+      const prev = this.getPrevious(at, match)
+      debugger
 
-        if (!prev) {
-          return
-        }
+      if (!current || !prev) {
+        return
+      }
 
-        const [prevNode, prevPath] = prev
-        const newPath = Path.next(prevPath)
-        const commonPath = Path.common(path, prevPath)
-        const isPreviousSibling = Path.isSibling(path, prevPath)
+      debugger
+      const [node, path] = current
+      const [prevNode, prevPath] = prev
+      const newPath = Path.next(prevPath)
+      const commonPath = Path.common(path, prevPath)
+      const isPreviousSibling = Path.isSibling(path, prevPath)
 
-        // Determine if the merge will leave an ancestor of the path empty as a
-        // result, in which case we'll want to remove it after merging.
-        const emptyAncestor = Node.furthest(this.value, path, ([n, p]) => {
-          return (
-            Path.isDescendant(p, commonPath) &&
-            Path.isAncestor(p, path) &&
-            Element.isElement(n) &&
-            n.nodes.length === 1
-          )
+      // Determine if the merge will leave an ancestor of the path empty as a
+      // result, in which case we'll want to remove it after merging.
+      const emptyAncestor = Node.furthest(this.value, path, ([n, p]) => {
+        return (
+          Path.isDescendant(p, commonPath) &&
+          Path.isAncestor(p, path) &&
+          Element.isElement(n) &&
+          n.nodes.length === 1
+        )
+      })
+
+      const emptyRef = emptyAncestor && this.createPathRef(emptyAncestor[1])
+      let properties
+      let position
+
+      // Ensure that the nodes are equivalent, and figure out what the position
+      // and extra properties of the merge will be.
+      if (Text.isText(node) && Text.isText(prevNode)) {
+        const { text, marks, ...rest } = node
+        position = prevNode.text.length
+        properties = rest as Partial<Text>
+      } else if (Element.isElement(node) && Element.isElement(prevNode)) {
+        const { nodes, ...rest } = node
+        position = prevNode.nodes.length
+        properties = rest as Partial<Element>
+      } else {
+        throw new Error(
+          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
+            node
+          )} ${JSON.stringify(prevNode)}`
+        )
+      }
+
+      // If the node isn't already the next sibling of the previous node, move
+      // it so that it is before merging.
+      if (!isPreviousSibling) {
+        this.moveNodes({ at: path, to: newPath })
+      }
+
+      // If there was going to be an empty ancestor of the node that was merged,
+      // we remove it from the tree.
+      if (emptyRef) {
+        this.removeNodes({ at: emptyRef.current! })
+      }
+
+      // If the target node that we're merging with is empty, remove it instead
+      // of merging the two. This is a common rich text editor behavior to
+      // prevent losing formatting when deleting entire nodes when you have a
+      // hanging selection.
+      if (
+        (Element.isElement(prevNode) && this.isEmpty(prevNode)) ||
+        (Text.isText(prevNode) && prevNode.text === '')
+      ) {
+        this.removeNodes({ at: prevPath })
+      } else {
+        this.apply({
+          type: 'merge_node',
+          path: newPath,
+          position,
+          target: null,
+          properties,
         })
+      }
 
-        const emptyRef = emptyAncestor && this.createPathRef(emptyAncestor[1])
-        let properties
-        let position
-
-        // Ensure that the nodes are equivalent, and figure out what the position
-        // and extra properties of the merge will be.
-        if (Text.isText(node) && Text.isText(prevNode)) {
-          const { text, marks, ...rest } = node
-          position = prevNode.text.length
-          properties = rest as Partial<Text>
-        } else if (Element.isElement(node) && Element.isElement(prevNode)) {
-          const { nodes, ...rest } = node
-          position = prevNode.nodes.length
-          properties = rest as Partial<Element>
-        } else {
-          throw new Error(
-            `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
-              node
-            )} ${JSON.stringify(prevNode)}`
-          )
-        }
-
-        // If the node isn't already the next sibling of the previous node, move
-        // it so that it is before merging.
-        if (!isPreviousSibling) {
-          this.moveNodes({ at: path, to: newPath })
-        }
-
-        // If there was going to be an empty ancestor of the node that was merged,
-        // we remove it from the tree.
-        if (emptyRef) {
-          this.removeNodes({ at: emptyRef.current! })
-        }
-
-        // If the target node that we're merging with is empty, remove it instead
-        // of merging the two. This is a common rich text editor behavior to
-        // prevent losing formatting when deleting entire nodes when you have a
-        // hanging selection.
-        if (
-          (Element.isElement(prevNode) && this.isEmpty(prevNode)) ||
-          (Text.isText(prevNode) && prevNode.text === '')
-        ) {
-          this.removeNodes({ at: prevPath })
-        } else {
-          this.apply({
-            type: 'merge_node',
-            path: newPath,
-            position,
-            target: null,
-            properties,
-          })
-        }
-
-        if (emptyRef) {
-          emptyRef.unref()
-        }
+      if (emptyRef) {
+        emptyRef.unref()
       }
     })
   }
@@ -416,16 +426,22 @@ class NodeCommands {
     options: {
       at?: Location
       match?: Match
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
+      let { at = this.value.selection } = options
       const {
-        at = this.value.selection,
         match = Path.isPath(at) ? at.length : 'block',
+        hanging = false,
       } = options
 
       if (!at) {
         return
+      }
+
+      if (!hanging && Range.isRange(at)) {
+        at = unhangRange(this, at)
       }
 
       const depths = this.matches({ at, match })
@@ -449,16 +465,22 @@ class NodeCommands {
     options: {
       at?: Location
       match?: Match
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
+      let { at = this.value.selection } = options
       const {
-        at = this.value.selection,
         match = Path.isPath(at) ? at.length : 'block',
+        hanging = false,
       } = options
 
       if (!at) {
         return
+      }
+
+      if (!hanging && Range.isRange(at)) {
+        at = unhangRange(this, at)
       }
 
       for (const [node, path] of this.matches({ at, match })) {
@@ -705,6 +727,39 @@ class NodeCommands {
       }
     })
   }
+}
+
+/**
+ * Convert a range into a non-hanging one.
+ */
+
+const unhangRange = (editor: Editor, range: Range): Range => {
+  let [start, end] = Range.edges(range)
+
+  // PERF: exit early if we can guarantee that the range isn't hanging.
+  if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    return range
+  }
+
+  const closestBlock = editor.getMatch(end.path, 'block')
+  const blockPath = closestBlock ? closestBlock[1] : []
+  const first = editor.getStart()
+  const before = { anchor: first, focus: end }
+  let skip = true
+
+  for (const [node, path] of editor.texts({ at: before, reverse: true })) {
+    if (skip) {
+      skip = false
+      continue
+    }
+
+    if (node.text !== '' || Path.isBefore(path, blockPath)) {
+      end = { path, offset: node.text.length }
+      break
+    }
+  }
+
+  return { anchor: start, focus: end }
 }
 
 export default NodeCommands

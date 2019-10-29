@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.entries(value, { at: [0] }))
+  return Array.from(Node.entries(value, { from: [0, 1] }))
 }
 
 export const output = [
@@ -41,6 +41,14 @@ export const output = [
     </element>,
     [0],
   ],
-  [<text key="a" />, [0, 0]],
   [<text key="b" />, [0, 1]],
+  [
+    <element>
+      <text key="c" />
+      <text key="d" />
+    </element>,
+    [1],
+  ],
+  [<text key="c" />, [1, 0]],
+  [<text key="d" />, [1, 1]],
 ]

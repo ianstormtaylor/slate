@@ -16,4 +16,4 @@ export const run = editor => {
   })
 }
 
-export const output = [0]
+export const output = []

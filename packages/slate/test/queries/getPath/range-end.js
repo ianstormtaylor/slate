@@ -19,4 +19,4 @@ export const run = editor => {
   )
 }
 
-export const output = [0, 1]
+export const output = [1, 0]

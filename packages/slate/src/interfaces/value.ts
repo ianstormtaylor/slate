@@ -243,14 +243,8 @@ namespace Value {
           const { path } = op
           const index = path[path.length - 1]
           const parent = Node.parent(v, path)
-          const rootStart = Node.start(v, [])
-          const rootEnd = Node.end(v, [])
-          const nodeStart = Node.start(v, path)
-          const nodeEnd = Node.end(v, path)
-          const before = { anchor: rootStart, focus: nodeStart }
-          const after = { anchor: nodeEnd, focus: rootEnd }
-          const [, prev] = Node.texts(v, { at: before, reverse: true })
-          const [, next] = Node.texts(v, { at: after })
+          const [, prev] = Node.texts(v, { from: path, reverse: true })
+          const [, next] = Node.texts(v, { from: path })
           parent.nodes.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
@@ -258,23 +252,21 @@ namespace Value {
           for (const [point, k, range, key] of Value.points(v)) {
             const result = Point.transform(point, op)
 
-            if (result == null) {
-              if (prev) {
-                const [prevNode, prevPath] = prev
-                point.path = prevPath
-                point.offset = prevNode.text.length
-              } else if (next) {
-                const [, nextPath] = next
-                const newNextPath = Path.transform(nextPath, op)!
-                point.path = newNextPath
-                point.offset = 0
-              } else if (key != null) {
-                delete v.annotations[key!]
-              } else {
-                v.selection = null
-              }
-            } else {
+            if (result != null) {
               range[k] = result
+            } else if (prev) {
+              const [prevNode, prevPath] = prev
+              point.path = prevPath
+              point.offset = prevNode.text.length
+            } else if (next) {
+              const [, nextPath] = next
+              const newNextPath = Path.transform(nextPath, op)!
+              point.path = newNextPath
+              point.offset = 0
+            } else if (key != null) {
+              delete v.annotations[key]
+            } else {
+              v.selection = null
             }
           }
 

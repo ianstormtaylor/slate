@@ -13,7 +13,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.texts(value, { at: [0, 1] }))
+  return Array.from(Node.texts(value, { from: [0, 1] }))
 }
 
 export const output = [[<text key="b" />, [0, 1]]]

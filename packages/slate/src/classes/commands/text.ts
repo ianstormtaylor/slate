@@ -2,6 +2,7 @@ import {
   Editor,
   Element,
   Node,
+  PathRef,
   Fragment,
   Path,
   Location,
@@ -25,16 +26,11 @@ class DeletingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
       const { reverse = false, unit = 'character', distance = 1 } = options
-      let { at } = options
-      let isSelection = false
-      let ancestorPath: Path = []
-      let ancestor: Node = this.value
+      let { at = this.value.selection } = options
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
+      if (!at) {
+        return
       }
 
       if (Range.isRange(at) && Range.isCollapsed(at)) {
@@ -50,58 +46,46 @@ class DeletingCommands {
         } else {
           const opts = { unit, distance }
           const target = reverse
-            ? this.getBefore(at, opts)
-            : this.getAfter(at, opts)
-
-          if (target) {
-            at = { anchor: at, focus: target }
-          }
+            ? this.getBefore(at, opts) || this.getStart()
+            : this.getAfter(at, opts) || this.getEnd()
+          at = { anchor: at, focus: target }
         }
-      }
-
-      if (Range.isRange(at)) {
-        const [start, end] = Range.edges(at)
-        const [, ancestorPath] = this.getAncestor(at)
-        const d = Range.isCollapsed(at) ? 'text' : ancestorPath.length
-        const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-        this.splitNodes({ at: end, match: d, always: true })
-        this.splitNodes({ at: start, match: d, always: true })
-        at = rangeRef.unref()!
       }
 
       if (Path.isPath(at)) {
-        const node = Node.get(this.value, at)
-        this.apply({ type: 'remove_node', path: at, node })
+        this.removeNodes({ at })
+        return
       }
 
-      if (Range.isRange(at)) {
-        const [start, end] = Range.edges(at)
-        const after = this.getAfter(end)!
-        const afterRef = this.createPointRef(after)
-        const l = ancestorPath.length
-        const startIndex = start.path[l]
-        const endIndex = end.path[l]
-        const hasBlocks =
-          Value.isValue(ancestor) ||
-          (Element.isElement(ancestor) && this.hasBlocks(ancestor))
-
-        // Iterate backwards so the paths are unaffected.
-        for (let i = endIndex; i >= startIndex; i--) {
-          const path = ancestorPath.concat(i)
-          const node = Node.get(this.value, path)
-          this.apply({ type: 'remove_node', path, node })
-        }
-
-        if (hasBlocks) {
-          this.mergeNodes({ at: afterRef.current!.path })
-        }
-
-        if (isSelection) {
-          this.select(afterRef.current!)
-        }
-
-        afterRef.unref()
+      if (Range.isCollapsed(at)) {
+        return
       }
+
+      const [start, end] = Range.edges(at)
+      const [ancestor, ancestorPath] = this.getAncestor(at)
+      const depth = ancestorPath.length + 1
+      const afterRef = this.createPointRef(end)
+      const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
+      debugger
+      this.splitNodes({ at: end, match: depth, always: true })
+      this.splitNodes({ at: start, match: depth, always: true })
+      const range = rangeRef.unref()!
+      debugger
+      this.removeNodes({ at: range, match: depth, hanging: true })
+
+      debugger
+      if (
+        Value.isValue(ancestor) ||
+        (Element.isElement(ancestor) && !this.isInline(ancestor))
+      ) {
+        this.mergeNodes({ at: afterRef.current!, hanging: true })
+      }
+
+      if (options.at == null) {
+        this.select(afterRef.current!)
+      }
+
+      afterRef.unref()
     })
   }
 

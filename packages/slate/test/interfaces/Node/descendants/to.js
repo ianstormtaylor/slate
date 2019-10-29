@@ -16,19 +16,23 @@ export const input = (
 
 export const test = value => {
   return Array.from(
-    Node.texts(value, {
-      at: {
-        anchor: {
-          path: [0, 1],
-          offset: 0,
-        },
-        focus: {
-          path: [0, 2],
-          offset: 0,
-        },
-      },
+    Node.descendants(value, {
+      from: [0, 1],
+      to: [0, 2],
     })
   )
 }
 
-export const output = [[<text key="b" />, [0, 1]], [<text key="c" />, [0, 2]]]
+export const output = [
+  [
+    <element>
+      <text key="a" />
+      <text key="b" />
+      <text key="c" />
+      <text key="d" />
+    </element>,
+    [0],
+  ],
+  [<text key="b" />, [0, 1]],
+  [<text key="c" />, [0, 2]],
+]

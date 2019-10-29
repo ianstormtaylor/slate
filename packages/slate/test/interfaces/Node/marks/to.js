@@ -16,16 +16,8 @@ export const input = (
 export const test = value => {
   return Array.from(
     Node.marks(value, {
-      at: {
-        anchor: {
-          path: [0, 0],
-          offset: 0,
-        },
-        focus: {
-          path: [0, 1],
-          offset: 0,
-        },
-      },
+      from: [0, 0],
+      to: [0, 1],
     })
   )
 }

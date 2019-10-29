@@ -13,9 +13,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(
-    Node.descendants(value, { at: { path: [0, 1], offset: 0 } })
-  )
+  return Array.from(Node.descendants(value, { from: [0, 1] }))
 }
 
 export const output = [

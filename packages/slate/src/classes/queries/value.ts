@@ -31,18 +31,13 @@ class ValueQueries {
     } = {}
   ): Iterable<AnnotationEntry> {
     const { annotations } = this.value
-    let { at } = options
-
-    if (Path.isPath(at)) {
-      at = this.getRange(at)
-    } else if (Point.isPoint(at)) {
-      at = { anchor: at, focus: at }
-    }
+    const { at } = options
+    const range = this.getRange(at)
 
     for (const key in annotations) {
       const annotation = annotations[key]
 
-      if (at && !Range.includes(at, annotation)) {
+      if (at && !Range.includes(range, annotation)) {
         continue
       }
 
@@ -51,22 +46,8 @@ class ValueQueries {
   }
 
   /**
-   * Iterate through all of the block nodes in the editor.
+   * Check if a node is a match.
    */
-
-  *blocks(
-    this: Editor,
-    options: {
-      at?: Location
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    yield* Node.elements(this.value, {
-      ...options,
-      pass: ([n]) =>
-        Element.isElement(n) && (this.isVoid(n) || this.hasInlines(n)),
-    })
-  }
 
   isMatch(this: Editor, entry: NodeEntry, match: Match) {
     const [node, path] = entry
@@ -94,15 +75,20 @@ class ValueQueries {
     }
   }
 
+  /**
+   * Iterate through all of the levels at a location.
+   */
+
   *levels(
     this: Editor,
-    path: Path,
+    at: Location,
     options: {
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
     const { reverse = false } = options
     const levels: NodeEntry[] = []
+    const path = this.getPath(at)
 
     for (const [n, p] of Node.levels(this.value, path)) {
       levels.push([n, p])
@@ -119,44 +105,6 @@ class ValueQueries {
     yield* levels
   }
 
-  *matches(
-    this: Editor,
-    options: {
-      match: Match
-      at: Location
-      hanging?: boolean
-      reverse?: boolean
-    }
-  ): Iterable<NodeEntry> {
-    const { reverse, match, hanging } = options
-    let { at } = options
-    let prevPath: Path | undefined
-
-    // PERF: If the target is a path, don't traverse.
-    if (Path.isPath(at)) {
-      const m = this.getMatch(at, match)
-
-      if (m) {
-        yield m
-      }
-
-      return
-    }
-
-    at = this.getRange(at, { hanging })
-
-    for (const [n, p] of this.entries({ at, reverse })) {
-      if (prevPath && Path.compare(p, prevPath) === 0) {
-        continue
-      }
-
-      if (this.isMatch([n, p], match)) {
-        prevPath = p
-        yield [n, p]
-      }
-    }
-  }
-
   /**
    * Iterate through all of the elements in the editor.
    */
@@ -168,8 +116,14 @@ class ValueQueries {
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
+    const { at } = options
+    const range = this.getRange(at)
+    const [from, to] = Range.edges(range, options)
+
     yield* Node.elements(this.value, {
       ...options,
+      from: from.path,
+      to: to.path,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
   }
@@ -185,8 +139,14 @@ class ValueQueries {
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
+    const { at } = options
+    const range = this.getRange(at)
+    const [from, to] = Range.edges(range, options)
+
     yield* Node.entries(this.value, {
       ...options,
+      from: from.path,
+      to: to.path,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
   }
@@ -274,24 +234,6 @@ class ValueQueries {
   }
 
   /**
-   * Iterate through all of the inline nodes in the editor.
-   */
-
-  *inlines(
-    this: Editor,
-    options: {
-      at?: Location
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [n, p] of this.elements(options)) {
-      if (this.isInline(n)) {
-        yield [n, p]
-      }
-    }
-  }
-
-  /**
    * Iterate through all of the text nodes in the editor.
    */
 
@@ -302,10 +244,57 @@ class ValueQueries {
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
+    const { at } = options
+    const range = this.getRange(at)
+    const [from, to] = Range.edges(range, options)
+
     yield* Node.marks(this.value, {
       ...options,
+      from: from.path,
+      to: to.path,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
+  }
+
+  /**
+   * Iterate through all of the nodes that match.
+   */
+
+  *matches(
+    this: Editor,
+    options: {
+      match: Match
+      at: Location
+      reverse?: boolean
+    }
+  ): Iterable<NodeEntry> {
+    const { reverse, match } = options
+    let { at } = options
+    let prevPath: Path | undefined
+
+    // PERF: If the target is a path, don't traverse.
+    if (Path.isPath(at)) {
+      const m = this.getMatch(at, match)
+
+      if (m) {
+        yield m
+      }
+
+      return
+    }
+
+    at = this.getRange(at)
+
+    for (const [n, p] of this.entries({ at, reverse })) {
+      if (prevPath && Path.compare(p, prevPath) === 0) {
+        continue
+      }
+
+      if (this.isMatch([n, p], match)) {
+        prevPath = p
+        yield [n, p]
+      }
+    }
   }
 
   /**
@@ -434,8 +423,14 @@ class ValueQueries {
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {
+    const { at } = options
+    const range = this.getRange(at)
+    const [from, to] = Range.edges(range, options)
+
     yield* Node.texts(this.value, {
       ...options,
+      from: from.path,
+      to: to.path,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
   }
