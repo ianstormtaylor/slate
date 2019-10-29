@@ -156,6 +156,14 @@ namespace Path {
   }
 
   /**
+   * Check if a path is equal to or an ancestor of another.
+   */
+
+  export const isCommon = (path: Path, another: Path): boolean => {
+    return path.length <= another.length && Path.compare(path, another) === 0
+  }
+
+  /**
    * Check if a path is a descendant of another.
    */
 

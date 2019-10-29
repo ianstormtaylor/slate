@@ -21,7 +21,8 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <cursor />three
+      <cursor />
     </block>
+    <block>three</block>
   </value>
 )

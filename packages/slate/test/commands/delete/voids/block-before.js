@@ -19,10 +19,8 @@ export const input = (
 
 export const output = (
   <value>
-    <block void>
+    <block>
       <cursor />
     </block>
   </value>
 )
-
-export const skip = true

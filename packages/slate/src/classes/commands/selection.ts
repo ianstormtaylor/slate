@@ -107,12 +107,7 @@ class SelectionCommands {
 
   select(this: Editor, target: Location) {
     const { selection } = this.value
-
-    if (Point.isPoint(target)) {
-      target = { anchor: target, focus: target }
-    } else if (Path.isPath(target)) {
-      target = this.getRange(target)
-    }
+    target = this.getRange(target)
 
     if (selection) {
       this.setSelection(target)

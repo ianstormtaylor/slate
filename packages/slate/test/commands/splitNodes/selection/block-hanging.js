@@ -22,12 +22,7 @@ export const output = (
   <value>
     <block>zero</block>
     <block>
-      <text />
-    </block>
-    <block>
       <cursor />cat is cute
     </block>
   </value>
 )
-
-export const skip = true

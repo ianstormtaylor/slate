@@ -3,20 +3,17 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.delete()
+  editor.splitNodes()
 }
 
 export const input = (
   <value>
     <block>
-      one
+      <text />
       <inline void>
-        <anchor />
+        word<cursor />
       </inline>
-      two
-    </block>
-    <block>
-      three <focus />
+      <text />
     </block>
   </value>
 )
@@ -24,7 +21,14 @@ export const input = (
 export const output = (
   <value>
     <block>
-      one<cursor />
+      <text />
+      <inline void>word</inline>
+      <text />
+    </block>
+    <block>
+      <cursor />
     </block>
   </value>
 )
+
+export const skip = true

@@ -4,11 +4,12 @@ import {
   Editor,
   Location,
   Node,
-  Path,
   NodeEntry,
+  Path,
   Point,
   Range,
   Text,
+  TextEntry,
 } from '../..'
 import { Match } from '../utils'
 
@@ -120,6 +121,23 @@ class LocationQueries {
 
   getEnd(this: Editor, at: Location = []): Point {
     return this.getPoint(at, { edge: 'end' })
+  }
+
+  /**
+   * Get the leaf text node at a location.
+   */
+
+  getLeaf(
+    this: Editor,
+    at: Location = [],
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    } = {}
+  ): TextEntry {
+    const path = this.getPath(at, options)
+    const node = Node.leaf(this.value, path)
+    return [node, path]
   }
 
   /**
@@ -292,7 +310,6 @@ class LocationQueries {
     let i = 0
 
     for (const entry of this.matches({ at: range, match, reverse: true })) {
-      debugger
       if (i === 1) {
         return entry
       }

@@ -22,7 +22,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <text />
+      <cursor />
     </block>
   </value>
 )

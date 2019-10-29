@@ -9,6 +9,7 @@ import {
   Range,
   Point,
   Value,
+  Text,
 } from '../..'
 
 class DeletingCommands {
@@ -67,31 +68,80 @@ class DeletingCommands {
         at = unhangRange(this, at)
       }
 
-      const [start, end] = Range.edges(at)
-      const [ancestor, ancestorPath] = this.getAncestor(at)
-      const depth = ancestorPath.length + 1
-      const afterRef = this.createPointRef(end)
-      const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-      debugger
-      this.splitNodes({ at: end, match: depth, always: true })
-      this.splitNodes({ at: start, match: depth, always: true })
-      const range = rangeRef.unref()!
-      debugger
-      this.removeNodes({ at: range, match: depth, hanging: true })
+      let [start, end] = Range.edges(at)
+      const [ancestor] = this.getAncestor(at)
+      const isSingleText = Path.equals(start.path, end.path)
+      const startVoid = this.getMatch(start.path, 'void')
+      const endVoid = this.getMatch(end.path, 'void')
 
-      debugger
-      if (
+      // If the start or end points are inside an inline void, nudge them out.
+      if (startVoid) {
+        const block = this.getMatch(start.path, 'block')
+        const before = this.getBefore(start)
+
+        if (before && block && Path.isAncestor(block[1], before.path)) {
+          start = before
+        }
+      }
+
+      if (endVoid) {
+        const block = this.getMatch(end.path, 'block')
+        const after = this.getAfter(end)
+
+        if (after && block && Path.isAncestor(block[1], after.path)) {
+          end = after
+        }
+      }
+
+      // Get the highest nodes that are completely inside the range, as well as
+      // the start and end nodes.
+      const matches = this.matches({
+        at,
+        match: ([n, p]) =>
+          (Element.isElement(n) && this.isVoid(n)) ||
+          (!Path.isCommon(p, start.path) && !Path.isCommon(p, end.path)),
+      })
+
+      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
+      const startRef = this.createPointRef(start)
+      const endRef = this.createPointRef(end)
+
+      if (!isSingleText && !startVoid) {
+        const point = startRef.current!
+        const [node] = this.getLeaf(point)
+        const { path } = point
+        const { offset } = start
+        const text = node.text.slice(offset)
+        this.apply({ type: 'remove_text', path, offset, text })
+      }
+
+      for (const pathRef of pathRefs) {
+        const path = pathRef.unref()!
+        this.removeNodes({ at: path })
+      }
+
+      if (!endVoid) {
+        const point = endRef.current!
+        const [node] = this.getLeaf(point)
+        const { path } = point
+        const offset = isSingleText ? start.offset : 0
+        const text = node.text.slice(offset, end.offset)
+        this.apply({ type: 'remove_text', path, offset, text })
+      }
+
+      const isBlockAncestor =
         Value.isValue(ancestor) ||
         (Element.isElement(ancestor) && !this.isInline(ancestor))
-      ) {
-        this.mergeNodes({ at: afterRef.current!, hanging: true })
+
+      if (isBlockAncestor && endRef.current && startRef.current) {
+        this.mergeNodes({ at: endRef.current, hanging: true })
       }
 
-      if (options.at == null) {
-        this.select(afterRef.current!)
-      }
+      const point = endRef.unref() || startRef.unref()
 
-      afterRef.unref()
+      if (options.at == null && point) {
+        this.select(point)
+      }
     })
   }
 
@@ -103,7 +153,7 @@ class DeletingCommands {
     this: Editor,
     fragment: Fragment,
     options: {
-      at?: Range | Point
+      at?: Location
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -193,6 +243,36 @@ class DeletingCommands {
       }
     })
   }
+
+  /**
+   * Remove a string of text in the editor.
+   */
+
+  removeText(
+    this: Editor,
+    text: string,
+    options: {
+      at?: Range
+    } = {}
+  ) {
+    this.withoutNormalizing(() => {
+      let { at = this.value.selection } = options
+
+      if (!at || Range.isCollapsed(at)) {
+        return
+      }
+
+      const [start, end] = Range.edges(at)
+      const texts = this.texts({ at })
+      const pathRefs = Array.from(texts, ([, p]) => this.createPathRef(p))
+
+      for (const [node, path] of this.texts({ at }))
+        if (Point.isPoint(at) && !this.getMatch(at.path, 'void')) {
+          const { path, offset } = at
+          this.apply({ type: 'insert_text', path, offset, text })
+        }
+    })
+  }
 }
 
 /**
@@ -213,15 +293,25 @@ const unhangRange = (editor: Editor, range: Range): Range => {
   const before = { anchor: first, focus: end }
   let skip = true
 
-  for (const [node, path] of editor.texts({ at: before, reverse: true })) {
-    if (skip) {
-      skip = false
-      continue
+  for (const [node, path] of editor.entries({ at: before, reverse: true })) {
+    if (Element.isElement(node) && editor.isVoid(node)) {
+      end = editor.getStart(path)
+      break
     }
 
-    if (node.text !== '' || Path.isBefore(path, blockPath)) {
-      end = { path, offset: node.text.length }
-      break
+    if (
+      Text.isText(node) ||
+      (Element.isElement(node) && editor.isInline(node))
+    ) {
+      if (skip) {
+        skip = false
+        continue
+      }
+
+      if (node.text !== '' || Path.isBefore(path, blockPath)) {
+        end = { path, offset: node.text.length }
+        break
+      }
     }
   }
 

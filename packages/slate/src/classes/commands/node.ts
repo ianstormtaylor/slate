@@ -206,14 +206,13 @@ class NodeCommands {
       }
 
       const current = this.getMatch(at, match)
-      const prev = this.getPrevious(at, match)
       debugger
+      const prev = this.getPrevious(at, match)
 
       if (!current || !prev) {
         return
       }
 
-      debugger
       const [node, path] = current
       const [prevNode, prevPath] = prev
       const newPath = Path.next(prevPath)
@@ -275,7 +274,6 @@ class NodeCommands {
       ) {
         this.removeNodes({ at: prevPath })
       } else {
-        debugger
         this.apply({
           type: 'merge_node',
           path: newPath,
@@ -283,7 +281,6 @@ class NodeCommands {
           target: null,
           properties,
         })
-        debugger
       }
 
       if (emptyRef) {
@@ -553,8 +550,8 @@ class NodeCommands {
         const point = this.getPoint(at)
         match = at.length - 1
         height = point.path.length - at.length + 1
-        always = true
         at = point
+        always = true
       }
 
       if (!at) {
@@ -562,24 +559,41 @@ class NodeCommands {
       }
 
       const beforeRef = this.createPointRef(at, { affinity: 'backward' })
-      const afterRef = this.createPointRef(at)
       const highest = this.getMatch(at, match)
 
       if (!highest) {
         return
       }
 
-      let depth = at.path.length - height
       const voidMatch = this.getMatch(at, 'void')
+      let nudge = 0
 
       if (voidMatch) {
-        const [, voidPath] = voidMatch
-        depth = Math.min(voidPath.length - 1, depth)
+        const [voidNode, voidPath] = voidMatch
+        let after = this.getAfter(voidPath)
+
+        if (!after) {
+          if (Element.isElement(voidNode) && this.isInline(voidNode)) {
+            const text = { text: '', marks: [] }
+            const afterPath = Path.next(voidPath)
+            this.insertNodes(text, { at: afterPath })
+            after = this.getPoint(afterPath)
+          } else {
+            return
+          }
+        }
+
+        const siblingHeight = after.path.length - voidPath.length
+        height = siblingHeight + 1
+        at = after
+        always = true
       }
 
+      const afterRef = this.createPointRef(at)
+      const depth = at.path.length - height
       let [, highestPath] = highest
       let lowestPath = at.path.slice(0, depth)
-      let position = height === 0 ? at.offset : at.path[depth]
+      let position = height === 0 ? at.offset : at.path[depth] + nudge
       let target: number | null = null
 
       for (const [node, path] of this.levels(lowestPath, { reverse: true })) {
