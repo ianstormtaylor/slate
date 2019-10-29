@@ -147,8 +147,6 @@ class LocationQueries {
     let first = true
 
     for (const [node] of this.texts({ at })) {
-      debugger
-
       if (first) {
         marks.push(...node.marks)
         first = false

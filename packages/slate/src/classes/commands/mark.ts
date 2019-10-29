@@ -107,7 +107,6 @@ class MarkCommands {
   ) {
     this.withoutNormalizing(() => {
       const existing = this.getActiveMarks(options)
-      debugger
       const exists = marks.every(m => Mark.exists(m, existing))
 
       if (exists) {
