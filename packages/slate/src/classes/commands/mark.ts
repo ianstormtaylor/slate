@@ -10,6 +10,7 @@ class MarkCommands {
     marks: Mark[],
     options: {
       at?: Location
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -43,6 +44,7 @@ class MarkCommands {
     marks: Mark[],
     options: {
       at?: Location
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -64,6 +66,7 @@ class MarkCommands {
     props: Partial<Mark>,
     options: {
       at?: Location
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -99,10 +102,12 @@ class MarkCommands {
     marks: Mark[],
     options: {
       at?: Location
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const existing = this.getActiveMarks(options)
+      debugger
       const exists = marks.every(m => Mark.exists(m, existing))
 
       if (exists) {
@@ -120,15 +125,22 @@ class MarkCommands {
 
 const splitLocation = (
   editor: Editor,
-  options: { at?: Location } = {}
+  options: {
+    at?: Location
+    hanging?: boolean
+  } = {}
 ): Location | undefined => {
-  const { at = editor.value.selection } = options
+  let { at = editor.value.selection, hanging = false } = options
 
   if (!at) {
     return
   }
 
   if (Range.isRange(at)) {
+    if (!hanging) {
+      at = editor.unhangRange(at)
+    }
+
     const rangeRef = editor.createRangeRef(at, { affinity: 'inward' })
     const [start, end] = Range.edges(at)
     editor.splitNodes({ at: end, match: 'text' })

@@ -187,7 +187,7 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = unhangRange(this, at)
+        at = this.unhangRange(at)
       }
 
       if (Range.isRange(at)) {
@@ -206,7 +206,6 @@ class NodeCommands {
       }
 
       const current = this.getMatch(at, match)
-      debugger
       const prev = this.getPrevious(at, match)
 
       if (!current || !prev) {
@@ -440,7 +439,7 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = unhangRange(this, at)
+        at = this.unhangRange(at)
       }
 
       const depths = this.matches({ at, match })
@@ -479,7 +478,7 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = unhangRange(this, at)
+        at = this.unhangRange(at)
       }
 
       for (const [node, path] of this.matches({ at, match })) {
@@ -570,22 +569,23 @@ class NodeCommands {
 
       if (voidMatch) {
         const [voidNode, voidPath] = voidMatch
-        let after = this.getAfter(voidPath)
 
-        if (!after) {
-          if (Element.isElement(voidNode) && this.isInline(voidNode)) {
+        if (Element.isElement(voidNode) && this.isInline(voidNode)) {
+          let after = this.getAfter(voidPath)
+
+          if (!after) {
             const text = { text: '', marks: [] }
             const afterPath = Path.next(voidPath)
             this.insertNodes(text, { at: afterPath })
-            after = this.getPoint(afterPath)
-          } else {
-            return
+            after = this.getPoint(afterPath)!
           }
+
+          at = after
+          always = true
         }
 
-        const siblingHeight = after.path.length - voidPath.length
+        const siblingHeight = at.path.length - voidPath.length
         height = siblingHeight + 1
-        at = after
         always = true
       }
 
@@ -596,7 +596,10 @@ class NodeCommands {
       let position = height === 0 ? at.offset : at.path[depth] + nudge
       let target: number | null = null
 
-      for (const [node, path] of this.levels(lowestPath, { reverse: true })) {
+      for (const [node, path] of this.levels({
+        at: lowestPath,
+        reverse: true,
+      })) {
         let split = false
 
         if (
@@ -618,7 +621,8 @@ class NodeCommands {
       }
 
       if (options.at == null) {
-        this.select(afterRef.current!)
+        const point = afterRef.current || this.getEnd()
+        this.select(point)
       }
 
       beforeRef.unref()
@@ -731,7 +735,7 @@ class NodeCommands {
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
 
-          const range = this.getRange(firstPath, { to: lastPath })
+          const range = this.getRange(firstPath, lastPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, nodes: [] }
@@ -745,39 +749,6 @@ class NodeCommands {
       }
     })
   }
-}
-
-/**
- * Convert a range into a non-hanging one.
- */
-
-const unhangRange = (editor: Editor, range: Range): Range => {
-  let [start, end] = Range.edges(range)
-
-  // PERF: exit early if we can guarantee that the range isn't hanging.
-  if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
-    return range
-  }
-
-  const closestBlock = editor.getMatch(end.path, 'block')
-  const blockPath = closestBlock ? closestBlock[1] : []
-  const first = editor.getStart()
-  const before = { anchor: first, focus: end }
-  let skip = true
-
-  for (const [node, path] of editor.texts({ at: before, reverse: true })) {
-    if (skip) {
-      skip = false
-      continue
-    }
-
-    if (node.text !== '' || Path.isBefore(path, blockPath)) {
-      end = { path, offset: node.text.length }
-      break
-    }
-  }
-
-  return { anchor: start, focus: end }
 }
 
 /**

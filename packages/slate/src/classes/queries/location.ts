@@ -1,19 +1,187 @@
+import { reverse as reverseText } from 'esrever'
 import {
   Ancestor,
   AncestorEntry,
+  AnnotationEntry,
   Editor,
+  Element,
+  ElementEntry,
   Location,
+  Mark,
+  MarkEntry,
   Node,
   NodeEntry,
   Path,
   Point,
   Range,
+  Span,
+  String,
   Text,
   TextEntry,
+  Value,
 } from '../..'
 import { Match } from '../utils'
 
 class LocationQueries {
+  /**
+   * Iterate through all of the annotations in the editor.
+   */
+
+  *annotations(
+    this: Editor,
+    options: {
+      at?: Location
+    } = {}
+  ): Iterable<AnnotationEntry> {
+    const { annotations } = this.value
+    const { at = [] } = options
+    const range = this.getRange(at)
+
+    for (const key in annotations) {
+      const annotation = annotations[key]
+
+      if (at && !Range.includes(range, annotation)) {
+        continue
+      }
+
+      yield [annotation, key]
+    }
+  }
+
+  /**
+   * Iterate through all of the elements in the editor.
+   */
+
+  *elements(
+    this: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
+    const [from, to] = getSpan(this, options)
+
+    yield* Node.elements(this.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+  }
+
+  /**
+   * Iterate through all of the nodes in the editor.
+   */
+
+  *entries(
+    this: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const [from, to] = getSpan(this, options)
+    const iterable = Node.entries(this.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+
+    for (const entry of iterable) {
+      yield entry
+    }
+  }
+
+  /**
+   * Get the marks that are "active" at a location. These are the
+   * marks that will be added to any text that is inserted.
+   *
+   * The `union: true` option can be passed to create a union of marks across
+   * the text nodes in the selection, instead of creating an intersection, which
+   * is the default.
+   *
+   * Note: to obey common rich text behavior, if the selection is collapsed at
+   * the start of a text node and there are previous text nodes in the same
+   * block, it will carry those marks forward from the previous text node. This
+   * allows for continuation of marks from previous words.
+   */
+
+  getActiveMarks(
+    this: Editor,
+    options: {
+      at?: Location
+      union?: boolean
+      hanging?: boolean
+    } = {}
+  ): Mark[] {
+    const { union = false, hanging = false } = options
+    let { at = this.value.selection } = options
+
+    if (!at) {
+      return []
+    }
+
+    at = this.getRange(at)
+
+    if (!hanging) {
+      at = this.unhangRange(at)
+    }
+
+    // If the range is collapsed at the start of a text node, it should carry
+    // over the marks from the previous text node in the same block.
+    if (Range.isCollapsed(at) && at.anchor.offset === 0) {
+      const { anchor } = at
+      const prev = this.getPrevious(anchor, 'text')
+
+      if (prev && Path.isSibling(anchor.path, prev[1])) {
+        const [prevNode, prevPath] = prev
+
+        if (Text.isText(prevNode)) {
+          at = this.getRange(prevPath)
+        }
+      }
+    }
+
+    const marks: Mark[] = []
+    let first = true
+
+    for (const [node] of this.texts({ at })) {
+      debugger
+
+      if (first) {
+        marks.push(...node.marks)
+        first = false
+        continue
+      }
+
+      if (union) {
+        for (const mark of node.marks) {
+          if (!Mark.exists(mark, marks)) {
+            marks.push(mark)
+          }
+        }
+      } else {
+        // PERF: If we're doing an intersection and the result hits zero it can
+        // never increase again, so we can exit early.
+        if (marks.length === 0) {
+          break
+        }
+
+        // Iterate backwards so that removing marks doesn't impact indexing.
+        for (let i = marks.length - 1; i >= 0; i--) {
+          const existing = marks[i]
+
+          if (!Mark.exists(existing, node.marks)) {
+            marks.splice(i, 1)
+          }
+        }
+      }
+    }
+
+    return marks
+  }
+
   /**
    * Get the point after a location.
    */
@@ -54,7 +222,7 @@ class LocationQueries {
 
   getAncestor(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -124,12 +292,30 @@ class LocationQueries {
   }
 
   /**
+   * Get the first node at a location.
+   */
+
+  getFirst(this: Editor, at: Location): NodeEntry {
+    const path = this.getPath(at, { edge: 'start' })
+    return this.getNode(path)
+  }
+
+  /**
+   * Get the last node at a location.
+   */
+
+  getLast(this: Editor, at: Location): NodeEntry {
+    const path = this.getPath(at, { edge: 'end' })
+    return this.getNode(path)
+  }
+
+  /**
    * Get the leaf text node at a location.
    */
 
   getLeaf(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -153,8 +339,8 @@ class LocationQueries {
 
     const path = this.getPath(at)
 
-    for (const entry of this.levels(path)) {
-      if (this.isMatch(entry, match)) {
+    for (const entry of this.levels({ at: path })) {
+      if (isMatch(this, entry, match)) {
         return entry
       }
     }
@@ -165,9 +351,12 @@ class LocationQueries {
    */
 
   getNext(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    const [, from] = this.getLast(at)
+    const [, to] = this.getLast([])
+    const span: Span = [from, to]
     let i = 0
 
-    for (const entry of this.matches({ at, match })) {
+    for (const entry of this.matches({ at: span, match })) {
       if (i === 1) {
         return entry
       }
@@ -182,7 +371,7 @@ class LocationQueries {
 
   getNode(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -199,7 +388,7 @@ class LocationQueries {
 
   getParent(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -217,7 +406,7 @@ class LocationQueries {
 
   getPath(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -262,7 +451,7 @@ class LocationQueries {
 
   getPoint(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       edge?: 'start' | 'end'
     } = {}
@@ -304,12 +493,12 @@ class LocationQueries {
    */
 
   getPrevious(this: Editor, at: Location, match: Match): NodeEntry | undefined {
-    const first = this.getStart(at)
-    const start = this.getStart()
-    const range = { anchor: start, focus: first }
+    const [, from] = this.getFirst(at)
+    const [, to] = this.getFirst([])
+    const span: Span = [from, to]
     let i = 0
 
-    for (const entry of this.matches({ at: range, match, reverse: true })) {
+    for (const entry of this.matches({ at: span, match, reverse: true })) {
       if (i === 1) {
         return entry
       }
@@ -322,9 +511,13 @@ class LocationQueries {
    * Get a range of a location.
    */
 
-  getRange(this: Editor, at: Location = [], to: Location = at): Range {
+  getRange(this: Editor, at: Location, to?: Location): Range {
+    if (Range.isRange(at) && !to) {
+      return at
+    }
+
     const start = this.getStart(at)
-    const end = this.getEnd(to)
+    const end = this.getEnd(to || at)
     return { anchor: start, focus: end }
   }
 
@@ -371,7 +564,7 @@ class LocationQueries {
 
   hasNode(
     this: Editor,
-    at: Location = [],
+    at: Location,
     options: {
       depth?: number
       edge?: 'start' | 'end'
@@ -411,6 +604,288 @@ class LocationQueries {
 
   isEdge(this: Editor, point: Point, at: Location = []): boolean {
     return this.isStart(point, at) || this.isEnd(point, at)
+  }
+
+  /**
+   * Iterate through all of the levels at a location.
+   */
+
+  *levels(
+    this: Editor,
+    options: {
+      at?: Location
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const { at = [], reverse = false } = options
+    const levels: NodeEntry[] = []
+    const path = this.getPath(at)
+
+    for (const [n, p] of Node.levels(this.value, path)) {
+      levels.push([n, p])
+
+      if (Element.isElement(n) && this.isVoid(n)) {
+        break
+      }
+    }
+
+    if (reverse) {
+      levels.reverse()
+    }
+
+    yield* levels
+  }
+
+  /**
+   * Iterate through all of the text nodes in the editor.
+   */
+
+  *marks(
+    this: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<MarkEntry> {
+    const [from, to] = getSpan(this, options)
+
+    yield* Node.marks(this.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+  }
+
+  /**
+   * Iterate through all of the nodes that match.
+   */
+
+  *matches(
+    this: Editor,
+    options: {
+      match: Match
+      at?: Location | Span
+      reverse?: boolean
+    }
+  ): Iterable<NodeEntry> {
+    const { reverse, match } = options
+    let { at } = options
+    let prevPath: Path | undefined
+
+    // PERF: If the target is a path, don't traverse.
+    if (Path.isPath(at)) {
+      const m = this.getMatch(at, match)
+
+      if (m) {
+        yield m
+      }
+
+      return
+    }
+
+    for (const [n, p] of this.entries({ at, reverse })) {
+      if (prevPath && Path.compare(p, prevPath) === 0) {
+        continue
+      }
+
+      if (isMatch(this, [n, p], match)) {
+        prevPath = p
+        yield [n, p]
+      }
+    }
+  }
+
+  /**
+   * Iterate through all of the positions in the document where a `Point` can be
+   * placed.
+   *
+   * By default it will move forward by individual offsets at a time,  but you
+   * can pass the `unit: 'character'` option to moved forward one character, word,
+   * or line at at time.
+   *
+   * Note: void nodes are treated as a single point, and iteration will not
+   * happen inside their content.
+   */
+
+  *positions(
+    this: Editor,
+    options: {
+      at?: Location
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+    } = {}
+  ): Iterable<Point> {
+    const { at = [], unit = 'offset', reverse = false } = options
+    const range = this.getRange(at)
+    const [start, end] = Range.edges(range)
+    const first = reverse ? end : start
+    let string = ''
+    let available = 0
+    let offset = 0
+    let distance: number | null = null
+    let isNewBlock = false
+
+    const advance = () => {
+      if (distance == null) {
+        if (unit === 'character') {
+          distance = String.getCharacterDistance(string)
+        } else if (unit === 'word') {
+          distance = String.getWordDistance(string)
+        } else if (unit === 'line' || unit === 'block') {
+          distance = string.length
+        } else {
+          distance = 1
+        }
+
+        string = string.slice(distance)
+      }
+
+      // Add or substract the offset.
+      offset = reverse ? offset - distance : offset + distance
+      // Subtract the distance traveled from the available text.
+      available = available - distance!
+      // If the available had room to spare, reset the distance so that it will
+      // advance again next time. Otherwise, set it to the overflow amount.
+      distance = available >= 0 ? null : 0 - available
+    }
+
+    for (const [node, path] of this.entries({ at, reverse })) {
+      if (Element.isElement(node)) {
+        // Void nodes are a special case, since we don't want to iterate over
+        // their content. We instead always just yield their first point.
+        if (this.isVoid(node)) {
+          yield this.getStart(path)
+          continue
+        }
+
+        if (this.isInline(node)) {
+          continue
+        }
+
+        if (this.hasInlines(node)) {
+          let e = Path.isAncestor(path, end.path) ? end : this.getEnd(path)
+          let s = Path.isAncestor(path, start.path)
+            ? start
+            : this.getStart(path)
+
+          const text = this.getText({ anchor: s, focus: e })
+          string = reverse ? reverseText(text) : text
+          isNewBlock = true
+        }
+      }
+
+      if (Text.isText(node)) {
+        const isFirst = Path.equals(path, first.path)
+        available = node.text.length
+        offset = reverse ? available : 0
+
+        if (isFirst) {
+          available = reverse ? first.offset : available - first.offset
+          offset = first.offset
+        }
+
+        if (isFirst || isNewBlock || unit === 'offset') {
+          yield { path, offset }
+        }
+
+        while (true) {
+          // If there's no more string, continue to the next block.
+          if (string === '') {
+            break
+          } else {
+            advance()
+          }
+
+          // If the available space hasn't overflow, we have another point to
+          // yield in the current text node.
+          if (available >= 0) {
+            yield { path, offset }
+          } else {
+            break
+          }
+        }
+
+        isNewBlock = false
+      }
+    }
+  }
+
+  /**
+   * Iterate through all of the text nodes in the editor.
+   */
+
+  *texts(
+    this: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<TextEntry> {
+    const [from, to] = getSpan(this, options)
+
+    yield* Node.texts(this.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+  }
+}
+
+/**
+ * Get the from and to path span from a location.
+ */
+
+const getSpan = (
+  editor: Editor,
+  options: {
+    at?: Location | Span
+    reverse?: boolean
+  } = {}
+): Span => {
+  const { at = [], reverse = false } = options
+
+  if (Span.isSpan(at)) {
+    return at
+  }
+
+  const first = editor.getPath(at, { edge: 'start' })
+  const last = editor.getPath(at, { edge: 'end' })
+  const from = reverse ? last : first
+  const to = reverse ? first : last
+  return [from, to]
+}
+
+/**
+ * Check if a node is a match.
+ */
+
+const isMatch = (editor: Editor, entry: NodeEntry, match: Match) => {
+  const [node, path] = entry
+
+  if (typeof match === 'function') {
+    return match(entry)
+  } else if (typeof match === 'number') {
+    return path.length === match
+  } else if (match === 'text') {
+    return Text.isText(node)
+  } else if (match === 'value') {
+    return Value.isValue(node)
+  } else if (match === 'inline') {
+    return (
+      (Element.isElement(node) && editor.isInline(node)) || Text.isText(node)
+    )
+  } else if (match === 'block') {
+    return (
+      Element.isElement(node) &&
+      !editor.isInline(node) &&
+      editor.hasInlines(node)
+    )
+  } else if (match === 'void') {
+    return Element.isElement(node) && editor.isVoid(node)
+  } else {
+    return Node.matches(node, match)
   }
 }
 

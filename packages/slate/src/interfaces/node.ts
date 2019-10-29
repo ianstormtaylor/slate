@@ -228,15 +228,7 @@ namespace Node {
     } = {}
   ): Iterable<NodeEntry> {
     const { pass, reverse = false } = options
-    let { from = [], to } = options
-    const start = reverse ? Node.last(root, from) : Node.first(root, from)
-    from = start[1]
-
-    if (to != null) {
-      const end = reverse ? Node.first(root, to) : Node.last(root, to)
-      to = end[1]
-    }
-
+    const { from = [], to } = options
     const visited = new Set()
     let p: Path = []
     let n = root

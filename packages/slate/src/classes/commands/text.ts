@@ -65,7 +65,7 @@ class DeletingCommands {
       }
 
       if (!hanging) {
-        at = unhangRange(this, at)
+        at = this.unhangRange(at)
       }
 
       let [start, end] = Range.edges(at)
@@ -273,49 +273,6 @@ class DeletingCommands {
         }
     })
   }
-}
-
-/**
- * Convert a range into a non-hanging one.
- */
-
-const unhangRange = (editor: Editor, range: Range): Range => {
-  let [start, end] = Range.edges(range)
-
-  // PERF: exit early if we can guarantee that the range isn't hanging.
-  if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
-    return range
-  }
-
-  const closestBlock = editor.getMatch(end.path, 'block')
-  const blockPath = closestBlock ? closestBlock[1] : []
-  const first = editor.getStart()
-  const before = { anchor: first, focus: end }
-  let skip = true
-
-  for (const [node, path] of editor.entries({ at: before, reverse: true })) {
-    if (Element.isElement(node) && editor.isVoid(node)) {
-      end = editor.getStart(path)
-      break
-    }
-
-    if (
-      Text.isText(node) ||
-      (Element.isElement(node) && editor.isInline(node))
-    ) {
-      if (skip) {
-        skip = false
-        continue
-      }
-
-      if (node.text !== '' || Path.isBefore(path, blockPath)) {
-        end = { path, offset: node.text.length }
-        break
-      }
-    }
-  }
-
-  return { anchor: start, focus: end }
 }
 
 export default DeletingCommands

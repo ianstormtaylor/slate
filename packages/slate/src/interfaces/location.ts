@@ -21,4 +21,18 @@ namespace Location {
   }
 }
 
-export { Location }
+type Span = [Path, Path]
+
+namespace Span {
+  /**
+   * Check if a value implements the `Span` interface.
+   */
+
+  export const isSpan = (value: any): value is Span => {
+    return (
+      Array.isArray(value) && value.length === 2 && value.every(Path.isPath)
+    )
+  }
+}
+
+export { Location, Span }

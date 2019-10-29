@@ -17,7 +17,7 @@ import GeneralCommands from './commands/general'
 import ElementQueries from './queries/element'
 import GeneralQueries from './queries/general'
 import LocationQueries from './queries/location'
-import ValueQueries from './queries/value'
+import RangeQueries from './queries/range'
 
 /**
  * The `EditorConstructor` interface is provided as a convenience for plugins
@@ -82,7 +82,7 @@ interface Editor
     ElementQueries,
     GeneralQueries,
     LocationQueries,
-    ValueQueries {}
+    RangeQueries {}
 
 const mixin = (Mixins: Array<new () => any>) => {
   for (const Mixin of Mixins) {
@@ -104,7 +104,7 @@ mixin([
   ElementQueries,
   GeneralQueries,
   LocationQueries,
-  ValueQueries,
+  RangeQueries,
 ])
 
 export { Editor, EditorConstructor }
