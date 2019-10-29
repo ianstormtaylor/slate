@@ -41,8 +41,6 @@ export const output = {
       path: [1, 0],
       offset: 1,
     },
-    isFocused: true,
-    marks: null,
   },
   annotations: {},
 }
