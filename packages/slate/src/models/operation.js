@@ -278,7 +278,8 @@ class Operation extends Record(DEFAULTS) {
         if ('anchor' in value) v.anchor = value.anchor.toJS()
         if ('focus' in value) v.focus = value.focus.toJS()
         if ('key' in value) v.key = value.key
-        if ('mark' in value) v.mark = value.mark.toJS()
+        if ('data' in value) v.data = value.data.toJS()
+        if ('type' in value) v.type = value.type
         value = v
       }
 
