@@ -122,7 +122,7 @@ const normalizeElements = (elements: HyperscriptShorthands) => {
 
     if (typeof props !== 'object') {
       throw new Error(
-        `Properties specified for a hyperscript shorthand should be an object, but for the custom <${tagName}> tag you passed: ${props}`
+        `Properties specified for a hyperscript shorthand should be an object, but for the custom element <${tagName}>  tag you passed: ${props}`
       )
     }
 
@@ -150,7 +150,7 @@ const normalizeMarks = (marks: HyperscriptShorthands) => {
 
     if (typeof props !== 'object') {
       throw new Error(
-        `Properties specified for a hyperscript shorthand should be an object, but for the custom <${tagName}> tag you passed: ${props}`
+        `Properties specified for a hyperscript shorthand should be an object, but for the custom mark <${tagName}> tag you passed: ${props}`
       )
     }
 
@@ -178,7 +178,7 @@ const normalizeAnnotations = (annotations: HyperscriptShorthands) => {
 
     if (typeof props !== 'object') {
       throw new Error(
-        `Properties specified for a hyperscript shorthand should be an object, but for the custom <${tagName}> tag you passed: ${props}`
+        `Properties specified for a hyperscript shorthand should be an object, but for the custom annotation <${tagName}> tag you passed: ${props}`
       )
     }
 

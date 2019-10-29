@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { EditorConstructor, Operation, Path } from '../..'
+import { EditorPlugin, EditorConstructor, Operation, Path } from 'slate'
 import { History } from './history'
 
 const HISTORY = Symbol('history')
@@ -11,9 +11,9 @@ const MERGING = Symbol('merging')
  * operations are applied to it, using undo and redo stacks.
  */
 
-const HistoryPlugin = () => {
-  return (Base: EditorConstructor) => {
-    return class extends Base {
+const HistoryPlugin: EditorPlugin = () => {
+  return (Editor: EditorConstructor) => {
+    return class extends Editor {
       [HISTORY]: History;
       [MERGING]: boolean | null;
       [SAVING]: boolean
@@ -88,7 +88,7 @@ const HistoryPlugin = () => {
       }
 
       /**
-       * Redo to the next value in the history.
+       * Redo the last batch of operations in the history.
        */
 
       redo(): void {
@@ -116,7 +116,7 @@ const HistoryPlugin = () => {
       }
 
       /**
-       * Undo the previous operations in the history.
+       * Undo the last batch of operations in the history.
        */
 
       undo(): void {
@@ -132,6 +132,7 @@ const HistoryPlugin = () => {
         this.withoutSaving(() => {
           this.withoutNormalizing(() => {
             const inverseOps = batch.map(Operation.inverse).reverse()
+            debugger
 
             for (const op of inverseOps) {
               this.apply(op)

@@ -27,6 +27,15 @@ import RangeQueries from './queries/range'
 type EditorConstructor = new (...args: any[]) => Editor
 
 /**
+ * The `EditorPlugin` interface is provided as a convenience for plugins
+ * who can use it when writing the typings for their plugin functions.
+ */
+
+type EditorPlugin = (
+  ...args: any
+) => ((Editor: EditorConstructor) => EditorConstructor)
+
+/**
  * The `Editor` class stores all the state of a Slate editor. It is extended by
  * plugins that wish to add their own methods that implement new behaviors.
  */
@@ -107,4 +116,4 @@ mixin([
   RangeQueries,
 ])
 
-export { Editor, EditorConstructor }
+export { Editor, EditorConstructor, EditorPlugin }

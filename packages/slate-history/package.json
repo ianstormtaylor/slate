@@ -1,49 +1,37 @@
 {
-  "name": "slate",
-  "description": "A completely customizable framework for building rich text editors.",
+  "name": "slate-history",
+  "description": "An operation-based history implementation for Slate editors.",
   "version": "0.47.8",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
   "types": "lib/index.d.ts",
-  "umd": "dist/slate.js",
-  "umdMin": "dist/slate.min.js",
+  "umd": "dist/slate-history.js",
+  "umdMin": "dist/slate-history.min.js",
   "files": [
     "dist/",
     "lib/"
   ],
   "dependencies": {
-    "@types/esrever": "^0.2.0",
-    "esrever": "^0.2.0",
     "immer": "^4.0.1",
     "is-plain-object": "^2.0.4",
     "tiny-invariant": "^1.0.1",
     "tiny-warning": "^0.0.3"
   },
+  "peerDependencies": {
+    "slate": ">=0.47.0"
+  },
   "devDependencies": {
+    "slate": "^0.47.8",
     "slate-hyperscript": "^0.13.8"
   },
   "keywords": [
-    "canvas",
-    "contenteditable",
-    "doc",
-    "docs",
-    "document",
-    "edit",
     "editor",
-    "html",
-    "immutable",
-    "markdown",
-    "medium",
-    "paper",
-    "react",
-    "rich",
-    "rich-text",
-    "richtext",
+    "history",
+    "operation",
+    "redo",
     "slate",
-    "text",
-    "wysiwyg",
-    "wysiwym"
+    "undo"
   ]
 }

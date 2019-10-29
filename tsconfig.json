@@ -1,6 +1,10 @@
 {
   "extends": "./config/typescript/tsconfig.json",
-  "references": [{ "path": "./packages/slate" }],
+  "references": [
+    { "path": "./packages/slate" },
+    { "path": "./packages/slate-hyperscript" },
+    { "path": "./packages/slate-history" }
+  ],
   "files": [],
   "typedocOptions": {
     "excludeExternals": true,

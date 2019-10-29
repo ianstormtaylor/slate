@@ -410,16 +410,14 @@ namespace Path {
 
             return copy.concat(p.slice(op.length))
           } else {
-            const copy = p.slice()
-
             if (Path.endsBefore(op, p)) {
               p[op.length - 1] -= 1
             }
 
             if (
-              Path.endsBefore(onp, copy) ||
-              Path.equals(onp, copy) ||
-              Path.isAncestor(onp, copy)
+              Path.endsBefore(onp, p) ||
+              Path.equals(onp, p) ||
+              Path.isAncestor(onp, p)
             ) {
               p[onp.length - 1] += 1
             }

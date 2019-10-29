@@ -365,7 +365,7 @@ namespace Operation {
       }
 
       case 'insert_node': {
-        return { ...op, type: 'insert_node' }
+        return { ...op, type: 'remove_node' }
       }
 
       case 'insert_text': {
@@ -387,11 +387,9 @@ namespace Operation {
         // We need to get the original path here, but sometimes the `newPath`
         // is a younger sibling of (or ends before) the original, and this
         // accounts for it.
-        return {
-          ...op,
-          path: Path.transform(path, op)!,
-          newPath: Path.transform(Path.next(path), op)!,
-        }
+        const inversePath = Path.transform(path, op)!
+        const inverseNewPath = Path.transform(Path.next(path), op)!
+        return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
       case 'remove_annotation': {
