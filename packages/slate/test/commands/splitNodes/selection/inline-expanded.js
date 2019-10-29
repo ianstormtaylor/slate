@@ -3,7 +3,7 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ match: 'inline' })
+  editor.splitNodes()
 }
 
 export const input = (
@@ -24,6 +24,9 @@ export const output = (
       <text />
       <inline>w</inline>
       <text />
+    </block>
+    <block>
+      <text />
       <inline>
         <cursor />d
       </inline>
@@ -31,5 +34,3 @@ export const output = (
     </block>
   </value>
 )
-
-export const skip = true

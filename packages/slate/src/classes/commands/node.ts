@@ -275,6 +275,7 @@ class NodeCommands {
       ) {
         this.removeNodes({ at: prevPath })
       } else {
+        debugger
         this.apply({
           type: 'merge_node',
           path: newPath,
@@ -282,6 +283,7 @@ class NodeCommands {
           target: null,
           properties,
         })
+        debugger
       }
 
       if (emptyRef) {
@@ -530,37 +532,19 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { always = false } = options
-      let { at = this.value.selection, match, height = 0 } = options
-      let target: number | null = null
-      let position
-      let edgeRef
-
-      if (!at) {
-        return
-      }
+      let {
+        match,
+        at = this.value.selection,
+        height = 0,
+        always = false,
+      } = options
 
       if (match == null) {
-        if (Path.isPath(at)) {
-          match = at.length
-        } else {
-          match = 'block'
-        }
+        match = Path.isPath(at) ? at.length : 'block'
       }
 
       if (Range.isRange(at)) {
-        if (Range.isCollapsed(at)) {
-          at = at.anchor
-        } else {
-          const [, end] = Range.edges(at)
-          const pointRef = this.createPointRef(end)
-          this.delete({ at })
-          at = pointRef.unref()!
-
-          if (options.at == null) {
-            this.select(at)
-          }
-        }
+        at = deleteRange(this, at)
       }
 
       // If the target is a path, the default height-skipping and position
@@ -568,32 +552,49 @@ class NodeCommands {
       if (Path.isPath(at)) {
         const point = this.getPoint(at)
         match = at.length - 1
-        position = at[at.length - 1]
         height = point.path.length - at.length + 1
+        always = true
         at = point
-      } else {
-        position = at.offset
-        edgeRef = this.createPointRef(at, { affinity: 'backward' })
       }
 
+      if (!at) {
+        return
+      }
+
+      const beforeRef = this.createPointRef(at, { affinity: 'backward' })
+      const afterRef = this.createPointRef(at)
       const highest = this.getMatch(at, match)
 
       if (!highest) {
         return
       }
 
-      const [, highestPath] = highest
-      const lowestPath = at.path.slice(0, at.path.length - height)
+      let depth = at.path.length - height
+      const voidMatch = this.getMatch(at, 'void')
 
-      for (const [n, path] of this.levels(lowestPath, { reverse: true })) {
+      if (voidMatch) {
+        const [, voidPath] = voidMatch
+        depth = Math.min(voidPath.length - 1, depth)
+      }
+
+      let [, highestPath] = highest
+      let lowestPath = at.path.slice(0, depth)
+      let position = height === 0 ? at.offset : at.path[depth]
+      let target: number | null = null
+
+      for (const [node, path] of this.levels(lowestPath, { reverse: true })) {
         let split = false
 
-        if (path.length < highestPath.length || path.length === 0) {
+        if (
+          path.length < highestPath.length ||
+          path.length === 0 ||
+          (Element.isElement(node) && this.isVoid(node))
+        ) {
           break
         }
 
-        if (always || !edgeRef || !this.isEdge(edgeRef.current!, path)) {
-          const { text, marks, nodes, ...properties } = n
+        if (always || !beforeRef || !this.isEdge(beforeRef.current!, path)) {
+          const { text, marks, nodes, ...properties } = node
           this.apply({ type: 'split_node', path, position, target, properties })
           split = true
         }
@@ -602,9 +603,12 @@ class NodeCommands {
         position = path[path.length - 1] + (split ? 1 : 0)
       }
 
-      if (edgeRef) {
-        edgeRef.unref()
+      if (options.at == null) {
+        this.select(afterRef.current!)
       }
+
+      beforeRef.unref()
+      afterRef.unref()
     })
   }
 
@@ -760,6 +764,21 @@ const unhangRange = (editor: Editor, range: Range): Range => {
   }
 
   return { anchor: start, focus: end }
+}
+
+/**
+ * Convert a range into a point by deleting it's content.
+ */
+
+const deleteRange = (editor: Editor, range: Range): Point | null => {
+  if (Range.isCollapsed(range)) {
+    return range.anchor
+  } else {
+    const [, end] = Range.edges(range)
+    const pointRef = editor.createPointRef(end)
+    editor.delete({ at: range })
+    return pointRef.unref()
+  }
 }
 
 export default NodeCommands

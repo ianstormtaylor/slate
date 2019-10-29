@@ -160,17 +160,19 @@ namespace Value {
         }
 
         case 'merge_node': {
+          debugger
           const { path } = op
           const node = Node.get(v, path)
           const prevPath = Path.previous(path)
           const prev = Node.get(v, prevPath)
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
+          debugger
 
           if (Text.isText(node) && Text.isText(prev)) {
-            prev.text = prev.text + node.text
+            prev.text += node.text
           } else if (!Text.isText(node) && !Text.isText(prev)) {
-            prev.nodes = prev.nodes.concat(node.nodes)
+            prev.nodes.push(...node.nodes)
           } else {
             throw new Error(
               `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`

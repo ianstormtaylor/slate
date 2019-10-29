@@ -23,11 +23,12 @@ class DeletingCommands {
       distance?: number
       unit?: 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
       const { reverse = false, unit = 'character', distance = 1 } = options
-      let { at = this.value.selection } = options
+      let { at = this.value.selection, hanging = false } = options
 
       if (!at) {
         return
@@ -49,6 +50,7 @@ class DeletingCommands {
             ? this.getBefore(at, opts) || this.getStart()
             : this.getAfter(at, opts) || this.getEnd()
           at = { anchor: at, focus: target }
+          hanging = true
         }
       }
 
@@ -59,6 +61,10 @@ class DeletingCommands {
 
       if (Range.isCollapsed(at)) {
         return
+      }
+
+      if (!hanging) {
+        at = unhangRange(this, at)
       }
 
       const [start, end] = Range.edges(at)
@@ -187,6 +193,39 @@ class DeletingCommands {
       }
     })
   }
+}
+
+/**
+ * Convert a range into a non-hanging one.
+ */
+
+const unhangRange = (editor: Editor, range: Range): Range => {
+  let [start, end] = Range.edges(range)
+
+  // PERF: exit early if we can guarantee that the range isn't hanging.
+  if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    return range
+  }
+
+  const closestBlock = editor.getMatch(end.path, 'block')
+  const blockPath = closestBlock ? closestBlock[1] : []
+  const first = editor.getStart()
+  const before = { anchor: first, focus: end }
+  let skip = true
+
+  for (const [node, path] of editor.texts({ at: before, reverse: true })) {
+    if (skip) {
+      skip = false
+      continue
+    }
+
+    if (node.text !== '' || Path.isBefore(path, blockPath)) {
+      end = { path, offset: node.text.length }
+      break
+    }
+  }
+
+  return { anchor: start, focus: end }
 }
 
 export default DeletingCommands

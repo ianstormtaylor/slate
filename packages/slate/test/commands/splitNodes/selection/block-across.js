@@ -3,24 +3,25 @@
 import { h } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ match: 'block' })
+  editor.splitNodes()
 }
 
 export const input = (
   <value>
     <block>
-      w<anchor />or<focus />d
+      wo<anchor />rd
+    </block>
+    <block>
+      an<focus />other
     </block>
   </value>
 )
 
 export const output = (
   <value>
-    <block>w</block>
+    <block>wo</block>
     <block>
-      <cursor />d
+      <cursor />other
     </block>
   </value>
 )
-
-export const skip = true
