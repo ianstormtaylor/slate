@@ -1,0 +1,33 @@
+{
+  "name": "slate-schema",
+  "description": "A plugin that ensures your Slate editors obey the rules of your schema.",
+  "version": "0.47.8",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "types": "lib/index.d.ts",
+  "umd": "dist/slate-schema.js",
+  "umdMin": "dist/slate-schema.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "dependencies": {},
+  "peerDependencies": {
+    "slate": ">=0.47.0"
+  },
+  "devDependencies": {
+    "slate": "^0.47.8",
+    "slate-hyperscript": "^0.13.8"
+  },
+  "keywords": [
+    "customize",
+    "editor",
+    "normalization",
+    "rules",
+    "schema",
+    "slate",
+    "validation"
+  ]
+}

@@ -3,6 +3,7 @@
   "references": [
     { "path": "./packages/slate" },
     { "path": "./packages/slate-hyperscript" },
+    { "path": "./packages/slate-schema" },
     { "path": "./packages/slate-history" }
   ],
   "files": [],

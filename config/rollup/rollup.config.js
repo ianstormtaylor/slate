@@ -9,19 +9,20 @@ import typescript from 'rollup-plugin-typescript2'
 import uglify from 'rollup-plugin-uglify'
 import { startCase } from 'lodash'
 
-import core from '../../packages/slate/package.json'
-import base64Serializer from '../../packages/slate-base64-serializer/package.json'
-import devEnvironment from '../../packages/slate-dev-environment/package.json'
-import history from '../../packages/slate-history/package.json'
-import hotkeys from '../../packages/slate-hotkeys/package.json'
-import htmlSerializer from '../../packages/slate-html-serializer/package.json'
-import hyperscript from '../../packages/slate-hyperscript/package.json'
-import parsePlaintext from '../../packages/slate-parse-plaintext/package.json'
-import plainSerializer from '../../packages/slate-plain-serializer/package.json'
-import propTypes from '../../packages/slate-prop-types/package.json'
-import react from '../../packages/slate-react/package.json'
-import reactPlaceholder from '../../packages/slate-react-placeholder/package.json'
-import renderPlaintext from '../../packages/slate-render-plaintext/package.json'
+import Core from '../../packages/slate/package.json'
+import Base64Serializer from '../../packages/slate-base64-serializer/package.json'
+import DevEnvironment from '../../packages/slate-dev-environment/package.json'
+import History from '../../packages/slate-history/package.json'
+import Hotkeys from '../../packages/slate-hotkeys/package.json'
+import HtmlSerializer from '../../packages/slate-html-serializer/package.json'
+import Hyperscript from '../../packages/slate-hyperscript/package.json'
+import ParsePlaintext from '../../packages/slate-parse-plaintext/package.json'
+import PlainSerializer from '../../packages/slate-plain-serializer/package.json'
+import PropTypes from '../../packages/slate-prop-types/package.json'
+import React from '../../packages/slate-react/package.json'
+import ReactPlaceholder from '../../packages/slate-react-placeholder/package.json'
+import RenderPlaintext from '../../packages/slate-render-plaintext/package.json'
+import Schema from '../../packages/slate-schema/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -176,17 +177,18 @@ function factory(pkg, options = {}) {
  */
 
 export default [
-  ...factory(core, { ts: true }),
-  ...factory(base64Serializer),
-  ...factory(devEnvironment),
-  ...factory(history, { ts: true }),
-  ...factory(hotkeys),
-  ...factory(htmlSerializer),
-  ...factory(hyperscript, { ts: true }),
-  ...factory(plainSerializer),
-  ...factory(parsePlaintext, { ts: true }),
-  ...factory(propTypes),
-  ...factory(react),
-  ...factory(reactPlaceholder),
-  ...factory(renderPlaintext, { ts: true }),
+  ...factory(Core, { ts: true }),
+  ...factory(Base64Serializer),
+  ...factory(DevEnvironment),
+  ...factory(History, { ts: true }),
+  ...factory(Hotkeys),
+  ...factory(HtmlSerializer),
+  ...factory(Hyperscript, { ts: true }),
+  ...factory(PlainSerializer),
+  ...factory(ParsePlaintext, { ts: true }),
+  ...factory(PropTypes),
+  ...factory(React),
+  ...factory(ReactPlaceholder),
+  ...factory(RenderPlaintext, { ts: true }),
+  ...factory(Schema, { ts: true }),
 ]
