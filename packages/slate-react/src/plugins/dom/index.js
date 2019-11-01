@@ -18,11 +18,17 @@ function DOMPlugin(options = {}) {
   const beforePlugin = BeforePlugin()
   const afterPlugin = AfterPlugin()
 
+  // Activate NoopPlugin only for debugging purposes
+  const noopPluginActivated = false
+
   // COMPAT: Add Android specific handling separately before it gets to the
   // other plugins because it is specific (other browser don't need it) and
   // finicky (it has to come before other plugins to work).
   const androidPlugins = IS_ANDROID
-    ? [AndroidPlugin(options), NoopPlugin(options)]
+    ? [
+        AndroidPlugin(options),
+        noopPluginActivated ? NoopPlugin(options) : undefined,
+      ]
     : []
 
   return [...androidPlugins, beforePlugin, ...plugins, afterPlugin]
