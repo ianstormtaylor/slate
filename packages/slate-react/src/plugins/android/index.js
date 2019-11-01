@@ -44,16 +44,18 @@ function AndroidPlugin({ editor }) {
    * handle `onCompositionStart`
    */
 
-  function onCompositionStart() {
+  function onCompositionStart(event, e, next) {
     observer.onCompositionStart()
+    return next()
   }
 
   /**
    * handle `onCompositionEnd`
    */
 
-  function onCompositionEnd() {
+  function onCompositionEnd(event, e, next) {
     observer.onCompositionEnd()
+    return next()
   }
 
   /**
@@ -62,26 +64,29 @@ function AndroidPlugin({ editor }) {
    * @param {Event} event
    */
 
-  function onSelect(event) {
+  function onSelect(event, e, next) {
     const window = getWindow(event.target)
     fixSelectionInZeroWidthBlock(window)
     observer.onSelect(event)
+    return next()
   }
 
   /**
    * handle `onComponentDidMount`
    */
 
-  function onComponentDidMount() {
+  function onComponentDidMount(event, e, next) {
     observer.connect()
+    return next()
   }
 
   /**
    * handle `onComponentDidUpdate`
    */
 
-  function onComponentDidUpdate() {
+  function onComponentDidUpdate(event, e, next) {
     observer.connect()
+    return next()
   }
 
   /**
@@ -90,8 +95,9 @@ function AndroidPlugin({ editor }) {
    * @param {Event} event
    */
 
-  function onComponentWillUnmount() {
+  function onComponentWillUnmount(event, e, next) {
     observer.disconnect()
+    return next()
   }
 
   /**
@@ -100,12 +106,13 @@ function AndroidPlugin({ editor }) {
    * @param {Event} event
    */
 
-  function onRender() {
+  function onRender(event, e, next) {
     observer.disconnect()
 
     // We don't want the `diff` from a previous render to apply to a
     // potentially different value (e.g. when we switch examples)
     observer.clearDiff()
+    return next()
   }
 
   return {
