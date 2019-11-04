@@ -20,7 +20,7 @@ const Children = (props: {
   const { annotations, block, decorations, node, selection } = props
   const editor = useEditor()
   const newDecorations = editor.getDecorations(node)
-  const path = editor.findPath(node)!
+  const path = editor.findPath(node)
   const children = []
 
   for (let i = 0; i < node.nodes.length; i++) {

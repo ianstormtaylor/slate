@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editor as BaseEditor } from 'slate'
-import { Editor, withReact } from 'slate-react'
+import { Editor, withReact, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 import initialValue from './value.json'

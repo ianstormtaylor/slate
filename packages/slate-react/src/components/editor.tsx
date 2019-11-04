@@ -23,6 +23,7 @@ import {
   removeAllRanges,
 } from '../utils/dom'
 import {
+  EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
@@ -50,6 +51,14 @@ const Editor = (props: {
     style = {},
     ...attributes
   } = props
+  if (!Value.isValue(value)) {
+    throw new Error(
+      `The \`value=\` prop you passed to <Editor> was not a valid Slate value: ${JSON.stringify(
+        value
+      )}`
+    )
+  }
+
   const ref = useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
@@ -73,6 +82,7 @@ const Editor = (props: {
   // Update element-related weak maps with the DOM element ref.
   useEffect(() => {
     if (ref.current) {
+      EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(value, ref.current)
       ELEMENT_TO_NODE.set(ref.current, value)
     } else {
@@ -80,23 +90,36 @@ const Editor = (props: {
     }
   })
 
-  // Attach to native DOM event listeners for events that aren't supported
-  // properly by React's composite event system.
+  // Attach a native DOM event handler for `selectionchange`, because React's
+  // built-in `onSelect` handler doesn't fire for all selection changes. It's a
+  // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
+  // fire for any change to the selection inside the editor. (2019/11/04)
+  // https://github.com/facebook/react/issues/5785
   useEffect(() => {
     window.document.addEventListener('selectionchange', onNativeSelectionChange)
-
-    if (ref.current && HAS_INPUT_EVENTS_LEVEL_2) {
-      ref.current.addEventListener('beforeinput', onNativeBeforeInput)
-    }
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
         onNativeSelectionChange
       )
+    }
+  }, [])
 
-      if (ref.current && HAS_INPUT_EVENTS_LEVEL_2) {
-        ref.current.removeEventListener('beforeinput', onNativeBeforeInput)
+  // Attach a native DOM event handler for `beforeinput` events, because React's
+  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
+  // real `beforeinput` events sadly... (2019/11/04)
+  // https://github.com/facebook/react/issues/11211
+  useEffect(() => {
+    if (HAS_INPUT_EVENTS_LEVEL_2) {
+      if (ref.current) {
+        ref.current.addEventListener('beforeinput', onNativeBeforeInput)
+      }
+
+      return () => {
+        if (ref.current) {
+          ref.current.removeEventListener('beforeinput', onNativeBeforeInput)
+        }
       }
     }
   }, [])
@@ -107,7 +130,7 @@ const Editor = (props: {
     const el = editor.toDomNode(value)
     const domSelection = window.getSelection()
 
-    if (!el || !selection || !domSelection || !editor.isFocused()) {
+    if (!selection || !domSelection || !editor.isFocused()) {
       return
     }
 
@@ -119,15 +142,6 @@ const Editor = (props: {
     }
 
     const newDomRange = editor.toDomRange(selection)
-
-    if (!newDomRange) {
-      warning(
-        false,
-        'Unable to find a native DOM range from the current selection.'
-      )
-
-      return
-    }
 
     if (isRangeEqual(newDomRange, domRange)) {
       return
@@ -279,8 +293,6 @@ const Editor = (props: {
                   const node = editor.toSlateNode(relatedTarget)
 
                   if (
-                    el &&
-                    node &&
                     editor.hasDomNode(relatedTarget) &&
                     (!Element.isElement(node) || !editor.isVoid(node))
                   ) {
@@ -373,7 +385,7 @@ const Editor = (props: {
               // and calling `preventDefault` hides the cursor.
               const node = editor.toSlateNode(event.target)
 
-              if (!node || (Element.isElement(node) && editor.isVoid(node))) {
+              if (Element.isElement(node) && editor.isVoid(node)) {
                 event.preventDefault()
               }
 
@@ -407,7 +419,7 @@ const Editor = (props: {
               !state.isUpdatingSelection &&
               hasEditableTarget(editor, event.target)
             ) {
-              const el = editor.toDomNode(value)!
+              const el = editor.toDomNode(value)
               state.latestElement = window.document.activeElement
 
               // COMPAT: If the editor has nested editable elements, the focus

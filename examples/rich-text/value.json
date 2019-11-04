@@ -6,28 +6,32 @@
       "type": "paragraph",
       "nodes": [
         {
-          "text": "This is editable "
+          "text": "This is editable ",
+          "marks": []
         },
         {
           "text": "rich",
           "marks": [{ "type": "bold" }]
         },
         {
-          "text": " text, "
+          "text": " text, ",
+          "marks": []
         },
         {
           "text": "much",
           "marks": [{ "type": "italic" }]
         },
         {
-          "text": " better than a "
+          "text": " better than a ",
+          "marks": []
         },
         {
           "text": "<textarea>",
           "marks": [{ "type": "code" }]
         },
         {
-          "text": "!"
+          "text": "!",
+          "marks": []
         }
       ]
     },
@@ -36,7 +40,8 @@
       "nodes": [
         {
           "text":
-            "Since it's rich text, you can do things like turn a selection of text "
+            "Since it's rich text, you can do things like turn a selection of text ",
+          "marks": []
         },
         {
           "text": "bold",
@@ -44,7 +49,8 @@
         },
         {
           "text":
-            ", or add a semantically rendered block quote in the middle of the page, like this:"
+            ", or add a semantically rendered block quote in the middle of the page, like this:",
+          "marks": []
         }
       ]
     },
@@ -52,7 +58,8 @@
       "type": "block-quote",
       "nodes": [
         {
-          "text": "A wise quote."
+          "text": "A wise quote.",
+          "marks": []
         }
       ]
     },
@@ -60,7 +67,8 @@
       "type": "paragraph",
       "nodes": [
         {
-          "text": "Try it out for yourself!"
+          "text": "Try it out for yourself!",
+          "marks": []
         }
       ]
     }

@@ -123,10 +123,7 @@ export default class ReactEditorEvents {
   onClick(this: ReactEditor, event: MouseEvent) {
     if (!this.isReadOnly() && isNativeNode(event.target)) {
       const node = this.toSlateNode(event.target)
-      if (!node) return
-
       const path = this.findPath(node)
-      if (!path) return
 
       // COMPAT: In Chrome & Safari, selections that are at the zero offset
       // of an inline node will be automatically replaced to be at the last
@@ -217,12 +214,7 @@ export default class ReactEditorEvents {
     IS_DRAGGING.set(this, true)
 
     const node = this.toSlateNode(event.target)
-
-    if (!node) {
-      return
-    }
-
-    const path = this.findPath(node)!
+    const path = this.findPath(node)
     const voidMatch = this.getMatch(path, 'void')
 
     // If a void node is being dragged and is not currently selected, select
@@ -528,16 +520,16 @@ export default class ReactEditorEvents {
    */
 
   onSelect(this: ReactEditor, event: any) {
+    const { selection } = this.value
     const domSelection = window.getSelection()
 
-    if (!domSelection) {
-      return
-    }
+    if (domSelection) {
+      const range = this.toSlateRange(domSelection)!
 
-    const range = this.toSlateRange(domSelection)
-
-    if (range) {
-      this.select(range)
+      if (!selection || !Range.equals(range, selection)) {
+        this.select(range)
+        this.focus()
+      }
     } else {
       this.blur()
     }

@@ -57,11 +57,16 @@ namespace Range {
     target: Path | Point | Range
   ): boolean => {
     if (Range.isRange(target)) {
-      return (
+      if (
         Range.includes(range, target.anchor) ||
-        Range.includes(range, target.focus) ||
-        Range.includes(target, range)
-      )
+        Range.includes(range, target.focus)
+      ) {
+        return true
+      }
+
+      const [rs, re] = Range.edges(range)
+      const [ts, te] = Range.edges(target)
+      return Point.isBefore(rs, ts) && Point.isAfter(re, te)
     }
 
     const [start, end] = Range.edges(range)

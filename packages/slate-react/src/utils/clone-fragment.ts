@@ -3,7 +3,7 @@ import { IS_IE } from './environment'
 import { Range, Node } from 'slate'
 
 import { removeAllRanges } from './dom'
-import { DATA, SELECTORS, TYPES } from './constants'
+import { TYPES } from './constants'
 import { encode } from './base-64'
 import { ReactEditor } from '../plugin'
 
@@ -72,10 +72,12 @@ function cloneFragment(
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
-  Array.from(contents.querySelectorAll(SELECTORS.ZERO_WIDTH)).forEach(zw => {
-    const isNewline = zw.getAttribute(DATA.ZERO_WIDTH) === 'n'
-    zw.textContent = isNewline ? '\n' : ''
-  })
+  Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
+    zw => {
+      const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
+      zw.textContent = isNewline ? '\n' : ''
+    }
+  )
 
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
@@ -92,7 +94,7 @@ function cloneFragment(
     attach = span
   }
 
-  attach.setAttribute(DATA.FRAGMENT, encoded)
+  attach.setAttribute('data-slate-fragment', encoded)
 
   // Creates value from only the selected blocks Then gets plaintext for
   // clipboard with proper linebreaks for BLOCK elements Via Plain serializer
@@ -121,7 +123,7 @@ function cloneFragment(
   // COMPAT: For browser that don't support the Clipboard API's setData method,
   // we must rely on the browser to natively copy what's selected.
   // So we add the div (containing our content) to the DOM, and select it.
-  const editorEl = (event.target as HTMLElement).closest(SELECTORS.EDITOR)!
+  const editorEl = (event.target as HTMLElement).closest('[data-slate-editor]')!
   div.setAttribute('contenteditable', 'true')
   div.style.position = 'absolute'
   div.style.left = '-9999px'

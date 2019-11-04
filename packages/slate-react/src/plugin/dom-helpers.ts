@@ -4,10 +4,15 @@ import {
   Point as SlatePoint,
   Range as SlateRange,
   Fragment as SlateFragment,
+  Value as SlateValue,
 } from 'slate'
 
-import { DATA, SELECTORS, TYPES } from '../utils/constants'
-import { ELEMENT_TO_NODE, NODE_TO_ELEMENT } from '../utils/weak-maps'
+import { TYPES } from '../utils/constants'
+import {
+  EDITOR_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  NODE_TO_ELEMENT,
+} from '../utils/weak-maps'
 import { IS_FIREFOX } from '../utils/environment'
 import { ReactEditor } from '.'
 import { SyntheticEvent } from 'react'
@@ -37,10 +42,6 @@ export default class ReactEditorDomHelpers {
     const { editable = false } = options
     const el = this.toDomNode(this.value)
     let element
-
-    if (!el) {
-      return false
-    }
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
     // target is originating from an internal "restricted" element (e.g. a
@@ -103,7 +104,7 @@ export default class ReactEditorDomHelpers {
 
     // If there isn't a fragment, but there is HTML, check to see if the HTML is
     // actually an encoded fragment.
-    if (!fragment && html && ~html.indexOf(` ${DATA.FRAGMENT}="`)) {
+    if (!fragment && html && ~html.indexOf(` data-slate-fragment="`)) {
       const matches = / data-slate-fragment="([^\s"]+)"/.exec(html)
 
       if (matches) {
@@ -214,7 +215,7 @@ export default class ReactEditorDomHelpers {
     event: Event | SyntheticEvent,
     type: string,
     content: string
-  ) {
+  ): void {
     const mime = TYPES[type.toUpperCase()]
 
     if (!mime) {
@@ -274,9 +275,12 @@ export default class ReactEditorDomHelpers {
    */
 
   toDomNode(this: ReactEditor, node: SlateNode): HTMLElement {
-    const domNode = NODE_TO_ELEMENT.get(node)
+    const domNode = SlateValue.isValue(node)
+      ? EDITOR_TO_ELEMENT.get(this)
+      : NODE_TO_ELEMENT.get(node)
 
     if (!domNode) {
+      debugger
       throw new Error(
         `Unable to find a DOM node for the Slate node: ${JSON.stringify(node)}`
       )
@@ -289,17 +293,15 @@ export default class ReactEditorDomHelpers {
    * Find a native DOM selection point from a Slate point.
    */
 
-  toDomPoint(
-    this: ReactEditor,
-    point: SlatePoint
-  ): { node: NativeElement; offset: number } | undefined {
+  toDomPoint(this: ReactEditor, point: SlatePoint): NativePoint {
     const [node] = this.getNode(point.path)
     const el = this.toDomNode(node)
+    let domPoint: NativePoint | undefined
 
     // For each leaf, we need to isolate its content, which means filtering
     // to its direct text and zero-width spans. (We have to filter out any
     // other siblings that may have been rendered alongside them.)
-    const selector = `${SELECTORS.STRING}, ${SELECTORS.ZERO_WIDTH}`
+    const selector = `[data-slate-string], [data-slate-zero-width]`
     const texts = Array.from(el.querySelectorAll(selector))
     let start = 0
 
@@ -311,33 +313,41 @@ export default class ReactEditorDomHelpers {
       }
 
       const { length } = domNode.textContent
-      const attr = text.getAttribute(DATA.LENGTH)
+      const attr = text.getAttribute('data-slate-length')
       const trueLength = attr == null ? length : parseInt(attr, 10)
       const end = start + trueLength
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
-        return { node: domNode, offset }
+        domPoint = { node: domNode, offset }
+        break
       }
 
       start = end
     }
+
+    if (!domPoint) {
+      debugger
+      throw new Error(
+        `Unable to find a DOM point for the Slate point: ${JSON.stringify(
+          point
+        )}`
+      )
+    }
+
+    return domPoint
   }
 
   /**
    * Find a native DOM range from a Slate `range`.
    */
 
-  toDomRange(this: ReactEditor, range: SlateRange): NativeRange | undefined {
+  toDomRange(this: ReactEditor, range: SlateRange): NativeRange {
     const { anchor, focus } = range
     const domAnchor = this.toDomPoint(anchor)
     const domFocus = SlateRange.isCollapsed(range)
       ? domAnchor
       : this.toDomPoint(focus)
-
-    if (!domAnchor || !domFocus) {
-      return
-    }
 
     const domRange = window.document.createRange()
     const start = SlateRange.isBackward(range) ? domFocus : domAnchor
@@ -351,27 +361,20 @@ export default class ReactEditorDomHelpers {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(this: ReactEditor, domNode: NativeNode): SlateNode | undefined {
-    let el = isNativeElement(domNode) ? domNode : domNode.parentElement
+  toSlateNode(this: ReactEditor, domNode: NativeNode): SlateNode {
+    let domEl = isNativeElement(domNode) ? domNode : domNode.parentElement
 
-    if (!el) {
-      return
+    if (domEl && !domEl.hasAttribute('data-slate-node')) {
+      domEl = domEl.closest(`[data-slate-node]`)
     }
 
-    if (!el.hasAttribute('data-slate-node')) {
-      const closest = el.closest(`[data-slate-node]`)
+    const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
 
-      if (closest) {
-        el = closest
-      }
+    if (!node) {
+      debugger
+      throw new Error(`Unable to find a Slate node from the DOM node: ${domEl}`)
     }
 
-    // If the element still does't have a key, we're lost.
-    if (!el.hasAttribute('data-slate-node')) {
-      return
-    }
-
-    const node = ELEMENT_TO_NODE.get(el as HTMLElement)
     return node
   }
 
@@ -391,16 +394,7 @@ export default class ReactEditorDomHelpers {
     }
 
     const node = this.toSlateNode(event.target)
-
-    if (!node) {
-      return
-    }
-
     const path = this.findPath(node)
-
-    if (!path) {
-      return
-    }
 
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
@@ -471,7 +465,7 @@ export default class ReactEditorDomHelpers {
       return
     }
 
-    let leafNode = parentNode.closest(SELECTORS.LEAF)
+    let leafNode = parentNode.closest('[data-slate-leaf]')
     let domNode
     let textNode
     let offset
@@ -479,12 +473,12 @@ export default class ReactEditorDomHelpers {
     // Calculate how far into the text node the `nearestNode` is, so that we
     // can determine what the offset relative to the text node is.
     if (leafNode) {
-      textNode = leafNode.closest(SELECTORS.TEXT)!
+      textNode = leafNode.closest('[data-slate-node="text"]')!
       const range = window.document.createRange()
       range.setStart(textNode, 0)
       range.setEnd(nearestNode, nearestOffset)
       const contents = range.cloneContents()
-      const zeroWidths = contents.querySelectorAll(SELECTORS.ZERO_WIDTH)
+      const zeroWidths = contents.querySelectorAll('[data-slate-zero-width]')
 
       Array.from(zeroWidths).forEach(el => {
         el!.parentNode!.removeChild(el)
@@ -500,19 +494,19 @@ export default class ReactEditorDomHelpers {
     } else {
       // For void nodes, the element with the offset key will be a cousin, not an
       // ancestor, so find it by going down from the nearest void parent.
-      const voidNode = parentNode.closest(SELECTORS.VOID)
+      const voidNode = parentNode.closest('[data-slate-void="true"]')
 
       if (!voidNode) {
         return
       }
 
-      leafNode = voidNode.querySelector(SELECTORS.LEAF)
+      leafNode = voidNode.querySelector('[data-slate-leaf]')
 
       if (!leafNode) {
         return
       }
 
-      textNode = leafNode.closest(SELECTORS.TEXT)
+      textNode = leafNode.closest('[data-slate-node="text"]')
       domNode = leafNode
       offset = domNode.textContent!.length
     }
@@ -524,7 +518,7 @@ export default class ReactEditorDomHelpers {
     // space character.
     if (
       offset === domNode.textContent!.length &&
-      parentNode.hasAttribute(DATA.ZERO_WIDTH)
+      parentNode.hasAttribute('data-slate-zero-width')
     ) {
       offset--
     }
@@ -533,16 +527,8 @@ export default class ReactEditorDomHelpers {
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = this.toSlateNode(textNode!)
-
-    if (!slateNode) {
-      return
-    }
-
     const path = this.findPath(slateNode)
-
-    if (path) {
-      return { path, offset }
-    }
+    return { path, offset }
   }
 
   /**

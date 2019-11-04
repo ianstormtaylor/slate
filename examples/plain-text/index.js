@@ -1,43 +1,26 @@
-import Plain from 'slate-plain-serializer'
-import { Editor } from 'slate-react'
+import React, { useState } from 'react'
+import { parsePlaintext } from 'slate-parse-plaintext'
+import { Editor as BaseEditor } from 'slate'
+import { Editor, withReact, useSlate } from 'slate-react'
+import { withHistory } from 'slate-history'
 
-import React from 'react'
+class ExampleEditor extends withHistory(withReact(BaseEditor)) {}
 
-/**
- * Deserialize the initial editor value.
- *
- * @type {Object}
- */
-
-const initialValue = Plain.deserialize(
+const initialValue = parsePlaintext(
   'This is editable plain text, just like a <textarea>!'
 )
 
-/**
- * The plain text example.
- *
- * @type {Component}
- */
-
-class PlainText extends React.Component {
-  /**
-   * Render the editor.
-   *
-   * @return {Component} component
-   */
-
-  render() {
-    return (
-      <Editor
-        placeholder="Enter some plain text..."
-        defaultValue={initialValue}
-      />
-    )
-  }
+const Example = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(ExampleEditor)
+  return (
+    <Editor
+      placeholder="Enter some plain text..."
+      editor={editor}
+      value={value}
+      onChange={change => setValue(change.value)}
+    />
+  )
 }
 
-/**
- * Export.
- */
-
-export default PlainText
+export default Example

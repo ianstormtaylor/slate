@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react'
+import getDirection from 'direction'
 import { Node, Range, Element as SlateElement, Path } from 'slate'
 
 import TextComponent from './text'
@@ -51,7 +52,8 @@ const Element = (props: {
   // If it's a block node with inline children, add the proper `dir` attribute
   // for text direction.
   if (!isInline && editor.hasInlines(node)) {
-    const dir = node.getTextDirection()
+    const text = Node.text(node)
+    const dir = getDirection(text)
 
     if (dir === 'rtl') {
       attributes.dir = dir

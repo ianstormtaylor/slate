@@ -10,13 +10,9 @@ export default class ReactEditorCommands {
 
   blur(this: ReactEditor) {
     const el = this.toDomNode(this.value)
-
-    if (!el) {
-      return
-    }
+    IS_FOCUSED.set(this, false)
 
     if (window.document.activeElement === el) {
-      IS_FOCUSED.set(this, false)
       el.blur()
     }
   }
@@ -27,13 +23,9 @@ export default class ReactEditorCommands {
 
   focus(this: ReactEditor) {
     const el = this.toDomNode(this.value)
-
-    if (!el) {
-      return
-    }
+    IS_FOCUSED.set(this, true)
 
     if (window.document.activeElement !== el) {
-      IS_FOCUSED.set(this, true)
       el.focus({ preventScroll: true })
     }
   }

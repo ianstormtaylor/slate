@@ -4,23 +4,14 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const HtmlWebpackTemplate = require('html-webpack-template')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
-const UglifyJSPlugin = require('uglifyjs-webpack-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 
-const DefinePlugin = webpack.DefinePlugin
-const NamedModulesPlugin = webpack.NamedModulesPlugin
-const HotModuleReplacementPlugin = webpack.HotModuleReplacementPlugin
 const IS_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = !IS_PROD
 
 const config = {
-  entry: [
-    'babel-polyfill',
-    // COMPAT: Missing in IE 11 and included separately because babel-polyfill does not support DOM elements:
-    // https://github.com/zloirock/core-js/issues/317
-    'element-closest',
-    'react-hot-loader/patch',
-    './examples/index.js',
-  ],
+  mode: 'development',
+  entry: './examples/index.js',
   output: {
     path: path.resolve(__dirname, '../../build'),
     filename: '[name]-[hash].js',
@@ -44,34 +35,21 @@ const config = {
         use: {
           loader: 'babel-loader',
           options: {
-            forceEnv: 'webpack',
+            envName: 'webpack',
           },
         },
         exclude: /node_modules/,
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: {
-                sourceMap: true,
-              },
-            },
-          ],
-        }),
+        use: [MiniCssExtractPlugin.loader, 'css-loader'],
       },
     ],
   },
   plugins: [
-    new DefinePlugin({
-      'process.env.NODE_ENV': JSON.stringify(
-        IS_PROD ? 'production' : 'development'
-      ),
+    new MiniCssExtractPlugin({
+      filename: '[name]-[hash].css',
     }),
-    new ExtractTextPlugin('[name]-[contenthash].css'),
     new HtmlWebpackPlugin({
       title: 'Slate',
       template: HtmlWebpackTemplate,
@@ -92,9 +70,6 @@ const config = {
       ],
     }),
     IS_PROD && new CopyWebpackPlugin(['examples/CNAME']),
-    IS_PROD && new UglifyJSPlugin({ sourceMap: true }),
-    IS_DEV && new NamedModulesPlugin(),
-    IS_DEV && new HotModuleReplacementPlugin(),
   ].filter(Boolean),
 }
 

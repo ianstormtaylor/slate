@@ -13,30 +13,34 @@ export default class ReactEditorQueries {
    * Find the path of Slate node.
    */
 
-  findPath(this: ReactEditor, node: Node): Path | undefined {
-    const path = []
-    let parent = node
+  findPath(this: ReactEditor, node: Node): Path {
+    const path: Path = []
+    let child = node
 
     while (true) {
-      const p = NODE_TO_PARENT.get(parent)
+      const parent = NODE_TO_PARENT.get(child)
 
-      if (p == null) {
-        if (Value.isValue(p)) {
+      if (parent == null) {
+        if (Value.isValue(child)) {
           return path
         } else {
           break
         }
       }
 
-      const i = NODE_TO_INDEX.get(parent)
+      const i = NODE_TO_INDEX.get(child)
 
       if (i == null) {
         break
       }
 
-      path.push(i)
-      parent = p
+      path.unshift(i)
+      child = parent
     }
+
+    throw new Error(
+      `Unable to find the path for Slate node: ${JSON.stringify(node)}`
+    )
   }
 
   /**

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Text, Path, Element } from 'slate'
+import { Text, Path, Element, Node } from 'slate'
 import { useEditor } from '../hooks/use-editor'
 
 /**
@@ -22,7 +22,7 @@ const String = ({
   leaves: any[]
 }) => {
   const editor = useEditor()
-  const path = editor.findPath(node)!
+  const path = editor.findPath(node)
   const parentPath = Path.parent(path)
 
   // COMPAT: Render text inside void nodes with a zero-width space.
@@ -53,9 +53,9 @@ const String = ({
   // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
   // so we need to add an extra trailing new lines to prevent that.
   if (block) {
-    const lastText = block.getLastText()
+    const [lastNode] = Node.last(block, [])
     const lastChar = text.charAt(text.length - 1)
-    const isLastText = node === lastText
+    const isLastText = node === lastNode
     const isLastLeaf = index === leaves.length - 1
 
     if (isLastText && isLastLeaf && lastChar === '\n') {
