@@ -6,22 +6,22 @@ import {
   RANGE_REFS,
   FLUSHING,
   NORMALIZING,
-} from '../../symbols'
+} from '../utils'
 
 class GeneralCommands {
   apply(this: Editor, op: Operation): void {
     this.value = Value.transform(this.value, op)
     this.operations.push(op)
 
-    for (const ref of Object.values(this[PATH_REFS])) {
+    for (const ref of PATH_REFS.get(this)!) {
       ref.transform(op)
     }
 
-    for (const ref of Object.values(this[POINT_REFS])) {
+    for (const ref of POINT_REFS.get(this)!) {
       ref.transform(op)
     }
 
-    for (const ref of Object.values(this[RANGE_REFS])) {
+    for (const ref of RANGE_REFS.get(this)!) {
       ref.transform(op)
     }
 
@@ -42,7 +42,7 @@ class GeneralCommands {
       dirtyPaths.push(path)
     }
 
-    for (const path of this[DIRTY_PATHS]) {
+    for (const path of DIRTY_PATHS.get(this)!) {
       add(Path.transform(path, op))
     }
 
@@ -50,17 +50,17 @@ class GeneralCommands {
       add(path)
     }
 
-    this[DIRTY_PATHS] = dirtyPaths
+    DIRTY_PATHS.set(this, dirtyPaths)
     this.normalize()
 
-    if (!this[FLUSHING]) {
-      this[FLUSHING] = true
+    if (!FLUSHING.get(this)) {
+      FLUSHING.set(this, true)
       Promise.resolve().then(() => this.flush())
     }
   }
 
   flush(this: Editor): void {
-    this[FLUSHING] = false
+    FLUSHING.set(this, false)
     const { value, operations } = this
 
     if (operations.length !== 0) {
@@ -78,31 +78,31 @@ class GeneralCommands {
   ): void {
     const { force = false } = options
 
-    if (!this[NORMALIZING]) {
+    if (!NORMALIZING.get(this)) {
       return
     }
 
     if (force) {
       const allPaths = Array.from(Node.entries(this.value), ([, p]) => p)
-      this[DIRTY_PATHS] = allPaths
+      DIRTY_PATHS.set(this, allPaths)
     }
 
-    if (this[DIRTY_PATHS].length === 0) {
+    if (DIRTY_PATHS.get(this)!.length === 0) {
       return
     }
 
     this.withoutNormalizing(() => {
-      const max = this[DIRTY_PATHS].length * 42 // HACK: better way to do this?
+      const max = DIRTY_PATHS.get(this)!.length * 42 // HACK: better way to do this?
       let m = 0
 
-      while (this[DIRTY_PATHS].length !== 0) {
+      while (DIRTY_PATHS.get(this)!.length !== 0) {
         if (m > max) {
           throw new Error(`
             Could not completely normalize the value after ${max} iterations! This is usually due to incorrect normalization logic that leaves a node in an invalid state.
           `)
         }
 
-        const path = this[DIRTY_PATHS].pop()
+        const path = DIRTY_PATHS.get(this)!.pop()
         this.normalizeNodes({ at: path! })
         m++
       }
@@ -110,10 +110,10 @@ class GeneralCommands {
   }
 
   withoutNormalizing(this: Editor, fn: () => void): void {
-    const value = this[NORMALIZING]
-    this[NORMALIZING] = false
+    const value = NORMALIZING.get(this)!
+    NORMALIZING.set(this, false)
     fn()
-    this[NORMALIZING] = value
+    NORMALIZING.set(this, value)
     this.normalize()
   }
 }

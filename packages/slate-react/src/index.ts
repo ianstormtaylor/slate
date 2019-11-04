@@ -1,0 +1,5 @@
+export { default as Editor } from './components/editor'
+export { useEditor } from './hooks/use-editor'
+export { useReadOnly } from './hooks/use-read-only'
+export { useSlate } from './hooks/use-slate'
+export { withReact, ReactEditor } from './plugin/index'

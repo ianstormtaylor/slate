@@ -1,10 +1,5 @@
-import { Operation, Range } from '..'
-
-/**
- * An auto-incrementing number to identify `RangeRef` objects.
- */
-
-let id = 0
+import { Operation, Range, Editor } from '..'
+import { RANGE_REFS } from './utils'
 
 /**
  * `RangeRef` objects keep a specific range in a document synced over time as new
@@ -13,21 +8,21 @@ let id = 0
  */
 
 class RangeRef {
-  id: number
   current: Range | null
   private affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
-  private onUnref: () => void
+  private editor: Editor
 
   constructor(props: {
     range: Range | null
     affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
-    onUnref: () => void
+    editor: Editor
   }) {
-    const { range, affinity, onUnref } = props
-    this.id = id++
+    const { range, affinity, editor } = props
     this.current = range
     this.affinity = affinity
-    this.onUnref = onUnref
+    this.editor = editor
+    const rangeRefs = RANGE_REFS.get(editor)!
+    rangeRefs.add(this)
   }
 
   /**
@@ -54,8 +49,9 @@ class RangeRef {
    */
 
   unref(): Range | null {
-    this.onUnref()
-    const { current } = this
+    const { current, editor } = this
+    const rangeRefs = RANGE_REFS.get(editor)!
+    rangeRefs.delete(this)
     this.current = null
     return current
   }

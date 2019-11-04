@@ -10,10 +10,7 @@ import uglify from 'rollup-plugin-uglify'
 import { startCase } from 'lodash'
 
 import Core from '../../packages/slate/package.json'
-import Base64Serializer from '../../packages/slate-base64-serializer/package.json'
-import DevEnvironment from '../../packages/slate-dev-environment/package.json'
 import History from '../../packages/slate-history/package.json'
-import Hotkeys from '../../packages/slate-hotkeys/package.json'
 import HtmlSerializer from '../../packages/slate-html-serializer/package.json'
 import Hyperscript from '../../packages/slate-hyperscript/package.json'
 import ParsePlaintext from '../../packages/slate-parse-plaintext/package.json'
@@ -178,16 +175,13 @@ function factory(pkg, options = {}) {
 
 export default [
   ...factory(Core, { ts: true }),
-  ...factory(Base64Serializer),
-  ...factory(DevEnvironment),
   ...factory(History, { ts: true }),
-  ...factory(Hotkeys),
   ...factory(HtmlSerializer),
   ...factory(Hyperscript, { ts: true }),
   ...factory(PlainSerializer),
   ...factory(ParsePlaintext, { ts: true }),
   ...factory(PropTypes),
-  ...factory(React),
+  ...factory(React, { ts: true }),
   ...factory(ReactPlaceholder),
   ...factory(RenderPlaintext, { ts: true }),
   ...factory(Schema, { ts: true }),

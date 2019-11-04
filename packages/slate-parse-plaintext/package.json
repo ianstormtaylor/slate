@@ -6,7 +6,7 @@
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/index.js",
   "module": "lib/index.es.js",
-  "types": "list/index.d.ts",
+  "types": "lib/index.d.ts",
   "umd": "dist/slate-parse-plaintext.js",
   "umdMin": "dist/slate-parse-plaintext.min.js",
   "files": [

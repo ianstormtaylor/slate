@@ -1,5 +1,4 @@
 import { Editor, Path, Point, PathRef, PointRef, Range, RangeRef } from '../..'
-import { PATH_REFS, POINT_REFS, RANGE_REFS } from '../../symbols'
 
 class GeneralQueries {
   /**
@@ -13,13 +12,7 @@ class GeneralQueries {
     options: { affinity?: 'backward' | 'forward' | null } = {}
   ): PathRef {
     const { affinity = 'forward' } = options
-    const ref: PathRef = new PathRef({
-      path,
-      affinity,
-      onUnref: () => delete this[PATH_REFS][ref.id],
-    })
-
-    this[PATH_REFS][ref.id] = ref
+    const ref: PathRef = new PathRef({ path, affinity, editor: this })
     return ref
   }
 
@@ -34,15 +27,10 @@ class GeneralQueries {
     options: { affinity?: 'backward' | 'forward' | null } = {}
   ): PointRef {
     const { affinity = 'forward' } = options
-    const ref: PointRef = new PointRef({
-      point,
-      affinity,
-      onUnref: () => delete this[POINT_REFS][ref.id],
-    })
-
-    this[POINT_REFS][ref.id] = ref
+    const ref: PointRef = new PointRef({ point, affinity, editor: this })
     return ref
   }
+
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the this.
@@ -56,13 +44,7 @@ class GeneralQueries {
     } = {}
   ): RangeRef {
     const { affinity = 'forward' } = options
-    const ref: RangeRef = new RangeRef({
-      range,
-      affinity,
-      onUnref: () => delete this[RANGE_REFS][ref.id],
-    })
-
-    this[RANGE_REFS][ref.id] = ref
+    const ref: RangeRef = new RangeRef({ range, affinity, editor: this })
     return ref
   }
 }

@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Change, Path, PathRef, PointRef, RangeRef, Operation, Value } from '..'
+import { Change, Operation, Value } from '..'
 import {
   DIRTY_PATHS,
   NORMALIZING,
@@ -7,7 +7,7 @@ import {
   PATH_REFS,
   POINT_REFS,
   RANGE_REFS,
-} from '../symbols'
+} from './utils'
 import AnnotationCommands from './commands/annotation'
 import TextCommands from './commands/text'
 import NodeCommands from './commands/node'
@@ -18,22 +18,32 @@ import ElementQueries from './queries/element'
 import GeneralQueries from './queries/general'
 import LocationQueries from './queries/location'
 import RangeQueries from './queries/range'
+import ValueQueries from './queries/value'
 
 /**
  * The `EditorConstructor` interface is provided as a convenience for plugins
  * who can use it when writing the typings for extending the `Editor` class.
  */
 
-type EditorConstructor = new (...args: any[]) => Editor
+type EditorConstructor<E extends Editor = Editor> = new (...args: any[]) => E
 
 /**
- * The `EditorPlugin` interface is provided as a convenience for plugins
+ * The `EditorMixin` interface is provided as a convenience for plugins
  * who can use it when writing the typings for their plugin functions.
  */
 
-type EditorPlugin = (
-  ...args: any
-) => ((Editor: EditorConstructor) => EditorConstructor)
+type EditorMixin<E extends Editor = Editor> = (
+  Editor: EditorConstructor<E>
+) => E
+
+/**
+ * The `EditorMixin` interface is provided as a convenience for plugins
+ * who can use it when writing the typings for their plugin functions.
+ */
+
+type EditorPlugin<E extends Editor = Editor> = (
+  ...args: any[]
+) => EditorMixin<E>
 
 /**
  * The `Editor` class stores all the state of a Slate editor. It is extended by
@@ -43,14 +53,7 @@ type EditorPlugin = (
 class Editor {
   onChange: (change: Change) => void
   operations: Operation[]
-  readOnly: boolean
-  value: Value;
-  [DIRTY_PATHS]: Path[];
-  [FLUSHING]: boolean;
-  [NORMALIZING]: boolean;
-  [PATH_REFS]: { [key: number]: PathRef };
-  [POINT_REFS]: { [key: number]: PointRef };
-  [RANGE_REFS]: { [key: number]: RangeRef }
+  value: Value
 
   constructor(
     props: {
@@ -61,7 +64,6 @@ class Editor {
   ) {
     const {
       onChange = () => {},
-      readOnly = false,
       value = produce(
         { nodes: [], selection: null, annotations: {} },
         () => {}
@@ -70,14 +72,14 @@ class Editor {
 
     this.onChange = onChange
     this.operations = []
-    this.readOnly = readOnly
     this.value = value
-    this[DIRTY_PATHS] = []
-    this[FLUSHING] = false
-    this[NORMALIZING] = true
-    this[PATH_REFS] = {}
-    this[POINT_REFS] = {}
-    this[RANGE_REFS] = {}
+
+    DIRTY_PATHS.set(this, [])
+    FLUSHING.set(this, false)
+    NORMALIZING.set(this, true)
+    PATH_REFS.set(this, new Set())
+    POINT_REFS.set(this, new Set())
+    RANGE_REFS.set(this, new Set())
   }
 }
 
@@ -91,7 +93,8 @@ interface Editor
     ElementQueries,
     GeneralQueries,
     LocationQueries,
-    RangeQueries {}
+    RangeQueries,
+    ValueQueries {}
 
 const mixin = (Mixins: Array<new () => any>) => {
   for (const Mixin of Mixins) {
@@ -114,6 +117,7 @@ mixin([
   GeneralQueries,
   LocationQueries,
   RangeQueries,
+  ValueQueries,
 ])
 
-export { Editor, EditorConstructor, EditorPlugin }
+export { Editor, EditorConstructor, EditorMixin, EditorPlugin }

@@ -2,9 +2,12 @@
   "extends": "./config/typescript/tsconfig.json",
   "references": [
     { "path": "./packages/slate" },
+    { "path": "./packages/slate-history" },
     { "path": "./packages/slate-hyperscript" },
-    { "path": "./packages/slate-schema" },
-    { "path": "./packages/slate-history" }
+    { "path": "./packages/slate-parse-plaintext" },
+    { "path": "./packages/slate-react" },
+    { "path": "./packages/slate-render-plaintext" },
+    { "path": "./packages/slate-schema" }
   ],
   "files": [],
   "typedocOptions": {

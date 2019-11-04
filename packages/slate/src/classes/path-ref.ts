@@ -1,10 +1,5 @@
-import { Operation, Path } from '..'
-
-/**
- * An auto-incrementing number to identify `PathRef` objects.
- */
-
-let id = 0
+import { Operation, Path, Editor } from '..'
+import { PATH_REFS } from './utils'
 
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new
@@ -13,21 +8,21 @@ let id = 0
  */
 
 class PathRef {
-  id: number
   current: Path | null
   private affinity: 'forward' | 'backward' | null
-  private onUnref: () => void
+  private editor: Editor
 
   constructor(props: {
     path: Path | null
     affinity: 'forward' | 'backward' | null
-    onUnref: () => void
+    editor: Editor
   }) {
-    const { path, affinity, onUnref } = props
-    this.id = id++
+    const { path, affinity, editor } = props
     this.current = path
     this.affinity = affinity
-    this.onUnref = onUnref
+    this.editor = editor
+    const pathRefs = PATH_REFS.get(editor)!
+    pathRefs.add(this)
   }
 
   /**
@@ -54,8 +49,9 @@ class PathRef {
    */
 
   unref(): Path | null {
-    this.onUnref()
-    const { current } = this
+    const { current, editor } = this
+    const pathRefs = PATH_REFS.get(editor)!
+    pathRefs.delete(this)
     this.current = null
     return current
   }

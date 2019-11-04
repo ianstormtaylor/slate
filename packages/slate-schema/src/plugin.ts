@@ -1,9 +1,9 @@
-import { EditorPlugin, EditorConstructor, Element, Node, Path } from 'slate'
+import { EditorConstructor, Element, Path } from 'slate'
 import { SchemaError } from './error'
 import { SchemaRule } from './rule'
 import { checkNode } from './checkers'
 
-const SchemaPlugin: EditorPlugin = (
+const SchemaPlugin = (
   options: {
     rules?: SchemaRule[]
     value?: Omit<SchemaRule, 'match'>

@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { EditorPlugin, EditorConstructor, Operation, Path } from 'slate'
+import { EditorConstructor, Operation, Path } from 'slate'
 import { History } from './history'
 
 const HISTORY = Symbol('history')
@@ -7,13 +7,21 @@ const SAVING = Symbol('saving')
 const MERGING = Symbol('merging')
 
 /**
+ * `HistoryEditor` is a Slate editor class with the `HistoryPlugin` added.
+ */
+
+export type HistoryEditor = InstanceType<
+  ReturnType<ReturnType<typeof HistoryPlugin>>
+>
+
+/**
  * The `HistoryPlugin` keeps track of the operation history of a Slate editor as
  * operations are applied to it, using undo and redo stacks.
  */
 
-const HistoryPlugin: EditorPlugin = () => {
+export const HistoryPlugin = () => {
   return (Editor: EditorConstructor) => {
-    return class extends Editor {
+    return class HistoryEditor extends Editor {
       [HISTORY]: History;
       [MERGING]: boolean | null;
       [SAVING]: boolean
@@ -222,5 +230,3 @@ const shouldSave = (op: Operation): boolean => {
     }
   }
 }
-
-export { HistoryPlugin }
