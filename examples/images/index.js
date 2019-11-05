@@ -1,191 +1,67 @@
-import { Editor, getEventTransfer } from 'slate-react'
-import { Block, Value } from 'slate'
-
-import React from 'react'
-import initialValueAsJson from './value.json'
+import React, { useState } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import { Editor as BaseEditor } from 'slate'
+import {
+  Editor,
+  withReact,
+  useSlate,
+  useSelected,
+  useFocused,
+} from 'slate-react'
+import { withSchema } from 'slate-schema'
+import { withHistory } from 'slate-history'
 import { css } from 'emotion'
+
+import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
-/**
- * Deserialize the initial editor value.
- *
- * @type {Object}
- */
-
-const initialValue = Value.fromJSON(initialValueAsJson)
-
-/**
- * A function to determine whether a URL has an image extension.
- *
- * @param {String} url
- * @return {Boolean}
- */
-
-function isImage(url) {
-  return imageExtensions.includes(getExtension(url))
-}
-
-/**
- * Get the extension of the URL, using the URL API.
- *
- * @param {String} url
- * @return {String}
- */
-
-function getExtension(url) {
-  return new URL(url).pathname.split('.').pop()
-}
-
-/**
- * A change function to standardize inserting images.
- *
- * @param {Editor} editor
- * @param {String} src
- * @param {Range} target
- */
-
-function insertImage(editor, src, target) {
-  if (target) {
-    editor.select(target)
-  }
-
-  editor.insertBlock({
-    type: 'image',
-    data: { src },
-  })
-}
-
-/**
- * The editor's schema.
- *
- * @type {Object}
- */
-
 const schema = {
-  document: {
-    last: { type: 'paragraph' },
-    normalize: (editor, { code, node, child }) => {
+  value: {
+    validate: {
+      last: { type: 'paragraph' },
+    },
+    normalize: (editor, { code, path }) => {
       switch (code) {
         case 'last_child_type_invalid': {
-          const paragraph = Block.create('paragraph')
-          return editor.insertNodeByKey(node.key, node.nodes.size, paragraph)
+          const paragraph = { type: 'paragraph', nodes: [] }
+          return editor.insertNodes(paragraph, { at: path })
         }
       }
     },
   },
   blocks: {
     image: {
-      isVoid: true,
+      define: {
+        isVoid: true,
+      },
     },
   },
 }
 
-/**
- * The images example.
- *
- * @type {Component}
- */
-
-class Images extends React.Component {
-  /**
-   * Store a reference to the `editor`.
-   *
-   * @param {Editor} editor
-   */
-
-  ref = editor => {
-    this.editor = editor
+class ExampleEditor extends withSchema(
+  withHistory(withReact(BaseEditor)),
+  schema
+) {
+  insertImage(src) {
+    const text = { text: '', marks: [] }
+    const image = { type: 'image', src, nodes: [text] }
+    this.insertNodes(image)
   }
 
-  /**
-   * Render the app.
-   *
-   * @return {Element} element
-   */
-
-  render() {
-    return (
-      <div>
-        <Toolbar>
-          <Button onMouseDown={this.onClickImage}>
-            <Icon>image</Icon>
-          </Button>
-        </Toolbar>
-        <Editor
-          placeholder="Enter some text..."
-          ref={this.ref}
-          defaultValue={initialValue}
-          schema={schema}
-          onDrop={this.onDropOrPaste}
-          onPaste={this.onDropOrPaste}
-          renderBlock={this.renderBlock}
-        />
-      </div>
-    )
+  renderElement(props) {
+    return <Element {...props} />
   }
 
-  /**
-   * Render a Slate block.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderBlock = (props, editor, next) => {
-    const { attributes, node, isFocused } = props
-
-    switch (node.type) {
-      case 'image': {
-        const src = node.data.get('src')
-        return (
-          <img
-            {...attributes}
-            src={src}
-            className={css`
-              display: block;
-              max-width: 100%;
-              max-height: 20em;
-              box-shadow: ${isFocused ? '0 0 0 2px blue;' : 'none'};
-            `}
-          />
-        )
-      }
-
-      default: {
-        return next()
-      }
-    }
-  }
-
-  /**
-   * On clicking the image button, prompt for an image and insert it.
-   *
-   * @param {Event} event
-   */
-
-  onClickImage = event => {
-    event.preventDefault()
-    const src = window.prompt('Enter the URL of the image:')
-    if (!src) return
-    this.editor.command(insertImage, src)
-  }
-
-  /**
-   * On drop, insert the image wherever it is dropped.
-   *
-   * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
-   */
-
-  onDropOrPaste = (event, editor, next) => {
-    const target = editor.findEventRange(event)
-    if (!target && event.type === 'drop') return next()
-
-    const transfer = getEventTransfer(event)
+  onDrop(event) {
+    debugger
+    const target = this.findEventRange(event)
+    const transfer = this.getEventTransfer(event)
     const { type, text, files } = transfer
+
+    if (target) {
+      this.select(target)
+    }
 
     if (type === 'files') {
       for (const file of files) {
@@ -194,27 +70,85 @@ class Images extends React.Component {
         if (mime !== 'image') continue
 
         reader.addEventListener('load', () => {
-          editor.command(insertImage, reader.result, target)
+          this.insertImage(reader.result)
         })
 
         reader.readAsDataURL(file)
       }
+
       return
     }
 
-    if (type === 'text') {
-      if (!isUrl(text)) return next()
-      if (!isImage(text)) return next()
-      editor.command(insertImage, text, target)
+    if (type === 'text' && isUrl(text) && isImageUrl(text)) {
+      this.insertImage(text)
       return
     }
 
-    next()
+    return super.onDrop(event)
   }
 }
 
-/**
- * Export.
- */
+const Example = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(ExampleEditor)
+  return (
+    <div>
+      <Toolbar>
+        <Button
+          onMouseDown={event => {
+            event.preventDefault()
+            const src = window.prompt('Enter the URL of the image:')
+            if (!src) return
+            editor.insertImage(src)
+          }}
+        >
+          <Icon>image</Icon>
+        </Button>
+      </Toolbar>
+      <Editor
+        placeholder="Enter some text..."
+        editor={editor}
+        value={value}
+        onChange={change => setValue(change.value)}
+      />
+    </div>
+  )
+}
 
-export default Images
+const Element = props => {
+  const { attributes, children, element } = props
+  switch (element.type) {
+    case 'image':
+      return <ImageElement {...props} />
+    default:
+      return <p {...attributes}>{children}</p>
+  }
+}
+
+const ImageElement = ({ attributes, children, element }) => {
+  const selected = useSelected()
+  const focused = useFocused()
+  return (
+    <div {...attributes}>
+      <div contentEditable={false}>
+        <img
+          src={element.src}
+          className={css`
+            display: block;
+            max-width: 100%;
+            max-height: 20em;
+            box-shadow: ${selected && focused ? '0 0 0 2px blue;' : 'none'};
+          `}
+        />
+      </div>
+      {children}
+    </div>
+  )
+}
+
+const isImageUrl = url => {
+  const ext = new URL(url).pathname.split('.').pop()
+  return imageExtensions.includes(ext)
+}
+
+export default Example

@@ -539,11 +539,3 @@ export default class ReactEditorEvents {
     IS_CLICKING.delete(this)
   }
 }
-
-/**
- * Check if an event is a synthetic event.
- */
-
-const isSynthetic = (event: Event | SyntheticEvent): boolean => {
-  return 'nativeEvent' in event
-}

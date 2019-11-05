@@ -2,11 +2,17 @@ import React, { useEffect, useRef } from 'react'
 import getDirection from 'direction'
 import { Node, Range, Element as SlateElement, Path } from 'slate'
 
-import TextComponent from './text'
+import Text from './text'
 import Children from './children'
 import { useEditor } from '../hooks/use-editor'
 import { useReadOnly } from '../hooks/use-read-only'
-import { NODE_TO_ELEMENT, ELEMENT_TO_NODE } from '../utils/weak-maps'
+import { SelectedContext } from '../hooks/use-selected'
+import {
+  NODE_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  NODE_TO_PARENT,
+  NODE_TO_INDEX,
+} from '../utils/weak-maps'
 
 /**
  * Element.
@@ -27,7 +33,7 @@ const Element = (props: {
   const isVoid = editor.isVoid(node)
   const isInline = editor.isInline(node)
 
-  let children = (
+  let children: JSX.Element | null = (
     <Children
       annotations={annotations}
       block={block}
@@ -42,6 +48,7 @@ const Element = (props: {
   const attributes: {
     'data-slate-node': 'element'
     'data-slate-void'?: true
+    contentEditable?: false
     dir?: 'rtl'
     ref: any
   } = {
@@ -63,35 +70,35 @@ const Element = (props: {
   // If it's a void node, wrap the children in extra void-specific elements.
   if (isVoid) {
     attributes['data-slate-void'] = true
+
+    if (!readOnly && isInline) {
+      attributes['contentEditable'] = false
+    }
+
     const Tag = editor.isInline(node) ? 'span' : 'div'
     const [[text]] = Node.texts(node)
-    children = (
+    children = readOnly ? null : (
       <Tag
-        data-slate-void
-        contentEditable={readOnly || !isInline ? undefined : false}
+        data-slate-spacer
+        style={{
+          height: '0',
+          color: 'transparent',
+          outline: 'none',
+          position: 'absolute',
+        }}
       >
-        {readOnly ? null : (
-          <Tag
-            data-slate-spacer
-            style={{
-              height: '0',
-              color: 'transparent',
-              outline: 'none',
-              position: 'absolute',
-            }}
-          >
-            <TextComponent
-              annotations={[]}
-              block={!isInline ? node : block}
-              decorations={[]}
-              node={text}
-              parent={node}
-            />
-          </Tag>
-        )}
-        <Tag contentEditable={readOnly ? undefined : false}>{children}</Tag>
+        <Text
+          annotations={[]}
+          block={!isInline ? node : block}
+          decorations={[]}
+          node={text}
+          parent={node}
+        />
       </Tag>
     )
+
+    NODE_TO_INDEX.set(text, 0)
+    NODE_TO_PARENT.set(text, node)
   }
 
   // Update element-related weak maps with the DOM element ref.
@@ -104,13 +111,17 @@ const Element = (props: {
     }
   })
 
-  const ret = editor.renderElement({
+  const child = editor.renderElement({
     attributes,
     children,
     element: node,
   })
 
-  return ret
+  return (
+    <SelectedContext.Provider value={!!selection}>
+      {child}
+    </SelectedContext.Provider>
+  )
 }
 
 export default Element

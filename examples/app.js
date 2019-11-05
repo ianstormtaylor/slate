@@ -18,7 +18,7 @@ import { Icon } from './components'
 // import Versions from './versions'
 // import HoveringMenu from './hovering-menu'
 // import HugeDocument from './huge-document'
-// import Images from './images'
+import Images from './images'
 // import Links from './links'
 // import MarkdownPreview from './markdown-preview'
 // import MarkdownShortcuts from './markdown-shortcuts'
@@ -52,7 +52,7 @@ const EXAMPLES = [
   // ['History', History, '/history'],
   // ['Hovering Menu', HoveringMenu, '/hovering-menu'],
   // ['Huge Document', HugeDocument, '/huge-document'],
-  // ['Images', Images, '/images'],
+  ['Images', Images, '/images'],
   // ['Input Tester', InputTester, '/input-tester'],
   // ['Links', Links, '/links'],
   // ['Markdown Preview', MarkdownPreview, '/markdown-preview'],

@@ -7,7 +7,10 @@ import { withHistory } from 'slate-history'
 import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
+// Define our custom editor class with example-specific logic. Note the two
+// mixins used to add React-specific behaviors and a history stack.
 class ExampleEditor extends withHistory(withReact(BaseEditor)) {
+  // Listen for certain hotkeys, and toggle marks if they are pressed.
   onKeyDown(event) {
     let type
 
@@ -35,12 +38,14 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     return <Mark {...props} />
   }
 
+  // Check if a specific mark is "active" in the rich-text sense.
   isMarkActive(type) {
     const marks = this.getActiveMarks()
     const isActive = marks.some(m => m.type === type)
     return isActive
   }
 
+  // Check if a specific block is "active" in the rich-text sense.
   isBlockActive(type) {
     const { selection } = this.value
 
@@ -55,6 +60,7 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     return false
   }
 
+  // Toggle the block type on or off depending on whether it's already active.
   toggleBlocks(type) {
     const isActive = this.isBlockActive(type)
     const isListType = type === 'bulleted-list' || type === 'numbered-list'
@@ -70,6 +76,8 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
   }
 }
 
+// Define our example React component which will render the editor and also a
+// toolbar with buttons that call into our editor class's methods when pressed.
 const Example = () => {
   const [value, setValue] = useState(initialValue)
   const editor = useSlate(ExampleEditor)
@@ -103,12 +111,16 @@ const Example = () => {
         autoFocus
         editor={editor}
         value={value}
-        onChange={change => setValue(change.value)}
+        onChange={change => {
+          // When the editor's value changes, update our state.
+          setValue(change.value)
+        }}
       />
     </div>
   )
 }
 
+// A component to handle rendering all of the element nodes in our editor.
 const Element = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'block-quote':
@@ -128,6 +140,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
+// A component to handle rendering all of the mark formatting in our editor.
 const Mark = ({ attributes, children, mark }) => {
   switch (mark.type) {
     case 'bold':
@@ -141,6 +154,7 @@ const Mark = ({ attributes, children, mark }) => {
   }
 }
 
+// A button that toggle a mark on or off when pressed.
 const MarkButton = ({ editor, type, icon }) => {
   return (
     <Button
@@ -156,6 +170,7 @@ const MarkButton = ({ editor, type, icon }) => {
   )
 }
 
+// A button that toggles a block-level formatting on or off when pressed.
 const BlockButton = ({ editor, type, icon }) => {
   return (
     <Button

@@ -16,7 +16,7 @@ const Text = (props: {
   parent: Element
   style?: Record<string, any>
 }) => {
-  const { annotations, block, decorations, node, parent, style } = props
+  const { annotations, block, decorations, node, parent, ...rest } = props
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = getLeaves(node, annotations, decorations)
   const children = []
@@ -51,7 +51,7 @@ const Text = (props: {
   })
 
   return (
-    <span data-slate-node="text" style={style} ref={ref}>
+    <span data-slate-node="text" ref={ref} {...rest}>
       {children}
     </span>
   )

@@ -13,6 +13,7 @@ export interface CustomAnnotationProps {
   decorations: Range[]
   marks: Mark[]
   node: Text
+  text: string
   attributes: {
     'data-slate-annotation': true
   }
@@ -34,6 +35,7 @@ export interface CustomDecorationProps {
   decorations: Range[]
   marks: Mark[]
   node: Text
+  text: string
   attributes: {
     'data-slate-decoration': true
   }
@@ -89,6 +91,7 @@ export interface CustomMarkProps {
   mark: Mark
   marks: Mark[]
   node: Text
+  text: string
   attributes: {
     'data-slate-mark': true
   }
