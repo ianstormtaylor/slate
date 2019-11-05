@@ -1,4 +1,4 @@
-import { Node, Path, Range, Value } from 'slate'
+import { Node, Path, Range, Value, Fragment } from 'slate'
 
 import { ReactEditor } from '.'
 import {
@@ -7,6 +7,7 @@ import {
   NODE_TO_INDEX,
   NODE_TO_PARENT,
 } from '../utils/weak-maps'
+import { decode } from '../utils/base-64'
 
 export default class ReactEditorQueries {
   /**
@@ -41,6 +42,22 @@ export default class ReactEditorQueries {
     throw new Error(
       `Unable to find the path for Slate node: ${JSON.stringify(node)}`
     )
+  }
+
+  /**
+   * Get a Slate fragment from a `DataTransfer` object.
+   */
+
+  getDataTransferFragment(
+    this: ReactEditor,
+    dataTransfer: DataTransfer
+  ): Fragment | undefined {
+    const base64 = dataTransfer.getData('application/x-slate-fragment')
+
+    if (base64) {
+      const fragment = decode(base64)
+      return fragment
+    }
   }
 
   /**

@@ -43,28 +43,9 @@ class ExampleEditor extends withSchema(
   withHistory(withReact(BaseEditor)),
   schema
 ) {
-  insertImage(src) {
-    const text = { text: '', marks: [] }
-    const image = { type: 'image', src, nodes: [text] }
-    this.insertNodes(image)
-  }
-
-  renderElement(props) {
-    return <Element {...props} />
-  }
-
-  onDrop(event) {
-    debugger
-    const target = this.findEventRange(event)
-    const transfer = this.getEventTransfer(event)
-    const { type, text, files } = transfer
-
-    if (target) {
-      this.select(target)
-    }
-
-    if (type === 'files') {
-      for (const file of files) {
+  insertDataTransfer(dataTransfer) {
+    if (dataTransfer.files && dataTransfer.files.length > 0) {
+      for (const file of Array.from(dataTransfer.files)) {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
         if (mime !== 'image') continue
@@ -79,12 +60,24 @@ class ExampleEditor extends withSchema(
       return
     }
 
-    if (type === 'text' && isUrl(text) && isImageUrl(text)) {
+    const text = dataTransfer.getData('text/plain')
+
+    if (text && isUrl(text) && isImageUrl(text)) {
       this.insertImage(text)
       return
     }
 
-    return super.onDrop(event)
+    return super.insertDataTransfer(dataTransfer)
+  }
+
+  insertImage(src) {
+    const text = { text: '', marks: [] }
+    const image = { type: 'image', src, nodes: [text] }
+    this.insertNodes(image)
+  }
+
+  renderElement(props) {
+    return <Element {...props} />
   }
 }
 

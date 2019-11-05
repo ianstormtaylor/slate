@@ -2,6 +2,7 @@ import { Editor } from 'slate'
 import { IS_FOCUSED } from '../utils/weak-maps'
 import { ReactEditor } from '.'
 import { removeAllRanges } from '../utils/dom'
+import { Utils } from '../utils/utils'
 
 export default class ReactEditorCommands {
   /**
@@ -48,6 +49,35 @@ export default class ReactEditorCommands {
         properties: selection,
         newProperties: null,
       })
+    }
+  }
+
+  /**
+   * Insert a `DataTransfer` object.
+   */
+
+  insertDataTransfer(this: ReactEditor, dataTransfer: DataTransfer) {
+    const fragment = Utils.getFragmentData(dataTransfer)
+
+    if (fragment) {
+      this.insertFragment(fragment)
+      return
+    }
+
+    const text = dataTransfer.getData('text/plain')
+
+    if (text) {
+      const lines = text.split('\n')
+      let split = false
+
+      for (const line of lines) {
+        if (split) {
+          this.splitNodes()
+        }
+
+        this.insertText(line)
+        split = true
+      }
     }
   }
 

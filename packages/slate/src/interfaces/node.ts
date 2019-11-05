@@ -327,8 +327,12 @@ namespace Node {
 
     return produce(root, r => {
       const [start, end] = Range.edges(range)
+      const iterable = Node.entries(r, {
+        reverse: true,
+        pass: ([, path]) => !Range.includes(range, path),
+      })
 
-      for (const [, path] of Node.entries(r, { reverse: true })) {
+      for (const [, path] of iterable) {
         if (!Range.includes(range, path)) {
           const parent = Node.parent(r, path)
           const index = path[path.length - 1]
@@ -345,6 +349,9 @@ namespace Node {
           leaf.text = leaf.text.slice(start.offset)
         }
       }
+
+      delete r.annotations
+      delete r.selection
     })
   }
 

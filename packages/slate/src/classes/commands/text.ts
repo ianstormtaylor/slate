@@ -133,7 +133,12 @@ class DeletingCommands {
         Value.isValue(ancestor) ||
         (Element.isElement(ancestor) && !this.isInline(ancestor))
 
-      if (isBlockAncestor && endRef.current && startRef.current) {
+      if (
+        !isSingleText &&
+        isBlockAncestor &&
+        endRef.current &&
+        startRef.current
+      ) {
         this.mergeNodes({ at: endRef.current, hanging: true })
       }
 

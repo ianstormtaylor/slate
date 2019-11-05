@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useCallback } from 'react'
 import { Change, Value, Element } from 'slate'
 import throttle from 'lodash/throttle'
 
@@ -28,6 +28,7 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
 } from '../utils/weak-maps'
+import { Utils } from '../utils/utils'
 
 /**
  * Editor.
@@ -72,6 +73,7 @@ const Editor = (props: {
       compositionCount: 0,
       isCopying: false,
       isComposing: false,
+      isDragging: false,
       isUpdatingSelection: false,
       latestElement: null as NativeElement | null,
       latestRange: null as NativeRange | null,
@@ -172,6 +174,25 @@ const Editor = (props: {
       state.isUpdatingSelection = false
     })
   })
+
+  // On drop handler.
+  const onDrop = useCallback((event: React.DragEvent) => {
+    if (!readOnly && hasTarget(editor, event.target)) {
+      event.preventDefault()
+      const { dataTransfer } = event
+      const range = editor.findEventRange(event)
+
+      if (range) {
+        if (state.isDragging) {
+          editor.delete()
+        }
+
+        editor.select(range)
+        editor.focus()
+        editor.insertDataTransfer(dataTransfer)
+      }
+    }
+  }, [])
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
@@ -404,15 +425,11 @@ const Editor = (props: {
             }}
             onDragStart={event => {
               if (hasTarget(editor, event.target)) {
+                state.isDragging = true
                 editor.onDragStart(event)
               }
             }}
-            onDrop={event => {
-              if (!readOnly && hasTarget(editor, event.target)) {
-                event.preventDefault()
-                editor.onDrop(event)
-              }
-            }}
+            onDrop={onDrop}
             onFocus={event => {
               if (
                 !readOnly &&

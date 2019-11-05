@@ -114,8 +114,8 @@ function cloneFragment(
   if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
     event.preventDefault()
     event.clipboardData.setData(TYPES.TEXT, plainText)
-    event.clipboardData.setData(TYPES.FRAGMENT, encoded)
     event.clipboardData.setData(TYPES.HTML, div.innerHTML)
+    event.clipboardData.setData(TYPES.FRAGMENT, encoded)
     callback()
     return
   }

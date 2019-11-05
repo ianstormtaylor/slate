@@ -1,5 +1,5 @@
 import { parsePlaintext } from 'slate-parse-plaintext'
-import { Range } from 'slate'
+import { Range, Node } from 'slate'
 import {
   SyntheticEvent,
   FocusEvent,
@@ -224,63 +224,20 @@ export default class ReactEditorEvents {
       this.select(range)
     }
 
-    const fragment = this.value.fragment
-    const encoded = encode(fragment)
-    this.setEventTransfer(event, 'fragment', encoded)
+    const { selection } = this.value
+
+    if (selection) {
+      const fragment = Node.fragment(this.value, selection)
+      const encoded = encode(fragment)
+      this.setEventTransfer(event, 'fragment', encoded)
+    }
   }
 
   /**
    * On drop.
    */
 
-  onDrop(this: ReactEditor, event: DragEvent) {
-    const target = this.findEventRange(event)
-
-    if (!target) {
-      return
-    }
-
-    const transfer = this.getEventTransfer(event)
-    const { type, fragment, text } = transfer
-    this.focus()
-    this.select(target)
-
-    if (IS_DRAGGING.get(this)) {
-      this.delete()
-    }
-
-    if (type === 'text' || type === 'html') {
-      const { anchor } = target
-      const voidMatch = this.getMatch(anchor.path, 'void')
-
-      if (voidMatch) {
-        const [, voidPath] = voidMatch
-        const after = this.getAfter(voidPath)
-
-        if (after) {
-          this.select(after)
-        }
-      }
-
-      if (text) {
-        const lines = text.split('\n')
-        let split = false
-
-        for (const line of lines) {
-          if (split) {
-            this.splitNodes()
-          }
-
-          this.insertText(line)
-          split = true
-        }
-      }
-    }
-
-    if (type === 'fragment' && fragment) {
-      this.insertFragment(fragment)
-    }
-  }
+  onDrop(this: ReactEditor, event: DragEvent) {}
 
   /**
    * On focus.
