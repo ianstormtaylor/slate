@@ -16,7 +16,6 @@ import {
 import { IS_FIREFOX } from '../utils/environment'
 import { ReactEditor } from '.'
 import { SyntheticEvent } from 'react'
-import { decode } from '../utils/base-64'
 import { isSyntheticEvent } from '../utils/react'
 import {
   NativeElement,
@@ -27,6 +26,7 @@ import {
   isNativeElement,
   NativeNode,
   normalizeNodeAndOffset,
+  NativeText,
 } from '../utils/dom'
 
 export default class ReactEditorDomHelpers {
@@ -66,208 +66,6 @@ export default class ReactEditorDomHelpers {
       element.closest(`[data-slate-editor]`) === el &&
       (!editable || el.isContentEditable)
     )
-  }
-
-  /**
-   * Get the transfer data from an DOM event.
-   */
-
-  getEventTransfer(event: Event | SyntheticEvent) {
-    const transfer = getDataTransfer(event)
-    const data: {
-      type: 'unknown' | 'text' | 'node' | 'fragment' | 'html' | 'files'
-      files: DataTransferItem[] | File[] | null
-      fragment: SlateFragment | null
-      html: string | null
-      node: SlateNode | null
-      rich: string | null
-      text: string | null
-    } = {
-      type: 'unknown',
-      files: null,
-      fragment: null,
-      html: null,
-      node: null,
-      rich: null,
-      text: null,
-    }
-
-    if (!transfer) {
-      return data
-    }
-
-    let fragment = getType(transfer, TYPES.FRAGMENT)
-    let node = getType(transfer, TYPES.NODE)
-    const html = getType(transfer, TYPES.HTML)
-    const rich = getType(transfer, TYPES.RICH)
-    let text = getType(transfer, TYPES.TEXT)
-
-    // If there isn't a fragment, but there is HTML, check to see if the HTML is
-    // actually an encoded fragment.
-    if (!fragment && html && ~html.indexOf(` data-slate-fragment="`)) {
-      const matches = / data-slate-fragment="([^\s"]+)"/.exec(html)
-
-      if (matches) {
-        const [, encoded] = matches
-
-        if (encoded) {
-          fragment = encoded
-        }
-      }
-    }
-
-    // COMPAT: Edge doesn't handle custom data types, and it instead embeds them
-    // inside `text/plain`. (2017/7/12)
-    if (text) {
-      const prefix = 'SLATE-DATA-EMBED::'
-      let types
-
-      if (text.substring(0, prefix.length) !== prefix) {
-        data.text = text
-        return data
-      }
-
-      // Attempt to parse, if fails then just standard text/plain
-      // Otherwise, already had data embedded
-      try {
-        types = JSON.parse(text.substring(prefix.length))
-      } catch (err) {
-        throw new Error('Unable to parse custom Slate drag event data.')
-      }
-
-      if (types[TYPES.FRAGMENT]) {
-        fragment = types[TYPES.FRAGMENT]
-      }
-
-      if (types[TYPES.NODE]) {
-        node = types[TYPES.NODE]
-      }
-
-      if (types[TYPES.TEXT]) {
-        text = types[TYPES.TEXT]
-      }
-    }
-
-    data.html = html
-    data.text = text
-    data.rich = rich
-
-    if (fragment) {
-      data.fragment = decode(fragment) as SlateFragment
-    }
-
-    if (node) {
-      data.node = decode(node) as SlateNode
-    }
-
-    if (transfer.files && transfer.files.length) {
-      data.files = Array.from(transfer.files)
-    }
-
-    // COMPAT: Edge sometimes throws 'NotSupportedError' when accessing
-    // `transfer.items`. (2017/7/12)
-    try {
-      if (transfer.items && transfer.items.length) {
-        const array = []
-
-        for (const item of Array.from(transfer.items)) {
-          if (item.kind === 'file') {
-            const file = item.getAsFile()
-
-            if (file) {
-              array.push(file)
-            }
-          }
-        }
-
-        data.files = array
-      }
-    } catch (err) {}
-
-    if (data.fragment) {
-      data.type = 'fragment'
-    } else if (data.node) {
-      data.type = 'node'
-    } else if (data.rich && data.html) {
-      // COMPAT: Microsoft Word adds an image of the selected text to the data.
-      // Since files are preferred over HTML or text, this would cause the type to
-      // be considered `files`. But it also adds rich text data so we can check
-      // for that and properly set the type to `html` or `text`. (2016/11/21)
-      data.type = 'html'
-    } else if (data.rich && data.text) {
-      data.type = 'text'
-    } else if (data.files && data.files.length) {
-      data.type = 'files'
-    } else if (data.html) {
-      data.type = 'html'
-    } else if (data.text) {
-      data.type = 'text'
-    }
-
-    return data
-  }
-
-  /**
-   * Set data with `type` and `content` on an `event`.
-   */
-
-  setEventTransfer(
-    event: Event | SyntheticEvent,
-    type: string,
-    content: string
-  ): void {
-    const mime = TYPES[type.toUpperCase()]
-
-    if (!mime) {
-      throw new Error(`Cannot set unknown transfer type "${mime}".`)
-    }
-
-    if (isSyntheticEvent(event)) {
-      event = event.nativeEvent
-    }
-
-    let transfer
-
-    if (event instanceof DragEvent) {
-      transfer = event.dataTransfer
-    } else if (event instanceof ClipboardEvent) {
-      transfer = event.clipboardData
-    }
-
-    if (!transfer) {
-      return
-    }
-
-    // COMPAT: In Edge, custom types throw errors, so embed all non-standard types
-    // in text/plain compound object. (2017/7/12)
-    try {
-      transfer.setData(mime, content)
-      // COMPAT: Safari needs to have the 'text' (and not 'text/plain') value in
-      // dataTransfer to display the cursor while dragging internally.
-      transfer.setData('text', transfer.getData('text'))
-    } catch (err) {
-      const prefix = 'SLATE-DATA-EMBED::'
-      const text = transfer.getData(TYPES.TEXT)
-      let obj = {}
-
-      // If the existing plain text data is prefixed, it's Slate JSON data.
-      if (text.substring(0, prefix.length) === prefix) {
-        try {
-          obj = JSON.parse(text.substring(prefix.length))
-        } catch (e) {
-          throw new Error(
-            'Failed to parse Slate data from `DataTransfer` object.'
-          )
-        }
-      } else {
-        // Otherwise, it's just set it as is.
-        obj[TYPES.TEXT] = text
-      }
-
-      obj[mime] = content
-      const string = `${prefix}${JSON.stringify(obj)}`
-      transfer.setData(TYPES.TEXT, string)
-    }
   }
 
   /**
@@ -452,75 +250,67 @@ export default class ReactEditorDomHelpers {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(
-    this: ReactEditor,
-    domPoint: NativePoint
-  ): SlatePoint | undefined {
+  toSlatePoint(this: ReactEditor, domPoint: NativePoint): SlatePoint {
     const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
       domPoint
     )
-    const { parentNode } = nearestNode
 
-    if (!parentNode || !isNativeElement(parentNode)) {
-      return
-    }
+    const parentNode = nearestNode.parentNode as NativeElement
+    let textNode: NativeElement | null = null
+    let offset = 0
 
-    let leafNode = parentNode.closest('[data-slate-leaf]')
-    let domNode
-    let textNode
-    let offset
-
-    // Calculate how far into the text node the `nearestNode` is, so that we
-    // can determine what the offset relative to the text node is.
-    if (leafNode) {
-      textNode = leafNode.closest('[data-slate-node="text"]')!
-      const range = window.document.createRange()
-      range.setStart(textNode, 0)
-      range.setEnd(nearestNode, nearestOffset)
-      const contents = range.cloneContents()
-      const zeroWidths = contents.querySelectorAll('[data-slate-zero-width]')
-
-      Array.from(zeroWidths).forEach(el => {
-        el!.parentNode!.removeChild(el)
-      })
-
-      // COMPAT: Edge has a bug where Range.prototype.toString() will
-      // convert \n into \r\n. The bug causes a loop when slate-react
-      // attempts to reposition its cursor to match the native position. Use
-      // textContent.length instead.
-      // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
-      offset = contents.textContent!.length
-      domNode = textNode
-    } else {
-      // For void nodes, the element with the offset key will be a cousin, not an
-      // ancestor, so find it by going down from the nearest void parent.
+    if (parentNode) {
       const voidNode = parentNode.closest('[data-slate-void="true"]')
+      let leafNode = parentNode.closest('[data-slate-leaf]')
+      let domNode: NativeElement | null = null
 
-      if (!voidNode) {
-        return
+      // Calculate how far into the text node the `nearestNode` is, so that we
+      // can determine what the offset relative to the text node is.
+      if (leafNode) {
+        textNode = leafNode.closest('[data-slate-node="text"]')!
+        const range = window.document.createRange()
+        range.setStart(textNode, 0)
+        range.setEnd(nearestNode, nearestOffset)
+        const contents = range.cloneContents()
+        const zeroWidths = contents.querySelectorAll('[data-slate-zero-width]')
+
+        Array.from(zeroWidths).forEach(el => {
+          el!.parentNode!.removeChild(el)
+        })
+
+        // COMPAT: Edge has a bug where Range.prototype.toString() will
+        // convert \n into \r\n. The bug causes a loop when slate-react
+        // attempts to reposition its cursor to match the native position. Use
+        // textContent.length instead.
+        // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
+        offset = contents.textContent!.length
+        domNode = textNode
+      } else if (voidNode) {
+        // For void nodes, the element with the offset key will be a cousin, not an
+        // ancestor, so find it by going down from the nearest void parent.
+
+        leafNode = voidNode.querySelector('[data-slate-leaf]')!
+        textNode = leafNode.closest('[data-slate-node="text"]')!
+        domNode = leafNode
+        offset = domNode.textContent!.length
       }
 
-      leafNode = voidNode.querySelector('[data-slate-leaf]')
-
-      if (!leafNode) {
-        return
+      // COMPAT: If the parent node is a Slate zero-width space, this is
+      // because the text node should have no characters. However, during IME
+      // composition the ASCII characters will be prepended to the zero-width
+      // space, so subtract 1 from the offset to account for the zero-width
+      // space character.
+      if (
+        domNode &&
+        offset === domNode.textContent!.length &&
+        parentNode.hasAttribute('data-slate-zero-width')
+      ) {
+        offset--
       }
-
-      textNode = leafNode.closest('[data-slate-node="text"]')
-      domNode = leafNode
-      offset = domNode.textContent!.length
     }
 
-    // COMPAT: If the parent node is a Slate zero-width space, this is
-    // because the text node should have no characters. However, during IME
-    // composition the ASCII characters will be prepended to the zero-width
-    // space, so subtract 1 from the offset to account for the zero-width
-    // space character.
-    if (
-      offset === domNode.textContent!.length &&
-      parentNode.hasAttribute('data-slate-zero-width')
-    ) {
-      offset--
+    if (!textNode) {
+      throw new Error(`Cannot find a Slate point from DOM point: ${domPoint}`)
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
@@ -538,38 +328,40 @@ export default class ReactEditorDomHelpers {
   toSlateRange(
     this: ReactEditor,
     domRange: NativeRange | NativeStaticRange | NativeSelection
-  ): SlateRange | undefined {
+  ): SlateRange {
     const el =
       domRange instanceof Selection
         ? domRange.anchorNode
         : domRange.startContainer
-
-    if (!el) {
-      return
-    }
-
     let anchorNode
     let anchorOffset
     let focusNode
     let focusOffset
     let isCollapsed
 
-    if (domRange instanceof Selection) {
-      anchorNode = domRange.anchorNode
-      anchorOffset = domRange.anchorOffset
-      focusNode = domRange.focusNode
-      focusOffset = domRange.focusOffset
-      isCollapsed = domRange.isCollapsed
-    } else {
-      anchorNode = domRange.startContainer
-      anchorOffset = domRange.startOffset
-      focusNode = domRange.endContainer
-      focusOffset = domRange.endOffset
-      isCollapsed = domRange.collapsed
+    if (el) {
+      if (domRange instanceof Selection) {
+        anchorNode = domRange.anchorNode
+        anchorOffset = domRange.anchorOffset
+        focusNode = domRange.focusNode
+        focusOffset = domRange.focusOffset
+        isCollapsed = domRange.isCollapsed
+      } else {
+        anchorNode = domRange.startContainer
+        anchorOffset = domRange.startOffset
+        focusNode = domRange.endContainer
+        focusOffset = domRange.endOffset
+        isCollapsed = domRange.collapsed
+      }
     }
 
-    if (!anchorNode || !focusNode) {
-      return
+    if (
+      anchorNode == null ||
+      focusNode == null ||
+      anchorOffset == null ||
+      focusOffset == null
+    ) {
+      throw new Error(`Cannot find Slat range from DOM range: ${domRange}`)
     }
 
     const anchor = this.toSlatePoint({
@@ -584,9 +376,7 @@ export default class ReactEditorDomHelpers {
           offset: focusOffset,
         })
 
-    if (anchor && focus) {
-      return { anchor, focus }
-    }
+    return { anchor, focus }
   }
 }
 

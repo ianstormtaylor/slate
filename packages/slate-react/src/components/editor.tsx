@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useMemo, useCallback } from 'react'
-import { Change, Value, Element } from 'slate'
-import throttle from 'lodash/throttle'
+import { Change, Value, Element, Range } from 'slate'
+import debounce from 'lodash/debounce'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
@@ -20,13 +20,13 @@ import {
   NativeRange,
   isNativeElement,
   isNativeNode,
-  removeAllRanges,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
+  IS_FOCUSED,
 } from '../utils/weak-maps'
 import { Utils } from '../utils/utils'
 
@@ -76,7 +76,6 @@ const Editor = (props: {
       isDragging: false,
       isUpdatingSelection: false,
       latestElement: null as NativeElement | null,
-      latestRange: null as NativeRange | null,
     }),
     []
   )
@@ -129,10 +128,10 @@ const Editor = (props: {
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useEffect(() => {
     const { selection } = value
-    const el = editor.toDomNode(value)
     const domSelection = window.getSelection()
 
     if (!selection || !domSelection || !editor.isFocused()) {
+      console.log('NO SELECTION / NO DOM SELECTION / NOT FOCUSED')
       return
     }
 
@@ -140,44 +139,204 @@ const Editor = (props: {
     const domRange = rangeCount > 0 ? domSelection.getRangeAt(0) : null
 
     if (!domRange) {
+      debugger
+      console.log('NO DOM RANGE')
       return
     }
 
     const newDomRange = editor.toDomRange(selection)
 
-    if (isRangeEqual(newDomRange, domRange)) {
-      return
+    if (!isRangeEqual(newDomRange, domRange)) {
+      setDomSelectionRange(newDomRange)
     }
-
-    state.isUpdatingSelection = true
-    removeAllRanges(domSelection)
-
-    // COMPAT: IE 11 does not support `setBaseAndExtent`. (2018/11/07)
-    if (!domSelection.setBaseAndExtent) {
-      domSelection.addRange(newDomRange)
-    } else {
-      domSelection.setBaseAndExtent(
-        newDomRange.startContainer,
-        newDomRange.startOffset,
-        newDomRange.endContainer,
-        newDomRange.endOffset
-      )
-    }
-
-    setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need
-      // to focus the contenteditable element too. (2016/11/16)
-      if (IS_FIREFOX) {
-        el.focus()
-      }
-
-      state.isUpdatingSelection = false
-    })
   })
+
+  const setDomSelectionRange = (domRange: NativeRange) => {
+    const el = editor.toDomNode(value)
+    const domSelection = window.getSelection()
+
+    if (domSelection) {
+      console.log('UPDATING SELECTION', domRange)
+      state.isUpdatingSelection = true
+      domSelection.removeAllRanges()
+      domSelection.setBaseAndExtent(
+        domRange.startContainer,
+        domRange.startOffset,
+        domRange.endContainer,
+        domRange.endOffset
+      )
+
+      setTimeout(() => {
+        // COMPAT: In Firefox, it's not enough to create a range, you also need
+        // to focus the contenteditable element too. (2016/11/16)
+        if (IS_FIREFOX) {
+          el.focus()
+        }
+
+        state.isUpdatingSelection = false
+      })
+    }
+  }
+
+  // On blur handler.
+  const onBlur = useCallback((event: React.FocusEvent) => {
+    if (
+      !readOnly &&
+      !state.isCopying &&
+      !state.isUpdatingSelection &&
+      hasEditableTarget(editor, event.target) &&
+      // COMPAT: If the current `activeElement` is still the previous
+      // one, this is due to the window being blurred when the tab
+      // itself becomes unfocused, so we want to abort early to allow to
+      // editor to stay focused when the tab becomes focused again.
+      state.latestElement !== window.document.activeElement
+    ) {
+      const { relatedTarget } = event
+
+      // COMPAT: The `relatedTarget` can be null when the new focus target
+      // is not a "focusable" element (eg. a `<div>` without `tabindex`
+      // set).
+      if (relatedTarget) {
+        const el = editor.toDomNode(value)
+
+        // COMPAT: The event should be ignored if the focus is returning
+        // to the editor from an embedded editable element (eg. an <input>
+        // element inside a void node).
+        if (relatedTarget === el) return
+
+        if (isNativeElement(relatedTarget)) {
+          // COMPAT: The event should be ignored if the focus is moving from
+          // the editor to inside a void node's spacer element.
+          if (relatedTarget.hasAttribute('data-slate-spacer')) return
+
+          // COMPAT: The event should be ignored if the focus is moving to a
+          // non- editable section of an element that isn't a void node (eg.
+          // a list item of the check list example).
+          const node = editor.toSlateNode(relatedTarget)
+
+          if (
+            editor.hasDomNode(relatedTarget) &&
+            (!Element.isElement(node) || !editor.isVoid(node))
+          ) {
+            return
+          }
+        }
+      }
+    }
+
+    IS_FOCUSED.delete(editor)
+  }, [])
+
+  // On click handler.
+  const onClick = useCallback((event: React.MouseEvent) => {
+    if (
+      !readOnly &&
+      hasTarget(editor, event.target) &&
+      isNativeNode(event.target)
+    ) {
+      const domSelection = window.getSelection()
+      const node = editor.toSlateNode(event.target)
+      const path = editor.findPath(node)
+      const start = editor.getStart(path)
+      const range = editor.getRange(start)
+      const domRange = editor.toDomRange(range)
+
+      if (domSelection && editor.getMatch(path, 'void')) {
+        setDomSelectionRange(domRange)
+      }
+    }
+  }, [])
+
+  // On composition end.
+  const onCompositionEnd = useCallback((event: React.CompositionEvent) => {
+    if (hasEditableTarget(editor, event.target)) {
+      const n = state.compositionCount
+
+      // The `count` ensures that if another composition starts before the
+      // timeout, we won't unset the flag, since a composition is still running.
+      window.requestAnimationFrame(() => {
+        if (state.compositionCount <= n) {
+          state.isComposing = false
+        }
+      })
+    }
+  }, [])
+
+  // On composition start.
+  const onCompositionStart = useCallback((event: React.CompositionEvent) => {
+    if (hasEditableTarget(editor, event.target)) {
+      state.isComposing = true
+      state.compositionCount++
+
+      if (editor.isSelected() && editor.isExpanded()) {
+        //  When a composition starts and the current selection is not
+        //  collapsed, the second composition keydown would drop the text
+        //  wrapping <span> which resulted on crash when updating the selection
+        //  after composition ends (because it cannot find <span> nodes in DOM).
+        //  This is a workaround that erases selection as soon as composition
+        //  starts and preventing <span> to be dropped.
+        //  https://github.com/ianstormtaylor/slate/issues/1879
+        editor.delete()
+      }
+    }
+  }, [])
+
+  // On copy handler.
+  const onCopy = useCallback((event: React.ClipboardEvent) => {
+    if (hasEditableTarget(editor, event.target)) {
+      event.preventDefault()
+      state.isCopying = true
+      window.requestAnimationFrame(() => (state.isCopying = false))
+      Utils.setFragmentData(event.clipboardData, editor)
+    }
+  }, [])
+
+  // On cut handler.
+  const onCut = useCallback((event: React.ClipboardEvent) => {
+    if (!readOnly && hasEditableTarget(editor, event.target)) {
+      event.preventDefault()
+      state.isCopying = true
+      window.requestAnimationFrame(() => (state.isCopying = false))
+      Utils.setFragmentData(event.clipboardData, editor)
+
+      if (editor.isExpanded()) {
+        editor.delete()
+      }
+    }
+  }, [])
+
+  // On drag end handler.
+  const onDragEnd = useCallback((event: React.DragEvent) => {
+    if (hasTarget(editor, event.target)) {
+      state.isDragging = false
+    }
+  }, [])
+
+  // On drag start handler.
+  const onDragStart = useCallback((event: React.DragEvent) => {
+    if (hasTarget(editor, event.target)) {
+      state.isDragging = true
+
+      if (isNativeNode(event.target)) {
+        const node = editor.toSlateNode(event.target)
+        const path = editor.findPath(node)
+        const voidMatch = editor.getMatch(path, 'void')
+
+        // If starting a drag on a void node, make sure it is selected so that
+        // it shows up in the selection's fragment.
+        if (voidMatch) {
+          const range = editor.getRange(path)
+          editor.select(range)
+        }
+
+        Utils.setFragmentData(event.dataTransfer, editor)
+      }
+    }
+  }, [])
 
   // On drop handler.
   const onDrop = useCallback((event: React.DragEvent) => {
-    if (!readOnly && hasTarget(editor, event.target)) {
+    if (!readOnly && hasEditableTarget(editor, event.target)) {
       event.preventDefault()
       const { dataTransfer } = event
       const range = editor.findEventRange(event)
@@ -191,6 +350,29 @@ const Editor = (props: {
         editor.focus()
         editor.insertDataTransfer(dataTransfer)
       }
+    }
+  }, [])
+
+  // On focus handler.
+  const onFocus = useCallback((event: React.FocusEvent) => {
+    if (
+      !readOnly &&
+      !state.isCopying &&
+      !state.isUpdatingSelection &&
+      hasEditableTarget(editor, event.target)
+    ) {
+      const el = editor.toDomNode(value)
+      state.latestElement = window.document.activeElement
+
+      // COMPAT: If the editor has nested editable elements, the focus
+      // can go to them. In Firefox, this must be prevented because it
+      // results in issues with keyboard navigation. (2017/03/30)
+      if (IS_FIREFOX && event.target !== el) {
+        el.focus()
+        return
+      }
+
+      IS_FOCUSED.set(editor, true)
     }
   }, [])
 
@@ -208,29 +390,36 @@ const Editor = (props: {
   // needed to account for React's `onSelect` being non-standard and not firing
   // until after a selection has been released. This causes issues in situations
   // where another change happens while a selection is being dragged.
-  const onNativeSelectionChange = throttle((event: Event) => {
+  const onNativeSelectionChange = debounce(() => {
     if (readOnly) return
     if (state.isCopying) return
     if (state.isComposing) return
     if (state.isUpdatingSelection) return
-    if (!hasEditableTarget(editor, event.target)) return
 
     const el = editor.toDomNode(value)
     const { activeElement } = window.document
-    if (activeElement !== el) return
 
-    const domSelection = window.getSelection()
+    if (activeElement === el) {
+      const domSelection = window.getSelection()
+      state.latestElement = activeElement
 
-    if (domSelection) {
-      const domRange = domSelection.getRangeAt(0)
-      state.latestRange = domRange ? domRange.cloneRange() : null
+      if (domSelection) {
+        const range = editor.toSlateRange(domSelection)
+        editor.select(range)
+        IS_FOCUSED.set(editor, true)
+      }
     } else {
-      state.latestRange = null
+      IS_FOCUSED.delete(editor)
     }
-
-    state.latestElement = activeElement
-    editor.onSelect(event)
   }, 100)
+
+  // On paste handler.
+  const onPaste = useCallback((event: React.ClipboardEvent) => {
+    if (!readOnly && hasEditableTarget(editor, event.target)) {
+      event.preventDefault()
+      editor.insertDataTransfer(event.clipboardData)
+    }
+  }, [])
 
   return (
     <EditorContext.Provider value={editor}>
@@ -279,126 +468,13 @@ const Editor = (props: {
                 editor.onBeforeInput(event)
               }
             }}
-            onBlur={event => {
-              if (
-                !readOnly &&
-                !state.isCopying &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target) &&
-                // COMPAT: If the current `activeElement` is still the previous
-                // one, this is due to the window being blurred when the tab
-                // itself becomes unfocused, so we want to abort early to allow to
-                // editor to stay focused when the tab becomes focused again.
-                state.latestElement !== window.document.activeElement
-              ) {
-                const { relatedTarget } = event
-
-                // COMPAT: The `relatedTarget` can be null when the new focus target
-                // is not a "focusable" element (eg. a `<div>` without `tabindex`
-                // set).
-                if (relatedTarget) {
-                  const el = editor.toDomNode(value)
-
-                  // COMPAT: The event should be ignored if the focus is returning
-                  // to the editor from an embedded editable element (eg. an <input>
-                  // element inside a void node).
-                  if (relatedTarget === el) return
-
-                  if (isNativeElement(relatedTarget)) {
-                    // COMPAT: The event should be ignored if the focus is moving from
-                    // the editor to inside a void node's spacer element.
-                    if (relatedTarget.hasAttribute('data-slate-spacer')) return
-
-                    // COMPAT: The event should be ignored if the focus is moving to a
-                    // non- editable section of an element that isn't a void node (eg.
-                    // a list item of the check list example).
-                    const node = editor.toSlateNode(relatedTarget)
-
-                    if (
-                      editor.hasDomNode(relatedTarget) &&
-                      (!Element.isElement(node) || !editor.isVoid(node))
-                    ) {
-                      return
-                    }
-                  }
-                }
-
-                editor.onBlur(event)
-              }
-            }}
-            onCompositionEnd={event => {
-              if (hasEditableTarget(editor, event.target)) {
-                const n = state.compositionCount
-
-                // The `count` check here ensures that if another composition
-                // starts before the timeout has closed out this one, we will
-                // abort unsetting the `isComposing` flag, since a composition is
-                // still in affect.
-                window.requestAnimationFrame(() => {
-                  if (state.compositionCount <= n) {
-                    state.isComposing = false
-                  }
-                })
-
-                editor.onCompositionEnd(event)
-              }
-            }}
-            onClick={event => {
-              editor.onClick(event)
-            }}
-            onCompositionStart={event => {
-              if (hasEditableTarget(editor, event.target)) {
-                state.isComposing = true
-                state.compositionCount++
-
-                if (editor.isSelected() && editor.isExpanded()) {
-                  // https://github.com/ianstormtaylor/slate/issues/1879 When
-                  // composition starts and the current selection is not collapsed,
-                  // the second composition key-down would drop the text wrapping
-                  // <spans> which resulted on crash in content.updateSelection
-                  // after composition ends (because it cannot find <span> nodes in
-                  // DOM). This is a workaround that erases selection as soon as
-                  // composition starts and preventing <spans> to be dropped.
-                  editor.delete()
-                }
-
-                editor.onCompositionStart(event)
-              }
-            }}
-            onCopy={event => {
-              if (hasEditableTarget(editor, event.target)) {
-                state.isCopying = true
-                window.requestAnimationFrame(() => (state.isCopying = false))
-                editor.onCopy(event)
-              }
-            }}
-            onCut={event => {
-              if (!readOnly && hasEditableTarget(editor, event.target)) {
-                state.isCopying = true
-                window.requestAnimationFrame(() => (state.isCopying = false))
-                editor.onCut(event)
-              }
-            }}
-            onDragEnd={event => {
-              if (hasTarget(editor, event.target)) {
-                editor.onDragEnd(event)
-              }
-            }}
-            onDragEnter={event => {
-              if (hasTarget(editor, event.target)) {
-                editor.onDragEnter(event)
-              }
-            }}
-            onDragExit={event => {
-              if (hasTarget(editor, event.target)) {
-                editor.onDragExit(event)
-              }
-            }}
-            onDragLeave={event => {
-              if (hasTarget(editor, event.target)) {
-                editor.onDragLeave(event)
-              }
-            }}
+            onBlur={onBlur}
+            onClick={onClick}
+            onCompositionEnd={onCompositionEnd}
+            onCompositionStart={onCompositionStart}
+            onCopy={onCopy}
+            onCut={onCut}
+            onDragEnd={onDragEnd}
             onDragOver={event => {
               if (hasTarget(editor, event.target)) {
                 // If the target is inside a void node, and only in this case,
@@ -419,38 +495,11 @@ const Editor = (props: {
                   event.preventDefault()
                   event.nativeEvent!.dataTransfer!.dropEffect = 'move'
                 }
-
-                editor.onDragOver(event)
               }
             }}
-            onDragStart={event => {
-              if (hasTarget(editor, event.target)) {
-                state.isDragging = true
-                editor.onDragStart(event)
-              }
-            }}
+            onDragStart={onDragStart}
             onDrop={onDrop}
-            onFocus={event => {
-              if (
-                !readOnly &&
-                !state.isCopying &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target)
-              ) {
-                const el = editor.toDomNode(value)
-                state.latestElement = window.document.activeElement
-
-                // COMPAT: If the editor has nested editable elements, the focus
-                // can go to them. In Firefox, this must be prevented because it
-                // results in issues with keyboard navigation. (2017/03/30)
-                if (IS_FIREFOX && event.target !== el) {
-                  el.focus()
-                  return
-                }
-
-                editor.onFocus(event)
-              }
-            }}
+            onFocus={onFocus}
             onInput={event => {
               if (
                 !state.isComposing &&
@@ -499,29 +548,7 @@ const Editor = (props: {
                 editor.onKeyDown(event)
               }
             }}
-            onKeyUp={event => {
-              if (hasEditableTarget(editor, event.target)) {
-                editor.onKeyUp(event)
-              }
-            }}
-            onPaste={event => {
-              if (!readOnly && hasEditableTarget(editor, event.target)) {
-                event.preventDefault()
-                editor.onPaste(event)
-              }
-            }}
-            onSelect={event => {
-              if (
-                !readOnly &&
-                !state.isCopying &&
-                !state.isComposing &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target)
-              ) {
-                state.latestElement = window.document.activeElement
-                editor.onSelect(event)
-              }
-            }}
+            onPaste={onPaste}
           >
             <Children
               annotations={Object.values(value.annotations)}
