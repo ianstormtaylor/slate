@@ -11,14 +11,9 @@ import { startCase } from 'lodash'
 
 import Core from '../../packages/slate/package.json'
 import History from '../../packages/slate-history/package.json'
-import HtmlSerializer from '../../packages/slate-html-serializer/package.json'
 import Hyperscript from '../../packages/slate-hyperscript/package.json'
-import ParsePlaintext from '../../packages/slate-parse-plaintext/package.json'
-import PlainSerializer from '../../packages/slate-plain-serializer/package.json'
-import PropTypes from '../../packages/slate-prop-types/package.json'
 import React from '../../packages/slate-react/package.json'
 import ReactPlaceholder from '../../packages/slate-react-placeholder/package.json'
-import RenderPlaintext from '../../packages/slate-render-plaintext/package.json'
 import Schema from '../../packages/slate-schema/package.json'
 
 /**
@@ -176,13 +171,8 @@ function factory(pkg, options = {}) {
 export default [
   ...factory(Core, { ts: true }),
   ...factory(History, { ts: true }),
-  ...factory(HtmlSerializer),
   ...factory(Hyperscript, { ts: true }),
-  ...factory(PlainSerializer),
-  ...factory(ParsePlaintext, { ts: true }),
-  ...factory(PropTypes),
   ...factory(React, { ts: true }),
   ...factory(ReactPlaceholder),
-  ...factory(RenderPlaintext, { ts: true }),
   ...factory(Schema, { ts: true }),
 ]

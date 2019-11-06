@@ -1,0 +1,14 @@
+{
+  "selection": null,
+  "annotations": {},
+  "nodes": [
+    {
+      "nodes": [
+        {
+          "text": "This is editable plain text, just like a <textarea>!",
+          "marks": []
+        }
+      ]
+    }
+  ]
+}

@@ -184,7 +184,6 @@ export const checkAncestor = (
     const n = Node.child(node, 0)
     const p = path.concat(0)
     const e = checkNode(n, p, check.first, rules)
-    debugger
 
     if (e) {
       if (e.code === 'node_invalid') {
@@ -286,7 +285,6 @@ export const checkAncestor = (
       const child = check.children[d]
       const max = child.max != null ? child.max : Infinity
       const min = child.min != null ? child.min : 0
-      debugger
 
       // If the children assertion was defined, but we don't current have a
       // definition, we've reached the end so any other children are overflows.

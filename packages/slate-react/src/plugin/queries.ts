@@ -6,6 +6,8 @@ import {
   IS_READ_ONLY,
   NODE_TO_INDEX,
   NODE_TO_PARENT,
+  PLACEHOLDER,
+  PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 
 export default class ReactEditorQueries {
@@ -48,7 +50,26 @@ export default class ReactEditorQueries {
    */
 
   getDecorations(this: ReactEditor, node: Node): Range[] {
-    return []
+    const placeholder = PLACEHOLDER.get(this)
+    const decorations = []
+
+    if (
+      placeholder &&
+      Value.isValue(node) &&
+      node.nodes.length === 1 &&
+      Array.from(Node.texts(node)).length === 1 &&
+      Node.text(node) === ''
+    ) {
+      const start = this.getStart([])
+      decorations.push({
+        [PLACEHOLDER_SYMBOL]: true,
+        placeholder,
+        anchor: start,
+        focus: start,
+      })
+    }
+
+    return decorations
   }
 
   /**

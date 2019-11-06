@@ -105,3 +105,31 @@ export const CustomMark = (props: CustomMarkProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>
 }
+
+/**
+ * A custom decoration for the default placeholder behavior.
+ */
+
+export const PlaceholderDecoration = (props: CustomDecorationProps) => {
+  const { decoration, attributes, children } = props
+  const { placeholder } = decoration
+  return (
+    <span {...attributes}>
+      <span
+        contentEditable={false}
+        style={{
+          pointerEvents: 'none',
+          display: 'inline-block',
+          width: '0',
+          maxWidth: '100%',
+          whiteSpace: 'nowrap',
+          opacity: '0.333',
+          verticalAlign: 'text-top',
+        }}
+      >
+        {placeholder}
+      </span>
+      {children}
+    </span>
+  )
+}

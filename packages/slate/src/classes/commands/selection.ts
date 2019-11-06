@@ -122,6 +122,8 @@ class SelectionCommands {
       )
     }
 
+    console.trace('select', target)
+
     this.apply({
       type: 'set_selection',
       properties: selection,
@@ -193,6 +195,8 @@ class SelectionCommands {
         newProps[k] = props[k]
       }
     }
+
+    console.trace('setSelection', newProps)
 
     if (Object.keys(oldProps).length > 0) {
       this.apply({

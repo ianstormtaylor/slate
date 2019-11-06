@@ -8,7 +8,9 @@ import {
   CustomDecorationProps,
   CustomMark,
   CustomMarkProps,
+  PlaceholderDecoration,
 } from './custom'
+import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -85,17 +87,25 @@ const Leaf = (props: {
   }
 
   for (const decoration of decorations) {
-    const ret = renderDecoration({
+    const p = {
       ...renderProps,
       decoration,
       children,
       attributes: {
         'data-slate-decoration': true,
       },
-    })
+    }
 
-    if (ret) {
-      children = ret
+    if (PLACEHOLDER_SYMBOL in decoration) {
+      // @ts-ignore
+      children = <PlaceholderDecoration {...p} />
+    } else {
+      // @ts-ignore
+      const ret = renderDecoration(p)
+
+      if (ret) {
+        children = ret
+      }
     }
   }
 

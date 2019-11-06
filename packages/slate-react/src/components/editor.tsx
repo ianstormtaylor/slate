@@ -22,6 +22,7 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   IS_FOCUSED,
+  PLACEHOLDER,
 } from '../utils/weak-maps'
 import { Utils } from '../utils/utils'
 import {
@@ -38,6 +39,7 @@ import {
 const Editor = (props: {
   editor: ReactEditor
   onChange?: (change: Change) => void
+  placeholder?: string
   readOnly?: boolean
   role?: string
   style?: Record<string, any>
@@ -52,6 +54,7 @@ const Editor = (props: {
     editor,
     value,
     onChange = () => {},
+    placeholder,
     readOnly = false,
     renderAnnotation,
     renderDecoration,
@@ -74,6 +77,7 @@ const Editor = (props: {
   // Update internal state on each render.
   editor.onChange = onChange
   editor.value = value
+  PLACEHOLDER.set(editor, placeholder)
   IS_READ_ONLY.set(editor, readOnly)
 
   // Keep track of some state for the event handler logic.
@@ -121,13 +125,13 @@ const Editor = (props: {
   useEffect(() => {
     if (ref.current) {
       // @ts-ignore The `beforeinput` event isn't recognized.
-      ref.current.addEventListener('beforeinput', onNativeBeforeInput)
+      ref.current.addEventListener('beforeinput', onDOMBeforeInput)
     }
 
     return () => {
       if (ref.current) {
         // @ts-ignore The `beforeinput` event isn't recognized.
-        ref.current.removeEventListener('beforeinput', onNativeBeforeInput)
+        ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
       }
     }
   }, [])
@@ -138,40 +142,17 @@ const Editor = (props: {
     const domSelection = window.getSelection()
 
     if (!selection || !domSelection || !editor.isFocused()) {
-      console.log('NO SELECTION / NO DOM SELECTION / NOT FOCUSED')
       return
     }
 
-    const { rangeCount } = domSelection
-    const domRange = rangeCount > 0 ? domSelection.getRangeAt(0) : null
-
-    if (!domRange) {
-      debugger
-      console.log('NO DOM RANGE')
-      return
-    }
-
-    const newDomRange = editor.toDomRange(selection)
-
-    if (!isRangeEqual(newDomRange, domRange)) {
-      setDomSelectionRange(newDomRange)
-    }
-  })
-
-  const setDomSelectionRange = (domRange: DOMRange) => {
     const el = editor.toDomNode(value)
-    const domSelection = window.getSelection()
+    const domRange = editor.toDomRange(selection)
+    const oldDomRange = domSelection.getRangeAt(0)
 
-    if (domSelection) {
-      console.log('UPDATING SELECTION', domRange)
+    if (!oldDomRange || !isRangeEqual(domRange, oldDomRange)) {
       state.isUpdatingSelection = true
       domSelection.removeAllRanges()
-      domSelection.setBaseAndExtent(
-        domRange.startContainer,
-        domRange.startOffset,
-        domRange.endContainer,
-        domRange.endOffset
-      )
+      domSelection.addRange(domRange)
 
       setTimeout(() => {
         // COMPAT: In Firefox, it's not enough to create a range, you also need
@@ -183,13 +164,13 @@ const Editor = (props: {
         state.isUpdatingSelection = false
       })
     }
-  }
+  })
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
   // to the real event sadly. (2019/11/01)
   // https://github.com/facebook/react/issues/11211
-  const onNativeBeforeInput = useCallback(
+  const onDOMBeforeInput = useCallback(
     (
       event: Event & {
         data: string | null
@@ -199,8 +180,6 @@ const Editor = (props: {
         isComposing: boolean
       }
     ) => {
-      console.log('onBeforeInput', event)
-
       if (!readOnly && hasEditableTarget(editor, event.target)) {
         const { inputType } = event
 
@@ -334,15 +313,12 @@ const Editor = (props: {
                 hasTarget(editor, event.target) &&
                 isDOMNode(event.target)
               ) {
-                const domSelection = window.getSelection()
                 const node = editor.toSlateNode(event.target)
                 const path = editor.findPath(node)
                 const start = editor.getStart(path)
-                const range = editor.getRange(start)
-                const domRange = editor.toDomRange(range)
 
-                if (domSelection && editor.getMatch(path, 'void')) {
-                  setDomSelectionRange(domRange)
+                if (editor.getMatch(start, 'void')) {
+                  editor.select(start)
                 }
               }
             }, [])}

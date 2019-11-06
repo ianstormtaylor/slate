@@ -25,15 +25,10 @@
   },
   "peerDependencies": {
     "slate": "*",
-    "slate-dev-benchmark": "*",
-    "slate-dev-environment": "*",
-    "slate-dev-test-utils": "*",
-    "slate-html-serializer": "*",
-    "slate-parse-plaintext": "*",
-    "slate-plain-serializer": "*",
+    "slate-history": "*",
     "slate-react": "*",
     "slate-react-placeholder": "*",
-    "slate-render-plaintext": "*"
+    "slate-schema": "*"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.4",

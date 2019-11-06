@@ -1,14 +1,11 @@
 import React, { useState } from 'react'
-import { parsePlaintext } from 'slate-parse-plaintext'
 import { Editor as BaseEditor } from 'slate'
 import { Editor, withReact, useSlate } from 'slate-react'
 import { withHistory } from 'slate-history'
 
-class ExampleEditor extends withHistory(withReact(BaseEditor)) {}
+import initialValue from './value.json'
 
-const initialValue = parsePlaintext(
-  'This is editable plain text, just like a <textarea>!'
-)
+class ExampleEditor extends withHistory(withReact(BaseEditor)) {}
 
 const Example = () => {
   const [value, setValue] = useState(initialValue)

@@ -106,7 +106,10 @@ const Example = () => {
         value={value}
         renderElement={props => <Element {...props} />}
         renderMark={props => <Mark {...props} />}
-        onChange={change => setValue(change.value)}
+        onChange={change => {
+          console.log(change)
+          setValue(change.value)
+        }}
       />
     </div>
   )
