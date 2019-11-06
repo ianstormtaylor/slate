@@ -13,7 +13,6 @@ import Core from '../../packages/slate/package.json'
 import History from '../../packages/slate-history/package.json'
 import Hyperscript from '../../packages/slate-hyperscript/package.json'
 import React from '../../packages/slate-react/package.json'
-import ReactPlaceholder from '../../packages/slate-react-placeholder/package.json'
 import Schema from '../../packages/slate-schema/package.json'
 
 /**
@@ -173,6 +172,5 @@ export default [
   ...factory(History, { ts: true }),
   ...factory(Hyperscript, { ts: true }),
   ...factory(React, { ts: true }),
-  ...factory(ReactPlaceholder),
   ...factory(Schema, { ts: true }),
 ]

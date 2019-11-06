@@ -27,7 +27,6 @@
     "slate": "*",
     "slate-history": "*",
     "slate-react": "*",
-    "slate-react-placeholder": "*",
     "slate-schema": "*"
   },
   "devDependencies": {
