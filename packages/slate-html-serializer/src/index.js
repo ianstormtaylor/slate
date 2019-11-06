@@ -1,8 +1,8 @@
 import React from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import typeOf from 'type-of'
-import { Node, Value } from 'slate'
-import { Record } from 'immutable'
+import { Node, Value, Annotation, Point, PathUtils } from 'slate'
+import { List, Map, Record } from 'immutable'
 
 /**
  * String.
@@ -102,6 +102,8 @@ class Html {
     this.rules = [...rules, TEXT_RULE]
     this.defaultBlock = defaultBlock
     this.parseHtml = parseHtml
+    this.annotations = Map()
+    this.nodeToAnnotationsMap = Map()
   }
 
   /**
@@ -171,8 +173,100 @@ class Html {
       },
     }
 
+    this.annotations = this.updateAnnotationPaths(
+      nodes,
+      List(),
+      this.annotations
+    )
+
+    if (!this.annotations.isEmpty()) {
+      json.annotations = this.annotations.toJSON()
+    }
+
+    this.annotations = this.annotations.clear()
+    this.nodeToAnnotationsMap = this.nodeToAnnotationsMap.clear()
+
     const ret = toJSON ? json : Value.fromJSON(json)
     return ret
+  }
+
+  /**
+   * Updates annotations found during deserialization to point to
+   * paths in the document.
+   *
+   * @param {List} nodes
+   * @param {List} path
+   * @param {Object} annotations
+   * @return {Object}
+   */
+
+  updateAnnotationPaths(nodes, path, annotations) {
+    nodes.forEach((node, index) => {
+      const newPath = path.concat(index)
+      const annotationKeys = this.nodeToAnnotationsMap.get(node)
+
+      if (annotationKeys) {
+        annotationKeys.forEach(key => {
+          annotations = annotations.set(
+            key,
+            this.expandAnnotationRange(
+              annotations.get(key),
+              newPath,
+              node.text.length
+            )
+          )
+        })
+      }
+
+      if (node.nodes) {
+        annotations = this.updateAnnotationPaths(
+          node.nodes,
+          newPath,
+          annotations
+        )
+      }
+    })
+
+    return annotations
+  }
+
+  /**
+   * Expands an annotation's range to overlap the node at a `path`.
+   *
+   * @param {Object} annotation
+   * @param {List} path
+   * @param {Number} length
+   * @return {Object}
+   */
+
+  expandAnnotationRange(annotation, path, length) {
+    if (
+      !annotation.anchor.path ||
+      PathUtils.compare(path, annotation.anchor.path) < 0
+    ) {
+      annotation = annotation.setAnchor(
+        Point.create({
+          path,
+          offset: 0,
+        })
+      )
+    }
+
+    if (
+      !annotation.focus.path ||
+      PathUtils.compare(path, annotation.focus.path) > 0 ||
+      (PathUtils.compare(path, annotation.focus.path) === 0 &&
+        length > annotation.focus.offset)
+    ) {
+      annotation = annotation.setFocus(
+        Point.create({
+          path,
+          offset: length,
+        })
+      )
+    }
+
+    return annotation
   }
 
   /**
@@ -257,6 +351,8 @@ class Html {
         return null
       } else if (ret.object === 'mark') {
         node = this.deserializeMark(ret)
+      } else if (ret.object === 'annotation') {
+        node = this.deserializeAnnotation(ret)
       } else {
         node = ret
       }
@@ -308,6 +404,47 @@ class Html {
   }
 
   /**
+   * Deserialize an `annotation` object.
+   *
+   * @param {Object} annotation
+   * @return {Array}
+   */
+
+  deserializeAnnotation = annotation => {
+    const addAnnotation = node => {
+      if (node.object === 'annotation') {
+        const ret = this.deserializeAnnotation(node)
+        return ret
+      } else if (node.object === 'text') {
+        if (!this.annotations.get(annotation.key)) {
+          delete annotation.nodes
+
+          this.annotations = this.annotations.set(
+            annotation.key,
+            Annotation.create(annotation)
+          )
+        }
+
+        this.nodeToAnnotationsMap = this.nodeToAnnotationsMap.set(
+          node,
+          (this.nodeToAnnotationsMap.get(node) || List()).concat(annotation.key)
+        )
+      } else if (node.nodes) {
+        node.nodes = node.nodes.map(addAnnotation)
+      }
+
+      return node
+    }
+
+    return annotation.nodes.reduce((nodes, node) => {
+      const ret = addAnnotation(node)
+      if (Array.isArray(ret)) return nodes.concat(ret)
+      nodes.push(ret)
+      return nodes
+    }, [])
+  }
+
+  /**
    * Serialize a `value` object into an HTML string.
    *
    * @param {Value} value
@@ -317,8 +454,16 @@ class Html {
    */
 
   serialize = (value, options = {}) => {
-    const { document } = value
-    const elements = document.nodes.map(this.serializeNode).filter(el => el)
+    const { document, annotations } = value
+    const elements = document.nodes
+      .map((n, index) => {
+        const nodeAnnotations = annotations
+          .map(a => a.relativeToChild(document, index))
+          .filter(a => a)
+
+        return this.serializeNode(n, nodeAnnotations)
+      })
+      .filter(el => el)
     if (options.render === false) return elements
 
     const html = renderToStaticMarkup(<body>{elements}</body>)
@@ -333,26 +478,19 @@ class Html {
    * @return {String}
    */
 
-  serializeNode = node => {
+  serializeNode = (node, annotations) => {
     if (node.object === 'text') {
-      const string = new String({ text: node.text })
-      const text = this.serializeString(string)
-
-      return node.marks.reduce((children, mark) => {
-        for (const rule of this.rules) {
-          if (!rule.serialize) continue
-          const ret = rule.serialize(mark, children)
-          if (ret === null) return
-          if (ret) return addKey(ret)
-        }
-
-        throw new Error(
-          `No serializer defined for mark of type "${mark.type}".`
-        )
-      }, text)
+      const leaves = node.getLeaves(annotations, [])
+      return leaves.map(leaf => this.serializeLeaf(leaf))
     }
 
-    const children = node.nodes.map(this.serializeNode)
+    const children = node.nodes.reduce((acc, child, index) => {
+      const nodeAnnotations = annotations
+        .map(a => a.relativeToChild(node, index))
+        .filter(a => a)
+
+      return acc.concat(this.serializeNode(child, nodeAnnotations))
+    }, [])
 
     for (const rule of this.rules) {
       if (!rule.serialize) continue
@@ -362,6 +500,24 @@ class Html {
     }
 
     throw new Error(`No serializer defined for node of type "${node.type}".`)
+  }
+
+  serializeLeaf = leaf => {
+    const string = new String({ text: leaf.text })
+    const text = this.serializeString(string)
+
+    return leaf.annotations.concat(leaf.marks).reduce((children, mark) => {
+      for (const rule of this.rules) {
+        if (!rule.serialize) continue
+        const ret = rule.serialize(mark, children)
+        if (ret === null) return
+        if (ret) return addKey(ret)
+      }
+
+      throw new Error(
+        `No serializer defined for ${mark.object} of type "${mark.type}".`
+      )
+    }, text)
   }
 
   /**

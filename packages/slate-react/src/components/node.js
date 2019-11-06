@@ -4,7 +4,6 @@ import React from 'react'
 import SlateTypes from 'slate-prop-types'
 import warning from 'tiny-warning'
 import Types from 'prop-types'
-import { PathUtils } from 'slate'
 
 import Void from './void'
 import Text from './text'
@@ -174,15 +173,15 @@ class Node extends React.Component {
     const newDecorations = node.getDecorations(editor)
     const children = node.nodes.toArray().map((child, i) => {
       const Component = child.object === 'text' ? Text : Node
-      const sel = selection && getRelativeRange(node, i, selection)
+      const sel = selection && selection.relativeToChild(node, i)
 
       const decs = newDecorations
         .concat(decorations)
-        .map(d => getRelativeRange(node, i, d))
+        .map(d => d.relativeToChild(node, i))
         .filter(d => d)
 
       const anns = annotations
-        .map(a => getRelativeRange(node, i, a))
+        .map(a => a.relativeToChild(node, i))
         .filter(a => a)
 
       return (
@@ -262,64 +261,6 @@ class Node extends React.Component {
       element
     )
   }
-}
-
-/**
- * Return a `range` relative to a child at `index`.
- *
- * @param {Range} range
- * @param {Number} index
- * @return {Range}
- */
-
-function getRelativeRange(node, index, range) {
-  if (range.isUnset) {
-    return null
-  }
-
-  const child = node.nodes.get(index)
-  let { start, end } = range
-  const { path: startPath } = start
-  const { path: endPath } = end
-  const startIndex = startPath.first()
-  const endIndex = endPath.first()
-
-  if (startIndex === index) {
-    start = start.setPath(startPath.rest())
-  } else if (startIndex < index && index <= endIndex) {
-    if (child.object === 'text') {
-      start = start.moveTo(PathUtils.create([index]), 0).setKey(child.key)
-    } else {
-      const [first] = child.texts()
-      const [firstNode, firstPath] = first
-      start = start.moveTo(firstPath, 0).setKey(firstNode.key)
-    }
-  } else {
-    start = null
-  }
-
-  if (endIndex === index) {
-    end = end.setPath(endPath.rest())
-  } else if (startIndex <= index && index < endIndex) {
-    if (child.object === 'text') {
-      const length = child.text.length
-      end = end.moveTo(PathUtils.create([index]), length).setKey(child.key)
-    } else {
-      const [last] = child.texts({ direction: 'backward' })
-      const [lastNode, lastPath] = last
-      end = end.moveTo(lastPath, lastNode.text.length).setKey(lastNode.key)
-    }
-  } else {
-    end = null
-  }
-
-  if (!start || !end) {
-    return null
-  }
-
-  range = range.setAnchor(start)
-  range = range.setFocus(end)
-  return range
 }
 
 /**

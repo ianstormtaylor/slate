@@ -7,6 +7,9 @@ import { createHyperscript } from 'slate-hyperscript'
  */
 
 const h = createHyperscript({
+  annotations: {
+    highlight: 'highlight',
+  },
   blocks: {
     line: 'line',
     paragraph: 'paragraph',
