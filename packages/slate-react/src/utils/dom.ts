@@ -1,5 +1,3 @@
-import { IS_IE } from './environment'
-
 /**
  * Types.
  */
@@ -123,20 +121,4 @@ export const getEditableChild = (
   }
 
   return child
-}
-
-/**
- * Cross-browser remove all ranges from a `domSelection`.
- */
-
-export const removeAllRanges = (domSelection: NativeSelection) => {
-  // COMPAT: In IE 11, if the selection contains nested tables, then
-  // `removeAllRanges` will throw an error.
-  if (IS_IE) {
-    const range = (window.document.body as any).createTextRange()
-    range.collapse()
-    range.select()
-  } else {
-    domSelection.removeAllRanges()
-  }
 }

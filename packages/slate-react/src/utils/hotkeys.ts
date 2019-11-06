@@ -1,5 +1,5 @@
 import { isKeyHotkey } from 'is-hotkey'
-import { IS_IOS, IS_MAC } from './environment'
+import { IS_APPLE } from './environment'
 
 /**
  * Hotkey mappings for each platform.
@@ -57,8 +57,8 @@ const create = (key: string) => {
   const isWindows = windows && isKeyHotkey(windows)
   return (event: KeyboardEvent) => {
     if (isGeneric && isGeneric(event)) return true
-    if ((IS_IOS || IS_MAC) && isApple && isApple(event)) return true
-    if (!IS_IOS && !IS_MAC && isWindows && isWindows(event)) return true
+    if (IS_APPLE && isApple && isApple(event)) return true
+    if (!IS_APPLE && isWindows && isWindows(event)) return true
     return false
   }
 }

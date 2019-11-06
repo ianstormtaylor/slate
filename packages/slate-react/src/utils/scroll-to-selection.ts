@@ -1,6 +1,6 @@
 import isBackward from 'selection-is-backward'
 
-import { IS_SAFARI, IS_IOS } from './environment'
+import { IS_IOS } from './environment'
 import { NativeSelection } from './dom'
 
 const OVERFLOWS = ['auto', 'overlay', 'scroll']

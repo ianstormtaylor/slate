@@ -4,7 +4,7 @@ import Hotkeys from '../utils/hotkeys'
 import { IS_FOCUSED } from '../utils/weak-maps'
 import { ReactEditor } from '.'
 import { Utils } from '../utils/utils'
-import { removeAllRanges, NativeStaticRange } from '../utils/dom'
+import { NativeStaticRange } from '../utils/dom'
 
 export default class ReactEditorCommands {
   /**
@@ -42,7 +42,7 @@ export default class ReactEditorCommands {
     const domSelection = window.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
-      removeAllRanges(domSelection)
+      domSelection.removeAllRanges()
     }
 
     if (selection) {
