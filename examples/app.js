@@ -26,7 +26,7 @@ import Images from './images'
 import PlainText from './plain-text'
 // import Plugins from './plugins'
 // import RTL from './rtl'
-// import ReadOnly from './read-only'
+import ReadOnly from './read-only'
 import RichText from './rich-text'
 // import SearchHighlighting from './search-highlighting'
 // import Composition from './composition'
@@ -62,7 +62,7 @@ const EXAMPLES = [
   // ['Placeholders', Placeholder, '/placeholder'],
   ['Plain Text', PlainText, '/plain-text'],
   // ['Plugins', Plugins, '/plugins'],
-  // ['Read-only', ReadOnly, '/read-only'],
+  ['Read-only', ReadOnly, '/read-only'],
   ['Rich Text', RichText, '/rich-text'],
   // ['RTL', RTL, '/rtl'],
   // ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
