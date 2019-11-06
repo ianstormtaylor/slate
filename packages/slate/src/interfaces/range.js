@@ -572,6 +572,62 @@ class RangeInterface {
   }
 
   /**
+   * Return a `range` relative to the child of `node` at `index`.
+   *
+   * @param {Node} node
+   * @param {Number} index
+   * @return {Range}
+   */
+
+  relativeToChild(node, index) {
+    if (this.isUnset) {
+      return null
+    }
+
+    const child = node.nodes.get(index)
+    let { start, end } = this
+    const { path: startPath } = start
+    const { path: endPath } = end
+    const startIndex = startPath.first()
+    const endIndex = endPath.first()
+
+    if (startIndex === index) {
+      start = start.setPath(startPath.rest())
+    } else if (startIndex < index && index <= endIndex) {
+      if (child.object === 'text') {
+        start = start.moveTo(PathUtils.create([index]), 0).setKey(child.key)
+      } else {
+        const [first] = child.texts()
+        const [firstNode, firstPath] = first
+        start = start.moveTo(firstPath, 0).setKey(firstNode.key)
+      }
+    } else {
+      start = null
+    }
+
+    if (endIndex === index) {
+      end = end.setPath(endPath.rest())
+    } else if (startIndex <= index && index < endIndex) {
+      if (child.object === 'text') {
+        const length = child.text.length
+        end = end.moveTo(PathUtils.create([index]), length).setKey(child.key)
+      } else {
+        const [last] = child.texts({ direction: 'backward' })
+        const [lastNode, lastPath] = last
+        end = end.moveTo(lastPath, lastNode.text.length).setKey(lastNode.key)
+      }
+    } else {
+      end = null
+    }
+
+    if (!start || !end) {
+      return null
+    }
+
+    return this.setAnchor(start).setFocus(end)
+  }
+
+  /**
    * Set the start point to a new `point`.
    *
    * @param {Point} point
