@@ -31,7 +31,6 @@
     "slate": ">=0.47.0"
   },
   "devDependencies": {
-    "mocha": "^2.5.3",
     "react-test-renderer": "^16.6.3",
     "slate": "^0.47.8",
     "slate-hyperscript": "^0.13.8"
