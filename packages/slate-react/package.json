@@ -19,13 +19,9 @@
     "@types/lodash": "^4.14.144",
     "@types/react": "^16.9.11",
     "direction": "^1.0.3",
-    "get-window": "^1.1.1",
     "is-hotkey": "0.1.4",
     "selection-is-backward": "^1.0.0",
-    "slate-parse-plaintext": "^0.7.10",
-    "slate-prop-types": "^0.5.41",
     "slate-react-placeholder": "^0.2.8",
-    "slate-render-plaintext": "^0.7.10",
     "tiny-invariant": "^1.0.6",
     "tiny-warning": "^1.0.3"
   },
@@ -39,9 +35,6 @@
     "react-test-renderer": "^16.6.3",
     "slate": "^0.47.8",
     "slate-hyperscript": "^0.13.8"
-  },
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "react": "React",

@@ -13,7 +13,7 @@ import {
 } from './custom'
 
 /**
- * Children of ancestor nodes.
+ * Children.
  */
 
 const Children = (props: {
