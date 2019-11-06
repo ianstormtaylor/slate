@@ -6,7 +6,6 @@ import {
   Value as SlateValue,
 } from 'slate'
 
-import { TYPES } from '../utils/constants'
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -14,8 +13,6 @@ import {
 } from '../utils/weak-maps'
 import { IS_FIREFOX } from '../utils/environment'
 import { ReactEditor } from '.'
-import { SyntheticEvent } from 'react'
-import { isSyntheticEvent } from '../utils/react'
 import {
   NativeElement,
   NativePoint,
@@ -376,40 +373,4 @@ export default class ReactEditorDomHelpers {
 
     return { anchor, focus }
   }
-}
-
-/**
- * Get a value from a `DataTransfer` keyed by type.
- */
-
-const getType = (transfer: DataTransfer, type: string): string | null => {
-  // COMPAT: In IE 11, there is no `types` field but `getData('Text')`
-  // is supported`. (2017/06/23)
-  if (!transfer.types || !transfer.types.length) {
-    return type === TYPES.TEXT ? transfer.getData('Text') || null : null
-  }
-
-  // COMPAT: In Edge, transfer.types doesn't respond to `indexOf`. (2017/10/25)
-  const types = Array.from(transfer.types)
-  return types.indexOf(type) !== -1 ? transfer.getData(type) || null : null
-}
-
-/**
- * Get the `DataTransfer` object from an event.
- */
-
-export const getDataTransfer = (
-  event: Event | SyntheticEvent
-): DataTransfer | null => {
-  if (isSyntheticEvent(event)) {
-    event = event.nativeEvent
-  }
-
-  if (event instanceof DragEvent) {
-    return event.dataTransfer
-  } else if (event instanceof ClipboardEvent) {
-    return event.clipboardData
-  }
-
-  return null
 }

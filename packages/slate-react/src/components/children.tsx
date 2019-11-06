@@ -5,6 +5,12 @@ import ElementComponent from './element'
 import TextComponent from './text'
 import { useEditor } from '../hooks/use-editor'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import {
+  CustomAnnotationProps,
+  CustomDecorationProps,
+  CustomElementProps,
+  CustomMarkProps,
+} from './custom'
 
 /**
  * Children of ancestor nodes.
@@ -15,9 +21,23 @@ const Children = (props: {
   block: Element | null
   decorations: Range[]
   node: Ancestor
+  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
+  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+  renderElement?: (props: CustomElementProps) => JSX.Element
+  renderMark?: (props: CustomMarkProps) => JSX.Element
   selection: Range | null
 }) => {
-  const { annotations, block, decorations, node, selection } = props
+  const {
+    annotations,
+    block,
+    decorations,
+    node,
+    renderAnnotation,
+    renderDecoration,
+    renderElement,
+    renderMark,
+    selection,
+  } = props
   const editor = useEditor()
   const newDecorations = editor.getDecorations(node)
   const path = editor.findPath(node)
@@ -53,7 +73,11 @@ const Children = (props: {
           annotations={anns}
           block={editor.isInline(node) ? block : node}
           decorations={decs}
-          node={n}
+          element={n}
+          renderAnnotation={renderAnnotation}
+          renderDecoration={renderDecoration}
+          renderElement={renderElement}
+          renderMark={renderMark}
           selection={sel}
         />
       )
@@ -65,6 +89,9 @@ const Children = (props: {
           decorations={decs}
           node={n}
           parent={node}
+          renderAnnotation={renderAnnotation}
+          renderDecoration={renderDecoration}
+          renderMark={renderMark}
         />
       )
     }

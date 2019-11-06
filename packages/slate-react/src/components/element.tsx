@@ -13,6 +13,13 @@ import {
   NODE_TO_PARENT,
   NODE_TO_INDEX,
 } from '../utils/weak-maps'
+import {
+  CustomAnnotationProps,
+  CustomDecorationProps,
+  CustomElement,
+  CustomElementProps,
+  CustomMarkProps,
+} from './custom'
 
 /**
  * Element.
@@ -22,23 +29,40 @@ const Element = (props: {
   annotations: Range[]
   block: SlateElement | null
   decorations: Range[]
-  node: SlateElement
+  element: SlateElement
   path?: Path
+  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
+  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+  renderElement?: (props: CustomElementProps) => JSX.Element
+  renderMark?: (props: CustomMarkProps) => JSX.Element
   selection: Range | null
 }) => {
-  const { annotations, block, decorations, node, selection } = props
+  const {
+    annotations,
+    block,
+    decorations,
+    element,
+    renderAnnotation,
+    renderDecoration,
+    renderElement = (props: CustomElementProps) => <CustomElement {...props} />,
+    renderMark,
+    selection,
+  } = props
   const ref = useRef<HTMLElement>(null)
   const editor = useEditor()
   const readOnly = useReadOnly()
-  const isVoid = editor.isVoid(node)
-  const isInline = editor.isInline(node)
+  const isInline = editor.isInline(element)
 
   let children: JSX.Element | null = (
     <Children
       annotations={annotations}
       block={block}
       decorations={decorations}
-      node={node}
+      node={element}
+      renderAnnotation={renderAnnotation}
+      renderDecoration={renderDecoration}
+      renderElement={renderElement}
+      renderMark={renderMark}
       selection={selection}
     />
   )
@@ -58,8 +82,8 @@ const Element = (props: {
 
   // If it's a block node with inline children, add the proper `dir` attribute
   // for text direction.
-  if (!isInline && editor.hasInlines(node)) {
-    const text = Node.text(node)
+  if (!isInline && editor.hasInlines(element)) {
+    const text = Node.text(element)
     const dir = getDirection(text)
 
     if (dir === 'rtl') {
@@ -68,15 +92,15 @@ const Element = (props: {
   }
 
   // If it's a void node, wrap the children in extra void-specific elements.
-  if (isVoid) {
+  if (editor.isVoid(element)) {
     attributes['data-slate-void'] = true
 
     if (!readOnly && isInline) {
       attributes['contentEditable'] = false
     }
 
-    const Tag = editor.isInline(node) ? 'span' : 'div'
-    const [[text]] = Node.texts(node)
+    const Tag = isInline ? 'span' : 'div'
+    const [[text]] = Node.texts(element)
     children = readOnly ? null : (
       <Tag
         data-slate-spacer
@@ -89,37 +113,31 @@ const Element = (props: {
       >
         <Text
           annotations={[]}
-          block={!isInline ? node : block}
+          block={!isInline ? element : block}
           decorations={[]}
           node={text}
-          parent={node}
+          parent={element}
         />
       </Tag>
     )
 
     NODE_TO_INDEX.set(text, 0)
-    NODE_TO_PARENT.set(text, node)
+    NODE_TO_PARENT.set(text, element)
   }
 
   // Update element-related weak maps with the DOM element ref.
   useEffect(() => {
     if (ref.current) {
-      NODE_TO_ELEMENT.set(node, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, node)
+      NODE_TO_ELEMENT.set(element, ref.current)
+      ELEMENT_TO_NODE.set(ref.current, element)
     } else {
-      NODE_TO_ELEMENT.delete(node)
+      NODE_TO_ELEMENT.delete(element)
     }
-  })
-
-  const child = editor.renderElement({
-    attributes,
-    children,
-    element: node,
   })
 
   return (
     <SelectedContext.Provider value={!!selection}>
-      {child}
+      {renderElement({ attributes, children, element })}
     </SelectedContext.Provider>
   )
 }

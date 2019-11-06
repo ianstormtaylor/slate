@@ -3,6 +3,11 @@ import { Range, Element, Mark, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { NODE_TO_ELEMENT, ELEMENT_TO_NODE } from '../utils/weak-maps'
+import {
+  CustomAnnotationProps,
+  CustomDecorationProps,
+  CustomMarkProps,
+} from './custom'
 
 /**
  * Text.
@@ -14,9 +19,22 @@ const Text = (props: {
   decorations: Range[]
   node: SlateText
   parent: Element
+  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
+  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+  renderMark?: (props: CustomMarkProps) => JSX.Element
   style?: Record<string, any>
 }) => {
-  const { annotations, block, decorations, node, parent, ...rest } = props
+  const {
+    annotations,
+    block,
+    decorations,
+    node,
+    parent,
+    renderAnnotation,
+    renderDecoration,
+    renderMark,
+    ...rest
+  } = props
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = getLeaves(node, annotations, decorations)
   const children = []
@@ -35,6 +53,9 @@ const Text = (props: {
         marks={leaf.marks}
         node={node}
         parent={parent}
+        renderAnnotation={renderAnnotation}
+        renderDecoration={renderDecoration}
+        renderMark={renderMark}
         text={text}
       />
     )

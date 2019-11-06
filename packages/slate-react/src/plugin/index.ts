@@ -2,7 +2,6 @@ import { EditorConstructor, Editor as CoreEditor } from 'slate'
 
 import ReactEditorCommands from './commands'
 import ReactEditorQueries from './queries'
-import ReactEditorRendering from './rendering'
 import ReactEditorDomHelpers from './dom-helpers'
 
 /**
@@ -17,8 +16,7 @@ export const withReact = (
   interface E
     extends ReactEditorCommands,
       ReactEditorDomHelpers,
-      ReactEditorQueries,
-      ReactEditorRendering {}
+      ReactEditorQueries {}
 
   const mixin = (Mixins: Array<new () => any>) => {
     for (const Mixin of Mixins) {
@@ -30,12 +28,7 @@ export const withReact = (
     }
   }
 
-  mixin([
-    ReactEditorCommands,
-    ReactEditorDomHelpers,
-    ReactEditorQueries,
-    ReactEditorRendering,
-  ])
+  mixin([ReactEditorCommands, ReactEditorDomHelpers, ReactEditorQueries])
 
   return E
 }
@@ -48,5 +41,4 @@ export interface ReactEditor
   extends CoreEditor,
     ReactEditorCommands,
     ReactEditorDomHelpers,
-    ReactEditorQueries,
-    ReactEditorRendering {}
+    ReactEditorQueries {}

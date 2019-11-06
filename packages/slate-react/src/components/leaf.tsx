@@ -1,7 +1,14 @@
 import React from 'react'
 import { Mark, Range, Text, Element } from 'slate'
-import { useEditor } from '../hooks/use-editor'
 import String from './string'
+import {
+  CustomAnnotation,
+  CustomAnnotationProps,
+  CustomDecoration,
+  CustomDecorationProps,
+  CustomMark,
+  CustomMarkProps,
+} from './custom'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -16,9 +23,11 @@ const Leaf = (props: {
   marks: Mark[]
   node: Text
   parent: Element
+  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
+  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+  renderMark?: (props: CustomMarkProps) => JSX.Element
   text: string
 }) => {
-  const editor = useEditor()
   const {
     annotations,
     block,
@@ -28,6 +37,13 @@ const Leaf = (props: {
     marks,
     node,
     parent,
+    renderAnnotation = (props: CustomAnnotationProps) => (
+      <CustomAnnotation {...props} />
+    ),
+    renderDecoration = (props: CustomDecorationProps) => (
+      <CustomDecoration {...props} />
+    ),
+    renderMark = (props: CustomMarkProps) => <CustomMark {...props} />,
     text,
   } = props
 
@@ -54,7 +70,7 @@ const Leaf = (props: {
   // in certain misbehaving browsers they aren't weirdly cloned/destroyed by
   // contenteditable behaviors. (2019/05/08)
   for (const mark of marks) {
-    const ret = editor.renderMark({
+    const ret = renderMark({
       ...renderProps,
       mark,
       children,
@@ -69,7 +85,7 @@ const Leaf = (props: {
   }
 
   for (const decoration of decorations) {
-    const ret = editor.renderDecoration({
+    const ret = renderDecoration({
       ...renderProps,
       decoration,
       children,
@@ -84,7 +100,7 @@ const Leaf = (props: {
   }
 
   for (const annotation of annotations) {
-    const ret = editor.renderAnnotation({
+    const ret = renderAnnotation({
       ...renderProps,
       annotation,
       children,

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editor as BaseEditor } from 'slate'
 import { Editor, withReact, useSlate } from 'slate-react'
@@ -10,35 +10,6 @@ import { Button, Icon, Toolbar } from '../components'
 // Define our custom editor class with example-specific logic. Note the two
 // mixins used to add React-specific behaviors and a history stack.
 class ExampleEditor extends withHistory(withReact(BaseEditor)) {
-  // Listen for certain hotkeys, and toggle marks if they are pressed.
-  onKeyDown(event) {
-    let type
-
-    if (isHotkey('mod+b', event)) {
-      type = 'bold'
-    } else if (isHotkey('mod+i', event)) {
-      type = 'italic'
-    } else if (isHotkey('mod+u', event)) {
-      type = 'underlined'
-    } else if (isHotkey('mod+`', event)) {
-      type = 'code'
-    } else {
-      return super.onKeyDown(event)
-    }
-
-    console.log('onKeyDown: PREVENT DEFAULT!')
-    event.preventDefault()
-    this.toggleMarks([{ type }])
-  }
-
-  renderElement(props) {
-    return <Element {...props} />
-  }
-
-  renderMark(props) {
-    return <Mark {...props} />
-  }
-
   // Check if a specific mark is "active" in the rich-text sense.
   isMarkActive(type) {
     const marks = this.getActiveMarks()
@@ -61,21 +32,25 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     return false
   }
 
-  onBeforeInput(event) {
-    switch (event.inputType) {
-      case 'formatBold':
-        this.toggleMarks([{ type: 'bold' }])
-        break
-      case 'formatItalic':
-        this.toggleMarks([{ type: 'italic' }])
-        break
-      case 'formatUnderline':
-        this.toggleMarks([{ type: 'underline' }])
-        break
-      default:
-        super.onBeforeInput(event)
-        break
+  // Listen for certain hotkeys, and toggle marks if they are pressed.
+  onKeyDown(event) {
+    let type
+
+    if (isHotkey('mod+b', event)) {
+      type = 'bold'
+    } else if (isHotkey('mod+i', event)) {
+      type = 'italic'
+    } else if (isHotkey('mod+u', event)) {
+      type = 'underlined'
+    } else if (isHotkey('mod+`', event)) {
+      type = 'code'
+    } else {
+      return super.onKeyDown(event)
     }
+
+    console.log('onKeyDown: PREVENT DEFAULT!')
+    event.preventDefault()
+    this.toggleMarks([{ type }])
   }
 
   // Toggle the block type on or off depending on whether it's already active.
@@ -129,10 +104,9 @@ const Example = () => {
         autoFocus
         editor={editor}
         value={value}
-        onChange={change => {
-          // When the editor's value changes, update our state.
-          setValue(change.value)
-        }}
+        renderElement={props => <Element {...props} />}
+        renderMark={props => <Mark {...props} />}
+        onChange={change => setValue(change.value)}
       />
     </div>
   )

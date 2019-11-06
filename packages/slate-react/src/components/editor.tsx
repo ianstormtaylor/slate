@@ -24,6 +24,12 @@ import {
   IS_FOCUSED,
 } from '../utils/weak-maps'
 import { Utils } from '../utils/utils'
+import {
+  CustomAnnotationProps,
+  CustomDecorationProps,
+  CustomElementProps,
+  CustomMarkProps,
+} from './custom'
 
 /**
  * Editor.
@@ -35,6 +41,10 @@ const Editor = (props: {
   readOnly?: boolean
   role?: string
   style?: Record<string, any>
+  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
+  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+  renderElement?: (props: CustomElementProps) => JSX.Element
+  renderMark?: (props: CustomMarkProps) => JSX.Element
   value: Value
   [key: string]: any
 }) => {
@@ -43,6 +53,10 @@ const Editor = (props: {
     value,
     onChange = () => {},
     readOnly = false,
+    renderAnnotation,
+    renderDecoration,
+    renderElement,
+    renderMark,
     role = 'textbox',
     style = {},
     ...attributes
@@ -250,16 +264,14 @@ const Editor = (props: {
             // COMPAT: The Grammarly Chrome extension works by changing the DOM
             // out from under `contenteditable` elements, which leads to weird
             // behaviors so we have to disable it like editor. (2017/04/24)
-            // data-gramm={false}
-            // role={readOnly ? undefined : props.role || 'textbox'}
-            // Mix in any extra attributes straight onto the DOM element.
-            // {...attributes}
+            data-gramm={false}
+            role={readOnly ? undefined : props.role || 'textbox'}
+            {...attributes}
             data-slate-editor
             data-slate-node="value"
             contentEditable={readOnly ? undefined : true}
             suppressContentEditableWarning
             ref={ref}
-            // Default styles required for proper contenteditable behavior.
             style={{
               // Prevent the default outline styles.
               outline: 'none',
@@ -429,6 +441,10 @@ const Editor = (props: {
               block={null}
               decorations={[]}
               node={value}
+              renderAnnotation={renderAnnotation}
+              renderDecoration={renderDecoration}
+              renderElement={renderElement}
+              renderMark={renderMark}
               selection={value.selection}
             />
           </div>
