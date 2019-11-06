@@ -26,6 +26,7 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
       return super.onKeyDown(event)
     }
 
+    console.log('onKeyDown: PREVENT DEFAULT!')
     event.preventDefault()
     this.toggleMarks([{ type }])
   }
@@ -58,6 +59,23 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     }
 
     return false
+  }
+
+  onBeforeInput(event) {
+    switch (event.inputType) {
+      case 'formatBold':
+        this.toggleMarks([{ type: 'bold' }])
+        break
+      case 'formatItalic':
+        this.toggleMarks([{ type: 'italic' }])
+        break
+      case 'formatUnderline':
+        this.toggleMarks([{ type: 'underline' }])
+        break
+      default:
+        super.onBeforeInput(event)
+        break
+    }
   }
 
   // Toggle the block type on or off depending on whether it's already active.

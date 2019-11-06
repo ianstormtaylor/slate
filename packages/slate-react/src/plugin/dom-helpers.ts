@@ -3,7 +3,6 @@ import {
   Node as SlateNode,
   Point as SlatePoint,
   Range as SlateRange,
-  Fragment as SlateFragment,
   Value as SlateValue,
 } from 'slate'
 
@@ -26,7 +25,6 @@ import {
   isNativeElement,
   NativeNode,
   normalizeNodeAndOffset,
-  NativeText,
 } from '../utils/dom'
 
 export default class ReactEditorDomHelpers {

@@ -1,6 +1,5 @@
 import { isKeyHotkey } from 'is-hotkey'
 import { IS_IOS, IS_MAC } from './environment'
-import { KeyboardEvent as ReactKeyboardEvent } from 'react'
 
 /**
  * Hotkey mappings for each platform.
@@ -56,12 +55,10 @@ const create = (key: string) => {
   const isGeneric = generic && isKeyHotkey(generic)
   const isApple = apple && isKeyHotkey(apple)
   const isWindows = windows && isKeyHotkey(windows)
-
-  return (event: ReactKeyboardEvent) => {
-    const e = event.nativeEvent
-    if (isGeneric && isGeneric(e)) return true
-    if ((IS_IOS || IS_MAC) && isApple && isApple(e)) return true
-    if (!IS_IOS && !IS_MAC && isWindows && isWindows(e)) return true
+  return (event: KeyboardEvent) => {
+    if (isGeneric && isGeneric(event)) return true
+    if ((IS_IOS || IS_MAC) && isApple && isApple(event)) return true
+    if (!IS_IOS && !IS_MAC && isWindows && isWindows(event)) return true
     return false
   }
 }

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Editor as BaseEditor } from 'slate'
+import { Editor as BaseEditor, Path } from 'slate'
 import {
   Editor,
   withReact,
@@ -19,14 +19,14 @@ import { Button, Icon, Toolbar } from '../components'
 const schema = {
   value: {
     validate: {
-      last: { type: 'paragraph' },
+      last: {
+        properties: { type: 'paragraph' },
+      },
     },
     normalize: (editor, { code, path }) => {
-      switch (code) {
-        case 'last_child_type_invalid': {
-          const paragraph = { type: 'paragraph', nodes: [] }
-          return editor.insertNodes(paragraph, { at: path })
-        }
+      if (code === 'last_child_property_invalid') {
+        const paragraph = { type: 'paragraph', nodes: [] }
+        editor.insertNodes(paragraph, { at: Path.next(path) })
       }
     },
   },
@@ -43,36 +43,34 @@ class ExampleEditor extends withSchema(
   withHistory(withReact(BaseEditor)),
   schema
 ) {
-  insertDataTransfer(dataTransfer) {
-    if (dataTransfer.files && dataTransfer.files.length > 0) {
-      for (const file of Array.from(dataTransfer.files)) {
+  // Override the `insertData` method to handle inserting image files or URLs.
+  insertData(data) {
+    const text = data.getData('text/plain')
+    const { files } = data
+
+    if (files && files.length > 0) {
+      for (const file of files) {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
-        if (mime !== 'image') continue
 
-        reader.addEventListener('load', () => {
-          this.insertImage(reader.result)
-        })
+        if (mime === 'image') {
+          reader.addEventListener('load', () => {
+            this.insertImage(reader.result)
+          })
 
-        reader.readAsDataURL(file)
+          reader.readAsDataURL(file)
+        }
       }
-
-      return
-    }
-
-    const text = dataTransfer.getData('text/plain')
-
-    if (text && isUrl(text) && isImageUrl(text)) {
+    } else if (isImageUrl(text)) {
       this.insertImage(text)
-      return
+    } else {
+      super.insertData(data)
     }
-
-    return super.insertDataTransfer(dataTransfer)
   }
 
-  insertImage(src) {
+  insertImage(url) {
     const text = { text: '', marks: [] }
-    const image = { type: 'image', src, nodes: [text] }
+    const image = { type: 'image', url, nodes: [text] }
     this.insertNodes(image)
   }
 
@@ -90,9 +88,9 @@ const Example = () => {
         <Button
           onMouseDown={event => {
             event.preventDefault()
-            const src = window.prompt('Enter the URL of the image:')
-            if (!src) return
-            editor.insertImage(src)
+            const url = window.prompt('Enter the URL of the image:')
+            if (!url) return
+            editor.insertImage(url)
           }}
         >
           <Icon>image</Icon>
@@ -125,12 +123,12 @@ const ImageElement = ({ attributes, children, element }) => {
     <div {...attributes}>
       <div contentEditable={false}>
         <img
-          src={element.src}
+          src={element.url}
           className={css`
             display: block;
             max-width: 100%;
             max-height: 20em;
-            box-shadow: ${selected && focused ? '0 0 0 2px blue;' : 'none'};
+            box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF;' : 'none'};
           `}
         />
       </div>
@@ -140,6 +138,8 @@ const ImageElement = ({ attributes, children, element }) => {
 }
 
 const isImageUrl = url => {
+  if (!url) return false
+  if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()
   return imageExtensions.includes(ext)
 }
