@@ -102,6 +102,10 @@ class Value extends Record(DEFAULTS) {
       selection = document.createSelection(selection)
     }
 
+    annotations = annotations.map(
+      a => (a.isSet ? a : document.createAnnotation(a))
+    )
+
     const value = new Value({
       annotations,
       data,
