@@ -1,7 +1,7 @@
 import { Fragment, Range, Node } from 'slate'
 
 import { ReactEditor } from '../plugin'
-import { isNativeText, isNativeElement, NativeNode } from './dom'
+import { isDOMText, isDOMElement, DOMNode } from './dom'
 
 namespace Utils {
   /**
@@ -87,7 +87,7 @@ namespace Utils {
     // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
     // in the HTML, and can be used for intra-Slate pasting. If it's a text
     // node, wrap it in a `<span>` so we have something to set an attribute on.
-    if (isNativeText(attach)) {
+    if (isDOMText(attach)) {
       const span = document.createElement('span')
       // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
       // then leading and trailing spaces will be ignored. (2017/09/21)
@@ -116,14 +116,14 @@ namespace Utils {
  * elements which get a newline appended.
  */
 
-const getPlainText = (domNode: NativeNode) => {
+const getPlainText = (domNode: DOMNode) => {
   let text = ''
 
-  if (isNativeText(domNode) && domNode.nodeValue) {
+  if (isDOMText(domNode) && domNode.nodeValue) {
     return domNode.nodeValue
   }
 
-  if (isNativeElement(domNode)) {
+  if (isDOMElement(domNode)) {
     for (const childNode of Array.from(domNode.childNodes)) {
       text += getPlainText(childNode)
     }

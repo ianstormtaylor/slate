@@ -9,12 +9,12 @@ import { IS_FIREFOX } from '../utils/environment'
 import { ReactEditor } from '../plugin'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import {
-  NativeElement,
-  NativeNode,
-  NativeRange,
-  isNativeElement,
-  isNativeNode,
-  NativeStaticRange,
+  DOMElement,
+  DOMNode,
+  DOMRange,
+  isDOMElement,
+  isDOMNode,
+  DOMStaticRange,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -82,7 +82,7 @@ const Editor = (props: {
       compositionCount: 0,
       isComposing: false,
       isUpdatingSelection: false,
-      latestElement: null as NativeElement | null,
+      latestElement: null as DOMElement | null,
     }),
     []
   )
@@ -104,12 +104,12 @@ const Editor = (props: {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useEffect(() => {
-    window.document.addEventListener('selectionchange', onNativeSelectionChange)
+    window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        onNativeSelectionChange
+        onDOMSelectionChange
       )
     }
   }, [])
@@ -158,7 +158,7 @@ const Editor = (props: {
     }
   })
 
-  const setDomSelectionRange = (domRange: NativeRange) => {
+  const setDomSelectionRange = (domRange: DOMRange) => {
     const el = editor.toDomNode(value)
     const domSelection = window.getSelection()
 
@@ -194,7 +194,7 @@ const Editor = (props: {
       event: Event & {
         data: string | null
         dataTransfer: DataTransfer | null
-        getTargetRanges(): NativeStaticRange[]
+        getTargetRanges(): DOMStaticRange[]
         inputType: string
         isComposing: boolean
       }
@@ -233,7 +233,7 @@ const Editor = (props: {
   // needed to account for React's `onSelect` being non-standard and not firing
   // until after a selection has been released. This causes issues in situations
   // where another change happens while a selection is being dragged.
-  const onNativeSelectionChange = useCallback(
+  const onDOMSelectionChange = useCallback(
     debounce(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const el = editor.toDomNode(value)
@@ -306,7 +306,7 @@ const Editor = (props: {
                   // element inside a void node).
                   if (relatedTarget === el) return
 
-                  if (isNativeElement(relatedTarget)) {
+                  if (isDOMElement(relatedTarget)) {
                     // COMPAT: The event should be ignored if the focus is moving from
                     // the editor to inside a void node's spacer element.
                     if (relatedTarget.hasAttribute('data-slate-spacer')) return
@@ -332,7 +332,7 @@ const Editor = (props: {
               if (
                 !readOnly &&
                 hasTarget(editor, event.target) &&
-                isNativeNode(event.target)
+                isDOMNode(event.target)
               ) {
                 const domSelection = window.getSelection()
                 const node = editor.toSlateNode(event.target)
@@ -458,7 +458,7 @@ const Editor = (props: {
  * Check if two DOM range objects are equal.
  */
 
-const isRangeEqual = (a: NativeRange, b: NativeRange) => {
+const isRangeEqual = (a: DOMRange, b: DOMRange) => {
   return (
     (a.startContainer === b.startContainer &&
       a.startOffset === b.startOffset &&
@@ -478,8 +478,8 @@ const isRangeEqual = (a: NativeRange, b: NativeRange) => {
 const hasTarget = (
   editor: ReactEditor,
   target: EventTarget | null
-): target is NativeNode => {
-  return isNativeNode(target) && editor.hasDomNode(target)
+): target is DOMNode => {
+  return isDOMNode(target) && editor.hasDomNode(target)
 }
 
 /**
@@ -489,8 +489,8 @@ const hasTarget = (
 const hasEditableTarget = (
   editor: ReactEditor,
   target: EventTarget | null
-): target is NativeNode => {
-  return isNativeNode(target) && editor.hasDomNode(target, { editable: true })
+): target is DOMNode => {
+  return isDOMNode(target) && editor.hasDomNode(target, { editable: true })
 }
 
 export default Editor

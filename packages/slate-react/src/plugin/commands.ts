@@ -4,7 +4,7 @@ import Hotkeys from '../utils/hotkeys'
 import { IS_FOCUSED } from '../utils/weak-maps'
 import { ReactEditor } from '.'
 import { Utils } from '../utils/utils'
-import { NativeStaticRange } from '../utils/dom'
+import { DOMStaticRange } from '../utils/dom'
 
 export default class ReactEditorCommands {
   /**
@@ -92,7 +92,7 @@ export default class ReactEditorCommands {
     event: Event & {
       data: string | null
       dataTransfer: DataTransfer | null
-      getTargetRanges(): NativeStaticRange[]
+      getTargetRanges(): DOMStaticRange[]
       inputType: string
       isComposing: boolean
     }

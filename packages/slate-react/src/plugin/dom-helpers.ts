@@ -1,27 +1,20 @@
-import {
-  Element as SlateElement,
-  Node as SlateNode,
-  Point as SlatePoint,
-  Range as SlateRange,
-  Value as SlateValue,
-} from 'slate'
+import { Element, Node, Point, Range, Value } from 'slate'
 
+import { ReactEditor } from '.'
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
 } from '../utils/weak-maps'
-import { IS_FIREFOX } from '../utils/environment'
-import { ReactEditor } from '.'
 import {
-  NativeElement,
-  NativePoint,
-  NativeRange,
-  NativeStaticRange,
-  NativeSelection,
-  isNativeElement,
-  NativeNode,
-  normalizeNodeAndOffset,
+  DOMElement,
+  DOMPoint,
+  DOMRange,
+  DOMStaticRange,
+  DOMSelection,
+  isDOMElement,
+  DOMNode,
+  normalizeDOMPoint,
 } from '../utils/dom'
 
 export default class ReactEditorDomHelpers {
@@ -31,7 +24,7 @@ export default class ReactEditorDomHelpers {
 
   hasDomNode(
     this: ReactEditor,
-    target: NativeNode,
+    target: DOMNode,
     options: { editable?: boolean } = {}
   ): boolean {
     const { editable = false } = options
@@ -43,10 +36,9 @@ export default class ReactEditorDomHelpers {
     // stepper arrow on a number input). (2018/05/04)
     // https://github.com/ianstormtaylor/slate/issues/1819
     try {
-      element = isNativeElement(target) ? target : target.parentElement
+      element = isDOMElement(target) ? target : target.parentElement
     } catch (err) {
       if (
-        !IS_FIREFOX ||
         !err.message.includes('Permission denied to access property "nodeType"')
       ) {
         throw err
@@ -67,15 +59,14 @@ export default class ReactEditorDomHelpers {
    * Find the native DOM element from a Slate node.
    */
 
-  toDomNode(this: ReactEditor, node: SlateNode): HTMLElement {
-    const domNode = SlateValue.isValue(node)
+  toDomNode(this: ReactEditor, node: Node): HTMLElement {
+    const domNode = Value.isValue(node)
       ? EDITOR_TO_ELEMENT.get(this)
       : NODE_TO_ELEMENT.get(node)
 
     if (!domNode) {
-      debugger
       throw new Error(
-        `Unable to find a DOM node for the Slate node: ${JSON.stringify(node)}`
+        `Cannot resolve a DOM node from Slate node: ${JSON.stringify(node)}`
       )
     }
 
@@ -86,10 +77,10 @@ export default class ReactEditorDomHelpers {
    * Find a native DOM selection point from a Slate point.
    */
 
-  toDomPoint(this: ReactEditor, point: SlatePoint): NativePoint {
+  toDomPoint(this: ReactEditor, point: Point): DOMPoint {
     const [node] = this.getNode(point.path)
     const el = this.toDomNode(node)
-    let domPoint: NativePoint | undefined
+    let domPoint: DOMPoint | undefined
 
     // For each leaf, we need to isolate its content, which means filtering
     // to its direct text and zero-width spans. (We have to filter out any
@@ -112,7 +103,7 @@ export default class ReactEditorDomHelpers {
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint = { node: domNode, offset }
+        domPoint = [domNode, offset]
         break
       }
 
@@ -120,11 +111,8 @@ export default class ReactEditorDomHelpers {
     }
 
     if (!domPoint) {
-      debugger
       throw new Error(
-        `Unable to find a DOM point for the Slate point: ${JSON.stringify(
-          point
-        )}`
+        `Cannot resolve a DOM point from Slate point: ${JSON.stringify(point)}`
       )
     }
 
@@ -135,18 +123,18 @@ export default class ReactEditorDomHelpers {
    * Find a native DOM range from a Slate `range`.
    */
 
-  toDomRange(this: ReactEditor, range: SlateRange): NativeRange {
+  toDomRange(this: ReactEditor, range: Range): DOMRange {
     const { anchor, focus } = range
     const domAnchor = this.toDomPoint(anchor)
-    const domFocus = SlateRange.isCollapsed(range)
+    const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : this.toDomPoint(focus)
 
     const domRange = window.document.createRange()
-    const start = SlateRange.isBackward(range) ? domFocus : domAnchor
-    const end = SlateRange.isBackward(range) ? domAnchor : domFocus
-    domRange.setStart(start.node, start.offset)
-    domRange.setEnd(end.node, end.offset)
+    const start = Range.isBackward(range) ? domFocus : domAnchor
+    const end = Range.isBackward(range) ? domAnchor : domFocus
+    domRange.setStart(start[0], start[1])
+    domRange.setEnd(end[0], end[1])
     return domRange
   }
 
@@ -154,8 +142,8 @@ export default class ReactEditorDomHelpers {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(this: ReactEditor, domNode: NativeNode): SlateNode {
-    let domEl = isNativeElement(domNode) ? domNode : domNode.parentElement
+  toSlateNode(this: ReactEditor, domNode: DOMNode): Node {
+    let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
       domEl = domEl.closest(`[data-slate-node]`)
@@ -164,8 +152,7 @@ export default class ReactEditorDomHelpers {
     const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
 
     if (!node) {
-      debugger
-      throw new Error(`Unable to find a Slate node from the DOM node: ${domEl}`)
+      throw new Error(`Cannot resolve a Slate node from DOM node: ${domEl}`)
     }
 
     return node
@@ -175,7 +162,7 @@ export default class ReactEditorDomHelpers {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(this: ReactEditor, event: any): SlateRange | undefined {
+  findEventRange(this: ReactEditor, event: any): Range | undefined {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -192,7 +179,7 @@ export default class ReactEditorDomHelpers {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (SlateElement.isElement(node) && this.isVoid(node)) {
+    if (Element.isElement(node) && this.isVoid(node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = this.isInline(node)
         ? x - rect.left < rect.left + rect.width - x
@@ -214,7 +201,7 @@ export default class ReactEditorDomHelpers {
     // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
     if (document.caretRangeFromPoint) {
       domRange = document.caretRangeFromPoint(x, y)
-    } else if (document.caretPositionFromPoint) {
+    } else {
       const position = document.caretPositionFromPoint(x, y)
 
       if (position) {
@@ -222,18 +209,10 @@ export default class ReactEditorDomHelpers {
         domRange.setStart(position.offsetNode, position.offset)
         domRange.setEnd(position.offsetNode, position.offset)
       }
-    } else if ('createTextRange' in document.body) {
-      // COMPAT: In IE, `caretRangeFromPoint` and
-      // `caretPositionFromPoint` don't exist. (2018/07/11)
-      domRange = (document.body as any).createTextRange()
+    }
 
-      try {
-        domRange.moveToPoint(x, y)
-      } catch (error) {
-        // IE11 will raise an `unspecified error` if `moveToPoint` is
-        // called during a dropEvent.
-        return
-      }
+    if (!domRange) {
+      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     // Resolve a Slate range from the DOM range.
@@ -245,19 +224,16 @@ export default class ReactEditorDomHelpers {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(this: ReactEditor, domPoint: NativePoint): SlatePoint {
-    const { node: nearestNode, offset: nearestOffset } = normalizeNodeAndOffset(
-      domPoint
-    )
-
-    const parentNode = nearestNode.parentNode as NativeElement
-    let textNode: NativeElement | null = null
+  toSlatePoint(this: ReactEditor, domPoint: DOMPoint): Point {
+    const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
+    const parentNode = nearestNode.parentNode as DOMElement
+    let textNode: DOMElement | null = null
     let offset = 0
 
     if (parentNode) {
       const voidNode = parentNode.closest('[data-slate-void="true"]')
       let leafNode = parentNode.closest('[data-slate-leaf]')
-      let domNode: NativeElement | null = null
+      let domNode: DOMElement | null = null
 
       // Calculate how far into the text node the `nearestNode` is, so that we
       // can determine what the offset relative to the text node is.
@@ -305,7 +281,9 @@ export default class ReactEditorDomHelpers {
     }
 
     if (!textNode) {
-      throw new Error(`Cannot find a Slate point from DOM point: ${domPoint}`)
+      throw new Error(
+        `Cannot resolve a Slate point from DOM point: ${domPoint}`
+      )
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
@@ -322,8 +300,8 @@ export default class ReactEditorDomHelpers {
 
   toSlateRange(
     this: ReactEditor,
-    domRange: NativeRange | NativeStaticRange | NativeSelection
-  ): SlateRange {
+    domRange: DOMRange | DOMStaticRange | DOMSelection
+  ): Range {
     const el =
       domRange instanceof Selection
         ? domRange.anchorNode
@@ -356,20 +334,15 @@ export default class ReactEditorDomHelpers {
       anchorOffset == null ||
       focusOffset == null
     ) {
-      throw new Error(`Cannot find Slat range from DOM range: ${domRange}`)
+      throw new Error(
+        `Cannot resolve a Slate range from DOM range: ${domRange}`
+      )
     }
 
-    const anchor = this.toSlatePoint({
-      node: anchorNode,
-      offset: anchorOffset,
-    })
-
+    const anchor = this.toSlatePoint([anchorNode, anchorOffset])
     const focus = isCollapsed
       ? anchor
-      : this.toSlatePoint({
-          node: focusNode,
-          offset: focusOffset,
-        })
+      : this.toSlatePoint([focusNode, focusOffset])
 
     return { anchor, focus }
   }

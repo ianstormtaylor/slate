@@ -2,36 +2,36 @@
  * Types.
  */
 
-export type NativeComment = Comment
-export type NativeElement = Element
-export type NativeText = Text
-export type NativeNode = Node
-export type NativePoint = { node: NativeNode; offset: number }
-export type NativeRange = Range
-export type NativeSelection = Selection
-export type NativeStaticRange = StaticRange
+export type DOMComment = Comment
+export type DOMElement = Element
+export type DOMText = Text
+export type DOMNode = Node
+export type DOMPoint = [DOMNode, number]
+export type DOMRange = Range
+export type DOMSelection = Selection
+export type DOMStaticRange = StaticRange
 
 /**
  * Check if a DOM node is a comment node.
  */
 
-export const isNativeComment = (value: any): value is NativeComment => {
-  return isNativeNode(value) && value.nodeType === 8
+export const isDOMComment = (value: any): value is DOMComment => {
+  return isDOMNode(value) && value.nodeType === 8
 }
 
 /**
  * Check if a DOM node is an element node.
  */
 
-export const isNativeElement = (value: any): value is NativeElement => {
-  return isNativeNode(value) && value.nodeType === 1
+export const isDOMElement = (value: any): value is DOMElement => {
+  return isDOMNode(value) && value.nodeType === 1
 }
 
 /**
  * Check if a value is a DOM node.
  */
 
-export const isNativeNode = (value: any): value is NativeNode => {
+export const isDOMNode = (value: any): value is DOMNode => {
   return value instanceof Node
 }
 
@@ -39,21 +39,20 @@ export const isNativeNode = (value: any): value is NativeNode => {
  * Check if a DOM node is an element node.
  */
 
-export const isNativeText = (value: any): value is NativeText => {
-  return isNativeNode(value) && value.nodeType === 3
+export const isDOMText = (value: any): value is DOMText => {
+  return isDOMNode(value) && value.nodeType === 3
 }
 
 /**
- * From a DOM selection's `node` and `offset`, normalize so that it always
- * refers to a text node.
+ * Normalize a DOM point so that it always refers to a text node.
  */
 
-export const normalizeNodeAndOffset = (domPoint: NativePoint) => {
-  let { node, offset } = domPoint
+export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
+  let [node, offset] = domPoint
 
   // If it's an element node, its offset refers to the index of its children
   // including comment nodes, so try to find the right text child node.
-  if (isNativeElement(node) && node.childNodes.length) {
+  if (isDOMElement(node) && node.childNodes.length) {
     const isLast = offset === node.childNodes.length
     const direction = isLast ? 'backward' : 'forward'
     const index = isLast ? offset - 1 : offset
@@ -61,7 +60,7 @@ export const normalizeNodeAndOffset = (domPoint: NativePoint) => {
 
     // If the node has children, traverse until we have a leaf node. Leaf nodes
     // can be either text nodes, or other void DOM nodes.
-    while (isNativeElement(node) && node.childNodes.length) {
+    while (isDOMElement(node) && node.childNodes.length) {
       const i = isLast ? node.childNodes.length - 1 : 0
       node = getEditableChild(node, i, direction)
     }
@@ -71,7 +70,7 @@ export const normalizeNodeAndOffset = (domPoint: NativePoint) => {
   }
 
   // Return the node and offset.
-  return { node, offset }
+  return [node, offset]
 }
 
 /**
@@ -80,10 +79,10 @@ export const normalizeNodeAndOffset = (domPoint: NativePoint) => {
  */
 
 export const getEditableChild = (
-  parent: NativeElement,
+  parent: DOMElement,
   index: number,
   direction: 'forward' | 'backward'
-): NativeNode => {
+): DOMNode => {
   const { childNodes } = parent
   let child = childNodes[index]
   let i = index
@@ -93,10 +92,9 @@ export const getEditableChild = (
   // While the child is a comment node, or an element node with no children,
   // keep iterating to find a sibling non-void, non-comment node.
   while (
-    isNativeComment(child) ||
-    (isNativeElement(child) && child.childNodes.length === 0) ||
-    (isNativeElement(child) &&
-      child.getAttribute('contenteditable') === 'false')
+    isDOMComment(child) ||
+    (isDOMElement(child) && child.childNodes.length === 0) ||
+    (isDOMElement(child) && child.getAttribute('contenteditable') === 'false')
   ) {
     if (triedForward && triedBackward) {
       break

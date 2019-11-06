@@ -1,7 +1,7 @@
 import isBackward from 'selection-is-backward'
 
-import { IS_IOS } from './environment'
-import { NativeSelection } from './dom'
+import { IS_SAFARI, IS_IOS } from './environment'
+import { DOMSelection } from './dom'
 
 const OVERFLOWS = ['auto', 'overlay', 'scroll']
 const IS_IOS_11 = IS_IOS && !!window.navigator.userAgent.match(/os 11_/i)
@@ -44,7 +44,7 @@ function findScrollContainer(el: HTMLElement): HTMLElement {
  * Scroll the current selection's focus point into view if needed.
  */
 
-function scrollToSelection(selection: NativeSelection) {
+function scrollToSelection(selection: DOMSelection) {
   if (IS_IOS_11) return
   if (!selection.anchorNode) return
 
