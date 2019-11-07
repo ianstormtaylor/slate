@@ -5,7 +5,7 @@ import debounce from 'lodash/debounce'
 import Children from './children'
 import { EditorContext } from '../hooks/use-editor'
 import { FocusedContext } from '../hooks/use-focused'
-import { IS_FIREFOX } from '../utils/environment'
+import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
 import { ReactEditor } from '../plugin'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import {
@@ -83,7 +83,6 @@ const Editor = (props: {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
-      compositionCount: 0,
       isComposing: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
@@ -192,14 +191,14 @@ const Editor = (props: {
           return
         }
 
+        const [targetRange] = event.getTargetRanges()
+
+        if (targetRange && inputType !== 'deleteContent') {
+          const range = editor.toSlateRange(targetRange)
+          editor.select(range)
+        }
+
         event.preventDefault()
-        // const [domRange] = event.getTargetRanges()
-
-        // if (domRange) {
-        //   const range = editor.toSlateRange(domRange)
-        //   editor.select(range)
-        // }
-
         editor.onBeforeInput(event)
       }
     },
@@ -322,22 +321,20 @@ const Editor = (props: {
             }, [])}
             onCompositionEnd={useCallback((event: React.CompositionEvent) => {
               if (hasEditableTarget(editor, event.target)) {
-                const n = state.compositionCount
+                state.isComposing = false
 
-                // The `count` ensures that if another composition starts before
-                // the timeout, we won't unset the flag, since a composition is
-                // still running.
-                window.requestAnimationFrame(() => {
-                  if (state.compositionCount <= n) {
-                    state.isComposing = false
-                  }
-                })
+                // COMPAT: In Chrome, `beforeinput` events for compositions
+                // aren't correct and never fire the "insertFromComposition"
+                // type that we need. So instead, insert whenever a composition
+                // ends since it will already have been committed to the DOM.
+                if (!IS_SAFARI && event.data) {
+                  editor.insertText(event.data)
+                }
               }
             }, [])}
             onCompositionStart={useCallback((event: React.CompositionEvent) => {
               if (hasEditableTarget(editor, event.target)) {
                 state.isComposing = true
-                state.compositionCount++
               }
             }, [])}
             onCopy={useCallback((event: React.ClipboardEvent) => {

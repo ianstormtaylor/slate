@@ -7,13 +7,5 @@
     { "path": "./packages/slate-react" },
     { "path": "./packages/slate-schema" }
   ],
-  "files": [],
-  "typedocOptions": {
-    "excludeExternals": true,
-    "hideGenerator": true,
-    "mode": "file",
-    "name": "Slate API Reference",
-    "out": "./site",
-    "readme": null
-  }
+  "files": []
 }

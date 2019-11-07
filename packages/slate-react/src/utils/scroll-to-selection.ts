@@ -1,5 +1,3 @@
-import isBackward from 'selection-is-backward'
-
 import { IS_SAFARI, IS_IOS } from './environment'
 import { DOMSelection } from './dom'
 
@@ -52,10 +50,9 @@ function scrollToSelection(selection: DOMSelection) {
   const isWindow =
     scroller === window.document.body ||
     scroller === window.document.documentElement
-  const backward = isBackward(selection)
 
   const range = selection.getRangeAt(0).cloneRange()
-  range.collapse(backward)
+  range.collapse()
   let cursorRect = range.getBoundingClientRect()
 
   // COMPAT: range.getBoundingClientRect() returns 0s in Safari when range is

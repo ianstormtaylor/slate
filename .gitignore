@@ -1,4 +1,5 @@
 *.log
+.next/
 build/
 dist/
 lib/
