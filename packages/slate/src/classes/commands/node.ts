@@ -721,8 +721,12 @@ class NodeCommands {
 
       for (const [, rootPath] of roots) {
         const a = Range.isRange(at)
-          ? Range.intersection(at, this.getRange(rootPath))!
+          ? Range.intersection(at, this.getRange(rootPath))
           : at
+
+        if (!a) {
+          continue
+        }
 
         const matches = Array.from(this.matches({ ...options, at: a, match }))
 

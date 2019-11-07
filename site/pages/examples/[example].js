@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { cx, css } from 'emotion'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
+import Link from 'next/link'
 import ErrorBoundary from 'react-error-boundary'
 
 import { Icon } from '../../examples/components'
@@ -16,7 +17,7 @@ import CheckLists from '../../examples/check-lists'
 // import HoveringMenu from '../../examples/hovering-menu'
 // import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
-// import Links from '../../examples/links'
+import Links from '../../examples/links'
 // import MarkdownPreview from '../../examples/markdown-preview'
 // import MarkdownShortcuts from '../../examples/markdown-shortcuts'
 // import PasteHtml from '../../examples/paste-html'
@@ -34,32 +35,32 @@ import RichText from '../../examples/rich-text'
 // import Placeholder from '../../examples/placeholder'
 
 const EXAMPLES = [
-  ['Checklists', CheckLists, '/check-lists'],
-  // ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
-  // ['Composition', Composition, '/composition/:subpage?'],
-  // ['Embeds', Embeds, '/embeds'],
-  // ['Emojis', Emojis, '/emojis'],
-  // ['Forced Layout', ForcedLayout, '/forced-layout'],
-  // ['History', History, '/history'],
-  // ['Hovering Menu', HoveringMenu, '/hovering-menu'],
-  // ['Huge Document', HugeDocument, '/huge-document'],
-  ['Images', Images, '/images'],
-  // ['Input Tester', InputTester, '/input-tester'],
-  // ['Links', Links, '/links'],
-  // ['Markdown Preview', MarkdownPreview, '/markdown-preview'],
-  // ['Markdown Shortcuts', MarkdownShortcuts, '/markdown-shortcuts'],
-  // ['Mentions', Mentions, '/mentions'],
-  // ['Paste HTML', PasteHtml, '/paste-html'],
-  // ['Placeholders', Placeholder, '/placeholder'],
-  ['Plain Text', PlainText, '/plain-text'],
-  // ['Plugins', Plugins, '/plugins'],
-  ['Read-only', ReadOnly, '/read-only'],
-  ['Rich Text', RichText, '/rich-text'],
-  // ['RTL', RTL, '/rtl'],
-  // ['Search Highlighting', SearchHighlighting, '/search-highlighting'],
-  // ['Syncing Operations', SyncingOperations, '/syncing-operations'],
-  // ['Tables', Tables, '/tables'],
-  // ['Versions', Versions, '/versions'],
+  ['Checklists', CheckLists, 'check-lists'],
+  // ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
+  // ['Composition', Composition, 'composition/:subpage?'],
+  // ['Embeds', Embeds, 'embeds'],
+  // ['Emojis', Emojis, 'emojis'],
+  // ['Forced Layout', ForcedLayout, 'forced-layout'],
+  // ['History', History, 'history'],
+  // ['Hovering Menu', HoveringMenu, 'hovering-menu'],
+  // ['Huge Document', HugeDocument, 'huge-document'],
+  ['Images', Images, 'images'],
+  // ['Input Tester', InputTester, 'input-tester'],
+  ['Links', Links, 'links'],
+  // ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
+  // ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
+  // ['Mentions', Mentions, 'mentions'],
+  // ['Paste HTML', PasteHtml, 'paste-html'],
+  // ['Placeholders', Placeholder, 'placeholder'],
+  ['Plain Text', PlainText, 'plain-text'],
+  // ['Plugins', Plugins, 'plugins'],
+  ['Read-only', ReadOnly, 'read-only'],
+  ['Rich Text', RichText, 'rich-text'],
+  // ['RTL', RTL, 'rtl'],
+  // ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
+  // ['Syncing Operations', SyncingOperations, 'syncing-operations'],
+  // ['Tables', Tables, 'tables'],
+  // ['Versions', Versions, 'versions'],
 ]
 
 const Header = props => (
@@ -96,7 +97,7 @@ const LinkList = props => (
   />
 )
 
-const Link = props => (
+const A = props => (
   <a
     {...props}
     className={css`
@@ -163,8 +164,10 @@ const TabButton = props => (
   />
 )
 
-const Tab = ({ active, ...props }) => (
+const Tab = React.forwardRef(({ active, href, ...props }, ref) => (
   <a
+    ref={ref}
+    href={href}
     {...props}
     className={css`
       display: inline-block;
@@ -180,7 +183,7 @@ const Tab = ({ active, ...props }) => (
       }
     `}
   />
-)
+))
 
 const Wrapper = ({ className, ...props }) => (
   <div
@@ -251,7 +254,7 @@ const ExamplePage = () => {
   const [showTabs, setShowTabs] = useState()
   const router = useRouter()
   const { example = 'rich-text' } = router.query
-  const EXAMPLE = EXAMPLES.find(e => e[2] === `/${example}`)
+  const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
 
   return (
@@ -279,8 +282,8 @@ const ExamplePage = () => {
         <Header>
           <Title>Slate Examples</Title>
           <LinkList>
-            <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
-            <Link href="https://docs.slatejs.org/">Docs</Link>
+            <A href="https://github.com/ianstormtaylor/slate">GitHub</A>
+            <A href="https://docs.slatejs.org/">Docs</A>
           </LinkList>
         </Header>
         <ExampleHeader>
@@ -294,17 +297,17 @@ const ExamplePage = () => {
           </TabButton>
           <ExampleTitle>
             {name}
-            <Link href="/examples/[example]" as={`/examples/${path}`}>
+            <A
+              href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+            >
               (View Source)
-            </Link>
+            </A>
           </ExampleTitle>
         </ExampleHeader>
         <TabList isVisible={showTabs}>
           {EXAMPLES.map(([n, , p]) => (
             <Link key={p} href="/examples/[example]" as={`/examples/${p}`}>
-              <Tab active={p === path} onClick={() => setShowTabs(false)}>
-                {n}
-              </Tab>
+              <Tab>{n}</Tab>
             </Link>
           ))}
         </TabList>

@@ -14,29 +14,6 @@ import initialValue from './value.json'
 
 // Define a custom editor with checklist-specific logic.
 class ExampleEditor extends withHistory(withReact(BaseEditor)) {
-  // When splitting a checklist item, make sure the next checklist item starts
-  // off unchecked.
-  splitNodes(options = {}) {
-    const { at, match } = options
-    const { selection } = this.value
-    let uncheck = false
-
-    if (!at && !match && selection) {
-      const { anchor } = selection
-      const match = this.getMatch(anchor, { type: 'check-list-item' })
-
-      if (match) {
-        uncheck = true
-      }
-    }
-
-    super.splitNodes(options)
-
-    if (uncheck) {
-      this.setNodes({ checked: false }, { match: { type: 'check-list-item' } })
-    }
-  }
-
   // When deleting backwards at the start of a checklist item, convert the block
   // to a paragraph instead.
   delete(options = {}) {

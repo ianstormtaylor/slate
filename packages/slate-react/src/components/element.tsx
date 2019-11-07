@@ -72,12 +72,17 @@ const Element = (props: {
   const attributes: {
     'data-slate-node': 'element'
     'data-slate-void'?: true
+    'data-slate-inline'?: true
     contentEditable?: false
     dir?: 'rtl'
     ref: any
   } = {
     'data-slate-node': 'element',
     ref,
+  }
+
+  if (isInline) {
+    attributes['data-slate-inline'] = true
   }
 
   // If it's a block node with inline children, add the proper `dir` attribute

@@ -1,210 +1,117 @@
-import { Editor, getEventTransfer } from 'slate-react'
-import { Value } from 'slate'
-
-import React from 'react'
-import initialValue from './value.json'
+import React, { useState } from 'react'
+import { Editor as BaseEditor, Range } from 'slate'
 import isUrl from 'is-url'
+import { Editor, withReact, useSlate } from 'slate-react'
+import { withHistory } from 'slate-history'
+
+import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
-/**
- * A change helper to standardize wrapping links.
- *
- * @param {Editor} editor
- * @param {String} href
- */
+// Define a custom editor with link-specific logic.
+class ExampleEditor extends withHistory(withReact(BaseEditor)) {
+  insertData(data) {
+    const text = data.getData('text/plain')
 
-function wrapLink(editor, href) {
-  editor.wrapInline({
-    type: 'link',
-    data: { href },
-  })
-
-  editor.moveToEnd()
-}
-
-/**
- * A change helper to standardize unwrapping links.
- *
- * @param {Editor} editor
- */
-
-function unwrapLink(editor) {
-  editor.unwrapInline('link')
-}
-
-/**
- * The links example.
- *
- * @type {Component}
- */
-
-class Links extends React.Component {
-  /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * Check whether the current selection has a link in it.
-   *
-   * @return {Boolean} hasLinks
-   */
-
-  hasLinks = () => {
-    const { value } = this.state
-    return value.inlines.some(inline => inline.type === 'link')
-  }
-
-  /**
-   * Store a reference to the `editor`.
-   *
-   * @param {Editor} editor
-   */
-
-  ref = editor => {
-    this.editor = editor
-  }
-
-  /**
-   * Render the app.
-   *
-   * @return {Element} element
-   */
-
-  render() {
-    return (
-      <div>
-        <Toolbar>
-          <Button active={this.hasLinks()} onMouseDown={this.onClickLink}>
-            <Icon>link</Icon>
-          </Button>
-        </Toolbar>
-        <Editor
-          placeholder="Enter some text..."
-          ref={this.ref}
-          value={this.state.value}
-          onChange={this.onChange}
-          onPaste={this.onPaste}
-          renderInline={this.renderInline}
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate inline.
-   *
-   * @param {Object} props
-   * @param {Editor} editor
-   * @param {Function} next
-   * @return {Element}
-   */
-
-  renderInline = (props, editor, next) => {
-    const { attributes, children, node } = props
-
-    switch (node.type) {
-      case 'link': {
-        const { data } = node
-        const href = data.get('href')
-        return (
-          <a {...attributes} href={href}>
-            {children}
-          </a>
-        )
+    if (isUrl(text)) {
+      if (this.isLinkActive()) {
+        this.unwrapLink()
+      } else {
+        this.wrapLink(url)
       }
-
-      default: {
-        return next()
-      }
-    }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Editor} editor
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * When clicking a link, if the selection has a link in it, remove the link.
-   * Otherwise, add a new link with an href and text.
-   *
-   * @param {Event} event
-   */
-
-  onClickLink = event => {
-    event.preventDefault()
-
-    const { editor } = this
-    const { value } = editor
-    const hasLinks = this.hasLinks()
-
-    if (hasLinks) {
-      editor.command(unwrapLink)
-    } else if (value.selection.isExpanded) {
-      const href = window.prompt('Enter the URL of the link:')
-
-      if (href == null) {
-        return
-      }
-
-      editor.command(wrapLink, href)
     } else {
-      const href = window.prompt('Enter the URL of the link:')
-
-      if (href == null) {
-        return
-      }
-
-      const text = window.prompt('Enter the text for the link:')
-
-      if (text == null) {
-        return
-      }
-
-      editor
-        .insertText(text)
-        .moveFocusBackward(text.length)
-        .command(wrapLink, href)
+      super.insertData(data)
     }
   }
 
-  /**
-   * On paste, if the text is a link, wrap the selection in a link.
-   *
-   * @param {Event} event
-   * @param {Editor} editor
-   * @param {Function} next
-   */
+  isInline(element) {
+    return element.type === 'link'
+  }
 
-  onPaste = (event, editor, next) => {
-    if (editor.value.selection.isCollapsed) return next()
+  isLinkActive() {
+    const { selection } = this.value
 
-    const transfer = getEventTransfer(event)
-    const { type, text } = transfer
-    if (type !== 'text' && type !== 'html') return next()
-    if (!isUrl(text)) return next()
-
-    if (this.hasLinks()) {
-      editor.command(unwrapLink)
+    if (selection) {
+      for (const [node] of this.elements({ at: selection })) {
+        if (node.type === 'link') {
+          return true
+        }
+      }
     }
 
-    editor.command(wrapLink, text)
+    return false
+  }
+
+  unwrapLink() {
+    this.unwrapNodes({ match: { type: 'link' } })
+  }
+
+  wrapLink(url) {
+    const link = { type: 'link', url, nodes: [] }
+    this.wrapNodes(link, { split: true })
+    this.collapse({ edge: 'end' })
   }
 }
 
-/**
- * Export.
- */
+// Define our example React component which renders the example.
+const Example = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(ExampleEditor)
+  return (
+    <div>
+      <Toolbar>
+        <Button
+          active={editor.isLinkActive()}
+          onMouseDown={event => {
+            event.preventDefault()
+            const { selection } = editor.value
+            if (!selection) return
 
-export default Links
+            if (editor.isLinkActive()) {
+              editor.unwrapLink()
+              return
+            }
+
+            const url = window.prompt('Enter the URL of the link:')
+            if (!url) return
+
+            const text = Range.isCollapsed(selection)
+              ? window.prompt('Enter the text for the link:')
+              : null
+
+            if (text != null) {
+              editor.insertText(text)
+              editor.move({ distance: text.length, reverse: true })
+            }
+
+            editor.wrapLink(url)
+          }}
+        >
+          <Icon>link</Icon>
+        </Button>
+      </Toolbar>
+      <Editor
+        placeholder="Enter some text..."
+        editor={editor}
+        value={value}
+        renderElement={props => <Element {...props} />}
+        onChange={change => setValue(change.value)}
+      />
+    </div>
+  )
+}
+
+// A component to handle rendering all of the element nodes in our editor.
+const Element = ({ attributes, children, element }) => {
+  switch (element.type) {
+    case 'link':
+      return (
+        <a {...attributes} href={element.url}>
+          {children}
+        </a>
+      )
+    default:
+      return <p {...attributes}>{children}</p>
+  }
+}
+
+export default Example

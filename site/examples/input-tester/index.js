@@ -7,12 +7,6 @@ import initialValueAsJson from './value.json'
 import { Icon } from '../components'
 import { createArrayValue } from 'react-values'
 
-/**
- * Deserialize the initial editor value.
- *
- * @type {Object}
- */
-
 const initialValue = Value.fromJSON(initialValueAsJson)
 
 const EventsValue = createArrayValue()

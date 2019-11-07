@@ -58,6 +58,7 @@ export interface CustomElementProps {
   children: any
   element: Element
   attributes: {
+    'data-slate-inline'?: true
     'data-slate-node': 'element'
     'data-slate-void'?: true
     dir?: 'rtl'

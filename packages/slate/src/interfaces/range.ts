@@ -26,16 +26,17 @@ namespace Range {
   }
 
   export const intersection = (range: Range, another: Range): Range | null => {
-    if (!Range.includes(range, another)) {
-      return null
-    }
-
     const { anchor, focus, ...rest } = range
     const [s1, e1] = Range.edges(range)
     const [s2, e2] = Range.edges(another)
     const start = Point.isBefore(s1, s2) ? s2 : s1
     const end = Point.isBefore(e1, e2) ? e1 : e2
-    return { anchor: start, focus: end, ...rest }
+
+    if (Point.isBefore(end, start)) {
+      return null
+    } else {
+      return { anchor: start, focus: end, ...rest }
+    }
   }
 
   /**
