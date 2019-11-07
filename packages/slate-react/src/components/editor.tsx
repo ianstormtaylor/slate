@@ -193,15 +193,13 @@ const Editor = (props: {
         }
 
         event.preventDefault()
-        const [domRange] = event.getTargetRanges()
+        // const [domRange] = event.getTargetRanges()
 
-        if (domRange) {
-          const range = editor.toSlateRange(domRange)
-          editor.select(range)
-        }
+        // if (domRange) {
+        //   const range = editor.toSlateRange(domRange)
+        //   editor.select(range)
+        // }
 
-        // Here we prefer the `dataTransfer` since it contains more information
-        // about rich text data types, but fall back to `data` for plain text.
         editor.onBeforeInput(event)
       }
     },

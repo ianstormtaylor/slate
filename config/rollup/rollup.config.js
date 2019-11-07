@@ -108,7 +108,7 @@ function configure(pkg, env, target, { ts }) {
     return {
       plugins,
       input,
-      // onwarn,
+      onwarn,
       output: {
         format: 'umd',
         file: `packages/${pkg.name}/${isProd ? pkg.umdMin : pkg.umd}`,
@@ -124,7 +124,7 @@ function configure(pkg, env, target, { ts }) {
     return {
       plugins,
       input,
-      // onwarn,
+      onwarn,
       output: [
         {
           file: `packages/${pkg.name}/${pkg.module}`,

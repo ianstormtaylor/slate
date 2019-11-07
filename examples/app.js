@@ -9,7 +9,7 @@ import {
 } from 'react-router-dom'
 
 import { Icon } from './components'
-// import CheckLists from './check-lists'
+import CheckLists from './check-lists'
 // import CodeHighlighting from './code-highlighting'
 // import Embeds from './embeds'
 // import Emojis from './emojis'
@@ -43,7 +43,7 @@ import RichText from './rich-text'
  */
 
 const EXAMPLES = [
-  // ['Checklists', CheckLists, '/check-lists'],
+  ['Checklists', CheckLists, '/check-lists'],
   // ['Code Highlighting', CodeHighlighting, '/code-highlighting'],
   // ['Composition', Composition, '/composition/:subpage?'],
   // ['Embeds', Embeds, '/embeds'],

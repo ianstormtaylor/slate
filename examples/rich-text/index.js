@@ -48,7 +48,6 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
       return super.onKeyDown(event)
     }
 
-    console.log('onKeyDown: PREVENT DEFAULT!')
     event.preventDefault()
     this.toggleMarks([{ type }])
   }
@@ -106,10 +105,7 @@ const Example = () => {
         value={value}
         renderElement={props => <Element {...props} />}
         renderMark={props => <Mark {...props} />}
-        onChange={change => {
-          console.log(change)
-          setValue(change.value)
-        }}
+        onChange={change => setValue(change.value)}
       />
     </div>
   )

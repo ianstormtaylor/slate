@@ -67,6 +67,7 @@
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.1.4",
     "is-url": "^1.2.2",
+    "lerna": "^3.18.3",
     "lodash": "^4.17.4",
     "mini-css-extract-plugin": "^0.8.0",
     "mocha": "^6.2.0",
