@@ -58,7 +58,14 @@ function CommandsPlugin() {
   function reconcileDOMNode(editor, domNode) {
     const domElement = domNode.parentElement.closest('[data-key]')
     const node = editor.findNode(domElement)
-    editor.reconcileNode(node)
+
+    if (node.object === 'text') {
+      editor.reconcileNode(node)
+    } else {
+      node.getTexts().forEach(textNode => {
+        editor.reconcileNode(textNode)
+      })
+    }
   }
 
   return {
