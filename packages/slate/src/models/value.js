@@ -707,7 +707,12 @@ class Value extends Record(DEFAULTS) {
   setAnnotation(properties, newProperties) {
     newProperties = Annotation.createProperties(newProperties)
     const annotation = Annotation.create(properties)
-    const next = annotation.merge(newProperties)
+    let next = annotation.merge(newProperties)
+
+    if (!next.isSet) {
+      next = this.document.createAnnotation(next)
+    }
+
     let value = this
     let { annotations } = value
     const { key } = annotation
