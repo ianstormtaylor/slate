@@ -48,12 +48,12 @@ Commands.removeAnnotation = (editor, annotation) => {
 }
 
 Commands.setAnnotation = (editor, annotation, newProperties) => {
-  annotation = Annotation.create(annotation)
+  const properties = Annotation.createProperties(annotation)
   newProperties = Annotation.createProperties(newProperties)
 
   editor.applyOperation({
     type: 'set_annotation',
-    properties: annotation,
+    properties,
     newProperties,
   })
 }
