@@ -355,11 +355,22 @@ function CompositionManager(editor) {
 
     const firstMutation = mutations[0]
 
+    // Here we want to filter BR nodes out.
+    // When the content editable choose to remove a node instead of
+    // a 'characterData' mutation, it is usually the only mutation, unless
+    // it's the last node. When it's the last node, the browser also adds a BR.
+    // We want to filter it out so we match the mutation correctly and call `removeNode`
+    const filterBr = () => {
+      return mutations.filter(m => {
+        return !(m.addedNodes[0] && m.addedNodes[0].nodeName === 'BR')
+      })
+    }
+
     if (firstMutation.type === 'characterData') {
       resolveDOMNode(firstMutation.target.parentNode)
     } else if (firstMutation.type === 'childList') {
       if (firstMutation.removedNodes.length > 0) {
-        if (mutations.length === 1) {
+        if (filterBr().length === 1) {
           removeNode(firstMutation.removedNodes[0])
         } else {
           mergeBlock()
