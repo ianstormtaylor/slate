@@ -1,21 +1,16 @@
 import React, { useState } from 'react'
-import { Editor as BaseEditor, Range, Point } from 'slate'
+import { Editor, Range, Point } from 'slate'
+import { css } from 'emotion'
+import { withHistory } from 'slate-history'
 import {
-  Editor,
+  Editable,
   withReact,
   useSlate,
   useEditor,
   useReadOnly,
 } from 'slate-react'
-import { css } from 'emotion'
-import { withHistory } from 'slate-history'
 
-import initialValue from './value.json'
-
-// Define a custom editor with checklist-specific logic.
-class ExampleEditor extends withHistory(withReact(BaseEditor)) {
-  // When deleting backwards at the start of a checklist item, convert the block
-  // to a paragraph instead.
+class CheckListsEditor extends withHistory(withReact(Editor)) {
   delete(options = {}) {
     const { at, reverse } = options
     const { selection } = this.value
@@ -42,13 +37,12 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
   }
 }
 
-// Define our example React component which renders the example.
-const Example = () => {
+const CheckListsExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ExampleEditor)
+  const editor = useSlate(CheckListsEditor)
   return (
     <div>
-      <Editor
+      <Editable
         spellCheck
         autoFocus
         editor={editor}
@@ -61,20 +55,18 @@ const Example = () => {
   )
 }
 
-// A component to handle rendering all of the element nodes in our editor.
 const Element = props => {
   const { attributes, children, element } = props
 
   switch (element.type) {
     case 'check-list-item':
-      return <CheckListItem {...props} />
+      return <CheckListItemElement {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
 }
 
-// A custom node for check list item elements.
-const CheckListItem = ({ attributes, children, element }) => {
+const CheckListItemElement = ({ attributes, children, element }) => {
   const editor = useEditor()
   const readOnly = useReadOnly()
   const { checked } = element
@@ -125,4 +117,88 @@ const CheckListItem = ({ attributes, children, element }) => {
   )
 }
 
-export default Example
+const initialValue = {
+  selection: null,
+  annotations: {},
+  nodes: [
+    {
+      nodes: [
+        {
+          text:
+            'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: true,
+      nodes: [
+        {
+          text: 'Slide to the left.',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: true,
+      nodes: [
+        {
+          text: 'Slide to the right.',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: false,
+      nodes: [
+        {
+          text: 'Criss-cross.',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: true,
+      nodes: [
+        {
+          text: 'Criss-cross!',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: false,
+      nodes: [
+        {
+          text: 'Cha cha real smooth…',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'check-list-item',
+      checked: false,
+      nodes: [
+        {
+          text: "Let's go to work!",
+          marks: [],
+        },
+      ],
+    },
+    {
+      nodes: [
+        {
+          text: 'Try it out for yourself!',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
+
+export default CheckListsExample

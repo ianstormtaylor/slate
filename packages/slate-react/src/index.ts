@@ -1,4 +1,5 @@
 export { default as Editor } from './components/editor'
+export { default as Editable } from './components/editor'
 export { useEditor } from './hooks/use-editor'
 export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'

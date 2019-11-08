@@ -7,7 +7,7 @@ This directory contains a set of examples that give you an idea for how you migh
 * [**Plain text**](./plain-text) — showing the most basic case: a glorified `<textarea>`.
 * [**Rich text**](./rich-text) — showing the features you'd expect from a basic editor.
 * [**Forced Layout**](./forced-layout) - showing how to use schema rules to enforce document structure
-* [**Auto-markdown**](./auto-markdown) — showing how to add key handlers for Markdown-like shortcuts.
+* [**Markdown Shortcuts**](./markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
 * [**Links**](./links) — showing how wrap text in inline nodes with associated data.
 * [**Images**](./images) — showing how to use void (text-less) nodes to add images.
 * [**Hovering menu**](./hovering-menu) — showing how a contextual hovering menu can be implemented.
@@ -33,7 +33,7 @@ Then start the watcher and examples server:
 yarn start
 ```
 
-Now you can open up `http://localhost:8080` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page. You can open the examples URL quickly with:
+Now you can open up `http://localhost:3000` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page. You can open the examples URL quickly with:
 
 ```
 yarn open

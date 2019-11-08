@@ -1,49 +1,24 @@
 import React, { useState } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Editor as BaseEditor, Path } from 'slate'
+import { Editor } from 'slate'
 import {
-  Editor,
+  Editable,
   withReact,
   useSlate,
   useSelected,
   useFocused,
 } from 'slate-react'
-import { withSchema } from 'slate-schema'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
-import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
-const schema = {
-  value: {
-    validate: {
-      last: {
-        properties: { type: 'paragraph' },
-      },
-    },
-    normalize: (editor, { code, path }) => {
-      if (code === 'last_child_property_invalid') {
-        const paragraph = { type: 'paragraph', nodes: [] }
-        editor.insertNodes(paragraph, { at: Path.next(path) })
-      }
-    },
-  },
-  blocks: {
-    image: {
-      define: {
-        isVoid: true,
-      },
-    },
-  },
-}
+class ImagesEditor extends withHistory(withReact(Editor)) {
+  isVoid(element) {
+    return element.type === 'image'
+  }
 
-class ExampleEditor extends withSchema(
-  withHistory(withReact(BaseEditor)),
-  schema
-) {
-  // Override the `insertData` method to handle inserting image files or URLs.
   insertData(data) {
     const text = data.getData('text/plain')
     const { files } = data
@@ -79,9 +54,9 @@ class ExampleEditor extends withSchema(
   }
 }
 
-const Example = () => {
+const ImagesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ExampleEditor)
+  const editor = useSlate(ImagesEditor)
   return (
     <div>
       <Toolbar>
@@ -96,7 +71,7 @@ const Example = () => {
           <Icon>image</Icon>
         </Button>
       </Toolbar>
-      <Editor
+      <Editable
         placeholder="Enter some text..."
         editor={editor}
         value={value}
@@ -144,4 +119,41 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-export default Example
+const initialValue = {
+  selection: null,
+  annotations: {},
+  nodes: [
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          text:
+            'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'image',
+      url: 'https://source.unsplash.com/kFrdX5IeQzI',
+      nodes: [
+        {
+          text: '',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          text:
+            'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
+
+export default ImagesExample

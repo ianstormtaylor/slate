@@ -5,7 +5,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import ErrorBoundary from 'react-error-boundary'
 
-import { Icon } from '../../examples/components'
+import { Icon } from '../../components'
 
 import CheckLists from '../../examples/check-lists'
 // import CodeHighlighting from '../../examples/code-highlighting'
@@ -14,8 +14,8 @@ import CheckLists from '../../examples/check-lists'
 // import ForcedLayout from '../../examples/forced-layout'
 // import History from '../../examples/history'
 // import Versions from '../../examples/versions'
-// import HoveringMenu from '../../examples/hovering-menu'
-// import HugeDocument from '../../examples/huge-document'
+import HoveringMenu from '../../examples/hovering-menu'
+import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
 import Links from '../../examples/links'
 // import MarkdownPreview from '../../examples/markdown-preview'
@@ -42,8 +42,8 @@ const EXAMPLES = [
   // ['Emojis', Emojis, 'emojis'],
   // ['Forced Layout', ForcedLayout, 'forced-layout'],
   // ['History', History, 'history'],
-  // ['Hovering Menu', HoveringMenu, 'hovering-menu'],
-  // ['Huge Document', HugeDocument, 'huge-document'],
+  ['Hovering Menu', HoveringMenu, 'hovering-menu'],
+  ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
   // ['Input Tester', InputTester, 'input-tester'],
   ['Links', Links, 'links'],
@@ -306,8 +306,13 @@ const ExamplePage = () => {
         </ExampleHeader>
         <TabList isVisible={showTabs}>
           {EXAMPLES.map(([n, , p]) => (
-            <Link key={p} href="/examples/[example]" as={`/examples/${p}`}>
-              <Tab>{n}</Tab>
+            <Link
+              key={p}
+              href="/examples/[example]"
+              as={`/examples/${p}`}
+              passHref
+            >
+              <Tab onClick={() => setShowTabs(false)}>{n}</Tab>
             </Link>
           ))}
         </TabList>

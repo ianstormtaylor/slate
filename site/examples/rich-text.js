@@ -1,23 +1,18 @@
 import React, { useState } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editor as BaseEditor } from 'slate'
-import { Editor, withReact, useSlate } from 'slate-react'
+import { Editable, withReact, useSlate } from 'slate-react'
+import { Editor } from 'slate'
 import { withHistory } from 'slate-history'
 
-import initialValue from './value.json'
 import { Button, Icon, Toolbar } from '../components'
 
-// Define our custom editor class with example-specific logic. Note the two
-// mixins used to add React-specific behaviors and a history stack.
-class ExampleEditor extends withHistory(withReact(BaseEditor)) {
-  // Check if a specific mark is "active" in the rich-text sense.
+class RichTextEditor extends withHistory(withReact(Editor)) {
   isMarkActive(type) {
     const marks = this.getActiveMarks()
     const isActive = marks.some(m => m.type === type)
     return isActive
   }
 
-  // Check if a specific block is "active" in the rich-text sense.
   isBlockActive(type) {
     const { selection } = this.value
 
@@ -32,7 +27,6 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     return false
   }
 
-  // Listen for certain hotkeys, and toggle marks if they are pressed.
   onKeyDown(event) {
     let type
 
@@ -52,7 +46,6 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
     this.toggleMarks([{ type }])
   }
 
-  // Toggle the block type on or off depending on whether it's already active.
   toggleBlocks(type) {
     const isActive = this.isBlockActive(type)
     const isListType = type === 'bulleted-list' || type === 'numbered-list'
@@ -68,11 +61,9 @@ class ExampleEditor extends withHistory(withReact(BaseEditor)) {
   }
 }
 
-// Define our example React component which will render the editor and also a
-// toolbar with buttons that call into our editor class's methods when pressed.
-const Example = () => {
+const RichTextExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ExampleEditor)
+  const editor = useSlate(RichTextEditor)
   return (
     <div>
       <Toolbar>
@@ -98,7 +89,7 @@ const Example = () => {
           icon="format_list_bulleted"
         />
       </Toolbar>
-      <Editor
+      <Editable
         spellCheck
         autoFocus
         editor={editor}
@@ -111,7 +102,6 @@ const Example = () => {
   )
 }
 
-// A component to handle rendering all of the element nodes in our editor.
 const Element = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'block-quote':
@@ -131,7 +121,6 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-// A component to handle rendering all of the mark formatting in our editor.
 const Mark = ({ attributes, children, mark }) => {
   switch (mark.type) {
     case 'bold':
@@ -145,7 +134,6 @@ const Mark = ({ attributes, children, mark }) => {
   }
 }
 
-// A button that toggle a mark on or off when pressed.
 const MarkButton = ({ editor, type, icon }) => {
   return (
     <Button
@@ -161,7 +149,6 @@ const MarkButton = ({ editor, type, icon }) => {
   )
 }
 
-// A button that toggles a block-level formatting on or off when pressed.
 const BlockButton = ({ editor, type, icon }) => {
   return (
     <Button
@@ -176,4 +163,81 @@ const BlockButton = ({ editor, type, icon }) => {
   )
 }
 
-export default Example
+const initialValue = {
+  selection: null,
+  annotations: {},
+  nodes: [
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          text: 'This is editable ',
+          marks: [],
+        },
+        {
+          text: 'rich',
+          marks: [{ type: 'bold' }],
+        },
+        {
+          text: ' text, ',
+          marks: [],
+        },
+        {
+          text: 'much',
+          marks: [{ type: 'italic' }],
+        },
+        {
+          text: ' better than a ',
+          marks: [],
+        },
+        {
+          text: '<textarea>',
+          marks: [{ type: 'code' }],
+        },
+        {
+          text: '!',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          text:
+            "Since it's rich text, you can do things like turn a selection of text ",
+          marks: [],
+        },
+        {
+          text: 'bold',
+          marks: [{ type: 'bold' }],
+        },
+        {
+          text:
+            ', or add a semantically rendered block quote in the middle of the page, like this:',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'block-quote',
+      nodes: [
+        {
+          text: 'A wise quote.',
+          marks: [],
+        },
+      ],
+    },
+    {
+      type: 'paragraph',
+      nodes: [
+        {
+          text: 'Try it out for yourself!',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
+
+export default RichTextExample

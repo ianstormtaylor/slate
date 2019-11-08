@@ -14,6 +14,7 @@ import {
   Path,
   Point,
   Range,
+  Fragment,
   Span,
   String,
   Text,
@@ -296,6 +297,16 @@ class LocationQueries {
   getFirst(this: Editor, at: Location): NodeEntry {
     const path = this.getPath(at, { edge: 'start' })
     return this.getNode(path)
+  }
+
+  /**
+   * Get the fragment at a location.
+   */
+
+  getFragment(this: Editor, at: Location): Fragment {
+    const range = this.getRange(at)
+    const fragment = Node.fragment(this.value, range)
+    return fragment
   }
 
   /**
