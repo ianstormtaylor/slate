@@ -356,7 +356,10 @@ function CompositionManager(editor) {
     const firstMutation = mutations[0]
 
     const matchCharacterDataParent = () => {
-      if (firstMutation.target.parentNode !== null) {
+      if (
+        firstMutation.target.parentNode &&
+        firstMutation.target.parentNode.closest(`[data-key]`)
+      ) {
         return firstMutation.target.parentNode
       } else {
         const mutationRemoveTarget = mutations.find(m => {
