@@ -295,6 +295,7 @@ class PasteHtml extends React.Component {
    */
 
   onPaste = (event, editor, next) => {
+    event.preventDefault()
     const transfer = getEventTransfer(event)
     if (transfer.type !== 'html') return next()
     const { document } = serializer.deserialize(transfer.html)
