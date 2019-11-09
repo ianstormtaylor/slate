@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useLayoutEffect, useRef } from 'react'
 import getDirection from 'direction'
 import { Node, Range, NodeEntry, Element as SlateElement, Path } from 'slate'
 
@@ -132,13 +132,18 @@ const Element = (props: {
     NODE_TO_PARENT.set(text, element)
   }
 
+  console.log('render (element)')
+
   // Update element-related weak maps with the DOM element ref.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ref.current) {
+      console.log('add (element)', key)
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
       ELEMENT_TO_NODE.set(ref.current, element)
     } else {
+      console.log('remove (element)', key)
+      KEY_TO_ELEMENT.delete(key)
       NODE_TO_ELEMENT.delete(element)
     }
   })
