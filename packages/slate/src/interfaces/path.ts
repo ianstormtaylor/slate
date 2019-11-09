@@ -317,21 +317,6 @@ namespace Path {
       }
 
       switch (operation.type) {
-        case 'add_mark':
-        case 'insert_text':
-        case 'remove_mark':
-        case 'remove_text':
-        case 'set_mark':
-        case 'set_node':
-        case 'set_selection':
-        case 'set_value':
-        case 'add_annotation':
-        case 'remove_annotation':
-        case 'set_annotation': {
-          // None of these operations have an affect on paths.
-          return
-        }
-
         case 'insert_node': {
           const { path: op } = operation
 

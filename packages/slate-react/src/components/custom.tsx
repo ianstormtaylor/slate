@@ -115,11 +115,11 @@ export const PlaceholderDecoration = (props: CustomDecorationProps) => {
         style={{
           pointerEvents: 'none',
           display: 'inline-block',
+          verticalAlign: 'text-top',
           width: '0',
           maxWidth: '100%',
           whiteSpace: 'nowrap',
           opacity: '0.333',
-          verticalAlign: 'text-top',
         }}
       >
         {placeholder}

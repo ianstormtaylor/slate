@@ -7,6 +7,7 @@ import {
   Operation,
 } from 'slate'
 import debounce from 'lodash/debounce'
+import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import { EditorContext } from '../hooks/use-editor'
@@ -164,6 +165,14 @@ const Editor = (props: {
       state.isUpdatingSelection = true
       domSelection.removeAllRanges()
       domSelection.addRange(domRange)
+
+      const scrollEl = domRange.startContainer.parentElement
+
+      if (scrollEl) {
+        scrollIntoView(scrollEl, {
+          scrollMode: 'if-needed',
+        })
+      }
 
       setTimeout(() => {
         // COMPAT: In Firefox, it's not enough to create a range, you also need
