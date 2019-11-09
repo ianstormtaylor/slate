@@ -181,7 +181,7 @@ namespace Node {
       pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<DescendantEntry> {
-    for (const [node, path] of Node.entries(root, options)) {
+    for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
         // guarantee that `node` is not a `Value`, but TypeScript doesn't know.
@@ -205,7 +205,7 @@ namespace Node {
       pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<ElementEntry> {
-    for (const [node, path] of Node.entries(root, options)) {
+    for (const [node, path] of Node.nodes(root, options)) {
       if (Element.isElement(node)) {
         yield [node, path]
       }
@@ -218,7 +218,7 @@ namespace Node {
    * position inside the root node.
    */
 
-  export function* entries(
+  export function* nodes(
     root: Node,
     options: {
       from?: Path
@@ -327,7 +327,7 @@ namespace Node {
 
     return produce(root, r => {
       const [start, end] = Range.edges(range)
-      const iterable = Node.entries(r, {
+      const iterable = Node.nodes(r, {
         reverse: true,
         pass: ([, path]) => !Range.includes(range, path),
       })
@@ -558,7 +558,7 @@ namespace Node {
       pass?: (node: NodeEntry) => boolean
     } = {}
   ): Iterable<TextEntry> {
-    for (const [node, path] of Node.entries(root, options)) {
+    for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
         yield [node, path]
       }

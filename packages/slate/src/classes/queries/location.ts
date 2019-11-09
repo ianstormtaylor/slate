@@ -73,7 +73,7 @@ class LocationQueries {
    * Iterate through all of the nodes in the editor.
    */
 
-  *entries(
+  *nodes(
     this: Editor,
     options: {
       at?: Location | Span
@@ -81,7 +81,7 @@ class LocationQueries {
     } = {}
   ): Iterable<NodeEntry> {
     const [from, to] = getSpan(this, options)
-    const iterable = Node.entries(this.value, {
+    const iterable = Node.nodes(this.value, {
       ...options,
       from,
       to,
@@ -692,7 +692,7 @@ class LocationQueries {
       return
     }
 
-    for (const [n, p] of this.entries({ at, reverse })) {
+    for (const [n, p] of this.nodes({ at, reverse })) {
       if (prevPath && Path.compare(p, prevPath) === 0) {
         continue
       }
@@ -758,7 +758,7 @@ class LocationQueries {
       distance = available >= 0 ? null : 0 - available
     }
 
-    for (const [node, path] of this.entries({ at, reverse })) {
+    for (const [node, path] of this.nodes({ at, reverse })) {
       if (Element.isElement(node)) {
         // Void nodes are a special case, since we don't want to iterate over
         // their content. We instead always just yield their first point.

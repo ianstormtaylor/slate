@@ -82,7 +82,7 @@ class GeneralCommands {
     }
 
     if (force) {
-      const allPaths = Array.from(Node.entries(this.value), ([, p]) => p)
+      const allPaths = Array.from(Node.nodes(this.value), ([, p]) => p)
       DIRTY_PATHS.set(this, allPaths)
     }
 
@@ -138,7 +138,7 @@ const getDirtyPaths = (op: Operation) => {
       const levels = Path.levels(path)
       const descendants = Text.isText(node)
         ? []
-        : Array.from(Node.entries(node), ([, p]) => path.concat(p))
+        : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
 
       return [...levels, ...descendants]
     }
