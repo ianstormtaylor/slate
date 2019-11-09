@@ -11,6 +11,7 @@ import { Leaf } from '../utils/leaf'
 export interface CustomAnnotationProps {
   annotation: Range
   children: any
+  key: string
   leaf: Leaf
   text: Text
   attributes: {

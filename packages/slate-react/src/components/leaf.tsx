@@ -49,10 +49,10 @@ const Leaf = (props: {
   // contenteditable behaviors. (2019/05/08)
   for (const mark of leaf.marks) {
     const ret = renderMark({
-      text,
+      children,
       leaf,
       mark,
-      children,
+      text,
       attributes: {
         'data-slate-mark': true,
       },
@@ -65,10 +65,10 @@ const Leaf = (props: {
 
   for (const decoration of leaf.decorations) {
     const p = {
-      text,
-      leaf,
-      decoration,
       children,
+      decoration,
+      leaf,
+      text,
       attributes: {
         'data-slate-decoration': true,
       },
@@ -87,12 +87,14 @@ const Leaf = (props: {
     }
   }
 
-  for (const annotation of leaf.annotations) {
+  for (const key in leaf.annotations) {
+    const annotation = leaf.annotations[key]
     const ret = renderAnnotation({
-      text,
-      leaf,
       annotation,
       children,
+      key,
+      leaf,
+      text,
       attributes: {
         'data-slate-annotation': true,
       },

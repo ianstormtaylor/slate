@@ -17,7 +17,7 @@ import {
  */
 
 const Children = (props: {
-  annotations: Range[]
+  annotations: Record<string, Range>
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
@@ -51,9 +51,9 @@ const Children = (props: {
     const range = editor.getRange(p)
     const sel = selection && Range.intersection(range, selection)
     const decs = decorate([n, p])
-    const anns = []
+    const anns = {}
 
-    for (let dec of decorations) {
+    for (const dec of decorations) {
       const d = Range.intersection(dec, range)
 
       if (d) {
@@ -61,11 +61,12 @@ const Children = (props: {
       }
     }
 
-    for (let ann of annotations) {
+    for (const k in annotations) {
+      const ann = annotations[k]
       const a = Range.intersection(ann, range)
 
       if (a) {
-        anns.push(a)
+        anns[k] = a
       }
     }
 

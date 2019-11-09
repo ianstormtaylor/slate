@@ -21,17 +21,17 @@ import {
   CustomElementProps,
   CustomMarkProps,
 } from './custom'
+import { isRangeListEqual, isRangeMapEqual } from '../utils/leaf'
 
 /**
  * Element.
  */
 
 const Element = (props: {
-  annotations: Range[]
+  annotations: Record<string, Range>
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
-  path?: Path
   renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderElement?: (props: CustomElementProps) => JSX.Element
@@ -119,7 +119,7 @@ const Element = (props: {
         }}
       >
         <Text
-          annotations={[]}
+          annotations={{}}
           decorations={[]}
           isLast={false}
           parent={element}
@@ -155,4 +155,21 @@ const Element = (props: {
   )
 }
 
-export default Element
+const MemoizedElement = React.memo(Element, (prev, next) => {
+  return (
+    prev.decorate === next.decorate &&
+    prev.element === next.element &&
+    prev.renderAnnotation === next.renderAnnotation &&
+    prev.renderDecoration === next.renderDecoration &&
+    prev.renderElement === next.renderElement &&
+    prev.renderMark === next.renderMark &&
+    isRangeListEqual(prev.decorations, next.decorations) &&
+    isRangeMapEqual(prev.annotations, next.annotations) &&
+    (prev.selection === next.selection ||
+      (!!prev.selection &&
+        !!next.selection &&
+        Range.equals(prev.selection, next.selection)))
+  )
+})
+
+export default MemoizedElement

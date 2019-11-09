@@ -423,7 +423,7 @@ const Editor = (props: {
             }}
           >
             <Children
-              annotations={Object.values(value.annotations)}
+              annotations={value.annotations}
               decorate={decorate}
               decorations={decorate([value, []])}
               node={value}

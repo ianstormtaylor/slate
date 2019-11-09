@@ -20,7 +20,7 @@ import {
  */
 
 const Text = (props: {
-  annotations: Range[]
+  annotations: Record<string, Range>
   decorations: Range[]
   isLast: boolean
   parent: Element
@@ -91,13 +91,17 @@ const Text = (props: {
 
 const getLeaves = (
   node: SlateText,
-  annotations: Range[],
+  annotations: Record<string, Range>,
   decorations: Range[]
 ): SlateLeaf[] => {
   const { text, marks } = node
-  let leaves: SlateLeaf[] = [{ text, marks, annotations: [], decorations: [] }]
+  let leaves: SlateLeaf[] = [{ text, marks, annotations: {}, decorations: [] }]
 
-  const compile = (range: Range, key: 'annotations' | 'decorations') => {
+  const compile = (
+    collection: 'annotations' | 'decorations',
+    range: Range,
+    key?: string
+  ) => {
     const [start, end] = Range.edges(range)
     const next = []
     let o = 0
@@ -109,7 +113,12 @@ const getLeaves = (
 
       // If the range encompases the entire leaf, add the range.
       if (start.offset <= offset && end.offset >= offset + length) {
-        leaf[key].push(range)
+        if (collection === 'annotations') {
+          leaf.annotations[key!] = range
+        } else {
+          leaf.decorations.push(range)
+        }
+
         next.push(leaf)
         continue
       }
@@ -139,7 +148,11 @@ const getLeaves = (
         ;[before, middle] = SlateLeaf.split(middle, start.offset - offset)
       }
 
-      middle[key].push(range)
+      if (collection === 'annotations') {
+        middle.annotations[key!] = range
+      } else {
+        middle.decorations.push(range)
+      }
 
       if (before) {
         next.push(before)
@@ -155,12 +168,13 @@ const getLeaves = (
     leaves = next
   }
 
-  for (const range of annotations) {
-    compile(range, 'annotations')
+  for (const key in annotations) {
+    const range = annotations[key]
+    compile('annotations', range, key)
   }
 
   for (const range of decorations) {
-    compile(range, 'decorations')
+    compile('decorations', range)
   }
 
   return leaves

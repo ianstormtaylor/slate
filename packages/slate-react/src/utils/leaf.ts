@@ -7,7 +7,7 @@ import { Range, Mark } from 'slate'
  */
 
 interface Leaf {
-  annotations: Range[]
+  annotations: Record<string, Range>
   decorations: Range[]
   marks: Mark[]
   text: string
@@ -26,10 +26,8 @@ namespace Leaf {
       leaf.marks.length === another.marks.length &&
       leaf.marks.every(m => Mark.exists(m, another.marks)) &&
       another.marks.every(m => Mark.exists(m, leaf.marks)) &&
-      leaf.decorations.every(d => Range.exists(d, another.decorations)) &&
-      another.decorations.every(d => Range.exists(d, leaf.decorations)) &&
-      leaf.annotations.every(a => Range.exists(a, another.annotations)) &&
-      another.annotations.every(a => Range.exists(a, leaf.annotations))
+      isRangeListEqual(leaf.decorations, another.decorations) &&
+      isRangeMapEqual(leaf.annotations, another.annotations)
     )
   }
 
@@ -56,17 +54,66 @@ namespace Leaf {
       {
         text: leaf.text.slice(0, offset),
         marks: leaf.marks,
-        annotations: [...leaf.annotations],
+        annotations: { ...leaf.annotations },
         decorations: [...leaf.decorations],
       },
       {
         text: leaf.text.slice(offset),
         marks: leaf.marks,
-        annotations: [...leaf.annotations],
+        annotations: { ...leaf.annotations },
         decorations: [...leaf.decorations],
       },
     ]
   }
 }
 
-export { Leaf }
+/**
+ * Check if a list of ranges is equal to another.
+ *
+ * PERF: this requires the two lists to also have the ranges inside them in the
+ * same order, but this is an okay constraint for us since decorations are
+ * kept in order, and the odd case where they aren't is okay to re-render for.
+ */
+
+const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
+  if (list.length !== another.length) {
+    return false
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    const range = list[i]
+    const other = another[i]
+
+    if (!Range.equals(range, other)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+/**
+ * Check if a map of ranges is equal to another.
+ */
+
+const isRangeMapEqual = (
+  map: Record<string, Range>,
+  another: Record<string, Range>
+): boolean => {
+  if (Object.keys(map).length !== Object.keys(another).length) {
+    return false
+  }
+
+  for (const key in map) {
+    const range = map[key]
+    const other = another[key]
+
+    if (!Range.equals(range, other)) {
+      return false
+    }
+  }
+
+  return true
+}
+
+export { Leaf, isRangeListEqual, isRangeMapEqual }
