@@ -49,7 +49,7 @@ const CheckListsExample = () => {
         value={value}
         placeholder="Get to work..."
         renderElement={props => <Element {...props} />}
-        onChange={change => setValue(change.value)}
+        onChange={setValue}
       />
     </div>
   )

@@ -75,7 +75,7 @@ const ImagesExample = () => {
         placeholder="Enter some text..."
         editor={editor}
         value={value}
-        onChange={change => setValue(change.value)}
+        onChange={setValue}
       />
     </div>
   )

@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Change, Operation, Value } from '..'
+import { Operation, Value } from '..'
 import {
   DIRTY_PATHS,
   NORMALIZING,
@@ -51,13 +51,13 @@ type EditorPlugin<E extends Editor = Editor> = (
  */
 
 class Editor {
-  onChange: (change: Change) => void
+  onChange: (value: Value, operations: Operation[]) => void
   operations: Operation[]
   value: Value
 
   constructor(
     props: {
-      onChange?(change: Change): void
+      onChange?(value: Value, operations: Operation[]): void
       readOnly?: boolean
       value?: Value
     } = {}

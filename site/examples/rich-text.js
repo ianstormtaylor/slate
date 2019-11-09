@@ -66,7 +66,6 @@ const RichTextExample = () => {
   const editor = useSlate(RichTextEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
-  const onChange = useCallback(change => setValue(change.value), [])
   return (
     <div>
       <Toolbar>
@@ -99,7 +98,7 @@ const RichTextExample = () => {
         value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={onChange}
+        onChange={setValue}
       />
     </div>
   )

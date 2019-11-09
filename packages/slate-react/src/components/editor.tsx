@@ -1,11 +1,11 @@
-import React, {
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react'
-import { Change, Value, Element, NodeEntry, Range as SlateRange } from 'slate'
+import React, { useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import {
+  Value,
+  Element,
+  NodeEntry,
+  Range as SlateRange,
+  Operation,
+} from 'slate'
 import debounce from 'lodash/debounce'
 
 import Children from './children'
@@ -45,7 +45,7 @@ import {
 const Editor = (props: {
   decorate?: (entry: NodeEntry) => SlateRange[]
   editor: ReactEditor
-  onChange: (change: Change) => void
+  onChange: (value: Value, operations: Operation[]) => void
   placeholder?: string
   readOnly?: boolean
   role?: string

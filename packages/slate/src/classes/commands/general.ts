@@ -1,4 +1,4 @@
-import { Change, Operation, Editor, Node, Path, Text, Value } from '../..'
+import { Operation, Editor, Node, Path, Text, Value } from '../..'
 import {
   DIRTY_PATHS,
   PATH_REFS,
@@ -64,9 +64,8 @@ class GeneralCommands {
     const { value, operations } = this
 
     if (operations.length !== 0) {
-      const change: Change = { value, operations }
       this.operations = []
-      this.onChange(change)
+      this.onChange(value, operations)
     }
   }
 

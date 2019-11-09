@@ -31,7 +31,6 @@ const HugeDocumentExample = () => {
   const [value, setValue] = useState(initialValue)
   const editor = useSlate(HugeDocumentEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const onChange = useCallback(change => setValue(change.value), [])
   return (
     <Editable
       spellCheck
@@ -39,7 +38,7 @@ const HugeDocumentExample = () => {
       editor={editor}
       value={value}
       renderElement={renderElement}
-      onChange={onChange}
+      onChange={setValue}
     />
   )
 }

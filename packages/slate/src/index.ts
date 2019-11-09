@@ -8,7 +8,6 @@ export { PathRef } from './classes/path-ref'
 export { PointRef } from './classes/point-ref'
 export { RangeRef } from './classes/range-ref'
 
-export * from './interfaces/change'
 export * from './interfaces/element'
 export * from './interfaces/fragment'
 export * from './interfaces/location'

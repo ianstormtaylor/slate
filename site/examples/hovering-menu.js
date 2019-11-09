@@ -85,7 +85,7 @@ const HoveringMenuExample = () => {
         editor={editor}
         value={value}
         renderMark={props => <Mark {...props} />}
-        onChange={change => setValue(change.value)}
+        onChange={setValue}
       />
     </div>
   )

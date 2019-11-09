@@ -14,7 +14,7 @@ const ReadOnlyExample = () => {
       readOnly
       editor={editor}
       value={value}
-      onChange={change => setValue(change.value)}
+      onChange={setValue}
     />
   )
 }
