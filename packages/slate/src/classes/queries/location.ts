@@ -16,12 +16,11 @@ import {
   Range,
   Fragment,
   Span,
-  String,
   Text,
   TextEntry,
   Value,
 } from '../..'
-import { Match } from '../utils'
+import { Match, getCharacterDistance, getWordDistance } from '../utils'
 
 class LocationQueries {
   /**
@@ -738,9 +737,9 @@ class LocationQueries {
     const advance = () => {
       if (distance == null) {
         if (unit === 'character') {
-          distance = String.getCharacterDistance(string)
+          distance = getCharacterDistance(string)
         } else if (unit === 'word') {
-          distance = String.getWordDistance(string)
+          distance = getWordDistance(string)
         } else if (unit === 'line' || unit === 'block') {
           distance = string.length
         } else {
