@@ -15,7 +15,7 @@ class RangeQueries {
 
     const closestBlock = this.getMatch(end.path, 'block')
     const blockPath = closestBlock ? closestBlock[1] : []
-    const first = this.getStart()
+    const first = this.getStart([])
     const before = { anchor: first, focus: end }
     let skip = true
 

@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.texts({ reverse: true }))
+  return Array.from(editor.texts({ at: [], reverse: true }))
 }
 
 export const output = [

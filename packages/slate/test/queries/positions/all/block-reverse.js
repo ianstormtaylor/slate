@@ -9,7 +9,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.positions({ reverse: true }))
+  return Array.from(editor.positions({ at: [], reverse: true }))
 }
 
 export const output = [

@@ -1,15 +1,12 @@
 import {
   Editor,
   Element,
-  Node,
-  PathRef,
   Fragment,
   Path,
   Location,
   Range,
   Point,
   Value,
-  Text,
 } from '../..'
 
 class DeletingCommands {
@@ -48,8 +45,8 @@ class DeletingCommands {
         } else {
           const opts = { unit, distance }
           const target = reverse
-            ? this.getBefore(at, opts) || this.getStart()
-            : this.getAfter(at, opts) || this.getEnd()
+            ? this.getBefore(at, opts) || this.getStart([])
+            : this.getAfter(at, opts) || this.getEnd([])
           at = { anchor: at, focus: target }
           hanging = true
         }

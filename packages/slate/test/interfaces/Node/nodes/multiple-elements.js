@@ -7,17 +7,15 @@ export const input = (
   <value>
     <element>
       <text key="a" />
-      <text key="b" />
     </element>
     <element>
-      <text key="c" />
-      <text key="d" />
+      <text key="b" />
     </element>
   </value>
 )
 
 export const test = value => {
-  return Array.from(Node.entries(value, { from: [0, 1] }))
+  return Array.from(Node.nodes(value))
 }
 
 export const output = [
@@ -25,11 +23,9 @@ export const output = [
     <value>
       <element>
         <text key="a" />
-        <text key="b" />
       </element>
       <element>
-        <text key="c" />
-        <text key="d" />
+        <text key="b" />
       </element>
     </value>,
     [],
@@ -37,18 +33,15 @@ export const output = [
   [
     <element>
       <text key="a" />
-      <text key="b" />
     </element>,
     [0],
   ],
-  [<text key="b" />, [0, 1]],
+  [<text key="a" />, [0, 0]],
   [
     <element>
-      <text key="c" />
-      <text key="d" />
+      <text key="b" />
     </element>,
     [1],
   ],
-  [<text key="c" />, [1, 0]],
-  [<text key="d" />, [1, 1]],
+  [<text key="b" />, [1, 0]],
 ]

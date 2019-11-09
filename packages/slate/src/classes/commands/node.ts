@@ -48,7 +48,7 @@ class NodeCommands {
         } else if (this.isInline(node)) {
           match = 'inline'
         } else {
-          match = Path.isPath(at) ? at.length : 'block'
+          match = 'block'
         }
       }
 
@@ -56,7 +56,7 @@ class NodeCommands {
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
-        at = selection || this.getEnd() || [this.value.nodes.length]
+        at = selection || this.getEnd([]) || [this.value.nodes.length]
         select = true
       }
 
@@ -621,7 +621,7 @@ class NodeCommands {
       }
 
       if (options.at == null) {
-        const point = afterRef.current || this.getEnd()
+        const point = afterRef.current || this.getEnd([])
         this.select(point)
       }
 

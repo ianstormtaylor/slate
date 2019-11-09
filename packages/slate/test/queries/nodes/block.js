@@ -4,20 +4,21 @@ import { h } from '../../helpers'
 
 export const input = (
   <value>
-    <block void>one</block>
+    <block>one</block>
   </value>
 )
 
 export const run = editor => {
-  return Array.from(editor.entries())
+  return Array.from(editor.nodes({ at: [] }))
 }
 
 export const output = [
   [
     <value>
-      <block void>one</block>
+      <block>one</block>
     </value>,
     [],
   ],
-  [<block void>one</block>, [0]],
+  [<block>one</block>, [0]],
+  [<text>one</text>, [0, 0]],
 ]

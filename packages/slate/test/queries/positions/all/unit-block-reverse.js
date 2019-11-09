@@ -10,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.positions({ unit: 'block', reverse: true }))
+  return Array.from(editor.positions({ at: [], unit: 'block', reverse: true }))
 }
 
 export const output = [

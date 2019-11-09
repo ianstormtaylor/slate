@@ -13,6 +13,7 @@ export type Match =
   | 'text'
   | 'void'
   | Partial<Node>
+  | Path
   | ((entry: NodeEntry) => boolean)
 
 /**

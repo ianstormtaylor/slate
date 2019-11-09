@@ -213,86 +213,6 @@ namespace Node {
   }
 
   /**
-   * Return an iterable of all the node entries of a root node. Each entry is
-   * returned as a `[Node, Path]` tuple, with the path referring to the node's
-   * position inside the root node.
-   */
-
-  export function* nodes(
-    root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
-    } = {}
-  ): Iterable<NodeEntry> {
-    const { pass, reverse = false } = options
-    const { from = [], to } = options
-    const visited = new Set()
-    let p: Path = []
-    let n = root
-
-    while (true) {
-      if (to && (reverse ? Path.isBefore(p, to) : Path.isAfter(p, to))) {
-        break
-      }
-
-      if (!visited.has(n)) {
-        yield [n, p]
-      }
-
-      // If we're allowed to go downward and we haven't decsended yet, do.
-      if (
-        !visited.has(n) &&
-        !Text.isText(n) &&
-        n.nodes.length !== 0 &&
-        (pass == null || pass([n, p]) === false)
-      ) {
-        visited.add(n)
-        let nextIndex = reverse ? n.nodes.length - 1 : 0
-
-        if (Path.isAncestor(p, from)) {
-          nextIndex = from[p.length]
-        }
-
-        p = p.concat(nextIndex)
-        n = Node.get(root, p)
-        continue
-      }
-
-      // If we're at the root and we can't go down, we're done.
-      if (p.length === 0) {
-        break
-      }
-
-      // If we're going forward...
-      if (!reverse) {
-        const newPath = Path.next(p)
-
-        if (Node.has(root, newPath)) {
-          p = newPath
-          n = Node.get(root, p)
-          continue
-        }
-      }
-
-      // If we're going backward...
-      if (reverse && p[p.length - 1] !== 0) {
-        const newPath = Path.previous(p)
-        p = newPath
-        n = Node.get(root, p)
-        continue
-      }
-
-      // Otherwise we're going upward...
-      p = Path.parent(p)
-      n = Node.get(root, p)
-      visited.add(n)
-    }
-  }
-
-  /**
    * Get the first node entry in a root node from a path.
    */
 
@@ -509,6 +429,86 @@ namespace Node {
         const mark = node.marks[i]
         yield [mark, i, node, path]
       }
+    }
+  }
+
+  /**
+   * Return an iterable of all the node entries of a root node. Each entry is
+   * returned as a `[Node, Path]` tuple, with the path referring to the node's
+   * position inside the root node.
+   */
+
+  export function* nodes(
+    root: Node,
+    options: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (entry: NodeEntry) => boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const { pass, reverse = false } = options
+    const { from = [], to } = options
+    const visited = new Set()
+    let p: Path = []
+    let n = root
+
+    while (true) {
+      if (to && (reverse ? Path.isBefore(p, to) : Path.isAfter(p, to))) {
+        break
+      }
+
+      if (!visited.has(n)) {
+        yield [n, p]
+      }
+
+      // If we're allowed to go downward and we haven't decsended yet, do.
+      if (
+        !visited.has(n) &&
+        !Text.isText(n) &&
+        n.nodes.length !== 0 &&
+        (pass == null || pass([n, p]) === false)
+      ) {
+        visited.add(n)
+        let nextIndex = reverse ? n.nodes.length - 1 : 0
+
+        if (Path.isAncestor(p, from)) {
+          nextIndex = from[p.length]
+        }
+
+        p = p.concat(nextIndex)
+        n = Node.get(root, p)
+        continue
+      }
+
+      // If we're at the root and we can't go down, we're done.
+      if (p.length === 0) {
+        break
+      }
+
+      // If we're going forward...
+      if (!reverse) {
+        const newPath = Path.next(p)
+
+        if (Node.has(root, newPath)) {
+          p = newPath
+          n = Node.get(root, p)
+          continue
+        }
+      }
+
+      // If we're going backward...
+      if (reverse && p[p.length - 1] !== 0) {
+        const newPath = Path.previous(p)
+        p = newPath
+        n = Node.get(root, p)
+        continue
+      }
+
+      // Otherwise we're going upward...
+      p = Path.parent(p)
+      n = Node.get(root, p)
+      visited.add(n)
     }
   }
 

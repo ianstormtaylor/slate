@@ -14,7 +14,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.positions({ unit: 'character' }))
+  return Array.from(editor.positions({ at: [], unit: 'character' }))
 }
 
 export const output = [

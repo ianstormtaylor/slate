@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Array.from(Node.entries(value, { reverse: true }))
+  return Array.from(Node.nodes(value, { reverse: true }))
 }
 
 export const output = [

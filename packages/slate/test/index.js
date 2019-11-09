@@ -15,9 +15,11 @@ describe('slate', () => {
     const TestEditor = TestPlugin(Editor)
     const editor = new TestEditor({ value: input })
 
-    for (const op of operations) {
-      editor.apply(op)
-    }
+    editor.withoutNormalizing(() => {
+      for (const op of operations) {
+        editor.apply(op)
+      }
+    })
 
     assert.deepEqual(editor.value, output)
   })
@@ -38,7 +40,7 @@ describe('slate', () => {
     assert.deepEqual(result, output)
   })
 
-  fixtures(__dirname, 'commands', ({ module }) => {
+  fixtures(__dirname, 'commands', ({ module, path }) => {
     const { input, run, output } = module
     const TestEditor = TestPlugin(Editor)
     const editor = new TestEditor({ value: input })

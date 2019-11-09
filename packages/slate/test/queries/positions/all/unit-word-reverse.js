@@ -10,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.positions({ unit: 'word', reverse: true }))
+  return Array.from(editor.positions({ at: [], unit: 'word', reverse: true }))
 }
 
 export const output = [

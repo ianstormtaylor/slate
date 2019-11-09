@@ -10,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.positions({ unit: 'line' }))
+  return Array.from(editor.positions({ at: [], unit: 'line' }))
 }
 
 export const output = [

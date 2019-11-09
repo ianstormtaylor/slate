@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.matches({ match: 'inline', reverse: true }))
+  return Array.from(editor.matches({ at: [], match: 'inline', reverse: true }))
 }
 
 export const output = [

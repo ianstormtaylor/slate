@@ -9,7 +9,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.matches({ match: 'inline' }))
+  return Array.from(editor.matches({ at: [], match: 'inline' }))
 }
 
 export const output = [[<text>one</text>, [0, 0]]]

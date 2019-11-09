@@ -15,16 +15,9 @@ class RichTextEditor extends withHistory(withReact(Editor)) {
 
   isBlockActive(type) {
     const { selection } = this.value
-
-    if (selection) {
-      for (const [node] of this.elements({ at: selection })) {
-        if (node.type === type) {
-          return true
-        }
-      }
-    }
-
-    return false
+    if (!selection) return false
+    const match = this.getMatch(selection, { type })
+    return !!match
   }
 
   onKeyDown(event) {

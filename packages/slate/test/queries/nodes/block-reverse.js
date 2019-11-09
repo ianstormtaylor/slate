@@ -10,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.entries({ reverse: true }))
+  return Array.from(editor.nodes({ at: [], reverse: true }))
 }
 
 export const output = [

@@ -14,7 +14,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.entries())
+  return Array.from(editor.nodes({ at: [] }))
 }
 
 export const output = [

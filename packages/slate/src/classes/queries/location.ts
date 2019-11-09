@@ -33,8 +33,13 @@ class LocationQueries {
       at?: Location
     } = {}
   ): Iterable<AnnotationEntry> {
-    const { annotations } = this.value
-    const { at = [] } = options
+    const { annotations, selection } = this.value
+    const { at = selection } = options
+
+    if (!at) {
+      return
+    }
+
     const range = this.getRange(at)
 
     for (const key in annotations) {
@@ -59,7 +64,13 @@ class LocationQueries {
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
-    const [from, to] = getSpan(this, options)
+    const { at = this.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = getSpan(this, at, options)
 
     yield* Node.elements(this.value, {
       ...options,
@@ -67,30 +78,6 @@ class LocationQueries {
       to,
       pass: ([n]) => Element.isElement(n) && this.isVoid(n),
     })
-  }
-
-  /**
-   * Iterate through all of the nodes in the editor.
-   */
-
-  *nodes(
-    this: Editor,
-    options: {
-      at?: Location | Span
-      reverse?: boolean
-    } = {}
-  ): Iterable<NodeEntry> {
-    const [from, to] = getSpan(this, options)
-    const iterable = Node.nodes(this.value, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
-    })
-
-    for (const entry of iterable) {
-      yield entry
-    }
   }
 
   /**
@@ -193,7 +180,7 @@ class LocationQueries {
     } = {}
   ): Point | undefined {
     const anchor = this.getPoint(at, { edge: 'end' })
-    const focus = this.getEnd()
+    const focus = this.getEnd([])
     const range = { anchor, focus }
     const { distance = 1 } = options
     let d = 0
@@ -251,7 +238,7 @@ class LocationQueries {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
     } = {}
   ): Point | undefined {
-    const anchor = this.getStart()
+    const anchor = this.getStart([])
     const focus = this.getPoint(at, { edge: 'start' })
     const range = { anchor, focus }
     const { distance = 1 } = options
@@ -277,7 +264,7 @@ class LocationQueries {
    * Get the start and end points of a location.
    */
 
-  getEdges(this: Editor, at: Location = []): [Point, Point] {
+  getEdges(this: Editor, at: Location): [Point, Point] {
     return [this.getStart(at), this.getEnd(at)]
   }
 
@@ -285,7 +272,7 @@ class LocationQueries {
    * Get the end point of a location.
    */
 
-  getEnd(this: Editor, at: Location = []): Point {
+  getEnd(this: Editor, at: Location): Point {
     return this.getPoint(at, { edge: 'end' })
   }
 
@@ -339,6 +326,11 @@ class LocationQueries {
    */
 
   getMatch(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+    // PERF: If the match is a path, don't traverse.
+    if (Path.isPath(match)) {
+      return this.getNode(match)
+    }
+
     // PERF: If the target is a path and the match is a depth, don't traverse.
     if (typeof match === 'number' && match <= at.length && Path.isPath(at)) {
       const p = at.slice(0, match)
@@ -506,7 +498,7 @@ class LocationQueries {
     const span: Span = [from, to]
     let i = 0
 
-    for (const entry of this.matches({ at: span, match, reverse: true })) {
+    for (const entry of this.matches({ match, at: span, reverse: true })) {
       if (i === 1) {
         return entry
       }
@@ -533,7 +525,7 @@ class LocationQueries {
    * Get the start point of a location.
    */
 
-  getStart(this: Editor, at: Location = []): Point {
+  getStart(this: Editor, at: Location): Point {
     return this.getPoint(at, { edge: 'start' })
   }
 
@@ -544,7 +536,7 @@ class LocationQueries {
    * of what their actual content is.
    */
 
-  getText(this: Editor, at: Location = []): string {
+  getText(this: Editor, at: Location): string {
     const range = this.getRange(at)
     const [start, end] = Range.edges(range)
     let text = ''
@@ -587,7 +579,7 @@ class LocationQueries {
    * Check if a point the start point of a location.
    */
 
-  isStart(this: Editor, point: Point, at: Location = []): boolean {
+  isStart(this: Editor, point: Point, at: Location): boolean {
     // PERF: If the offset isn't `0` we know it's not the start.
     if (point.offset !== 0) {
       return false
@@ -601,7 +593,7 @@ class LocationQueries {
    * Check if a point is the end point of a location.
    */
 
-  isEnd(this: Editor, point: Point, at: Location = []): boolean {
+  isEnd(this: Editor, point: Point, at: Location): boolean {
     const end = this.getEnd(at)
     return Point.equals(point, end)
   }
@@ -610,7 +602,7 @@ class LocationQueries {
    * Check if a point is an edge of a location.
    */
 
-  isEdge(this: Editor, point: Point, at: Location = []): boolean {
+  isEdge(this: Editor, point: Point, at: Location): boolean {
     return this.isStart(point, at) || this.isEnd(point, at)
   }
 
@@ -625,7 +617,12 @@ class LocationQueries {
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = [], reverse = false } = options
+    const { at = this.value.selection, reverse = false } = options
+
+    if (!at) {
+      return
+    }
+
     const levels: NodeEntry[] = []
     const path = this.getPath(at)
 
@@ -655,7 +652,13 @@ class LocationQueries {
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
-    const [from, to] = getSpan(this, options)
+    const { at = this.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = getSpan(this, at, options)
 
     yield* Node.marks(this.value, {
       ...options,
@@ -672,25 +675,22 @@ class LocationQueries {
   *matches(
     this: Editor,
     options: {
-      match: Match
       at?: Location | Span
+      match?: Match
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
-    const { reverse, match } = options
-    let { at } = options
-    let prevPath: Path | undefined
+    const {
+      at = this.value.selection,
+      match = Path.isPath(at) ? at : () => true,
+      reverse = false,
+    } = options
 
-    // PERF: If the target is a path, don't traverse.
-    if (Path.isPath(at)) {
-      const m = this.getMatch(at, match)
-
-      if (m) {
-        yield m
-      }
-
+    if (!at) {
       return
     }
+
+    let prevPath: Path | undefined
 
     for (const [n, p] of this.nodes({ at, reverse })) {
       if (prevPath && Path.compare(p, prevPath) === 0) {
@@ -701,6 +701,36 @@ class LocationQueries {
         prevPath = p
         yield [n, p]
       }
+    }
+  }
+
+  /**
+   * Iterate through all of the nodes in the editor.
+   */
+
+  *nodes(
+    this: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const { at = this.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = getSpan(this, at, options)
+    const iterable = Node.nodes(this.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && this.isVoid(n),
+    })
+
+    for (const entry of iterable) {
+      yield entry
     }
   }
 
@@ -724,7 +754,16 @@ class LocationQueries {
       reverse?: boolean
     } = {}
   ): Iterable<Point> {
-    const { at = [], unit = 'offset', reverse = false } = options
+    const {
+      at = this.value.selection,
+      unit = 'offset',
+      reverse = false,
+    } = options
+
+    if (!at) {
+      return
+    }
+
     const range = this.getRange(at)
     const [start, end] = Range.edges(range)
     const first = reverse ? end : start
@@ -830,7 +869,13 @@ class LocationQueries {
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {
-    const [from, to] = getSpan(this, options)
+    const { at = this.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = getSpan(this, at, options)
 
     yield* Node.texts(this.value, {
       ...options,
@@ -847,12 +892,12 @@ class LocationQueries {
 
 const getSpan = (
   editor: Editor,
+  at: Location | Span,
   options: {
-    at?: Location | Span
     reverse?: boolean
   } = {}
 ): Span => {
-  const { at = [], reverse = false } = options
+  const { reverse = false } = options
 
   if (Span.isSpan(at)) {
     return at
@@ -892,6 +937,8 @@ const isMatch = (editor: Editor, entry: NodeEntry, match: Match) => {
     )
   } else if (match === 'void') {
     return Element.isElement(node) && editor.isVoid(node)
+  } else if (Path.isPath(match)) {
+    return Path.equals(path, match)
   } else {
     return Node.matches(node, match)
   }
