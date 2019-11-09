@@ -62,7 +62,7 @@ namespace Value {
       isPlainObject(value) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.nodes) &&
-      isAnnotationMap(value.annotations)
+      Range.isRangeMap(value.annotations)
     )
   }
 
@@ -384,22 +384,6 @@ namespace Value {
       }
     })
   }
-}
-
-/**
- * Check if a value is a map of `Annotation` objects.
- */
-
-export const isAnnotationMap = (value: any): value is Record<string, Range> => {
-  if (!isPlainObject(value)) {
-    return false
-  }
-
-  for (const key in value) {
-    return Range.isRange(value[key])
-  }
-
-  return true
 }
 
 export {

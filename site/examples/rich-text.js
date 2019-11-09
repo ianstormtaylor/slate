@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate } from 'slate-react'
 import { Editor } from 'slate'
@@ -64,6 +64,9 @@ class RichTextEditor extends withHistory(withReact(Editor)) {
 const RichTextExample = () => {
   const [value, setValue] = useState(initialValue)
   const editor = useSlate(RichTextEditor)
+  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderMark = useCallback(props => <Mark {...props} />, [])
+  const onChange = useCallback(change => setValue(change.value), [])
   return (
     <div>
       <Toolbar>
@@ -94,9 +97,9 @@ const RichTextExample = () => {
         autoFocus
         editor={editor}
         value={value}
-        renderElement={props => <Element {...props} />}
-        renderMark={props => <Mark {...props} />}
-        onChange={change => setValue(change.value)}
+        renderElement={renderElement}
+        renderMark={renderMark}
+        onChange={onChange}
       />
     </div>
   )

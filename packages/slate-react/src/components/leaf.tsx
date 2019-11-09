@@ -11,33 +11,25 @@ import {
   PlaceholderDecoration,
 } from './custom'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
+import { Leaf as SlateLeaf } from '../utils/leaf'
 
 /**
  * Individual leaves in a text node with unique formatting.
  */
 
 const Leaf = (props: {
-  annotations: Range[]
-  block: Element | null
-  decorations: Range[]
-  index: number
-  leaves: any[]
-  marks: Mark[]
-  node: Text
+  isLast: boolean
+  leaf: SlateLeaf
   parent: Element
   renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
-  text: string
+  text: Text
 }) => {
   const {
-    annotations,
-    block,
-    decorations,
-    index,
-    leaves,
-    marks,
-    node,
+    leaf,
+    isLast,
+    text,
     parent,
     renderAnnotation = (props: CustomAnnotationProps) => (
       <CustomAnnotation {...props} />
@@ -46,34 +38,19 @@ const Leaf = (props: {
       <CustomDecoration {...props} />
     ),
     renderMark = (props: CustomMarkProps) => <CustomMark {...props} />,
-    text,
   } = props
 
-  const renderProps = {
-    marks,
-    annotations,
-    decorations,
-    node,
-    text,
-  }
-
   let children = (
-    <String
-      node={node}
-      index={index}
-      text={text}
-      parent={parent}
-      block={block}
-      leaves={leaves}
-    />
+    <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
   // COMPAT: Having the `data-` attributes on these leaf elements ensures that
   // in certain misbehaving browsers they aren't weirdly cloned/destroyed by
   // contenteditable behaviors. (2019/05/08)
-  for (const mark of marks) {
+  for (const mark of leaf.marks) {
     const ret = renderMark({
-      ...renderProps,
+      text,
+      leaf,
       mark,
       children,
       attributes: {
@@ -86,9 +63,10 @@ const Leaf = (props: {
     }
   }
 
-  for (const decoration of decorations) {
+  for (const decoration of leaf.decorations) {
     const p = {
-      ...renderProps,
+      text,
+      leaf,
       decoration,
       children,
       attributes: {
@@ -109,9 +87,10 @@ const Leaf = (props: {
     }
   }
 
-  for (const annotation of annotations) {
+  for (const annotation of leaf.annotations) {
     const ret = renderAnnotation({
-      ...renderProps,
+      text,
+      leaf,
       annotation,
       children,
       attributes: {
@@ -127,4 +106,16 @@ const Leaf = (props: {
   return <span data-slate-leaf>{children}</span>
 }
 
-export default Leaf
+const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
+  return (
+    next.parent === prev.parent &&
+    next.isLast === prev.isLast &&
+    next.renderAnnotation === prev.renderAnnotation &&
+    next.renderDecoration === prev.renderDecoration &&
+    next.renderMark === prev.renderMark &&
+    next.text === prev.text &&
+    SlateLeaf.equals(next.leaf, prev.leaf)
+  )
+})
+
+export default MemoizedLeaf

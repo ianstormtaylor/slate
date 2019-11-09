@@ -1,28 +1,22 @@
 import React from 'react'
 import { Text, Path, Element, Node } from 'slate'
+
 import { useEditor } from '../hooks/use-editor'
+import { Leaf } from '../utils/leaf'
 
 /**
  * Leaf content strings.
  */
 
-const String = ({
-  node,
-  index,
-  text,
-  parent,
-  block,
-  leaves,
-}: {
-  node: Text
-  index: number
-  text: string
+const String = (props: {
+  isLast: boolean
+  leaf: Leaf
   parent: Element
-  block: Element | null
-  leaves: any[]
+  text: Text
 }) => {
+  const { isLast, leaf, parent, text } = props
   const editor = useEditor()
-  const path = editor.findPath(node)
+  const path = editor.findPath(text)
   const parentPath = Path.parent(path)
 
   // COMPAT: Render text inside void nodes with a zero-width space.
@@ -35,8 +29,8 @@ const String = ({
   // width space that will convert into a line break when copying and pasting
   // to support expected plain text.
   if (
-    text === '' &&
-    parent.nodes[parent.nodes.length - 1] === node &&
+    leaf.text === '' &&
+    parent.nodes[parent.nodes.length - 1] === text &&
     !editor.isInline(parent) &&
     editor.getText(parentPath) === ''
   ) {
@@ -46,24 +40,17 @@ const String = ({
   // COMPAT: If the text is empty, it's because it's on the edge of an inline
   // node, so we render a zero-width space so that the selection can be
   // inserted next to it still.
-  if (text === '') {
+  if (leaf.text === '') {
     return <ZeroWidthString />
   }
 
   // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
   // so we need to add an extra trailing new lines to prevent that.
-  if (block) {
-    const [lastNode] = Node.last(block, [])
-    const lastChar = text.charAt(text.length - 1)
-    const isLastText = node === lastNode
-    const isLastLeaf = index === leaves.length - 1
-
-    if (isLastText && isLastLeaf && lastChar === '\n') {
-      return <TextString isTrailing text={text} />
-    }
+  if (isLast && leaf.text.slice(-1) === '\n') {
+    return <TextString isTrailing text={leaf.text} />
   }
 
-  return <TextString text={text} />
+  return <TextString text={leaf.text} />
 }
 
 /**

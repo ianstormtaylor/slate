@@ -2,7 +2,13 @@ import React, { useEffect, useRef } from 'react'
 import { Range, Element, Mark, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
-import { NODE_TO_ELEMENT, ELEMENT_TO_NODE } from '../utils/weak-maps'
+import { Leaf as SlateLeaf } from '../utils/leaf'
+import { useEditor } from '../hooks/use-editor'
+import {
+  KEY_TO_ELEMENT,
+  NODE_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+} from '../utils/weak-maps'
 import {
   CustomAnnotationProps,
   CustomDecorationProps,
@@ -15,48 +21,43 @@ import {
 
 const Text = (props: {
   annotations: Range[]
-  block: Element | null
   decorations: Range[]
-  node: SlateText
+  isLast: boolean
   parent: Element
   renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
-  style?: Record<string, any>
+  text: SlateText
 }) => {
   const {
     annotations,
-    block,
     decorations,
-    node,
+    isLast,
     parent,
     renderAnnotation,
     renderDecoration,
     renderMark,
-    ...rest
+    text,
   } = props
+  const editor = useEditor()
   const ref = useRef<HTMLSpanElement>(null)
-  const leaves = getLeaves(node, annotations, decorations)
+  const leaves = getLeaves(text, annotations, decorations)
+  const key = editor.findKey(text)
   const children = []
 
   for (let i = 0; i < leaves.length; i++) {
     const leaf = leaves[i]
-    const { text } = leaf
 
     children.push(
       <Leaf
-        annotations={leaf.annotations}
-        block={block}
-        decorations={leaf.decorations}
-        index={i}
-        leaves={leaves}
-        marks={leaf.marks}
-        node={node}
+        isLast={isLast && i === leaves.length - 1}
+        key={`${key.id}-${i}`}
+        leaf={leaf}
+        text={text}
         parent={parent}
         renderAnnotation={renderAnnotation}
         renderDecoration={renderDecoration}
         renderMark={renderMark}
-        text={text}
       />
     )
   }
@@ -64,25 +65,19 @@ const Text = (props: {
   // Update element-related weak maps with the DOM element ref.
   useEffect(() => {
     if (ref.current) {
-      NODE_TO_ELEMENT.set(node, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, node)
+      KEY_TO_ELEMENT.set(key, ref.current)
+      NODE_TO_ELEMENT.set(text, ref.current)
+      ELEMENT_TO_NODE.set(ref.current, text)
     } else {
-      NODE_TO_ELEMENT.delete(node)
+      NODE_TO_ELEMENT.delete(text)
     }
   })
 
   return (
-    <span data-slate-node="text" ref={ref} {...rest}>
+    <span data-slate-node="text" ref={ref}>
       {children}
     </span>
   )
-}
-
-interface SlateLeaf {
-  annotations: Range[]
-  decorations: Range[]
-  marks: Mark[]
-  text: string
 }
 
 /**
@@ -132,11 +127,11 @@ const getLeaves = (
       let after
 
       if (end.offset < offset + length) {
-        ;[middle, after] = split(middle, end.offset - offset)
+        ;[middle, after] = SlateLeaf.split(middle, end.offset - offset)
       }
 
       if (start.offset > offset) {
-        ;[before, middle] = split(middle, start.offset - offset)
+        ;[before, middle] = SlateLeaf.split(middle, start.offset - offset)
       }
 
       middle[key].push(range)
@@ -166,25 +161,30 @@ const getLeaves = (
   return leaves
 }
 
-/**
- * Split a leaf into two at an offset.
- */
+const MemoizedText = React.memo(Text, (prev, next) => {
+  if (
+    next.parent === prev.parent &&
+    next.isLast === prev.isLast &&
+    next.renderAnnotation === prev.renderAnnotation &&
+    next.renderDecoration === prev.renderDecoration &&
+    next.renderMark === prev.renderMark &&
+    next.text === prev.text
+  ) {
+    return SlateLeaf.equals(
+      {
+        ...next.text,
+        annotations: next.annotations,
+        decorations: next.decorations,
+      },
+      {
+        ...prev.text,
+        annotations: prev.annotations,
+        decorations: prev.decorations,
+      }
+    )
+  }
 
-const split = (leaf: SlateLeaf, offset: number): [SlateLeaf, SlateLeaf] => {
-  return [
-    {
-      text: leaf.text.slice(0, offset),
-      marks: leaf.marks,
-      annotations: [...leaf.annotations],
-      decorations: [...leaf.decorations],
-    },
-    {
-      text: leaf.text.slice(offset),
-      marks: leaf.marks,
-      annotations: [...leaf.annotations],
-      decorations: [...leaf.decorations],
-    },
-  ]
-}
+  return false
+})
 
-export default Text
+export default MemoizedText

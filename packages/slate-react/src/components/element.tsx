@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react'
 import getDirection from 'direction'
-import { Node, Range, Element as SlateElement, Path } from 'slate'
+import { Node, Range, NodeEntry, Element as SlateElement, Path } from 'slate'
 
 import Text from './text'
 import Children from './children'
@@ -12,6 +12,7 @@ import {
   ELEMENT_TO_NODE,
   NODE_TO_PARENT,
   NODE_TO_INDEX,
+  KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import {
   CustomAnnotationProps,
@@ -27,7 +28,7 @@ import {
 
 const Element = (props: {
   annotations: Range[]
-  block: SlateElement | null
+  decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
   path?: Path
@@ -39,7 +40,7 @@ const Element = (props: {
 }) => {
   const {
     annotations,
-    block,
+    decorate,
     decorations,
     element,
     renderAnnotation,
@@ -52,11 +53,12 @@ const Element = (props: {
   const editor = useEditor()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
+  const key = editor.findKey(element)
 
   let children: JSX.Element | null = (
     <Children
       annotations={annotations}
-      block={block}
+      decorate={decorate}
       decorations={decorations}
       node={element}
       renderAnnotation={renderAnnotation}
@@ -118,10 +120,10 @@ const Element = (props: {
       >
         <Text
           annotations={[]}
-          block={!isInline ? element : block}
           decorations={[]}
-          node={text}
+          isLast={false}
           parent={element}
+          text={text}
         />
       </Tag>
     )
@@ -133,6 +135,7 @@ const Element = (props: {
   // Update element-related weak maps with the DOM element ref.
   useEffect(() => {
     if (ref.current) {
+      KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
       ELEMENT_TO_NODE.set(ref.current, element)
     } else {

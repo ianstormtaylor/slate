@@ -51,6 +51,29 @@ namespace Range {
   }
 
   /**
+   * Check if a range exists in a list or map of ranges.
+   */
+
+  export const exists = (
+    range: Range,
+    target: Range[] | Record<string, Range>
+  ): boolean => {
+    if (Range.isRangeList(target)) {
+      return !!target.find(r => Range.equals(r, range))
+    }
+
+    if (Range.isRangeMap(target)) {
+      for (const key in target) {
+        if (Range.equals(range, target[key])) {
+          return true
+        }
+      }
+    }
+
+    return false
+  }
+
+  /**
    * Check if a range includes a path, a point or part of another range.
    */
 
@@ -136,6 +159,32 @@ namespace Range {
       Point.isPoint(value.anchor) &&
       Point.isPoint(value.focus)
     )
+  }
+
+  /**
+   * Check if a value is an array of `Range` objects.
+   */
+
+  export const isRangeList = (value: any): value is Range[] => {
+    return (
+      Array.isArray(value) && (value.length === 0 || Range.isRange(value[0]))
+    )
+  }
+
+  /**
+   * Check if a value is a map of `Range` objects.
+   */
+
+  export const isRangeMap = (value: any): value is Record<string, Range> => {
+    if (!isPlainObject(value)) {
+      return false
+    }
+
+    for (const key in value) {
+      return Range.isRange(value[key])
+    }
+
+    return true
   }
 
   /**

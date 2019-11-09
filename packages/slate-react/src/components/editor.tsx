@@ -1,5 +1,11 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react'
-import { Change, Value, Element } from 'slate'
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react'
+import { Change, Value, Element, NodeEntry, Range as SlateRange } from 'slate'
 import debounce from 'lodash/debounce'
 
 import Children from './children'
@@ -37,8 +43,9 @@ import {
  */
 
 const Editor = (props: {
+  decorate?: (entry: NodeEntry) => SlateRange[]
   editor: ReactEditor
-  onChange?: (change: Change) => void
+  onChange: (change: Change) => void
   placeholder?: string
   readOnly?: boolean
   role?: string
@@ -51,9 +58,10 @@ const Editor = (props: {
   [key: string]: any
 }) => {
   const {
+    decorate = defaultDecorate,
     editor,
     value,
-    onChange = () => {},
+    onChange,
     placeholder,
     readOnly = false,
     renderAnnotation,
@@ -91,7 +99,7 @@ const Editor = (props: {
   )
 
   // Update element-related weak maps with the DOM element ref.
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ref.current) {
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(value, ref.current)
@@ -106,7 +114,7 @@ const Editor = (props: {
   // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
-  useEffect(() => {
+  useLayoutEffect(() => {
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
@@ -121,7 +129,7 @@ const Editor = (props: {
   // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
   // real `beforeinput` events sadly... (2019/11/04)
   // https://github.com/facebook/react/issues/11211
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (ref.current) {
       // @ts-ignore The `beforeinput` event isn't recognized.
       ref.current.addEventListener('beforeinput', onDOMBeforeInput)
@@ -135,8 +143,11 @@ const Editor = (props: {
     }
   }, [])
 
+  console.log('render')
+
   // Whenever the editor updates, make sure the DOM selection state is in sync.
-  useEffect(() => {
+  useLayoutEffect(() => {
+    console.log('useLayoutEffect: sync selection')
     const { selection } = value
     const domSelection = window.getSelection()
 
@@ -149,6 +160,7 @@ const Editor = (props: {
     const oldDomRange = domSelection.getRangeAt(0)
 
     if (!oldDomRange || !isRangeEqual(domRange, oldDomRange)) {
+      console.log('update DOM selection')
       state.isUpdatingSelection = true
       domSelection.removeAllRanges()
       domSelection.addRange(domRange)
@@ -180,6 +192,7 @@ const Editor = (props: {
       }
     ) => {
       if (!readOnly && hasEditableTarget(editor, event.target)) {
+        console.log('beforeinput', event)
         const { inputType } = event
 
         // These two types occur while a user is composing text and can't be
@@ -211,6 +224,7 @@ const Editor = (props: {
   // where another change happens while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     debounce(() => {
+      console.log('selectionchange')
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const el = editor.toDomNode(value)
         const { activeElement } = window.document
@@ -221,6 +235,7 @@ const Editor = (props: {
 
           if (domSelection) {
             const range = editor.toSlateRange(domSelection)
+            console.log('select', domSelection, range)
             editor.select(range)
             IS_FOCUSED.set(editor, true)
           }
@@ -409,8 +424,8 @@ const Editor = (props: {
           >
             <Children
               annotations={Object.values(value.annotations)}
-              block={null}
-              decorations={[]}
+              decorate={decorate}
+              decorations={decorate([value, []])}
               node={value}
               renderAnnotation={renderAnnotation}
               renderDecoration={renderDecoration}
@@ -424,6 +439,12 @@ const Editor = (props: {
     </EditorContext.Provider>
   )
 }
+
+/**
+ * A default memoized decorate function.
+ */
+
+const defaultDecorate = () => []
 
 /**
  * Check if two DOM range objects are equal.

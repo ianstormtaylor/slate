@@ -1,6 +1,8 @@
 import React from 'react'
 import { Element, Range, Mark, Text } from 'slate'
+
 import { useEditor } from '../hooks/use-editor'
+import { Leaf } from '../utils/leaf'
 
 /**
  * `CustomAnnotationProps` are passed to the `renderAnnotation` handler.
@@ -8,12 +10,9 @@ import { useEditor } from '../hooks/use-editor'
 
 export interface CustomAnnotationProps {
   annotation: Range
-  annotations: Range[]
   children: any
-  decorations: Range[]
-  marks: Mark[]
-  node: Text
-  text: string
+  leaf: Leaf
+  text: Text
   attributes: {
     'data-slate-annotation': true
   }
@@ -29,13 +28,10 @@ export const CustomAnnotation = (props: CustomAnnotationProps) => {
 }
 
 export interface CustomDecorationProps {
-  annotations: Range[]
   children: any
   decoration: Range
-  decorations: Range[]
-  marks: Mark[]
-  node: Text
-  text: string
+  leaf: Leaf
+  text: Text
   attributes: {
     'data-slate-decoration': true
   }
@@ -86,13 +82,10 @@ export const CustomElement = (props: CustomElementProps) => {
  */
 
 export interface CustomMarkProps {
-  annotations: Range[]
   children: any
-  decorations: Range[]
   mark: Mark
-  marks: Mark[]
-  node: Text
-  text: string
+  leaf: Leaf
+  text: Text
   attributes: {
     'data-slate-mark': true
   }

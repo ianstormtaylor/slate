@@ -20,6 +20,7 @@
     "@types/react": "^16.9.11",
     "direction": "^1.0.3",
     "is-hotkey": "0.1.4",
+    "is-plain-object": "^3.0.0",
     "slate-react-placeholder": "^0.2.8",
     "tiny-invariant": "^1.0.6",
     "tiny-warning": "^1.0.3"

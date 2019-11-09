@@ -3,6 +3,7 @@ import { cx, css } from 'emotion'
 import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
+import dynamic from 'next/dynamic'
 import ErrorBoundary from 'react-error-boundary'
 
 import { Icon } from '../../components'
@@ -10,10 +11,7 @@ import { Icon } from '../../components'
 import CheckLists from '../../examples/check-lists'
 // import CodeHighlighting from '../../examples/code-highlighting'
 // import Embeds from '../../examples/embeds'
-// import Emojis from '../../examples/emojis'
 // import ForcedLayout from '../../examples/forced-layout'
-// import History from '../../examples/history'
-// import Versions from '../../examples/versions'
 import HoveringMenu from '../../examples/hovering-menu'
 import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
@@ -22,26 +20,18 @@ import Links from '../../examples/links'
 // import MarkdownShortcuts from '../../examples/markdown-shortcuts'
 // import PasteHtml from '../../examples/paste-html'
 import PlainText from '../../examples/plain-text'
-// import Plugins from '../../examples/plugins'
-// import RTL from '../../examples/rtl'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/rich-text'
-// import SearchHighlighting from '../../examples/search-highlighting'
-// import Composition from '../../examples/composition'
+import SearchHighlighting from '../../examples/search-highlighting'
 // import InputTester from '../../examples/input-tester'
-// import SyncingOperations from '../../examples/syncing-operations'
 // import Tables from '../../examples/tables'
 // import Mentions from '../../examples/mentions'
-// import Placeholder from '../../examples/placeholder'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
   // ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
-  // ['Composition', Composition, 'composition/:subpage?'],
   // ['Embeds', Embeds, 'embeds'],
-  // ['Emojis', Emojis, 'emojis'],
   // ['Forced Layout', ForcedLayout, 'forced-layout'],
-  // ['History', History, 'history'],
   ['Hovering Menu', HoveringMenu, 'hovering-menu'],
   ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
@@ -51,16 +41,11 @@ const EXAMPLES = [
   // ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   // ['Mentions', Mentions, 'mentions'],
   // ['Paste HTML', PasteHtml, 'paste-html'],
-  // ['Placeholders', Placeholder, 'placeholder'],
   ['Plain Text', PlainText, 'plain-text'],
-  // ['Plugins', Plugins, 'plugins'],
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'rich-text'],
-  // ['RTL', RTL, 'rtl'],
-  // ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  // ['Syncing Operations', SyncingOperations, 'syncing-operations'],
+  ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   // ['Tables', Tables, 'tables'],
-  // ['Versions', Versions, 'versions'],
 ]
 
 const Header = props => (
@@ -256,7 +241,7 @@ const ExamplePage = () => {
   const { example = 'rich-text' } = router.query
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
-
+  console.log('render [example]')
   return (
     <ErrorBoundary
       onError={(error, stacktrace) => {
@@ -341,4 +326,14 @@ const ExamplePage = () => {
   )
 }
 
-export default ExamplePage
+// Disable SSR because it results in a double rendering which makes debugging
+// examples more challenging. No idea how any of this works.
+const NoSsrExamplePage = dynamic(() => Promise.resolve(ExamplePage), {
+  ssr: false,
+})
+
+NoSsrExamplePage.getInitialProps = () => {
+  return {}
+}
+
+export default NoSsrExamplePage

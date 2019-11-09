@@ -1,4 +1,4 @@
-import { Fragment, Range, Node } from 'slate'
+import { Fragment, Range as SlateRange, Node as SlateNode } from 'slate'
 
 import { ReactEditor } from '../plugin'
 import { isDOMText, isDOMElement, DOMNode } from './dom'
@@ -27,7 +27,7 @@ namespace Utils {
   export const setFragmentData = (
     dataTransfer: DataTransfer,
     editor: ReactEditor
-  ) => {
+  ): void => {
     const { value } = editor
     const { selection } = value
 
@@ -35,11 +35,11 @@ namespace Utils {
       return
     }
 
-    const [start, end] = Range.edges(selection)
+    const [start, end] = SlateRange.edges(selection)
     const startVoid = editor.getMatch(start.path, 'void')
     const endVoid = editor.getMatch(end.path, 'void')
 
-    if (Range.isCollapsed(selection) && !startVoid) {
+    if (SlateRange.isCollapsed(selection) && !startVoid) {
       return
     }
 
@@ -97,7 +97,7 @@ namespace Utils {
       attach = span
     }
 
-    const fragment = Node.fragment(value, selection)
+    const fragment = SlateNode.fragment(value, selection)
     const string = JSON.stringify(fragment)
     const encoded = window.btoa(encodeURIComponent(string))
     attach.setAttribute('data-slate-fragment', encoded)

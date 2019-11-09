@@ -1,12 +1,42 @@
-import { Editor, Range } from 'slate'
+import { Editor, Operation, Path, Range } from 'slate'
 
 import Hotkeys from '../utils/hotkeys'
-import { IS_FOCUSED } from '../utils/weak-maps'
+import { IS_FOCUSED, NODE_TO_KEY } from '../utils/weak-maps'
 import { ReactEditor } from '.'
 import { Utils } from '../utils/utils'
 import { DOMStaticRange } from '../utils/dom'
 
 export default class ReactEditorCommands {
+  /**
+   * Override
+   */
+
+  apply(this: Editor, op: Operation) {
+    const paths: Path[] = []
+
+    switch (op.type) {
+      case 'insert_text':
+        paths.push(op.path)
+        break
+    }
+
+    const map: { [key: string]: Path } = {}
+
+    for (const path of paths) {
+      const [node] = this.getNode(path)
+      const key = NODE_TO_KEY.get(node)
+      map[key] = path
+    }
+
+    super.apply(op)
+
+    for (const key in map) {
+      const path = map[key]
+      const [node] = this.getNode(path)
+      NODE_TO_KEY.set(node, key)
+    }
+  }
+
   /**
    * Blur the editor.
    */

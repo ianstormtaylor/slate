@@ -1,5 +1,5 @@
 import React from 'react'
-import { Range, Element, Ancestor, Descendant } from 'slate'
+import { Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 
 import ElementComponent from './element'
 import TextComponent from './text'
@@ -18,7 +18,7 @@ import {
 
 const Children = (props: {
   annotations: Range[]
-  block: Element | null
+  decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
   renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
@@ -29,7 +29,7 @@ const Children = (props: {
 }) => {
   const {
     annotations,
-    block,
+    decorate,
     decorations,
     node,
     renderAnnotation,
@@ -39,19 +39,21 @@ const Children = (props: {
     selection,
   } = props
   const editor = useEditor()
-  const newDecorations = editor.getDecorations(node)
   const path = editor.findPath(node)
   const children = []
+  const isLeafBlock =
+    Element.isElement(node) && !editor.isInline(node) && editor.hasInlines(node)
 
   for (let i = 0; i < node.nodes.length; i++) {
     const p = path.concat(i)
     const n = node.nodes[i] as Descendant
+    const key = editor.findKey(n)
     const range = editor.getRange(p)
     const sel = selection && Range.intersection(range, selection)
+    const decs = decorate([n, p])
     const anns = []
-    const decs = []
 
-    for (let dec of newDecorations.concat(decorations)) {
+    for (let dec of decorations) {
       const d = Range.intersection(dec, range)
 
       if (d) {
@@ -71,9 +73,10 @@ const Children = (props: {
       children.push(
         <ElementComponent
           annotations={anns}
-          block={editor.isInline(node) ? block : node}
+          decorate={decorate}
           decorations={decs}
           element={n}
+          key={key.id}
           renderAnnotation={renderAnnotation}
           renderDecoration={renderDecoration}
           renderElement={renderElement}
@@ -85,13 +88,14 @@ const Children = (props: {
       children.push(
         <TextComponent
           annotations={anns}
-          block={block}
           decorations={decs}
-          node={n}
+          key={key.id}
+          isLast={isLeafBlock && i === node.nodes.length}
           parent={node}
           renderAnnotation={renderAnnotation}
           renderDecoration={renderDecoration}
           renderMark={renderMark}
+          text={n}
         />
       )
     }
