@@ -362,8 +362,9 @@ const Editor = (props: {
               if (!readOnly && hasEditableTarget(editor, event.target)) {
                 event.preventDefault()
                 Utils.setFragmentData(event.clipboardData, editor)
+                const { selection } = value
 
-                if (editor.isExpanded()) {
+                if (selection && SlateRange.isExpanded(selection)) {
                   editor.delete()
                 }
               }

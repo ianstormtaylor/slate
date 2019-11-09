@@ -6,6 +6,7 @@ import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu } from '../components'
+import { Range } from 'slate'
 
 class HoveringMenuEditor extends withHistory(withReact(Editor)) {
   onBeforeInput(event) {
@@ -35,7 +36,7 @@ const HoveringMenuExample = () => {
       !el ||
       !selection ||
       !editor.isFocused() ||
-      !editor.isExpanded() ||
+      Range.isCollapsed(selection) ||
       editor.getText(selection) === ''
     ) {
       el.removeAttribute('style')
