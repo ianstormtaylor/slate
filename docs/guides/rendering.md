@@ -8,12 +8,12 @@ You can define these behaviors by passing `props` into the editor, or you can de
 
 ## Nodes & Marks
 
-Using custom components for the nodes and marks is the most common rendering need. Slate makes this easy to do, you just define a `renderNode` function.
+Using custom components for the nodes and marks is the most common rendering need. Slate makes this easy to do. In case of nodes, you just define a function and pass it to the `renderBlock` or `renderInline` prop of `Editor` component.
 
 The function is called with the node's props, including `props.node` which is the node itself. You can use these to determine what to render. For example, you can render nodes using simple HTML elements:
 
 ```js
-function renderNode(props, editor, next) {
+function renderBlock(props, editor, next) {
   const { node, attributes, children } = props
 
   switch (node.type) {
@@ -29,6 +29,16 @@ function renderNode(props, editor, next) {
       return next()
   }
 }
+
+function renderInline(props, editor, next) {
+  ...
+}
+
+<Editor
+  renderBlock={renderBlock}
+  renderInline={renderInline}
+  ...
+/>
 ```
 
 > 🤖 Be sure to mix in `props.attributes` and render `props.children` in your node components! The attributes are required for utilities like Slate's `findDOMNode`, and the children are the actual text content of your nodes.
@@ -36,7 +46,7 @@ function renderNode(props, editor, next) {
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```js
-function renderNode(props, editor, next) {
+function renderBlock(props, editor, next) {
   switch (props.node.type) {
     case 'paragraph':
       return <ParagraphComponent {...props} />
@@ -50,12 +60,12 @@ function renderNode(props, editor, next) {
 }
 ```
 
-And you can just as easily put that `renderNode` logic into a plugin, and pass that plugin into your editor instead:
+And you can just as easily put that `renderBlock` or `renderInline` logic into a plugin, and pass that plugin into your editor instead:
 
 ```js
 function SomeRenderingPlugin() {
   return {
-    renderNode(props, editor, next) {
+    renderBlock(props, editor, next) {
       ...
     }
   }
