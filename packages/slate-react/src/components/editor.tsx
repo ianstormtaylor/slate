@@ -152,38 +152,40 @@ const Editor = (props: {
     const { selection } = value
     const domSelection = window.getSelection()
 
-    if (!selection || !domSelection || !editor.isFocused()) {
+    if (!domSelection || !editor.isFocused()) {
       return
     }
 
     const el = editor.toDomNode(value)
-    const domRange = editor.toDomRange(selection)
-    const oldDomRange = domSelection.getRangeAt(0)
+    const domRange = domSelection.getRangeAt(0)
+    const newDomRange = selection && editor.toDomRange(selection)
 
-    if (!oldDomRange || !isRangeEqual(domRange, oldDomRange)) {
-      console.log('update DOM selection')
-      state.isUpdatingSelection = true
-      domSelection.removeAllRanges()
-      domSelection.addRange(domRange)
+    if (
+      (!selection && !domRange) ||
+      (domRange && newDomRange && isRangeEqual(domRange, newDomRange))
+    ) {
+      return
+    }
 
-      const scrollEl = domRange.startContainer.parentElement
+    state.isUpdatingSelection = true
+    console.log('updating domSelection')
+    domSelection.removeAllRanges()
 
-      if (scrollEl) {
-        scrollIntoView(scrollEl, {
-          scrollMode: 'if-needed',
-        })
+    if (newDomRange) {
+      domSelection.addRange(newDomRange!)
+      const leafEl = newDomRange.startContainer.parentElement!
+      scrollIntoView(leafEl, { scrollMode: 'if-needed' })
+    }
+
+    setTimeout(() => {
+      // COMPAT: In Firefox, it's not enough to create a range, you also need
+      // to focus the contenteditable element too. (2016/11/16)
+      if (newDomRange && IS_FIREFOX) {
+        el.focus()
       }
 
-      setTimeout(() => {
-        // COMPAT: In Firefox, it's not enough to create a range, you also need
-        // to focus the contenteditable element too. (2016/11/16)
-        if (IS_FIREFOX) {
-          el.focus()
-        }
-
-        state.isUpdatingSelection = false
-      })
-    }
+      state.isUpdatingSelection = false
+    })
   })
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
@@ -235,21 +237,31 @@ const Editor = (props: {
     debounce(() => {
       console.log('selectionchange')
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
-        const el = editor.toDomNode(value)
         const { activeElement } = window.document
+        const el = editor.toDomNode(value)
+        const domSelection = window.getSelection()
+        const domRange =
+          domSelection &&
+          domSelection.rangeCount > 0 &&
+          domSelection.getRangeAt(0)
 
         if (activeElement === el) {
-          const domSelection = window.getSelection()
           state.latestElement = activeElement
-
-          if (domSelection) {
-            const range = editor.toSlateRange(domSelection)
-            console.log('select', domSelection, range)
-            editor.select(range)
-            IS_FOCUSED.set(editor, true)
-          }
+          IS_FOCUSED.set(editor, true)
         } else {
           IS_FOCUSED.delete(editor)
+        }
+
+        if (
+          domRange &&
+          hasEditableTarget(editor, domRange.startContainer) &&
+          hasEditableTarget(editor, domRange.endContainer)
+        ) {
+          const range = editor.toSlateRange(domRange)
+          console.log('select', domRange, range)
+          editor.select(range)
+        } else {
+          editor.deselect()
         }
       }
     }, 100),

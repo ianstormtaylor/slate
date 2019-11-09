@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { EditorConstructor, Operation, Path } from 'slate'
+import { Editor, Operation, Path } from 'slate'
 import { History } from './history'
 
 const HISTORY = Symbol('history')
@@ -17,7 +17,7 @@ export type HistoryEditor = InstanceType<ReturnType<typeof withHistory>>
  * editor as operations are applied to it, using undo and redo stacks.
  */
 
-export const withHistory = (Editor: EditorConstructor) => {
+export const withHistory = (Editor: new (...args: any[]) => Editor) => {
   return class HistoryEditor extends Editor {
     [HISTORY]: History;
     [MERGING]: boolean | null;
@@ -45,29 +45,35 @@ export const withHistory = (Editor: EditorConstructor) => {
       let save = this[SAVING]
       let merge = this[MERGING]
 
-      if (save === false || !shouldSave(op)) {
-        super.apply(op)
-        return
-      }
-
       this[HISTORY] = produce(history, h => {
         const { undos } = h
         const lastBatch = undos[undos.length - 1]
         const lastOp = lastBatch && lastBatch[lastBatch.length - 1]
+        const overwrite = shouldOverwrite(op, lastOp)
 
-        // If `merge` is non-commital, and this is not the first operation in
-        // a new editor, then merge, otherwise merge based on the last
-        // operation.
+        if (save == null) {
+          save = shouldSave(op, lastOp)
+        }
+
+        if (!save) {
+          return
+        }
+
         if (merge == null) {
-          if (operations.length !== 0) {
+          if (lastBatch == null) {
+            merge = false
+          } else if (operations.length !== 0) {
             merge = true
           } else {
-            merge = shouldMerge(op, lastOp)
+            merge = shouldMerge(op, lastOp) || overwrite
           }
         }
 
-        // If the `merge` flag is true, add the operation to the last batch.
-        if (merge && lastBatch) {
+        if (lastBatch && merge) {
+          if (overwrite) {
+            lastBatch.pop()
+          }
+
           lastBatch.push(op)
         } else {
           const batch = [op]
@@ -139,7 +145,16 @@ export const withHistory = (Editor: EditorConstructor) => {
           const inverseOps = batch.map(Operation.inverse).reverse()
 
           for (const op of inverseOps) {
-            this.apply(op)
+            // If the final operation is deselecting the editor, skip it. This is
+            if (
+              op === inverseOps[inverseOps.length - 1] &&
+              op.type === 'set_selection' &&
+              op.newProperties == null
+            ) {
+              continue
+            } else {
+              this.apply(op)
+            }
           }
         })
       })
@@ -180,29 +195,27 @@ export const withHistory = (Editor: EditorConstructor) => {
  * Check whether to merge an operation into the previous operation.
  */
 
-const shouldMerge = (op: Operation, into: Operation | null): boolean => {
-  if (into == null) {
-    return false
-  }
-
-  if (op.type === 'set_selection' && into.type === 'set_selection') {
+const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
+  if (op.type === 'set_selection') {
     return true
   }
 
   if (
+    prev &&
     op.type === 'insert_text' &&
-    into.type === 'insert_text' &&
-    op.offset === into.offset + into.text.length &&
-    Path.equals(op.path, into.path)
+    prev.type === 'insert_text' &&
+    op.offset === prev.offset + prev.text.length &&
+    Path.equals(op.path, prev.path)
   ) {
     return true
   }
 
   if (
+    prev &&
     op.type === 'remove_text' &&
-    into.type === 'remove_text' &&
-    op.offset + op.text.length === into.offset &&
-    Path.equals(op.path, into.path)
+    prev.type === 'remove_text' &&
+    op.offset + op.text.length === prev.offset &&
+    Path.equals(op.path, prev.path)
   ) {
     return true
   }
@@ -214,14 +227,25 @@ const shouldMerge = (op: Operation, into: Operation | null): boolean => {
  * Check whether an operation needs to be saved to the history.
  */
 
-const shouldSave = (op: Operation): boolean => {
-  switch (op.type) {
-    case 'set_selection': {
-      return op.newProperties != null
-    }
-
-    default: {
-      return true
-    }
+const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
+  if (op.type === 'set_selection' && op.newProperties == null) {
+    return false
   }
+
+  return true
+}
+
+/**
+ * Check whether an operation should overwrite the previous one.
+ */
+
+const shouldOverwrite = (
+  op: Operation,
+  prev: Operation | undefined
+): boolean => {
+  if (prev && op.type === 'set_selection' && prev.type === 'set_selection') {
+    return true
+  }
+
+  return false
 }

@@ -1,9 +1,4 @@
-export {
-  Editor,
-  EditorConstructor,
-  EditorMixin,
-  EditorPlugin,
-} from './classes/editor'
+export { Editor } from './classes/editor'
 export { PathRef } from './classes/path-ref'
 export { PointRef } from './classes/point-ref'
 export { RangeRef } from './classes/range-ref'

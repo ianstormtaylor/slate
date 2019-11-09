@@ -187,7 +187,7 @@ class SelectionCommands {
         (k === 'focus' &&
           props.focus != null &&
           !Point.equals(props.focus, selection.focus)) ||
-        props[k] !== selection[k]
+        (k !== 'anchor' && k !== 'focus' && props[k] !== selection[k])
       ) {
         oldProps[k] = selection[k]
         newProps[k] = props[k]

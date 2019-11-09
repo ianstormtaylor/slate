@@ -20,31 +20,6 @@ import LocationQueries from './queries/location'
 import RangeQueries from './queries/range'
 
 /**
- * The `EditorConstructor` interface is provided as a convenience for plugins
- * who can use it when writing the typings for extending the `Editor` class.
- */
-
-type EditorConstructor<E extends Editor = Editor> = new (...args: any[]) => E
-
-/**
- * The `EditorMixin` interface is provided as a convenience for plugins
- * who can use it when writing the typings for their plugin functions.
- */
-
-type EditorMixin<E extends Editor = Editor> = (
-  Editor: EditorConstructor<E>
-) => E
-
-/**
- * The `EditorMixin` interface is provided as a convenience for plugins
- * who can use it when writing the typings for their plugin functions.
- */
-
-type EditorPlugin<E extends Editor = Editor> = (
-  ...args: any[]
-) => EditorMixin<E>
-
-/**
  * The `Editor` class stores all the state of a Slate editor. It is extended by
  * plugins that wish to add their own methods that implement new behaviors.
  */
@@ -117,4 +92,4 @@ mixin([
   RangeQueries,
 ])
 
-export { Editor, EditorConstructor, EditorMixin, EditorPlugin }
+export { Editor }

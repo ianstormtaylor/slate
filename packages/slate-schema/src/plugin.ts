@@ -1,4 +1,4 @@
-import { EditorConstructor, Element, Path } from 'slate'
+import { Editor, Element, Path } from 'slate'
 import { SchemaError } from './error'
 import { SchemaRule } from './rule'
 import { checkNode } from './checkers'
@@ -15,7 +15,7 @@ export type SchemaEditor = InstanceType<ReturnType<typeof withSchema>>
  */
 
 export const withSchema = (
-  Editor: EditorConstructor,
+  Editor: new (...args: any[]) => Editor,
   options: {
     rules?: SchemaRule[]
     value?: Omit<SchemaRule, 'match'>

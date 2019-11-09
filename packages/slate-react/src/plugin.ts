@@ -1,5 +1,5 @@
 import {
-  EditorConstructor,
+  Editor,
   Element as SlateElement,
   Node as SlateNode,
   Operation as SlateOperation,
@@ -46,7 +46,7 @@ export type ReactEditor = InstanceType<ReturnType<typeof withReact>>
  * `withReact` adds React and DOM specific behaviors to the editor.
  */
 
-export const withReact = (Editor: EditorConstructor) => {
+export const withReact = (Editor: new (...args: any[]) => Editor) => {
   return class ReactEditor extends Editor {
     apply(op: SlateOperation): void {
       const matches: [SlatePath, Key][] = []
