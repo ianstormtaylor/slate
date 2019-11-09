@@ -10,22 +10,21 @@ import {
   Path,
 } from 'slate'
 
-import Hotkeys from '../utils/hotkeys'
-import { Key } from '../utils/key'
-import { Utils } from '../utils/utils'
+import Hotkeys from './utils/hotkeys'
+import { Key } from './utils/key'
+import { Utils } from './utils/utils'
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
   IS_FOCUSED,
   IS_READ_ONLY,
-  NODE_TO_ELEMENT,
   KEY_TO_ELEMENT,
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
   PLACEHOLDER,
   PLACEHOLDER_SYMBOL,
-} from '../utils/weak-maps'
+} from './utils/weak-maps'
 import {
   DOMElement,
   DOMNode,
@@ -35,7 +34,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
-} from '../utils/dom'
+} from './utils/dom'
 
 /**
  * `ReactEditor` is a Slate editor interface with the React mixin applied.
@@ -46,8 +45,6 @@ export type ReactEditor = InstanceType<ReturnType<typeof withReact>>
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
  */
-
-let k = 0
 
 export const withReact = (Editor: EditorConstructor) => {
   return class ReactEditor extends Editor {
