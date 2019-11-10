@@ -1,4 +1,4 @@
-name: ci
+name: actions
 on: [push]
 jobs:
   ci:
@@ -8,10 +8,6 @@ jobs:
     - uses: actions/setup-node@v1
       with:
         node-version: 12
-    - run: |
-        yarn install
-        yarn build
-        yarn lint
-        yarn test
+    - run: yarn && yarn build && yarn lint && yarn test
       env:
         CI: true
