@@ -152,7 +152,7 @@ const Editor = (props: {
     const { selection } = value
     const domSelection = window.getSelection()
 
-    if (!domSelection || !editor.isFocused()) {
+    if (state.isComposing || !domSelection || !editor.isFocused()) {
       return
     }
 
