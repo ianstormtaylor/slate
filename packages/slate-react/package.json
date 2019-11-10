@@ -21,9 +21,7 @@
     "direction": "^1.0.3",
     "is-hotkey": "0.1.4",
     "is-plain-object": "^3.0.0",
-    "scroll-into-view-if-needed": "^2.2.20",
-    "tiny-invariant": "^1.0.6",
-    "tiny-warning": "^1.0.3"
+    "scroll-into-view-if-needed": "^2.2.20"
   },
   "peerDependencies": {
     "react": ">=16.6.0",

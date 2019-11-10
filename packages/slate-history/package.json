@@ -15,9 +15,7 @@
   ],
   "dependencies": {
     "immer": "^4.0.1",
-    "is-plain-object": "^2.0.4",
-    "tiny-invariant": "^1.0.1",
-    "tiny-warning": "^0.0.3"
+    "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
     "slate": ">=0.47.0"
