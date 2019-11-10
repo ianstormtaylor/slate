@@ -25,7 +25,7 @@ import RichText from '../../examples/rich-text'
 import SearchHighlighting from '../../examples/search-highlighting'
 // import InputTester from '../../examples/input-tester'
 // import Tables from '../../examples/tables'
-// import Mentions from '../../examples/mentions'
+import Mentions from '../../examples/mentions'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
@@ -39,7 +39,7 @@ const EXAMPLES = [
   ['Links', Links, 'links'],
   // ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
   // ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
-  // ['Mentions', Mentions, 'mentions'],
+  ['Mentions', Mentions, 'mentions'],
   // ['Paste HTML', PasteHtml, 'paste-html'],
   ['Plain Text', PlainText, 'plain-text'],
   ['Read-only', ReadOnly, 'read-only'],

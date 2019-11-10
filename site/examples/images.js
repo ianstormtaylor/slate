@@ -103,7 +103,7 @@ const ImageElement = ({ attributes, children, element }) => {
             display: block;
             max-width: 100%;
             max-height: 20em;
-            box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF;' : 'none'};
+            box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF' : 'none'};
           `}
         />
       </div>
