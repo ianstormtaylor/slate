@@ -217,7 +217,22 @@ const Editor = (props: {
 
         const [targetRange] = event.getTargetRanges()
 
-        if (targetRange && inputType !== 'deleteContent') {
+        if (
+          targetRange &&
+          // COMPAT: We ignore setting the range in simple deleting cases
+          // because plugins need to know where the cursor was, and the DOM API
+          // will end up selecting the range to be deleted instead. (2019/11/10)
+          inputType !== 'deleteContent' &&
+          inputType !== 'deleteContentBackward' &&
+          inputType !== 'deleteContentForward' &&
+          inputType !== 'deleteEntireSoftLine' &&
+          inputType !== 'deleteHardLineBackward' &&
+          inputType !== 'deleteHardLineForward' &&
+          inputType !== 'deleteSoftLineBackward' &&
+          inputType !== 'deleteSoftLineForward' &&
+          inputType !== 'deleteWordBackward' &&
+          inputType !== 'deleteWordForward'
+        ) {
           const range = editor.toSlateRange(targetRange)
           editor.select(range)
         }

@@ -33,6 +33,10 @@ const resolveDescendants = (children: any[]): Descendant[] => {
   const nodes: Node[] = []
 
   const addChild = (child: Node | Token): void => {
+    if (child == null) {
+      return
+    }
+
     const prev = nodes[nodes.length - 1]
 
     if (typeof child === 'string') {
@@ -76,7 +80,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
     }
   }
 
-  for (const child of children.flat()) {
+  for (const child of children.flat(Infinity)) {
     addChild(child)
   }
 

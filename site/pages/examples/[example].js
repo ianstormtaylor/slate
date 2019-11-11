@@ -9,43 +9,39 @@ import ErrorBoundary from 'react-error-boundary'
 import { Icon } from '../../components'
 
 import CheckLists from '../../examples/check-lists'
-// import CodeHighlighting from '../../examples/code-highlighting'
-// import Embeds from '../../examples/embeds'
-// import ForcedLayout from '../../examples/forced-layout'
+import Embeds from '../../examples/embeds'
+import ForcedLayout from '../../examples/forced-layout'
 import HoveringMenu from '../../examples/hovering-menu'
 import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
 import Links from '../../examples/links'
-// import MarkdownPreview from '../../examples/markdown-preview'
-// import MarkdownShortcuts from '../../examples/markdown-shortcuts'
-// import PasteHtml from '../../examples/paste-html'
+import MarkdownPreview from '../../examples/markdown-preview'
+import MarkdownShortcuts from '../../examples/markdown-shortcuts'
+import Mentions from '../../examples/mentions'
+import PasteHtml from '../../examples/paste-html'
 import PlainText from '../../examples/plain-text'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/rich-text'
 import SearchHighlighting from '../../examples/search-highlighting'
-// import InputTester from '../../examples/input-tester'
-// import Tables from '../../examples/tables'
-import Mentions from '../../examples/mentions'
+import Tables from '../../examples/tables'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
-  // ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
-  // ['Embeds', Embeds, 'embeds'],
-  // ['Forced Layout', ForcedLayout, 'forced-layout'],
+  ['Embeds', Embeds, 'embeds'],
+  ['Forced Layout', ForcedLayout, 'forced-layout'],
   ['Hovering Menu', HoveringMenu, 'hovering-menu'],
   ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
-  // ['Input Tester', InputTester, 'input-tester'],
   ['Links', Links, 'links'],
-  // ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
-  // ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
+  ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
+  ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
-  // ['Paste HTML', PasteHtml, 'paste-html'],
+  ['Paste HTML', PasteHtml, 'paste-html'],
   ['Plain Text', PlainText, 'plain-text'],
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'rich-text'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  // ['Tables', Tables, 'tables'],
+  ['Tables', Tables, 'tables'],
 ]
 
 const Header = props => (
