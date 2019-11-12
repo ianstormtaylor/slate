@@ -332,21 +332,10 @@ class LocationQueries {
     at: Location,
     match: NodeMatch
   ): NodeEntry | undefined {
-    // PERF: If the match is a path, don't traverse.
-    if (Path.isPath(match)) {
-      return this.getNode(match)
-    }
-
-    // PERF: If the target is a path and the match is a depth, don't traverse.
-    if (typeof match === 'number' && match <= at.length && Path.isPath(at)) {
-      const p = at.slice(0, match)
-      return this.getNode(p)
-    }
-
     const path = this.getPath(at)
 
     for (const entry of this.levels({ at: path })) {
-      if (isMatch(this, entry, match)) {
+      if (this.isNodeMatch(entry, match)) {
         return entry
       }
     }
@@ -690,14 +679,20 @@ class LocationQueries {
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
-    const {
-      at = this.value.selection,
-      match = Path.isPath(at) ? at : () => true,
-      reverse = false,
-    } = options
+    const { at = this.value.selection, reverse = false } = options
+    let { match } = options
 
     if (!at) {
       return
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const path = at
+        match = ([, p]) => Path.equals(p, path)
+      } else {
+        match = () => true
+      }
     }
 
     let prevPath: Path | undefined
@@ -707,7 +702,7 @@ class LocationQueries {
         continue
       }
 
-      if (isMatch(this, [n, p], match)) {
+      if (this.isNodeMatch([n, p], match)) {
         prevPath = p
         yield [n, p]
       }
@@ -918,40 +913,6 @@ const getSpan = (
   const from = reverse ? last : first
   const to = reverse ? first : last
   return [from, to]
-}
-
-/**
- * Check if a node is a match.
- */
-
-const isMatch = (editor: Editor, entry: NodeEntry, match: NodeMatch) => {
-  const [node, path] = entry
-
-  if (typeof match === 'function') {
-    return match(entry)
-  } else if (typeof match === 'number') {
-    return path.length === match
-  } else if (match === 'text') {
-    return Text.isText(node)
-  } else if (match === 'value') {
-    return Value.isValue(node)
-  } else if (match === 'inline') {
-    return (
-      (Element.isElement(node) && editor.isInline(node)) || Text.isText(node)
-    )
-  } else if (match === 'block') {
-    return (
-      Element.isElement(node) &&
-      !editor.isInline(node) &&
-      editor.hasInlines(node)
-    )
-  } else if (match === 'void') {
-    return Element.isElement(node) && editor.isVoid(node)
-  } else if (Path.isPath(match)) {
-    return Path.equals(path, match)
-  } else {
-    return Node.matches(node, match)
-  }
 }
 
 export default LocationQueries

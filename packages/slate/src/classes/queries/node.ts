@@ -14,29 +14,43 @@ class NodeQueries {
    * Check if a node entry is a match.
    */
 
-  isNodeMatch(this: Editor, entry: NodeEntry, match: NodeMatch) {
-    const [node, path] = entry
+  isNodeMatch(this: Editor, entry: NodeEntry, match: NodeMatch | NodeMatch[]) {
+    const [node] = entry
+
+    // If match is an array, treat it as an OR condition.
+    if (Array.isArray(match)) {
+      for (const m of match) {
+        if (this.isNodeMatch(entry, m)) {
+          return true
+        }
+      }
+
+      return false
+    }
+
+    switch (match) {
+      case 'text':
+        return Text.isText(node)
+      case 'value':
+        return Value.isValue(node)
+      case 'element':
+        return Element.isElement(node)
+      case 'inline':
+        return (
+          (Element.isElement(node) && this.isInline(node)) || Text.isText(node)
+        )
+      case 'block':
+        return (
+          Element.isElement(node) &&
+          !this.isInline(node) &&
+          this.hasInlines(node)
+        )
+      case 'void':
+        return Element.isElement(node) && this.isVoid(node)
+    }
 
     if (typeof match === 'function') {
       return match(entry)
-    } else if (typeof match === 'number') {
-      return path.length === match
-    } else if (match === 'text') {
-      return Text.isText(node)
-    } else if (match === 'value') {
-      return Value.isValue(node)
-    } else if (match === 'inline') {
-      return (
-        (Element.isElement(node) && this.isInline(node)) || Text.isText(node)
-      )
-    } else if (match === 'block') {
-      return (
-        Element.isElement(node) && !this.isInline(node) && this.hasInlines(node)
-      )
-    } else if (match === 'void') {
-      return Element.isElement(node) && this.isVoid(node)
-    } else if (Path.isPath(match)) {
-      return Path.equals(path, match)
     } else {
       return Node.matches(node, match)
     }

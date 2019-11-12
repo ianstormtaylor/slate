@@ -43,7 +43,8 @@ class NodeCommands {
 
       if (match == null) {
         if (Path.isPath(at)) {
-          match = at.length
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
         } else if (Text.isText(node)) {
           match = 'text'
         } else if (this.isInline(node)) {
@@ -123,10 +124,17 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const {
-        at = this.value.selection,
-        match = Path.isPath(at) ? at.length : 'block',
-      } = options
+      const { at = this.value.selection } = options
+      let { match } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -177,11 +185,17 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      let { at = this.value.selection } = options
-      const {
-        match = Path.isPath(at) ? at.length : 'block',
-        hanging = false,
-      } = options
+      let { match, at = this.value.selection } = options
+      const { hanging = false } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -302,11 +316,17 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const {
-        to,
-        at = this.value.selection,
-        match = Path.isPath(at) ? at.length : 'block',
-      } = options
+      const { to, at = this.value.selection } = options
+      let { match } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -430,11 +450,17 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      let { at = this.value.selection } = options
-      const {
-        match = Path.isPath(at) ? at.length : 'block',
-        hanging = false,
-      } = options
+      let { match, at = this.value.selection } = options
+      const { hanging = false } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -469,11 +495,17 @@ class NodeCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      let { at = this.value.selection } = options
-      const {
-        match = Path.isPath(at) ? at.length : 'block',
-        hanging = false,
-      } = options
+      let { match, at = this.value.selection } = options
+      const { hanging = false } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -538,7 +570,7 @@ class NodeCommands {
       } = options
 
       if (match == null) {
-        match = Path.isPath(at) ? at.length : 'block'
+        match = 'block'
       }
 
       if (Range.isRange(at)) {
@@ -548,9 +580,10 @@ class NodeCommands {
       // If the target is a path, the default height-skipping and position
       // counters need to account for us potentially splitting at a non-leaf.
       if (Path.isPath(at)) {
-        const point = this.getPoint(at)
-        match = at.length - 1
-        height = point.path.length - at.length + 1
+        const path = at
+        const point = this.getPoint(path)
+        match = ([, p]) => p.length === path.length - 1
+        height = point.path.length - path.length + 1
         at = point
         always = true
       }
@@ -646,11 +679,17 @@ class NodeCommands {
     }
   ) {
     this.withoutNormalizing(() => {
-      const {
-        at = this.value.selection,
-        match = Path.isPath(at) ? at.length : 'block',
-        split = false,
-      } = options
+      const { at = this.value.selection, split = false } = options
+      let { match } = options
+
+      if (match == null) {
+        if (Path.isPath(at)) {
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
+        } else {
+          match = 'block'
+        }
+      }
 
       if (!at) {
         return
@@ -668,7 +707,7 @@ class NodeCommands {
           range = Range.intersection(at, range)!
         }
 
-        this.liftNodes({ at: range, match: depth })
+        this.liftNodes({ at: range, match: ([, p]) => p.length === depth })
       }
     })
   }
@@ -697,7 +736,8 @@ class NodeCommands {
 
       if (match == null) {
         if (Path.isPath(at)) {
-          match = at.length
+          const path = at
+          match = ([, p]) => Path.equals(p, path)
         } else if (this.isInline(element)) {
           match = 'inline'
         } else {
@@ -748,7 +788,7 @@ class NodeCommands {
           this.insertNodes(wrapper, { at: wrapperPath })
           this.moveNodes({
             at: range,
-            match: depth,
+            match: ([, p]) => p.length === depth,
             to: wrapperPath.concat(0),
           })
         }

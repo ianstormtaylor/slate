@@ -572,12 +572,11 @@ export type AncestorEntry = [Ancestor, Path]
  */
 
 export type NodeMatch =
-  | number
-  | 'value'
   | 'block'
+  | 'element'
   | 'inline'
   | 'text'
+  | 'value'
   | 'void'
   | Partial<Node>
-  | Path
   | ((entry: NodeEntry) => boolean)

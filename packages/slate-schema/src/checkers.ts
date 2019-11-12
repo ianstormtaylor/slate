@@ -6,15 +6,12 @@ import {
   Editor,
   MarkEntry,
   AnnotationEntry,
+  AncestorEntry,
+  Descendant,
 } from 'slate'
 
-import { AnnotationError, MarkError, NodeError } from './error'
-import {
-  NodeRule,
-  NodeValidation,
-  AnnotationValidation,
-  MarkValidation,
-} from './rule'
+import { AnnotationError, MarkError, NodeError } from './errors'
+import { NodeRule, AnnotationRule, MarkRule, ChildValidation } from './rules'
 
 /**
  * Check an annotation object.
@@ -23,13 +20,14 @@ import {
 export const checkAnnotation = (
   editor: Editor,
   entry: AnnotationEntry,
-  check: AnnotationValidation
+  rule: AnnotationRule
 ): AnnotationError | undefined => {
+  const { validate: v } = rule
   const [annotation, key] = entry
 
-  if ('properties' in check) {
-    for (const k in check.properties) {
-      const fn = check.properties[k]
+  if ('properties' in v) {
+    for (const k in v.properties) {
+      const fn = v.properties[k]
       const value = annotation[k]
 
       if (!fn(value)) {
@@ -51,13 +49,14 @@ export const checkAnnotation = (
 export const checkMark = (
   editor: Editor,
   entry: MarkEntry,
-  check: MarkValidation
+  rule: MarkRule
 ): MarkError | undefined => {
+  const { validate: v } = rule
   const [mark, index, node, path] = entry
 
-  if ('properties' in check) {
-    for (const k in check.properties) {
-      const p = check.properties[k]
+  if ('properties' in v) {
+    for (const k in v.properties) {
+      const p = v.properties[k]
       const value = mark[k]
 
       if ((typeof p === 'function' && !p(value)) || p !== value) {
@@ -81,177 +80,269 @@ export const checkMark = (
 export const checkNode = (
   editor: Editor,
   entry: NodeEntry,
-  check: NodeValidation,
+  rule: NodeRule,
   rules: NodeRule[]
 ): NodeError | undefined => {
+  const { validate: v } = rule
   const [node, path] = entry
 
-  if ('properties' in check) {
-    for (const k in check.properties) {
-      const p = check.properties[k]
-      const value = node[k]
-      const isInvalid = typeof p === 'function' ? !p(value) : p !== value
+  if (editor.isNodeMatch(entry, rule.match)) {
+    if ('properties' in v) {
+      for (const k in v.properties) {
+        const p = v.properties[k]
+        const value = node[k]
+        const isInvalid = typeof p === 'function' ? !p(value) : p !== value
 
-      if (isInvalid) {
-        return { code: 'node_property_invalid', node, path, property: k }
-      }
-    }
-  }
-
-  if ('marks' in check && check.marks != null) {
-    for (const [mark, index, n, p] of Node.marks(node)) {
-      if (!check.marks.some(c => Mark.matches(mark, c))) {
-        return { code: 'mark_invalid', node: n, path: p, mark, index }
-      }
-    }
-  }
-
-  if ('text' in check && check.text != null) {
-    const text = Node.text(node)
-
-    if (!check.text(text)) {
-      return { code: 'node_text_invalid', node, path, text }
-    }
-  }
-
-  if (Text.isText(node)) {
-    return
-  }
-
-  if ('first' in check && check.first != null && node.nodes.length !== 0) {
-    const n = Node.child(node, 0)
-    const p = path.concat(0)
-
-    if (!editor.isNodeMatch(entry, check.first)) {
-      return { code: 'first_child_invalid', node: n, path: p, index: 0 }
-    }
-  }
-
-  if ('last' in check && check.last != null && node.nodes.length !== 0) {
-    const i = node.nodes.length - 1
-    const n = Node.child(node, i)
-    const p = path.concat(i)
-
-    if (!editor.isNodeMatch(entry, check.last)) {
-      return { code: 'last_child_invalid', node: n, path: p, index: i }
-    }
-  }
-
-  const processed = new Set()
-  let d = 0
-  let m = 1
-  let i = 0
-
-  while (i < node.nodes.length) {
-    const n = Node.child(node, i)
-    const p = path.concat(i)
-
-    if (!processed.has(i)) {
-      for (const rule of rules) {
-        if (
-          ('parent' in check ||
-            ('previous' in check && i > 0) ||
-            ('next' in check && i < node.nodes.length - 1)) &&
-          editor.isNodeMatch([n, p], rule.match)
-        ) {
-          if ('parent' in check && check.parent != null) {
-            if (!editor.isNodeMatch(entry, check.parent)) {
-              return { code: 'parent_invalid', node, path, index: i }
-            }
-          }
-
-          if ('previous' in check && check.previous != null) {
-            const prevN = Node.child(node, i - 1)
-            const prevP = path.concat(i - 1)
-
-            if (!editor.isNodeMatch([prevN, prevP], check.previous)) {
-              return {
-                code: 'previous_sibling_invalid',
-                node: prevN,
-                path: prevP,
-              }
-            }
-          }
-
-          if ('next' in check && check.next != null) {
-            const nextN = Node.child(node, i + 1)
-            const nextP = path.concat(i + 1)
-
-            if (!editor.isNodeMatch([nextN, nextP], check.next)) {
-              return { code: 'next_sibling_invalid', node: nextN, path: nextP }
-            }
-          }
+        if (isInvalid) {
+          return { code: 'node_property_invalid', node, path, property: k }
         }
       }
     }
 
-    processed.add(i)
+    if ('marks' in v && v.marks != null) {
+      for (const [mark, index, n, p] of Node.marks(node)) {
+        if (!v.marks.some(m => Mark.matches(mark, m))) {
+          return { code: 'mark_invalid', node: n, path: p, mark, index }
+        }
+      }
+    }
 
-    if ('children' in check && check.children != null) {
-      const child = check.children[d]
-      const { match = {}, max = Infinity, min = 0 } = child
+    if ('text' in v && v.text != null) {
+      const text = Node.text(node)
 
-      // If the children assertion was defined, but we don't current have a
-      // definition, we've reached the end so any other children are overflows.
-      if (!child) {
-        return { code: 'child_unexpected', node: n, path: p, index: i }
+      if (!v.text(text)) {
+        return { code: 'node_text_invalid', node, path, text }
+      }
+    }
+
+    if (!Text.isText(node)) {
+      if ('first' in v && v.first != null && node.nodes.length !== 0) {
+        const n = Node.child(node, 0)
+        const p = path.concat(0)
+
+        if (!editor.isNodeMatch([n, p], v.first)) {
+          return { code: 'first_child_invalid', node: n, path: p, index: 0 }
+        }
       }
 
-      // Since we want to report overflow on last matching child we don't
-      // immediately check for count > max, but instead do so once we find
-      // a child that doesn't match.
-      if (m - 1 > max) {
+      if ('last' in v && v.last != null && node.nodes.length !== 0) {
+        const i = node.nodes.length - 1
+        const n = Node.child(node, i)
+        const p = path.concat(i)
+
+        if (!editor.isNodeMatch([n, p], v.last)) {
+          return { code: 'last_child_invalid', node: n, path: p, index: i }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Check an ancestor node object's children.
+ */
+
+export const checkAncestor = (
+  editor: Editor,
+  entry: AncestorEntry,
+  rule: NodeRule,
+  ancestorRules: NodeRule[]
+): NodeError | undefined => {
+  const { validate: v } = rule
+  const [parent, parentPath] = entry
+  const processed = new Set()
+  const isMatch = editor.isNodeMatch(entry, rule.match)
+  const groups = 'children' in v && v.children != null ? v.children : []
+  let index = 0
+  let count = 0
+  let g = 0
+  debugger
+
+  while (true) {
+    debugger
+    count++
+    const group = groups[g] as ChildValidation | undefined
+    const child = parent.nodes[index] as Descendant | undefined
+    const childPath = parentPath.concat(index)
+
+    // For each child check the parent-related validations. But ensure that we
+    // only ever check each child once, which isn't guaranteed since we're not
+    // iterating just over the children in one go.
+    if (child && !processed.has(child)) {
+      processed.add(child)
+
+      for (const r of ancestorRules) {
+        const e = checkParent(editor, entry, index, rule, r)
+
+        if (e) {
+          return e
+        }
+      }
+    }
+
+    // If we're out of children and groups we're done.
+    if (!child && !group) {
+      break
+    }
+
+    // If the entry doesn't match the rule, then the `children` validation is
+    // irrelevant, so just keep iterating the children.
+    if (!isMatch) {
+      if (child) {
+        index++
+        continue
+      } else {
+        break
+      }
+    }
+
+    // If we're out of groups, just continue iterating the children.
+    if (!group) {
+      index++
+      continue
+    }
+
+    // Since we want to report overflow on last matching child we don't
+    // immediately v for count > max, but instead do so once we find
+    // a child that doesn't match.
+    if (child && group.max != null && count > group.max) {
+      if (g < groups.length - 1 && (group.min == null || count <= group.min)) {
+        g++
+        count = 0
+        continue
+      } else {
         return {
           code: 'child_max_invalid',
-          node: n,
-          path: p,
-          index: i,
-          count: m,
-          max,
+          node: parent,
+          path: parentPath,
+          index,
+          count,
+          max: group.max,
         }
-      }
-
-      // Otherwise either we exhausted the last group, in which case it's
-      // an unexpected child that has overflowed.
-      if (m > max) {
-        return { code: 'child_unexpected', node: n, path: p, index: i }
-      }
-
-      if (!editor.isNodeMatch([n, p], match)) {
-        // If there are more children definitions after this one, then this
-        // child might actually be valid for a future one.
-        if (check.children.length > d + 1) {
-          // If we've already satisfied the current child definition's minimum
-          // then we can proceed to the next definition.
-          if (m >= min) {
-            d++
-            m = 1
-            continue
-          }
-
-          // There might just not be enough elements for current group, and
-          // current child is in fact the first of the next group. If so, the
-          // next def will not report errors, in which case we can rewind and
-          // report an minimum error.
-          const nextChild = check.children[d + 1]
-
-          if (nextChild && editor.isNodeMatch([n, p], nextChild.match || {})) {
-            return {
-              code: 'child_min_invalid',
-              node: n,
-              path: p,
-              index: i,
-              count: m,
-              min,
-            }
-          }
-        }
-
-        return { code: 'child_invalid', node: n, path: p, index: i }
       }
     }
 
-    i++
-    m++
+    // If there's no child, we're either done, we're in an optional group, or
+    // we're missing a child in a group with a mininmum set.
+    if (!child) {
+      if (group.min != null && group.min > 0) {
+        return {
+          code: 'child_min_invalid',
+          node: parent,
+          path: parentPath,
+          index,
+          count,
+          min: group.min,
+        }
+      } else {
+        g++
+        count = 0
+        continue
+      }
+    }
+
+    if (editor.isNodeMatch([child, childPath], group.match || {})) {
+      index++
+      continue
+    }
+
+    // If there are more children definitions after this one, then this
+    // child might actually be valid for a future one.
+    if (g + 1 < groups.length) {
+      // If we've already satisfied the current child definition's minimum
+      // then we can proceed to the next definition.
+      if (group.min == null || count >= group.min) {
+        g++
+        count = 0
+        continue
+      }
+
+      // The current group might be missing an element, and the child is
+      // actually a member of the next group. If so, the next validation
+      // won't report errors, and we can break to error out as minimum.
+      const nc = groups[g + 1]
+
+      if (nc && editor.isNodeMatch([child, childPath], nc.match || {})) {
+        return {
+          code: 'child_min_invalid',
+          node: parent,
+          path: parentPath,
+          index,
+          count,
+          min: group.min,
+        }
+      }
+    }
+
+    return { code: 'child_invalid', node: child, path: childPath, index }
+  }
+
+  debugger
+}
+
+/**
+ * Check a parent node object's children.
+ */
+
+export const checkParent = (
+  editor: Editor,
+  entry: AncestorEntry,
+  index: number,
+  rule: NodeRule,
+  childRule: NodeRule
+): NodeError | undefined => {
+  const { validate: cv } = childRule
+  const [parent, parentPath] = entry
+  const child = Node.child(parent, index)
+  const childPath = parentPath.concat(index)
+
+  if (
+    'parent' in cv &&
+    cv.parent != null &&
+    editor.isNodeMatch([child, childPath], rule.match) &&
+    !editor.isNodeMatch([parent, parentPath], cv.parent)
+  ) {
+    return {
+      code: 'parent_invalid',
+      node: parent,
+      path: parentPath,
+      index,
+    }
+  }
+
+  if (
+    'previous' in cv &&
+    cv.previous != null &&
+    index > 0 &&
+    editor.isNodeMatch([child, childPath], rule.match)
+  ) {
+    const prevChild = Node.child(parent, index - 1)
+    const prevPath = parentPath.concat(index - 1)
+
+    if (!editor.isNodeMatch([prevChild, prevPath], cv.previous)) {
+      return {
+        code: 'previous_sibling_invalid',
+        node: prevChild,
+        path: prevPath,
+      }
+    }
+  }
+
+  if (
+    'next' in cv &&
+    cv.next != null &&
+    index < parent.nodes.length - 1 &&
+    editor.isNodeMatch([child, childPath], rule.match)
+  ) {
+    const nextChild = Node.child(parent, index + 1)
+    const nextPath = parentPath.concat(index + 1)
+
+    if (!editor.isNodeMatch([nextChild, nextPath], cv.next)) {
+      return {
+        code: 'next_sibling_invalid',
+        node: nextChild,
+        path: nextPath,
+      }
+    }
   }
 }

@@ -1,8 +1,8 @@
-import { Editor, Path } from 'slate'
+import { Editor, Path, Text } from 'slate'
 
-import { NodeRule, SchemaRule, AnnotationRule, MarkRule } from './rule'
-import { NodeError } from './error'
-import { checkNode } from './checkers'
+import { NodeRule, SchemaRule, AnnotationRule, MarkRule } from './rules'
+import { NodeError } from './errors'
+import { checkNode, checkAncestor } from './checkers'
 
 /**
  * `SchemaEditor` is a Slate editor class with `withSchema` mixed in.
@@ -22,6 +22,7 @@ export const withSchema = (
   const annotationRules: AnnotationRule[] = []
   const markRules: MarkRule[] = []
   const nodeRules: NodeRule[] = []
+  const ancestorRules: NodeRule[] = []
 
   for (const rule of rules) {
     if (rule.for === 'annotation') {
@@ -30,6 +31,14 @@ export const withSchema = (
       markRules.push(rule)
     } else {
       nodeRules.push(rule)
+
+      if (
+        'parent' in rule.validate ||
+        'next' in rule.validate ||
+        'previous' in rule.validate
+      ) {
+        ancestorRules.push(rule)
+      }
     }
   }
 
@@ -42,15 +51,16 @@ export const withSchema = (
     normalizeNodes(options: { at: Path }): void {
       const { at } = options
       const entry = this.getNode(at)
+      const [n, p] = entry
       let error: NodeError | undefined
       let rule: NodeRule | undefined
 
       for (const r of nodeRules) {
-        if (!this.isNodeMatch(entry, r.match)) {
-          continue
-        }
+        let e = checkNode(this, entry, r, nodeRules)
 
-        const e = checkNode(this, entry, r.validate, nodeRules)
+        if (!e && !Text.isText(n)) {
+          e = checkAncestor(this, [n, p], r, ancestorRules)
+        }
 
         if (e) {
           error = e
@@ -77,18 +87,16 @@ export const withSchema = (
       }
 
       switch (error.code) {
-        case 'child_max_invalid':
-        case 'child_min_invalid':
         case 'first_child_invalid':
         case 'last_child_invalid': {
-          const { code, path } = error
+          const { path } = error
           const [parent, parentPath] = this.getParent(path)
 
-          if (parent.nodes.length > 1 || code === 'child_min_invalid') {
+          if (parent.nodes.length > 1) {
             this.removeNodes({ at: path })
           } else if (parentPath.length === 0) {
             const range = this.getRange(parentPath)
-            this.removeNodes({ at: range, match: 1 })
+            this.removeNodes({ at: range, match: ([, p]) => p.length === 1 })
           } else {
             this.removeNodes({ at: parentPath })
           }
@@ -96,20 +104,47 @@ export const withSchema = (
           break
         }
 
+        case 'child_max_invalid': {
+          const { node, path, index } = error
+          debugger
+
+          if (node.nodes.length === 1 && path.length !== 0) {
+            this.removeNodes({ at: path })
+          } else {
+            this.removeNodes({ at: path.concat(index) })
+          }
+
+          break
+        }
+
+        case 'child_min_invalid': {
+          const { path } = error
+          debugger
+
+          if (path.length === 0) {
+            const range = this.getRange(path)
+            this.removeNodes({ at: range, match: ([, p]) => p.length === 1 })
+          } else {
+            this.removeNodes({ at: path })
+          }
+
+          break
+        }
+
         case 'child_invalid':
         case 'child_unexpected':
-        case 'mark_invalid':
+        case 'next_sibling_invalid':
         case 'node_property_invalid':
-        case 'node_text_invalid': {
+        case 'node_text_invalid':
+        case 'previous_sibling_invalid': {
           const { path } = error
           this.removeNodes({ at: path })
           break
         }
 
-        case 'next_sibling_invalid': {
-          const { path } = error
-          const prevPath = Path.previous(path)
-          this.removeNodes({ at: prevPath })
+        case 'mark_invalid': {
+          const { mark, path } = error
+          this.removeMarks([mark], { at: path })
           break
         }
 
@@ -117,13 +152,6 @@ export const withSchema = (
           const { path, index } = error
           const childPath = path.concat(index)
           this.removeNodes({ at: childPath })
-          break
-        }
-
-        case 'previous_sibling_invalid': {
-          const { path } = error
-          const nextPath = Path.next(path)
-          this.removeNodes({ at: nextPath })
           break
         }
 

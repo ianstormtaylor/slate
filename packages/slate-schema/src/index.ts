@@ -1,3 +1,3 @@
-export * from './error'
+export * from './errors'
 export * from './plugin'
-export * from './rule'
+export * from './rules'
