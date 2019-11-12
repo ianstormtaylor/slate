@@ -3,7 +3,7 @@
 import { jsx } from '../../helpers'
 
 export const schema = {
-  blocks: {
+  elements: {
     a: {
       validate: {
         children: [{ max: 1 }, { min: 1 }],

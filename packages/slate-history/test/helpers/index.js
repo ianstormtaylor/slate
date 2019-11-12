@@ -7,12 +7,8 @@ export const jsx = createHyperscript({
   },
 })
 
-export const HelpersPlugin = () => Editor => {
+export const withHelpers = Editor => {
   return class extends Editor {
-    isAtomic(mark) {
-      return mark.atomic === true ? true : super.isAtomic(mark)
-    }
-
     isInline(node) {
       return node.inline === true ? true : super.isInline(node)
     }

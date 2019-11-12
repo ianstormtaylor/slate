@@ -1,14 +1,12 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { Editor } from 'slate'
-import { HelpersPlugin } from './helpers'
-import { HistoryPlugin } from '..'
+import { withHelpers } from './helpers'
+import { withHistory } from '..'
 
 describe('slate-history', () => {
   fixtures(__dirname, 'undo', ({ module }) => {
     const { input, run, output } = module
-    const withHistory = HistoryPlugin()
-    const withHelpers = HelpersPlugin()
     const TestEditor = withHelpers(withHistory(Editor))
     const editor = new TestEditor({ value: input })
     run(editor)

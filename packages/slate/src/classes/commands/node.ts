@@ -11,6 +11,7 @@ import {
   Range,
   Point,
 } from '../..'
+import { Value } from '../../interfaces/value'
 
 class NodeCommands {
   /**
@@ -350,12 +351,13 @@ class NodeCommands {
     }
 
     // Determine whether the node should have block or inline children.
-    const shouldHaveInlines =
-      Element.isElement(node) &&
-      (this.isInline(node) ||
-        node.nodes.length === 0 ||
-        Text.isText(node.nodes[0]) ||
-        this.isInline(node.nodes[0]))
+    const shouldHaveInlines = Value.isValue(node)
+      ? false
+      : Element.isElement(node) &&
+        (this.isInline(node) ||
+          node.nodes.length === 0 ||
+          Text.isText(node.nodes[0]) ||
+          this.isInline(node.nodes[0]))
 
     // Since we'll be applying operations while iterating, keep track of an
     // index that accounts for any added/removed nodes.
@@ -365,31 +367,31 @@ class NodeCommands {
       const child = node.nodes[i] as Descendant
       const prev = node.nodes[i - 1]
       const isLast = i === node.nodes.length - 1
+      const isInlineOrText =
+        Text.isText(child) || (Element.isElement(child) && this.isInline(child))
+
+      // Only allow block nodes in the top-level value and parent blocks that
+      // only contain block nodes. Similarly, only allow inline nodes in other
+      // inline nodes, or parent blocks that only contain inlines and text.
+      if (isInlineOrText !== shouldHaveInlines) {
+        this.removeNodes({ at: at.concat(n) })
+        n--
+        continue
+      }
 
       if (Element.isElement(child)) {
-        const isInline = this.isInline(child)
-
-        // Only allow block nodes in the top-level value and parent blocks that
-        // only contain block nodes. Similarly, only allow inline nodes in other
-        // inline nodes, or parent blocks that only contain inlines and text.
-        if (isInline !== shouldHaveInlines) {
-          this.removeNodes({ at: at.concat(n) })
-          n--
-          continue
-        }
-
         // Ensure that inline nodes are surrounded by text nodes.
-        if (isInline) {
+        if (this.isInline(child)) {
           if (prev == null || !Text.isText(prev)) {
-            const child = { text: '', marks: [] }
-            this.insertNodes(child, { at: at.concat(n) })
+            const newChild = { text: '', marks: [] }
+            this.insertNodes(newChild, { at: at.concat(n) })
             n++
             continue
           }
 
           if (isLast) {
-            const child = { text: '', marks: [] }
-            this.insertNodes(child, { at: at.concat(n + 1) })
+            const newChild = { text: '', marks: [] }
+            this.insertNodes(newChild, { at: at.concat(n + 1) })
             n++
             continue
           }
