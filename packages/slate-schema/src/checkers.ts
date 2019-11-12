@@ -156,10 +156,8 @@ export const checkAncestor = (
   let index = 0
   let count = 0
   let g = 0
-  debugger
 
   while (true) {
-    debugger
     count++
     const group = groups[g] as ChildValidation | undefined
     const child = parent.nodes[index] as Descendant | undefined
@@ -202,11 +200,13 @@ export const checkAncestor = (
       continue
     }
 
+    debugger
+
     // Since we want to report overflow on last matching child we don't
     // immediately v for count > max, but instead do so once we find
     // a child that doesn't match.
     if (child && group.max != null && count > group.max) {
-      if (g < groups.length - 1 && (group.min == null || count <= group.min)) {
+      if (g < groups.length - 1 && (group.min == null || count >= group.min)) {
         g++
         count = 0
         continue
@@ -225,7 +225,7 @@ export const checkAncestor = (
     // If there's no child, we're either done, we're in an optional group, or
     // we're missing a child in a group with a mininmum set.
     if (!child) {
-      if (group.min != null && group.min > 0) {
+      if (group.min != null && count <= group.min) {
         return {
           code: 'child_min_invalid',
           node: parent,
@@ -276,8 +276,6 @@ export const checkAncestor = (
 
     return { code: 'child_invalid', node: child, path: childPath, index }
   }
-
-  debugger
 }
 
 /**

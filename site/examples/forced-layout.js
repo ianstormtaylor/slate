@@ -4,32 +4,39 @@ import { Editor } from 'slate'
 import { withHistory } from 'slate-history'
 import { withSchema } from 'slate-schema'
 
-const schema = {
-  value: {
+const schema = [
+  {
+    for: 'node',
+    match: 'value',
     validate: {
       children: [
-        { match: { properties: { type: 'title' } }, min: 1, max: 1 },
-        { match: { properties: { type: 'paragraph' } }, min: 1 },
+        { match: { type: 'title' }, min: 1, max: 1 },
+        { match: { type: 'paragraph' }, min: 1 },
       ],
     },
     normalize: (editor, error) => {
       const { code, path, index } = error
+      const type = index === 0 ? 'title' : 'paragraph'
 
+      debugger
       switch (code) {
-        case 'child_unexpected':
-        case 'child_type_invalid': {
-          const type = index === 0 ? 'title' : 'paragraph'
-          return editor.setNodes({ type }, { at: path })
+        case 'child_invalid': {
+          editor.setNodes({ type }, { at: path })
+          break
         }
         case 'child_min_invalid': {
-          const type = index === 0 ? 'title' : 'paragraph'
           const block = { type, nodes: [{ text: '', marks: [] }] }
-          return editor.insertNodes(block, { at: path })
+          editor.insertNodes(block, { at: path.concat(index) })
+          break
+        }
+        case 'child_max_invalid': {
+          editor.setNodes({ type }, { at: path.concat(index) })
+          break
         }
       }
     },
   },
-}
+]
 
 const ForcedLayoutEditor = withSchema(withHistory(withReact(Editor)), schema)
 

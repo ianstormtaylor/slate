@@ -7,16 +7,14 @@ export const schema = [
     for: 'node',
     match: { a: true },
     validate: {
-      children: [{ min: 1 }],
+      text: v => v === 'valid',
     },
   },
 ]
 
 export const input = (
   <value>
-    <element a>
-      <element b>one</element>
-    </element>
+    <element a>invalid</element>
   </value>
 )
 

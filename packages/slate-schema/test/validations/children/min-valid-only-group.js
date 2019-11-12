@@ -1,21 +1,23 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from 'slate-hyperscript'
 
 export const schema = [
   {
     for: 'node',
     match: { a: true },
     validate: {
-      text: v => v === 'valid',
+      children: [{ min: 1 }],
     },
   },
 ]
 
 export const input = (
   <value>
-    <element a>invalid</element>
+    <element a>
+      <element b>one</element>
+    </element>
   </value>
 )
 
-export const output = <value />
+export const output = input

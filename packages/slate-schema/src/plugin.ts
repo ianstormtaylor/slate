@@ -106,7 +106,6 @@ export const withSchema = (
 
         case 'child_max_invalid': {
           const { node, path, index } = error
-          debugger
 
           if (node.nodes.length === 1 && path.length !== 0) {
             this.removeNodes({ at: path })
@@ -119,7 +118,6 @@ export const withSchema = (
 
         case 'child_min_invalid': {
           const { path } = error
-          debugger
 
           if (path.length === 0) {
             const range = this.getRange(path)
