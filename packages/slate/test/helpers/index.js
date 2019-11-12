@@ -1,13 +1,13 @@
 import { createHyperscript } from 'slate-hyperscript'
 
-const h = createHyperscript({
+export const jsx = createHyperscript({
   elements: {
     block: {},
     inline: { inline: true },
   },
 })
 
-const TestPlugin = Editor => {
+export const TestPlugin = Editor => {
   return class extends Editor {
     isAtomic(mark) {
       return mark.atomic === true ? true : super.isAtomic(mark)
@@ -22,5 +22,3 @@ const TestPlugin = Editor => {
     }
   }
 }
-
-export { h, TestPlugin }

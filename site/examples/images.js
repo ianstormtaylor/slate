@@ -48,10 +48,6 @@ class ImagesEditor extends withHistory(withReact(Editor)) {
     const image = { type: 'image', url, nodes: [text] }
     this.insertNodes(image)
   }
-
-  renderElement(props) {
-    return <Element {...props} />
-  }
 }
 
 const ImagesExample = () => {
@@ -76,6 +72,7 @@ const ImagesExample = () => {
         editor={editor}
         value={value}
         onChange={setValue}
+        renderElement={props => <Element {...props} />}
       />
     </div>
   )

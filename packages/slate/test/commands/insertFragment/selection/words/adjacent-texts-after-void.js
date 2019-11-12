@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from '../../../../helpers/h'
+import { jsx } from '../../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
@@ -29,7 +29,8 @@ export const output = (
         <text />
       </inline>
       <text>
-        onetwo<cursor />
+        onetwo
+        <cursor />
       </text>
     </block>
   </value>

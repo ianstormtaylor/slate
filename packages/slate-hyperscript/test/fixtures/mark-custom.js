@@ -1,8 +1,8 @@
-/** @jsx h */
+/** @jsx jsx */
 
 import { createHyperscript } from 'slate-hyperscript'
 
-const h = createHyperscript({
+const jsx = createHyperscript({
   marks: {
     b: { type: 'bold' },
   },

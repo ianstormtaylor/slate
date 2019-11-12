@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from '../../helpers/h'
+import { jsx } from '../../helpers'
 
 export const schema = {
   rules: [

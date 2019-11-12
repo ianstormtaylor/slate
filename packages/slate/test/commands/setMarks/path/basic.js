@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import { h } from '../../../helpers'
+import { jsx } from '../../../helpers'
 
 export const run = editor => {
   editor.setMarks([{ existing: true }], { key: true }, { at: [0, 0] })

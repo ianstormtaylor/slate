@@ -1,8 +1,8 @@
-/** @jsx h */
+/** @jsx jsx */
 
 import { createHyperscript } from 'slate-hyperscript'
 
-const h = createHyperscript({
+const jsx = createHyperscript({
   annotations: {
     highlight: { type: 'highlight' },
   },
@@ -11,10 +11,12 @@ const h = createHyperscript({
 export const input = (
   <value>
     <element>
-      o<highlight key="a" />ne
+      o<highlight key="a" />
+      ne
     </element>
     <element>
-      tw<highlight key="a" />o
+      tw
+      <highlight key="a" />o
     </element>
   </value>
 )

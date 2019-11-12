@@ -16,47 +16,9 @@ import {
  * occur in a Slate document tree.
  */
 
-type Node = Value | Element | Text
+export type Node = Value | Element | Text
 
-/**
- * The `Descendant` union type represents nodes that are descendants in the
- * tree. It is returned as a convenience in certain cases to narrow a value
- * further than the more generic `Node` union.
- */
-
-type Descendant = Element | Text
-
-/**
- * The `Ancestor` union type represents nodes that are ancestors in the tree.
- * It is returned as a convenience in certain cases to narrow a value further
- * than the more generic `Node` union.
- */
-
-type Ancestor = Value | Element
-
-/**
- * `NodeEntry` objects are returned when iterating over the nodes in a Slate
- * document tree. They consist of the node and its `Path` relative to the root
- * node in the document.
- */
-
-type NodeEntry = [Node, Path]
-
-/**
- * `DescendantEntry` objects are returned when iterating over the descendants in
- * a Slate document tree.
- */
-
-type DescendantEntry = [Descendant, Path]
-
-/**
- * `AncestorEntry` objects are returned when iterating over the ancestors in a
- * Slate document tree.
- */
-
-type AncestorEntry = [Ancestor, Path]
-
-namespace Node {
+export namespace Node {
   export const matches = (node: Node, props: Partial<Node>): boolean => {
     return (
       (Value.isValue(node) && Value.matches(node, props)) ||
@@ -566,4 +528,56 @@ namespace Node {
   }
 }
 
-export { Ancestor, AncestorEntry, Descendant, DescendantEntry, Node, NodeEntry }
+/**
+ * The `Descendant` union type represents nodes that are descendants in the
+ * tree. It is returned as a convenience in certain cases to narrow a value
+ * further than the more generic `Node` union.
+ */
+
+export type Descendant = Element | Text
+
+/**
+ * The `Ancestor` union type represents nodes that are ancestors in the tree.
+ * It is returned as a convenience in certain cases to narrow a value further
+ * than the more generic `Node` union.
+ */
+
+export type Ancestor = Value | Element
+
+/**
+ * `NodeEntry` objects are returned when iterating over the nodes in a Slate
+ * document tree. They consist of the node and its `Path` relative to the root
+ * node in the document.
+ */
+
+export type NodeEntry = [Node, Path]
+
+/**
+ * `DescendantEntry` objects are returned when iterating over the descendants in
+ * a Slate document tree.
+ */
+
+export type DescendantEntry = [Descendant, Path]
+
+/**
+ * `AncestorEntry` objects are returned when iterating over the ancestors in a
+ * Slate document tree.
+ */
+
+export type AncestorEntry = [Ancestor, Path]
+
+/**
+ * `NodeMatch` values are used as shorthands for matching a node by either its
+ * kind, its location, its behavior or its properties.
+ */
+
+export type NodeMatch =
+  | number
+  | 'value'
+  | 'block'
+  | 'inline'
+  | 'text'
+  | 'void'
+  | Partial<Node>
+  | Path
+  | ((entry: NodeEntry) => boolean)

@@ -3,6 +3,7 @@ import {
   Editor,
   Node,
   NodeEntry,
+  NodeMatch,
   Element,
   Location,
   Path,
@@ -10,7 +11,6 @@ import {
   Range,
   Point,
 } from '../..'
-import { Match } from '../utils'
 
 class NodeCommands {
   /**
@@ -22,7 +22,7 @@ class NodeCommands {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
     } = {}
   ) {
     this.withoutNormalizing(() => {
@@ -118,7 +118,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
     }
   ) {
     this.withoutNormalizing(() => {
@@ -171,7 +171,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       hanging?: boolean
     } = {}
   ) {
@@ -296,7 +296,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       to: Path
     }
   ) {
@@ -423,7 +423,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       hanging?: boolean
     } = {}
   ) {
@@ -462,7 +462,7 @@ class NodeCommands {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       hanging?: boolean
     } = {}
   ) {
@@ -522,7 +522,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       always?: boolean
       height?: number
     } = {}
@@ -639,7 +639,7 @@ class NodeCommands {
     this: Editor,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       split?: boolean
     }
   ) {
@@ -681,7 +681,7 @@ class NodeCommands {
     element: Element,
     options: {
       at?: Location
-      match?: Match
+      match?: NodeMatch
       split?: boolean
     } = {}
   ) {

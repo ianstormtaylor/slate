@@ -18,10 +18,6 @@ class EmbedsEditor extends withHistory(withReact(Editor)) {
     const video = { type: 'video', url, nodes: [{ text: '', marks: [] }] }
     this.insertNodes(video)
   }
-
-  renderElement(props) {
-    return <Element {...props} />
-  }
 }
 
 const EmbedsExample = () => {

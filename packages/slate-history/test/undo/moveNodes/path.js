@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import { h } from '../../helpers'
+import { jsx } from '../../helpers'
 
 export const run = editor => {
   editor.moveNodes({ at: [0], to: [1] })

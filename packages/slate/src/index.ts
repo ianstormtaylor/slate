@@ -1,8 +1,7 @@
-export { Editor } from './classes/editor'
-export { PathRef } from './classes/path-ref'
-export { PointRef } from './classes/point-ref'
-export { RangeRef } from './classes/range-ref'
-
+export * from './classes/editor'
+export * from './classes/path-ref'
+export * from './classes/point-ref'
+export * from './classes/range-ref'
 export * from './interfaces/element'
 export * from './interfaces/fragment'
 export * from './interfaces/location'

@@ -1,5 +1,5 @@
 import { Operation, Path, Editor } from '..'
-import { PATH_REFS } from './utils'
+import { PATH_REFS } from '../utils/state'
 
 /**
  * `PathRef` objects keep a specific path in a document synced over time as new
@@ -7,7 +7,7 @@ import { PATH_REFS } from './utils'
  * at any time for the up-to-date path value.
  */
 
-class PathRef {
+export class PathRef {
   current: Path | null
   private affinity: 'forward' | 'backward' | null
   private editor: Editor
@@ -56,5 +56,3 @@ class PathRef {
     return current
   }
 }
-
-export { PathRef }

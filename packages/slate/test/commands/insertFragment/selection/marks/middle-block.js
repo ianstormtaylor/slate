@@ -1,41 +1,38 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from '../../../../helpers/h'
+import { jsx } from '../../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-
     <block>
       <mark key="a">bar</mark>
     </block>
-
   )
 }
 
 export const input = (
   <value>
-
     <block>
       <block>
-        Foo<cursor />baz
-        </block>
+        Foo
+        <cursor />
+        baz
+      </block>
     </block>
-
   </value>
 )
 
 export const output = (
   <value>
-
     <block>
       <block>
         Foo
-          <mark key="a">
-          bar<cursor />
+        <mark key="a">
+          bar
+          <cursor />
         </mark>
         baz
-        </block>
+      </block>
     </block>
-
   </value>
 )

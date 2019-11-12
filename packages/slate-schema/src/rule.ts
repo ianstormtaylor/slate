@@ -1,83 +1,51 @@
-import { Editor } from 'slate'
-import { SchemaError } from './error'
+import { Editor, AnnotationMatch, NodeMatch, MarkMatch } from 'slate'
+import { NodeError, MarkError, AnnotationError } from './error'
 
-interface SchemaValueCheck {
-  object?: 'value'
-  children?: SchemaChildCheck[]
-  first?: SchemaDescendantCheck
-  last?: SchemaDescendantCheck
-  marks?: SchemaMarkCheck[]
-  text?: RegExp
-  properties?: {}
+export interface AnnotationValidation {
+  properties?: Record<string, any>
 }
 
-interface SchemaElementCheck {
-  object?: 'element'
-  children?: SchemaChildCheck[]
-  next?: SchemaDescendantCheck
-  previous?: SchemaDescendantCheck
-  first?: SchemaDescendantCheck
-  last?: SchemaDescendantCheck
-  parent?: SchemaAncestorCheck
-  marks?: SchemaMarkCheck[]
-  text?: (text: string) => boolean
-  properties?: {}
+export interface AnnotationRule {
+  for: 'annotation'
+  match: AnnotationMatch
+  validate: AnnotationValidation
+  normalize: (editor: Editor, error: AnnotationError) => void
 }
 
-interface SchemaTextCheck {
-  object?: 'text'
-  next?: SchemaDescendantCheck
-  previous?: SchemaDescendantCheck
-  parent?: SchemaAncestorCheck
-  marks?: SchemaMarkCheck[]
-  text?: RegExp
-  properties?: {}
+export interface MarkValidation {
+  properties?: Record<string, any>
 }
 
-type SchemaNodeCheck = SchemaValueCheck | SchemaElementCheck | SchemaTextCheck
-type SchemaAncestorCheck = SchemaValueCheck | SchemaElementCheck
-type SchemaDescendantCheck = SchemaElementCheck | SchemaTextCheck
+export interface MarkRule {
+  for: 'mark'
+  match: MarkMatch
+  validate: MarkValidation
+  normalize: (editor: Editor, error: MarkError) => void
+}
 
-interface SchemaChildCheck {
-  match?: SchemaDescendantCheck
+export interface ChildValidation {
+  match?: NodeMatch[]
   min?: number
   max?: number
 }
 
-interface SchemaAnnotationCheck {
-  object?: 'annotation'
-  properties?: {}
+export interface NodeValidation {
+  children?: ChildValidation[]
+  first?: NodeMatch[]
+  last?: NodeMatch[]
+  marks?: MarkMatch[]
+  next?: NodeMatch[]
+  parent?: NodeMatch[]
+  previous?: NodeMatch[]
+  properties?: Record<string, any>
+  text?: (text: string) => boolean
 }
 
-interface SchemaMarkCheck {
-  object?: 'mark'
-  properties?: {}
+export interface NodeRule {
+  for: 'node'
+  match: NodeMatch
+  validate: NodeValidation
+  normalize: (editor: Editor, error: NodeError) => void
 }
 
-interface SchemaFunctionCheck {
-  (object: any): boolean
-}
-
-type SchemaCheck =
-  | SchemaNodeCheck
-  | SchemaAnnotationCheck
-  | SchemaMarkCheck
-  | SchemaFunctionCheck
-
-interface SchemaDefine {
-  isInline?: boolean
-  isVoid?: boolean
-}
-
-interface SchemaNormalize {
-  (editor: Editor, error: SchemaError): void
-}
-
-interface SchemaRule {
-  match: SchemaCheck
-  validate?: SchemaCheck
-  define?: SchemaDefine
-  normalize?: SchemaNormalize
-}
-
-export { SchemaCheck, SchemaDefine, SchemaNormalize, SchemaRule }
+export type SchemaRule = AnnotationRule | MarkRule | NodeRule

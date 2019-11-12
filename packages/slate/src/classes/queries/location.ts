@@ -1,4 +1,6 @@
 import { reverse as reverseText } from 'esrever'
+
+import { getCharacterDistance, getWordDistance } from '../../utils/strings'
 import {
   Ancestor,
   AncestorEntry,
@@ -11,6 +13,7 @@ import {
   MarkEntry,
   Node,
   NodeEntry,
+  NodeMatch,
   Path,
   Point,
   Range,
@@ -20,7 +23,6 @@ import {
   TextEntry,
   Value,
 } from '../..'
-import { Match, getCharacterDistance, getWordDistance } from '../utils'
 
 class LocationQueries {
   /**
@@ -325,7 +327,11 @@ class LocationQueries {
    * Get the first matching node in a single branch of the document.
    */
 
-  getMatch(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+  getMatch(
+    this: Editor,
+    at: Location,
+    match: NodeMatch
+  ): NodeEntry | undefined {
     // PERF: If the match is a path, don't traverse.
     if (Path.isPath(match)) {
       return this.getNode(match)
@@ -350,7 +356,7 @@ class LocationQueries {
    * Get the matching node in the branch of the document after a location.
    */
 
-  getNext(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+  getNext(this: Editor, at: Location, match: NodeMatch): NodeEntry | undefined {
     const [, from] = this.getLast(at)
     const [, to] = this.getLast([])
     const span: Span = [from, to]
@@ -492,7 +498,11 @@ class LocationQueries {
    * Get the matching node in the branch of the document before a location.
    */
 
-  getPrevious(this: Editor, at: Location, match: Match): NodeEntry | undefined {
+  getPrevious(
+    this: Editor,
+    at: Location,
+    match: NodeMatch
+  ): NodeEntry | undefined {
     const [, from] = this.getFirst(at)
     const [, to] = this.getFirst([])
     const span: Span = [from, to]
@@ -676,7 +686,7 @@ class LocationQueries {
     this: Editor,
     options: {
       at?: Location | Span
-      match?: Match
+      match?: NodeMatch
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
@@ -914,7 +924,7 @@ const getSpan = (
  * Check if a node is a match.
  */
 
-const isMatch = (editor: Editor, entry: NodeEntry, match: Match) => {
+const isMatch = (editor: Editor, entry: NodeEntry, match: NodeMatch) => {
   const [node, path] = entry
 
   if (typeof match === 'function') {

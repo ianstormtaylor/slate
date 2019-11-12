@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import { h } from '../../helpers'
+import { jsx } from '../../helpers'
 import { PathUtils } from 'slate'
 
 export const run = editor => {

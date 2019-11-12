@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import { h } from '../../../helpers'
+import { jsx } from '../../../helpers'
 
 export const run = editor => {
   editor.splitNodes({ match: 'block', at: { path: [0, 0], offset: 2 } })

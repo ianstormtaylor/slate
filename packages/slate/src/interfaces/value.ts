@@ -18,41 +18,13 @@ import {
  * nodes in the document and the user's currently selected range of text.
  */
 
-interface Value extends Element {
+export interface Value extends Element {
   selection: Range | null
   annotations: Record<string, Range>
   [key: string]: any
 }
 
-/**
- * `ValueEntry` objects refer to an `Value` and the `Path` where it can be
- * found inside a root node.
- */
-
-type ValueEntry = [Value, Path]
-
-/**
- * `AnnotationEntry` objects are returned when iterating over annotations
- * in the top-level value.
- */
-
-type AnnotationEntry = [Range, string]
-
-/**
- * `AnnotationPointEntry` objects are returned when iterating over `Point`
- * objects that belong to an annotation.
- */
-
-type AnnotationPointEntry = [Point, PointKey, Range, string]
-
-/**
- * `SelectionPointEntry` objects are returned when iterating over `Point`
- * objects that belong to a selection.
- */
-
-type SelectionPointEntry = [Point, PointKey, Range]
-
-namespace Value {
+export namespace Value {
   /**
    * Check if a value implements the `Value` interface.
    */
@@ -386,10 +358,38 @@ namespace Value {
   }
 }
 
-export {
-  Value,
-  ValueEntry,
-  AnnotationEntry,
-  AnnotationPointEntry,
-  SelectionPointEntry,
-}
+/**
+ * `ValueEntry` objects refer to an `Value` and the `Path` where it can be
+ * found inside a root node.
+ */
+
+export type ValueEntry = [Value, Path]
+
+/**
+ * `AnnotationEntry` objects are returned when iterating over annotations
+ * in the top-level value.
+ */
+
+export type AnnotationEntry = [Range, string]
+
+/**
+ * `AnnotationMatch` objects are a shorthand for matching annotation objects.
+ */
+
+export type AnnotationMatch =
+  | Partial<Range>
+  | ((entry: AnnotationEntry) => boolean)
+
+/**
+ * `AnnotationPointEntry` objects are returned when iterating over `Point`
+ * objects that belong to an annotation.
+ */
+
+export type AnnotationPointEntry = [Point, PointKey, Range, string]
+
+/**
+ * `SelectionPointEntry` objects are returned when iterating over `Point`
+ * objects that belong to a selection.
+ */
+
+export type SelectionPointEntry = [Point, PointKey, Range]

@@ -1,6 +1,6 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from 'slate-hyperscript'
+import { jsx } from 'slate-hyperscript'
 
 export const input = <fragment>word</fragment>
 

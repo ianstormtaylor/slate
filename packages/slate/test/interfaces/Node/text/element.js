@@ -1,7 +1,7 @@
-/** @jsx h  */
+/** @jsx jsx  */
 
 import { Node } from 'slate'
-import h from 'slate-hyperscript'
+import { jsx } from 'slate-hyperscript'
 
 export const input = (
   <element>

@@ -1,43 +1,31 @@
-import { Ancestor, Range, Element, Mark, Node, Path, Text, Value } from 'slate'
-import { SchemaRule, SchemaCheck } from './rule'
 import {
-  AnnotationSchemaError,
-  MarkSchemaError,
-  NodeSchemaError,
-} from './error'
+  NodeEntry,
+  Node,
+  Text,
+  Mark,
+  Editor,
+  MarkEntry,
+  AnnotationEntry,
+} from 'slate'
+
+import { AnnotationError, MarkError, NodeError } from './error'
+import {
+  NodeRule,
+  NodeValidation,
+  AnnotationValidation,
+  MarkValidation,
+} from './rule'
 
 /**
  * Check an annotation object.
  */
 
 export const checkAnnotation = (
-  annotation: Range,
-  key: string,
-  check: SchemaCheck
-): AnnotationSchemaError | undefined => {
-  if (typeof check === 'function') {
-    if (check(annotation)) {
-      return
-    } else {
-      return {
-        code: 'annotation_invalid',
-        annotation,
-        key,
-      }
-    }
-  }
-
-  if (
-    'object' in check &&
-    check.object === 'annotation' &&
-    !Range.isRange(annotation)
-  ) {
-    return {
-      code: 'annotation_object_invalid',
-      annotation,
-      key,
-    }
-  }
+  editor: Editor,
+  entry: AnnotationEntry,
+  check: AnnotationValidation
+): AnnotationError | undefined => {
+  const [annotation, key] = entry
 
   if ('properties' in check) {
     for (const k in check.properties) {
@@ -61,23 +49,11 @@ export const checkAnnotation = (
  */
 
 export const checkMark = (
-  mark: Mark,
-  index: number,
-  node: Text,
-  path: Path,
-  check: SchemaCheck
-): MarkSchemaError | undefined => {
-  if (typeof check === 'function') {
-    if (check(mark)) {
-      return
-    } else {
-      return { code: 'mark_invalid', mark, index, node, path }
-    }
-  }
-
-  if ('object' in check && check.object === 'mark' && !Mark.isMark(mark)) {
-    return { code: 'mark_object_invalid', mark, index, node, path }
-  }
+  editor: Editor,
+  entry: MarkEntry,
+  check: MarkValidation
+): MarkError | undefined => {
+  const [mark, index, node, path] = entry
 
   if ('properties' in check) {
     for (const k in check.properties) {
@@ -103,27 +79,12 @@ export const checkMark = (
  */
 
 export const checkNode = (
-  node: Node,
-  path: Path,
-  check: SchemaCheck,
-  rules: SchemaRule[]
-): NodeSchemaError | MarkSchemaError | undefined => {
-  if (typeof check === 'function') {
-    if (check(node)) {
-      return
-    } else {
-      return { code: 'node_invalid', node, path }
-    }
-  }
-
-  if (
-    'object' in check &&
-    ((check.object === 'value' && !Value.isValue(node)) ||
-      (check.object === 'element' && !Element.isElement(node)) ||
-      (check.object === 'text' && !Text.isText(node)))
-  ) {
-    return { code: 'node_object_invalid', node, path }
-  }
+  editor: Editor,
+  entry: NodeEntry,
+  check: NodeValidation,
+  rules: NodeRule[]
+): NodeError | undefined => {
+  const [node, path] = entry
 
   if ('properties' in check) {
     for (const k in check.properties) {
@@ -139,60 +100,30 @@ export const checkNode = (
 
   if ('marks' in check && check.marks != null) {
     for (const [mark, index, n, p] of Node.marks(node)) {
-      for (const c of check.marks) {
-        const e = checkMark(mark, index, n, path.concat(p), c)
-
-        if (e) {
-          return e
-        }
+      if (!check.marks.some(c => Mark.matches(mark, c))) {
+        return { code: 'mark_invalid', node: n, path: p, mark, index }
       }
     }
   }
 
   if ('text' in check && check.text != null) {
     const text = Node.text(node)
-    const valid =
-      typeof check.text === 'function'
-        ? check.text(text)
-        : check.text.test(text)
 
-    if (!valid) {
+    if (!check.text(text)) {
       return { code: 'node_text_invalid', node, path, text }
     }
   }
 
-  if (!Text.isText(node)) {
-    const error = checkAncestor(node, path, check, rules)
-
-    if (error) {
-      return error
-    }
+  if (Text.isText(node)) {
+    return
   }
-}
 
-/**
- * Check an ancestor object.
- */
-
-export const checkAncestor = (
-  node: Ancestor,
-  path: Path,
-  check: SchemaCheck,
-  rules: SchemaRule[]
-): NodeSchemaError | undefined => {
   if ('first' in check && check.first != null && node.nodes.length !== 0) {
     const n = Node.child(node, 0)
     const p = path.concat(0)
-    const e = checkNode(n, p, check.first, rules)
 
-    if (e) {
-      if (e.code === 'node_invalid') {
-        return { ...e, code: 'first_child_invalid', node: n, index: 0 }
-      } else if (e.code === 'node_object_invalid') {
-        return { ...e, code: 'first_child_object_invalid', node: n, index: 0 }
-      } else if (e.code === 'node_property_invalid') {
-        return { ...e, code: 'first_child_property_invalid', node: n, index: 0 }
-      }
+    if (!editor.isNodeMatch(entry, check.first)) {
+      return { code: 'first_child_invalid', node: n, path: p, index: 0 }
     }
   }
 
@@ -200,16 +131,9 @@ export const checkAncestor = (
     const i = node.nodes.length - 1
     const n = Node.child(node, i)
     const p = path.concat(i)
-    const e = checkNode(n, p, check.last, rules)
 
-    if (e) {
-      if (e.code === 'node_invalid') {
-        return { ...e, code: 'last_child_invalid', node: n, index: i }
-      } else if (e.code === 'node_object_invalid') {
-        return { ...e, code: 'last_child_object_invalid', node: n, index: i }
-      } else if (e.code === 'node_property_invalid') {
-        return { ...e, code: 'last_child_property_invalid', node: n, index: i }
-      }
+    if (!editor.isNodeMatch(entry, check.last)) {
+      return { code: 'last_child_invalid', node: n, path: p, index: i }
     }
   }
 
@@ -228,34 +152,23 @@ export const checkAncestor = (
           ('parent' in check ||
             ('previous' in check && i > 0) ||
             ('next' in check && i < node.nodes.length - 1)) &&
-          checkNode(n, p, rule.match, rules) === undefined
+          editor.isNodeMatch([n, p], rule.match)
         ) {
           if ('parent' in check && check.parent != null) {
-            const e = checkNode(node, path, check.parent, rules)
-
-            if (e) {
-              if (e.code === 'node_invalid') {
-                return { ...e, index: i, node, code: 'parent_invalid' }
-              } else if (e.code === 'node_object_invalid') {
-                return { ...e, index: i, node, code: 'parent_object_invalid' }
-              } else if (e.code === 'node_property_invalid') {
-                return { ...e, index: i, node, code: 'parent_property_invalid' }
-              }
+            if (!editor.isNodeMatch(entry, check.parent)) {
+              return { code: 'parent_invalid', node, path, index: i }
             }
           }
 
           if ('previous' in check && check.previous != null) {
             const prevN = Node.child(node, i - 1)
             const prevP = path.concat(i - 1)
-            const e = checkNode(prevN, prevP, check.previous, rules)
 
-            if (e) {
-              if (e.code === 'node_invalid') {
-                return { ...e, code: 'previous_sibling_invalid' }
-              } else if (e.code === 'node_object_invalid') {
-                return { ...e, code: 'previous_sibling_object_invalid' }
-              } else if (e.code === 'node_property_invalid') {
-                return { ...e, code: 'previous_sibling_property_invalid' }
+            if (!editor.isNodeMatch([prevN, prevP], check.previous)) {
+              return {
+                code: 'previous_sibling_invalid',
+                node: prevN,
+                path: prevP,
               }
             }
           }
@@ -263,16 +176,9 @@ export const checkAncestor = (
           if ('next' in check && check.next != null) {
             const nextN = Node.child(node, i + 1)
             const nextP = path.concat(i + 1)
-            const e = checkNode(nextN, nextP, check.next, rules)
 
-            if (e) {
-              if (e.code === 'node_invalid') {
-                return { ...e, code: 'next_sibling_invalid' }
-              } else if (e.code === 'node_object_invalid') {
-                return { ...e, code: 'next_sibling_object_invalid' }
-              } else if (e.code === 'node_property_invalid') {
-                return { ...e, code: 'next_sibling_property_invalid' }
-              }
+            if (!editor.isNodeMatch([nextN, nextP], check.next)) {
+              return { code: 'next_sibling_invalid', node: nextN, path: nextP }
             }
           }
         }
@@ -283,8 +189,7 @@ export const checkAncestor = (
 
     if ('children' in check && check.children != null) {
       const child = check.children[d]
-      const max = child.max != null ? child.max : Infinity
-      const min = child.min != null ? child.min : 0
+      const { match = {}, max = Infinity, min = 0 } = child
 
       // If the children assertion was defined, but we don't current have a
       // definition, we've reached the end so any other children are overflows.
@@ -312,9 +217,7 @@ export const checkAncestor = (
         return { code: 'child_unexpected', node: n, path: p, index: i }
       }
 
-      const e = checkNode(n, p, child.match || {}, rules)
-
-      if (e) {
+      if (!editor.isNodeMatch([n, p], match)) {
         // If there are more children definitions after this one, then this
         // child might actually be valid for a future one.
         if (check.children.length > d + 1) {
@@ -332,10 +235,7 @@ export const checkAncestor = (
           // report an minimum error.
           const nextChild = check.children[d + 1]
 
-          if (
-            nextChild &&
-            checkNode(n, p, nextChild.match || {}, rules) === undefined
-          ) {
+          if (nextChild && editor.isNodeMatch([n, p], nextChild.match || {})) {
             return {
               code: 'child_min_invalid',
               node: n,
@@ -347,26 +247,7 @@ export const checkAncestor = (
           }
         }
 
-        // Or the child is invalid against the definition.
-        if (e.code === 'node_invalid') {
-          return { ...e, node: n, path: p, index: i, code: 'child_invalid' }
-        } else if (e.code === 'node_object_invalid') {
-          return {
-            ...e,
-            code: 'child_object_invalid',
-            node: n,
-            path: p,
-            index: i,
-          }
-        } else if (e.code === 'node_property_invalid') {
-          return {
-            ...e,
-            code: 'child_property_invalid',
-            node: n,
-            path: p,
-            index: i,
-          }
-        }
+        return { code: 'child_invalid', node: n, path: p, index: i }
       }
     }
 

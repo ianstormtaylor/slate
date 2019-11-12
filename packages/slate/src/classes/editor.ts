@@ -1,4 +1,5 @@
 import { produce } from 'immer'
+
 import { Operation, Value } from '..'
 import {
   DIRTY_PATHS,
@@ -7,7 +8,8 @@ import {
   PATH_REFS,
   POINT_REFS,
   RANGE_REFS,
-} from './utils'
+} from '../utils/state'
+
 import AnnotationCommands from './commands/annotation'
 import TextCommands from './commands/text'
 import NodeCommands from './commands/node'
@@ -17,6 +19,7 @@ import GeneralCommands from './commands/general'
 import ElementQueries from './queries/element'
 import GeneralQueries from './queries/general'
 import LocationQueries from './queries/location'
+import NodeQueries from './queries/node'
 import RangeQueries from './queries/range'
 
 /**
@@ -24,7 +27,7 @@ import RangeQueries from './queries/range'
  * plugins that wish to add their own methods that implement new behaviors.
  */
 
-class Editor {
+export class Editor {
   onChange: (value: Value, operations: Operation[]) => void
   operations: Operation[]
   value: Value
@@ -57,7 +60,7 @@ class Editor {
   }
 }
 
-interface Editor
+export interface Editor
   extends AnnotationCommands,
     TextCommands,
     NodeCommands,
@@ -67,6 +70,7 @@ interface Editor
     ElementQueries,
     GeneralQueries,
     LocationQueries,
+    NodeQueries,
     RangeQueries {}
 
 const mixin = (Mixins: Array<new () => any>) => {
@@ -89,7 +93,6 @@ mixin([
   ElementQueries,
   GeneralQueries,
   LocationQueries,
+  NodeQueries,
   RangeQueries,
 ])
-
-export { Editor }

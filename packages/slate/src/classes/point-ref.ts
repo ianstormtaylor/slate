@@ -1,5 +1,5 @@
 import { Operation, Point, Editor } from '..'
-import { POINT_REFS } from './utils'
+import { POINT_REFS } from '../utils/state'
 
 /**
  * `PointRef` objects keep a specific point in a document synced over time as new
@@ -7,7 +7,7 @@ import { POINT_REFS } from './utils'
  * at any time for the up-to-date point value.
  */
 
-class PointRef {
+export class PointRef {
   current: Point | null
   private affinity: 'forward' | 'backward' | null
   private editor: Editor
@@ -56,5 +56,3 @@ class PointRef {
     return current
   }
 }
-
-export { PointRef }

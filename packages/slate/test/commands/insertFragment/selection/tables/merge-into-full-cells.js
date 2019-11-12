@@ -1,10 +1,9 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from '../../../../helpers/h'
+import { jsx } from '../../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-
     <block>
       <block>
         <block>
@@ -13,13 +12,11 @@ export const run = editor => {
         </block>
       </block>
     </block>
-
   )
 }
 
 export const input = (
   <value>
-
     <block>
       <block>
         <block>
@@ -31,14 +28,12 @@ export const input = (
         </block>
       </block>
     </block>
-
   </value>
 )
 
 // TODO: paste "Existing 2" before / after "New 2" in second cell?
 export const output = (
   <value>
-
     <block>
       <block>
         <block>
@@ -50,7 +45,6 @@ export const output = (
         </block>
       </block>
     </block>
-
   </value>
 )
 

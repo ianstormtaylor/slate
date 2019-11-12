@@ -1,5 +1,5 @@
 import { Operation, Range, Editor } from '..'
-import { RANGE_REFS } from './utils'
+import { RANGE_REFS } from '../utils/state'
 
 /**
  * `RangeRef` objects keep a specific range in a document synced over time as new
@@ -7,7 +7,7 @@ import { RANGE_REFS } from './utils'
  * at any time for the up-to-date range value.
  */
 
-class RangeRef {
+export class RangeRef {
   current: Range | null
   private affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
   private editor: Editor
@@ -56,5 +56,3 @@ class RangeRef {
     return current
   }
 }
-
-export { RangeRef }

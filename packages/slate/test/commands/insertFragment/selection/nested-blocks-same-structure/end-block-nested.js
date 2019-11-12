@@ -1,23 +1,20 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from '../../../../helpers/h'
+import { jsx } from '../../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-
     <block>
       <block>
         <block>2</block>
         <block>3</block>
       </block>
     </block>
-
   )
 }
 
 export const input = (
   <value>
-
     <block>
       <block>
         <block>
@@ -27,13 +24,11 @@ export const input = (
         </block>
       </block>
     </block>
-
   </value>
 )
 
 export const output = (
   <value>
-
     <block>
       <block>
         <block>
@@ -44,7 +39,6 @@ export const output = (
         </block>
       </block>
     </block>
-
   </value>
 )
 

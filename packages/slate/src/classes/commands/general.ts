@@ -6,7 +6,7 @@ import {
   RANGE_REFS,
   FLUSHING,
   NORMALIZING,
-} from '../utils'
+} from '../../utils/state'
 
 class GeneralCommands {
   apply(this: Editor, op: Operation): void {
