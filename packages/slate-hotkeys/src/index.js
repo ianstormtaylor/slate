@@ -43,7 +43,7 @@ const APPLE_HOTKEYS = {
 const WINDOWS_HOTKEYS = {
   deleteWordBackward: 'ctrl+shift?+backspace',
   deleteWordForward: 'ctrl+shift?+delete',
-  redo: 'ctrl+y',
+  redo: ['ctrl+y', 'ctrl+shift+z'],
 }
 
 /**
