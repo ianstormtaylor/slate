@@ -3,7 +3,13 @@ import Debug from 'debug'
 import Hotkeys from 'slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
-import { IS_IOS, IS_IE, IS_EDGE } from 'slate-dev-environment'
+import {
+  IS_IOS,
+  IS_IE,
+  IS_EDGE,
+  IS_CHROME,
+  IS_MAC,
+} from 'slate-dev-environment'
 
 import cloneFragment from '../../utils/clone-fragment'
 import getEventTransfer from '../../utils/get-event-transfer'
@@ -45,7 +51,25 @@ function AfterPlugin(options = {}) {
     // gets triggered for character insertions, so we can just insert directly.
     if (isSynthetic) {
       event.preventDefault()
-      editor.insertText(event.data)
+
+      // COMPAT: On macOS, long press triggers an IME to insert an accent.
+      // Browsers that implements `beforeinput` event uses the
+      // `insertReplacementText` and a proper range. Chrome is instead selecting
+      // the character to replace, right when the input is triggered.
+      if (IS_MAC && IS_CHROME) {
+        const window = getWindow(event.target)
+        const domSelection = window.getSelection()
+
+        if (!domSelection.isCollapsed && value.selection.isCollapsed) {
+          const range = editor.findRange(domSelection)
+          editor.insertTextAtRange(range, event.data)
+        } else {
+          editor.insertText(event.data)
+        }
+      } else {
+        editor.insertText(event.data)
+      }
+
       return next()
     }
 
