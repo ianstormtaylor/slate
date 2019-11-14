@@ -5,7 +5,7 @@ import { jsx } from 'slate-hyperscript'
 export const input = <element>word</element>
 
 export const output = {
-  nodes: [
+  children: [
     {
       text: 'word',
       marks: [],

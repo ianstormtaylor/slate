@@ -206,8 +206,8 @@ class DeletingCommands {
       const isBlockEnd = this.isEnd(at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
-      const [, firstPath] = Node.first({ nodes: fragment }, [])
-      const [, lastPath] = Node.last({ nodes: fragment }, [])
+      const [, firstPath] = Node.first({ children: fragment }, [])
+      const [, lastPath] = Node.last({ children: fragment }, [])
 
       // TODO: convert into a proper `Nodes.matches` iterable
       const matches: NodeEntry[] = []
@@ -236,13 +236,15 @@ class DeletingCommands {
         return true
       }
 
-      for (const entry of Node.nodes({ nodes: fragment }, { pass: matcher })) {
+      for (const entry of Node.nodes(
+        { children: fragment },
+        { pass: matcher }
+      )) {
         if (entry[1].length > 0 && matcher(entry)) {
           matches.push(entry)
         }
       }
 
-      debugger
       const starts = []
       const middles = []
       const ends = []
@@ -265,7 +267,6 @@ class DeletingCommands {
       const [, inlinePath] = inlineMatch
       const isInlineStart = this.isStart(at, inlinePath)
       const isInlineEnd = this.isEnd(at, inlinePath)
-      debugger
 
       const middleRef = this.createPathRef(
         isBlockEnd ? Path.next(blockPath) : blockPath
@@ -276,7 +277,6 @@ class DeletingCommands {
       )
 
       this.splitNodes({ at, match: hasBlocks ? 'block' : 'inline' })
-      debugger
 
       const startRef = this.createPathRef(
         !isInlineStart || (isInlineStart && isInlineEnd)

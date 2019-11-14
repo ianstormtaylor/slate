@@ -1,7 +1,7 @@
 import { Element } from 'slate'
 
 export const input = {
-  nodes: [],
+  children: [],
 }
 
 export const test = value => {

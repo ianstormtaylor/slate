@@ -5,15 +5,17 @@ import { jsx } from '../../helpers'
 export const input = (
   <value>
     <block>
-      one<inline>
+      one
+      <inline>
         two<inline>three</inline>four
-      </inline>five
+      </inline>
+      five
     </block>
   </value>
 )
 
 export const run = editor => {
-  const inline = editor.value.nodes[0].nodes[1]
+  const inline = editor.value.children[0].children[1]
   return editor.hasTexts(inline)
 }
 

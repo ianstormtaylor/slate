@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  const inline = editor.value.nodes[0].nodes[1]
+  const inline = editor.value.children[0].children[1]
   return editor.hasTexts(inline)
 }
 

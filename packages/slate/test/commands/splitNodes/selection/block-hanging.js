@@ -10,10 +10,12 @@ export const input = (
   <value>
     <block>zero</block>
     <block>
-      <anchor />word
+      <anchor />
+      word
     </block>
     <block>
-      <focus />cat is cute
+      <focus />
+      cat is cute
     </block>
   </value>
 )
@@ -22,7 +24,10 @@ export const output = (
   <value>
     <block>zero</block>
     <block>
-      <cursor />cat is cute
+      <cursor />
     </block>
+    <block>cat is cute</block>
   </value>
 )
+
+export const skip = true

@@ -92,7 +92,7 @@ export const withSchema = (
           const { path } = error
           const [parent, parentPath] = this.getParent(path)
 
-          if (parent.nodes.length > 1) {
+          if (parent.children.length > 1) {
             this.removeNodes({ at: path })
           } else if (parentPath.length === 0) {
             const range = this.getRange(parentPath)
@@ -107,7 +107,7 @@ export const withSchema = (
         case 'child_max_invalid': {
           const { node, path, index } = error
 
-          if (node.nodes.length === 1 && path.length !== 0) {
+          if (node.children.length === 1 && path.length !== 0) {
             this.removeNodes({ at: path })
           } else {
             this.removeNodes({ at: path.concat(index) })

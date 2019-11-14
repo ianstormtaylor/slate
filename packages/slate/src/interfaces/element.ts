@@ -8,7 +8,7 @@ import { Node, Path, Value } from '..'
  */
 
 interface Element {
-  nodes: Node[]
+  children: Node[]
   [key: string]: any
 }
 
@@ -27,7 +27,7 @@ namespace Element {
   export const isElement = (value: any): value is Element => {
     return (
       isPlainObject(value) &&
-      Node.isNodeList(value.nodes) &&
+      Node.isNodeList(value.children) &&
       !Value.isValue(value)
     )
   }
@@ -47,7 +47,7 @@ namespace Element {
    * Check if an element matches set of properties.
    *
    * Note: the is for checking custom properties, and it does not ensure that
-   * any children in the `nodes` property are equal.
+   * any children in the `children` property are equal.
    */
 
   export const matches = (
@@ -55,7 +55,7 @@ namespace Element {
     props: Partial<Element>
   ): boolean => {
     for (const key in props) {
-      if (key === 'nodes') {
+      if (key === 'children') {
         continue
       }
 

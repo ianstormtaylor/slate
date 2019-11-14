@@ -12,9 +12,9 @@ export const input = (
 )
 
 export const output = {
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text: 'one',
           marks: [{}],

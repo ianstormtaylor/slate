@@ -44,9 +44,9 @@ const Children = (props: {
   const isLeafBlock =
     Element.isElement(node) && !editor.isInline(node) && editor.hasInlines(node)
 
-  for (let i = 0; i < node.nodes.length; i++) {
+  for (let i = 0; i < node.children.length; i++) {
     const p = path.concat(i)
-    const n = node.nodes[i] as Descendant
+    const n = node.children[i] as Descendant
     const key = editor.findKey(n)
     const range = editor.getRange(p)
     const sel = selection && Range.intersection(range, selection)
@@ -91,7 +91,7 @@ const Children = (props: {
           annotations={anns}
           decorations={decs}
           key={key.id}
-          isLast={isLeafBlock && i === node.nodes.length}
+          isLast={isLeafBlock && i === node.children.length}
           parent={node}
           renderAnnotation={renderAnnotation}
           renderDecoration={renderDecoration}

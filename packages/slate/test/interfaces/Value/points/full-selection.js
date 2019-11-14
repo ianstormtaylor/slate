@@ -1,7 +1,7 @@
 import { Value } from 'slate'
 
 export const input = {
-  nodes: [],
+  children: [],
   selection: {
     isFocused: true,
     marks: [],

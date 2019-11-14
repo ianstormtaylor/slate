@@ -4,7 +4,7 @@ export const input = {
   type: 'remove_node',
   path: [0],
   node: {
-    nodes: [],
+    children: [],
   },
 }
 

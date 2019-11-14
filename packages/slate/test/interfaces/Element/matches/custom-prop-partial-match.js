@@ -1,7 +1,7 @@
 import { Mark } from 'slate'
 
 export const input = {
-  element: { nodes: [], type: 'bold', other: true },
+  element: { children: [], type: 'bold', other: true },
   props: { type: 'bold' },
 }
 

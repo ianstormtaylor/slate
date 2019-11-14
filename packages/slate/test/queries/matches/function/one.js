@@ -11,7 +11,9 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.matches({ at: [], match: 1 }))
+  return Array.from(
+    editor.matches({ at: [], match: ([, p]) => p.length === 1 })
+  )
 }
 
 export const output = [

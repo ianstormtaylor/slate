@@ -3,7 +3,7 @@
 import { jsx } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ match: 0 })
+  editor.splitNodes({ match: ([, p]) => p.length === 0 })
 }
 
 export const input = (
@@ -11,7 +11,9 @@ export const input = (
     <block>
       <block>
         <block>
-          wo<cursor />rd
+          wo
+          <cursor />
+          rd
         </block>
       </block>
     </block>
@@ -28,7 +30,8 @@ export const output = (
     <block>
       <block>
         <block>
-          <cursor />rd
+          <cursor />
+          rd
         </block>
       </block>
     </block>

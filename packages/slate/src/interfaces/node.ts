@@ -74,7 +74,7 @@ export namespace Node {
       )
     }
 
-    const c = root.nodes[index] as Descendant
+    const c = root.children[index] as Descendant
 
     if (c == null) {
       throw new Error(
@@ -182,10 +182,10 @@ export namespace Node {
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.nodes.length === 0) {
+      if (Text.isText(n) || n.children.length === 0) {
         break
       } else {
-        n = n.nodes[0]
+        n = n.children[0]
         p.push(0)
       }
     }
@@ -217,7 +217,7 @@ export namespace Node {
         if (!Range.includes(range, path)) {
           const parent = Node.parent(r, path)
           const index = path[path.length - 1]
-          parent.nodes.splice(index, 1)
+          parent.children.splice(index, 1)
         }
 
         if (Path.equals(path, end.path)) {
@@ -235,7 +235,7 @@ export namespace Node {
       delete r.selection
     })
 
-    return newRoot.nodes
+    return newRoot.children
   }
 
   /**
@@ -265,7 +265,7 @@ export namespace Node {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
-      if (Text.isText(node) || !node.nodes[p]) {
+      if (Text.isText(node) || !node.children[p]) {
         throw new Error(
           `Cannot find a descendant at path [${path}] in node: ${JSON.stringify(
             root
@@ -273,7 +273,7 @@ export namespace Node {
         )
       }
 
-      node = node.nodes[p]
+      node = node.children[p]
     }
 
     return node
@@ -289,11 +289,11 @@ export namespace Node {
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
-      if (Text.isText(node) || !node.nodes[p]) {
+      if (Text.isText(node) || !node.children[p]) {
         return false
       }
 
-      node = node.nodes[p]
+      node = node.children[p]
     }
 
     return true
@@ -326,11 +326,11 @@ export namespace Node {
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.nodes.length === 0) {
+      if (Text.isText(n) || n.children.length === 0) {
         break
       } else {
-        const i = n.nodes.length - 1
-        n = n.nodes[i]
+        const i = n.children.length - 1
+        n = n.children[i]
         p.push(i)
       }
     }
@@ -429,11 +429,11 @@ export namespace Node {
       if (
         !visited.has(n) &&
         !Text.isText(n) &&
-        n.nodes.length !== 0 &&
+        n.children.length !== 0 &&
         (pass == null || pass([n, p]) === false)
       ) {
         visited.add(n)
-        let nextIndex = reverse ? n.nodes.length - 1 : 0
+        let nextIndex = reverse ? n.children.length - 1 : 0
 
         if (Path.isAncestor(p, from)) {
           nextIndex = from[p.length]
@@ -504,7 +504,7 @@ export namespace Node {
     if (Text.isText(node)) {
       return node.text
     } else {
-      return node.nodes.map(Node.text).join('')
+      return node.children.map(Node.text).join('')
     }
   }
 

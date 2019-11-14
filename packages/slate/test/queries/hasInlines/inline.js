@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  const block = editor.value.nodes[0]
+  const block = editor.value.children[0]
   return editor.hasInlines(block)
 }
 

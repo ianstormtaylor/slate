@@ -2,7 +2,7 @@ import { Node } from 'slate'
 
 export const input = [
   {
-    nodes: [],
+    children: [],
   },
 ]
 

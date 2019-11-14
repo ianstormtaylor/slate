@@ -116,7 +116,7 @@ export const checkNode = (
     }
 
     if (!Text.isText(node)) {
-      if ('first' in v && v.first != null && node.nodes.length !== 0) {
+      if ('first' in v && v.first != null && node.children.length !== 0) {
         const n = Node.child(node, 0)
         const p = path.concat(0)
 
@@ -125,8 +125,8 @@ export const checkNode = (
         }
       }
 
-      if ('last' in v && v.last != null && node.nodes.length !== 0) {
-        const i = node.nodes.length - 1
+      if ('last' in v && v.last != null && node.children.length !== 0) {
+        const i = node.children.length - 1
         const n = Node.child(node, i)
         const p = path.concat(i)
 
@@ -160,7 +160,7 @@ export const checkAncestor = (
   while (true) {
     count++
     const group = groups[g] as ChildValidation | undefined
-    const child = parent.nodes[index] as Descendant | undefined
+    const child = parent.children[index] as Descendant | undefined
     const childPath = parentPath.concat(index)
 
     // For each child check the parent-related validations. But ensure that we
@@ -327,7 +327,7 @@ export const checkParent = (
   if (
     'next' in cv &&
     cv.next != null &&
-    index < parent.nodes.length - 1 &&
+    index < parent.children.length - 1 &&
     editor.isNodeMatch([child, childPath], rule.match)
   ) {
     const nextChild = Node.child(parent, index + 1)

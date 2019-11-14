@@ -1,7 +1,7 @@
 import { Element } from 'slate'
 
 export const input = {
-  element: { nodes: [], type: 'bold' },
+  element: { children: [], type: 'bold' },
   props: { type: 'italic' },
 }
 

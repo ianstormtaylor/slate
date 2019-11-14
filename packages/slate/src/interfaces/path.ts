@@ -395,16 +395,22 @@ namespace Path {
 
             return copy.concat(p.slice(op.length))
           } else {
-            if (Path.endsBefore(op, p)) {
-              p[op.length - 1] -= 1
-            }
-
             if (
               Path.endsBefore(onp, p) ||
               Path.equals(onp, p) ||
               Path.isAncestor(onp, p)
             ) {
+              if (Path.endsBefore(op, p)) {
+                p[op.length - 1] -= 1
+              }
+
               p[onp.length - 1] += 1
+            } else if (Path.endsBefore(op, p)) {
+              if (Path.equals(onp, p)) {
+                p[onp.length - 1] += 1
+              }
+
+              p[op.length - 1] -= 1
             }
           }
 

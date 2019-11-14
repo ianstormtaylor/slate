@@ -58,7 +58,7 @@ class NodeCommands {
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
-        at = selection || this.getEnd([]) || [this.value.nodes.length]
+        at = selection || this.getEnd([]) || [this.value.children.length]
         select = true
       }
 
@@ -121,7 +121,7 @@ class NodeCommands {
     options: {
       at?: Location
       match?: NodeMatch
-    }
+    } = {}
   ) {
     this.withoutNormalizing(() => {
       const { at = this.value.selection } = options
@@ -154,7 +154,7 @@ class NodeCommands {
 
         const [parent, parentPath] = this.getNode(Path.parent(path))
         const index = path[path.length - 1]
-        const { length } = parent.nodes
+        const { length } = parent.children
 
         if (length === 1) {
           this.moveNodes({ at: path, to: Path.next(parentPath) })
@@ -255,7 +255,7 @@ class NodeCommands {
           Path.isDescendant(p, commonPath) &&
           Path.isAncestor(p, path) &&
           Element.isElement(n) &&
-          n.nodes.length === 1
+          n.children.length === 1
         )
       })
 
@@ -270,8 +270,8 @@ class NodeCommands {
         position = prevNode.text.length
         properties = rest as Partial<Text>
       } else if (Element.isElement(node) && Element.isElement(prevNode)) {
-        const { nodes, ...rest } = node
-        position = prevNode.nodes.length
+        const { children, ...rest } = node
+        position = prevNode.children.length
         properties = rest as Partial<Element>
       } else {
         throw new Error(
@@ -379,7 +379,7 @@ class NodeCommands {
     }
 
     // Ensure that block and inline nodes have at least one text child.
-    if (Element.isElement(node) && node.nodes.length === 0) {
+    if (Element.isElement(node) && node.children.length === 0) {
       const child = { text: '', marks: [] }
       this.insertNodes(child, { at: at.concat(0) })
       return
@@ -390,18 +390,18 @@ class NodeCommands {
       ? false
       : Element.isElement(node) &&
         (this.isInline(node) ||
-          node.nodes.length === 0 ||
-          Text.isText(node.nodes[0]) ||
-          this.isInline(node.nodes[0]))
+          node.children.length === 0 ||
+          Text.isText(node.children[0]) ||
+          this.isInline(node.children[0]))
 
     // Since we'll be applying operations while iterating, keep track of an
     // index that accounts for any added/removed nodes.
     let n = 0
 
-    for (let i = 0; i < node.nodes.length; i++, n++) {
-      const child = node.nodes[i] as Descendant
-      const prev = node.nodes[i - 1] as Descendant
-      const isLast = i === node.nodes.length - 1
+    for (let i = 0; i < node.children.length; i++, n++) {
+      const child = node.children[i] as Descendant
+      const prev = node.children[i - 1] as Descendant
+      const isLast = i === node.children.length - 1
       const isInlineOrText =
         Text.isText(child) || (Element.isElement(child) && this.isInline(child))
 
@@ -538,7 +538,7 @@ class NodeCommands {
           if (
             k === 'annotations' ||
             k === 'marks' ||
-            k === 'nodes' ||
+            k === 'children' ||
             k === 'selection' ||
             k === 'text'
           ) {
@@ -664,7 +664,7 @@ class NodeCommands {
         const isEnd = this.isEnd(point, path)
 
         if (always || !beforeRef || !this.isEdge(point, path)) {
-          const { text, marks, nodes, ...properties } = node
+          const { text, marks, children, ...properties } = node
           this.apply({ type: 'split_node', path, position, target, properties })
           split = true
         }
@@ -802,7 +802,7 @@ class NodeCommands {
           const range = this.getRange(firstPath, lastPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
-          const wrapper = { ...element, nodes: [] }
+          const wrapper = { ...element, children: [] }
           this.insertNodes(wrapper, { at: wrapperPath })
           this.moveNodes({
             at: range,

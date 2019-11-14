@@ -9,7 +9,7 @@ export const input = (
 )
 
 export const run = editor => {
-  const text = editor.value.nodes[0].nodes[0]
+  const text = editor.value.children[0].children[0]
   return editor.isVoid(text)
 }
 

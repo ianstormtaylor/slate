@@ -148,7 +148,7 @@ export function createElement(
   attributes: { [key: string]: any },
   children: any[]
 ): Element {
-  return { ...attributes, nodes: resolveDescendants(children) }
+  return { ...attributes, children: resolveDescendants(children) }
 }
 
 /**
@@ -305,9 +305,9 @@ export function createValue(
     }
   }
 
-  const nodes = resolveDescendants(otherChildren)
+  const descendants = resolveDescendants(otherChildren)
   const value: Value = {
-    nodes,
+    children: descendants,
     selection: null,
     annotations: {},
     ...attributes,

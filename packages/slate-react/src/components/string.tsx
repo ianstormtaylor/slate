@@ -30,7 +30,7 @@ const String = (props: {
   // to support expected plain text.
   if (
     leaf.text === '' &&
-    parent.nodes[parent.nodes.length - 1] === text &&
+    parent.children[parent.children.length - 1] === text &&
     !editor.isInline(parent) &&
     editor.getText(parentPath) === ''
   ) {

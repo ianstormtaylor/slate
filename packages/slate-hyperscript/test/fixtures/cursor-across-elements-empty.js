@@ -18,9 +18,9 @@ export const input = (
 )
 
 export const output = {
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text: '',
           marks: [],
@@ -28,7 +28,7 @@ export const output = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: '',
           marks: [],

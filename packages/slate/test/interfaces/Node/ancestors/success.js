@@ -15,4 +15,7 @@ export const test = value => {
   return Array.from(Node.ancestors(value, [0, 0]))
 }
 
-export const output = [[input, []], [input.nodes[0], [0]]]
+export const output = [
+  [input, []],
+  [input.children[0], [0]],
+]

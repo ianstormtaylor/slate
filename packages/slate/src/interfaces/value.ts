@@ -33,7 +33,7 @@ export namespace Value {
     return (
       isPlainObject(value) &&
       (value.selection === null || Range.isRange(value.selection)) &&
-      Node.isNodeList(value.nodes) &&
+      Node.isNodeList(value.children) &&
       Range.isRangeMap(value.annotations)
     )
   }
@@ -47,7 +47,7 @@ export namespace Value {
 
   export const matches = (value: Value, props: Partial<Value>): boolean => {
     for (const key in props) {
-      if (key === 'annotations' || key === 'nodes' || key === 'selection') {
+      if (key === 'annotations' || key === 'children' || key === 'selection') {
         continue
       }
 
@@ -108,7 +108,7 @@ export namespace Value {
           const { path, node } = op
           const parent = Node.parent(v, path)
           const index = path[path.length - 1]
-          parent.nodes.splice(index, 0, node)
+          parent.children.splice(index, 0, node)
 
           for (const [point, key, range] of Value.points(v)) {
             range[key] = Point.transform(point, op)!
@@ -142,14 +142,14 @@ export namespace Value {
           if (Text.isText(node) && Text.isText(prev)) {
             prev.text += node.text
           } else if (!Text.isText(node) && !Text.isText(prev)) {
-            prev.nodes.push(...node.nodes)
+            prev.children.push(...node.children)
           } else {
             throw new Error(
               `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
             )
           }
 
-          parent.nodes.splice(index, 1)
+          parent.children.splice(index, 1)
 
           for (const [point, key, range] of Value.points(v)) {
             range[key] = Point.transform(point, op)!
@@ -177,12 +177,12 @@ export namespace Value {
           // of date. So instead of using the `op.newPath` directly, we
           // transform `op.path` to ascertain what the `newPath` would be after
           // the operation was applied.
-          parent.nodes.splice(index, 1)
+          parent.children.splice(index, 1)
           const truePath = Path.transform(path, op)!
           const newParent = Node.get(v, Path.parent(truePath))
           const newIndex = truePath[truePath.length - 1]
 
-          newParent.nodes.splice(newIndex, 0, node)
+          newParent.children.splice(newIndex, 0, node)
 
           for (const [point, key, range] of Value.points(v)) {
             range[key] = Point.transform(point, op)!
@@ -217,7 +217,7 @@ export namespace Value {
           const parent = Node.parent(v, path)
           const [, prev] = Node.texts(v, { from: path, reverse: true })
           const [, next] = Node.texts(v, { from: path })
-          parent.nodes.splice(index, 1)
+          parent.children.splice(index, 1)
 
           // Transform all of the points in the value, but if the point was in the
           // node that was removed we need to update the range or remove it.
@@ -335,17 +335,17 @@ export namespace Value {
             node.text = before
             newNode = { ...node, ...(properties as Partial<Text>), text: after }
           } else {
-            const before = node.nodes.slice(0, position)
-            const after = node.nodes.slice(position)
-            node.nodes = before
+            const before = node.children.slice(0, position)
+            const after = node.children.slice(position)
+            node.children = before
             newNode = {
               ...node,
               ...(properties as Partial<Element>),
-              nodes: after,
+              children: after,
             }
           }
 
-          parent.nodes.splice(index + 1, 0, newNode)
+          parent.children.splice(index + 1, 0, newNode)
 
           for (const [point, key, range] of Value.points(v)) {
             range[key] = Point.transform(point, op)!

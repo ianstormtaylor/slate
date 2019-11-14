@@ -3,7 +3,7 @@
 import { jsx } from '../../../helpers'
 
 export const run = editor => {
-  editor.liftNodes({ match: 3 })
+  editor.liftNodes({ match: ([, p]) => p.length === 3 })
 }
 
 export const input = (
@@ -11,7 +11,8 @@ export const input = (
     <block a>
       <block b>
         <block c>
-          <cursor />one
+          <cursor />
+          one
         </block>
       </block>
     </block>
@@ -22,7 +23,8 @@ export const output = (
   <value>
     <block a>
       <block c>
-        <cursor />one
+        <cursor />
+        one
       </block>
     </block>
   </value>

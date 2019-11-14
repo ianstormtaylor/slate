@@ -17,6 +17,6 @@ export const test = value => {
 
 export const output = [
   [input, []],
-  [input.nodes[0], [0]],
-  [input.nodes[0].nodes[0], [0, 0]],
+  [input.children[0], [0]],
+  [input.children[0].children[0], [0, 0]],
 ]

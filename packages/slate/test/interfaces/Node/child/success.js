@@ -15,4 +15,4 @@ export const test = value => {
   return Node.child(value, 0)
 }
 
-export const output = input.nodes[0]
+export const output = input.children[0]

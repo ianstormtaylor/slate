@@ -13,11 +13,11 @@ export const input = (
 )
 
 export const output = {
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
-          nodes: [
+          children: [
             {
               text: 'word',
               marks: [],

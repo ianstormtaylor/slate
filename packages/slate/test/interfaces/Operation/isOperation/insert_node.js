@@ -4,7 +4,7 @@ export const input = {
   type: 'insert_node',
   path: [0],
   node: {
-    nodes: [],
+    children: [],
   },
 }
 

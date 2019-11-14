@@ -3,7 +3,10 @@
 import { jsx } from '../../../helpers'
 
 export const run = editor => {
-  editor.splitNodes({ at: { path: [0, 0], offset: 2 }, match: 1 })
+  editor.splitNodes({
+    at: { path: [0, 0], offset: 2 },
+    match: ([, p]) => p.length === 1,
+  })
 }
 
 export const input = (

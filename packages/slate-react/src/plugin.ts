@@ -154,7 +154,7 @@ export const withReact = (Editor: new (...args: any[]) => Editor) => {
       if (
         placeholder &&
         SlateValue.isValue(node) &&
-        node.nodes.length === 1 &&
+        node.children.length === 1 &&
         Array.from(SlateNode.texts(node)).length === 1 &&
         SlateNode.text(node) === ''
       ) {

@@ -42,7 +42,7 @@ export class Editor {
     const {
       onChange = () => {},
       value = produce(
-        { nodes: [], selection: null, annotations: {} },
+        { children: [], selection: null, annotations: {} },
         () => {}
       ),
     } = props

@@ -3,17 +3,19 @@
 import { jsx } from '../../../helpers'
 
 export const run = editor => {
-  editor.moveNodes({ match: 2, to: [0] })
+  editor.moveNodes({ match: ([, p]) => p.length === 2, to: [0] })
 }
 
 export const input = (
   <value>
     <block>
       <block>
-        <anchor />one
+        <anchor />
+        one
       </block>
       <block>
-        two<focus />
+        two
+        <focus />
       </block>
     </block>
   </value>
@@ -22,10 +24,12 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <anchor />one
+      <anchor />
+      one
     </block>
     <block>
-      two<focus />
+      two
+      <focus />
     </block>
     <block>
       <text />

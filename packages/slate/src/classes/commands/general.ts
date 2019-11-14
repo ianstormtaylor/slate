@@ -10,9 +10,6 @@ import {
 
 class GeneralCommands {
   apply(this: Editor, op: Operation): void {
-    this.value = Value.transform(this.value, op)
-    this.operations.push(op)
-
     for (const ref of PATH_REFS.get(this)!) {
       ref.transform(op)
     }
@@ -25,32 +22,34 @@ class GeneralCommands {
       ref.transform(op)
     }
 
-    const pathCache = {}
+    const set = new Set()
     const dirtyPaths: Path[] = []
     const add = (path: Path | null) => {
-      if (path == null) {
-        return
+      if (path) {
+        const key = path.join(',')
+
+        if (!set.has(key)) {
+          set.add(key)
+          dirtyPaths.push(path)
+        }
       }
-
-      const key = path.join(',')
-
-      if (key in pathCache) {
-        return
-      }
-
-      pathCache[key] = true
-      dirtyPaths.push(path)
     }
 
-    for (const path of DIRTY_PATHS.get(this)!) {
-      add(Path.transform(path, op))
+    const oldDirtyPaths = DIRTY_PATHS.get(this)!
+    const newDirtyPaths = getDirtyPaths(op)
+
+    for (const path of oldDirtyPaths) {
+      const newPath = Path.transform(path, op)
+      add(newPath)
     }
 
-    for (const path of getDirtyPaths(op)) {
+    for (const path of newDirtyPaths) {
       add(path)
     }
 
     DIRTY_PATHS.set(this, dirtyPaths)
+    this.value = Value.transform(this.value, op)
+    this.operations.push(op)
     this.normalize()
 
     if (!FLUSHING.get(this)) {

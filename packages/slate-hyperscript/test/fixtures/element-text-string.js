@@ -9,7 +9,7 @@ export const input = (
 )
 
 export const output = {
-  nodes: [
+  children: [
     {
       text: 'word',
       marks: [],
