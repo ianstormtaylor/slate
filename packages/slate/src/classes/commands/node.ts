@@ -24,10 +24,11 @@ class NodeCommands {
     options: {
       at?: Location
       match?: NodeMatch
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
+      const { selection, hanging = false } = this.value
       let { at, match } = options
       let select = false
 
@@ -63,6 +64,10 @@ class NodeCommands {
       }
 
       if (Range.isRange(at)) {
+        if (!hanging) {
+          at = this.unhangRange(at)
+        }
+
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {

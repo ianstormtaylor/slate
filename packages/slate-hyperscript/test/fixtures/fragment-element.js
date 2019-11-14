@@ -8,15 +8,13 @@ export const input = (
   </fragment>
 )
 
-export const output = {
-  children: [
-    {
-      children: [
-        {
-          text: 'word',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+export const output = [
+  {
+    children: [
+      {
+        text: 'word',
+        marks: [],
+      },
+    ],
+  },
+]

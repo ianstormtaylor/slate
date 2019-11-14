@@ -29,5 +29,3 @@ export const output = (
     <block>text</block>
   </value>
 )
-
-export const skip = true

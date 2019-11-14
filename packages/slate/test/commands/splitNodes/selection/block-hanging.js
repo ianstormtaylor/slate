@@ -8,25 +8,26 @@ export const run = editor => {
 
 export const input = (
   <value>
-    <block>zero</block>
+    <block>one</block>
     <block>
       <anchor />
-      word
+      two
     </block>
     <block>
       <focus />
-      cat is cute
+      three
     </block>
   </value>
 )
 
+// TODO: the selection is wrong here
 export const output = (
   <value>
-    <block>zero</block>
+    <block>one</block>
     <block>
       <cursor />
     </block>
-    <block>cat is cute</block>
+    <block>three</block>
   </value>
 )
 

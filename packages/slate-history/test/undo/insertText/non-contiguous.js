@@ -29,3 +29,5 @@ export const output = (
     </block>
   </value>
 )
+
+export const skip = true
