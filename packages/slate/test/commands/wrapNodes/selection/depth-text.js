@@ -6,7 +6,9 @@ export const input = (
   <value>
     <block>
       <text>
-        <anchor />word<focus />
+        <anchor />
+        word
+        <focus />
       </text>
     </block>
   </value>
@@ -20,7 +22,9 @@ export const output = (
   <value>
     <block>
       <block new>
-        <anchor />word<focus />
+        <anchor />
+        word
+        <focus />
       </block>
     </block>
   </value>

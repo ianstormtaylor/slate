@@ -6,7 +6,9 @@ export const input = (
   <value>
     <block a>
       <block>
-        w<anchor />or<focus />d
+        w<anchor />
+        or
+        <focus />d
       </block>
     </block>
   </value>
@@ -22,7 +24,9 @@ export const output = (
       <block>w</block>
       <block new>
         <block>
-          <anchor />or<focus />
+          <anchor />
+          or
+          <focus />
         </block>
       </block>
       <block>d</block>

@@ -11,7 +11,8 @@ export const input = (
     <block>
       <text />
       <inline>
-        wor📛<cursor />d
+        wor📛
+        <cursor />d
       </inline>
       <text />
     </block>
@@ -23,7 +24,8 @@ export const output = (
     <block>
       <text />
       <inline>
-        wor<cursor />d
+        wor
+        <cursor />d
       </inline>
       <text />
     </block>

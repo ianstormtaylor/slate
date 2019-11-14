@@ -20,7 +20,8 @@ export const input = (
 export const output = (
   <value>
     <block>
-      wor<anchor />d<focus />
+      wor
+      <anchor />d<focus />
     </block>
   </value>
 )

@@ -8,20 +8,18 @@ export const run = editor => {
 
 export const input = (
   <value>
-    
-      <block>
-        word<cursor />
-      </block>
-    
+    <block>
+      word
+      <cursor />
+    </block>
   </value>
 )
 
 export const output = (
   <value>
-    
-      <block>
-        worda<cursor />
-      </block>
-    
+    <block>
+      worda
+      <cursor />
+    </block>
   </value>
 )

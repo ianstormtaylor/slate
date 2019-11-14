@@ -11,7 +11,9 @@ export const input = (
     <block>
       <text />
       <inline void>
-        wo<cursor />rd
+        wo
+        <cursor />
+        rd
       </inline>
       <text />
     </block>

@@ -11,7 +11,8 @@ export const input = (
     <block>Hello</block>
     <block>
       <block>
-        <cursor />world!
+        <cursor />
+        world!
       </block>
     </block>
   </value>
@@ -20,7 +21,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      Hello<cursor />world!
+      Hello
+      <cursor />
+      world!
     </block>
   </value>
 )

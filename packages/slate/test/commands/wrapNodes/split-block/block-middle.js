@@ -5,7 +5,9 @@ import { jsx } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      w<anchor />or<focus />d
+      w<anchor />
+      or
+      <focus />d
     </block>
   </value>
 )
@@ -19,7 +21,9 @@ export const output = (
     <block>w</block>
     <block new>
       <block>
-        <anchor />or<focus />
+        <anchor />
+        or
+        <focus />
       </block>
     </block>
     <block>d</block>

@@ -23,4 +23,7 @@ export const test = value => {
   )
 }
 
-export const output = [[<text key="b" />, [0, 1]], [<text key="c" />, [0, 2]]]
+export const output = [
+  [<text key="b" />, [0, 1]],
+  [<text key="c" />, [0, 2]],
+]

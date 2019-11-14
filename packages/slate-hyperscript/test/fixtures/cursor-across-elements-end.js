@@ -5,10 +5,12 @@ import { jsx } from 'slate-hyperscript'
 export const input = (
   <value>
     <element>
-      one<anchor />
+      one
+      <anchor />
     </element>
     <element>
-      two<focus />
+      two
+      <focus />
     </element>
   </value>
 )

@@ -11,7 +11,8 @@ export const input = (
     <block>
       <text />
       <inline>
-        wo<anchor />
+        wo
+        <anchor />
         <mark key="a">rd</mark>
       </inline>
       <text />
@@ -20,7 +21,8 @@ export const input = (
       <text />
       <inline>
         <mark key="a">an</mark>
-        <focus />other
+        <focus />
+        other
       </inline>
       <text />
     </block>
@@ -32,14 +34,18 @@ export const output = (
     <block>
       <text />
       <inline>
-        wo<anchor />rd
+        wo
+        <anchor />
+        rd
       </inline>
       <text />
     </block>
     <block>
       <text />
       <inline>
-        an<focus />other
+        an
+        <focus />
+        other
       </inline>
       <text />
     </block>

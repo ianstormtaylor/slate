@@ -5,9 +5,11 @@ import { jsx } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      one<inline>
+      one
+      <inline>
         two<inline>three</inline>four
-      </inline>five
+      </inline>
+      five
     </block>
   </value>
 )

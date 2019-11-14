@@ -853,9 +853,9 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **Internal-yet-public `Node` methods have been changed.** There were a handful of internal methods that shouldn't be used in 99% of Slate implementations that updated or removed. This was done in the process of streamlining many of the `Node` methods to make them more consistent and easier to use. For a list of those affected:
 
-* `Node.assertPath` was changed. It was previously confusingly named because the equivalent `Node.getPath` did something completely different. You should now use `Node.assertNode(path)` if you need this behavior.
-* `Node.removeDescendant` was removed. There's no reason you should have been using this, since it was an undocumented and unused method that was left over from a previous version.
-* `Node.updateNode`, `Node.insertNode`, `Node.removeNode`, `Node.splitNode` and `Node.mergeNode` mutating methods were changed. All of your changes should be done with operations, so you likely weren't using these internal methods. They have been changed internally to use paths.
+- `Node.assertPath` was changed. It was previously confusingly named because the equivalent `Node.getPath` did something completely different. You should now use `Node.assertNode(path)` if you need this behavior.
+- `Node.removeDescendant` was removed. There's no reason you should have been using this, since it was an undocumented and unused method that was left over from a previous version.
+- `Node.updateNode`, `Node.insertNode`, `Node.removeNode`, `Node.splitNode` and `Node.mergeNode` mutating methods were changed. All of your changes should be done with operations, so you likely weren't using these internal methods. They have been changed internally to use paths.
 
 ###### DEPRECATED
 
@@ -863,9 +863,9 @@ This is just an attempt to make dealing with normalization errors slightly more 
 
 **Internal-yet-public `Node` methods have been deprecated.** There were a handful of internal methods that shouldn't be used in 99% of Slate implementations that were deprecated. For a list of those affected:
 
-* `Node.getKeys` and `Node.getKeysAsArray` were deprecated. If you really need to check the presence of a key, use the new `Node.getKeysToPathsObject` instead.
-* `Node.areDescendantsSorted` and `Node.isInRange` were deprecated. These were used to check whether a node was in a range, but this can be done more performantly and more easily with paths now.
-* `Node.getNodeAtPath` and `Node.getDescendantAtPath` were deprecated. These were probably not in use by anyone, but if you were using them you can use the existing `Node.getNode` and `Node.getDescendant` methods instead which now take either paths or keys.
+- `Node.getKeys` and `Node.getKeysAsArray` were deprecated. If you really need to check the presence of a key, use the new `Node.getKeysToPathsObject` instead.
+- `Node.areDescendantsSorted` and `Node.isInRange` were deprecated. These were used to check whether a node was in a range, but this can be done more performantly and more easily with paths now.
+- `Node.getNodeAtPath` and `Node.getDescendantAtPath` were deprecated. These were probably not in use by anyone, but if you were using them you can use the existing `Node.getNode` and `Node.getDescendant` methods instead which now take either paths or keys.
 
 ---
 
@@ -1139,16 +1139,16 @@ function onKeyDown(e, data, change) {
 
 **Some `Node` methods have been deprecated!** There were a few methods that had been added over time that were either poorly named that have been deprecated and renamed, and a handful of methods that are no longer useful for the core library that have been deprecated. Here's a full list:
 
-* `areDescendantSorted` -> `areDescendantsSorted`
-* `getHighestChild` -> `getFurthestAncestor`
-* `getHighestOnlyChildParent` -> `getFurthestOnlyChildAncestor`
-* `concatChildren`
-* `decorateTexts`
-* `filterDescendantsDeep`
-* `findDescendantDeep`
-* `getChildrenBetween`
-* `getChildrenBetweenIncluding`
-* `isInlineSplitAtRange`
+- `areDescendantSorted` -> `areDescendantsSorted`
+- `getHighestChild` -> `getFurthestAncestor`
+- `getHighestOnlyChildParent` -> `getFurthestOnlyChildAncestor`
+- `concatChildren`
+- `decorateTexts`
+- `filterDescendantsDeep`
+- `findDescendantDeep`
+- `getChildrenBetween`
+- `getChildrenBetweenIncluding`
+- `isInlineSplitAtRange`
 
 ---
 
@@ -1166,30 +1166,30 @@ function onKeyDown(e, data, change) {
 
 **Some `Selection` methods have been deprecated!** Previously there were many inconsistencies in the naming and handling of selection changes. This has all been cleaned up, but in the process some methods have been deprecated. Here is a full list of the deprecated methods and their new alternatives:
 
-* `moveToOffsets` -> `moveOffsetsTo`
-* `moveForward` -> `move`
-* `moveBackward` -> `move`
-* `moveAnchorOffset` -> `moveAnchor`
-* `moveFocusOffset` -> `moveFocus`
-* `moveStartOffset` -> `moveStart`
-* `moveEndOffset` -> `moveEnd`
-* `extendForward` -> `extend`
-* `extendBackward` -> `extend`
-* `unset` -> `deselect`
+- `moveToOffsets` -> `moveOffsetsTo`
+- `moveForward` -> `move`
+- `moveBackward` -> `move`
+- `moveAnchorOffset` -> `moveAnchor`
+- `moveFocusOffset` -> `moveFocus`
+- `moveStartOffset` -> `moveStart`
+- `moveEndOffset` -> `moveEnd`
+- `extendForward` -> `extend`
+- `extendBackward` -> `extend`
+- `unset` -> `deselect`
 
 **Some selection transforms have been deprecated!** Along with the methods, the selection-based transforms have also been refactored, resulting in deprecations. Here is a full list of the deprecated transforms and their new alternatives:
 
-* `moveTo` -> `select`
-* `moveToOffsets` -> `moveOffsetsTo`
-* `moveForward` -> `move`
-* `moveBackward` -> `move`
-* `moveStartOffset` -> `moveStart`
-* `moveEndOffset` -> `moveEnd`
-* `extendForward` -> `extend`
-* `extendBackward` -> `extend`
-* `flipSelection` -> `flip`
-* `unsetSelection` -> `deselect`
-* `unsetMarks`
+- `moveTo` -> `select`
+- `moveToOffsets` -> `moveOffsetsTo`
+- `moveForward` -> `move`
+- `moveBackward` -> `move`
+- `moveStartOffset` -> `moveStart`
+- `moveEndOffset` -> `moveEnd`
+- `extendForward` -> `extend`
+- `extendBackward` -> `extend`
+- `flipSelection` -> `flip`
+- `unsetSelection` -> `deselect`
+- `unsetMarks`
 
 ---
 

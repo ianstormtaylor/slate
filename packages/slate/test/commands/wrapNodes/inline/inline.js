@@ -11,7 +11,8 @@ export const input = (
     <block>
       <text />
       <inline>
-        <cursor />word
+        <cursor />
+        word
       </inline>
       <text />
     </block>
@@ -25,7 +26,8 @@ export const output = (
       <inline a>
         <text />
         <inline>
-          <cursor />word
+          <cursor />
+          word
         </inline>
         <text />
       </inline>

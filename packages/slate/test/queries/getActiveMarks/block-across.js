@@ -7,14 +7,16 @@ export const input = (
     <block>
       <mark key="a">
         <mark key="b">
-          o<anchor />ne
+          o<anchor />
+          ne
         </mark>
       </mark>
     </block>
     <block>
       <mark key="a">
         <mark key="b">
-          o<focus />ne
+          o<focus />
+          ne
         </mark>
       </mark>
     </block>

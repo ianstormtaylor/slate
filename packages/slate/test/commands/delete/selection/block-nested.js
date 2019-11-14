@@ -10,13 +10,15 @@ export const input = (
   <value>
     <block>
       <block>
-        <anchor />one
+        <anchor />
+        one
       </block>
       <block>
         <block>two</block>
         <block>
           <block>
-            three<focus />
+            three
+            <focus />
           </block>
         </block>
       </block>

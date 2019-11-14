@@ -11,7 +11,8 @@ export const input = (
     <block>
       w
       <mark key="a">
-        or<cursor />
+        or
+        <cursor />
       </mark>
       d
     </block>
@@ -23,7 +24,8 @@ export const output = (
     <block>
       w
       <mark key="a">
-        ora<cursor />
+        ora
+        <cursor />
       </mark>
       d
     </block>

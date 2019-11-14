@@ -11,10 +11,12 @@ export const input = (
     <block>
       <block>
         <block>
-          word<anchor />
+          word
+          <anchor />
         </block>
         <block>
-          <focus />another
+          <focus />
+          another
         </block>
       </block>
     </block>
@@ -26,7 +28,9 @@ export const output = (
     <block>
       <block>
         <block>
-          word<cursor />another
+          word
+          <cursor />
+          another
         </block>
       </block>
     </block>

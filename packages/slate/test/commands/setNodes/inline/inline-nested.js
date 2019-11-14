@@ -13,7 +13,8 @@ export const input = (
       <inline>
         <text />
         <inline>
-          <cursor />word
+          <cursor />
+          word
         </inline>
         <text />
       </inline>
@@ -29,7 +30,8 @@ export const output = (
       <inline key>
         <text />
         <inline>
-          <cursor />word
+          <cursor />
+          word
         </inline>
         <text />
       </inline>

@@ -10,10 +10,14 @@ export const input = (
   <value>
     <block key="a">
       <block>
-        wo<anchor />rd
+        wo
+        <anchor />
+        rd
       </block>
       <block>
-        an<focus />other
+        an
+        <focus />
+        other
       </block>
     </block>
   </value>
@@ -22,10 +26,14 @@ export const input = (
 export const output = (
   <value>
     <block>
-      wo<anchor />rd
+      wo
+      <anchor />
+      rd
     </block>
     <block>
-      an<focus />other
+      an
+      <focus />
+      other
     </block>
   </value>
 )

@@ -8,7 +8,8 @@ export const input = (
       <mark key="a">one</mark>
     </block>
     <block>
-      <cursor />two
+      <cursor />
+      two
     </block>
   </value>
 )

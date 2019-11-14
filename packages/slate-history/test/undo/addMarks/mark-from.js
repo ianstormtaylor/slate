@@ -13,7 +13,8 @@ export const input = (
     <block>
       <mark key="a">
         w<anchor />o
-      </mark>r<focus />d
+      </mark>
+      r<focus />d
     </block>
   </value>
 )

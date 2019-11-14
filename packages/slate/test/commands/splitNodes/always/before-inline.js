@@ -9,7 +9,8 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      word<cursor />
+      word
+      <cursor />
       <inline>hyperlink</inline>
       word
     </block>

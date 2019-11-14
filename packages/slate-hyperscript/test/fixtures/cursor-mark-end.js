@@ -6,7 +6,8 @@ export const input = (
   <value>
     <element>
       <mark>
-        one<cursor />
+        one
+        <cursor />
       </mark>
       two
     </element>

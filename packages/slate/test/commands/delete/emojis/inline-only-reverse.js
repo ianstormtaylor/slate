@@ -11,7 +11,8 @@ export const input = (
     <block>
       <text />
       <inline>
-        📛<cursor />
+        📛
+        <cursor />
       </inline>
       <text />
     </block>

@@ -11,7 +11,9 @@ export const input = (
     <block>
       <text />
       <inline>
-        wo<cursor />rd
+        wo
+        <cursor />
+        rd
       </inline>
       <text />
     </block>
@@ -28,7 +30,8 @@ export const output = (
     <block>
       <text />
       <inline>
-        <cursor />rd
+        <cursor />
+        rd
       </inline>
       <text />
     </block>

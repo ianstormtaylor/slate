@@ -10,7 +10,9 @@ export const input = (
   <value>
     <block>
       <mark key>
-        <anchor />one<focus />
+        <anchor />
+        one
+        <focus />
       </mark>
     </block>
   </value>

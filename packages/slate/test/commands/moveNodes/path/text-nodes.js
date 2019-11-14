@@ -6,7 +6,8 @@ export const input = (
   <value>
     <block>one</block>
     <block>
-      <cursor />two
+      <cursor />
+      two
     </block>
   </value>
 )
@@ -21,7 +22,9 @@ export const output = (
       <text />
     </block>
     <block>
-      one<cursor />two
+      one
+      <cursor />
+      two
     </block>
   </value>
 )

@@ -10,7 +10,8 @@ export const input = (
   <value>
     <block>
       <block>
-        on<cursor />e
+        on
+        <cursor />e
       </block>
       <block>two</block>
     </block>

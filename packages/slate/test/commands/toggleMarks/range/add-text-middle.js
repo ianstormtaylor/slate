@@ -20,9 +20,7 @@ export const input = (
 export const output = (
   <value>
     <block>
-      w
-      <mark key="a">or</mark>
-      d
+      w<mark key="a">or</mark>d
     </block>
   </value>
 )

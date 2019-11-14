@@ -5,7 +5,9 @@ import { jsx } from 'slate-hyperscript'
 export const input = (
   <value>
     <element>
-      wo<cursor />rd
+      wo
+      <cursor />
+      rd
     </element>
   </value>
 )

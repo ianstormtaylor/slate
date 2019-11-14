@@ -5,7 +5,8 @@ import { jsx } from '../../helpers'
 export const input = (
   <value>
     <block>
-      on<cursor />e
+      on
+      <cursor />e
     </block>
   </value>
 )

@@ -5,10 +5,12 @@ import { jsx } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      on<anchor />e
+      on
+      <anchor />e
     </block>
     <block>
-      t<focus />wo
+      t<focus />
+      wo
     </block>
     <block>three</block>
   </value>
@@ -21,7 +23,8 @@ export const run = editor => {
 export const output = (
   <value>
     <block>
-      <cursor />three
+      <cursor />
+      three
     </block>
   </value>
 )

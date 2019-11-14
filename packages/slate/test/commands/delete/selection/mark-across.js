@@ -10,12 +10,14 @@ export const input = (
   <value>
     <block>
       <mark key="a">
-        <anchor />wo
+        <anchor />
+        wo
       </mark>
       rd
     </block>
     <block>
-      two<focus />
+      two
+      <focus />
     </block>
   </value>
 )

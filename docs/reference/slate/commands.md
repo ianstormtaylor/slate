@@ -585,9 +585,11 @@ This method can be used to allow a sequence of change operations that should not
 
 ```js
 editor.withoutNormalizing(() => {
-  node.nodes.filter(n => n.object != 'block').forEach(child => {
-    editor.removeNodeByKey(child.key)
-  })
+  node.nodes
+    .filter(n => n.object != 'block')
+    .forEach(child => {
+      editor.removeNodeByKey(child.key)
+    })
 })
 ```
 

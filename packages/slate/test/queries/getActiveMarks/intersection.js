@@ -7,7 +7,9 @@ export const input = (
     <block>
       <mark key="a">
         <anchor />o
-      </mark>n<mark key="b">
+      </mark>
+      n
+      <mark key="b">
         e<focus />
       </mark>
     </block>

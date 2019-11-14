@@ -10,10 +10,14 @@ export const input = (
   <value>
     <block>
       <block void>
-        wo<anchor />rd
+        wo
+        <anchor />
+        rd
       </block>
       <block void>
-        an<focus />other
+        an
+        <focus />
+        other
       </block>
     </block>
   </value>

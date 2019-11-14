@@ -6,7 +6,9 @@ export const input = (
   <value>
     <block>
       <text>
-        w<anchor />or<focus />d
+        w<anchor />
+        or
+        <focus />d
       </text>
     </block>
   </value>
@@ -19,7 +21,10 @@ export const run = editor => {
 export const output = (
   <value>
     <block>
-      wx<anchor />or<focus />d
+      wx
+      <anchor />
+      or
+      <focus />d
     </block>
   </value>
 )

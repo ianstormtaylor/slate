@@ -10,7 +10,9 @@ export const input = (
   <value>
     <block>
       <text>
-        wo<cursor />rd
+        wo
+        <cursor />
+        rd
       </text>
     </block>
   </value>
@@ -19,7 +21,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      xwo<cursor />rd
+      xwo
+      <cursor />
+      rd
     </block>
   </value>
 )

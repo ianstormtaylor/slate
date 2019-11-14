@@ -7,14 +7,18 @@ export const input = (
     <block>
       <text />
       <inline>
-        wo<anchor />rd
+        wo
+        <anchor />
+        rd
       </inline>
       <text />
     </block>
     <block>
       <text />
       <inline>
-        an<focus />other
+        an
+        <focus />
+        other
       </inline>
       <text />
     </block>
@@ -35,7 +39,8 @@ export const output = (
     <block>
       <text />
       <inline>
-        <cursor />other
+        <cursor />
+        other
       </inline>
       <text />
     </block>

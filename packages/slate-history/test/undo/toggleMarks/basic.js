@@ -11,7 +11,9 @@ export const input = (
     <block>
       one
       <mark a>
-        <anchor />two<focus />
+        <anchor />
+        two
+        <focus />
       </mark>
       three
     </block>

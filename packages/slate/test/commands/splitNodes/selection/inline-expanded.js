@@ -11,7 +11,9 @@ export const input = (
     <block>
       <text />
       <inline>
-        w<anchor />or<focus />d
+        w<anchor />
+        or
+        <focus />d
       </inline>
       <text />
     </block>

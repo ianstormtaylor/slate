@@ -19,7 +19,9 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <anchor />word<focus />
+      <anchor />
+      word
+      <focus />
     </block>
   </value>
 )

@@ -10,10 +10,12 @@ export const input = (
   <value>
     <block key="a">
       <block>
-        <anchor />one
+        <anchor />
+        one
       </block>
       <block>
-        <focus />two
+        <focus />
+        two
       </block>
       <block>three</block>
       <block>four</block>
@@ -26,10 +28,12 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <anchor />one
+      <anchor />
+      one
     </block>
     <block>
-      <focus />two
+      <focus />
+      two
     </block>
     <block>three</block>
     <block>four</block>

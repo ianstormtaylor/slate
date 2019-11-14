@@ -6,7 +6,8 @@ export const input = (
   <value>
     <element>
       <element>
-        <cursor />word
+        <cursor />
+        word
       </element>
     </element>
   </value>

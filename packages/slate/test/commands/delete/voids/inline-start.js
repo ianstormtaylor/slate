@@ -13,7 +13,8 @@ export const input = (
       <inline void>
         <anchor />
       </inline>
-      <focus />two
+      <focus />
+      two
     </block>
   </value>
 )

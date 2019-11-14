@@ -16,7 +16,8 @@ export const output = (
   <value>
     <block>one</block>
     <block>
-      two<cursor />
+      two
+      <cursor />
     </block>
   </value>
 )

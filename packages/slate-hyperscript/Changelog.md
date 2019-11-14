@@ -98,7 +98,7 @@ This allows you to much more easily test invalid states and transition states. H
 
 ```js
 // Previously you had to do...
-const text = <text>word</text>[0]
+const text = (<text>word</text>)[0]
 
 // But now it's more obvious...
 const text = <text>word</text>

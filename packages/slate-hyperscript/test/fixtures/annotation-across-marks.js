@@ -12,7 +12,8 @@ export const input = (
     </element>
     <element>
       <mark>
-        tw<annotation key="a" />o
+        tw
+        <annotation key="a" />o
       </mark>
     </element>
   </value>

@@ -11,7 +11,8 @@ export const input = (
     <block>
       <text />
       <inline void>
-        word<cursor />
+        word
+        <cursor />
       </inline>
       <text />
     </block>

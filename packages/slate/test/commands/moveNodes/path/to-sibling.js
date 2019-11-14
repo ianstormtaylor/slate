@@ -5,7 +5,8 @@ import { jsx } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      <cursor />one
+      <cursor />
+      one
     </block>
     <block>
       <block>two</block>
@@ -22,7 +23,8 @@ export const output = (
     <block>
       <block>two</block>
       <block>
-        <cursor />one
+        <cursor />
+        one
       </block>
     </block>
   </value>

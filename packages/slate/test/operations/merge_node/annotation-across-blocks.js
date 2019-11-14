@@ -5,10 +5,12 @@ import { jsx } from 'slate-hyperscript'
 export const input = (
   <value>
     <element>
-      o<annotation key="a" />ne
+      o<annotation key="a" />
+      ne
     </element>
     <element>
-      tw<annotation key="a" />o
+      tw
+      <annotation key="a" />o
     </element>
   </value>
 )

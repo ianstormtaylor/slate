@@ -10,10 +10,12 @@ export const input = (
   <value>
     <block>
       <mark key="a">
-        on<anchor />e
+        on
+        <anchor />e
       </mark>
       <mark key="c">
-        tw<focus />o
+        tw
+        <focus />o
       </mark>
     </block>
   </value>

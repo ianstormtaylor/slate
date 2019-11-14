@@ -4,17 +4,17 @@
 
 This directory contains a set of examples that give you an idea for how you might use Slate to implement your own editor. Take a look around!
 
-* [**Plain text**](./plain-text) — showing the most basic case: a glorified `<textarea>`.
-* [**Rich text**](./rich-text) — showing the features you'd expect from a basic editor.
-* [**Forced Layout**](./forced-layout) - showing how to use schema rules to enforce document structure
-* [**Markdown Shortcuts**](./markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
-* [**Links**](./links) — showing how wrap text in inline nodes with associated data.
-* [**Images**](./images) — showing how to use void (text-less) nodes to add images.
-* [**Hovering menu**](./hovering-menu) — showing how a contextual hovering menu can be implemented.
-* [**Tables**](./tables) — showing how to nest blocks to render more advanced components.
-* [**Paste HTML**](./paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](./code-highlighting) — showing how to use decorations to dynamically mark text.
-* ...and more!
+- [**Plain text**](./plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](./rich-text) — showing the features you'd expect from a basic editor.
+- [**Forced Layout**](./forced-layout) - showing how to use schema rules to enforce document structure
+- [**Markdown Shortcuts**](./markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](./links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](./images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](./hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](./tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](./paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Code Highlighting**](./code-highlighting) — showing how to use decorations to dynamically mark text.
+- ...and more!
 
 If you have an idea for an example that shows a common use case, pull request it!
 

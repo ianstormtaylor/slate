@@ -31,10 +31,10 @@ That will render a basic Slate editor on your page.
 
 Now... we need to add the [`Html`](../reference/slate-html-serializer/index.md) serializer. And to do that, we need to tell it a bit about the schema we plan on using. For this example, we'll work with a schema that has a few different parts:
 
-* A `paragraph` block.
-* A `code` block for code samples.
-* A `quote` block for quotes...
-* And `bold`, `italic` and `underline` formatting.
+- A `paragraph` block.
+- A `code` block for code samples.
+- A `quote` block for quotes...
+- And `bold`, `italic` and `underline` formatting.
 
 By default, the `Html` serializer knows nothing about our schema, just like Slate itself. To fix this, we need to pass it a set of `rules`. Each rule defines how to serialize and deserialize a Slate object.
 

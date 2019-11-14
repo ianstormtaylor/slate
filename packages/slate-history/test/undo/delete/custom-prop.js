@@ -9,10 +9,12 @@ export const run = editor => {
 export const input = (
   <value>
     <block a>
-      o<anchor />ne
+      o<anchor />
+      ne
     </block>
     <block b>
-      tw<focus />o
+      tw
+      <focus />o
     </block>
   </value>
 )

@@ -11,7 +11,8 @@ export const input = (
     <block>
       word
       <inline>hyperlink</inline>
-      <cursor />word
+      <cursor />
+      word
     </block>
   </value>
 )
@@ -24,7 +25,8 @@ export const output = (
       <text />
     </block>
     <block>
-      <cursor />word
+      <cursor />
+      word
     </block>
   </value>
 )

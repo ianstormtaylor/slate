@@ -2,16 +2,16 @@
 
 Want to contribute to Slate? That would be awesome!
 
-* [Reporting Bugs](#reporting-bugs)
-* [Asking Questions](#asking-questions)
-* [Submitting Pull Requests](#submitting-pull-requests)
-* [Running Examples](#running-examples)
-* [Running Tests](#running-tests)
-* [Running Benchmarks](#running-benchmarks)
-* [Adding Browser Support](#adding-browser-support)
-* [Testing Input Methods](#testing-input-methods)
-* [Debugging Slate Methods](#debugging-slate-methods)
-* [Publishing Releases](#publishing-releases)
+- [Reporting Bugs](#reporting-bugs)
+- [Asking Questions](#asking-questions)
+- [Submitting Pull Requests](#submitting-pull-requests)
+- [Running Examples](#running-examples)
+- [Running Tests](#running-tests)
+- [Running Benchmarks](#running-benchmarks)
+- [Adding Browser Support](#adding-browser-support)
+- [Testing Input Methods](#testing-input-methods)
+- [Debugging Slate Methods](#debugging-slate-methods)
+- [Publishing Releases](#publishing-releases)
 
 ## Reporting Bugs
 
@@ -19,9 +19,9 @@ If you run into any weird behavior while using Slate, feel free to open a new is
 
 Any issue you open must include:
 
-* A [JSFiddle](https://jsfiddle.net/fj9dvhom/1/) that reproduces the bug with a minimal setup.
-* A GIF showing the issue in action. (Using something like [RecordIt](http://recordit.co/).)
-* A clear explanation of what the issue is.
+- A [JSFiddle](https://jsfiddle.net/fj9dvhom/1/) that reproduces the bug with a minimal setup.
+- A GIF showing the issue in action. (Using something like [RecordIt](http://recordit.co/).)
+- A clear explanation of what the issue is.
 
 Here's a [JSFiddle template for Slate](https://jsfiddle.net/fj9dvhom/1/) to get you started:
 

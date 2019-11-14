@@ -15,7 +15,8 @@ export const input = (
     </block>
     <block>
       <mark key="a">
-        <cursor />Cute
+        <cursor />
+        Cute
       </mark>
     </block>
   </value>
@@ -30,7 +31,8 @@ export const output = (
     </block>
     <block>
       <mark key="a">
-        is <cursor />Cute
+        is <cursor />
+        Cute
       </mark>
     </block>
   </value>

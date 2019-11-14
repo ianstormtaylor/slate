@@ -11,11 +11,13 @@ export const input = (
   <value>
     <block>
       <mark key="a">
-        <anchor />one
+        <anchor />
+        one
       </mark>
     </block>
     <block>
-      two<focus />
+      two
+      <focus />
     </block>
   </value>
 )
@@ -23,7 +25,8 @@ export const input = (
 export const output = (
   <value>
     <block>
-      ab<cursor />
+      ab
+      <cursor />
     </block>
   </value>
 )

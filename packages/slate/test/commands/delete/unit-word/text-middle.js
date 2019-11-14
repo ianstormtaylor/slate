@@ -9,7 +9,8 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      o<cursor />ne two three
+      o<cursor />
+      ne two three
     </block>
   </value>
 )

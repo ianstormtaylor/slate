@@ -12,7 +12,9 @@ export const input = (
       <text />
       <inline>
         <mark key="a">
-          wo<cursor />rd
+          wo
+          <cursor />
+          rd
         </mark>
       </inline>
       <text />
@@ -30,7 +32,8 @@ export const output = (
       <text />
       <inline>
         <mark key="a">
-          <cursor />rd
+          <cursor />
+          rd
         </mark>
       </inline>
       <text />

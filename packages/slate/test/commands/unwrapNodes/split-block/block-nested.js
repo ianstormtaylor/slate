@@ -13,10 +13,12 @@ export const input = (
         <block>one</block>
         <block>two</block>
         <block>
-          <anchor />three
+          <anchor />
+          three
         </block>
         <block>
-          four<focus />
+          four
+          <focus />
         </block>
         <block>five</block>
         <block>six</block>
@@ -33,10 +35,12 @@ export const output = (
         <block>two</block>
       </block>
       <block>
-        <anchor />three
+        <anchor />
+        three
       </block>
       <block>
-        four<focus />
+        four
+        <focus />
       </block>
       <block key="a">
         <block>five</block>

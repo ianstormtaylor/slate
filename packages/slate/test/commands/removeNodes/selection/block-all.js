@@ -5,10 +5,12 @@ import { jsx } from '../../../helpers'
 export const input = (
   <value>
     <block>
-      on<anchor />e
+      on
+      <anchor />e
     </block>
     <block>
-      t<focus />wo
+      t<focus />
+      wo
     </block>
   </value>
 )

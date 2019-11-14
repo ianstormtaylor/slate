@@ -13,7 +13,8 @@ export const run = editor => {
 export const input = (
   <value>
     <block void>
-      text<cursor />
+      text
+      <cursor />
     </block>
     <block>text</block>
   </value>

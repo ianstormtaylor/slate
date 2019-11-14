@@ -13,7 +13,8 @@ export const input = (
     </block>
     <block>one</block>
     <block>
-      tw<focus />o
+      tw
+      <focus />o
     </block>
     <block>three</block>
   </value>

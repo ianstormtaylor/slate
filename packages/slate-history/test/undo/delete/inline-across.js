@@ -11,14 +11,16 @@ export const input = (
     <block>
       <text />
       <inline a>
-        o<anchor />ne
+        o<anchor />
+        ne
       </inline>
       <text />
     </block>
     <block>
       <text />
       <inline b>
-        tw<focus />o
+        tw
+        <focus />o
       </inline>
       <text />
     </block>

@@ -2,9 +2,9 @@
 
 A series of common questions people have about Slate:
 
-* [Why is content pasted as plain text?](#why-is-content-is-pasted-as-plain-text)
-* [What can a `Block` node have as its children?](#what-can-a-block-node-have-as-its-children)
-* [What browsers and devices does Slate support?](#what-browsers-and-devices-does-slate-support)
+- [Why is content pasted as plain text?](#why-is-content-is-pasted-as-plain-text)
+- [What can a `Block` node have as its children?](#what-can-a-block-node-have-as-its-children)
+- [What browsers and devices does Slate support?](#what-browsers-and-devices-does-slate-support)
 
 ### Why is content pasted as plain text?
 

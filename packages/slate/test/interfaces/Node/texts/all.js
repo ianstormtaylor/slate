@@ -16,4 +16,7 @@ export const test = value => {
   return Array.from(Node.texts(value))
 }
 
-export const output = [[<text key="a" />, [0, 0]], [<text key="b" />, [0, 1]]]
+export const output = [
+  [<text key="a" />, [0, 0]],
+  [<text key="b" />, [0, 1]],
+]

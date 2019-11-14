@@ -22,7 +22,8 @@ export const input = (
 export const output = (
   <value>
     <block>
-      <cursor />one
+      <cursor />
+      one
     </block>
     <block>two</block>
   </value>

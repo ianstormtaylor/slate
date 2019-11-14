@@ -15,4 +15,7 @@ export const run = editor => {
   })
 }
 
-export const output = [{ path: [0, 0], offset: 1 }, { path: [0, 0], offset: 3 }]
+export const output = [
+  { path: [0, 0], offset: 1 },
+  { path: [0, 0], offset: 3 },
+]

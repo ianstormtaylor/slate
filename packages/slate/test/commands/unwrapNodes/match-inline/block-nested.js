@@ -12,7 +12,8 @@ export const input = (
       <block>
         w<anchor />
         <inline key="a">
-          or<focus />
+          or
+          <focus />
         </inline>
         d
       </block>
@@ -24,7 +25,9 @@ export const output = (
   <value>
     <block>
       <block>
-        w<anchor />or<focus />d
+        w<anchor />
+        or
+        <focus />d
       </block>
     </block>
   </value>

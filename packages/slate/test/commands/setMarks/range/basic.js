@@ -18,9 +18,7 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
-      w
-      <mark key="a">or</mark>
-      d
+      w<mark key="a">or</mark>d
     </block>
   </value>
 )

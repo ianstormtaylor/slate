@@ -50,19 +50,19 @@ Why create Slate? Well... _(Beware: this section has a few of [my](https://githu
 
 Before creating Slate, I tried a lot of the other rich text libraries out there—[**Draft.js**](https://facebook.github.io/draft-js/), [**Prosemirror**](http://prosemirror.net/), [**Quill**](http://quilljs.com/), etc. What I found was that while getting simple examples to work was easy enough, once you started trying to build something like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/), you ran into deeper issues...
 
-* **The editor's "schema" was hardcoded and hard to customize.** Things like bold and italic were supported out of the box, but what about comments, or embeds, or even more domain-specific needs?
+- **The editor's "schema" was hardcoded and hard to customize.** Things like bold and italic were supported out of the box, but what about comments, or embeds, or even more domain-specific needs?
 
-* **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
+- **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
 
-* **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
+- **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
 
-* **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you have to learn a whole new system with new "gotchas".
+- **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you have to learn a whole new system with new "gotchas".
 
-* **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use to for a realtime, collaborative editing use case without basically rewriting the editor.
+- **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use to for a realtime, collaborative editing use case without basically rewriting the editor.
 
-* **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
+- **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
 
-* **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
+- **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
 
 Of course not every editor exhibits all of these issues, but if you've tried using another editor you might have run into similar problems. To get around the limitations of their API's and achieve the user experience you're after, you have to resort to very hacky things. And some experiences are just plain impossible to achieve.
 
@@ -104,16 +104,16 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-* [**Plain text**](./examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-* [**Rich text**](./examples/rich-text) — showing the features you'd expect from a basic editor.
-* [**Auto-markdown**](./examples/markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
-* [**Links**](./examples/links) — showing how wrap text in inline nodes with associated data.
-* [**Images**](./examples/images) — showing how to use void (text-less) nodes to add images.
-* [**Hovering menu**](./examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-* [**Tables**](./examples/tables) — showing how to nest blocks to render more advanced components.
-* [**Paste HTML**](./examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorations to dynamically mark text.
-* [**See all the examples...**](./examples)
+- [**Plain text**](./examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](./examples/rich-text) — showing the features you'd expect from a basic editor.
+- [**Auto-markdown**](./examples/markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](./examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](./examples/images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](./examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](./examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](./examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorations to dynamically mark text.
+- [**See all the examples...**](./examples)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -123,16 +123,16 @@ If you have an idea for an example that shows a common use case, pull request it
 
 Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
 
-* [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
-* [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
-* [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code) adds code editing behavior like tab-to-indent, and enter-to-soft-break.
-* [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list) adds rich, nested list editing behavior.
-* [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table) adds complex table editing behavior!
-* [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
-* [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
-* [`slate-soft-break`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-soft-break) adds a soft break when `enter` is pressed.
-* [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-* [**See all the plugins...**](./docs/general/plugins.md)
+- [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
+- [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
+- [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code) adds code editing behavior like tab-to-indent, and enter-to-soft-break.
+- [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list) adds rich, nested list editing behavior.
+- [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table) adds complex table editing behavior!
+- [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
+- [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
+- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-soft-break) adds a soft break when `enter` is pressed.
+- [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images) lets users drop or paste images to insert them!
+- [**See all the plugins...**](./docs/general/plugins.md)
 
 <br/>
 
@@ -140,17 +140,17 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/slate-core).
 
-* [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
-* [**Guides**](http://docs.slatejs.org/guides)
-* [**Reference**](http://docs.slatejs.org/slate-core)
-* [**FAQ**](http://docs.slatejs.org/general/faq)
-* [**Resources**](http://docs.slatejs.org/general/resources)
+- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
+- [**Guides**](http://docs.slatejs.org/guides)
+- [**Reference**](http://docs.slatejs.org/slate-core)
+- [**FAQ**](http://docs.slatejs.org/general/faq)
+- [**Resources**](http://docs.slatejs.org/general/resources)
 
 If even that's not enough, you can always [read the source itself](./packages/slate), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
-* [中文](https://doodlewind.github.io/slate-doc-cn/)
+- [中文](https://doodlewind.github.io/slate-doc-cn/)
 
 If you're maintaining a translation, feel free to pull request it here!
 

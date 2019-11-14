@@ -11,14 +11,16 @@ export const input = (
     <block>
       <text />
       <inline>
-        <anchor />word
+        <anchor />
+        word
       </inline>
       <text />
     </block>
     <block>
       <text />
       <inline>
-        another<focus />
+        another
+        <focus />
       </inline>
       <text />
     </block>
@@ -30,14 +32,16 @@ export const output = (
     <block>
       <text />
       <inline key>
-        <anchor />word
+        <anchor />
+        word
       </inline>
       <text key />
     </block>
     <block>
       <text key />
       <inline key>
-        another<focus />
+        another
+        <focus />
       </inline>
       <text />
     </block>

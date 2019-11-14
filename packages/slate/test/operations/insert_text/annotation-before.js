@@ -23,7 +23,8 @@ export const operations = [
 export const output = (
   <value>
     <element>
-      wx<cursor />
+      wx
+      <cursor />
       <annotation key="a">or</annotation>d
     </element>
   </value>

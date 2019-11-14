@@ -10,7 +10,8 @@ export const input = (
   <value>
     <block>word</block>
     <block>
-      <cursor />another
+      <cursor />
+      another
     </block>
   </value>
 )
@@ -22,7 +23,8 @@ export const output = (
       <text />
     </block>
     <block>
-      <cursor />another
+      <cursor />
+      another
     </block>
   </value>
 )

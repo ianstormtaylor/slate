@@ -11,7 +11,9 @@ export const input = (
     <block>
       <text />
       <inline>
-        <anchor />word<focus />
+        <anchor />
+        word
+        <focus />
       </inline>
       <text />
     </block>

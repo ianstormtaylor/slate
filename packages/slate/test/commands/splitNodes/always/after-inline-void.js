@@ -13,7 +13,8 @@ export const input = (
       <inline void>
         <text />
       </inline>
-      <cursor />two
+      <cursor />
+      two
     </block>
   </value>
 )
@@ -28,7 +29,8 @@ export const output = (
       <text />
     </block>
     <block>
-      <cursor />two
+      <cursor />
+      two
     </block>
   </value>
 )

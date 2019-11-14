@@ -14,4 +14,7 @@ export const run = editor => {
   return Array.from(editor.texts({ at: [] }))
 }
 
-export const output = [[<text>one</text>, [0, 0]], [<text>three</text>, [0, 2]]]
+export const output = [
+  [<text>one</text>, [0, 0]],
+  [<text>three</text>, [0, 2]],
+]
