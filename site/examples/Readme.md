@@ -1,7 +1,5 @@
 # Examples
 
-![](../docs/images/preview.png)
-
 This directory contains a set of examples that give you an idea for how you might use Slate to implement your own editor. Take a look around!
 
 - [**Plain text**](./plain-text) — showing the most basic case: a glorified `<textarea>`.

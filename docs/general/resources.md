@@ -12,8 +12,8 @@ These libraries are helpful when developing with Slate:
 
 These products use Slate, and can give you an idea of what's possible:
 
-- [Cake](https://www.cake.co/)
 - [Archbee](https://archbee.io)
+- [Cake](https://www.cake.co/)
 - [Chatterbug](https://chatterbug.com)
 - [GitBook](https://www.gitbook.com/)
 - [Grafana](https://grafana.com/)
@@ -32,10 +32,10 @@ These products use Slate, and can give you an idea of what's possible:
 These pre-packaged editors are built on top of Slate, and can be helpful to see how you might structure your code:
 
 - [Canner Editor](https://github.com/Canner/canner-slate-editor) is a rich text editor.
+- [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com).
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
 - [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
 - [ORY Editor](https://editor.ory.am/) is a self-contained, inline WYSIWYG editor library.
 - [Outline Editor](https://github.com/outline/rich-markdown-editor) is the editor that powers the [Outline](https://www.getoutline.com/) wiki.
-- [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com).
 
 (Or, if you have their exact use case, can be a drop-in editor for you.)

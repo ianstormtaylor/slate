@@ -20,7 +20,6 @@
 
 ## General
 
-- [Plugins](./general/plugins.md)
 - [Resources](./general/resources.md)
 - [Contributing](../Contributing.md)
 - [Changelog](./general/changelog.md)
@@ -55,9 +54,6 @@
 - [Rendering](./reference/slate-react/rendering.md)
 - [Utils](./reference/slate-react/utils.md)
 
-## Other Packages
+## Slate Hyperscript
 
-- [`slate-html-serializer`](./reference/slate-html-serializer/index.md)
-- [`slate-hyperscript`](./reference/slate-hyperscript/index.md)
-- [`slate-plain-serializer`](./reference/slate-plain-serializer/index.md)
-- [`slate-prop-types`](./reference/slate-prop-types/index.md)
+- [Hyperscript](./reference/slate-hyperscript/index.md)
