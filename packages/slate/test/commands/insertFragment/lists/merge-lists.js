@@ -5,7 +5,8 @@ import { jsx } from '../../../helpers'
 export const run = editor => {
   editor.insertFragment(
     <block>
-      <block>2</block>
+      <block>3</block>
+      <block>4</block>
     </block>
   )
 }
@@ -13,9 +14,9 @@ export const run = editor => {
 export const input = (
   <value>
     <block>
+      <block>1</block>
       <block>
-        {'1 '}
-        <cursor />
+        2<cursor />
       </block>
     </block>
   </value>
@@ -24,8 +25,10 @@ export const input = (
 export const output = (
   <value>
     <block>
+      <block>1</block>
+      <block>23</block>
       <block>
-        1 2<cursor />
+        4<cursor />
       </block>
     </block>
   </value>

@@ -39,6 +39,8 @@ class NodeQueries {
         return (
           (Element.isElement(node) && this.isInline(node)) || Text.isText(node)
         )
+      case 'inline-element':
+        return Element.isElement(node) && this.isInline(node)
       case 'block':
         return (
           Element.isElement(node) &&

@@ -356,8 +356,8 @@ export namespace Node {
   /**
    * Return an iterable of the in a branch of the tree, from a specific path.
    *
-   * By default the order is bottom-up, from lowest to highest node in the
-   * tree, but you can pass the `reverse: true` option to go top-down.
+   * By default the order is top-down, from lowest to highest node in the tree,
+   * but you can pass the `reverse: true` option to go bottom-up.
    */
 
   export function* levels(
@@ -575,6 +575,7 @@ export type NodeMatch =
   | 'block'
   | 'element'
   | 'inline'
+  | 'inline-element'
   | 'text'
   | 'value'
   | 'void'

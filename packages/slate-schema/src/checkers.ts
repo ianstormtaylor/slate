@@ -200,8 +200,6 @@ export const checkAncestor = (
       continue
     }
 
-    debugger
-
     // Since we want to report overflow on last matching child we don't
     // immediately v for count > max, but instead do so once we find
     // a child that doesn't match.

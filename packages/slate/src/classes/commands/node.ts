@@ -221,13 +221,28 @@ class NodeCommands {
       }
 
       const current = this.getMatch(at, match)
-      const prev = this.getPrevious(at, match)
 
-      if (!current || !prev) {
+      if (!current) {
         return
       }
 
+      let prevMatch: NodeMatch = 'block'
       const [node, path] = current
+
+      if (Value.isValue(node)) {
+        return
+      } else if (Text.isText(node)) {
+        prevMatch = 'text'
+      } else if (this.isInline(node)) {
+        prevMatch = 'inline'
+      }
+
+      const prev = this.getPrevious(at, prevMatch)
+
+      if (!prev) {
+        return
+      }
+
       const [prevNode, prevPath] = prev
       const newPath = Path.next(prevPath)
       const commonPath = Path.common(path, prevPath)
@@ -385,7 +400,7 @@ class NodeCommands {
 
     for (let i = 0; i < node.nodes.length; i++, n++) {
       const child = node.nodes[i] as Descendant
-      const prev = node.nodes[i - 1]
+      const prev = node.nodes[i - 1] as Descendant
       const isLast = i === node.nodes.length - 1
       const isInlineOrText =
         Text.isText(child) || (Element.isElement(child) && this.isInline(child))
@@ -645,14 +660,17 @@ class NodeCommands {
           break
         }
 
-        if (always || !beforeRef || !this.isEdge(beforeRef.current!, path)) {
+        const point = beforeRef.current!
+        const isEnd = this.isEnd(point, path)
+
+        if (always || !beforeRef || !this.isEdge(point, path)) {
           const { text, marks, nodes, ...properties } = node
           this.apply({ type: 'split_node', path, position, target, properties })
           split = true
         }
 
         target = position
-        position = path[path.length - 1] + (split ? 1 : 0)
+        position = path[path.length - 1] + (split || isEnd ? 1 : 0)
       }
 
       if (options.at == null) {

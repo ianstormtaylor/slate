@@ -8,6 +8,9 @@ import {
   Point,
   Value,
 } from '../..'
+import { Node, NodeEntry } from '../../interfaces/node'
+import { Mark } from '../../interfaces/mark'
+import { Text } from '../../interfaces/text'
 
 class DeletingCommands {
   /**
@@ -156,57 +159,159 @@ class DeletingCommands {
     fragment: Fragment,
     options: {
       at?: Location
+      hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      const { selection } = this.value
-      let { at } = options
-      let isSelection = false
+      let { at = this.value.selection } = options
+      const { hanging = false } = options
 
-      if (!at && selection) {
-        at = selection
-        isSelection = true
-      }
-
-      if (Range.isRange(at) && Range.isCollapsed(at)) {
-        at = at.anchor
-      }
-
-      if (Range.isRange(at)) {
-        const [, end] = Range.edges(at)
-        const pointRef = this.createPointRef(end)
-        this.delete({ at })
-        at = pointRef.unref()!
-      }
-
-      if (!Point.isPoint(at) || this.getMatch(at.path, 'void')) {
+      if (!fragment.nodes.length) {
         return
       }
 
-      const pointRef = this.createPointRef(at)
-      this.splitNodes({ at, always: true })
+      if (!at) {
+        return
+      } else if (Range.isRange(at)) {
+        if (!hanging) {
+          at = this.unhangRange(at)
+        }
 
-      if (pointRef.current) {
-        const [, insertPath] = this.getMatch(pointRef.current.path, 'block')!
-        this.insertNodes(fragment.nodes, { at: insertPath })
+        if (Range.isCollapsed(at)) {
+          at = at.anchor
+        } else {
+          const [, end] = Range.edges(at)
+          const pointRef = this.createPointRef(end)
+          this.delete({ at })
+          at = pointRef.unref()!
+        }
+      } else if (Path.isPath(at)) {
+        at = this.getStart(at)
+      }
 
-        const afterClosest = this.getMatch(pointRef.current.path, 'block')
-        const beforeClosest = this.getMatch(at.path, 'block')
+      if (this.getMatch(at.path, 'void')) {
+        return
+      }
 
-        if (afterClosest && beforeClosest) {
-          const [, afterPath] = afterClosest
-          const [, beforePath] = beforeClosest
-          const startPath = Path.next(beforePath)
-          this.mergeNodes({ at: afterPath })
-          this.mergeNodes({ at: startPath })
+      let inlineElementMatch = this.getMatch(at, 'inline-element')
+
+      if (inlineElementMatch) {
+        const [, inlinePath] = inlineElementMatch
+
+        if (this.isEnd(at, inlinePath)) {
+          const after = this.getAfter(inlinePath)!
+          at = after
+        } else if (this.isStart(at, inlinePath)) {
+          const before = this.getBefore(inlinePath)!
+          at = before
         }
       }
 
-      if (isSelection) {
-        this.select(pointRef.current!)
+      const blockMatch = this.getMatch(at, 'block')!
+      const [, blockPath] = blockMatch
+      const isBlockStart = this.isStart(at, blockPath)
+      const isBlockEnd = this.isEnd(at, blockPath)
+      const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
+      const mergeEnd = !isBlockEnd
+      const [, firstPath] = Node.first(fragment, [])
+      const [, lastPath] = Node.last(fragment, [])
+
+      // TODO: convert into a proper `Nodes.matches` iterable
+      const matches: NodeEntry[] = []
+
+      const matcher = ([n, p]: NodeEntry) => {
+        if (
+          mergeStart &&
+          Path.isAncestor(p, firstPath) &&
+          Element.isElement(n) &&
+          !this.isVoid(n) &&
+          !this.isInline(n)
+        ) {
+          return false
+        }
+
+        if (
+          mergeEnd &&
+          Path.isAncestor(p, lastPath) &&
+          Element.isElement(n) &&
+          !this.isVoid(n) &&
+          !this.isInline(n)
+        ) {
+          return false
+        }
+
+        return true
       }
 
-      pointRef.unref()
+      for (const entry of Node.nodes(fragment, { pass: matcher })) {
+        if (matcher(entry)) {
+          matches.push(entry)
+        }
+      }
+
+      const starts = []
+      const middles = []
+      const ends = []
+      let starting = true
+      let hasBlocks = false
+
+      for (const [node] of matches) {
+        if (Element.isElement(node) && !this.isInline(node)) {
+          starting = false
+          hasBlocks = true
+          middles.push(node)
+        } else if (starting) {
+          starts.push(node)
+        } else {
+          ends.push(node)
+        }
+      }
+
+      const inlineMatch = this.getMatch(at, 'inline')!
+      const [, inlinePath] = inlineMatch
+      const isInlineStart = this.isStart(at, inlinePath)
+      const isInlineEnd = this.isEnd(at, inlinePath)
+      debugger
+
+      const middleRef = this.createPathRef(
+        isBlockEnd ? Path.next(blockPath) : blockPath
+      )
+
+      const endRef = this.createPathRef(
+        isInlineEnd ? Path.next(inlinePath) : inlinePath
+      )
+
+      this.splitNodes({ at, match: hasBlocks ? 'block' : 'inline' })
+      debugger
+
+      const startRef = this.createPathRef(
+        !isInlineStart || (isInlineStart && isInlineEnd)
+          ? Path.next(inlinePath)
+          : inlinePath
+      )
+
+      this.insertNodes(starts, { at: startRef.current!, match: 'inline' })
+      this.insertNodes(middles, { at: middleRef.current!, match: 'block' })
+      this.insertNodes(ends, { at: endRef.current!, match: 'inline' })
+
+      if (!options.at) {
+        let path
+
+        if (ends.length > 0) {
+          path = Path.previous(endRef.current!)
+        } else if (middles.length > 0) {
+          path = Path.previous(middleRef.current!)
+        } else {
+          path = Path.previous(startRef.current!)
+        }
+
+        const end = this.getEnd(path)
+        this.select(end)
+      }
+
+      startRef.unref()
+      middleRef.unref()
+      endRef.unref()
     })
   }
 

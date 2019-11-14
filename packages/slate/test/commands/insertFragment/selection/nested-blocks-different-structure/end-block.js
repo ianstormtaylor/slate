@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx } from '../../../../helpers'
+import { jsx } from '../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(

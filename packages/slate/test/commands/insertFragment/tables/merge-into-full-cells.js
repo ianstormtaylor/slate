@@ -6,8 +6,10 @@ export const run = editor => {
   editor.insertFragment(
     <block>
       <block>
-        <block>2</block>
-        <block>3</block>
+        <block>
+          <block>New 1</block>
+          <block>New 2</block>
+        </block>
       </block>
     </block>
   )
@@ -19,23 +21,27 @@ export const input = (
       <block>
         <block>
           <block>
-            1<cursor />
+            {'Existing 1 '}
+            <cursor />
           </block>
+          <block>Existing 2</block>
         </block>
       </block>
     </block>
   </value>
 )
 
+// TODO: paste "Existing 2" before / after "New 2" in second cell?
 export const output = (
   <value>
     <block>
       <block>
         <block>
-          <block>12</block>
+          <block>Existing 1 New 1</block>
           <block>
-            3<cursor />
+            New 2<cursor />
           </block>
+          <block>Existing 2</block>
         </block>
       </block>
     </block>

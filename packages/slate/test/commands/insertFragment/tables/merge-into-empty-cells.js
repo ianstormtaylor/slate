@@ -6,8 +6,10 @@ export const run = editor => {
   editor.insertFragment(
     <block>
       <block>
-        <block>2</block>
-        <block>3</block>
+        <block>
+          <block>1</block>
+          <block>2</block>
+        </block>
       </block>
     </block>
   )
@@ -19,7 +21,10 @@ export const input = (
       <block>
         <block>
           <block>
-            1<cursor />
+            <cursor />
+          </block>
+          <block>
+            <text />
           </block>
         </block>
       </block>
@@ -27,14 +32,18 @@ export const input = (
   </value>
 )
 
+// TODO: paste "2" into second cell instead of creating new one?
 export const output = (
   <value>
     <block>
       <block>
         <block>
-          <block>12</block>
+          <block>1</block>
           <block>
-            3<cursor />
+            2<cursor />
+          </block>
+          <block>
+            <text />
           </block>
         </block>
       </block>

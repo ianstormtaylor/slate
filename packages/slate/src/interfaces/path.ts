@@ -212,8 +212,8 @@ namespace Path {
    * Get a list of paths at every level down to a path. Note: this is the same
    * as `Path.ancestors`, but including the path itself.
    *
-   * The paths are sorted from deepest to shallowest. However, if the
-   * `reverse: true` option is passed, they are reversed.
+   * The paths are sorted from shallowest to deepest. However, if the `reverse:
+   * true` option is passed, they are reversed.
    */
 
   export const levels = (

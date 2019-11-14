@@ -4,9 +4,11 @@ import { jsx } from '../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-    <block>
-      <block>2</block>
-    </block>
+    <fragment>
+      <block>one</block>
+      <block>two</block>
+      <block>three</block>
+    </fragment>
   )
 }
 
@@ -14,7 +16,7 @@ export const input = (
   <value>
     <block>
       <block>
-        {'1 '}
+        word
         <cursor />
       </block>
     </block>
@@ -24,11 +26,12 @@ export const input = (
 export const output = (
   <value>
     <block>
+      <block>wordone</block>
+      <block>two</block>
       <block>
-        1 2<cursor />
+        three
+        <cursor />
       </block>
     </block>
   </value>
 )
-
-export const skip = true

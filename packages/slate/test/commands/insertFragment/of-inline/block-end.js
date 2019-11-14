@@ -4,31 +4,31 @@ import { jsx } from '../../../helpers'
 
 export const run = editor => {
   editor.insertFragment(
-    <block>
-      <block>2</block>
-    </block>
+    <fragment>
+      <inline>fragment</inline>
+    </fragment>
   )
 }
 
 export const input = (
   <value>
     <block>
-      <block>
-        {'1 '}
-        <cursor />
-      </block>
+      word
+      <cursor />
     </block>
   </value>
 )
 
+// TODO: this cursor placement seems off
 export const output = (
   <value>
     <block>
-      <block>
-        1 2<cursor />
-      </block>
+      word
+      <inline>
+        fragment
+        <cursor />
+      </inline>
+      <text />
     </block>
   </value>
 )
-
-export const skip = true

@@ -18,7 +18,6 @@ const schema = [
       const { code, path, index } = error
       const type = index === 0 ? 'title' : 'paragraph'
 
-      debugger
       switch (code) {
         case 'child_invalid': {
           editor.setNodes({ type }, { at: path })
