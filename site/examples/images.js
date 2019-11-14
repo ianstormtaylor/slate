@@ -45,7 +45,7 @@ class ImagesEditor extends withHistory(withReact(Editor)) {
 
   insertImage(url) {
     const text = { text: '', marks: [] }
-    const image = { type: 'image', url, nodes: [text] }
+    const image = { type: 'image', url, children: [text] }
     this.insertNodes(image)
   }
 }
@@ -120,10 +120,10 @@ const isImageUrl = url => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text:
             'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
@@ -134,7 +134,7 @@ const initialValue = {
     {
       type: 'image',
       url: 'https://source.unsplash.com/kFrdX5IeQzI',
-      nodes: [
+      children: [
         {
           text: '',
           marks: [],
@@ -143,7 +143,7 @@ const initialValue = {
     },
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text:
             'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',

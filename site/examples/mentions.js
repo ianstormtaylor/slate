@@ -26,7 +26,7 @@ class MentionEditor extends withHistory(withReact(Editor)) {
   }
 
   insertMention(id) {
-    const mention = { type: 'mention', id, nodes: [{ text: '', marks: [] }] }
+    const mention = { type: 'mention', id, children: [{ text: '', marks: [] }] }
     this.insertNodes(mention)
   }
 
@@ -119,9 +119,9 @@ const MentionElement = ({ attributes, children, element }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text: 'Try mentioning some people, like ',
           marks: [],
@@ -129,7 +129,7 @@ const initialValue = {
         {
           type: 'mention',
           id: 324,
-          nodes: [{ text: '', marks: [] }],
+          children: [{ text: '', marks: [] }],
         },
         {
           text: ' or ',
@@ -138,7 +138,7 @@ const initialValue = {
         {
           type: 'mention',
           id: 253,
-          nodes: [{ text: '', marks: [] }],
+          children: [{ text: '', marks: [] }],
         },
         {
           text: '.',

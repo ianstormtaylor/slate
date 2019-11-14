@@ -126,9 +126,9 @@ const MarkButton = ({ editor, type, icon }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'This example shows how you can make a hovering menu appear above your content, which you can use to make text ',
@@ -153,7 +153,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: 'Try it out yourself! Just ',
           marks: [],

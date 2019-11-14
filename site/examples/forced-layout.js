@@ -24,7 +24,7 @@ const schema = [
           break
         }
         case 'child_min_invalid': {
-          const block = { type, nodes: [{ text: '', marks: [] }] }
+          const block = { type, children: [{ text: '', marks: [] }] }
           editor.insertNodes(block, { at: path.concat(index) })
           break
         }
@@ -70,10 +70,10 @@ const Element = ({ attributes, children, element }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
       type: 'title',
-      nodes: [
+      children: [
         {
           text: 'Enforce Your Layout!',
           marks: [],
@@ -82,7 +82,7 @@ const initialValue = {
     },
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text:
             'This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',

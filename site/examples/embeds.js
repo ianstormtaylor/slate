@@ -15,7 +15,7 @@ class EmbedsEditor extends withHistory(withReact(Editor)) {
   }
 
   insertVideo(url) {
-    const video = { type: 'video', url, nodes: [{ text: '', marks: [] }] }
+    const video = { type: 'video', url, children: [{ text: '', marks: [] }] }
     this.insertNodes(video)
   }
 }
@@ -112,9 +112,9 @@ const VideoElement = ({ attributes, children, element }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'In addition to simple image nodes, you can actually create complex embedded nodes. For example, this one contains an input element that lets you change the video being rendered!',
@@ -125,7 +125,7 @@ const initialValue = {
     {
       type: 'video',
       url: 'https://player.vimeo.com/video/26689853',
-      nodes: [
+      children: [
         {
           text: '',
           marks: [],
@@ -133,7 +133,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text:
             'Try it out! This editor is built to handle Vimeo embeds, but you could handle any type.',

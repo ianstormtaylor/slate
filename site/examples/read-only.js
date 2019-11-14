@@ -22,9 +22,9 @@ const ReadOnlyExample = () => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text: 'This is editable plain text, just like a <textarea>!',
           marks: [],

@@ -5,22 +5,22 @@ import { Editable, withReact, useSlate } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
-const nodes = []
+const children = []
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes,
+  children,
 }
 
 for (let h = 0; h < HEADINGS; h++) {
-  nodes.push({
+  children.push({
     type: 'heading',
-    nodes: [{ text: faker.lorem.sentence(), marks: [] }],
+    children: [{ text: faker.lorem.sentence(), marks: [] }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
-    nodes.push({
-      nodes: [{ text: faker.lorem.paragraph(), marks: [] }],
+    children.push({
+      children: [{ text: faker.lorem.paragraph(), marks: [] }],
     })
   }
 }

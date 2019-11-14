@@ -36,7 +36,7 @@ class MarkdownShortcutsEditor extends withHistory(withReact(Editor)) {
         this.setNodes({ type }, { match: 'block' })
 
         if (type === 'list-item') {
-          const list = { type: 'bulleted-list', nodes: [] }
+          const list = { type: 'bulleted-list', children: [] }
           this.wrapNodes(list, { match: { type: 'list-item' } })
         }
 
@@ -95,9 +95,9 @@ const Element = ({ attributes, children, element }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
@@ -107,7 +107,7 @@ const initialValue = {
     },
     {
       type: 'block-quote',
-      nodes: [
+      children: [
         {
           text: 'A wise quote.',
           marks: [],
@@ -115,7 +115,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text:
             'Order when you start a line with "## " you get a level-two heading, like this:',
@@ -125,7 +125,7 @@ const initialValue = {
     },
     {
       type: 'heading-two',
-      nodes: [
+      children: [
         {
           text: 'Try it out!',
           marks: [],
@@ -133,7 +133,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text:
             'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',

@@ -120,9 +120,9 @@ const CheckListItemElement = ({ attributes, children, element }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
@@ -133,7 +133,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: true,
-      nodes: [
+      children: [
         {
           text: 'Slide to the left.',
           marks: [],
@@ -143,7 +143,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: true,
-      nodes: [
+      children: [
         {
           text: 'Slide to the right.',
           marks: [],
@@ -153,7 +153,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: false,
-      nodes: [
+      children: [
         {
           text: 'Criss-cross.',
           marks: [],
@@ -163,7 +163,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: true,
-      nodes: [
+      children: [
         {
           text: 'Criss-cross!',
           marks: [],
@@ -173,7 +173,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: false,
-      nodes: [
+      children: [
         {
           text: 'Cha cha real smooth…',
           marks: [],
@@ -183,7 +183,7 @@ const initialValue = {
     {
       type: 'check-list-item',
       checked: false,
-      nodes: [
+      children: [
         {
           text: "Let's go to work!",
           marks: [],
@@ -191,7 +191,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: 'Try it out for yourself!',
           marks: [],

@@ -49,7 +49,7 @@ class RichTextEditor extends withHistory(withReact(Editor)) {
     this.setNodes({ type: newType })
 
     if (!isActive && isListType) {
-      this.wrapNodes({ type, nodes: [] })
+      this.wrapNodes({ type, children: [] })
     }
   }
 }
@@ -161,10 +161,10 @@ const BlockButton = ({ editor, type, icon }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text: 'This is editable ',
           marks: [],
@@ -197,7 +197,7 @@ const initialValue = {
     },
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text:
             "Since it's rich text, you can do things like turn a selection of text ",
@@ -216,7 +216,7 @@ const initialValue = {
     },
     {
       type: 'block-quote',
-      nodes: [
+      children: [
         {
           text: 'A wise quote.',
           marks: [],
@@ -225,7 +225,7 @@ const initialValue = {
     },
     {
       type: 'paragraph',
-      nodes: [
+      children: [
         {
           text: 'Try it out for yourself!',
           marks: [],

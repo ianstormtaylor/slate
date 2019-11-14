@@ -153,9 +153,9 @@ const Decoration = props => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.',
@@ -164,7 +164,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: '## Try it out!',
           marks: [],
@@ -172,7 +172,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: 'Try it out for yourself!',
           marks: [],

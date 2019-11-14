@@ -89,9 +89,9 @@ const Mark = ({ attributes, children, mark }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             'Since the editor is based on a recursive tree model, similar to an HTML document, you can create complex nested structures, like tables:',
@@ -101,17 +101,17 @@ const initialValue = {
     },
     {
       type: 'table',
-      nodes: [
+      children: [
         {
           type: 'table-row',
-          nodes: [
+          children: [
             {
               type: 'table-cell',
-              nodes: [{ text: '', marks: [] }],
+              children: [{ text: '', marks: [] }],
             },
             {
               type: 'table-cell',
-              nodes: [
+              children: [
                 {
                   text: 'Human',
                   marks: [{ type: 'bold' }],
@@ -120,7 +120,7 @@ const initialValue = {
             },
             {
               type: 'table-cell',
-              nodes: [
+              children: [
                 {
                   text: 'Dog',
                   marks: [{ type: 'bold' }],
@@ -129,7 +129,7 @@ const initialValue = {
             },
             {
               type: 'table-cell',
-              nodes: [
+              children: [
                 {
                   text: 'Cat',
                   marks: [{ type: 'bold' }],
@@ -140,10 +140,10 @@ const initialValue = {
         },
         {
           type: 'table-row',
-          nodes: [
+          children: [
             {
               type: 'table-cell',
-              nodes: [
+              children: [
                 {
                   text: '# of Feet',
                   marks: [{ type: 'bold' }],
@@ -152,24 +152,24 @@ const initialValue = {
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '2', marks: [] }],
+              children: [{ text: '2', marks: [] }],
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '4', marks: [] }],
+              children: [{ text: '4', marks: [] }],
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '4', marks: [] }],
+              children: [{ text: '4', marks: [] }],
             },
           ],
         },
         {
           type: 'table-row',
-          nodes: [
+          children: [
             {
               type: 'table-cell',
-              nodes: [
+              children: [
                 {
                   text: '# of Lives',
                   marks: [{ type: 'bold' }],
@@ -178,22 +178,22 @@ const initialValue = {
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '1', marks: [] }],
+              children: [{ text: '1', marks: [] }],
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '1', marks: [] }],
+              children: [{ text: '1', marks: [] }],
             },
             {
               type: 'table-cell',
-              nodes: [{ text: '9', marks: [] }],
+              children: [{ text: '9', marks: [] }],
             },
           ],
         },
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text:
             "This table is just a basic example of rendering a table, and it doesn't have fancy functionality. But you could augment it to add support for navigating with arrow keys, displaying table headers, adding column and rows, or even formulas if you wanted to get really crazy!",

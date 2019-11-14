@@ -198,9 +198,9 @@ const Mark = ({ attributes, children, mark }) => {
 const initialValue = {
   selection: null,
   annotations: {},
-  nodes: [
+  children: [
     {
-      nodes: [
+      children: [
         {
           text:
             "By default, pasting content into a Slate editor will use the clipboard's ",
@@ -226,7 +226,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text: 'This is an example of doing exactly that!',
           marks: [],
@@ -234,7 +234,7 @@ const initialValue = {
       ],
     },
     {
-      nodes: [
+      children: [
         {
           text:
             "Try it out for yourself! Copy and paste some rendered HTML rich text content (not the source code) from another site into this editor and it's formatting should be preserved.",
