@@ -24,6 +24,7 @@ class GeneralCommands {
 
     const set = new Set()
     const dirtyPaths: Path[] = []
+
     const add = (path: Path | null) => {
       if (path) {
         const key = path.join(',')
@@ -160,13 +161,13 @@ const getDirtyPaths = (op: Operation) => {
       const newAncestors: Path[] = []
 
       for (const ancestor of Path.ancestors(path)) {
-        const path = Path.transform(ancestor, op)
-        oldAncestors.push(path!)
+        const p = Path.transform(ancestor, op)
+        oldAncestors.push(p!)
       }
 
       for (const ancestor of Path.ancestors(newPath)) {
-        const path = Path.transform(ancestor, op)
-        newAncestors.push(path!)
+        const p = Path.transform(ancestor, op)
+        newAncestors.push(p!)
       }
 
       return [...oldAncestors, ...newAncestors]

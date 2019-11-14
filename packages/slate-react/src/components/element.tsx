@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import getDirection from 'direction'
-import { Node, Range, NodeEntry, Element as SlateElement, Path } from 'slate'
+import { Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import Children from './children'
@@ -45,7 +45,7 @@ const Element = (props: {
     element,
     renderAnnotation,
     renderDecoration,
-    renderElement = (props: CustomElementProps) => <CustomElement {...props} />,
+    renderElement = (p: CustomElementProps) => <CustomElement {...p} />,
     renderMark,
     selection,
   } = props
@@ -103,11 +103,12 @@ const Element = (props: {
     attributes['data-slate-void'] = true
 
     if (!readOnly && isInline) {
-      attributes['contentEditable'] = false
+      attributes.contentEditable = false
     }
 
     const Tag = isInline ? 'span' : 'div'
     const [[text]] = Node.texts(element)
+
     children = readOnly ? null : (
       <Tag
         data-slate-spacer

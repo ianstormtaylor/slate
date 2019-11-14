@@ -46,6 +46,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
 
     if (Text.isText(child)) {
       const c = child // HACK: fix typescript complaining
+
       if (
         Text.isText(prev) &&
         STRINGS.has(prev) &&
@@ -334,7 +335,7 @@ export function createValue(
     }
 
     for (const o in anns) {
-      const offset = parseInt(o)
+      const offset = parseInt(o, 10)
       const token = anns[offset]
       const { key } = token
       const partial = partials[key]
@@ -344,6 +345,7 @@ export function createValue(
       } else {
         const [pPath, pOffset, pToken] = partial
         delete partials[key]
+
         value.annotations[key] = {
           anchor: { path: pPath, offset: pOffset },
           focus: { path, offset },

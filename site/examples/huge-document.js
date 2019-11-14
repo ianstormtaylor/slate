@@ -38,7 +38,7 @@ const HugeDocumentExample = () => {
       editor={editor}
       value={value}
       renderElement={renderElement}
-      onChange={setValue}
+      onChange={v => setValue(v)}
     />
   )
 }

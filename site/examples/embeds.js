@@ -29,7 +29,7 @@ const EmbedsExample = () => {
         placeholder="Enter some text..."
         editor={editor}
         value={value}
-        onChange={value => setValue(value)}
+        onChange={v => setValue(v)}
         renderElement={props => <Element {...props} />}
       />
     </div>
@@ -38,6 +38,7 @@ const EmbedsExample = () => {
 
 const Element = props => {
   const { attributes, children, element } = props
+
   switch (element.type) {
     case 'video':
       return <VideoElement {...props} />

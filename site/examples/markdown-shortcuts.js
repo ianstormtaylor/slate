@@ -27,8 +27,8 @@ class MarkdownShortcutsEditor extends withHistory(withReact(Editor)) {
       const path = block ? block[1] : []
       const start = this.getStart(path)
       const range = { anchor, focus: start }
-      const text = this.getText(range)
-      const type = SHORTCUTS[text]
+      const beforeText = this.getText(range)
+      const type = SHORTCUTS[beforeText]
 
       if (type) {
         this.select(range)
@@ -61,7 +61,7 @@ const MarkdownShortcutsExample = () => {
         editor={editor}
         value={value}
         renderElement={renderElement}
-        onChange={value => setValue(value)}
+        onChange={v => setValue(v)}
       />
     </div>
   )

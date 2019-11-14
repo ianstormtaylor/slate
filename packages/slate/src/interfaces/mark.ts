@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Path, Text } from '..'
+
 /**
  * `Mark` objects represent formatting that is applied to text in a Slate
  * document. They appear in leaf text nodes in the document, as well as in

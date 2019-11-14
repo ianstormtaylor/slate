@@ -71,7 +71,7 @@ const ImagesExample = () => {
         placeholder="Enter some text..."
         editor={editor}
         value={value}
-        onChange={setValue}
+        onChange={v => setValue(v)}
         renderElement={props => <Element {...props} />}
       />
     </div>
@@ -80,6 +80,7 @@ const ImagesExample = () => {
 
 const Element = props => {
   const { attributes, children, element } = props
+
   switch (element.type) {
     case 'image':
       return <ImageElement {...props} />

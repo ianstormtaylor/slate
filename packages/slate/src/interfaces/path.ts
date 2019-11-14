@@ -386,7 +386,7 @@ namespace Path {
           }
 
           if (Path.isAncestor(op, p) || Path.equals(op, p)) {
-            let copy = onp.slice()
+            const copy = onp.slice()
 
             if (Path.endsBefore(op, onp) && op.length < onp.length) {
               const i = Math.min(onp.length, op.length) - 1
@@ -394,24 +394,22 @@ namespace Path {
             }
 
             return copy.concat(p.slice(op.length))
-          } else {
-            if (
-              Path.endsBefore(onp, p) ||
-              Path.equals(onp, p) ||
-              Path.isAncestor(onp, p)
-            ) {
-              if (Path.endsBefore(op, p)) {
-                p[op.length - 1] -= 1
-              }
-
-              p[onp.length - 1] += 1
-            } else if (Path.endsBefore(op, p)) {
-              if (Path.equals(onp, p)) {
-                p[onp.length - 1] += 1
-              }
-
+          } else if (
+            Path.endsBefore(onp, p) ||
+            Path.equals(onp, p) ||
+            Path.isAncestor(onp, p)
+          ) {
+            if (Path.endsBefore(op, p)) {
               p[op.length - 1] -= 1
             }
+
+            p[onp.length - 1] += 1
+          } else if (Path.endsBefore(op, p)) {
+            if (Path.equals(onp, p)) {
+              p[onp.length - 1] += 1
+            }
+
+            p[op.length - 1] -= 1
           }
 
           break

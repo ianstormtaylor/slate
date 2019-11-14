@@ -63,7 +63,7 @@ const LinkExample = () => {
         editor={editor}
         value={value}
         renderElement={props => <Element {...props} />}
-        onChange={setValue}
+        onChange={v => setValue(v)}
       />
     </div>
   )

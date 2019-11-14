@@ -112,7 +112,7 @@ const PasteHtmlExample = () => {
         value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={value => setValue(value)}
+        onChange={v => setValue(v)}
       />
     </div>
   )

@@ -142,6 +142,7 @@ namespace Point {
               (op.position === offset && affinity === 'forward')
             ) {
               p.offset -= op.position
+
               p.path = Path.transform(path, op, {
                 ...options,
                 affinity: 'forward',

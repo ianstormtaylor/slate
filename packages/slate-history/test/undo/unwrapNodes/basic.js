@@ -1,7 +1,6 @@
 /** @jsx jsx */
 
 import { jsx } from '../../helpers'
-import { PathUtils } from 'slate'
 
 export const run = editor => {
   editor.unwrapNodes({ key: 'a' })

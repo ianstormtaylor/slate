@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react'
-import { Range, Element, Mark, Text as SlateText } from 'slate'
+import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { Leaf as SlateLeaf } from '../utils/leaf'

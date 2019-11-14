@@ -91,7 +91,7 @@ const RichTextExample = () => {
         value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={setValue}
+        onChange={v => setValue(v)}
       />
     </div>
   )

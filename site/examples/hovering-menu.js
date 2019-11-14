@@ -48,6 +48,7 @@ const HoveringMenuExample = () => {
     const rect = domRange.getBoundingClientRect()
     el.style.opacity = 1
     el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`
+
     el.style.left = `${rect.left +
       window.pageXOffset -
       el.offsetWidth / 2 +
@@ -86,7 +87,7 @@ const HoveringMenuExample = () => {
         editor={editor}
         value={value}
         renderMark={props => <Mark {...props} />}
-        onChange={setValue}
+        onChange={v => setValue(v)}
       />
     </div>
   )

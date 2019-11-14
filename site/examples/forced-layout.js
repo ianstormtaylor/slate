@@ -52,7 +52,7 @@ const ForcedLayoutExample = () => {
         editor={editor}
         value={value}
         renderElement={renderElement}
-        onChange={value => setValue(value)}
+        onChange={v => setValue(v)}
       />
     </div>
   )

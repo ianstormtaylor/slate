@@ -615,7 +615,7 @@ class NodeCommands {
       }
 
       const voidMatch = this.getMatch(at, 'void')
-      let nudge = 0
+      const nudge = 0
 
       if (voidMatch) {
         const [voidNode, voidPath] = voidMatch
@@ -641,8 +641,8 @@ class NodeCommands {
 
       const afterRef = this.createPointRef(at)
       const depth = at.path.length - height
-      let [, highestPath] = highest
-      let lowestPath = at.path.slice(0, depth)
+      const [, highestPath] = highest
+      const lowestPath = at.path.slice(0, depth)
       let position = height === 0 ? at.offset : at.path[depth] + nudge
       let target: number | null = null
 
@@ -804,6 +804,7 @@ class NodeCommands {
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, children: [] }
           this.insertNodes(wrapper, { at: wrapperPath })
+
           this.moveNodes({
             at: range,
             match: ([, p]) => p.length === depth,

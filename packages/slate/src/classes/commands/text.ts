@@ -1,7 +1,14 @@
-import { Editor, Element, Path, Location, Range, Point, Value } from '../..'
-import { Node, NodeEntry, Descendant } from '../../interfaces/node'
-import { Mark } from '../../interfaces/mark'
-import { Text } from '../../interfaces/text'
+import {
+  Editor,
+  Element,
+  Location,
+  Node,
+  NodeEntry,
+  Path,
+  Point,
+  Range,
+  Value,
+} from '../..'
 
 class DeletingCommands {
   /**
@@ -186,7 +193,7 @@ class DeletingCommands {
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      let inlineElementMatch = this.getMatch(at, 'inline-element')
+      const inlineElementMatch = this.getMatch(at, 'inline-element')
 
       if (inlineElementMatch) {
         const [, inlinePath] = inlineElementMatch
@@ -357,7 +364,7 @@ class DeletingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      let { at = this.value.selection } = options
+      const { at = this.value.selection } = options
 
       if (!at || Range.isCollapsed(at)) {
         return

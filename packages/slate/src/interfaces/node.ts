@@ -481,15 +481,15 @@ export namespace Node {
 
   export const parent = (root: Node, path: Path): Ancestor => {
     const parentPath = Path.parent(path)
-    const parent = Node.get(root, parentPath)
+    const p = Node.get(root, parentPath)
 
-    if (Text.isText(parent)) {
+    if (Text.isText(p)) {
       throw new Error(
         `Cannot get the parent of path [${path}] because it does not exist in the root.`
       )
     }
 
-    return parent
+    return p
   }
 
   /**

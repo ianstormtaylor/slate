@@ -815,8 +815,8 @@ class LocationQueries {
         }
 
         if (this.hasInlines(node)) {
-          let e = Path.isAncestor(path, end.path) ? end : this.getEnd(path)
-          let s = Path.isAncestor(path, start.path)
+          const e = Path.isAncestor(path, end.path) ? end : this.getEnd(path)
+          const s = Path.isAncestor(path, start.path)
             ? start
             : this.getStart(path)
 

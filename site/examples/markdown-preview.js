@@ -59,7 +59,7 @@ const MarkdownPreviewExample = () => {
         value={value}
         decorate={decorate}
         renderDecoration={renderDecoration}
-        onChange={value => setValue(value)}
+        onChange={v => setValue(v)}
       />
     </div>
   )
@@ -143,6 +143,7 @@ const Decoration = props => {
         </span>
       )
     }
+
     default: {
       throw new Error(`Unknown markdown decoration type: "${decoration.type}"`)
     }

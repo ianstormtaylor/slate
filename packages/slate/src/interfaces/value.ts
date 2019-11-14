@@ -338,6 +338,7 @@ export namespace Value {
             const before = node.children.slice(0, position)
             const after = node.children.slice(position)
             node.children = before
+
             newNode = {
               ...node,
               ...(properties as Partial<Element>),

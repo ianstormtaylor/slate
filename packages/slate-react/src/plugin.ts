@@ -159,6 +159,7 @@ export const withReact = (Editor: new (...args: any[]) => Editor) => {
         SlateNode.text(node) === ''
       ) {
         const start = this.getStart([])
+
         decorations.push({
           [PLACEHOLDER_SYMBOL]: true,
           placeholder,

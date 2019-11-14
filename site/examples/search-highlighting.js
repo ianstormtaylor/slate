@@ -77,7 +77,7 @@ const SearchHighlightingExample = () => {
         decorate={decorate}
         renderDecoration={props => <Decoration {...props} />}
         renderMark={props => <Mark {...props} />}
-        onChange={setValue}
+        onChange={v => setValue(v)}
       />
     </div>
   )

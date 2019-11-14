@@ -1,5 +1,5 @@
 import React from 'react'
-import { Mark, Range, Text, Element } from 'slate'
+import { Text, Element } from 'slate'
 import String from './string'
 import {
   CustomAnnotation,

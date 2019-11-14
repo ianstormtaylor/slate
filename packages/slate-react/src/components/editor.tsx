@@ -6,7 +6,7 @@ import {
   Range as SlateRange,
   Operation,
 } from 'slate'
-import debounce from 'lodash/debounce'
+import debounce from 'just-debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
@@ -69,10 +69,10 @@ const Editor = (props: {
     renderDecoration,
     renderElement,
     renderMark,
-    role = 'textbox',
     style = {},
     ...attributes
   } = props
+
   if (!Value.isValue(value)) {
     throw new Error(
       `The \`value=\` prop you passed to <Editor> was not a valid Slate value: ${JSON.stringify(
@@ -285,7 +285,7 @@ const Editor = (props: {
             // out from under `contenteditable` elements, which leads to weird
             // behaviors so we have to disable it like editor. (2017/04/24)
             data-gramm={false}
-            role={readOnly ? undefined : props.role || 'textbox'}
+            role={readOnly ? undefined : 'textbox'}
             {...attributes}
             data-slate-editor
             data-slate-node="value"

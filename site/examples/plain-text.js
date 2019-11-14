@@ -13,7 +13,7 @@ const PlainTextExample = () => {
       placeholder="Enter some plain text..."
       editor={editor}
       value={value}
-      onChange={value => setValue(value)}
+      onChange={v => setValue(v)}
     />
   )
 }

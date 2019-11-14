@@ -27,10 +27,6 @@
     "node": true
   },
   "rules": {
-    "@typescript-eslint/no-unused-vars": [
-      "error",
-      { "vars": "all", "args": "none" }
-    ],
     "constructor-super": "error",
     "dot-notation": ["error", { "allowKeywords": true }],
     "eqeqeq": ["error", "smart"],
@@ -50,16 +46,6 @@
     "import/no-named-as-default-member": "error",
     "import/no-unresolved": "error",
     "linebreak-style": "error",
-    "lines-around-comment": [
-      "error",
-      {
-        "beforeBlockComment": true,
-        "afterBlockComment": true,
-        "allowBlockStart": true,
-        "allowObjectStart": true,
-        "allowArrayStart": true
-      }
-    ],
     "no-array-constructor": "error",
     "no-class-assign": "error",
     "no-console": "error",
@@ -77,7 +63,6 @@
     "no-extra-boolean-cast": "error",
     "no-func-assign": "error",
     "no-invalid-regexp": "error",
-    "no-lonely-if": "error",
     "no-native-reassign": "error",
     "no-negated-in-lhs": "error",
     "no-new-object": "error",
@@ -85,18 +70,7 @@
     "no-path-concat": "error",
     "no-redeclare": "error",
     "no-regex-spaces": "error",
-    "no-restricted-globals": [
-      "error",
-      "event",
-      "Node",
-      "parent",
-      "Range",
-      "Selection",
-      "Text"
-    ],
     "no-sequences": "error",
-    "no-shadow": "error",
-    "no-shadow-restricted-names": "error",
     "no-tabs": "error",
     "no-this-before-super": "error",
     "no-throw-literal": "error",

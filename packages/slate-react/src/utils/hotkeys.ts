@@ -55,6 +55,7 @@ const create = (key: string) => {
   const isGeneric = generic && isKeyHotkey(generic)
   const isApple = apple && isKeyHotkey(apple)
   const isWindows = windows && isKeyHotkey(windows)
+
   return (event: KeyboardEvent) => {
     if (isGeneric && isGeneric(event)) return true
     if (IS_APPLE && isApple && isApple(event)) return true
