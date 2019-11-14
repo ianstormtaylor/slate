@@ -1,6 +1,6 @@
 {
   "name": "slate-schema",
-  "description": "A plugin that ensures your Slate editors obey the rules of your schema.",
+  "description": "A mixin for ensuring your Slate content conforms to a set of rules.",
   "version": "0.47.8",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
@@ -13,21 +13,23 @@
     "dist/",
     "lib/"
   ],
-  "dependencies": {},
   "peerDependencies": {
-    "slate": ">=0.47.0"
+    "slate": ">=0.50.0"
   },
-  "devDependencies": {
-    "slate": "^0.47.8",
-    "slate-hyperscript": "^0.13.8"
+  "umdGlobals": {
+    "slate": "Slate"
   },
   "keywords": [
+    "content",
     "customize",
     "editor",
+    "enforce",
+    "normalize",
     "normalization",
     "rules",
     "schema",
     "slate",
+    "validate",
     "validation"
   ]
 }

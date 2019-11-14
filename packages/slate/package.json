@@ -19,9 +19,6 @@
     "immer": "^4.0.1",
     "is-plain-object": "^2.0.4"
   },
-  "devDependencies": {
-    "slate-hyperscript": "^0.13.8"
-  },
   "keywords": [
     "canvas",
     "contenteditable",

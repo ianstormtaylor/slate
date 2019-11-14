@@ -2,7 +2,10 @@
   "extends": ["prettier", "prettier/react"],
   "plugins": ["import", "react", "prettier"],
   "settings": {
-    "import/extensions": [".js"]
+    "import/extensions": [".js"],
+    "react": {
+      "version": "detect"
+    }
   },
   "parser": "babel-eslint",
   "parserOptions": {
@@ -161,7 +164,7 @@
     {
       "files": "**/test/**/*.js",
       "rules": {
-        "import/no-extraneous-dependencies": false
+        "import/no-extraneous-dependencies": "off"
       }
     }
   ]

@@ -18,18 +18,19 @@
     "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
-    "slate": ">=0.47.0"
+    "slate": ">=0.50.0"
   },
-  "devDependencies": {
-    "slate": "^0.47.8",
-    "slate-hyperscript": "^0.13.8"
+  "umdGlobals": {
+    "slate": "Slate"
   },
   "keywords": [
     "editor",
     "history",
     "operation",
     "redo",
+    "save",
     "slate",
+    "stack",
     "undo"
   ]
 }

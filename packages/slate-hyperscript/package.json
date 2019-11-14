@@ -17,7 +17,7 @@
     "is-plain-object": "^2.0.4"
   },
   "peerDependencies": {
-    "slate": ">=0.47.0"
+    "slate": ">=0.50.0"
   },
   "devDependencies": {
     "slate": "^0.47.8"
@@ -26,9 +26,11 @@
     "slate": "Slate"
   },
   "keywords": [
+    "deserialize",
+    "h",
+    "html",
     "hyperscript",
     "jsx",
-    "html",
     "slate",
     "sugar",
     "xml"

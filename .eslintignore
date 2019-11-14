@@ -1,1 +1,8 @@
 *.md
+.github/
+.next/
+build/
+dist/
+lib/
+node_modules/
+tmp/
