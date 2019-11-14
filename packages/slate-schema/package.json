@@ -1,5 +1,6 @@
 {
   "name": "slate-schema",
+  "type": "module",
   "description": "A mixin for ensuring your Slate content conforms to a set of rules.",
   "version": "0.47.8",
   "license": "MIT",

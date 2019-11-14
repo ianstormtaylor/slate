@@ -1,16 +1,23 @@
 {
-  "extends": ["prettier", "prettier/react"],
-  "plugins": ["import", "react", "prettier"],
-  "settings": {
-    "import/extensions": [".js"],
-    "react": {
-      "version": "detect"
-    }
-  },
-  "parser": "babel-eslint",
+  "extends": [
+    "plugin:import/typescript",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
+  "plugins": ["@typescript-eslint", "import", "react", "prettier"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020,
     "ecmaFeatures": {
       "jsx": true
+    }
+  },
+  "settings": {
+    "import/extensions": [".js", ".ts"],
+    "react": {
+      "version": "detect"
     }
   },
   "env": {
@@ -20,6 +27,10 @@
     "node": true
   },
   "rules": {
+    "@typescript-eslint/no-unused-vars": [
+      "error",
+      { "vars": "all", "args": "none" }
+    ],
     "constructor-super": "error",
     "dot-notation": ["error", { "allowKeywords": true }],
     "eqeqeq": ["error", "smart"],
@@ -76,19 +87,11 @@
     "no-regex-spaces": "error",
     "no-restricted-globals": [
       "error",
-      "Debug",
-      "document",
-      "Document",
       "event",
-      "history",
-      "History",
-      "length",
-      "Map",
       "Node",
       "parent",
       "Range",
       "Selection",
-      "Set",
       "Text"
     ],
     "no-sequences": "error",
@@ -97,13 +100,10 @@
     "no-tabs": "error",
     "no-this-before-super": "error",
     "no-throw-literal": "error",
-    "no-undef": "error",
     "no-unneeded-ternary": "error",
     "no-unreachable": "error",
     "no-unsafe-finally": "error",
     "no-unsafe-negation": "error",
-    "no-unused-expressions": "error",
-    "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
     "no-useless-call": "error",
     "no-useless-computed-key": "error",
     "no-useless-constructor": "error",
@@ -164,7 +164,8 @@
     {
       "files": "**/test/**/*.js",
       "rules": {
-        "import/no-extraneous-dependencies": "off"
+        "import/no-extraneous-dependencies": "off",
+        "import/no-unresolved": "off"
       }
     }
   ]

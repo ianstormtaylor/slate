@@ -237,7 +237,6 @@ const ExamplePage = () => {
   const { example = 'rich-text' } = router.query
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
-  console.log('render [example]')
   return (
     <ErrorBoundary
       onError={(error, stacktrace) => {

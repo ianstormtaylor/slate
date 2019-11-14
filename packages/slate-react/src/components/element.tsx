@@ -132,17 +132,13 @@ const Element = (props: {
     NODE_TO_PARENT.set(text, element)
   }
 
-  console.log('render (element)')
-
   // Update element-related weak maps with the DOM element ref.
   useLayoutEffect(() => {
     if (ref.current) {
-      console.log('add (element)', key)
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
       ELEMENT_TO_NODE.set(ref.current, element)
     } else {
-      console.log('remove (element)', key)
       KEY_TO_ELEMENT.delete(key)
       NODE_TO_ELEMENT.delete(element)
     }

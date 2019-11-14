@@ -2,7 +2,6 @@ import React from 'react'
 import Link from 'next/link'
 
 const A = React.forwardRef((props, ref) => {
-  console.log(props)
   return <a ref={ref} {...props} />
 })
 

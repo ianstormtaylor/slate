@@ -62,17 +62,13 @@ const Text = (props: {
     )
   }
 
-  console.log('render (text)')
-
   // Update element-related weak maps with the DOM element ref.
   useLayoutEffect(() => {
     if (ref.current) {
-      console.log('add (text)', key)
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(text, ref.current)
       ELEMENT_TO_NODE.set(ref.current, text)
     } else {
-      console.log('remove (text)', key)
       KEY_TO_ELEMENT.delete(key)
       NODE_TO_ELEMENT.delete(text)
     }

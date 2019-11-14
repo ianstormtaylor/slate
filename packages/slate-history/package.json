@@ -1,5 +1,6 @@
 {
   "name": "slate-history",
+  "type": "module",
   "description": "An operation-based history implementation for Slate editors.",
   "version": "0.47.8",
   "license": "MIT",

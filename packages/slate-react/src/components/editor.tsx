@@ -144,11 +144,8 @@ const Editor = (props: {
     }
   }, [])
 
-  console.log('render')
-
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useLayoutEffect(() => {
-    console.log('useLayoutEffect: sync selection')
     const { selection } = value
     const domSelection = window.getSelection()
 
@@ -168,7 +165,6 @@ const Editor = (props: {
     }
 
     state.isUpdatingSelection = true
-    console.log('updating domSelection')
     domSelection.removeAllRanges()
 
     if (newDomRange) {
@@ -203,7 +199,6 @@ const Editor = (props: {
       }
     ) => {
       if (!readOnly && hasEditableTarget(editor, event.target)) {
-        console.log('beforeinput', event)
         const { inputType } = event
 
         // These two types occur while a user is composing text and can't be
@@ -250,7 +245,6 @@ const Editor = (props: {
   // where another change happens while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     debounce(() => {
-      console.log('selectionchange')
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
         const el = editor.toDomNode(value)
@@ -273,7 +267,6 @@ const Editor = (props: {
           hasEditableTarget(editor, domRange.endContainer)
         ) {
           const range = editor.toSlateRange(domRange)
-          console.log('select', domRange, range)
           editor.select(range)
         } else {
           editor.deselect()
