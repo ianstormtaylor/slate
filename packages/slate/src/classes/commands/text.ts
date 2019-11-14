@@ -154,7 +154,6 @@ class DeletingCommands {
     } = {}
   ) {
     this.withoutNormalizing(() => {
-      debugger
       let { at = this.value.selection } = options
       const { hanging = false } = options
 
