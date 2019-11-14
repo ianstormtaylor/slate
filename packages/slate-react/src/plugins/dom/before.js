@@ -478,6 +478,10 @@ function BeforePlugin() {
     return null
   }
 
+  function isInCompositionMode() {
+    return isComposing
+  }
+
   /**
    * Return the plugin.
    *
@@ -504,7 +508,7 @@ function BeforePlugin() {
     onKeyDown,
     onPaste,
     onSelect,
-    queries: { userActionPerformed },
+    queries: { userActionPerformed, isInCompositionMode },
     commands: { clearUserActionPerformed },
   }
 }

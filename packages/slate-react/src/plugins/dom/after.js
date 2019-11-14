@@ -60,7 +60,11 @@ function AfterPlugin(options = {}) {
         const window = getWindow(event.target)
         const domSelection = window.getSelection()
 
-        if (!domSelection.isCollapsed && value.selection.isCollapsed) {
+        if (
+          !domSelection.isCollapsed &&
+          value.selection.isCollapsed &&
+          !editor.isInCompositionMode()
+        ) {
           const range = editor.findRange(domSelection)
           editor.insertTextAtRange(range, event.data)
         } else {
