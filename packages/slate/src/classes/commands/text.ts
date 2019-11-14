@@ -1,14 +1,5 @@
-import {
-  Editor,
-  Element,
-  Fragment,
-  Path,
-  Location,
-  Range,
-  Point,
-  Value,
-} from '../..'
-import { Node, NodeEntry } from '../../interfaces/node'
+import { Editor, Element, Path, Location, Range, Point, Value } from '../..'
+import { Node, NodeEntry, Descendant } from '../../interfaces/node'
 import { Mark } from '../../interfaces/mark'
 import { Text } from '../../interfaces/text'
 
@@ -156,17 +147,18 @@ class DeletingCommands {
 
   insertFragment(
     this: Editor,
-    fragment: Fragment,
+    fragment: Node[],
     options: {
       at?: Location
       hanging?: boolean
     } = {}
   ) {
     this.withoutNormalizing(() => {
+      debugger
       let { at = this.value.selection } = options
       const { hanging = false } = options
 
-      if (!fragment.nodes.length) {
+      if (!fragment.length) {
         return
       }
 
@@ -193,6 +185,8 @@ class DeletingCommands {
         return
       }
 
+      // If the insert point is at the edge of an inline node, move it outside
+      // instead since it will need to be split otherwise.
       let inlineElementMatch = this.getMatch(at, 'inline-element')
 
       if (inlineElementMatch) {
@@ -213,8 +207,8 @@ class DeletingCommands {
       const isBlockEnd = this.isEnd(at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
-      const [, firstPath] = Node.first(fragment, [])
-      const [, lastPath] = Node.last(fragment, [])
+      const [, firstPath] = Node.first({ nodes: fragment }, [])
+      const [, lastPath] = Node.last({ nodes: fragment }, [])
 
       // TODO: convert into a proper `Nodes.matches` iterable
       const matches: NodeEntry[] = []
@@ -243,12 +237,13 @@ class DeletingCommands {
         return true
       }
 
-      for (const entry of Node.nodes(fragment, { pass: matcher })) {
-        if (matcher(entry)) {
+      for (const entry of Node.nodes({ nodes: fragment }, { pass: matcher })) {
+        if (entry[1].length > 0 && matcher(entry)) {
           matches.push(entry)
         }
       }
 
+      debugger
       const starts = []
       const middles = []
       const ends = []

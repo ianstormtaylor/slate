@@ -6,8 +6,8 @@ export const run = editor => {
   editor.insertFragment(
     <fragment>
       <mark a>one</mark>
-      <mark b>one</mark>
-      <mark c>one</mark>
+      <mark b>two</mark>
+      <mark c>three</mark>
     </fragment>
   )
 }

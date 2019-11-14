@@ -1,16 +1,20 @@
-import { Fragment, Range as SlateRange, Node as SlateNode } from 'slate'
+import {
+  Range as SlateRange,
+  Node as SlateNode,
+  Descendant as SlateDescendant,
+} from 'slate'
 
 import { ReactEditor } from '../plugin'
 import { isDOMText, isDOMElement, DOMNode } from './dom'
 
 namespace Utils {
   /**
-   * Get the `Fragment` data from a `DataTransfer` object.
+   * Get the fragment data from a `DataTransfer` object.
    */
 
   export const getFragmentData = (
     dataTransfer: DataTransfer
-  ): Fragment | undefined => {
+  ): SlateDescendant[] | undefined => {
     const base64 = dataTransfer.getData('application/x-slate-fragment')
 
     if (base64) {

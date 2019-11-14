@@ -3,7 +3,7 @@
 import { jsx } from '../../../helpers'
 
 export const run = editor => {
-  editor.insertFragment(<block>fragment</block>)
+  editor.insertFragment(<fragment>fragment</fragment>)
 }
 
 export const input = (

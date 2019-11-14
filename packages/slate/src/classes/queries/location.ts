@@ -17,12 +17,11 @@ import {
   Path,
   Point,
   Range,
-  Fragment,
   Span,
   Text,
   TextEntry,
-  Value,
 } from '../..'
+import { Descendant } from '../../interfaces/node'
 
 class LocationQueries {
   /**
@@ -291,7 +290,7 @@ class LocationQueries {
    * Get the fragment at a location.
    */
 
-  getFragment(this: Editor, at: Location): Fragment {
+  getFragment(this: Editor, at: Location): Descendant[] {
     const range = this.getRange(at)
     const fragment = Node.fragment(this.value, range)
     return fragment

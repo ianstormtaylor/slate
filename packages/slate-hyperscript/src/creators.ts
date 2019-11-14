@@ -1,7 +1,6 @@
 import {
   Element,
   Descendant,
-  Fragment,
   Mark,
   Node,
   Path,
@@ -165,15 +164,15 @@ export function createFocus(
 }
 
 /**
- * Create an `Fragment` object.
+ * Create a fragment.
  */
 
 export function createFragment(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Fragment {
-  return { nodes: resolveDescendants(children) }
+): Descendant[] {
+  return resolveDescendants(children)
 }
 
 /**

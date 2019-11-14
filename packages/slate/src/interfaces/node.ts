@@ -2,7 +2,6 @@ import { produce } from 'immer'
 import {
   Element,
   ElementEntry,
-  Fragment,
   MarkEntry,
   Path,
   Range,
@@ -198,7 +197,7 @@ export namespace Node {
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  export const fragment = (root: Node, range: Range): Fragment => {
+  export const fragment = (root: Node, range: Range): Descendant[] => {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -207,7 +206,7 @@ export namespace Node {
       )
     }
 
-    return produce(root, r => {
+    const newRoot = produce(root, r => {
       const [start, end] = Range.edges(range)
       const iterable = Node.nodes(r, {
         reverse: true,
@@ -235,6 +234,8 @@ export namespace Node {
       delete r.annotations
       delete r.selection
     })
+
+    return newRoot.nodes
   }
 
   /**
