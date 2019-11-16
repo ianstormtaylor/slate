@@ -20,7 +20,7 @@
     "open": "open http://localhost:3000",
     "release": "yarn build:production && yarn test && yarn lint && lerna publish",
     "serve": "cd ./site && next",
-    "start": "npm-run-all --parallel --print-label watch server",
+    "start": "npm-run-all --parallel --print-label watch serve",
     "test": "cross-env BABEL_ENV=test FORBID_WARNINGS=true mocha --require ./config/babel/register ./packages/*/test/index.js",
     "test:debug": "cross-env BABEL_ENV=test FORBID_WARNINGS=true mocha debug --require ./config/babel/register ./packages/*/test/index.js",
     "watch": "yarn build --watch"

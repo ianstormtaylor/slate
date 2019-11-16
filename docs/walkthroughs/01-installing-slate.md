@@ -3,97 +3,92 @@
 Slate is a monorepo divided up into multi npm packages, so to install it you do:
 
 ```
-npm install slate slate-react
+yarn add slate slate-react
 ```
 
 You'll also need to be sure to install Slate's peer dependencies:
 
 ```
-npm install react react-dom immutable
+yarn add react react-dom
 ```
 
-_Note, if you'd rather use a pre-bundled version of Slate, you can `npm install slate` and retrieve the bundled `dist/slate.js` file! Check out the [Using the Bundled Source](./using-the-bundled-source.md) guide for more information._
+_Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add slate` and retrieve the bundled `dist/slate.js` file! Check out the [Using the Bundled Source](./using-the-bundled-source.md) guide for more information._
 
 Once you've installed Slate, you'll need to import it.
 
 Slate exposes a set of modules that you'll use to build your editor. The most important of which is an `Editor` component.
 
 ```js
-// Import the Slate editor.
-import { Editor } from 'slate-react'
+// Import the Slate editable component.
+import { Editable } from 'slate-react'
 ```
 
-In addition to rendering the editor, you need to give Slate a "initial value" to render as content. We'll use the `Value` model that ships with Slate to create a new initial value that just contains a single paragraph block with some text in it:
+The `<Editable>` component acts like `contenteditable`.
+
+In addition to rendering the editable, you need to give Slate a "initial value" to render as content. That value is just plain JSON, and we'll set an initial one that contains a single paragraph block with some text in it:
 
 ```js
 // Import the `Value` model.
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Editable } from 'slate-react'
 
 // Create our initial value...
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text: 'A line of text in a paragraph.',
-          },
-        ],
-      },
-    ],
-  },
-})
-```
-
-And now that we've created our initial value, we define our `App` and pass it into Slate's `Editor` component, like so:
-
-```js
-// Import React!
-import React from 'react'
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
-
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text: 'A line of text in a paragraph.',
-          },
-        ],
-      },
-    ],
-  },
-})
-
-// Define our app...
-class App extends React.Component {
-  // Set the initial value when the app is first constructed.
-  state = {
-    value: initialValue,
-  }
-
-  // On change, update the app's React state with the new editor value.
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  // Render the editor.
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: [
+    {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'A line of text in a paragraph.',
+          marks: [],
+        },
+      ],
+    },
+  ],
 }
 ```
 
-You'll notice that the `onChange` handler passed into the `Editor` component just updates the app's state with the newest changed value. That way, when it re-renders the editor, the new value is reflected with your changes.
+And now that we've created our initial value, we define our `<App>` and pass it into Slate's `<Editable>` component, like so:
+
+```js
+// Import React!
+import React, { useState } from 'react'
+import { Editable } from 'slate-react'
+
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: [
+    {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'A line of text in a paragraph.',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
+
+// Define our app...
+const App = () => {
+  // Set the initial value when the app is first constructed.
+  const [value, setValue] = useState(initialValue)
+
+  // Render the editable component.
+  return (
+    <Editable
+      value={value}
+      // On change, update the state with the new value.
+      onChange={newValue => setValue(newValue)}
+    />
+  )
+}
+```
+
+You'll notice that the `onChange` handler passed into the `<Editable>` component just updates the app's state with the newest changed value. That way, when it re-renders the editor, the new value is reflected with your changes.
 
 And that's it!
 

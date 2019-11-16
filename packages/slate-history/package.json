@@ -18,6 +18,10 @@
     "immer": "^4.0.1",
     "is-plain-object": "^2.0.4"
   },
+  "devDependencies": {
+    "slate": "^0.47.8",
+    "slate-hyperscript": "^0.13.8"
+  },
   "peerDependencies": {
     "slate": ">=0.50.0"
   },

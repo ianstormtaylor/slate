@@ -6,7 +6,7 @@ import {
   Range as SlateRange,
   Operation,
 } from 'slate'
-import debounce from 'just-debounce'
+import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
@@ -200,6 +200,7 @@ const Editor = (props: {
     ) => {
       if (!readOnly && hasEditableTarget(editor, event.target)) {
         const { inputType } = event
+        const data = event.dataTransfer || event.data || undefined
 
         // These two types occur while a user is composing text and can't be
         // cancelled. Let them through and wait for the composition to end.
@@ -211,38 +212,24 @@ const Editor = (props: {
         }
 
         const [targetRange] = event.getTargetRanges()
+        let range
 
-        if (
-          targetRange &&
-          // COMPAT: We ignore setting the range in simple deleting cases
-          // because plugins need to know where the cursor was, and the DOM API
-          // will end up selecting the range to be deleted instead. (2019/11/10)
-          inputType !== 'deleteContent' &&
-          inputType !== 'deleteContentBackward' &&
-          inputType !== 'deleteContentForward' &&
-          inputType !== 'deleteEntireSoftLine' &&
-          inputType !== 'deleteHardLineBackward' &&
-          inputType !== 'deleteHardLineForward' &&
-          inputType !== 'deleteSoftLineBackward' &&
-          inputType !== 'deleteSoftLineForward' &&
-          inputType !== 'deleteWordBackward' &&
-          inputType !== 'deleteWordForward'
-        ) {
-          const range = editor.toSlateRange(targetRange)
-          editor.select(range)
+        if (targetRange) {
+          range = editor.toSlateRange(targetRange)
         }
 
         event.preventDefault()
-        editor.onBeforeInput(event)
+        editor.handleInput(inputType, data, range)
       }
     },
     []
   )
 
-  // On native `selectionchange` event, trigger the `onSelect` handler. This is
-  // needed to account for React's `onSelect` being non-standard and not firing
-  // until after a selection has been released. This causes issues in situations
-  // where another change happens while a selection is being dragged.
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React's `onSelect` is leaky
+  // and non-standard so it doesn't fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     debounce(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
@@ -287,6 +274,11 @@ const Editor = (props: {
             data-gramm={false}
             role={readOnly ? undefined : 'textbox'}
             {...attributes}
+            // COMPAT: Firefox doesn't support the `beforeinput` event, so we'd
+            // have to use hacks to make these replacement-based features work.
+            spellCheck={IS_FIREFOX ? undefined : attributes.spellCheck}
+            autoCorrect={IS_FIREFOX ? undefined : attributes.autoCorrect}
+            autoCapitalize={IS_FIREFOX ? undefined : attributes.autoCapitalize}
             data-slate-editor
             data-slate-node="value"
             contentEditable={readOnly ? undefined : true}
@@ -302,6 +294,16 @@ const Editor = (props: {
               // Allow for passed-in styles to override anything.
               ...style,
             }}
+            onBeforeInput={useCallback((event: React.SyntheticEvent) => {
+              // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+              // fall back to React's leaky polyfill instead just for it. It
+              // only works for the `insertText` input type.
+              if (IS_FIREFOX && !readOnly) {
+                event.preventDefault()
+                const text = (event as any).data as string
+                editor.handleInput('insertText', text)
+              }
+            }, [])}
             onBlur={useCallback((event: React.FocusEvent) => {
               if (
                 !readOnly &&
@@ -451,6 +453,18 @@ const Editor = (props: {
                 editor.onKeyDown(event.nativeEvent)
               }
             }}
+            onPaste={useCallback((event: React.ClipboardEvent) => {
+              // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+              // fall back to React's `onPaste` here instead.
+              if (
+                IS_FIREFOX &&
+                !readOnly &&
+                hasEditableTarget(editor, event.target)
+              ) {
+                event.preventDefault()
+                editor.handleInput('insertFromPaste', event.clipboardData)
+              }
+            }, [])}
           >
             <Children
               annotations={value.annotations}

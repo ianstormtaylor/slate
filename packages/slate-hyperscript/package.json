@@ -17,11 +17,11 @@
   "dependencies": {
     "is-plain-object": "^2.0.4"
   },
-  "peerDependencies": {
-    "slate": ">=0.50.0"
-  },
   "devDependencies": {
     "slate": "^0.47.8"
+  },
+  "peerDependencies": {
+    "slate": ">=0.50.0"
   },
   "umdGlobals": {
     "slate": "Slate"

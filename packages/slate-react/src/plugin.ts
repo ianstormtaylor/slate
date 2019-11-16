@@ -172,6 +172,92 @@ export const withReact = (Editor: new (...args: any[]) => Editor) => {
     }
 
     /**
+     * Transform an `InputEvent` into commands on the editor.
+     */
+
+    handleInput(
+      type: string,
+      data?: DataTransfer | string,
+      range?: SlateRange
+    ): void {
+      // Each of these input types reflects specific user intent, and most of them
+      // are cancellable so we can perform the action on the Slate model direclty.
+      // https://w3c.github.io/input-events/#dom-inputevent-inputtype
+      switch (type) {
+        case 'deleteByComposition':
+        case 'deleteByCut':
+        case 'deleteByDrag':
+        case 'deleteContent':
+        case 'deleteContentForward': {
+          this.delete()
+          break
+        }
+
+        case 'deleteContentBackward': {
+          this.delete({ reverse: true })
+          break
+        }
+
+        case 'deleteEntireSoftLine': {
+          this.delete({ unit: 'line', reverse: true })
+          this.delete({ unit: 'line' })
+          break
+        }
+
+        case 'deleteSoftLineBackward':
+        case 'deleteHardLineBackward': {
+          this.delete({ unit: 'line', reverse: true })
+          break
+        }
+
+        case 'deleteSoftLineForward':
+        case 'deleteHardLineForward': {
+          this.delete({ unit: 'line' })
+          break
+        }
+
+        case 'deleteWordBackward': {
+          this.delete({ unit: 'word', reverse: true })
+          break
+        }
+
+        case 'deleteWordForward': {
+          this.delete({ unit: 'word' })
+          break
+        }
+
+        case 'insertLineBreak':
+        case 'insertParagraph': {
+          if (range) {
+            this.select(range)
+          }
+
+          this.splitNodes({ always: true })
+          break
+        }
+
+        case 'insertFromComposition':
+        case 'insertFromDrop':
+        case 'insertFromPaste':
+        case 'insertFromYank':
+        case 'insertReplacementText':
+        case 'insertText': {
+          if (range) {
+            this.select(range)
+          }
+
+          if (data instanceof DataTransfer) {
+            this.insertData(data)
+          } else if (typeof data === 'string') {
+            this.insertText(data)
+          }
+
+          break
+        }
+      }
+    }
+
+    /**
      * Check if the editor is focused.
      */
 

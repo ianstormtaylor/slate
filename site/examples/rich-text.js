@@ -59,6 +59,7 @@ const RichTextExample = () => {
   const editor = useSlate(RichTextEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
+  console.log('render', value)
   return (
     <div>
       <Toolbar>
