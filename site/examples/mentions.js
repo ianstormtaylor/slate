@@ -29,32 +29,32 @@ class MentionEditor extends withHistory(withReact(Editor)) {
     const mention = { type: 'mention', id, children: [{ text: '', marks: [] }] }
     this.insertNodes(mention)
   }
-
-  promptMention() {
-    const name = window.prompt('Who would you like to mention?')
-    if (!name) return
-    const regex = new RegExp(`^${name}`, 'i')
-    const match = Object.entries(USERS).find(([, name]) => regex.test(name))
-    const id = match ? match[0] : 57
-    this.insertMention(id)
-  }
-
-  onKeyDown(event) {
-    if (event.key === '@') {
-      this.promptMention()
-    } else {
-      super.onKeyDown(event)
-    }
-  }
 }
 
 const MentionExample = () => {
   const [value, setValue] = useState(initialValue)
   const editor = useSlate(MentionEditor)
+  const promptMention = () => {
+    const name = window.prompt('Who would you like to mention?')
+    if (!name) return
+    const regex = new RegExp(`^${name}`, 'i')
+    const match = Object.entries(USERS).find(([, name]) => regex.test(name))
+    const id = match ? match[0] : 57
+    editor.insertMention(id)
+  }
+
   return (
     <div>
       <Toolbar>
-        <MentionButton editor={editor} />
+        <Button
+          active={editor.isMentionActive()}
+          onMouseDown={event => {
+            event.preventDefault()
+            promptMention()
+          }}
+        >
+          <Icon>person_pin</Icon>
+        </Button>
       </Toolbar>
       <Editable
         placeholder="Enter some text..."
@@ -62,22 +62,14 @@ const MentionExample = () => {
         value={value}
         renderElement={props => <Element {...props} />}
         onChange={v => setValue(v)}
+        onKeyDown={event => {
+          if (event.key === '@') {
+            event.preventDefault()
+            promptMention()
+          }
+        }}
       />
     </div>
-  )
-}
-
-const MentionButton = ({ editor }) => {
-  return (
-    <Button
-      active={editor.isMentionActive()}
-      onMouseDown={event => {
-        event.preventDefault()
-        editor.promptMention()
-      }}
-    >
-      <Icon>person_pin</Icon>
-    </Button>
   )
 }
 

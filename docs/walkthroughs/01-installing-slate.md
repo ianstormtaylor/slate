@@ -16,9 +16,12 @@ _Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add sla
 
 Once you've installed Slate, you'll need to import it.
 
-Slate exposes a set of modules that you'll use to build your editor. The most important of which is an `Editor` component.
+Slate exposes a set of modules that you'll use to build your editor. The most important of which are the `Editor` class and the `<Editable>` component.
 
 ```js
+// Import the Slate editor class.
+import { Editor } from 'slate'
+
 // Import the Slate editable component.
 import { Editable } from 'slate-react'
 ```
@@ -28,9 +31,6 @@ The `<Editable>` component acts like `contenteditable`.
 In addition to rendering the editable, you need to give Slate a "initial value" to render as content. That value is just plain JSON, and we'll set an initial one that contains a single paragraph block with some text in it:
 
 ```js
-// Import the `Value` model.
-import { Editable } from 'slate-react'
-
 // Create our initial value...
 const initialValue = {
   selection: null,
@@ -49,12 +49,12 @@ const initialValue = {
 }
 ```
 
-And now that we've created our initial value, we define our `<App>` and pass it into Slate's `<Editable>` component, like so:
+And now that we've created our initial value, we define our `<App>`, initialize a new `Editor` instance and pass it into Slate's `<Editable>` component, like so:
 
 ```js
-// Import React!
 import React, { useState } from 'react'
-import { Editable } from 'slate-react'
+import { Editor } from 'slate'
+import { Editable, useSlate } from 'slate-react'
 
 const initialValue = {
   selection: null,
@@ -77,11 +77,14 @@ const App = () => {
   // Set the initial value when the app is first constructed.
   const [value, setValue] = useState(initialValue)
 
+  // Create an instance of a Slate editor using the `useSlate` hook.
+  const editor = useSlate(Editor)
+
   // Render the editable component.
   return (
     <Editable
+      editor={editor}
       value={value}
-      // On change, update the state with the new value.
       onChange={newValue => setValue(newValue)}
     />
   )

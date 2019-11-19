@@ -1,4 +1,5 @@
 import React from 'react'
+import ReactDOM from 'react-dom'
 import { cx, css } from 'emotion'
 
 export const Button = React.forwardRef(
@@ -119,6 +120,10 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
     )}
   />
 ))
+
+export const Portal = ({ children }) => {
+  return ReactDOM.createPortal(children, document.body)
+}
 
 export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
   <Menu

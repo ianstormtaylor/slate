@@ -13,48 +13,38 @@ Let's use the `onKeyDown` handler to change the editor's content when we press a
 Here's our app from earlier:
 
 ```js
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    />
+  )
 }
 ```
 
 Now we add an `onKeyDown` handler:
 
 ```js
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  // Define a new handler which prints the key that was pressed.
-  onKeyDown = (event, editor, next) => {
-    console.log(event.key)
-    return next()
-  }
-
-  render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-        onKeyDown={this.onKeyDown}
-      />
-    )
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+      // Define a new handler which prints the key that was pressed.
+      onKeyDown={event => {
+        console.log(event.key)
+      }}
+    />
+  )
 }
 ```
 
@@ -65,35 +55,25 @@ Now we want to make it actually change the content. For the purposes of our exam
 Our `onKeyDown` handler might look like this:
 
 ```js
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  onKeyDown = (event, editor, next) => {
-    // Return with no changes if the keypress is not '&'
-    if (event.key !== '&') return next()
-
-    // Prevent the ampersand character from being inserted.
-    event.preventDefault()
-
-    // Change the value by inserting 'and' at the cursor's position.
-    editor.insertText('and')
-  }
-
-  render() {
-    return (
-      <Editor
-        value={this.state.value}
-        onChange={this.onChange}
-        onKeyDown={this.onKeyDown}
-      />
-    )
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+      onKeyDown={event => {
+        if (event.key === '&') {
+          // Prevent the ampersand character from being inserted.
+          event.preventDefault()
+          // Change the value by inserting 'and' at the cursor's position.
+          editor.insertText('and')
+        }
+      }}
+    />
+  )
 }
 ```
 

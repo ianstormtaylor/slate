@@ -1,11 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
-import ReactDOM from 'react-dom'
 import { Editable, withReact, useSlate } from 'slate-react'
 import { Editor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
-import { Button, Icon, Menu } from '../components'
+import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 class HoveringMenuEditor extends withHistory(withReact(Editor)) {
@@ -92,8 +91,6 @@ const HoveringMenuExample = () => {
     </div>
   )
 }
-
-const Portal = ({ children }) => ReactDOM.createPortal(children, document.body)
 
 const Mark = ({ attributes, children, mark }) => {
   switch (mark.type) {

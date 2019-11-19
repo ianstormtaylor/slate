@@ -354,6 +354,8 @@ class DeletingCommands {
 
   /**
    * Remove a string of text in the editor.
+   *
+   * TODO!
    */
 
   removeText(

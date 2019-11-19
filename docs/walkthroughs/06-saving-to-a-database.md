@@ -11,38 +11,35 @@ In this guide, we'll show you how to add logic to save your Slate content to a d
 Let's start with a basic editor:
 
 ```js
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import React, { useState } from 'react'
+import { Editor } from 'slate'
+import { Editable, useSlate } from 'slate-react'
 
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
+const App = () => {
+  const editor = useSlate(Editor)
+  const [value, setValue] = useState({
+    selection: null,
+    annotations: {},
+    children: [
       {
-        object: 'block',
         type: 'paragraph',
-        nodes: [
+        children: [
           {
-            object: 'text',
             text: 'A line of text in a paragraph.',
+            marks: [],
           },
         ],
       },
     ],
-  },
-})
+  })
 
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    />
+  )
 }
 ```
 
@@ -50,42 +47,44 @@ That will render a basic Slate editor on your page, and when you type things wil
 
 What we need to do is save the changes you make somewhere. For this example, we'll just be using [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), but it will give you an idea for where you'd need to add your own database hooks.
 
-So, in our `onChange` handler, we need to save the `value`. But the `value` argument that `onChange` receives is an immutable object, so we can't just save it as-is. We need to serialize it to a format we understand first, like JSON!
+So, in our `onChange` handler, we need to save the `value`. But the `value` argument that `onChange` receives is a JSON object with stateful properties like `selection`, so we can't just save it as-is. We need to turn it into a string, and only store what we need—in this case `value.children`.
 
 ```js
-const initialValue = Value.fromJSON({
-  document: {
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        nodes: [
-          {
-            object: 'text',
-            text: 'A line of text in a paragraph.',
-          },
-        ],
-      },
-    ],
-  },
-})
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: [
+    {
+      type: 'paragraph',
+      children: [
+        {
+          text: 'A line of text in a paragraph.',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
 
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    // Save the value to Local Storage.
-    const content = JSON.stringify(value.toJSON())
-    localStorage.setItem('content', content)
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => {
+        // Save the value to Local Storage.
+        const { children } = value
+        const content = JSON.stringify(children)
+        localStorage.setItem('content', content)
 
-    this.setState({ value })
-  }
-
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+        // Continue calling `setValue` so that the editor updates on screen.
+        setValue(newValue)
+      }}
+    />
+  )
 }
 ```
 
@@ -95,41 +94,39 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```js
 // Update the initial content to be pulled from Local Storage if it exists.
-const existingValue = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(
-  existingValue || {
-    document: {
-      nodes: [
+const existingContent = JSON.parse(localStorage.getItem('content'))
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: existingContent || [
+    {
+      type: 'paragraph',
+      children: [
         {
-          object: 'block',
-          type: 'paragraph',
-          nodes: [
-            {
-              object: 'text',
-              text: 'A line of text in a paragraph.',
-            },
-          ],
+          text: 'A line of text in a paragraph.',
+          marks: [],
         },
       ],
     },
-  }
-)
+  ],
+}
 
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    const content = JSON.stringify(value.toJSON())
-    localStorage.setItem('content', content)
-
-    this.setState({ value })
-  }
-
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => {
+        const { children } = value
+        const content = JSON.stringify(children)
+        localStorage.setItem('content', content)
+        setValue(newValue)
+      }}
+    />
+  )
 }
 ```
 
@@ -138,44 +135,43 @@ Now you should be able to save changes across refreshes!
 However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage, this doesn't really matter, but if you're saving things to a database via HTTP request, this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
 
 ```js
-const existingValue = JSON.parse(localStorage.getItem('content'))
-const initialValue = Value.fromJSON(
-  existingValue || {
-    document: {
-      nodes: [
+const existingContent = JSON.parse(localStorage.getItem('content'))
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: existingContent || [
+    {
+      type: 'paragraph',
+      children: [
         {
-          object: 'block',
-          type: 'paragraph',
-          nodes: [
-            {
-              object: 'text',
-              text: 'A line of text in a paragraph.',
-            },
-          ],
+          text: 'A line of text in a paragraph.',
+          marks: [],
         },
       ],
     },
-  }
-)
+  ],
+}
 
-class App extends React.Component {
-  state = {
-    value: initialValue,
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  onChange = ({ value }) => {
-    // Check to see if the document has changed before saving.
-    if (value.document != this.state.value.document) {
-      const content = JSON.stringify(value.toJSON())
-      localStorage.setItem('content', content)
-    }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => {
+        // Check to see if the content has changed before saving.
+        if (newValue.children !== value.children) {
+          const { children } = value
+          const content = JSON.stringify(children)
+          localStorage.setItem('content', content)
+        }
 
-    this.setState({ value })
-  }
-
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+        setValue(newValue)
+      }}
+    />
+  )
 }
 ```
 
@@ -183,42 +179,63 @@ Now your content will be saved only when the content itself changes!
 
 Success—you've got JSON in your database.
 
-But what if you want something other than JSON? Well, you'd need to serialize your value differently. For example, if you want to save your content as plain text instead of JSON, you can use the `Plain` serializer that ships with Slate, like so:
+But what if you want something other than JSON? Well, you'd need to serialize your value differently. For example, if you want to save your content as plain text instead of JSON, we can write some logic to serialize and deserialize plain text values:
 
 ```js
-// Switch to using the Plain serializer.
-import { Editor } from 'slate-react'
-import Plain from 'slate-plain-serializer'
+// Import the `Node` utilities from Slate.
+import { Node } from 'slate'
 
-const existingValue = localStorage.getItem('content')
-const initialValue = Plain.deserialize(
-  existingValue || 'A string of plain text.'
-)
+// Define a serializing function that takes a value object and returns a string.
+const serialize = value => {
+  return (
+    value.children
+      // Return the text content of each paragraph in the value's children/
+      .map(n => Node.text(n))
+      // Join them all with line breaks denoting paragraphs.
+      .join('\n')
+  )
+}
 
-class App extends React.Component {
-  state = {
-    value: initialValue,
+// Define a deserializing function that takes a string and returns a value.
+const deserialize = string => {
+  // Return a value JSON object with children derived by splitting the string.
+  return {
+    selection: null,
+    annotations: {},
+    children: string.split('\n').map(line => {
+      return {
+        type: 'paragraph',
+        children: [{ text: line, marks: [] }],
+      }
+    }),
   }
+}
 
-  onChange = ({ value }) => {
-    if (value.document != this.state.value.document) {
-      const content = Plain.serialize(value)
-      localStorage.setItem('content', content)
-    }
+// Use our deserializing function to read the data from Local Storage.
+const existingContent = localStorage.getItem('content')
+const initialValue = deserialize(existingContent || '')
 
-    this.setState({ value })
-  }
+const App = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useSlate(Editor)
 
-  render() {
-    return <Editor value={this.state.value} onChange={this.onChange} />
-  }
+  return (
+    <Editable
+      editor={editor}
+      value={value}
+      onChange={newValue => {
+        // Serialize the value and save the string value to Local Storage.
+        const content = serialize(newValue)
+        localStorage.setItem('content', content)
+        setValue(newValue)
+      }}
+    />
+  )
 }
 ```
 
 That works! Now you're working with plain text.
 
-However, sometimes you may want something a bit more custom, and a bit more complex... good old fashioned HTML. In that case, check out the next guide...
+You can emulate this strategy for any format you like. You can serialize to HTML, to Markdown, or even to your own custom JSON format that is tailored to your use case.
 
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./saving-and-loading-html-content.md">Saving and Loading HTML Content</a></p>
-<br/>
+> 🤖 Note that even though you _can_ serialize your content however you like, there are tradeoffs. The serialization process has a cost itself, and certain formats may be harder to work with than others. In general we recommend writing your own format only if your use case has a specific need for it. Otherwise, you're often better leaving the data in the format Slate uses.

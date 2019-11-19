@@ -9,7 +9,9 @@ class GeneralQueries {
   createPathRef(
     this: Editor,
     path: Path,
-    options: { affinity?: 'backward' | 'forward' | null } = {}
+    options: {
+      affinity?: 'backward' | 'forward' | null
+    } = {}
   ): PathRef {
     const { affinity = 'forward' } = options
     const ref: PathRef = new PathRef({ path, affinity, editor: this })
@@ -24,7 +26,9 @@ class GeneralQueries {
   createPointRef(
     this: Editor,
     point: Point,
-    options: { affinity?: 'backward' | 'forward' | null } = {}
+    options: {
+      affinity?: 'backward' | 'forward' | null
+    } = {}
   ): PointRef {
     const { affinity = 'forward' } = options
     const ref: PointRef = new PointRef({ point, affinity, editor: this })

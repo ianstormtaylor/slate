@@ -6,6 +6,13 @@ import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
+const MARK_HOTKEYS = {
+  'mod+b': 'bold',
+  'mod+i': 'italic',
+  'mod+u': 'underlined',
+  'mod+`': 'code',
+}
+
 class RichTextEditor extends withHistory(withReact(Editor)) {
   isMarkActive(type) {
     const marks = this.getActiveMarks()
@@ -18,25 +25,6 @@ class RichTextEditor extends withHistory(withReact(Editor)) {
     if (!selection) return false
     const match = this.getMatch(selection, { type })
     return !!match
-  }
-
-  onKeyDown(event) {
-    let type
-
-    if (isHotkey('mod+b', event)) {
-      type = 'bold'
-    } else if (isHotkey('mod+i', event)) {
-      type = 'italic'
-    } else if (isHotkey('mod+u', event)) {
-      type = 'underlined'
-    } else if (isHotkey('mod+`', event)) {
-      type = 'code'
-    } else {
-      return super.onKeyDown(event)
-    }
-
-    event.preventDefault()
-    this.toggleMarks([{ type }])
   }
 
   toggleBlocks(type) {
@@ -93,6 +81,15 @@ const RichTextExample = () => {
         renderElement={renderElement}
         renderMark={renderMark}
         onChange={v => setValue(v)}
+        onKeyDown={event => {
+          for (const hotkey in MARK_HOTKEYS) {
+            if (isHotkey(hotkey, event)) {
+              const type = MARK_HOTKEYS[hotkey]
+              event.preventDefault()
+              editor.toggleMarks([{ type }])
+            }
+          }
+        }}
       />
     </div>
   )
