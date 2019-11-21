@@ -10,6 +10,7 @@ import {
   IS_ANDROID,
   IS_FIREFOX,
   HAS_INPUT_EVENTS_LEVEL_2,
+  IS_CHROME,
 } from 'slate-dev-environment'
 import Hotkeys from 'slate-hotkeys'
 
@@ -463,7 +464,9 @@ class Content extends React.Component {
     // at the end of a block. The selection ends up to the left of the inserted
     // character instead of to the right. This behavior continues even if
     // you enter more than one character. (2019/01/03)
-    if (!IS_ANDROID && handler === 'onSelect' && !this.tmp.isComposing) {
+
+    // isComposing: cherry-pick from a closed PR[https://github.com/ianstormtaylor/slate/pull/2454/], solved the cursor position problem when using IME.
+    if (!IS_ANDROID && !this.tmp.isComposing && handler === 'onSelect') {
       const { editor } = this.props
       const { value } = editor
       const { selection } = value
@@ -472,6 +475,17 @@ class Content extends React.Component {
       const range = editor.findRange(domSelection)
 
       if (range && range.equals(selection.toRange())) {
+        // CHROME:
+        // Every typing will trigger `onSelect`
+        // When typing with IME, the native inputEvent.getTargetRanges() will always return [](seems like a bug in Chrome, Safari is working well),
+        // and with invalid ranges, the onBeforeInput would not insert or update the text and the ranges.
+        // So when using Chrome and with native onBeforeInput event, updateSelection will cause range-conflicts when you are typing some Chinese(or Janpanese,Latin,...) characters.
+        // The cursor will always end up on the left of the last input instead of following the typeing.
+        // P.S. HAS_INPUT_EVENTS_LEVEL_2 is not working well in Chrome now
+        // Chrome suppose to support HAS_INPUT_EVENTS_LEVEL_2
+        // however, <'onbeforeinput' in element> is not working well in some versions(e.g. v78.0.x)
+        // so currently HAS_INPUT_EVENTS_LEVEL_2 is not working exactly quiet well in most versoins of Chrome
+        if (IS_CHROME && HAS_INPUT_EVENTS_LEVEL_2) return
         this.updateSelection()
         return
       }

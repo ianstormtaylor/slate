@@ -108,7 +108,7 @@ function AfterPlugin(options = {}) {
 
         break
       }
-
+      case 'insertFromComposition':
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
@@ -116,6 +116,11 @@ function AfterPlugin(options = {}) {
         // and `dataTransfer` should have the text for the
         // `insertReplacementText` input type, but Safari uses `insertText` for
         // spell check replacements and sets `data` to `null`. (2018/08/09)
+        // `insertFromComposition` input type
+        // when using IME input, Safari will do a `deleteCompositionText` to delete the composition string,
+        // and then do a `insertFromComposition` to input the `converted clause`.
+        // E.G:  '`a'<insertCompositionText> => ''<deleteCompositionText> => 'à'<insertFromComposition>
+        // so, here needs to fixed the `insertFromComposition` to inserted the final `converted clause` in Safari. (2019/11/21)
         const text =
           event.data == null
             ? event.dataTransfer.getData('text/plain')
