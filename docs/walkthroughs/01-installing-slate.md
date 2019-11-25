@@ -19,11 +19,11 @@ Once you've installed Slate, you'll need to import it.
 Slate exposes a set of modules that you'll use to build your editor. The most important of which are the `Editor` class and the `<Editable>` component.
 
 ```js
-// Import the Slate editor class.
-import { Editor } from 'slate'
+// Import the Slate editor factory.
+import { createEditor } from 'slate'
 
-// Import the Slate editable component.
-import { Editable } from 'slate-react'
+// Import the Slate editable component and React plugin.
+import { Editable, withReact } from 'slate-react'
 ```
 
 The `<Editable>` component acts like `contenteditable`.
@@ -52,9 +52,9 @@ const initialValue = {
 And now that we've created our initial value, we define our `<App>`, initialize a new `Editor` instance and pass it into Slate's `<Editable>` component, like so:
 
 ```js
-import React, { useState } from 'react'
-import { Editor } from 'slate'
-import { Editable, useSlate } from 'slate-react'
+import React, { useState, useMemo } from 'react'
+import { createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
 
 const initialValue = {
   selection: null,
@@ -77,8 +77,8 @@ const App = () => {
   // Set the initial value when the app is first constructed.
   const [value, setValue] = useState(initialValue)
 
-  // Create an instance of a Slate editor using the `useSlate` hook.
-  const editor = useSlate(Editor)
+  // Create a Slate editor object that won't change across renders.
+  const editor = useMemo(() => withReact(createEditor()), [])
 
   // Render the editable component.
   return (

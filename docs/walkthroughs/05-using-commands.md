@@ -2,13 +2,13 @@
 <p align="center"><strong>Previous:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
 <br/>
 
-# Using Mixins
+# Using Commands
 
 Up until now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most powerful things about Slate is that it lets you model your specific rich text "domain" however you'd like, and write less one-off code.
 
-In the previous guides we've written some useful code to handle formatting code blocks and bold marks. And we've hooked up the `onKeyDown` handler to invoke that code. But we've always done it using the built-in `Editor` class.
+In the previous guides we've written some useful code to handle formatting code blocks and bold marks. And we've hooked up the `onKeyDown` handler to invoke that code. But we've always done it using the built-in `Editor` helpers directly, instead of using "commands".
 
-Slate lets you augment the built-in `Editor` with your own custom methods. And you can even use pre-packaged "mixins" which add a given set of functionality.
+Slate lets you augment the built-in `editor` object to handle your own custom rich text commands. And you can even use pre-packaged "plugins" which add a given set of functionality.
 
 Let's see how this works.
 
@@ -17,7 +17,7 @@ We'll start with our app from earlier:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -52,10 +52,11 @@ const App = () => {
             event.preventDefault()
             const { selection } = editor.value
             const isCode = selection
-              ? editor.getMatch(selection, { type: 'code' })
+              ? Editor.match(editor, selection, { type: 'code' })
               : false
 
-            editor.setNodes(
+            Editor.setNodes(
+              editor,
               { type: isCode ? null : 'code' },
               { match: 'block' }
             )
@@ -64,7 +65,7 @@ const App = () => {
 
           case 'b': {
             event.preventDefault()
-            editor.toggleMarks([{ type: 'bold' }])
+            Editor.toggleMarks(editor, [{ type: 'bold' }])
             break
           }
         }
@@ -76,16 +77,16 @@ const App = () => {
 
 It has the concept of "code blocks" and "bold marks". But these things are all defined in one-off cases inside the `onKeyDown` handler. If you wanted to reuse that logic elsewhere you'd need to extract it.
 
-We can instead implement these domain-specific concepts on a custom `Editor` subclass:
+We can instead implement these domain-specific concepts by extending the `editor` object:
 
 ```js
-// Create a custom editor class that extends the base editor.
-class CustomEditor extends Editor {}
+// Create a custom editor plugin function that extends the base editor.
+const withCustom = editor => {}
 
 const App = () => {
   const [value, setValue] = useState(initialValue)
   // Pass in the new `CustomEditor` to the `useSlate` hook instead.
-  const editor = useSlate(CustomEditor)
+  const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -120,10 +121,11 @@ const App = () => {
             event.preventDefault()
             const { selection } = editor.value
             const isCode = selection
-              ? editor.getMatch(selection, { type: 'code' })
+              ? Editor.match(editor, selection, { type: 'code' })
               : false
 
-            editor.setNodes(
+            Editor.setNodes(
+              editor,
               { type: isCode ? null : 'code' },
               { match: 'block' }
             )
@@ -132,7 +134,7 @@ const App = () => {
 
           case 'b': {
             event.preventDefault()
-            editor.toggleMarks([{ type: 'bold' }])
+            Editor.toggleMarks(editor, [{ type: 'bold' }])
             break
           }
         }
@@ -142,36 +144,67 @@ const App = () => {
 }
 ```
 
-Since we haven't yet defined (or overridden) any methods on our `CustomEditor`, nothing will change. Our app will still function exactly as it did before.
+Since we haven't yet defined (or overridden) any commands in `withCustom`, nothing will change yet. Our app will still function exactly as it did before.
 
 However, now we can start extract bits of logic into reusable methods:
 
 ```js
-class CustomEditor extends Editor {
-  // Define a method that checks whether a code block is "active"
+const withCustom = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    // Define a command to toggle the bold mark formatting.
+    if (command.type === 'toggle_bold_mark') {
+      const isActive = CustomEditor.isBoldMarkActive(editor)
+      // Delegate to the existing `add_mark` and `remove_mark` commands, so that
+      // other plugins can override them if they need to still.
+      editor.exec({
+        type: isActive ? 'remove_mark' : 'add_mark',
+        mark: { type: 'bold' },
+      })
+    }
+
+    // Define a command to toggle the code block formatting.
+    else if (command.type === 'toggle_code_block') {
+      const isActive = CustomEditor.isCodeBlockActive(editor)
+      // There is no `set_nodes` command, so we can transform the editor
+      // directly using the helper instead.
+      Editor.setNodes(
+        editor,
+        { type: isActive ? null : 'code' },
+        { match: 'block' }
+      )
+    }
+
+    // Otherwise, fall back to the built-in `exec` logic for everything else.
+    else {
+      exec(command)
+    }
+  }
+
+  return editor
+}
+
+// Define our own custom set of helpers for common queries.
+const CustomEditor = {
+  isBoldMarkActive() {
+    const { selection } = this.value
+    const activeMarks = Editor.activeMarks(editor)
+    return activeMarks.some(mark => mark.type === 'bold')
+  },
+
   isCodeBlockActive() {
     const { selection } = this.value
     const isCode = selection
-      ? this.getMatch(selection, { type: 'code' })
+      ? Editor.match(editor, selection, { type: 'code' })
       : false
     return isCode
-  }
-
-  // Define a method that toggle the code block formatting.
-  toggleCodeBlock() {
-    const isActive = this.isCodeBlockActive()
-    this.setNodes({ type: isActive ? null : 'code' }, { match: 'block' })
-  }
-
-  // Define a method specifically for toggling the bold mark formatting.
-  toggleBoldMark() {
-    this.toggleMarks([{ type: 'bold' }])
-  }
+  },
 }
 
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(CustomEditor)
+  const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -196,7 +229,7 @@ const App = () => {
       renderElement={renderElement}
       renderMark={renderMark}
       onChange={newValue => setValue(newValue)}
-      // Replace the `onKeyDown` logic with your new methods.
+      // Replace the `onKeyDown` logic with our new commands.
       onKeyDown={event => {
         if (!event.ctrlKey) {
           return
@@ -205,13 +238,13 @@ const App = () => {
         switch (event.key) {
           case '`': {
             event.preventDefault()
-            editor.toggleCodeBlock()
+            editor.exec({ type: 'toggle_code_block' })
             break
           }
 
           case 'b': {
             event.preventDefault()
-            editor.toggleBoldMark()
+            editor.exec({ type: 'toggle_bold_mark' })
             break
           }
         }
@@ -221,12 +254,12 @@ const App = () => {
 }
 ```
 
-Now your methods are clearly defined and you can invoke them from anywhere you have access to your `editor` instead. For example, from hypothetical toolbar buttons:
+Now our commands are clearly defined and you can invoke them from anywhere we have access to our `editor` object. For example, from hypothetical toolbar buttons:
 
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(CustomEditor)
+  const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -252,14 +285,14 @@ const App = () => {
           text="Bold"
           onMouseDown={event => {
             event.preventDefault()
-            editor.toggleBoldMark()
+            editor.exec({ type: 'toggle_bold_mark' })
           }}
         />
         <Button
           text="Code Block"
           onMouseDown={event => {
             event.preventDefault()
-            editor.toggleCodeBlock()
+            editor.exec({ type: 'toggle_code_block' })
           }}
         />
       </Toolbar>
@@ -277,13 +310,13 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              editor.toggleCodeBlock()
+              editor.exec({ type: 'toggle_code_block' })
               break
             }
 
             case 'b': {
               event.preventDefault()
-              editor.toggleBoldMark()
+              editor.exec({ type: 'toggle_bold_mark' })
               break
             }
           }
@@ -296,7 +329,7 @@ const App = () => {
 
 That's the benefit of extracting the logic.
 
-And you don't necessarily need to define it all in the same class. You can use the "mixin" pattern to add logic to behaviors to an editor from elsewhere.
+And you don't necessarily need to define it all in the same plugin. You can use the plugin pattern to add logic and behaviors to an editor from elsewhere.
 
 For example, you can use the `slate-history` package to add a history stack to your editor, like so:
 
@@ -304,12 +337,13 @@ For example, you can use the `slate-history` package to add a history stack to y
 import { Editor } from 'slate'
 import { withHistory } from 'slate-history'
 
-class CustomEditor extends withHistory(Editor) {
-  // Your custom logic here...
-}
+const editor = useMemo(
+  () => withCustom(withHistory(withReact(createEditor()))),
+  []
+)
 ```
 
-And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our mark hotkey logic tested and isolated in a single place, making the code easier to maintain.
+And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our command logic tested and isolated in a single place, making the code easier to maintain.
 
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
 

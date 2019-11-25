@@ -12,27 +12,27 @@ Let's start with a basic editor:
 
 ```js
 import React, { useState } from 'react'
-import { Editor } from 'slate'
-import { Editable, useSlate } from 'slate-react'
+import { createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
+
+const initialValue = {
+  selection: null,
+  annotations: {},
+  children: [
+    {
+      children: [
+        {
+          text: 'A line of text in a paragraph.',
+          marks: [],
+        },
+      ],
+    },
+  ],
+}
 
 const App = () => {
-  const editor = useSlate(Editor)
-  const [value, setValue] = useState({
-    selection: null,
-    annotations: {},
-    children: [
-      {
-        type: 'paragraph',
-        children: [
-          {
-            text: 'A line of text in a paragraph.',
-            marks: [],
-          },
-        ],
-      },
-    ],
-  })
-
+  const editor = useMemo(() => withReact(createEditor()), [])
+  const [value, setValue] = useState(initialValue)
   return (
     <Editable
       editor={editor}
@@ -55,7 +55,6 @@ const initialValue = {
   annotations: {},
   children: [
     {
-      type: 'paragraph',
       children: [
         {
           text: 'A line of text in a paragraph.',
@@ -67,9 +66,8 @@ const initialValue = {
 }
 
 const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
   return (
     <Editable
       editor={editor}
@@ -100,7 +98,6 @@ const initialValue = {
   annotations: {},
   children: existingContent || [
     {
-      type: 'paragraph',
       children: [
         {
           text: 'A line of text in a paragraph.',
@@ -112,9 +109,8 @@ const initialValue = {
 }
 
 const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
   return (
     <Editable
       editor={editor}
@@ -141,7 +137,6 @@ const initialValue = {
   annotations: {},
   children: existingContent || [
     {
-      type: 'paragraph',
       children: [
         {
           text: 'A line of text in a paragraph.',
@@ -153,9 +148,8 @@ const initialValue = {
 }
 
 const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
   return (
     <Editable
       editor={editor}
@@ -189,7 +183,7 @@ import { Node } from 'slate'
 const serialize = value => {
   return (
     value.children
-      // Return the text content of each paragraph in the value's children/
+      // Return the text content of each paragraph in the value's children.
       .map(n => Node.text(n))
       // Join them all with line breaks denoting paragraphs.
       .join('\n')
@@ -204,7 +198,6 @@ const deserialize = string => {
     annotations: {},
     children: string.split('\n').map(line => {
       return {
-        type: 'paragraph',
         children: [{ text: line, marks: [] }],
       }
     }),
@@ -216,9 +209,8 @@ const existingContent = localStorage.getItem('content')
 const initialValue = deserialize(existingContent || '')
 
 const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
   return (
     <Editable
       editor={editor}

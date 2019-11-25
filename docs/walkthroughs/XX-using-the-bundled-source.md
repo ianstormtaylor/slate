@@ -22,13 +22,12 @@ node_modules/
 
 A minified version called `slate.min.js` is also included for convenience.
 
-Before you can add `slate.js` to your page, you need to bring your own copy of `immutable`, `react`, `react-dom` and `react-dom-server`, like so:
+Before you can add `slate.js` to your page, you need to bring your own copy of `react`, `react-dom` and `react-dom-server`, like so:
 
 ```html
 <script src="./vendor/react.js"></script>
 <script src="./vendor/react-dom.js"></script>
 <script src="./vendor/react-dom-server.js"></script>
-<script src="./vendor/immutable.js"></script>
 ```
 
 This ensures that Slate isn't bundling its own copy of Immutable and React, which would greatly increase the file size of your application.
@@ -45,7 +44,6 @@ To make things easier, for quick prototyping, you can also use the [`unpkg.com`]
 <script src="https://unpkg.com/react/umd/react.production.min.js"></script>
 <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
 <script src="https://unpkg.com/react-dom/umd/react-dom-server.browser.production.min.js"></script>
-<script src="https://unpkg.com/immutable/dist/immutable.js"></script>
 <script src="https://unpkg.com/slate/dist/slate.js"></script>
 <script src="https://unpkg.com/slate-react/dist/slate-react.js"></script>
 ```

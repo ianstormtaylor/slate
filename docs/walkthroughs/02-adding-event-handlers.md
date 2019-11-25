@@ -15,8 +15,7 @@ Here's our app from earlier:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
       editor={editor}
@@ -32,8 +31,7 @@ Now we add an `onKeyDown` handler:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
       editor={editor}
@@ -57,8 +55,7 @@ Our `onKeyDown` handler might look like this:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
       editor={editor}
@@ -68,8 +65,8 @@ const App = () => {
         if (event.key === '&') {
           // Prevent the ampersand character from being inserted.
           event.preventDefault()
-          // Change the value by inserting 'and' at the cursor's position.
-          editor.insertText('and')
+          // Execute a command to insert text when the event occurs.
+          editor.exec({ type: 'insert_text', text: 'and' })
         }
       }}
     />

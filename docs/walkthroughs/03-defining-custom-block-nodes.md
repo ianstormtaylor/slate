@@ -13,8 +13,7 @@ We'll show you how. Let's start with our app from earlier:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
-
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
       editor={editor}
@@ -23,7 +22,7 @@ const App = () => {
       onKeyDown={event => {
         if (event.key === '&') {
           event.preventDefault()
-          editor.insertText('and')
+          editor.exec({ type: 'insert_text', text: 'and' })
         }
       }}
     />
@@ -67,7 +66,7 @@ Now, let's add that renderer to our `Editor`:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
 
   // Define a rendering function based on the element passed to `props`. We use
   // `useCallback` here to memoize the function for subsequent renders.
@@ -90,7 +89,7 @@ const App = () => {
       onKeyDown={event => {
         if (event.key === '&') {
           event.preventDefault()
-          editor.insertText('and')
+          editor.exec({ type: 'insert_text', text: 'and' })
         }
       }}
     />
@@ -113,9 +112,12 @@ const DefaultElement = props => {
 Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `Ctrl-\`` shortcut that does just that:
 
 ```js
+// Import the `Editor` helpers from Slate.
+import { Editor } from 'slate'
+
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -136,7 +138,7 @@ const App = () => {
           // Prevent the "`" from being inserted by default.
           event.preventDefault()
           // Otherwise, set the currently selected blocks type to "code".
-          editor.setNodes({ type: 'code' }, { match: 'block' })
+          Editor.setNodes(editor, { type: 'code' }, { match: 'block' })
         }
       }}
     />
@@ -163,7 +165,7 @@ But we forgot one thing. When you hit `Ctrl-\`` again, it should change the code
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -185,11 +187,12 @@ const App = () => {
           // Determine whether any of the currently selected blocks are code blocks.
           const { selection } = editor.value
           const isCode = selection
-            ? editor.getMatch(selection, { type: 'code' })
+            ? Editor.match(editor, selection, { type: 'code' })
             : false
 
           // Toggle the block type depending on `isCode`.
-          editor.setNodes(
+          Editor.setNodes(
+            editor,
             { type: isCode ? 'paragraph' : 'code' },
             { match: 'block' }
           )

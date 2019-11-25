@@ -13,7 +13,7 @@ So we start with our app from earlier:
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (prop.element.type) {
       case 'code':
@@ -35,11 +35,15 @@ const App = () => {
           // Determine whether any of the currently selected blocks are code blocks.
           const { selection } = editor.value
           const isCode = selection
-            ? editor.getMatch(selection, { type: 'code' })
+            ? Editor.match(editor, selection, { type: 'code' })
             : false
 
           // Toggle the block type depending on `isCode`.
-          editor.setNodes({ type: isCode ? null : 'code' }, { match: 'block' })
+          Editor.setNodes(
+            editor,
+            { type: isCode ? null : 'code' },
+            { match: 'block' }
+          )
         }
       }}
     />
@@ -52,7 +56,7 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `c
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (prop.element.type) {
       case 'code':
@@ -79,10 +83,11 @@ const App = () => {
             event.preventDefault()
             const { selection } = editor.value
             const isCode = selection
-              ? editor.getMatch(selection, { type: 'code' })
+              ? Editor.match(editor, selection, { type: 'code' })
               : false
 
-            editor.setNodes(
+            Editor.setNodes(
+              editor,
               { type: isCode ? null : 'code' },
               { match: 'block' }
             )
@@ -92,7 +97,7 @@ const App = () => {
           // When "B" is pressed, add a bold mark to the text.
           case 'b': {
             event.preventDefault()
-            editor.toggleMarks([{ type: 'bold' }])
+            Editor.toggleMarks(editor, [{ type: 'bold' }])
             break
           }
         }
@@ -120,7 +125,7 @@ And now, let's tell Slate about that mark. To do that, we'll pass in the `render
 ```js
 const App = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(Editor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -157,10 +162,11 @@ const App = () => {
             event.preventDefault()
             const { selection } = editor.value
             const isCode = selection
-              ? editor.getMatch(selection, { type: 'code' })
+              ? Editor.match(editor, selection, { type: 'code' })
               : false
 
-            editor.setNodes(
+            Editor.setNodes(
+              editor,
               { type: isCode ? null : 'code' },
               { match: 'block' }
             )
@@ -169,7 +175,7 @@ const App = () => {
 
           case 'b': {
             event.preventDefault()
-            editor.toggleMarks([{ type: 'bold' }])
+            Editor.toggleMarks(editor, [{ type: 'bold' }])
             break
           }
         }
