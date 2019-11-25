@@ -1,15 +1,13 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.insertText('t')
-  editor.flush()
-  editor.move({ reverse: true })
-  editor.insertText('w')
-  editor.flush()
-  editor.move({ reverse: true })
-  editor.insertText('o')
+  editor.exec({ type: 'insert_text', text: 't' })
+  // editor.move({ reverse: true })
+  editor.exec({ type: 'insert_text', text: 'w' })
+  // editor.move({ reverse: true })
+  editor.exec({ type: 'insert_text', text: 'o' })
 }
 
 export const input = (

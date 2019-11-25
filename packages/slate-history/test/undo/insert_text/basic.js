@@ -1,9 +1,9 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.insertText('text')
+  editor.exec({ type: 'insert_text', text: 'text' })
 }
 
 export const input = (

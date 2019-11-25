@@ -1,11 +1,9 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.addMarks([{ key: 'a' }])
-  editor.flush()
-  editor.undo()
+  editor.exec({ type: 'add_mark', mark: { key: 'a' } })
 }
 
 export const input = (

@@ -1,22 +1,18 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.wrapNodes(<inline />)
+  editor.exec({ type: 'add_mark', mark: { key: 'a' } })
 }
 
 export const input = (
   <value>
     <block>
-      wo
       <anchor />
-      rd
-    </block>
-    <block>
-      an
+      wo
       <focus />
-      other
+      rd
     </block>
   </value>
 )

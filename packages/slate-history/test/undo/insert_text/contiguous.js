@@ -1,13 +1,11 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.insertText('t')
-  editor.flush()
-  editor.insertText('w')
-  editor.flush()
-  editor.insertText('o')
+  editor.exec({ type: 'insert_text', text: 't' })
+  editor.exec({ type: 'insert_text', text: 'w' })
+  editor.exec({ type: 'insert_text', text: 'o' })
 }
 
 export const input = (

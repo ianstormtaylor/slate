@@ -1,18 +1,18 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.delete()
+  editor.exec({ type: 'add_mark', mark: { key: 'a' } })
 }
 
 export const input = (
   <value>
-    <block a>
+    <block>
       o<anchor />
       ne
     </block>
-    <block b>
+    <block>
       tw
       <focus />o
     </block>
@@ -20,5 +20,3 @@ export const input = (
 )
 
 export const output = input
-
-export const skip = true

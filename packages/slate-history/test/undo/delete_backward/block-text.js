@@ -1,15 +1,19 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.moveNodes({ at: [0], to: [1] })
+  editor.delete()
 }
 
 export const input = (
   <value>
-    <block>one</block>
-    <block>two</block>
+    <block>
+      wo
+      <cursor />
+      rd
+    </block>
   </value>
 )
 

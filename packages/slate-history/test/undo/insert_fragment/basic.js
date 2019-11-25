@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 const fragment = (
   <block type="d">
@@ -22,7 +22,7 @@ const fragment = (
 )
 
 export const run = editor => {
-  editor.insertFragment(fragment)
+  editor.exec({ type: 'insert_fragment', fragment })
 }
 
 export const input = (

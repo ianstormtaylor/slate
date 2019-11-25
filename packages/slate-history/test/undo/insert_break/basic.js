@@ -1,22 +1,20 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.unwrapNodes({ key: 'a' })
-  editor.flush()
-  editor.undo()
+  editor.exec({ type: 'insert_break' })
 }
 
 export const input = (
   <value>
-    <block a>
+    <block>
       <block>
-        <cursor />
-        one
+        on
+        <cursor />e
       </block>
       <block>two</block>
-      <block>three</block>
     </block>
   </value>
 )

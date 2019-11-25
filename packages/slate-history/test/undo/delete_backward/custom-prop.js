@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const run = editor => {
   editor.delete()
@@ -8,15 +9,13 @@ export const run = editor => {
 
 export const input = (
   <value>
-    <block>
-      <mark key="a">
-        on
-        <anchor />e
-      </mark>
-      <mark key="c">
-        tw
-        <focus />o
-      </mark>
+    <block a>
+      o<anchor />
+      ne
+    </block>
+    <block b>
+      tw
+      <focus />o
     </block>
   </value>
 )

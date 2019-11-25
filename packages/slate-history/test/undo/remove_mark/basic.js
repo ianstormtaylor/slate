@@ -1,21 +1,19 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { jsx } from '../..'
 
 export const run = editor => {
-  editor.toggleMarks([{ key: 'a' }])
+  editor.exec({ type: 'remove_mark', mark: { key: true } })
 }
 
 export const input = (
   <value>
     <block>
-      one
-      <mark a>
+      <mark key>
         <anchor />
-        two
+        one
         <focus />
       </mark>
-      three
     </block>
   </value>
 )

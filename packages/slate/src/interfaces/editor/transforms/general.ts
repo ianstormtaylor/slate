@@ -14,7 +14,6 @@ export const GeneralTransforms = {
     } = {}
   ) {
     const { force = false } = options
-    debugger
 
     if (!Editor.isNormalizing(editor)) {
       return
