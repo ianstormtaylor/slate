@@ -52,7 +52,7 @@ export const withReact = (editor: Editor): Editor => {
     apply(op)
 
     for (const [path, key] of matches) {
-      const [node] = Editor.getNode(editor, path)
+      const [node] = Editor.node(editor, path)
       NODE_TO_KEY.set(node, key)
     }
   }

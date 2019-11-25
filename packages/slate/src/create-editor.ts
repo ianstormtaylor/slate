@@ -75,6 +75,7 @@ export const createEditor = (): Editor => {
 
       if (!FLUSHING.get(editor)) {
         FLUSHING.set(editor, true)
+
         Promise.resolve().then(() => {
           FLUSHING.set(editor, false)
           editor.onChange(editor.value, editor.operations)

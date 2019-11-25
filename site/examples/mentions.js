@@ -80,7 +80,7 @@ const withMentions = editor => {
 }
 
 const isMentionActive = editor => {
-  const match = Editor.getMatch(editor, editor.value.selection, {
+  const match = Editor.match(editor, editor.value.selection, {
     type: 'mention',
   })
   return !!match

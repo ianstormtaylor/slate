@@ -40,7 +40,7 @@ export const GeneralTransforms = {
         }
 
         const path = DIRTY_PATHS.get(editor)!.pop()!
-        const entry = Editor.getNode(editor, path)
+        const entry = Editor.node(editor, path)
         editor.normalizeNode(entry)
         m++
       }

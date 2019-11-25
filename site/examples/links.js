@@ -65,7 +65,7 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  return !!Editor.getMatch(editor, { type: 'link' })
+  return !!Editor.match(editor, { type: 'link' })
 }
 
 const unwrapLink = editor => {

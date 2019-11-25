@@ -40,7 +40,7 @@ export const LocationQueries = {
       return
     }
 
-    const range = Editor.getRange(editor, at)
+    const range = Editor.range(editor, at)
 
     for (const key in annotations) {
       const annotation = annotations[key]
@@ -70,7 +70,7 @@ export const LocationQueries = {
       return
     }
 
-    const [from, to] = getSpan(editor, at, options)
+    const [from, to] = toSpan(editor, at, options)
 
     yield* Node.elements(editor.value, {
       ...options,
@@ -94,7 +94,7 @@ export const LocationQueries = {
    * allows for continuation of marks from previous words.
    */
 
-  getActiveMarks(
+  activeMarks(
     editor: Editor,
     options: {
       at?: Location
@@ -109,7 +109,7 @@ export const LocationQueries = {
       return []
     }
 
-    at = Editor.getRange(editor, at)
+    at = Editor.range(editor, at)
 
     if (!hanging) {
       at = Editor.unhangRange(editor, at)
@@ -119,13 +119,13 @@ export const LocationQueries = {
     // over the marks from the previous text node in the same block.
     if (Range.isCollapsed(at) && at.anchor.offset === 0) {
       const { anchor } = at
-      const prev = Editor.getPrevious(editor, anchor, 'text')
+      const prev = Editor.previous(editor, anchor, 'text')
 
       if (prev && Path.isSibling(anchor.path, prev[1])) {
         const [prevNode, prevPath] = prev
 
         if (Text.isText(prevNode)) {
-          at = Editor.getRange(editor, prevPath)
+          at = Editor.range(editor, prevPath)
         }
       }
     }
@@ -171,7 +171,7 @@ export const LocationQueries = {
    * Get the point after a location.
    */
 
-  getAfter(
+  after(
     editor: Editor,
     at: Location,
     options: {
@@ -179,8 +179,8 @@ export const LocationQueries = {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
     } = {}
   ): Point | undefined {
-    const anchor = Editor.getPoint(editor, at, { edge: 'end' })
-    const focus = Editor.getEnd(editor, [])
+    const anchor = Editor.point(editor, at, { edge: 'end' })
+    const focus = Editor.end(editor, [])
     const range = { anchor, focus }
     const { distance = 1 } = options
     let d = 0
@@ -205,7 +205,7 @@ export const LocationQueries = {
    * Get the common ancestor node of a location.
    */
 
-  getAncestor(
+  ancestor(
     editor: Editor,
     at: Location,
     options: {
@@ -214,10 +214,10 @@ export const LocationQueries = {
     } = {}
   ): AncestorEntry {
     if (Path.isPath(at) || Point.isPoint(at)) {
-      return Editor.getParent(editor, at, options)
+      return Editor.parent(editor, at, options)
     }
 
-    const path = Editor.getPath(editor, at, options)
+    const path = Editor.path(editor, at, options)
     const ancestorPath = Path.equals(at.anchor.path, at.focus.path)
       ? Path.parent(path)
       : path
@@ -230,7 +230,7 @@ export const LocationQueries = {
    * Get the point before a location.
    */
 
-  getBefore(
+  before(
     editor: Editor,
     at: Location,
     options: {
@@ -238,8 +238,8 @@ export const LocationQueries = {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
     } = {}
   ): Point | undefined {
-    const anchor = Editor.getStart(editor, [])
-    const focus = Editor.getPoint(editor, at, { edge: 'start' })
+    const anchor = Editor.start(editor, [])
+    const focus = Editor.point(editor, at, { edge: 'start' })
     const range = { anchor, focus }
     const { distance = 1 } = options
     let d = 0
@@ -268,33 +268,33 @@ export const LocationQueries = {
    * Get the start and end points of a location.
    */
 
-  getEdges(editor: Editor, at: Location): [Point, Point] {
-    return [Editor.getStart(editor, at), Editor.getEnd(editor, at)]
+  edges(editor: Editor, at: Location): [Point, Point] {
+    return [Editor.start(editor, at), Editor.end(editor, at)]
   },
 
   /**
    * Get the end point of a location.
    */
 
-  getEnd(editor: Editor, at: Location): Point {
-    return Editor.getPoint(editor, at, { edge: 'end' })
+  end(editor: Editor, at: Location): Point {
+    return Editor.point(editor, at, { edge: 'end' })
   },
 
   /**
    * Get the first node at a location.
    */
 
-  getFirst(editor: Editor, at: Location): NodeEntry {
-    const path = Editor.getPath(editor, at, { edge: 'start' })
-    return Editor.getNode(editor, path)
+  first(editor: Editor, at: Location): NodeEntry {
+    const path = Editor.path(editor, at, { edge: 'start' })
+    return Editor.node(editor, path)
   },
 
   /**
    * Get the fragment at a location.
    */
 
-  getFragment(editor: Editor, at: Location): Descendant[] {
-    const range = Editor.getRange(editor, at)
+  fragment(editor: Editor, at: Location): Descendant[] {
+    const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor.value, range)
     return fragment
   },
@@ -303,16 +303,16 @@ export const LocationQueries = {
    * Get the last node at a location.
    */
 
-  getLast(editor: Editor, at: Location): NodeEntry {
-    const path = Editor.getPath(editor, at, { edge: 'end' })
-    return Editor.getNode(editor, path)
+  last(editor: Editor, at: Location): NodeEntry {
+    const path = Editor.path(editor, at, { edge: 'end' })
+    return Editor.node(editor, path)
   },
 
   /**
    * Get the leaf text node at a location.
    */
 
-  getLeaf(
+  leaf(
     editor: Editor,
     at: Location,
     options: {
@@ -320,7 +320,7 @@ export const LocationQueries = {
       edge?: 'start' | 'end'
     } = {}
   ): TextEntry {
-    const path = Editor.getPath(editor, at, options)
+    const path = Editor.path(editor, at, options)
     const node = Node.leaf(editor.value, path)
     return [node, path]
   },
@@ -329,12 +329,8 @@ export const LocationQueries = {
    * Get the first matching node in a single branch of the document.
    */
 
-  getMatch(
-    editor: Editor,
-    at: Location,
-    match: NodeMatch
-  ): NodeEntry | undefined {
-    const path = Editor.getPath(editor, at)
+  match(editor: Editor, at: Location, match: NodeMatch): NodeEntry | undefined {
+    const path = Editor.path(editor, at)
 
     for (const entry of Editor.levels(editor, { at: path })) {
       if (Editor.isNodeMatch(editor, entry, match)) {
@@ -347,13 +343,9 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  getNext(
-    editor: Editor,
-    at: Location,
-    match: NodeMatch
-  ): NodeEntry | undefined {
-    const [, from] = Editor.getLast(editor, at)
-    const [, to] = Editor.getLast(editor, [])
+  next(editor: Editor, at: Location, match: NodeMatch): NodeEntry | undefined {
+    const [, from] = Editor.last(editor, at)
+    const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
     let i = 0
 
@@ -370,7 +362,7 @@ export const LocationQueries = {
    * Get the node at a location.
    */
 
-  getNode(
+  node(
     editor: Editor,
     at: Location,
     options: {
@@ -378,7 +370,7 @@ export const LocationQueries = {
       edge?: 'start' | 'end'
     } = {}
   ): NodeEntry {
-    const path = Editor.getPath(editor, at, options)
+    const path = Editor.path(editor, at, options)
     const node = Node.get(editor.value, path)
     return [node, path]
   },
@@ -387,7 +379,7 @@ export const LocationQueries = {
    * Get the parent node of a location.
    */
 
-  getParent(
+  parent(
     editor: Editor,
     at: Location,
     options: {
@@ -395,9 +387,9 @@ export const LocationQueries = {
       edge?: 'start' | 'end'
     } = {}
   ): AncestorEntry {
-    const path = Editor.getPath(editor, at, options)
+    const path = Editor.path(editor, at, options)
     const parentPath = Path.parent(path)
-    const entry = Editor.getNode(editor, parentPath)
+    const entry = Editor.node(editor, parentPath)
     return entry as AncestorEntry
   },
 
@@ -405,7 +397,7 @@ export const LocationQueries = {
    * Get the path of a location.
    */
 
-  getPath(
+  path(
     editor: Editor,
     at: Location,
     options: {
@@ -450,7 +442,7 @@ export const LocationQueries = {
    * Get the start or end point of a location.
    */
 
-  getPoint(
+  point(
     editor: Editor,
     at: Location,
     options: {
@@ -493,13 +485,13 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document before a location.
    */
 
-  getPrevious(
+  previous(
     editor: Editor,
     at: Location,
     match: NodeMatch
   ): NodeEntry | undefined {
-    const [, from] = Editor.getFirst(editor, at)
-    const [, to] = Editor.getFirst(editor, [])
+    const [, from] = Editor.first(editor, at)
+    const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
     let i = 0
 
@@ -520,13 +512,13 @@ export const LocationQueries = {
    * Get a range of a location.
    */
 
-  getRange(editor: Editor, at: Location, to?: Location): Range {
+  range(editor: Editor, at: Location, to?: Location): Range {
     if (Range.isRange(at) && !to) {
       return at
     }
 
-    const start = Editor.getStart(editor, at)
-    const end = Editor.getEnd(editor, to || at)
+    const start = Editor.start(editor, at)
+    const end = Editor.end(editor, to || at)
     return { anchor: start, focus: end }
   },
 
@@ -534,8 +526,8 @@ export const LocationQueries = {
    * Get the start point of a location.
    */
 
-  getStart(editor: Editor, at: Location): Point {
-    return Editor.getPoint(editor, at, { edge: 'start' })
+  start(editor: Editor, at: Location): Point {
+    return Editor.point(editor, at, { edge: 'start' })
   },
 
   /**
@@ -545,8 +537,8 @@ export const LocationQueries = {
    * of what their actual content is.
    */
 
-  getText(editor: Editor, at: Location): string {
-    const range = Editor.getRange(editor, at)
+  text(editor: Editor, at: Location): string {
+    const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     let text = ''
 
@@ -568,23 +560,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Check if there is a node at a location.
-   */
-
-  hasNode(
-    editor: Editor,
-    at: Location,
-    options: {
-      depth?: number
-      edge?: 'start' | 'end'
-    } = {}
-  ): boolean {
-    const path = Editor.getPath(editor, at, options)
-    const exists = Node.has(editor.value, path)
-    return exists
-  },
-
-  /**
    * Check if a point the start point of a location.
    */
 
@@ -594,7 +569,7 @@ export const LocationQueries = {
       return false
     }
 
-    const start = Editor.getStart(editor, at)
+    const start = Editor.start(editor, at)
     return Point.equals(point, start)
   },
 
@@ -603,7 +578,7 @@ export const LocationQueries = {
    */
 
   isEnd(editor: Editor, point: Point, at: Location): boolean {
-    const end = Editor.getEnd(editor, at)
+    const end = Editor.end(editor, at)
     return Point.equals(point, end)
   },
 
@@ -633,7 +608,7 @@ export const LocationQueries = {
     }
 
     const levels: NodeEntry[] = []
-    const path = Editor.getPath(editor, at)
+    const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor.value, path)) {
       levels.push([n, p])
@@ -667,7 +642,7 @@ export const LocationQueries = {
       return
     }
 
-    const [from, to] = getSpan(editor, at, options)
+    const [from, to] = toSpan(editor, at, options)
 
     yield* Node.marks(editor.value, {
       ...options,
@@ -736,7 +711,7 @@ export const LocationQueries = {
       return
     }
 
-    const [from, to] = getSpan(editor, at, options)
+    const [from, to] = toSpan(editor, at, options)
     const iterable = Node.nodes(editor.value, {
       ...options,
       from,
@@ -779,7 +754,7 @@ export const LocationQueries = {
       return
     }
 
-    const range = Editor.getRange(editor, at)
+    const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     const first = reverse ? end : start
     let string = ''
@@ -817,7 +792,7 @@ export const LocationQueries = {
         // Void nodes are a special case, since we don't want to iterate over
         // their content. We instead always just yield their first point.
         if (editor.isVoid(node)) {
-          yield Editor.getStart(editor, path)
+          yield Editor.start(editor, path)
           continue
         }
 
@@ -828,12 +803,12 @@ export const LocationQueries = {
         if (Editor.hasInlines(editor, node)) {
           const e = Path.isAncestor(path, end.path)
             ? end
-            : Editor.getEnd(editor, path)
+            : Editor.end(editor, path)
           const s = Path.isAncestor(path, start.path)
             ? start
-            : Editor.getStart(editor, path)
+            : Editor.start(editor, path)
 
-          const text = Editor.getText(editor, { anchor: s, focus: e })
+          const text = Editor.text(editor, { anchor: s, focus: e })
           string = reverse ? reverseText(text) : text
           isNewBlock = true
         }
@@ -892,7 +867,7 @@ export const LocationQueries = {
       return
     }
 
-    const [from, to] = getSpan(editor, at, options)
+    const [from, to] = toSpan(editor, at, options)
 
     yield* Node.texts(editor.value, {
       ...options,
@@ -907,7 +882,7 @@ export const LocationQueries = {
  * Get the from and to path span from a location.
  */
 
-const getSpan = (
+const toSpan = (
   editor: Editor,
   at: Location | Span,
   options: {
@@ -920,8 +895,8 @@ const getSpan = (
     return at
   }
 
-  const first = Editor.getPath(editor, at, { edge: 'start' })
-  const last = Editor.getPath(editor, at, { edge: 'end' })
+  const first = Editor.path(editor, at, { edge: 'start' })
+  const last = Editor.path(editor, at, { edge: 'end' })
   const from = reverse ? last : first
   const to = reverse ? first : last
   return [from, to]

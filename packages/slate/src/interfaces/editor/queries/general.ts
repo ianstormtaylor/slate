@@ -22,7 +22,7 @@ export const GeneralQueries = {
    * operations are applied to the editor.
    */
 
-  createPathRef(
+  pathRef(
     editor: Editor,
     path: Path,
     options: {
@@ -52,7 +52,7 @@ export const GeneralQueries = {
    * operations are applied to the editor.
    */
 
-  createPointRef(
+  pointRef(
     editor: Editor,
     point: Point,
     options: {
@@ -82,7 +82,7 @@ export const GeneralQueries = {
    * operations are applied to the editor.
    */
 
-  createRangeRef(
+  rangeRef(
     editor: Editor,
     range: Range,
     options: {

@@ -80,8 +80,8 @@ export const SelectionTransforms = {
 
     if (edge == null || edge === 'anchor') {
       const point = reverse
-        ? Editor.getBefore(editor, anchor, opts)
-        : Editor.getAfter(editor, anchor, opts)
+        ? Editor.before(editor, anchor, opts)
+        : Editor.after(editor, anchor, opts)
 
       if (point) {
         props.anchor = point
@@ -90,8 +90,8 @@ export const SelectionTransforms = {
 
     if (edge == null || edge === 'focus') {
       const point = reverse
-        ? Editor.getBefore(editor, focus, opts)
-        : Editor.getAfter(editor, focus, opts)
+        ? Editor.before(editor, focus, opts)
+        : Editor.after(editor, focus, opts)
 
       if (point) {
         props.focus = point
@@ -107,7 +107,7 @@ export const SelectionTransforms = {
 
   select(editor: Editor, target: Location) {
     const { selection } = editor.value
-    target = Editor.getRange(editor, target)
+    target = Editor.range(editor, target)
 
     if (selection) {
       Editor.setSelection(editor, target)

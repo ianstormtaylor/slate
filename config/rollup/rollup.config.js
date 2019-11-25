@@ -17,18 +17,13 @@ import Schema from '../../packages/slate-schema/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
- *
- * @param {Object} pkg
- * @param {String} env
- * @param {String} format
- * @return {Object}
  */
 
-function configure(pkg, env, target, { ts }) {
+function configure(pkg, env, target) {
   const isProd = env === 'production'
   const isUmd = target === 'umd'
   const isModule = target === 'module'
-  const input = `packages/${pkg.name}/src/index.${ts ? 'ts' : 'js'}`
+  const input = `packages/${pkg.name}/src/index.ts`
   const deps = []
     .concat(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
     .concat(pkg.peerDependencies ? Object.keys(pkg.peerDependencies) : [])
@@ -47,11 +42,10 @@ function configure(pkg, env, target, { ts }) {
       browser: true,
     }),
 
-    ts &&
-      typescript({
-        abortOnError: false,
-        tsconfig: `./packages/${pkg.name}/tsconfig.json`,
-      }),
+    typescript({
+      abortOnError: false,
+      tsconfig: `./packages/${pkg.name}/tsconfig.json`,
+    }),
 
     // Allow Rollup to resolve CommonJS modules, since it only resolves ES2015
     // modules by default.
@@ -62,6 +56,7 @@ function configure(pkg, env, target, { ts }) {
       // https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
       namedExports: {
         esrever: ['reverse'],
+
         immutable: [
           'List',
           'Map',
@@ -150,8 +145,6 @@ function configure(pkg, env, target, { ts }) {
 
 /**
  * Return a Rollup configuration for a `pkg`.
- *
- * @return {Array}
  */
 
 function factory(pkg, options = {}) {
@@ -168,9 +161,9 @@ function factory(pkg, options = {}) {
  */
 
 export default [
-  ...factory(Core, { ts: true }),
-  ...factory(History, { ts: true }),
-  ...factory(Hyperscript, { ts: true }),
-  ...factory(React, { ts: true }),
-  ...factory(Schema, { ts: true }),
+  ...factory(Core),
+  ...factory(History),
+  ...factory(Hyperscript),
+  ...factory(React),
+  ...factory(Schema),
 ]

@@ -99,7 +99,7 @@ export const ReactEditor = {
       Array.from(SlateNode.texts(node)).length === 1 &&
       SlateNode.text(node) === ''
     ) {
-      const start = Editor.getStart(editor, [])
+      const start = Editor.start(editor, [])
 
       decorations.push({
         [PLACEHOLDER_SYMBOL]: true,
@@ -231,7 +231,7 @@ export const ReactEditor = {
    */
 
   toDomPoint(editor: ReactEditor, point: SlatePoint): DOMPoint {
-    const [node] = Editor.getNode(editor, point.path)
+    const [node] = Editor.node(editor, point.path)
     const el = ReactEditor.toDomNode(editor, node)
     let domPoint: DOMPoint | undefined
 
@@ -338,15 +338,15 @@ export const ReactEditor = {
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 
-      const edge = Editor.getPoint(editor, path, {
+      const edge = Editor.point(editor, path, {
         edge: isPrev ? 'start' : 'end',
       })
       const point = isPrev
-        ? Editor.getBefore(editor, edge)
-        : Editor.getAfter(editor, edge)
+        ? Editor.before(editor, edge)
+        : Editor.after(editor, edge)
 
       if (point) {
-        const range = Editor.getRange(editor, point)
+        const range = Editor.range(editor, point)
         return range
       }
     }

@@ -60,7 +60,7 @@ export const NodeTransforms = {
       // common use case when inserting from a non-selected state.
       if (!at) {
         at = selection ||
-          Editor.getEnd(editor, []) || [editor.value.children.length]
+          Editor.end(editor, []) || [editor.value.children.length]
         select = true
       }
 
@@ -73,18 +73,18 @@ export const NodeTransforms = {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = Editor.createPointRef(editor, end)
+          const pointRef = Editor.pointRef(editor, end)
           Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       }
 
       if (Point.isPoint(at)) {
-        const atMatch = Editor.getMatch(editor, at.path, match)
+        const atMatch = Editor.match(editor, at.path, match)
 
         if (atMatch) {
           const [, matchPath] = atMatch
-          const pathRef = Editor.createPathRef(editor, matchPath)
+          const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
           Editor.splitNodes(editor, { at, match })
           const path = pathRef.unref()!
@@ -97,7 +97,7 @@ export const NodeTransforms = {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (Editor.getMatch(editor, parentPath, 'void')) {
+      if (Editor.match(editor, parentPath, 'void')) {
         return
       }
 
@@ -108,7 +108,7 @@ export const NodeTransforms = {
       }
 
       if (select) {
-        const point = Editor.getEnd(editor, at)
+        const point = Editor.end(editor, at)
 
         if (point) {
           Editor.select(editor, point)
@@ -147,9 +147,7 @@ export const NodeTransforms = {
       }
 
       const matches = Editor.matches(editor, { at, match })
-      const pathRefs = Array.from(matches, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
+      const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
@@ -160,7 +158,7 @@ export const NodeTransforms = {
           )
         }
 
-        const [parent, parentPath] = Editor.getNode(editor, Path.parent(path))
+        const [parent, parentPath] = Editor.node(editor, Path.parent(path))
         const index = path[path.length - 1]
         const { length } = parent.children
 
@@ -218,7 +216,7 @@ export const NodeTransforms = {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = Editor.createPointRef(editor, end)
+          const pointRef = Editor.pointRef(editor, end)
           Editor.delete(editor, { at })
           at = pointRef.unref()!
 
@@ -228,7 +226,7 @@ export const NodeTransforms = {
         }
       }
 
-      const current = Editor.getMatch(editor, at, match)
+      const current = Editor.match(editor, at, match)
 
       if (!current) {
         return
@@ -245,7 +243,7 @@ export const NodeTransforms = {
         prevMatch = 'inline'
       }
 
-      const prev = Editor.getPrevious(editor, at, prevMatch)
+      const prev = Editor.previous(editor, at, prevMatch)
 
       if (!prev) {
         return
@@ -267,8 +265,7 @@ export const NodeTransforms = {
         )
       })
 
-      const emptyRef =
-        emptyAncestor && Editor.createPathRef(editor, emptyAncestor[1])
+      const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
       let properties
       let position
 
@@ -356,11 +353,9 @@ export const NodeTransforms = {
         return
       }
 
-      const toRef = Editor.createPathRef(editor, to)
+      const toRef = Editor.pathRef(editor, to)
       const targets = Editor.matches(editor, { at, match })
-      const pathRefs = Array.from(targets, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
+      const pathRefs = Array.from(targets, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
@@ -382,7 +377,7 @@ export const NodeTransforms = {
 
   normalizeNodes(editor: Editor, options: { at: Path }): void {
     const { at } = options
-    const [node] = Editor.getNode(editor, at)
+    const [node] = Editor.node(editor, at)
 
     // There are no core normalizations for text nodes.
     if (Text.isText(node)) {
@@ -498,13 +493,11 @@ export const NodeTransforms = {
       }
 
       const depths = Editor.matches(editor, { at, match })
-      const pathRefs = Array.from(depths, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
+      const pathRefs = Array.from(depths, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const [node] = Editor.getNode(editor, path)
+        const [node] = Editor.node(editor, path)
         editor.apply({ type: 'remove_node', path, node })
       }
     })
@@ -610,7 +603,7 @@ export const NodeTransforms = {
       // counters need to account for us potentially splitting at a non-leaf.
       if (Path.isPath(at)) {
         const path = at
-        const point = Editor.getPoint(editor, path)
+        const point = Editor.point(editor, path)
         match = ([, p]) => p.length === path.length - 1
         height = point.path.length - path.length + 1
         at = point
@@ -621,29 +614,29 @@ export const NodeTransforms = {
         return
       }
 
-      const beforeRef = Editor.createPointRef(editor, at, {
+      const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const highest = Editor.getMatch(editor, at, match)
+      const highest = Editor.match(editor, at, match)
 
       if (!highest) {
         return
       }
 
-      const voidMatch = Editor.getMatch(editor, at, 'void')
+      const voidMatch = Editor.match(editor, at, 'void')
       const nudge = 0
 
       if (voidMatch) {
         const [voidNode, voidPath] = voidMatch
 
         if (Element.isElement(voidNode) && editor.isInline(voidNode)) {
-          let after = Editor.getAfter(editor, voidPath)
+          let after = Editor.after(editor, voidPath)
 
           if (!after) {
             const text = { text: '', marks: [] }
             const afterPath = Path.next(voidPath)
             Editor.insertNodes(editor, text, { at: afterPath })
-            after = Editor.getPoint(editor, afterPath)!
+            after = Editor.point(editor, afterPath)!
           }
 
           at = after
@@ -655,7 +648,7 @@ export const NodeTransforms = {
         always = true
       }
 
-      const afterRef = Editor.createPointRef(editor, at)
+      const afterRef = Editor.pointRef(editor, at)
       const depth = at.path.length - height
       const [, highestPath] = highest
       const lowestPath = at.path.slice(0, depth)
@@ -696,7 +689,7 @@ export const NodeTransforms = {
       }
 
       if (options.at == null) {
-        const point = afterRef.current || Editor.getEnd(editor, [])
+        const point = afterRef.current || Editor.end(editor, [])
         Editor.select(editor, point)
       }
 
@@ -736,14 +729,12 @@ export const NodeTransforms = {
       }
 
       const matches = Editor.matches(editor, { at, match })
-      const pathRefs = Array.from(matches, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
+      const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
         const depth = path.length + 1
-        let range = Editor.getRange(editor, path)
+        let range = Editor.range(editor, path)
 
         if (split && Range.isRange(at)) {
           range = Range.intersection(at, range)!
@@ -792,7 +783,7 @@ export const NodeTransforms = {
 
       if (split && Range.isRange(at)) {
         const [start, end] = Range.edges(at)
-        const rangeRef = Editor.createRangeRef(editor, at, {
+        const rangeRef = Editor.rangeRef(editor, at, {
           affinity: 'inward',
         })
         Editor.splitNodes(editor, { at: end, match })
@@ -810,7 +801,7 @@ export const NodeTransforms = {
 
       for (const [, rootPath] of roots) {
         const a = Range.isRange(at)
-          ? Range.intersection(at, Editor.getRange(editor, rootPath))
+          ? Range.intersection(at, Editor.range(editor, rootPath))
           : at
 
         if (!a) {
@@ -830,7 +821,7 @@ export const NodeTransforms = {
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
 
-          const range = Editor.getRange(editor, firstPath, lastPath)
+          const range = Editor.range(editor, firstPath, lastPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, children: [] }
@@ -856,7 +847,7 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
     return range.anchor
   } else {
     const [, end] = Range.edges(range)
-    const pointRef = Editor.createPointRef(editor, end)
+    const pointRef = Editor.pointRef(editor, end)
     Editor.delete(editor, { at: range })
     return pointRef.unref()
   }

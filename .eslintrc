@@ -119,20 +119,7 @@
     ],
     "valid-typeof": "error",
     "yield-star-spacing": ["error", "after"],
-    "yoda": ["error", "never"],
-    "padding-line-between-statements": [
-      "error",
-      { "blankLine": "always", "prev": "multiline-expression", "next": "*" },
-      { "blankLine": "any", "prev": "multiline-expression", "next": "return" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
-      { "blankLine": "any", "prev": "empty", "next": "multiline-expression" },
-      { "blankLine": "always", "prev": "multiline-block-like", "next": "*" },
-      { "blankLine": "any", "prev": "multiline-block-like", "next": "return" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
-      { "blankLine": "any", "prev": "case", "next": "case" }
-    ]
+    "yoda": ["error", "never"]
   },
   "overrides": [
     {

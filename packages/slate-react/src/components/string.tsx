@@ -32,7 +32,7 @@ const String = (props: {
     leaf.text === '' &&
     parent.children[parent.children.length - 1] === text &&
     !editor.isInline(parent) &&
-    Editor.getText(editor, parentPath) === ''
+    Editor.text(editor, parentPath) === ''
   ) {
     return <ZeroWidthString isLineBreak />
   }

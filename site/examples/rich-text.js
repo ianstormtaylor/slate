@@ -107,7 +107,7 @@ const withRichText = editor => {
 }
 
 const isMarkActive = (editor, type) => {
-  const marks = Editor.getActiveMarks(editor)
+  const marks = Editor.activeMarks(editor)
   const isActive = marks.some(m => m.type === type)
   return isActive
 }
@@ -115,7 +115,7 @@ const isMarkActive = (editor, type) => {
 const isBlockActive = (editor, type) => {
   const { selection } = editor.value
   if (!selection) return false
-  const match = Editor.getMatch(editor, selection, { type })
+  const match = Editor.match(editor, selection, { type })
   return !!match
 }
 

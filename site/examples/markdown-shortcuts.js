@@ -47,11 +47,11 @@ const withShortcuts = editor => {
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
-      const block = Editor.getMatch(editor, anchor, 'block')
+      const block = Editor.match(editor, anchor, 'block')
       const path = block ? block[1] : []
-      const start = Editor.getStart(editor, path)
+      const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
-      const beforeText = Editor.getText(editor, range)
+      const beforeText = Editor.text(editor, range)
       const type = SHORTCUTS[beforeText]
 
       if (type) {

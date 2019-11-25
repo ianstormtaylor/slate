@@ -13,9 +13,9 @@ export const RangeQueries = {
       return range
     }
 
-    const closestBlock = Editor.getMatch(editor, end.path, 'block')
+    const closestBlock = Editor.match(editor, end.path, 'block')
     const blockPath = closestBlock ? closestBlock[1] : []
-    const first = Editor.getStart(editor, [])
+    const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }
     let skip = true
 

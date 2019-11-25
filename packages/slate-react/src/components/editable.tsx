@@ -232,7 +232,7 @@ export const Editable = (props: {
             const range = ReactEditor.toSlateRange(editor, targetRange)
 
             if (!selection || !SlateRange.equals(selection, range)) {
-              editor.exec({ type: 'select', range: range })
+              editor.exec({ type: 'select', range })
             }
           }
         }
@@ -464,10 +464,10 @@ export const Editable = (props: {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                const start = Editor.getStart(editor, path)
+                const start = Editor.start(editor, path)
 
-                if (Editor.getMatch(editor, start, 'void')) {
-                  const range = Editor.getRange(editor, start)
+                if (Editor.match(editor, start, 'void')) {
+                  const range = Editor.range(editor, start)
                   editor.exec({ type: 'select', range })
                 }
               }
@@ -542,12 +542,12 @@ export const Editable = (props: {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                const voidMatch = Editor.getMatch(editor, path, 'void')
+                const voidMatch = Editor.match(editor, path, 'void')
 
                 // If starting a drag on a void node, make sure it is selected
                 // so that it shows up in the selection's fragment.
                 if (voidMatch) {
-                  const range = Editor.getRange(editor, path)
+                  const range = Editor.range(editor, path)
                   editor.exec({ type: 'select', range })
                 }
 
@@ -794,8 +794,8 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
   }
 
   const [start, end] = SlateRange.edges(selection)
-  const startVoid = Editor.getMatch(editor, start.path, 'void')
-  const endVoid = Editor.getMatch(editor, end.path, 'void')
+  const startVoid = Editor.match(editor, start.path, 'void')
+  const endVoid = Editor.match(editor, end.path, 'void')
 
   if (SlateRange.isCollapsed(selection) && !startVoid) {
     return

@@ -38,7 +38,7 @@ export const TextTransforms = {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = Editor.getMatch(editor, at.path, 'void')
+        const furthestVoid = Editor.match(editor, at.path, 'void')
 
         if (furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -46,8 +46,8 @@ export const TextTransforms = {
         } else {
           const opts = { unit, distance }
           const target = reverse
-            ? Editor.getBefore(editor, at, opts) || Editor.getStart(editor, [])
-            : Editor.getAfter(editor, at, opts) || Editor.getEnd(editor, [])
+            ? Editor.before(editor, at, opts) || Editor.start(editor, [])
+            : Editor.after(editor, at, opts) || Editor.end(editor, [])
           at = { anchor: at, focus: target }
           hanging = true
         }
@@ -67,15 +67,15 @@ export const TextTransforms = {
       }
 
       let [start, end] = Range.edges(at)
-      const [ancestor] = Editor.getAncestor(editor, at)
+      const [ancestor] = Editor.ancestor(editor, at)
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = Editor.getMatch(editor, start.path, 'void')
-      const endVoid = Editor.getMatch(editor, end.path, 'void')
+      const startVoid = Editor.match(editor, start.path, 'void')
+      const endVoid = Editor.match(editor, end.path, 'void')
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
-        const block = Editor.getMatch(editor, start.path, 'block')
-        const before = Editor.getBefore(editor, start)
+        const block = Editor.match(editor, start.path, 'block')
+        const before = Editor.before(editor, start)
 
         if (before && block && Path.isAncestor(block[1], before.path)) {
           start = before
@@ -83,8 +83,8 @@ export const TextTransforms = {
       }
 
       if (endVoid) {
-        const block = Editor.getMatch(editor, end.path, 'block')
-        const after = Editor.getAfter(editor, end)
+        const block = Editor.match(editor, end.path, 'block')
+        const after = Editor.after(editor, end)
 
         if (after && block && Path.isAncestor(block[1], after.path)) {
           end = after
@@ -100,15 +100,13 @@ export const TextTransforms = {
           (!Path.isCommon(p, start.path) && !Path.isCommon(p, end.path)),
       })
 
-      const pathRefs = Array.from(matches, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
-      const startRef = Editor.createPointRef(editor, start)
-      const endRef = Editor.createPointRef(editor, end)
+      const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
+      const startRef = Editor.pointRef(editor, start)
+      const endRef = Editor.pointRef(editor, end)
 
       if (!isSingleText && !startVoid) {
         const point = startRef.current!
-        const [node] = Editor.getLeaf(editor, point)
+        const [node] = Editor.leaf(editor, point)
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
@@ -122,7 +120,7 @@ export const TextTransforms = {
 
       if (!endVoid) {
         const point = endRef.current!
-        const [node] = Editor.getLeaf(editor, point)
+        const [node] = Editor.leaf(editor, point)
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
@@ -181,35 +179,35 @@ export const TextTransforms = {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = Editor.createPointRef(editor, end)
+          const pointRef = Editor.pointRef(editor, end)
           Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       } else if (Path.isPath(at)) {
-        at = Editor.getStart(editor, at)
+        at = Editor.start(editor, at)
       }
 
-      if (Editor.getMatch(editor, at.path, 'void')) {
+      if (Editor.match(editor, at.path, 'void')) {
         return
       }
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = Editor.getMatch(editor, at, 'inline-element')
+      const inlineElementMatch = Editor.match(editor, at, 'inline-element')
 
       if (inlineElementMatch) {
         const [, inlinePath] = inlineElementMatch
 
         if (Editor.isEnd(editor, at, inlinePath)) {
-          const after = Editor.getAfter(editor, inlinePath)!
+          const after = Editor.after(editor, inlinePath)!
           at = after
         } else if (Editor.isStart(editor, at, inlinePath)) {
-          const before = Editor.getBefore(editor, inlinePath)!
+          const before = Editor.before(editor, inlinePath)!
           at = before
         }
       }
 
-      const blockMatch = Editor.getMatch(editor, at, 'block')!
+      const blockMatch = Editor.match(editor, at, 'block')!
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
@@ -272,24 +270,24 @@ export const TextTransforms = {
         }
       }
 
-      const inlineMatch = Editor.getMatch(editor, at, 'inline')!
+      const inlineMatch = Editor.match(editor, at, 'inline')!
       const [, inlinePath] = inlineMatch
       const isInlineStart = Editor.isStart(editor, at, inlinePath)
       const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
 
-      const middleRef = Editor.createPathRef(
+      const middleRef = Editor.pathRef(
         editor,
         isBlockEnd ? Path.next(blockPath) : blockPath
       )
 
-      const endRef = Editor.createPathRef(
+      const endRef = Editor.pathRef(
         editor,
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
 
       Editor.splitNodes(editor, { at, match: hasBlocks ? 'block' : 'inline' })
 
-      const startRef = Editor.createPathRef(
+      const startRef = Editor.pathRef(
         editor,
         !isInlineStart || (isInlineStart && isInlineEnd)
           ? Path.next(inlinePath)
@@ -317,7 +315,7 @@ export const TextTransforms = {
           path = Path.previous(startRef.current!)
         }
 
-        const end = Editor.getEnd(editor, path)
+        const end = Editor.end(editor, path)
         Editor.select(editor, end)
       }
 
@@ -350,13 +348,13 @@ export const TextTransforms = {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const pointRef = Editor.createPointRef(editor, Range.end(at))
+          const pointRef = Editor.pointRef(editor, Range.end(at))
           Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       }
 
-      if (Point.isPoint(at) && !Editor.getMatch(editor, at.path, 'void')) {
+      if (Point.isPoint(at) && !Editor.match(editor, at.path, 'void')) {
         const { path, offset } = at
         editor.apply({ type: 'insert_text', path, offset, text })
       }
@@ -385,12 +383,10 @@ export const TextTransforms = {
 
       const [start, end] = Range.edges(at)
       const texts = Editor.texts(editor, { at })
-      const pathRefs = Array.from(texts, ([, p]) =>
-        Editor.createPathRef(editor, p)
-      )
+      const pathRefs = Array.from(texts, ([, p]) => Editor.pathRef(editor, p))
 
       for (const [node, path] of Editor.texts(editor, { at }))
-        if (Point.isPoint(at) && !Editor.getMatch(editor, at.path, 'void')) {
+        if (Point.isPoint(at) && !Editor.match(editor, at.path, 'void')) {
           const { path, offset } = at
           editor.apply({ type: 'insert_text', path, offset, text })
         }

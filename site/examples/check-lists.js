@@ -38,13 +38,13 @@ const withChecklists = editor => {
       Range.isCollapsed(selection)
     ) {
       const { anchor } = selection
-      const match = Editor.getMatch(editor, anchor, {
+      const match = Editor.match(editor, anchor, {
         type: 'check-list-item',
       })
 
       if (match) {
         const [, path] = match
-        const start = Editor.getStart(editor, path)
+        const start = Editor.start(editor, path)
 
         if (Point.equals(anchor, start)) {
           Editor.setNodes(

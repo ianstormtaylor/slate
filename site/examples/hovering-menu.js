@@ -24,7 +24,7 @@ const HoveringMenuExample = () => {
       !selection ||
       !editor.isFocused() ||
       Range.isCollapsed(selection) ||
-      editor.getText(selection) === ''
+      editor.text(selection) === ''
     ) {
       el.removeAttribute('style')
       return
@@ -114,7 +114,7 @@ const withMarks = editor => {
 }
 
 const isMarkActive = (editor, type) => {
-  const marks = Editor.getActiveMarks(editor)
+  const marks = Editor.activeMarks(editor)
   const isActive = marks.some(m => m.type === type)
   return isActive
 }

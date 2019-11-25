@@ -77,12 +77,12 @@ export const withSchema = (
       case 'first_child_invalid':
       case 'last_child_invalid': {
         const { path } = error
-        const [parent, parentPath] = Editor.getParent(editor, path)
+        const [parent, parentPath] = Editor.parent(editor, path)
 
         if (parent.children.length > 1) {
           Editor.removeNodes(editor, { at: path })
         } else if (parentPath.length === 0) {
-          const range = Editor.getRange(editor, parentPath)
+          const range = Editor.range(editor, parentPath)
           Editor.removeNodes(editor, {
             at: range,
             match: ([, p]) => p.length === 1,
@@ -110,7 +110,7 @@ export const withSchema = (
         const { path } = error
 
         if (path.length === 0) {
-          const range = Editor.getRange(editor, path)
+          const range = Editor.range(editor, path)
           Editor.removeNodes(editor, {
             at: range,
             match: ([, p]) => p.length === 1,

@@ -120,7 +120,7 @@ const splitLocation = (
       at = Editor.unhangRange(editor, at)
     }
 
-    const rangeRef = Editor.createRangeRef(editor, at, { affinity: 'inward' })
+    const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
     const [start, end] = Range.edges(at)
     Editor.splitNodes(editor, { at: end, match: 'text' })
     Editor.splitNodes(editor, { at: start, match: 'text' })

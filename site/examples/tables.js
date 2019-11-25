@@ -37,13 +37,13 @@ const withTables = editor => {
       Range.isCollapsed(selection)
     ) {
       const { anchor } = selection
-      const cell = Editor.getMatch(editor, anchor, { type: 'table-cell' })
+      const cell = Editor.match(editor, anchor, { type: 'table-cell' })
 
       if (cell) {
         const [, cellPath] = cell
         const edge = reverse
-          ? Editor.getStart(editor, cellPath)
-          : Editor.getEnd(editor, cellPath)
+          ? Editor.start(editor, cellPath)
+          : Editor.end(editor, cellPath)
 
         if (Point.equals(anchor, edge)) {
           return
@@ -54,8 +54,8 @@ const withTables = editor => {
     if (
       type === 'insert_break' &&
       selection &&
-      (Editor.getMatch(editor, selection.anchor, { type: 'table' }) ||
-        Editor.getMatch(editor, selection.focus, { type: 'table' }))
+      (Editor.match(editor, selection.anchor, { type: 'table' }) ||
+        Editor.match(editor, selection.focus, { type: 'table' }))
     ) {
       return
     }
