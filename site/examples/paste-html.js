@@ -1,15 +1,9 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import { Editor } from 'slate'
+import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
-import {
-  Editable,
-  withReact,
-  useSlate,
-  useSelected,
-  useFocused,
-} from 'slate-react'
+import { Editable, withReact, useSelected, useFocused } from 'slate-react'
 
 const ELEMENT_TAGS = {
   A: el => ({ type: 'link', url: el.getAttribute('href') }),
@@ -77,45 +71,56 @@ export const deserialize = el => {
   return children
 }
 
-class PasteHtmlEditor extends withHistory(withReact(Editor)) {
-  isVoid(element) {
-    return element.type === 'image'
-  }
-
-  isInline(element) {
-    return element.type === 'link'
-  }
-
-  insertData(data) {
-    const html = data.getData('text/html')
-
-    if (html) {
-      const parsed = new DOMParser().parseFromString(html, 'text/html')
-      const fragment = deserialize(parsed.body)
-      this.insertFragment(fragment)
-    } else {
-      super.insertData(data)
-    }
-  }
-}
-
 const PasteHtmlExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(PasteHtmlEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
+  const editor = useMemo(
+    () => withHtml(withReact(withHistory(createEditor()))),
+    []
+  )
   return (
     <div>
       <Editable
-        placeholder="Paste in some HTML..."
         editor={editor}
         value={value}
         renderElement={renderElement}
         renderMark={renderMark}
         onChange={v => setValue(v)}
+        placeholder="Paste in some HTML..."
       />
     </div>
   )
+}
+
+const withHtml = editor => {
+  const { exec, isInline, isVoid } = editor
+
+  editor.isInline = element => {
+    return element.type === 'link' ? true : isInline(element)
+  }
+
+  editor.isVoid = element => {
+    return element.type === 'image' ? true : isVoid(element)
+  }
+
+  editor.exec = command => {
+    if (command.type === 'insert_data') {
+      const { data } = command
+      const html = data.getData('text/html')
+
+      if (html) {
+        const parsed = new DOMParser().parseFromString(html, 'text/html')
+        const fragment = deserialize(parsed.body)
+        Editor.insertFragment(editor, fragment)
+        return
+      }
+    }
+
+    exec(command)
+  }
+
+  return editor
 }
 
 const Element = props => {

@@ -1,5 +1,6 @@
 *.log
 .next/
+.vscode/
 build/
 dist/
 lib/

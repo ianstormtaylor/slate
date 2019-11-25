@@ -4,23 +4,26 @@ import {
   Node,
   NodeEntry,
   NodeMatch,
-  Path,
   Text,
   Value,
-} from '../..'
+} from '../../..'
 
-class NodeQueries {
+export const NodeQueries = {
   /**
    * Check if a node entry is a match.
    */
 
-  isNodeMatch(this: Editor, entry: NodeEntry, match: NodeMatch | NodeMatch[]) {
+  isNodeMatch(
+    editor: Editor,
+    entry: NodeEntry,
+    match: NodeMatch | NodeMatch[]
+  ) {
     const [node] = entry
 
     // If match is an array, treat it as an OR condition.
     if (Array.isArray(match)) {
       for (const m of match) {
-        if (this.isNodeMatch(entry, m)) {
+        if (Editor.isNodeMatch(editor, entry, m)) {
           return true
         }
       }
@@ -37,18 +40,19 @@ class NodeQueries {
         return Element.isElement(node)
       case 'inline':
         return (
-          (Element.isElement(node) && this.isInline(node)) || Text.isText(node)
+          (Element.isElement(node) && editor.isInline(node)) ||
+          Text.isText(node)
         )
       case 'inline-element':
-        return Element.isElement(node) && this.isInline(node)
+        return Element.isElement(node) && editor.isInline(node)
       case 'block':
         return (
           Element.isElement(node) &&
-          !this.isInline(node) &&
-          this.hasInlines(node)
+          !editor.isInline(node) &&
+          Editor.hasInlines(editor, node)
         )
       case 'void':
-        return Element.isElement(node) && this.isVoid(node)
+        return Element.isElement(node) && editor.isVoid(node)
     }
 
     if (typeof match === 'function') {
@@ -56,7 +60,5 @@ class NodeQueries {
     } else {
       return Node.matches(node, match)
     }
-  }
+  },
 }
-
-export default NodeQueries

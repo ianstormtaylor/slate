@@ -1,56 +1,56 @@
-import { Editor, Location, Point, Range, Path } from '../..'
+import { Editor, Location, Point, Range } from '../../..'
 
-class SelectionCommands {
+export const SelectionTransforms = {
   /**
    * Collapse the selection.
    */
 
   collapse(
-    this: Editor,
+    editor: Editor,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
   ) {
     const { edge = 'anchor' } = options
-    const { selection } = this.value
+    const { selection } = editor.value
 
     if (!selection) {
       return
     } else if (edge === 'anchor') {
-      this.select(selection.anchor)
+      Editor.select(editor, selection.anchor)
     } else if (edge === 'focus') {
-      this.select(selection.focus)
+      Editor.select(editor, selection.focus)
     } else if (edge === 'start') {
       const [start] = Range.edges(selection)
-      this.select(start)
+      Editor.select(editor, start)
     } else if (edge === 'end') {
       const [, end] = Range.edges(selection)
-      this.select(end)
+      Editor.select(editor, end)
     }
-  }
+  },
 
   /**
    * Unset the selection.
    */
 
-  deselect(this: Editor) {
-    const { selection } = this.value
+  deselect(editor: Editor) {
+    const { selection } = editor.value
 
     if (selection) {
-      this.apply({
+      editor.apply({
         type: 'set_selection',
         properties: selection,
         newProperties: null,
       })
     }
-  }
+  },
 
   /**
    * Move the selection's point forward or backward.
    */
 
   move(
-    this: Editor,
+    editor: Editor,
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line'
@@ -58,7 +58,7 @@ class SelectionCommands {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
   ) {
-    const { selection } = this.value
+    const { selection } = editor.value
     const { distance = 1, unit = 'character', reverse = false } = options
     let { edge = null } = options
 
@@ -80,8 +80,8 @@ class SelectionCommands {
 
     if (edge == null || edge === 'anchor') {
       const point = reverse
-        ? this.getBefore(anchor, opts)
-        : this.getAfter(anchor, opts)
+        ? Editor.getBefore(editor, anchor, opts)
+        : Editor.getAfter(editor, anchor, opts)
 
       if (point) {
         props.anchor = point
@@ -90,27 +90,27 @@ class SelectionCommands {
 
     if (edge == null || edge === 'focus') {
       const point = reverse
-        ? this.getBefore(focus, opts)
-        : this.getAfter(focus, opts)
+        ? Editor.getBefore(editor, focus, opts)
+        : Editor.getAfter(editor, focus, opts)
 
       if (point) {
         props.focus = point
       }
     }
 
-    this.setSelection(props)
-  }
+    Editor.setSelection(editor, props)
+  },
 
   /**
    * Set the selection to a new value.
    */
 
-  select(this: Editor, target: Location) {
-    const { selection } = this.value
-    target = this.getRange(target)
+  select(editor: Editor, target: Location) {
+    const { selection } = editor.value
+    target = Editor.getRange(editor, target)
 
     if (selection) {
-      this.setSelection(target)
+      Editor.setSelection(editor, target)
       return
     }
 
@@ -122,25 +122,25 @@ class SelectionCommands {
       )
     }
 
-    this.apply({
+    editor.apply({
       type: 'set_selection',
       properties: selection,
       newProperties: target,
     })
-  }
+  },
 
   /**
    * Set new properties on one of the selection's points.
    */
 
   setPoint(
-    this: Editor,
+    editor: Editor,
     props: Partial<Point>,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     }
   ) {
-    const { selection } = this.value
+    const { selection } = editor.value
     let { edge = 'both' } = options
 
     if (!selection) {
@@ -160,18 +160,18 @@ class SelectionCommands {
     const newPoint = Object.assign(point, props)
 
     if (edge === 'anchor') {
-      this.setSelection({ anchor: newPoint })
+      Editor.setSelection(editor, { anchor: newPoint })
     } else {
-      this.setSelection({ focus: newPoint })
+      Editor.setSelection(editor, { focus: newPoint })
     }
-  }
+  },
 
   /**
    * Set new properties on the selection.
    */
 
-  setSelection(this: Editor, props: Partial<Range>) {
-    const { selection } = this.value
+  setSelection(editor: Editor, props: Partial<Range>) {
+    const { selection } = editor.value
     const oldProps: Partial<Range> | null = {}
     const newProps: Partial<Range> = {}
 
@@ -195,13 +195,11 @@ class SelectionCommands {
     }
 
     if (Object.keys(oldProps).length > 0) {
-      this.apply({
+      editor.apply({
         type: 'set_selection',
         properties: oldProps,
         newProperties: newProps,
       })
     }
-  }
+  },
 }
-
-export default SelectionCommands

@@ -1,53 +1,31 @@
-import React, { useState } from 'react'
-import {
-  Editable,
-  withReact,
-  useSlate,
-  useSelected,
-  useFocused,
-} from 'slate-react'
-import { Editor } from 'slate'
+import React, { useState, useMemo } from 'react'
+import { Editable, withReact, useSelected, useFocused } from 'slate-react'
+import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
-class MentionEditor extends withHistory(withReact(Editor)) {
-  isInline(element) {
-    return element.type === 'mention'
-  }
-
-  isVoid(element) {
-    return element.type === 'mention'
-  }
-
-  isMentionActive() {
-    const match = this.getMatch(this.value.selection, { type: 'mention' })
-    return !!match
-  }
-
-  insertMention(id) {
-    const mention = { type: 'mention', id, children: [{ text: '', marks: [] }] }
-    this.insertNodes(mention)
-  }
-}
-
 const MentionExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(MentionEditor)
+  const editor = useMemo(
+    () => withMentions(withReact(withHistory(createEditor()))),
+    []
+  )
+
   const promptMention = () => {
     const name = window.prompt('Who would you like to mention?')
     if (!name) return
     const regex = new RegExp(`^${name}`, 'i')
     const match = Object.entries(USERS).find(([, name]) => regex.test(name))
     const id = match ? match[0] : 57
-    editor.insertMention(id)
+    editor.exec({ type: 'insert_mention', id })
   }
 
   return (
     <div>
       <Toolbar>
         <Button
-          active={editor.isMentionActive()}
+          active={isMentionActive(editor)}
           onMouseDown={event => {
             event.preventDefault()
             promptMention()
@@ -57,10 +35,10 @@ const MentionExample = () => {
         </Button>
       </Toolbar>
       <Editable
-        placeholder="Enter some text..."
         editor={editor}
         value={value}
         renderElement={props => <Element {...props} />}
+        placeholder="Enter some text..."
         onChange={v => setValue(v)}
         onKeyDown={event => {
           if (event.key === '@') {
@@ -71,6 +49,41 @@ const MentionExample = () => {
       />
     </div>
   )
+}
+
+const withMentions = editor => {
+  const { exec, isInline, isVoid } = editor
+
+  editor.isInline = element => {
+    return element.type === 'mention' ? true : isInline(element)
+  }
+
+  editor.isVoid = element => {
+    return element.type === 'mention' ? true : isVoid(element)
+  }
+
+  editor.exec = command => {
+    if (command.type === 'insert_mention') {
+      const { id } = command
+      const mention = {
+        type: 'mention',
+        id,
+        children: [{ text: '', marks: [] }],
+      }
+      Editor.insertNodes(editor, mention)
+    } else {
+      exec(command)
+    }
+  }
+
+  return editor
+}
+
+const isMentionActive = editor => {
+  const match = Editor.getMatch(editor, editor.value.selection, {
+    type: 'mention',
+  })
+  return !!match
 }
 
 const Element = props => {

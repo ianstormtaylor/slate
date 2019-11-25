@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useState, useMemo } from 'react'
 import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor, Range } from 'slate'
+import { Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -16,55 +16,62 @@ const SHORTCUTS = {
   '######': 'heading-six',
 }
 
-class MarkdownShortcutsEditor extends withHistory(withReact(Editor)) {
-  insertText(text, options = {}) {
-    const { at } = options
-    const { selection } = this.value
+const MarkdownShortcutsExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const renderElement = useCallback(props => <Element {...props} />, [])
+  const editor = useMemo(
+    () => withShortcuts(withReact(withHistory(createEditor()))),
+    []
+  )
+  return (
+    <div>
+      <Editable
+        editor={editor}
+        value={value}
+        renderElement={renderElement}
+        onChange={v => setValue(v)}
+        placeholder="Write some markdown..."
+        spellCheck
+        autoFocus
+      />
+    </div>
+  )
+}
 
-    if (text === ' ' && !at && selection && Range.isCollapsed(selection)) {
+const withShortcuts = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    const { text } = options
+    const { selection } = editor.value
+
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
-      const block = this.getMatch(anchor, 'block')
+      const block = Editor.getMatch(editor, anchor, 'block')
       const path = block ? block[1] : []
-      const start = this.getStart(path)
+      const start = Editor.getStart(editor, path)
       const range = { anchor, focus: start }
-      const beforeText = this.getText(range)
+      const beforeText = Editor.getText(editor, range)
       const type = SHORTCUTS[beforeText]
 
       if (type) {
-        this.select(range)
-        this.delete()
-        this.setNodes({ type }, { match: 'block' })
+        Editor.select(editor, range)
+        Editor.delete(editor)
+        Editor.setNodes(editor, { type }, { match: 'block' })
 
         if (type === 'list-item') {
           const list = { type: 'bulleted-list', children: [] }
-          this.wrapNodes(list, { match: { type: 'list-item' } })
+          Editor.wrapNodes(editor, list, { match: { type: 'list-item' } })
         }
 
         return
       }
     }
 
-    super.insertText(text, options)
+    exec(command)
   }
-}
 
-const MarkdownShortcutsExample = () => {
-  const [value, setValue] = useState(initialValue)
-  const editor = useSlate(MarkdownShortcutsEditor)
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  return (
-    <div>
-      <Editable
-        spellCheck
-        autoFocus
-        placeholder="Write some markdown..."
-        editor={editor}
-        value={value}
-        renderElement={renderElement}
-        onChange={v => setValue(v)}
-      />
-    </div>
-  )
+  return editor
 }
 
 const Element = ({ attributes, children, element }) => {

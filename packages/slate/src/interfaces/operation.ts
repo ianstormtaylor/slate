@@ -287,7 +287,10 @@ namespace Operation {
 
       case 'set_selection': {
         return (
-          isPlainObject(value.properties) && isPlainObject(value.newProperties)
+          (value.properties === null && Range.isRange(value.newProperties)) ||
+          (value.newProperties === null && Range.isRange(value.properties)) ||
+          (isPlainObject(value.properties) &&
+            isPlainObject(value.newProperties))
         )
       }
 

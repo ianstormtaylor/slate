@@ -7,19 +7,12 @@ import { Node, Path, Value } from '..'
  * depending on the Slate editor's schema.
  */
 
-interface Element {
+export interface Element {
   children: Node[]
   [key: string]: any
 }
 
-/**
- * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
- * found inside a root node.
- */
-
-type ElementEntry = [Element, Path]
-
-namespace Element {
+export namespace Element {
   /**
    * Check if a value implements the `Element` interface.
    */
@@ -68,4 +61,9 @@ namespace Element {
   }
 }
 
-export { Element, ElementEntry }
+/**
+ * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
+ * found inside a root node.
+ */
+
+export type ElementEntry = [Element, Path]

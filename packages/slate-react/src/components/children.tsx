@@ -1,6 +1,7 @@
 import React from 'react'
-import { Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
+import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 
+import { ReactEditor } from '..'
 import ElementComponent from './element'
 import TextComponent from './text'
 import { useEditor } from '../hooks/use-editor'
@@ -39,16 +40,18 @@ const Children = (props: {
     selection,
   } = props
   const editor = useEditor()
-  const path = editor.findPath(node)
+  const path = ReactEditor.findPath(editor, node)
   const children = []
   const isLeafBlock =
-    Element.isElement(node) && !editor.isInline(node) && editor.hasInlines(node)
+    Element.isElement(node) &&
+    !editor.isInline(node) &&
+    Editor.hasInlines(editor, node)
 
   for (let i = 0; i < node.children.length; i++) {
     const p = path.concat(i)
     const n = node.children[i] as Descendant
-    const key = editor.findKey(n)
-    const range = editor.getRange(p)
+    const key = ReactEditor.findKey(editor, n)
+    const range = Editor.getRange(editor, p)
     const sel = selection && Range.intersection(range, selection)
     const decs = decorate([n, p])
     const anns = {}

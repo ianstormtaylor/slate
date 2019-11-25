@@ -86,7 +86,7 @@ export const checkNode = (
   const { validate: v } = rule
   const [node, path] = entry
 
-  if (editor.isNodeMatch(entry, rule.match)) {
+  if (Editor.isNodeMatch(editor, entry, rule.match)) {
     if ('properties' in v) {
       for (const k in v.properties) {
         const p = v.properties[k]
@@ -120,7 +120,7 @@ export const checkNode = (
         const n = Node.child(node, 0)
         const p = path.concat(0)
 
-        if (!editor.isNodeMatch([n, p], v.first)) {
+        if (!Editor.isNodeMatch(editor, [n, p], v.first)) {
           return { code: 'first_child_invalid', node: n, path: p, index: 0 }
         }
       }
@@ -130,7 +130,7 @@ export const checkNode = (
         const n = Node.child(node, i)
         const p = path.concat(i)
 
-        if (!editor.isNodeMatch([n, p], v.last)) {
+        if (!Editor.isNodeMatch(editor, [n, p], v.last)) {
           return { code: 'last_child_invalid', node: n, path: p, index: i }
         }
       }
@@ -151,7 +151,7 @@ export const checkAncestor = (
   const { validate: v } = rule
   const [parent, parentPath] = entry
   const processed = new Set()
-  const isMatch = editor.isNodeMatch(entry, rule.match)
+  const isMatch = Editor.isNodeMatch(editor, entry, rule.match)
   const groups = 'children' in v && v.children != null ? v.children : []
   let index = 0
   let count = 0
@@ -239,7 +239,7 @@ export const checkAncestor = (
       }
     }
 
-    if (editor.isNodeMatch([child, childPath], group.match || {})) {
+    if (Editor.isNodeMatch(editor, [child, childPath], group.match || {})) {
       index++
       continue
     }
@@ -260,7 +260,10 @@ export const checkAncestor = (
       // won't report errors, and we can break to error out as minimum.
       const nc = groups[g + 1]
 
-      if (nc && editor.isNodeMatch([child, childPath], nc.match || {})) {
+      if (
+        nc &&
+        Editor.isNodeMatch(editor, [child, childPath], nc.match || {})
+      ) {
         return {
           code: 'child_min_invalid',
           node: parent,
@@ -295,8 +298,8 @@ export const checkParent = (
   if (
     'parent' in cv &&
     cv.parent != null &&
-    editor.isNodeMatch([child, childPath], rule.match) &&
-    !editor.isNodeMatch([parent, parentPath], cv.parent)
+    Editor.isNodeMatch(editor, [child, childPath], rule.match) &&
+    !Editor.isNodeMatch(editor, [parent, parentPath], cv.parent)
   ) {
     return {
       code: 'parent_invalid',
@@ -310,12 +313,12 @@ export const checkParent = (
     'previous' in cv &&
     cv.previous != null &&
     index > 0 &&
-    editor.isNodeMatch([child, childPath], rule.match)
+    Editor.isNodeMatch(editor, [child, childPath], rule.match)
   ) {
     const prevChild = Node.child(parent, index - 1)
     const prevPath = parentPath.concat(index - 1)
 
-    if (!editor.isNodeMatch([prevChild, prevPath], cv.previous)) {
+    if (!Editor.isNodeMatch(editor, [prevChild, prevPath], cv.previous)) {
       return {
         code: 'previous_sibling_invalid',
         node: prevChild,
@@ -328,12 +331,12 @@ export const checkParent = (
     'next' in cv &&
     cv.next != null &&
     index < parent.children.length - 1 &&
-    editor.isNodeMatch([child, childPath], rule.match)
+    Editor.isNodeMatch(editor, [child, childPath], rule.match)
   ) {
     const nextChild = Node.child(parent, index + 1)
     const nextPath = parentPath.concat(index + 1)
 
-    if (!editor.isNodeMatch([nextChild, nextPath], cv.next)) {
+    if (!Editor.isNodeMatch(editor, [nextChild, nextPath], cv.next)) {
       return {
         code: 'next_sibling_invalid',
         node: nextChild,

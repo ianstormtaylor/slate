@@ -1,24 +1,20 @@
-import { Editor, Point, Range } from '../..'
+import { Editor, Point, Range } from '../../..'
 
-class AnnotationCommands {
+export const AnnotationTransforms = {
   /**
    * Add a new `annotation` object with a `key`.
    */
 
-  addAnnotation(this: Editor, key: string, annotation: Range) {
-    this.apply({
-      type: 'add_annotation',
-      key,
-      annotation,
-    })
-  }
+  addAnnotation(editor: Editor, key: string, annotation: Range) {
+    editor.apply({ type: 'add_annotation', key, annotation })
+  },
 
   /**
    * Remove an existing annotation object by `key`.
    */
 
-  removeAnnotation(this: Editor, key: string) {
-    const { annotations } = this.value
+  removeAnnotation(editor: Editor, key: string) {
+    const { annotations } = editor.value
 
     if (!(key in annotations)) {
       throw new Error(
@@ -28,19 +24,15 @@ class AnnotationCommands {
 
     const annotation = annotations[key]
 
-    this.apply({
-      type: 'remove_annotation',
-      key,
-      annotation,
-    })
-  }
+    editor.apply({ type: 'remove_annotation', key, annotation })
+  },
 
   /**
    * Set new properties on an annotation object with `key`.
    */
 
-  setAnnotation(this: Editor, key: string, props: Partial<Range>) {
-    const { annotations } = this.value
+  setAnnotation(editor: Editor, key: string, props: Partial<Range>) {
+    const { annotations } = editor.value
 
     if (!(key in annotations)) {
       throw new Error(
@@ -65,14 +57,12 @@ class AnnotationCommands {
     }
 
     if (Object.keys(newProps).length > 0) {
-      this.apply({
+      editor.apply({
         type: 'set_annotation',
         key,
         properties: prevProps,
         newProperties: newProps,
       })
     }
-  }
+  },
 }
-
-export default AnnotationCommands

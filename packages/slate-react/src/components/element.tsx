@@ -1,11 +1,10 @@
 import React, { useLayoutEffect, useRef } from 'react'
 import getDirection from 'direction'
-import { Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import Children from './children'
-import { useEditor } from '../hooks/use-editor'
-import { useReadOnly } from '../hooks/use-read-only'
+import { ReactEditor, useEditor, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import {
   NODE_TO_ELEMENT,
@@ -53,7 +52,7 @@ const Element = (props: {
   const editor = useEditor()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
-  const key = editor.findKey(element)
+  const key = ReactEditor.findKey(editor, element)
 
   let children: JSX.Element | null = (
     <Children
@@ -89,7 +88,7 @@ const Element = (props: {
 
   // If it's a block node with inline children, add the proper `dir` attribute
   // for text direction.
-  if (!isInline && editor.hasInlines(element)) {
+  if (!isInline && Editor.hasInlines(editor, element)) {
     const text = Node.text(element)
     const dir = getDirection(text)
 

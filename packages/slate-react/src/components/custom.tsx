@@ -1,5 +1,5 @@
 import React from 'react'
-import { Element, Range, Mark, Text } from 'slate'
+import { Element, Range, Mark, Text, Editor } from 'slate'
 
 import { useEditor } from '../hooks/use-editor'
 import { Leaf } from '../utils/leaf'

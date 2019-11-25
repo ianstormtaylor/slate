@@ -1,30 +1,54 @@
-import React, { useState } from 'react'
-import { Editor, Range, Point } from 'slate'
+import React, { useState, useMemo, useCallback } from 'react'
+import { Editable, withReact, useEditor, useReadOnly } from 'slate-react'
+import { Editor, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
-import {
-  Editable,
-  withReact,
-  useSlate,
-  useEditor,
-  useReadOnly,
-} from 'slate-react'
 
-class CheckListsEditor extends withHistory(withReact(Editor)) {
-  delete(options = {}) {
-    const { at, reverse } = options
-    const { selection } = this.value
+const CheckListsExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const renderElement = useCallback(props => <Element {...props} />, [])
+  const editor = useMemo(
+    () => withChecklists(withHistory(withReact(createEditor()))),
+    []
+  )
+  return (
+    <div>
+      <Editable
+        editor={editor}
+        value={value}
+        renderElement={renderElement}
+        onChange={v => setValue(v)}
+        placeholder="Get to work…"
+        spellCheck
+        autoFocus
+      />
+    </div>
+  )
+}
 
-    if (!at && reverse && selection && Range.isCollapsed(selection)) {
+const withChecklists = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    const { selection } = editor.value
+
+    if (
+      command.type === 'delete_backward' &&
+      selection &&
+      Range.isCollapsed(selection)
+    ) {
       const { anchor } = selection
-      const match = this.getMatch(anchor, { type: 'check-list-item' })
+      const match = Editor.getMatch(editor, anchor, {
+        type: 'check-list-item',
+      })
 
       if (match) {
         const [, path] = match
-        const start = this.getStart(path)
+        const start = Editor.getStart(editor, path)
 
         if (Point.equals(anchor, start)) {
-          this.setNodes(
+          Editor.setNodes(
+            editor,
             { type: 'paragraph' },
             { match: { type: 'check-list-item' } }
           )
@@ -33,26 +57,10 @@ class CheckListsEditor extends withHistory(withReact(Editor)) {
       }
     }
 
-    super.delete(options)
+    exec(command)
   }
-}
 
-const CheckListsExample = () => {
-  const [value, setValue] = useState(initialValue)
-  const editor = useSlate(CheckListsEditor)
-  return (
-    <div>
-      <Editable
-        spellCheck
-        autoFocus
-        editor={editor}
-        value={value}
-        placeholder="Get to work..."
-        renderElement={props => <Element {...props} />}
-        onChange={v => setValue(v)}
-      />
-    </div>
-  )
+  return editor
 }
 
 const Element = props => {

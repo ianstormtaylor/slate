@@ -1,14 +1,14 @@
+import { Editor } from 'slate'
 import { createContext, useContext } from 'react'
-import { ReactEditor } from '..'
 
 /**
- * A React context for sharing the `ReactEditor` class.
+ * A React context for sharing the `Editor` class.
  */
 
-export const EditorContext = createContext<ReactEditor | undefined>(undefined)
+export const EditorContext = createContext<Editor | undefined>(undefined)
 
 /**
- * Get the current `ReactEditor` class that the component lives under.
+ * Get the current `Editor` class that the component lives under.
  */
 
 export const useEditor = () => {
@@ -16,7 +16,7 @@ export const useEditor = () => {
 
   if (!editor) {
     throw new Error(
-      `The \`useEditor\` hook must be used inside the <Editor> context.`
+      `The \`useEditor\` hook must be used inside the <Editable> component's context.`
     )
   }
 

@@ -1,19 +1,17 @@
-import React, { useState } from 'react'
-import { Editor } from 'slate'
-import { Editable, withReact, useSlate } from 'slate-react'
+import React, { useState, useMemo } from 'react'
+import { createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
-
-const PlainTextEditor = withHistory(withReact(Editor))
 
 const PlainTextExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(PlainTextEditor)
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   return (
     <Editable
-      placeholder="Enter some plain text..."
       editor={editor}
       value={value}
       onChange={v => setValue(v)}
+      placeholder="Enter some plain text..."
     />
   )
 }

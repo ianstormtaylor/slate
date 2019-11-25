@@ -1,25 +1,25 @@
 import {
   Descendant,
   Editor,
+  Element,
+  Location,
   Node,
   NodeEntry,
   NodeMatch,
-  Element,
-  Location,
   Path,
-  Text,
-  Range,
   Point,
-} from '../..'
-import { Value } from '../../interfaces/value'
+  Range,
+  Text,
+  Value,
+} from '../../..'
 
-class NodeCommands {
+export const NodeTransforms = {
   /**
-   * Insert nodes at a specific location in the editor.
+   * Insert nodes at a specific location in the Editor.
    */
 
   insertNodes(
-    this: Editor,
+    editor: Editor,
     nodes: Node | Node[],
     options: {
       at?: Location
@@ -27,8 +27,8 @@ class NodeCommands {
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      const { selection, hanging = false } = this.value
+    Editor.withoutNormalizing(editor, () => {
+      const { selection, hanging = false } = editor.value
       let { at, match } = options
       let select = false
 
@@ -48,7 +48,7 @@ class NodeCommands {
           match = ([, p]) => Path.equals(p, path)
         } else if (Text.isText(node)) {
           match = 'text'
-        } else if (this.isInline(node)) {
+        } else if (editor.isInline(node)) {
           match = 'inline'
         } else {
           match = 'block'
@@ -59,33 +59,34 @@ class NodeCommands {
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
-        at = selection || this.getEnd([]) || [this.value.children.length]
+        at = selection ||
+          Editor.getEnd(editor, []) || [editor.value.children.length]
         select = true
       }
 
       if (Range.isRange(at)) {
         if (!hanging) {
-          at = this.unhangRange(at)
+          at = Editor.unhangRange(editor, at)
         }
 
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = this.createPointRef(end)
-          this.delete({ at })
+          const pointRef = Editor.createPointRef(editor, end)
+          Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       }
 
       if (Point.isPoint(at)) {
-        const atMatch = this.getMatch(at.path, match)
+        const atMatch = Editor.getMatch(editor, at.path, match)
 
         if (atMatch) {
           const [, matchPath] = atMatch
-          const pathRef = this.createPathRef(matchPath)
-          const isAtEnd = this.isEnd(at, matchPath)
-          this.splitNodes({ at, match })
+          const pathRef = Editor.createPathRef(editor, matchPath)
+          const isAtEnd = Editor.isEnd(editor, at, matchPath)
+          Editor.splitNodes(editor, { at, match })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
         } else {
@@ -96,25 +97,25 @@ class NodeCommands {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (this.getMatch(parentPath, 'void')) {
+      if (Editor.getMatch(editor, parentPath, 'void')) {
         return
       }
 
       for (const node of nodes) {
         const path = parentPath.concat(index)
         index++
-        this.apply({ type: 'insert_node', path, node })
+        editor.apply({ type: 'insert_node', path, node })
       }
 
       if (select) {
-        const point = this.getEnd(at)
+        const point = Editor.getEnd(editor, at)
 
         if (point) {
-          this.select(point)
+          Editor.select(editor, point)
         }
       }
     })
-  }
+  },
 
   /**
    * Lift nodes at a specific location upwards in the document tree, splitting
@@ -122,14 +123,14 @@ class NodeCommands {
    */
 
   liftNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      const { at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      const { at = editor.value.selection } = options
       let { match } = options
 
       if (match == null) {
@@ -145,8 +146,10 @@ class NodeCommands {
         return
       }
 
-      const matches = this.matches({ at, match })
-      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
+      const matches = Editor.matches(editor, { at, match })
+      const pathRefs = Array.from(matches, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
@@ -157,24 +160,24 @@ class NodeCommands {
           )
         }
 
-        const [parent, parentPath] = this.getNode(Path.parent(path))
+        const [parent, parentPath] = Editor.getNode(editor, Path.parent(path))
         const index = path[path.length - 1]
         const { length } = parent.children
 
         if (length === 1) {
-          this.moveNodes({ at: path, to: Path.next(parentPath) })
-          this.removeNodes({ at: parentPath })
+          Editor.moveNodes(editor, { at: path, to: Path.next(parentPath) })
+          Editor.removeNodes(editor, { at: parentPath })
         } else if (index === 0) {
-          this.moveNodes({ at: path, to: parentPath })
+          Editor.moveNodes(editor, { at: path, to: parentPath })
         } else if (index === length - 1) {
-          this.moveNodes({ at: path, to: Path.next(parentPath) })
+          Editor.moveNodes(editor, { at: path, to: Path.next(parentPath) })
         } else {
-          this.splitNodes({ at: Path.next(path) })
-          this.moveNodes({ at: path, to: Path.next(parentPath) })
+          Editor.splitNodes(editor, { at: Path.next(path) })
+          Editor.moveNodes(editor, { at: path, to: Path.next(parentPath) })
         }
       }
     })
-  }
+  },
 
   /**
    * Merge a node at a location with the previous node of the same depth,
@@ -182,15 +185,15 @@ class NodeCommands {
    */
 
   mergeNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      let { match, at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      let { match, at = editor.value.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -207,7 +210,7 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = this.unhangRange(at)
+        at = Editor.unhangRange(editor, at)
       }
 
       if (Range.isRange(at)) {
@@ -215,17 +218,17 @@ class NodeCommands {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = this.createPointRef(end)
-          this.delete({ at })
+          const pointRef = Editor.createPointRef(editor, end)
+          Editor.delete(editor, { at })
           at = pointRef.unref()!
 
           if (options.at == null) {
-            this.select(at)
+            Editor.select(editor, at)
           }
         }
       }
 
-      const current = this.getMatch(at, match)
+      const current = Editor.getMatch(editor, at, match)
 
       if (!current) {
         return
@@ -238,11 +241,11 @@ class NodeCommands {
         return
       } else if (Text.isText(node)) {
         prevMatch = 'text'
-      } else if (this.isInline(node)) {
+      } else if (editor.isInline(node)) {
         prevMatch = 'inline'
       }
 
-      const prev = this.getPrevious(at, prevMatch)
+      const prev = Editor.getPrevious(editor, at, prevMatch)
 
       if (!prev) {
         return
@@ -255,7 +258,7 @@ class NodeCommands {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Node.furthest(this.value, path, ([n, p]) => {
+      const emptyAncestor = Node.furthest(editor.value, path, ([n, p]) => {
         return (
           Path.isDescendant(p, commonPath) &&
           Path.isAncestor(p, path) &&
@@ -264,7 +267,8 @@ class NodeCommands {
         )
       })
 
-      const emptyRef = emptyAncestor && this.createPathRef(emptyAncestor[1])
+      const emptyRef =
+        emptyAncestor && Editor.createPathRef(editor, emptyAncestor[1])
       let properties
       let position
 
@@ -289,13 +293,13 @@ class NodeCommands {
       // If the node isn't already the next sibling of the previous node, move
       // it so that it is before merging.
       if (!isPreviousSibling) {
-        this.moveNodes({ at: path, to: newPath })
+        Editor.moveNodes(editor, { at: path, to: newPath })
       }
 
       // If there was going to be an empty ancestor of the node that was merged,
       // we remove it from the tree.
       if (emptyRef) {
-        this.removeNodes({ at: emptyRef.current! })
+        Editor.removeNodes(editor, { at: emptyRef.current! })
       }
 
       // If the target node that we're merging with is empty, remove it instead
@@ -303,12 +307,12 @@ class NodeCommands {
       // prevent losing formatting when deleting entire nodes when you have a
       // hanging selection.
       if (
-        (Element.isElement(prevNode) && this.isEmpty(prevNode)) ||
+        (Element.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
         (Text.isText(prevNode) && prevNode.text === '')
       ) {
-        this.removeNodes({ at: prevPath })
+        Editor.removeNodes(editor, { at: prevPath })
       } else {
-        this.apply({
+        editor.apply({
           type: 'merge_node',
           path: newPath,
           position,
@@ -321,22 +325,22 @@ class NodeCommands {
         emptyRef.unref()
       }
     })
-  }
+  },
 
   /**
    * Move the nodes at a location to a new location.
    */
 
   moveNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
       to: Path
     }
   ) {
-    this.withoutNormalizing(() => {
-      const { to, at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      const { to, at = editor.value.selection } = options
       let { match } = options
 
       if (match == null) {
@@ -352,31 +356,33 @@ class NodeCommands {
         return
       }
 
-      const toRef = this.createPathRef(to)
-      const targets = this.matches({ at, match })
-      const pathRefs = Array.from(targets, ([, p]) => this.createPathRef(p))
+      const toRef = Editor.createPathRef(editor, to)
+      const targets = Editor.matches(editor, { at, match })
+      const pathRefs = Array.from(targets, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
         const newPath = toRef.current!
 
         if (path.length !== 0) {
-          this.apply({ type: 'move_node', path, newPath })
+          editor.apply({ type: 'move_node', path, newPath })
         }
       }
 
       toRef.unref()
     })
-  }
+  },
 
   /**
    * Normalize a node at a path, returning it to a valid state if it is
    * currently invalid.
    */
 
-  normalizeNodes(this: Editor, options: { at: Path }): void {
+  normalizeNodes(editor: Editor, options: { at: Path }): void {
     const { at } = options
-    const [node] = this.getNode(at)
+    const [node] = Editor.getNode(editor, at)
 
     // There are no core normalizations for text nodes.
     if (Text.isText(node)) {
@@ -386,7 +392,7 @@ class NodeCommands {
     // Ensure that block and inline nodes have at least one text child.
     if (Element.isElement(node) && node.children.length === 0) {
       const child = { text: '', marks: [] }
-      this.insertNodes(child, { at: at.concat(0) })
+      Editor.insertNodes(editor, child, { at: at.concat(0) })
       return
     }
 
@@ -394,10 +400,10 @@ class NodeCommands {
     const shouldHaveInlines = Value.isValue(node)
       ? false
       : Element.isElement(node) &&
-        (this.isInline(node) ||
+        (editor.isInline(node) ||
           node.children.length === 0 ||
           Text.isText(node.children[0]) ||
-          this.isInline(node.children[0]))
+          editor.isInline(node.children[0]))
 
     // Since we'll be applying operations while iterating, keep track of an
     // index that accounts for any added/removed nodes.
@@ -408,30 +414,31 @@ class NodeCommands {
       const prev = node.children[i - 1] as Descendant
       const isLast = i === node.children.length - 1
       const isInlineOrText =
-        Text.isText(child) || (Element.isElement(child) && this.isInline(child))
+        Text.isText(child) ||
+        (Element.isElement(child) && editor.isInline(child))
 
       // Only allow block nodes in the top-level value and parent blocks that
       // only contain block nodes. Similarly, only allow inline nodes in other
       // inline nodes, or parent blocks that only contain inlines and text.
       if (isInlineOrText !== shouldHaveInlines) {
-        this.removeNodes({ at: at.concat(n) })
+        Editor.removeNodes(editor, { at: at.concat(n) })
         n--
         continue
       }
 
       if (Element.isElement(child)) {
         // Ensure that inline nodes are surrounded by text nodes.
-        if (this.isInline(child)) {
+        if (editor.isInline(child)) {
           if (prev == null || !Text.isText(prev)) {
             const newChild = { text: '', marks: [] }
-            this.insertNodes(newChild, { at: at.concat(n) })
+            Editor.insertNodes(editor, newChild, { at: at.concat(n) })
             n++
             continue
           }
 
           if (isLast) {
             const newChild = { text: '', marks: [] }
-            this.insertNodes(newChild, { at: at.concat(n + 1) })
+            Editor.insertNodes(editor, newChild, { at: at.concat(n + 1) })
             n++
             continue
           }
@@ -440,37 +447,37 @@ class NodeCommands {
         // Merge adjacent text nodes that are empty or have matching marks.
         if (prev != null && Text.isText(prev)) {
           if (Text.matches(child, prev)) {
-            this.mergeNodes({ at: at.concat(n) })
+            Editor.mergeNodes(editor, { at: at.concat(n) })
             n--
             continue
           } else if (prev.text === '') {
-            this.removeNodes({ at: at.concat(n - 1) })
+            Editor.removeNodes(editor, { at: at.concat(n - 1) })
             n--
             continue
           } else if (isLast && child.text === '') {
-            this.removeNodes({ at: at.concat(n) })
+            Editor.removeNodes(editor, { at: at.concat(n) })
             n--
             continue
           }
         }
       }
     }
-  }
+  },
 
   /**
    * Remove the nodes at a specific location in the document.
    */
 
   removeNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      let { match, at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      let { match, at = editor.value.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -487,26 +494,28 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = this.unhangRange(at)
+        at = Editor.unhangRange(editor, at)
       }
 
-      const depths = this.matches({ at, match })
-      const pathRefs = Array.from(depths, ([, p]) => this.createPathRef(p))
+      const depths = Editor.matches(editor, { at, match })
+      const pathRefs = Array.from(depths, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const [node] = this.getNode(path)
-        this.apply({ type: 'remove_node', path, node })
+        const [node] = Editor.getNode(editor, path)
+        editor.apply({ type: 'remove_node', path, node })
       }
     })
-  }
+  },
 
   /**
    * Set new properties on the nodes ...
    */
 
   setNodes(
-    this: Editor,
+    editor: Editor,
     props: Partial<Node>,
     options: {
       at?: Location
@@ -514,8 +523,8 @@ class NodeCommands {
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      let { match, at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      let { match, at = editor.value.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -532,10 +541,10 @@ class NodeCommands {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = this.unhangRange(at)
+        at = Editor.unhangRange(editor, at)
       }
 
-      for (const [node, path] of this.matches({ at, match })) {
+      for (const [node, path] of Editor.matches(editor, { at, match })) {
         const properties: Partial<Node> = {}
         const newProperties: Partial<Node> = {}
 
@@ -557,7 +566,7 @@ class NodeCommands {
         }
 
         if (Object.keys(newProperties).length !== 0) {
-          this.apply({
+          editor.apply({
             type: 'set_node',
             path,
             properties,
@@ -566,14 +575,14 @@ class NodeCommands {
         }
       }
     })
-  }
+  },
 
   /**
    * Split the nodes at a specific location.
    */
 
   splitNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
@@ -581,10 +590,10 @@ class NodeCommands {
       height?: number
     } = {}
   ) {
-    this.withoutNormalizing(() => {
+    Editor.withoutNormalizing(editor, () => {
       let {
         match,
-        at = this.value.selection,
+        at = editor.value.selection,
         height = 0,
         always = false,
       } = options
@@ -594,14 +603,14 @@ class NodeCommands {
       }
 
       if (Range.isRange(at)) {
-        at = deleteRange(this, at)
+        at = deleteRange(editor, at)
       }
 
       // If the target is a path, the default height-skipping and position
       // counters need to account for us potentially splitting at a non-leaf.
       if (Path.isPath(at)) {
         const path = at
-        const point = this.getPoint(path)
+        const point = Editor.getPoint(editor, path)
         match = ([, p]) => p.length === path.length - 1
         height = point.path.length - path.length + 1
         at = point
@@ -612,27 +621,29 @@ class NodeCommands {
         return
       }
 
-      const beforeRef = this.createPointRef(at, { affinity: 'backward' })
-      const highest = this.getMatch(at, match)
+      const beforeRef = Editor.createPointRef(editor, at, {
+        affinity: 'backward',
+      })
+      const highest = Editor.getMatch(editor, at, match)
 
       if (!highest) {
         return
       }
 
-      const voidMatch = this.getMatch(at, 'void')
+      const voidMatch = Editor.getMatch(editor, at, 'void')
       const nudge = 0
 
       if (voidMatch) {
         const [voidNode, voidPath] = voidMatch
 
-        if (Element.isElement(voidNode) && this.isInline(voidNode)) {
-          let after = this.getAfter(voidPath)
+        if (Element.isElement(voidNode) && editor.isInline(voidNode)) {
+          let after = Editor.getAfter(editor, voidPath)
 
           if (!after) {
             const text = { text: '', marks: [] }
             const afterPath = Path.next(voidPath)
-            this.insertNodes(text, { at: afterPath })
-            after = this.getPoint(afterPath)!
+            Editor.insertNodes(editor, text, { at: afterPath })
+            after = Editor.getPoint(editor, afterPath)!
           }
 
           at = after
@@ -644,14 +655,14 @@ class NodeCommands {
         always = true
       }
 
-      const afterRef = this.createPointRef(at)
+      const afterRef = Editor.createPointRef(editor, at)
       const depth = at.path.length - height
       const [, highestPath] = highest
       const lowestPath = at.path.slice(0, depth)
       let position = height === 0 ? at.offset : at.path[depth] + nudge
       let target: number | null = null
 
-      for (const [node, path] of this.levels({
+      for (const [node, path] of Editor.levels(editor, {
         at: lowestPath,
         reverse: true,
       })) {
@@ -660,18 +671,24 @@ class NodeCommands {
         if (
           path.length < highestPath.length ||
           path.length === 0 ||
-          (Element.isElement(node) && this.isVoid(node))
+          (Element.isElement(node) && editor.isVoid(node))
         ) {
           break
         }
 
         const point = beforeRef.current!
-        const isEnd = this.isEnd(point, path)
+        const isEnd = Editor.isEnd(editor, point, path)
 
-        if (always || !beforeRef || !this.isEdge(point, path)) {
-          const { text, marks, children, ...properties } = node
-          this.apply({ type: 'split_node', path, position, target, properties })
+        if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
+          const { text, marks, children, ...properties } = node
+          editor.apply({
+            type: 'split_node',
+            path,
+            position,
+            target,
+            properties,
+          })
         }
 
         target = position
@@ -679,14 +696,14 @@ class NodeCommands {
       }
 
       if (options.at == null) {
-        const point = afterRef.current || this.getEnd([])
-        this.select(point)
+        const point = afterRef.current || Editor.getEnd(editor, [])
+        Editor.select(editor, point)
       }
 
       beforeRef.unref()
       afterRef.unref()
     })
-  }
+  },
 
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent if
@@ -694,15 +711,15 @@ class NodeCommands {
    */
 
   unwrapNodes(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       match?: NodeMatch
       split?: boolean
     }
   ) {
-    this.withoutNormalizing(() => {
-      const { at = this.value.selection, split = false } = options
+    Editor.withoutNormalizing(editor, () => {
+      const { at = editor.value.selection, split = false } = options
       let { match } = options
 
       if (match == null) {
@@ -718,22 +735,27 @@ class NodeCommands {
         return
       }
 
-      const matches = this.matches({ at, match })
-      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
+      const matches = Editor.matches(editor, { at, match })
+      const pathRefs = Array.from(matches, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
         const depth = path.length + 1
-        let range = this.getRange(path)
+        let range = Editor.getRange(editor, path)
 
         if (split && Range.isRange(at)) {
           range = Range.intersection(at, range)!
         }
 
-        this.liftNodes({ at: range, match: ([, p]) => p.length === depth })
+        Editor.liftNodes(editor, {
+          at: range,
+          match: ([, p]) => p.length === depth,
+        })
       }
     })
-  }
+  },
 
   /**
    * Wrap the nodes at a location in a new container node, splitting the edges
@@ -741,7 +763,7 @@ class NodeCommands {
    */
 
   wrapNodes(
-    this: Editor,
+    editor: Editor,
     element: Element,
     options: {
       at?: Location
@@ -749,9 +771,9 @@ class NodeCommands {
       split?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
+    Editor.withoutNormalizing(editor, () => {
       const { split = false } = options
-      let { match, at = this.value.selection } = options
+      let { match, at = editor.value.selection } = options
 
       if (!at) {
         return
@@ -761,7 +783,7 @@ class NodeCommands {
         if (Path.isPath(at)) {
           const path = at
           match = ([, p]) => Path.equals(p, path)
-        } else if (this.isInline(element)) {
+        } else if (editor.isInline(element)) {
           match = 'inline'
         } else {
           match = 'block'
@@ -770,30 +792,34 @@ class NodeCommands {
 
       if (split && Range.isRange(at)) {
         const [start, end] = Range.edges(at)
-        const rangeRef = this.createRangeRef(at, { affinity: 'inward' })
-        this.splitNodes({ at: end, match })
-        this.splitNodes({ at: start, match })
+        const rangeRef = Editor.createRangeRef(editor, at, {
+          affinity: 'inward',
+        })
+        Editor.splitNodes(editor, { at: end, match })
+        Editor.splitNodes(editor, { at: start, match })
         at = rangeRef.unref()!
 
         if (options.at == null) {
-          this.select(at)
+          Editor.select(editor, at)
         }
       }
 
-      const roots: NodeEntry[] = this.isInline(element)
-        ? Array.from(this.matches({ ...options, at, match: 'block' }))
-        : [[this.value, []]]
+      const roots: NodeEntry[] = editor.isInline(element)
+        ? Array.from(Editor.matches(editor, { ...options, at, match: 'block' }))
+        : [[editor.value, []]]
 
       for (const [, rootPath] of roots) {
         const a = Range.isRange(at)
-          ? Range.intersection(at, this.getRange(rootPath))
+          ? Range.intersection(at, Editor.getRange(editor, rootPath))
           : at
 
         if (!a) {
           continue
         }
 
-        const matches = Array.from(this.matches({ ...options, at: a, match }))
+        const matches = Array.from(
+          Editor.matches(editor, { ...options, at: a, match })
+        )
 
         if (matches.length > 0) {
           const [first] = matches
@@ -804,13 +830,13 @@ class NodeCommands {
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
 
-          const range = this.getRange(firstPath, lastPath)
+          const range = Editor.getRange(editor, firstPath, lastPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, children: [] }
-          this.insertNodes(wrapper, { at: wrapperPath })
+          Editor.insertNodes(editor, wrapper, { at: wrapperPath })
 
-          this.moveNodes({
+          Editor.moveNodes(editor, {
             at: range,
             match: ([, p]) => p.length === depth,
             to: wrapperPath.concat(0),
@@ -818,7 +844,7 @@ class NodeCommands {
         }
       }
     })
-  }
+  },
 }
 
 /**
@@ -830,10 +856,8 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
     return range.anchor
   } else {
     const [, end] = Range.edges(range)
-    const pointRef = editor.createPointRef(end)
-    editor.delete({ at: range })
+    const pointRef = Editor.createPointRef(editor, end)
+    Editor.delete(editor, { at: range })
     return pointRef.unref()
   }
 }
-
-export default NodeCommands

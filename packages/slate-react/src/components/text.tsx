@@ -3,7 +3,7 @@ import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { Leaf as SlateLeaf } from '../utils/leaf'
-import { useEditor } from '../hooks/use-editor'
+import { ReactEditor, useEditor } from '..'
 import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
@@ -42,7 +42,7 @@ const Text = (props: {
   const editor = useEditor()
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = getLeaves(text, annotations, decorations)
-  const key = editor.findKey(text)
+  const key = ReactEditor.findKey(editor, text)
   const children = []
 
   for (let i = 0; i < leaves.length; i++) {

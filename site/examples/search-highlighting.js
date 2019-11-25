@@ -1,17 +1,15 @@
-import React, { useState, useCallback } from 'react'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor, Text } from 'slate'
+import React, { useState, useCallback, useMemo } from 'react'
+import { Editable, withReact } from 'slate-react'
+import { Text, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Icon, Toolbar } from '../components'
 
-const SearchHighlightingEditor = withHistory(withReact(Editor))
-
 const SearchHighlightingExample = () => {
   const [value, setValue] = useState(initialValue)
   const [search, setSearch] = useState()
-  const editor = useSlate(SearchHighlightingEditor)
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []
@@ -69,9 +67,6 @@ const SearchHighlightingExample = () => {
         </div>
       </Toolbar>
       <Editable
-        placeholder="Enter some rich text..."
-        spellCheck
-        autoFocus
         editor={editor}
         value={value}
         decorate={decorate}

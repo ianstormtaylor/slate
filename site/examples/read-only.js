@@ -1,20 +1,17 @@
-import React, { useState } from 'react'
-import { Editor } from 'slate'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { withHistory } from 'slate-history'
-
-const ReadOnlyEditor = withHistory(withReact(Editor))
+import React, { useState, useMemo } from 'react'
+import { createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ReadOnlyEditor)
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
-      placeholder="Enter some plain text..."
       readOnly
       editor={editor}
       value={value}
       onChange={v => setValue(v)}
+      placeholder="Enter some plain text..."
     />
   )
 }

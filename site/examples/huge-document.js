@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import faker from 'faker'
-import { Editor } from 'slate'
-import { Editable, withReact, useSlate } from 'slate-react'
+import { createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
@@ -25,20 +25,18 @@ for (let h = 0; h < HEADINGS; h++) {
   }
 }
 
-const HugeDocumentEditor = withReact(Editor)
-
 const HugeDocumentExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(HugeDocumentEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Editable
-      spellCheck
-      autoFocus
       editor={editor}
       value={value}
       renderElement={renderElement}
       onChange={v => setValue(v)}
+      spellCheck
+      autoFocus
     />
   )
 }

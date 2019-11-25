@@ -1,6 +1,6 @@
-import React, { useCallback, useState } from 'react'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor } from 'slate'
+import React, { useCallback, useMemo, useState } from 'react'
+import { Editable, withReact } from 'slate-react'
+import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { withSchema } from 'slate-schema'
 
@@ -20,16 +20,16 @@ const schema = [
 
       switch (code) {
         case 'child_invalid': {
-          editor.setNodes({ type }, { at: path })
+          Editor.setNodes(editor, { type }, { at: path })
           break
         }
         case 'child_min_invalid': {
           const block = { type, children: [{ text: '', marks: [] }] }
-          editor.insertNodes(block, { at: path.concat(index) })
+          Editor.insertNodes(editor, block, { at: path.concat(index) })
           break
         }
         case 'child_max_invalid': {
-          editor.setNodes({ type }, { at: path.concat(index) })
+          Editor.setNodes(editor, { type }, { at: path.concat(index) })
           break
         }
       }
@@ -37,22 +37,23 @@ const schema = [
   },
 ]
 
-const ForcedLayoutEditor = withSchema(withHistory(withReact(Editor)), schema)
-
 const ForcedLayoutExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ForcedLayoutEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
+  const editor = useMemo(
+    () => withSchema(withHistory(withReact(createEditor())), schema),
+    []
+  )
   return (
     <div>
       <Editable
-        spellCheck
-        autoFocus
-        placeholder="Enter a title…"
         editor={editor}
         value={value}
         renderElement={renderElement}
         onChange={v => setValue(v)}
+        placeholder="Enter a title…"
+        spellCheck
+        autoFocus
       />
     </div>
   )

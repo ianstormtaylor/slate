@@ -1,7 +1,7 @@
 import React from 'react'
-import { Text, Path, Element, Node } from 'slate'
+import { Editor, Text, Path, Element, Node } from 'slate'
 
-import { useEditor } from '../hooks/use-editor'
+import { ReactEditor, useEditor } from '..'
 import { Leaf } from '../utils/leaf'
 
 /**
@@ -16,7 +16,7 @@ const String = (props: {
 }) => {
   const { isLast, leaf, parent, text } = props
   const editor = useEditor()
-  const path = editor.findPath(text)
+  const path = ReactEditor.findPath(editor, text)
   const parentPath = Path.parent(path)
 
   // COMPAT: Render text inside void nodes with a zero-width space.
@@ -32,7 +32,7 @@ const String = (props: {
     leaf.text === '' &&
     parent.children[parent.children.length - 1] === text &&
     !editor.isInline(parent) &&
-    editor.getText(parentPath) === ''
+    Editor.getText(editor, parentPath) === ''
   ) {
     return <ZeroWidthString isLineBreak />
   }

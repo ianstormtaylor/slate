@@ -1,36 +1,19 @@
-import React, { useState } from 'react'
-import { Editor } from 'slate'
-import { withHistory } from 'slate-history'
-import {
-  Editable,
-  withReact,
-  useSlate,
-  useSelected,
-  useFocused,
-} from 'slate-react'
-
-class EmbedsEditor extends withHistory(withReact(Editor)) {
-  isVoid(element) {
-    return element.type === 'video'
-  }
-
-  insertVideo(url) {
-    const video = { type: 'video', url, children: [{ text: '', marks: [] }] }
-    this.insertNodes(video)
-  }
-}
+import React, { useMemo, useState } from 'react'
+import { Editor, createEditor } from 'slate'
+import { Editable, withReact, useSelected, useFocused } from 'slate-react'
 
 const EmbedsExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(EmbedsEditor)
+  const isVoid = element => element.type === 'video'
+  const editor = useMemo(() => withReact(createEditor({ isVoid })), [])
   return (
     <div>
       <Editable
-        placeholder="Enter some text..."
         editor={editor}
         value={value}
-        onChange={v => setValue(v)}
         renderElement={props => <Element {...props} />}
+        onChange={v => setValue(v)}
+        placeholder="Enter some text..."
       />
     </div>
   )
@@ -38,7 +21,6 @@ const EmbedsExample = () => {
 
 const Element = props => {
   const { attributes, children, element } = props
-
   switch (element.type) {
     case 'video':
       return <VideoElement {...props} />
@@ -101,7 +83,7 @@ const VideoElement = ({ attributes, children, element }) => {
           }}
           onChange={value => {
             const path = editor.findPath(element)
-            editor.setNodes({ url: value }, { at: path })
+            Editor.setNodes(editor, { url: value }, { at: path })
           }}
         />
       ) : null}

@@ -8,15 +8,15 @@ import {
   Point,
   Range,
   Value,
-} from '../..'
+} from '../../..'
 
-class DeletingCommands {
+export const TextTransforms = {
   /**
    * Delete content in the editor.
    */
 
   delete(
-    this: Editor,
+    editor: Editor,
     options: {
       at?: Location
       distance?: number
@@ -25,9 +25,9 @@ class DeletingCommands {
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
+    Editor.withoutNormalizing(editor, () => {
       const { reverse = false, unit = 'character', distance = 1 } = options
-      let { at = this.value.selection, hanging = false } = options
+      let { at = editor.value.selection, hanging = false } = options
 
       if (!at) {
         return
@@ -38,7 +38,7 @@ class DeletingCommands {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = this.getMatch(at.path, 'void')
+        const furthestVoid = Editor.getMatch(editor, at.path, 'void')
 
         if (furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -46,15 +46,15 @@ class DeletingCommands {
         } else {
           const opts = { unit, distance }
           const target = reverse
-            ? this.getBefore(at, opts) || this.getStart([])
-            : this.getAfter(at, opts) || this.getEnd([])
+            ? Editor.getBefore(editor, at, opts) || Editor.getStart(editor, [])
+            : Editor.getAfter(editor, at, opts) || Editor.getEnd(editor, [])
           at = { anchor: at, focus: target }
           hanging = true
         }
       }
 
       if (Path.isPath(at)) {
-        this.removeNodes({ at })
+        Editor.removeNodes(editor, { at })
         return
       }
 
@@ -63,19 +63,19 @@ class DeletingCommands {
       }
 
       if (!hanging) {
-        at = this.unhangRange(at)
+        at = Editor.unhangRange(editor, at)
       }
 
       let [start, end] = Range.edges(at)
-      const [ancestor] = this.getAncestor(at)
+      const [ancestor] = Editor.getAncestor(editor, at)
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = this.getMatch(start.path, 'void')
-      const endVoid = this.getMatch(end.path, 'void')
+      const startVoid = Editor.getMatch(editor, start.path, 'void')
+      const endVoid = Editor.getMatch(editor, end.path, 'void')
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
-        const block = this.getMatch(start.path, 'block')
-        const before = this.getBefore(start)
+        const block = Editor.getMatch(editor, start.path, 'block')
+        const before = Editor.getBefore(editor, start)
 
         if (before && block && Path.isAncestor(block[1], before.path)) {
           start = before
@@ -83,8 +83,8 @@ class DeletingCommands {
       }
 
       if (endVoid) {
-        const block = this.getMatch(end.path, 'block')
-        const after = this.getAfter(end)
+        const block = Editor.getMatch(editor, end.path, 'block')
+        const after = Editor.getAfter(editor, end)
 
         if (after && block && Path.isAncestor(block[1], after.path)) {
           end = after
@@ -93,43 +93,45 @@ class DeletingCommands {
 
       // Get the highest nodes that are completely inside the range, as well as
       // the start and end nodes.
-      const matches = this.matches({
+      const matches = Editor.matches(editor, {
         at,
         match: ([n, p]) =>
-          (Element.isElement(n) && this.isVoid(n)) ||
+          (Element.isElement(n) && editor.isVoid(n)) ||
           (!Path.isCommon(p, start.path) && !Path.isCommon(p, end.path)),
       })
 
-      const pathRefs = Array.from(matches, ([, p]) => this.createPathRef(p))
-      const startRef = this.createPointRef(start)
-      const endRef = this.createPointRef(end)
+      const pathRefs = Array.from(matches, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
+      const startRef = Editor.createPointRef(editor, start)
+      const endRef = Editor.createPointRef(editor, end)
 
       if (!isSingleText && !startVoid) {
         const point = startRef.current!
-        const [node] = this.getLeaf(point)
+        const [node] = Editor.getLeaf(editor, point)
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        this.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: 'remove_text', path, offset, text })
       }
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        this.removeNodes({ at: path })
+        Editor.removeNodes(editor, { at: path })
       }
 
       if (!endVoid) {
         const point = endRef.current!
-        const [node] = this.getLeaf(point)
+        const [node] = Editor.getLeaf(editor, point)
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        this.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: 'remove_text', path, offset, text })
       }
 
       const isBlockAncestor =
         Value.isValue(ancestor) ||
-        (Element.isElement(ancestor) && !this.isInline(ancestor))
+        (Element.isElement(ancestor) && !editor.isInline(ancestor))
 
       if (
         !isSingleText &&
@@ -137,31 +139,31 @@ class DeletingCommands {
         endRef.current &&
         startRef.current
       ) {
-        this.mergeNodes({ at: endRef.current, hanging: true })
+        Editor.mergeNodes(editor, { at: endRef.current, hanging: true })
       }
 
       const point = endRef.unref() || startRef.unref()
 
       if (options.at == null && point) {
-        this.select(point)
+        Editor.select(editor, point)
       }
     })
-  }
+  },
 
   /**
    * Insert a fragment at a specific location in the editor.
    */
 
   insertFragment(
-    this: Editor,
+    editor: Editor,
     fragment: Node[],
     options: {
       at?: Location
       hanging?: boolean
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      let { at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      let { at = editor.value.selection } = options
       const { hanging = false } = options
 
       if (!fragment.length) {
@@ -172,45 +174,45 @@ class DeletingCommands {
         return
       } else if (Range.isRange(at)) {
         if (!hanging) {
-          at = this.unhangRange(at)
+          at = Editor.unhangRange(editor, at)
         }
 
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
           const [, end] = Range.edges(at)
-          const pointRef = this.createPointRef(end)
-          this.delete({ at })
+          const pointRef = Editor.createPointRef(editor, end)
+          Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       } else if (Path.isPath(at)) {
-        at = this.getStart(at)
+        at = Editor.getStart(editor, at)
       }
 
-      if (this.getMatch(at.path, 'void')) {
+      if (Editor.getMatch(editor, at.path, 'void')) {
         return
       }
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = this.getMatch(at, 'inline-element')
+      const inlineElementMatch = Editor.getMatch(editor, at, 'inline-element')
 
       if (inlineElementMatch) {
         const [, inlinePath] = inlineElementMatch
 
-        if (this.isEnd(at, inlinePath)) {
-          const after = this.getAfter(inlinePath)!
+        if (Editor.isEnd(editor, at, inlinePath)) {
+          const after = Editor.getAfter(editor, inlinePath)!
           at = after
-        } else if (this.isStart(at, inlinePath)) {
-          const before = this.getBefore(inlinePath)!
+        } else if (Editor.isStart(editor, at, inlinePath)) {
+          const before = Editor.getBefore(editor, inlinePath)!
           at = before
         }
       }
 
-      const blockMatch = this.getMatch(at, 'block')!
+      const blockMatch = Editor.getMatch(editor, at, 'block')!
       const [, blockPath] = blockMatch
-      const isBlockStart = this.isStart(at, blockPath)
-      const isBlockEnd = this.isEnd(at, blockPath)
+      const isBlockStart = Editor.isStart(editor, at, blockPath)
+      const isBlockEnd = Editor.isEnd(editor, at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
       const [, firstPath] = Node.first({ children: fragment }, [])
@@ -224,8 +226,8 @@ class DeletingCommands {
           mergeStart &&
           Path.isAncestor(p, firstPath) &&
           Element.isElement(n) &&
-          !this.isVoid(n) &&
-          !this.isInline(n)
+          !editor.isVoid(n) &&
+          !editor.isInline(n)
         ) {
           return false
         }
@@ -234,8 +236,8 @@ class DeletingCommands {
           mergeEnd &&
           Path.isAncestor(p, lastPath) &&
           Element.isElement(n) &&
-          !this.isVoid(n) &&
-          !this.isInline(n)
+          !editor.isVoid(n) &&
+          !editor.isInline(n)
         ) {
           return false
         }
@@ -259,7 +261,7 @@ class DeletingCommands {
       let hasBlocks = false
 
       for (const [node] of matches) {
-        if (Element.isElement(node) && !this.isInline(node)) {
+        if (Element.isElement(node) && !editor.isInline(node)) {
           starting = false
           hasBlocks = true
           middles.push(node)
@@ -270,30 +272,39 @@ class DeletingCommands {
         }
       }
 
-      const inlineMatch = this.getMatch(at, 'inline')!
+      const inlineMatch = Editor.getMatch(editor, at, 'inline')!
       const [, inlinePath] = inlineMatch
-      const isInlineStart = this.isStart(at, inlinePath)
-      const isInlineEnd = this.isEnd(at, inlinePath)
+      const isInlineStart = Editor.isStart(editor, at, inlinePath)
+      const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
 
-      const middleRef = this.createPathRef(
+      const middleRef = Editor.createPathRef(
+        editor,
         isBlockEnd ? Path.next(blockPath) : blockPath
       )
 
-      const endRef = this.createPathRef(
+      const endRef = Editor.createPathRef(
+        editor,
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
 
-      this.splitNodes({ at, match: hasBlocks ? 'block' : 'inline' })
+      Editor.splitNodes(editor, { at, match: hasBlocks ? 'block' : 'inline' })
 
-      const startRef = this.createPathRef(
+      const startRef = Editor.createPathRef(
+        editor,
         !isInlineStart || (isInlineStart && isInlineEnd)
           ? Path.next(inlinePath)
           : inlinePath
       )
 
-      this.insertNodes(starts, { at: startRef.current!, match: 'inline' })
-      this.insertNodes(middles, { at: middleRef.current!, match: 'block' })
-      this.insertNodes(ends, { at: endRef.current!, match: 'inline' })
+      Editor.insertNodes(editor, starts, {
+        at: startRef.current!,
+        match: 'inline',
+      })
+      Editor.insertNodes(editor, middles, {
+        at: middleRef.current!,
+        match: 'block',
+      })
+      Editor.insertNodes(editor, ends, { at: endRef.current!, match: 'inline' })
 
       if (!options.at) {
         let path
@@ -306,29 +317,29 @@ class DeletingCommands {
           path = Path.previous(startRef.current!)
         }
 
-        const end = this.getEnd(path)
-        this.select(end)
+        const end = Editor.getEnd(editor, path)
+        Editor.select(editor, end)
       }
 
       startRef.unref()
       middleRef.unref()
       endRef.unref()
     })
-  }
+  },
 
   /**
-   * Insert a string of text in the editor.
+   * Insert a string of text in the Editor.
    */
 
   insertText(
-    this: Editor,
+    editor: Editor,
     text: string,
     options: {
       at?: Point | Range
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      const { selection } = this.value
+    Editor.withoutNormalizing(editor, () => {
+      const { selection } = editor.value
       let { at } = options
 
       if (!at && selection) {
@@ -339,18 +350,18 @@ class DeletingCommands {
         if (Range.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const pointRef = this.createPointRef(Range.end(at))
-          this.delete({ at })
+          const pointRef = Editor.createPointRef(editor, Range.end(at))
+          Editor.delete(editor, { at })
           at = pointRef.unref()!
         }
       }
 
-      if (Point.isPoint(at) && !this.getMatch(at.path, 'void')) {
+      if (Point.isPoint(at) && !Editor.getMatch(editor, at.path, 'void')) {
         const { path, offset } = at
-        this.apply({ type: 'insert_text', path, offset, text })
+        editor.apply({ type: 'insert_text', path, offset, text })
       }
     })
-  }
+  },
 
   /**
    * Remove a string of text in the editor.
@@ -359,30 +370,30 @@ class DeletingCommands {
    */
 
   removeText(
-    this: Editor,
+    editor: Editor,
     text: string,
     options: {
       at?: Range
     } = {}
   ) {
-    this.withoutNormalizing(() => {
-      const { at = this.value.selection } = options
+    Editor.withoutNormalizing(editor, () => {
+      const { at = editor.value.selection } = options
 
       if (!at || Range.isCollapsed(at)) {
         return
       }
 
       const [start, end] = Range.edges(at)
-      const texts = this.texts({ at })
-      const pathRefs = Array.from(texts, ([, p]) => this.createPathRef(p))
+      const texts = Editor.texts(editor, { at })
+      const pathRefs = Array.from(texts, ([, p]) =>
+        Editor.createPathRef(editor, p)
+      )
 
-      for (const [node, path] of this.texts({ at }))
-        if (Point.isPoint(at) && !this.getMatch(at.path, 'void')) {
+      for (const [node, path] of Editor.texts(editor, { at }))
+        if (Point.isPoint(at) && !Editor.getMatch(editor, at.path, 'void')) {
           const { path, offset } = at
-          this.apply({ type: 'insert_text', path, offset, text })
+          editor.apply({ type: 'insert_text', path, offset, text })
         }
     })
-  }
+  },
 }
-
-export default DeletingCommands

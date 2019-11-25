@@ -1,2 +1,4 @@
-export { HistoryEditor, withHistory } from './plugin'
-export { History } from './history'
+export * from './history'
+export * from './history-command'
+export * from './history-editor'
+export * from './with-history'

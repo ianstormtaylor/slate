@@ -1,3 +1,3 @@
 export * from './errors'
-export * from './plugin'
+export * from './with-schema'
 export * from './rules'

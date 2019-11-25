@@ -1,10 +1,12 @@
 import React, { useLayoutEffect, useRef, useMemo, useCallback } from 'react'
 import {
+  Editor,
   Value,
+  Operation,
   Element,
   NodeEntry,
+  Node as SlateNode,
   Range as SlateRange,
-  Operation,
 } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
@@ -14,7 +16,7 @@ import Hotkeys from '../utils/hotkeys'
 import { EditorContext } from '../hooks/use-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
-import { ReactEditor } from '../plugin'
+import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import {
   DOMElement,
@@ -22,6 +24,7 @@ import {
   DOMRange,
   isDOMElement,
   isDOMNode,
+  isDOMText,
   DOMStaticRange,
 } from '../utils/dom'
 import {
@@ -32,7 +35,6 @@ import {
   IS_FOCUSED,
   PLACEHOLDER,
 } from '../utils/weak-maps'
-import { Utils } from '../utils/utils'
 import {
   CustomAnnotationProps,
   CustomDecorationProps,
@@ -41,13 +43,14 @@ import {
 } from './custom'
 
 /**
- * Editor.
+ * Editable.
  */
 
-const Editor = (props: {
+export const Editable = (props: {
   decorate?: (entry: NodeEntry) => SlateRange[]
   editor: ReactEditor
   onChange: (value: Value, operations: Operation[]) => void
+  onDOMBeforeInput: (event: Event) => void
   placeholder?: string
   readOnly?: boolean
   role?: string
@@ -150,13 +153,13 @@ const Editor = (props: {
     const { selection } = value
     const domSelection = window.getSelection()
 
-    if (state.isComposing || !domSelection || !editor.isFocused()) {
+    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
     }
 
-    const el = editor.toDomNode(value)
+    const el = ReactEditor.toDomNode(editor, value)
     const domRange = domSelection.getRangeAt(0)
-    const newDomRange = selection && editor.toDomRange(selection)
+    const newDomRange = selection && ReactEditor.toDomRange(editor, selection)
 
     if (
       (!selection && !domRange) ||
@@ -199,28 +202,128 @@ const Editor = (props: {
         isComposing: boolean
       }
     ) => {
-      if (!readOnly && hasEditableTarget(editor, event.target)) {
-        const { inputType } = event
+      if (
+        !readOnly &&
+        hasEditableTarget(editor, event.target) &&
+        !isDOMEventHandled(event, props.onDOMBeforeInput)
+      ) {
+        const { selection } = editor.value
+        const { inputType: type } = event
         const data = event.dataTransfer || event.data || undefined
 
         // These two types occur while a user is composing text and can't be
         // cancelled. Let them through and wait for the composition to end.
         if (
-          inputType === 'insertCompositionText' ||
-          inputType === 'deleteCompositionText'
+          type === 'insertCompositionText' ||
+          type === 'deleteCompositionText'
         ) {
           return
         }
 
-        const [targetRange] = event.getTargetRanges()
-        let range
+        event.preventDefault()
 
-        if (targetRange) {
-          range = editor.toSlateRange(targetRange)
+        // COMPAT: For the deleting forward/backward input types we don't want
+        // to change the selection because it is the range that will be deleted,
+        // and those commands determine that for themselves.
+        if (!type.startsWith('delete') || type.startsWith('deleteBy')) {
+          const [targetRange] = event.getTargetRanges()
+
+          if (targetRange) {
+            const range = ReactEditor.toSlateRange(editor, targetRange)
+
+            if (!selection || !SlateRange.equals(selection, range)) {
+              editor.exec({ type: 'select', range: range })
+            }
+          }
         }
 
-        event.preventDefault()
-        editor.handleInput(inputType, data, range)
+        // COMPAT: If the selection is expanded, even if the command seems like
+        // a delete forward/backward command it should delete the selection.
+        if (
+          selection &&
+          SlateRange.isExpanded(selection) &&
+          type.startsWith('delete')
+        ) {
+          editor.exec({ type: 'delete_fragment' })
+          return
+        }
+
+        switch (type) {
+          case 'deleteByComposition':
+          case 'deleteByCut':
+          case 'deleteByDrag': {
+            editor.exec({ type: 'delete_fragment' })
+            break
+          }
+
+          case 'deleteContent':
+          case 'deleteContentForward': {
+            editor.exec({ type: 'delete_forward', unit: 'character' })
+            break
+          }
+
+          case 'deleteContentBackward': {
+            editor.exec({ type: 'delete_backward', unit: 'character' })
+            break
+          }
+
+          case 'deleteEntireSoftLine': {
+            editor.exec({ type: 'delete_backward', unit: 'line' })
+            editor.exec({ type: 'delete_forward', unit: 'line' })
+            break
+          }
+
+          case 'deleteHardLineBackward': {
+            editor.exec({ type: 'delete_backward', unit: 'block' })
+            break
+          }
+
+          case 'deleteSoftLineBackward': {
+            editor.exec({ type: 'delete_backward', unit: 'line' })
+            break
+          }
+
+          case 'deleteHardLineForward': {
+            editor.exec({ type: 'delete_forward', unit: 'block' })
+            break
+          }
+
+          case 'deleteSoftLineForward': {
+            editor.exec({ type: 'delete_forward', unit: 'line' })
+            break
+          }
+
+          case 'deleteWordBackward': {
+            editor.exec({ type: 'delete_backward', unit: 'word' })
+            break
+          }
+
+          case 'deleteWordForward': {
+            editor.exec({ type: 'delete_forward', unit: 'word' })
+            break
+          }
+
+          case 'insertLineBreak':
+          case 'insertParagraph': {
+            editor.exec({ type: 'insert_break' })
+            break
+          }
+
+          case 'insertFromComposition':
+          case 'insertFromDrop':
+          case 'insertFromPaste':
+          case 'insertFromYank':
+          case 'insertReplacementText':
+          case 'insertText': {
+            if (data instanceof DataTransfer) {
+              editor.exec({ type: 'insert_data', data })
+            } else if (typeof data === 'string') {
+              editor.exec({ type: 'insert_text', text: data })
+            }
+
+            break
+          }
+        }
       }
     },
     []
@@ -235,7 +338,7 @@ const Editor = (props: {
     debounce(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
-        const el = editor.toDomNode(value)
+        const el = ReactEditor.toDomNode(editor, value)
         const domSelection = window.getSelection()
         const domRange =
           domSelection &&
@@ -254,10 +357,10 @@ const Editor = (props: {
           hasEditableTarget(editor, domRange.startContainer) &&
           hasEditableTarget(editor, domRange.endContainer)
         ) {
-          const range = editor.toSlateRange(domRange)
-          editor.select(range)
+          const range = ReactEditor.toSlateRange(editor, domRange)
+          editor.exec({ type: 'select', range })
         } else {
-          editor.deselect()
+          editor.exec({ type: 'deselect' })
         }
       }
     }, 100),
@@ -267,7 +370,7 @@ const Editor = (props: {
   return (
     <EditorContext.Provider value={editor}>
       <ReadOnlyContext.Provider value={readOnly}>
-        <FocusedContext.Provider value={editor.isFocused()}>
+        <FocusedContext.Provider value={ReactEditor.isFocused(editor)}>
           <div
             // COMPAT: The Grammarly Chrome extension works by changing the DOM
             // out from under `contenteditable` elements, which leads to weird
@@ -302,7 +405,7 @@ const Editor = (props: {
               if (IS_FIREFOX && !readOnly) {
                 event.preventDefault()
                 const text = (event as any).data as string
-                editor.handleInput('insertText', text)
+                editor.exec({ type: 'insert_text', text })
               }
             }, [])}
             onBlur={useCallback((event: React.FocusEvent) => {
@@ -323,7 +426,7 @@ const Editor = (props: {
                 // is not a "focusable" element (eg. a `<div>` without `tabindex`
                 // set).
                 if (relatedTarget) {
-                  const el = editor.toDomNode(value)
+                  const el = ReactEditor.toDomNode(editor, value)
 
                   // COMPAT: The event should be ignored if the focus is returning
                   // to the editor from an embedded editable element (eg. an <input>
@@ -338,10 +441,10 @@ const Editor = (props: {
                     // COMPAT: The event should be ignored if the focus is moving to a
                     // non- editable section of an element that isn't a void node (eg.
                     // a list item of the check list example).
-                    const node = editor.toSlateNode(relatedTarget)
+                    const node = ReactEditor.toSlateNode(editor, relatedTarget)
 
                     if (
-                      editor.hasDomNode(relatedTarget) &&
+                      ReactEditor.hasDomNode(editor, relatedTarget) &&
                       (!Element.isElement(node) || !editor.isVoid(node))
                     ) {
                       return
@@ -359,12 +462,13 @@ const Editor = (props: {
                 !isEventHandled(event, attributes.onClick) &&
                 isDOMNode(event.target)
               ) {
-                const node = editor.toSlateNode(event.target)
-                const path = editor.findPath(node)
-                const start = editor.getStart(path)
+                const node = ReactEditor.toSlateNode(editor, event.target)
+                const path = ReactEditor.findPath(editor, node)
+                const start = Editor.getStart(editor, path)
 
-                if (editor.getMatch(start, 'void')) {
-                  editor.select(start)
+                if (Editor.getMatch(editor, start, 'void')) {
+                  const range = Editor.getRange(editor, start)
+                  editor.exec({ type: 'select', range })
                 }
               }
             }, [])}
@@ -380,7 +484,7 @@ const Editor = (props: {
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
                 if (!IS_SAFARI && event.data) {
-                  editor.insertText(event.data)
+                  editor.exec({ type: 'insert_text', text: event.data })
                 }
               }
             }, [])}
@@ -398,7 +502,7 @@ const Editor = (props: {
                 !isEventHandled(event, attributes.onCopy)
               ) {
                 event.preventDefault()
-                Utils.setFragmentData(event.clipboardData, editor)
+                setFragmentData(event.clipboardData, editor)
               }
             }, [])}
             onCut={useCallback((event: React.ClipboardEvent) => {
@@ -408,11 +512,11 @@ const Editor = (props: {
                 !isEventHandled(event, attributes.onCut)
               ) {
                 event.preventDefault()
-                Utils.setFragmentData(event.clipboardData, editor)
+                setFragmentData(event.clipboardData, editor)
                 const { selection } = value
 
                 if (selection && SlateRange.isExpanded(selection)) {
-                  editor.delete()
+                  editor.exec({ type: 'delete_fragment' })
                 }
               }
             }, [])}
@@ -424,7 +528,7 @@ const Editor = (props: {
                 // Only when the target is void, call `preventDefault` to signal
                 // that drops are allowed. Editable content is droppable by
                 // default, and calling `preventDefault` hides the cursor.
-                const node = editor.toSlateNode(event.target)
+                const node = ReactEditor.toSlateNode(editor, event.target)
 
                 if (Element.isElement(node) && editor.isVoid(node)) {
                   event.preventDefault()
@@ -436,18 +540,18 @@ const Editor = (props: {
                 hasTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onDragStart)
               ) {
-                const node = editor.toSlateNode(event.target)
-                const path = editor.findPath(node)
-                const voidMatch = editor.getMatch(path, 'void')
+                const node = ReactEditor.toSlateNode(editor, event.target)
+                const path = ReactEditor.findPath(editor, node)
+                const voidMatch = Editor.getMatch(editor, path, 'void')
 
                 // If starting a drag on a void node, make sure it is selected
                 // so that it shows up in the selection's fragment.
                 if (voidMatch) {
-                  const range = editor.getRange(path)
-                  editor.select(range)
+                  const range = Editor.getRange(editor, path)
+                  editor.exec({ type: 'select', range })
                 }
 
-                Utils.setFragmentData(event.dataTransfer, editor)
+                setFragmentData(event.dataTransfer, editor)
               }
             }, [])}
             onFocus={useCallback((event: React.FocusEvent) => {
@@ -457,7 +561,7 @@ const Editor = (props: {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onFocus)
               ) {
-                const el = editor.toDomNode(value)
+                const el = ReactEditor.toDomNode(editor, value)
                 state.latestElement = window.document.activeElement
 
                 // COMPAT: If the editor has nested editable elements, the focus
@@ -479,16 +583,17 @@ const Editor = (props: {
               ) {
                 const { nativeEvent } = event
 
-                // COMPAT: Since we prevent the default behavior on `beforeinput` events,
-                // the browser doesn't think there's ever any history stack to undo or redo,
-                // so we have to manage these hotkeys ourselves. (2019/11/06)
+                // COMPAT: Since we prevent the default behavior on
+                // `beforeinput` events, the browser doesn't think there's ever
+                // any history stack to undo or redo, so we have to manage these
+                // hotkeys ourselves. (2019/11/06)
                 if (Hotkeys.isRedo(nativeEvent)) {
-                  editor.redo()
+                  editor.exec({ type: 'redo' })
                   return
                 }
 
                 if (Hotkeys.isUndo(nativeEvent)) {
-                  editor.undo()
+                  editor.exec({ type: 'undo' })
                   return
                 }
 
@@ -496,72 +601,72 @@ const Editor = (props: {
                 // properly. In Chrome, the selection isn't properly extended.
                 // And in Firefox, the selection isn't properly collapsed.
                 // (2017/10/17)
-                if (Hotkeys.isMoveLineBackward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'line', reverse: true })
-                  return
-                }
+                // if (Hotkeys.isMoveLineBackward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'line', reverse: true })
+                //   return
+                // }
 
-                if (Hotkeys.isMoveLineForward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'line' })
-                  return
-                }
+                // if (Hotkeys.isMoveLineForward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'line' })
+                //   return
+                // }
 
-                if (Hotkeys.isExtendLineBackward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'line', edge: 'focus', reverse: true })
-                  return
-                }
+                // if (Hotkeys.isExtendLineBackward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'line', edge: 'focus', reverse: true })
+                //   return
+                // }
 
-                if (Hotkeys.isExtendLineForward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'line', edge: 'focus' })
-                  return
-                }
+                // if (Hotkeys.isExtendLineForward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'line', edge: 'focus' })
+                //   return
+                // }
 
                 // COMPAT: If a void node is selected, or a zero-width text node
                 // adjacent to an inline is selected, we need to handle these
                 // hotkeys manually because browsers won't be able to skip over
                 // the void node with the zero-width space not being an empty
                 // string.
-                if (Hotkeys.isMoveBackward(nativeEvent)) {
-                  const { selection } = editor.value
-                  event.preventDefault()
+                // if (Hotkeys.isMoveBackward(nativeEvent)) {
+                //   const { selection } = editor.value
+                //   event.preventDefault()
 
-                  if (selection && SlateRange.isCollapsed(selection)) {
-                    editor.move({ reverse: true })
-                  } else {
-                    editor.collapse({ edge: 'start' })
-                  }
+                //   if (selection && SlateRange.isCollapsed(selection)) {
+                //     editor.move({ reverse: true })
+                //   } else {
+                //     editor.collapse({ edge: 'start' })
+                //   }
 
-                  return
-                }
+                //   return
+                // }
 
-                if (Hotkeys.isMoveForward(nativeEvent)) {
-                  const { selection } = editor.value
-                  event.preventDefault()
+                // if (Hotkeys.isMoveForward(nativeEvent)) {
+                //   const { selection } = editor.value
+                //   event.preventDefault()
 
-                  if (selection && SlateRange.isCollapsed(selection)) {
-                    editor.move()
-                  } else {
-                    editor.collapse({ edge: 'end' })
-                  }
+                //   if (selection && SlateRange.isCollapsed(selection)) {
+                //     editor.move()
+                //   } else {
+                //     editor.collapse({ edge: 'end' })
+                //   }
 
-                  return
-                }
+                //   return
+                // }
 
-                if (Hotkeys.isMoveWordBackward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'word', reverse: true })
-                  return
-                }
+                // if (Hotkeys.isMoveWordBackward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'word', reverse: true })
+                //   return
+                // }
 
-                if (Hotkeys.isMoveWordForward(nativeEvent)) {
-                  event.preventDefault()
-                  editor.move({ unit: 'word' })
-                  return
-                }
+                // if (Hotkeys.isMoveWordForward(nativeEvent)) {
+                //   event.preventDefault()
+                //   editor.move({ unit: 'word' })
+                //   return
+                // }
               }
             }}
             onPaste={useCallback((event: React.ClipboardEvent) => {
@@ -574,7 +679,10 @@ const Editor = (props: {
                 !isEventHandled(event, attributes.onPaste)
               ) {
                 event.preventDefault()
-                editor.handleInput('insertFromPaste', event.clipboardData)
+                editor.exec({
+                  type: 'insert_data',
+                  data: event.clipboardData,
+                })
               }
             }, [])}
           >
@@ -627,7 +735,7 @@ const hasTarget = (
   editor: ReactEditor,
   target: EventTarget | null
 ): target is DOMNode => {
-  return isDOMNode(target) && editor.hasDomNode(target)
+  return isDOMNode(target) && ReactEditor.hasDomNode(editor, target)
 }
 
 /**
@@ -638,7 +746,10 @@ const hasEditableTarget = (
   editor: ReactEditor,
   target: EventTarget | null
 ): target is DOMNode => {
-  return isDOMNode(target) && editor.hasDomNode(target, { editable: true })
+  return (
+    isDOMNode(target) &&
+    ReactEditor.hasDomNode(editor, target, { editable: true })
+  )
 }
 
 /**
@@ -657,4 +768,129 @@ const isEventHandled = (
   return event.isDefaultPrevented() || event.isPropagationStopped()
 }
 
-export default Editor
+/**
+ * Check if a DOM event is overrided by a handler.
+ */
+
+const isDOMEventHandled = (event: Event, handler?: (event: Event) => void) => {
+  if (!handler) {
+    return false
+  }
+
+  handler(event)
+  return event.defaultPrevented
+}
+
+/**
+ * Set the currently selected fragment to the clipboard.
+ */
+
+const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
+  const { value } = editor
+  const { selection } = value
+
+  if (!selection) {
+    return
+  }
+
+  const [start, end] = SlateRange.edges(selection)
+  const startVoid = Editor.getMatch(editor, start.path, 'void')
+  const endVoid = Editor.getMatch(editor, end.path, 'void')
+
+  if (SlateRange.isCollapsed(selection) && !startVoid) {
+    return
+  }
+
+  // Create a fake selection so that we can add a Base64-encoded copy of the
+  // fragment to the HTML, to decode on future pastes.
+  const domRange = ReactEditor.toDomRange(editor, selection)
+  let contents = domRange.cloneContents()
+  let attach = contents.childNodes[0] as HTMLElement
+
+  // Make sure attach is non-empty, since empty nodes will not get copied.
+  contents.childNodes.forEach(node => {
+    if (node.textContent && node.textContent.trim() !== '') {
+      attach = node as HTMLElement
+    }
+  })
+
+  // COMPAT: If the end node is a void node, we need to move the end of the
+  // range from the void node's spacer span, to the end of the void node's
+  // content, since the spacer is before void's content in the DOM.
+  if (endVoid) {
+    const [voidNode] = endVoid
+    const r = domRange.cloneRange()
+    const domNode = ReactEditor.toDomNode(editor, voidNode)
+    r.setEndAfter(domNode)
+    contents = r.cloneContents()
+  }
+
+  // COMPAT: If the start node is a void node, we need to attach the encoded
+  // fragment to the void node's content node instead of the spacer, because
+  // attaching it to empty `<div>/<span>` nodes will end up having it erased by
+  // most browsers. (2018/04/27)
+  if (startVoid) {
+    attach = contents.querySelector('[data-slate-spacer]')! as HTMLElement
+  }
+
+  // Remove any zero-width space spans from the cloned DOM so that they don't
+  // show up elsewhere when pasted.
+  Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
+    zw => {
+      const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
+      zw.textContent = isNewline ? '\n' : ''
+    }
+  )
+
+  // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
+  // in the HTML, and can be used for intra-Slate pasting. If it's a text
+  // node, wrap it in a `<span>` so we have something to set an attribute on.
+  if (isDOMText(attach)) {
+    const span = document.createElement('span')
+    // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
+    // then leading and trailing spaces will be ignored. (2017/09/21)
+    span.style.whiteSpace = 'pre'
+    span.appendChild(attach)
+    contents.appendChild(span)
+    attach = span
+  }
+
+  const fragment = SlateNode.fragment(value, selection)
+  const string = JSON.stringify(fragment)
+  const encoded = window.btoa(encodeURIComponent(string))
+  attach.setAttribute('data-slate-fragment', encoded)
+  dataTransfer.setData('application/x-slate-fragment', encoded)
+
+  // Add the content to a <div> so that we can get its inner HTML.
+  const div = document.createElement('div')
+  div.appendChild(contents)
+  dataTransfer.setData('text/html', div.innerHTML)
+  dataTransfer.setData('text/plain', getPlainText(div))
+}
+
+/**
+ * Get a plaintext representation of the content of a node, accounting for block
+ * elements which get a newline appended.
+ */
+
+const getPlainText = (domNode: DOMNode) => {
+  let text = ''
+
+  if (isDOMText(domNode) && domNode.nodeValue) {
+    return domNode.nodeValue
+  }
+
+  if (isDOMElement(domNode)) {
+    for (const childNode of Array.from(domNode.childNodes)) {
+      text += getPlainText(childNode)
+    }
+
+    const display = getComputedStyle(domNode).getPropertyValue('display')
+
+    if (display === 'block' || display === 'list' || domNode.tagName === 'BR') {
+      text += '\n'
+    }
+  }
+
+  return text
+}

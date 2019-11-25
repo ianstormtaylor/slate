@@ -39,9 +39,9 @@
     "@babel/register": "^7.6.2",
     "@babel/runtime": "^7.6.3",
     "@types/mocha": "^5.2.7",
-    "@types/node": "^12.7.12",
-    "@typescript-eslint/eslint-plugin": "^2.3.3",
-    "@typescript-eslint/parser": "^2.3.3",
+    "@types/node": "^12.12.11",
+    "@typescript-eslint/eslint-plugin": "^2.8.0",
+    "@typescript-eslint/parser": "^2.8.0",
     "babel-eslint": "^8.2.1",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
@@ -76,13 +76,16 @@
     "rollup-plugin-node-globals": "^1.4.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-typescript2": "^0.24.3",
+    "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
     "slate": "^0.47.8",
     "slate-history": "^0.47.8",
     "slate-hyperscript": "^0.13.8",
     "slate-react": "^0.22.9",
     "slate-schema": "^0.47.8",
-    "typescript": "^3.6.4"
+    "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.14.149"
   }
 }

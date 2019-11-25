@@ -1,11 +1,11 @@
-import { Editor, Path, Range } from '../..'
+import { Editor, Path, Range } from '../../..'
 
-class RangeQueries {
+export const RangeQueries = {
   /**
    * Convert a range into a non-hanging one.
    */
 
-  unhangRange(this: Editor, range: Range): Range {
+  unhangRange(editor: Editor, range: Range): Range {
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
@@ -13,13 +13,16 @@ class RangeQueries {
       return range
     }
 
-    const closestBlock = this.getMatch(end.path, 'block')
+    const closestBlock = Editor.getMatch(editor, end.path, 'block')
     const blockPath = closestBlock ? closestBlock[1] : []
-    const first = this.getStart([])
+    const first = Editor.getStart(editor, [])
     const before = { anchor: first, focus: end }
     let skip = true
 
-    for (const [node, path] of this.texts({ at: before, reverse: true })) {
+    for (const [node, path] of Editor.texts(editor, {
+      at: before,
+      reverse: true,
+    })) {
       if (skip) {
         skip = false
         continue
@@ -32,7 +35,5 @@ class RangeQueries {
     }
 
     return { anchor: start, focus: end }
-  }
+  },
 }
-
-export default RangeQueries

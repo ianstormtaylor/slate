@@ -1,31 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor } from 'slate'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
+import { Editable, withReact } from 'slate-react'
+import { Editor, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
-class HoveringMenuEditor extends withHistory(withReact(Editor)) {
-  onBeforeInput(event) {
-    switch (event.inputType) {
-      case 'formatBold':
-        return this.toggleMarks([{ type: 'bold' }])
-      case 'formatItalic':
-        return this.toggleMarks([{ type: 'italic' }])
-      case 'formatUnderline':
-        return this.toggleMarks([{ type: 'underlined' }])
-      default:
-        return super.onBeforeInput(event)
-    }
-  }
-}
-
 const HoveringMenuExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(HoveringMenuEditor)
   const ref = useRef()
+  const editor = useMemo(
+    () => withMarks(withHistory(withReact(createEditor()))),
+    []
+  )
 
   useEffect(() => {
     const el = ref.current
@@ -82,14 +70,53 @@ const HoveringMenuExample = () => {
         </Menu>
       </Portal>
       <Editable
-        placeholder="Enter some text..."
         editor={editor}
         value={value}
         renderMark={props => <Mark {...props} />}
         onChange={v => setValue(v)}
+        placeholder="Enter some text..."
+        onDOMBeforeInput={event => {
+          switch (event.inputType) {
+            case 'formatBold':
+              return this.toggleMarks([{ type: 'bold' }])
+            case 'formatItalic':
+              return this.toggleMarks([{ type: 'italic' }])
+            case 'formatUnderline':
+              return this.toggleMarks([{ type: 'underlined' }])
+          }
+        }}
       />
     </div>
   )
+}
+
+const withMarks = editor => {
+  const { exec } = editor
+
+  editor.exec = (editor, command) => {
+    switch (command.type) {
+      case 'toggle_mark': {
+        const { mark } = command
+        const isActive = isMarkActive(editor, mark.type)
+        const command = isActive ? 'remove_mark' : 'add_mark'
+        editor.exec({ type: command, mark })
+        break
+      }
+
+      default: {
+        exec(editor, command)
+        break
+      }
+    }
+  }
+
+  return editor
+}
+
+const isMarkActive = (editor, type) => {
+  const marks = Editor.getActiveMarks(editor)
+  const isActive = marks.some(m => m.type === type)
+  return isActive
 }
 
 const Mark = ({ attributes, children, mark }) => {
@@ -104,15 +131,13 @@ const Mark = ({ attributes, children, mark }) => {
 }
 
 const MarkButton = ({ editor, type, icon }) => {
-  const marks = editor.getActiveMarks()
-  const isActive = marks.some(m => m.type === type)
   return (
     <Button
       reversed
-      active={isActive}
+      active={isMarkActive(editor, type)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.toggleMarks([{ type }])
+        editor.exec({ type: 'toggle_mark', mark: { type } })
       }}
     >
       <Icon>{icon}</Icon>

@@ -1,57 +1,19 @@
-import React, { useCallback, useState } from 'react'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor, Range, Point } from 'slate'
+import React, { useCallback, useState, useMemo } from 'react'
+import { Editable, withReact } from 'slate-react'
+import { Editor, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-
-class TablesEditor extends withHistory(withReact(Editor)) {
-  delete(options = {}) {
-    const { at, reverse } = options
-    const { selection } = this.value
-
-    if (!at && selection && Range.isCollapsed(selection)) {
-      const { anchor } = selection
-      const cell = this.getMatch(anchor, { type: 'table-cell' })
-
-      if (cell) {
-        const [, cellPath] = cell
-        const edge = reverse ? this.getStart(cellPath) : this.getEnd(cellPath)
-
-        if (Point.equals(anchor, edge)) {
-          return
-        }
-      }
-    }
-
-    super.delete(options)
-  }
-
-  splitNodes(options = {}) {
-    const { at } = options
-    const { selection } = this.value
-
-    if (
-      !at &&
-      selection &&
-      (this.getMatch(selection.anchor, { type: 'table' }) ||
-        this.getMatch(selection.focus, { type: 'table' }))
-    ) {
-      return
-    }
-
-    super.splitNodes(options)
-  }
-}
 
 const TablesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(TablesEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
+  const editor = useMemo(
+    () => withTables(withHistory(withReact(createEditor()))),
+    []
+  )
   return (
     <div>
       <Editable
-        spellCheck
-        autoFocus
         editor={editor}
         value={value}
         renderElement={renderElement}
@@ -60,6 +22,48 @@ const TablesExample = () => {
       />
     </div>
   )
+}
+
+const withTables = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    const { selection } = editor.value
+    const { type } = command
+
+    if (
+      (type === 'delete_forward' || type === 'delete_backward') &&
+      selection &&
+      Range.isCollapsed(selection)
+    ) {
+      const { anchor } = selection
+      const cell = Editor.getMatch(editor, anchor, { type: 'table-cell' })
+
+      if (cell) {
+        const [, cellPath] = cell
+        const edge = reverse
+          ? Editor.getStart(editor, cellPath)
+          : Editor.getEnd(editor, cellPath)
+
+        if (Point.equals(anchor, edge)) {
+          return
+        }
+      }
+    }
+
+    if (
+      type === 'insert_break' &&
+      selection &&
+      (Editor.getMatch(editor, selection.anchor, { type: 'table' }) ||
+        Editor.getMatch(editor, selection.focus, { type: 'table' }))
+    ) {
+      return
+    }
+
+    exec(command)
+  }
+
+  return editor
 }
 
 const Element = ({ attributes, children, element }) => {

@@ -1,58 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Editor } from 'slate'
-import {
-  Editable,
-  withReact,
-  useSlate,
-  useSelected,
-  useFocused,
-} from 'slate-react'
+import { Editor, createEditor } from 'slate'
+import { Editable, useSelected, useFocused, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import { Button, Icon, Toolbar } from '../components'
 
-class ImagesEditor extends withHistory(withReact(Editor)) {
-  isVoid(element) {
-    return element.type === 'image'
-  }
-
-  insertData(data) {
-    const text = data.getData('text/plain')
-    const { files } = data
-
-    if (files && files.length > 0) {
-      for (const file of files) {
-        const reader = new FileReader()
-        const [mime] = file.type.split('/')
-
-        if (mime === 'image') {
-          reader.addEventListener('load', () => {
-            this.insertImage(reader.result)
-          })
-
-          reader.readAsDataURL(file)
-        }
-      }
-    } else if (isImageUrl(text)) {
-      this.insertImage(text)
-    } else {
-      super.insertData(data)
-    }
-  }
-
-  insertImage(url) {
-    const text = { text: '', marks: [] }
-    const image = { type: 'image', url, children: [text] }
-    this.insertNodes(image)
-  }
-}
-
 const ImagesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(ImagesEditor)
+  const editor = useMemo(
+    () => withImages(withHistory(withReact(createEditor()))),
+    []
+  )
   return (
     <div>
       <Toolbar>
@@ -61,21 +22,76 @@ const ImagesExample = () => {
             event.preventDefault()
             const url = window.prompt('Enter the URL of the image:')
             if (!url) return
-            editor.insertImage(url)
+            editor.exec({ type: 'insert_url', url })
           }}
         >
           <Icon>image</Icon>
         </Button>
       </Toolbar>
       <Editable
-        placeholder="Enter some text..."
         editor={editor}
         value={value}
         onChange={v => setValue(v)}
         renderElement={props => <Element {...props} />}
+        placeholder="Enter some text..."
       />
     </div>
   )
+}
+
+const withImages = editor => {
+  const { exec, isVoid } = editor
+
+  editor.isVoid = element => {
+    return element.type === 'image' ? true : isVoid(element)
+  }
+
+  editor.exec = command => {
+    switch (command.type) {
+      case 'insert_data': {
+        const { data } = command
+        const text = data.getData('text/plain')
+        const { files } = data
+
+        if (files && files.length > 0) {
+          for (const file of files) {
+            const reader = new FileReader()
+            const [mime] = file.type.split('/')
+
+            if (mime === 'image') {
+              reader.addEventListener('load', () => {
+                const url = reader.result
+                editor.exec({ type: 'insert_image', url })
+              })
+
+              reader.readAsDataURL(file)
+            }
+          }
+        } else if (isImageUrl(text)) {
+          editor.exec({ type: 'insert_image', url: text })
+        } else {
+          exec(editor, command)
+        }
+
+        break
+      }
+
+      case 'insert_image': {
+        const { url } = command
+        const text = { text: '', marks: [] }
+        const image = { type: 'image', url, children: [text] }
+        Editor.insertNodes(editor, image)
+        break
+      }
+
+      default: {
+        exec(command)
+        break
+      }
+    }
+  }
+
+  return editor
 }
 
 const Element = props => {

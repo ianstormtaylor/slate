@@ -1,7 +1,7 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor } from 'slate'
+import { Editable, withReact } from 'slate-react'
+import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -13,41 +13,14 @@ const MARK_HOTKEYS = {
   'mod+`': 'code',
 }
 
-class RichTextEditor extends withHistory(withReact(Editor)) {
-  isMarkActive(type) {
-    const marks = this.getActiveMarks()
-    const isActive = marks.some(m => m.type === type)
-    return isActive
-  }
-
-  isBlockActive(type) {
-    const { selection } = this.value
-    if (!selection) return false
-    const match = this.getMatch(selection, { type })
-    return !!match
-  }
-
-  toggleBlocks(type) {
-    const isActive = this.isBlockActive(type)
-    const isListType = type === 'bulleted-list' || type === 'numbered-list'
-    this.unwrapNodes({ match: { type: 'bulleted-list' } })
-    this.unwrapNodes({ match: { type: 'numbered-list' } })
-
-    const newType = isActive ? 'paragraph' : isListType ? 'list-item' : type
-    this.setNodes({ type: newType })
-
-    if (!isActive && isListType) {
-      this.wrapNodes({ type, children: [] })
-    }
-  }
-}
-
 const RichTextExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useSlate(RichTextEditor)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
-  console.log('render', value)
+  const editor = useMemo(
+    () => withRichText(withHistory(withReact(createEditor()))),
+    []
+  )
   return (
     <div>
       <Toolbar>
@@ -74,25 +47,76 @@ const RichTextExample = () => {
         />
       </Toolbar>
       <Editable
-        spellCheck
-        autoFocus
         editor={editor}
         value={value}
         renderElement={renderElement}
         renderMark={renderMark}
         onChange={v => setValue(v)}
+        placeholder="Enter some rich text…"
+        spellCheck
+        autoFocus
         onKeyDown={event => {
           for (const hotkey in MARK_HOTKEYS) {
             if (isHotkey(hotkey, event)) {
-              const type = MARK_HOTKEYS[hotkey]
               event.preventDefault()
-              editor.toggleMarks([{ type }])
+              editor.exec({
+                type: 'toggle_mark',
+                mark: MARK_HOTKEYS[hotkey],
+              })
             }
           }
         }}
       />
     </div>
   )
+}
+
+const withRichText = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    if (command.type === 'toggle_block') {
+      const { block: type } = command
+      const isActive = isBlockActive(editor, type)
+      const isListType = type === 'bulleted-list' || type === 'numbered-list'
+      Editor.unwrapNodes(editor, { match: { type: 'bulleted-list' } })
+      Editor.unwrapNodes(editor, { match: { type: 'numbered-list' } })
+
+      const newType = isActive ? 'paragraph' : isListType ? 'list-item' : type
+      Editor.setNodes(editor, { type: newType })
+
+      if (!isActive && isListType) {
+        Editor.wrapNodes(editor, { type, children: [] })
+      }
+
+      return
+    }
+
+    if (command.type === 'toggle_mark') {
+      const { mark: type } = command
+      const isActive = isMarkActive(editor, type)
+      const cmd = isActive ? 'remove_mark' : 'add_mark'
+      editor.exec({ type: cmd, mark: { type } })
+      return
+    }
+
+    exec(command)
+  }
+
+  return editor
+}
+
+const isMarkActive = (editor, type) => {
+  const marks = Editor.getActiveMarks(editor)
+  const isActive = marks.some(m => m.type === type)
+  return isActive
+}
+
+const isBlockActive = (editor, type) => {
+  const { selection } = editor.value
+  if (!selection) return false
+  const match = Editor.getMatch(editor, selection, { type })
+  return !!match
 }
 
 const Element = ({ attributes, children, element }) => {
@@ -130,11 +154,10 @@ const Mark = ({ attributes, children, mark }) => {
 const MarkButton = ({ editor, type, icon }) => {
   return (
     <Button
-      active={editor.isMarkActive(type)}
+      active={isMarkActive(editor, type)}
       onMouseDown={event => {
-        const mark = { type }
         event.preventDefault()
-        editor.toggleMarks([mark])
+        editor.exec({ type: 'toggle_mark', mark: type })
       }}
     >
       <Icon>{icon}</Icon>
@@ -145,10 +168,10 @@ const MarkButton = ({ editor, type, icon }) => {
 const BlockButton = ({ editor, type, icon }) => {
   return (
     <Button
-      active={editor.isBlockActive(type)}
+      active={isBlockActive(editor, type)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.toggleBlocks(type)
+        editor.exec({ type: 'toggle_block', block: type })
       }}
     >
       <Icon>{icon}</Icon>
