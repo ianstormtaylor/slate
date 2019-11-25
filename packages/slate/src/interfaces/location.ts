@@ -9,30 +9,33 @@ import { Path, Point, Range } from '..'
  * converting between the different interfaces in their own code base.
  */
 
-type Location = Path | Point | Range
+export type Location = Path | Point | Range
 
-namespace Location {
+export const Location = {
   /**
    * Check if a value implements the `Location` interface.
    */
 
-  export const isLocation = (value: any): value is Location => {
+  isLocation(value: any): value is Location {
     return Path.isPath(value) || Point.isPoint(value) || Range.isRange(value)
-  }
+  },
 }
 
-type Span = [Path, Path]
+/**
+ * The `Span` interface is a low-level way to refer to locations in nodes
+ * without using `Point` which requires leaf text nodes to be present.
+ */
 
-namespace Span {
+export type Span = [Path, Path]
+
+export const Span = {
   /**
    * Check if a value implements the `Span` interface.
    */
 
-  export const isSpan = (value: any): value is Span => {
+  isSpan(value: any): value is Span {
     return (
       Array.isArray(value) && value.length === 2 && value.every(Path.isPath)
     )
-  }
+  },
 }
-
-export { Location, Span }

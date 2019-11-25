@@ -12,41 +12,38 @@ export interface Element {
   [key: string]: any
 }
 
-export namespace Element {
+export const Element = {
   /**
    * Check if a value implements the `Element` interface.
    */
 
-  export const isElement = (value: any): value is Element => {
+  isElement(value: any): value is Element {
     return (
       isPlainObject(value) &&
       Node.isNodeList(value.children) &&
       !Value.isValue(value)
     )
-  }
+  },
 
   /**
    * Check if a value is an array of `Element` objects.
    */
 
-  export const isElementList = (value: any): value is Element[] => {
+  isElementList(value: any): value is Element[] {
     return (
       Array.isArray(value) &&
       (value.length === 0 || Element.isElement(value[0]))
     )
-  }
+  },
 
   /**
    * Check if an element matches set of properties.
    *
-   * Note: the is for checking custom properties, and it does not ensure that
-   * any children in the `children` property are equal.
+   * Note: this checks custom properties, and it does not ensure that any
+   * children are equivalent.
    */
 
-  export const matches = (
-    element: Element,
-    props: Partial<Element>
-  ): boolean => {
+  matches(element: Element, props: Partial<Element>): boolean {
     for (const key in props) {
       if (key === 'children') {
         continue
@@ -58,7 +55,7 @@ export namespace Element {
     }
 
     return true
-  }
+  },
 }
 
 /**

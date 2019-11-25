@@ -1,77 +1,10 @@
 import isPlainObject from 'is-plain-object'
 import { Mark, Node, Range } from '..'
 
-export interface AddAnnotationCommand {
-  type: 'add_annotation'
-  key: string
-  properties: Record<string, any>
-}
-
-export interface AddMarkCommand {
-  type: 'add_mark'
-  mark: Mark
-}
-
-export interface DeselectCommand {
-  type: 'deselect'
-}
-
-export interface DeleteBackwardCommand {
-  type: 'delete_backward'
-  unit: 'character' | 'word' | 'line' | 'block'
-}
-
-export interface DeleteForwardCommand {
-  type: 'delete_forward'
-  unit: 'character' | 'word' | 'line' | 'block'
-}
-
-export interface DeleteFragmentCommand {
-  type: 'delete_fragment'
-}
-
-export interface InsertTextCommand {
-  type: 'insert_text'
-  text: string
-}
-
-export interface InsertFragmentCommand {
-  type: 'insert_fragment'
-  fragment: Node[]
-}
-
-export interface InsertBreakCommand {
-  type: 'insert_break'
-}
-
-export interface RemoveAnnotationCommand {
-  type: 'remove_annotation'
-  key: string
-}
-
-export interface RemoveMarkCommand {
-  type: 'remove_mark'
-  mark: Mark
-}
-
-export interface SelectCommand {
-  type: 'select'
-  range: Range
-}
-
-export type CoreCommand =
-  | AddAnnotationCommand
-  | AddMarkCommand
-  | DeselectCommand
-  | DeleteBackwardCommand
-  | DeleteForwardCommand
-  | DeleteFragmentCommand
-  | InsertTextCommand
-  | InsertFragmentCommand
-  | InsertBreakCommand
-  | RemoveAnnotationCommand
-  | RemoveMarkCommand
-  | SelectCommand
+/**
+ * `Command` objects represent an action that a user is taking on the editor.
+ * They capture the semantic "intent" of a user while they edit a document.
+ */
 
 export interface Command {
   type: string
@@ -232,3 +165,130 @@ export const Command = {
     )
   },
 }
+
+/**
+ * The `AddAnnotationCommand` adds an annotation to the current selection.
+ */
+
+export interface AddAnnotationCommand {
+  type: 'add_annotation'
+  key: string
+  properties: Record<string, any>
+}
+
+/**
+ * The `AddMarkCommand` adds a mark to the current selection.
+ */
+
+export interface AddMarkCommand {
+  type: 'add_mark'
+  mark: Mark
+}
+
+/**
+ * The `DeselectCommand` removes the current selection.
+ */
+
+export interface DeselectCommand {
+  type: 'deselect'
+}
+
+/**
+ * The `DeleteBackwardCommand` delete's content backward, meaning before the
+ * current selection, by a specific `unit` of distance.
+ */
+
+export interface DeleteBackwardCommand {
+  type: 'delete_backward'
+  unit: 'character' | 'word' | 'line' | 'block'
+}
+
+/**
+ * The `DeleteBackwardCommand` delete's content forward, meaning after the
+ * current selection, by a specific `unit` of distance.
+ */
+
+export interface DeleteForwardCommand {
+  type: 'delete_forward'
+  unit: 'character' | 'word' | 'line' | 'block'
+}
+
+/**
+ * The `DeleteFragmentCommand` delete's the content of the current selection.
+ */
+
+export interface DeleteFragmentCommand {
+  type: 'delete_fragment'
+}
+
+/**
+ * The `InsertTextCommand` inserts a string of text at the current selection.
+ */
+
+export interface InsertTextCommand {
+  type: 'insert_text'
+  text: string
+}
+
+/**
+ * The `InsertFragmentCommand` inserts a list of nodes at the current selection.
+ */
+
+export interface InsertFragmentCommand {
+  type: 'insert_fragment'
+  fragment: Node[]
+}
+
+/**
+ * The `InsertBreakCommand` breaks a block in two at the current selection.
+ */
+
+export interface InsertBreakCommand {
+  type: 'insert_break'
+}
+
+/**
+ * The `RemoveAnnotationCommand` removes an annotation at the current selection.
+ */
+
+export interface RemoveAnnotationCommand {
+  type: 'remove_annotation'
+  key: string
+}
+
+/**
+ * The `RemoveMarkCommand` removes a mark in the current selection.
+ */
+
+export interface RemoveMarkCommand {
+  type: 'remove_mark'
+  mark: Mark
+}
+
+/**
+ * The `SelectCommand` changes the current selection.
+ */
+
+export interface SelectCommand {
+  type: 'select'
+  range: Range
+}
+
+/**
+ * The `CoreCommand` union is a set of all of the commands that are recognized
+ * by Slate's "core" out of the box.
+ */
+
+export type CoreCommand =
+  | AddAnnotationCommand
+  | AddMarkCommand
+  | DeselectCommand
+  | DeleteBackwardCommand
+  | DeleteForwardCommand
+  | DeleteFragmentCommand
+  | InsertTextCommand
+  | InsertFragmentCommand
+  | InsertBreakCommand
+  | RemoveAnnotationCommand
+  | RemoveMarkCommand
+  | SelectCommand

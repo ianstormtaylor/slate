@@ -171,38 +171,36 @@ type TextOperation = InsertTextOperation | RemoveTextOperation
 
 type ValueOperation = SetValueOperation
 
-namespace Operation {
+const Operation = {
   /**
    * Check of a value is an `AnnotationOperation` object.
    */
 
-  export const isAnnotationOperation = (
-    value: any
-  ): value is AnnotationOperation => {
+  isAnnotationOperation(value: any): value is AnnotationOperation {
     return Operation.isOperation(value) && value.type.endsWith('_annotation')
-  }
+  },
 
   /**
    * Check of a value is a `NodeOperation` object.
    */
 
-  export const isNodeOperation = (value: any): value is NodeOperation => {
+  isNodeOperation(value: any): value is NodeOperation {
     return Operation.isOperation(value) && value.type.endsWith('_node')
-  }
+  },
 
   /**
    * Check of a value is a `MarkOperation` object.
    */
 
-  export const isMarkOperation = (value: any): value is MarkOperation => {
+  isMarkOperation(value: any): value is MarkOperation {
     return Operation.isOperation(value) && value.type.endsWith('_mark')
-  }
+  },
 
   /**
    * Check of a value is an `Operation` object.
    */
 
-  export const isOperation = (value: any): value is Operation => {
+  isOperation(value: any): value is Operation {
     if (!isPlainObject(value)) {
       return false
     }
@@ -313,51 +311,49 @@ namespace Operation {
         return false
       }
     }
-  }
+  },
 
   /**
    * Check if a value is a list of `Operation` objects.
    */
 
-  export const isOperationList = (value: any): value is Operation[] => {
+  isOperationList(value: any): value is Operation[] {
     return (
       Array.isArray(value) &&
       (value.length === 0 || Operation.isOperation(value[0]))
     )
-  }
+  },
 
   /**
    * Check of a value is a `SelectionOperation` object.
    */
 
-  export const isSelectionOperation = (
-    value: any
-  ): value is SelectionOperation => {
+  isSelectionOperation(value: any): value is SelectionOperation {
     return Operation.isOperation(value) && value.type.endsWith('_selection')
-  }
+  },
 
   /**
    * Check of a value is a `TextOperation` object.
    */
 
-  export const isTextOperation = (value: any): value is TextOperation => {
+  isTextOperation(value: any): value is TextOperation {
     return Operation.isOperation(value) && value.type.endsWith('_text')
-  }
+  },
 
   /**
    * Check of a value is a `ValueOperation` object.
    */
 
-  export const isValueOperation = (value: any): value is ValueOperation => {
+  isValueOperation(value: any): value is ValueOperation {
     return Operation.isOperation(value) && value.type.endsWith('_value')
-  }
+  },
 
   /**
    * Invert an operation, returning a new operation that will exactly undo the
    * original when applied.
    */
 
-  export const inverse = (op: Operation): Operation => {
+  inverse(op: Operation): Operation {
     switch (op.type) {
       case 'add_annotation': {
         return { ...op, type: 'remove_annotation' }
@@ -443,7 +439,7 @@ namespace Operation {
         return { ...op, type: 'merge_node', path: Path.next(op.path) }
       }
     }
-  }
+  },
 }
 
 export {

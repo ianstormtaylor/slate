@@ -9,25 +9,19 @@ import { Operation, Path } from '..'
  * only refer to `Text` nodes.
  */
 
-interface Point {
+export interface Point {
   path: Path
   offset: number
   [key: string]: any
 }
 
-/**
- * `PointKey` is either an "anchor" or "focus" point string.
- */
-
-type PointKey = 'anchor' | 'focus'
-
-namespace Point {
+export const Point = {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.
    */
 
-  export const compare = (point: Point, another: Point): -1 | 0 | 1 => {
+  compare(point: Point, another: Point): -1 | 0 | 1 {
     const result = Path.compare(point.path, another.path)
 
     if (result === 0) {
@@ -37,57 +31,56 @@ namespace Point {
     }
 
     return result
-  }
+  },
 
   /**
    * Check if a point is after another.
    */
 
-  export const isAfter = (point: Point, another: Point): boolean => {
+  isAfter(point: Point, another: Point): boolean {
     return Point.compare(point, another) === 1
-  }
+  },
 
   /**
    * Check if a point is before another.
    */
 
-  export const isBefore = (point: Point, another: Point): boolean => {
+  isBefore(point: Point, another: Point): boolean {
     return Point.compare(point, another) === -1
-  }
+  },
 
   /**
    * Check if a point is exactly equal to another.
    */
 
-  export const equals = (point: Point, another: Point): boolean => {
-    // PERF: We could compare to a result of `0` here, but it's slightly faster
-    // to first ensure the offsets are equal and to use `Path.equals`.
+  equals(point: Point, another: Point): boolean {
+    // PERF: ensure the offsets are equal first since they are cheaper to check.
     return (
       point.offset === another.offset && Path.equals(point.path, another.path)
     )
-  }
+  },
 
   /**
    * Check if a value implements the `Point` interface.
    */
 
-  export const isPoint = (value: any): value is Point => {
+  isPoint(value: any): value is Point {
     return (
       isPlainObject(value) &&
       typeof value.offset === 'number' &&
       Path.isPath(value.path)
     )
-  }
+  },
 
   /**
    * Transform a point by an operation.
    */
 
-  export const transform = (
+  transform(
     point: Point,
     op: Operation,
     options: { affinity?: 'forward' | 'backward' | null } = {}
-  ): Point | null => {
+  ): Point | null {
     return produce(point, p => {
       const { affinity = 'forward' } = options
       const { path, offset } = p
@@ -156,7 +149,11 @@ namespace Point {
         }
       }
     })
-  }
+  },
 }
 
-export { Point, PointKey }
+/**
+ * `PointKey` is either an "anchor" or "focus" point string.
+ */
+
+export type PointKey = 'anchor' | 'focus'

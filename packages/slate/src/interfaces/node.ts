@@ -17,20 +17,20 @@ import {
 
 export type Node = Value | Element | Text
 
-export namespace Node {
-  export const matches = (node: Node, props: Partial<Node>): boolean => {
+export const Node = {
+  matches(node: Node, props: Partial<Node>): boolean {
     return (
       (Value.isValue(node) && Value.matches(node, props)) ||
       (Element.isElement(node) && Element.matches(node, props)) ||
       (Text.isText(node) && Text.matches(node, props))
     )
-  }
+  },
 
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
 
-  export const ancestor = (root: Node, path: Path): Ancestor => {
+  ancestor(root: Node, path: Path): Ancestor {
     const node = Node.get(root, path)
 
     if (Text.isText(node)) {
@@ -40,7 +40,7 @@ export namespace Node {
     }
 
     return node
-  }
+  },
 
   /**
    * Return an iterable of all the ancestor nodes above a specific path.
@@ -49,7 +49,7 @@ export namespace Node {
    * the tree, but you can pass the `reverse: true` option to go top-down.
    */
 
-  export function* ancestors(
+  *ancestors(
     root: Node,
     path: Path,
     options: {
@@ -61,13 +61,13 @@ export namespace Node {
       const entry: AncestorEntry = [n, p]
       yield entry
     }
-  }
+  },
 
   /**
    * Get the child of a node at a specific index.
    */
 
-  export const child = (root: Node, index: number): Descendant => {
+  child(root: Node, index: number): Descendant {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get the child of a text node: ${JSON.stringify(root)}`
@@ -85,39 +85,39 @@ export namespace Node {
     }
 
     return c
-  }
+  },
 
   /**
    * Find the closest matching node entry starting from a specific path.
    */
 
-  export const closest = (
+  closest(
     root: Node,
     path: Path,
     predicate: (entry: NodeEntry) => boolean
-  ): NodeEntry | undefined => {
+  ): NodeEntry | undefined {
     for (const entry of Node.levels(root, path, { reverse: true })) {
       if (predicate(entry)) {
         return entry
       }
     }
-  }
+  },
 
   /**
    * Get an entry for the common ancesetor node of two paths.
    */
 
-  export const common = (root: Node, path: Path, another: Path): NodeEntry => {
+  common(root: Node, path: Path, another: Path): NodeEntry {
     const p = Path.common(path, another)
     const n = Node.get(root, p)
     return [n, p]
-  }
+  },
 
   /**
    * Get the node at a specific path, asserting that it's a descendant node.
    */
 
-  export const descendant = (root: Node, path: Path): Descendant => {
+  descendant(root: Node, path: Path): Descendant {
     const node = Node.get(root, path)
 
     if (Value.isValue(node)) {
@@ -127,13 +127,13 @@ export namespace Node {
     }
 
     return node
-  }
+  },
 
   /**
    * Return an iterable of all the descendant node entries inside a root node.
    */
 
-  export function* descendants(
+  *descendants(
     root: Node,
     options: {
       from?: Path
@@ -149,7 +149,7 @@ export namespace Node {
         yield [node, path] as DescendantEntry
       }
     }
-  }
+  },
 
   /**
    * Return an iterable of all the element nodes inside a root node. Each iteration
@@ -157,7 +157,7 @@ export namespace Node {
    * root node is an element it will be included in the iteration as well.
    */
 
-  export function* elements(
+  *elements(
     root: Node,
     options: {
       from?: Path
@@ -171,13 +171,13 @@ export namespace Node {
         yield [node, path]
       }
     }
-  }
+  },
 
   /**
    * Get the first node entry in a root node from a path.
    */
 
-  export const first = (root: Node, path: Path): NodeEntry => {
+  first(root: Node, path: Path): NodeEntry {
     const p = path.slice()
     let n = Node.get(root, p)
 
@@ -191,13 +191,13 @@ export namespace Node {
     }
 
     return [n, p]
-  }
+  },
 
   /**
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  export const fragment = (root: Node, range: Range): Descendant[] => {
+  fragment(root: Node, range: Range): Descendant[] {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -236,30 +236,30 @@ export namespace Node {
     })
 
     return newRoot.children
-  }
+  },
 
   /**
    * Find the furthest matching node entry starting from a specific path.
    */
 
-  export const furthest = (
+  furthest(
     root: Node,
     path: Path,
     predicate: (entry: NodeEntry) => boolean
-  ): NodeEntry | undefined => {
+  ): NodeEntry | undefined {
     for (const entry of Node.levels(root, path)) {
       if (predicate(entry)) {
         return entry
       }
     }
-  }
+  },
 
   /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
    */
 
-  export const get = (root: Node, path: Path): Node => {
+  get(root: Node, path: Path): Node {
     let node = root
 
     for (let i = 0; i < path.length; i++) {
@@ -277,13 +277,13 @@ export namespace Node {
     }
 
     return node
-  }
+  },
 
   /**
    * Check if a descendant node exists at a specific path.
    */
 
-  export const has = (root: Node, path: Path): boolean => {
+  has(root: Node, path: Path): boolean {
     let node = root
 
     for (let i = 0; i < path.length; i++) {
@@ -297,31 +297,31 @@ export namespace Node {
     }
 
     return true
-  }
+  },
 
   /**
    * Check if a value implements the `Node` interface.
    */
 
-  export const isNode = (value: any): value is Node => {
+  isNode(value: any): value is Node {
     return (
       Text.isText(value) || Element.isElement(value) || Value.isValue(value)
     )
-  }
+  },
 
   /**
    * Check if a value is a list of `Node` objects.
    */
 
-  export const isNodeList = (value: any): value is Node[] => {
+  isNodeList(value: any): value is Node[] {
     return Array.isArray(value) && (value.length === 0 || Node.isNode(value[0]))
-  }
+  },
 
   /**
    * Get the lash node entry in a root node from a path.
    */
 
-  export const last = (root: Node, path: Path): NodeEntry => {
+  last(root: Node, path: Path): NodeEntry {
     const p = path.slice()
     let n = Node.get(root, p)
 
@@ -336,13 +336,13 @@ export namespace Node {
     }
 
     return [n, p]
-  }
+  },
 
   /**
    * Get the node at a specific path, ensuring it's a leaf text node.
    */
 
-  export const leaf = (root: Node, path: Path): Text => {
+  leaf(root: Node, path: Path): Text {
     const node = Node.get(root, path)
 
     if (!Text.isText(node)) {
@@ -352,7 +352,7 @@ export namespace Node {
     }
 
     return node
-  }
+  },
 
   /**
    * Return an iterable of the in a branch of the tree, from a specific path.
@@ -361,7 +361,7 @@ export namespace Node {
    * but you can pass the `reverse: true` option to go bottom-up.
    */
 
-  export function* levels(
+  *levels(
     root: Node,
     path: Path,
     options: {
@@ -372,13 +372,13 @@ export namespace Node {
       const n = Node.get(root, p)
       yield [n, p]
     }
-  }
+  },
 
   /**
    * Return an iterable of all the marks in all of the text nodes in a root node.
    */
 
-  export function* marks(
+  *marks(
     root: Node,
     options: {
       from?: Path
@@ -393,7 +393,7 @@ export namespace Node {
         yield [mark, i, node, path]
       }
     }
-  }
+  },
 
   /**
    * Return an iterable of all the node entries of a root node. Each entry is
@@ -401,7 +401,7 @@ export namespace Node {
    * position inside the root node.
    */
 
-  export function* nodes(
+  *nodes(
     root: Node,
     options: {
       from?: Path
@@ -473,13 +473,13 @@ export namespace Node {
       n = Node.get(root, p)
       visited.add(n)
     }
-  }
+  },
 
   /**
    * Get the parent of a node at a specific path.
    */
 
-  export const parent = (root: Node, path: Path): Ancestor => {
+  parent(root: Node, path: Path): Ancestor {
     const parentPath = Path.parent(path)
     const p = Node.get(root, parentPath)
 
@@ -490,7 +490,7 @@ export namespace Node {
     }
 
     return p
-  }
+  },
 
   /**
    * Get the concatenated text string of a node's content.
@@ -500,19 +500,19 @@ export namespace Node {
    * computations for a node.
    */
 
-  export const text = (node: Node): string => {
+  text(node: Node): string {
     if (Text.isText(node)) {
       return node.text
     } else {
       return node.children.map(Node.text).join('')
     }
-  }
+  },
 
   /**
    * Return an iterable of all leaf text nodes in a root node.
    */
 
-  export function* texts(
+  *texts(
     root: Node,
     options: {
       from?: Path
@@ -526,7 +526,7 @@ export namespace Node {
         yield [node, path]
       }
     }
-  }
+  },
 }
 
 /**

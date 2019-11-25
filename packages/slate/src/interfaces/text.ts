@@ -7,39 +7,32 @@ import { Mark, Path } from '..'
  * the document tree as they cannot contain any children.
  */
 
-interface Text {
+export interface Text {
   text: string
   marks: Mark[]
   [key: string]: any
 }
 
-/**
- * `TextEntry` objects refer to an `Text` and the `Path` where it can be
- * found inside a root node.
- */
-
-type TextEntry = [Text, Path]
-
-namespace Text {
+export const Text = {
   /**
    * Check if a value implements the `Text` interface.
    */
 
-  export const isText = (value: any): value is Text => {
+  isText(value: any): value is Text {
     return (
       isPlainObject(value) &&
       typeof value.text === 'string' &&
       Array.isArray(value.marks)
     )
-  }
+  },
 
   /**
    * Check if a value is a list of `Text` objects.
    */
 
-  export const isTextList = (value: any): value is Text[] => {
+  isTextList(value: any): value is Text[] {
     return Array.isArray(value) && (value.length === 0 || Text.isText(value[0]))
-  }
+  },
 
   /**
    * Check if an text matches set of properties.
@@ -49,7 +42,7 @@ namespace Text {
    * will ensure that the set of marks is exactly equal.
    */
 
-  export const matches = (text: Text, props: Partial<Text>): boolean => {
+  matches(text: Text, props: Partial<Text>): boolean {
     for (const key in props) {
       if (key === 'text') {
         continue
@@ -85,7 +78,12 @@ namespace Text {
     }
 
     return true
-  }
+  },
 }
 
-export { Text, TextEntry }
+/**
+ * `TextEntry` objects refer to an `Text` and the `Path` where it can be
+ * found inside a root node.
+ */
+
+export type TextEntry = [Text, Path]

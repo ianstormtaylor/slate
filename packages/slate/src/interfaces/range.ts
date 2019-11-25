@@ -8,56 +8,56 @@ import { Operation, Path, Point } from '..'
  * multiple nodes.
  */
 
-interface Range {
+export interface Range {
   anchor: Point
   focus: Point
   [key: string]: any
 }
 
-namespace Range {
-  export const start = (range: Range): Point => {
-    const [start] = Range.edges(range)
-    return start
-  }
+export const Range = {
+  /**
+   * Get the start and end points of a range, in the order in which they appear
+   * in the document.
+   */
 
-  export const end = (range: Range): Point => {
+  edges(
+    range: Range,
+    options: {
+      reverse?: boolean
+    } = {}
+  ): [Point, Point] {
+    const { reverse = false } = options
+    const { anchor, focus } = range
+    return Range.isBackward(range) === reverse
+      ? [anchor, focus]
+      : [focus, anchor]
+  },
+
+  /**
+   * Get the end point of a range.
+   */
+
+  end(range: Range): Point {
     const [, end] = Range.edges(range)
     return end
-  }
-
-  export const intersection = (range: Range, another: Range): Range | null => {
-    const { anchor, focus, ...rest } = range
-    const [s1, e1] = Range.edges(range)
-    const [s2, e2] = Range.edges(another)
-    const start = Point.isBefore(s1, s2) ? s2 : s1
-    const end = Point.isBefore(e1, e2) ? e1 : e2
-
-    if (Point.isBefore(end, start)) {
-      return null
-    } else {
-      return { anchor: start, focus: end, ...rest }
-    }
-  }
+  },
 
   /**
    * Check if a range is exactly equal to another.
    */
 
-  export const equals = (range: Range, another: Range): boolean => {
+  equals(range: Range, another: Range): boolean {
     return (
       Point.equals(range.anchor, another.anchor) &&
       Point.equals(range.focus, another.focus)
     )
-  }
+  },
 
   /**
    * Check if a range exists in a list or map of ranges.
    */
 
-  export const exists = (
-    range: Range,
-    target: Range[] | Record<string, Range>
-  ): boolean => {
+  exists(range: Range, target: Range[] | Record<string, Range>): boolean {
     if (Range.isRangeList(target)) {
       return !!target.find(r => Range.equals(r, range))
     }
@@ -71,16 +71,13 @@ namespace Range {
     }
 
     return false
-  }
+  },
 
   /**
    * Check if a range includes a path, a point or part of another range.
    */
 
-  export const includes = (
-    range: Range,
-    target: Path | Point | Range
-  ): boolean => {
+  includes(range: Range, target: Path | Point | Range): boolean {
     if (Range.isRange(target)) {
       if (
         Range.includes(range, target.anchor) ||
@@ -107,27 +104,45 @@ namespace Range {
     }
 
     return isAfterStart && isBeforeEnd
-  }
+  },
+
+  /**
+   * Get the intersection of a range with another.
+   */
+
+  intersection(range: Range, another: Range): Range | null {
+    const { anchor, focus, ...rest } = range
+    const [s1, e1] = Range.edges(range)
+    const [s2, e2] = Range.edges(another)
+    const start = Point.isBefore(s1, s2) ? s2 : s1
+    const end = Point.isBefore(e1, e2) ? e1 : e2
+
+    if (Point.isBefore(end, start)) {
+      return null
+    } else {
+      return { anchor: start, focus: end, ...rest }
+    }
+  },
 
   /**
    * Check if a range is backward, meaning that its anchor point appears in the
    * document _after_ its focus point.
    */
 
-  export const isBackward = (range: Range): boolean => {
+  isBackward(range: Range): boolean {
     const { anchor, focus } = range
     return Point.isAfter(anchor, focus)
-  }
+  },
 
   /**
    * Check if a range is collapsed, meaning that both its anchor and focus
    * points refer to the exact same position in the document.
    */
 
-  export const isCollapsed = (range: Range): boolean => {
+  isCollapsed(range: Range): boolean {
     const { anchor, focus } = range
     return Point.equals(anchor, focus)
-  }
+  },
 
   /**
    * Check if a range is expanded.
@@ -135,9 +150,9 @@ namespace Range {
    * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
    */
 
-  export const isExpanded = (range: Range): boolean => {
-    return !isCollapsed(range)
-  }
+  isExpanded(range: Range): boolean {
+    return !Range.isCollapsed(range)
+  },
 
   /**
    * Check if a range is forward.
@@ -145,37 +160,37 @@ namespace Range {
    * This is the opposite of [[Range.isBackward]] and is provided for legibility.
    */
 
-  export const isForward = (range: Range): boolean => {
-    return !isBackward(range)
-  }
+  isForward(range: Range): boolean {
+    return !Range.isBackward(range)
+  },
 
   /**
    * Check if a value implements the [[Range]] interface.
    */
 
-  export const isRange = (value: any): value is Range => {
+  isRange(value: any): value is Range {
     return (
       isPlainObject(value) &&
       Point.isPoint(value.anchor) &&
       Point.isPoint(value.focus)
     )
-  }
+  },
 
   /**
    * Check if a value is an array of `Range` objects.
    */
 
-  export const isRangeList = (value: any): value is Range[] => {
+  isRangeList(value: any): value is Range[] {
     return (
       Array.isArray(value) && (value.length === 0 || Range.isRange(value[0]))
     )
-  }
+  },
 
   /**
    * Check if a value is a map of `Range` objects.
    */
 
-  export const isRangeMap = (value: any): value is Record<string, Range> => {
+  isRangeMap(value: any): value is Record<string, Range> {
     if (!isPlainObject(value)) {
       return false
     }
@@ -185,35 +200,26 @@ namespace Range {
     }
 
     return true
-  }
+  },
 
   /**
-   * Get the start and end points of a range, in the order in which they appear
-   * in the document.
+   * Get the start point of a range.
    */
 
-  export const edges = (
-    range: Range,
-    options: {
-      reverse?: boolean
-    } = {}
-  ): [Point, Point] => {
-    const { reverse = false } = options
-    const { anchor, focus } = range
-    return Range.isBackward(range) === reverse
-      ? [anchor, focus]
-      : [focus, anchor]
-  }
+  start(range: Range): Point {
+    const [start] = Range.edges(range)
+    return start
+  },
 
   /**
    * Transform a range by an operation.
    */
 
-  export const transform = (
+  transform(
     range: Range,
     op: Operation,
     options: { affinity: 'forward' | 'backward' | 'outward' | 'inward' | null }
-  ): Range | null => {
+  ): Range | null {
     const { affinity = 'inward' } = options
     let affinityAnchor: 'forward' | 'backward' | null
     let affinityFocus: 'forward' | 'backward' | null
@@ -250,7 +256,5 @@ namespace Range {
       r.anchor = anchor
       r.focus = focus
     })
-  }
+  },
 }
-
-export { Range }

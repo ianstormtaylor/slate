@@ -7,9 +7,9 @@ import { Operation } from '..'
  * object, they can be relative to any `Node` object.
  */
 
-type Path = number[]
+export type Path = number[]
 
-namespace Path {
+export const Path = {
   /**
    * Get a list of ancestor paths for a given path.
    *
@@ -17,10 +17,7 @@ namespace Path {
    * `reverse: true` option is passed, they are reversed.
    */
 
-  export const ancestors = (
-    path: Path,
-    options: { reverse?: boolean } = {}
-  ): Path[] => {
+  ancestors(path: Path, options: { reverse?: boolean } = {}): Path[] {
     const { reverse = false } = options
     let paths = Path.levels(path, options)
 
@@ -31,13 +28,13 @@ namespace Path {
     }
 
     return paths
-  }
+  },
 
   /**
    * Get the common ancestor path of two paths.
    */
 
-  export const common = (path: Path, another: Path): Path => {
+  common(path: Path, another: Path): Path {
     const common: Path = []
 
     for (let i = 0; i < path.length && i < another.length; i++) {
@@ -52,7 +49,7 @@ namespace Path {
     }
 
     return common
-  }
+  },
 
   /**
    * Compare a path to another, returning an integer indicating whether the path
@@ -63,7 +60,7 @@ namespace Path {
    * [[Path.equals]] instead.
    */
 
-  export const compare = (path: Path, another: Path): -1 | 0 | 1 => {
+  compare(path: Path, another: Path): -1 | 0 | 1 {
     const min = Math.min(path.length, another.length)
 
     for (let i = 0; i < min; i++) {
@@ -72,131 +69,131 @@ namespace Path {
     }
 
     return 0
-  }
+  },
 
   /**
    * Check if a path ends after one of the indexes in another.
    */
 
-  export const endsAfter = (path: Path, another: Path): boolean => {
+  endsAfter(path: Path, another: Path): boolean {
     const i = path.length - 1
     const as = path.slice(0, i)
     const bs = another.slice(0, i)
     const av = path[i]
     const bv = another[i]
     return Path.equals(as, bs) && av > bv
-  }
+  },
 
   /**
    * Check if a path ends at one of the indexes in another.
    */
 
-  export const endsAt = (path: Path, another: Path): boolean => {
+  endsAt(path: Path, another: Path): boolean {
     const i = path.length
     const as = path.slice(0, i)
     const bs = another.slice(0, i)
     return Path.equals(as, bs)
-  }
+  },
 
   /**
    * Check if a path ends before one of the indexes in another.
    */
 
-  export const endsBefore = (path: Path, another: Path): boolean => {
+  endsBefore(path: Path, another: Path): boolean {
     const i = path.length - 1
     const as = path.slice(0, i)
     const bs = another.slice(0, i)
     const av = path[i]
     const bv = another[i]
     return Path.equals(as, bs) && av < bv
-  }
+  },
 
   /**
    * Check if a path is exactly equal to another.
    */
 
-  export const equals = (path: Path, another: Path): boolean => {
+  equals(path: Path, another: Path): boolean {
     return (
       path.length === another.length && path.every((n, i) => n === another[i])
     )
-  }
+  },
 
   /**
    * Check if a path is after another.
    */
 
-  export const isAfter = (path: Path, another: Path): boolean => {
+  isAfter(path: Path, another: Path): boolean {
     return Path.compare(path, another) === 1
-  }
+  },
 
   /**
    * Check if a path is an ancestor of another.
    */
 
-  export const isAncestor = (path: Path, another: Path): boolean => {
+  isAncestor(path: Path, another: Path): boolean {
     return path.length < another.length && Path.compare(path, another) === 0
-  }
+  },
 
   /**
    * Check if a path is before another.
    */
 
-  export const isBefore = (path: Path, another: Path): boolean => {
+  isBefore(path: Path, another: Path): boolean {
     return Path.compare(path, another) === -1
-  }
+  },
 
   /**
    * Check if a path is a child of another.
    */
 
-  export const isChild = (path: Path, another: Path): boolean => {
+  isChild(path: Path, another: Path): boolean {
     return (
       path.length === another.length + 1 && Path.compare(path, another) === 0
     )
-  }
+  },
 
   /**
    * Check if a path is equal to or an ancestor of another.
    */
 
-  export const isCommon = (path: Path, another: Path): boolean => {
+  isCommon(path: Path, another: Path): boolean {
     return path.length <= another.length && Path.compare(path, another) === 0
-  }
+  },
 
   /**
    * Check if a path is a descendant of another.
    */
 
-  export const isDescendant = (path: Path, another: Path): boolean => {
+  isDescendant(path: Path, another: Path): boolean {
     return path.length > another.length && Path.compare(path, another) === 0
-  }
+  },
 
   /**
    * Check if a path is the parent of another.
    */
 
-  export const isParent = (path: Path, another: Path): boolean => {
+  isParent(path: Path, another: Path): boolean {
     return (
       path.length + 1 === another.length && Path.compare(path, another) === 0
     )
-  }
+  },
 
   /**
    * Check is a value implements the `Path` interface.
    */
 
-  export const isPath = (value: any): value is Path => {
+  isPath(value: any): value is Path {
     return (
       Array.isArray(value) &&
       (value.length === 0 || typeof value[0] === 'number')
     )
-  }
+  },
 
   /**
    * Check if a path is a sibling of another.
    */
 
-  export const isSibling = (path: Path, another: Path): boolean => {
+  isSibling(path: Path, another: Path): boolean {
     if (path.length !== another.length) {
       return false
     }
@@ -206,7 +203,7 @@ namespace Path {
     const al = path[path.length - 1]
     const bl = another[another.length - 1]
     return al !== bl && Path.equals(as, bs)
-  }
+  },
 
   /**
    * Get a list of paths at every level down to a path. Note: this is the same
@@ -216,12 +213,12 @@ namespace Path {
    * true` option is passed, they are reversed.
    */
 
-  export const levels = (
+  levels(
     path: Path,
     options: {
       reverse?: boolean
     } = {}
-  ): Path[] => {
+  ): Path[] {
     const { reverse = false } = options
     const list: Path[] = []
 
@@ -234,13 +231,13 @@ namespace Path {
     }
 
     return list
-  }
+  },
 
   /**
    * Given a path, get the path to the next sibling node.
    */
 
-  export const next = (path: Path): Path => {
+  next(path: Path): Path {
     if (path.length === 0) {
       throw new Error(
         `Cannot get the next path of a root path [${path}], because it has no next index.`
@@ -249,25 +246,25 @@ namespace Path {
 
     const last = path[path.length - 1]
     return path.slice(0, -1).concat(last + 1)
-  }
+  },
 
   /**
    * Given a path, return a new path referring to the parent node above it.
    */
 
-  export const parent = (path: Path): Path => {
+  parent(path: Path): Path {
     if (path.length === 0) {
       throw new Error(`Cannot get the parent path of the root path [${path}].`)
     }
 
     return path.slice(0, -1)
-  }
+  },
 
   /**
    * Given a path, get the path to the previous sibling node.
    */
 
-  export const previous = (path: Path): Path => {
+  previous(path: Path): Path {
     if (path.length === 0) {
       throw new Error(
         `Cannot get the previous path of a root path [${path}], because it has no previous index.`
@@ -283,13 +280,13 @@ namespace Path {
     }
 
     return path.slice(0, -1).concat(last - 1)
-  }
+  },
 
   /**
    * Get a path relative to an ancestor.
    */
 
-  export const relative = (path: Path, ancestor: Path): Path => {
+  relative(path: Path, ancestor: Path): Path {
     if (!Path.isAncestor(ancestor, path) && !Path.equals(path, ancestor)) {
       throw new Error(
         `Cannot get the relative path of [${path}] inside ancestor [${ancestor}], because it is not above or equal to the path.`
@@ -297,17 +294,17 @@ namespace Path {
     }
 
     return path.slice(ancestor.length)
-  }
+  },
 
   /**
    * Transform a path by an operation.
    */
 
-  export const transform = (
+  transform(
     path: Path,
     operation: Operation,
     options: { affinity?: 'forward' | 'backward' | null } = {}
-  ): Path | null => {
+  ): Path | null {
     return produce(path, p => {
       const { affinity = 'forward' } = options
 
@@ -416,7 +413,5 @@ namespace Path {
         }
       }
     })
-  }
+  },
 }
-
-export { Path }

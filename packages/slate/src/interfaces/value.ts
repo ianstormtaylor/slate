@@ -24,19 +24,19 @@ export interface Value extends Element {
   [key: string]: any
 }
 
-export namespace Value {
+export const Value = {
   /**
    * Check if a value implements the `Value` interface.
    */
 
-  export const isValue = (value: any): value is Value => {
+  isValue(value: any): value is Value {
     return (
       isPlainObject(value) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Range.isRangeMap(value.annotations)
     )
-  }
+  },
 
   /**
    * Check if a value matches a set of properties.
@@ -45,7 +45,7 @@ export namespace Value {
    * any children in the `nodes` property are equal.
    */
 
-  export const matches = (value: Value, props: Partial<Value>): boolean => {
+  matches(value: Value, props: Partial<Value>): boolean {
     for (const key in props) {
       if (key === 'annotations' || key === 'children' || key === 'selection') {
         continue
@@ -57,15 +57,13 @@ export namespace Value {
     }
 
     return true
-  }
+  },
 
   /**
    * Iterate through all of the point objects in a value.
    */
 
-  export function* points(
-    value: Value
-  ): Iterable<SelectionPointEntry | AnnotationPointEntry> {
+  *points(value: Value): Iterable<SelectionPointEntry | AnnotationPointEntry> {
     const { selection, annotations } = value
 
     if (selection != null) {
@@ -78,13 +76,13 @@ export namespace Value {
       yield [annotation.anchor, 'anchor', annotation, key]
       yield [annotation.focus, 'focus', annotation, key]
     }
-  }
+  },
 
   /**
    * Transform a value by an operation.
    */
 
-  export const transform = (value: Value, op: Operation): Value => {
+  transform(value: Value, op: Operation): Value {
     return produce(value, v => {
       switch (op.type) {
         case 'add_annotation': {
@@ -356,7 +354,7 @@ export namespace Value {
         }
       }
     })
-  }
+  },
 }
 
 /**

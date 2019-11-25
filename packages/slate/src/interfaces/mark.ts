@@ -11,36 +11,36 @@ export interface Mark {
   [key: string]: any
 }
 
-export namespace Mark {
+export const Mark = {
   /**
    * Check if a mark exists in a set of marks.
    */
 
-  export const exists = (mark: Mark, marks: Mark[]): boolean => {
+  exists(mark: Mark, marks: Mark[]): boolean {
     return !!marks.find(f => Mark.matches(f, mark))
-  }
+  },
 
   /**
    * Check if a value implements the `Mark` interface.
    */
 
-  export const isMark = (value: any): value is Mark => {
+  isMark(value: any): value is Mark {
     return isPlainObject(value)
-  }
+  },
 
   /**
    * Check if a value is an array of `Mark` objects.
    */
 
-  export const isMarkSet = (value: any): value is Mark[] => {
+  isMarkSet(value: any): value is Mark[] {
     return Array.isArray(value) && (value.length === 0 || Mark.isMark(value[0]))
-  }
+  },
 
   /**
    * Check if a mark matches set of properties.
    */
 
-  export const matches = (mark: Mark, props: Partial<Mark>): boolean => {
+  matches(mark: Mark, props: Partial<Mark>): boolean {
     for (const key in props) {
       if (mark[key] !== props[key]) {
         return false
@@ -48,7 +48,7 @@ export namespace Mark {
     }
 
     return true
-  }
+  },
 }
 
 /**
