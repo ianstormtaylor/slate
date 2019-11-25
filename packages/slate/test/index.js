@@ -1,7 +1,7 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
-import { Editor } from 'slate'
-import { TestPlugin } from './helpers'
+import { Editor, createEditor } from 'slate'
+import { createHyperscript } from 'slate-hyperscript'
 
 describe('slate', () => {
   fixtures(__dirname, 'interfaces', ({ module }) => {
@@ -12,10 +12,10 @@ describe('slate', () => {
 
   fixtures(__dirname, 'operations', ({ module }) => {
     const { input, operations, output } = module
-    const TestEditor = TestPlugin(Editor)
-    const editor = new TestEditor({ value: input })
+    const editor = withTest(createEditor())
+    editor.value = input
 
-    editor.withoutNormalizing(() => {
+    Editor.withoutNormalizing(editor, () => {
       for (const op of operations) {
         editor.apply(op)
       }
@@ -26,25 +26,46 @@ describe('slate', () => {
 
   fixtures(__dirname, 'normalization', ({ module }) => {
     const { input, output } = module
-    const TestEditor = TestPlugin(Editor)
-    const editor = new TestEditor({ value: input })
-    editor.normalize({ force: true })
+    const editor = withTest(createEditor())
+    editor.value = input
+    Editor.normalize(editor, { force: true })
     assert.deepEqual(editor.value, output)
   })
 
   fixtures(__dirname, 'queries', ({ module }) => {
     const { input, run, output } = module
-    const TestEditor = TestPlugin(Editor)
-    const editor = new TestEditor({ value: input })
+    const editor = withTest(createEditor())
+    editor.value = input
     const result = run(editor)
     assert.deepEqual(result, output)
   })
 
-  fixtures(__dirname, 'commands', ({ module, path }) => {
+  fixtures(__dirname, 'transforms', ({ module }) => {
     const { input, run, output } = module
-    const TestEditor = TestPlugin(Editor)
-    const editor = new TestEditor({ value: input })
+    const editor = withTest(createEditor())
+    editor.value = input
     run(editor)
     assert.deepEqual(editor.value, output)
   })
+})
+
+const withTest = editor => {
+  const { isInline, isVoid } = editor
+
+  editor.isInline = element => {
+    return element.inline === true ? true : isInline(element)
+  }
+
+  editor.isVoid = node => {
+    return node.void === true ? true : isVoid(node)
+  }
+
+  return editor
+}
+
+export const jsx = createHyperscript({
+  elements: {
+    block: {},
+    inline: { inline: true },
+  },
 })

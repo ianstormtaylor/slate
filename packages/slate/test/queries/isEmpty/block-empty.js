@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -10,7 +11,7 @@ export const input = (
 
 export const run = editor => {
   const block = editor.value.children[0]
-  return editor.isEmpty(block)
+  return Editor.isEmpty(editor, block)
 }
 
 export const output = true

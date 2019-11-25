@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -9,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getPoint([0], { edge: 'start' })
+  return Editor.point(editor, [0], { edge: 'start' })
 }
 
 export const output = { path: [0, 0], offset: 0 }

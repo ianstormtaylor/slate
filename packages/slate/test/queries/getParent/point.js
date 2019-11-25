@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -9,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getParent({ path: [0, 0], offset: 1 })
+  return Editor.parent(editor, { path: [0, 0], offset: 1 })
 }
 
 export const output = [<block>one</block>, [0]]

@@ -175,7 +175,8 @@ export const GeneralQueries = {
    */
 
   isNormalizing(editor: Editor): boolean {
-    return NORMALIZING.get(editor) || false
+    const isNormalizing = NORMALIZING.get(editor)
+    return isNormalizing === undefined ? true : isNormalizing
   },
 
   /**

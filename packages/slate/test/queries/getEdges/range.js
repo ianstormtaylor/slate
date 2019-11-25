@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -9,7 +10,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getEdges({
+  return Editor.edges(editor, {
     anchor: { path: [0, 0], offset: 1 },
     focus: { path: [0, 0], offset: 3 },
   })

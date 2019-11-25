@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../../..'
 
 export const input = (
   <value>
@@ -11,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(editor.matches({ at: [], match: 'block' }))
+  return Array.from(Editor.matches(editor, { at: [], match: 'block' }))
 }
 
 export const output = [

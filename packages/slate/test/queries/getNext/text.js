@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -10,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getNext([0], 'text')
+  return Editor.next(editor, [0], 'text')
 }
 
 export const output = [<text>two</text>, [1, 0]]

@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../..'
 
 export const input = (
   <value>
@@ -13,7 +14,7 @@ export const input = (
 
 export const run = editor => {
   const { anchor } = editor.value.selection
-  return editor.isEnd(anchor, [0])
+  return Editor.isEnd(editor, anchor, [0])
 }
 
 export const output = true

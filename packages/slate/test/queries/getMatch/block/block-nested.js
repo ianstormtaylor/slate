@@ -1,6 +1,7 @@
 /** @jsx jsx */
 
-import { jsx } from '../../../helpers'
+import { Editor } from 'slate'
+import { jsx } from '../../..'
 
 export const input = (
   <value>
@@ -11,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return editor.getMatch([0, 0, 0], 'block')
+  return Editor.match(editor, [0, 0, 0], 'block')
 }
 
 export const output = [<block>one</block>, [0, 0]]
