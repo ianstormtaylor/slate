@@ -54,33 +54,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Iterate through all of the elements in the Editor.
-   */
-
-  *elements(
-    editor: Editor,
-    options: {
-      at?: Location | Span
-      reverse?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    const { at = editor.value.selection } = options
-
-    if (!at) {
-      return
-    }
-
-    const [from, to] = toSpan(editor, at, options)
-
-    yield* Node.elements(editor.value, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
-  },
-
-  /**
    * Get the marks that are "active" at a location. These are the
    * marks that will be added to any text that is inserted.
    *
@@ -273,6 +246,33 @@ export const LocationQueries = {
   },
 
   /**
+   * Iterate through all of the elements in the Editor.
+   */
+
+  *elements(
+    editor: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<ElementEntry> {
+    const { at = editor.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = toSpan(editor, at, options)
+
+    yield* Node.elements(editor.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
+    })
+  },
+
+  /**
    * Get the end point of a location.
    */
 
@@ -297,6 +297,37 @@ export const LocationQueries = {
     const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor.value, range)
     return fragment
+  },
+
+  /**
+   * Check if a point the start point of a location.
+   */
+
+  isStart(editor: Editor, point: Point, at: Location): boolean {
+    // PERF: If the offset isn't `0` we know it's not the start.
+    if (point.offset !== 0) {
+      return false
+    }
+
+    const start = Editor.start(editor, at)
+    return Point.equals(point, start)
+  },
+
+  /**
+   * Check if a point is the end point of a location.
+   */
+
+  isEnd(editor: Editor, point: Point, at: Location): boolean {
+    const end = Editor.end(editor, at)
+    return Point.equals(point, end)
+  },
+
+  /**
+   * Check if a point is an edge of a location.
+   */
+
+  isEdge(editor: Editor, point: Point, at: Location): boolean {
+    return Editor.isStart(editor, point, at) || Editor.isEnd(editor, point, at)
   },
 
   /**
@@ -326,6 +357,68 @@ export const LocationQueries = {
   },
 
   /**
+   * Iterate through all of the levels at a location.
+   */
+
+  *levels(
+    editor: Editor,
+    options: {
+      at?: Location
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const { at = editor.value.selection, reverse = false } = options
+
+    if (!at) {
+      return
+    }
+
+    const levels: NodeEntry[] = []
+    const path = Editor.path(editor, at)
+
+    for (const [n, p] of Node.levels(editor.value, path)) {
+      levels.push([n, p])
+
+      if (Element.isElement(n) && editor.isVoid(n)) {
+        break
+      }
+    }
+
+    if (reverse) {
+      levels.reverse()
+    }
+
+    yield* levels
+  },
+
+  /**
+   * Iterate through all of the text nodes in the Editor.
+   */
+
+  *marks(
+    editor: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<MarkEntry> {
+    const { at = editor.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = toSpan(editor, at, options)
+
+    yield* Node.marks(editor.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
+    })
+  },
+
+  /**
    * Get the first matching node in a single branch of the document.
    */
 
@@ -333,8 +426,50 @@ export const LocationQueries = {
     const path = Editor.path(editor, at)
 
     for (const entry of Editor.levels(editor, { at: path })) {
-      if (Editor.isNodeMatch(editor, entry, match)) {
+      if (Editor.isMatch(editor, entry, match)) {
         return entry
+      }
+    }
+  },
+
+  /**
+   * Iterate through all of the nodes that match.
+   */
+
+  *matches(
+    editor: Editor,
+    options: {
+      at?: Location | Span
+      match?: NodeMatch
+      reverse?: boolean
+    }
+  ): Iterable<NodeEntry> {
+    const { at = editor.value.selection, reverse = false } = options
+    let { match } = options
+
+    if (!at) {
+      return
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const path = at
+        match = ([, p]) => Path.equals(p, path)
+      } else {
+        match = () => true
+      }
+    }
+
+    let prevPath: Path | undefined
+
+    for (const [n, p] of Editor.nodes(editor, { at, reverse })) {
+      if (prevPath && Path.compare(p, prevPath) === 0) {
+        continue
+      }
+
+      if (Editor.isMatch(editor, [n, p], match)) {
+        prevPath = p
+        yield [n, p]
       }
     }
   },
@@ -373,6 +508,36 @@ export const LocationQueries = {
     const path = Editor.path(editor, at, options)
     const node = Node.get(editor.value, path)
     return [node, path]
+  },
+
+  /**
+   * Iterate through all of the nodes in the Editor.
+   */
+
+  *nodes(
+    editor: Editor,
+    options: {
+      at?: Location | Span
+      reverse?: boolean
+    } = {}
+  ): Iterable<NodeEntry> {
+    const { at = editor.value.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const [from, to] = toSpan(editor, at, options)
+    const iterable = Node.nodes(editor.value, {
+      ...options,
+      from,
+      to,
+      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
+    })
+
+    for (const entry of iterable) {
+      yield entry
+    }
   },
 
   /**
@@ -479,249 +644,6 @@ export const LocationQueries = {
     }
 
     return at
-  },
-
-  /**
-   * Get the matching node in the branch of the document before a location.
-   */
-
-  previous(
-    editor: Editor,
-    at: Location,
-    match: NodeMatch
-  ): NodeEntry | undefined {
-    const [, from] = Editor.first(editor, at)
-    const [, to] = Editor.first(editor, [])
-    const span: Span = [from, to]
-    let i = 0
-
-    for (const entry of Editor.matches(editor, {
-      match,
-      at: span,
-      reverse: true,
-    })) {
-      if (i === 1) {
-        return entry
-      }
-
-      i++
-    }
-  },
-
-  /**
-   * Get a range of a location.
-   */
-
-  range(editor: Editor, at: Location, to?: Location): Range {
-    if (Range.isRange(at) && !to) {
-      return at
-    }
-
-    const start = Editor.start(editor, at)
-    const end = Editor.end(editor, to || at)
-    return { anchor: start, focus: end }
-  },
-
-  /**
-   * Get the start point of a location.
-   */
-
-  start(editor: Editor, at: Location): Point {
-    return Editor.point(editor, at, { edge: 'start' })
-  },
-
-  /**
-   * Get the text content of a location.
-   *
-   * Note: the text of void nodes is presumed to be an empty string, regardless
-   * of what their actual content is.
-   */
-
-  text(editor: Editor, at: Location): string {
-    const range = Editor.range(editor, at)
-    const [start, end] = Range.edges(range)
-    let text = ''
-
-    for (const [node, path] of Editor.texts(editor, { at: range })) {
-      let t = node.text
-
-      if (Path.equals(path, end.path)) {
-        t = t.slice(0, end.offset)
-      }
-
-      if (Path.equals(path, start.path)) {
-        t = t.slice(start.offset)
-      }
-
-      text += t
-    }
-
-    return text
-  },
-
-  /**
-   * Check if a point the start point of a location.
-   */
-
-  isStart(editor: Editor, point: Point, at: Location): boolean {
-    // PERF: If the offset isn't `0` we know it's not the start.
-    if (point.offset !== 0) {
-      return false
-    }
-
-    const start = Editor.start(editor, at)
-    return Point.equals(point, start)
-  },
-
-  /**
-   * Check if a point is the end point of a location.
-   */
-
-  isEnd(editor: Editor, point: Point, at: Location): boolean {
-    const end = Editor.end(editor, at)
-    return Point.equals(point, end)
-  },
-
-  /**
-   * Check if a point is an edge of a location.
-   */
-
-  isEdge(editor: Editor, point: Point, at: Location): boolean {
-    return Editor.isStart(editor, point, at) || Editor.isEnd(editor, point, at)
-  },
-
-  /**
-   * Iterate through all of the levels at a location.
-   */
-
-  *levels(
-    editor: Editor,
-    options: {
-      at?: Location
-      reverse?: boolean
-    } = {}
-  ): Iterable<NodeEntry> {
-    const { at = editor.value.selection, reverse = false } = options
-
-    if (!at) {
-      return
-    }
-
-    const levels: NodeEntry[] = []
-    const path = Editor.path(editor, at)
-
-    for (const [n, p] of Node.levels(editor.value, path)) {
-      levels.push([n, p])
-
-      if (Element.isElement(n) && editor.isVoid(n)) {
-        break
-      }
-    }
-
-    if (reverse) {
-      levels.reverse()
-    }
-
-    yield* levels
-  },
-
-  /**
-   * Iterate through all of the text nodes in the Editor.
-   */
-
-  *marks(
-    editor: Editor,
-    options: {
-      at?: Location | Span
-      reverse?: boolean
-    } = {}
-  ): Iterable<MarkEntry> {
-    const { at = editor.value.selection } = options
-
-    if (!at) {
-      return
-    }
-
-    const [from, to] = toSpan(editor, at, options)
-
-    yield* Node.marks(editor.value, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
-  },
-
-  /**
-   * Iterate through all of the nodes that match.
-   */
-
-  *matches(
-    editor: Editor,
-    options: {
-      at?: Location | Span
-      match?: NodeMatch
-      reverse?: boolean
-    }
-  ): Iterable<NodeEntry> {
-    const { at = editor.value.selection, reverse = false } = options
-    let { match } = options
-
-    if (!at) {
-      return
-    }
-
-    if (match == null) {
-      if (Path.isPath(at)) {
-        const path = at
-        match = ([, p]) => Path.equals(p, path)
-      } else {
-        match = () => true
-      }
-    }
-
-    let prevPath: Path | undefined
-
-    for (const [n, p] of Editor.nodes(editor, { at, reverse })) {
-      if (prevPath && Path.compare(p, prevPath) === 0) {
-        continue
-      }
-
-      if (Editor.isNodeMatch(editor, [n, p], match)) {
-        prevPath = p
-        yield [n, p]
-      }
-    }
-  },
-
-  /**
-   * Iterate through all of the nodes in the Editor.
-   */
-
-  *nodes(
-    editor: Editor,
-    options: {
-      at?: Location | Span
-      reverse?: boolean
-    } = {}
-  ): Iterable<NodeEntry> {
-    const { at = editor.value.selection } = options
-
-    if (!at) {
-      return
-    }
-
-    const [from, to] = toSpan(editor, at, options)
-    const iterable = Node.nodes(editor.value, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
-
-    for (const entry of iterable) {
-      yield entry
-    }
   },
 
   /**
@@ -848,6 +770,84 @@ export const LocationQueries = {
         isNewBlock = false
       }
     }
+  },
+
+  /**
+   * Get the matching node in the branch of the document before a location.
+   */
+
+  previous(
+    editor: Editor,
+    at: Location,
+    match: NodeMatch
+  ): NodeEntry | undefined {
+    const [, from] = Editor.first(editor, at)
+    const [, to] = Editor.first(editor, [])
+    const span: Span = [from, to]
+    let i = 0
+
+    for (const entry of Editor.matches(editor, {
+      match,
+      at: span,
+      reverse: true,
+    })) {
+      if (i === 1) {
+        return entry
+      }
+
+      i++
+    }
+  },
+
+  /**
+   * Get a range of a location.
+   */
+
+  range(editor: Editor, at: Location, to?: Location): Range {
+    if (Range.isRange(at) && !to) {
+      return at
+    }
+
+    const start = Editor.start(editor, at)
+    const end = Editor.end(editor, to || at)
+    return { anchor: start, focus: end }
+  },
+
+  /**
+   * Get the start point of a location.
+   */
+
+  start(editor: Editor, at: Location): Point {
+    return Editor.point(editor, at, { edge: 'start' })
+  },
+
+  /**
+   * Get the text content of a location.
+   *
+   * Note: the text of void nodes is presumed to be an empty string, regardless
+   * of what their actual content is.
+   */
+
+  text(editor: Editor, at: Location): string {
+    const range = Editor.range(editor, at)
+    const [start, end] = Range.edges(range)
+    let text = ''
+
+    for (const [node, path] of Editor.texts(editor, { at: range })) {
+      let t = node.text
+
+      if (Path.equals(path, end.path)) {
+        t = t.slice(0, end.offset)
+      }
+
+      if (Path.equals(path, start.path)) {
+        t = t.slice(start.offset)
+      }
+
+      text += t
+    }
+
+    return text
   },
 
   /**

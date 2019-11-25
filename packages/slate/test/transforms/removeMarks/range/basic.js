@@ -4,12 +4,14 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.removeMarks(editor, [{ key: 'a' }], {
-    at: {
+  Editor.removeMarks(
+    editor,
+    {
       anchor: { path: [0, 1], offset: 0 },
       focus: { path: [0, 1], offset: 2 },
     },
-  })
+    [{ key: 'a' }]
+  )
 }
 
 export const input = (

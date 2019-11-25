@@ -6,14 +6,12 @@ import { jsx } from '../../..'
 export const run = editor => {
   Editor.setMarks(
     editor,
-    [{ key: 'a' }],
-    { thing: true },
     {
-      at: {
-        anchor: { path: [0, 1], offset: 0 },
-        focus: { path: [0, 1], offset: 2 },
-      },
-    }
+      anchor: { path: [0, 1], offset: 0 },
+      focus: { path: [0, 1], offset: 2 },
+    },
+    [{ key: 'a' }],
+    { thing: true }
   )
 }
 

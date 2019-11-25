@@ -7,18 +7,15 @@ export const MarkTransforms = {
 
   addMarks(
     editor: Editor,
+    at: Location,
     marks: Mark[],
     options: {
-      at?: Location
       hanging?: boolean
+      select?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const at = splitLocation(editor, options)
-
-      if (!at) {
-        return
-      }
+      at = splitLocation(editor, at, options)
 
       // De-dupe the marks being added to ensure the set is unique.
       const set: Mark[] = []
@@ -39,16 +36,21 @@ export const MarkTransforms = {
     })
   },
 
+  /**
+   * Remove a set of marks from the text nodes at a location.
+   */
+
   removeMarks(
     editor: Editor,
+    at: Location,
     marks: Mark[],
     options: {
-      at?: Location
       hanging?: boolean
+      select?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const at = splitLocation(editor, options)
+      at = splitLocation(editor, at, options)
 
       if (at) {
         for (const [mark, i, node, path] of Editor.marks(editor, { at })) {
@@ -60,37 +62,40 @@ export const MarkTransforms = {
     })
   },
 
+  /**
+   * Set new properties on the set of marks at a location.
+   */
+
   setMarks(
     editor: Editor,
+    at: Location,
     marks: Mark[],
     props: Partial<Mark>,
     options: {
-      at?: Location
       hanging?: boolean
+      select?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const at = splitLocation(editor, options)
+      at = splitLocation(editor, at, options)
 
-      if (at) {
-        for (const [mark, i, node, path] of Editor.marks(editor, { at })) {
-          if (Mark.exists(mark, marks)) {
-            const newProps = {}
+      for (const [mark, i, node, path] of Editor.marks(editor, { at })) {
+        if (Mark.exists(mark, marks)) {
+          const newProps = {}
 
-            for (const k in props) {
-              if (props[k] !== mark[k]) {
-                newProps[k] = props[k]
-              }
+          for (const k in props) {
+            if (props[k] !== mark[k]) {
+              newProps[k] = props[k]
             }
+          }
 
-            if (Object.keys(newProps).length > 0) {
-              editor.apply({
-                type: 'set_mark',
-                path,
-                properties: mark,
-                newProperties: newProps,
-              })
-            }
+          if (Object.keys(newProps).length > 0) {
+            editor.apply({
+              type: 'set_mark',
+              path,
+              properties: mark,
+              newProperties: newProps,
+            })
           }
         }
       }
@@ -104,16 +109,13 @@ export const MarkTransforms = {
 
 const splitLocation = (
   editor: Editor,
+  at: Location,
   options: {
-    at?: Location
     hanging?: boolean
+    select?: boolean
   } = {}
-): Location | undefined => {
-  let { at = editor.value.selection, hanging = false } = options
-
-  if (!at) {
-    return
-  }
+): Location => {
+  let { hanging = false, select = false } = options
 
   if (Range.isRange(at)) {
     if (!hanging) {
@@ -126,7 +128,7 @@ const splitLocation = (
     Editor.splitNodes(editor, { at: start, match: 'text' })
     const range = rangeRef.unref()!
 
-    if (options.at == null) {
+    if (select) {
       Editor.select(editor, range)
     }
 

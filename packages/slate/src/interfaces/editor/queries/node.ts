@@ -13,17 +13,13 @@ export const NodeQueries = {
    * Check if a node entry is a match.
    */
 
-  isNodeMatch(
-    editor: Editor,
-    entry: NodeEntry,
-    match: NodeMatch | NodeMatch[]
-  ) {
+  isMatch(editor: Editor, entry: NodeEntry, match: NodeMatch | NodeMatch[]) {
     const [node] = entry
 
     // If match is an array, treat it as an OR condition.
     if (Array.isArray(match)) {
       for (const m of match) {
-        if (Editor.isNodeMatch(editor, entry, m)) {
+        if (Editor.isMatch(editor, entry, m)) {
           return true
         }
       }

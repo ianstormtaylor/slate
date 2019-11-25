@@ -18,6 +18,33 @@ export const RANGE_REFS: WeakMap<Editor, Set<RangeRef>> = new WeakMap()
 
 export const GeneralQueries = {
   /**
+   * Check if a value is an `Editor` object.
+   */
+
+  isEditor(value: any): value is Editor {
+    return (
+      isPlainObject(value) &&
+      typeof value.apply === 'function' &&
+      typeof value.exec === 'function' &&
+      typeof value.isInline === 'function' &&
+      typeof value.isVoid === 'function' &&
+      typeof value.normalizeNode === 'function' &&
+      typeof value.onChange === 'function' &&
+      Value.isValue(value.value) &&
+      Operation.isOperationList(value.operations)
+    )
+  },
+
+  /**
+   * Check if the editor is currently normalizing after each operation.
+   */
+
+  isNormalizing(editor: Editor): boolean {
+    const isNormalizing = NORMALIZING.get(editor)
+    return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
    */
@@ -45,6 +72,21 @@ export const GeneralQueries = {
     const refs = Editor.pathRefs(editor)
     refs.add(ref)
     return ref
+  },
+
+  /**
+   * Get the set of currently tracked path refs of the editor.
+   */
+
+  pathRefs(editor: Editor): Set<PathRef> {
+    let refs = PATH_REFS.get(editor)
+
+    if (!refs) {
+      refs = new Set()
+      PATH_REFS.set(editor, refs)
+    }
+
+    return refs
   },
 
   /**
@@ -78,6 +120,21 @@ export const GeneralQueries = {
   },
 
   /**
+   * Get the set of currently tracked point refs of the editor.
+   */
+
+  pointRefs(editor: Editor): Set<PointRef> {
+    let refs = POINT_REFS.get(editor)
+
+    if (!refs) {
+      refs = new Set()
+      POINT_REFS.set(editor, refs)
+    }
+
+    return refs
+  },
+
+  /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
    */
@@ -108,54 +165,6 @@ export const GeneralQueries = {
   },
 
   /**
-   * Check if a value is an `Editor` object.
-   */
-
-  isEditor(value: any): value is Editor {
-    return (
-      isPlainObject(value) &&
-      typeof value.apply === 'function' &&
-      typeof value.exec === 'function' &&
-      typeof value.isInline === 'function' &&
-      typeof value.isVoid === 'function' &&
-      typeof value.normalizeNode === 'function' &&
-      typeof value.onChange === 'function' &&
-      Value.isValue(value.value) &&
-      Operation.isOperationList(value.operations)
-    )
-  },
-
-  /**
-   * Get the set of currently tracked path refs of the editor.
-   */
-
-  pathRefs(editor: Editor): Set<PathRef> {
-    let refs = PATH_REFS.get(editor)
-
-    if (!refs) {
-      refs = new Set()
-      PATH_REFS.set(editor, refs)
-    }
-
-    return refs
-  },
-
-  /**
-   * Get the set of currently tracked point refs of the editor.
-   */
-
-  pointRefs(editor: Editor): Set<PointRef> {
-    let refs = POINT_REFS.get(editor)
-
-    if (!refs) {
-      refs = new Set()
-      POINT_REFS.set(editor, refs)
-    }
-
-    return refs
-  },
-
-  /**
    * Get the set of currently tracked range refs of the editor.
    */
 
@@ -168,15 +177,6 @@ export const GeneralQueries = {
     }
 
     return refs
-  },
-
-  /**
-   * Check if the editor is currently normalizing after each operation.
-   */
-
-  isNormalizing(editor: Editor): boolean {
-    const isNormalizing = NORMALIZING.get(editor)
-    return isNormalizing === undefined ? true : isNormalizing
   },
 
   /**
