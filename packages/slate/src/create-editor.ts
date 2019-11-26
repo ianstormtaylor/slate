@@ -99,18 +99,15 @@ export const createEditor = (): Editor => {
           }
 
           case 'add_mark': {
-            if (selection) {
-              const { mark } = command
-              Editor.addMarks(editor, selection, [mark])
-            }
-
+            const { mark } = command
+            Editor.addMarks(editor, [mark])
             break
           }
 
           case 'delete_backward': {
             if (selection && Range.isCollapsed(selection)) {
               const { unit } = command
-              Editor.delete(editor, { at: selection, unit, reverse: true })
+              Editor.delete(editor, { unit, reverse: true })
             }
 
             break
@@ -119,7 +116,7 @@ export const createEditor = (): Editor => {
           case 'delete_forward': {
             if (selection && Range.isCollapsed(selection)) {
               const { unit } = command
-              Editor.delete(editor, { at: selection, unit })
+              Editor.delete(editor, { unit })
             }
 
             break
@@ -127,7 +124,7 @@ export const createEditor = (): Editor => {
 
           case 'delete_fragment': {
             if (selection && Range.isExpanded(selection)) {
-              Editor.delete(editor, { at: selection })
+              Editor.delete(editor)
             }
 
             break
@@ -139,28 +136,19 @@ export const createEditor = (): Editor => {
           }
 
           case 'insert_break': {
-            if (selection) {
-              Editor.splitNodes(editor, { at: selection, always: true })
-            }
-
+            Editor.splitNodes(editor, { always: true })
             break
           }
 
           case 'insert_fragment': {
-            if (selection) {
-              const { fragment } = command
-              Editor.insertFragment(editor, fragment, { at: selection })
-            }
-
+            const { fragment } = command
+            Editor.insertFragment(editor, fragment)
             break
           }
 
           case 'insert_text': {
-            if (selection) {
-              const { text } = command
-              Editor.insertText(editor, text, { at: selection })
-            }
-
+            const { text } = command
+            Editor.insertText(editor, text)
             break
           }
 
@@ -171,11 +159,8 @@ export const createEditor = (): Editor => {
           }
 
           case 'remove_mark': {
-            if (selection) {
-              const { mark } = command
-              Editor.removeMarks(editor, selection, [mark])
-            }
-
+            const { mark } = command
+            Editor.removeMarks(editor, [mark])
             break
           }
 

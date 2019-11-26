@@ -4,14 +4,12 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.addMarks(
-    editor,
-    {
+  Editor.addMarks(editor, [{ key: 'a' }], {
+    at: {
       anchor: { path: [0, 0], offset: 1 },
       focus: { path: [0, 0], offset: 3 },
     },
-    [{ key: 'a' }]
-  )
+  })
 }
 
 export const input = (
