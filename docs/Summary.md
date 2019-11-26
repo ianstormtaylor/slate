@@ -2,13 +2,12 @@
 
 ## Walkthroughs
 
-- [Installing Slate](./walkthroughs/installing-slate.md)
-- [Adding Event Handlers](./walkthroughs/adding-event-handlers.md)
-- [Defining Custom Block Nodes](./walkthroughs/defining-custom-block-nodes.md)
-- [Applying Custom Formatting](./walkthroughs/applying-custom-formatting.md)
-- [Using Plugins](./walkthroughs/using-plugins.md)
-- [Saving to a Database](./walkthroughs/saving-to-a-database.md)
-- [Saving and Loading HTML Content](./walkthroughs/saving-and-loading-html-content.md)
+- [Installing Slate](./walkthroughs/01-installing-slate.md)
+- [Adding Event Handlers](./walkthroughs/02-adding-event-handlers.md)
+- [Defining Custom Elements](./walkthroughs/03-defining-custom-elements.md)
+- [Applying Custom Formatting](./walkthroughs/04-applying-custom-formatting.md)
+- [Executing Commands](./walkthroughs/05-executing-commands.md)
+- [Saving to a Database](./walkthroughs/06-saving-to-a-database.md)
 
 ## Guides
 

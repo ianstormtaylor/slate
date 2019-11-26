@@ -348,5 +348,5 @@ And there you have it! We just added a ton of functionality to the editor with v
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./saving-to-a-database.md">Saving to a Database</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./06-saving-to-a-database.md">Saving to a Database</a></p>
 <br/>

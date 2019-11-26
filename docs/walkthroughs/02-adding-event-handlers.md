@@ -79,5 +79,5 @@ With that added, try typing `&`, and you should see it suddenly become `and` ins
 This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and the `editor` that lets you perform commands. Simple!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./03-defining-custom-elements.md">Defining Custom Elements</a></p>
 <br/>

@@ -206,5 +206,5 @@ const App = () => {
 And there you have it! If you press `Ctrl-\`` while inside a code block, it should turn back into a paragraph!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./04-applying-custom-formatting.md">Applying Custom Formatting</a></p>
 <br/>

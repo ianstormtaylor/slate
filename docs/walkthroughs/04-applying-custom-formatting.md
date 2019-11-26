@@ -192,5 +192,5 @@ const BoldMark = props => {
 Now, if you try selecting a piece of text and hitting `Ctrl-B` you should see it turn bold! Magic!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./using-mixins.md">Using Mixins</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./05-executing-commands.md">Executing Commands</a></p>
 <br/>

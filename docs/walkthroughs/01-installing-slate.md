@@ -98,5 +98,5 @@ And that's it!
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
 <br/>
-<p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
+<p align="center"><strong>Next:</strong><br/><a href="./02-adding-event-handlers.md">Adding Event Handlers</a></p>
 <br/>
