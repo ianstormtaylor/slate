@@ -91,7 +91,8 @@ export const createEditor = (): Editor => {
           case 'add_annotation': {
             if (selection) {
               const { key, properties } = command
-              const annotation = { ...selection, properties }
+              const { anchor, focus } = selection
+              const annotation = { anchor, focus, ...properties }
               Editor.addAnnotation(editor, key, annotation)
             }
 
@@ -143,6 +144,12 @@ export const createEditor = (): Editor => {
           case 'insert_fragment': {
             const { fragment } = command
             Editor.insertFragment(editor, fragment)
+            break
+          }
+
+          case 'insert_node': {
+            const { node } = command
+            Editor.insertNodes(editor, [node])
             break
           }
 

@@ -360,36 +360,4 @@ export const TextTransforms = {
       }
     })
   },
-
-  /**
-   * Remove a string of text in the editor.
-   *
-   * TODO!
-   */
-
-  removeText(
-    editor: Editor,
-    text: string,
-    options: {
-      at?: Range
-    } = {}
-  ) {
-    Editor.withoutNormalizing(editor, () => {
-      const { at = editor.value.selection } = options
-
-      if (!at || Range.isCollapsed(at)) {
-        return
-      }
-
-      const [start, end] = Range.edges(at)
-      const texts = Editor.texts(editor, { at })
-      const pathRefs = Array.from(texts, ([, p]) => Editor.pathRef(editor, p))
-
-      for (const [node, path] of Editor.texts(editor, { at }))
-        if (Point.isPoint(at) && !Editor.match(editor, at.path, 'void')) {
-          const { path, offset } = at
-          editor.apply({ type: 'insert_text', path, offset, text })
-        }
-    })
-  },
 }

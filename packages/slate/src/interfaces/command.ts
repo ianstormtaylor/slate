@@ -98,15 +98,11 @@ export const Command = {
   },
 
   /**
-   * Check if a value is a `InsertTextCommand` object.
+   * Check if a value is an `InsertBreakCommand` object.
    */
 
-  isInsertTextCommand(value: any): value is InsertTextCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'insert_text' &&
-      typeof value.text === 'string'
-    )
+  isInsertBreakCommand(value: any): value is InsertBreakCommand {
+    return Command.isCommand(value) && value.type === 'insert_break'
   },
 
   /**
@@ -122,11 +118,27 @@ export const Command = {
   },
 
   /**
-   * Check if a value is an `InsertBreakCommand` object.
+   * Check if a value is an `InsertNodeCommand` object.
    */
 
-  isInsertBreakCommand(value: any): value is InsertBreakCommand {
-    return Command.isCommand(value) && value.type === 'insert_break'
+  isInsertNodeCommand(value: any): value is InsertNodeCommand {
+    return (
+      Command.isCommand(value) &&
+      value.type === 'insert_node' &&
+      Node.isNode(value.node)
+    )
+  },
+
+  /**
+   * Check if a value is a `InsertTextCommand` object.
+   */
+
+  isInsertTextCommand(value: any): value is InsertTextCommand {
+    return (
+      Command.isCommand(value) &&
+      value.type === 'insert_text' &&
+      typeof value.text === 'string'
+    )
   },
 
   /**
@@ -222,12 +234,11 @@ export interface DeleteFragmentCommand {
 }
 
 /**
- * The `InsertTextCommand` inserts a string of text at the current selection.
+ * The `InsertBreakCommand` breaks a block in two at the current selection.
  */
 
-export interface InsertTextCommand {
-  type: 'insert_text'
-  text: string
+export interface InsertBreakCommand {
+  type: 'insert_break'
 }
 
 /**
@@ -240,11 +251,21 @@ export interface InsertFragmentCommand {
 }
 
 /**
- * The `InsertBreakCommand` breaks a block in two at the current selection.
+ * The `InsertNodeCommand` inserts a node at the current selection.
  */
 
-export interface InsertBreakCommand {
-  type: 'insert_break'
+export interface InsertNodeCommand {
+  type: 'insert_node'
+  node: Node
+}
+
+/**
+ * The `InsertTextCommand` inserts a string of text at the current selection.
+ */
+
+export interface InsertTextCommand {
+  type: 'insert_text'
+  text: string
 }
 
 /**
@@ -282,13 +303,14 @@ export interface SelectCommand {
 export type CoreCommand =
   | AddAnnotationCommand
   | AddMarkCommand
-  | DeselectCommand
   | DeleteBackwardCommand
   | DeleteForwardCommand
   | DeleteFragmentCommand
-  | InsertTextCommand
-  | InsertFragmentCommand
+  | DeselectCommand
   | InsertBreakCommand
+  | InsertFragmentCommand
+  | InsertNodeCommand
+  | InsertTextCommand
   | RemoveAnnotationCommand
   | RemoveMarkCommand
   | SelectCommand
