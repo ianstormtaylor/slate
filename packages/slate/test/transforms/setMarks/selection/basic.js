@@ -4,13 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setMarks(
-    editor,
-    editor.value.selection,
-    [{ key: 'a' }],
-    { thing: true },
-    { select: true }
-  )
+  Editor.setMarks(editor, [{ key: 'a' }], { thing: true })
 }
 
 export const input = (

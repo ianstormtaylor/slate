@@ -135,7 +135,7 @@ export const withSchema = (
 
       case 'mark_invalid': {
         const { mark, path } = error
-        Editor.removeMarks(editor, path, [mark])
+        Editor.removeMarks(editor, [mark], { at: path })
         break
       }
 
