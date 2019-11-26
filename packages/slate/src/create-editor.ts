@@ -100,15 +100,13 @@ export const createEditor = (): Editor => {
           }
 
           case 'add_mark': {
-            const { mark } = command
-            Editor.addMarks(editor, [mark])
+            Editor.addMarks(editor, [command.mark])
             break
           }
 
           case 'delete_backward': {
             if (selection && Range.isCollapsed(selection)) {
-              const { unit } = command
-              Editor.delete(editor, { unit, reverse: true })
+              Editor.delete(editor, { unit: command.unit, reverse: true })
             }
 
             break
@@ -116,8 +114,7 @@ export const createEditor = (): Editor => {
 
           case 'delete_forward': {
             if (selection && Range.isCollapsed(selection)) {
-              const { unit } = command
-              Editor.delete(editor, { unit })
+              Editor.delete(editor, { unit: command.unit })
             }
 
             break
@@ -131,49 +128,33 @@ export const createEditor = (): Editor => {
             break
           }
 
-          case 'deselect': {
-            Editor.deselect(editor)
-            break
-          }
-
           case 'insert_break': {
             Editor.splitNodes(editor, { always: true })
             break
           }
 
           case 'insert_fragment': {
-            const { fragment } = command
-            Editor.insertFragment(editor, fragment)
+            Editor.insertFragment(editor, command.fragment)
             break
           }
 
           case 'insert_node': {
-            const { node } = command
-            Editor.insertNodes(editor, [node])
+            Editor.insertNodes(editor, [command.node])
             break
           }
 
           case 'insert_text': {
-            const { text } = command
-            Editor.insertText(editor, text)
+            Editor.insertText(editor, command.text)
             break
           }
 
           case 'remove_annotation': {
-            const { key } = command
-            Editor.removeAnnotation(editor, key)
+            Editor.removeAnnotation(editor, command.key)
             break
           }
 
           case 'remove_mark': {
-            const { mark } = command
-            Editor.removeMarks(editor, [mark])
-            break
-          }
-
-          case 'select': {
-            const { range } = command
-            Editor.select(editor, range)
+            Editor.removeMarks(editor, [command.mark])
             break
           }
         }

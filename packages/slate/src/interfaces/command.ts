@@ -53,24 +53,15 @@ export const Command = {
     return (
       Command.isAddAnnotationCommand(value) ||
       Command.isAddMarkCommand(value) ||
-      Command.isDeselectCommand(value) ||
       Command.isDeleteBackwardCommand(value) ||
       Command.isDeleteForwardCommand(value) ||
+      Command.isDeleteFragmentCommand(value) ||
       Command.isInsertTextCommand(value) ||
       Command.isInsertFragmentCommand(value) ||
       Command.isInsertBreakCommand(value) ||
       Command.isRemoveAnnotationCommand(value) ||
-      Command.isRemoveMarkCommand(value) ||
-      Command.isSelectCommand(value)
+      Command.isRemoveMarkCommand(value)
     )
-  },
-
-  /**
-   * Check if a value is a `DeselectCommand` object.
-   */
-
-  isDeselectCommand(value: any): value is DeselectCommand {
-    return Command.isCommand(value) && value.type === 'deselect'
   },
 
   /**
@@ -95,6 +86,14 @@ export const Command = {
       value.type === 'delete_forward' &&
       typeof value.unit === 'string'
     )
+  },
+
+  /**
+   * Check if a value is a `DeleteFragmentCommand` object.
+   */
+
+  isDeleteFragmentCommand(value: any): value is DeleteFragmentCommand {
+    return Command.isCommand(value) && value.type === 'delete_fragment'
   },
 
   /**
@@ -164,18 +163,6 @@ export const Command = {
       Mark.isMark(value.mark)
     )
   },
-
-  /**
-   * Check if a value is a `SelectCommand` object.
-   */
-
-  isSelectCommand(value: any): value is SelectCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'select' &&
-      Range.isRange(value.range)
-    )
-  },
 }
 
 /**
@@ -195,14 +182,6 @@ export interface AddAnnotationCommand {
 export interface AddMarkCommand {
   type: 'add_mark'
   mark: Mark
-}
-
-/**
- * The `DeselectCommand` removes the current selection.
- */
-
-export interface DeselectCommand {
-  type: 'deselect'
 }
 
 /**
@@ -287,15 +266,6 @@ export interface RemoveMarkCommand {
 }
 
 /**
- * The `SelectCommand` changes the current selection.
- */
-
-export interface SelectCommand {
-  type: 'select'
-  range: Range
-}
-
-/**
  * The `CoreCommand` union is a set of all of the commands that are recognized
  * by Slate's "core" out of the box.
  */
@@ -306,11 +276,9 @@ export type CoreCommand =
   | DeleteBackwardCommand
   | DeleteForwardCommand
   | DeleteFragmentCommand
-  | DeselectCommand
   | InsertBreakCommand
   | InsertFragmentCommand
   | InsertNodeCommand
   | InsertTextCommand
   | RemoveAnnotationCommand
   | RemoveMarkCommand
-  | SelectCommand

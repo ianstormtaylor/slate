@@ -315,7 +315,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): SlateRange | undefined {
+  findEventRange(editor: ReactEditor, event: any): SlateRange {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -323,7 +323,7 @@ export const ReactEditor = {
     const { clientX: x, clientY: y, target } = event
 
     if (x == null || y == null) {
-      return
+      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
     }
 
     const node = ReactEditor.toSlateNode(editor, event.target)

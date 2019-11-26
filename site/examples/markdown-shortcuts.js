@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useMemo } from 'react'
-import { Editable, withReact, useSlate } from 'slate-react'
-import { Editor, Range, createEditor } from 'slate'
+import { Editable, withReact } from 'slate-react'
+import { Editor, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -42,10 +42,14 @@ const withShortcuts = editor => {
   const { exec } = editor
 
   editor.exec = command => {
-    const { text } = options
     const { selection } = editor.value
 
-    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+    if (
+      command.type === 'insert_text' &&
+      command.text === ' ' &&
+      selection &&
+      Range.isCollapsed(selection)
+    ) {
       const { anchor } = selection
       const block = Editor.match(editor, anchor, 'block')
       const path = block ? block[1] : []
@@ -65,6 +69,30 @@ const withShortcuts = editor => {
         }
 
         return
+      }
+    }
+
+    if (
+      command.type === 'delete_backward' &&
+      selection &&
+      Range.isCollapsed(selection)
+    ) {
+      const { anchor } = selection
+      const match = Editor.match(editor, anchor, 'block')
+
+      if (match) {
+        const [block, path] = match
+        const start = Editor.start(editor, path)
+
+        if (block.type !== 'paragraph' && Point.equals(anchor, start)) {
+          Editor.setNodes(editor, { type: 'paragraph' })
+
+          if (match.type === 'list-item') {
+            Editor.unwrapNodes(editor, { match: { type: 'bulleted-list' } })
+          }
+
+          return
+        }
       }
     }
 
@@ -104,6 +132,7 @@ const initialValue = {
   annotations: {},
   children: [
     {
+      type: 'paragraph',
       children: [
         {
           text:
@@ -122,6 +151,7 @@ const initialValue = {
       ],
     },
     {
+      type: 'paragraph',
       children: [
         {
           text:
@@ -140,6 +170,7 @@ const initialValue = {
       ],
     },
     {
+      type: 'paragraph',
       children: [
         {
           text:

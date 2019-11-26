@@ -4,8 +4,7 @@ import { Editable, withReact, useSelected, useFocused } from 'slate-react'
 
 const EmbedsExample = () => {
   const [value, setValue] = useState(initialValue)
-  const isVoid = element => element.type === 'video'
-  const editor = useMemo(() => withReact(createEditor({ isVoid })), [])
+  const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
     <div>
       <Editable
@@ -17,6 +16,12 @@ const EmbedsExample = () => {
       />
     </div>
   )
+}
+
+const withEmbeds = editor => {
+  const { isVoid } = editor
+  editor.isVoid = element => (element.type === 'video' ? true : isVoid(element))
+  return editor
 }
 
 const Element = props => {
@@ -35,16 +40,16 @@ const VideoElement = ({ attributes, children, element }) => {
   const { url } = element
   return (
     <div {...attributes}>
-      {children}
       <div
+        contentEditable={false}
         style={{
           position: 'relative',
-          outline: focused ? '2px solid blue' : 'none',
+          boxShaodow: selected && focused ? '0 0 0 3px #B4D5FF' : 'none',
         }}
       >
         <div
           style={{
-            display: focused ? 'none' : 'block',
+            display: selected && focused ? 'none' : 'block',
             position: 'absolute',
             top: '0',
             left: '0',
@@ -72,21 +77,22 @@ const VideoElement = ({ attributes, children, element }) => {
             }}
           />
         </div>
+        {selected && focused ? (
+          <input
+            value={url}
+            onClick={e => e.stopPropagation()}
+            style={{
+              marginTop: '5px',
+              boxSizing: 'border-box',
+            }}
+            onChange={value => {
+              const path = editor.findPath(element)
+              Editor.setNodes(editor, { url: value }, { at: path })
+            }}
+          />
+        ) : null}
       </div>
-      {selected && focused ? (
-        <input
-          value={url}
-          onClick={e => e.stopPropagation()}
-          style={{
-            marginTop: '5px',
-            boxSizing: 'border-box',
-          }}
-          onChange={value => {
-            const path = editor.findPath(element)
-            Editor.setNodes(editor, { url: value }, { at: path })
-          }}
-        />
-      ) : null}
+      {children}
     </div>
   )
 }

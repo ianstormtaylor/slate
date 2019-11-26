@@ -15,7 +15,17 @@ const LinkExample = () => {
   return (
     <div>
       <Toolbar>
-        <LinkButton />
+        <Button
+          active={isLinkActive(editor)}
+          onMouseDown={event => {
+            event.preventDefault()
+            const url = window.prompt('Enter the URL of the link:')
+            if (!url) return
+            editor.exec({ type: 'insert_link', url })
+          }}
+        >
+          <Icon>link</Icon>
+        </Button>
       </Toolbar>
       <Editable
         editor={editor}
@@ -49,7 +59,7 @@ const withLinks = editor => {
     let text
 
     if (command.type === 'insert_data') {
-      text = data.getData('text/plain')
+      text = command.data.getData('text/plain')
     } else if (command.type === 'insert_text') {
       text = command.text
     }
@@ -65,7 +75,8 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  return !!Editor.match(editor, { type: 'link' })
+  const { selection } = editor.value
+  return !!(selection && Editor.match(editor, selection, { type: 'link' }))
 }
 
 const unwrapLink = editor => {
@@ -80,22 +91,6 @@ const wrapLink = (editor, url) => {
   const link = { type: 'link', url, children: [] }
   Editor.wrapNodes(editor, link, { split: true })
   Editor.collapse(editor, { edge: 'end' })
-}
-
-const LinkButton = ({ editor }) => {
-  return (
-    <Button
-      active={isLinkActive(editor)}
-      onMouseDown={event => {
-        event.preventDefault()
-        const url = window.prompt('Enter the URL of the link:')
-        if (!url) return
-        editor.exec({ type: 'insert_link', url })
-      }}
-    >
-      <Icon>link</Icon>
-    </Button>
-  )
 }
 
 const Element = ({ attributes, children, element }) => {

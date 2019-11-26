@@ -41,9 +41,10 @@ const withTables = editor => {
 
       if (cell) {
         const [, cellPath] = cell
-        const edge = reverse
-          ? Editor.start(editor, cellPath)
-          : Editor.end(editor, cellPath)
+        const edge =
+          type === 'delete_backward'
+            ? Editor.start(editor, cellPath)
+            : Editor.end(editor, cellPath)
 
         if (Point.equals(anchor, edge)) {
           return

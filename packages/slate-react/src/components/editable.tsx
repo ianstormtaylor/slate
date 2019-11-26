@@ -74,6 +74,7 @@ export const Editable = (props: {
     renderElement,
     renderMark,
     style = {},
+    onDOMBeforeInput: propsOnDOMBeforeInput,
     ...attributes
   } = props
 
@@ -157,17 +158,26 @@ export const Editable = (props: {
       return
     }
 
-    const el = ReactEditor.toDomNode(editor, value)
-    const domRange = domSelection.getRangeAt(0)
+    const hasDomSelection = domSelection.type !== 'None'
+
+    // If the DOM selection is properly unset, we're done.
+    if (!selection && !hasDomSelection) {
+      return
+    }
+
     const newDomRange = selection && ReactEditor.toDomRange(editor, selection)
 
+    // If the DOM selection is already correct, we're done.
     if (
-      (!selection && !domRange) ||
-      (domRange && newDomRange && isRangeEqual(domRange, newDomRange))
+      hasDomSelection &&
+      newDomRange &&
+      isRangeEqual(domSelection.getRangeAt(0), newDomRange)
     ) {
       return
     }
 
+    // Otherwise the DOM selection is out of sync, so update it.
+    const el = ReactEditor.toDomNode(editor, value)
     state.isUpdatingSelection = true
     domSelection.removeAllRanges()
 
@@ -205,7 +215,7 @@ export const Editable = (props: {
       if (
         !readOnly &&
         hasEditableTarget(editor, event.target) &&
-        !isDOMEventHandled(event, props.onDOMBeforeInput)
+        !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
         const { selection } = editor.value
         const { inputType: type } = event
@@ -232,7 +242,7 @@ export const Editable = (props: {
             const range = ReactEditor.toSlateRange(editor, targetRange)
 
             if (!selection || !SlateRange.equals(selection, range)) {
-              editor.exec({ type: 'select', range })
+              Editor.select(editor, range)
             }
           }
         }
@@ -358,9 +368,9 @@ export const Editable = (props: {
           hasEditableTarget(editor, domRange.endContainer)
         ) {
           const range = ReactEditor.toSlateRange(editor, domRange)
-          editor.exec({ type: 'select', range })
+          Editor.select(editor, range)
         } else {
-          editor.exec({ type: 'deselect' })
+          Editor.deselect(editor)
         }
       }
     }, 100),
@@ -410,46 +420,53 @@ export const Editable = (props: {
             }, [])}
             onBlur={useCallback((event: React.FocusEvent) => {
               if (
-                !readOnly &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onBlur) &&
-                // COMPAT: If the current `activeElement` is still the previous
-                // one, this is due to the window being blurred when the tab
-                // itself becomes unfocused, so we want to abort early to allow to
-                // editor to stay focused when the tab becomes focused again.
-                state.latestElement !== window.document.activeElement
+                readOnly ||
+                state.isUpdatingSelection ||
+                !hasEditableTarget(editor, event.target) ||
+                isEventHandled(event, attributes.onBlur)
               ) {
-                const { relatedTarget } = event
+                return
+              }
 
-                // COMPAT: The `relatedTarget` can be null when the new focus target
-                // is not a "focusable" element (eg. a `<div>` without `tabindex`
-                // set).
-                if (relatedTarget) {
-                  const el = ReactEditor.toDomNode(editor, value)
+              // COMPAT: If the current `activeElement` is still the previous
+              // one, this is due to the window being blurred when the tab
+              // itself becomes unfocused, so we want to abort early to allow to
+              // editor to stay focused when the tab becomes focused again.
+              if (state.latestElement === window.document.activeElement) {
+                return
+              }
 
-                  // COMPAT: The event should be ignored if the focus is returning
-                  // to the editor from an embedded editable element (eg. an <input>
-                  // element inside a void node).
-                  if (relatedTarget === el) return
+              const { relatedTarget } = event
+              const el = ReactEditor.toDomNode(editor, value)
 
-                  if (isDOMElement(relatedTarget)) {
-                    // COMPAT: The event should be ignored if the focus is moving from
-                    // the editor to inside a void node's spacer element.
-                    if (relatedTarget.hasAttribute('data-slate-spacer')) return
+              // COMPAT: The event should be ignored if the focus is returning
+              // to the editor from an embedded editable element (eg. an <input>
+              // element inside a void node).
+              if (relatedTarget === el) {
+                return
+              }
 
-                    // COMPAT: The event should be ignored if the focus is moving to a
-                    // non- editable section of an element that isn't a void node (eg.
-                    // a list item of the check list example).
-                    const node = ReactEditor.toSlateNode(editor, relatedTarget)
+              // COMPAT: The event should be ignored if the focus is moving from
+              // the editor to inside a void node's spacer element.
+              if (
+                isDOMElement(relatedTarget) &&
+                relatedTarget.hasAttribute('data-slate-spacer')
+              ) {
+                return
+              }
 
-                    if (
-                      ReactEditor.hasDomNode(editor, relatedTarget) &&
-                      (!Element.isElement(node) || !editor.isVoid(node))
-                    ) {
-                      return
-                    }
-                  }
+              // COMPAT: The event should be ignored if the focus is moving to a
+              // non- editable section of an element that isn't a void node (eg.
+              // a list item of the check list example).
+              if (
+                relatedTarget != null &&
+                isDOMNode(relatedTarget) &&
+                ReactEditor.hasDomNode(editor, relatedTarget)
+              ) {
+                const node = ReactEditor.toSlateNode(editor, relatedTarget)
+
+                if (Element.isElement(node) && !editor.isVoid(node)) {
+                  return
                 }
               }
 
@@ -468,7 +485,7 @@ export const Editable = (props: {
 
                 if (Editor.match(editor, start, 'void')) {
                   const range = Editor.range(editor, start)
-                  editor.exec({ type: 'select', range })
+                  Editor.select(editor, range)
                 }
               }
             }, [])}
@@ -548,10 +565,32 @@ export const Editable = (props: {
                 // so that it shows up in the selection's fragment.
                 if (voidMatch) {
                   const range = Editor.range(editor, path)
-                  editor.exec({ type: 'select', range })
+                  Editor.select(editor, range)
                 }
 
                 setFragmentData(event.dataTransfer, editor)
+              }
+            }, [])}
+            onDrop={useCallback((event: React.DragEvent) => {
+              if (
+                hasTarget(editor, event.target) &&
+                !readOnly &&
+                !isEventHandled(event, attributes.onDrop)
+              ) {
+                // COMPAT: Firefox doesn't fire `beforeinput` events at all, and
+                // Chromium browsers don't properly fire them for files being
+                // dropped into a `contenteditable`. (2019/11/26)
+                // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
+                if (
+                  IS_FIREFOX ||
+                  (!IS_SAFARI && event.dataTransfer.files.length > 0)
+                ) {
+                  event.preventDefault()
+                  const range = ReactEditor.findEventRange(editor, event)
+                  const data = event.dataTransfer
+                  Editor.select(editor, range)
+                  editor.exec({ type: 'insert_data', data })
+                }
               }
             }, [])}
             onFocus={useCallback((event: React.FocusEvent) => {
@@ -601,72 +640,76 @@ export const Editable = (props: {
                 // properly. In Chrome, the selection isn't properly extended.
                 // And in Firefox, the selection isn't properly collapsed.
                 // (2017/10/17)
-                // if (Hotkeys.isMoveLineBackward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'line', reverse: true })
-                //   return
-                // }
+                if (Hotkeys.isMoveLineBackward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, { unit: 'line', reverse: true })
+                  return
+                }
 
-                // if (Hotkeys.isMoveLineForward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'line' })
-                //   return
-                // }
+                if (Hotkeys.isMoveLineForward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, { unit: 'line' })
+                  return
+                }
 
-                // if (Hotkeys.isExtendLineBackward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'line', edge: 'focus', reverse: true })
-                //   return
-                // }
+                if (Hotkeys.isExtendLineBackward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, {
+                    unit: 'line',
+                    edge: 'focus',
+                    reverse: true,
+                  })
+                  return
+                }
 
-                // if (Hotkeys.isExtendLineForward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'line', edge: 'focus' })
-                //   return
-                // }
+                if (Hotkeys.isExtendLineForward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, { unit: 'line', edge: 'focus' })
+                  return
+                }
 
                 // COMPAT: If a void node is selected, or a zero-width text node
                 // adjacent to an inline is selected, we need to handle these
                 // hotkeys manually because browsers won't be able to skip over
                 // the void node with the zero-width space not being an empty
                 // string.
-                // if (Hotkeys.isMoveBackward(nativeEvent)) {
-                //   const { selection } = editor.value
-                //   event.preventDefault()
+                if (Hotkeys.isMoveBackward(nativeEvent)) {
+                  const { selection } = editor.value
+                  event.preventDefault()
 
-                //   if (selection && SlateRange.isCollapsed(selection)) {
-                //     editor.move({ reverse: true })
-                //   } else {
-                //     editor.collapse({ edge: 'start' })
-                //   }
+                  if (selection && SlateRange.isCollapsed(selection)) {
+                    Editor.move(editor, { reverse: true })
+                  } else {
+                    Editor.collapse(editor, { edge: 'start' })
+                  }
 
-                //   return
-                // }
+                  return
+                }
 
-                // if (Hotkeys.isMoveForward(nativeEvent)) {
-                //   const { selection } = editor.value
-                //   event.preventDefault()
+                if (Hotkeys.isMoveForward(nativeEvent)) {
+                  const { selection } = editor.value
+                  event.preventDefault()
 
-                //   if (selection && SlateRange.isCollapsed(selection)) {
-                //     editor.move()
-                //   } else {
-                //     editor.collapse({ edge: 'end' })
-                //   }
+                  if (selection && SlateRange.isCollapsed(selection)) {
+                    Editor.move(editor)
+                  } else {
+                    Editor.collapse(editor, { edge: 'end' })
+                  }
 
-                //   return
-                // }
+                  return
+                }
 
-                // if (Hotkeys.isMoveWordBackward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'word', reverse: true })
-                //   return
-                // }
+                if (Hotkeys.isMoveWordBackward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, { unit: 'word', reverse: true })
+                  return
+                }
 
-                // if (Hotkeys.isMoveWordForward(nativeEvent)) {
-                //   event.preventDefault()
-                //   editor.move({ unit: 'word' })
-                //   return
-                // }
+                if (Hotkeys.isMoveWordForward(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.move(editor, { unit: 'word' })
+                  return
+                }
               }
             }}
             onPaste={useCallback((event: React.ClipboardEvent) => {

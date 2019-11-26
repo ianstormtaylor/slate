@@ -70,7 +70,7 @@ const withImages = editor => {
         } else if (isImageUrl(text)) {
           editor.exec({ type: 'insert_image', url: text })
         } else {
-          exec(editor, command)
+          exec(command)
         }
 
         break

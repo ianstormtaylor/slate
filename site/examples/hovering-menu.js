@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Editable, withReact } from 'slate-react'
+import { Editable, ReactEditor, withReact } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
@@ -22,9 +22,9 @@ const HoveringMenuExample = () => {
     if (
       !el ||
       !selection ||
-      !editor.isFocused() ||
+      !ReactEditor.isFocused(editor) ||
       Range.isCollapsed(selection) ||
-      editor.text(selection) === ''
+      Editor.text(editor, selection) === ''
     ) {
       el.removeAttribute('style')
       return
@@ -78,11 +78,11 @@ const HoveringMenuExample = () => {
         onDOMBeforeInput={event => {
           switch (event.inputType) {
             case 'formatBold':
-              return this.toggleMarks([{ type: 'bold' }])
+              return editor.exec({ type: 'toggle_mark', mark: 'bold' })
             case 'formatItalic':
-              return this.toggleMarks([{ type: 'italic' }])
+              return editor.exec({ type: 'toggle_mark', mark: 'italic' })
             case 'formatUnderline':
-              return this.toggleMarks([{ type: 'underlined' }])
+              return editor.exec({ type: 'toggle_mark', mark: 'underlined' })
           }
         }}
       />
@@ -93,18 +93,18 @@ const HoveringMenuExample = () => {
 const withMarks = editor => {
   const { exec } = editor
 
-  editor.exec = (editor, command) => {
+  editor.exec = command => {
     switch (command.type) {
       case 'toggle_mark': {
         const { mark } = command
         const isActive = isMarkActive(editor, mark.type)
-        const command = isActive ? 'remove_mark' : 'add_mark'
-        editor.exec({ type: command, mark })
+        const cmd = isActive ? 'remove_mark' : 'add_mark'
+        editor.exec({ type: cmd, mark })
         break
       }
 
       default: {
-        exec(editor, command)
+        exec(command)
         break
       }
     }
