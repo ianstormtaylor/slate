@@ -1,7 +1,3 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
-<br/>
-
 # Defining Custom Block Nodes
 
 In our previous example, we started with a paragraph, but we never actually told Slate anything about the `paragraph` block type. We just let it use its internal default renderer, which uses a plain old `<div>`.
@@ -204,7 +200,3 @@ const App = () => {
 ```
 
 And there you have it! If you press `Ctrl-\`` while inside a code block, it should turn back into a paragraph!
-
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./04-applying-custom-formatting.md">Applying Custom Formatting</a></p>
-<br/>

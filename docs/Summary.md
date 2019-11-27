@@ -11,11 +11,15 @@
 
 ## Guides
 
-- [Commands & Queries](./guides/commands-and-queries.md)
-- [Data Model](./guides/data-model.md)
-- [Plugins](./guides/plugins.md)
-- [Rendering](./guides/rendering.md)
-- [Schemas](./guides/schemas.md)
+- [Interfaces](./guides/01-interfaces.md)
+- [Nodes](./guides/02-nodes.md)
+- [Locations](./guides/03-locations.md)
+- [Formatting](./guides/04-formatting.md)
+- [Commands](./guides/05-commands.md)
+- [Operations](./guides/06-operations.md)
+- [Editor](./guides/07-editor.md)
+- [Plugins](./guides/08-plugins.md)
+- [Rendering](./guides/09-rendering.md)
 
 ## General
 

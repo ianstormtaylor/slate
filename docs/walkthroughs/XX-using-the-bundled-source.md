@@ -49,7 +49,3 @@ To make things easier, for quick prototyping, you can also use the [`unpkg.com`]
 ```
 
 That's it, you're ready to go!
-
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./adding-event-handlers.md">Adding Event Handlers</a></p>
-<br/>

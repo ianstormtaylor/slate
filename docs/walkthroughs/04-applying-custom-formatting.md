@@ -1,7 +1,3 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./defining-custom-block-nodes.md">Defining Custom Block Nodes</a></p>
-<br/>
-
 # Applying Custom Formatting
 
 In the previous guide we learned how to create custom block types that render chunks of text inside different containers. But Slate allows for more than just "blocks".
@@ -190,7 +186,3 @@ const BoldMark = props => {
 ```
 
 Now, if you try selecting a piece of text and hitting `Ctrl-B` you should see it turn bold! Magic!
-
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./05-executing-commands.md">Executing Commands</a></p>
-<br/>

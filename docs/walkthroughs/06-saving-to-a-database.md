@@ -1,7 +1,3 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./using-plugins.md">Using Plugins</a></p>
-<br/>
-
 # Saving to a Database
 
 Now that you've learned the basics of how to add functionality to the Slate editor, you might be wondering how you'd go about saving the content you've been editing, such that you can come back to your app later and have it load.

@@ -1,7 +1,3 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./installing-slate.md">Installing Slate</a></p>
-<br/>
-
 # Adding Event Handlers
 
 Okay, so you've got Slate installed and rendered on the page, and when you type in it, you can see the changes reflected. But you want to do more than just type a plaintext string.
@@ -77,7 +73,3 @@ const App = () => {
 With that added, try typing `&`, and you should see it suddenly become `and` instead!
 
 This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and the `editor` that lets you perform commands. Simple!
-
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./03-defining-custom-elements.md">Defining Custom Elements</a></p>
-<br/>

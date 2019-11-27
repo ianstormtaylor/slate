@@ -13,7 +13,6 @@
   <a href="#principles"><strong>Principles</strong></a> ·
   <a href="http://slatejs.org"><strong>Demo</strong></a> ·
   <a href="#examples"><strong>Examples</strong></a> ·
-  <a href="./docs/general/plugins.md"><strong>Plugins</strong></a> ·
   <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> ·
   <a href="./Contributing.md"><strong>Contributing!</strong></a>
 </p>
@@ -38,7 +37,7 @@
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
-It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/) and [Immutable](https://immutable-js.github.io/immutable-js/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
+It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
 > 🤖 **Slate is currently in beta**. Its core API is useable now, but you might need to pull request a fix or two for advanced use cases. Some of its APIs are not "finalized" and will (breaking) change over time as we discover better solutions.
 
@@ -76,21 +75,19 @@ Which brings me to how Slate solves all of that...
 
 Slate tries to solve the question of "[Why?](#why)" with a few principles:
 
-1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities—the core editor logic is even implemented as its own plugin. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Dropbox's, without having to fight against the library's assumptions.
+1. **First-class plugins.** The most important part of Slate is that plugins are first-class entities. That means you can _completely_ customize the editing experience, to build complex editors like Medium's or Dropbox's, without having to fight against the library's assumptions.
 
-2. **Schema-less core.** Slate's core logic doesn't assume anything about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond the most basic use cases.
+2. **Schema-less core.** Slate's core logic assumes very little about the schema of the data you'll be editing, which means that there are no assumptions baked into the library that'll trip you up when you need to go beyond the most basic use cases.
 
 3. **Nested document model.** The document model used for Slate is a nested, recursive tree, just like the DOM itself. This means that creating complex components like tables or nested block quotes are possible for advanced use cases. But it's also easy to keep it simple by only using a single level of hierarchy.
 
 4. **Parallel to the DOM.** Slate's data model is based on the DOM—the document is a nested tree, it uses selections and ranges, and it exposes all the standard event handlers. This means that advanced behaviors like tables or nested block quotes are possible. Pretty much anything you can do in the DOM, you can do in Slate.
 
-5. **Stateless views and immutable data.** By using React and Immutable.js, the Slate editor is built in a stateless fashion using immutable data structures, which leads to much easier to reason about code, and a much easier time writing plugins.
+5. **Intuitive commands.** Slate documents are edited using "commands", that are designed to be high-level and extremely intuitive to write and read, so that custom functionality is as expressive as possible. This greatly increases your ability to reason about your code.
 
-6. **Intuitive changes.** Slate documents are edited using "changes", that are designed to be high-level and extremely intuitive to write and read, so that custom functionality is as expressive as possible. This greatly increases your ability to reason about your code.
+6. **Collaboration-ready data model.** The data model Slate uses—specifically how operations are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
 
-7. **Collaboration-ready data model.** The data model Slate uses—specifically how changes are applied to the document—has been designed to allow for collaborative editing to be layered on top, so you won't need to rethink everything if you decide to make your editor collaborative.
-
-8. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
+7. **Clear "core" boundaries.** With a plugin-first architecture, and a schema-less core, it becomes a lot clearer where the boundary is between "core" and "custom", which means that the core experience doesn't get bogged down in edge cases.
 
 <br/>
 
@@ -102,47 +99,31 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 ### Examples
 
+## Examples
+
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](./examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](./examples/rich-text) — showing the features you'd expect from a basic editor.
-- [**Auto-markdown**](./examples/markdown-shortcuts) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](./examples/links) — showing how wrap text in inline nodes with associated data.
-- [**Images**](./examples/images) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](./examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-- [**Tables**](./examples/tables) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](./examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Code Highlighting**](./examples/code-highlighting) — showing how to use decorations to dynamically mark text.
-- [**See all the examples...**](./examples)
+- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/examples/rich-text) — showing the features you'd expect from a basic editor.
+- [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](https://github.com/ianstormtaylor/slate/tree/master/examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](https://github.com/ianstormtaylor/slate/tree/master/examples/images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
+- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/examples/mentions)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
 <br/>
 
-### Plugins
-
-Slate encourages you to write small, reusable modules. Check out the public ones you can use in your project!
-
-- [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
-- [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
-- [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code) adds code editing behavior like tab-to-indent, and enter-to-soft-break.
-- [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list) adds rich, nested list editing behavior.
-- [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table) adds complex table editing behavior!
-- [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
-- [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
-- [`slate-soft-break`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-soft-break) adds a soft break when `enter` is pressed.
-- [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-- [**See all the plugins...**](./docs/general/plugins.md)
-
-<br/>
-
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/slate-core).
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models.
 
 - [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
 - [**Guides**](http://docs.slatejs.org/guides)
-- [**Reference**](http://docs.slatejs.org/slate-core)
 - [**FAQ**](http://docs.slatejs.org/general/faq)
 - [**Resources**](http://docs.slatejs.org/general/resources)
 
@@ -160,16 +141,13 @@ If you're maintaining a translation, feel free to pull request it here!
 
 Slate's codebase is monorepo managed with [Lerna](https://lernajs.io/). It consists of a handful of packages—although you won't always use all of them. They are:
 
-| **Package**                                                     | **Version**                                                                                                                                     | **Size**                                                                                                                                                                                                                | **Description**                                     |
-| --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------- |
-| [`slate`](./packages/slate)                                     | [![](https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6)](./slate/package.json)                                     | [![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=size)](https://unpkg.com/slate/dist/slate.min.js)                                                                         | Slate's core data model logic.                      |
-| [`slate-base64-serializer`](./packages/slate-base64-serializer) | [![](https://img.shields.io/npm/v/slate-base64-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-base64-serializer/package.json) | [![](http://img.badgesize.io/https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-base64-serializer/dist/slate-base64-serializer.min.js) | A Base64 string serializer for Slate documents.     |
-| [`slate-html-serializer`](./packages/slate-html-serializer)     | [![](https://img.shields.io/npm/v/slate-html-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-html-serializer/package.json)     | [![](http://img.badgesize.io/https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-html-serializer/dist/slate-html-serializer.min.js)         | An HTML serializer for Slate documents.             |
-| [`slate-hyperscript`](./packages/slate-hyperscript)             | [![](https://img.shields.io/npm/v/slate-hyperscript.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hyperscript/package.json)             | [![](http://img.badgesize.io/https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js)                         | A hyperscript tool to write JSX Slate documents!    |
-| [`slate-plain-serializer`](./packages/slate-plain-serializer)   | [![](https://img.shields.io/npm/v/slate-plain-serializer.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-plain-serializer/package.json)   | [![](http://img.badgesize.io/https://unpkg.com/slate-plain-serializer/dist/slate-plain-serializer.min.js?compression=gzip&label=size)](https://unpkg.com/slate-plain-serializer/dist/slate-plain-serializer.min.js)     | A plain text serializer for Slate documents.        |
-| [`slate-prop-types`](./packages/slate-prop-types)               | [![](https://img.shields.io/npm/v/slate-prop-types.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-prop-types/package.json)               | [![](http://img.badgesize.io/https://unpkg.com/slate-prop-types/dist/slate-prop-types.min.js?compression=gzip&label=size)](https://unpkg.com/slate-prop-types/dist/slate-prop-types.min.js)                             | React prop types for checking Slate values.         |
-| [`slate-react`](./packages/slate-react)                         | [![](https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-react/package.json)                         | [![](http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=size)](https://unpkg.com/slate-react/dist/slate-react.min.js)                                                 | React components for rendering Slate editors.       |
-| [`slate-hotkeys`](./packages/slate-hotkeys)                     | [![](https://img.shields.io/npm/v/slate-hotkeys.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hotkeys/package.json)                     | [![](http://img.badgesize.io/https://unpkg.com/slate-hotkeys/dist/slate-hotkeys.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hotkeys/dist/slate-hotkeys.min.js)                                         | Detect common keypresses in a platform-agnostic way |
+| **Package**                                         | **Version**                                                                                                                         | **Size**                                                                                                                                                                                        | **Description**                                      |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| [`slate`](./packages/slate)                         | [![](https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6)](./slate/package.json)                         | [![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=size)](https://unpkg.com/slate/dist/slate.min.js)                                                 | Slate's core data model logic.                       |
+| [`slate-history`](./packages/slate-history)         | [![](https://img.shields.io/npm/v/slate-history.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-history/package.json)         | [![](http://img.badgesize.io/https://unpkg.com/slate-history/dist/slate-history.min.js?compression=gzip&label=size)](https://unpkg.com/slate-history/dist/slate-history.min.js)                 | A plugin that adds undo/redo history to Slate.       |
+| [`slate-hyperscript`](./packages/slate-hyperscript) | [![](https://img.shields.io/npm/v/slate-hyperscript.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hyperscript/package.json) | [![](http://img.badgesize.io/https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js) | A hyperscript tool to write JSX Slate documents!     |
+| [`slate-react`](./packages/slate-react)             | [![](https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-react/package.json)             | [![](http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=size)](https://unpkg.com/slate-react/dist/slate-react.min.js)                         | React components for rendering Slate editors.        |
+| [`slate-schema`](./packages/slate-schema)           | [![](https://img.shields.io/npm/v/slate-schema.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-schema/package.json)           | [![](http://img.badgesize.io/https://unpkg.com/slate-schema/dist/slate-schema.min.js?compression=gzip&label=size)](https://unpkg.com/slate-schema/dist/slate-schema.min.js)                     | A plugin for enforcing constraints on Slate content. |
 
 <br />
 

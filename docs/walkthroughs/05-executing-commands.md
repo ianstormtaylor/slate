@@ -1,7 +1,3 @@
-<br/>
-<p align="center"><strong>Previous:</strong><br/><a href="./applying-custom-formatting.md">Applying Custom Formatting</a></p>
-<br/>
-
 # Using Commands
 
 Up until now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most powerful things about Slate is that it lets you model your specific rich text "domain" however you'd like, and write less one-off code.
@@ -346,7 +342,3 @@ const editor = useMemo(
 And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our command logic tested and isolated in a single place, making the code easier to maintain.
 
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
-
-<br/>
-<p align="center"><strong>Next:</strong><br/><a href="./06-saving-to-a-database.md">Saving to a Database</a></p>
-<br/>
