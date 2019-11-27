@@ -135,7 +135,6 @@ const isImageUrl = url => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       type: 'paragraph',

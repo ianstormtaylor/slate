@@ -150,7 +150,6 @@ const Decoration = props => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [

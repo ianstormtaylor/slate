@@ -202,7 +202,6 @@ const Mark = ({ attributes, children, mark }) => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [

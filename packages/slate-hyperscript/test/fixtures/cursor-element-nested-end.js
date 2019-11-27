@@ -38,5 +38,4 @@ export const output = {
       offset: 4,
     },
   },
-  annotations: {},
 }

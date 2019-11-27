@@ -2,7 +2,6 @@ import { Value } from 'slate'
 
 export const input = {
   children: [],
-  annotations: {},
 }
 
 export const test = value => {

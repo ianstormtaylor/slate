@@ -20,7 +20,6 @@ import {
 
 export interface Value extends Element {
   selection: Range | null
-  annotations: Record<string, Range>
   [key: string]: any
 }
 
@@ -33,8 +32,7 @@ export const Value = {
     return (
       isPlainObject(value) &&
       (value.selection === null || Range.isRange(value.selection)) &&
-      Node.isNodeList(value.children) &&
-      Range.isRangeMap(value.annotations)
+      Node.isNodeList(value.children)
     )
   },
 
@@ -47,7 +45,7 @@ export const Value = {
 
   matches(value: Value, props: Partial<Value>): boolean {
     for (const key in props) {
-      if (key === 'annotations' || key === 'children' || key === 'selection') {
+      if (key === 'children' || key === 'selection') {
         continue
       }
 
@@ -63,18 +61,12 @@ export const Value = {
    * Iterate through all of the point objects in a value.
    */
 
-  *points(value: Value): Iterable<SelectionPointEntry | AnnotationPointEntry> {
-    const { selection, annotations } = value
+  *points(value: Value): Iterable<SelectionPointEntry> {
+    const { selection } = value
 
     if (selection != null) {
       yield [selection.anchor, 'anchor', selection]
       yield [selection.focus, 'focus', selection]
-    }
-
-    for (const key in annotations) {
-      const annotation = annotations[key]
-      yield [annotation.anchor, 'anchor', annotation, key]
-      yield [annotation.focus, 'focus', annotation, key]
     }
   },
 
@@ -85,12 +77,6 @@ export const Value = {
   transform(value: Value, op: Operation): Value {
     return produce(value, v => {
       switch (op.type) {
-        case 'add_annotation': {
-          const { annotation, key } = op
-          v.annotations[key] = annotation
-          break
-        }
-
         case 'add_mark': {
           const { path, mark } = op
           const node = Node.leaf(v, path)
@@ -189,12 +175,6 @@ export const Value = {
           break
         }
 
-        case 'remove_annotation': {
-          const { key } = op
-          delete v.annotations[key]
-          break
-        }
-
         case 'remove_mark': {
           const { path, mark } = op
           const node = Node.leaf(v, path)
@@ -219,7 +199,7 @@ export const Value = {
 
           // Transform all of the points in the value, but if the point was in the
           // node that was removed we need to update the range or remove it.
-          for (const [point, k, range, key] of Value.points(v)) {
+          for (const [point, k, range] of Value.points(v)) {
             const result = Point.transform(point, op)
 
             if (result != null) {
@@ -233,8 +213,6 @@ export const Value = {
               const newNextPath = Path.transform(nextPath, op)!
               point.path = newNextPath
               point.offset = 0
-            } else if (key != null) {
-              delete v.annotations[key]
             } else {
               v.selection = null
             }
@@ -254,13 +232,6 @@ export const Value = {
             range[key] = Point.transform(point, op)!
           }
 
-          break
-        }
-
-        case 'set_annotation': {
-          const { key, newProperties } = op
-          const annotation = v.annotations[key]
-          Object.assign(annotation, newProperties)
           break
         }
 
@@ -363,28 +334,6 @@ export const Value = {
  */
 
 export type ValueEntry = [Value, Path]
-
-/**
- * `AnnotationEntry` objects are returned when iterating over annotations
- * in the top-level value.
- */
-
-export type AnnotationEntry = [Range, string]
-
-/**
- * `AnnotationMatch` objects are a shorthand for matching annotation objects.
- */
-
-export type AnnotationMatch =
-  | Partial<Range>
-  | ((entry: AnnotationEntry) => boolean)
-
-/**
- * `AnnotationPointEntry` objects are returned when iterating over `Point`
- * objects that belong to an annotation.
- */
-
-export type AnnotationPointEntry = [Point, PointKey, Range, string]
 
 /**
  * `SelectionPointEntry` objects are returned when iterating over `Point`

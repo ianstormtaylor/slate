@@ -454,7 +454,6 @@ export const NodeTransforms = {
 
         for (const k in props) {
           if (
-            k === 'annotations' ||
             k === 'marks' ||
             k === 'children' ||
             k === 'selection' ||

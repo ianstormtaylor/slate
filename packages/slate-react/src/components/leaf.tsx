@@ -2,8 +2,6 @@ import React from 'react'
 import { Text, Element } from 'slate'
 import String from './string'
 import {
-  CustomAnnotation,
-  CustomAnnotationProps,
   CustomDecoration,
   CustomDecorationProps,
   CustomMark,
@@ -21,7 +19,6 @@ const Leaf = (props: {
   isLast: boolean
   leaf: SlateLeaf
   parent: Element
-  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
   text: Text
@@ -31,9 +28,6 @@ const Leaf = (props: {
     isLast,
     text,
     parent,
-    renderAnnotation = (props: CustomAnnotationProps) => (
-      <CustomAnnotation {...props} />
-    ),
     renderDecoration = (props: CustomDecorationProps) => (
       <CustomDecoration {...props} />
     ),
@@ -87,24 +81,6 @@ const Leaf = (props: {
     }
   }
 
-  for (const key in leaf.annotations) {
-    const annotation = leaf.annotations[key]
-    const ret = renderAnnotation({
-      annotation,
-      children,
-      key,
-      leaf,
-      text,
-      attributes: {
-        'data-slate-annotation': true,
-      },
-    })
-
-    if (ret) {
-      children = ret
-    }
-  }
-
   return <span data-slate-leaf>{children}</span>
 }
 
@@ -112,7 +88,6 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
-    next.renderAnnotation === prev.renderAnnotation &&
     next.renderDecoration === prev.renderDecoration &&
     next.renderMark === prev.renderMark &&
     next.text === prev.text &&

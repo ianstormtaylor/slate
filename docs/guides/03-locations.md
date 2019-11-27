@@ -14,7 +14,6 @@ For example, in this document:
 
 ```js
 const value = {
-  annotations: {},
   selection: null,
   children: [
     {
@@ -99,7 +98,6 @@ The selection is a special range that is property of the top-level `Value`. For 
 
 ```js
 const value = {
-  annotations: {},
   selection: {
     anchor: { path: [0, 0], offset: 0 },
     focus: { path: [0, 0], offset: 15 },

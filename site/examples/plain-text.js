@@ -18,7 +18,6 @@ const PlainTextExample = () => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [

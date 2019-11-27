@@ -4,7 +4,6 @@ export const input = [
   {
     children: [],
     selection: null,
-    annotations: {},
   },
 ]
 

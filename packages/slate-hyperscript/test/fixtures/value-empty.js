@@ -7,5 +7,4 @@ export const input = <value />
 export const output = {
   children: [],
   selection: null,
-  annotations: {},
 }

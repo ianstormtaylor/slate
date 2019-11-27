@@ -13,7 +13,6 @@ import { Editable, withReact } from 'slate-react'
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [
@@ -48,7 +47,6 @@ So, in our `onChange` handler, we need to save the `value`. But the `value` argu
 ```js
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [
@@ -91,7 +89,6 @@ But... if you refresh the page, everything is still reset. That's because we nee
 const existingContent = JSON.parse(localStorage.getItem('content'))
 const initialValue = {
   selection: null,
-  annotations: {},
   children: existingContent || [
     {
       children: [
@@ -130,7 +127,6 @@ However, if you inspect the change handler, you'll notice that it's actually sav
 const existingContent = JSON.parse(localStorage.getItem('content'))
 const initialValue = {
   selection: null,
-  annotations: {},
   children: existingContent || [
     {
       children: [
@@ -191,7 +187,6 @@ const deserialize = string => {
   // Return a value JSON object with children derived by splitting the string.
   return {
     selection: null,
-    annotations: {},
     children: string.split('\n').map(line => {
       return {
         children: [{ text: line, marks: [] }],

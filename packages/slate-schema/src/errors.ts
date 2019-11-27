@@ -1,12 +1,5 @@
 import { Ancestor, Descendant, Range, Mark, Node, Path, Text } from 'slate'
 
-export interface AnnotationPropertyInvalidError {
-  code: 'annotation_property_invalid'
-  annotation: Range
-  key: string
-  property: string
-}
-
 export interface ChildInvalidError {
   code: 'child_invalid'
   node: Descendant
@@ -103,8 +96,6 @@ export interface PreviousSiblingInvalidError {
   path: Path
 }
 
-export type AnnotationError = AnnotationPropertyInvalidError
-
 export type MarkError = MarkPropertyInvalidError
 
 export type NodeError =
@@ -121,4 +112,4 @@ export type NodeError =
   | ParentInvalidError
   | PreviousSiblingInvalidError
 
-export type SchemaError = AnnotationError | MarkError | NodeError
+export type SchemaError = MarkError | NodeError

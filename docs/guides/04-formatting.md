@@ -1,4 +1,4 @@
-# Formatting: Marks, Annotations and Decorations
+# Formatting: Marks and Decorations
 
 We've already seen how `Element` objects can be extended with custom properties to add semantic meaning to your rich-text documents. But there are other kinds of formatting too.
 
@@ -44,12 +44,6 @@ Of course, this mark ordering stuff sounds pretty complex. But, you do not have 
 - Marks represent **unordered**, character-level formatting.
 - Inlines represent **contiguous**, semantic elements in the document.
 
-## Annotations
-
-Annotations are formatting that is expressed as a `Range` object. Sometimes you want to model formatting that doesn't apply to the text itself, but applies to a range of content all at once, like when implementing "comments".
-
-You can use annotations on the top-level `Value` object for this.
-
 ## Decorations
 
-Decorations are similar to annotations, with each one applying to a range of content. However, they are computed at render-time based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.
+Decorations are similar to marks, with each one applying to a range of content. However, they are computed at render-time based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.

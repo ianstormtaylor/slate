@@ -1,6 +1,5 @@
 import { Command, Element, Operation, NodeEntry, Value } from '../..'
 
-import { AnnotationTransforms } from './transforms/annotation'
 import { ElementQueries } from './queries/element'
 import { GeneralTransforms } from './transforms/general'
 import { GeneralQueries } from './queries/general'
@@ -30,7 +29,6 @@ export interface Editor {
 }
 
 export const Editor = {
-  ...AnnotationTransforms,
   ...ElementQueries,
   ...GeneralQueries,
   ...GeneralTransforms,

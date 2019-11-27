@@ -7,7 +7,6 @@ import TextComponent from './text'
 import { useEditor } from '../hooks/use-editor'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
-  CustomAnnotationProps,
   CustomDecorationProps,
   CustomElementProps,
   CustomMarkProps,
@@ -18,22 +17,18 @@ import {
  */
 
 const Children = (props: {
-  annotations: Record<string, Range>
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
-  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderElement?: (props: CustomElementProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
   selection: Range | null
 }) => {
   const {
-    annotations,
     decorate,
     decorations,
     node,
-    renderAnnotation,
     renderDecoration,
     renderElement,
     renderMark,
@@ -64,24 +59,13 @@ const Children = (props: {
       }
     }
 
-    for (const k in annotations) {
-      const ann = annotations[k]
-      const a = Range.intersection(ann, range)
-
-      if (a) {
-        anns[k] = a
-      }
-    }
-
     if (Element.isElement(n)) {
       children.push(
         <ElementComponent
-          annotations={anns}
           decorate={decorate}
           decorations={decs}
           element={n}
           key={key.id}
-          renderAnnotation={renderAnnotation}
           renderDecoration={renderDecoration}
           renderElement={renderElement}
           renderMark={renderMark}
@@ -91,12 +75,10 @@ const Children = (props: {
     } else {
       children.push(
         <TextComponent
-          annotations={anns}
           decorations={decs}
           key={key.id}
           isLast={isLeafBlock && i === node.children.length}
           parent={node}
-          renderAnnotation={renderAnnotation}
           renderDecoration={renderDecoration}
           renderMark={renderMark}
           text={n}

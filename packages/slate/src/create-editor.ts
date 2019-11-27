@@ -24,7 +24,7 @@ const FLUSHING: WeakMap<Editor, boolean> = new WeakMap()
 
 export const createEditor = (): Editor => {
   const editor: Editor = {
-    value: { selection: null, annotations: {}, children: [] },
+    value: { selection: null, children: [] },
     operations: [],
     isInline: () => false,
     isVoid: () => false,
@@ -88,17 +88,6 @@ export const createEditor = (): Editor => {
 
       if (Command.isCoreCommand(command)) {
         switch (command.type) {
-          case 'add_annotation': {
-            if (selection) {
-              const { key, properties } = command
-              const { anchor, focus } = selection
-              const annotation = { anchor, focus, ...properties }
-              Editor.addAnnotation(editor, key, annotation)
-            }
-
-            break
-          }
-
           case 'add_mark': {
             Editor.addMarks(editor, [command.mark])
             break
@@ -145,11 +134,6 @@ export const createEditor = (): Editor => {
 
           case 'insert_text': {
             Editor.insertText(editor, command.text)
-            break
-          }
-
-          case 'remove_annotation': {
-            Editor.removeAnnotation(editor, command.key)
             break
           }
 

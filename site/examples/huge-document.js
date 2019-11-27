@@ -8,7 +8,6 @@ const PARAGRAPHS = 7
 const children = []
 const initialValue = {
   selection: null,
-  annotations: {},
   children,
 }
 

@@ -231,7 +231,6 @@ export const Node = {
         }
       }
 
-      delete r.annotations
       delete r.selection
     })
 

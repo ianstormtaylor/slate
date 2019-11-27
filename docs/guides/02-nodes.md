@@ -10,7 +10,6 @@ These three interfaces are combined together to form a tree—just like the DOM.
 
 ```js
 const value = {
-  annotations: {},
   selection: null,
   children: [
     {
@@ -43,14 +42,13 @@ The top-level node in a Slate document is called the `Value`. It encapsulates al
 
 ```ts
 interface Value {
-  annotations: Record<string, Range>
   selection: Range | null
   children: Node[]
   [key: string]: any
 }
 ```
 
-We'll cover annotations and selections later. But in terms of the "content" the most important property is `value.children` which contains a tree of `Node` objects.
+We'll cover selections later. But in terms of the "content" the most important property is `value.children` which contains a tree of `Node` objects.
 
 ## `Element`
 

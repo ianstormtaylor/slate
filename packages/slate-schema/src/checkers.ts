@@ -5,42 +5,12 @@ import {
   Mark,
   Editor,
   MarkEntry,
-  AnnotationEntry,
   AncestorEntry,
   Descendant,
 } from 'slate'
 
-import { AnnotationError, MarkError, NodeError } from './errors'
-import { NodeRule, AnnotationRule, MarkRule, ChildValidation } from './rules'
-
-/**
- * Check an annotation object.
- */
-
-export const checkAnnotation = (
-  editor: Editor,
-  entry: AnnotationEntry,
-  rule: AnnotationRule
-): AnnotationError | undefined => {
-  const { validate: v } = rule
-  const [annotation, key] = entry
-
-  if ('properties' in v) {
-    for (const k in v.properties) {
-      const fn = v.properties[k]
-      const value = annotation[k]
-
-      if (!fn(value)) {
-        return {
-          code: 'annotation_property_invalid',
-          annotation,
-          key,
-          property: k,
-        }
-      }
-    }
-  }
-}
+import { MarkError, NodeError } from './errors'
+import { NodeRule, MarkRule, ChildValidation } from './rules'
 
 /**
  * Check a mark object.

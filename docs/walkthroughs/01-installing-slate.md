@@ -34,7 +34,6 @@ In addition to rendering the editable, you need to give Slate a "initial value" 
 // Create our initial value...
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       type: 'paragraph',
@@ -58,7 +57,6 @@ import { Editable, withReact } from 'slate-react'
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       type: 'paragraph',

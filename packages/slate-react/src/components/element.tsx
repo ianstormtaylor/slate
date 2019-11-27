@@ -14,35 +14,30 @@ import {
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import {
-  CustomAnnotationProps,
   CustomDecorationProps,
   CustomElement,
   CustomElementProps,
   CustomMarkProps,
 } from './custom'
-import { isRangeListEqual, isRangeMapEqual } from '../utils/leaf'
+import { isRangeListEqual } from '../utils/leaf'
 
 /**
  * Element.
  */
 
 const Element = (props: {
-  annotations: Record<string, Range>
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
-  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderElement?: (props: CustomElementProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
   selection: Range | null
 }) => {
   const {
-    annotations,
     decorate,
     decorations,
     element,
-    renderAnnotation,
     renderDecoration,
     renderElement = (p: CustomElementProps) => <CustomElement {...p} />,
     renderMark,
@@ -56,11 +51,9 @@ const Element = (props: {
 
   let children: JSX.Element | null = (
     <Children
-      annotations={annotations}
       decorate={decorate}
       decorations={decorations}
       node={element}
-      renderAnnotation={renderAnnotation}
       renderDecoration={renderDecoration}
       renderElement={renderElement}
       renderMark={renderMark}
@@ -118,13 +111,7 @@ const Element = (props: {
           position: 'absolute',
         }}
       >
-        <Text
-          annotations={{}}
-          decorations={[]}
-          isLast={false}
-          parent={element}
-          text={text}
-        />
+        <Text decorations={[]} isLast={false} parent={element} text={text} />
       </Tag>
     )
 
@@ -155,12 +142,10 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.decorate === next.decorate &&
     prev.element === next.element &&
-    prev.renderAnnotation === next.renderAnnotation &&
     prev.renderDecoration === next.renderDecoration &&
     prev.renderElement === next.renderElement &&
     prev.renderMark === next.renderMark &&
     isRangeListEqual(prev.decorations, next.decorations) &&
-    isRangeMapEqual(prev.annotations, next.annotations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&

@@ -147,7 +147,6 @@ const MarkButton = ({ editor, type, icon }) => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [

@@ -1,13 +1,6 @@
 import { Mark, Node, Path, Range, Value } from '..'
 import isPlainObject from 'is-plain-object'
 
-type AddAnnotationOperation = {
-  type: 'add_annotation'
-  key: string
-  annotation: Range
-  [key: string]: any
-}
-
 type AddMarkOperation = {
   type: 'add_mark'
   path: Path
@@ -46,13 +39,6 @@ type MoveNodeOperation = {
   [key: string]: any
 }
 
-type RemoveAnnotationOperation = {
-  type: 'remove_annotation'
-  key: string
-  annotation: Range
-  [key: string]: any
-}
-
 type RemoveMarkOperation = {
   type: 'remove_mark'
   path: Path
@@ -72,14 +58,6 @@ type RemoveTextOperation = {
   path: Path
   offset: number
   text: string
-  [key: string]: any
-}
-
-type SetAnnotationOperation = {
-  type: 'set_annotation'
-  key: string
-  properties: Partial<Range>
-  newProperties: Partial<Range>
   [key: string]: any
 }
 
@@ -143,17 +121,11 @@ type SplitNodeOperation = {
  */
 
 type Operation =
-  | AnnotationOperation
   | NodeOperation
   | MarkOperation
   | SelectionOperation
   | TextOperation
   | ValueOperation
-
-type AnnotationOperation =
-  | AddAnnotationOperation
-  | RemoveAnnotationOperation
-  | SetAnnotationOperation
 
 type NodeOperation =
   | InsertNodeOperation
@@ -172,14 +144,6 @@ type TextOperation = InsertTextOperation | RemoveTextOperation
 type ValueOperation = SetValueOperation
 
 const Operation = {
-  /**
-   * Check of a value is an `AnnotationOperation` object.
-   */
-
-  isAnnotationOperation(value: any): value is AnnotationOperation {
-    return Operation.isOperation(value) && value.type.endsWith('_annotation')
-  },
-
   /**
    * Check of a value is a `NodeOperation` object.
    */
@@ -210,10 +174,6 @@ const Operation = {
         return Path.isPath(value.path) && Mark.isMark(value.mark)
       }
 
-      case 'add_annotation': {
-        return typeof value.key === 'string' && Range.isRange(value.annotation)
-      }
-
       case 'insert_node': {
         return Path.isPath(value.path) && Node.isNode(value.node)
       }
@@ -239,10 +199,6 @@ const Operation = {
         return Path.isPath(value.path) && Path.isPath(value.newPath)
       }
 
-      case 'remove_annotation': {
-        return typeof value.key === 'string' && Range.isRange(value.annotation)
-      }
-
       case 'remove_mark': {
         return Path.isPath(value.path) && Mark.isMark(value.mark)
       }
@@ -256,14 +212,6 @@ const Operation = {
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
-        )
-      }
-
-      case 'set_annotation': {
-        return (
-          typeof value.key === 'string' &&
-          isPlainObject(value.properties) &&
-          isPlainObject(value.newProperties)
         )
       }
 
@@ -355,10 +303,6 @@ const Operation = {
 
   inverse(op: Operation): Operation {
     switch (op.type) {
-      case 'add_annotation': {
-        return { ...op, type: 'remove_annotation' }
-      }
-
       case 'add_mark': {
         return { ...op, type: 'remove_mark' }
       }
@@ -391,10 +335,6 @@ const Operation = {
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
-      case 'remove_annotation': {
-        return { ...op, type: 'add_annotation' }
-      }
-
       case 'remove_mark': {
         return { ...op, type: 'add_mark' }
       }
@@ -407,7 +347,6 @@ const Operation = {
         return { ...op, type: 'insert_text' }
       }
 
-      case 'set_annotation':
       case 'set_mark':
       case 'set_node':
       case 'set_value': {
@@ -444,16 +383,13 @@ const Operation = {
 
 export {
   AddMarkOperation,
-  AddAnnotationOperation,
   InsertNodeOperation,
   InsertTextOperation,
   MergeNodeOperation,
   MoveNodeOperation,
-  RemoveAnnotationOperation,
   RemoveMarkOperation,
   RemoveNodeOperation,
   RemoveTextOperation,
-  SetAnnotationOperation,
   SetMarkOperation,
   SetNodeOperation,
   SetSelectionOperation,

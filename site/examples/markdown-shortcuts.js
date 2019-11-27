@@ -129,7 +129,6 @@ const Element = ({ attributes, children, element }) => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       type: 'paragraph',

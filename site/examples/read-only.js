@@ -18,7 +18,6 @@ const ReadOnlyExample = () => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       children: [

@@ -36,7 +36,6 @@ import {
   PLACEHOLDER,
 } from '../utils/weak-maps'
 import {
-  CustomAnnotationProps,
   CustomDecorationProps,
   CustomElementProps,
   CustomMarkProps,
@@ -55,7 +54,6 @@ export const Editable = (props: {
   readOnly?: boolean
   role?: string
   style?: Record<string, any>
-  renderAnnotation?: (props: CustomAnnotationProps) => JSX.Element
   renderDecoration?: (props: CustomDecorationProps) => JSX.Element
   renderElement?: (props: CustomElementProps) => JSX.Element
   renderMark?: (props: CustomMarkProps) => JSX.Element
@@ -69,7 +67,6 @@ export const Editable = (props: {
     onChange,
     placeholder,
     readOnly = false,
-    renderAnnotation,
     renderDecoration,
     renderElement,
     renderMark,
@@ -730,11 +727,9 @@ export const Editable = (props: {
             }, [])}
           >
             <Children
-              annotations={value.annotations}
               decorate={decorate}
               decorations={decorate([value, []])}
               node={value}
-              renderAnnotation={renderAnnotation}
               renderDecoration={renderDecoration}
               renderElement={renderElement}
               renderMark={renderMark}

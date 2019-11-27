@@ -1,32 +1,8 @@
 import React from 'react'
-import { Element, Range, Mark, Text, Editor } from 'slate'
+import { Element, Range, Mark, Text } from 'slate'
 
 import { useEditor } from '../hooks/use-editor'
 import { Leaf } from '../utils/leaf'
-
-/**
- * `CustomAnnotationProps` are passed to the `renderAnnotation` handler.
- */
-
-export interface CustomAnnotationProps {
-  annotation: Range
-  children: any
-  key: string
-  leaf: Leaf
-  text: Text
-  attributes: {
-    'data-slate-annotation': true
-  }
-}
-
-/**
- * The default custom annotation renderer.
- */
-
-export const CustomAnnotation = (props: CustomAnnotationProps) => {
-  const { attributes, children } = props
-  return <span {...attributes}>{children}</span>
-}
 
 export interface CustomDecorationProps {
   children: any

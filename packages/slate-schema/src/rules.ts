@@ -1,16 +1,5 @@
-import { Editor, AnnotationMatch, NodeMatch, MarkMatch } from 'slate'
-import { NodeError, MarkError, AnnotationError } from './errors'
-
-export interface AnnotationValidation {
-  properties?: Record<string, any>
-}
-
-export interface AnnotationRule {
-  for: 'annotation'
-  match: AnnotationMatch
-  validate: AnnotationValidation
-  normalize: (editor: Editor, error: AnnotationError) => void
-}
+import { Editor, NodeMatch, MarkMatch } from 'slate'
+import { NodeError, MarkError } from './errors'
 
 export interface MarkValidation {
   properties?: Record<string, any>
@@ -48,4 +37,4 @@ export interface NodeRule {
   normalize: (editor: Editor, error: NodeError) => void
 }
 
-export type SchemaRule = AnnotationRule | MarkRule | NodeRule
+export type SchemaRule = MarkRule | NodeRule

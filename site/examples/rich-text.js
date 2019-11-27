@@ -181,7 +181,6 @@ const BlockButton = ({ editor, type, icon }) => {
 
 const initialValue = {
   selection: null,
-  annotations: {},
   children: [
     {
       type: 'paragraph',

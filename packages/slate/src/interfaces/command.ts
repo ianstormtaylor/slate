@@ -21,19 +21,6 @@ export const Command = {
   },
 
   /**
-   * Check if a value is an `AddAnnotationCommand` object.
-   */
-
-  isAddAnnotationCommand(value: any): value is AddAnnotationCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'add_annotation' &&
-      typeof value.key === 'string' &&
-      isPlainObject(value.properties)
-    )
-  },
-
-  /**
    * Check if a value is an `AddMarkCommand` object.
    */
 
@@ -51,7 +38,6 @@ export const Command = {
 
   isCoreCommand(value: any): value is CoreCommand {
     return (
-      Command.isAddAnnotationCommand(value) ||
       Command.isAddMarkCommand(value) ||
       Command.isDeleteBackwardCommand(value) ||
       Command.isDeleteForwardCommand(value) ||
@@ -59,7 +45,6 @@ export const Command = {
       Command.isInsertTextCommand(value) ||
       Command.isInsertFragmentCommand(value) ||
       Command.isInsertBreakCommand(value) ||
-      Command.isRemoveAnnotationCommand(value) ||
       Command.isRemoveMarkCommand(value)
     )
   },
@@ -141,18 +126,6 @@ export const Command = {
   },
 
   /**
-   * Check if a value is a `RemoveAnnotationCommand` object.
-   */
-
-  isRemoveAnnotationCommand(value: any): value is RemoveAnnotationCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'remove_annotation' &&
-      typeof value.key === 'string'
-    )
-  },
-
-  /**
    * Check if a value is a `RemoveMarkCommand` object.
    */
 
@@ -163,16 +136,6 @@ export const Command = {
       Mark.isMark(value.mark)
     )
   },
-}
-
-/**
- * The `AddAnnotationCommand` adds an annotation to the current selection.
- */
-
-export interface AddAnnotationCommand {
-  type: 'add_annotation'
-  key: string
-  properties: Record<string, any>
 }
 
 /**
@@ -248,15 +211,6 @@ export interface InsertTextCommand {
 }
 
 /**
- * The `RemoveAnnotationCommand` removes an annotation at the current selection.
- */
-
-export interface RemoveAnnotationCommand {
-  type: 'remove_annotation'
-  key: string
-}
-
-/**
  * The `RemoveMarkCommand` removes a mark in the current selection.
  */
 
@@ -271,7 +225,6 @@ export interface RemoveMarkCommand {
  */
 
 export type CoreCommand =
-  | AddAnnotationCommand
   | AddMarkCommand
   | DeleteBackwardCommand
   | DeleteForwardCommand
@@ -280,5 +233,4 @@ export type CoreCommand =
   | InsertFragmentCommand
   | InsertNodeCommand
   | InsertTextCommand
-  | RemoveAnnotationCommand
   | RemoveMarkCommand

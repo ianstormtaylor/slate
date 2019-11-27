@@ -3,11 +3,10 @@ import { Range, Mark } from 'slate'
 
 /**
  * The `Leaf` interface represents the individual leaves inside a text node,
- * once annotations and decorations have been applied.
+ * once decorations have been applied.
  */
 
 interface Leaf {
-  annotations: Record<string, Range>
   decorations: Range[]
   marks: Mark[]
   text: string
@@ -21,13 +20,11 @@ namespace Leaf {
   export const equals = (leaf: Leaf, another: Leaf): boolean => {
     return (
       leaf.text === another.text &&
-      leaf.annotations.length === another.annotations.length &&
       leaf.decorations.length === another.decorations.length &&
       leaf.marks.length === another.marks.length &&
       leaf.marks.every(m => Mark.exists(m, another.marks)) &&
       another.marks.every(m => Mark.exists(m, leaf.marks)) &&
-      isRangeListEqual(leaf.decorations, another.decorations) &&
-      isRangeMapEqual(leaf.annotations, another.annotations)
+      isRangeListEqual(leaf.decorations, another.decorations)
     )
   }
 
@@ -40,8 +37,7 @@ namespace Leaf {
       isPlainObject(value) &&
       typeof value.text === 'string' &&
       Mark.isMarkSet(value.marks) &&
-      Range.isRangeList(value.decorations) &&
-      Range.isRangeMap(value.annotations)
+      Range.isRangeList(value.decorations)
     )
   }
 
@@ -54,13 +50,11 @@ namespace Leaf {
       {
         text: leaf.text.slice(0, offset),
         marks: leaf.marks,
-        annotations: { ...leaf.annotations },
         decorations: [...leaf.decorations],
       },
       {
         text: leaf.text.slice(offset),
         marks: leaf.marks,
-        annotations: { ...leaf.annotations },
         decorations: [...leaf.decorations],
       },
     ]

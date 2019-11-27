@@ -13,12 +13,6 @@ const ANCHOR: WeakMap<Node, [number, AnchorToken]> = new WeakMap()
 const FOCUS: WeakMap<Node, [number, FocusToken]> = new WeakMap()
 
 /**
- * A weak map to hold annotation tokens.
- */
-
-const ANNOTATION: WeakMap<Node, Record<number, AnnotationToken>> = new WeakMap()
-
-/**
  * All tokens inherit from a single constructor for `instanceof` checking.
  */
 
@@ -79,22 +73,6 @@ export class FocusToken extends Token {
 }
 
 /**
- * Annotation tokens represent an edge of an annotation range.
- */
-
-export class AnnotationToken extends Token {
-  key: string
-  props: {}
-
-  constructor(props: { key: string }) {
-    super()
-    const { key, ...rest } = props
-    this.key = key
-    this.props = rest
-  }
-}
-
-/**
  * Add an anchor token to the end of a text node.
  */
 
@@ -130,30 +108,4 @@ export const getFocusOffset = (
   text: Text
 ): [number, FocusToken] | undefined => {
   return FOCUS.get(text)
-}
-
-/**
- * Add an annotation token to the end of a text node.
- */
-
-export const addAnnotationToken = (text: Text, token: AnnotationToken) => {
-  let map = ANNOTATION.get(text)
-
-  if (map == null) {
-    map = {}
-    ANNOTATION.set(text, map)
-  }
-
-  const offset = text.text.length
-  map[offset] = token
-}
-
-/**
- * Get the offset if a text node has an associated focus token.
- */
-
-export const getAnnotationOffsets = (
-  text: Text
-): Record<number, AnnotationToken> | undefined => {
-  return ANNOTATION.get(text)
 }

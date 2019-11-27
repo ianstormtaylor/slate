@@ -3,7 +3,6 @@ import { reverse as reverseText } from 'esrever'
 import {
   Ancestor,
   AncestorEntry,
-  AnnotationEntry,
   Descendant,
   Editor,
   Element,
@@ -23,36 +22,6 @@ import {
 } from '../../..'
 
 export const LocationQueries = {
-  /**
-   * Iterate through all of the annotations in the Editor.
-   */
-
-  *annotations(
-    editor: Editor,
-    options: {
-      at?: Location
-    } = {}
-  ): Iterable<AnnotationEntry> {
-    const { annotations, selection } = editor.value
-    const { at = selection } = options
-
-    if (!at) {
-      return
-    }
-
-    const range = Editor.range(editor, at)
-
-    for (const key in annotations) {
-      const annotation = annotations[key]
-
-      if (at && !Range.includes(range, annotation)) {
-        continue
-      }
-
-      yield [annotation, key]
-    }
-  },
-
   /**
    * Get the marks that are "active" at a location. These are the
    * marks that will be added to any text that is inserted.

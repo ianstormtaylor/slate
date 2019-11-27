@@ -1,10 +1,8 @@
 import isPlainObject from 'is-plain-object'
 import { Element, Mark } from 'slate'
-import { Token } from './tokens'
 import {
   createAnchor,
   createCursor,
-  createAnnotation,
   createElement,
   createFocus,
   createFragment,
@@ -20,7 +18,6 @@ import {
 
 const DEFAULT_CREATORS = {
   anchor: createAnchor,
-  annotation: createAnnotation,
   cursor: createCursor,
   element: createElement,
   focus: createFocus,
@@ -58,16 +55,13 @@ const createHyperscript = (
     creators?: HyperscriptCreators
     elements?: HyperscriptShorthands
     marks?: HyperscriptShorthands
-    annotations?: HyperscriptShorthands
   } = {}
 ) => {
-  const { annotations = {}, elements = {}, marks = {} } = options
-  const annotationCreators = normalizeAnnotations(annotations)
+  const { elements = {}, marks = {} } = options
   const elementCreators = normalizeElements(elements)
   const markCreators = normalizeMarks(marks)
   const creators = {
     ...DEFAULT_CREATORS,
-    ...annotationCreators,
     ...elementCreators,
     ...markCreators,
     ...options.creators,
@@ -160,38 +154,6 @@ const normalizeMarks = (marks: HyperscriptShorthands) => {
       children: any[]
     ) => {
       return createMark('mark', { ...props, ...attributes }, children)
-    }
-  }
-
-  return creators
-}
-
-/**
- * Normalize a dictionary of annotation shorthands into creator functions.
- */
-
-const normalizeAnnotations = (annotations: HyperscriptShorthands) => {
-  const creators: HyperscriptCreators<(Node | Token)[]> = {}
-
-  for (const tagName in annotations) {
-    const props = annotations[tagName]
-
-    if (typeof props !== 'object') {
-      throw new Error(
-        `Properties specified for a hyperscript shorthand should be an object, but for the custom annotation <${tagName}> tag you passed: ${props}`
-      )
-    }
-
-    creators[tagName] = (
-      tagName: string,
-      attributes: { [key: string]: any },
-      children: any[]
-    ) => {
-      return createAnnotation(
-        'annotation',
-        { ...props, ...attributes },
-        children
-      )
     }
   }
 

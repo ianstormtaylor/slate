@@ -1,6 +1,6 @@
 import { Editor, Text, NodeEntry } from 'slate'
 
-import { NodeRule, SchemaRule, AnnotationRule, MarkRule } from './rules'
+import { NodeRule, SchemaRule, MarkRule } from './rules'
 import { NodeError } from './errors'
 import { checkNode, checkAncestor } from './checkers'
 
@@ -14,15 +14,12 @@ export const withSchema = (
   rules: SchemaRule[] = []
 ): Editor => {
   const { normalizeNode } = editor
-  const annotationRules: AnnotationRule[] = []
   const markRules: MarkRule[] = []
   const nodeRules: NodeRule[] = []
   const ancestorRules: NodeRule[] = []
 
   for (const rule of rules) {
-    if (rule.for === 'annotation') {
-      annotationRules.push(rule)
-    } else if (rule.for === 'mark') {
+    if (rule.for === 'mark') {
       markRules.push(rule)
     } else {
       nodeRules.push(rule)

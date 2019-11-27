@@ -10,15 +10,12 @@ import {
 } from 'slate'
 import {
   AnchorToken,
-  AnnotationToken,
   FocusToken,
   Token,
   addAnchorToken,
-  addAnnotationToken,
   addFocusToken,
   getAnchorOffset,
   getFocusOffset,
-  getAnnotationOffsets,
 } from './tokens'
 
 /**
@@ -72,8 +69,6 @@ const resolveDescendants = (children: any[]): Descendant[] => {
         addAnchorToken(n, child)
       } else if (child instanceof FocusToken) {
         addFocusToken(n, child)
-      } else if (child instanceof AnnotationToken) {
-        addAnnotationToken(n, child)
       }
     } else {
       throw new Error(`Unexpected hyperscript child object: ${child}`)
@@ -97,35 +92,6 @@ export function createAnchor(
   children: any[]
 ): AnchorToken {
   return new AnchorToken(attributes)
-}
-
-/**
- * Create an annotation token, or two.
- */
-
-export function createAnnotation(
-  tagName: string,
-  attributes: { [key: string]: any },
-  children: any[]
-): (Node | Token)[] {
-  if (!('key' in attributes)) {
-    throw new Error(
-      `The <annotation> tag must be passed a unique \`key\` string attribute to uniquely identify it.`
-    )
-  }
-
-  const { key, ...rest } = attributes
-
-  if (children.length === 0) {
-    return [new AnnotationToken({ key, ...rest })]
-  } else {
-    const array: (Node | Token)[] = resolveDescendants(children)
-    const start = new AnnotationToken({ key, ...rest })
-    const end = new AnnotationToken({ key, ...rest })
-    array.unshift(start)
-    array.push(end)
-    return array
-  }
 }
 
 /**
@@ -310,19 +276,16 @@ export function createValue(
   const value: Value = {
     children: descendants,
     selection: null,
-    annotations: {},
     ...attributes,
   }
 
   const selection: Partial<Range> = {}
-  const partials: Record<string, [Path, number, AnnotationToken]> = {}
 
   // Search the document's texts to see if any of them have tokens associated
-  // that need incorporated into the selection or annotations.
+  // that need incorporated into the selection.
   for (const [node, path] of Node.texts(value)) {
     const anchor = getAnchorOffset(node)
     const focus = getFocusOffset(node)
-    const anns = getAnnotationOffsets(node)
 
     if (anchor != null) {
       const [offset] = anchor
@@ -333,33 +296,6 @@ export function createValue(
       const [offset] = focus
       selection.focus = { path, offset }
     }
-
-    for (const o in anns) {
-      const offset = parseInt(o, 10)
-      const token = anns[offset]
-      const { key } = token
-      const partial = partials[key]
-
-      if (!partial) {
-        partials[key] = [path, offset, token]
-      } else {
-        const [pPath, pOffset, pToken] = partial
-        delete partials[key]
-
-        value.annotations[key] = {
-          anchor: { path: pPath, offset: pOffset },
-          focus: { path, offset },
-          ...pToken.props,
-          ...token.props,
-        }
-      }
-    }
-  }
-
-  if (Object.keys(partials).length > 0) {
-    throw new Error(
-      `Slate hyperscript must have both a start and an end defined for each <annotation> tag using the \`key=\` prop.`
-    )
   }
 
   if (selection.anchor && !selection.focus) {

@@ -3,8 +3,7 @@ import { Path, Text } from '..'
 
 /**
  * `Mark` objects represent formatting that is applied to text in a Slate
- * document. They appear in leaf text nodes in the document, as well as in
- * annotations on the root value object.
+ * document. They appear in leaf text nodes in the document.
  */
 
 export interface Mark {

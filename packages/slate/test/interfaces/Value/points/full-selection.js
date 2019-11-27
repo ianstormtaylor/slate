@@ -14,7 +14,6 @@ export const input = {
       offset: 0,
     },
   },
-  annotations: {},
 }
 
 export const test = value => {
