@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact } from 'slate-react'
+import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
@@ -14,44 +14,29 @@ const MARK_HOTKEYS = {
 }
 
 const RichTextExample = () => {
-  const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
   const editor = useMemo(
     () => withRichText(withHistory(withReact(createEditor()))),
     []
   )
+
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
-        <MarkButton editor={editor} type="bold" icon="format_bold" />
-        <MarkButton editor={editor} type="italic" icon="format_italic" />
-        <MarkButton
-          editor={editor}
-          type="underlined"
-          icon="format_underlined"
-        />
-        <MarkButton editor={editor} type="code" icon="code" />
-        <BlockButton editor={editor} type="heading-one" icon="looks_one" />
-        <BlockButton editor={editor} type="heading-two" icon="looks_two" />
-        <BlockButton editor={editor} type="block-quote" icon="format_quote" />
-        <BlockButton
-          editor={editor}
-          type="numbered-list"
-          icon="format_list_numbered"
-        />
-        <BlockButton
-          editor={editor}
-          type="bulleted-list"
-          icon="format_list_bulleted"
-        />
+        <MarkButton type="bold" icon="format_bold" />
+        <MarkButton type="italic" icon="format_italic" />
+        <MarkButton type="underlined" icon="format_underlined" />
+        <MarkButton type="code" icon="code" />
+        <BlockButton type="heading-one" icon="looks_one" />
+        <BlockButton type="heading-two" icon="looks_two" />
+        <BlockButton type="block-quote" icon="format_quote" />
+        <BlockButton type="numbered-list" icon="format_list_numbered" />
+        <BlockButton type="bulleted-list" icon="format_list_bulleted" />
       </Toolbar>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={v => setValue(v)}
         placeholder="Enter some rich text…"
         spellCheck
         autoFocus
@@ -67,7 +52,7 @@ const RichTextExample = () => {
           }
         }}
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -113,7 +98,7 @@ const isMarkActive = (editor, type) => {
 }
 
 const isBlockActive = (editor, type) => {
-  const { selection } = editor.value
+  const { selection } = editor
   if (!selection) return false
   const match = Editor.match(editor, selection, { type })
   return !!match
@@ -151,7 +136,8 @@ const Mark = ({ attributes, children, mark }) => {
   }
 }
 
-const MarkButton = ({ editor, type, icon }) => {
+const MarkButton = ({ type, icon }) => {
+  const editor = useSlate()
   return (
     <Button
       active={isMarkActive(editor, type)}
@@ -165,7 +151,8 @@ const MarkButton = ({ editor, type, icon }) => {
   )
 }
 
-const BlockButton = ({ editor, type, icon }) => {
+const BlockButton = ({ type, icon }) => {
+  const editor = useSlate()
   return (
     <Button
       active={isBlockActive(editor, type)}
@@ -179,80 +166,77 @@ const BlockButton = ({ editor, type, icon }) => {
   )
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text: 'This is editable ',
-          marks: [],
-        },
-        {
-          text: 'rich',
-          marks: [{ type: 'bold' }],
-        },
-        {
-          text: ' text, ',
-          marks: [],
-        },
-        {
-          text: 'much',
-          marks: [{ type: 'italic' }],
-        },
-        {
-          text: ' better than a ',
-          marks: [],
-        },
-        {
-          text: '<textarea>',
-          marks: [{ type: 'code' }],
-        },
-        {
-          text: '!',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            "Since it's rich text, you can do things like turn a selection of text ",
-          marks: [],
-        },
-        {
-          text: 'bold',
-          marks: [{ type: 'bold' }],
-        },
-        {
-          text:
-            ', or add a semantically rendered block quote in the middle of the page, like this:',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'block-quote',
-      children: [
-        {
-          text: 'A wise quote.',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text: 'Try it out for yourself!',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: 'This is editable ',
+        marks: [],
+      },
+      {
+        text: 'rich',
+        marks: [{ type: 'bold' }],
+      },
+      {
+        text: ' text, ',
+        marks: [],
+      },
+      {
+        text: 'much',
+        marks: [{ type: 'italic' }],
+      },
+      {
+        text: ' better than a ',
+        marks: [],
+      },
+      {
+        text: '<textarea>',
+        marks: [{ type: 'code' }],
+      },
+      {
+        text: '!',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          "Since it's rich text, you can do things like turn a selection of text ",
+        marks: [],
+      },
+      {
+        text: 'bold',
+        marks: [{ type: 'bold' }],
+      },
+      {
+        text:
+          ', or add a semantically rendered block quote in the middle of the page, like this:',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'block-quote',
+    children: [
+      {
+        text: 'A wise quote.',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: 'Try it out for yourself!',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default RichTextExample

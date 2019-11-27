@@ -3,15 +3,15 @@
 import { jsx } from '..'
 
 export const input = (
-  <value>
+  <editor>
     <block />
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       <text />
     </block>
-  </value>
+  </editor>
 )

@@ -1,33 +1,25 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { createEditor } from 'slate'
-import { Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      readOnly
-      editor={editor}
-      value={value}
-      onChange={v => setValue(v)}
-      placeholder="Enter some plain text..."
-    />
+    <Slate editor={editor} defaultValue={initialValue}>
+      <Editable readOnly placeholder="Enter some plain text..." />
+    </Slate>
   )
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text: 'This is editable plain text, just like a <textarea>!',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    children: [
+      {
+        text: 'This is editable plain text, just like a <textarea>!',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default ReadOnlyExample

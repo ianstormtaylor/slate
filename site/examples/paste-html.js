@@ -1,9 +1,15 @@
-import React, { useCallback, useState, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
-import { Editable, withReact, useSelected, useFocused } from 'slate-react'
+import {
+  Slate,
+  Editable,
+  withReact,
+  useSelected,
+  useFocused,
+} from 'slate-react'
 
 const ELEMENT_TAGS = {
   A: el => ({ type: 'link', url: el.getAttribute('href') }),
@@ -72,7 +78,6 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
-  const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
   const editor = useMemo(
@@ -80,16 +85,13 @@ const PasteHtmlExample = () => {
     []
   )
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={v => setValue(v)}
         placeholder="Paste in some HTML..."
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -200,53 +202,50 @@ const Mark = ({ attributes, children, mark }) => {
   }
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text:
-            "By default, pasting content into a Slate editor will use the clipboard's ",
-          marks: [],
-        },
-        {
-          text: "'text/plain'",
-          marks: [{ type: 'code' }],
-        },
-        {
-          text:
-            " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintaing its formatting. To do this, your editor needs to handle ",
-          marks: [],
-        },
-        {
-          text: "'text/html'",
-          marks: [{ type: 'code' }],
-        },
-        {
-          text: ' data. ',
-          marks: [],
-        },
-      ],
-    },
-    {
-      children: [
-        {
-          text: 'This is an example of doing exactly that!',
-          marks: [],
-        },
-      ],
-    },
-    {
-      children: [
-        {
-          text:
-            "Try it out for yourself! Copy and paste some rendered HTML rich text content (not the source code) from another site into this editor and it's formatting should be preserved.",
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    children: [
+      {
+        text:
+          "By default, pasting content into a Slate editor will use the clipboard's ",
+        marks: [],
+      },
+      {
+        text: "'text/plain'",
+        marks: [{ type: 'code' }],
+      },
+      {
+        text:
+          " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintaing its formatting. To do this, your editor needs to handle ",
+        marks: [],
+      },
+      {
+        text: "'text/html'",
+        marks: [{ type: 'code' }],
+      },
+      {
+        text: ' data. ',
+        marks: [],
+      },
+    ],
+  },
+  {
+    children: [
+      {
+        text: 'This is an example of doing exactly that!',
+        marks: [],
+      },
+    ],
+  },
+  {
+    children: [
+      {
+        text:
+          "Try it out for yourself! Copy and paste some rendered HTML rich text content (not the source code) from another site into this editor and it's formatting should be preserved.",
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default PasteHtmlExample

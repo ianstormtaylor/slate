@@ -4,14 +4,14 @@ import { Node } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       <text key="a" />
     </element>
     <element>
       <text key="b" />
     </element>
-  </value>
+  </editor>
 )
 
 export const test = value => {

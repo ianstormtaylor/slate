@@ -45,7 +45,7 @@ export const LocationQueries = {
     } = {}
   ): Mark[] {
     const { union = false, hanging = false } = options
-    let { at = editor.value.selection } = options
+    let { at = editor.selection } = options
 
     if (!at) {
       return []
@@ -164,7 +164,7 @@ export const LocationQueries = {
       ? Path.parent(path)
       : path
 
-    const ancestor = Node.get(editor.value, ancestorPath) as Ancestor
+    const ancestor = Node.get(editor, ancestorPath) as Ancestor
     return [ancestor, ancestorPath]
   },
 
@@ -225,7 +225,7 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
-    const { at = editor.value.selection } = options
+    const { at = editor.selection } = options
 
     if (!at) {
       return
@@ -233,7 +233,7 @@ export const LocationQueries = {
 
     const [from, to] = toSpan(editor, at, options)
 
-    yield* Node.elements(editor.value, {
+    yield* Node.elements(editor, {
       ...options,
       from,
       to,
@@ -264,7 +264,7 @@ export const LocationQueries = {
 
   fragment(editor: Editor, at: Location): Descendant[] {
     const range = Editor.range(editor, at)
-    const fragment = Node.fragment(editor.value, range)
+    const fragment = Node.fragment(editor, range)
     return fragment
   },
 
@@ -321,7 +321,7 @@ export const LocationQueries = {
     } = {}
   ): TextEntry {
     const path = Editor.path(editor, at, options)
-    const node = Node.leaf(editor.value, path)
+    const node = Node.leaf(editor, path)
     return [node, path]
   },
 
@@ -336,7 +336,7 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = editor.value.selection, reverse = false } = options
+    const { at = editor.selection, reverse = false } = options
 
     if (!at) {
       return
@@ -345,7 +345,7 @@ export const LocationQueries = {
     const levels: NodeEntry[] = []
     const path = Editor.path(editor, at)
 
-    for (const [n, p] of Node.levels(editor.value, path)) {
+    for (const [n, p] of Node.levels(editor, path)) {
       levels.push([n, p])
 
       if (Element.isElement(n) && editor.isVoid(n)) {
@@ -371,7 +371,7 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<MarkEntry> {
-    const { at = editor.value.selection } = options
+    const { at = editor.selection } = options
 
     if (!at) {
       return
@@ -379,7 +379,7 @@ export const LocationQueries = {
 
     const [from, to] = toSpan(editor, at, options)
 
-    yield* Node.marks(editor.value, {
+    yield* Node.marks(editor, {
       ...options,
       from,
       to,
@@ -413,7 +413,7 @@ export const LocationQueries = {
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
-    const { at = editor.value.selection, reverse = false } = options
+    const { at = editor.selection, reverse = false } = options
     let { match } = options
 
     if (!at) {
@@ -475,7 +475,7 @@ export const LocationQueries = {
     } = {}
   ): NodeEntry {
     const path = Editor.path(editor, at, options)
-    const node = Node.get(editor.value, path)
+    const node = Node.get(editor, path)
     return [node, path]
   },
 
@@ -490,14 +490,14 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = editor.value.selection } = options
+    const { at = editor.selection } = options
 
     if (!at) {
       return
     }
 
     const [from, to] = toSpan(editor, at, options)
-    const iterable = Node.nodes(editor.value, {
+    const iterable = Node.nodes(editor, {
       ...options,
       from,
       to,
@@ -543,10 +543,10 @@ export const LocationQueries = {
 
     if (Path.isPath(at)) {
       if (edge === 'start') {
-        const [, firstPath] = Node.first(editor.value, at)
+        const [, firstPath] = Node.first(editor, at)
         at = firstPath
       } else if (edge === 'end') {
-        const [, lastPath] = Node.last(editor.value, at)
+        const [, lastPath] = Node.last(editor, at)
         at = lastPath
       }
     }
@@ -589,14 +589,14 @@ export const LocationQueries = {
       let path
 
       if (edge === 'end') {
-        const [, lastPath] = Node.last(editor.value, at)
+        const [, lastPath] = Node.last(editor, at)
         path = lastPath
       } else {
-        const [, firstPath] = Node.first(editor.value, at)
+        const [, firstPath] = Node.first(editor, at)
         path = firstPath
       }
 
-      const node = Node.get(editor.value, path)
+      const node = Node.get(editor, path)
 
       if (!Text.isText(node)) {
         throw new Error(
@@ -635,11 +635,7 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<Point> {
-    const {
-      at = editor.value.selection,
-      unit = 'offset',
-      reverse = false,
-    } = options
+    const { at = editor.selection, unit = 'offset', reverse = false } = options
 
     if (!at) {
       return
@@ -830,7 +826,7 @@ export const LocationQueries = {
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {
-    const { at = editor.value.selection } = options
+    const { at = editor.selection } = options
 
     if (!at) {
       return
@@ -838,7 +834,7 @@ export const LocationQueries = {
 
     const [from, to] = toSpan(editor, at, options)
 
-    yield* Node.texts(editor.value, {
+    yield* Node.texts(editor, {
       ...options,
       from,
       to,

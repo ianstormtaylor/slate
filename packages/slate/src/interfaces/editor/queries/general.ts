@@ -8,7 +8,7 @@ import {
   PointRef,
   Range,
   RangeRef,
-  Value,
+  Node,
 } from '../../..'
 
 export const NORMALIZING: WeakMap<Editor, boolean> = new WeakMap()
@@ -30,7 +30,8 @@ export const GeneralQueries = {
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
-      Value.isValue(value.value) &&
+      (value.selection === null || Range.isRange(value.selection)) &&
+      Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
     )
   },

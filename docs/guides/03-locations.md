@@ -13,8 +13,7 @@ type Path = number[]
 For example, in this document:
 
 ```js
-const value = {
-  selection: null,
+const editor = {
   children: [
     {
       type: 'paragraph',
@@ -94,10 +93,10 @@ One important distinction is that the anchor and focus points of ranges **always
 
 Ranges are used in many places in Slate's API when you need to refer to a span of content between two points. One of the most common though is the user's current "selection".
 
-The selection is a special range that is property of the top-level `Value`. For example, say someone has the whole sentence currently selected:
+The selection is a special range that is property of the top-level `Editor`. For example, say someone has the whole sentence currently selected:
 
 ```js
-const value = {
+const editor = {
   selection: {
     anchor: { path: [0, 0], offset: 0 },
     focus: { path: [0, 0], offset: 15 },

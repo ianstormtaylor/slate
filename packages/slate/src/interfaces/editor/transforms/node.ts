@@ -1,5 +1,4 @@
 import {
-  Descendant,
   Editor,
   Element,
   Location,
@@ -10,7 +9,6 @@ import {
   Point,
   Range,
   Text,
-  Value,
 } from '../../..'
 
 export const NodeTransforms = {
@@ -28,7 +26,8 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { selection, hanging = false } = editor.value
+      const { selection } = editor
+      const { hanging = false } = options
       let { at, match } = options
       let select = false
 
@@ -59,8 +58,7 @@ export const NodeTransforms = {
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
-        at = selection ||
-          Editor.end(editor, []) || [editor.value.children.length]
+        at = selection || Editor.end(editor, []) || [editor.children.length]
         select = true
       }
 
@@ -130,7 +128,7 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { at = editor.value.selection } = options
+      const { at = editor.selection } = options
       let { match } = options
 
       if (match == null) {
@@ -191,7 +189,7 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.value.selection } = options
+      let { match, at = editor.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -235,7 +233,7 @@ export const NodeTransforms = {
       let prevMatch: NodeMatch = 'block'
       const [node, path] = current
 
-      if (Value.isValue(node)) {
+      if (Editor.isEditor(node)) {
         return
       } else if (Text.isText(node)) {
         prevMatch = 'text'
@@ -256,7 +254,7 @@ export const NodeTransforms = {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Node.furthest(editor.value, path, ([n, p]) => {
+      const emptyAncestor = Node.furthest(editor, path, ([n, p]) => {
         return (
           Path.isDescendant(p, commonPath) &&
           Path.isAncestor(p, path) &&
@@ -337,7 +335,7 @@ export const NodeTransforms = {
     }
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { to, at = editor.value.selection } = options
+      const { to, at = editor.selection } = options
       let { match } = options
 
       if (match == null) {
@@ -383,7 +381,7 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.value.selection } = options
+      let { match, at = editor.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -428,7 +426,7 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.value.selection } = options
+      let { match, at = editor.selection } = options
       const { hanging = false } = options
 
       if (match == null) {
@@ -494,12 +492,7 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let {
-        match,
-        at = editor.value.selection,
-        height = 0,
-        always = false,
-      } = options
+      let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
         match = 'block'
@@ -622,7 +615,7 @@ export const NodeTransforms = {
     }
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { at = editor.value.selection, split = false } = options
+      const { at = editor.selection, split = false } = options
       let { match } = options
 
       if (match == null) {
@@ -674,7 +667,7 @@ export const NodeTransforms = {
   ) {
     Editor.withoutNormalizing(editor, () => {
       const { split = false } = options
-      let { match, at = editor.value.selection } = options
+      let { match, at = editor.selection } = options
 
       if (!at) {
         return
@@ -707,7 +700,7 @@ export const NodeTransforms = {
 
       const roots: NodeEntry[] = editor.isInline(element)
         ? Array.from(Editor.matches(editor, { ...options, at, match: 'block' }))
-        : [[editor.value, []]]
+        : [[editor, []]]
 
       for (const [, rootPath] of roots) {
         const a = Range.isRange(at)

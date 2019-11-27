@@ -11,7 +11,7 @@ const App = () => {
   const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
-    switch (prop.element.type) {
+    switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
       default:
@@ -20,29 +20,26 @@ const App = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '`' && event.ctrlKey) {
-          event.preventDefault()
-          // Determine whether any of the currently selected blocks are code blocks.
-          const { selection } = editor.value
-          const isCode = selection
-            ? Editor.match(editor, selection, { type: 'code' })
-            : false
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        onKeyDown={event => {
+          if (event.key === '`' && event.ctrlKey) {
+            event.preventDefault()
+            const { selection } = editor
+            const isCode = selection
+              ? Editor.match(editor, selection, { type: 'code' })
+              : false
 
-          // Toggle the block type depending on `isCode`.
-          Editor.setNodes(
-            editor,
-            { type: isCode ? null : 'code' },
-            { match: 'block' }
-          )
-        }
-      }}
-    />
+            Editor.setNodes(
+              editor,
+              { type: isCode ? 'paragraph' : 'code' },
+              { match: 'block' }
+            )
+          }
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -51,7 +48,6 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `c
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (prop.element.type) {
@@ -63,42 +59,41 @@ const App = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (!event.ctrlKey) {
-          return
-        }
-
-        // When "`" is pressed, keep our existing code block logic.
-        switch (event.key) {
-          case '`': {
-            event.preventDefault()
-            const { selection } = editor.value
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
-
-            Editor.setNodes(
-              editor,
-              { type: isCode ? null : 'code' },
-              { match: 'block' }
-            )
-            break
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
           }
 
-          // When "B" is pressed, add a bold mark to the text.
-          case 'b': {
-            event.preventDefault()
-            Editor.toggleMarks(editor, [{ type: 'bold' }])
-            break
+          // When "`" is pressed, keep our existing code block logic.
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              const { selection } = editor
+              const isCode = selection
+                ? Editor.match(editor, selection, { type: 'code' })
+                : false
+
+              Editor.setNodes(
+                editor,
+                { type: isCode ? null : 'code' },
+                { match: 'block' }
+              )
+              break
+            }
+
+            // When "B" is pressed, add a bold mark to the text.
+            case 'b': {
+              event.preventDefault()
+              Editor.addMarks(editor, [{ type: 'bold' }])
+              break
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -120,7 +115,6 @@ And now, let's tell Slate about that mark. To do that, we'll pass in the `render
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -141,42 +135,41 @@ const App = () => {
   })
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      // Pass in the `renderMark` function.
-      renderMark={renderMark}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (!event.ctrlKey) {
-          return
-        }
-
-        switch (event.key) {
-          case '`': {
-            event.preventDefault()
-            const { selection } = editor.value
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
-
-            Editor.setNodes(
-              editor,
-              { type: isCode ? null : 'code' },
-              { match: 'block' }
-            )
-            break
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        // Pass in the `renderMark` function.
+        renderMark={renderMark}
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
           }
 
-          case 'b': {
-            event.preventDefault()
-            Editor.toggleMarks(editor, [{ type: 'bold' }])
-            break
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              const { selection } = editor
+              const isCode = selection
+                ? Editor.match(editor, selection, { type: 'code' })
+                : false
+
+              Editor.setNodes(
+                editor,
+                { type: isCode ? null : 'code' },
+                { match: 'block' }
+              )
+              break
+            }
+
+            case 'b': {
+              event.preventDefault()
+              Editor.addMarks(editor, [{ type: 'bold' }])
+              break
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </Slate>
   )
 }
 

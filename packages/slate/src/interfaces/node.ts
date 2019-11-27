@@ -1,5 +1,6 @@
 import { produce } from 'immer'
 import {
+  Editor,
   Element,
   ElementEntry,
   MarkEntry,
@@ -7,7 +8,6 @@ import {
   Range,
   Text,
   TextEntry,
-  Value,
 } from '..'
 
 /**
@@ -15,12 +15,11 @@ import {
  * occur in a Slate document tree.
  */
 
-export type Node = Value | Element | Text
+export type Node = Editor | Element | Text
 
 export const Node = {
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Value.isValue(node) && Value.matches(node, props)) ||
       (Element.isElement(node) && Element.matches(node, props)) ||
       (Text.isText(node) && Text.matches(node, props))
     )
@@ -120,9 +119,9 @@ export const Node = {
   descendant(root: Node, path: Path): Descendant {
     const node = Node.get(root, path)
 
-    if (Value.isValue(node)) {
+    if (Editor.isEditor(node)) {
       throw new Error(
-        `Cannot get the descendant node at path [${path}] because it refers to a value node instead: ${node}`
+        `Cannot get the descendant node at path [${path}] because it refers to the root editor node instead: ${node}`
       )
     }
 
@@ -145,7 +144,7 @@ export const Node = {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
-        // guarantee that `node` is not a `Value`, but TypeScript doesn't know.
+        // guarantee that `node` is not a `Editor`, but TypeScript doesn't know.
         yield [node, path] as DescendantEntry
       }
     }
@@ -304,7 +303,7 @@ export const Node = {
 
   isNode(value: any): value is Node {
     return (
-      Text.isText(value) || Element.isElement(value) || Value.isValue(value)
+      Text.isText(value) || Element.isElement(value) || Editor.isEditor(value)
     )
   },
 
@@ -542,7 +541,7 @@ export type Descendant = Element | Text
  * than the more generic `Node` union.
  */
 
-export type Ancestor = Value | Element
+export type Ancestor = Editor | Element
 
 /**
  * `NodeEntry` objects are returned when iterating over the nodes in a Slate
@@ -577,7 +576,7 @@ export type NodeMatch =
   | 'inline'
   | 'inline-element'
   | 'text'
-  | 'value'
+  | 'editor'
   | 'void'
   | Partial<Node>
   | ((entry: NodeEntry) => boolean)

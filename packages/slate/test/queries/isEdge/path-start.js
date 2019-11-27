@@ -4,16 +4,16 @@ import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <cursor />
       one
     </block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {
-  const { anchor } = editor.value.selection
+  const { anchor } = editor.selection
   return Editor.isEdge(editor, anchor, [0])
 }
 

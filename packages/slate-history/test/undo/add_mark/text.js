@@ -7,14 +7,14 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <anchor />
       wo
       <focus />
       rd
     </block>
-  </value>
+  </editor>
 )
 
 export const output = input

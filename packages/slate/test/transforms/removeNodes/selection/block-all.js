@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>
       on
       <anchor />e
@@ -13,11 +13,11 @@ export const input = (
       t<focus />
       wo
     </block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {
   Editor.removeNodes(editor)
 }
 
-export const output = <value />
+export const output = <editor />

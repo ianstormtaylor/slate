@@ -5,7 +5,6 @@ import {
   Path as SlatePath,
   Point as SlatePoint,
   Range as SlateRange,
-  Value as SlateValue,
 } from 'slate'
 
 import { Key } from './utils/key'
@@ -62,7 +61,7 @@ export const ReactEditor = {
       const parent = NODE_TO_PARENT.get(child)
 
       if (parent == null) {
-        if (SlateValue.isValue(child)) {
+        if (Editor.isEditor(child)) {
           return path
         } else {
           break
@@ -94,7 +93,7 @@ export const ReactEditor = {
 
     if (
       placeholder &&
-      SlateValue.isValue(node) &&
+      Editor.isEditor(node) &&
       node.children.length === 1 &&
       Array.from(SlateNode.texts(node)).length === 1 &&
       SlateNode.text(node) === ''
@@ -133,7 +132,7 @@ export const ReactEditor = {
    */
 
   blur(editor: ReactEditor): void {
-    const el = ReactEditor.toDomNode(editor, editor.value)
+    const el = ReactEditor.toDomNode(editor, editor)
     IS_FOCUSED.set(editor, false)
 
     if (window.document.activeElement === el) {
@@ -146,7 +145,7 @@ export const ReactEditor = {
    */
 
   focus(editor: ReactEditor): void {
-    const el = ReactEditor.toDomNode(editor, editor.value)
+    const el = ReactEditor.toDomNode(editor, editor)
     IS_FOCUSED.set(editor, true)
 
     if (window.document.activeElement !== el) {
@@ -159,7 +158,7 @@ export const ReactEditor = {
    */
 
   deselect(editor: ReactEditor): void {
-    const { selection } = editor.value
+    const { selection } = editor
     const domSelection = window.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
@@ -181,7 +180,7 @@ export const ReactEditor = {
     options: { editable?: boolean } = {}
   ): boolean {
     const { editable = false } = options
-    const el = ReactEditor.toDomNode(editor, editor.value)
+    const el = ReactEditor.toDomNode(editor, editor)
     let element
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
@@ -213,7 +212,7 @@ export const ReactEditor = {
    */
 
   toDomNode(editor: ReactEditor, node: SlateNode): HTMLElement {
-    const domNode = SlateValue.isValue(node)
+    const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
 

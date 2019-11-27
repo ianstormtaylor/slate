@@ -1,4 +1,4 @@
-import { Command, Element, Operation, NodeEntry, Value } from '../..'
+import { Command, Element, Operation, Range, Node, NodeEntry } from '../..'
 
 import { ElementQueries } from './queries/element'
 import { GeneralTransforms } from './transforms/general'
@@ -18,13 +18,14 @@ import { TextTransforms } from './transforms/text'
 
 export interface Editor {
   apply: (operation: Operation) => void
+  children: Node[]
   exec: (command: Command) => void
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: (value: Value, operations: Operation[]) => void
+  onChange: (children: Node[], operations: Operation[]) => void
   operations: Operation[]
-  value: Value
+  selection: Range | null
   [key: string]: any
 }
 

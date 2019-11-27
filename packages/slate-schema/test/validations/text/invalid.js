@@ -13,9 +13,9 @@ export const schema = [
 ]
 
 export const input = (
-  <value>
+  <editor>
     <element a>invalid</element>
-  </value>
+  </editor>
 )
 
-export const output = <value />
+export const output = <editor />

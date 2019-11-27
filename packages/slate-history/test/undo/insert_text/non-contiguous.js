@@ -11,21 +11,21 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       one
       <cursor />
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       onew
       <cursor />t
     </block>
-  </value>
+  </editor>
 )
 
 export const skip = true

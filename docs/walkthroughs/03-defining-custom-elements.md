@@ -8,20 +8,18 @@ We'll show you how. Let's start with our app from earlier:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '&') {
-          event.preventDefault()
-          editor.exec({ type: 'insert_text', text: 'and' })
-        }
-      }}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        onKeyDown={event => {
+          if (event.key === '&') {
+            event.preventDefault()
+            editor.exec({ type: 'insert_text', text: 'and' })
+          }
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -61,7 +59,6 @@ Now, let's add that renderer to our `Editor`:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
 
   // Define a rendering function based on the element passed to `props`. We use
@@ -76,19 +73,18 @@ const App = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      // Pass in the `renderElement` function.
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '&') {
-          event.preventDefault()
-          editor.exec({ type: 'insert_text', text: 'and' })
-        }
-      }}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        // Pass in the `renderElement` function.
+        renderElement={renderElement}
+        onKeyDown={event => {
+          if (event.key === '&') {
+            event.preventDefault()
+            editor.exec({ type: 'insert_text', text: 'and' })
+          }
+        }}
+      />
+    </Slate>
   )
 }
 
@@ -112,7 +108,6 @@ Okay, but now we'll need a way for the user to actually turn a block into a code
 import { Editor } from 'slate'
 
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -124,20 +119,19 @@ const App = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '`' && event.ctrlKey) {
-          // Prevent the "`" from being inserted by default.
-          event.preventDefault()
-          // Otherwise, set the currently selected blocks type to "code".
-          Editor.setNodes(editor, { type: 'code' }, { match: 'block' })
-        }
-      }}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        onKeyDown={event => {
+          if (event.key === '`' && event.ctrlKey) {
+            // Prevent the "`" from being inserted by default.
+            event.preventDefault()
+            // Otherwise, set the currently selected blocks type to "code".
+            Editor.setNodes(editor, { type: 'code' }, { match: 'block' })
+          }
+        }}
+      />
+    </Slate>
   )
 }
 
@@ -172,29 +166,28 @@ const App = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '`' && event.ctrlKey) {
-          event.preventDefault()
-          // Determine whether any of the currently selected blocks are code blocks.
-          const { selection } = editor.value
-          const isCode = selection
-            ? Editor.match(editor, selection, { type: 'code' })
-            : false
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        onKeyDown={event => {
+          if (event.key === '`' && event.ctrlKey) {
+            event.preventDefault()
+            // Determine whether any of the currently selected blocks are code blocks.
+            const { selection } = editor
+            const isCode = selection
+              ? Editor.match(editor, selection, { type: 'code' })
+              : false
 
-          // Toggle the block type depending on `isCode`.
-          Editor.setNodes(
-            editor,
-            { type: isCode ? 'paragraph' : 'code' },
-            { match: 'block' }
-          )
-        }
-      }}
-    />
+            // Toggle the block type depending on `isCode`.
+            Editor.setNodes(
+              editor,
+              { type: isCode ? 'paragraph' : 'code' },
+              { match: 'block' }
+            )
+          }
+        }}
+      />
+    </Slate>
   )
 }
 ```

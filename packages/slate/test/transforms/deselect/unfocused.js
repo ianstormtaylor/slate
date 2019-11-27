@@ -8,16 +8,16 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <cursor focused={false} />
       one
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>one</block>
-  </value>
+  </editor>
 )

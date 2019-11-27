@@ -12,7 +12,7 @@ export const SelectionTransforms = {
     } = {}
   ) {
     const { edge = 'anchor' } = options
-    const { selection } = editor.value
+    const { selection } = editor
 
     if (!selection) {
       return
@@ -34,7 +34,7 @@ export const SelectionTransforms = {
    */
 
   deselect(editor: Editor) {
-    const { selection } = editor.value
+    const { selection } = editor
 
     if (selection) {
       editor.apply({
@@ -58,7 +58,7 @@ export const SelectionTransforms = {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
   ) {
-    const { selection } = editor.value
+    const { selection } = editor
     const { distance = 1, unit = 'character', reverse = false } = options
     let { edge = null } = options
 
@@ -106,7 +106,7 @@ export const SelectionTransforms = {
    */
 
   select(editor: Editor, target: Location) {
-    const { selection } = editor.value
+    const { selection } = editor
     target = Editor.range(editor, target)
 
     if (selection) {
@@ -140,7 +140,7 @@ export const SelectionTransforms = {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     }
   ) {
-    const { selection } = editor.value
+    const { selection } = editor
     let { edge = 'both' } = options
 
     if (!selection) {
@@ -171,7 +171,7 @@ export const SelectionTransforms = {
    */
 
   setSelection(editor: Editor, props: Partial<Range>) {
-    const { selection } = editor.value
+    const { selection } = editor
     const oldProps: Partial<Range> | null = {}
     const newProps: Partial<Range> = {}
 

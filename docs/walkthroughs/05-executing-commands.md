@@ -12,7 +12,6 @@ We'll start with our app from earlier:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -32,41 +31,40 @@ const App = () => {
   })
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      renderMark={renderMark}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (!event.ctrlKey) {
-          return
-        }
-
-        switch (event.key) {
-          case '`': {
-            event.preventDefault()
-            const { selection } = editor.value
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
-
-            Editor.setNodes(
-              editor,
-              { type: isCode ? null : 'code' },
-              { match: 'block' }
-            )
-            break
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        renderMark={renderMark}
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
           }
 
-          case 'b': {
-            event.preventDefault()
-            Editor.toggleMarks(editor, [{ type: 'bold' }])
-            break
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              const { selection } = editor
+              const isCode = selection
+                ? Editor.match(editor, selection, { type: 'code' })
+                : false
+
+              Editor.setNodes(
+                editor,
+                { type: isCode ? null : 'code' },
+                { match: 'block' }
+              )
+              break
+            }
+
+            case 'b': {
+              event.preventDefault()
+              Editor.addMarks(editor, [{ type: 'bold' }])
+              break
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -76,12 +74,13 @@ It has the concept of "code blocks" and "bold marks". But these things are all d
 We can instead implement these domain-specific concepts by extending the `editor` object:
 
 ```js
-// Create a custom editor plugin function that extends the base editor.
-const withCustom = editor => {}
+// Create a custom editor plugin function that will augment the editor.
+const withCustom = editor => {
+  return editor
+}
 
 const App = () => {
-  const [value, setValue] = useState(initialValue)
-  // Pass in the new `CustomEditor` to the `useSlate` hook instead.
+  // Wrap the editor with our new `withCustom` plugin.
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -101,41 +100,40 @@ const App = () => {
   })
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      renderMark={renderMark}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (!event.ctrlKey) {
-          return
-        }
-
-        switch (event.key) {
-          case '`': {
-            event.preventDefault()
-            const { selection } = editor.value
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
-
-            Editor.setNodes(
-              editor,
-              { type: isCode ? null : 'code' },
-              { match: 'block' }
-            )
-            break
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        renderMark={renderMark}
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
           }
 
-          case 'b': {
-            event.preventDefault()
-            Editor.toggleMarks(editor, [{ type: 'bold' }])
-            break
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              const { selection } = editor
+              const isCode = selection
+                ? Editor.match(editor, selection, { type: 'code' })
+                : false
+
+              Editor.setNodes(
+                editor,
+                { type: isCode ? null : 'code' },
+                { match: 'block' }
+              )
+              break
+            }
+
+            case 'b': {
+              event.preventDefault()
+              Editor.toggleMarks(editor, [{ type: 'bold' }])
+              break
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -183,14 +181,14 @@ const withCustom = editor => {
 
 // Define our own custom set of helpers for common queries.
 const CustomEditor = {
-  isBoldMarkActive() {
-    const { selection } = this.value
+  isBoldMarkActive(editor) {
+    const { selection } = editor
     const activeMarks = Editor.activeMarks(editor)
     return activeMarks.some(mark => mark.type === 'bold')
   },
 
-  isCodeBlockActive() {
-    const { selection } = this.value
+  isCodeBlockActive(editor) {
+    const { selection } = editor
     const isCode = selection
       ? Editor.match(editor, selection, { type: 'code' })
       : false
@@ -199,7 +197,6 @@ const CustomEditor = {
 }
 
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -219,33 +216,32 @@ const App = () => {
   })
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      renderMark={renderMark}
-      onChange={newValue => setValue(newValue)}
-      // Replace the `onKeyDown` logic with our new commands.
-      onKeyDown={event => {
-        if (!event.ctrlKey) {
-          return
-        }
-
-        switch (event.key) {
-          case '`': {
-            event.preventDefault()
-            editor.exec({ type: 'toggle_code_block' })
-            break
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        renderElement={renderElement}
+        renderMark={renderMark}
+        // Replace the `onKeyDown` logic with our new commands.
+        onKeyDown={event => {
+          if (!event.ctrlKey) {
+            return
           }
 
-          case 'b': {
-            event.preventDefault()
-            editor.exec({ type: 'toggle_bold_mark' })
-            break
+          switch (event.key) {
+            case '`': {
+              event.preventDefault()
+              editor.exec({ type: 'toggle_code_block' })
+              break
+            }
+
+            case 'b': {
+              event.preventDefault()
+              editor.exec({ type: 'toggle_bold_mark' })
+              break
+            }
           }
-        }
-      }}
-    />
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -274,24 +270,26 @@ const App = () => {
   })
 
   return (
-    <React.Fragment>
-      // Add a hypothetical toolbar with buttons that call the same methods.
-      <Toolbar>
-        <Button
-          text="Bold"
+    // Add a  toolbar with buttons that call the same methods.
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <div>
+        <button
           onMouseDown={event => {
             event.preventDefault()
             editor.exec({ type: 'toggle_bold_mark' })
           }}
-        />
-        <Button
-          text="Code Block"
+        >
+          Bold
+        </button>
+        <button
           onMouseDown={event => {
             event.preventDefault()
             editor.exec({ type: 'toggle_code_block' })
           }}
-        />
-      </Toolbar>
+        >
+          Code Block
+        </button>
+      </div>
       <Editable
         editor={editor}
         value={value}
@@ -318,7 +316,7 @@ const App = () => {
           }
         }}
       />
-    </React.Fragment>
+    </Slate>
   )
 }
 ```

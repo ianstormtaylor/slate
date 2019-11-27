@@ -12,7 +12,6 @@ import {
   Range,
   RangeRef,
   Text,
-  Value,
 } from '.'
 import { DIRTY_PATHS } from './interfaces/editor/transforms/general'
 
@@ -24,8 +23,9 @@ const FLUSHING: WeakMap<Editor, boolean> = new WeakMap()
 
 export const createEditor = (): Editor => {
   const editor: Editor = {
-    value: { selection: null, children: [] },
+    children: [],
     operations: [],
+    selection: null,
     isInline: () => false,
     isVoid: () => false,
     onChange: () => {},
@@ -69,7 +69,7 @@ export const createEditor = (): Editor => {
       }
 
       DIRTY_PATHS.set(editor, dirtyPaths)
-      editor.value = Value.transform(editor.value, op)
+      Editor.transform(editor, op)
       editor.operations.push(op)
       Editor.normalize(editor)
 
@@ -78,13 +78,13 @@ export const createEditor = (): Editor => {
 
         Promise.resolve().then(() => {
           FLUSHING.set(editor, false)
-          editor.onChange(editor.value, editor.operations)
+          editor.onChange(editor.children, editor.operations)
           editor.operations = []
         })
       }
     },
     exec: (command: Command) => {
-      const { selection } = editor.value
+      const { selection } = editor
 
       if (Command.isCoreCommand(command)) {
         switch (command.type) {
@@ -160,7 +160,7 @@ export const createEditor = (): Editor => {
       }
 
       // Determine whether the node should have block or inline children.
-      const shouldHaveInlines = Value.isValue(node)
+      const shouldHaveInlines = Editor.isEditor(node)
         ? false
         : Element.isElement(node) &&
           (editor.isInline(node) ||
@@ -180,9 +180,10 @@ export const createEditor = (): Editor => {
           Text.isText(child) ||
           (Element.isElement(child) && editor.isInline(child))
 
-        // Only allow block nodes in the top-level value and parent blocks that
-        // only contain block nodes. Similarly, only allow inline nodes in other
-        // inline nodes, or parent blocks that only contain inlines and text.
+        // Only allow block nodes in the top-level children and parent blocks
+        // that only contain block nodes. Similarly, only allow inline nodes in
+        // other inline nodes, or parent blocks that only contain inlines and
+        // text.
         if (isInlineOrText !== shouldHaveInlines) {
           Editor.removeNodes(editor, { at: path.concat(n) })
           n--

@@ -1,5 +1,5 @@
-import React, { useCallback, useState, useMemo } from 'react'
-import { Editable, withReact } from 'slate-react'
+import React, { useCallback, useMemo } from 'react'
+import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
@@ -17,24 +17,20 @@ const SHORTCUTS = {
 }
 
 const MarkdownShortcutsExample = () => {
-  const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={renderElement}
-        onChange={v => setValue(v)}
         placeholder="Write some markdown..."
         spellCheck
         autoFocus
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -42,7 +38,7 @@ const withShortcuts = editor => {
   const { exec } = editor
 
   editor.exec = command => {
-    const { selection } = editor.value
+    const { selection } = editor
 
     if (
       command.type === 'insert_text' &&
@@ -127,58 +123,55 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'block-quote',
-      children: [
-        {
-          text: 'A wise quote.',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'Order when you start a line with "## " you get a level-two heading, like this:',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'heading-two',
-      children: [
-        {
-          text: 'Try it out!',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'block-quote',
+    children: [
+      {
+        text: 'A wise quote.',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'Order when you start a line with "## " you get a level-two heading, like this:',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'heading-two',
+    children: [
+      {
+        text: 'Try it out!',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default MarkdownShortcutsExample

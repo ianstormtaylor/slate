@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <mark key="a">
         <anchor />o
@@ -14,7 +14,7 @@ export const input = (
         e<focus />
       </mark>
     </block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {

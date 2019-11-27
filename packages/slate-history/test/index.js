@@ -1,18 +1,15 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { createHyperscript } from 'slate-hyperscript'
-import { createEditor } from 'slate'
 import { withHistory } from '..'
 
 describe('slate-history', () => {
   fixtures(__dirname, 'undo', ({ module }) => {
     const { input, run, output } = module
-    const editor = withTest(withHistory(createEditor()))
-    editor.value = input
+    const editor = withTest(withHistory(input))
     run(editor)
-    // editor.flush()
     editor.exec({ type: 'undo' })
-    assert.deepEqual(editor.value, output)
+    assert.deepEqual(editor.children, output.children)
   })
 })
 

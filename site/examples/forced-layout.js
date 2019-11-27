@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { Editable, withReact } from 'slate-react'
+import React, { useCallback, useMemo } from 'react'
+import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { withSchema } from 'slate-schema'
@@ -7,7 +7,7 @@ import { withSchema } from 'slate-schema'
 const schema = [
   {
     for: 'node',
-    match: 'value',
+    match: 'editor',
     validate: {
       children: [
         { match: { type: 'title' }, min: 1, max: 1 },
@@ -38,24 +38,20 @@ const schema = [
 ]
 
 const ForcedLayoutExample = () => {
-  const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withSchema(withHistory(withReact(createEditor())), schema),
     []
   )
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={renderElement}
-        onChange={v => setValue(v)}
         placeholder="Enter a title…"
         spellCheck
         autoFocus
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -68,29 +64,26 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'title',
-      children: [
-        {
-          text: 'Enforce Your Layout!',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    type: 'title',
+    children: [
+      {
+        text: 'Enforce Your Layout!',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default ForcedLayoutExample

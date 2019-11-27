@@ -1,41 +1,35 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Editor, createEditor } from 'slate'
-import { Editable, useSelected, useFocused, withReact } from 'slate-react'
+import {
+  Slate,
+  Editable,
+  useEditor,
+  useSelected,
+  useFocused,
+  withReact,
+} from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
-        <Button
-          onMouseDown={event => {
-            event.preventDefault()
-            const url = window.prompt('Enter the URL of the image:')
-            if (!url) return
-            editor.exec({ type: 'insert_url', url })
-          }}
-        >
-          <Icon>image</Icon>
-        </Button>
+        <InsertImageButton />
       </Toolbar>
       <Editable
-        editor={editor}
-        value={value}
-        onChange={v => setValue(v)}
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -126,6 +120,22 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
+const InsertImageButton = () => {
+  const editor = useEditor()
+  return (
+    <Button
+      onMouseDown={event => {
+        event.preventDefault()
+        const url = window.prompt('Enter the URL of the image:')
+        if (!url) return
+        editor.exec({ type: 'insert_url', url })
+      }}
+    >
+      <Icon>image</Icon>
+    </Button>
+  )
+}
+
 const isImageUrl = url => {
   if (!url) return false
   if (!isUrl(url)) return false
@@ -133,40 +143,37 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'image',
-      url: 'https://source.unsplash.com/kFrdX5IeQzI',
-      children: [
-        {
-          text: '',
-          marks: [],
-        },
-      ],
-    },
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text:
-            'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'image',
+    url: 'https://source.unsplash.com/kFrdX5IeQzI',
+    children: [
+      {
+        text: '',
+        marks: [],
+      },
+    ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default ImagesExample

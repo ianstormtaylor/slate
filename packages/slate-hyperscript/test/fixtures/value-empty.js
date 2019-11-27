@@ -2,7 +2,7 @@
 
 import { jsx } from 'slate-hyperscript'
 
-export const input = <value />
+export const input = <editor />
 
 export const output = {
   children: [],

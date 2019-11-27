@@ -4,7 +4,7 @@ import { Node } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       <text key="a" />
       <text key="b" />
@@ -13,7 +13,7 @@ export const input = (
       <text key="c" />
       <text key="d" />
     </element>
-  </value>
+  </editor>
 )
 
 export const test = value => {
@@ -22,7 +22,7 @@ export const test = value => {
 
 export const output = [
   [
-    <value>
+    <editor>
       <element>
         <text key="a" />
         <text key="b" />
@@ -31,7 +31,7 @@ export const output = [
         <text key="c" />
         <text key="d" />
       </element>
-    </value>,
+    </editor>,
     [],
   ],
   [

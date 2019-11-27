@@ -3,7 +3,7 @@
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       <element>
         wo
@@ -11,7 +11,7 @@ export const input = (
         rd
       </element>
     </element>
-  </value>
+  </editor>
 )
 
 export const output = {

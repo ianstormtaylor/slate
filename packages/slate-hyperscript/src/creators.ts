@@ -6,7 +6,8 @@ import {
   Path,
   Range,
   Text,
-  Value,
+  Editor,
+  createEditor as makeEditor,
 } from 'slate'
 import {
   AnchorToken,
@@ -253,14 +254,14 @@ export function createText(
 }
 
 /**
- * Create a top-level `Value` object.
+ * Create a top-level `Editor` object.
  */
 
-export function createValue(
+export function createEditor(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-) {
+): Editor {
   const otherChildren: any[] = []
   let selectionChild: Range | undefined
 
@@ -273,17 +274,14 @@ export function createValue(
   }
 
   const descendants = resolveDescendants(otherChildren)
-  const value: Value = {
-    children: descendants,
-    selection: null,
-    ...attributes,
-  }
-
   const selection: Partial<Range> = {}
+  const editor = makeEditor()
+  Object.assign(editor, attributes)
+  editor.children = descendants
 
   // Search the document's texts to see if any of them have tokens associated
   // that need incorporated into the selection.
-  for (const [node, path] of Node.texts(value)) {
+  for (const [node, path] of Node.texts(editor)) {
     const anchor = getAnchorOffset(node)
     const focus = getFocusOffset(node)
 
@@ -311,10 +309,10 @@ export function createValue(
   }
 
   if (selectionChild != null) {
-    value.selection = selectionChild
+    editor.selection = selectionChild
   } else if (Range.isRange(selection)) {
-    value.selection = selection
+    editor.selection = selection
   }
 
-  return value
+  return editor
 }

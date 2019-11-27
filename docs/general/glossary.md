@@ -112,10 +112,6 @@ To "unwrap" is the opposite of to ["wrap"](#wrap), removing a surrounding node f
 
 ### Validate
 
-### Value
-
-A Slate "value" is the top-level object in Slate and is an object encapsulating the content of a Slate editor.
-
 ### Wrap
 
 To "wrap" is to surround a piece of text or a node in another node. For example, if you select the text `Google` and want to turn it into a link, you'd "wrap" it with an inline link node.

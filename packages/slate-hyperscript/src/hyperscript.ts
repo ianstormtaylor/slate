@@ -3,13 +3,13 @@ import { Element, Mark } from 'slate'
 import {
   createAnchor,
   createCursor,
+  createEditor,
   createElement,
   createFocus,
   createFragment,
   createMark,
   createSelection,
   createText,
-  createValue,
 } from './creators'
 
 /**
@@ -19,13 +19,13 @@ import {
 const DEFAULT_CREATORS = {
   anchor: createAnchor,
   cursor: createCursor,
+  editor: createEditor,
   element: createElement,
   focus: createFocus,
   fragment: createFragment,
   mark: createMark,
   selection: createSelection,
   text: createText,
-  value: createValue,
 }
 
 /**

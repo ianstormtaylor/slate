@@ -8,7 +8,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>one</block>
     <block>
       <anchor />
@@ -18,18 +18,18 @@ export const input = (
       <focus />
       three
     </block>
-  </value>
+  </editor>
 )
 
 // TODO: the selection is wrong here
 export const output = (
-  <value>
+  <editor>
     <block>one</block>
     <block>
       <cursor />
     </block>
     <block>three</block>
-  </value>
+  </editor>
 )
 
 export const skip = true

@@ -1,4 +1,4 @@
-import { Mark, Node, Path, Range, Value } from '..'
+import { Mark, Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
 type AddMarkOperation = {
@@ -97,13 +97,6 @@ type SetSelectionOperation =
       newProperties: null
     }
 
-type SetValueOperation = {
-  type: 'set_value'
-  properties: Partial<Value>
-  newProperties: Partial<Value>
-  [key: string]: any
-}
-
 type SplitNodeOperation = {
   type: 'split_node'
   path: Path
@@ -125,7 +118,6 @@ type Operation =
   | MarkOperation
   | SelectionOperation
   | TextOperation
-  | ValueOperation
 
 type NodeOperation =
   | InsertNodeOperation
@@ -140,8 +132,6 @@ type MarkOperation = AddMarkOperation | RemoveMarkOperation | SetMarkOperation
 type SelectionOperation = SetSelectionOperation
 
 type TextOperation = InsertTextOperation | RemoveTextOperation
-
-type ValueOperation = SetValueOperation
 
 const Operation = {
   /**
@@ -289,14 +279,6 @@ const Operation = {
   },
 
   /**
-   * Check of a value is a `ValueOperation` object.
-   */
-
-  isValueOperation(value: any): value is ValueOperation {
-    return Operation.isOperation(value) && value.type.endsWith('_value')
-  },
-
-  /**
    * Invert an operation, returning a new operation that will exactly undo the
    * original when applied.
    */
@@ -348,8 +330,7 @@ const Operation = {
       }
 
       case 'set_mark':
-      case 'set_node':
-      case 'set_value': {
+      case 'set_node': {
         const { properties, newProperties } = op
         return { ...op, properties: newProperties, newProperties: properties }
       }
@@ -393,7 +374,6 @@ export {
   SetMarkOperation,
   SetNodeOperation,
   SetSelectionOperation,
-  SetValueOperation,
   SplitNodeOperation,
   Operation,
 }

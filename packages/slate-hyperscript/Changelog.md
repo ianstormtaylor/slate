@@ -94,7 +94,7 @@ Similarly, these are no longer equivalent either:
 
 This allows you to much more easily test invalid states and transition states. However, it means that you need to be more explicit in the "normal" states than previously.
 
-**The `<text>` and `<mark>` creators now return useful objects.** This is a related change that makes the library more useful. Previously you could expect to receive a `value` from the `<value>` creator, but the others were less consistent. For example, the `<text>` creator would actually return an array, instead of the `Text` node that you expect.
+**The `<text>` and `<mark>` creators now return useful objects.** This is a related change that makes the library more useful. Previously you could expect to receive a `value` from the `<editor>` creator, but the others were less consistent. For example, the `<text>` creator would actually return an array, instead of the `Text` node that you expect.
 
 ```js
 // Previously you had to do...
@@ -120,7 +120,7 @@ Similarly, the `mark` creator used to return a `Text` node. Now it returns a lis
 
 ###### NEW
 
-**Introducing the `schema` option.** You can now pass in a `schema` option to the `createHyperscript` factory, which will ensure that schema rules are bound whenever you use the `<value>` tag. This is helpful for defining atomicity of decorations, or the voidness of nodes in the future.
+**Introducing the `schema` option.** You can now pass in a `schema` option to the `createHyperscript` factory, which will ensure that schema rules are bound whenever you use the `<editor>` tag. This is helpful for defining atomicity of decorations, or the voidness of nodes in the future.
 
 ###### BREAKING
 
@@ -191,7 +191,7 @@ const selection = (
 
 ###### DEPRECATED
 
-**The `<state>` tag has been renamed to `<value>`.** This is to stay in line with the newest version of Slate where the `State` object was renamed to `Value`.
+**The `<state>` tag has been renamed to `<editor>`.** This is to stay in line with the newest version of Slate where the `State` object was renamed to `Value`.
 
 ---
 

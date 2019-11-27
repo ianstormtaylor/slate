@@ -5,7 +5,7 @@ import { NodeError } from './errors'
 import { checkNode, checkAncestor } from './checkers'
 
 /**
- * The `withSchema` plugin augments an editor to ensure that its value is
+ * The `withSchema` plugin augments an editor to ensure that its content is
  * normalized to always obey a schema after operations are applied.
  */
 

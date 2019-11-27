@@ -8,7 +8,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <block>
         on
@@ -16,7 +16,7 @@ export const input = (
       </block>
       <block>two</block>
     </block>
-  </value>
+  </editor>
 )
 
 export const output = input

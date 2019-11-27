@@ -3,19 +3,19 @@
 import { Editor } from 'slate'
 import { jsx } from '../../..'
 
-export const input = <value />
+export const input = <editor />
 
 export const run = editor => {
   Editor.insertNodes(editor, <block>one</block>)
 }
 
 export const output = (
-  <value>
+  <editor>
     <block>
       one
       <cursor />
     </block>
-  </value>
+  </editor>
 )
 
 export const skip = true

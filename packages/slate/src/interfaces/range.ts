@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
-import { Operation, Path, Point } from '..'
+import { Operation, Path, Point, PointEntry } from '..'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -200,6 +200,15 @@ export const Range = {
     }
 
     return true
+  },
+
+  /**
+   * Iterate through all of the point entries in a range.
+   */
+
+  *points(range: Range): Iterable<PointEntry> {
+    yield [range.anchor, 'anchor']
+    yield [range.focus, 'focus']
   },
 
   /**

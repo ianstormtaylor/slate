@@ -153,7 +153,8 @@ export const Point = {
 }
 
 /**
- * `PointKey` is either an "anchor" or "focus" point string.
+ * `PointEntry` objects are returned when iterating over `Point` objects that
+ * belong to a range.
  */
 
-export type PointKey = 'anchor' | 'focus'
+export type PointEntry = [Point, 'anchor' | 'focus']

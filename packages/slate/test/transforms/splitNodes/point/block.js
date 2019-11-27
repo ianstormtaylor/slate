@@ -11,16 +11,16 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <text>word</text>
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>wo</block>
     <block>rd</block>
-  </value>
+  </editor>
 )

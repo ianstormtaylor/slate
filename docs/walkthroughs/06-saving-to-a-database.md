@@ -7,33 +7,27 @@ In this guide, we'll show you how to add logic to save your Slate content to a d
 Let's start with a basic editor:
 
 ```js
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 import { createEditor } from 'slate'
-import { Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const defaultValue = [
+  {
+    children: [
+      {
+        text: 'A line of text in a paragraph.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(initialValue)
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable />
+    </Slate>
   )
 }
 ```
@@ -42,40 +36,34 @@ That will render a basic Slate editor on your page, and when you type things wil
 
 What we need to do is save the changes you make somewhere. For this example, we'll just be using [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), but it will give you an idea for where you'd need to add your own database hooks.
 
-So, in our `onChange` handler, we need to save the `value`. But the `value` argument that `onChange` receives is a JSON object with stateful properties like `selection`, so we can't just save it as-is. We need to turn it into a string, and only store what we need—in this case `value.children`.
+So, in our `onChange` handler, we need to save the `value`:
 
 ```js
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const defaultValue = [
+  {
+    children: [
+      {
+        text: 'A line of text in a paragraph.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(initialValue)
   return (
-    <Editable
+    <Slate
       editor={editor}
-      value={value}
-      onChange={newValue => {
+      defaultValue={defaultValue}
+      onChange={value => {
         // Save the value to Local Storage.
-        const { children } = value
-        const content = JSON.stringify(children)
+        const content = JSON.stringify(value)
         localStorage.setItem('content', content)
-
-        // Continue calling `setValue` so that the editor updates on screen.
-        setValue(newValue)
       }}
-    />
+    >
+      <Editable />
+    </Slate>
   )
 }
 ```
@@ -86,95 +74,49 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```js
 // Update the initial content to be pulled from Local Storage if it exists.
-const existingContent = JSON.parse(localStorage.getItem('content'))
-const initialValue = {
-  selection: null,
-  children: existingContent || [
-    {
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const existingValue = JSON.parse(localStorage.getItem('content'))
+const defaultValue = existingValue || [
+  {
+    children: [
+      {
+        text: 'A line of text in a paragraph.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(initialValue)
   return (
-    <Editable
+    <Slate
       editor={editor}
-      value={value}
-      onChange={newValue => {
-        const { children } = value
-        const content = JSON.stringify(children)
+      defaultValue={defaultValue}
+      onChange={value => {
+        const content = JSON.stringify(value)
         localStorage.setItem('content', content)
-        setValue(newValue)
       }}
-    />
+    >
+      <Editable />
+    </Slate>
   )
 }
 ```
 
 Now you should be able to save changes across refreshes!
 
-However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage, this doesn't really matter, but if you're saving things to a database via HTTP request, this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
-
-```js
-const existingContent = JSON.parse(localStorage.getItem('content'))
-const initialValue = {
-  selection: null,
-  children: existingContent || [
-    {
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
-
-const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(initialValue)
-  return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => {
-        // Check to see if the content has changed before saving.
-        if (newValue.children !== value.children) {
-          const { children } = value
-          const content = JSON.stringify(children)
-          localStorage.setItem('content', content)
-        }
-
-        setValue(newValue)
-      }}
-    />
-  )
-}
-```
-
-Now your content will be saved only when the content itself changes!
-
 Success—you've got JSON in your database.
 
 But what if you want something other than JSON? Well, you'd need to serialize your value differently. For example, if you want to save your content as plain text instead of JSON, we can write some logic to serialize and deserialize plain text values:
 
 ```js
-// Import the `Node` utilities from Slate.
+// Import the `Node` helper interface from Slate.
 import { Node } from 'slate'
 
-// Define a serializing function that takes a value object and returns a string.
+// Define a serializing function that takes a value and returns a string.
 const serialize = value => {
   return (
-    value.children
+    value
       // Return the text content of each paragraph in the value's children.
       .map(n => Node.text(n))
       // Join them all with line breaks denoting paragraphs.
@@ -184,35 +126,32 @@ const serialize = value => {
 
 // Define a deserializing function that takes a string and returns a value.
 const deserialize = string => {
-  // Return a value JSON object with children derived by splitting the string.
-  return {
-    selection: null,
-    children: string.split('\n').map(line => {
-      return {
-        children: [{ text: line, marks: [] }],
-      }
-    }),
-  }
+  // Return a value array of children derived by splitting the string.
+  return string.split('\n').map(line => {
+    return {
+      children: [{ text: line, marks: [] }],
+    }
+  })
 }
 
 // Use our deserializing function to read the data from Local Storage.
-const existingContent = localStorage.getItem('content')
-const initialValue = deserialize(existingContent || '')
+const existingValue = localStorage.getItem('content')
+const initialValue = deserialize(existingValue || '')
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(initialValue)
   return (
-    <Editable
+    <Slate
       editor={editor}
-      value={value}
-      onChange={newValue => {
+      defaultValue={defaultValue}
+      onChange={value => {
         // Serialize the value and save the string value to Local Storage.
         const content = serialize(newValue)
         localStorage.setItem('content', content)
-        setValue(newValue)
       }}
-    />
+    >
+      <Editable />
+    </Slate>
   )
 }
 ```

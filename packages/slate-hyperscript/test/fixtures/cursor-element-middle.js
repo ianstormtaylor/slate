@@ -3,12 +3,12 @@
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       o<cursor />
       ne
     </element>
-  </value>
+  </editor>
 )
 
 export const output = {

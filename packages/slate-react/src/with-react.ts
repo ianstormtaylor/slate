@@ -3,13 +3,14 @@ import { Editor, Node, Path, Operation, Command } from 'slate'
 import { ReactEditor, ReactCommand } from '.'
 import { Key } from './utils/key'
 import { NODE_TO_KEY } from './utils/weak-maps'
+import { EDITOR_TO_CONTEXT_LISTENER } from './hooks/use-slate'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
  */
 
 export const withReact = (editor: Editor): Editor => {
-  const { apply, exec } = editor
+  const { apply, exec, onChange } = editor
 
   editor.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
@@ -87,6 +88,16 @@ export const withReact = (editor: Editor): Editor => {
     } else {
       exec(command)
     }
+  }
+
+  editor.onChange = (children: Node[], operations: Operation[]) => {
+    const contextOnChange = EDITOR_TO_CONTEXT_LISTENER.get(editor)
+
+    if (contextOnChange) {
+      contextOnChange(children, operations)
+    }
+
+    onChange(children, operations)
   }
 
   return editor

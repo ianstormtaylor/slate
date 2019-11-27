@@ -4,13 +4,13 @@ import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>one</block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {
-  const block = editor.value.children[0]
+  const block = editor.children[0]
   return Editor.hasTexts(editor, block)
 }
 

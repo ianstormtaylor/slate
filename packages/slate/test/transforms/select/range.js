@@ -17,20 +17,20 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <cursor />
       one
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       <anchor />
       one
       <focus />
     </block>
-  </value>
+  </editor>
 )

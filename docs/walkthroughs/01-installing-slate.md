@@ -22,75 +22,96 @@ Slate exposes a set of modules that you'll use to build your editor. The most im
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
-// Import the Slate editable component and React plugin.
-import { Editable, withReact } from 'slate-react'
+// Import the Slate components and React plugin.
+import { Slate, Editable, withReact } from 'slate-react'
 ```
 
-The `<Editable>` component acts like `contenteditable`.
+Before we use those imports, let's start with an empty `<App>` component:
 
-In addition to rendering the editable, you need to give Slate a "initial value" to render as content. That value is just plain JSON, and we'll set an initial one that contains a single paragraph block with some text in it:
-
-```js
-// Create our initial value...
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
-```
-
-And now that we've created our initial value, we define our `<App>`, initialize a new `Editor` instance and pass it into Slate's `<Editable>` component, like so:
-
-```js
-import React, { useState, useMemo } from 'react'
-import { createEditor } from 'slate'
-import { Editable, withReact } from 'slate-react'
-
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      type: 'paragraph',
-      children: [
-        {
-          text: 'A line of text in a paragraph.',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
-
+```jsx
 // Define our app...
 const App = () => {
-  // Set the initial value when the app is first constructed.
-  const [value, setValue] = useState(initialValue)
+  return null
+}
+```
 
+The next step is to create a new `Editor` object. We want the editor to be stable across renders, so we use the `useMemo` hook:
+
+```jsx
+const App = () => {
   // Create a Slate editor object that won't change across renders.
   const editor = useMemo(() => withReact(createEditor()), [])
+  return null
+}
+```
 
-  // Render the editable component.
+Of course we haven't rendered anything, so you won't see any changes.
+
+Next up is to render a `<Slate>` context provider.
+
+The provider component leeps track of your Slate editor, it's plugins, it's default value, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
+
+```jsx
+const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
+  // Render the Slate editor context.
+  return <Slate editor={editor} />
+}
+```
+
+You can think of the `<Slate>` component as provided an "un-controlled" editor context to every component underneath it.
+
+This is a slightly different mental model than things like `<input>` or `<textarea>`, because rich-text documents are more complex. You'll often want to include toolbars, or live previews, or other complex components next to your editable content.
+
+By having a shared context, those other components can execute commands, query the editor's state, etc.
+
+Okay, so the next step is to render the `<Editable>` component itself:
+
+```jsx
+const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-    />
+    // Add the editable component inside the context.
+    <Slate editor={editor}>
+      <Editable />
+    </Slate>
   )
 }
 ```
 
-You'll notice that the `onChange` handler passed into the `<Editable>` component just updates the app's state with the newest changed value. That way, when it re-renders the editor, the new value is reflected with your changes.
+The `<Editable>` component acts like `contenteditable`. Anywhere you render it will render an editable rich-text document for the nearest editor context.
 
-And that's it!
+There's only last step. So far we haven't defined what the default value of the editor is, so it's empty. Let's fix that by defining an initial value.
+
+The value is just plain JSON. Here's one contains a single paragraph block with some text in it:
+
+```js
+// Create our default value...
+const defaultValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text: 'A line of text in a paragraph.',
+        marks: [],
+      },
+    ],
+  },
+]
+
+const App = () => {
+  const editor = useMemo(() => withReact(createEditor()), [])
+  return (
+    // Add the default value as a prop to the editor context.
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable />
+    </Slate>
+  )
+}
+```
+
+There you have it!
 
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
+
+You'll notice that there is no `onChange` handler defined. That's because the `<Slate>` context acts like an **un-controlled** component, with the changes automatically being propogated to any context consumers. However, just like with un-controlled components you can attach an `onChange` prop to listen for changes. We'll cover that later.

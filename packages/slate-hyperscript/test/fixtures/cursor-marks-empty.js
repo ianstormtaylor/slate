@@ -3,11 +3,11 @@
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       <cursor marks={[]} />
     </element>
-  </value>
+  </editor>
 )
 
 export const output = {

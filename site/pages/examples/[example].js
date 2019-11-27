@@ -11,7 +11,7 @@ import { Icon } from '../../components'
 import CheckLists from '../../examples/check-lists'
 import Embeds from '../../examples/embeds'
 import ForcedLayout from '../../examples/forced-layout'
-import HoveringMenu from '../../examples/hovering-menu'
+import HoveringToolbar from '../../examples/hovering-toolbar'
 import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
 import Links from '../../examples/links'
@@ -29,7 +29,7 @@ const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
   ['Embeds', Embeds, 'embeds'],
   ['Forced Layout', ForcedLayout, 'forced-layout'],
-  ['Hovering Menu', HoveringMenu, 'hovering-menu'],
+  ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
   ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
   ['Links', Links, 'links'],

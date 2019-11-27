@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useMemo } from 'react'
-import { Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 import { Text, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
@@ -7,7 +7,6 @@ import { withHistory } from 'slate-history'
 import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState(initialValue)
   const [search, setSearch] = useState()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -38,7 +37,7 @@ const SearchHighlightingExample = () => {
   )
 
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
         <div
           className={css`
@@ -67,14 +66,11 @@ const SearchHighlightingExample = () => {
         </div>
       </Toolbar>
       <Editable
-        editor={editor}
-        value={value}
         decorate={decorate}
         renderDecoration={props => <Decoration {...props} />}
         renderMark={props => <Mark {...props} />}
-        onChange={v => setValue(v)}
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -96,35 +92,32 @@ const Mark = ({ attributes, children, mark }) => {
   }
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text:
-            'This is editable text that you can search. As you search, it looks for matching strings of text, and adds ',
-          marks: [],
-        },
-        {
-          text: 'decorations',
-          marks: [{ type: 'bold' }],
-        },
-        {
-          text: ' to them in realtime.',
-          marks: [],
-        },
-      ],
-    },
-    {
-      children: [
-        {
-          text: 'Try it out for yourself by typing in the search box above!',
-          marks: [],
-        },
-      ],
-    },
-  ],
-}
+const initialValue = [
+  {
+    children: [
+      {
+        text:
+          'This is editable text that you can search. As you search, it looks for matching strings of text, and adds ',
+        marks: [],
+      },
+      {
+        text: 'decorations',
+        marks: [{ type: 'bold' }],
+      },
+      {
+        text: ' to them in realtime.',
+        marks: [],
+      },
+    ],
+  },
+  {
+    children: [
+      {
+        text: 'Try it out for yourself by typing in the search box above!',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default SearchHighlightingExample

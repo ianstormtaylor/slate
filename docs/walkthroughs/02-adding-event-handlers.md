@@ -10,14 +10,11 @@ Here's our app from earlier:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable />
+    </Slate>
   )
 }
 ```
@@ -26,18 +23,16 @@ Now we add an `onKeyDown` handler:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-      // Define a new handler which prints the key that was pressed.
-      onKeyDown={event => {
-        console.log(event.key)
-      }}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        // Define a new handler which prints the key that was pressed.
+        onKeyDown={event => {
+          console.log(event.key)
+        }}
+      />
+    </Slate>
   )
 }
 ```
@@ -50,22 +45,20 @@ Our `onKeyDown` handler might look like this:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      onChange={newValue => setValue(newValue)}
-      onKeyDown={event => {
-        if (event.key === '&') {
-          // Prevent the ampersand character from being inserted.
-          event.preventDefault()
-          // Execute a command to insert text when the event occurs.
-          editor.exec({ type: 'insert_text', text: 'and' })
-        }
-      }}
-    />
+    <Slate editor={editor} defaultValue={defaultValue}>
+      <Editable
+        onKeyDown={event => {
+          if (event.key === '&') {
+            // Prevent the ampersand character from being inserted.
+            event.preventDefault()
+            // Execute a command to insert text when the event occurs.
+            editor.exec({ type: 'insert_text', text: 'and' })
+          }
+        }}
+      />
+    </Slate>
   )
 }
 ```

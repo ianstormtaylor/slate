@@ -13,17 +13,17 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       word
       <cursor />
     </block>
-  </value>
+  </editor>
 )
 
 // TODO: this cursor placement seems off
 export const output = (
-  <value>
+  <editor>
     <block>
       word
       <inline>
@@ -32,5 +32,5 @@ export const output = (
       </inline>
       <text />
     </block>
-  </value>
+  </editor>
 )

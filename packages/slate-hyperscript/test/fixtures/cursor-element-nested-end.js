@@ -3,14 +3,14 @@
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
+  <editor>
     <element>
       <element>
         word
         <cursor />
       </element>
     </element>
-  </value>
+  </editor>
 )
 
 export const output = {

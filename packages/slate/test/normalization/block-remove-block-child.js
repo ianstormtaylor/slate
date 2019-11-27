@@ -5,18 +5,18 @@ import { jsx } from '..'
 export const schema = {}
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <text>one</text>
       <block>two</block>
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       <text>one</text>
     </block>
-  </value>
+  </editor>
 )

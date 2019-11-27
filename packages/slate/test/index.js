@@ -1,6 +1,6 @@
 import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
-import { Editor, createEditor } from 'slate'
+import { Editor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
 
 describe('slate', () => {
@@ -12,8 +12,7 @@ describe('slate', () => {
 
   fixtures(__dirname, 'operations', ({ module }) => {
     const { input, operations, output } = module
-    const editor = withTest(createEditor())
-    editor.value = input
+    const editor = withTest(input)
 
     Editor.withoutNormalizing(editor, () => {
       for (const op of operations) {
@@ -21,31 +20,28 @@ describe('slate', () => {
       }
     })
 
-    assert.deepEqual(editor.value, output)
+    assert.deepEqual(editor.children, output.children)
   })
 
   fixtures(__dirname, 'normalization', ({ module }) => {
     const { input, output } = module
-    const editor = withTest(createEditor())
-    editor.value = input
+    const editor = withTest(input)
     Editor.normalize(editor, { force: true })
-    assert.deepEqual(editor.value, output)
+    assert.deepEqual(editor.children, output.children)
   })
 
   fixtures(__dirname, 'queries', ({ module }) => {
     const { input, run, output } = module
-    const editor = withTest(createEditor())
-    editor.value = input
+    const editor = withTest(input)
     const result = run(editor)
     assert.deepEqual(result, output)
   })
 
   fixtures(__dirname, 'transforms', ({ module }) => {
     const { input, run, output } = module
-    const editor = withTest(createEditor())
-    editor.value = input
+    const editor = withTest(input)
     run(editor)
-    assert.deepEqual(editor.value, output)
+    assert.deepEqual(editor.children, output.children)
   })
 })
 

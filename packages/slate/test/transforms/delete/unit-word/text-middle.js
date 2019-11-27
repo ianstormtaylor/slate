@@ -8,18 +8,18 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       o<cursor />
       ne two three
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       o<cursor /> two three
     </block>
-  </value>
+  </editor>
 )

@@ -8,22 +8,22 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <text />
       <inline>word</inline>
       <cursor />
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       <text />
       <inline>word</inline>
       fragment
       <cursor />
     </block>
-  </value>
+  </editor>
 )

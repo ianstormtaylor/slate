@@ -16,12 +16,12 @@ export const schema = [
 ]
 
 export const input = (
-  <value>
+  <editor>
     <element a>
       <element b>one</element>
       <element b>one</element>
     </element>
-  </value>
+  </editor>
 )
 
 export const output = input

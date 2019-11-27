@@ -10,12 +10,10 @@ For example if you wanted to render custom element components, you'd pass in the
 
 ```jsx
 import { createEditor } from 'slate'
-import { Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 
 const MyEditor = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(editor.value)
-
   const renderElement = useCallback(({ attributes, children, element }) => {
     switch (element.type) {
       case 'quote':
@@ -32,12 +30,9 @@ const MyEditor = () => {
   }, [])
 
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={newValue => setValue(newValue)}
-    />
+    <Slate editor={editor}>
+      <Editable renderElement={renderElement} />
+    </Slate>
   )
 }
 ```
@@ -76,25 +71,32 @@ const renderMark = useCallback(({ attributes, children, mark }) => {
 
 ## Toolbars, Menus, Overlays, and more!
 
-In addition to controlling the rendering of elements and marks inside Slate, you can also pass the `editor` object to other components so that they can execute commands, query the editor state, or anything else.
+In addition to controlling the rendering of elements and marks inside Slate, you can also retrieve the current editor context from inside other components using the `useSlate` hook.
 
-A common use case for this is rendering a toolbar with formatting buttons:
+That way other components can execute commands, query the editor state, or anything else.
+
+A common use case for this is rendering a toolbar with formatting buttons that are highlighted based on the current selection:
 
 ```jsx
 const MyEditor = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState(editor.value)
   return (
-    <React.Fragment>
-      <Toolbar editor={editor} />
-      <Editable
-        editor={editor}
-        value={value}
-        onChange={newValue => setValue(newValue)}
-      />
-    </React.Fragment>
+    <Slate editor={editor}>
+      <Toolbar />
+      <Editable />
+    </Slate>
+  )
+}
+
+const Toolbar = () => {
+  const editor = useSlate()
+  return (
+    <div>
+      <Button active={isBoldActive(editor)}>B</Button>
+      <Button active={isItalicActive(editor)}>B</Button>
+    </div>
   )
 }
 ```
 
-All your editor-aware components need to do is accept the `editor`. They can retrieve the document, selection, etc. via the `editor.value` property.
+Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will will re-render whenever the editor changes, so that the active state of the buttons stays in sync.

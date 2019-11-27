@@ -9,16 +9,21 @@ interface Editor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: (value: Value, operations: Operation[]) => void
+  onChange: (children: Node[], operations: Operation[]) => void
+  children: Node[]
   operations: Operation[]
-  value: Value
+  selection: Range | null
   [key: string]: any
 }
 ```
 
 Slightly more complex than the others, because it contains all of the top-level functions that define your custom, domain-specific behaviors.
 
-But as for the data, it's just the two properties: `value` which contains the state of your editor, and `operations` which contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
+The `children` property contains the document tree of nodes that make up the editor's content.
+
+The `selection` property contains the user's current selection, if any.
+
+And the `operations` property contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
 
 ## Overriding Behaviors
 

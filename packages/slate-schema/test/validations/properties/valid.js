@@ -15,11 +15,11 @@ export const schema = [
 ]
 
 export const input = (
-  <value>
+  <editor>
     <element a thing="valid">
       word
     </element>
-  </value>
+  </editor>
 )
 
 export const output = input

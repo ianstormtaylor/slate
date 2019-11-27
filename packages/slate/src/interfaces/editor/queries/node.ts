@@ -1,12 +1,4 @@
-import {
-  Editor,
-  Element,
-  Node,
-  NodeEntry,
-  NodeMatch,
-  Text,
-  Value,
-} from '../../..'
+import { Editor, Element, Node, NodeEntry, NodeMatch, Text } from '../../..'
 
 export const NodeQueries = {
   /**
@@ -30,8 +22,8 @@ export const NodeQueries = {
     switch (match) {
       case 'text':
         return Text.isText(node)
-      case 'value':
-        return Value.isValue(node)
+      case 'editor':
+        return Editor.isEditor(node)
       case 'element':
         return Element.isElement(node)
       case 'inline':

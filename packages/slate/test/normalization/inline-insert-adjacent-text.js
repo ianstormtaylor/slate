@@ -3,16 +3,16 @@
 import { jsx } from '..'
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <inline>one</inline>
       <inline>two</inline>
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       <text />
       <inline>one</inline>
@@ -20,5 +20,5 @@ export const output = (
       <inline>two</inline>
       <text />
     </block>
-  </value>
+  </editor>
 )

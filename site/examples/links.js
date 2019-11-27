@@ -1,40 +1,26 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import isUrl from 'is-url'
-import { Editable, withReact } from 'slate-react'
-import { Editor, Range, createEditor } from 'slate'
+import { Slate, Editable, withReact, useSlate } from 'slate-react'
+import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
   )
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
-        <Button
-          active={isLinkActive(editor)}
-          onMouseDown={event => {
-            event.preventDefault()
-            const url = window.prompt('Enter the URL of the link:')
-            if (!url) return
-            editor.exec({ type: 'insert_link', url })
-          }}
-        >
-          <Icon>link</Icon>
-        </Button>
+        <LinkButton />
       </Toolbar>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={props => <Element {...props} />}
-        onChange={v => setValue(v)}
         placeholder="Enter some text..."
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -49,7 +35,7 @@ const withLinks = editor => {
     if (command.type === 'insert_link') {
       const { url } = command
 
-      if (editor.value.selection) {
+      if (editor.selection) {
         wrapLink(editor, url)
       }
 
@@ -75,7 +61,7 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  const { selection } = editor.value
+  const { selection } = editor
   return !!(selection && Editor.match(editor, selection, { type: 'link' }))
 }
 
@@ -106,42 +92,55 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text:
-            'In addition to block nodes, you can create inline nodes, like ',
-          marks: [],
-        },
-        {
-          type: 'link',
-          url: 'https://en.wikipedia.org/wiki/Hypertext',
-          children: [
-            {
-              text: 'hyperlinks',
-              marks: [],
-            },
-          ],
-        },
-        {
-          text: '!',
-          marks: [],
-        },
-      ],
-    },
-    {
-      children: [
-        {
-          text:
-            'This example shows hyperlinks in action. It features two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected.',
-          marks: [],
-        },
-      ],
-    },
-  ],
+const LinkButton = () => {
+  const editor = useSlate()
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        event.preventDefault()
+        const url = window.prompt('Enter the URL of the link:')
+        if (!url) return
+        editor.exec({ type: 'insert_link', url })
+      }}
+    >
+      <Icon>link</Icon>
+    </Button>
+  )
 }
+
+const initialValue = [
+  {
+    children: [
+      {
+        text: 'In addition to block nodes, you can create inline nodes, like ',
+        marks: [],
+      },
+      {
+        type: 'link',
+        url: 'https://en.wikipedia.org/wiki/Hypertext',
+        children: [
+          {
+            text: 'hyperlinks',
+            marks: [],
+          },
+        ],
+      },
+      {
+        text: '!',
+        marks: [],
+      },
+    ],
+  },
+  {
+    children: [
+      {
+        text:
+          'This example shows hyperlinks in action. It features two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 export default LinkExample

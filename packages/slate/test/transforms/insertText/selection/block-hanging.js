@@ -8,7 +8,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <anchor />
       one
@@ -17,17 +17,17 @@ export const input = (
       <focus />
       two
     </block>
-  </value>
+  </editor>
 )
 
 // TODO: the hanging selection here isn't right
 export const output = (
-  <value>
+  <editor>
     <block>
       a<cursor />
     </block>
     <block>two</block>
-  </value>
+  </editor>
 )
 
 export const skip = true

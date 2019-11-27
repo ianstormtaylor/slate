@@ -49,7 +49,6 @@ const Children = (props: {
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
     const decs = decorate([n, p])
-    const anns = {}
 
     for (const dec of decorations) {
       const d = Range.intersection(dec, range)

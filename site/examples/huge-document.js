@@ -1,42 +1,32 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import faker from 'faker'
 import { createEditor } from 'slate'
-import { Editable, withReact } from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
-const children = []
-const initialValue = {
-  selection: null,
-  children,
-}
+const initialValue = []
 
 for (let h = 0; h < HEADINGS; h++) {
-  children.push({
+  initialValue.push({
     type: 'heading',
     children: [{ text: faker.lorem.sentence(), marks: [] }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
-    children.push({
+    initialValue.push({
       children: [{ text: faker.lorem.paragraph(), marks: [] }],
     })
   }
 }
 
 const HugeDocumentExample = () => {
-  const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Editable
-      editor={editor}
-      value={value}
-      renderElement={renderElement}
-      onChange={v => setValue(v)}
-      spellCheck
-      autoFocus
-    />
+    <Slate editor={editor} defaultValue={initialValue}>
+      <Editable renderElement={renderElement} spellCheck autoFocus />
+    </Slate>
   )
 }
 

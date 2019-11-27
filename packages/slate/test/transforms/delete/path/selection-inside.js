@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>one</block>
     <block>
       <text>
@@ -12,7 +12,7 @@ export const input = (
         wo
       </text>
     </block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {
@@ -20,7 +20,7 @@ export const run = editor => {
 }
 
 export const output = (
-  <value>
+  <editor>
     <block>
       one
       <cursor />
@@ -28,5 +28,5 @@ export const output = (
     <block>
       <text />
     </block>
-  </value>
+  </editor>
 )

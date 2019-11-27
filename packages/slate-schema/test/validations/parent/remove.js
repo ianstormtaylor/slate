@@ -13,20 +13,20 @@ export const schema = [
 ]
 
 export const input = (
-  <value>
+  <editor>
     <element a>
       <element a>one</element>
       <element a>two</element>
       <element c>three</element>
     </element>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <element a>
       <element a>one</element>
       <element a>two</element>
     </element>
-  </value>
+  </editor>
 )

@@ -7,7 +7,6 @@ import {
   Path,
   Point,
   Range,
-  Value,
 } from '../../..'
 
 export const TextTransforms = {
@@ -27,7 +26,7 @@ export const TextTransforms = {
   ) {
     Editor.withoutNormalizing(editor, () => {
       const { reverse = false, unit = 'character', distance = 1 } = options
-      let { at = editor.value.selection, hanging = false } = options
+      let { at = editor.selection, hanging = false } = options
 
       if (!at) {
         return
@@ -128,7 +127,7 @@ export const TextTransforms = {
       }
 
       const isBlockAncestor =
-        Value.isValue(ancestor) ||
+        Editor.isEditor(ancestor) ||
         (Element.isElement(ancestor) && !editor.isInline(ancestor))
 
       if (
@@ -161,7 +160,7 @@ export const TextTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { at = editor.value.selection } = options
+      let { at = editor.selection } = options
       const { hanging = false } = options
 
       if (!fragment.length) {
@@ -337,7 +336,7 @@ export const TextTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { selection } = editor.value
+      const { selection } = editor
       let { at } = options
 
       if (!at && selection) {

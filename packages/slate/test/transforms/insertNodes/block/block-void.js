@@ -13,21 +13,21 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block void>
       text
       <cursor />
     </block>
     <block>text</block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block void>text</block>
     <block>
       <cursor />
     </block>
     <block>text</block>
-  </value>
+  </editor>
 )

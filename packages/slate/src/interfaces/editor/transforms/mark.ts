@@ -109,7 +109,7 @@ const splitLocation = (
     hanging?: boolean
   } = {}
 ): Location | undefined => {
-  let { at = editor.value.selection, hanging = false } = options
+  let { at = editor.selection, hanging = false } = options
 
   if (!at) {
     return

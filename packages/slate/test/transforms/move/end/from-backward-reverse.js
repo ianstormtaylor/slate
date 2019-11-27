@@ -8,21 +8,21 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       one <focus />
       two <anchor />
       three
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       o<anchor />
       ne <focus />
       two three
     </block>
-  </value>
+  </editor>
 )

@@ -11,19 +11,19 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <cursor />
       one
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       o<cursor />
       ne
     </block>
-  </value>
+  </editor>
 )

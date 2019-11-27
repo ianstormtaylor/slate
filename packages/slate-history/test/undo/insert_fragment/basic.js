@@ -26,7 +26,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block type="d">
       <block>
         <text>
@@ -34,7 +34,7 @@ export const input = (
         </text>
       </block>
     </block>
-  </value>
+  </editor>
 )
 
 export const output = input

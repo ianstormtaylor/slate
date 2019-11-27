@@ -8,7 +8,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       w<anchor />o<inline key="a">rd</inline>
       <text />
@@ -20,11 +20,11 @@ export const input = (
       <focus />
       her
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       w<anchor />
       ord
@@ -34,5 +34,5 @@ export const output = (
       <focus />
       her
     </block>
-  </value>
+  </editor>
 )

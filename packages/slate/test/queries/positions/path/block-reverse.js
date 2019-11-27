@@ -4,10 +4,10 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
-  <value>
+  <editor>
     <block>one</block>
     <block>two</block>
-  </value>
+  </editor>
 )
 
 export const run = editor => {

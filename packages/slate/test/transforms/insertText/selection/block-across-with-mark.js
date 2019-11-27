@@ -9,7 +9,7 @@ export const run = editor => {
 }
 
 export const input = (
-  <value>
+  <editor>
     <block>
       <mark key="a">
         <anchor />
@@ -20,16 +20,16 @@ export const input = (
       two
       <focus />
     </block>
-  </value>
+  </editor>
 )
 
 export const output = (
-  <value>
+  <editor>
     <block>
       ab
       <cursor />
     </block>
-  </value>
+  </editor>
 )
 
 export const skip = true

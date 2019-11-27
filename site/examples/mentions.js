@@ -1,12 +1,18 @@
-import React, { useState, useMemo } from 'react'
-import { Editable, withReact, useSelected, useFocused } from 'slate-react'
+import React, { useMemo } from 'react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import {
+  Slate,
+  Editable,
+  withReact,
+  useSlate,
+  useSelected,
+  useFocused,
+} from 'slate-react'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const MentionExample = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withMentions(withReact(withHistory(createEditor()))),
     []
@@ -22,24 +28,13 @@ const MentionExample = () => {
   }
 
   return (
-    <div>
+    <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
-        <Button
-          active={isMentionActive(editor)}
-          onMouseDown={event => {
-            event.preventDefault()
-            promptMention()
-          }}
-        >
-          <Icon>person_pin</Icon>
-        </Button>
+        <MentionButton />
       </Toolbar>
       <Editable
-        editor={editor}
-        value={value}
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
-        onChange={v => setValue(v)}
         onKeyDown={event => {
           if (event.key === '@') {
             event.preventDefault()
@@ -47,7 +42,7 @@ const MentionExample = () => {
           }
         }}
       />
-    </div>
+    </Slate>
   )
 }
 
@@ -80,7 +75,7 @@ const withMentions = editor => {
 }
 
 const isMentionActive = editor => {
-  const match = Editor.match(editor, editor.value.selection, {
+  const match = Editor.match(editor, editor.selection, {
     type: 'mention',
   })
   return !!match
@@ -121,37 +116,49 @@ const MentionElement = ({ attributes, children, element }) => {
   )
 }
 
-const initialValue = {
-  selection: null,
-  children: [
-    {
-      children: [
-        {
-          text: 'Try mentioning some people, like ',
-          marks: [],
-        },
-        {
-          type: 'mention',
-          id: 324,
-          children: [{ text: '', marks: [] }],
-        },
-        {
-          text: ' or ',
-          marks: [],
-        },
-        {
-          type: 'mention',
-          id: 253,
-          children: [{ text: '', marks: [] }],
-        },
-        {
-          text: '.',
-          marks: [],
-        },
-      ],
-    },
-  ],
+const MentionButton = () => {
+  const editor = useSlate()
+  return (
+    <Button
+      active={isMentionActive(editor)}
+      onMouseDown={event => {
+        event.preventDefault()
+        promptMention()
+      }}
+    >
+      <Icon>person_pin</Icon>
+    </Button>
+  )
 }
+
+const initialValue = [
+  {
+    children: [
+      {
+        text: 'Try mentioning some people, like ',
+        marks: [],
+      },
+      {
+        type: 'mention',
+        id: 324,
+        children: [{ text: '', marks: [] }],
+      },
+      {
+        text: ' or ',
+        marks: [],
+      },
+      {
+        type: 'mention',
+        id: 253,
+        children: [{ text: '', marks: [] }],
+      },
+      {
+        text: '.',
+        marks: [],
+      },
+    ],
+  },
+]
 
 const USERS = {
   1: '2-1B',
