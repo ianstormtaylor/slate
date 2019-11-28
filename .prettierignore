@@ -5,4 +5,5 @@ dist/
 lib/
 node_modules/
 package.json
+site/out/
 tmp/
