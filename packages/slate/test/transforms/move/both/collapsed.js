@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.move(editor, )
+  Editor.move(editor)
 }
 
 export const input = (

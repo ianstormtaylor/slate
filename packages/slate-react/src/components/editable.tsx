@@ -346,7 +346,6 @@ export const Editable = (props: {
           hasEditableTarget(editor, domRange.endContainer)
         ) {
           const range = ReactEditor.toSlateRange(editor, domRange)
-          console.log('selectionchange', range)
           Editor.select(editor, range)
         } else {
           Editor.deselect(editor)
@@ -355,8 +354,6 @@ export const Editable = (props: {
     }, 100),
     []
   )
-
-  console.log('render', editor.selection)
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
