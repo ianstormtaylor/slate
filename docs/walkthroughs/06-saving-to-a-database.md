@@ -146,7 +146,7 @@ const App = () => {
       defaultValue={defaultValue}
       onChange={value => {
         // Serialize the value and save the string value to Local Storage.
-        const content = serialize(newValue)
+        const content = serialize(value)
         localStorage.setItem('content', content)
       }}
     >
