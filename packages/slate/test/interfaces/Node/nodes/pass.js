@@ -18,16 +18,7 @@ export const test = value => {
 }
 
 export const output = [
-  [
-    <editor>
-      <element>
-        <element>
-          <text key="a" />
-        </element>
-      </element>
-    </editor>,
-    [],
-  ],
+  [input, []],
   [
     <element>
       <element>

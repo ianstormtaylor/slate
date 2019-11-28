@@ -15,13 +15,7 @@ export const run = editor => {
 }
 
 export const output = [
-  [
-    <editor>
-      <block>one</block>
-      <block>two</block>
-    </editor>,
-    [],
-  ],
+  [input, []],
   [<block>one</block>, [0]],
   [<text>one</text>, [0, 0]],
   [<block>two</block>, [1]],

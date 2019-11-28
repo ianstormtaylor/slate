@@ -15,10 +15,4 @@ export const test = value => {
   return Node.get(value, [])
 }
 
-export const output = (
-  <editor>
-    <element>
-      <text />
-    </element>
-  </editor>
-)
+export const output = input

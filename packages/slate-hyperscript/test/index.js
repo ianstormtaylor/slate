@@ -5,6 +5,16 @@ import { fixtures } from '../../../support/fixtures'
 describe('slate-hyperscript', () => {
   fixtures(resolve(__dirname, 'fixtures'), ({ module }) => {
     const { input, output } = module
-    assert.deepEqual(input, output)
+    let actual = {}
+
+    if (Array.isArray(output)) {
+      actual = output
+    } else {
+      for (const key in output) {
+        actual[key] = input[key]
+      }
+    }
+
+    assert.deepEqual(actual, output)
   })
 })
