@@ -32,7 +32,7 @@ Please run through this checklist for your pull request:
 
 - [ ] The new code matches the existing patterns and styles.
 - [ ] The tests pass with `yarn test`.
-- [ ] The linter passes with `yarn lint`. (Fix errors with `yarn prettier`.)
+- [ ] The linter passes with `yarn lint`. (Fix errors with `yarn fix`.)
 - [ ] The relevant examples still work. (Run examples with `yarn watch`.)
 
 #### Does this fix any issues or need any specific reviewers?
