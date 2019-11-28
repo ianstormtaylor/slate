@@ -23,6 +23,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Outline](https://www.getoutline.com/)
 - [Prezly](https://www.prezly.com/)
 - [Sanity.io](https://www.sanity.io)
+- [Slite](https://slite.com)
 - [Taskade](https://www.taskade.com/)
 - [Yuque](https://www.yuque.com/)
 - [Thoughts](https://thoughts.teambition.com)
