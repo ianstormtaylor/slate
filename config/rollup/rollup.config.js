@@ -88,7 +88,7 @@ function configure(pkg, env, target) {
       runtimeHelpers: true,
       include: [`packages/${pkg.name}/src/**`],
       extensions: ['.js', '.ts'],
-      configFile: './config/babel/babel.config.js',
+      configFile: './config/babel/babel.config.cjs',
     }),
 
     // Register Node.js globals for browserify compatibility.
