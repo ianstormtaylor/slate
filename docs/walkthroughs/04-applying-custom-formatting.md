@@ -8,7 +8,6 @@ So we start with our app from earlier:
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -67,8 +66,8 @@ const App = () => {
             return
           }
 
-          // When "`" is pressed, keep our existing code block logic.
           switch (event.key) {
+            // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
               const { selection } = editor
@@ -132,7 +131,7 @@ const App = () => {
         return <BoldMark {...props} />
       }
     }
-  })
+  }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
