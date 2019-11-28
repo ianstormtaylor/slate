@@ -40,10 +40,6 @@ Please include tests and docs with every pull request!
 
 ## Running Examples
 
-Check out the [Examples readme](https://github.com/ianstormtaylor/slate/blob/master/examples/Readme.md) to see how to get the examples running locally!
-
-## Running Tests
-
 To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
 ```
@@ -51,21 +47,23 @@ yarn install
 yarn build
 ```
 
-Then run the tests with:
+Then you can start the examples server with:
+
+```
+yarn start
+```
+
+## Running Tests
+
+Follow the examples running steps, and then run the tests with:
 
 ```
 yarn test
 ```
 
-To keep the source rebuilding on every file change, you need to run an additional watching command in a separate process:
+If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:debug`.
 
-```
-yarn watch
-```
-
-If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test debug`.
-
-If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test.
+If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. (This is a Mocha flag that gets passed through.)
 
 ## Testing Input Methods
 
