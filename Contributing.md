@@ -5,6 +5,7 @@ Want to contribute to Slate? That would be awesome!
 - [Reporting Bugs](#reporting-bugs)
 - [Asking Questions](#asking-questions)
 - [Submitting Pull Requests](#submitting-pull-requests)
+- [Repository Setup](#repository-setup)
 - [Running Examples](#running-examples)
 - [Running Tests](#running-tests)
 - [Testing Input Methods](#testing-input-methods)
@@ -38,14 +39,20 @@ All pull requests are super welcomed and greatly appreciated! Issues in need of 
 
 Please include tests and docs with every pull request!
 
-## Running Examples
+## Repository Setup
 
-To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
+The slate repository is a monorepo that is managed with [lerna](https://github.com/lerna/lerna). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
+
+To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
 ```
 yarn install
 yarn build
 ```
+
+## Running Examples
+
+To run the examples, start by building the mono repo as described in the [Repository Setup](#repository-setup) section.
 
 Then you can start the examples server with:
 
@@ -55,7 +62,9 @@ yarn start
 
 ## Running Tests
 
-Follow the examples running steps, and then run the tests with:
+To run the tests, start by building the mono repo as described in the [Repository Setup](#repository-setup) section.
+
+Then you can reun the tests with: 
 
 ```
 yarn test
