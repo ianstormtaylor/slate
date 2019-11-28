@@ -24,7 +24,7 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   IS_FOCUSED,
-  PLACEHOLDER,
+  PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import {
   CustomDecorationProps,
@@ -63,7 +63,6 @@ export const Editable = (props: {
   const ref = useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
-  PLACEHOLDER.set(editor, placeholder)
   IS_READ_ONLY.set(editor, readOnly)
 
   // Keep track of some state for the event handler logic.
@@ -348,6 +347,23 @@ export const Editable = (props: {
     }, 100),
     []
   )
+
+  const decorations = []
+
+  if (
+    placeholder &&
+    editor.children.length === 1 &&
+    Array.from(Node.texts(editor)).length === 1 &&
+    Node.text(editor) === ''
+  ) {
+    const start = Editor.start(editor, [])
+    decorations.push({
+      [PLACEHOLDER_SYMBOL]: true,
+      placeholder,
+      anchor: start,
+      focus: start,
+    })
+  }
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
@@ -701,7 +717,7 @@ export const Editable = (props: {
       >
         <Children
           decorate={decorate}
-          decorations={decorate([editor, []])}
+          decorations={decorations}
           node={editor}
           renderDecoration={renderDecoration}
           renderElement={renderElement}

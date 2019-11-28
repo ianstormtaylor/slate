@@ -10,7 +10,6 @@ import {
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
-  PLACEHOLDER,
   PLACEHOLDER_SYMBOL,
 } from './utils/weak-maps'
 import {
@@ -74,34 +73,6 @@ export const ReactEditor = {
     throw new Error(
       `Unable to find the path for Slate node: ${JSON.stringify(node)}`
     )
-  },
-
-  /**
-   * Resolve the decorations for a node.
-   */
-
-  getDecorations(editor: ReactEditor, node: Node): Range[] {
-    const placeholder = PLACEHOLDER.get(editor)
-    const decorations = []
-
-    if (
-      placeholder &&
-      Editor.isEditor(node) &&
-      node.children.length === 1 &&
-      Array.from(Node.texts(node)).length === 1 &&
-      Node.text(node) === ''
-    ) {
-      const start = Editor.start(editor, [])
-
-      decorations.push({
-        [PLACEHOLDER_SYMBOL]: true,
-        placeholder,
-        anchor: start,
-        focus: start,
-      })
-    }
-
-    return decorations
   },
 
   /**
@@ -392,9 +363,12 @@ export const ReactEditor = {
         range.setStart(textNode, 0)
         range.setEnd(nearestNode, nearestOffset)
         const contents = range.cloneContents()
-        const zeroWidths = contents.querySelectorAll('[data-slate-zero-width]')
+        const removals = [
+          ...contents.querySelectorAll('[data-slate-zero-width]'),
+          ...contents.querySelectorAll('[contenteditable=false]'),
+        ]
 
-        Array.from(zeroWidths).forEach(el => {
+        removals.forEach(el => {
           el!.parentNode!.removeChild(el)
         })
 

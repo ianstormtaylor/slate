@@ -1,9 +1,9 @@
 import React from 'react'
 import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 
-import { ReactEditor } from '..'
 import ElementComponent from './element'
 import TextComponent from './text'
+import { ReactEditor } from '..'
 import { useEditor } from '../hooks/use-editor'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
@@ -36,6 +36,7 @@ const Children = (props: {
   } = props
   const editor = useEditor()
   const path = ReactEditor.findPath(editor, node)
+  const decs = decorations.concat(decorate([node, path]))
   const children = []
   const isLeafBlock =
     Element.isElement(node) &&
@@ -48,13 +49,13 @@ const Children = (props: {
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
-    const decs = decorate([n, p])
+    const ds = decorate([n, p])
 
-    for (const dec of decorations) {
+    for (const dec of decs) {
       const d = Range.intersection(dec, range)
 
       if (d) {
-        decs.push(d)
+        ds.push(d)
       }
     }
 
@@ -62,7 +63,7 @@ const Children = (props: {
       children.push(
         <ElementComponent
           decorate={decorate}
-          decorations={decs}
+          decorations={ds}
           element={n}
           key={key.id}
           renderDecoration={renderDecoration}

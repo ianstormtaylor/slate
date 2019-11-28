@@ -83,7 +83,11 @@ const Element = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'link':
       return (
-        <a {...attributes} href={element.url}>
+        <a
+          {...attributes}
+          href={element.url}
+          style={{ border: '1px solid red', padding: '5px', margin: '5px' }}
+        >
           {children}
         </a>
       )
