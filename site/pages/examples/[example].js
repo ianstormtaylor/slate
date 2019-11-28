@@ -278,7 +278,7 @@ const ExamplePage = () => {
           <ExampleTitle>
             {name}
             <A
-              href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+              href={`https://github.com/ianstormtaylor/slate/blob/master/site/examples/${path}.js`}
             >
               (View Source)
             </A>
