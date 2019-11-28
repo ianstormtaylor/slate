@@ -1,11 +1,5 @@
 import React, { useLayoutEffect, useRef, useMemo, useCallback } from 'react'
-import {
-  Editor,
-  Element,
-  NodeEntry,
-  Node as SlateNode,
-  Range as SlateRange,
-} from 'slate'
+import { Editor, Element, NodeEntry, Node, Range } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -43,7 +37,7 @@ import {
  */
 
 export const Editable = (props: {
-  decorate?: (entry: NodeEntry) => SlateRange[]
+  decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput: (event: Event) => void
   placeholder?: string
   readOnly?: boolean
@@ -143,7 +137,7 @@ export const Editable = (props: {
       return
     }
 
-    const newDomRange = selection && ReactEditor.toDomRange(editor, selection)
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     // If the DOM selection is already correct, we're done.
     if (
@@ -155,7 +149,7 @@ export const Editable = (props: {
     }
 
     // Otherwise the DOM selection is out of sync, so update it.
-    const el = ReactEditor.toDomNode(editor, editor)
+    const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
     domSelection.removeAllRanges()
 
@@ -219,7 +213,7 @@ export const Editable = (props: {
           if (targetRange) {
             const range = ReactEditor.toSlateRange(editor, targetRange)
 
-            if (!selection || !SlateRange.equals(selection, range)) {
+            if (!selection || !Range.equals(selection, range)) {
               Editor.select(editor, range)
             }
           }
@@ -229,7 +223,7 @@ export const Editable = (props: {
         // a delete forward/backward command it should delete the selection.
         if (
           selection &&
-          SlateRange.isExpanded(selection) &&
+          Range.isExpanded(selection) &&
           type.startsWith('delete')
         ) {
           editor.exec({ type: 'delete_fragment' })
@@ -326,7 +320,7 @@ export const Editable = (props: {
     debounce(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
-        const el = ReactEditor.toDomNode(editor, editor)
+        const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = window.getSelection()
         const domRange =
           domSelection &&
@@ -413,7 +407,7 @@ export const Editable = (props: {
           }
 
           const { relatedTarget } = event
-          const el = ReactEditor.toDomNode(editor, editor)
+          const el = ReactEditor.toDOMNode(editor, editor)
 
           // COMPAT: The event should be ignored if the focus is returning
           // to the editor from an embedded editable element (eg. an <input>
@@ -437,7 +431,7 @@ export const Editable = (props: {
           if (
             relatedTarget != null &&
             isDOMNode(relatedTarget) &&
-            ReactEditor.hasDomNode(editor, relatedTarget)
+            ReactEditor.hasDOMNode(editor, relatedTarget)
           ) {
             const node = ReactEditor.toSlateNode(editor, relatedTarget)
 
@@ -508,7 +502,7 @@ export const Editable = (props: {
             setFragmentData(event.clipboardData, editor)
             const { selection } = editor
 
-            if (selection && SlateRange.isExpanded(selection)) {
+            if (selection && Range.isExpanded(selection)) {
               editor.exec({ type: 'delete_fragment' })
             }
           }
@@ -576,7 +570,7 @@ export const Editable = (props: {
             hasEditableTarget(editor, event.target) &&
             !isEventHandled(event, attributes.onFocus)
           ) {
-            const el = ReactEditor.toDomNode(editor, editor)
+            const el = ReactEditor.toDOMNode(editor, editor)
             state.latestElement = window.document.activeElement
 
             // COMPAT: If the editor has nested editable elements, the focus
@@ -653,7 +647,7 @@ export const Editable = (props: {
               const { selection } = editor
               event.preventDefault()
 
-              if (selection && SlateRange.isCollapsed(selection)) {
+              if (selection && Range.isCollapsed(selection)) {
                 Editor.move(editor, { reverse: true })
               } else {
                 Editor.collapse(editor, { edge: 'start' })
@@ -666,7 +660,7 @@ export const Editable = (props: {
               const { selection } = editor
               event.preventDefault()
 
-              if (selection && SlateRange.isCollapsed(selection)) {
+              if (selection && Range.isCollapsed(selection)) {
                 Editor.move(editor)
               } else {
                 Editor.collapse(editor, { edge: 'end' })
@@ -750,7 +744,7 @@ const hasTarget = (
   editor: ReactEditor,
   target: EventTarget | null
 ): target is DOMNode => {
-  return isDOMNode(target) && ReactEditor.hasDomNode(editor, target)
+  return isDOMNode(target) && ReactEditor.hasDOMNode(editor, target)
 }
 
 /**
@@ -763,7 +757,7 @@ const hasEditableTarget = (
 ): target is DOMNode => {
   return (
     isDOMNode(target) &&
-    ReactEditor.hasDomNode(editor, target, { editable: true })
+    ReactEditor.hasDOMNode(editor, target, { editable: true })
   )
 }
 
@@ -807,17 +801,17 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
     return
   }
 
-  const [start, end] = SlateRange.edges(selection)
+  const [start, end] = Range.edges(selection)
   const startVoid = Editor.match(editor, start.path, 'void')
   const endVoid = Editor.match(editor, end.path, 'void')
 
-  if (SlateRange.isCollapsed(selection) && !startVoid) {
+  if (Range.isCollapsed(selection) && !startVoid) {
     return
   }
 
   // Create a fake selection so that we can add a Base64-encoded copy of the
   // fragment to the HTML, to decode on future pastes.
-  const domRange = ReactEditor.toDomRange(editor, selection)
+  const domRange = ReactEditor.toDOMRange(editor, selection)
   let contents = domRange.cloneContents()
   let attach = contents.childNodes[0] as HTMLElement
 
@@ -834,7 +828,7 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
   if (endVoid) {
     const [voidNode] = endVoid
     const r = domRange.cloneRange()
-    const domNode = ReactEditor.toDomNode(editor, voidNode)
+    const domNode = ReactEditor.toDOMNode(editor, voidNode)
     r.setEndAfter(domNode)
     contents = r.cloneContents()
   }
@@ -869,7 +863,7 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
     attach = span
   }
 
-  const fragment = SlateNode.fragment(editor, selection)
+  const fragment = Node.fragment(editor, selection)
   const string = JSON.stringify(fragment)
   const encoded = window.btoa(encodeURIComponent(string))
   attach.setAttribute('data-slate-fragment', encoded)

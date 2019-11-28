@@ -1,9 +1,17 @@
 import { Command } from 'slate'
 
+/**
+ * The `InsertDataCommand` inserts content from a `DataTransfer` object.
+ */
+
 export interface InsertDataCommand {
   type: 'insert_data'
   data: DataTransfer
 }
+
+/**
+ * The `ReactCommand` union for all commands that the React plugins defines.
+ */
 
 export type ReactCommand = InsertDataCommand
 

@@ -1,11 +1,4 @@
-import {
-  Editor,
-  Element as SlateElement,
-  Node as SlateNode,
-  Path as SlatePath,
-  Point as SlatePoint,
-  Range as SlateRange,
-} from 'slate'
+import { Editor, Element, Node, Path, Point, Range } from 'slate'
 
 import { Key } from './utils/key'
 import {
@@ -38,7 +31,7 @@ export const ReactEditor = {
    * Find a key for a Slate node.
    */
 
-  findKey(editor: ReactEditor, node: SlateNode): Key {
+  findKey(editor: ReactEditor, node: Node): Key {
     let key = NODE_TO_KEY.get(node)
 
     if (!key) {
@@ -53,8 +46,8 @@ export const ReactEditor = {
    * Find the path of Slate node.
    */
 
-  findPath(editor: ReactEditor, node: SlateNode): SlatePath {
-    const path: SlatePath = []
+  findPath(editor: ReactEditor, node: Node): Path {
+    const path: Path = []
     let child = node
 
     while (true) {
@@ -87,7 +80,7 @@ export const ReactEditor = {
    * Resolve the decorations for a node.
    */
 
-  getDecorations(editor: ReactEditor, node: SlateNode): SlateRange[] {
+  getDecorations(editor: ReactEditor, node: Node): Range[] {
     const placeholder = PLACEHOLDER.get(editor)
     const decorations = []
 
@@ -95,8 +88,8 @@ export const ReactEditor = {
       placeholder &&
       Editor.isEditor(node) &&
       node.children.length === 1 &&
-      Array.from(SlateNode.texts(node)).length === 1 &&
-      SlateNode.text(node) === ''
+      Array.from(Node.texts(node)).length === 1 &&
+      Node.text(node) === ''
     ) {
       const start = Editor.start(editor, [])
 
@@ -132,7 +125,7 @@ export const ReactEditor = {
    */
 
   blur(editor: ReactEditor): void {
-    const el = ReactEditor.toDomNode(editor, editor)
+    const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, false)
 
     if (window.document.activeElement === el) {
@@ -145,7 +138,7 @@ export const ReactEditor = {
    */
 
   focus(editor: ReactEditor): void {
-    const el = ReactEditor.toDomNode(editor, editor)
+    const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, true)
 
     if (window.document.activeElement !== el) {
@@ -174,13 +167,13 @@ export const ReactEditor = {
    * Check if a DOM node is within the editor.
    */
 
-  hasDomNode(
+  hasDOMNode(
     editor: ReactEditor,
     target: DOMNode,
     options: { editable?: boolean } = {}
   ): boolean {
     const { editable = false } = options
-    const el = ReactEditor.toDomNode(editor, editor)
+    const el = ReactEditor.toDOMNode(editor, editor)
     let element
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
@@ -211,7 +204,7 @@ export const ReactEditor = {
    * Find the native DOM element from a Slate node.
    */
 
-  toDomNode(editor: ReactEditor, node: SlateNode): HTMLElement {
+  toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
@@ -229,9 +222,9 @@ export const ReactEditor = {
    * Find a native DOM selection point from a Slate point.
    */
 
-  toDomPoint(editor: ReactEditor, point: SlatePoint): DOMPoint {
+  toDOMPoint(editor: ReactEditor, point: Point): DOMPoint {
     const [node] = Editor.node(editor, point.path)
-    const el = ReactEditor.toDomNode(editor, node)
+    const el = ReactEditor.toDOMNode(editor, node)
     let domPoint: DOMPoint | undefined
 
     // For each leaf, we need to isolate its content, which means filtering
@@ -275,16 +268,16 @@ export const ReactEditor = {
    * Find a native DOM range from a Slate `range`.
    */
 
-  toDomRange(editor: ReactEditor, range: SlateRange): DOMRange {
+  toDOMRange(editor: ReactEditor, range: Range): DOMRange {
     const { anchor, focus } = range
-    const domAnchor = ReactEditor.toDomPoint(editor, anchor)
-    const domFocus = SlateRange.isCollapsed(range)
+    const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
+    const domFocus = Range.isCollapsed(range)
       ? domAnchor
-      : ReactEditor.toDomPoint(editor, focus)
+      : ReactEditor.toDOMPoint(editor, focus)
 
     const domRange = window.document.createRange()
-    const start = SlateRange.isBackward(range) ? domFocus : domAnchor
-    const end = SlateRange.isBackward(range) ? domAnchor : domFocus
+    const start = Range.isBackward(range) ? domFocus : domAnchor
+    const end = Range.isBackward(range) ? domAnchor : domFocus
     domRange.setStart(start[0], start[1])
     domRange.setEnd(end[0], end[1])
     return domRange
@@ -294,7 +287,7 @@ export const ReactEditor = {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(editor: ReactEditor, domNode: DOMNode): SlateNode {
+  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
@@ -314,7 +307,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): SlateRange {
+  findEventRange(editor: ReactEditor, event: any): Range {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -331,7 +324,7 @@ export const ReactEditor = {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (SlateElement.isElement(node) && editor.isVoid(node)) {
+    if (Element.isElement(node) && editor.isVoid(node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = editor.isInline(node)
         ? x - rect.left < rect.left + rect.width - x
@@ -380,7 +373,7 @@ export const ReactEditor = {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): SlatePoint {
+  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
     const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
@@ -405,7 +398,7 @@ export const ReactEditor = {
           el!.parentNode!.removeChild(el)
         })
 
-        // COMPAT: Edge has a bug where SlateRange.prototype.toString() will
+        // COMPAT: Edge has a bug where Range.prototype.toString() will
         // convert \n into \r\n. The bug causes a loop when slate-react
         // attempts to reposition its cursor to match the native position. Use
         // textContent.length instead.
@@ -457,7 +450,7 @@ export const ReactEditor = {
   toSlateRange(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): SlateRange {
+  ): Range {
     const el =
       domRange instanceof Selection
         ? domRange.anchorNode
