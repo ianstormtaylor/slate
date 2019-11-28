@@ -250,7 +250,6 @@ Now our commands are clearly defined and you can invoke them from anywhere we ha
 
 ```js
 const App = () => {
-  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -292,10 +291,8 @@ const App = () => {
       </div>
       <Editable
         editor={editor}
-        value={value}
         renderElement={renderElement}
         renderMark={renderMark}
-        onChange={newValue => setValue(newValue)}
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return
