@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
-    "build:next": "cd ./site && next build",
+    "build:next": "cd ./site && next build && next export",
     "build:production": "cross-env NODE_ENV=production yarn build",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js",
     "clean": "rm -rf ./node_modules ./packages/*/{dist,lib,node_modules} ./site/.next",

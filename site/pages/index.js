@@ -1,20 +1,14 @@
-import React from 'react'
-import Link from 'next/link'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
-const A = React.forwardRef((props, ref) => {
-  return <a ref={ref} {...props} />
-})
+const Home = () => {
+  const router = useRouter()
 
-const Home = () => (
-  <div>
-    <Link href="/">
-      <a>link</a>
-    </Link>
-    <br />
-    <Link href="/">
-      <A>link</A>
-    </Link>
-  </div>
-)
+  useEffect(() => {
+    router.replace(`/examples`)
+  })
+
+  return null
+}
 
 export default Home
