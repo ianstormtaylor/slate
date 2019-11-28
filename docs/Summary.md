@@ -9,17 +9,17 @@
 - [Executing Commands](./walkthroughs/05-executing-commands.md)
 - [Saving to a Database](./walkthroughs/06-saving-to-a-database.md)
 
-## Guides
+## Concepts
 
-- [Interfaces](./guides/01-interfaces.md)
-- [Nodes](./guides/02-nodes.md)
-- [Locations](./guides/03-locations.md)
-- [Formatting](./guides/04-formatting.md)
-- [Commands](./guides/05-commands.md)
-- [Operations](./guides/06-operations.md)
-- [Editor](./guides/07-editor.md)
-- [Plugins](./guides/08-plugins.md)
-- [Rendering](./guides/09-rendering.md)
+- [Interfaces](./concepts/01-interfaces.md)
+- [Nodes](./concepts/02-nodes.md)
+- [Locations](./concepts/03-locations.md)
+- [Formatting](./concepts/04-formatting.md)
+- [Commands](./concepts/05-commands.md)
+- [Operations](./concepts/06-operations.md)
+- [Editor](./concepts/07-editor.md)
+- [Plugins](./concepts/08-plugins.md)
+- [Rendering](./concepts/09-rendering.md)
 
 ## General
 
@@ -27,4 +27,3 @@
 - [Contributing](../Contributing.md)
 - [Changelog](./general/changelog.md)
 - [FAQ](./general/faq.md)
-- [Glossary](./general/glossary.md)
