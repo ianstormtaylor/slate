@@ -15,7 +15,7 @@
     "lib/"
   ],
   "dependencies": {
-    "is-plain-object": "^2.0.4"
+    "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
     "slate": "^0.47.8"
