@@ -38,7 +38,7 @@ import {
 
 export const Editable = (props: {
   decorate?: (entry: NodeEntry) => Range[]
-  onDOMBeforeInput: (event: Event) => void
+  onDOMBeforeInput?: (event: Event) => void
   placeholder?: string
   readOnly?: boolean
   role?: string
