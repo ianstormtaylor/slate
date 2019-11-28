@@ -28,7 +28,7 @@ const App = () => {
         return <BoldMark {...props} />
       }
     }
-  })
+  }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
@@ -97,7 +97,7 @@ const App = () => {
         return <BoldMark {...props} />
       }
     }
-  })
+  }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
@@ -213,7 +213,7 @@ const App = () => {
         return <BoldMark {...props} />
       }
     }
-  })
+  }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
@@ -267,7 +267,7 @@ const App = () => {
         return <BoldMark {...props} />
       }
     }
-  })
+  }, [])
 
   return (
     // Add a  toolbar with buttons that call the same methods.

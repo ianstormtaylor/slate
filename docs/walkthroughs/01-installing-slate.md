@@ -49,7 +49,7 @@ Of course we haven't rendered anything, so you won't see any changes.
 
 Next up is to render a `<Slate>` context provider.
 
-The provider component leeps track of your Slate editor, it's plugins, it's default value, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
+The provider component keeps track of your Slate editor, it's plugins, it's default value, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
 
 ```jsx
 const App = () => {
@@ -81,7 +81,7 @@ const App = () => {
 
 The `<Editable>` component acts like `contenteditable`. Anywhere you render it will render an editable rich-text document for the nearest editor context.
 
-There's only last step. So far we haven't defined what the default value of the editor is, so it's empty. Let's fix that by defining an initial value.
+There's only one last step. So far we haven't defined what the default value of the editor is, so it's empty. Let's fix that by defining an initial value.
 
 The value is just plain JSON. Here's one contains a single paragraph block with some text in it:
 
@@ -114,4 +114,4 @@ There you have it!
 
 That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
 
-You'll notice that there is no `onChange` handler defined. That's because the `<Slate>` context acts like an **un-controlled** component, with the changes automatically being propogated to any context consumers. However, just like with un-controlled components you can attach an `onChange` prop to listen for changes. We'll cover that later.
+You'll notice that there is no `onChange` handler defined. That's because the `<Slate>` context acts like an **un-controlled** component, with the changes automatically being propagated to any context consumers. However, just like with un-controlled components you can attach an `onChange` prop to listen for changes. We'll cover that later.
