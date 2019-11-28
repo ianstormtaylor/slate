@@ -58,7 +58,7 @@ Previously the `<Editor>` component was doing double duty as a sort of "controll
 
 ### Hooks
 
-In addition to the `useSlate` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states (often for void nodes). And since the use React's Content API they will automatically re-render when their state changes.
+In addition to the `useSlate` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states (often for void nodes). And since they use React's Context API they will automatically re-render when their state changes.
 
 ### `beforeinput`
 
