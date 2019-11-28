@@ -1,11 +1,13 @@
 {
   "name": "slate",
+  "type": "module",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.47.9",
+  "version": "0.47.8",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/slate.js",
-  "module": "lib/slate.es.js",
+  "main": "lib/index.js",
+  "module": "lib/index.es.js",
+  "types": "lib/index.d.ts",
   "umd": "dist/slate.js",
   "umdMin": "dist/slate.min.js",
   "files": [
@@ -13,27 +15,10 @@
     "lib/"
   ],
   "dependencies": {
-    "debug": "^3.1.0",
-    "direction": "^0.1.5",
+    "@types/esrever": "^0.2.0",
     "esrever": "^0.2.0",
-    "is-plain-object": "^2.0.4",
-    "lodash": "^4.17.4",
-    "tiny-invariant": "^1.0.1",
-    "tiny-warning": "^0.0.3",
-    "type-of": "^2.0.1"
-  },
-  "peerDependencies": {
-    "immutable": ">=3.8.1 || >4.0.0-rc"
-  },
-  "devDependencies": {
-    "slate-dev-test-utils": "^0.0.1",
-    "slate-hyperscript": "^0.13.9"
-  },
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
-  },
-  "umdGlobals": {
-    "immutable": "Immutable"
+    "immer": "^5.0.0",
+    "is-plain-object": "^3.0.0"
   },
   "keywords": [
     "canvas",

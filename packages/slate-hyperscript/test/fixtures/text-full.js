@@ -1,11 +1,10 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from 'slate-hyperscript'
+import { jsx } from 'slate-hyperscript'
 
 export const input = <text>word</text>
 
 export const output = {
-  object: 'text',
   text: 'word',
   marks: [],
 }

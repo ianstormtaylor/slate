@@ -1,64 +1,36 @@
-/** @jsx h */
+/** @jsx jsx */
 
-import h from 'slate-hyperscript'
+import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <value>
-    <document>
-      <block type="paragraph">
-        <text key="a">two</text>
-      </block>
-    </document>
+  <editor>
+    <element>word</element>
     <selection>
-      <anchor key="a" offset={1} />
-      <focus key="a" offset={2} />
+      <anchor path={[0, 0]} offset={1} />
+      <focus path={[0, 0]} offset={2} />
     </selection>
-  </value>
+  </editor>
 )
 
-export const options = {
-  preserveSelection: true,
-  preserveKeys: true,
-}
-
 export const output = {
-  object: 'value',
-  document: {
-    object: 'document',
-    key: '2',
-    data: {},
-    nodes: [
-      {
-        object: 'block',
-        key: '1',
-        type: 'paragraph',
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            key: 'a',
-            text: 'two',
-            marks: [],
-          },
-        ],
-      },
-    ],
-  },
+  children: [
+    {
+      children: [
+        {
+          text: 'word',
+          marks: [],
+        },
+      ],
+    },
+  ],
   selection: {
-    object: 'selection',
     anchor: {
-      object: 'point',
-      key: 'a',
       path: [0, 0],
       offset: 1,
     },
     focus: {
-      object: 'point',
-      key: 'a',
       path: [0, 0],
       offset: 2,
     },
-    isFocused: false,
-    marks: null,
   },
 }

@@ -1,13 +1,23 @@
 {
-  "extends": ["prettier", "prettier/react"],
-  "plugins": ["import", "react", "prettier"],
-  "settings": {
-    "import/extensions": [".js"]
-  },
-  "parser": "babel-eslint",
+  "extends": [
+    "plugin:import/typescript",
+    "prettier",
+    "prettier/@typescript-eslint",
+    "prettier/react"
+  ],
+  "plugins": ["@typescript-eslint", "import", "react", "prettier"],
+  "parser": "@typescript-eslint/parser",
   "parserOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2020,
     "ecmaFeatures": {
       "jsx": true
+    }
+  },
+  "settings": {
+    "import/extensions": [".js", ".ts"],
+    "react": {
+      "version": "detect"
     }
   },
   "env": {
@@ -36,16 +46,6 @@
     "import/no-named-as-default-member": "error",
     "import/no-unresolved": "error",
     "linebreak-style": "error",
-    "lines-around-comment": [
-      "error",
-      {
-        "beforeBlockComment": true,
-        "afterBlockComment": true,
-        "allowBlockStart": true,
-        "allowObjectStart": true,
-        "allowArrayStart": true
-      }
-    ],
     "no-array-constructor": "error",
     "no-class-assign": "error",
     "no-console": "error",
@@ -63,7 +63,6 @@
     "no-extra-boolean-cast": "error",
     "no-func-assign": "error",
     "no-invalid-regexp": "error",
-    "no-lonely-if": "error",
     "no-native-reassign": "error",
     "no-negated-in-lhs": "error",
     "no-new-object": "error",
@@ -71,36 +70,14 @@
     "no-path-concat": "error",
     "no-redeclare": "error",
     "no-regex-spaces": "error",
-    "no-restricted-globals": [
-      "error",
-      "Debug",
-      "document",
-      "Document",
-      "event",
-      "history",
-      "History",
-      "length",
-      "Map",
-      "Node",
-      "parent",
-      "Range",
-      "Selection",
-      "Set",
-      "Text"
-    ],
     "no-sequences": "error",
-    "no-shadow": "error",
-    "no-shadow-restricted-names": "error",
     "no-tabs": "error",
     "no-this-before-super": "error",
     "no-throw-literal": "error",
-    "no-undef": "error",
     "no-unneeded-ternary": "error",
     "no-unreachable": "error",
     "no-unsafe-finally": "error",
     "no-unsafe-negation": "error",
-    "no-unused-expressions": "error",
-    "no-unused-vars": ["error", { "vars": "all", "args": "none" }],
     "no-useless-call": "error",
     "no-useless-computed-key": "error",
     "no-useless-constructor": "error",
@@ -120,7 +97,6 @@
     "prettier/prettier": "error",
     "radix": "error",
     "react/jsx-boolean-value": ["error", "never"],
-    "react/jsx-key": "error",
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-undef": "error",
@@ -143,26 +119,14 @@
     ],
     "valid-typeof": "error",
     "yield-star-spacing": ["error", "after"],
-    "yoda": ["error", "never"],
-    "padding-line-between-statements": [
-      "error",
-      { "blankLine": "always", "prev": "multiline-expression", "next": "*" },
-      { "blankLine": "any", "prev": "multiline-expression", "next": "return" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-expression" },
-      { "blankLine": "any", "prev": "empty", "next": "multiline-expression" },
-      { "blankLine": "always", "prev": "multiline-block-like", "next": "*" },
-      { "blankLine": "any", "prev": "multiline-block-like", "next": "return" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
-      { "blankLine": "always", "prev": "*", "next": "multiline-block-like" },
-      { "blankLine": "any", "prev": "case", "next": "case" }
-    ]
+    "yoda": ["error", "never"]
   },
   "overrides": [
     {
       "files": "**/test/**/*.js",
       "rules": {
-        "import/no-extraneous-dependencies": false
+        "import/no-extraneous-dependencies": "off",
+        "import/no-unresolved": "off"
       }
     }
   ]
