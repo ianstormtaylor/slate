@@ -9,6 +9,7 @@
   "types": "lib/index.d.ts",
   "umd": "dist/slate-react.js",
   "umdMin": "dist/slate-react.min.js",
+  "sideEffects": false,
   "files": [
     "dist/",
     "lib/"

@@ -9,6 +9,7 @@
   "types": "lib/index.d.ts",
   "umd": "dist/slate-hyperscript.js",
   "umdMin": "dist/slate-hyperscript.min.js",
+  "sideEffects": false,
   "files": [
     "dist/",
     "lib/"

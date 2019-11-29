@@ -9,6 +9,7 @@
   "types": "lib/index.d.ts",
   "umd": "dist/slate-history.js",
   "umdMin": "dist/slate-history.min.js",
+  "sideEffects": false,
   "files": [
     "dist/",
     "lib/"
