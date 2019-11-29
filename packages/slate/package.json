@@ -1,6 +1,5 @@
 {
   "name": "slate",
-  "type": "module",
   "description": "A completely customizable framework for building rich text editors.",
   "version": "0.50.0",
   "license": "MIT",
