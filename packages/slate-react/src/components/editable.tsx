@@ -349,7 +349,7 @@ export const Editable = (
     []
   )
 
-  const decorations = []
+  const decorations = decorate([editor, []])
 
   if (
     placeholder &&

@@ -36,7 +36,6 @@ const Children = (props: {
   } = props
   const editor = useEditor()
   const path = ReactEditor.findPath(editor, node)
-  const decs = decorations.concat(decorate([node, path]))
   const children = []
   const isLeafBlock =
     Element.isElement(node) &&
@@ -51,7 +50,7 @@ const Children = (props: {
     const sel = selection && Range.intersection(range, selection)
     const ds = decorate([n, p])
 
-    for (const dec of decs) {
+    for (const dec of decorations) {
       const d = Range.intersection(dec, range)
 
       if (d) {
@@ -75,7 +74,7 @@ const Children = (props: {
     } else {
       children.push(
         <TextComponent
-          decorations={decs}
+          decorations={ds}
           key={key.id}
           isLast={isLeafBlock && i === node.children.length}
           parent={node}
