@@ -614,17 +614,20 @@ export const Editable = (
             !isEventHandled(event, attributes.onKeyDown)
           ) {
             const { nativeEvent } = event
+            const { selection } = editor
 
             // COMPAT: Since we prevent the default behavior on
             // `beforeinput` events, the browser doesn't think there's ever
             // any history stack to undo or redo, so we have to manage these
             // hotkeys ourselves. (2019/11/06)
             if (Hotkeys.isRedo(nativeEvent)) {
+              event.preventDefault()
               editor.exec({ type: 'redo' })
               return
             }
 
             if (Hotkeys.isUndo(nativeEvent)) {
+              event.preventDefault()
               editor.exec({ type: 'undo' })
               return
             }
@@ -667,7 +670,6 @@ export const Editable = (
             // the void node with the zero-width space not being an empty
             // string.
             if (Hotkeys.isMoveBackward(nativeEvent)) {
-              const { selection } = editor
               event.preventDefault()
 
               if (selection && Range.isCollapsed(selection)) {
@@ -680,7 +682,6 @@ export const Editable = (
             }
 
             if (Hotkeys.isMoveForward(nativeEvent)) {
-              const { selection } = editor
               event.preventDefault()
 
               if (selection && Range.isCollapsed(selection)) {
@@ -702,6 +703,100 @@ export const Editable = (
               event.preventDefault()
               Editor.move(editor, { unit: 'word' })
               return
+            }
+
+            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+            // fall back to guessing at the input intention for hotkeys.
+            // COMPAT: In iOS, some of these hotkeys are handled in the
+            if (IS_FIREFOX) {
+              // We don't have a core behavior for these, but they change the
+              // DOM if we don't prevent them, so we have to.
+              if (
+                Hotkeys.isBold(nativeEvent) ||
+                Hotkeys.isItalic(nativeEvent) ||
+                Hotkeys.isTransposeCharacter(nativeEvent)
+              ) {
+                event.preventDefault()
+                return
+              }
+
+              if (Hotkeys.isSplitBlock(nativeEvent)) {
+                event.preventDefault()
+                editor.exec({ type: 'insert_break' })
+                return
+              }
+
+              if (Hotkeys.isDeleteBackward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_backward', unit: 'character' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isDeleteForward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_forward', unit: 'character' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_backward', unit: 'line' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isDeleteLineForward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_forward', unit: 'line' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_backward', unit: 'word' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isDeleteWordForward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  editor.exec({ type: 'delete_fragment' })
+                } else {
+                  editor.exec({ type: 'delete_forward', unit: 'word' })
+                }
+
+                return
+              }
             }
           }
         }}
