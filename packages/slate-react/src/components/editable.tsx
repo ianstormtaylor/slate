@@ -36,18 +36,19 @@ import {
  * Editable.
  */
 
-export const Editable = (props: {
-  decorate?: (entry: NodeEntry) => Range[]
-  onDOMBeforeInput?: (event: Event) => void
-  placeholder?: string
-  readOnly?: boolean
-  role?: string
-  style?: Record<string, any>
-  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
-  renderElement?: (props: CustomElementProps) => JSX.Element
-  renderMark?: (props: CustomMarkProps) => JSX.Element
-  [key: string]: any
-}) => {
+export const Editable = (
+  props: {
+    decorate?: (entry: NodeEntry) => Range[]
+    onDOMBeforeInput?: (event: Event) => void
+    placeholder?: string
+    readOnly?: boolean
+    role?: string
+    style?: React.CSSProperties
+    renderDecoration?: (props: CustomDecorationProps) => JSX.Element
+    renderElement?: (props: CustomElementProps) => JSX.Element
+    renderMark?: (props: CustomMarkProps) => JSX.Element
+  } & React.HTMLAttributes<HTMLDivElement>
+) => {
   const {
     decorate = defaultDecorate,
     placeholder,
@@ -404,7 +405,7 @@ export const Editable = (props: {
             editor.exec({ type: 'insert_text', text })
           }
         }, [])}
-        onBlur={useCallback((event: React.FocusEvent) => {
+        onBlur={useCallback((event: React.FocusEvent<HTMLDivElement>) => {
           if (
             readOnly ||
             state.isUpdatingSelection ||
@@ -458,7 +459,7 @@ export const Editable = (props: {
 
           IS_FOCUSED.delete(editor)
         }, [])}
-        onClick={useCallback((event: React.MouseEvent) => {
+        onClick={useCallback((event: React.MouseEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
             hasTarget(editor, event.target) &&
@@ -475,31 +476,37 @@ export const Editable = (props: {
             }
           }
         }, [])}
-        onCompositionEnd={useCallback((event: React.CompositionEvent) => {
-          if (
-            hasEditableTarget(editor, event.target) &&
-            !isEventHandled(event, attributes.onCompositionEnd)
-          ) {
-            state.isComposing = false
+        onCompositionEnd={useCallback(
+          (event: React.CompositionEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCompositionEnd)
+            ) {
+              state.isComposing = false
 
-            // COMPAT: In Chrome, `beforeinput` events for compositions
-            // aren't correct and never fire the "insertFromComposition"
-            // type that we need. So instead, insert whenever a composition
-            // ends since it will already have been committed to the DOM.
-            if (!IS_SAFARI && event.data) {
-              editor.exec({ type: 'insert_text', text: event.data })
+              // COMPAT: In Chrome, `beforeinput` events for compositions
+              // aren't correct and never fire the "insertFromComposition"
+              // type that we need. So instead, insert whenever a composition
+              // ends since it will already have been committed to the DOM.
+              if (!IS_SAFARI && event.data) {
+                editor.exec({ type: 'insert_text', text: event.data })
+              }
             }
-          }
-        }, [])}
-        onCompositionStart={useCallback((event: React.CompositionEvent) => {
-          if (
-            hasEditableTarget(editor, event.target) &&
-            !isEventHandled(event, attributes.onCompositionStart)
-          ) {
-            state.isComposing = true
-          }
-        }, [])}
-        onCopy={useCallback((event: React.ClipboardEvent) => {
+          },
+          []
+        )}
+        onCompositionStart={useCallback(
+          (event: React.CompositionEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCompositionStart)
+            ) {
+              state.isComposing = true
+            }
+          },
+          []
+        )}
+        onCopy={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           if (
             hasEditableTarget(editor, event.target) &&
             !isEventHandled(event, attributes.onCopy)
@@ -508,7 +515,7 @@ export const Editable = (props: {
             setFragmentData(event.clipboardData, editor)
           }
         }, [])}
-        onCut={useCallback((event: React.ClipboardEvent) => {
+        onCut={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
             hasEditableTarget(editor, event.target) &&
@@ -523,7 +530,7 @@ export const Editable = (props: {
             }
           }
         }, [])}
-        onDragOver={useCallback((event: React.DragEvent) => {
+        onDragOver={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
             !isEventHandled(event, attributes.onDragOver)
@@ -538,7 +545,7 @@ export const Editable = (props: {
             }
           }
         }, [])}
-        onDragStart={useCallback((event: React.DragEvent) => {
+        onDragStart={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
             !isEventHandled(event, attributes.onDragStart)
@@ -557,7 +564,7 @@ export const Editable = (props: {
             setFragmentData(event.dataTransfer, editor)
           }
         }, [])}
-        onDrop={useCallback((event: React.DragEvent) => {
+        onDrop={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
             !readOnly &&
@@ -579,7 +586,7 @@ export const Editable = (props: {
             }
           }
         }, [])}
-        onFocus={useCallback((event: React.FocusEvent) => {
+        onFocus={useCallback((event: React.FocusEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
             !state.isUpdatingSelection &&
@@ -698,7 +705,7 @@ export const Editable = (props: {
             }
           }
         }}
-        onPaste={useCallback((event: React.ClipboardEvent) => {
+        onPaste={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           // COMPAT: Firefox doesn't support the `beforeinput` event, so we
           // fall back to React's `onPaste` here instead.
           if (
@@ -781,9 +788,11 @@ const hasEditableTarget = (
  * Check if an event is overrided by a handler.
  */
 
-const isEventHandled = (
-  event: React.SyntheticEvent,
-  handler?: (event: React.SyntheticEvent) => void
+const isEventHandled = <
+  EventType extends React.SyntheticEvent<unknown, unknown>
+>(
+  event: EventType,
+  handler?: (event: EventType) => void
 ) => {
   if (!handler) {
     return false
