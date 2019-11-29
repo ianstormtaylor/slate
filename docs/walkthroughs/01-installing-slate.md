@@ -49,7 +49,7 @@ Of course we haven't rendered anything, so you won't see any changes.
 
 Next up is to render a `<Slate>` context provider.
 
-The provider component keeps track of your Slate editor, it's plugins, it's default value, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
+The provider component keeps track of your Slate editor, its plugins, its default value, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
 
 ```jsx
 const App = () => {
@@ -83,7 +83,7 @@ The `<Editable>` component acts like `contenteditable`. Anywhere you render it w
 
 There's only one last step. So far we haven't defined what the default value of the editor is, so it's empty. Let's fix that by defining an initial value.
 
-The value is just plain JSON. Here's one contains a single paragraph block with some text in it:
+The value is just plain JSON. Here's one containing a single paragraph block with some text in it:
 
 ```js
 // Create our default value...
