@@ -120,10 +120,10 @@ If you have an idea for an example that shows a common use case, pull request it
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models.
+If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
 
 - [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
-- [**Guides**](http://docs.slatejs.org/guides)
+- [**Concepts**](http://docs.slatejs.org/concepts)
 - [**FAQ**](http://docs.slatejs.org/general/faq)
 - [**Resources**](http://docs.slatejs.org/general/resources)
 
