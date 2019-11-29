@@ -8,6 +8,7 @@
 - [Applying Custom Formatting](./walkthroughs/04-applying-custom-formatting.md)
 - [Executing Commands](./walkthroughs/05-executing-commands.md)
 - [Saving to a Database](./walkthroughs/06-saving-to-a-database.md)
+- [Using the bundled Source](./walkthroughs/XX-using-the-bundled-source.md)
 
 ## Concepts
 
@@ -20,6 +21,7 @@
 - [Editor](./concepts/07-editor.md)
 - [Plugins](./concepts/08-plugins.md)
 - [Rendering](./concepts/09-rendering.md)
+- [Migrating](./concepts/XX-migrating.md)
 
 ## General
 

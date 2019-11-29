@@ -15,7 +15,7 @@
     }
   },
   "settings": {
-    "import/extensions": [".js", ".ts"],
+    "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
     "react": {
       "version": "detect"
     }

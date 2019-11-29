@@ -1,6 +1,5 @@
 {
   "name": "slate-react",
-  "type": "module",
   "description": "Tools for building completely customizable rich-text editors with React.",
   "version": "0.50.1",
   "license": "MIT",

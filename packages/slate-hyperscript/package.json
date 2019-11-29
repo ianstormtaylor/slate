@@ -1,6 +1,5 @@
 {
   "name": "slate-hyperscript",
-  "type": "module",
   "description": "A hyperscript helper for creating Slate documents.",
   "version": "0.50.0",
   "license": "MIT",

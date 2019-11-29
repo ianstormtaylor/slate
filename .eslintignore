@@ -7,3 +7,4 @@ lib/
 node_modules/
 site/out/
 tmp/
+next.config.js

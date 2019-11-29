@@ -64,7 +64,7 @@ yarn start
 
 To run the tests, start by building the mono repo as described in the [Repository Setup](#repository-setup) section.
 
-Then you can reun the tests with: 
+Then you can rerun the tests with:
 
 ```
 yarn test

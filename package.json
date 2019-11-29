@@ -1,7 +1,6 @@
 {
   "private": true,
   "name": "slate-packages",
-  "type": "module",
   "workspaces": [
     "packages/*"
   ],
@@ -14,8 +13,8 @@
     "fix:eslint": "yarn lint:eslint --fix",
     "fix:prettier": "yarn lint:prettier --write",
     "lint": "yarn lint:eslint && yarn lint:prettier",
-    "lint:eslint": "eslint ./{packages,site}/**/*.{js,jsx,ts,tsx}",
-    "lint:prettier": "prettier --list-different **/*.{css,md,js,jsx,json,ts,tsx}",
+    "lint:eslint": "eslint \"./{packages,site}/**/*.{js,jsx,ts,tsx}\"",
+    "lint:prettier": "prettier --list-different \"**/*.{css,md,js,jsx,json,ts,tsx}\"",
     "open": "open http://localhost:3000",
     "release": "NODE_ENV=production yarn build:rollup && yarn test &&  lerna publish",
     "serve": "cd ./site && next",
