@@ -110,7 +110,7 @@ const BoldMark = props => {
 
 Pretty familiar, right?
 
-And now, let's tell Slate about that mark. To do that, we'll pass in the `renderMark` prop to our editor. Also, let's allow our mark to be toggled by changing `addMark` to `toggleMark`.
+And now, let's tell Slate about that mark. To do that, we'll pass in the `renderMark` prop to our editor. Also, let's allow our mark to be toggled by calling either `addMarks` or `removeMarks`.
 
 ```js
 const App = () => {
@@ -162,7 +162,12 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, [{ type: 'bold' }])
+              const isBold = Editor.activeMarks(editor).some(m => m.type === 'bold');
+              if (isBold) {
+                Editor.addMarks(editor, [{ type: 'bold' }])
+              } else {          
+                Editor.removeMarks(editor, [{ type: 'bold' }])
+              }
               break
             }
           }
