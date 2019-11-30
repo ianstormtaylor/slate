@@ -358,8 +358,8 @@ export const LocationQueries = {
       pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
     })
 
-    let universalMarks: Mark[] = []
-    let distinctMarks: Mark[] = []
+    const universalMarks: Mark[] = []
+    const distinctMarks: Mark[] = []
     let universalEntries: MarkEntry[] = []
     let first = true
 
@@ -372,10 +372,8 @@ export const LocationQueries = {
           return Mark.matches(entry[0], m)
         }
       }
-      debugger
 
       if (mode === 'universal') {
-        debugger
         if (first) {
           universalMarks.push(...node.marks)
           universalEntries = node.marks.map((m, i) => [m, i, node, path])
@@ -386,11 +384,9 @@ export const LocationQueries = {
         // PERF: If we're in universal mode and the eligible marks hits zero
         // it can never increase again, so we can exit early.
         if (universalMarks.length === 0) {
-          debugger
           return
         }
 
-        debugger
         for (let i = universalMarks.length - 1; i >= 0; i--) {
           const existing = universalMarks[i]
 
@@ -428,7 +424,6 @@ export const LocationQueries = {
     // In universal mode, the marks are collected while iterating and we can
     // only be certain of which are universal when we've finished.
     if (mode === 'universal') {
-      debugger
       yield* universalEntries
     }
   },
