@@ -104,7 +104,7 @@ export const withHistory = (editor: Editor): Editor => {
           undos.shift()
         }
 
-        if (shouldEmptyRedos(op)) {
+        if (shouldClear(op)) {
           history.redos = []
         }
       }
@@ -176,10 +176,13 @@ const shouldOverwrite = (
 }
 
 /**
- * Check whether empty redos after one operation.
+ * Check whether an operation should clear the redos stack.
  */
 
-const shouldEmptyRedos = (op: Operation): boolean => {
-  if (['set_selection'].includes(op.type)) return false
+const shouldClear = (op: Operation): boolean => {
+  if (op.type === 'set_selection') {
+    return false
+  }
+
   return true
 }
