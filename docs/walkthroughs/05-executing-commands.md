@@ -43,14 +43,11 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const { selection } = editor
-              const isCode = selection
-                ? Editor.match(editor, selection, { type: 'code' })
-                : false
-
+              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+              const isCodeActive = !!node
               Editor.setNodes(
                 editor,
-                { type: isCode ? null : 'code' },
+                { type: isCodeActive ? null : 'code' },
                 { match: 'block' }
               )
               break
@@ -112,14 +109,11 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const { selection } = editor
-              const isCode = selection
-                ? Editor.match(editor, selection, { type: 'code' })
-                : false
-
+              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+              const isCodeActive = !!node
               Editor.setNodes(
                 editor,
-                { type: isCode ? null : 'code' },
+                { type: isCodeActive ? null : 'code' },
                 { match: 'block' }
               )
               break
@@ -182,17 +176,21 @@ const withCustom = editor => {
 // Define our own custom set of helpers for common queries.
 const CustomEditor = {
   isBoldMarkActive(editor) {
-    const { selection } = editor
-    const activeMarks = Editor.activeMarks(editor)
-    return activeMarks.some(mark => mark.type === 'bold')
+    const [mark] = Editor.marks(editor, {
+      match: { type: 'bold' },
+      mode: 'universal',
+    })
+
+    return !!mark
   },
 
   isCodeBlockActive(editor) {
-    const { selection } = editor
-    const isCode = selection
-      ? Editor.match(editor, selection, { type: 'code' })
-      : false
-    return isCode
+    const [node] = Editor.nodes(editor, {
+      match: { type: 'code' },
+      mode: 'highest',
+    })
+
+    return !!node
   },
 }
 

@@ -1,3 +1,4 @@
+import warning from 'tiny-warning'
 import { reverse as reverseText } from 'esrever'
 
 import {
@@ -20,6 +21,7 @@ import {
   Text,
   TextEntry,
 } from '../../..'
+import { MarkMatch } from '../../mark'
 
 export const LocationQueries = {
   /**
@@ -44,69 +46,19 @@ export const LocationQueries = {
       hanging?: boolean
     } = {}
   ): Mark[] {
-    const { union = false, hanging = false } = options
-    let { at = editor.selection } = options
+    warning(
+      false,
+      'The `Editor.activeMarks` helper is deprecated, use `Editor.marks` instead.'
+    )
 
-    if (!at) {
-      return []
-    }
-
-    at = Editor.range(editor, at)
-
-    if (!hanging) {
-      at = Editor.unhangRange(editor, at)
-    }
-
-    // If the range is collapsed at the start of a text node, it should carry
-    // over the marks from the previous text node in the same block.
-    if (Range.isCollapsed(at) && at.anchor.offset === 0) {
-      const { anchor } = at
-      const prev = Editor.previous(editor, anchor, 'text')
-
-      if (prev && Path.isSibling(anchor.path, prev[1])) {
-        const [prevNode, prevPath] = prev
-
-        if (Text.isText(prevNode)) {
-          at = Editor.range(editor, prevPath)
-        }
-      }
-    }
-
-    const marks: Mark[] = []
-    let first = true
-
-    for (const [node] of Editor.texts(editor, { at })) {
-      if (first) {
-        marks.push(...node.marks)
-        first = false
-        continue
-      }
-
-      if (union) {
-        for (const mark of node.marks) {
-          if (!Mark.exists(mark, marks)) {
-            marks.push(mark)
-          }
-        }
-      } else {
-        // PERF: If we're doing an intersection and the result hits zero it can
-        // never increase again, so we can exit early.
-        if (marks.length === 0) {
-          break
-        }
-
-        // Iterate backwards so that removing marks doesn't impact indexing.
-        for (let i = marks.length - 1; i >= 0; i--) {
-          const existing = marks[i]
-
-          if (!Mark.exists(existing, node.marks)) {
-            marks.splice(i, 1)
-          }
-        }
-      }
-    }
-
-    return marks
+    return Array.from(
+      Editor.marks(editor, {
+        at: options.at,
+        mode: options.union ? 'distinct' : 'universal',
+        continuing: true,
+      }),
+      ([m]) => m
+    )
   },
 
   /**
@@ -368,23 +320,117 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location | Span
+      match?: MarkMatch
+      mode?: 'all' | 'first' | 'distinct' | 'universal'
       reverse?: boolean
+      continuing?: boolean
     } = {}
   ): Iterable<MarkEntry> {
-    const { at = editor.selection } = options
+    const { match, mode = 'all', reverse = false, continuing = false } = options
+    let { at = editor.selection } = options
 
     if (!at) {
       return
     }
 
-    const [from, to] = toSpan(editor, at, options)
+    // If the range is collapsed at the start of a text node, it should continue
+    // the marks from the previous text node in the same block.
+    if (
+      continuing &&
+      Range.isRange(at) &&
+      Range.isCollapsed(at) &&
+      at.anchor.offset === 0
+    ) {
+      const { anchor } = at
+      const prev = Editor.previous(editor, anchor, 'text')
 
-    yield* Node.marks(editor, {
-      ...options,
+      if (prev && Path.isSibling(anchor.path, prev[1])) {
+        const [, prevPath] = prev
+        at = Editor.range(editor, prevPath)
+      }
+    }
+
+    const [from, to] = toSpan(editor, at, options)
+    const iterable = Node.texts(editor, {
+      reverse,
       from,
       to,
       pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
     })
+
+    let universalMarks: Mark[] = []
+    let distinctMarks: Mark[] = []
+    let universalEntries: MarkEntry[] = []
+    let first = true
+
+    for (const entry of iterable) {
+      const [node, path] = entry
+      const isMatch = (m: MarkMatch, entry: MarkEntry) => {
+        if (typeof m === 'function') {
+          return m(entry)
+        } else {
+          return Mark.matches(entry[0], m)
+        }
+      }
+      debugger
+
+      if (mode === 'universal') {
+        debugger
+        if (first) {
+          universalMarks.push(...node.marks)
+          universalEntries = node.marks.map((m, i) => [m, i, node, path])
+          first = false
+          continue
+        }
+
+        // PERF: If we're in universal mode and the eligible marks hits zero
+        // it can never increase again, so we can exit early.
+        if (universalMarks.length === 0) {
+          debugger
+          return
+        }
+
+        debugger
+        for (let i = universalMarks.length - 1; i >= 0; i--) {
+          const existing = universalMarks[i]
+
+          if (!Mark.exists(existing, node.marks)) {
+            universalMarks.splice(i, 1)
+          }
+        }
+      } else {
+        for (let index = 0; index < node.marks.length; index++) {
+          const mark = node.marks[index]
+          const markEntry: MarkEntry = [mark, index, node, path]
+
+          if (match != null && !isMatch(match, markEntry)) {
+            continue
+          }
+
+          if (mode === 'distinct') {
+            if (Mark.exists(mark, distinctMarks)) {
+              continue
+            } else {
+              distinctMarks.push(mark)
+            }
+          }
+
+          yield markEntry
+
+          // After matching a mark, if we're in first mode skip to the next text.
+          if (mode === 'first') {
+            break
+          }
+        }
+      }
+    }
+
+    // In universal mode, the marks are collected while iterating and we can
+    // only be certain of which are universal when we've finished.
+    if (mode === 'universal') {
+      debugger
+      yield* universalEntries
+    }
   },
 
   /**
@@ -413,6 +459,11 @@ export const LocationQueries = {
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
+    warning(
+      false,
+      'The `Editor.matches` helper is deprecated, use `Editor.nodes` instead.'
+    )
+
     const { at = editor.selection, reverse = false } = options
     let { match } = options
 
@@ -453,7 +504,11 @@ export const LocationQueries = {
     const span: Span = [from, to]
     let i = 0
 
-    for (const entry of Editor.matches(editor, { at: span, match })) {
+    for (const entry of Editor.nodes(editor, {
+      at: span,
+      match,
+      mode: 'highest',
+    })) {
       if (i === 1) {
         return entry
       }
@@ -487,10 +542,17 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location | Span
+      match?: NodeMatch
+      mode?: 'all' | 'highest'
       reverse?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = editor.selection } = options
+    const {
+      at = editor.selection,
+      match,
+      mode = 'all',
+      reverse = false,
+    } = options
 
     if (!at) {
       return
@@ -498,13 +560,32 @@ export const LocationQueries = {
 
     const [from, to] = toSpan(editor, at, options)
     const iterable = Node.nodes(editor, {
-      ...options,
+      reverse,
       from,
       to,
       pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
     })
 
+    let prev: NodeEntry | undefined
+
     for (const entry of iterable) {
+      if (match != null) {
+        if (mode === 'highest' && prev) {
+          const [, prevPath] = prev
+          const [, path] = entry
+
+          if (Path.compare(path, prevPath) === 0) {
+            continue
+          }
+        }
+
+        if (!Editor.isMatch(editor, entry, match)) {
+          continue
+        }
+
+        prev = entry
+      }
+
       yield entry
     }
   },
@@ -751,10 +832,11 @@ export const LocationQueries = {
     const span: Span = [from, to]
     let i = 0
 
-    for (const entry of Editor.matches(editor, {
+    for (const entry of Editor.nodes(editor, {
       match,
       at: span,
       reverse: true,
+      mode: 'highest',
     })) {
       if (i === 1) {
         return entry

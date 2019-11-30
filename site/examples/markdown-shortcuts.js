@@ -47,7 +47,7 @@ const withShortcuts = editor => {
       Range.isCollapsed(selection)
     ) {
       const { anchor } = selection
-      const block = Editor.match(editor, anchor, 'block')
+      const [block] = Editor.nodes(editor, { match: 'block' })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
@@ -73,14 +73,16 @@ const withShortcuts = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const { anchor } = selection
-      const match = Editor.match(editor, anchor, 'block')
+      const [match] = Editor.nodes(editor, { match: 'block' })
 
       if (match) {
         const [block, path] = match
         const start = Editor.start(editor, path)
 
-        if (block.type !== 'paragraph' && Point.equals(anchor, start)) {
+        if (
+          block.type !== 'paragraph' &&
+          Point.equals(selection.anchor, start)
+        ) {
           Editor.setNodes(editor, { type: 'paragraph' })
 
           if (match.type === 'list-item') {

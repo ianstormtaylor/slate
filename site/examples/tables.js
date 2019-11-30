@@ -29,8 +29,7 @@ const withTables = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const { anchor } = selection
-      const cell = Editor.match(editor, anchor, { type: 'table-cell' })
+      const [cell] = Editor.nodes(editor, { match: { type: 'table-cell' } })
 
       if (cell) {
         const [, cellPath] = cell
@@ -39,19 +38,18 @@ const withTables = editor => {
             ? Editor.start(editor, cellPath)
             : Editor.end(editor, cellPath)
 
-        if (Point.equals(anchor, edge)) {
+        if (Point.equals(selection.anchor, edge)) {
           return
         }
       }
     }
 
-    if (
-      type === 'insert_break' &&
-      selection &&
-      (Editor.match(editor, selection.anchor, { type: 'table' }) ||
-        Editor.match(editor, selection.focus, { type: 'table' }))
-    ) {
-      return
+    if (type === 'insert_break' && selection) {
+      const [table] = Editor.nodes(editor, { match: { type: 'table' } })
+
+      if (table) {
+        return
+      }
     }
 
     exec(command)

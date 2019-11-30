@@ -92,8 +92,9 @@ export const TextTransforms = {
 
       // Get the highest nodes that are completely inside the range, as well as
       // the start and end nodes.
-      const matches = Editor.matches(editor, {
+      const matches = Editor.nodes(editor, {
         at,
+        mode: 'highest',
         match: ([n, p]) =>
           (Element.isElement(n) && editor.isVoid(n)) ||
           (!Path.isCommon(p, start.path) && !Path.isCommon(p, end.path)),

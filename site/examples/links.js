@@ -61,8 +61,8 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  const { selection } = editor
-  return !!(selection && Editor.match(editor, selection, { type: 'link' }))
+  const [link] = Editor.nodes(editor, { match: { type: 'link' } })
+  return !!link
 }
 
 const unwrapLink = editor => {

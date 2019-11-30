@@ -57,9 +57,8 @@ const withMarks = editor => {
 }
 
 const isMarkActive = (editor, type) => {
-  const marks = Editor.activeMarks(editor)
-  const isActive = marks.some(m => m.type === type)
-  return isActive
+  const [mark] = Editor.marks(editor, { match: { type }, mode: 'universal' })
+  return !!mark
 }
 
 const Mark = ({ attributes, children, mark }) => {

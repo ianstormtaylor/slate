@@ -75,10 +75,8 @@ const withMentions = editor => {
 }
 
 const isMentionActive = editor => {
-  const match = Editor.match(editor, editor.selection, {
-    type: 'mention',
-  })
-  return !!match
+  const [mention] = Editor.nodes(editor, { match: { type: 'mention' } })
+  return !!mention
 }
 
 const Element = props => {

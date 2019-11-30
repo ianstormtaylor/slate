@@ -144,7 +144,7 @@ export const NodeTransforms = {
         return
       }
 
-      const matches = Editor.matches(editor, { at, match })
+      const matches = Editor.nodes(editor, { at, match, mode: 'highest' })
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
@@ -352,7 +352,7 @@ export const NodeTransforms = {
       }
 
       const toRef = Editor.pathRef(editor, to)
-      const targets = Editor.matches(editor, { at, match })
+      const targets = Editor.nodes(editor, { at, match, mode: 'highest' })
       const pathRefs = Array.from(targets, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
@@ -401,7 +401,7 @@ export const NodeTransforms = {
         at = Editor.unhangRange(editor, at)
       }
 
-      const depths = Editor.matches(editor, { at, match })
+      const depths = Editor.nodes(editor, { at, match, mode: 'highest' })
       const pathRefs = Array.from(depths, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
@@ -446,7 +446,11 @@ export const NodeTransforms = {
         at = Editor.unhangRange(editor, at)
       }
 
-      for (const [node, path] of Editor.matches(editor, { at, match })) {
+      for (const [node, path] of Editor.nodes(editor, {
+        at,
+        match,
+        mode: 'highest',
+      })) {
         const properties: Partial<Node> = {}
         const newProperties: Partial<Node> = {}
 
@@ -631,7 +635,7 @@ export const NodeTransforms = {
         return
       }
 
-      const matches = Editor.matches(editor, { at, match })
+      const matches = Editor.nodes(editor, { at, match, mode: 'highest' })
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
       for (const pathRef of pathRefs) {
@@ -699,7 +703,14 @@ export const NodeTransforms = {
       }
 
       const roots: NodeEntry[] = editor.isInline(element)
-        ? Array.from(Editor.matches(editor, { ...options, at, match: 'block' }))
+        ? Array.from(
+            Editor.nodes(editor, {
+              ...options,
+              at,
+              match: 'block',
+              mode: 'highest',
+            })
+          )
         : [[editor, []]]
 
       for (const [, rootPath] of roots) {
@@ -712,7 +723,7 @@ export const NodeTransforms = {
         }
 
         const matches = Array.from(
-          Editor.matches(editor, { ...options, at: a, match })
+          Editor.nodes(editor, { ...options, at: a, match, mode: 'highest' })
         )
 
         if (matches.length > 0) {

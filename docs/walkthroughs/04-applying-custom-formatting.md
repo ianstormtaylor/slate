@@ -26,13 +26,11 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const { selection } = editor
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
-
+            const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+            const isCodeActive = !!node
             Editor.setNodes(
               editor,
-              { type: isCode ? 'paragraph' : 'code' },
+              { type: isCodeActive ? 'paragraph' : 'code' },
               { match: 'block' }
             )
           }
@@ -70,14 +68,11 @@ const App = () => {
             // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
-              const { selection } = editor
-              const isCode = selection
-                ? Editor.match(editor, selection, { type: 'code' })
-                : false
-
+              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+              const isCodeActive = !!node
               Editor.setNodes(
                 editor,
-                { type: isCode ? null : 'code' },
+                { type: isCodeActive ? null : 'code' },
                 { match: 'block' }
               )
               break
@@ -147,14 +142,11 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const { selection } = editor
-              const isCode = selection
-                ? Editor.match(editor, selection, { type: 'code' })
-                : false
-
+              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+              const isCodeActive = !!node
               Editor.setNodes(
                 editor,
-                { type: isCode ? null : 'code' },
+                { type: isCodeActive ? null : 'code' },
                 { match: 'block' }
               )
               break

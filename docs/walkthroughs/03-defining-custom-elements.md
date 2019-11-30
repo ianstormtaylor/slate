@@ -173,15 +173,13 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
-            const { selection } = editor
-            const isCode = selection
-              ? Editor.match(editor, selection, { type: 'code' })
-              : false
+            const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+            const isCodeActive = !!node
 
             // Toggle the block type depending on `isCode`.
             Editor.setNodes(
               editor,
-              { type: isCode ? 'paragraph' : 'code' },
+              { type: isCodeActive ? 'paragraph' : 'code' },
               { match: 'block' }
             )
           }
