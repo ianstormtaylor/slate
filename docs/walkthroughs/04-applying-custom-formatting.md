@@ -81,7 +81,7 @@ const App = () => {
             // When "B" is pressed, add a bold mark to the text.
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, [{ type: 'bold' }])
+              Editor.addMarks(editor, { type: 'bold' })
               break
             }
           }
@@ -154,7 +154,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, [{ type: 'bold' }])
+              Editor.addMarks(editor, { type: 'bold' })
               break
             }
           }

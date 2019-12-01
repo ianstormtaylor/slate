@@ -89,7 +89,7 @@ export const createEditor = (): Editor => {
       if (Command.isCoreCommand(command)) {
         switch (command.type) {
           case 'add_mark': {
-            Editor.addMarks(editor, [command.mark])
+            Editor.addMarks(editor, command.mark)
             break
           }
 

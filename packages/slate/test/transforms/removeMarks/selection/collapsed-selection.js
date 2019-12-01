@@ -4,8 +4,8 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.addMarks(editor, [{ key: 'a' }])
-  Editor.removeMarks(editor, [{ key: 'a' }])
+  Editor.addMarks(editor, { key: 'a' })
+  Editor.removeMarks(editor, { key: 'a' })
   Editor.insertText(editor, 'a')
 }
 

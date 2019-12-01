@@ -111,7 +111,7 @@ Editor.insertNodes(editor, [element], { at: path })
 Editor.splitNodes(editor, { at: point })
 
 // Add a mark to all the text in a range.
-Editor.addMarks(editor, [mark], { at: range })
+Editor.addMarks(editor, mark, { at: range })
 ```
 
 The editor-specific helpers are the ones you'll use most often when working with Slate editors, so it pays to become very familiar with them.

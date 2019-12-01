@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setMarks(editor, [{ existing: true }], { key: true }, { at: [0, 0] })
+  Editor.setMarks(editor, { existing: true }, { key: true }, { at: [0, 0] })
 }
 
 export const input = (

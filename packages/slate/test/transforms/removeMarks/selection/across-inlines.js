@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.removeMarks(editor, [{ key: 'a' }])
+  Editor.removeMarks(editor, { key: 'a' })
 }
 
 export const input = (
