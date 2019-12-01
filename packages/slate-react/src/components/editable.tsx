@@ -498,7 +498,7 @@ export const Editable = (
           }
 
           IS_FOCUSED.delete(editor)
-        }, [])}
+        }, [attributes.onBlur])}
         onClick={useCallback((event: React.MouseEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
@@ -515,7 +515,7 @@ export const Editable = (
               Editor.select(editor, range)
             }
           }
-        }, [])}
+        }, [attributes.onClick])}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
             if (
@@ -533,7 +533,7 @@ export const Editable = (
               }
             }
           },
-          []
+          [attributes.onCompositionEnd]
         )}
         onCompositionStart={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -544,7 +544,7 @@ export const Editable = (
               state.isComposing = true
             }
           },
-          []
+          [attributes.onCompositionStart]
         )}
         onCopy={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           if (
@@ -554,7 +554,7 @@ export const Editable = (
             event.preventDefault()
             setFragmentData(event.clipboardData, editor)
           }
-        }, [])}
+        }, [attributes.onCopy])}
         onCut={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
@@ -569,7 +569,7 @@ export const Editable = (
               editor.exec({ type: 'delete_fragment' })
             }
           }
-        }, [])}
+        }, [attributes.onCut])}
         onDragOver={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
@@ -584,7 +584,7 @@ export const Editable = (
               event.preventDefault()
             }
           }
-        }, [])}
+        }, [attributes.onDragOver])}
         onDragStart={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
@@ -603,7 +603,7 @@ export const Editable = (
 
             setFragmentData(event.dataTransfer, editor)
           }
-        }, [])}
+        }, [attributes.onDragStart])}
         onDrop={useCallback((event: React.DragEvent<HTMLDivElement>) => {
           if (
             hasTarget(editor, event.target) &&
@@ -625,7 +625,7 @@ export const Editable = (
               editor.exec({ type: 'insert_data', data })
             }
           }
-        }, [])}
+        }, [attributes.onDrop])}
         onFocus={useCallback((event: React.FocusEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
@@ -646,8 +646,8 @@ export const Editable = (
 
             IS_FOCUSED.set(editor, true)
           }
-        }, [])}
-        onKeyDown={event => {
+        }, [attributes.onFocus])}
+        onKeyDown={useCallback((event: React.KeyboardEvent<HTMLDivElement>) => {
           if (
             !readOnly &&
             hasEditableTarget(editor, event.target) &&
@@ -839,7 +839,7 @@ export const Editable = (
               }
             }
           }
-        }}
+        }, [attributes.onKeyDown])}
         onPaste={useCallback((event: React.ClipboardEvent<HTMLDivElement>) => {
           // COMPAT: Firefox doesn't support the `beforeinput` event, so we
           // fall back to React's `onPaste` here instead.
@@ -855,7 +855,7 @@ export const Editable = (
               data: event.clipboardData,
             })
           }
-        }, [])}
+        }, [attributes.onPaste])}
       >
         <Children
           decorate={decorate}
