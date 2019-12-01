@@ -1,7 +1,7 @@
 {
   "name": "slate-schema",
   "description": "A mixin for ensuring your Slate content conforms to a set of rules.",
-  "version": "0.50.5",
+  "version": "0.50.6",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -10,10 +10,12 @@
   "umd": "dist/slate-schema.js",
   "umdMin": "dist/slate-schema.min.js",
   "sideEffects": false,
-  "files": ["dist/"],
+  "files": [
+    "dist/"
+  ],
   "devDependencies": {
-    "slate": "^0.50.5",
-    "slate-hyperscript": "^0.50.5"
+    "slate": "^0.50.6",
+    "slate-hyperscript": "^0.50.6"
   },
   "peerDependencies": {
     "slate": ">=0.50.0"
