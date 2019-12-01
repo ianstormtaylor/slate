@@ -1,5 +1,5 @@
 import React, { useLayoutEffect, useRef, useMemo, useCallback } from 'react'
-import { Editor, Element, NodeEntry, Node, Range } from 'slate'
+import { Editor, Element, NodeEntry, Node, Range, Text, Mark } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -9,6 +9,7 @@ import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
+import { Leaf } from '../utils/leaf'
 import {
   DOMElement,
   DOMNode,
@@ -26,11 +27,50 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
-import {
-  CustomDecorationProps,
-  CustomElementProps,
-  CustomMarkProps,
-} from './custom'
+
+/**
+ * `RenderDecorationProps` are passed to the `renderDecoration` handler.
+ */
+
+export interface RenderDecorationProps {
+  children: any
+  decoration: Range
+  leaf: Leaf
+  text: Text
+  attributes: {
+    'data-slate-decoration': true
+  }
+}
+
+/**
+ * `RenderElementProps` are passed to the `renderElement` handler.
+ */
+
+export interface RenderElementProps {
+  children: any
+  element: Element
+  attributes: {
+    'data-slate-inline'?: true
+    'data-slate-node': 'element'
+    'data-slate-void'?: true
+    dir?: 'rtl'
+    ref: any
+  }
+}
+
+/**
+ * `RenderMarkProps` are passed to the `renderMark` handler.
+ */
+
+export interface RenderMarkProps {
+  children: any
+  mark: Mark
+  leaf: Leaf
+  text: Text
+  attributes: {
+    'data-slate-mark': true
+  }
+}
 
 /**
  * Editable.
@@ -44,9 +84,9 @@ export const Editable = (
     readOnly?: boolean
     role?: string
     style?: React.CSSProperties
-    renderDecoration?: (props: CustomDecorationProps) => JSX.Element
-    renderElement?: (props: CustomElementProps) => JSX.Element
-    renderMark?: (props: CustomMarkProps) => JSX.Element
+    renderDecoration?: (props: RenderDecorationProps) => JSX.Element
+    renderElement?: (props: RenderElementProps) => JSX.Element
+    renderMark?: (props: RenderMarkProps) => JSX.Element
   } & React.TextareaHTMLAttributes<HTMLDivElement>
 ) => {
   const {

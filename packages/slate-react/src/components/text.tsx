@@ -4,12 +4,12 @@ import { Range, Element, Text as SlateText } from 'slate'
 import Leaf from './leaf'
 import { Leaf as SlateLeaf } from '../utils/leaf'
 import { ReactEditor, useEditor } from '..'
+import { RenderDecorationProps, RenderMarkProps } from './editable'
 import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
 } from '../utils/weak-maps'
-import { CustomDecorationProps, CustomMarkProps } from './custom'
 
 /**
  * Text.
@@ -19,8 +19,8 @@ const Text = (props: {
   decorations: Range[]
   isLast: boolean
   parent: Element
-  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
-  renderMark?: (props: CustomMarkProps) => JSX.Element
+  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
+  renderMark?: (props: RenderMarkProps) => JSX.Element
   text: SlateText
 }) => {
   const {

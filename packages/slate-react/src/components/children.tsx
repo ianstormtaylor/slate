@@ -7,10 +7,10 @@ import { ReactEditor } from '..'
 import { useEditor } from '../hooks/use-editor'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
-  CustomDecorationProps,
-  CustomElementProps,
-  CustomMarkProps,
-} from './custom'
+  RenderDecorationProps,
+  RenderElementProps,
+  RenderMarkProps,
+} from './editable'
 
 /**
  * Children.
@@ -20,9 +20,9 @@ const Children = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
-  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
-  renderElement?: (props: CustomElementProps) => JSX.Element
-  renderMark?: (props: CustomMarkProps) => JSX.Element
+  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderMark?: (props: RenderMarkProps) => JSX.Element
   selection: Range | null
 }) => {
   const {

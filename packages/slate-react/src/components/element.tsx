@@ -14,11 +14,10 @@ import {
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import {
-  CustomDecorationProps,
-  CustomElement,
-  CustomElementProps,
-  CustomMarkProps,
-} from './custom'
+  RenderDecorationProps,
+  RenderElementProps,
+  RenderMarkProps,
+} from './editable'
 import { isRangeListEqual } from '../utils/leaf'
 
 /**
@@ -29,9 +28,9 @@ const Element = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
-  renderDecoration?: (props: CustomDecorationProps) => JSX.Element
-  renderElement?: (props: CustomElementProps) => JSX.Element
-  renderMark?: (props: CustomMarkProps) => JSX.Element
+  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderMark?: (props: RenderMarkProps) => JSX.Element
   selection: Range | null
 }) => {
   const {
@@ -39,7 +38,7 @@ const Element = (props: {
     decorations,
     element,
     renderDecoration,
-    renderElement = (p: CustomElementProps) => <CustomElement {...p} />,
+    renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderMark,
     selection,
   } = props
@@ -152,5 +151,20 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
         Range.equals(prev.selection, next.selection)))
   )
 })
+
+/**
+ * The default element renderer.
+ */
+
+export const DefaultElement = (props: RenderElementProps) => {
+  const { attributes, children, element } = props
+  const editor = useEditor()
+  const Tag = editor.isInline(element) ? 'span' : 'div'
+  return (
+    <Tag {...attributes} style={{ position: 'relative' }}>
+      {children}
+    </Tag>
+  )
+}
 
 export default MemoizedElement
