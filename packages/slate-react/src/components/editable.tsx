@@ -47,7 +47,7 @@ export const Editable = (
     renderDecoration?: (props: CustomDecorationProps) => JSX.Element
     renderElement?: (props: CustomElementProps) => JSX.Element
     renderMark?: (props: CustomMarkProps) => JSX.Element
-  } & React.HTMLAttributes<HTMLDivElement>
+  } & React.TextareaHTMLAttributes<HTMLDivElement>
 ) => {
   const {
     decorate = defaultDecorate,
