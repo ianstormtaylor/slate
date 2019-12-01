@@ -48,7 +48,7 @@ const VideoElement = ({ attributes, children, element }) => {
         contentEditable={false}
         style={{
           position: 'relative',
-          boxShaodow: selected && focused ? '0 0 0 3px #B4D5FF' : 'none',
+          boxShadow: selected && focused ? '0 0 0 3px #B4D5FF' : 'none',
         }}
       >
         <div
