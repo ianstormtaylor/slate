@@ -173,24 +173,17 @@ export const LocationQueries = {
   *elements(
     editor: Editor,
     options: {
-      at?: Location | Span
+      at?: Location
+      match?: NodeMatch
+      mode?: 'all' | 'highest'
       reverse?: boolean
     } = {}
   ): Iterable<ElementEntry> {
-    const { at = editor.selection } = options
-
-    if (!at) {
-      return
+    for (const [node, path] of this.nodes(editor, options)) {
+      if (Element.isElement(node)) {
+        yield [node, path]
+      }
     }
-
-    const [from, to] = toSpan(editor, at, options)
-
-    yield* Node.elements(editor, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
   },
 
   /**
@@ -319,7 +312,7 @@ export const LocationQueries = {
   *marks(
     editor: Editor,
     options: {
-      at?: Location | Span
+      at?: Location
       match?: MarkMatch
       mode?: 'all' | 'first' | 'distinct' | 'universal'
       reverse?: boolean
@@ -350,20 +343,12 @@ export const LocationQueries = {
       }
     }
 
-    const [from, to] = toSpan(editor, at, options)
-    const iterable = Node.texts(editor, {
-      reverse,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
-
     const universalMarks: Mark[] = []
     const distinctMarks: Mark[] = []
     let universalEntries: MarkEntry[] = []
     let first = true
 
-    for (const entry of iterable) {
+    for (const entry of Editor.texts(editor, { reverse, at })) {
       const [node, path] = entry
       const isMatch = (m: MarkMatch, entry: MarkEntry) => {
         if (typeof m === 'function') {
@@ -449,7 +434,7 @@ export const LocationQueries = {
   *matches(
     editor: Editor,
     options: {
-      at?: Location | Span
+      at?: Location
       match?: NodeMatch
       reverse?: boolean
     }
@@ -553,7 +538,19 @@ export const LocationQueries = {
       return
     }
 
-    const [from, to] = toSpan(editor, at, options)
+    let from
+    let to
+
+    if (Span.isSpan(at)) {
+      from = at[0]
+      to = at[1]
+    } else {
+      const first = Editor.path(editor, at, { edge: 'start' })
+      const last = Editor.path(editor, at, { edge: 'end' })
+      from = reverse ? last : first
+      to = reverse ? first : last
+    }
+
     const iterable = Node.nodes(editor, {
       reverse,
       from,
@@ -899,49 +896,18 @@ export const LocationQueries = {
   *texts(
     editor: Editor,
     options: {
-      at?: Location | Span
+      at?: Location
+      match?: NodeMatch
+      mode?: 'all' | 'highest'
       reverse?: boolean
     } = {}
   ): Iterable<TextEntry> {
-    const { at = editor.selection } = options
-
-    if (!at) {
-      return
+    for (const [node, path] of this.nodes(editor, options)) {
+      if (Text.isText(node)) {
+        yield [node, path]
+      }
     }
-
-    const [from, to] = toSpan(editor, at, options)
-
-    yield* Node.texts(editor, {
-      ...options,
-      from,
-      to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
-    })
   },
-}
-
-/**
- * Get the from and to path span from a location.
- */
-
-const toSpan = (
-  editor: Editor,
-  at: Location | Span,
-  options: {
-    reverse?: boolean
-  } = {}
-): Span => {
-  const { reverse = false } = options
-
-  if (Span.isSpan(at)) {
-    return at
-  }
-
-  const first = Editor.path(editor, at, { edge: 'start' })
-  const last = Editor.path(editor, at, { edge: 'end' })
-  const from = reverse ? last : first
-  const to = reverse ? first : last
-  return [from, to]
 }
 
 /**
