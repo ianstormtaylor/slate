@@ -6,7 +6,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Editor.setMarks(
     editor,
-    [{ key: 'a' }],
+    { key: 'a' },
     { thing: true },
     {
       at: {
