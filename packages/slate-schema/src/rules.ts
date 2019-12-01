@@ -13,7 +13,7 @@ export interface MarkRule {
 }
 
 export interface ChildValidation {
-  match?: NodeMatch[]
+  match?: NodeMatch | NodeMatch[]
   min?: number
   max?: number
 }
