@@ -4,16 +4,13 @@
   "version": "0.50.6",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/index.js",
-  "module": "lib/index.es.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "umd": "dist/slate-react.js",
   "umdMin": "dist/slate-react.min.js",
   "sideEffects": false,
-  "files": [
-    "dist/",
-    "lib/"
-  ],
+  "files": ["dist/"],
   "dependencies": {
     "@types/debounce": "^1.2.0",
     "@types/debug": "^4.1.5",

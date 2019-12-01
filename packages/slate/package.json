@@ -4,16 +4,13 @@
   "version": "0.50.5",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/index.js",
-  "module": "lib/index.es.js",
-  "types": "lib/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "umd": "dist/slate.js",
   "umdMin": "dist/slate.min.js",
   "sideEffects": false,
-  "files": [
-    "dist/",
-    "lib/"
-  ],
+  "files": ["dist/"],
   "dependencies": {
     "@types/esrever": "^0.2.0",
     "esrever": "^0.2.0",
