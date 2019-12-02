@@ -4,32 +4,22 @@ export interface ChildInvalidError {
   code: 'child_invalid'
   node: Descendant
   path: Path
-  index: number
 }
 
 export interface ChildMaxInvalidError {
   code: 'child_max_invalid'
   node: Descendant
   path: Path
-  index: number
   count: number
   max: number
 }
 
 export interface ChildMinInvalidError {
   code: 'child_min_invalid'
-  node: Descendant
+  node: Descendant | undefined
   path: Path
-  index: number
   count: number
   min: number
-}
-
-export interface ChildUnexpectedError {
-  code: 'child_unexpected'
-  node: Descendant
-  path: Path
-  index: number
 }
 
 export interface FirstChildInvalidError {
@@ -102,7 +92,6 @@ export type NodeError =
   | ChildInvalidError
   | ChildMaxInvalidError
   | ChildMinInvalidError
-  | ChildUnexpectedError
   | FirstChildInvalidError
   | LastChildInvalidError
   | MarkInvalidError

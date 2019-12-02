@@ -181,9 +181,8 @@ export const checkAncestor = (
       } else {
         return {
           code: 'child_max_invalid',
-          node: parent,
-          path: parentPath,
-          index,
+          node: child,
+          path: childPath,
           count,
           max: group.max,
         }
@@ -196,9 +195,8 @@ export const checkAncestor = (
       if (group.min != null && count <= group.min) {
         return {
           code: 'child_min_invalid',
-          node: parent,
-          path: parentPath,
-          index,
+          node: child,
+          path: childPath,
           count,
           min: group.min,
         }
@@ -233,16 +231,15 @@ export const checkAncestor = (
       if (nc && Editor.isMatch(editor, [child, childPath], nc.match || {})) {
         return {
           code: 'child_min_invalid',
-          node: parent,
-          path: parentPath,
-          index,
+          node: child,
+          path: childPath,
           count,
           min: group.min,
         }
       }
     }
 
-    return { code: 'child_invalid', node: child, path: childPath, index }
+    return { code: 'child_invalid', node: child, path: childPath }
   }
 }
 

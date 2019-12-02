@@ -92,12 +92,13 @@ export const withSchema = (
       }
 
       case 'child_max_invalid': {
-        const { node, path, index } = error
+        const { path } = error
+        const [parent, parentPath] = Editor.parent(editor, path)
 
-        if (node.children.length === 1 && path.length !== 0) {
-          Editor.removeNodes(editor, { at: path })
+        if (parent.children.length === 1 && parentPath.length !== 0) {
+          Editor.removeNodes(editor, { at: parentPath })
         } else {
-          Editor.removeNodes(editor, { at: path.concat(index) })
+          Editor.removeNodes(editor, { at: path })
         }
 
         break
@@ -105,22 +106,22 @@ export const withSchema = (
 
       case 'child_min_invalid': {
         const { path } = error
+        const [, parentPath] = Editor.parent(editor, path)
 
-        if (path.length === 0) {
-          const range = Editor.range(editor, path)
+        if (parentPath.length === 0) {
+          const range = Editor.range(editor, parentPath)
           Editor.removeNodes(editor, {
             at: range,
             match: ([, p]) => p.length === 1,
           })
         } else {
-          Editor.removeNodes(editor, { at: path })
+          Editor.removeNodes(editor, { at: parentPath })
         }
 
         break
       }
 
       case 'child_invalid':
-      case 'child_unexpected':
       case 'next_sibling_invalid':
       case 'node_property_invalid':
       case 'node_text_invalid':
