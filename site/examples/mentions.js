@@ -12,20 +12,20 @@ import {
 
 import { Button, Icon, Toolbar } from '../components'
 
+const promptMention = editor => {
+  const name = window.prompt('Who would you like to mention?')
+  if (!name) return
+  const regex = new RegExp(`^${name}`, 'i')
+  const match = Object.entries(USERS).find(([, name]) => regex.test(name))
+  const id = match ? match[0] : 57
+  editor.exec({ type: 'insert_mention', id })
+}
+
 const MentionExample = () => {
   const editor = useMemo(
     () => withMentions(withReact(withHistory(createEditor()))),
     []
   )
-
-  const promptMention = () => {
-    const name = window.prompt('Who would you like to mention?')
-    if (!name) return
-    const regex = new RegExp(`^${name}`, 'i')
-    const match = Object.entries(USERS).find(([, name]) => regex.test(name))
-    const id = match ? match[0] : 57
-    editor.exec({ type: 'insert_mention', id })
-  }
 
   return (
     <Slate editor={editor} defaultValue={initialValue}>
@@ -38,7 +38,7 @@ const MentionExample = () => {
         onKeyDown={event => {
           if (event.key === '@') {
             event.preventDefault()
-            promptMention()
+            promptMention(editor)
           }
         }}
       />
@@ -121,7 +121,7 @@ const MentionButton = () => {
       active={isMentionActive(editor)}
       onMouseDown={event => {
         event.preventDefault()
-        promptMention()
+        promptMention(editor)
       }}
     >
       <Icon>person_pin</Icon>
