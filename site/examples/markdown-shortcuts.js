@@ -85,7 +85,7 @@ const withShortcuts = editor => {
         ) {
           Editor.setNodes(editor, { type: 'paragraph' })
 
-          if (match.type === 'list-item') {
+          if (block.type === 'list-item') {
             Editor.unwrapNodes(editor, { match: { type: 'bulleted-list' } })
           }
 
