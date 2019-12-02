@@ -36,10 +36,10 @@ export const output = (
         <anchor />
         word
       </inline>
-      <text key />
+      <text />
     </block>
     <block>
-      <text key />
+      <text />
       <inline key>
         another
         <focus />

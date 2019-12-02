@@ -193,7 +193,7 @@ export const TextTransforms = {
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = Editor.match(editor, at, 'inline-element')
+      const inlineElementMatch = Editor.match(editor, at, 'inline')
 
       if (inlineElementMatch) {
         const [, inlinePath] = inlineElementMatch
@@ -270,7 +270,7 @@ export const TextTransforms = {
         }
       }
 
-      const inlineMatch = Editor.match(editor, at, 'inline')!
+      const inlineMatch = Editor.match(editor, at, ['inline', 'text'])!
       const [, inlinePath] = inlineMatch
       const isInlineStart = Editor.isStart(editor, at, inlinePath)
       const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
@@ -285,7 +285,10 @@ export const TextTransforms = {
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
 
-      Editor.splitNodes(editor, { at, match: hasBlocks ? 'block' : 'inline' })
+      Editor.splitNodes(editor, {
+        at,
+        match: hasBlocks ? 'block' : ['inline', 'text'],
+      })
 
       const startRef = Editor.pathRef(
         editor,
@@ -296,13 +299,18 @@ export const TextTransforms = {
 
       Editor.insertNodes(editor, starts, {
         at: startRef.current!,
-        match: 'inline',
+        match: ['inline', 'text'],
       })
+
       Editor.insertNodes(editor, middles, {
         at: middleRef.current!,
         match: 'block',
       })
-      Editor.insertNodes(editor, ends, { at: endRef.current!, match: 'inline' })
+
+      Editor.insertNodes(editor, ends, {
+        at: endRef.current!,
+        match: ['inline', 'text'],
+      })
 
       if (!options.at) {
         let path

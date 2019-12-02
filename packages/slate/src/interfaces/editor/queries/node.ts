@@ -5,19 +5,12 @@ export const NodeQueries = {
    * Check if a node entry is a match.
    */
 
-  isMatch(editor: Editor, entry: NodeEntry, match: NodeMatch | NodeMatch[]) {
-    const [node] = entry
-
-    // If match is an array, treat it as an OR condition.
+  isMatch(editor: Editor, entry: NodeEntry, match: NodeMatch): boolean {
     if (Array.isArray(match)) {
-      for (const m of match) {
-        if (Editor.isMatch(editor, entry, m)) {
-          return true
-        }
-      }
-
-      return false
+      return match.some(m => Editor.isMatch(editor, entry, m))
     }
+
+    const [node] = entry
 
     switch (match) {
       case 'text':
@@ -27,11 +20,6 @@ export const NodeQueries = {
       case 'element':
         return Element.isElement(node)
       case 'inline':
-        return (
-          (Element.isElement(node) && editor.isInline(node)) ||
-          Text.isText(node)
-        )
-      case 'inline-element':
         return Element.isElement(node) && editor.isInline(node)
       case 'block':
         return (

@@ -13,19 +13,19 @@ export interface MarkRule {
 }
 
 export interface ChildValidation {
-  match?: NodeMatch | NodeMatch[]
+  match?: NodeMatch
   min?: number
   max?: number
 }
 
 export interface NodeValidation {
   children?: ChildValidation[]
-  first?: NodeMatch[]
-  last?: NodeMatch[]
-  marks?: MarkMatch[]
-  next?: NodeMatch[]
-  parent?: NodeMatch[]
-  previous?: NodeMatch[]
+  first?: NodeMatch
+  last?: NodeMatch
+  marks?: MarkMatch
+  next?: NodeMatch
+  parent?: NodeMatch
+  previous?: NodeMatch
   properties?: Record<string, any>
   text?: (text: string) => boolean
 }

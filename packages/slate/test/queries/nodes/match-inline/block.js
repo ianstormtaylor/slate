@@ -15,4 +15,4 @@ export const run = editor => {
   )
 }
 
-export const output = [[<text>one</text>, [0, 0]]]
+export const output = []

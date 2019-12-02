@@ -13,11 +13,14 @@ export const input = (
 
 export const run = editor => {
   return Array.from(
-    Editor.nodes(editor, { at: [], match: 'inline', mode: 'highest' })
+    Editor.nodes(editor, { at: [], match: ['inline', 'text'], mode: 'highest' })
   )
 }
 
 export const output = [
+  [<text>one</text>, [0, 0]],
   [<inline>two</inline>, [0, 1]],
+  [<text>three</text>, [0, 2]],
   [<inline>four</inline>, [0, 3]],
+  [<text>five</text>, [0, 4]],
 ]

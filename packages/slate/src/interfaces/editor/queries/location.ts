@@ -350,13 +350,6 @@ export const LocationQueries = {
 
     for (const entry of Editor.texts(editor, { reverse, at })) {
       const [node, path] = entry
-      const isMatch = (m: MarkMatch, entry: MarkEntry) => {
-        if (typeof m === 'function') {
-          return m(entry)
-        } else {
-          return Mark.matches(entry[0], m)
-        }
-      }
 
       if (mode === 'universal') {
         if (first) {
@@ -384,7 +377,7 @@ export const LocationQueries = {
           const mark = node.marks[index]
           const markEntry: MarkEntry = [mark, index, node, path]
 
-          if (match != null && !isMatch(match, markEntry)) {
+          if (match != null && !Editor.isMarkMatch(editor, markEntry, match)) {
             continue
           }
 

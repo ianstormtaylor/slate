@@ -17,8 +17,4 @@ export const run = editor => {
   )
 }
 
-export const output = [
-  [<text>one</text>, [0, 0]],
-  [<inline>two</inline>, [0, 1]],
-  [<text>three</text>, [0, 2]],
-]
+export const output = [[<inline>two</inline>, [0, 1]]]

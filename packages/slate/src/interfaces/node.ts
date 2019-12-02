@@ -574,9 +574,9 @@ export type NodeMatch =
   | 'block'
   | 'element'
   | 'inline'
-  | 'inline-element'
   | 'text'
   | 'editor'
   | 'void'
   | Partial<Node>
   | ((entry: NodeEntry) => boolean)
+  | NodeMatch[]

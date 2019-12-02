@@ -62,4 +62,7 @@ export type MarkEntry = [Mark, number, Text, Path]
  * `MarkMatch` values are used as shorthands for matching mark objects.
  */
 
-export type MarkMatch = Partial<Mark> | ((entry: MarkEntry) => boolean)
+export type MarkMatch =
+  | Partial<Mark>
+  | ((entry: MarkEntry) => boolean)
+  | MarkMatch[]

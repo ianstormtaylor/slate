@@ -48,7 +48,7 @@ export const NodeTransforms = {
         } else if (Text.isText(node)) {
           match = 'text'
         } else if (editor.isInline(node)) {
-          match = 'inline'
+          match = ['inline', 'text']
         } else {
           match = 'block'
         }
@@ -682,7 +682,7 @@ export const NodeTransforms = {
           const path = at
           match = ([, p]) => Path.equals(p, path)
         } else if (editor.isInline(element)) {
-          match = 'inline'
+          match = ['inline', 'text']
         } else {
           match = 'block'
         }

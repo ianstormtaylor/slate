@@ -70,8 +70,9 @@ export const checkNode = (
     }
 
     if ('marks' in v && v.marks != null) {
-      for (const [mark, index, n, p] of Node.marks(node)) {
-        if (!v.marks.some(m => Mark.matches(mark, m))) {
+      for (const entry of Node.marks(node)) {
+        if (!Editor.isMarkMatch(editor, entry, v.marks)) {
+          const [mark, index, n, p] = entry
           return { code: 'mark_invalid', node: n, path: p, mark, index }
         }
       }

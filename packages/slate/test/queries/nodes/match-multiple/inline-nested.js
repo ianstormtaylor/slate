@@ -17,15 +17,17 @@ export const input = (
 
 export const run = editor => {
   return Array.from(
-    Editor.nodes(editor, { at: [], match: 'inline', mode: 'highest' })
+    Editor.nodes(editor, { at: [], match: ['inline', 'text'], mode: 'highest' })
   )
 }
 
 export const output = [
+  [<text>one</text>, [0, 0]],
   [
     <inline>
       two<inline>three</inline>four
     </inline>,
     [0, 1],
   ],
+  [<text>five</text>, [0, 2]],
 ]
