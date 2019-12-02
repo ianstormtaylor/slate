@@ -51,7 +51,7 @@ const withLinks = editor => {
     }
 
     if (text && isUrl(text)) {
-      wrapLink(editor, url)
+      wrapLink(editor, text)
     } else {
       exec(command)
     }
