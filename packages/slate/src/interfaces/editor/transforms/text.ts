@@ -333,15 +333,18 @@ export const TextTransforms = {
     editor: Editor,
     text: string,
     options: {
-      at?: Point | Range
+      at?: Location
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { selection } = editor
-      let { at } = options
+      let { at = editor.selection } = options
 
-      if (!at && selection) {
-        at = selection
+      if (!at) {
+        return
+      }
+
+      if (Path.isPath(at)) {
+        at = Editor.range(editor, at)
       }
 
       if (Range.isRange(at)) {
@@ -354,10 +357,12 @@ export const TextTransforms = {
         }
       }
 
-      if (Point.isPoint(at) && !Editor.match(editor, at.path, 'void')) {
-        const { path, offset } = at
-        editor.apply({ type: 'insert_text', path, offset, text })
+      if (Editor.match(editor, at.path, 'void')) {
+        return
       }
+
+      const { path, offset } = at
+      editor.apply({ type: 'insert_text', path, offset, text })
     })
   },
 }
