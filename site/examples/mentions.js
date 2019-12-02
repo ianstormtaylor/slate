@@ -12,7 +12,7 @@ import {
 
 import { Button, Icon, Toolbar } from '../components'
 
-const promptMention = (editor) => {
+const promptMention = editor => {
   const name = window.prompt('Who would you like to mention?')
   if (!name) return
   const regex = new RegExp(`^${name}`, 'i')
