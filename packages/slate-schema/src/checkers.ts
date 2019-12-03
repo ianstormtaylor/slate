@@ -7,6 +7,7 @@ import {
   MarkEntry,
   AncestorEntry,
   Descendant,
+  DescendantEntry,
 } from 'slate'
 
 import { MarkError, NodeError } from './errors'
@@ -53,10 +54,10 @@ export const checkNode = (
   rule: NodeRule,
   rules: NodeRule[]
 ): NodeError | undefined => {
-  const { validate: v } = rule
+  const { match: m, validate: v } = rule
   const [node, path] = entry
 
-  if (Editor.isMatch(editor, entry, rule.match)) {
+  if (Editor.isMatch(editor, entry, m)) {
     if ('properties' in v) {
       for (const k in v.properties) {
         const p = v.properties[k]
@@ -117,7 +118,7 @@ export const checkAncestor = (
   editor: Editor,
   entry: AncestorEntry,
   rule: NodeRule,
-  ancestorRules: NodeRule[]
+  parentRules: NodeRule[]
 ): [NodeRule, NodeError] | undefined => {
   const { validate: v } = rule
   const [parent, parentPath] = entry
@@ -140,8 +141,8 @@ export const checkAncestor = (
     if (child && !processed.has(child)) {
       processed.add(child)
 
-      for (const r of ancestorRules) {
-        const e = checkParent(editor, entry, index, rule, r)
+      for (const r of parentRules) {
+        const e = checkParent(editor, entry, [child, childPath], r)
 
         if (e) {
           return [r, e]
@@ -260,20 +261,19 @@ export const checkAncestor = (
 export const checkParent = (
   editor: Editor,
   entry: AncestorEntry,
-  index: number,
-  rule: NodeRule,
-  childRule: NodeRule
+  childEntry: DescendantEntry,
+  rule: NodeRule
 ): NodeError | undefined => {
-  const { validate: cv } = childRule
+  const { match: m, validate: v } = rule
   const [parent, parentPath] = entry
-  const child = Node.child(parent, index)
-  const childPath = parentPath.concat(index)
+  const [child, childPath] = childEntry
+  const index = childPath[childPath.length - 1]
 
   if (
-    'parent' in cv &&
-    cv.parent != null &&
-    Editor.isMatch(editor, [child, childPath], rule.match) &&
-    !Editor.isMatch(editor, [parent, parentPath], cv.parent)
+    'parent' in v &&
+    v.parent != null &&
+    Editor.isMatch(editor, [child, childPath], m) &&
+    !Editor.isMatch(editor, [parent, parentPath], v.parent)
   ) {
     return {
       code: 'parent_invalid',
@@ -284,15 +284,15 @@ export const checkParent = (
   }
 
   if (
-    'previous' in cv &&
-    cv.previous != null &&
+    'previous' in v &&
+    v.previous != null &&
     index > 0 &&
-    Editor.isMatch(editor, [child, childPath], rule.match)
+    Editor.isMatch(editor, [child, childPath], m)
   ) {
     const prevChild = Node.child(parent, index - 1)
     const prevPath = parentPath.concat(index - 1)
 
-    if (!Editor.isMatch(editor, [prevChild, prevPath], cv.previous)) {
+    if (!Editor.isMatch(editor, [prevChild, prevPath], v.previous)) {
       return {
         code: 'previous_sibling_invalid',
         node: prevChild,
@@ -302,15 +302,15 @@ export const checkParent = (
   }
 
   if (
-    'next' in cv &&
-    cv.next != null &&
+    'next' in v &&
+    v.next != null &&
     index < parent.children.length - 1 &&
-    Editor.isMatch(editor, [child, childPath], rule.match)
+    Editor.isMatch(editor, [child, childPath], m)
   ) {
     const nextChild = Node.child(parent, index + 1)
     const nextPath = parentPath.concat(index + 1)
 
-    if (!Editor.isMatch(editor, [nextChild, nextPath], cv.next)) {
+    if (!Editor.isMatch(editor, [nextChild, nextPath], v.next)) {
       return {
         code: 'next_sibling_invalid',
         node: nextChild,

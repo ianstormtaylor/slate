@@ -7,8 +7,13 @@ export const schema = [
     for: 'node',
     match: { c: true },
     validate: {
-      parent: [{ b: true }],
+      parent: { b: true },
     },
+  },
+  {
+    for: 'node',
+    match: { a: true },
+    validate: {},
   },
 ]
 

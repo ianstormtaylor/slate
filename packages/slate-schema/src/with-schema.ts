@@ -16,7 +16,7 @@ export const withSchema = (
   const { normalizeNode } = editor
   const markRules: MarkRule[] = []
   const nodeRules: NodeRule[] = []
-  const ancestorRules: NodeRule[] = []
+  const parentRules: NodeRule[] = []
 
   for (const rule of rules) {
     if (rule.for === 'mark') {
@@ -29,7 +29,7 @@ export const withSchema = (
         'next' in rule.validate ||
         'previous' in rule.validate
       ) {
-        ancestorRules.push(rule)
+        parentRules.push(rule)
       }
     }
   }
@@ -48,7 +48,7 @@ export const withSchema = (
       }
 
       if (!Text.isText(n)) {
-        const failure = checkAncestor(editor, [n, p], r, ancestorRules)
+        const failure = checkAncestor(editor, [n, p], r, parentRules)
 
         if (failure) {
           rule = failure[0]
