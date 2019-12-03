@@ -28,7 +28,7 @@ export const SlateContext = createContext<[Editor] | null>(null)
 
 export const Slate = (props: {
   editor: Editor
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   defaultValue?: Node[]
   onChange?: (children: Node[], operations: Operation[]) => void
 }) => {
