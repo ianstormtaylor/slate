@@ -2,7 +2,7 @@
 
 Migrating from earlier versions of Slate to the `0.50.x` versions is not a simple task. The entire framework was re-considered from the ground up. This has resulted in a **much** better set of abstractions, which will result in you writing less code. But the migration process is not simple.
 
-It's highly recommended that after reading this guide you read through the original [Walkthroughs](../walkthroughs) and the other [Concepts](./) to see how all of the new concepts get applied.
+It's highly recommended that after reading this guide you read through the original [Walkthroughs](../walkthroughs/01-installing-slate.md) and the other [Concepts](./01-interfaces.md) to see how all of the new concepts get applied.
 
 ## Major Differences
 
