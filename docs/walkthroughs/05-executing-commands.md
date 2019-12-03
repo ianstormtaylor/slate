@@ -121,7 +121,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.toggleMarks(editor, [{ type: 'bold' }])
+              Editor.addMarks(editor, [{ type: 'bold' }])
               break
             }
           }
