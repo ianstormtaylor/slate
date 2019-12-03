@@ -7,10 +7,10 @@ import { checkNode, checkAncestor } from './checkers'
 /**
  * The `withSchema` plugin augments an editor to ensure that its content is
  * normalized to always obey a schema after operations are applied.
- * 
+ *
  * The parameters are curried so that it can easily be composed with other plugins.
  * For example (using flowRight from lodash):
- * 
+ *
  * editor = _.flowRight(
  *    withHistory,
  *    withSchema(rules),
@@ -18,12 +18,17 @@ import { checkNode, checkAncestor } from './checkers'
  */
 
 type IWithSchema = {
-  (rules: SchemaRule[]): (editor: Editor) => Editor;
-  (rules: SchemaRule[], editor: Editor): Editor;
+  (rules: SchemaRule[]): (editor: Editor) => Editor
+  (rules: SchemaRule[], editor: Editor): Editor
 }
 
-export const withSchema: IWithSchema = (rules: SchemaRule[] = [], editor?: Editor): any => {
-  if (editor === undefined) { return (editor: Editor) => withSchema(rules, editor); }
+export const withSchema: IWithSchema = (
+  rules: SchemaRule[] = [],
+  editor?: Editor
+): any => {
+  if (editor === undefined) {
+    return (editor: Editor) => withSchema(rules, editor)
+  }
 
   const { normalizeNode } = editor
   const markRules: MarkRule[] = []
