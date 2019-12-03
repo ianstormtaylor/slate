@@ -40,16 +40,21 @@ export const withSchema = (
     let rule: NodeRule | undefined
 
     for (const r of nodeRules) {
-      let e = checkNode(editor, entry, r, nodeRules)
+      error = checkNode(editor, [n, p], r, nodeRules)
 
-      if (!e && !Text.isText(n)) {
-        e = checkAncestor(editor, [n, p], r, ancestorRules)
-      }
-
-      if (e) {
-        error = e
+      if (error) {
         rule = r
         break
+      }
+
+      if (!Text.isText(n)) {
+        const failure = checkAncestor(editor, [n, p], r, ancestorRules)
+
+        if (failure) {
+          rule = failure[0]
+          error = failure[1]
+          break
+        }
       }
     }
 

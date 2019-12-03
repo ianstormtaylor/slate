@@ -118,7 +118,7 @@ export const checkAncestor = (
   entry: AncestorEntry,
   rule: NodeRule,
   ancestorRules: NodeRule[]
-): NodeError | undefined => {
+): [NodeRule, NodeError] | undefined => {
   const { validate: v } = rule
   const [parent, parentPath] = entry
   const processed = new Set()
@@ -144,7 +144,7 @@ export const checkAncestor = (
         const e = checkParent(editor, entry, index, rule, r)
 
         if (e) {
-          return e
+          return [r, e]
         }
       }
     }
@@ -180,13 +180,16 @@ export const checkAncestor = (
         count = 0
         continue
       } else {
-        return {
-          code: 'child_max_invalid',
-          node: child,
-          path: childPath,
-          count,
-          max: group.max,
-        }
+        return [
+          rule,
+          {
+            code: 'child_max_invalid',
+            node: child,
+            path: childPath,
+            count,
+            max: group.max,
+          },
+        ]
       }
     }
 
@@ -194,13 +197,16 @@ export const checkAncestor = (
     // we're missing a child in a group with a mininmum set.
     if (!child) {
       if (group.min != null && count <= group.min) {
-        return {
-          code: 'child_min_invalid',
-          node: child,
-          path: childPath,
-          count,
-          min: group.min,
-        }
+        return [
+          rule,
+          {
+            code: 'child_min_invalid',
+            node: child,
+            path: childPath,
+            count,
+            min: group.min,
+          },
+        ]
       } else {
         g++
         count = 0
@@ -230,17 +236,20 @@ export const checkAncestor = (
       const nc = groups[g + 1]
 
       if (nc && Editor.isMatch(editor, [child, childPath], nc.match || {})) {
-        return {
-          code: 'child_min_invalid',
-          node: child,
-          path: childPath,
-          count,
-          min: group.min,
-        }
+        return [
+          rule,
+          {
+            code: 'child_min_invalid',
+            node: child,
+            path: childPath,
+            count,
+            min: group.min,
+          },
+        ]
       }
     }
 
-    return { code: 'child_invalid', node: child, path: childPath }
+    return [rule, { code: 'child_invalid', node: child, path: childPath }]
   }
 }
 
