@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useEditor } from '..'
@@ -59,8 +59,26 @@ const String = (props: {
 
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
+  const editor: any = useEditor()
+
+  const ref: React.RefObject<HTMLSpanElement> = useRef() as any
+
+  useEffect(() => {
+    // console.log(ref.current)
+    if (ref.current && ref.current.innerText !== text) {
+      // console.log(editor)
+      ref.current.innerText = text
+      // console.log(editor)
+      editor.apply({
+        type: 'set_selection',
+        properties: editor.selection,
+        newProperties: editor.selection,
+      })
+    }
+  })
+
   return (
-    <span data-slate-string>
+    <span data-slate-string ref={ref}>
       {text}
       {isTrailing ? '\n' : null}
     </span>
