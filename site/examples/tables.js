@@ -1,9 +1,11 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderMark = useCallback(props => <Mark {...props} />, [])
   const editor = useMemo(
@@ -11,7 +13,15 @@ const TablesExample = () => {
     []
   )
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable renderElement={renderElement} renderMark={renderMark} />
     </Slate>
   )

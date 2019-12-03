@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { css } from 'emotion'
@@ -8,12 +8,23 @@ import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withMarks(withHistory(withReact(createEditor()))),
     []
   )
+
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <HoveringToolbar />
       <Editable
         renderMark={props => <Mark {...props} />}
