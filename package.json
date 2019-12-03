@@ -20,7 +20,7 @@
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
     "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
-    "test:debug": "mocha debug --require ./config/babel/register.cjs ./packages/*/test/index.js",
+    "test:inspect": "yarn test --inspect-brk",
     "watch": "yarn build:rollup --watch"
   },
   "devDependencies": {
