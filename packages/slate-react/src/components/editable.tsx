@@ -534,7 +534,7 @@ export const Editable = (
               // aren't correct and never fire the "insertFromComposition"
               // type that we need. So instead, insert whenever a composition
               // ends since it will already have been committed to the DOM.
-              if (!IS_SAFARI && event.data) {
+              if (!IS_SAFARI && !IS_FIREFOX && event.data) {
                 editor.exec({ type: 'insert_text', text: event.data })
               }
             }
