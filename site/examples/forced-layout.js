@@ -40,7 +40,7 @@ const schema = [
 const ForcedLayoutExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withSchema(withHistory(withReact(createEditor())), schema),
+    () => withSchema(schema, withHistory(withReact(createEditor()))),
     []
   )
   return (
