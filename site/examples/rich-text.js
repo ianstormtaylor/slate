@@ -100,7 +100,7 @@ const withRichText = editor => {
 }
 
 const isMarkActive = (editor, type) => {
-  const [mark] = Editor.marks(editor, { match: { type }, mode: 'universal' })
+  const [mark] = Editor.marks(editor, { match: { type } })
   return !!mark
 }
 
