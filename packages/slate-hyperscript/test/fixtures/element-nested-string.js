@@ -14,7 +14,7 @@ export const output = {
       children: [
         {
           text: 'word',
-          marks: [],
+          
         },
       ],
     },

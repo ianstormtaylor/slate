@@ -1,9 +1,7 @@
 import {
   Element,
   Descendant,
-  Mark,
   Node,
-  Path,
   Range,
   Text,
   Editor,
@@ -37,7 +35,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
     const prev = nodes[nodes.length - 1]
 
     if (typeof child === 'string') {
-      const text = { text: child, marks: [] }
+      const text = { text: child }
       STRINGS.add(text)
       child = text
     }
@@ -49,8 +47,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
         Text.isText(prev) &&
         STRINGS.has(prev) &&
         STRINGS.has(c) &&
-        c.marks.every(m => Mark.exists(m, prev.marks)) &&
-        prev.marks.every(m => Mark.exists(m, c.marks))
+        Text.matches(prev, c)
       ) {
         prev.text += c.text
       } else {
@@ -144,43 +141,6 @@ export function createFragment(
 }
 
 /**
- * Create a `Text` object with a mark applied.
- */
-
-export function createMark(
-  tagName: string,
-  attributes: { [key: string]: any },
-  children: any[]
-): Text {
-  const mark = { ...attributes }
-  const nodes = resolveDescendants(children)
-
-  if (nodes.length > 1) {
-    throw new Error(
-      `The <mark> hyperscript tag must only contain a single node's worth of children.`
-    )
-  }
-
-  if (nodes.length === 0) {
-    return { text: '', marks: [mark] }
-  }
-
-  const [node] = nodes
-
-  if (!Text.isText(node)) {
-    throw new Error(
-      `The <mark> hyperscript tag must only contain text content as children.`
-    )
-  }
-
-  if (!Mark.exists(mark, node.marks)) {
-    node.marks.push(mark)
-  }
-
-  return node
-}
-
-/**
  * Create a `Selection` object.
  */
 
@@ -237,7 +197,7 @@ export function createText(
   let [node] = nodes
 
   if (node == null) {
-    node = { text: '', marks: [] }
+    node = { text: '' }
   }
 
   if (!Text.isText(node)) {
@@ -245,8 +205,8 @@ export function createText(
     The <text> hyperscript tag can only contain text content as children.`)
   }
 
-  // COMPAT: Re-create the node, because if they used the <text> tag we want to
-  // guarantee that it won't be merge with other string children.
+  // COMPAT: If they used the <text> tag we want to guarantee that it won't be
+  // merge with other string children.
   STRINGS.delete(node)
 
   Object.assign(node, attributes)

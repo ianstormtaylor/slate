@@ -1,4 +1,4 @@
-import { Mark, Node, Path, Text } from 'slate'
+import { Node, Path, Text } from 'slate'
 
 /**
  * A weak map to hold anchor tokens.
@@ -23,23 +23,17 @@ export class Token {}
  */
 
 export class AnchorToken extends Token {
-  focused: boolean
-  marks: Mark[] | null
   offset?: number
   path?: Path
 
   constructor(
     props: {
-      focused?: boolean
-      marks?: Mark[] | null
       offset?: number
       path?: Path
     } = {}
   ) {
     super()
-    const { focused = true, marks = null, offset, path } = props
-    this.focused = focused
-    this.marks = marks
+    const { offset, path } = props
     this.offset = offset
     this.path = path
   }
@@ -50,23 +44,17 @@ export class AnchorToken extends Token {
  */
 
 export class FocusToken extends Token {
-  focused: boolean
-  marks: Mark[] | null
   offset?: number
   path?: Path
 
   constructor(
     props: {
-      focused?: boolean
-      marks?: Mark[] | null
       offset?: number
       path?: Path
     } = {}
   ) {
     super()
-    const { focused = true, marks = null, offset, path } = props
-    this.focused = focused
-    this.marks = marks
+    const { offset, path } = props
     this.offset = offset
     this.path = path
   }

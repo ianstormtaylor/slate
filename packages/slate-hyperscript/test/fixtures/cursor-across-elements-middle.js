@@ -21,7 +21,7 @@ export const output = {
       children: [
         {
           text: 'one',
-          marks: [],
+          
         },
       ],
     },
@@ -29,7 +29,7 @@ export const output = {
       children: [
         {
           text: 'two',
-          marks: [],
+          
         },
       ],
     },

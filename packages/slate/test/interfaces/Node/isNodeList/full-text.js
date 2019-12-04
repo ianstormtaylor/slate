@@ -3,7 +3,7 @@ import { Node } from 'slate'
 export const input = [
   {
     text: '',
-    marks: [],
+    
   },
 ]
 

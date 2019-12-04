@@ -6,11 +6,7 @@ import TextComponent from './text'
 import { ReactEditor } from '..'
 import { useEditor } from '../hooks/use-editor'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
-import {
-  RenderDecorationProps,
-  RenderElementProps,
-  RenderMarkProps,
-} from './editable'
+import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**
  * Children.
@@ -20,18 +16,16 @@ const Children = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
-  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
   renderElement?: (props: RenderElementProps) => JSX.Element
-  renderMark?: (props: RenderMarkProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {
   const {
     decorate,
     decorations,
     node,
-    renderDecoration,
     renderElement,
-    renderMark,
+    renderLeaf,
     selection,
   } = props
   const editor = useEditor()
@@ -65,9 +59,8 @@ const Children = (props: {
           decorations={ds}
           element={n}
           key={key.id}
-          renderDecoration={renderDecoration}
           renderElement={renderElement}
-          renderMark={renderMark}
+          renderLeaf={renderLeaf}
           selection={sel}
         />
       )
@@ -78,8 +71,7 @@ const Children = (props: {
           key={key.id}
           isLast={isLeafBlock && i === node.children.length}
           parent={node}
-          renderDecoration={renderDecoration}
-          renderMark={renderMark}
+          renderLeaf={renderLeaf}
           text={n}
         />
       )

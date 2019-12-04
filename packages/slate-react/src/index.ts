@@ -1,6 +1,6 @@
 export * from './components/editable'
 export { DefaultElement } from './components/element'
-export { DefaultMark, DefaultDecoration } from './components/leaf'
+export { DefaultLeaf } from './components/leaf'
 export * from './hooks/use-editor'
 export * from './hooks/use-focused'
 export * from './hooks/use-read-only'

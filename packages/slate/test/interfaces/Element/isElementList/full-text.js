@@ -3,7 +3,7 @@ import { Element } from 'slate'
 export const input = [
   {
     text: '',
-    marks: [],
+    
   },
 ]
 
