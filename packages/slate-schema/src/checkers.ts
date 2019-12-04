@@ -130,7 +130,6 @@ export const checkAncestor = (
   let g = 0
 
   while (true) {
-    count++
     const group = groups[g] as ChildValidation | undefined
     const child = parent.children[index] as Descendant | undefined
     const childPath = parentPath.concat(index)
@@ -172,6 +171,12 @@ export const checkAncestor = (
       continue
     }
 
+    if (
+      child &&
+      Editor.isMatch(editor, [child, childPath], group.match || {})
+    ) {
+      count++
+    }
     // Since we want to report overflow on last matching child we don't
     // immediately v for count > max, but instead do so once we find
     // a child that doesn't match.
@@ -197,7 +202,7 @@ export const checkAncestor = (
     // If there's no child, we're either done, we're in an optional group, or
     // we're missing a child in a group with a mininmum set.
     if (!child) {
-      if (group.min != null && count <= group.min) {
+      if (group.min != null && count < group.min) {
         return [
           rule,
           {

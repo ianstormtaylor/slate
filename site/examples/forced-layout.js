@@ -15,7 +15,8 @@ const schema = [
       ],
     },
     normalize: (editor, error) => {
-      const { code, path, index } = error
+      const { code, path } = error
+      const [index] = path
       const type = index === 0 ? 'title' : 'paragraph'
 
       switch (code) {
@@ -25,11 +26,11 @@ const schema = [
         }
         case 'child_min_invalid': {
           const block = { type, children: [{ text: '', marks: [] }] }
-          Editor.insertNodes(editor, block, { at: path.concat(index) })
+          Editor.insertNodes(editor, block, { at: path })
           break
         }
         case 'child_max_invalid': {
-          Editor.setNodes(editor, { type }, { at: path.concat(index) })
+          Editor.setNodes(editor, { type }, { at: path })
           break
         }
       }
