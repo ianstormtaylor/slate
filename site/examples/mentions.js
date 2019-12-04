@@ -24,7 +24,7 @@ const MentionExample = () => {
   )
 
   const chars = CHARACTERS.filter(c =>
-    c.toLowerCase().startsWith(search)
+    c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
   const suggest = target && chars.length > 0
 
