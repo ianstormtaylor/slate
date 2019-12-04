@@ -1,4 +1,10 @@
-import React, { useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import React, {
+  useLayoutEffect,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from 'react'
 import { Editor, Element, NodeEntry, Node, Range, Text, Mark } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
@@ -96,6 +102,7 @@ export const Editable = (
     renderDecoration,
     renderElement,
     renderMark,
+    autoFocus,
     style = {},
     onDOMBeforeInput: propsOnDOMBeforeInput,
     ...attributes
@@ -209,6 +216,14 @@ export const Editable = (
       state.isUpdatingSelection = false
     })
   })
+
+  // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
+  // needs to be manually focused.
+  useEffect(() => {
+    if (ref.current && autoFocus) {
+      ref.current.focus()
+    }
+  }, [autoFocus])
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
