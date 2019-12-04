@@ -234,7 +234,7 @@ const ExamplePage = () => {
   const [stacktrace, setStacktrace] = useState()
   const [showTabs, setShowTabs] = useState()
   const router = useRouter()
-  const { example = 'rich-text' } = router.query
+  const { example = router.asPath.replace('/examples/', '') } = router.query
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
   return (
