@@ -345,7 +345,7 @@ export const LocationQueries = {
 
     const universalMarks: Mark[] = []
     const distinctMarks: Mark[] = []
-    let universalEntries: MarkEntry[] = []
+    const universalEntries: MarkEntry[] = []
     let first = true
 
     for (const entry of Editor.texts(editor, { reverse, at })) {
