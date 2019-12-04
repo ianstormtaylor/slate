@@ -345,7 +345,7 @@ export const LocationQueries = {
 
     const universalMarks: Mark[] = []
     const distinctMarks: Mark[] = []
-    let universalEntries: MarkEntry[] = []
+    const universalEntries: MarkEntry[] = []
     let first = true
 
     for (const entry of Editor.texts(editor, { reverse, at })) {
@@ -353,8 +353,16 @@ export const LocationQueries = {
 
       if (mode === 'universal') {
         if (first) {
-          universalMarks.push(...node.marks)
-          universalEntries = node.marks.map((m, i) => [m, i, node, path])
+          for (let i = 0; i < node.marks.length; i++) {
+            const mark = node.marks[i]
+            const markEntry: MarkEntry = [mark, i, node, path]
+
+            if (match == null || Editor.isMarkMatch(editor, markEntry, match)) {
+              universalMarks.push(mark)
+              universalEntries.push(markEntry)
+            }
+          }
+
           first = false
           continue
         }
@@ -370,6 +378,7 @@ export const LocationQueries = {
 
           if (!Mark.exists(existing, node.marks)) {
             universalMarks.splice(i, 1)
+            universalEntries.splice(i, 1)
           }
         }
       } else {
