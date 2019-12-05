@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import faker from 'faker'
 import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
@@ -21,10 +21,20 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 const HugeDocumentExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable renderElement={renderElement} spellCheck autoFocus />
     </Slate>
   )

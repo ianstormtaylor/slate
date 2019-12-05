@@ -1,9 +1,10 @@
+import { unstable_batchedUpdates } from 'react-dom'
 import { Editor, Node, Path, Operation, Command } from 'slate'
 
-import { ReactEditor, ReactCommand } from '.'
-import { Key } from './utils/key'
-import { NODE_TO_KEY } from './utils/weak-maps'
-import { EDITOR_TO_CONTEXT_LISTENER } from './hooks/use-slate'
+import { ReactEditor } from './react-editor'
+import { ReactCommand } from './react-command'
+import { Key } from '../utils/key'
+import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY } from '../utils/weak-maps'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -87,14 +88,21 @@ export const withReact = (editor: Editor): Editor => {
     }
   }
 
-  editor.onChange = (children: Node[], operations: Operation[]) => {
-    const contextOnChange = EDITOR_TO_CONTEXT_LISTENER.get(editor)
+  editor.onChange = () => {
+    // COMPAT: React doesn't batch `setState` hook calls, which means that the
+    // children and selection can get out of sync for one render pass. So we
+    // have to use this unstable API to ensure it batches them. (2019/12/03)
+    // https://github.com/facebook/react/issues/14259#issuecomment-439702367
+    unstable_batchedUpdates(() => {
+      const contextOnChange = EDITOR_TO_ON_CHANGE.get(editor)
 
-    if (contextOnChange) {
-      contextOnChange(children, operations)
-    }
+      if (contextOnChange) {
+        const { children, selection } = editor
+        contextOnChange(children, selection)
+      }
 
-    onChange(children, operations)
+      onChange()
+    })
   }
 
   return editor

@@ -18,7 +18,6 @@
     "@types/debug": "^4.1.5",
     "@types/is-hotkey": "^0.1.1",
     "@types/lodash": "^4.14.149",
-    "@types/react": "^16.9.13",
     "debounce": "^1.2.0",
     "direction": "^1.0.3",
     "is-hotkey": "^0.1.6",

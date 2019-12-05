@@ -22,7 +22,7 @@ export interface Editor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: (children: Node[], operations: Operation[]) => void
+  onChange: () => void
   operations: Operation[]
   selection: Range | null
   [key: string]: any

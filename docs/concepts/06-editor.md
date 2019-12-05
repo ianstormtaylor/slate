@@ -9,7 +9,7 @@ interface Editor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: (children: Node[], operations: Operation[]) => void
+  onChange: () => void
   children: Node[]
   operations: Operation[]
   selection: Range | null

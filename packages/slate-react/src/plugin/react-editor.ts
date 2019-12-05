@@ -1,6 +1,6 @@
 import { Editor, Element, Node, Path, Point, Range } from 'slate'
 
-import { Key } from './utils/key'
+import { Key } from '../utils/key'
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -10,8 +10,7 @@ import {
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
-  PLACEHOLDER_SYMBOL,
-} from './utils/weak-maps'
+} from '../utils/weak-maps'
 import {
   DOMElement,
   DOMNode,
@@ -21,7 +20,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
-} from './utils/dom'
+} from '../utils/dom'
 
 export interface ReactEditor extends Editor {}
 

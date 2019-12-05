@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import { Editor, createEditor } from 'slate'
@@ -23,6 +23,8 @@ const BLOCK_FORMATS = [
 ]
 
 const RichTextExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -31,7 +33,15 @@ const RichTextExample = () => {
   )
 
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Toolbar>
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
@@ -79,6 +79,8 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -86,7 +88,15 @@ const PasteHtmlExample = () => {
     []
   )
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}

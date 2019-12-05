@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
 import { Editor, createEditor } from 'slate'
@@ -7,12 +7,23 @@ import { withHistory } from 'slate-history'
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
   )
+
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Toolbar>
         <LinkButton />
       </Toolbar>
