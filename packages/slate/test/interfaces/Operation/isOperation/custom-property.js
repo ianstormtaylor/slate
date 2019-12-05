@@ -1,9 +1,10 @@
 import { Operation } from 'slate'
 
 export const input = {
-  type: 'add_mark',
+  type: 'set_node',
   path: [0],
-  mark: {},
+  properties: {},
+  newProperties: {},
   custom: true,
 }
 

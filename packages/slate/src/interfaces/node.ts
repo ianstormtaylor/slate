@@ -1,14 +1,5 @@
 import { produce } from 'immer'
-import {
-  Editor,
-  Element,
-  ElementEntry,
-  MarkEntry,
-  Path,
-  Range,
-  Text,
-  TextEntry,
-} from '..'
+import { Editor, Element, ElementEntry, Path, Range, Text, TextEntry } from '..'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -369,27 +360,6 @@ export const Node = {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
-    }
-  },
-
-  /**
-   * Return an iterable of all the marks in all of the text nodes in a root node.
-   */
-
-  *marks(
-    root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    } = {}
-  ): Iterable<MarkEntry> {
-    for (const [node, path] of Node.texts(root, options)) {
-      for (let i = 0; i < node.marks.length; i++) {
-        const mark = node.marks[i]
-        yield [mark, i, node, path]
-      }
     }
   },
 

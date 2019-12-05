@@ -16,7 +16,6 @@ const defaultValue = [
     children: [
       {
         text: 'A line of text in a paragraph.',
-        marks: [],
       },
     ],
   },
@@ -44,7 +43,6 @@ const defaultValue = [
     children: [
       {
         text: 'A line of text in a paragraph.',
-        marks: [],
       },
     ],
   },
@@ -80,7 +78,6 @@ const defaultValue = existingValue || [
     children: [
       {
         text: 'A line of text in a paragraph.',
-        marks: [],
       },
     ],
   },
@@ -129,7 +126,7 @@ const deserialize = string => {
   // Return a value array of children derived by splitting the string.
   return string.split('\n').map(line => {
     return {
-      children: [{ text: line, marks: [] }],
+      children: [{ text: line }],
     }
   })
 }

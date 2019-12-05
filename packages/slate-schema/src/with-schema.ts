@@ -1,6 +1,6 @@
 import { Editor, Text, NodeEntry } from 'slate'
 
-import { NodeRule, SchemaRule, MarkRule } from './rules'
+import { NodeRule, SchemaRule } from './rules'
 import { NodeError } from './errors'
 import { checkNode, checkAncestor } from './checkers'
 
@@ -14,23 +14,16 @@ export const withSchema = (
   rules: SchemaRule[] = []
 ): Editor => {
   const { normalizeNode } = editor
-  const markRules: MarkRule[] = []
-  const nodeRules: NodeRule[] = []
+  const nodeRules: NodeRule[] = rules
   const parentRules: NodeRule[] = []
 
   for (const rule of rules) {
-    if (rule.for === 'mark') {
-      markRules.push(rule)
-    } else {
-      nodeRules.push(rule)
-
-      if (
-        'parent' in rule.validate ||
-        'next' in rule.validate ||
-        'previous' in rule.validate
-      ) {
-        parentRules.push(rule)
-      }
+    if (
+      'parent' in rule.validate ||
+      'next' in rule.validate ||
+      'previous' in rule.validate
+    ) {
+      parentRules.push(rule)
     }
   }
 
@@ -133,12 +126,6 @@ export const withSchema = (
       case 'previous_sibling_invalid': {
         const { path } = error
         Editor.removeNodes(editor, { at: path })
-        break
-      }
-
-      case 'mark_invalid': {
-        const { mark, path } = error
-        Editor.removeMarks(editor, [mark], { at: path })
         break
       }
 

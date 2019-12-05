@@ -2,47 +2,14 @@ import {
   NodeEntry,
   Node,
   Text,
-  Mark,
   Editor,
-  MarkEntry,
   AncestorEntry,
   Descendant,
   DescendantEntry,
 } from 'slate'
 
-import { MarkError, NodeError } from './errors'
-import { NodeRule, MarkRule, ChildValidation } from './rules'
-
-/**
- * Check a mark object.
- */
-
-export const checkMark = (
-  editor: Editor,
-  entry: MarkEntry,
-  rule: MarkRule
-): MarkError | undefined => {
-  const { validate: v } = rule
-  const [mark, index, node, path] = entry
-
-  if ('properties' in v) {
-    for (const k in v.properties) {
-      const p = v.properties[k]
-      const value = mark[k]
-
-      if ((typeof p === 'function' && !p(value)) || p !== value) {
-        return {
-          code: 'mark_property_invalid',
-          mark,
-          index,
-          node,
-          path,
-          property: k,
-        }
-      }
-    }
-  }
-}
+import { NodeError } from './errors'
+import { NodeRule, ChildValidation } from './rules'
 
 /**
  * Check a node object.
@@ -66,15 +33,6 @@ export const checkNode = (
 
         if (isInvalid) {
           return { code: 'node_property_invalid', node, path, property: k }
-        }
-      }
-    }
-
-    if ('marks' in v && v.marks != null) {
-      for (const entry of Node.marks(node)) {
-        if (!Editor.isMarkMatch(editor, entry, v.marks)) {
-          const [mark, index, n, p] = entry
-          return { code: 'mark_invalid', node: n, path: p, mark, index }
         }
       }
     }

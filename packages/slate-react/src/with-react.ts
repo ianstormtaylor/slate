@@ -16,11 +16,8 @@ export const withReact = (editor: Editor): Editor => {
     const matches: [Path, Key][] = []
 
     switch (op.type) {
-      case 'add_mark':
       case 'insert_text':
-      case 'remove_mark':
       case 'remove_text':
-      case 'set_mark':
       case 'set_node': {
         for (const [node, path] of Editor.levels(editor, { at: op.path })) {
           const key = ReactEditor.findKey(editor, node)

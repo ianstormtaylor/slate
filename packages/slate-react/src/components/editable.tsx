@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useCallback,
 } from 'react'
-import { Editor, Element, NodeEntry, Node, Range, Text, Mark } from 'slate'
+import { Editor, Element, NodeEntry, Node, Range, Text } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -15,7 +15,6 @@ import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
-import { Leaf } from '../utils/leaf'
 import {
   DOMElement,
   DOMNode,
@@ -35,20 +34,6 @@ import {
 } from '../utils/weak-maps'
 
 /**
- * `RenderDecorationProps` are passed to the `renderDecoration` handler.
- */
-
-export interface RenderDecorationProps {
-  children: any
-  decoration: Range
-  leaf: Leaf
-  text: Text
-  attributes: {
-    'data-slate-decoration': true
-  }
-}
-
-/**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
@@ -56,8 +41,8 @@ export interface RenderElementProps {
   children: any
   element: Element
   attributes: {
-    'data-slate-inline'?: true
     'data-slate-node': 'element'
+    'data-slate-inline'?: true
     'data-slate-void'?: true
     dir?: 'rtl'
     ref: any
@@ -65,16 +50,15 @@ export interface RenderElementProps {
 }
 
 /**
- * `RenderMarkProps` are passed to the `renderMark` handler.
+ * `RenderLeafProps` are passed to the `renderLeaf` handler.
  */
 
-export interface RenderMarkProps {
+export interface RenderLeafProps {
   children: any
-  mark: Mark
-  leaf: Leaf
+  leaf: Text
   text: Text
   attributes: {
-    'data-slate-mark': true
+    'data-slate-leaf': true
   }
 }
 
@@ -90,21 +74,19 @@ export const Editable = (
     readOnly?: boolean
     role?: string
     style?: React.CSSProperties
-    renderDecoration?: (props: RenderDecorationProps) => JSX.Element
     renderElement?: (props: RenderElementProps) => JSX.Element
-    renderMark?: (props: RenderMarkProps) => JSX.Element
+    renderLeaf?: (props: RenderLeafProps) => JSX.Element
   } & React.TextareaHTMLAttributes<HTMLDivElement>
 ) => {
   const {
+    autoFocus,
     decorate = defaultDecorate,
+    onDOMBeforeInput: propsOnDOMBeforeInput,
     placeholder,
     readOnly = false,
-    renderDecoration,
     renderElement,
-    renderMark,
-    autoFocus,
+    renderLeaf,
     style = {},
-    onDOMBeforeInput: propsOnDOMBeforeInput,
     ...attributes
   } = props
   const editor = useSlate()
@@ -906,9 +888,8 @@ export const Editable = (
           decorate={decorate}
           decorations={decorations}
           node={editor}
-          renderDecoration={renderDecoration}
           renderElement={renderElement}
-          renderMark={renderMark}
+          renderLeaf={renderLeaf}
           selection={editor.selection}
         />
       </div>

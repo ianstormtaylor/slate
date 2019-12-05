@@ -6,16 +6,25 @@ import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
-const MARK_HOTKEYS = {
+const HOTKEYS = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+u': 'underlined',
   'mod+`': 'code',
 }
 
+const TEXT_FORMATS = ['bold', 'italic', 'underlined', 'code']
+const LIST_FORMATS = ['numbered-list', 'bulleted-list']
+const BLOCK_FORMATS = [
+  ...LIST_FORMATS,
+  'heading-one',
+  'heading-two',
+  'block-quote',
+]
+
 const RichTextExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderMark = useCallback(props => <Mark {...props} />, [])
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withRichText(withHistory(withReact(createEditor()))),
     []
@@ -24,30 +33,27 @@ const RichTextExample = () => {
   return (
     <Slate editor={editor} defaultValue={initialValue}>
       <Toolbar>
-        <MarkButton type="bold" icon="format_bold" />
-        <MarkButton type="italic" icon="format_italic" />
-        <MarkButton type="underlined" icon="format_underlined" />
-        <MarkButton type="code" icon="code" />
-        <BlockButton type="heading-one" icon="looks_one" />
-        <BlockButton type="heading-two" icon="looks_two" />
-        <BlockButton type="block-quote" icon="format_quote" />
-        <BlockButton type="numbered-list" icon="format_list_numbered" />
-        <BlockButton type="bulleted-list" icon="format_list_bulleted" />
+        <FormatButton format="bold" icon="format_bold" />
+        <FormatButton format="italic" icon="format_italic" />
+        <FormatButton format="underlined" icon="format_underlined" />
+        <FormatButton format="code" icon="code" />
+        <FormatButton format="heading-one" icon="looks_one" />
+        <FormatButton format="heading-two" icon="looks_two" />
+        <FormatButton format="block-quote" icon="format_quote" />
+        <FormatButton format="numbered-list" icon="format_list_numbered" />
+        <FormatButton format="bulleted-list" icon="format_list_bulleted" />
       </Toolbar>
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         placeholder="Enter some rich text…"
         spellCheck
         autoFocus
         onKeyDown={event => {
-          for (const hotkey in MARK_HOTKEYS) {
+          for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event)) {
               event.preventDefault()
-              editor.exec({
-                type: 'toggle_mark',
-                mark: MARK_HOTKEYS[hotkey],
-              })
+              editor.exec({ type: 'toggle_format', format: HOTKEYS[hotkey] })
             }
           }
         }}
@@ -60,53 +66,60 @@ const withRichText = editor => {
   const { exec } = editor
 
   editor.exec = command => {
-    if (command.type === 'toggle_block') {
-      const { block: type } = command
-      const isActive = isBlockActive(editor, type)
-      const isListType = type === 'bulleted-list' || type === 'numbered-list'
+    if (command.type === 'toggle_format') {
+      const { format } = command
+      const isActive = isFormatActive(editor, format)
+      const isList = LIST_FORMATS.includes(format)
 
-      Editor.unwrapNodes(editor, {
-        match: { type: 'bulleted-list' },
-        split: true,
-      })
-
-      Editor.unwrapNodes(editor, {
-        match: { type: 'numbered-list' },
-        split: true,
-      })
-
-      const newType = isActive ? 'paragraph' : isListType ? 'list-item' : type
-      Editor.setNodes(editor, { type: newType })
-
-      if (!isActive && isListType) {
-        Editor.wrapNodes(editor, { type, children: [] })
+      if (TEXT_FORMATS.includes(format)) {
+        Editor.setNodes(
+          editor,
+          { [format]: isActive ? null : true },
+          { match: 'text', split: true }
+        )
       }
 
-      return
-    }
+      if (BLOCK_FORMATS.includes(format)) {
+        for (const f of LIST_FORMATS) {
+          Editor.unwrapNodes(editor, { match: { type: f }, split: true })
+        }
 
-    if (command.type === 'toggle_mark') {
-      const { mark: type } = command
-      const isActive = isMarkActive(editor, type)
-      const cmd = isActive ? 'remove_mark' : 'add_mark'
-      editor.exec({ type: cmd, mark: { type } })
-      return
-    }
+        Editor.setNodes(editor, {
+          type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+        })
 
-    exec(command)
+        if (!isActive && isList) {
+          Editor.wrapNodes(editor, { type: format, children: [] })
+        }
+      }
+    } else {
+      exec(command)
+    }
   }
 
   return editor
 }
 
-const isMarkActive = (editor, type) => {
-  const [match] = Editor.marks(editor, { match: { type }, mode: 'universal' })
-  return !!match
-}
+const isFormatActive = (editor, format) => {
+  if (TEXT_FORMATS.includes(format)) {
+    const [match] = Editor.nodes(editor, {
+      match: { [format]: true },
+      mode: 'all',
+    })
 
-const isBlockActive = (editor, type) => {
-  const [match] = Editor.nodes(editor, { match: { type } })
-  return !!match
+    return !!match
+  }
+
+  if (BLOCK_FORMATS.includes(format)) {
+    const [match] = Editor.nodes(editor, {
+      match: { type: format },
+      mode: 'all',
+    })
+
+    return !!match
+  }
+
+  return false
 }
 
 const Element = ({ attributes, children, element }) => {
@@ -128,42 +141,34 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
-    case 'code':
-      return <code {...attributes}>{children}</code>
-    case 'italic':
-      return <em {...attributes}>{children}</em>
-    case 'underlined':
-      return <u {...attributes}>{children}</u>
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
   }
+
+  if (leaf.code) {
+    children = <code>{children}</code>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underlined) {
+    children = <u>{children}</u>
+  }
+
+  return <span {...attributes}>{children}</span>
 }
 
-const MarkButton = ({ type, icon }) => {
+const FormatButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
-      active={isMarkActive(editor, type)}
+      active={isFormatActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'toggle_mark', mark: type })
-      }}
-    >
-      <Icon>{icon}</Icon>
-    </Button>
-  )
-}
-
-const BlockButton = ({ type, icon }) => {
-  const editor = useSlate()
-  return (
-    <Button
-      active={isBlockActive(editor, type)}
-      onMouseDown={event => {
-        event.preventDefault()
-        editor.exec({ type: 'toggle_block', block: type })
+        editor.exec({ type: 'toggle_format', format })
       }}
     >
       <Icon>{icon}</Icon>
@@ -175,34 +180,13 @@ const initialValue = [
   {
     type: 'paragraph',
     children: [
-      {
-        text: 'This is editable ',
-        marks: [],
-      },
-      {
-        text: 'rich',
-        marks: [{ type: 'bold' }],
-      },
-      {
-        text: ' text, ',
-        marks: [],
-      },
-      {
-        text: 'much',
-        marks: [{ type: 'italic' }],
-      },
-      {
-        text: ' better than a ',
-        marks: [],
-      },
-      {
-        text: '<textarea>',
-        marks: [{ type: 'code' }],
-      },
-      {
-        text: '!',
-        marks: [],
-      },
+      { text: 'This is editable ' },
+      { text: 'rich', bold: true },
+      { text: ' text, ' },
+      { text: 'much', italic: true },
+      { text: ' better than a ' },
+      { text: '<textarea>', code: true },
+      { text: '!' },
     ],
   },
   {
@@ -211,36 +195,21 @@ const initialValue = [
       {
         text:
           "Since it's rich text, you can do things like turn a selection of text ",
-        marks: [],
       },
-      {
-        text: 'bold',
-        marks: [{ type: 'bold' }],
-      },
+      { text: 'bold', bold: true },
       {
         text:
           ', or add a semantically rendered block quote in the middle of the page, like this:',
-        marks: [],
       },
     ],
   },
   {
     type: 'block-quote',
-    children: [
-      {
-        text: 'A wise quote.',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'A wise quote.' }],
   },
   {
     type: 'paragraph',
-    children: [
-      {
-        text: 'Try it out for yourself!',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Try it out for yourself!' }],
   },
 ]
 

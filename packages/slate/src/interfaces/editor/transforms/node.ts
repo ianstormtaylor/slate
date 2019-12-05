@@ -270,7 +270,7 @@ export const NodeTransforms = {
       // Ensure that the nodes are equivalent, and figure out what the position
       // and extra properties of the merge will be.
       if (Text.isText(node) && Text.isText(prevNode)) {
-        const { text, marks, ...rest } = node
+        const { text, ...rest } = node
         position = prevNode.text.length
         properties = rest as Partial<Text>
       } else if (Element.isElement(node) && Element.isElement(prevNode)) {
@@ -413,7 +413,7 @@ export const NodeTransforms = {
   },
 
   /**
-   * Set new properties on the nodes ...
+   * Set new properties on the nodes at a location.
    */
 
   setNodes(
@@ -422,12 +422,14 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
+      mode?: 'all' | 'highest'
       hanging?: boolean
+      split?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
-      const { hanging = false } = options
+      const { hanging = false, mode = 'highest', split = false } = options
 
       if (match == null) {
         if (Path.isPath(at)) {
@@ -446,21 +448,29 @@ export const NodeTransforms = {
         at = Editor.unhangRange(editor, at)
       }
 
-      for (const [node, path] of Editor.nodes(editor, {
-        at,
-        match,
-        mode: 'highest',
-      })) {
+      if (split && Range.isRange(at)) {
+        const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
+        const [start, end] = Range.edges(at)
+        Editor.splitNodes(editor, { at: end, match })
+        Editor.splitNodes(editor, { at: start, match })
+        at = rangeRef.unref()!
+
+        if (options.at == null) {
+          Editor.select(editor, at)
+        }
+      }
+
+      for (const [node, path] of Editor.nodes(editor, { at, match, mode })) {
         const properties: Partial<Node> = {}
         const newProperties: Partial<Node> = {}
 
+        // You can't set properties on the editor node.
+        if (path.length === 0) {
+          continue
+        }
+
         for (const k in props) {
-          if (
-            k === 'marks' ||
-            k === 'children' ||
-            k === 'selection' ||
-            k === 'text'
-          ) {
+          if (k === 'children' || k === 'text') {
             continue
           }
 
@@ -540,7 +550,7 @@ export const NodeTransforms = {
           let after = Editor.after(editor, voidPath)
 
           if (!after) {
-            const text = { text: '', marks: [] }
+            const text = { text: '' }
             const afterPath = Path.next(voidPath)
             Editor.insertNodes(editor, text, { at: afterPath })
             after = Editor.point(editor, afterPath)!
@@ -581,7 +591,7 @@ export const NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const { text, marks, children, ...properties } = node
+          const { text, children, ...properties } = node
           editor.apply({
             type: 'split_node',
             path,

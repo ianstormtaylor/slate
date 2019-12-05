@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Element, Mark } from 'slate'
+import { Element } from 'slate'
 import {
   createAnchor,
   createCursor,
@@ -7,7 +7,6 @@ import {
   createElement,
   createFocus,
   createFragment,
-  createMark,
   createSelection,
   createText,
 } from './creators'
@@ -23,7 +22,6 @@ const DEFAULT_CREATORS = {
   element: createElement,
   focus: createFocus,
   fragment: createFragment,
-  mark: createMark,
   selection: createSelection,
   text: createText,
 }
@@ -54,16 +52,13 @@ const createHyperscript = (
   options: {
     creators?: HyperscriptCreators
     elements?: HyperscriptShorthands
-    marks?: HyperscriptShorthands
   } = {}
 ) => {
-  const { elements = {}, marks = {} } = options
+  const { elements = {} } = options
   const elementCreators = normalizeElements(elements)
-  const markCreators = normalizeMarks(marks)
   const creators = {
     ...DEFAULT_CREATORS,
     ...elementCreators,
-    ...markCreators,
     ...options.creators,
   }
 
@@ -126,34 +121,6 @@ const normalizeElements = (elements: HyperscriptShorthands) => {
       children: any[]
     ) => {
       return createElement('element', { ...props, ...attributes }, children)
-    }
-  }
-
-  return creators
-}
-
-/**
- * Normalize a dictionary of mark shorthands into creator functions.
- */
-
-const normalizeMarks = (marks: HyperscriptShorthands) => {
-  const creators: HyperscriptCreators<Mark> = {}
-
-  for (const tagName in marks) {
-    const props = marks[tagName]
-
-    if (typeof props !== 'object') {
-      throw new Error(
-        `Properties specified for a hyperscript shorthand should be an object, but for the custom mark <${tagName}> tag you passed: ${props}`
-      )
-    }
-
-    creators[tagName] = (
-      tagName: string,
-      attributes: { [key: string]: any },
-      children: any[]
-    ) => {
-      return createMark('mark', { ...props, ...attributes }, children)
     }
   }
 

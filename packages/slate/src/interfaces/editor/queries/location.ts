@@ -9,8 +9,6 @@ import {
   Element,
   ElementEntry,
   Location,
-  Mark,
-  MarkEntry,
   Node,
   NodeEntry,
   NodeMatch,
@@ -21,46 +19,8 @@ import {
   Text,
   TextEntry,
 } from '../../..'
-import { MarkMatch } from '../../mark'
 
 export const LocationQueries = {
-  /**
-   * Get the marks that are "active" at a location. These are the
-   * marks that will be added to any text that is inserted.
-   *
-   * The `union: true` option can be passed to create a union of marks across
-   * the text nodes in the selection, instead of creating an intersection, which
-   * is the default.
-   *
-   * Note: to obey common rich text behavior, if the selection is collapsed at
-   * the start of a text node and there are previous text nodes in the same
-   * block, it will carry those marks forward from the previous text node. This
-   * allows for continuation of marks from previous words.
-   */
-
-  activeMarks(
-    editor: Editor,
-    options: {
-      at?: Location
-      union?: boolean
-      hanging?: boolean
-    } = {}
-  ): Mark[] {
-    warning(
-      false,
-      'The `Editor.activeMarks` helper is deprecated, use `Editor.marks` instead.'
-    )
-
-    return Array.from(
-      Editor.marks(editor, {
-        at: options.at,
-        mode: options.union ? 'distinct' : 'universal',
-        continuing: true,
-      }),
-      ([m]) => m
-    )
-  },
-
   /**
    * Get the point after a location.
    */
@@ -303,116 +263,6 @@ export const LocationQueries = {
     }
 
     yield* levels
-  },
-
-  /**
-   * Iterate through all of the text nodes in the Editor.
-   */
-
-  *marks(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: MarkMatch
-      mode?: 'all' | 'first' | 'distinct' | 'universal'
-      reverse?: boolean
-      continuing?: boolean
-    } = {}
-  ): Iterable<MarkEntry> {
-    const { match, mode = 'all', reverse = false, continuing = false } = options
-    let { at = editor.selection } = options
-
-    if (!at) {
-      return
-    }
-
-    // If the range is collapsed at the start of a text node, it should continue
-    // the marks from the previous text node in the same block.
-    if (
-      continuing &&
-      Range.isRange(at) &&
-      Range.isCollapsed(at) &&
-      at.anchor.offset === 0
-    ) {
-      const { anchor } = at
-      const prev = Editor.previous(editor, anchor, 'text')
-
-      if (prev && Path.isSibling(anchor.path, prev[1])) {
-        const [, prevPath] = prev
-        at = Editor.range(editor, prevPath)
-      }
-    }
-
-    const universalMarks: Mark[] = []
-    const distinctMarks: Mark[] = []
-    const universalEntries: MarkEntry[] = []
-    let first = true
-
-    for (const entry of Editor.texts(editor, { reverse, at })) {
-      const [node, path] = entry
-
-      if (mode === 'universal') {
-        if (first) {
-          for (let i = 0; i < node.marks.length; i++) {
-            const mark = node.marks[i]
-            const markEntry: MarkEntry = [mark, i, node, path]
-
-            if (match == null || Editor.isMarkMatch(editor, markEntry, match)) {
-              universalMarks.push(mark)
-              universalEntries.push(markEntry)
-            }
-          }
-
-          first = false
-          continue
-        }
-
-        // PERF: If we're in universal mode and the eligible marks hits zero
-        // it can never increase again, so we can exit early.
-        if (universalMarks.length === 0) {
-          return
-        }
-
-        for (let i = universalMarks.length - 1; i >= 0; i--) {
-          const existing = universalMarks[i]
-
-          if (!Mark.exists(existing, node.marks)) {
-            universalMarks.splice(i, 1)
-            universalEntries.splice(i, 1)
-          }
-        }
-      } else {
-        for (let index = 0; index < node.marks.length; index++) {
-          const mark = node.marks[index]
-          const markEntry: MarkEntry = [mark, index, node, path]
-
-          if (match != null && !Editor.isMarkMatch(editor, markEntry, match)) {
-            continue
-          }
-
-          if (mode === 'distinct') {
-            if (Mark.exists(mark, distinctMarks)) {
-              continue
-            } else {
-              distinctMarks.push(mark)
-            }
-          }
-
-          yield markEntry
-
-          // After matching a mark, if we're in first mode skip to the next text.
-          if (mode === 'first') {
-            break
-          }
-        }
-      }
-    }
-
-    // In universal mode, the marks are collected while iterating and we can
-    // only be certain of which are universal when we've finished.
-    if (mode === 'universal') {
-      yield* universalEntries
-    }
   },
 
   /**
