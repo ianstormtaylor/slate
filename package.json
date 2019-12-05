@@ -79,11 +79,11 @@
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
-    "slate": "^0.50.0",
-    "slate-history": "^0.50.0",
-    "slate-hyperscript": "^0.50.0",
-    "slate-react": "^0.50.0",
-    "slate-schema": "^0.50.0",
+    "slate": "*",
+    "slate-history": "*",
+    "slate-hyperscript": "*",
+    "slate-react": "*",
+    "slate-schema": "*",
     "typescript": "^3.7.2"
   }
 }
