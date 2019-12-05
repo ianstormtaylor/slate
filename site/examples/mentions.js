@@ -154,7 +154,7 @@ const withMentions = editor => {
       const mention = {
         type: 'mention',
         character: command.character,
-        children: [{ text: '', marks: [] }],
+        children: [{ text: 'NOTEMPTY', marks: [] }],
       }
 
       Editor.insertNodes(editor, mention)
@@ -220,7 +220,7 @@ const initialValue = [
       {
         type: 'mention',
         character: 'R2-D2',
-        children: [{ text: '', marks: [] }],
+        children: [{ text: 'NOTEMPTY', marks: [] }],
       },
       {
         text: ' or ',
@@ -229,7 +229,7 @@ const initialValue = [
       {
         type: 'mention',
         character: 'Mace Windu',
-        children: [{ text: '', marks: [] }],
+        children: [{ text: 'NOTEMPTY', marks: [] }],
       },
       {
         text: '!',
