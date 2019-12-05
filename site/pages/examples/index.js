@@ -5,7 +5,7 @@ const Example = () => {
   const router = useRouter()
 
   useEffect(() => {
-    router.replace(`/examples/rich-text`)
+    router.replace(`/examples/richtext`)
   })
 
   return null

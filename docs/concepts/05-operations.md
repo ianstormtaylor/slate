@@ -2,7 +2,7 @@
 
 Operations are the granular, low-level actions that occur while invoking commands. A single high-level command could result in many low-level operations being applied to the editor.
 
-Unlike commands, operations aren't extendable. Slate's core defines all of the possible operations that can occur on a rich-text document. For example:
+Unlike commands, operations aren't extendable. Slate's core defines all of the possible operations that can occur on a richtext document. For example:
 
 ```js
 editor.apply({

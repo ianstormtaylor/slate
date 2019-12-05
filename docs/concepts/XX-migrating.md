@@ -50,7 +50,7 @@ Block-ness and inline-ness is now a runtime choice. Previously it was baked into
 
 ### More React-ish
 
-Rendering and event-handling is no longer a plugin's concern. Previously plugins had full control over the rendering logic, and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the rich-text aspects, and leaves the rendering and event handling aspects to React.
+Rendering and event-handling is no longer a plugin's concern. Previously plugins had full control over the rendering logic, and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the richtext aspects, and leaves the rendering and event handling aspects to React.
 
 ### Context
 

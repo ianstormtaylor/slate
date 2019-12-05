@@ -2,7 +2,7 @@
 
 One of the best parts of Slate is that it's built with React, so it fits right into your existing application. It doesn't re-invent its own view layer that you have to learn. It tries to keep everything as React-y as possible.
 
-To that end, Slate gives you control over the rendering behavior of your custom nodes and properties in your rich-text domain.
+To that end, Slate gives you control over the rendering behavior of your custom nodes and properties in your richtext domain.
 
 You can define these behaviors by passing "render props" to the top-level `<Editable>` component.
 

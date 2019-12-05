@@ -103,8 +103,8 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/plain-text.js) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/rich-text.js) — showing the features you'd expect from a basic editor.
+- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/plaintext.js) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/richtext.js) — showing the features you'd expect from a basic editor.
 - [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/markdown-preview.js) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/links.js) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/images.js) — showing how to use void (text-less) nodes to add images.

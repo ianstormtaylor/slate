@@ -1,6 +1,6 @@
 # Commands
 
-While editing rich-text content, your users will be doing things like inserting text, deleteing text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
+While editing richtext content, your users will be doing things like inserting text, deleteing text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
 
 Commands are the high-level actions that represent a specific intent of the user. Their interface is simply:
 
@@ -11,7 +11,7 @@ interface Command {
 }
 ```
 
-Slate defines and recognizes a handful of core commands out of the box for common rich-text behaviors, like:
+Slate defines and recognizes a handful of core commands out of the box for common richtext behaviors, like:
 
 ```js
 editor.exec({

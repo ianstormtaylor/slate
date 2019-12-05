@@ -13,7 +13,7 @@ Which means it must have a `text` property with a string of content.
 
 But **any** other custom properties are also allowed, and completely up to you. This lets you tailor your data to your specific domain and use case, adding whatever formatting logic you'd like, without Slate getting in the way.
 
-This interface-based approach separates Slate from most other rich-text editors which require you to work with their hand-rolled "model" classes, and makes it much easier to reason about. It also means that it avoids startup time penalties related to "initializing" the data model.
+This interface-based approach separates Slate from most other richtext editors which require you to work with their hand-rolled "model" classes, and makes it much easier to reason about. It also means that it avoids startup time penalties related to "initializing" the data model.
 
 ## Custom Properties
 

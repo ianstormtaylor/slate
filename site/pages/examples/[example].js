@@ -19,9 +19,9 @@ import MarkdownPreview from '../../examples/markdown-preview'
 import MarkdownShortcuts from '../../examples/markdown-shortcuts'
 import Mentions from '../../examples/mentions'
 import PasteHtml from '../../examples/paste-html'
-import PlainText from '../../examples/plain-text'
+import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
-import RichText from '../../examples/rich-text'
+import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import Tables from '../../examples/tables'
 
@@ -37,9 +37,9 @@ const EXAMPLES = [
   ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
   ['Paste HTML', PasteHtml, 'paste-html'],
-  ['Plain Text', PlainText, 'plain-text'],
+  ['Plain Text', PlainText, 'plaintext'],
   ['Read-only', ReadOnly, 'read-only'],
-  ['Rich Text', RichText, 'rich-text'],
+  ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Tables', Tables, 'tables'],
 ]

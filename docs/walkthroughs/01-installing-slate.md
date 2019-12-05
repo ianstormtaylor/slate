@@ -61,7 +61,7 @@ const App = () => {
 
 You can think of the `<Slate>` component as provided an "un-controlled" editor context to every component underneath it.
 
-This is a slightly different mental model than things like `<input>` or `<textarea>`, because rich-text documents are more complex. You'll often want to include toolbars, or live previews, or other complex components next to your editable content.
+This is a slightly different mental model than things like `<input>` or `<textarea>`, because richtext documents are more complex. You'll often want to include toolbars, or live previews, or other complex components next to your editable content.
 
 By having a shared context, those other components can execute commands, query the editor's state, etc.
 
@@ -79,7 +79,7 @@ const App = () => {
 }
 ```
 
-The `<Editable>` component acts like `contenteditable`. Anywhere you render it will render an editable rich-text document for the nearest editor context.
+The `<Editable>` component acts like `contenteditable`. Anywhere you render it will render an editable richtext document for the nearest editor context.
 
 There's only one last step. So far we haven't defined what the default value of the editor is, so it's empty. Let's fix that by defining an initial value.
 
