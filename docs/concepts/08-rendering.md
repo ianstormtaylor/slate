@@ -127,7 +127,7 @@ const Toolbar = () => {
   return (
     <div>
       <Button active={isBoldActive(editor)}>B</Button>
-      <Button active={isItalicActive(editor)}>B</Button>
+      <Button active={isItalicActive(editor)}>I</Button>
     </div>
   )
 }
