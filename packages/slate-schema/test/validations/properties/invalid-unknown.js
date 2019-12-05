@@ -8,7 +8,7 @@ export const schema = [
     match: { a: true },
     validate: {
       properties: {
-        thing: v => v == null || v === 'valid',
+        a: true,
       },
     },
   },
@@ -16,7 +16,7 @@ export const schema = [
 
 export const input = (
   <editor>
-    <element a thing="invalid">
+    <element a thing="unknown">
       word
     </element>
   </editor>
