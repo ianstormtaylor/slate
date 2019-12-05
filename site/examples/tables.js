@@ -5,14 +5,14 @@ import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderMark = useCallback(props => <Mark {...props} />, [])
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withTables(withHistory(withReact(createEditor()))),
     []
   )
   return (
     <Slate editor={editor} defaultValue={initialValue}>
-      <Editable renderElement={renderElement} renderMark={renderMark} />
+      <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
     </Slate>
   )
 }
@@ -75,11 +75,12 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
   }
+
+  return <span {...attributes}>{children}</span>
 }
 
 const initialValue = [

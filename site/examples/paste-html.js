@@ -28,6 +28,7 @@ const ELEMENT_TAGS = {
   UL: () => ({ type: 'bulleted-list' }),
 }
 
+// COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
 const TEXT_TAGS = {
   CODE: () => ({ code: true }),
   DEL: () => ({ strikethrough: true }),
@@ -79,7 +80,7 @@ export const deserialize = el => {
 
 const PasteHtmlExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderMark = useCallback(props => <Mark {...props} />, [])
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withHtml(withReact(withHistory(createEditor()))),
     []
@@ -88,7 +89,7 @@ const PasteHtmlExample = () => {
     <Slate editor={editor} defaultValue={initialValue}>
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         placeholder="Paste in some HTML..."
       />
     </Slate>
@@ -187,19 +188,28 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
-    case 'code':
-      return <code {...attributes}>{children}</code>
-    case 'italic':
-      return <em {...attributes}>{children}</em>
-    case 'underlined':
-      return <u {...attributes}>{children}</u>
-    case 'strikethrough':
-      return <del {...attributes}>{children}</del>
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
   }
+
+  if (leaf.code) {
+    children = <code>{children}</code>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underlined) {
+    children = <u>{children}</u>
+  }
+
+  if (leaf.strikethrough) {
+    children = <del>{children}</del>
+  }
+
+  return <span {...attributes}>{children}</span>
 }
 
 const initialValue = [

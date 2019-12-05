@@ -21,9 +21,9 @@ const SearchHighlightingExample = () => {
         parts.forEach((part, i) => {
           if (i !== 0) {
             ranges.push({
-              type: 'highlight',
               anchor: { path, offset: offset - search.length },
               focus: { path, offset },
+              highlight: true,
             })
           }
 
@@ -65,31 +65,23 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable
-        decorate={decorate}
-        renderDecoration={props => <Decoration {...props} />}
-        renderMark={props => <Mark {...props} />}
-      />
+      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
     </Slate>
   )
 }
 
-const Decoration = ({ decoration, attributes, children }) => {
-  switch (decoration.type) {
-    case 'highlight':
-      return (
-        <span {...attributes} style={{ backgroundColor: '#ffeeba' }}>
-          {children}
-        </span>
-      )
-  }
-}
-
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
-  }
+const Leaf = ({ attributes, children, leaf }) => {
+  return (
+    <span
+      {...attributes}
+      className={css`
+        font-weight: ${leaf.bold && 'bold'};
+        background-color: ${leaf.highlight && '#ffeeba'};
+      `}
+    >
+      {children}
+    </span>
+  )
 }
 
 const initialValue = [
