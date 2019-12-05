@@ -17,10 +17,10 @@ export const schema = [
 
 export const input = (
   <editor>
-    <element a thing="valid">
+    <element a thing="invalid">
       word
     </element>
   </editor>
 )
 
-export const output = input
+export const output = <editor />

@@ -42,6 +42,13 @@ export interface NextSiblingInvalidError {
   path: Path
 }
 
+export interface NodeLeafInvalidError {
+  code: 'node_leaf_invalid'
+  node: Node
+  path: Path
+  property: string
+}
+
 export interface NodePropertyInvalidError {
   code: 'node_property_invalid'
   node: Node
@@ -76,6 +83,7 @@ export type NodeError =
   | FirstChildInvalidError
   | LastChildInvalidError
   | NextSiblingInvalidError
+  | NodeLeafInvalidError
   | NodePropertyInvalidError
   | NodeTextInvalidError
   | ParentInvalidError
