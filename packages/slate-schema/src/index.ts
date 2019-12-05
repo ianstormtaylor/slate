@@ -1,3 +1,3 @@
 export * from './errors'
-export * from './with-schema'
+export * from './define-schema'
 export * from './rules'
