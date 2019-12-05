@@ -1,12 +1,11 @@
 // Components
 export {
-  RenderDecorationProps,
   RenderElementProps,
-  RenderMarkProps,
+  RenderLeafProps,
   Editable,
 } from './components/editable'
 export { DefaultElement } from './components/element'
-export { DefaultMark, DefaultDecoration } from './components/leaf'
+export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
 
 // Hooks

@@ -2,7 +2,8 @@ import { Operation } from 'slate'
 
 export const input = {
   path: [0],
-  mark: {},
+  properties: {},
+  newProperties: {},
 }
 
 export const test = value => {

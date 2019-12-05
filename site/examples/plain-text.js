@@ -25,10 +25,7 @@ const PlainTextExample = () => {
 const initialValue = [
   {
     children: [
-      {
-        text: '',
-        marks: [],
-      },
+      { text: 'This is editable plain text, just like a <textarea>!' },
     ],
   },
 ]

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Editor, Node, Operation, Range } from 'slate'
+import { Editor, Node, Range } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
@@ -16,7 +16,7 @@ export const Slate = (props: {
   editor: Editor
   value: Node[]
   selection: Range | null
-  children: JSX.Element | JSX.Element[]
+  children: React.ReactNode
   onChange: (children: Node[], selection: Range | null) => void
   [key: string]: any
 }) => {

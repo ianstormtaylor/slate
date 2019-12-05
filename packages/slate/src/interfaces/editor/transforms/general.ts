@@ -2,7 +2,6 @@ import { createDraft, finishDraft, isDraft } from 'immer'
 import {
   Node,
   Editor,
-  Mark,
   Range,
   Point,
   Text,
@@ -68,17 +67,6 @@ export const GeneralTransforms = {
     let selection = editor.selection && createDraft(editor.selection)
 
     switch (op.type) {
-      case 'add_mark': {
-        const { path, mark } = op
-        const node = Node.leaf(editor, path)
-
-        if (!Mark.exists(mark, node.marks)) {
-          node.marks.push(mark)
-        }
-
-        break
-      }
-
       case 'insert_node': {
         const { path, node } = op
         const parent = Node.parent(editor, path)
@@ -174,20 +162,6 @@ export const GeneralTransforms = {
         break
       }
 
-      case 'remove_mark': {
-        const { path, mark } = op
-        const node = Node.leaf(editor, path)
-
-        for (let i = 0; i < node.marks.length; i++) {
-          if (Mark.matches(node.marks[i], mark)) {
-            node.marks.splice(i, 1)
-            break
-          }
-        }
-
-        break
-      }
-
       case 'remove_node': {
         const { path } = op
         const index = path[path.length - 1]
@@ -238,20 +212,6 @@ export const GeneralTransforms = {
         break
       }
 
-      case 'set_mark': {
-        const { path, properties, newProperties } = op
-        const node = Node.leaf(editor, path)
-
-        for (const mark of node.marks) {
-          if (Mark.matches(mark, properties)) {
-            Object.assign(mark, newProperties)
-            break
-          }
-        }
-
-        break
-      }
-
       case 'set_node': {
         const { path, newProperties } = op
 
@@ -260,7 +220,21 @@ export const GeneralTransforms = {
         }
 
         const node = Node.get(editor, path)
-        Object.assign(node, newProperties)
+
+        for (const key in newProperties) {
+          if (key === 'children' || key === 'text') {
+            throw new Error(`Cannot set the "${key}" property of nodes!`)
+          }
+
+          const value = newProperties[key]
+
+          if (value == null) {
+            delete node[key]
+          } else {
+            node[key] = value
+          }
+        }
+
         break
       }
 

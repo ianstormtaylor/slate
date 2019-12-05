@@ -26,7 +26,7 @@ const MentionExample = () => {
   )
 
   const chars = CHARACTERS.filter(c =>
-    c.toLowerCase().startsWith(search)
+    c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
   const suggest = target && chars.length > 0
 
@@ -158,7 +158,7 @@ const withMentions = editor => {
       const mention = {
         type: 'mention',
         character: command.character,
-        children: [{ text: '', marks: [] }],
+        children: [{ text: '' }],
       }
 
       Editor.insertNodes(editor, mention)
@@ -211,34 +211,24 @@ const initialValue = [
       {
         text:
           'This example shows how you might implement a simple @-mentions feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The mentions are rendered as void inline elements inside the document.',
-        marks: [],
       },
     ],
   },
   {
     children: [
-      {
-        text: 'Try mentioning characters, like ',
-        marks: [],
-      },
+      { text: 'Try mentioning characters, like ' },
       {
         type: 'mention',
         character: 'R2-D2',
-        children: [{ text: '', marks: [] }],
+        children: [{ text: '' }],
       },
-      {
-        text: ' or ',
-        marks: [],
-      },
+      { text: ' or ' },
       {
         type: 'mention',
         character: 'Mace Windu',
-        children: [{ text: '', marks: [] }],
+        children: [{ text: '' }],
       },
-      {
-        text: '!',
-        marks: [],
-      },
+      { text: '!' },
     ],
   },
 ]

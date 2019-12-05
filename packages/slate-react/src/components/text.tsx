@@ -2,9 +2,8 @@ import React, { useLayoutEffect, useRef } from 'react'
 import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
-import { Leaf as SlateLeaf } from '../utils/leaf'
 import { ReactEditor, useEditor } from '..'
-import { RenderDecorationProps, RenderMarkProps } from './editable'
+import { RenderLeafProps } from './editable'
 import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
@@ -19,18 +18,10 @@ const Text = (props: {
   decorations: Range[]
   isLast: boolean
   parent: Element
-  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
-  renderMark?: (props: RenderMarkProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
 }) => {
-  const {
-    decorations,
-    isLast,
-    parent,
-    renderDecoration,
-    renderMark,
-    text,
-  } = props
+  const { decorations, isLast, parent, renderLeaf, text } = props
   const editor = useEditor()
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = getLeaves(text, decorations)
@@ -47,8 +38,7 @@ const Text = (props: {
         leaf={leaf}
         text={text}
         parent={parent}
-        renderDecoration={renderDecoration}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
       />
     )
   }
@@ -76,12 +66,12 @@ const Text = (props: {
  * Get the leaves for a text node given decorations.
  */
 
-const getLeaves = (node: SlateText, decorations: Range[]): SlateLeaf[] => {
-  const { text, marks } = node
-  let leaves: SlateLeaf[] = [{ text, marks, decorations: [] }]
+const getLeaves = (node: SlateText, decorations: Range[]): SlateText[] => {
+  let leaves: SlateText[] = [{ ...node }]
 
-  const compile = (range: Range, key?: string) => {
-    const [start, end] = Range.edges(range)
+  for (const dec of decorations) {
+    const { anchor, focus, ...rest } = dec
+    const [start, end] = Range.edges(dec)
     const next = []
     let o = 0
 
@@ -92,7 +82,7 @@ const getLeaves = (node: SlateText, decorations: Range[]): SlateLeaf[] => {
 
       // If the range encompases the entire leaf, add the range.
       if (start.offset <= offset && end.offset >= offset + length) {
-        leaf.decorations.push(range)
+        Object.assign(leaf, rest)
         next.push(leaf)
         continue
       }
@@ -115,14 +105,18 @@ const getLeaves = (node: SlateText, decorations: Range[]): SlateLeaf[] => {
       let after
 
       if (end.offset < offset + length) {
-        ;[middle, after] = SlateLeaf.split(middle, end.offset - offset)
+        const off = end.offset - offset
+        after = { ...middle, text: middle.text.slice(off) }
+        middle = { ...middle, text: middle.text.slice(0, off) }
       }
 
       if (start.offset > offset) {
-        ;[before, middle] = SlateLeaf.split(middle, start.offset - offset)
+        const off = start.offset - offset
+        before = { ...middle, text: middle.text.slice(0, off) }
+        middle = { ...middle, text: middle.text.slice(off) }
       }
 
-      middle.decorations.push(range)
+      Object.assign(middle, rest)
 
       if (before) {
         next.push(before)
@@ -138,28 +132,16 @@ const getLeaves = (node: SlateText, decorations: Range[]): SlateLeaf[] => {
     leaves = next
   }
 
-  for (const range of decorations) {
-    compile(range)
-  }
-
   return leaves
 }
 
 const MemoizedText = React.memo(Text, (prev, next) => {
-  if (
+  return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
-    next.renderDecoration === prev.renderDecoration &&
-    next.renderMark === prev.renderMark &&
+    next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text
-  ) {
-    return SlateLeaf.equals(
-      { ...next.text, decorations: next.decorations },
-      { ...prev.text, decorations: prev.decorations }
-    )
-  }
-
-  return false
+  )
 })
 
 export default MemoizedText

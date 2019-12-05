@@ -3,12 +3,13 @@
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
-  <text>
-    <text>word</text>
+  <text b>
+    <text a>word</text>
   </text>
 )
 
 export const output = {
   text: 'word',
-  marks: [],
+  a: true,
+  b: true,
 }

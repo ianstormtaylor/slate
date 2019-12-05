@@ -1,29 +1,58 @@
 import isPlainObject from 'is-plain-object'
-import { Mark, Path } from '..'
+import { Path } from '..'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
- * Slate document along with any formatting marks. They are always leaf nodes in
- * the document tree as they cannot contain any children.
+ * Slate document along with any formatting properties. They are always leaf
+ * nodes in the document tree as they cannot contain any children.
  */
 
 export interface Text {
   text: string
-  marks: Mark[]
   [key: string]: any
 }
 
 export const Text = {
   /**
+   * Check if two text nodes are equal.
+   */
+
+  equals(
+    text: Text,
+    another: Text,
+    options: { loose?: boolean } = {}
+  ): boolean {
+    const { loose = false } = options
+
+    for (const key in text) {
+      if (loose && key === 'text') {
+        continue
+      }
+
+      if (text[key] !== another[key]) {
+        return false
+      }
+    }
+
+    for (const key in another) {
+      if (loose && key === 'text') {
+        continue
+      }
+
+      if (text[key] !== another[key]) {
+        return false
+      }
+    }
+
+    return true
+  },
+
+  /**
    * Check if a value implements the `Text` interface.
    */
 
   isText(value: any): value is Text {
-    return (
-      isPlainObject(value) &&
-      typeof value.text === 'string' &&
-      Array.isArray(value.marks)
-    )
+    return isPlainObject(value) && typeof value.text === 'string'
   },
 
   /**
@@ -38,37 +67,12 @@ export const Text = {
    * Check if an text matches set of properties.
    *
    * Note: this is for matching custom properties, and it does not ensure that
-   * the `text` property are two nodes equal. However, if `marks` are passed it
-   * will ensure that the set of marks is exactly equal.
+   * the `text` property are two nodes equal.
    */
 
   matches(text: Text, props: Partial<Text>): boolean {
     for (const key in props) {
       if (key === 'text') {
-        continue
-      }
-
-      if (key === 'marks' && props.marks != null) {
-        const existing = text.marks
-        const { marks } = props
-
-        // PERF: If the lengths aren't the same, we know it's not a match.
-        if (existing.length !== marks.length) {
-          return false
-        }
-
-        for (const m of existing) {
-          if (!Mark.exists(m, marks)) {
-            return false
-          }
-        }
-
-        for (const m of marks) {
-          if (!Mark.exists(m, existing)) {
-            return false
-          }
-        }
-
         continue
       }
 

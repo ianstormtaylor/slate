@@ -1,5 +1,12 @@
 import React, { useState, useMemo, useCallback } from 'react'
-import { Slate, Editable, withReact, useEditor, useReadOnly } from 'slate-react'
+import {
+  Slate,
+  Editable,
+  withReact,
+  useEditor,
+  useReadOnly,
+  ReactEditor,
+} from 'slate-react'
 import { Editor, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
@@ -107,8 +114,12 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           type="checkbox"
           checked={checked}
           onChange={event => {
-            const path = editor.findPath(element)
-            editor.setNodes({ checked: event.target.checked }, { at: path })
+            const path = ReactEditor.findPath(editor, element)
+            Editor.setNodes(
+              editor,
+              { checked: event.target.checked },
+              { at: path }
+            )
           }}
         />
       </span>
@@ -137,77 +148,41 @@ const initialValue = [
       {
         text:
           'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
-        marks: [],
       },
     ],
   },
   {
     type: 'check-list-item',
     checked: true,
-    children: [
-      {
-        text: 'Slide to the left.',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Slide to the left.' }],
   },
   {
     type: 'check-list-item',
     checked: true,
-    children: [
-      {
-        text: 'Slide to the right.',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Slide to the right.' }],
   },
   {
     type: 'check-list-item',
     checked: false,
-    children: [
-      {
-        text: 'Criss-cross.',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Criss-cross.' }],
   },
   {
     type: 'check-list-item',
     checked: true,
-    children: [
-      {
-        text: 'Criss-cross!',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Criss-cross!' }],
   },
   {
     type: 'check-list-item',
     checked: false,
-    children: [
-      {
-        text: 'Cha cha real smooth…',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Cha cha real smooth…' }],
   },
   {
     type: 'check-list-item',
     checked: false,
-    children: [
-      {
-        text: "Let's go to work!",
-        marks: [],
-      },
-    ],
+    children: [{ text: "Let's go to work!" }],
   },
   {
-    children: [
-      {
-        text: 'Try it out for yourself!',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Try it out for yourself!' }],
   },
 ]
 

@@ -2,9 +2,9 @@
 
 import { jsx } from 'slate-hyperscript'
 
-export const input = <text />
+export const input = <text a />
 
 export const output = {
   text: '',
-  marks: [],
+  a: true,
 }
