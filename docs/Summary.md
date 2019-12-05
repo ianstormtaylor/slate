@@ -27,5 +27,5 @@
 
 - [Resources](./general/resources.md)
 - [Contributing](../Contributing.md)
-- [Changelog](./general/changelog.md)
+- [Changelog](../Changelog.md)
 - [FAQ](./general/faq.md)
