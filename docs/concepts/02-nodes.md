@@ -16,7 +16,6 @@ const editor = {
       children: [
         {
           text: 'A line of text!',
-          marks: [],
         },
       ],
     },
@@ -127,18 +126,17 @@ Text nodes are the lowest-level nodes in the tree, containing the text content o
 ```ts
 interface Text {
   text: string
-  marks: Mark[]
   [key: string]: any
 }
 ```
 
-We'll cover `Mark` objects shortly, but for now you can get an idea for them:
+For example, a string of bold text:
 
 ```js
 const text = {
   text: 'A string of bold text',
-  marks: [{ type: 'bold' }],
+  bold: true,
 }
 ```
 
-Text nodes too can contain any custom properties you want, although it is rarer to need to do that.
+Text nodes too can contain any custom properties you want, and that's how you implement custom formatting like **bold**, _italic_, `code`, etc.

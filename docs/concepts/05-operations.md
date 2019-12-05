@@ -17,7 +17,6 @@ editor.apply({
   path: [0, 0],
   node: {
     text: 'A line of text!',
-    marks: [],
   },
 })
 

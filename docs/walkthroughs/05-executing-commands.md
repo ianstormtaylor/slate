@@ -22,19 +22,15 @@ const App = () => {
     }
   }, [])
 
-  const renderMark = useCallback(props => {
-    switch (props.mark.type) {
-      case 'bold': {
-        return <BoldMark {...props} />
-      }
-    }
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
   }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return
@@ -55,7 +51,11 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, { type: 'bold' })
+              Editor.setNodes(
+                editor,
+                { bold: true },
+                { match: 'text', split: true }
+              )
               break
             }
           }
@@ -66,7 +66,7 @@ const App = () => {
 }
 ```
 
-It has the concept of "code blocks" and "bold marks". But these things are all defined in one-off cases inside the `onKeyDown` handler. If you wanted to reuse that logic elsewhere you'd need to extract it.
+It has the concept of "code blocks" and "bold formatting". But these things are all defined in one-off cases inside the `onKeyDown` handler. If you wanted to reuse that logic elsewhere you'd need to extract it.
 
 We can instead implement these domain-specific concepts by extending the `editor` object:
 
@@ -88,19 +88,15 @@ const App = () => {
     }
   }, [])
 
-  const renderMark = useCallback(props => {
-    switch (props.mark.type) {
-      case 'bold': {
-        return <BoldMark {...props} />
-      }
-    }
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
   }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return
@@ -121,7 +117,11 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, [{ type: 'bold' }])
+              Editor.setNodes(
+                editor,
+                { bold: true },
+                { match: 'text', split: true }
+              )
               break
             }
           }
@@ -141,22 +141,19 @@ const withCustom = editor => {
   const { exec } = editor
 
   editor.exec = command => {
-    // Define a command to toggle the bold mark formatting.
+    // Define a command to toggle the bold  formatting.
     if (command.type === 'toggle_bold_mark') {
       const isActive = CustomEditor.isBoldMarkActive(editor)
-      // Delegate to the existing `add_mark` and `remove_mark` commands, so that
-      // other plugins can override them if they need to still.
-      editor.exec({
-        type: isActive ? 'remove_mark' : 'add_mark',
-        mark: { type: 'bold' },
-      })
+      Editor.setNodes(
+        editor,
+        { bold: isActive ? null : true },
+        { match: 'text', split: true }
+      )
     }
 
     // Define a command to toggle the code block formatting.
     else if (command.type === 'toggle_code_block') {
       const isActive = CustomEditor.isCodeBlockActive(editor)
-      // There is no `set_nodes` command, so we can transform the editor
-      // directly using the helper instead.
       Editor.setNodes(
         editor,
         { type: isActive ? null : 'code' },
@@ -173,24 +170,24 @@ const withCustom = editor => {
   return editor
 }
 
-// Define our own custom set of helpers for common queries.
+// Define our own custom set of helpers for active-checking queries.
 const CustomEditor = {
   isBoldMarkActive(editor) {
-    const [mark] = Editor.marks(editor, {
-      match: { type: 'bold' },
+    const [match] = Editor.nodes(editor, {
+      match: { bold: true },
       mode: 'universal',
     })
 
-    return !!mark
+    return !!match
   },
 
   isCodeBlockActive(editor) {
-    const [node] = Editor.nodes(editor, {
+    const [match] = Editor.nodes(editor, {
       match: { type: 'code' },
       mode: 'highest',
     })
 
-    return !!node
+    return !!match
   },
 }
 
@@ -205,19 +202,15 @@ const App = () => {
     }
   }, [])
 
-  const renderMark = useCallback(props => {
-    switch (props.mark.type) {
-      case 'bold': {
-        return <BoldMark {...props} />
-      }
-    }
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
   }, [])
 
   return (
     <Slate editor={editor} defaultValue={defaultValue}>
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         // Replace the `onKeyDown` logic with our new commands.
         onKeyDown={event => {
           if (!event.ctrlKey) {
@@ -258,12 +251,8 @@ const App = () => {
     }
   }, [])
 
-  const renderMark = useCallback(props => {
-    switch (props.mark.type) {
-      case 'bold': {
-        return <BoldMark {...props} />
-      }
-    }
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
   }, [])
 
   return (
@@ -290,7 +279,7 @@ const App = () => {
       <Editable
         editor={editor}
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return

@@ -95,8 +95,8 @@ for (const [element, path] of Editor.elements(editor, { at: range })) {
   // ...
 }
 
-// Iterate over every mark in every text node in the current selection.
-for (const [mark, index, text, path] of Editor.marks(editor)) {
+// Iterate over every point in every text node in the current selection.
+for (const [point] of Editor.positions(editor)) {
   // ...
 }
 ```
@@ -110,8 +110,8 @@ Editor.insertNodes(editor, [element], { at: path })
 // Split the nodes in half at a specific point.
 Editor.splitNodes(editor, { at: point })
 
-// Add a mark to all the text in a range.
-Editor.addMarks(editor, mark, { at: range })
+// Add a quote format to all the block nodes in the selection.
+Editor.setNodes(editor, { type: 'quote' })
 ```
 
 The editor-specific helpers are the ones you'll use most often when working with Slate editors, so it pays to become very familiar with them.

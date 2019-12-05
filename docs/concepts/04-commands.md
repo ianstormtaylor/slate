@@ -1,6 +1,6 @@
 # Commands
 
-While editing rich-text content, your users will be doing things like inserting text, deleteing text, splitting paragraphs, adding marks, etc. These edits are expressed using two concepts: commands and operations.
+While editing rich-text content, your users will be doing things like inserting text, deleteing text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
 
 Commands are the high-level actions that represent a specific intent of the user. Their interface is simply:
 
@@ -25,12 +25,11 @@ editor.exec({
 })
 
 editor.exec({
-  type: 'add_mark',
-  mark: { type: 'bold' },
+  type: 'insert_break',
 })
 ```
 
-But you can (and will!) also define your own custom commands that model your domain. For example, you might want to define a `wrap_quote` command, or a `insert_image` command depending on what types of content you allow.
+But you can (and will!) also define your own custom commands that model your domain. For example, you might want to define a `wrap_quote` command, or a `insert_image` command, or a `format_bold` command depending on what types of content you allow.
 
 Commands always describe an action to be taken as if the user themselves was performing the action. For that reason, they never need to define a location to perform the command, because they always act on the user's current selection.
 
