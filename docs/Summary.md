@@ -27,3 +27,6 @@
 - [Contributing](../Contributing.md)
 - [Changelog](./general/changelog.md)
 - [FAQ](./general/faq.md)
+
+## API Reference
+- [Slate](./api/slate.md)

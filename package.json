@@ -22,7 +22,8 @@
     "start": "npm-run-all --parallel --print-label watch serve",
     "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
     "test:debug": "mocha debug --require ./config/babel/register ./packages/*/test/index.js",
-    "watch": "yarn build:rollup --watch"
+    "watch": "yarn build:rollup --watch",
+    "build:doc": "jsdoc2md --files ./packages/slate/src/**/*.ts --configure ./jsdoc2md.json > ./docs/api/slate.md"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -56,6 +57,8 @@
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
+    "jsdoc-babel": "^0.5.0",
+    "jsdoc-to-markdown": "^5.0.3",
     "lerna": "^3.19.0",
     "lodash": "^4.17.4",
     "mocha": "^6.2.0",
