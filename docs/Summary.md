@@ -20,7 +20,7 @@
 - [Editor](./concepts/06-editor.md)
 - [Plugins](./concepts/07-plugins.md)
 - [Rendering](./concepts/08-rendering.md)
-- [Rendering](./concepts/09-serializing.md)
+- [Serializing](./concepts/09-serializing.md)
 - [Migrating](./concepts/XX-migrating.md)
 
 ## General
