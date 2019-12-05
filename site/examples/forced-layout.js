@@ -2,9 +2,9 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { withSchema } from 'slate-schema'
+import { defineSchema } from 'slate-schema'
 
-const schema = [
+const withSchema = defineSchema([
   {
     for: 'node',
     match: 'editor',
@@ -36,14 +36,14 @@ const schema = [
       }
     },
   },
-]
+])
 
 const ForcedLayoutExample = () => {
   const [value, setValue] = useState(initialValue)
   const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withSchema(withHistory(withReact(createEditor())), schema),
+    () => withSchema(withHistory(withReact(createEditor()))),
     []
   )
   return (
