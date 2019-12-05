@@ -15,12 +15,12 @@
 - [Interfaces](./concepts/01-interfaces.md)
 - [Nodes](./concepts/02-nodes.md)
 - [Locations](./concepts/03-locations.md)
-- [Formatting](./concepts/04-formatting.md)
-- [Commands](./concepts/05-commands.md)
-- [Operations](./concepts/06-operations.md)
-- [Editor](./concepts/07-editor.md)
-- [Plugins](./concepts/08-plugins.md)
-- [Rendering](./concepts/09-rendering.md)
+- [Commands](./concepts/04-commands.md)
+- [Operations](./concepts/05-operations.md)
+- [Editor](./concepts/06-editor.md)
+- [Plugins](./concepts/07-plugins.md)
+- [Rendering](./concepts/08-rendering.md)
+- [Rendering](./concepts/09-serializing.md)
 - [Migrating](./concepts/XX-migrating.md)
 
 ## General
