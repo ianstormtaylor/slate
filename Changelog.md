@@ -30,6 +30,30 @@ And the marks are added and removed from the text nodes using the same `Editor.s
 
 **The `<Slate>` component is now a "controlled" component.** This makes things a bit more React-ish, and makes it easier to update the editor's value when new data is received after the initial render. To arrive at the previous "uncontrolled" behavior you'll need to implement it in userland using React's built-in hooks.
 
+Whereas previously you would do:
+
+```jsx
+<Slate defaultValue={initialValue}>...</Slate>
+```
+
+Now you must manage the value and selection yourself, like:
+
+```jsx
+const [value, setValue] = useState(initialValue)
+const [selection, setSelection] = useState(null)
+
+<Slate
+  value={value}
+  selection={selection}
+  onChange={(value, selection) => {
+    setValue(value)
+    setSelection(selection)
+  }}
+>
+  ...
+</Slate>
+```
+
 ---
 
 ### `0.50.0` — November 27, 2019
