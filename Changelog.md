@@ -4,6 +4,20 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.52.0` — December 5, 2019
+
+###### BREAKING
+
+**The `slate-schema` package now exports a factory.** Previously you imported the `withSchema` function directly from the package, and passed in your schema rules when you called it. However, now you import the `defineSchema` factory instead which takes your schema rules and returns a custom `withSchema` plugin function. This way you can still use helpers like `compose` with the plugin, while pre-defining your custom rules.
+
+**The `properties` validation in the schema is now exhaustive.** Previously a `properties` validation would check any properties you defined, and leave any unknown ones as is. This made it hard to be certain about which properties would end up on a node. Now any non-defined properties are considered invalid. And using an empty `{}` validation would ensure that there are no custom properties at all.
+
+###### NEW
+
+**The `leaves` schema validation ensures text-level formatting.** You can use it from any higher up element node in the tree, to guarantee that it only contains certain types of text-level formatting on its inner text nodes. For example you could use it to ensure that a `code` block doesn't allow any of its text to be bolded or italicized.
+
+---
+
 ### `0.51.0` — December 5, 2019
 
 ###### BREAKING
