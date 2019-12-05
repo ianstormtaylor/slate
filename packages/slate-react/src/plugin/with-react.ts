@@ -1,4 +1,4 @@
-import { unstable_batchedUpdates } from 'react-dom'
+import ReactDOM from 'react-dom'
 import { Editor, Node, Path, Operation, Command } from 'slate'
 
 import { ReactEditor } from './react-editor'
@@ -93,7 +93,7 @@ export const withReact = (editor: Editor): Editor => {
     // children and selection can get out of sync for one render pass. So we
     // have to use this unstable API to ensure it batches them. (2019/12/03)
     // https://github.com/facebook/react/issues/14259#issuecomment-439702367
-    unstable_batchedUpdates(() => {
+    ReactDOM.unstable_batchedUpdates(() => {
       const contextOnChange = EDITOR_TO_ON_CHANGE.get(editor)
 
       if (contextOnChange) {
