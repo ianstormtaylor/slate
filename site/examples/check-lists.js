@@ -1,5 +1,12 @@
 import React, { useMemo, useCallback } from 'react'
-import { Slate, Editable, withReact, useEditor, useReadOnly } from 'slate-react'
+import {
+  Slate,
+  Editable,
+  withReact,
+  useEditor,
+  useReadOnly,
+  ReactEditor,
+} from 'slate-react'
 import { Editor, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
@@ -96,8 +103,12 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           type="checkbox"
           checked={checked}
           onChange={event => {
-            const path = editor.findPath(element)
-            editor.setNodes({ checked: event.target.checked }, { at: path })
+            const path = ReactEditor.findPath(editor, element)
+            Editor.setNodes(
+              editor,
+              { checked: event.target.checked },
+              { at: path }
+            )
           }}
         />
       </span>
