@@ -11,6 +11,7 @@ export interface NodeValidation {
   children?: ChildValidation[]
   first?: NodeMatch
   last?: NodeMatch
+  leaves?: Record<string, any>
   next?: NodeMatch
   parent?: NodeMatch
   previous?: NodeMatch

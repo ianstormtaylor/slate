@@ -118,6 +118,7 @@ export const defineSchema = (
 
         case 'child_invalid':
         case 'next_sibling_invalid':
+        case 'node_leaf_invalid':
         case 'node_property_invalid':
         case 'node_text_invalid':
         case 'previous_sibling_invalid': {

@@ -7,9 +7,8 @@ export const schema = [
     for: 'node',
     match: { a: true },
     validate: {
-      properties: {
-        a: true,
-        thing: v => v == null || v === 'valid',
+      leaves: {
+        bold: v => v === true || v === undefined,
       },
     },
   },
@@ -17,10 +16,16 @@ export const schema = [
 
 export const input = (
   <editor>
-    <element a thing="valid">
-      word
+    <element a>
+      <text unknown>word</text>
     </element>
   </editor>
 )
 
-export const output = input
+export const output = (
+  <editor>
+    <element a>
+      <text />
+    </element>
+  </editor>
+)

@@ -26,6 +26,8 @@ export const checkNode = (
 
   if (Editor.isMatch(editor, entry, m)) {
     if ('properties' in v) {
+      const { children, text, ...existing } = node
+
       for (const k in v.properties) {
         const p = v.properties[k]
         const value = node[k]
@@ -34,6 +36,12 @@ export const checkNode = (
         if (isInvalid) {
           return { code: 'node_property_invalid', node, path, property: k }
         }
+
+        delete existing[k]
+      }
+
+      for (const k in existing) {
+        return { code: 'node_property_invalid', node, path, property: k }
       }
     }
 
@@ -62,6 +70,33 @@ export const checkNode = (
 
         if (!Editor.isMatch(editor, [n, p], v.last)) {
           return { code: 'last_child_invalid', node: n, path: p, index: i }
+        }
+      }
+
+      if ('leaves' in v && v.leaves != null) {
+        for (const [n, p] of Editor.texts(editor, { at: path })) {
+          const { text, ...existing } = n
+
+          for (const k in v.leaves) {
+            const l = v.leaves[k]
+            const value = n[k]
+            const isInvalid = typeof l === 'function' ? !l(value) : l !== value
+
+            if (isInvalid) {
+              return {
+                code: 'node_leaf_invalid',
+                node: n,
+                path: p,
+                property: k,
+              }
+            }
+
+            delete existing[k]
+          }
+
+          for (const k in existing) {
+            return { code: 'node_leaf_invalid', node: n, path: p, property: k }
+          }
         }
       }
     }
