@@ -98,24 +98,14 @@ const initialValue = [
       {
         text:
           'This is editable text that you can search. As you search, it looks for matching strings of text, and adds ',
-        marks: [],
       },
-      {
-        text: 'decorations',
-        marks: [{ type: 'bold' }],
-      },
-      {
-        text: ' to them in realtime.',
-        marks: [],
-      },
+      { text: 'decorations', bold: true },
+      { text: ' to them in realtime.' },
     ],
   },
   {
     children: [
-      {
-        text: 'Try it out for yourself by typing in the search box above!',
-        marks: [],
-      },
+      { text: 'Try it out for yourself by typing in the search box above!' },
     ],
   },
 ]

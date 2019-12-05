@@ -47,7 +47,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
         Text.isText(prev) &&
         STRINGS.has(prev) &&
         STRINGS.has(c) &&
-        Text.matches(prev, c)
+        Text.equals(prev, c, { loose: true })
       ) {
         prev.text += c.text
       } else {

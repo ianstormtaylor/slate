@@ -2,7 +2,6 @@ import { Element } from 'slate'
 
 export const input = {
   text: '',
-  
 }
 
 export const test = value => {

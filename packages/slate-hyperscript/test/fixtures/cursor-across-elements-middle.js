@@ -21,7 +21,6 @@ export const output = {
       children: [
         {
           text: 'one',
-          
         },
       ],
     },
@@ -29,7 +28,6 @@ export const output = {
       children: [
         {
           text: 'two',
-          
         },
       ],
     },

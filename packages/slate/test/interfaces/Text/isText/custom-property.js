@@ -2,7 +2,7 @@ import { Text } from 'slate'
 
 export const input = {
   text: '',
-  
+
   custom: true,
 }
 

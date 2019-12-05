@@ -17,7 +17,6 @@ export const output = {
       children: [
         {
           text: 'one',
-          
         },
       ],
     },

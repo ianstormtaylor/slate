@@ -21,7 +21,6 @@ export const output = {
           children: [
             {
               text: 'word',
-              
             },
           ],
         },
