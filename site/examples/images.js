@@ -72,7 +72,7 @@ const withImages = editor => {
 
       case 'insert_image': {
         const { url } = command
-        const text = { text: '', marks: [] }
+        const text = { text: 'NOTEMPTY', marks: [] }
         const image = { type: 'image', url, children: [text] }
         Editor.insertNodes(editor, image)
         break
@@ -159,7 +159,7 @@ const initialValue = [
     url: 'https://source.unsplash.com/kFrdX5IeQzI',
     children: [
       {
-        text: '',
+        text: 'NOTEMPTY',
         marks: [],
       },
     ],
