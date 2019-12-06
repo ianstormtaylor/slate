@@ -199,7 +199,7 @@ export const NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          match = ([n]) => parent.children.includes(n)
+          match = n => parent.children.includes(n)
         } else {
           match = 'block'
         }
@@ -530,7 +530,8 @@ export const NodeTransforms = {
       if (Path.isPath(at)) {
         const path = at
         const point = Editor.point(editor, path)
-        match = ([, p]) => p.length === path.length - 1
+        const [parent] = Editor.parent(editor, path)
+        match = n => n === parent
         height = point.path.length - path.length + 1
         at = point
         always = true
@@ -690,7 +691,7 @@ export const NodeTransforms = {
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const depth = path.length + 1
+        const [node] = Editor.node(editor, path)
         let range = Editor.range(editor, path)
 
         if (split && Range.isRange(at)) {
@@ -699,7 +700,7 @@ export const NodeTransforms = {
 
         Editor.liftNodes(editor, {
           at: range,
-          match: ([, p]) => p.length === depth,
+          match: n => node.children.includes(n),
           voids,
         })
       }
@@ -786,6 +787,7 @@ export const NodeTransforms = {
             : Path.common(firstPath, lastPath)
 
           const range = Editor.range(editor, firstPath, lastPath)
+          const [commonNode] = Editor.node(editor, commonPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath).slice(0, depth)
           const wrapper = { ...element, children: [] }
@@ -793,7 +795,7 @@ export const NodeTransforms = {
 
           Editor.moveNodes(editor, {
             at: range,
-            match: ([, p]) => p.length === depth,
+            match: n => commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
           })
@@ -818,10 +820,7 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
   }
 }
 
-const matchPath = (
-  editor: Editor,
-  path: Path
-): ((entry: NodeEntry) => boolean) => {
+const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
   const [node] = Editor.node(editor, path)
-  return ([n]) => n === node
+  return n => n === node
 }

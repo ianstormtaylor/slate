@@ -103,14 +103,27 @@ export const TextTransforms = {
 
       // Get the highest nodes that are completely inside the range, as well as
       // the start and end nodes.
-      const matches = Editor.nodes(editor, {
+      const matches: NodeEntry[] = []
+      let lastPath: Path | undefined
+
+      for (const entry of Editor.nodes(editor, {
         at,
         voids,
-        mode: 'highest',
-        match: ([n, p]) =>
-          (!voids && Element.isElement(n) && editor.isVoid(n)) ||
-          (!Path.isCommon(p, start.path) && !Path.isCommon(p, end.path)),
-      })
+      })) {
+        const [node, path] = entry
+
+        if (lastPath && Path.compare(path, lastPath) === 0) {
+          continue
+        }
+
+        if (
+          (Element.isElement(node) && editor.isVoid(node)) ||
+          (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
+        ) {
+          matches.push(entry)
+          lastPath = path
+        }
+      }
 
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
       const startRef = Editor.pointRef(editor, start)
