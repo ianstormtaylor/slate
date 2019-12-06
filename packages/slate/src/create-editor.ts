@@ -145,7 +145,7 @@ export const createEditor = (): Editor => {
       // Ensure that block and inline nodes have at least one text child.
       if (Element.isElement(node) && node.children.length === 0) {
         const child = { text: '' }
-        Editor.insertNodes(editor, child, { at: path.concat(0) })
+        Editor.insertNodes(editor, child, { at: path.concat(0), voids: true })
         return
       }
 
@@ -175,43 +175,42 @@ export const createEditor = (): Editor => {
         // other inline nodes, or parent blocks that only contain inlines and
         // text.
         if (isInlineOrText !== shouldHaveInlines) {
-          Editor.removeNodes(editor, { at: path.concat(n) })
+          Editor.removeNodes(editor, { at: path.concat(n), voids: true })
           n--
-          continue
-        }
-
-        if (Element.isElement(child)) {
+        } else if (Element.isElement(child)) {
           // Ensure that inline nodes are surrounded by text nodes.
           if (editor.isInline(child)) {
             if (prev == null || !Text.isText(prev)) {
               const newChild = { text: '' }
-              Editor.insertNodes(editor, newChild, { at: path.concat(n) })
+              Editor.insertNodes(editor, newChild, {
+                at: path.concat(n),
+                voids: true,
+              })
               n++
-              continue
-            }
-
-            if (isLast) {
+            } else if (isLast) {
               const newChild = { text: '' }
-              Editor.insertNodes(editor, newChild, { at: path.concat(n + 1) })
+              Editor.insertNodes(editor, newChild, {
+                at: path.concat(n + 1),
+                voids: true,
+              })
               n++
-              continue
             }
           }
         } else {
           // Merge adjacent text nodes that are empty or match.
           if (prev != null && Text.isText(prev)) {
             if (Text.equals(child, prev, { loose: true })) {
-              Editor.mergeNodes(editor, { at: path.concat(n) })
+              Editor.mergeNodes(editor, { at: path.concat(n), voids: true })
               n--
-              continue
             } else if (prev.text === '') {
-              Editor.removeNodes(editor, { at: path.concat(n - 1) })
+              Editor.removeNodes(editor, {
+                at: path.concat(n - 1),
+                voids: true,
+              })
               n--
-              continue
             } else if (isLast && child.text === '') {
-              Editor.removeNodes(editor, { at: path.concat(n) })
+              Editor.removeNodes(editor, { at: path.concat(n), voids: true })
               n--
-              continue
             }
           }
         }

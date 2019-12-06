@@ -137,9 +137,10 @@ export const LocationQueries = {
       match?: NodeMatch
       mode?: 'all' | 'highest'
       reverse?: boolean
+      voids?: boolean
     } = {}
   ): Iterable<ElementEntry> {
-    for (const [node, path] of this.nodes(editor, options)) {
+    for (const [node, path] of Editor.nodes(editor, options)) {
       if (Element.isElement(node)) {
         yield [node, path]
       }
@@ -239,9 +240,10 @@ export const LocationQueries = {
     options: {
       at?: Location
       reverse?: boolean
+      voids?: boolean
     } = {}
   ): Iterable<NodeEntry> {
-    const { at = editor.selection, reverse = false } = options
+    const { at = editor.selection, reverse = false, voids = false } = options
 
     if (!at) {
       return
@@ -253,7 +255,7 @@ export const LocationQueries = {
     for (const [n, p] of Node.levels(editor, path)) {
       levels.push([n, p])
 
-      if (Element.isElement(n) && editor.isVoid(n)) {
+      if (!voids && Element.isElement(n) && editor.isVoid(n)) {
         break
       }
     }
@@ -269,10 +271,18 @@ export const LocationQueries = {
    * Get the first matching node in a single branch of the document.
    */
 
-  match(editor: Editor, at: Location, match: NodeMatch): NodeEntry | undefined {
+  match(
+    editor: Editor,
+    at: Location,
+    match: NodeMatch,
+    options: {
+      voids?: boolean
+    } = {}
+  ): NodeEntry | undefined {
+    const { voids = false } = options
     const path = Editor.path(editor, at)
 
-    for (const entry of Editor.levels(editor, { at: path })) {
+    for (const entry of Editor.levels(editor, { at: path, voids })) {
       if (Editor.isMatch(editor, entry, match)) {
         return entry
       }
@@ -330,23 +340,21 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next(editor: Editor, at: Location, match: NodeMatch): NodeEntry | undefined {
+  next(
+    editor: Editor,
+    at: Location,
+    match: NodeMatch,
+    options: {
+      mode?: 'all' | 'highest'
+      voids?: boolean
+    } = {}
+  ): NodeEntry | undefined {
+    const { mode = 'highest', voids = false } = options
     const [, from] = Editor.last(editor, at)
     const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
-    let i = 0
-
-    for (const entry of Editor.nodes(editor, {
-      at: span,
-      match,
-      mode: 'highest',
-    })) {
-      if (i === 1) {
-        return entry
-      }
-
-      i++
-    }
+    const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
+    return next
   },
 
   /**
@@ -377,6 +385,7 @@ export const LocationQueries = {
       match?: NodeMatch
       mode?: 'all' | 'highest'
       reverse?: boolean
+      voids?: boolean
     } = {}
   ): Iterable<NodeEntry> {
     const {
@@ -384,6 +393,7 @@ export const LocationQueries = {
       match,
       mode = 'all',
       reverse = false,
+      voids = false,
     } = options
 
     if (!at) {
@@ -407,20 +417,19 @@ export const LocationQueries = {
       reverse,
       from,
       to,
-      pass: ([n]) => Element.isElement(n) && editor.isVoid(n),
+      pass: ([n]) => (voids ? false : Element.isElement(n) && editor.isVoid(n)),
     })
 
     let prev: NodeEntry | undefined
 
     for (const entry of iterable) {
-      if (match != null) {
-        if (mode === 'highest' && prev) {
-          const [, prevPath] = prev
-          const [, path] = entry
-
-          if (Path.compare(path, prevPath) === 0) {
-            continue
-          }
+      if (match) {
+        if (
+          mode === 'highest' &&
+          prev &&
+          Path.compare(entry[1], prev[1]) === 0
+        ) {
+          continue
         }
 
         if (!Editor.isMatch(editor, entry, match)) {
@@ -669,25 +678,25 @@ export const LocationQueries = {
   previous(
     editor: Editor,
     at: Location,
-    match: NodeMatch
+    match: NodeMatch,
+    options: {
+      mode?: 'all' | 'highest'
+      voids?: boolean
+    } = {}
   ): NodeEntry | undefined {
+    const { mode = 'highest', voids = false } = options
     const [, from] = Editor.first(editor, at)
     const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
-    let i = 0
-
-    for (const entry of Editor.nodes(editor, {
-      match,
-      at: span,
+    const [, previous] = Editor.nodes(editor, {
       reverse: true,
-      mode: 'highest',
-    })) {
-      if (i === 1) {
-        return entry
-      }
+      at: span,
+      match,
+      mode,
+      voids,
+    })
 
-      i++
-    }
+    return previous
   },
 
   /**
@@ -752,9 +761,10 @@ export const LocationQueries = {
       match?: NodeMatch
       mode?: 'all' | 'highest'
       reverse?: boolean
+      voids?: boolean
     } = {}
   ): Iterable<TextEntry> {
-    for (const [node, path] of this.nodes(editor, options)) {
+    for (const [node, path] of Editor.nodes(editor, options)) {
       if (Text.isText(node)) {
         yield [node, path]
       }
