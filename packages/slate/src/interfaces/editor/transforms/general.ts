@@ -40,7 +40,7 @@ export const GeneralTransforms = {
     }
 
     Editor.withoutNormalizing(editor, () => {
-      const max = getDirtyPaths(editor).length * 42 // HACK: better way to do editor?
+      const max = getDirtyPaths(editor).length * 42 // HACK: better way?
       let m = 0
 
       while (getDirtyPaths(editor).length !== 0) {
