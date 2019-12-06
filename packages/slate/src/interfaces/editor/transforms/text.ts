@@ -66,26 +66,31 @@ export const TextTransforms = {
       }
 
       let [start, end] = Range.edges(at)
-      const [ancestor] = Editor.ancestor(editor, at)
+      const startBlock = Editor.match(editor, start.path, 'block')
+      const endBlock = Editor.match(editor, end.path, 'block')
+      const isAcrossBlocks =
+        startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
       const startVoid = Editor.match(editor, start.path, 'void')
       const endVoid = Editor.match(editor, end.path, 'void')
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
-        const block = Editor.match(editor, start.path, 'block')
         const before = Editor.before(editor, start)
 
-        if (before && block && Path.isAncestor(block[1], before.path)) {
+        if (
+          before &&
+          startBlock &&
+          Path.isAncestor(startBlock[1], before.path)
+        ) {
           start = before
         }
       }
 
       if (endVoid) {
-        const block = Editor.match(editor, end.path, 'block')
         const after = Editor.after(editor, end)
 
-        if (after && block && Path.isAncestor(block[1], after.path)) {
+        if (after && endBlock && Path.isAncestor(endBlock[1], after.path)) {
           end = after
         }
       }
@@ -127,13 +132,9 @@ export const TextTransforms = {
         editor.apply({ type: 'remove_text', path, offset, text })
       }
 
-      const isBlockAncestor =
-        Editor.isEditor(ancestor) ||
-        (Element.isElement(ancestor) && !editor.isInline(ancestor))
-
       if (
         !isSingleText &&
-        isBlockAncestor &&
+        isAcrossBlocks &&
         endRef.current &&
         startRef.current
       ) {
