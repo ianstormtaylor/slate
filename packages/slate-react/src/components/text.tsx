@@ -1,9 +1,10 @@
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { ReactEditor, useEditor } from '..'
 import { RenderLeafProps } from './editable'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
@@ -44,7 +45,7 @@ const Text = (props: {
   }
 
   // Update element-related weak maps with the DOM element ref.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (ref.current) {
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(text, ref.current)
