@@ -5,7 +5,14 @@ export const RangeQueries = {
    * Convert a range into a non-hanging one.
    */
 
-  unhangRange(editor: Editor, range: Range): Range {
+  unhangRange(
+    editor: Editor,
+    range: Range,
+    options: {
+      voids?: boolean
+    } = {}
+  ): Range {
+    const { voids = false } = options
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
@@ -22,6 +29,7 @@ export const RangeQueries = {
     for (const [node, path] of Editor.texts(editor, {
       at: before,
       reverse: true,
+      voids,
     })) {
       if (skip) {
         skip = false
