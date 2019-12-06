@@ -9,6 +9,14 @@ So we start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -19,18 +27,25 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const { selection } = editor
-            const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-            const isCodeActive = !!node
+            const [match] = Editor.nodes(editor, { match: { type: 'code' } })
             Editor.setNodes(
               editor,
-              { type: isCodeActive ? 'paragraph' : 'code' },
+              { type: match ? 'paragraph' : 'code' },
               { match: 'block' }
             )
           }
@@ -46,6 +61,14 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `c
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (prop.element.type) {
       case 'code':
@@ -56,7 +79,15 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -68,11 +99,10 @@ const App = () => {
             // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
               Editor.setNodes(
                 editor,
-                { type: isCodeActive ? null : 'code' },
+                { type: match ? 'paragraph' : 'code' },
                 { match: 'block' }
               )
               break
@@ -123,6 +153,14 @@ And now, let's tell Slate about that leaf. To do that, we'll pass in the `render
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -138,7 +176,15 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         // Pass in the `renderLeaf` function.
@@ -151,11 +197,10 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
               Editor.setNodes(
                 editor,
-                { type: isCodeActive ? null : 'code' },
+                { type: match ? null : 'code' },
                 { match: 'block' }
               )
               break

@@ -13,6 +13,14 @@ We'll start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -27,7 +35,15 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -39,11 +55,10 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
               Editor.setNodes(
                 editor,
-                { type: isCodeActive ? null : 'code' },
+                { type: match ? null : 'code' },
                 { match: 'block' }
               )
               break
@@ -79,6 +94,14 @@ const withCustom = editor => {
 const App = () => {
   // Wrap the editor with our new `withCustom` plugin.
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -93,7 +116,15 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -193,6 +224,14 @@ const CustomEditor = {
 
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -207,16 +246,24 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        // Replace the `onKeyDown` logic with our new commands.
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return
           }
 
+          // Replace the `onKeyDown` logic with our new commands.
           switch (event.key) {
             case '`': {
               event.preventDefault()
@@ -242,6 +289,14 @@ Now our commands are clearly defined and you can invoke them from anywhere we ha
 ```js
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -256,8 +311,16 @@ const App = () => {
   }, [])
 
   return (
-    // Add a  toolbar with buttons that call the same methods.
-    <Slate editor={editor} defaultValue={defaultValue}>
+    // Add a toolbar with buttons that call the same methods.
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <div>
         <button
           onMouseDown={event => {

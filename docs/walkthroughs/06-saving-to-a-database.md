@@ -7,24 +7,26 @@ In this guide, we'll show you how to add logic to save your Slate content to a d
 Let's start with a basic editor:
 
 ```js
-import React, { useMemo } from 'react'
-import { createEditor } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
-
-const defaultValue = [
-  {
-    children: [
-      {
-        text: 'A line of text in a paragraph.',
-      },
-    ],
-  },
-]
-
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable />
     </Slate>
   )
@@ -50,11 +52,23 @@ const defaultValue = [
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   return (
     <Slate
       editor={editor}
-      defaultValue={defaultValue}
-      onChange={value => {
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+
         // Save the value to Local Storage.
         const content = JSON.stringify(value)
         localStorage.setItem('content', content)
@@ -71,25 +85,27 @@ Now whenever you edit the page, if you look in Local Storage, you should see the
 But... if you refresh the page, everything is still reset. That's because we need to make sure the initial value is pulled from that same Local Storage location, like so:
 
 ```js
-// Update the initial content to be pulled from Local Storage if it exists.
-const existingValue = JSON.parse(localStorage.getItem('content'))
-const defaultValue = existingValue || [
-  {
-    children: [
-      {
-        text: 'A line of text in a paragraph.',
-      },
-    ],
-  },
-]
-
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  // Update the initial content to be pulled from Local Storage if it exists.
+  const [value, setValue] = useState(
+    JSON.parse(localStorage.getItem('content')) || [
+      {
+        type: 'paragraph',
+        children: [{ text: 'A line of text in a paragraph.' }],
+      },
+    ]
+  )
+
   return (
     <Slate
       editor={editor}
-      defaultValue={defaultValue}
-      onChange={value => {
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
         const content = JSON.stringify(value)
         localStorage.setItem('content', content)
       }}
@@ -131,20 +147,24 @@ const deserialize = string => {
   })
 }
 
-// Use our deserializing function to read the data from Local Storage.
-const existingValue = localStorage.getItem('content')
-const initialValue = deserialize(existingValue || '')
-
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  // Use our deserializing function to read the data from Local Storage.
+  const [value, setValue] = useState(
+    deserialize(localStorage.getItem('content')) || ''
+  )
+
   return (
     <Slate
       editor={editor}
-      defaultValue={defaultValue}
-      onChange={value => {
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
         // Serialize the value and save the string value to Local Storage.
-        const content = serialize(value)
-        localStorage.setItem('content', content)
+        localStorage.setItem('content', serialize(value))
       }}
     >
       <Editable />
