@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import getDirection from 'direction'
 import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
@@ -6,6 +6,7 @@ import Text from './text'
 import Children from './children'
 import { ReactEditor, useEditor, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -111,7 +112,7 @@ const Element = (props: {
   }
 
   // Update element-related weak maps with the DOM element ref.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (ref.current) {
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)

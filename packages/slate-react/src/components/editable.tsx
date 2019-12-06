@@ -1,10 +1,4 @@
-import React, {
-  useLayoutEffect,
-  useEffect,
-  useRef,
-  useMemo,
-  useCallback,
-} from 'react'
+import React, { useEffect, useRef, useMemo, useCallback } from 'react'
 import { Editor, Element, NodeEntry, Node, Range, Text } from 'slate'
 import debounce from 'debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
@@ -15,6 +9,7 @@ import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   DOMElement,
   DOMNode,
@@ -106,7 +101,7 @@ export const Editable = (
   )
 
   // Update element-related weak maps with the DOM element ref.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (ref.current) {
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
@@ -121,7 +116,7 @@ export const Editable = (
   // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
@@ -136,7 +131,7 @@ export const Editable = (
   // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
   // real `beforeinput` events sadly... (2019/11/04)
   // https://github.com/facebook/react/issues/11211
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (ref.current) {
       // @ts-ignore The `beforeinput` event isn't recognized.
       ref.current.addEventListener('beforeinput', onDOMBeforeInput)
@@ -151,7 +146,7 @@ export const Editable = (
   }, [])
 
   // Whenever the editor updates, make sure the DOM selection state is in sync.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     const { selection } = editor
     const domSelection = window.getSelection()
 
