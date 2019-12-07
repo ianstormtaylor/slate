@@ -20,17 +20,15 @@ const withSchema = defineSchema([
       const type = index === 0 ? 'title' : 'paragraph'
 
       switch (code) {
-        case 'child_invalid': {
+        case 'child_invalid':
+        case 'child_max_invalid': {
           Editor.setNodes(editor, { type }, { at: path })
           break
         }
+
         case 'child_min_invalid': {
           const block = { type, children: [{ text: '' }] }
           Editor.insertNodes(editor, block, { at: path })
-          break
-        }
-        case 'child_max_invalid': {
-          Editor.setNodes(editor, { type }, { at: path })
           break
         }
       }

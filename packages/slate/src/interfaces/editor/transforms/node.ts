@@ -656,7 +656,7 @@ export const NodeTransforms = {
     }
 
     Editor.setNodes(editor, obj, options)
-  }
+  },
 
   /**
    * Unwrap the nodes at a location from a parent node, splitting the parent if
