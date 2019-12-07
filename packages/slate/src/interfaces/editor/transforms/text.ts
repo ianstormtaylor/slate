@@ -392,6 +392,7 @@ export const TextTransforms = {
           const pointRef = Editor.pointRef(editor, end)
           Editor.delete(editor, { at, voids })
           at = pointRef.unref()!
+          Editor.setSelection(editor, { anchor: at, focus: at })
         }
       }
 
