@@ -86,7 +86,7 @@ const MentionExample = () => {
           const before = wordBefore && Editor.before(editor, wordBefore)
           const beforeRange = before && Editor.range(editor, before, start)
           const beforeText = beforeRange && Editor.text(editor, beforeRange)
-          const beforeMatch = beforeText?.match(/^@(\w+)$/)
+          const beforeMatch = beforeText && beforeText.match(/^@(\w+)$/)
           const after = Editor.after(editor, start)
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.text(editor, afterRange)
