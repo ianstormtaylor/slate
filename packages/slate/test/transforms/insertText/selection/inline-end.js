@@ -1,10 +1,9 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.insertText(editor, 'four')
+  editor.exec({ type: 'insert_text', text: 'four' })
 }
 
 export const input = (

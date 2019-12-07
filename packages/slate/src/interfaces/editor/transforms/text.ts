@@ -399,27 +399,6 @@ export const TextTransforms = {
         return
       }
 
-      // If the selection is being used to determine the insertion point, and
-      // that point is inside an inline element, then check to see if it's the
-      // end of the inline.
-      const inlineElementMatch = Editor.match(editor, at, 'inline')
-
-      if (inlineElementMatch && !options.at) {
-        const [, inlinePath] = inlineElementMatch
-
-        // If the point is at the end of the inline, the text should be
-        // inserted outside of the inline
-        if (Editor.isEnd(editor, at, inlinePath)) {
-          const after = Editor.after(editor, inlinePath)!
-          at = after
-
-          // Need to update the selection point manually, otherwise the
-          // insert_text transform won't move the cursor after inserting,
-          // keeping it at the inside edge of the inline..
-          Editor.setSelection(editor, { anchor: at, focus: at })
-        }
-      }
-
       const { path, offset } = at
       editor.apply({ type: 'insert_text', path, offset, text })
     })
