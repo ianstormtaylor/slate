@@ -28,7 +28,6 @@ const MentionExample = () => {
   const chars = CHARACTERS.filter(c =>
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
-  const suggest = target && chars.length > 0
 
   const onKeyDown = useCallback(
     event => {
@@ -62,14 +61,14 @@ const MentionExample = () => {
   )
 
   useEffect(() => {
-    if (suggest && target) {
+    if (target && chars.length > 0) {
       const el = ref.current
       const domRange = ReactEditor.toDOMRange(editor, target)
       const rect = domRange.getBoundingClientRect()
       el.style.top = `${rect.top + window.pageYOffset + 24}px`
       el.style.left = `${rect.left + window.pageXOffset}px`
     }
-  }, [index, search, target])
+  }, [chars.length, editor, index, search, target])
 
   return (
     <Slate
@@ -108,7 +107,7 @@ const MentionExample = () => {
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
       />
-      {suggest && (
+      {target && chars.length > 0 && (
         <Portal>
           <div
             ref={ref}
