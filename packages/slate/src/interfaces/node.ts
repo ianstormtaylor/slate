@@ -78,6 +78,30 @@ export const Node = {
   },
 
   /**
+   * Iterate over the children of a node at a specific path.
+   */
+
+  *children(
+    root: Node,
+    path: Path,
+    options: {
+      reverse?: boolean
+    } = {}
+  ): Iterable<DescendantEntry> {
+    const { reverse = false } = options
+    const ancestor = Node.ancestor(root, path)
+    const { children } = ancestor
+    let index = reverse ? children.length - 1 : 0
+
+    while (reverse ? index >= 0 : index < children.length) {
+      const child = Node.child(ancestor, index)
+      const childPath = path.concat(index)
+      yield [child, childPath]
+      index = reverse ? index - 1 : index + 1
+    }
+  },
+
+  /**
    * Find the closest matching node entry starting from a specific path.
    */
 

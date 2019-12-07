@@ -631,6 +631,34 @@ export const NodeTransforms = {
   },
 
   /**
+   * Unset properties on the nodes at a location.
+   */
+
+  unsetNodes(
+    editor: Editor,
+    props: string | string[],
+    options: {
+      at?: Location
+      match?: NodeMatch
+      mode?: 'all' | 'highest'
+      split?: boolean
+      voids?: boolean
+    } = {}
+  ) {
+    if (!Array.isArray(props)) {
+      props = [props]
+    }
+
+    const obj = {}
+
+    for (const key of props) {
+      obj[key] = null
+    }
+
+    Editor.setNodes(editor, obj, options)
+  }
+
+  /**
    * Unwrap the nodes at a location from a parent node, splitting the parent if
    * necessary to ensure that only the content in the range is unwrapped.
    */
