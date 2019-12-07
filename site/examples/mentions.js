@@ -62,7 +62,7 @@ const MentionExample = () => {
   )
 
   useEffect(() => {
-    if (suggest) {
+    if (suggest && target) {
       const el = ref.current
       const domRange = ReactEditor.toDOMRange(editor, target)
       const rect = domRange.getBoundingClientRect()
