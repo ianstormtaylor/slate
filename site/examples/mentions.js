@@ -83,14 +83,10 @@ const MentionExample = () => {
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)
           const wordBefore = Editor.before(editor, start, { unit: 'word' })
-          let before
-          if (wordBefore) before = Editor.before(editor, wordBefore)
-          let beforeRange
-          if (before) beforeRange = Editor.range(editor, before, start)
-          let beforeText
-          if (beforeRange) beforeText = Editor.text(editor, beforeRange)
-          let beforeMatch
-          if (beforeText) beforeMatch = beforeText.match(/^@(\w+)$/)
+          const before = wordBefore && Editor.before(editor, wordBefore)
+          const beforeRange = before && Editor.range(editor, before, start)
+          const beforeText = beforeRange && Editor.text(editor, beforeRange)
+          const beforeMatch = beforeText && beforeText.match(/^@(\w+)$/)
           const after = Editor.after(editor, start)
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.text(editor, afterRange)
