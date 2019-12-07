@@ -118,24 +118,6 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const Decoration = props => {
-  const { children, attributes, leaf } = props
-
-  switch (decoration.type) {
-    case 'blockquote': {
-      return (
-        <span {...attributes} style={{}}>
-          {children}
-        </span>
-      )
-    }
-
-    default: {
-      throw new Error(`Unknown markdown decoration type: "${decoration.type}"`)
-    }
-  }
-}
-
 const initialValue = [
   {
     children: [
