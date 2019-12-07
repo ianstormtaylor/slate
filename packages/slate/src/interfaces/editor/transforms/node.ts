@@ -184,12 +184,13 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
+      withMatch?: NodeMatch
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.selection } = options
+      let { match, withMatch, at = editor.selection } = options
       const { hanging = false, voids = false } = options
 
       if (!at) {
@@ -225,18 +226,23 @@ export const NodeTransforms = {
         return
       }
 
-      let prevMatch: NodeMatch = 'block'
       const [node, path] = current
 
       if (Editor.isEditor(node)) {
         return
-      } else if (Text.isText(node)) {
-        prevMatch = 'text'
-      } else if (editor.isInline(node)) {
-        prevMatch = 'inline'
       }
 
-      const prev = Editor.previous(editor, at, prevMatch, { voids })
+      if (withMatch == null) {
+        if (Text.isText(node)) {
+          withMatch = 'text'
+        } else if (editor.isInline(node)) {
+          withMatch = 'inline'
+        } else {
+          withMatch = 'block'
+        }
+      }
+
+      const prev = Editor.previous(editor, at, withMatch, { voids })
 
       if (!prev) {
         return
