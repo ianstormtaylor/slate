@@ -45,6 +45,9 @@ function configure(pkg, env, target) {
     typescript({
       abortOnError: false,
       tsconfig: `./packages/${pkg.name}/tsconfig.json`,
+      // COMPAT: Without this flag sometimes the declarations are not updated.
+      // clean: isProd ? true : false,
+      clean: true,
     }),
 
     // Allow Rollup to resolve CommonJS modules, since it only resolves ES2015
