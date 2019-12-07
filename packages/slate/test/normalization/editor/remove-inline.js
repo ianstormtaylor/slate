@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { jsx } from '..'
+import { jsx } from '../..'
 
 export const input = (
   <editor>
-    <text>one</text>
+    <inline>one</inline>
     <block>two</block>
   </editor>
 )

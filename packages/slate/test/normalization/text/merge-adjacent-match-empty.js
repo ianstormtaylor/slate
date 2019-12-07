@@ -1,14 +1,14 @@
 /** @jsx jsx */
 
-import { jsx } from '..'
+import { jsx } from '../..'
 
 export const schema = {}
 
 export const input = (
   <editor>
     <block>
-      <text />
-      <text />
+      <text>1</text>
+      <text>2</text>
     </block>
   </editor>
 )
@@ -16,7 +16,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text />
+      <text>12</text>
     </block>
   </editor>
 )

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { jsx } from '..'
+import { jsx } from '../..'
 
 export const schema = {}
 
