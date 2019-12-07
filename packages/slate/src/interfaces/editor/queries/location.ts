@@ -383,7 +383,7 @@ export const LocationQueries = {
     options: {
       at?: Location | Span
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       reverse?: boolean
       voids?: boolean
     } = {}
@@ -421,25 +421,41 @@ export const LocationQueries = {
     })
 
     let prev: NodeEntry | undefined
-
-    for (const entry of iterable) {
-      if (match) {
-        if (
-          mode === 'highest' &&
-          prev &&
-          Path.compare(entry[1], prev[1]) === 0
-        ) {
-          continue
-        }
-
+    
+    if(mode === 'lowest') {
+      const matches = [];
+      for(const entry of iterable) {
         if (!Editor.isMatch(editor, entry, match)) {
           continue
         }
-
-        prev = entry
+        if(prev && Path.isChild(entry[1], prev[1])) // If entry is a child of prev, exchange the match
+          matches[matches.length-1] = entry;
+        else
+          matches.push(entry);
+        prev = entry;
       }
+      for(const entry of matches) yield entry;
+    }
+    else {
+      for (const entry of iterable) {
+        if (match) {
+          if (
+            mode === 'highest' &&
+            prev &&
+            Path.compare(entry[1], prev[1]) === 0
+          ) {
+            continue
+          }
 
-      yield entry
+          if (!Editor.isMatch(editor, entry, match)) {
+            continue
+          }
+
+          prev = entry
+        }
+
+        yield entry
+      }
     }
   },
 
