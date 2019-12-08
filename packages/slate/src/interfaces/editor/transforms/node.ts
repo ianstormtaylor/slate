@@ -184,13 +184,12 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      withMatch?: NodeMatch
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let { match, withMatch, at = editor.selection } = options
+      let { match, at = editor.selection } = options
       const { hanging = false, voids = false } = options
 
       if (!at) {
@@ -198,7 +197,12 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        if (Path.isPath(at)) {
+          const [parent] = Editor.parent(editor, at)
+          match = ([n]) => parent.children.includes(n)
+        } else {
+          match = 'block'
+        }
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -221,34 +225,19 @@ export const NodeTransforms = {
       }
 
       const current = Editor.match(editor, at, match, { voids })
+      const prev = Editor.previous(editor, at, match, { voids })
 
-      if (!current) {
+      if (!current || !prev) {
         return
       }
 
       const [node, path] = current
-
-      if (Editor.isEditor(node)) {
-        return
-      }
-
-      if (withMatch == null) {
-        if (Text.isText(node)) {
-          withMatch = 'text'
-        } else if (editor.isInline(node)) {
-          withMatch = 'inline'
-        } else {
-          withMatch = 'block'
-        }
-      }
-
-      const prev = Editor.previous(editor, at, withMatch, { voids })
-
-      if (!prev) {
-        return
-      }
-
       const [prevNode, prevPath] = prev
+
+      if (path.length === 0 || prevPath.length === 0) {
+        return
+      }
+
       const newPath = Path.next(prevPath)
       const commonPath = Path.common(path, prevPath)
       const isPreviousSibling = Path.isSibling(path, prevPath)

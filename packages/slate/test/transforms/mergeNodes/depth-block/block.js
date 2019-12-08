@@ -6,16 +6,23 @@ import { jsx } from '../../..'
 export const input = (
   <editor>
     <block>one</block>
-    <block>two</block>
+    <block>
+      <cursor />
+      two
+    </block>
   </editor>
 )
 
 export const run = editor => {
-  Editor.mergeNodes(editor, { at: { path: [1, 0], offset: 0 }, match: 'block' })
+  Editor.mergeNodes(editor, { match: 'block' })
 }
 
 export const output = (
   <editor>
-    <block>onetwo</block>
+    <block>
+      one
+      <cursor />
+      two
+    </block>
   </editor>
 )
