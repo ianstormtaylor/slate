@@ -14,7 +14,7 @@ const withImages = editor => {
     if (command.type === 'insert_image') {
       const { url } = command
       const element = { type: 'image', url, children: [{ text: '' }] }
-      Editor.insertNodes(element)
+      Editor.insertNodes(editor, element)
     } else {
       exec(command)
     }
