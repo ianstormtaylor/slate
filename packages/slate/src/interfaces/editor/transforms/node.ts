@@ -640,7 +640,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
