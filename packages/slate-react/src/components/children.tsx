@@ -69,7 +69,7 @@ const Children = (props: {
         <TextComponent
           decorations={ds}
           key={key.id}
-          isLast={isLeafBlock && i === node.children.length}
+          isLast={isLeafBlock && i === node.children.length - 1}
           parent={node}
           renderLeaf={renderLeaf}
           text={n}
