@@ -14,7 +14,7 @@ const withImages = editor => {
     if (command.type === 'insert_image') {
       const { url } = command
       const element = { type: 'image', url, children: [{ text: '' }] }
-      Editor.insertNodes(editor)
+      Editor.insertNodes(element)
     } else {
       exec(command)
     }
@@ -68,4 +68,4 @@ export const MyElement = {
 }
 ```
 
-Then you can use `MySelect` everywhere and have access to all your helpers in one place.
+Then you can use `MyElement` everywhere and have access to all your helpers in one place.
