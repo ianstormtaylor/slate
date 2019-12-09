@@ -425,10 +425,11 @@ export const LocationQueries = {
     if (mode === 'lowest') {
       const lowEntries = []
       for (const entry of iterable) {
-        if(match) {
+        if (match) {
           if (!Editor.isMatch(editor, entry, match)) {
             continue
           }
+          
           if (prev && Path.isChild(entry[1], prev[1])) // If entry is a child of prev, exchange the match
             lowEntries[lowEntries.length - 1] = entry
           else lowEntries.push(entry)
@@ -436,8 +437,7 @@ export const LocationQueries = {
         }
       }
       for (const lowEntry of lowEntries) yield lowEntry
-    }
-    else {
+    } else {
       for (const entry of iterable) {
         if (match) {
           if (
