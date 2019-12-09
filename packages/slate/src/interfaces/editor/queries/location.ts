@@ -56,31 +56,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Get the common ancestor node of a location.
-   */
-
-  ancestor(
-    editor: Editor,
-    at: Location,
-    options: {
-      depth?: number
-      edge?: 'start' | 'end'
-    } = {}
-  ): AncestorEntry {
-    if (Path.isPath(at) || Point.isPoint(at)) {
-      return Editor.parent(editor, at, options)
-    }
-
-    const path = Editor.path(editor, at, options)
-    const ancestorPath = Path.equals(at.anchor.path, at.focus.path)
-      ? Path.parent(path)
-      : path
-
-    const ancestor = Node.get(editor, ancestorPath) as Ancestor
-    return [ancestor, ancestorPath]
-  },
-
-  /**
    * Get the point before a location.
    */
 
@@ -175,20 +150,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Check if a point the start point of a location.
-   */
-
-  isStart(editor: Editor, point: Point, at: Location): boolean {
-    // PERF: If the offset isn't `0` we know it's not the start.
-    if (point.offset !== 0) {
-      return false
-    }
-
-    const start = Editor.start(editor, at)
-    return Point.equals(point, start)
-  },
-
-  /**
    * Check if a point is the end point of a location.
    */
 
@@ -203,6 +164,20 @@ export const LocationQueries = {
 
   isEdge(editor: Editor, point: Point, at: Location): boolean {
     return Editor.isStart(editor, point, at) || Editor.isEnd(editor, point, at)
+  },
+
+  /**
+   * Check if a point is the start point of a location.
+   */
+
+  isStart(editor: Editor, point: Point, at: Location): boolean {
+    // PERF: If the offset isn't `0` we know it's not the start.
+    if (point.offset !== 0) {
+      return false
+    }
+
+    const start = Editor.start(editor, at)
+    return Point.equals(point, start)
   },
 
   /**

@@ -9,13 +9,6 @@ import { Editor, Element, ElementEntry, Path, Range, Text, TextEntry } from '..'
 export type Node = Editor | Element | Text
 
 export const Node = {
-  matches(node: Node, props: Partial<Node>): boolean {
-    return (
-      (Element.isElement(node) && Element.matches(node, props)) ||
-      (Text.isText(node) && Text.matches(node, props))
-    )
-  },
-
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
@@ -98,22 +91,6 @@ export const Node = {
       const childPath = path.concat(index)
       yield [child, childPath]
       index = reverse ? index - 1 : index + 1
-    }
-  },
-
-  /**
-   * Find the closest matching node entry starting from a specific path.
-   */
-
-  closest(
-    root: Node,
-    path: Path,
-    predicate: (entry: NodeEntry) => boolean
-  ): NodeEntry | undefined {
-    for (const entry of Node.levels(root, path, { reverse: true })) {
-      if (predicate(entry)) {
-        return entry
-      }
     }
   },
 
@@ -252,22 +229,6 @@ export const Node = {
   },
 
   /**
-   * Find the furthest matching node entry starting from a specific path.
-   */
-
-  furthest(
-    root: Node,
-    path: Path,
-    predicate: (entry: NodeEntry) => boolean
-  ): NodeEntry | undefined {
-    for (const entry of Node.levels(root, path)) {
-      if (predicate(entry)) {
-        return entry
-      }
-    }
-  },
-
-  /**
    * Get the descendant node referred to by a specific path. If the path is an
    * empty array, it refers to the root node itself.
    */
@@ -385,6 +346,17 @@ export const Node = {
       const n = Node.get(root, p)
       yield [n, p]
     }
+  },
+
+  /**
+   * Check if a node matches a set of props.
+   */
+
+  matches(node: Node, props: Partial<Node>): boolean {
+    return (
+      (Element.isElement(node) && Element.matches(node, props)) ||
+      (Text.isText(node) && Text.matches(node, props))
+    )
   },
 
   /**
