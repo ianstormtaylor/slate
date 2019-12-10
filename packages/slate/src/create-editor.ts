@@ -78,7 +78,7 @@ export const createEditor = (): Editor => {
 
         Promise.resolve().then(() => {
           FLUSHING.set(editor, false)
-          editor.onChange(editor.children, editor.operations)
+          editor.onChange()
           editor.operations = []
         })
       }
@@ -88,11 +88,6 @@ export const createEditor = (): Editor => {
 
       if (Command.isCoreCommand(command)) {
         switch (command.type) {
-          case 'add_mark': {
-            Editor.addMarks(editor, command.mark)
-            break
-          }
-
           case 'delete_backward': {
             if (selection && Range.isCollapsed(selection)) {
               Editor.delete(editor, { unit: command.unit, reverse: true })
@@ -133,12 +128,26 @@ export const createEditor = (): Editor => {
           }
 
           case 'insert_text': {
-            Editor.insertText(editor, command.text)
-            break
-          }
+            if (selection) {
+              const { anchor } = selection
 
-          case 'remove_mark': {
-            Editor.removeMarks(editor, [command.mark])
+              // If the cursor is at the end of an inline, move it outside
+              // of the inline before inserting
+              if (Range.isCollapsed(selection)) {
+                const inline = Editor.match(editor, anchor, 'inline')
+
+                if (inline) {
+                  const [, inlinePath] = inline
+
+                  if (Editor.isEnd(editor, anchor, inlinePath)) {
+                    const point = Editor.after(editor, inlinePath)!
+                    Editor.setSelection(editor, { anchor: point, focus: point })
+                  }
+                }
+              }
+
+              Editor.insertText(editor, command.text)
+            }
             break
           }
         }
@@ -154,8 +163,8 @@ export const createEditor = (): Editor => {
 
       // Ensure that block and inline nodes have at least one text child.
       if (Element.isElement(node) && node.children.length === 0) {
-        const child = { text: '', marks: [] }
-        Editor.insertNodes(editor, child, { at: path.concat(0) })
+        const child = { text: '' }
+        Editor.insertNodes(editor, child, { at: path.concat(0), voids: true })
         return
       }
 
@@ -185,43 +194,42 @@ export const createEditor = (): Editor => {
         // other inline nodes, or parent blocks that only contain inlines and
         // text.
         if (isInlineOrText !== shouldHaveInlines) {
-          Editor.removeNodes(editor, { at: path.concat(n) })
+          Editor.removeNodes(editor, { at: path.concat(n), voids: true })
           n--
-          continue
-        }
-
-        if (Element.isElement(child)) {
+        } else if (Element.isElement(child)) {
           // Ensure that inline nodes are surrounded by text nodes.
           if (editor.isInline(child)) {
             if (prev == null || !Text.isText(prev)) {
-              const newChild = { text: '', marks: [] }
-              Editor.insertNodes(editor, newChild, { at: path.concat(n) })
+              const newChild = { text: '' }
+              Editor.insertNodes(editor, newChild, {
+                at: path.concat(n),
+                voids: true,
+              })
               n++
-              continue
-            }
-
-            if (isLast) {
-              const newChild = { text: '', marks: [] }
-              Editor.insertNodes(editor, newChild, { at: path.concat(n + 1) })
+            } else if (isLast) {
+              const newChild = { text: '' }
+              Editor.insertNodes(editor, newChild, {
+                at: path.concat(n + 1),
+                voids: true,
+              })
               n++
-              continue
             }
           }
         } else {
-          // Merge adjacent text nodes that are empty or have matching marks.
+          // Merge adjacent text nodes that are empty or match.
           if (prev != null && Text.isText(prev)) {
-            if (Text.matches(child, prev)) {
-              Editor.mergeNodes(editor, { at: path.concat(n) })
+            if (Text.equals(child, prev, { loose: true })) {
+              Editor.mergeNodes(editor, { at: path.concat(n), voids: true })
               n--
-              continue
             } else if (prev.text === '') {
-              Editor.removeNodes(editor, { at: path.concat(n - 1) })
+              Editor.removeNodes(editor, {
+                at: path.concat(n - 1),
+                voids: true,
+              })
               n--
-              continue
             } else if (isLast && child.text === '') {
-              Editor.removeNodes(editor, { at: path.concat(n) })
+              Editor.removeNodes(editor, { at: path.concat(n), voids: true })
               n--
-              continue
             }
           }
         }
@@ -238,11 +246,8 @@ export const createEditor = (): Editor => {
 
 const getDirtyPaths = (op: Operation) => {
   switch (op.type) {
-    case 'add_mark':
     case 'insert_text':
-    case 'remove_mark':
     case 'remove_text':
-    case 'set_mark':
     case 'set_node': {
       const { path } = op
       return Path.levels(path)

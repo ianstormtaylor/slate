@@ -2,47 +2,14 @@ import {
   NodeEntry,
   Node,
   Text,
-  Mark,
   Editor,
-  MarkEntry,
   AncestorEntry,
   Descendant,
   DescendantEntry,
 } from 'slate'
 
-import { MarkError, NodeError } from './errors'
-import { NodeRule, MarkRule, ChildValidation } from './rules'
-
-/**
- * Check a mark object.
- */
-
-export const checkMark = (
-  editor: Editor,
-  entry: MarkEntry,
-  rule: MarkRule
-): MarkError | undefined => {
-  const { validate: v } = rule
-  const [mark, index, node, path] = entry
-
-  if ('properties' in v) {
-    for (const k in v.properties) {
-      const p = v.properties[k]
-      const value = mark[k]
-
-      if ((typeof p === 'function' && !p(value)) || p !== value) {
-        return {
-          code: 'mark_property_invalid',
-          mark,
-          index,
-          node,
-          path,
-          property: k,
-        }
-      }
-    }
-  }
-}
+import { NodeError } from './errors'
+import { NodeRule, ChildValidation } from './rules'
 
 /**
  * Check a node object.
@@ -59,6 +26,8 @@ export const checkNode = (
 
   if (Editor.isMatch(editor, entry, m)) {
     if ('properties' in v) {
+      const { children, text, ...existing } = node
+
       for (const k in v.properties) {
         const p = v.properties[k]
         const value = node[k]
@@ -67,15 +36,12 @@ export const checkNode = (
         if (isInvalid) {
           return { code: 'node_property_invalid', node, path, property: k }
         }
-      }
-    }
 
-    if ('marks' in v && v.marks != null) {
-      for (const entry of Node.marks(node)) {
-        if (!Editor.isMarkMatch(editor, entry, v.marks)) {
-          const [mark, index, n, p] = entry
-          return { code: 'mark_invalid', node: n, path: p, mark, index }
-        }
+        delete existing[k]
+      }
+
+      for (const k in existing) {
+        return { code: 'node_property_invalid', node, path, property: k }
       }
     }
 
@@ -106,6 +72,33 @@ export const checkNode = (
           return { code: 'last_child_invalid', node: n, path: p, index: i }
         }
       }
+
+      if ('leaves' in v && v.leaves != null) {
+        for (const [n, p] of Editor.texts(editor, { at: path })) {
+          const { text, ...existing } = n
+
+          for (const k in v.leaves) {
+            const l = v.leaves[k]
+            const value = n[k]
+            const isInvalid = typeof l === 'function' ? !l(value) : l !== value
+
+            if (isInvalid) {
+              return {
+                code: 'node_leaf_invalid',
+                node: n,
+                path: p,
+                property: k,
+              }
+            }
+
+            delete existing[k]
+          }
+
+          for (const k in existing) {
+            return { code: 'node_leaf_invalid', node: n, path: p, property: k }
+          }
+        }
+      }
     }
   }
 }
@@ -130,7 +123,6 @@ export const checkAncestor = (
   let g = 0
 
   while (true) {
-    count++
     const group = groups[g] as ChildValidation | undefined
     const child = parent.children[index] as Descendant | undefined
     const childPath = parentPath.concat(index)
@@ -172,6 +164,12 @@ export const checkAncestor = (
       continue
     }
 
+    if (
+      child &&
+      Editor.isMatch(editor, [child, childPath], group.match || {})
+    ) {
+      count++
+    }
     // Since we want to report overflow on last matching child we don't
     // immediately v for count > max, but instead do so once we find
     // a child that doesn't match.
@@ -197,7 +195,7 @@ export const checkAncestor = (
     // If there's no child, we're either done, we're in an optional group, or
     // we're missing a child in a group with a mininmum set.
     if (!child) {
-      if (group.min != null && count <= group.min) {
+      if (group.min != null && count < group.min) {
         return [
           rule,
           {

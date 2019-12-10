@@ -1,12 +1,5 @@
-import { Mark, Node, Path, Range } from '..'
+import { Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
-
-type AddMarkOperation = {
-  type: 'add_mark'
-  path: Path
-  mark: Mark
-  [key: string]: any
-}
 
 type InsertNodeOperation = {
   type: 'insert_node'
@@ -39,13 +32,6 @@ type MoveNodeOperation = {
   [key: string]: any
 }
 
-type RemoveMarkOperation = {
-  type: 'remove_mark'
-  path: Path
-  mark: Mark
-  [key: string]: any
-}
-
 type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
@@ -58,14 +44,6 @@ type RemoveTextOperation = {
   path: Path
   offset: number
   text: string
-  [key: string]: any
-}
-
-type SetMarkOperation = {
-  type: 'set_mark'
-  path: Path
-  properties: Partial<Mark>
-  newProperties: Partial<Mark>
   [key: string]: any
 }
 
@@ -113,11 +91,7 @@ type SplitNodeOperation = {
  * collaboration, and other features.
  */
 
-type Operation =
-  | NodeOperation
-  | MarkOperation
-  | SelectionOperation
-  | TextOperation
+type Operation = NodeOperation | SelectionOperation | TextOperation
 
 type NodeOperation =
   | InsertNodeOperation
@@ -126,8 +100,6 @@ type NodeOperation =
   | RemoveNodeOperation
   | SetNodeOperation
   | SplitNodeOperation
-
-type MarkOperation = AddMarkOperation | RemoveMarkOperation | SetMarkOperation
 
 type SelectionOperation = SetSelectionOperation
 
@@ -143,14 +115,6 @@ const Operation = {
   },
 
   /**
-   * Check of a value is a `MarkOperation` object.
-   */
-
-  isMarkOperation(value: any): value is MarkOperation {
-    return Operation.isOperation(value) && value.type.endsWith('_mark')
-  },
-
-  /**
    * Check of a value is an `Operation` object.
    */
 
@@ -160,10 +124,6 @@ const Operation = {
     }
 
     switch (value.type) {
-      case 'add_mark': {
-        return Path.isPath(value.path) && Mark.isMark(value.mark)
-      }
-
       case 'insert_node': {
         return Path.isPath(value.path) && Node.isNode(value.node)
       }
@@ -189,10 +149,6 @@ const Operation = {
         return Path.isPath(value.path) && Path.isPath(value.newPath)
       }
 
-      case 'remove_mark': {
-        return Path.isPath(value.path) && Mark.isMark(value.mark)
-      }
-
       case 'remove_node': {
         return Path.isPath(value.path) && Node.isNode(value.node)
       }
@@ -202,14 +158,6 @@ const Operation = {
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
-        )
-      }
-
-      case 'set_mark': {
-        return (
-          Path.isPath(value.path) &&
-          isPlainObject(value.properties) &&
-          isPlainObject(value.newProperties)
         )
       }
 
@@ -285,10 +233,6 @@ const Operation = {
 
   inverse(op: Operation): Operation {
     switch (op.type) {
-      case 'add_mark': {
-        return { ...op, type: 'remove_mark' }
-      }
-
       case 'insert_node': {
         return { ...op, type: 'remove_node' }
       }
@@ -317,10 +261,6 @@ const Operation = {
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
-      case 'remove_mark': {
-        return { ...op, type: 'add_mark' }
-      }
-
       case 'remove_node': {
         return { ...op, type: 'insert_node' }
       }
@@ -329,7 +269,6 @@ const Operation = {
         return { ...op, type: 'insert_text' }
       }
 
-      case 'set_mark':
       case 'set_node': {
         const { properties, newProperties } = op
         return { ...op, properties: newProperties, newProperties: properties }
@@ -363,15 +302,12 @@ const Operation = {
 }
 
 export {
-  AddMarkOperation,
   InsertNodeOperation,
   InsertTextOperation,
   MergeNodeOperation,
   MoveNodeOperation,
-  RemoveMarkOperation,
   RemoveNodeOperation,
   RemoveTextOperation,
-  SetMarkOperation,
   SetNodeOperation,
   SetSelectionOperation,
   SplitNodeOperation,

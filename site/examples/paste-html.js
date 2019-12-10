@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
@@ -28,14 +28,15 @@ const ELEMENT_TAGS = {
   UL: () => ({ type: 'bulleted-list' }),
 }
 
-const MARK_TAGS = {
-  CODE: () => ({ type: 'code' }),
-  DEL: () => ({ type: 'strikethrough' }),
-  EM: () => ({ type: 'italic' }),
-  I: () => ({ type: 'italic' }),
-  S: () => ({ type: 'strikethrough' }),
-  STRONG: () => ({ type: 'bold' }),
-  U: () => ({ type: 'underline' }),
+// COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
+const TEXT_TAGS = {
+  CODE: () => ({ code: true }),
+  DEL: () => ({ strikethrough: true }),
+  EM: () => ({ italic: true }),
+  I: () => ({ italic: true }),
+  S: () => ({ strikethrough: true }),
+  STRONG: () => ({ bold: true }),
+  U: () => ({ underline: true }),
 }
 
 export const deserialize = el => {
@@ -58,7 +59,9 @@ export const deserialize = el => {
     parent = el.childNodes[0]
   }
 
-  const children = Array.from(parent.childNodes).map(deserialize)
+  const children = Array.from(parent.childNodes)
+    .map(deserialize)
+    .flat()
 
   if (el.nodeName === 'BODY') {
     return jsx('fragment', {}, children)
@@ -69,26 +72,36 @@ export const deserialize = el => {
     return jsx('element', attrs, children)
   }
 
-  if (MARK_TAGS[nodeName]) {
-    const attrs = MARK_TAGS[nodeName](el)
-    return jsx('mark', attrs, children)
+  if (TEXT_TAGS[nodeName]) {
+    const attrs = TEXT_TAGS[nodeName](el)
+    return children.map(child => jsx('text', attrs, child))
   }
 
   return children
 }
 
 const PasteHtmlExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderMark = useCallback(props => <Mark {...props} />, [])
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withHtml(withReact(withHistory(createEditor()))),
     []
   )
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
-        renderMark={renderMark}
+        renderLeaf={renderLeaf}
         placeholder="Paste in some HTML..."
       />
     </Slate>
@@ -187,19 +200,28 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
-    case 'code':
-      return <code {...attributes}>{children}</code>
-    case 'italic':
-      return <em {...attributes}>{children}</em>
-    case 'underlined':
-      return <u {...attributes}>{children}</u>
-    case 'strikethrough':
-      return <del {...attributes}>{children}</del>
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
   }
+
+  if (leaf.code) {
+    children = <code>{children}</code>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underlined) {
+    children = <u>{children}</u>
+  }
+
+  if (leaf.strikethrough) {
+    children = <del>{children}</del>
+  }
+
+  return <span {...attributes}>{children}</span>
 }
 
 const initialValue = [
@@ -208,41 +230,24 @@ const initialValue = [
       {
         text:
           "By default, pasting content into a Slate editor will use the clipboard's ",
-        marks: [],
       },
-      {
-        text: "'text/plain'",
-        marks: [{ type: 'code' }],
-      },
+      { text: "'text/plain'", code: true },
       {
         text:
           " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintaing its formatting. To do this, your editor needs to handle ",
-        marks: [],
       },
-      {
-        text: "'text/html'",
-        marks: [{ type: 'code' }],
-      },
-      {
-        text: ' data. ',
-        marks: [],
-      },
+      { text: "'text/html'", code: true },
+      { text: ' data. ' },
     ],
   },
   {
-    children: [
-      {
-        text: 'This is an example of doing exactly that!',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'This is an example of doing exactly that!' }],
   },
   {
     children: [
       {
         text:
           "Try it out for yourself! Copy and paste some rendered HTML rich text content (not the source code) from another site into this editor and it's formatting should be preserved.",
-        marks: [],
       },
     ],
   },

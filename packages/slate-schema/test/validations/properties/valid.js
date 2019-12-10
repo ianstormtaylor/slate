@@ -8,6 +8,7 @@ export const schema = [
     match: { a: true },
     validate: {
       properties: {
+        a: true,
         thing: v => v == null || v === 'valid',
       },
     },

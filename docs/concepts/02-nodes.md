@@ -6,7 +6,7 @@ The most important type are the `Node` objects:
 - Container `Element` nodes which have semantic meaning in your domain.
 - And leaf-level `Text` nodes which contain the document's text.
 
-These three interfaces are combined together to form a tree—just like the DOM. For example, here's a simple plain-text value:
+These three interfaces are combined together to form a tree—just like the DOM. For example, here's a simple plaintext value:
 
 ```js
 const editor = {
@@ -16,7 +16,6 @@ const editor = {
       children: [
         {
           text: 'A line of text!',
-          marks: [],
         },
       ],
     },
@@ -25,7 +24,7 @@ const editor = {
 }
 ```
 
-Mirroring the DOM as much as possible is one of Slate's principles. People use the DOM to represent documents with rich-text-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
+Mirroring the DOM as much as possible is one of Slate's principles. People use the DOM to represent documents with richtext-like structures all the time. Mirroring the DOM helps make the library familiar for new users, and it lets us reuse battle-tested patterns without having to reinvent them ourselves.
 
 > 🤖 The following content on Mozilla's Developer Network may help you learn more about the corresponding DOM concepts:
 >
@@ -38,7 +37,7 @@ A Slate document is a nested and recursive structure. In a document, elements ca
 
 ## `Editor`
 
-The top-level node in a Slate document is the `Editor` itself. It encapsulates all of the rich-text "content" of the document. Its interface is:
+The top-level node in a Slate document is the `Editor` itself. It encapsulates all of the richtext "content" of the document. Its interface is:
 
 ```ts
 interface Editor {
@@ -51,7 +50,7 @@ We'll cover its functionality later, but the important part as far as nodes are 
 
 ## `Element`
 
-Elements make up the middle layers of a rich-text document. They are the nodes that are custom to your own domain. Their interface is:
+Elements make up the middle layers of a richtext document. They are the nodes that are custom to your own domain. Their interface is:
 
 ```ts
 interface Element {
@@ -127,18 +126,17 @@ Text nodes are the lowest-level nodes in the tree, containing the text content o
 ```ts
 interface Text {
   text: string
-  marks: Mark[]
   [key: string]: any
 }
 ```
 
-We'll cover `Mark` objects shortly, but for now you can get an idea for them:
+For example, a string of bold text:
 
 ```js
 const text = {
   text: 'A string of bold text',
-  marks: [{ type: 'bold' }],
+  bold: true,
 }
 ```
 
-Text nodes too can contain any custom properties you want, although it is rarer to need to do that.
+Text nodes too can contain any custom properties you want, and that's how you implement custom formatting like **bold**, _italic_, `code`, etc.

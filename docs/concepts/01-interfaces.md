@@ -5,16 +5,15 @@ Slate works with pure JSON objects. All it requires is that those JSON objects c
 ```ts
 interface Text {
   text: string
-  marks: Mark[]
   [key: string]: any
 }
 ```
 
-Which means it must have a `text` property with a string of content, and a `marks` property with an array of formatting marks (or an empty array).
+Which means it must have a `text` property with a string of content.
 
-But other custom properties are also allowed, and completely up to you. This lets you tailor your data to your specific domain and use case, without Slate getting in the way.
+But **any** other custom properties are also allowed, and completely up to you. This lets you tailor your data to your specific domain and use case, adding whatever formatting logic you'd like, without Slate getting in the way.
 
-This interface-based approach separates Slate from most other rich-text editors which require you to work with their hand-rolled "model" classes, and makes it much easier to reason about. It also means that it avoids startup time penalties related to "initializing" the data model.
+This interface-based approach separates Slate from most other richtext editors which require you to work with their hand-rolled "model" classes, and makes it much easier to reason about. It also means that it avoids startup time penalties related to "initializing" the data model.
 
 ## Custom Properties
 

@@ -1,4 +1,4 @@
-import { Ancestor, Descendant, Range, Mark, Node, Path, Text } from 'slate'
+import { Ancestor, Descendant, Node, Path } from 'slate'
 
 export interface ChildInvalidError {
   code: 'child_invalid'
@@ -42,6 +42,13 @@ export interface NextSiblingInvalidError {
   path: Path
 }
 
+export interface NodeLeafInvalidError {
+  code: 'node_leaf_invalid'
+  node: Node
+  path: Path
+  property: string
+}
+
 export interface NodePropertyInvalidError {
   code: 'node_property_invalid'
   node: Node
@@ -54,23 +61,6 @@ export interface NodeTextInvalidError {
   node: Node
   path: Path
   text: string
-}
-
-export interface MarkInvalidError {
-  code: 'mark_invalid'
-  node: Text
-  path: Path
-  mark: Mark
-  index: number
-}
-
-export interface MarkPropertyInvalidError {
-  code: 'mark_property_invalid'
-  mark: Mark
-  index: number
-  node: Text
-  path: Path
-  property: string
 }
 
 export interface ParentInvalidError {
@@ -86,19 +76,17 @@ export interface PreviousSiblingInvalidError {
   path: Path
 }
 
-export type MarkError = MarkPropertyInvalidError
-
 export type NodeError =
   | ChildInvalidError
   | ChildMaxInvalidError
   | ChildMinInvalidError
   | FirstChildInvalidError
   | LastChildInvalidError
-  | MarkInvalidError
   | NextSiblingInvalidError
+  | NodeLeafInvalidError
   | NodePropertyInvalidError
   | NodeTextInvalidError
   | ParentInvalidError
   | PreviousSiblingInvalidError
 
-export type SchemaError = MarkError | NodeError
+export type SchemaError = NodeError

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react'
+import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { css } from 'emotion'
@@ -8,24 +8,38 @@ import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const editor = useMemo(
-    () => withMarks(withHistory(withReact(createEditor()))),
+    () => withFormatting(withHistory(withReact(createEditor()))),
     []
   )
+
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <HoveringToolbar />
       <Editable
-        renderMark={props => <Mark {...props} />}
+        renderLeaf={props => <Leaf {...props} />}
         placeholder="Enter some text..."
         onDOMBeforeInput={event => {
           switch (event.inputType) {
             case 'formatBold':
-              return editor.exec({ type: 'toggle_mark', mark: 'bold' })
+              return editor.exec({ type: 'toggle_format', format: 'bold' })
             case 'formatItalic':
-              return editor.exec({ type: 'toggle_mark', mark: 'italic' })
+              return editor.exec({ type: 'toggle_format', format: 'italic' })
             case 'formatUnderline':
-              return editor.exec({ type: 'toggle_mark', mark: 'underlined' })
+              return editor.exec({
+                type: 'toggle_format',
+                format: 'underlined',
+              })
           }
         }}
       />
@@ -33,16 +47,19 @@ const HoveringMenuExample = () => {
   )
 }
 
-const withMarks = editor => {
+const withFormatting = editor => {
   const { exec } = editor
 
   editor.exec = command => {
     switch (command.type) {
-      case 'toggle_mark': {
-        const { mark } = command
-        const isActive = isMarkActive(editor, mark.type)
-        const cmd = isActive ? 'remove_mark' : 'add_mark'
-        editor.exec({ type: cmd, mark })
+      case 'toggle_format': {
+        const { format } = command
+        const isActive = isFormatActive(editor, format)
+        Editor.setNodes(
+          editor,
+          { [format]: isActive ? null : true },
+          { match: 'text', split: true }
+        )
         break
       }
 
@@ -56,20 +73,28 @@ const withMarks = editor => {
   return editor
 }
 
-const isMarkActive = (editor, type) => {
-  const [mark] = Editor.marks(editor, { match: { type }, mode: 'universal' })
-  return !!mark
+const isFormatActive = (editor, format) => {
+  const [match] = Editor.nodes(editor, {
+    match: { [format]: true },
+    mode: 'all',
+  })
+  return !!match
 }
 
-const Mark = ({ attributes, children, mark }) => {
-  switch (mark.type) {
-    case 'bold':
-      return <strong {...attributes}>{children}</strong>
-    case 'italic':
-      return <em {...attributes}>{children}</em>
-    case 'underlined':
-      return <u {...attributes}>{children}</u>
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
   }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underlined) {
+    children = <u>{children}</u>
+  }
+
+  return <span {...attributes}>{children}</span>
 }
 
 const HoveringToolbar = () => {
@@ -99,7 +124,6 @@ const HoveringToolbar = () => {
     const rect = domRange.getBoundingClientRect()
     el.style.opacity = 1
     el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`
-
     el.style.left = `${rect.left +
       window.pageXOffset -
       el.offsetWidth / 2 +
@@ -123,23 +147,23 @@ const HoveringToolbar = () => {
           transition: opacity 0.75s;
         `}
       >
-        <MarkButton type="bold" icon="format_bold" />
-        <MarkButton type="italic" icon="format_italic" />
-        <MarkButton type="underlined" icon="format_underlined" />
+        <FormatButton format="bold" icon="format_bold" />
+        <FormatButton format="italic" icon="format_italic" />
+        <FormatButton format="underlined" icon="format_underlined" />
       </Menu>
     </Portal>
   )
 }
 
-const MarkButton = ({ type, icon }) => {
+const FormatButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
       reversed
-      active={isMarkActive(editor, type)}
+      active={isFormatActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'toggle_mark', mark: { type } })
+        editor.exec({ type: 'toggle_format', format })
       }}
     >
       <Icon>{icon}</Icon>
@@ -153,40 +177,18 @@ const initialValue = [
       {
         text:
           'This example shows how you can make a hovering menu appear above your content, which you can use to make text ',
-        marks: [],
       },
-      {
-        text: 'bold',
-        marks: [{ type: 'bold' }],
-      },
-      {
-        text: ', ',
-        marks: [],
-      },
-      {
-        text: 'italic',
-        marks: [{ type: 'italic' }],
-      },
-      {
-        text: ', or anything else you might want to do!',
-        marks: [],
-      },
+      { text: 'bold', bold: true },
+      { text: ', ' },
+      { text: 'italic', italic: true },
+      { text: ', or anything else you might want to do!' },
     ],
   },
   {
     children: [
-      {
-        text: 'Try it out yourself! Just ',
-        marks: [],
-      },
-      {
-        text: 'select any piece of text and the menu will appear',
-        marks: [{ type: 'bold' }, { type: 'italic' }],
-      },
-      {
-        text: '.',
-        marks: [],
-      },
+      { text: 'Try it out yourself! Just ' },
+      { text: 'select any piece of text and the menu will appear', bold: true },
+      { text: '.' },
     ],
   },
 ]

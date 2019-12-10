@@ -20,7 +20,6 @@ const editor = {
       children: [
         {
           text: 'A line of text!',
-          marks: [],
         },
       ],
     },
@@ -107,7 +106,6 @@ const editor = {
       children: [
         {
           text: 'A line of text!',
-          marks: [],
         },
       ],
     },

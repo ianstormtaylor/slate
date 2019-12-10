@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useEditor } from '..'
-import { Leaf } from '../utils/leaf'
 
 /**
  * Leaf content strings.
@@ -10,7 +9,7 @@ import { Leaf } from '../utils/leaf'
 
 const String = (props: {
   isLast: boolean
-  leaf: Leaf
+  leaf: Text
   parent: Element
   text: Text
 }) => {

@@ -1,7 +1,7 @@
 {
   "name": "slate-hyperscript",
   "description": "A hyperscript helper for creating Slate documents.",
-  "version": "0.50.8",
+  "version": "0.52.5",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -17,7 +17,7 @@
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
-    "slate": "^0.50.8"
+    "slate": "^0.52.5"
   },
   "peerDependencies": {
     "slate": ">=0.50.0"
@@ -31,8 +31,8 @@
     "html",
     "hyperscript",
     "jsx",
+    "serialize",
     "slate",
-    "sugar",
     "xml"
   ]
 }

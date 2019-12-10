@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Editor, createEditor } from 'slate'
@@ -16,12 +16,23 @@ import { css } from 'emotion'
 import { Button, Icon, Toolbar } from '../components'
 
 const ImagesExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
+
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Toolbar>
         <InsertImageButton />
       </Toolbar>
@@ -72,7 +83,7 @@ const withImages = editor => {
 
       case 'insert_image': {
         const { url } = command
-        const text = { text: '', marks: [] }
+        const text = { text: '' }
         const image = { type: 'image', url, children: [text] }
         Editor.insertNodes(editor, image)
         break
@@ -128,7 +139,7 @@ const InsertImageButton = () => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
         if (!url) return
-        editor.exec({ type: 'insert_url', url })
+        editor.exec({ type: 'insert_image', url })
       }}
     >
       <Icon>image</Icon>
@@ -150,19 +161,13 @@ const initialValue = [
       {
         text:
           'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
-        marks: [],
       },
     ],
   },
   {
     type: 'image',
     url: 'https://source.unsplash.com/kFrdX5IeQzI',
-    children: [
-      {
-        text: '',
-        marks: [],
-      },
-    ],
+    children: [{ text: '' }],
   },
   {
     type: 'paragraph',
@@ -170,7 +175,6 @@ const initialValue = [
       {
         text:
           'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
-        marks: [],
       },
     ],
   },

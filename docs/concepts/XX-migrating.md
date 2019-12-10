@@ -50,7 +50,7 @@ Block-ness and inline-ness is now a runtime choice. Previously it was baked into
 
 ### More React-ish
 
-Rendering and event-handling is no longer a plugin's concern. Previously plugins had full control over the rendering logic, and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the rich-text aspects, and leaves the rendering and event handling aspects to React.
+Rendering and event-handling is no longer a plugin's concern. Previously plugins had full control over the rendering logic, and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the richtext aspects, and leaves the rendering and event handling aspects to React.
 
 ### Context
 
@@ -68,9 +68,13 @@ We now use the `beforeinput` event almost exclusively. Instead of having relying
 
 The core history logic has now finally been extracted into a standalone plugin. This makes it much easier for people to implement their own custom history behaviors. And it ensures that plugins have enough control to augment the editor in complex ways, because the history requires it.
 
+### Mark-less
+
+Marks have been removed the Slate data model. Now that we have the ability to define custom properties right on the nodes themselves, you can model marks as custom properties of text nodes. For example bold can be modelled simply as a `bold: true` property.
+
 ### Annotation-less
 
-Similarly, annotations have been removed from Slate's core. They can be fully implemented now in userland by defining custom operations and rendering annotated ranges using decorations. But most cases should be using plain marks or plain decorations anyways. There were not that many use cases that benefitted from annotations.
+Similarly, annotations have been removed from Slate's core. They can be fully implemented now in userland by defining custom operations and rendering annotated ranges using decorations. But most cases should be using custom text node properties or decorations anyways. There were not that many use cases that benefitted from annotations.
 
 ## Reductions
 
@@ -79,23 +83,23 @@ One of the goals was to dramatically simplify a lot of the logic in Slate to mak
 To give you a sense for the change in total lines of code:
 
 ```
-slate                       8,436  ->  4,038  (48%)
-slate-react                 3,905  ->    715  (18%)
+slate                       8,436  ->  3,724  (48%)
+slate-react                 3,905  ->    627  (18%)
 
 slate-base64-serializer        38  ->      0
 slate-dev-benchmark           340  ->      0
 slate-dev-environment         102  ->      0
 slate-dev-test-utils           44  ->      0
-slate-history                   0  ->    201
+slate-history                   0  ->    209
 slate-hotkeys                  62  ->      0
 slate-html-serializer         253  ->      0
-slate-hyperscript             447  ->    410
+slate-hyperscript             447  ->    345
 slate-plain-serializer         56  ->      0
 slate-prop-types               62  ->      0
 slate-react-placeholder        62  ->      0
-slate-schema                    0  ->    504
+slate-schema                    0  ->    439
 
-total                      13,807  ->  5,868  (43%)
+total                      13,807  ->  5,344  (39%)
 ```
 
 It's quite a big difference! And that doesn't even include the dependencies that were shed in the process too.

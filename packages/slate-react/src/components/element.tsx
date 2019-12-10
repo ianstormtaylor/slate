@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useRef } from 'react'
+import React, { useRef } from 'react'
 import getDirection from 'direction'
 import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
@@ -6,6 +6,7 @@ import Text from './text'
 import Children from './children'
 import { ReactEditor, useEditor, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -13,12 +14,7 @@ import {
   NODE_TO_INDEX,
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
-import {
-  RenderDecorationProps,
-  RenderElementProps,
-  RenderMarkProps,
-} from './editable'
-import { isRangeListEqual } from '../utils/leaf'
+import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**
  * Element.
@@ -28,18 +24,16 @@ const Element = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
-  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
   renderElement?: (props: RenderElementProps) => JSX.Element
-  renderMark?: (props: RenderMarkProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {
   const {
     decorate,
     decorations,
     element,
-    renderDecoration,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
-    renderMark,
+    renderLeaf,
     selection,
   } = props
   const ref = useRef<HTMLElement>(null)
@@ -53,9 +47,8 @@ const Element = (props: {
       decorate={decorate}
       decorations={decorations}
       node={element}
-      renderDecoration={renderDecoration}
       renderElement={renderElement}
-      renderMark={renderMark}
+      renderLeaf={renderLeaf}
       selection={selection}
     />
   )
@@ -119,7 +112,7 @@ const Element = (props: {
   }
 
   // Update element-related weak maps with the DOM element ref.
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     if (ref.current) {
       KEY_TO_ELEMENT.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
@@ -141,9 +134,8 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.decorate === next.decorate &&
     prev.element === next.element &&
-    prev.renderDecoration === next.renderDecoration &&
     prev.renderElement === next.renderElement &&
-    prev.renderMark === next.renderMark &&
+    prev.renderLeaf === next.renderLeaf &&
     isRangeListEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
@@ -165,6 +157,31 @@ export const DefaultElement = (props: RenderElementProps) => {
       {children}
     </Tag>
   )
+}
+
+/**
+ * Check if a list of ranges is equal to another.
+ *
+ * PERF: this requires the two lists to also have the ranges inside them in the
+ * same order, but this is an okay constraint for us since decorations are
+ * kept in order, and the odd case where they aren't is okay to re-render for.
+ */
+
+const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
+  if (list.length !== another.length) {
+    return false
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    const range = list[i]
+    const other = another[i]
+
+    if (!Range.equals(range, other)) {
+      return false
+    }
+  }
+
+  return true
 }
 
 export default MemoizedElement

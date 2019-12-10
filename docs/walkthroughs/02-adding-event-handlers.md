@@ -11,8 +11,24 @@ Here's our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable />
     </Slate>
   )
@@ -24,8 +40,24 @@ Now we add an `onKeyDown` handler:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         // Define a new handler which prints the key that was pressed.
         onKeyDown={event => {
@@ -46,8 +78,24 @@ Our `onKeyDown` handler might look like this:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         onKeyDown={event => {
           if (event.key === '&') {

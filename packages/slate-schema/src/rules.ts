@@ -1,16 +1,5 @@
-import { Editor, NodeMatch, MarkMatch } from 'slate'
-import { NodeError, MarkError } from './errors'
-
-export interface MarkValidation {
-  properties?: Record<string, any>
-}
-
-export interface MarkRule {
-  for: 'mark'
-  match: MarkMatch
-  validate: MarkValidation
-  normalize: (editor: Editor, error: MarkError) => void
-}
+import { Editor, NodeMatch } from 'slate'
+import { NodeError } from './errors'
 
 export interface ChildValidation {
   match?: NodeMatch
@@ -22,7 +11,7 @@ export interface NodeValidation {
   children?: ChildValidation[]
   first?: NodeMatch
   last?: NodeMatch
-  marks?: MarkMatch
+  leaves?: Record<string, any>
   next?: NodeMatch
   parent?: NodeMatch
   previous?: NodeMatch
@@ -37,4 +26,4 @@ export interface NodeRule {
   normalize: (editor: Editor, error: NodeError) => void
 }
 
-export type SchemaRule = MarkRule | NodeRule
+export type SchemaRule = NodeRule

@@ -12,7 +12,7 @@
     "fix": "yarn fix:prettier && yarn fix:eslint",
     "fix:eslint": "yarn lint:eslint --fix",
     "fix:prettier": "yarn lint:prettier --write",
-    "lint": "yarn lint:eslint && yarn lint:prettier",
+    "lint": "yarn lint:eslint",
     "lint:eslint": "eslint \"./{packages,site}/**/*.{js,jsx,ts,tsx}\"",
     "lint:prettier": "prettier --list-different \"**/*.{css,md,js,jsx,json,ts,tsx}\"",
     "open": "open http://localhost:3000",
@@ -40,6 +40,7 @@
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.14",
     "@types/react": "^16.9.13",
+    "@types/react-dom": "^16.9.4",
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-eslint": "^10.0.3",
@@ -78,11 +79,11 @@
     "rollup-plugin-terser": "^5.1.2",
     "rollup-plugin-typescript2": "^0.25.2",
     "rollup-plugin-uglify": "^6.0.3",
-    "slate": "^0.50.0",
-    "slate-history": "^0.50.0",
-    "slate-hyperscript": "^0.50.0",
-    "slate-react": "^0.50.0",
-    "slate-schema": "^0.50.0",
+    "slate": "*",
+    "slate-history": "*",
+    "slate-hyperscript": "*",
+    "slate-react": "*",
+    "slate-schema": "*",
     "typescript": "^3.7.2"
   }
 }

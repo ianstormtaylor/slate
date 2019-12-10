@@ -52,8 +52,8 @@ const withTest = editor => {
     return element.inline === true ? true : isInline(element)
   }
 
-  editor.isVoid = node => {
-    return node.void === true ? true : isVoid(node)
+  editor.isVoid = element => {
+    return element.void === true ? true : isVoid(element)
   }
 
   return editor

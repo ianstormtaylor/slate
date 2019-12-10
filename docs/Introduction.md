@@ -60,16 +60,17 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/examples/plain-text) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/examples/rich-text) — showing the features you'd expect from a basic editor.
-- [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://github.com/ianstormtaylor/slate/tree/master/examples/links) — showing how wrap text in inline nodes with associated data.
-- [**Images**](https://github.com/ianstormtaylor/slate/tree/master/examples/images) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
-- [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/examples/tables) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
-- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/examples/mentions)
+- [**Plain text**](https://www.slatejs.org/examples/plaintext) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](https://www.slatejs.org/examples/richtext) — showing the features you'd expect from a basic editor.
+- [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](https://www.slatejs.org/examples/links) — showing how wrap text in inline nodes with associated data.
+- [**Images**](https://www.slatejs.org/examples/images) — showing how to use void (text-less) nodes to add images.
+- [**Hovering menu**](https://www.slatejs.org/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](https://www.slatejs.org/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Mentions**](https://www.slatejs.org/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
+
+Each example includes a **View Source** link to the code that implements it. And we have [other examples](https://github.com/ianstormtaylor/slate/tree/master/site/examples) too.
 
 If you have an idea for an example that shows a common use case, pull request it!
 

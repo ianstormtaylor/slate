@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
@@ -17,13 +17,23 @@ const SHORTCUTS = {
 }
 
 const MarkdownShortcutsExample = () => {
+  const [value, setValue] = useState(initialValue)
+  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
   return (
-    <Slate editor={editor} defaultValue={initialValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         placeholder="Write some markdown..."
@@ -132,18 +142,12 @@ const initialValue = [
       {
         text:
           'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
-        marks: [],
       },
     ],
   },
   {
     type: 'block-quote',
-    children: [
-      {
-        text: 'A wise quote.',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'A wise quote.' }],
   },
   {
     type: 'paragraph',
@@ -151,18 +155,12 @@ const initialValue = [
       {
         text:
           'Order when you start a line with "## " you get a level-two heading, like this:',
-        marks: [],
       },
     ],
   },
   {
     type: 'heading-two',
-    children: [
-      {
-        text: 'Try it out!',
-        marks: [],
-      },
-    ],
+    children: [{ text: 'Try it out!' }],
   },
   {
     type: 'paragraph',
@@ -170,7 +168,6 @@ const initialValue = [
       {
         text:
           'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
-        marks: [],
       },
     ],
   },

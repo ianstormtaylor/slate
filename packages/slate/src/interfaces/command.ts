@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Mark, Node, Range } from '..'
+import { Node } from '..'
 
 /**
  * `Command` objects represent an action that a user is taking on the editor.
@@ -21,31 +21,17 @@ export const Command = {
   },
 
   /**
-   * Check if a value is an `AddMarkCommand` object.
-   */
-
-  isAddMarkCommand(value: any): value is AddMarkCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'add_mark' &&
-      Mark.isMark(value.mark)
-    )
-  },
-
-  /**
    * Check if a value is a `CoreCommand` object.
    */
 
   isCoreCommand(value: any): value is CoreCommand {
     return (
-      Command.isAddMarkCommand(value) ||
       Command.isDeleteBackwardCommand(value) ||
       Command.isDeleteForwardCommand(value) ||
       Command.isDeleteFragmentCommand(value) ||
       Command.isInsertTextCommand(value) ||
       Command.isInsertFragmentCommand(value) ||
-      Command.isInsertBreakCommand(value) ||
-      Command.isRemoveMarkCommand(value)
+      Command.isInsertBreakCommand(value)
     )
   },
 
@@ -124,27 +110,6 @@ export const Command = {
       typeof value.text === 'string'
     )
   },
-
-  /**
-   * Check if a value is a `RemoveMarkCommand` object.
-   */
-
-  isRemoveMarkCommand(value: any): value is RemoveMarkCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'remove_mark' &&
-      Mark.isMark(value.mark)
-    )
-  },
-}
-
-/**
- * The `AddMarkCommand` adds a mark to the current selection.
- */
-
-export interface AddMarkCommand {
-  type: 'add_mark'
-  mark: Mark
 }
 
 /**
@@ -211,21 +176,11 @@ export interface InsertTextCommand {
 }
 
 /**
- * The `RemoveMarkCommand` removes a mark in the current selection.
- */
-
-export interface RemoveMarkCommand {
-  type: 'remove_mark'
-  mark: Mark
-}
-
-/**
  * The `CoreCommand` union is a set of all of the commands that are recognized
  * by Slate's "core" out of the box.
  */
 
 export type CoreCommand =
-  | AddMarkCommand
   | DeleteBackwardCommand
   | DeleteForwardCommand
   | DeleteFragmentCommand
@@ -233,4 +188,3 @@ export type CoreCommand =
   | InsertFragmentCommand
   | InsertNodeCommand
   | InsertTextCommand
-  | RemoveMarkCommand

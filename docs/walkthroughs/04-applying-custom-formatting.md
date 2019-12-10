@@ -9,6 +9,14 @@ So we start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -19,18 +27,25 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const { selection } = editor
-            const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-            const isCodeActive = !!node
+            const [match] = Editor.nodes(editor, { match: { type: 'code' } })
             Editor.setNodes(
               editor,
-              { type: isCodeActive ? 'paragraph' : 'code' },
+              { type: match ? 'paragraph' : 'code' },
               { match: 'block' }
             )
           }
@@ -41,11 +56,19 @@ const App = () => {
 }
 ```
 
-And now, we'll edit the `onKeyDown` handler to make it so that when you press `control-B`, it will add a "bold" mark to the currently selected text:
+And now, we'll edit the `onKeyDown` handler to make it so that when you press `control-B`, it will add a `bold` format to the currently selected text:
 
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (prop.element.type) {
       case 'code':
@@ -56,7 +79,15 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -68,20 +99,25 @@ const App = () => {
             // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
               Editor.setNodes(
                 editor,
-                { type: isCodeActive ? null : 'code' },
+                { type: match ? 'paragraph' : 'code' },
                 { match: 'block' }
               )
               break
             }
 
-            // When "B" is pressed, add a bold mark to the text.
+            // When "B" is pressed, bold the text in the selection.
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, { type: 'bold' })
+              Editor.setNodes(
+                editor,
+                { bold: true },
+                // Apply it to text nodes, and split the text node up if the
+                // selection is overlapping only part of it.
+                { match: 'text', split: true }
+              )
               break
             }
           }
@@ -94,22 +130,37 @@ const App = () => {
 
 Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `Ctrl-B`, you won't notice any change. That's because we haven't told Slate how to render a "bold" mark.
 
-For every mark type you want to add to your schema, you need to give Slate a "renderer" for that mark, just like elements. So let's define our `bold` mark:
+For every format you want to add to your schema, Slate will break up the text content into "leaves", and you need to tell Slate how to read it, just like for elements. So let's define a `Leaf` component:
 
 ```js
-// Define a React component to render bold text with.
-const BoldMark = props => {
-  return <strong {...props.attributes}>{props.children}</strong>
+// Define a React component to render leaves with bold text.
+const Leaf = props => {
+  return (
+    <span
+      {...props.attributes}
+      style={{ fontWeight: props.leaf.bold ? 'bold' : 'normal' }}
+    >
+      {props.children}
+    </span>
+  )
 }
 ```
 
 Pretty familiar, right?
 
-And now, let's tell Slate about that mark. To do that, we'll pass in the `renderMark` prop to our editor. Also, let's allow our mark to be toggled by changing `addMark` to `toggleMark`.
+And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor. Also, let's allow our formatting to be toggled by adding active-checking logic.
 
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
+  const [selection, setSelection] = useState(null)
+  const [value, setValue] = useState([
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ])
+
   const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
@@ -119,21 +170,25 @@ const App = () => {
     }
   }, [])
 
-  // Define a mark rendering function that is memoized with `useCallback`.
-  const renderMark = useCallback(props => {
-    switch (props.mark.type) {
-      case 'bold': {
-        return <BoldMark {...props} />
-      }
-    }
+  // Define a leaf rendering function that is memoized with `useCallback`.
+  const renderLeaf = useCallback(props => {
+    return <Leaf {...props} />
   }, [])
 
   return (
-    <Slate editor={editor} defaultValue={defaultValue}>
+    <Slate
+      editor={editor}
+      value={value}
+      selection={selection}
+      onChange={(value, selection) => {
+        setValue(value)
+        setSelection(selection)
+      }}
+    >
       <Editable
         renderElement={renderElement}
-        // Pass in the `renderMark` function.
-        renderMark={renderMark}
+        // Pass in the `renderLeaf` function.
+        renderLeaf={renderLeaf}
         onKeyDown={event => {
           if (!event.ctrlKey) {
             return
@@ -142,11 +197,10 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
               Editor.setNodes(
                 editor,
-                { type: isCodeActive ? null : 'code' },
+                { type: match ? null : 'code' },
                 { match: 'block' }
               )
               break
@@ -154,7 +208,11 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.addMarks(editor, { type: 'bold' })
+              Editor.setNodes(
+                editor,
+                { bold: true },
+                { match: 'text', split: true }
+              )
               break
             }
           }
@@ -164,8 +222,15 @@ const App = () => {
   )
 }
 
-const BoldMark = props => {
-  return <strong {...props.attributes}>{props.children}</strong>
+const Leaf = props => {
+  return (
+    <span
+      {...props.attributes}
+      style={{ fontWeight: props.leaf.bold ? 'bold' : 'normal' }}
+    >
+      {props.children}
+    </span>
+  )
 }
 ```
 

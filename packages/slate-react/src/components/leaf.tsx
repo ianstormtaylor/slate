@@ -2,9 +2,8 @@ import React from 'react'
 import { Text, Element } from 'slate'
 
 import String from './string'
-import { Leaf as SlateLeaf } from '../utils/leaf'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
-import { RenderDecorationProps, RenderMarkProps } from './editable'
+import { RenderLeafProps } from './editable'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -12,10 +11,9 @@ import { RenderDecorationProps, RenderMarkProps } from './editable'
 
 const Leaf = (props: {
   isLast: boolean
-  leaf: SlateLeaf
+  leaf: Text
   parent: Element
-  renderDecoration?: (props: RenderDecorationProps) => JSX.Element
-  renderMark?: (props: RenderMarkProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: Text
 }) => {
   const {
@@ -23,117 +21,64 @@ const Leaf = (props: {
     isLast,
     text,
     parent,
-    renderDecoration = (props: RenderDecorationProps) => (
-      <DefaultDecoration {...props} />
-    ),
-    renderMark = (props: RenderMarkProps) => <DefaultMark {...props} />,
+    renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
+  if (leaf[PLACEHOLDER_SYMBOL]) {
+    children = (
+      <React.Fragment>
+        <span
+          contentEditable={false}
+          style={{
+            pointerEvents: 'none',
+            display: 'inline-block',
+            verticalAlign: 'text-top',
+            width: '0',
+            maxWidth: '100%',
+            whiteSpace: 'nowrap',
+            opacity: '0.333',
+          }}
+        >
+          {leaf.placeholder}
+        </span>
+        {children}
+      </React.Fragment>
+    )
+  }
+
   // COMPAT: Having the `data-` attributes on these leaf elements ensures that
   // in certain misbehaving browsers they aren't weirdly cloned/destroyed by
   // contenteditable behaviors. (2019/05/08)
-  for (const mark of leaf.marks) {
-    const ret = renderMark({
-      children,
-      leaf,
-      mark,
-      text,
-      attributes: {
-        'data-slate-mark': true,
-      },
-    })
-
-    if (ret) {
-      children = ret
-    }
+  const attributes: {
+    'data-slate-leaf': true
+  } = {
+    'data-slate-leaf': true,
   }
 
-  for (const decoration of leaf.decorations) {
-    const p = {
-      children,
-      decoration,
-      leaf,
-      text,
-      attributes: {
-        'data-slate-decoration': true,
-      },
-    }
-
-    if (PLACEHOLDER_SYMBOL in decoration) {
-      // @ts-ignore
-      children = <PlaceholderDecoration {...p} />
-    } else {
-      // @ts-ignore
-      const ret = renderDecoration(p)
-
-      if (ret) {
-        children = ret
-      }
-    }
-  }
-
-  return <span data-slate-leaf>{children}</span>
+  return renderLeaf({ attributes, children, leaf, text })
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
-    next.renderDecoration === prev.renderDecoration &&
-    next.renderMark === prev.renderMark &&
+    next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
-    SlateLeaf.equals(next.leaf, prev.leaf)
+    Text.matches(next.leaf, prev.leaf)
   )
 })
 
 /**
- * The default custom decoration renderer.
+ * The default custom leaf renderer.
  */
 
-export const DefaultDecoration = (props: RenderDecorationProps) => {
+export const DefaultLeaf = (props: RenderLeafProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>
-}
-
-/**
- * The default custom mark renderer.
- */
-
-export const DefaultMark = (props: RenderMarkProps) => {
-  const { attributes, children } = props
-  return <span {...attributes}>{children}</span>
-}
-
-/**
- * A custom decoration for the default placeholder behavior.
- */
-
-const PlaceholderDecoration = (props: RenderDecorationProps) => {
-  const { decoration, attributes, children } = props
-  const { placeholder } = decoration
-  return (
-    <span {...attributes}>
-      <span
-        contentEditable={false}
-        style={{
-          pointerEvents: 'none',
-          display: 'inline-block',
-          verticalAlign: 'text-top',
-          width: '0',
-          maxWidth: '100%',
-          whiteSpace: 'nowrap',
-          opacity: '0.333',
-        }}
-      >
-        {placeholder}
-      </span>
-      {children}
-    </span>
-  )
 }
 
 export default MemoizedLeaf
