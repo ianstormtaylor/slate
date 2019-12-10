@@ -6,7 +6,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Editor.splitNodes(editor, {
     at: { path: [0, 0], offset: 2 },
-    match: ([, p]) => p.length === 1,
+    match: 'block',
   })
 }
 

@@ -1,16 +1,14 @@
-import { Editor, Element, Node, NodeEntry, NodeMatch, Text } from '../../..'
+import { Editor, Element, Node, NodeMatch, Text } from '../../..'
 
 export const NodeQueries = {
   /**
    * Check if a node entry is a match.
    */
 
-  isMatch(editor: Editor, entry: NodeEntry, match: NodeMatch): boolean {
+  isMatch(editor: Editor, node: Node, match: NodeMatch): boolean {
     if (Array.isArray(match)) {
-      return match.some(m => Editor.isMatch(editor, entry, m))
+      return match.some(m => Editor.isMatch(editor, node, m))
     }
-
-    const [node] = entry
 
     switch (match) {
       case 'text':
@@ -32,7 +30,7 @@ export const NodeQueries = {
     }
 
     if (typeof match === 'function') {
-      return match(entry)
+      return match(node, editor)
     } else {
       return Node.matches(node, match)
     }
