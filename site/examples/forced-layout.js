@@ -2,46 +2,43 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { defineSchema } from 'slate-schema'
 
-const withSchema = defineSchema([
-  {
-    for: 'node',
-    match: 'editor',
-    validate: {
-      children: [
-        { match: { type: 'title' }, min: 1, max: 1 },
-        { match: { type: 'paragraph' }, min: 1 },
-      ],
-    },
-    normalize: (editor, error) => {
-      const { code, path } = error
-      const [index] = path
-      const type = index === 0 ? 'title' : 'paragraph'
+const withLayout = editor => {
+  const { normalizeNode } = editor
 
-      switch (code) {
-        case 'child_invalid':
-        case 'child_max_invalid': {
-          Editor.setNodes(editor, { type }, { at: path })
-          break
-        }
+  editor.normalizeNode = path => {
+    if (path.length === 0) {
+      if (editor.children.length < 1) {
+        const title = { type: 'title', children: [{ text: 'Untitled' }] }
+        Editor.insertNodes(editor, title, { at: path.concat(0) })
+      }
 
-        case 'child_min_invalid': {
-          const block = { type, children: [{ text: '' }] }
-          Editor.insertNodes(editor, block, { at: path })
-          break
+      if (editor.children.length < 2) {
+        const paragraph = { type: 'paragraph', children: [{ text: '' }] }
+        Editor.insertNodes(editor, paragraph, { at: path.concat(1) })
+      }
+
+      for (const [child, childPath] of Node.children(editor, path)) {
+        const type = childPath[0] === 0 ? 'title' : 'paragraph'
+
+        if (child.type !== type) {
+          Editor.setNodes(editor, { type }, { at: childPath })
         }
       }
-    },
-  },
-])
+    }
+
+    return normalizeNode(path)
+  }
+
+  return editor
+}
 
 const ForcedLayoutExample = () => {
   const [value, setValue] = useState(initialValue)
   const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withSchema(withHistory(withReact(createEditor()))),
+    () => withLayout(withHistory(withReact(createEditor()))),
     []
   )
   return (
@@ -83,7 +80,7 @@ const initialValue = [
     children: [
       {
         text:
-          'This example shows how to enforce your layout with schema-specific rules. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
+          'This example shows how to enforce your layout with domain-specific constraints. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
       },
     ],
   },

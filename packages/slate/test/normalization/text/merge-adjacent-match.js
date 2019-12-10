@@ -2,8 +2,6 @@
 
 import { jsx } from '../..'
 
-export const schema = {}
-
 export const input = (
   <editor>
     <block>
