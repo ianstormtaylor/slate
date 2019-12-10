@@ -8,7 +8,7 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ###### BREAKING
 
-**The `slate-schema` package has been removed.** This decision was made because with the new helpers on the `Editor.*` interface, and with the changes to `normalizeNode` in the latest version of Slate, adding constraints using `normalizeNode` actually leads to more maintainable code that using `slate-schema`. Previously it was required to keep things from getting too unreadable, but that always came at a large cost of indirection and learning additional APIs. Everything you could do with `slate-schema` you can do with `normalizeNode`, and more.
+**The `slate-schema` package has been removed!** This decision was made because with the new helpers on the `Editor.*` interface, and with the changes to `normalizeNode` in the latest version of Slate, adding constraints using `normalizeNode` actually leads to more maintainable code that using `slate-schema`. Previously it was required to keep things from getting too unreadable, but that always came at a large cost of indirection and learning additional APIs. Everything you could do with `slate-schema` you can do with `normalizeNode`, and more.
 
 **Node matching functions now receive just a `Node`.** Previously they received a `NodeEntry` tuple, which consisted of `[node, path]`. However now they receive only a `node` argument, which makes it easier to write one-off node-checking helpers and pass them in directly as arguments. If you need to ensure a path, lookup the node first.
 
