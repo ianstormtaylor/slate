@@ -117,7 +117,7 @@ export const TextTransforms = {
         }
 
         if (
-          (Element.isElement(node) && editor.isVoid(node)) ||
+          (!voids && Element.isElement(node) && editor.isVoid(node)) ||
           (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
         ) {
           matches.push(entry)

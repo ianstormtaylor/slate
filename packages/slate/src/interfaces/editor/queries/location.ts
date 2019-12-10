@@ -685,7 +685,7 @@ export const LocationQueries = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = ([n]) => parent.children.includes(n)
+        match = n => parent.children.includes(n)
       } else {
         match = () => true
       }
