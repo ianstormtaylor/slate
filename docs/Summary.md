@@ -21,6 +21,7 @@
 - [Plugins](./concepts/07-plugins.md)
 - [Rendering](./concepts/08-rendering.md)
 - [Serializing](./concepts/09-serializing.md)
+- [Normalizing](./concepts/10-normalizing.md)
 - [Migrating](./concepts/XX-migrating.md)
 
 ## General
