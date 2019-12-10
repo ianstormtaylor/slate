@@ -57,6 +57,10 @@ export interface RenderLeafProps {
   }
 }
 
+/**
+ * `EditableProps` are passed to the `<Editable>` component.
+ */
+
 export type EditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput?: (event: Event) => void
