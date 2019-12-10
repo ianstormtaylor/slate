@@ -39,7 +39,7 @@ type HyperscriptCreators<T = any> = Record<
 /**
  * `HyperscriptShorthands` are dictionaries of properties applied to specific
  * kind of object, keyed by tag name. They allow you to easily define custom
- * hyperscript tags for your schema.
+ * hyperscript tags for your domain.
  */
 
 type HyperscriptShorthands = Record<string, Record<string, any>>

@@ -97,9 +97,8 @@ slate-hyperscript             447  ->    345
 slate-plain-serializer         56  ->      0
 slate-prop-types               62  ->      0
 slate-react-placeholder        62  ->      0
-slate-schema                    0  ->    439
 
-total                      13,807  ->  5,344  (39%)
+total                      13,807  ->  4,905  (36%)
 ```
 
 It's quite a big difference! And that doesn't even include the dependencies that were shed in the process too.

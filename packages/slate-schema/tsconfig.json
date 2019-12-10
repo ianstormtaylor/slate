@@ -1,9 +1,0 @@
-{
-  "extends": "../../config/typescript/tsconfig.json",
-  "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./lib",
-    "composite": true
-  },
-  "references": []
-}

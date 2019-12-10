@@ -12,7 +12,7 @@ One of Slate's core principles is that, unlike most other editors, it does **not
 
 For the most part, this leads to increased flexbility without many downsides, but there are certain cases where you have to do a bit more work. Pasting is one of those cases.
 
-Since Slate knows nothing about your schema, it can't know how to parse pasted HTML content (or other content). So, by default whenever a user pastes content into a Slate editor, it will parse it as plain text. If you want it to be smarter about pasted content, you need to override the `insert_data` command and deserialize the `DataTransfer` object's `text/html` data as you wish.
+Since Slate knows nothing about your domain, it can't know how to parse pasted HTML content (or other content). So, by default whenever a user pastes content into a Slate editor, it will parse it as plain text. If you want it to be smarter about pasted content, you need to override the `insert_data` command and deserialize the `DataTransfer` object's `text/html` data as you wish.
 
 ### What browsers and devices does Slate support?
 

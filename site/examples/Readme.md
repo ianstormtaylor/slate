@@ -4,7 +4,7 @@ This directory contains a set of examples that give you an idea for how you migh
 
 - [**Plain text**](./plaintext.js) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](./richtext.js) — showing the features you'd expect from a basic editor.
-- [**Forced Layout**](./forced-layout.js) - showing how to use schema rules to enforce document structure
+- [**Forced Layout**](./forced-layout.js) - showing how to use constraints to enforce a document structure.
 - [**Markdown Shortcuts**](./markdown-shortcuts.js) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](./links.js) — showing how wrap text in inline nodes with associated data.
 - [**Images**](./images.js) — showing how to use void (text-less) nodes to add images.
