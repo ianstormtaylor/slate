@@ -55,15 +55,42 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
+type TextStringProps = { text: string; isTrailing?: boolean }
+class TextString extends React.Component<TextStringProps> {
+  ref: { current: HTMLSpanElement | null } = React.createRef()
 
-const TextString = (props: { text: string; isTrailing?: boolean }) => {
-  const { text, isTrailing = false } = props
-  return (
-    <span data-slate-string>
-      {text}
-      {isTrailing ? '\n' : null}
-    </span>
-  )
+  // This component may have skipped rendering due to native operations being
+  // applied. If an undo is performed React will see the old and new shadow DOM
+  // match and not apply an update. Forces each render to actually reconcile.
+  forceUpdateFlag = false
+
+  shouldComponentUpdate(nextProps: TextStringProps) {
+    return this.ref.current
+      ? this.ref.current.textContent !== nextProps.text
+      : true
+  }
+
+  componentDidMount() {
+    this.forceUpdateFlag = !this.forceUpdateFlag
+  }
+
+  componentDidUpdate() {
+    this.forceUpdateFlag = !this.forceUpdateFlag
+  }
+
+  render() {
+    const { text, isTrailing = false } = this.props
+    return (
+      <span
+        data-slate-string
+        ref={this.ref}
+        key={this.forceUpdateFlag ? 'A' : 'B'}
+      >
+        {text}
+        {isTrailing ? '\n' : null}
+      </span>
+    )
+  }
 }
 
 /**
