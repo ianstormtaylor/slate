@@ -343,7 +343,7 @@ export const LocationQueries = {
   next(
     editor: Editor,
     at: Location,
-    match: NodeMatch,
+    match?: NodeMatch,
     options: {
       mode?: 'all' | 'highest'
       voids?: boolean
@@ -353,6 +353,20 @@ export const LocationQueries = {
     const [, from] = Editor.last(editor, at)
     const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
+
+    if (Path.isPath(at) && at.length === 0) {
+      throw new Error(`Cannot get the next node from the root node!`)
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const [parent] = Editor.parent(editor, at)
+        match = ([n]) => parent.children.includes(n)
+      } else {
+        match = () => true
+      }
+    }
+
     const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
     return next
   },
@@ -678,7 +692,7 @@ export const LocationQueries = {
   previous(
     editor: Editor,
     at: Location,
-    match: NodeMatch,
+    match?: NodeMatch,
     options: {
       mode?: 'all' | 'highest'
       voids?: boolean
@@ -688,6 +702,20 @@ export const LocationQueries = {
     const [, from] = Editor.first(editor, at)
     const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
+
+    if (Path.isPath(at) && at.length === 0) {
+      throw new Error(`Cannot get the previous node from the root node!`)
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const [parent] = Editor.parent(editor, at)
+        match = ([n]) => parent.children.includes(n)
+      } else {
+        match = () => true
+      }
+    }
+
     const [, previous] = Editor.nodes(editor, {
       reverse: true,
       at: span,
