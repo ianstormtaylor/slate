@@ -24,7 +24,7 @@ These default constraints are all mandated because they make working with Slate 
 
 The built-in constraints are fairly generic. But you can also add your own constraints on top of the built-in ones that are specific to your domain.
 
-To do this, you extend the `normalizeNode` function on the editor. The `normalizeNode` function gets called every time an operation is applied that changes a node (or its descendants), giving you the opportunity to ensure that the changes didn't leave it in an invalid state, and correcting the node if so.
+To do this, you extend the `normalizeNode` function on the editor. The `normalizeNode` function gets called every time an operation is applied that inserts or updates a node (or its descendants), giving you the opportunity to ensure that the changes didn't leave it in an invalid state, and correcting the node if so.
 
 For example here's a plugin that ensures `paragraph` blocks only have text or inline elements as children:
 
@@ -92,24 +92,60 @@ To see how this works in practice, let's start with this invalid document:
 </editor>
 ```
 
-If we ran our `normalizeNode` function on the **bottom** paragraph, it would be valid. It only contains text nodes as children.
+The editor starts by running `normalizeNode` on `<paragraph c>`. And it is valid, because contains only text nodes as children.
 
-But then, we move up the tree, and run it against the **middle** paragraph. The middle paragraph is invalid, since it contains a block element. So it gets unwrapped, resulting in a new document of:
+But then, it moves up the tree, and runs `normalizeNode` on `<paragraph b>`. This paragraph is invalid, since it contains a block element (`<paragraph c>`). So that child block gets unwrapped, resulting in a new document of:
 
 ```jsx
 <editor>
   <paragraph a>
-    <paragraph c>word</paragraph>
+    <paragraph b>word</paragraph>
   </paragraph>
 </editor>
 ```
 
-And now, with the middle paragraph gone, we move up the tree again arriving at the **top** paragraph. It's also invalid and gets unwrapped. And you end with a document of:
+And in performing that fix, the top-level `<paragraph a>` changed. It gets normalized, and it is invalid, so `<paragraph b>` gets unwrapped, resulting in:
 
 ```jsx
 <editor>
-  <paragraph c>word</paragraph>
+  <paragraph a>word</paragraph>
 </editor>
 ```
 
-And all normalization passes return no changes.
+And now when `normalizeNode` runs, no changes are made, so the document is valid!
+
+> 🤖 For the most part you don't need to think about these internals. You can just know that anytime `normalizeNode` is called and you spot an invalid state, you can fix that single invalid state and trust that `normalizeNode` will be called again until the node becomes valid.
+
+## Incorrect Fixes
+
+The one pitfall to avoid however it creating an infinite normalization loop. This can happen if you check for a specific invalid structure, but then **don't** actually fix that structure with the change you make to the node. Resulting in an infinite loop because the node continues to be flagged as invalid, but never fixed properly.
+
+For example, consider a normalization that ensured `link` elements have a valid `url` property:
+
+```js
+// WARNING: this is an example of incorrect behavior!
+const withLinks = editor => {
+  const { normalizeNode } = editor
+
+  editor.normalizeNode = entry => {
+    const [node, path] = entry
+
+    if (
+      Element.isElement(node) &&
+      node.type === 'link' &&
+      typeof node.url !== 'string'
+    ) {
+      Editor.setNodes(editor, { url: null }, { at: path })
+      return
+    }
+
+    normalizeNode(entry)
+  }
+
+  return editor
+}
+```
+
+This fix are incorrectly written. It wants to ensure that all `link` elements have a `url` property string. But to fix invalid links it sets the `url` to `null`, which is still not a string!
+
+In this case you'd either want to unwrap the link, removing it entirely. _Or_ expand your validation to accept an "empty" `url == null` as well.
