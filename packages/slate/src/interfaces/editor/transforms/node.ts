@@ -244,7 +244,7 @@ export const NodeTransforms = {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Node.furthest(editor, path, ([n, p]) => {
+      const emptyAncestor = Editor.match(editor, path, ([n, p]) => {
         return (
           Path.isDescendant(p, commonPath) &&
           Path.isAncestor(p, path) &&
