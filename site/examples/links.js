@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -85,9 +85,20 @@ const wrapLink = (editor, url) => {
     unwrapLink(editor)
   }
 
-  const link = { type: 'link', url, children: [] }
-  Editor.wrapNodes(editor, link, { split: true })
-  Editor.collapse(editor, { edge: 'end' })
+  const { selection } = editor
+  const isCollapsed = Range.isCollapsed(selection)
+  const link = {
+    type: 'link',
+    url,
+    children: isCollapsed ? [{ text: url }] : [],
+  }
+
+  if (isCollapsed) {
+    Editor.insertNodes(editor, link)
+  } else {
+    Editor.wrapNodes(editor, link, { split: true })
+    Editor.collapse(editor, { edge: 'end' })
+  }
 }
 
 const Element = ({ attributes, children, element }) => {
