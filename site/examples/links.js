@@ -86,6 +86,9 @@ const wrapLink = (editor, url) => {
   }
 
   const link = { type: 'link', url, children: [] }
+  if (Point.equals(editor.selection.anchor, editor.selection.focus)) {
+    Editor.insertText(editor, url)
+  }
   Editor.wrapNodes(editor, link, { split: true })
   Editor.collapse(editor, { edge: 'end' })
 }
