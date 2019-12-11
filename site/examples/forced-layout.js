@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, createEditor, Node } from 'slate'
 import { withHistory } from 'slate-history'
 
 const withLayout = editor => {
   const { normalizeNode } = editor
 
-  editor.normalizeNode = path => {
+  editor.normalizeNode = ([node, path]) => {
     if (path.length === 0) {
       if (editor.children.length < 1) {
         const title = { type: 'title', children: [{ text: 'Untitled' }] }
@@ -27,7 +27,7 @@ const withLayout = editor => {
       }
     }
 
-    return normalizeNode(path)
+    return normalizeNode([node, path])
   }
 
   return editor
