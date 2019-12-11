@@ -123,7 +123,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ) {
@@ -322,7 +322,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
     }
@@ -370,7 +370,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
@@ -419,7 +419,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
       voids?: boolean
@@ -637,7 +637,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
@@ -665,7 +665,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
@@ -719,7 +719,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
