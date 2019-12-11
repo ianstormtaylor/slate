@@ -13,7 +13,6 @@ import Core from '../../packages/slate/package.json'
 import History from '../../packages/slate-history/package.json'
 import Hyperscript from '../../packages/slate-hyperscript/package.json'
 import React from '../../packages/slate-react/package.json'
-import Schema from '../../packages/slate-schema/package.json'
 
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
@@ -168,5 +167,4 @@ export default [
   ...factory(History),
   ...factory(Hyperscript),
   ...factory(React),
-  ...factory(Schema),
 ]

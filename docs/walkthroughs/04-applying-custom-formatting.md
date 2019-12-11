@@ -130,7 +130,7 @@ const App = () => {
 
 Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `Ctrl-B`, you won't notice any change. That's because we haven't told Slate how to render a "bold" mark.
 
-For every format you want to add to your schema, Slate will break up the text content into "leaves", and you need to tell Slate how to read it, just like for elements. So let's define a `Leaf` component:
+For every format you add, Slate will break up the text content into "leaves", and you need to tell Slate how to read it, just like for elements. So let's define a `Leaf` component:
 
 ```js
 // Define a React component to render leaves with bold text.

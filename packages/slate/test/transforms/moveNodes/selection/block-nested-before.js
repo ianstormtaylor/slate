@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.moveNodes(editor, { match: ([, p]) => p.length === 2, to: [0] })
+  Editor.moveNodes(editor, { match: 'block', to: [0] })
 }
 
 export const input = (

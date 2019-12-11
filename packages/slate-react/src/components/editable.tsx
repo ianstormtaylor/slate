@@ -58,21 +58,26 @@ export interface RenderLeafProps {
 }
 
 /**
+ * `EditableProps` are passed to the `<Editable>` component.
+ */
+
+export type EditableProps = {
+  decorate?: (entry: NodeEntry) => Range[]
+  onDOMBeforeInput?: (event: Event) => void
+  placeholder?: string
+  readOnly?: boolean
+  role?: string
+  style?: React.CSSProperties
+  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  as?: React.ElementType
+} & React.TextareaHTMLAttributes<HTMLDivElement>
+
+/**
  * Editable.
  */
 
-export const Editable = (
-  props: {
-    decorate?: (entry: NodeEntry) => Range[]
-    onDOMBeforeInput?: (event: Event) => void
-    placeholder?: string
-    readOnly?: boolean
-    role?: string
-    style?: React.CSSProperties
-    renderElement?: (props: RenderElementProps) => JSX.Element
-    renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  } & React.TextareaHTMLAttributes<HTMLDivElement>
-) => {
+export const Editable = (props: EditableProps) => {
   const {
     autoFocus,
     decorate = defaultDecorate,
@@ -82,6 +87,7 @@ export const Editable = (
     renderElement,
     renderLeaf,
     style = {},
+    as: Component = 'div',
     ...attributes
   } = props
   const editor = useSlate()
@@ -400,7 +406,7 @@ export const Editable = (
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <div
+      <Component
         // COMPAT: The Grammarly Chrome extension works by changing the DOM
         // out from under `contenteditable` elements, which leads to weird
         // behaviors so we have to disable it like editor. (2017/04/24)
@@ -887,7 +893,7 @@ export const Editable = (
           renderLeaf={renderLeaf}
           selection={editor.selection}
         />
-      </div>
+      </Component>
     </ReadOnlyContext.Provider>
   )
 }

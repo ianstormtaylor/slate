@@ -56,31 +56,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Get the common ancestor node of a location.
-   */
-
-  ancestor(
-    editor: Editor,
-    at: Location,
-    options: {
-      depth?: number
-      edge?: 'start' | 'end'
-    } = {}
-  ): AncestorEntry {
-    if (Path.isPath(at) || Point.isPoint(at)) {
-      return Editor.parent(editor, at, options)
-    }
-
-    const path = Editor.path(editor, at, options)
-    const ancestorPath = Path.equals(at.anchor.path, at.focus.path)
-      ? Path.parent(path)
-      : path
-
-    const ancestor = Node.get(editor, ancestorPath) as Ancestor
-    return [ancestor, ancestorPath]
-  },
-
-  /**
    * Get the point before a location.
    */
 
@@ -175,20 +150,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Check if a point the start point of a location.
-   */
-
-  isStart(editor: Editor, point: Point, at: Location): boolean {
-    // PERF: If the offset isn't `0` we know it's not the start.
-    if (point.offset !== 0) {
-      return false
-    }
-
-    const start = Editor.start(editor, at)
-    return Point.equals(point, start)
-  },
-
-  /**
    * Check if a point is the end point of a location.
    */
 
@@ -203,6 +164,20 @@ export const LocationQueries = {
 
   isEdge(editor: Editor, point: Point, at: Location): boolean {
     return Editor.isStart(editor, point, at) || Editor.isEnd(editor, point, at)
+  },
+
+  /**
+   * Check if a point is the start point of a location.
+   */
+
+  isStart(editor: Editor, point: Point, at: Location): boolean {
+    // PERF: If the offset isn't `0` we know it's not the start.
+    if (point.offset !== 0) {
+      return false
+    }
+
+    const start = Editor.start(editor, at)
+    return Point.equals(point, start)
   },
 
   /**
@@ -283,7 +258,7 @@ export const LocationQueries = {
     const path = Editor.path(editor, at)
 
     for (const entry of Editor.levels(editor, { at: path, voids })) {
-      if (Editor.isMatch(editor, entry, match)) {
+      if (Editor.isMatch(editor, entry[0], match)) {
         return entry
       }
     }
@@ -315,8 +290,8 @@ export const LocationQueries = {
 
     if (match == null) {
       if (Path.isPath(at)) {
-        const path = at
-        match = ([, p]) => Path.equals(p, path)
+        const [node] = Editor.node(editor, at)
+        match = n => n === node
       } else {
         match = () => true
       }
@@ -329,7 +304,7 @@ export const LocationQueries = {
         continue
       }
 
-      if (Editor.isMatch(editor, [n, p], match)) {
+      if (Editor.isMatch(editor, n, match)) {
         prevPath = p
         yield [n, p]
       }
@@ -343,7 +318,7 @@ export const LocationQueries = {
   next(
     editor: Editor,
     at: Location,
-    match: NodeMatch,
+    match?: NodeMatch,
     options: {
       mode?: 'all' | 'highest'
       voids?: boolean
@@ -353,6 +328,20 @@ export const LocationQueries = {
     const [, from] = Editor.last(editor, at)
     const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
+
+    if (Path.isPath(at) && at.length === 0) {
+      throw new Error(`Cannot get the next node from the root node!`)
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const [parent] = Editor.parent(editor, at)
+        match = n => parent.children.includes(n)
+      } else {
+        match = () => true
+      }
+    }
+
     const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
     return next
   },
@@ -432,7 +421,7 @@ export const LocationQueries = {
           continue
         }
 
-        if (!Editor.isMatch(editor, entry, match)) {
+        if (!Editor.isMatch(editor, entry[0], match)) {
           continue
         }
 
@@ -678,7 +667,7 @@ export const LocationQueries = {
   previous(
     editor: Editor,
     at: Location,
-    match: NodeMatch,
+    match?: NodeMatch,
     options: {
       mode?: 'all' | 'highest'
       voids?: boolean
@@ -688,6 +677,20 @@ export const LocationQueries = {
     const [, from] = Editor.first(editor, at)
     const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
+
+    if (Path.isPath(at) && at.length === 0) {
+      throw new Error(`Cannot get the previous node from the root node!`)
+    }
+
+    if (match == null) {
+      if (Path.isPath(at)) {
+        const [parent] = Editor.parent(editor, at)
+        match = n => parent.children.includes(n)
+      } else {
+        match = () => true
+      }
+    }
+
     const [, previous] = Editor.nodes(editor, {
       reverse: true,
       at: span,

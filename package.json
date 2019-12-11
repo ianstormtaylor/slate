@@ -83,7 +83,6 @@
     "slate-history": "*",
     "slate-hyperscript": "*",
     "slate-react": "*",
-    "slate-schema": "*",
     "typescript": "^3.7.2"
   }
 }

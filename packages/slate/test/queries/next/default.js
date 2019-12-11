@@ -11,10 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.ancestor(editor, {
-    anchor: { path: [0, 0], offset: 1 },
-    focus: { path: [0, 0], offset: 2 },
-  })
+  return Editor.next(editor, [0])
 }
 
-export const output = [<block>one</block>, [0]]
+export const output = [<block>two</block>, [1]]

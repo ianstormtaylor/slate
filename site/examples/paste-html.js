@@ -52,7 +52,7 @@ export const deserialize = el => {
   let parent = el
 
   if (
-    el.nodeNode === 'PRE' &&
+    nodeName === 'PRE' &&
     el.childNodes[0] &&
     el.childNodes[0].nodeName === 'CODE'
   ) {

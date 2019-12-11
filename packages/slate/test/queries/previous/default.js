@@ -6,11 +6,12 @@ import { jsx } from '../..'
 export const input = (
   <editor>
     <block>one</block>
+    <block>two</block>
   </editor>
 )
 
 export const run = editor => {
-  return Editor.ancestor(editor, [0, 0])
+  return Editor.previous(editor, [1])
 }
 
 export const output = [<block>one</block>, [0]]

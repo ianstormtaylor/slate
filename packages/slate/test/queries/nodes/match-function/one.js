@@ -15,14 +15,10 @@ export const run = editor => {
   return Array.from(
     Editor.nodes(editor, {
       at: [],
-      match: ([, p]) => p.length === 1,
+      match: () => true,
       mode: 'highest',
     })
   )
 }
 
-export const output = [
-  [<block>one</block>, [0]],
-  [<block>two</block>, [1]],
-  [<block>three</block>, [2]],
-]
+export const output = [[input, []]]
