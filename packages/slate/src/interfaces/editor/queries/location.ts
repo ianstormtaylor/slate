@@ -784,7 +784,7 @@ const PUNCTUATION = /[\u0021-\u0023\u0025-\u002A\u002C-\u002F\u003A\u003B\u003F\
 const CHAMELEON = /['\u2018\u2019]/
 const SURROGATE_START = 0xd800
 const SURROGATE_END = 0xdfff
-const ZERO_WIDTH_JOINER = 0x200D;
+const ZERO_WIDTH_JOINER = 0x200d
 
 /**
  * Check if a character is a word character. The `remaining` argument is used
@@ -854,7 +854,8 @@ const getWordDistance = (text: string): number => {
   return length
 }
 
-const isSurrogate = (code: number): boolean => SURROGATE_START <= code && code <= SURROGATE_END
+const isSurrogate = (code: number): boolean =>
+  SURROGATE_START <= code && code <= SURROGATE_END
 
 /**
  * Does `code` form Modifier with next one.
@@ -903,95 +904,95 @@ const isBMPEmoji = (code: number): boolean => {
 }
 
 const getCharOffset = (text: string, forward?: boolean): number => {
-  let offset = 0;
+  let offset = 0
   // prev types:
   // SURR: surrogate pair
   // MOD: modifier (technically also surrogate pair)
   // ZWJ: zero width joiner
   // VAR: variation selector
   // BMP: sequenceable character from basic multilingual plane
-  let prev = null;
-  let charCode = text.charCodeAt(0);
+  let prev = null
+  let charCode = text.charCodeAt(0)
 
   while (charCode) {
     if (isSurrogate(charCode)) {
-      let modifier = isModifier(charCode, text, offset)
+      const modifier = isModifier(charCode, text, offset)
 
       // Early returns are the heart of this function, where we decide if previous and current
       // codepoints should form a single character (in terms of how many of them should selection
       // jump over).
       if (forward) {
         if (
-          (!modifier && prev && prev != "ZWJ") ||
-          (modifier && prev && prev != "SURR")
+          (!modifier && prev && prev !== 'ZWJ') ||
+          (modifier && prev && prev !== 'SURR')
         ) {
-          break;
+          break
         }
       } else {
-        if (prev == "SURR" || prev == "BMP") {
-          break;
+        if (prev === 'SURR' || prev === 'BMP') {
+          break
         }
       }
 
-      offset += 2;
-      prev = modifier ? "MOD" : "SURR";
-      charCode = text.charCodeAt(offset);
+      offset += 2
+      prev = modifier ? 'MOD' : 'SURR'
+      charCode = text.charCodeAt(offset)
       // Absolutely fine to `continue` without any checks because if `charCode` is NaN (which
       // is the case when out of `text` range), next `while` loop won"t execute and we"re done.
       continue
     }
 
-    if (charCode == ZERO_WIDTH_JOINER) {
-      offset += 1;
-      prev = "ZWJ";
-      charCode = text.charCodeAt(offset);
+    if (charCode === ZERO_WIDTH_JOINER) {
+      offset += 1
+      prev = 'ZWJ'
+      charCode = text.charCodeAt(offset)
 
-      continue;
+      continue
     }
 
     if (isBMPEmoji(charCode)) {
       if (
-        (forward && prev == "VAR") ||
-        (prev && prev != "ZWJ" && prev != "VAR")
+        (forward && prev === 'VAR') ||
+        (prev && prev !== 'ZWJ' && prev !== 'VAR')
       ) {
-        break;
+        break
       }
-      offset += 1;
-      prev = "BMP";
-      charCode = text.charCodeAt(offset);
+      offset += 1
+      prev = 'BMP'
+      charCode = text.charCodeAt(offset)
 
-      continue;
-    }
-
-    if (isVariationSelector(charCode)) {
-      if (!forward && prev && prev != "ZWJ") {
-        break;
-      }
-      offset += 1;
-      prev = "VAR";
-      charCode = text.charCodeAt(offset);
       continue
     }
 
-    // Modifier "groups up" with what ever character is before that (even whitespace), need to
+    if (isVariationSelector(charCode)) {
+      if (!forward && prev && prev !== 'ZWJ') {
+        break
+      }
+      offset += 1
+      prev = 'VAR'
+      charCode = text.charCodeAt(offset)
+      continue
+    }
+
+    // Modifier 'groups up' with what ever character is before that (even whitespace), need to
     // look ahead.
     if (forward) {
-      const nextCharCode = text.charCodeAt(offset + 1);
+      const nextCharCode = text.charCodeAt(offset + 1)
 
       if (isModifier(nextCharCode, text, offset + 1)) {
-        offset += 3;
-        prev = "MOD";
-        charCode = text.charCodeAt(offset);
-        continue;
+        offset += 3
+        prev = 'MOD'
+        charCode = text.charCodeAt(offset)
+        continue
       }
-    } else if (prev == "MOD") {
-      offset += 1;
-      break;
+    } else if (prev === 'MOD') {
+      offset += 1
+      break
     }
 
     // If while loop ever gets here, we're done (e.g latin chars).
-    break;
+    break
   }
 
-  return offset || 1;
+  return offset || 1
 }
