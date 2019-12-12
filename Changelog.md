@@ -4,6 +4,24 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.54.0` — December 12, 2019
+
+###### BREAKING
+
+**The `<Slate>` `onChange` handler no longer receives the `selection` argument.** Previously it received `(value, selection)`, now it receives simply `(value)`. Instead, you can access any property of the editor directly (including the value as `editor.children`). The `value/onChange` convention is provided purely for form-related use cases that expect it. This is along with the change to how extra props are "controlled". By default they are uncontrolled, but you can pass in any of the other top-level editor properties to take control of them.
+
+**The `Command` and `CoreCommand` interfaces have been split apart.** Previously you could access `Command.isCoreCommand`, however now this helper lives directly on the core command interface as `CoreCommand.isCoreCommand`. This makes it more symmetrical with userland commands.
+
+**Command checkers have been simplified.** Previously Slate exposed command-checking helpers like `Command.isInsertTextCommand`. However these were verbose and not useful most of the time. Instead, you can now check for `CoreCommand.isCoreCommand` and then use the `command.type` property to narrow further. This keeps core more symmetrical with how userland will implement custom commands.
+
+###### NEW
+
+**The `<Slate>` component is now pseudo-controlled.** It requires a `value=` prop to be passed in which is controlled. However, the `selection`, `marks`, `history`, or any other props are not required to be controlled. They default to being uncontrolled. If your use case requires controlling these extra props you can pass them in and they will start being controlled again. This change was made to make using Slate easier, while still allowing for more complex state to be controlled by core or plugins going forward—state that users don't need to concern themselves with most of time.
+
+**The `Editor` now has a `marks` property.** This property represents text-level formatting that will be applied to the next character that is inserted. This is a common richtext editor behavior, where pressing a **Bold** button with a collapsed selection turns on "bold" formatting mode, and then typing a character becomes bold. This state isn't stored in the document, and is instead stored as an extra property on the editor itself.
+
+---
+
 ### `0.53.0` — December 10, 2019
 
 ###### BREAKING
