@@ -11,7 +11,6 @@ Here's our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -20,15 +19,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable />
     </Slate>
   )
@@ -40,7 +31,6 @@ Now we add an `onKeyDown` handler:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -49,15 +39,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         // Define a new handler which prints the key that was pressed.
         onKeyDown={event => {
@@ -78,7 +60,6 @@ Our `onKeyDown` handler might look like this:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -87,15 +68,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         onKeyDown={event => {
           if (event.key === '&') {
