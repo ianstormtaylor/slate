@@ -19,97 +19,6 @@ export const Command = {
   isCommand(value: any): value is Command {
     return isPlainObject(value) && typeof value.type === 'string'
   },
-
-  /**
-   * Check if a value is a `CoreCommand` object.
-   */
-
-  isCoreCommand(value: any): value is CoreCommand {
-    return (
-      Command.isDeleteBackwardCommand(value) ||
-      Command.isDeleteForwardCommand(value) ||
-      Command.isDeleteFragmentCommand(value) ||
-      Command.isInsertTextCommand(value) ||
-      Command.isInsertFragmentCommand(value) ||
-      Command.isInsertBreakCommand(value)
-    )
-  },
-
-  /**
-   * Check if a value is a `DeleteBackwardCommand` object.
-   */
-
-  isDeleteBackwardCommand(value: any): value is DeleteBackwardCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'delete_backward' &&
-      typeof value.unit === 'string'
-    )
-  },
-
-  /**
-   * Check if a value is a `DeleteForwardCommand` object.
-   */
-
-  isDeleteForwardCommand(value: any): value is DeleteForwardCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'delete_forward' &&
-      typeof value.unit === 'string'
-    )
-  },
-
-  /**
-   * Check if a value is a `DeleteFragmentCommand` object.
-   */
-
-  isDeleteFragmentCommand(value: any): value is DeleteFragmentCommand {
-    return Command.isCommand(value) && value.type === 'delete_fragment'
-  },
-
-  /**
-   * Check if a value is an `InsertBreakCommand` object.
-   */
-
-  isInsertBreakCommand(value: any): value is InsertBreakCommand {
-    return Command.isCommand(value) && value.type === 'insert_break'
-  },
-
-  /**
-   * Check if a value is an `InsertFragmentCommand` object.
-   */
-
-  isInsertFragmentCommand(value: any): value is InsertFragmentCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'insert_fragment' &&
-      Node.isNodeList(value.fragment)
-    )
-  },
-
-  /**
-   * Check if a value is an `InsertNodeCommand` object.
-   */
-
-  isInsertNodeCommand(value: any): value is InsertNodeCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'insert_node' &&
-      Node.isNode(value.node)
-    )
-  },
-
-  /**
-   * Check if a value is a `InsertTextCommand` object.
-   */
-
-  isInsertTextCommand(value: any): value is InsertTextCommand {
-    return (
-      Command.isCommand(value) &&
-      value.type === 'insert_text' &&
-      typeof value.text === 'string'
-    )
-  },
 }
 
 /**
@@ -138,6 +47,15 @@ export interface DeleteForwardCommand {
 
 export interface DeleteFragmentCommand {
   type: 'delete_fragment'
+}
+
+/**
+ * The `FormatTextCommand` adds properties to the text nodes in the selection.
+ */
+
+export interface FormatTextCommand {
+  type: 'format_text'
+  properties: Record<string, any>
 }
 
 /**
@@ -184,7 +102,39 @@ export type CoreCommand =
   | DeleteBackwardCommand
   | DeleteForwardCommand
   | DeleteFragmentCommand
+  | FormatTextCommand
   | InsertBreakCommand
   | InsertFragmentCommand
   | InsertNodeCommand
   | InsertTextCommand
+
+export const CoreCommand = {
+  /**
+   * Check if a value is a `CoreCommand` object.
+   */
+
+  isCoreCommand(value: any): value is CoreCommand {
+    if (Command.isCommand(value)) {
+      switch (value.type) {
+        case 'delete_backward':
+          return typeof value.unit === 'string'
+        case 'delete_forward':
+          return typeof value.unit === 'string'
+        case 'delete_fragment':
+          return true
+        case 'format_text':
+          return isPlainObject(value.properties)
+        case 'insert_break':
+          return true
+        case 'insert_fragment':
+          return Node.isNodeList(value.fragment)
+        case 'insert_node':
+          return Node.isNode(value.node)
+        case 'insert_text':
+          return typeof value.text === 'string'
+      }
+    }
+
+    return false
+  },
+}

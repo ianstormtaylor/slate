@@ -4,12 +4,14 @@ import {
   Operation,
   Path,
   Point,
+  Text,
   PathRef,
   PointRef,
   Range,
   RangeRef,
   Node,
 } from '../../..'
+import { TextEntry } from '../../text'
 
 export const NORMALIZING: WeakMap<Editor, boolean> = new WeakMap()
 export const PATH_REFS: WeakMap<Editor, Set<PathRef>> = new WeakMap()
@@ -30,6 +32,7 @@ export const GeneralQueries = {
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
+      (value.marks === null || isPlainObject(value.marks)) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
@@ -43,6 +46,58 @@ export const GeneralQueries = {
   isNormalizing(editor: Editor): boolean {
     const isNormalizing = NORMALIZING.get(editor)
     return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
+   * Get the marks that would be added to text at the current selection.
+   */
+
+  marks(editor: Editor): Record<string, any> | null {
+    const { marks, selection } = editor
+
+    if (!selection) {
+      return null
+    }
+
+    if (marks) {
+      return marks
+    }
+
+    if (Range.isExpanded(selection)) {
+      const [match] = Editor.nodes(editor, {
+        match: 'text',
+        mode: 'all',
+      })
+
+      if (match) {
+        const [node] = match as TextEntry
+        const { text, ...rest } = node
+        return rest
+      } else {
+        return {}
+      }
+    }
+
+    const { anchor } = selection
+    const { path } = anchor
+    let [node] = Editor.leaf(editor, path)
+
+    if (anchor.offset === 0) {
+      const prev = Editor.previous(editor, path, 'text')
+      const block = Editor.match(editor, path, 'block')
+
+      if (prev && block) {
+        const [prevNode, prevPath] = prev
+        const [, blockPath] = block
+
+        if (Path.isAncestor(blockPath, prevPath)) {
+          node = prevNode as Text
+        }
+      }
+    }
+
+    const { text, ...rest } = node
+    return rest
   },
 
   /**

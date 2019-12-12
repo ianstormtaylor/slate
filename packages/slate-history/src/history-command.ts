@@ -16,24 +16,14 @@ export const HistoryCommand = {
    */
 
   isHistoryCommand(value: any): value is HistoryCommand {
-    return (
-      HistoryCommand.isRedoCommand(value) || HistoryCommand.isUndoCommand(value)
-    )
-  },
+    if (Command.isCommand(value)) {
+      switch (value.type) {
+        case 'redo':
+        case 'undo':
+          return true
+      }
+    }
 
-  /**
-   * Check if a value is a `RedoCommand` object.
-   */
-
-  isRedoCommand(value: any): value is RedoCommand {
-    return Command.isCommand(value) && value.type === 'redo'
-  },
-
-  /**
-   * Check if a value is an `UndoCommand` object.
-   */
-
-  isUndoCommand(value: any): value is UndoCommand {
-    return Command.isCommand(value) && value.type === 'undo'
+    return false
   },
 }

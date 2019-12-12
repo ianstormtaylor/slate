@@ -16,15 +16,16 @@ import { TextTransforms } from './transforms/text'
  */
 
 export interface Editor {
-  apply: (operation: Operation) => void
   children: Node[]
+  selection: Range | null
+  operations: Operation[]
+  marks: Record<string, any> | null
+  apply: (operation: Operation) => void
   exec: (command: Command) => void
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-  operations: Operation[]
-  selection: Range | null
   [key: string]: any
 }
 
