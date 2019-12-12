@@ -22,19 +22,10 @@ for (let h = 0; h < HEADINGS; h++) {
 
 const HugeDocumentExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable renderElement={renderElement} spellCheck autoFocus />
     </Slate>
   )

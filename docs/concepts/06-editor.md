@@ -4,15 +4,16 @@ All of the behaviors, content and state of a Slate editor is rollup up into a si
 
 ```ts
 interface Editor {
+  children: Node[]
+  operations: Operation[]
+  selection: Range | null
+  marks: Record<string, any> | null
   apply: (operation: Operation) => void
   exec: (command: Command) => void
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-  children: Node[]
-  operations: Operation[]
-  selection: Range | null
   [key: string]: any
 }
 ```

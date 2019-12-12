@@ -32,13 +32,10 @@ export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 
 /**
- * Weak map for associating the context `onChange` prop with the plugin.
+ * Weak map for associating the context `onChange` context with the plugin.
  */
 
-export const EDITOR_TO_ON_CHANGE = new WeakMap<
-  Editor,
-  (children: Node[], selection: Range | null) => void
->()
+export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
 
 /**
  * Symbols.

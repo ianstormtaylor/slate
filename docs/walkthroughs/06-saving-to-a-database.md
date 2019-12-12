@@ -9,7 +9,6 @@ Let's start with a basic editor:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -18,15 +17,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable />
     </Slate>
   )
@@ -52,7 +43,6 @@ const defaultValue = [
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -65,9 +55,8 @@ const App = () => {
       editor={editor}
       value={value}
       selection={selection}
-      onChange={(value, selection) => {
+      onChange={value => {
         setValue(value)
-        setSelection(selection)
 
         // Save the value to Local Storage.
         const content = JSON.stringify(value)
@@ -87,7 +76,6 @@ But... if you refresh the page, everything is still reset. That's because we nee
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   // Update the initial content to be pulled from Local Storage if it exists.
   const [value, setValue] = useState(
     JSON.parse(localStorage.getItem('content')) || [
@@ -102,10 +90,8 @@ const App = () => {
     <Slate
       editor={editor}
       value={value}
-      selection={selection}
-      onChange={(value, selection) => {
+      onChange={value => {
         setValue(value)
-        setSelection(selection)
         const content = JSON.stringify(value)
         localStorage.setItem('content', content)
       }}
@@ -149,7 +135,6 @@ const deserialize = string => {
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   // Use our deserializing function to read the data from Local Storage.
   const [value, setValue] = useState(
     deserialize(localStorage.getItem('content')) || ''
@@ -159,10 +144,8 @@ const App = () => {
     <Slate
       editor={editor}
       value={value}
-      selection={selection}
-      onChange={(value, selection) => {
+      onChange={value => {
         setValue(value)
-        setSelection(selection)
         // Serialize the value and save the string value to Local Storage.
         localStorage.setItem('content', serialize(value))
       }}

@@ -15,7 +15,6 @@ import { Portal } from '../components'
 const MentionExample = () => {
   const ref = useRef()
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const [target, setTarget] = useState()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
@@ -74,10 +73,8 @@ const MentionExample = () => {
     <Slate
       editor={editor}
       value={value}
-      selection={selection}
-      onChange={(value, selection) => {
+      onChange={value => {
         setValue(value)
-        setSelection(selection)
 
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)

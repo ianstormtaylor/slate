@@ -57,7 +57,10 @@ export const withReact = (editor: Editor): Editor => {
   }
 
   editor.exec = (command: Command) => {
-    if (ReactCommand.isInsertDataCommand(command)) {
+    if (
+      ReactCommand.isReactCommand(command) &&
+      command.type === 'insert_data'
+    ) {
       const { data } = command
       const fragment = data.getData('application/x-slate-fragment')
 
@@ -94,11 +97,10 @@ export const withReact = (editor: Editor): Editor => {
     // have to use this unstable API to ensure it batches them. (2019/12/03)
     // https://github.com/facebook/react/issues/14259#issuecomment-439702367
     ReactDOM.unstable_batchedUpdates(() => {
-      const contextOnChange = EDITOR_TO_ON_CHANGE.get(editor)
+      const onContextChange = EDITOR_TO_ON_CHANGE.get(editor)
 
-      if (contextOnChange) {
-        const { children, selection } = editor
-        contextOnChange(children, selection)
+      if (onContextChange) {
+        onContextChange()
       }
 
       onChange()

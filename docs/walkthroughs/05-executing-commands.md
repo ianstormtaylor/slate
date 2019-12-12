@@ -13,7 +13,6 @@ We'll start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -35,15 +34,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -94,7 +85,6 @@ const withCustom = editor => {
 const App = () => {
   // Wrap the editor with our new `withCustom` plugin.
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -116,15 +106,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -224,7 +206,6 @@ const CustomEditor = {
 
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -246,15 +227,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -289,7 +262,6 @@ Now our commands are clearly defined and you can invoke them from anywhere we ha
 ```js
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -312,15 +284,7 @@ const App = () => {
 
   return (
     // Add a toolbar with buttons that call the same methods.
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <div>
         <button
           onMouseDown={event => {

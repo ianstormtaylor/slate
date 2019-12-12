@@ -17,22 +17,13 @@ import { Button, Icon, Toolbar } from '../components'
 
 const ImagesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <InsertImageButton />
       </Toolbar>

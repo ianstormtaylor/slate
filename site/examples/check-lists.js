@@ -13,7 +13,6 @@ import { withHistory } from 'slate-history'
 
 const CheckListsExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
@@ -21,15 +20,7 @@ const CheckListsExample = () => {
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         placeholder="Get to work…"
