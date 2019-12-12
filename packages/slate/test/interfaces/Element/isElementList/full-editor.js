@@ -3,8 +3,9 @@ import { Element } from 'slate'
 export const input = [
   {
     children: [],
-    selection: null,
     operations: [],
+    selection: null,
+    marks: null,
     apply() {},
     exec() {},
     isInline() {},
