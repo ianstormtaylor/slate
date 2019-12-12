@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Editor, Node, Path } from '..'
+import isMatch from 'lodash/isMatch'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -44,17 +45,7 @@ export const Element = {
    */
 
   matches(element: Element, props: Partial<Element>): boolean {
-    for (const key in props) {
-      if (key === 'children') {
-        continue
-      }
-
-      if (element[key] !== props[key]) {
-        return false
-      }
-    }
-
-    return true
+    return isMatch(element, props)
   },
 }
 

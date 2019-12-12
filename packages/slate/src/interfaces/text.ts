@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Path } from '..'
+import isMatch from 'lodash/isMatch'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -71,17 +72,7 @@ export const Text = {
    */
 
   matches(text: Text, props: Partial<Text>): boolean {
-    for (const key in props) {
-      if (key === 'text') {
-        continue
-      }
-
-      if (text[key] !== props[key]) {
-        return false
-      }
-    }
-
-    return true
+    return isMatch(text, props)
   },
 }
 
