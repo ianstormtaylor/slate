@@ -17,5 +17,3 @@ export const output = (
     </block>
   </editor>
 )
-
-export const skip = true

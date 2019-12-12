@@ -46,7 +46,14 @@ export const NodeTransforms = {
       // no selection, insert at the end of the document since that is such a
       // common use case when inserting from a non-selected state.
       if (!at) {
-        at = selection || Editor.end(editor, []) || [editor.children.length]
+        if (editor.selection) {
+          at = editor.selection
+        } else if (editor.children.length > 0) {
+          at = Editor.end(editor, [])
+        } else {
+          at = [0]
+        }
+
         select = true
       }
 
