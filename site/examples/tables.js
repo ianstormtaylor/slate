@@ -5,7 +5,6 @@ import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -13,15 +12,7 @@ const TablesExample = () => {
     []
   )
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
     </Slate>
   )

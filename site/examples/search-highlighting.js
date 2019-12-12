@@ -8,7 +8,6 @@ import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const [search, setSearch] = useState()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -39,15 +38,7 @@ const SearchHighlightingExample = () => {
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <div
           className={css`

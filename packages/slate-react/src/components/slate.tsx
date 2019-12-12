@@ -16,7 +16,7 @@ export const Slate = (props: {
   editor: Editor
   value: Node[]
   children: React.ReactNode
-  onChange: (value: Node[], selection: Range | null) => void
+  onChange: (value: Node[]) => void
   [key: string]: any
 }) => {
   const { editor, children, onChange, value, ...rest } = props
@@ -28,7 +28,7 @@ export const Slate = (props: {
   }, [key, value, ...Object.values(rest)])
 
   const onContextChange = useCallback(() => {
-    onChange(editor.children, editor.selection)
+    onChange(editor.children)
     setKey(key + 1)
   }, [key, onChange])
 

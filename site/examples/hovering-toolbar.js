@@ -9,22 +9,13 @@ import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withFormatting(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}
