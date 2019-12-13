@@ -23,14 +23,14 @@ export const NodeTransforms = {
       at?: Location
       match?: NodeMatch
       hanging?: boolean
+      select?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
       const { selection } = editor
       const { hanging = false, voids = false } = options
-      let { at, match } = options
-      let select = false
+      let { at, match, select } = options
 
       if (Node.isNode(nodes)) {
         nodes = [nodes]
@@ -55,6 +55,10 @@ export const NodeTransforms = {
         }
 
         select = true
+      }
+
+      if (select == null) {
+        select = false
       }
 
       if (Range.isRange(at)) {
