@@ -75,9 +75,9 @@ const MentionExample = () => {
       value={value}
       onChange={value => {
         setValue(value)
-        
+  
         const { selection } = editor
-        
+  
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)
           const wordBefore = Editor.before(editor, start, { unit: 'word' })
