@@ -903,7 +903,7 @@ const isBMPEmoji = (code: number): boolean => {
   )
 }
 
-const getCharOffset = (text: string, forward?: boolean): number => {
+const getCharOffset = (text: string): number => {
   let offset = 0
   // prev types:
   // SURR: surrogate pair
@@ -921,17 +921,8 @@ const getCharOffset = (text: string, forward?: boolean): number => {
       // Early returns are the heart of this function, where we decide if previous and current
       // codepoints should form a single character (in terms of how many of them should selection
       // jump over).
-      if (forward) {
-        if (
-          (!modifier && prev && prev !== 'ZWJ') ||
-          (modifier && prev && prev !== 'SURR')
-        ) {
-          break
-        }
-      } else {
-        if (prev === 'SURR' || prev === 'BMP') {
-          break
-        }
+      if (prev === 'SURR' || prev === 'BMP') {
+        break
       }
 
       offset += 2
@@ -952,7 +943,6 @@ const getCharOffset = (text: string, forward?: boolean): number => {
 
     if (isBMPEmoji(charCode)) {
       if (
-        (forward && prev === 'VAR') ||
         (prev && prev !== 'ZWJ' && prev !== 'VAR')
       ) {
         break
@@ -965,7 +955,7 @@ const getCharOffset = (text: string, forward?: boolean): number => {
     }
 
     if (isVariationSelector(charCode)) {
-      if (!forward && prev && prev !== 'ZWJ') {
+      if (prev && prev !== 'ZWJ') {
         break
       }
       offset += 1
@@ -976,16 +966,7 @@ const getCharOffset = (text: string, forward?: boolean): number => {
 
     // Modifier 'groups up' with what ever character is before that (even whitespace), need to
     // look ahead.
-    if (forward) {
-      const nextCharCode = text.charCodeAt(offset + 1)
-
-      if (isModifier(nextCharCode, text, offset + 1)) {
-        offset += 3
-        prev = 'MOD'
-        charCode = text.charCodeAt(offset)
-        continue
-      }
-    } else if (prev === 'MOD') {
+    if (prev === 'MOD') {
       offset += 1
       break
     }
