@@ -942,9 +942,7 @@ const getCharOffset = (text: string): number => {
     }
 
     if (isBMPEmoji(charCode)) {
-      if (
-        (prev && prev !== 'ZWJ' && prev !== 'VAR')
-      ) {
+      if (prev && prev !== 'ZWJ' && prev !== 'VAR') {
         break
       }
       offset += 1
