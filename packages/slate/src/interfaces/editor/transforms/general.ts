@@ -10,6 +10,7 @@ import {
   Descendant,
   Path,
 } from '../../..'
+import { TextEntry } from '../../text'
 
 export const DIRTY_PATHS: WeakMap<Editor, Path[]> = new WeakMap()
 
@@ -166,8 +167,6 @@ export const GeneralTransforms = {
         const { path } = op
         const index = path[path.length - 1]
         const parent = Node.parent(editor, path)
-        const [, prev] = Node.texts(editor, { from: path, reverse: true })
-        const [, next] = Node.texts(editor, { from: path })
         parent.children.splice(index, 1)
 
         // Transform all of the points in the value, but if the point was in the
@@ -178,17 +177,31 @@ export const GeneralTransforms = {
 
             if (selection != null && result != null) {
               selection[key] = result
-            } else if (prev) {
-              const [prevNode, prevPath] = prev
-              point.path = prevPath
-              point.offset = prevNode.text.length
-            } else if (next) {
-              const [, nextPath] = next
-              const newNextPath = Path.transform(nextPath, op)!
-              point.path = newNextPath
-              point.offset = 0
             } else {
-              selection = null
+              let found = false
+              let prev: TextEntry | undefined
+              let next: TextEntry | undefined
+
+              for (const [n, p] of Node.texts(editor)) {
+                if (Path.compare(p, path) === -1) {
+                  prev = [n, p]
+                } else {
+                  next = [n, p]
+                  break
+                }
+              }
+
+              if (!found) {
+                if (prev) {
+                  point.path = prev[1]
+                  point.offset = prev[0].text.length
+                } else if (next) {
+                  point.path = next[1]
+                  point.offset = 0
+                } else {
+                  selection = null
+                }
+              }
             }
           }
         }
