@@ -28,7 +28,6 @@ export const NodeTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { selection } = editor
       const { hanging = false, voids = false } = options
       let { at, match, select } = options
 

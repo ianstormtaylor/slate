@@ -313,6 +313,8 @@ export const GeneralTransforms = {
       editor.selection = isDraft(selection)
         ? (finishDraft(selection) as Range)
         : selection
+    } else {
+      editor.selection = null
     }
   },
 }
