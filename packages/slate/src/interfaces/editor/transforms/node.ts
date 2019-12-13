@@ -800,7 +800,7 @@ export const NodeTransforms = {
           const range = Editor.range(editor, firstPath, lastPath)
           const [commonNode] = Editor.node(editor, commonPath)
           const depth = commonPath.length + 1
-          const wrapperPath = Path.next(lastPath).slice(0, depth)
+          const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
           Editor.insertNodes(editor, wrapper, { at: wrapperPath, voids })
 
