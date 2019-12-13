@@ -178,7 +178,6 @@ export const GeneralTransforms = {
             if (selection != null && result != null) {
               selection[key] = result
             } else {
-              let found = false
               let prev: TextEntry | undefined
               let next: TextEntry | undefined
 
@@ -191,16 +190,14 @@ export const GeneralTransforms = {
                 }
               }
 
-              if (!found) {
-                if (prev) {
-                  point.path = prev[1]
-                  point.offset = prev[0].text.length
-                } else if (next) {
-                  point.path = next[1]
-                  point.offset = 0
-                } else {
-                  selection = null
-                }
+              if (prev) {
+                point.path = prev[1]
+                point.offset = prev[0].text.length
+              } else if (next) {
+                point.path = next[1]
+                point.offset = 0
+              } else {
+                selection = null
               }
             }
           }
