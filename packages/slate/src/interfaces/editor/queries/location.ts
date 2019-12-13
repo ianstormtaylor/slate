@@ -819,91 +819,7 @@ const isWordCharacter = (char: string, remaining: string): boolean => {
 /**
  * Get the distance to the end of the first character in a string of text.
  */
-
 const getCharacterDistance = (text: string): number => {
-  return getCharOffset(text)
-}
-
-/**
- * Get the distance to the end of the first word in a string of text.
- */
-
-const getWordDistance = (text: string): number => {
-  let length = 0
-  let i = 0
-  let started = false
-  let char
-
-  while ((char = text.charAt(i))) {
-    const l = getCharacterDistance(char)
-    char = text.slice(i, i + l)
-    const rest = text.slice(i + l)
-
-    if (isWordCharacter(char, rest)) {
-      started = true
-      length += l
-    } else if (!started) {
-      length += l
-    } else {
-      break
-    }
-
-    i += l
-  }
-
-  return length
-}
-
-const isSurrogate = (code: number): boolean =>
-  SURROGATE_START <= code && code <= SURROGATE_END
-
-/**
- * Does `code` form Modifier with next one.
- *
- * https://emojipedia.org/modifiers/
- */
-
-const isModifier = (code: number, text: string, offset: number): boolean => {
-  if (code === 0xd83c) {
-    const next = text.charCodeAt(offset + 1)
-    return next <= 0xdfff && next >= 0xdffb
-  }
-  return false
-}
-
-/**
- * Is `code` a Variation Selector.
- *
- * https://codepoints.net/variation_selectors
- */
-
-const isVariationSelector = (code: number): boolean => {
-  return code <= 0xfe0f && code >= 0xfe00
-}
-
-/**
- * Is `code` one of the BMP codes used in emoji sequences.
- *
- * https://emojipedia.org/emoji-zwj-sequences/
- */
-
-const isBMPEmoji = (code: number): boolean => {
-  // This requires tiny bit of maintanance, better ideas?
-  // Fortunately it only happens if new Unicode Standard
-  // is released. Fails gracefully if upkeep lags behind,
-  // same way Slate previously behaved with all emojis.
-  return (
-    code === 0x2764 || // heart (❤)
-    code === 0x2642 || // male (♂)
-    code === 0x2640 || // female (♀)
-    code === 0x2620 || // scull (☠)
-    code === 0x2695 || // medical (⚕)
-    code === 0x2708 || // plane (✈️)
-    code === 0x25ef // large circle (◯)
-  )
-}
-
-const getCharOffset = (text: string): number => {
   let offset = 0
   // prev types:
   // SURR: surrogate pair
@@ -911,7 +827,7 @@ const getCharOffset = (text: string): number => {
   // ZWJ: zero width joiner
   // VAR: variation selector
   // BMP: sequenceable character from basic multilingual plane
-  let prev = null
+  let prev: 'SURR' | 'MOD' | 'ZWJ' | 'VAR' | 'BMP' | null = null
   let charCode = text.charCodeAt(0)
 
   while (charCode) {
@@ -975,3 +891,87 @@ const getCharOffset = (text: string): number => {
 
   return offset || 1
 }
+
+/**
+ * Get the distance to the end of the first word in a string of text.
+ */
+
+const getWordDistance = (text: string): number => {
+  let length = 0
+  let i = 0
+  let started = false
+  let char
+
+  while ((char = text.charAt(i))) {
+    const l = getCharacterDistance(char)
+    char = text.slice(i, i + l)
+    const rest = text.slice(i + l)
+
+    if (isWordCharacter(char, rest)) {
+      started = true
+      length += l
+    } else if (!started) {
+      length += l
+    } else {
+      break
+    }
+
+    i += l
+  }
+
+  return length
+}
+
+/**
+ * Determines if `code` is a surrogate
+ */
+
+const isSurrogate = (code: number): boolean =>
+  SURROGATE_START <= code && code <= SURROGATE_END
+
+/**
+ * Does `code` form Modifier with next one.
+ *
+ * https://emojipedia.org/modifiers/
+ */
+
+const isModifier = (code: number, text: string, offset: number): boolean => {
+  if (code === 0xd83c) {
+    const next = text.charCodeAt(offset + 1)
+    return next <= 0xdfff && next >= 0xdffb
+  }
+  return false
+}
+
+/**
+ * Is `code` a Variation Selector.
+ *
+ * https://codepoints.net/variation_selectors
+ */
+
+const isVariationSelector = (code: number): boolean => {
+  return code <= 0xfe0f && code >= 0xfe00
+}
+
+/**
+ * Is `code` one of the BMP codes used in emoji sequences.
+ *
+ * https://emojipedia.org/emoji-zwj-sequences/
+ */
+
+const isBMPEmoji = (code: number): boolean => {
+  // This requires tiny bit of maintanance, better ideas?
+  // Fortunately it only happens if new Unicode Standard
+  // is released. Fails gracefully if upkeep lags behind,
+  // same way Slate previously behaved with all emojis.
+  return (
+    code === 0x2764 || // heart (❤)
+    code === 0x2642 || // male (♂)
+    code === 0x2640 || // female (♀)
+    code === 0x2620 || // scull (☠)
+    code === 0x2695 || // medical (⚕)
+    code === 0x2708 || // plane (✈️)
+    code === 0x25ef // large circle (◯)
+  )
+}
+
