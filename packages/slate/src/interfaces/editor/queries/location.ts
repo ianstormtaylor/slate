@@ -819,6 +819,7 @@ const isWordCharacter = (char: string, remaining: string): boolean => {
 /**
  * Get the distance to the end of the first character in a string of text.
  */
+
 const getCharacterDistance = (text: string): number => {
   let offset = 0
   // prev types:
@@ -974,4 +975,3 @@ const isBMPEmoji = (code: number): boolean => {
     code === 0x25ef // large circle (◯)
   )
 }
-
