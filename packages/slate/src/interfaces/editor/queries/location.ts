@@ -372,7 +372,8 @@ export const LocationQueries = {
     options: {
       at?: Location | Span
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
       reverse?: boolean
       voids?: boolean
     } = {}
@@ -381,6 +382,7 @@ export const LocationQueries = {
       at = editor.selection,
       match,
       mode = 'all',
+      universal = false,
       reverse = false,
       voids = false,
     } = options
@@ -409,26 +411,59 @@ export const LocationQueries = {
       pass: ([n]) => (voids ? false : Element.isElement(n) && editor.isVoid(n)),
     })
 
-    let prev: NodeEntry | undefined
+    const matches: NodeEntry[] = []
+    let hit: NodeEntry | undefined
 
     for (const entry of iterable) {
-      if (match) {
-        if (
-          mode === 'highest' &&
-          prev &&
-          Path.compare(entry[1], prev[1]) === 0
-        ) {
-          continue
-        }
+      const isMatch = !match || Editor.isMatch(editor, entry[0], match)
+      const isLower = hit && Path.compare(entry[1], hit[1]) === 0
 
-        if (!Editor.isMatch(editor, entry[0], match)) {
-          continue
-        }
-
-        prev = entry
+      // If we've arrived at a leaf text node that is not lower than the last
+      // hit, then we've found a branch that doesn't include a match, which
+      // means the match is not universal.
+      if (universal && !isMatch && !isLower && Text.isText(entry[0])) {
+        return
       }
 
-      yield entry
+      // If there's a match and it's lower than the last, update the hit.
+      if (mode === 'lowest' && isMatch && isLower) {
+        hit = entry
+      }
+
+      if (
+        !isMatch ||
+        (mode === 'highest' && isLower) ||
+        (mode === 'lowest' && isLower)
+      ) {
+        continue
+      }
+
+      // In lowest mode we emit the last hit, once it's guaranteed lowest.
+      const emit = mode === 'lowest' ? hit : entry
+      hit = entry
+
+      if (emit) {
+        if (universal) {
+          matches.push(emit)
+        } else {
+          yield emit
+        }
+      }
+    }
+
+    // Since lowest is always emitting one behind, catch up at the end.
+    if (mode === 'lowest' && hit) {
+      if (universal) {
+        matches.push(hit)
+      } else {
+        yield hit
+      }
+    }
+
+    // Universal defers to ensure that the match occurs in every branch, so we
+    // yield all of the matches after iterating.
+    if (universal) {
+      yield* matches
     }
   },
 
