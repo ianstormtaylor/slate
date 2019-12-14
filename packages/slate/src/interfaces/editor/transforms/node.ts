@@ -681,13 +681,8 @@ export const NodeTransforms = {
     }
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const {
-        at = editor.selection,
-        mode = 'highest',
-        split = false,
-        voids = false,
-      } = options
-      let { match } = options
+      const { mode = 'highest', split = false, voids = false } = options
+      let { at = editor.selection, match } = options
 
       if (!at) {
         return
@@ -697,6 +692,11 @@ export const NodeTransforms = {
         match = Path.isPath(at) ? matchPath(editor, at) : 'block'
       }
 
+      if (Path.isPath(at)) {
+        at = Editor.range(editor, at)
+      }
+
+      const rangeRef = Range.isRange(at) ? Editor.rangeRef(editor, at) : null
       const matches = Editor.nodes(editor, { at, match, mode, voids })
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
@@ -705,8 +705,8 @@ export const NodeTransforms = {
         const [node] = Editor.node(editor, path)
         let range = Editor.range(editor, path)
 
-        if (split && Range.isRange(at)) {
-          range = Range.intersection(at, range)!
+        if (split && rangeRef) {
+          range = Range.intersection(rangeRef.current!, range)!
         }
 
         Editor.liftNodes(editor, {
@@ -714,6 +714,10 @@ export const NodeTransforms = {
           match: n => node.children.includes(n),
           voids,
         })
+      }
+
+      if (rangeRef) {
+        rangeRef.unref()
       }
     })
   },
