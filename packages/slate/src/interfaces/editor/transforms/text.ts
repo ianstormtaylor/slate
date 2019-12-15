@@ -27,7 +27,6 @@ export const TextTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      debugger
       const {
         reverse = false,
         unit = 'character',

@@ -30,7 +30,7 @@ export const LocationQueries = {
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): NodeEntry | undefined {
+  ): AncestorEntry | undefined {
     const { voids = false, mode = 'lowest' } = options
     let { match = () => true, at = editor.selection } = options
 
@@ -41,13 +41,9 @@ export const LocationQueries = {
     const path = Editor.path(editor, at)
     const reverse = mode === 'lowest'
 
-    for (const entry of Editor.levels(editor, { at: path, voids, reverse })) {
-      if (match(entry[0])) {
-        if (Path.equals(entry[1], path)) {
-          console.trace('Not above!', path)
-        }
-
-        return entry
+    for (const [n, p] of Editor.levels(editor, { at: path, voids, reverse })) {
+      if (!Text.isText(n) && !Path.equals(path, p) && match(n)) {
+        return [n, p]
       }
     }
   },
