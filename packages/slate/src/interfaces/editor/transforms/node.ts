@@ -609,7 +609,7 @@ export const NodeTransforms = {
         if (
           path.length < highestPath.length ||
           path.length === 0 ||
-          (!voids && Element.isElement(node) && editor.isVoid(node))
+          (!voids && Editor.isVoid(editor, node))
         ) {
           break
         }

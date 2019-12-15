@@ -297,7 +297,7 @@ export const LocationQueries = {
     for (const [n, p] of Node.levels(editor, path)) {
       levels.push([n, p])
 
-      if (!voids && Element.isElement(n) && editor.isVoid(n)) {
+      if (!voids && Editor.isVoid(editor, n)) {
         break
       }
     }
@@ -412,7 +412,7 @@ export const LocationQueries = {
       reverse,
       from,
       to,
-      pass: ([n]) => (voids ? false : Element.isElement(n) && editor.isVoid(n)),
+      pass: ([n]) => (voids ? false : Editor.isVoid(editor, n)),
     })
 
     const matches: NodeEntry[] = []

@@ -591,7 +591,7 @@ export const Editable = (props: EditableProps) => {
               // default, and calling `preventDefault` hides the cursor.
               const node = ReactEditor.toSlateNode(editor, event.target)
 
-              if (Element.isElement(node) && editor.isVoid(node)) {
+              if (Editor.isVoid(editor, node)) {
                 event.preventDefault()
               }
             }

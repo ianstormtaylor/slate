@@ -120,7 +120,7 @@ export const TextTransforms = {
         }
 
         if (
-          (!voids && Element.isElement(node) && editor.isVoid(node)) ||
+          (!voids && Editor.isVoid(editor, node)) ||
           (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
         ) {
           matches.push(entry)
