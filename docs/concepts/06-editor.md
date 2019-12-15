@@ -88,8 +88,8 @@ const fragment = Editor.fragment(editor, range)
 There are also many iterator-based helpers, for example:
 
 ```js
-// Iterate over every element in a range.
-for (const [element, path] of Editor.elements(editor, { at: range })) {
+// Iterate over every node in a range.
+for (const [node, path] of Editor.nodes(editor, { at: range })) {
   // ...
 }
 

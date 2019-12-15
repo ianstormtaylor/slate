@@ -1,4 +1,4 @@
-import { Editor, Path, Range } from '../../..'
+import { Editor, Text, Path, Range } from '../../..'
 
 export const RangeQueries = {
   /**
@@ -26,8 +26,9 @@ export const RangeQueries = {
     const before = { anchor: first, focus: end }
     let skip = true
 
-    for (const [node, path] of Editor.texts(editor, {
+    for (const [node, path] of Editor.nodes(editor, {
       at: before,
+      match: Text.isText,
       reverse: true,
       voids,
     })) {

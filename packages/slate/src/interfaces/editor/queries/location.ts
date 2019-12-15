@@ -2,6 +2,7 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   AncestorEntry,
+  Ancestor,
   Descendant,
   Editor,
   Element,
@@ -17,22 +18,30 @@ import {
   TextEntry,
 } from '../../..'
 
+type NodeMatch<T extends Node> =
+  | ((node: Node) => node is T)
+  | ((node: Node) => boolean)
+
 export const LocationQueries = {
   /**
    * Get the ancestor above a location in the document.
    */
 
-  above(
+  above<T extends Ancestor>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): AncestorEntry | undefined {
-    const { voids = false, mode = 'lowest' } = options
-    let { match = () => true, at = editor.selection } = options
+  ): NodeEntry<T> | undefined {
+    const { voids = false, mode = 'lowest', at = editor.selection } = options
+    let { match } = options
+
+    if (!match) {
+      match = () => true
+    }
 
     if (!at) {
       return
@@ -131,7 +140,7 @@ export const LocationQueries = {
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ) {
+  ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       match: n => Editor.isBlock(editor, n),
       ...options,
@@ -144,27 +153,6 @@ export const LocationQueries = {
 
   edges(editor: Editor, at: Location): [Point, Point] {
     return [Editor.start(editor, at), Editor.end(editor, at)]
-  },
-
-  /**
-   * Iterate through all of the elements in the Editor.
-   */
-
-  *elements(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: (node: Node) => boolean
-      mode?: 'all' | 'highest' | 'lowest'
-      reverse?: boolean
-      voids?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [node, path] of Editor.nodes(editor, options)) {
-      if (Element.isElement(node)) {
-        yield [node, path]
-      }
-    }
   },
 
   /**
@@ -205,7 +193,7 @@ export const LocationQueries = {
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ) {
+  ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       match: n => Editor.isInline(editor, n),
       ...options,
@@ -263,7 +251,7 @@ export const LocationQueries = {
       depth?: number
       edge?: 'start' | 'end'
     } = {}
-  ): TextEntry {
+  ): NodeEntry<Text> {
     const path = Editor.path(editor, at, options)
     const node = Node.leaf(editor, path)
     return [node, path]
@@ -309,15 +297,15 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next(
+  next<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): NodeEntry | undefined {
+  ): NodeEntry<T> | undefined {
     const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
 
@@ -367,25 +355,29 @@ export const LocationQueries = {
    * Iterate through all of the nodes in the Editor.
    */
 
-  *nodes(
+  *nodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location | Span
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       universal?: boolean
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Iterable<NodeEntry<T>> {
     const {
       at = editor.selection,
-      match,
       mode = 'all',
       universal = false,
       reverse = false,
       voids = false,
     } = options
+    let { match } = options
+
+    if (!match) {
+      match = () => true
+    }
 
     if (!at) {
       return
@@ -411,36 +403,37 @@ export const LocationQueries = {
       pass: ([n]) => (voids ? false : Editor.isVoid(editor, n)),
     })
 
-    const matches: NodeEntry[] = []
-    let hit: NodeEntry | undefined
+    const matches: NodeEntry<T>[] = []
+    let hit: NodeEntry<T> | undefined
 
-    for (const entry of iterable) {
-      const isMatch = !match || match(entry[0])
-      const isLower = hit && Path.compare(entry[1], hit[1]) === 0
+    for (const [node, path] of iterable) {
+      const isLower = hit && Path.compare(path, hit[1]) === 0
 
-      // If we've arrived at a leaf text node that is not lower than the last
-      // hit, then we've found a branch that doesn't include a match, which
-      // means the match is not universal.
-      if (universal && !isMatch && !isLower && Text.isText(entry[0])) {
-        return
+      // In highest mode any node lower than the last hit is not a match.
+      if (mode === 'highest' && isLower) {
+        continue
+      }
+
+      if (!match(node)) {
+        // If we've arrived at a leaf text node that is not lower than the last
+        // hit, then we've found a branch that doesn't include a match, which
+        // means the match is not universal.
+        if (universal && !isLower && Text.isText(node)) {
+          return
+        } else {
+          continue
+        }
       }
 
       // If there's a match and it's lower than the last, update the hit.
-      if (mode === 'lowest' && isMatch && isLower) {
-        hit = entry
-      }
-
-      if (
-        !isMatch ||
-        (mode === 'highest' && isLower) ||
-        (mode === 'lowest' && isLower)
-      ) {
+      if (mode === 'lowest' && isLower) {
+        hit = [node, path]
         continue
       }
 
       // In lowest mode we emit the last hit, once it's guaranteed lowest.
-      const emit = mode === 'lowest' ? hit : entry
-      hit = entry
+      const emit: NodeEntry<T> | undefined =
+        mode === 'lowest' ? hit : [node, path]
 
       if (emit) {
         if (universal) {
@@ -449,6 +442,8 @@ export const LocationQueries = {
           yield emit
         }
       }
+
+      hit = [node, path]
     }
 
     // Since lowest is always emitting one behind, catch up at the end.
@@ -699,15 +694,15 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document before a location.
    */
 
-  previous(
+  previous<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): NodeEntry | undefined {
+  ): NodeEntry<T> | undefined {
     const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
 
@@ -777,7 +772,10 @@ export const LocationQueries = {
     const [start, end] = Range.edges(range)
     let text = ''
 
-    for (const [node, path] of Editor.texts(editor, { at: range })) {
+    for (const [node, path] of Editor.nodes(editor, {
+      at: range,
+      match: Text.isText,
+    })) {
       let t = node.text
 
       if (Path.equals(path, end.path)) {
@@ -795,27 +793,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Iterate through all of the text nodes in the Editor.
-   */
-
-  *texts(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: (node: Node) => boolean
-      mode?: 'all' | 'highest' | 'lowest'
-      reverse?: boolean
-      voids?: boolean
-    } = {}
-  ): Iterable<TextEntry> {
-    for (const [node, path] of Editor.nodes(editor, options)) {
-      if (Text.isText(node)) {
-        yield [node, path]
-      }
-    }
-  },
-
-  /**
    * Match a void node in the current branch of the editor.
    */
 
@@ -826,10 +803,10 @@ export const LocationQueries = {
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ) {
+  ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
-      match: n => Editor.isVoid(editor, n),
       ...options,
+      match: n => Editor.isVoid(editor, n),
     })
   },
 }
