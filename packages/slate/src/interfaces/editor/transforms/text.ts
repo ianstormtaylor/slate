@@ -43,10 +43,7 @@ export const TextTransforms = {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = Editor.match(editor, {
-          at: at.path,
-          match: 'void',
-        })
+        const furthestVoid = Editor.void(editor, { at: at.path })
 
         if (!voids && furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -88,12 +85,8 @@ export const TextTransforms = {
       const isAcrossBlocks =
         startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = voids
-        ? null
-        : Editor.match(editor, { at: start.path, match: 'void' })
-      const endVoid = voids
-        ? null
-        : Editor.match(editor, { at: end.path, match: 'void' })
+      const startVoid = voids ? null : Editor.void(editor, { at: start.path })
+      const endVoid = voids ? null : Editor.void(editor, { at: end.path })
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
@@ -221,7 +214,7 @@ export const TextTransforms = {
         } else {
           const [, end] = Range.edges(at)
 
-          if (!voids && Editor.match(editor, { at: end, match: 'void' })) {
+          if (!voids && Editor.void(editor, { at: end })) {
             return
           }
 
@@ -233,7 +226,7 @@ export const TextTransforms = {
         at = Editor.start(editor, at)
       }
 
-      if (!voids && Editor.match(editor, { at: at.path, match: 'void' })) {
+      if (!voids && Editor.void(editor, { at: at.path })) {
         return
       }
 
@@ -422,7 +415,7 @@ export const TextTransforms = {
         } else {
           const end = Range.end(at)
 
-          if (!voids && Editor.match(editor, { at: end, match: 'void' })) {
+          if (!voids && Editor.void(editor, { at: end })) {
             return
           }
 
@@ -433,7 +426,7 @@ export const TextTransforms = {
         }
       }
 
-      if (!voids && Editor.match(editor, { at: at.path, match: 'void' })) {
+      if (!voids && Editor.void(editor, { at: at.path })) {
         return
       }
 

@@ -109,7 +109,7 @@ export const NodeTransforms = {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (!voids && Editor.match(editor, { at: parentPath, match: 'void' })) {
+      if (!voids && Editor.void(editor, { at: parentPath })) {
         return
       }
 
@@ -560,7 +560,7 @@ export const NodeTransforms = {
         return
       }
 
-      const voidMatch = Editor.match(editor, { at, match: 'void' })
+      const voidMatch = Editor.void(editor, { at })
       const nudge = 0
 
       if (!voids && voidMatch) {

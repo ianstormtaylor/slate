@@ -828,6 +828,25 @@ export const LocationQueries = {
       }
     }
   },
+
+  /**
+   * Match a void node in the current branch of the editor.
+   */
+
+  void(
+    editor: Editor,
+    options: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) {
+    return Editor.match(editor, {
+      mode: 'highest',
+      match: n => Editor.isVoid(editor, n),
+      ...options,
+    })
+  },
 }
 
 /**

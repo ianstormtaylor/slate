@@ -199,8 +199,7 @@ export const ReactEditor = {
 
     // If we're inside a void node, force the offset to 0, otherwise the zero
     // width spacing character will result in an incorrect offset of 1
-    const [match] = Editor.nodes(editor, { at: point, match: 'void' })
-    if (match) {
+    if (Editor.void(editor, { at: point })) {
       point = { path: point.path, offset: 0 }
     }
 
