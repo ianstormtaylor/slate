@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.match(editor, {
+  return Editor.above(editor, {
     at: [0, 0, 0],
     match: n => Editor.isBlock(editor, n),
     mode: 'lowest',

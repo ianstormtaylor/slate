@@ -20,6 +20,40 @@ import {
 
 export const LocationQueries = {
   /**
+   * Get the ancestor above a location in the document.
+   */
+
+  above(
+    editor: Editor,
+    options: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
+  ): NodeEntry | undefined {
+    const { voids = false, mode = 'lowest' } = options
+    let { match = () => true, at = editor.selection } = options
+
+    if (!at) {
+      return
+    }
+
+    const path = Editor.path(editor, at)
+    const reverse = mode === 'lowest'
+
+    for (const entry of Editor.levels(editor, { at: path, voids, reverse })) {
+      if (match(entry[0])) {
+        if (Path.equals(entry[1], path)) {
+          console.trace('Not above!', path)
+        }
+
+        return entry
+      }
+    }
+  },
+
+  /**
    * Get the point after a location.
    */
 
@@ -103,7 +137,7 @@ export const LocationQueries = {
       voids?: boolean
     }
   ) {
-    return Editor.match(editor, {
+    return Editor.above(editor, {
       mode: 'lowest',
       match: n => Editor.isBlock(editor, n),
       ...options,
@@ -178,7 +212,7 @@ export const LocationQueries = {
       voids?: boolean
     }
   ) {
-    return Editor.match(editor, {
+    return Editor.above(editor, {
       mode: 'lowest',
       match: n => Editor.isInline(editor, n),
       ...options,
@@ -276,36 +310,6 @@ export const LocationQueries = {
     }
 
     yield* levels
-  },
-
-  /**
-   * Get the first matching node in a single branch of the document.
-   */
-
-  match(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: (node: Node) => boolean
-      mode?: 'highest' | 'lowest'
-      voids?: boolean
-    } = {}
-  ): NodeEntry | undefined {
-    const { voids = false, mode = 'lowest' } = options
-    let { match = () => true, at = editor.selection } = options
-
-    if (!at) {
-      return
-    }
-
-    const path = Editor.path(editor, at)
-    const reverse = mode === 'lowest'
-
-    for (const entry of Editor.levels(editor, { at: path, voids, reverse })) {
-      if (match(entry[0])) {
-        return entry
-      }
-    }
   },
 
   /**
@@ -877,7 +881,7 @@ export const LocationQueries = {
       voids?: boolean
     }
   ) {
-    return Editor.match(editor, {
+    return Editor.above(editor, {
       match: n => Editor.isVoid(editor, n),
       ...options,
     })

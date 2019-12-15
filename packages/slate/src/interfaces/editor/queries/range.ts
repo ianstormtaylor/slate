@@ -20,7 +20,7 @@ export const RangeQueries = {
       return range
     }
 
-    const closestBlock = Editor.match(editor, {
+    const closestBlock = Editor.above(editor, {
       at: end.path,
       match: n => Editor.isBlock(editor, n),
       mode: 'lowest',

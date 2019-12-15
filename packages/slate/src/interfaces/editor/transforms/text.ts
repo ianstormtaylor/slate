@@ -74,13 +74,13 @@ export const TextTransforms = {
       }
 
       let [start, end] = Range.edges(at)
-      const startBlock = Editor.match(editor, {
+      const startBlock = Editor.above(editor, {
         at: start.path,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',
         voids,
       })
-      const endBlock = Editor.match(editor, {
+      const endBlock = Editor.above(editor, {
         at: end.path,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',
@@ -237,7 +237,7 @@ export const TextTransforms = {
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = Editor.match(editor, {
+      const inlineElementMatch = Editor.above(editor, {
         at,
         match: n => Editor.isInline(editor, n),
         mode: 'highest',
@@ -256,7 +256,7 @@ export const TextTransforms = {
         }
       }
 
-      const blockMatch = Editor.match(editor, {
+      const blockMatch = Editor.above(editor, {
         at,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',
@@ -323,7 +323,7 @@ export const TextTransforms = {
         }
       }
 
-      const inlineMatch = Editor.match(editor, {
+      const [inlineMatch] = Editor.nodes(editor, {
         at,
         match: n => Text.isText(n) || Editor.isInline(editor, n),
         mode: 'highest',

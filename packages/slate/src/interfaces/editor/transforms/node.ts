@@ -85,15 +85,15 @@ export const NodeTransforms = {
           }
         }
 
-        const atMatch = Editor.match(editor, {
+        const [entry] = Editor.nodes(editor, {
           at: at.path,
           match,
           mode,
           voids,
         })
 
-        if (atMatch) {
-          const [, matchPath] = atMatch
+        if (entry) {
+          const [, matchPath] = entry
           const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
           Editor.splitNodes(editor, { at, match, mode, voids })
@@ -241,7 +241,7 @@ export const NodeTransforms = {
         }
       }
 
-      const current = Editor.match(editor, { at, match, voids, mode })
+      const [current] = Editor.nodes(editor, { at, match, voids, mode })
       const prev = Editor.previous(editor, { at, match, voids, mode })
 
       if (!current || !prev) {
@@ -264,7 +264,7 @@ export const NodeTransforms = {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Editor.match(editor, {
+      const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
         match: n =>
@@ -561,7 +561,7 @@ export const NodeTransforms = {
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const highest = Editor.match(editor, { at, match, mode, voids })
+      const [highest] = Editor.nodes(editor, { at, match, mode, voids })
 
       if (!highest) {
         return

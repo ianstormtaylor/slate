@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.match(editor, {
+  return Editor.above(editor, {
     at: [0, 1, 0],
     match: n => Editor.isInline(editor, n),
   })
