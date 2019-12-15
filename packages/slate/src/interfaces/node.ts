@@ -515,18 +515,18 @@ export type Ancestor = Editor | Element
  * node in the document.
  */
 
-export type NodeEntry<T = Node> = [T, Path]
+export type NodeEntry<T extends Node = Node> = [T, Path]
 
 /**
  * `DescendantEntry` objects are returned when iterating over the descendants in
  * a Slate document tree.
  */
 
-export type DescendantEntry = NodeEntry<Descendant>
+export type DescendantEntry<T extends Descendant = Descendant> = NodeEntry<T>
 
 /**
  * `AncestorEntry` objects are returned when iterating over the ancestors in a
  * Slate document tree.
  */
 
-export type AncestorEntry = NodeEntry<Ancestor>
+export type AncestorEntry<T extends Ancestor = Ancestor> = NodeEntry<T>
