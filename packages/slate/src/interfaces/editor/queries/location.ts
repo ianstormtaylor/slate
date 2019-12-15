@@ -1,12 +1,10 @@
 import { reverse as reverseText } from 'esrever'
 
 import {
-  AncestorEntry,
   Ancestor,
   Descendant,
   Editor,
   Element,
-  ElementEntry,
   Location,
   Node,
   NodeEntry,
@@ -15,7 +13,6 @@ import {
   Range,
   Span,
   Text,
-  TextEntry,
 } from '../../..'
 
 type NodeMatch<T extends Node> =
@@ -473,11 +470,11 @@ export const LocationQueries = {
       depth?: number
       edge?: 'start' | 'end'
     } = {}
-  ): AncestorEntry {
+  ): NodeEntry<Ancestor> {
     const path = Editor.path(editor, at, options)
     const parentPath = Path.parent(path)
     const entry = Editor.node(editor, parentPath)
-    return entry as AncestorEntry
+    return entry as NodeEntry<Ancestor>
   },
 
   /**

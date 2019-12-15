@@ -8,7 +8,7 @@ import {
   PathRef,
   PointRef,
   Element,
-  TextEntry,
+  NodeEntry,
   Range,
   RangeRef,
   Node,
@@ -92,7 +92,7 @@ export const GeneralQueries = {
       const [match] = Editor.nodes(editor, { match: Text.isText })
 
       if (match) {
-        const [node] = match as TextEntry
+        const [node] = match as NodeEntry<Text>
         const { text, ...rest } = node
         return rest
       } else {

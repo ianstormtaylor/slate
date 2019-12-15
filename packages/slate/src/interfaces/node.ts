@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Editor, Element, ElementEntry, Path, Range, Text, TextEntry } from '..'
+import { Editor, Element, ElementEntry, Path, Range, Text } from '..'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -38,10 +38,10 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<AncestorEntry> {
+  ): Iterable<NodeEntry<Ancestor>> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
-      const entry: AncestorEntry = [n, p]
+      const entry: NodeEntry<Ancestor> = [n, p]
       yield entry
     }
   },
@@ -80,7 +80,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<DescendantEntry> {
+  ): Iterable<NodeEntry<Descendant>> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -132,12 +132,12 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<DescendantEntry> {
+  ): Iterable<NodeEntry<Descendant>> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
         // guarantee that `node` is not a `Editor`, but TypeScript doesn't know.
-        yield [node, path] as DescendantEntry
+        yield [node, path] as NodeEntry<Descendant>
       }
     }
   },
@@ -484,7 +484,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<TextEntry> {
+  ): Iterable<NodeEntry<Text>> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
         yield [node, path]
@@ -516,17 +516,3 @@ export type Ancestor = Editor | Element
  */
 
 export type NodeEntry<T extends Node = Node> = [T, Path]
-
-/**
- * `DescendantEntry` objects are returned when iterating over the descendants in
- * a Slate document tree.
- */
-
-export type DescendantEntry<T extends Descendant = Descendant> = NodeEntry<T>
-
-/**
- * `AncestorEntry` objects are returned when iterating over the ancestors in a
- * Slate document tree.
- */
-
-export type AncestorEntry<T extends Ancestor = Ancestor> = NodeEntry<T>
