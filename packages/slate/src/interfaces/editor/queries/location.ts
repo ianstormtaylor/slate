@@ -248,14 +248,20 @@ export const LocationQueries = {
 
   match(
     editor: Editor,
-    at: Location,
-    match: NodeMatch,
     options: {
+      at?: Location
+      match?: NodeMatch
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
     const { voids = false, mode = 'highest' } = options
+    let { match = () => true, at = editor.selection } = options
+
+    if (!at) {
+      return
+    }
+
     const path = Editor.path(editor, at)
     const reverse = mode === 'lowest'
 

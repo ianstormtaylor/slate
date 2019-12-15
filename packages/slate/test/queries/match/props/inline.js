@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.match(editor, [0, 1, 0], { a: true })
+  return Editor.match(editor, { at: [0, 1, 0], match: { a: true } })
 }
 
 export const output = [

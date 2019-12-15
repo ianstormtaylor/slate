@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.match(editor, [0, 0, 0], 'block')
+  return Editor.match(editor, { at: [0, 0, 0], match: 'block' })
 }
 
 export const output = [<block>one</block>, [0, 0]]

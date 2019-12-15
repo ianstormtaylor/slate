@@ -512,7 +512,7 @@ export const Editable = (props: EditableProps) => {
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
 
-              if (Editor.match(editor, start, 'void')) {
+              if (Editor.match(editor, { at: start, match: 'void' })) {
                 const range = Editor.range(editor, start)
                 Editor.select(editor, range)
               }
@@ -606,7 +606,10 @@ export const Editable = (props: EditableProps) => {
             ) {
               const node = ReactEditor.toSlateNode(editor, event.target)
               const path = ReactEditor.findPath(editor, node)
-              const voidMatch = Editor.match(editor, path, 'void')
+              const voidMatch = Editor.match(editor, {
+                at: path,
+                match: 'void',
+              })
 
               // If starting a drag on a void node, make sure it is selected
               // so that it shows up in the selection's fragment.
@@ -989,8 +992,8 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
   }
 
   const [start, end] = Range.edges(selection)
-  const startVoid = Editor.match(editor, start.path, 'void')
-  const endVoid = Editor.match(editor, end.path, 'void')
+  const startVoid = Editor.match(editor, { at: start.path, match: 'void' })
+  const endVoid = Editor.match(editor, { at: end.path, match: 'void' })
 
   if (Range.isCollapsed(selection) && !startVoid) {
     return

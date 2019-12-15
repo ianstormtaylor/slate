@@ -87,7 +87,12 @@ export const NodeTransforms = {
           }
         }
 
-        const atMatch = Editor.match(editor, at.path, match, { mode, voids })
+        const atMatch = Editor.match(editor, {
+          at: at.path,
+          match,
+          mode,
+          voids,
+        })
 
         if (atMatch) {
           const [, matchPath] = atMatch
@@ -104,7 +109,7 @@ export const NodeTransforms = {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (!voids && Editor.match(editor, parentPath, 'void')) {
+      if (!voids && Editor.match(editor, { at: parentPath, match: 'void' })) {
         return
       }
 
@@ -236,7 +241,7 @@ export const NodeTransforms = {
         }
       }
 
-      const current = Editor.match(editor, at, match, { voids, mode })
+      const current = Editor.match(editor, { at, match, voids, mode })
       const prev = Editor.previous(editor, { at, match, voids, mode })
 
       if (!current || !prev) {
@@ -259,12 +264,11 @@ export const NodeTransforms = {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Editor.match(
-        editor,
-        path,
-        n =>
-          levels.includes(n) && Element.isElement(n) && n.children.length === 1
-      )
+      const emptyAncestor = Editor.match(editor, {
+        at: path,
+        match: n =>
+          levels.includes(n) && Element.isElement(n) && n.children.length === 1,
+      })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
       let properties
@@ -550,13 +554,13 @@ export const NodeTransforms = {
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const highest = Editor.match(editor, at, match, { mode, voids })
+      const highest = Editor.match(editor, { at, match, mode, voids })
 
       if (!highest) {
         return
       }
 
-      const voidMatch = Editor.match(editor, at, 'void')
+      const voidMatch = Editor.match(editor, { at, match: 'void' })
       const nudge = 0
 
       if (!voids && voidMatch) {

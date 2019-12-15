@@ -43,7 +43,10 @@ export const TextTransforms = {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = Editor.match(editor, at.path, 'void')
+        const furthestVoid = Editor.match(editor, {
+          at: at.path,
+          match: 'void',
+        })
 
         if (!voids && furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -72,13 +75,25 @@ export const TextTransforms = {
       }
 
       let [start, end] = Range.edges(at)
-      const startBlock = Editor.match(editor, start.path, 'block', { voids })
-      const endBlock = Editor.match(editor, end.path, 'block', { voids })
+      const startBlock = Editor.match(editor, {
+        at: start.path,
+        match: 'block',
+        voids,
+      })
+      const endBlock = Editor.match(editor, {
+        at: end.path,
+        match: 'block',
+        voids,
+      })
       const isAcrossBlocks =
         startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = voids ? null : Editor.match(editor, start.path, 'void')
-      const endVoid = voids ? null : Editor.match(editor, end.path, 'void')
+      const startVoid = voids
+        ? null
+        : Editor.match(editor, { at: start.path, match: 'void' })
+      const endVoid = voids
+        ? null
+        : Editor.match(editor, { at: end.path, match: 'void' })
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
@@ -206,7 +221,7 @@ export const TextTransforms = {
         } else {
           const [, end] = Range.edges(at)
 
-          if (!voids && Editor.match(editor, end, 'void')) {
+          if (!voids && Editor.match(editor, { at: end, match: 'void' })) {
             return
           }
 
@@ -218,13 +233,17 @@ export const TextTransforms = {
         at = Editor.start(editor, at)
       }
 
-      if (!voids && Editor.match(editor, at.path, 'void')) {
+      if (!voids && Editor.match(editor, { at: at.path, match: 'void' })) {
         return
       }
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = Editor.match(editor, at, 'inline', { voids })
+      const inlineElementMatch = Editor.match(editor, {
+        at,
+        match: 'inline',
+        voids,
+      })
 
       if (inlineElementMatch) {
         const [, inlinePath] = inlineElementMatch
@@ -238,7 +257,7 @@ export const TextTransforms = {
         }
       }
 
-      const blockMatch = Editor.match(editor, at, 'block', { voids })!
+      const blockMatch = Editor.match(editor, { at, match: 'block', voids })!
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
@@ -299,7 +318,9 @@ export const TextTransforms = {
         }
       }
 
-      const inlineMatch = Editor.match(editor, at, ['inline', 'text'], {
+      const inlineMatch = Editor.match(editor, {
+        at,
+        match: ['inline', 'text'],
         voids,
       })!
       const [, inlinePath] = inlineMatch
@@ -401,7 +422,7 @@ export const TextTransforms = {
         } else {
           const end = Range.end(at)
 
-          if (!voids && Editor.match(editor, end, 'void')) {
+          if (!voids && Editor.match(editor, { at: end, match: 'void' })) {
             return
           }
 
@@ -412,7 +433,7 @@ export const TextTransforms = {
         }
       }
 
-      if (!voids && Editor.match(editor, at.path, 'void')) {
+      if (!voids && Editor.match(editor, { at: at.path, match: 'void' })) {
         return
       }
 
