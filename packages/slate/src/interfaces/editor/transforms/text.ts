@@ -27,6 +27,7 @@ export const TextTransforms = {
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
+      debugger
       const {
         reverse = false,
         unit = 'character',
@@ -44,7 +45,7 @@ export const TextTransforms = {
       }
 
       if (Point.isPoint(at)) {
-        const furthestVoid = Editor.void(editor, { at: at.path })
+        const furthestVoid = Editor.void(editor, { at, mode: 'highest' })
 
         if (!voids && furthestVoid) {
           const [, voidPath] = furthestVoid
@@ -88,8 +89,12 @@ export const TextTransforms = {
       const isAcrossBlocks =
         startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
-      const startVoid = voids ? null : Editor.void(editor, { at: start.path })
-      const endVoid = voids ? null : Editor.void(editor, { at: end.path })
+      const startVoid = voids
+        ? null
+        : Editor.void(editor, { at: start, mode: 'highest' })
+      const endVoid = voids
+        ? null
+        : Editor.void(editor, { at: end, mode: 'highest' })
 
       // If the start or end points are inside an inline void, nudge them out.
       if (startVoid) {
@@ -117,10 +122,7 @@ export const TextTransforms = {
       const matches: NodeEntry[] = []
       let lastPath: Path | undefined
 
-      for (const entry of Editor.nodes(editor, {
-        at,
-        voids,
-      })) {
+      for (const entry of Editor.nodes(editor, { at, voids })) {
         const [node, path] = entry
 
         if (lastPath && Path.compare(path, lastPath) === 0) {
@@ -229,7 +231,7 @@ export const TextTransforms = {
         at = Editor.start(editor, at)
       }
 
-      if (!voids && Editor.void(editor, { at: at.path })) {
+      if (!voids && Editor.void(editor, { at })) {
         return
       }
 
@@ -238,6 +240,7 @@ export const TextTransforms = {
       const inlineElementMatch = Editor.match(editor, {
         at,
         match: n => Editor.isInline(editor, n),
+        mode: 'highest',
         voids,
       })
 
@@ -323,6 +326,7 @@ export const TextTransforms = {
       const inlineMatch = Editor.match(editor, {
         at,
         match: n => Text.isText(n) || Editor.isInline(editor, n),
+        mode: 'highest',
         voids,
       })!
 
@@ -440,7 +444,7 @@ export const TextTransforms = {
         }
       }
 
-      if (!voids && Editor.void(editor, { at: at.path })) {
+      if (!voids && Editor.void(editor, { at })) {
         return
       }
 

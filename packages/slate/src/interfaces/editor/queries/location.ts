@@ -291,7 +291,7 @@ export const LocationQueries = {
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
-    const { voids = false, mode = 'highest' } = options
+    const { voids = false, mode = 'lowest' } = options
     let { match = () => true, at = editor.selection } = options
 
     if (!at) {
@@ -368,7 +368,7 @@ export const LocationQueries = {
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
-    const { mode = 'highest', voids = false } = options
+    const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
 
     if (!at) {
@@ -758,7 +758,7 @@ export const LocationQueries = {
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
-    const { mode = 'highest', voids = false } = options
+    const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
 
     if (!at) {
@@ -878,7 +878,6 @@ export const LocationQueries = {
     }
   ) {
     return Editor.match(editor, {
-      mode: 'highest',
       match: n => Editor.isVoid(editor, n),
       ...options,
     })

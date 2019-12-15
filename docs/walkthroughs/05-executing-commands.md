@@ -192,7 +192,7 @@ const CustomEditor = {
   isBoldMarkActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: n => n.bold === true,
-      mode: 'universal',
+      universal: true,
     })
 
     return !!match
@@ -201,7 +201,6 @@ const CustomEditor = {
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
       match: n => n.type === 'code',
-      mode: 'highest',
     })
 
     return !!match

@@ -266,6 +266,7 @@ export const NodeTransforms = {
       // result, in which case we'll want to remove it after merging.
       const emptyAncestor = Editor.match(editor, {
         at: path,
+        mode: 'highest',
         match: n =>
           levels.includes(n) && Element.isElement(n) && n.children.length === 1,
       })
@@ -566,7 +567,7 @@ export const NodeTransforms = {
         return
       }
 
-      const voidMatch = Editor.void(editor, { at })
+      const voidMatch = Editor.void(editor, { at, mode: 'highest' })
       const nudge = 0
 
       if (!voids && voidMatch) {
