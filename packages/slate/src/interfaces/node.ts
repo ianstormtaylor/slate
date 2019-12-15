@@ -530,19 +530,3 @@ export type DescendantEntry = [Descendant, Path]
  */
 
 export type AncestorEntry = [Ancestor, Path]
-
-/**
- * `NodeMatch` values are used as shorthands for matching a node by either its
- * kind, its location, its behavior or its properties.
- */
-
-export type NodeMatch =
-  | 'block'
-  | 'element'
-  | 'inline'
-  | 'text'
-  | 'editor'
-  | 'void'
-  | Partial<Node>
-  | ((node: Node, editor: Editor) => boolean)
-  | NodeMatch[]

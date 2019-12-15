@@ -2,7 +2,6 @@ import warning from 'tiny-warning'
 import { reverse as reverseText } from 'esrever'
 
 import {
-  Ancestor,
   AncestorEntry,
   Descendant,
   Editor,
@@ -11,7 +10,6 @@ import {
   Location,
   Node,
   NodeEntry,
-  NodeMatch,
   Path,
   Point,
   Range,
@@ -128,7 +126,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest'
       reverse?: boolean
       voids?: boolean
@@ -365,7 +363,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -755,7 +753,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -854,7 +852,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest'
       reverse?: boolean
       voids?: boolean

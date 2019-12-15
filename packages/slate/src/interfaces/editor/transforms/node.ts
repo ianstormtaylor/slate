@@ -3,8 +3,6 @@ import {
   Element,
   Location,
   Node,
-  NodeEntry,
-  NodeMatch,
   Path,
   Point,
   Range,
@@ -21,7 +19,7 @@ export const NodeTransforms = {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -138,7 +136,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -201,7 +199,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -339,7 +337,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -389,7 +387,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -436,7 +434,7 @@ export const NodeTransforms = {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -524,7 +522,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -653,7 +651,7 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -681,7 +679,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -741,7 +739,7 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
