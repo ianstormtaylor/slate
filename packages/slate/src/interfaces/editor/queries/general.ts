@@ -108,7 +108,7 @@ export const GeneralQueries = {
     let [node] = Editor.leaf(editor, path)
 
     if (anchor.offset === 0) {
-      const prev = Editor.previous(editor, path, 'text')
+      const prev = Editor.previous(editor, { at: path, match: 'text' })
       const block = Editor.match(editor, path, 'block')
 
       if (prev && block) {

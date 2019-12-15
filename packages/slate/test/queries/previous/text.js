@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.previous(editor, [1], 'text')
+  return Editor.previous(editor, { at: [1], match: 'text' })
 }
 
 export const output = [<text>one</text>, [0, 0]]

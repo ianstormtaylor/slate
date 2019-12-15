@@ -237,7 +237,7 @@ export const NodeTransforms = {
       }
 
       const current = Editor.match(editor, at, match, { voids, mode })
-      const prev = Editor.previous(editor, at, match, { voids, mode })
+      const prev = Editor.previous(editor, { at, match, voids, mode })
 
       if (!current || !prev) {
         return

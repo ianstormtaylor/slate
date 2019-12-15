@@ -703,14 +703,20 @@ export const LocationQueries = {
 
   previous(
     editor: Editor,
-    at: Location,
-    match?: NodeMatch,
     options: {
+      at?: Location
+      match?: NodeMatch
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
     const { mode = 'highest', voids = false } = options
+    let { match, at } = options
+
+    if (!at) {
+      return
+    }
+
     const [, from] = Editor.first(editor, at)
     const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
