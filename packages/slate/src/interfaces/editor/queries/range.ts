@@ -20,13 +20,8 @@ export const RangeQueries = {
       return range
     }
 
-    const closestBlock = Editor.above(editor, {
-      at: end.path,
-      match: n => Editor.isBlock(editor, n),
-      mode: 'lowest',
-    })
-
-    const blockPath = closestBlock ? closestBlock[1] : []
+    const endBlock = Editor.block(editor, { at: end })
+    const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }
     let skip = true

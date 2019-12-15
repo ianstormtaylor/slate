@@ -186,20 +186,15 @@ export const createEditor = (): Editor => {
 
           case 'insert_text': {
             if (selection) {
-              const { anchor } = selection
-
               // If the cursor is at the end of an inline, move it outside of
               // the inline before inserting
               if (Range.isCollapsed(selection)) {
-                const inline = Editor.above(editor, {
-                  at: anchor,
-                  match: n => Editor.isInline(editor, n),
-                })
+                const inline = Editor.inline(editor, { mode: 'highest' })
 
                 if (inline) {
                   const [, inlinePath] = inline
 
-                  if (Editor.isEnd(editor, anchor, inlinePath)) {
+                  if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
                     const point = Editor.after(editor, inlinePath)!
                     Editor.setSelection(editor, { anchor: point, focus: point })
                   }

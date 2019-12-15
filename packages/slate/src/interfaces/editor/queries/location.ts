@@ -135,10 +135,9 @@ export const LocationQueries = {
       at?: Location
       mode?: 'highest' | 'lowest'
       voids?: boolean
-    }
+    } = {}
   ) {
     return Editor.above(editor, {
-      mode: 'lowest',
       match: n => Editor.isBlock(editor, n),
       ...options,
     })
@@ -210,10 +209,9 @@ export const LocationQueries = {
       at?: Location
       mode?: 'highest' | 'lowest'
       voids?: boolean
-    }
+    } = {}
   ) {
     return Editor.above(editor, {
-      mode: 'lowest',
       match: n => Editor.isInline(editor, n),
       ...options,
     })
@@ -879,7 +877,7 @@ export const LocationQueries = {
       at?: Location
       mode?: 'highest' | 'lowest'
       voids?: boolean
-    }
+    } = {}
   ) {
     return Editor.above(editor, {
       match: n => Editor.isVoid(editor, n),
