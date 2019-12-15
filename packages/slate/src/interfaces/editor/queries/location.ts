@@ -15,10 +15,6 @@ import {
   Text,
 } from '../../..'
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
-
 export const LocationQueries = {
   /**
    * Get the ancestor above a location in the document.
@@ -887,3 +883,11 @@ const getWordDistance = (text: string): number => {
 
   return length
 }
+
+/**
+ * A helper type for narrowing matched nodes with a predicate.
+ */
+
+type NodeMatch<T extends Node> =
+  | ((node: Node) => node is T)
+  | ((node: Node) => boolean)
