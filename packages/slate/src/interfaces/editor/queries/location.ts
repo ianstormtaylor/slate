@@ -1,4 +1,3 @@
-import warning from 'tiny-warning'
 import { reverse as reverseText } from 'esrever'
 
 import {
@@ -160,7 +159,7 @@ export const LocationQueries = {
     options: {
       at?: Location
       match?: (node: Node) => boolean
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       reverse?: boolean
       voids?: boolean
     } = {}
@@ -308,53 +307,6 @@ export const LocationQueries = {
     }
 
     yield* levels
-  },
-
-  /**
-   * Iterate through all of the nodes that match.
-   */
-
-  *matches(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: (node: Node) => boolean
-      reverse?: boolean
-    }
-  ): Iterable<NodeEntry> {
-    warning(
-      false,
-      'The `Editor.matches` helper is deprecated, use `Editor.nodes` instead.'
-    )
-
-    const { at = editor.selection, reverse = false } = options
-    let { match } = options
-
-    if (!at) {
-      return
-    }
-
-    if (match == null) {
-      if (Path.isPath(at)) {
-        const [node] = Editor.node(editor, at)
-        match = n => n === node
-      } else {
-        match = () => true
-      }
-    }
-
-    let prevPath: Path | undefined
-
-    for (const [n, p] of Editor.nodes(editor, { at, reverse })) {
-      if (prevPath && Path.compare(p, prevPath) === 0) {
-        continue
-      }
-
-      if (match(n)) {
-        prevPath = p
-        yield [n, p]
-      }
-    }
   },
 
   /**
@@ -855,7 +807,7 @@ export const LocationQueries = {
     options: {
       at?: Location
       match?: (node: Node) => boolean
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       reverse?: boolean
       voids?: boolean
     } = {}

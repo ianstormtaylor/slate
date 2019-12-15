@@ -89,10 +89,7 @@ export const GeneralQueries = {
     }
 
     if (Range.isExpanded(selection)) {
-      const [match] = Editor.nodes(editor, {
-        match: Text.isText,
-        mode: 'all',
-      })
+      const [match] = Editor.nodes(editor, { match: Text.isText })
 
       if (match) {
         const [node] = match as TextEntry

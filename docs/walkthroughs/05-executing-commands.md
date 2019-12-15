@@ -120,10 +120,10 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, {
+              const [match] = Editor.nodes(editor, {
                 match: n => n.type === 'code',
               })
-              const isCodeActive = !!node
+              const isCodeActive = !!match
               Editor.setNodes(
                 editor,
                 { type: isCodeActive ? null : 'code' },

@@ -125,9 +125,8 @@ export const createEditor = (): Editor => {
 
               if (Range.isExpanded(selection)) {
                 const [match] = Editor.nodes(editor, {
-                  at: selection,
                   match: n => Text.isText(n) && Text.matches(n, properties),
-                  // TODO: should be `mode: 'universal'`
+                  universal: true,
                 })
 
                 if (match) {
