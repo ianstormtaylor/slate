@@ -319,14 +319,20 @@ export const LocationQueries = {
 
   next(
     editor: Editor,
-    at: Location,
-    match?: NodeMatch,
     options: {
+      at?: Location
+      match?: NodeMatch
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
     const { mode = 'highest', voids = false } = options
+    let { match, at = editor.selection } = options
+
+    if (!at) {
+      return
+    }
+
     const [, from] = Editor.last(editor, at)
     const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
@@ -711,7 +717,7 @@ export const LocationQueries = {
     } = {}
   ): NodeEntry | undefined {
     const { mode = 'highest', voids = false } = options
-    let { match, at } = options
+    let { match, at = editor.selection } = options
 
     if (!at) {
       return
