@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.splitNodes(editor, { match: () => true })
+  Editor.splitNodes(editor, { match: () => true, mode: 'highest' })
 }
 
 export const input = (

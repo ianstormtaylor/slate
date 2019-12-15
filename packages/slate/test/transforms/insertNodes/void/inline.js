@@ -29,11 +29,13 @@ export const output = (
   <editor>
     <block>
       one
-      <inline>two</inline>
-      <text />
-      <inline void>
-        four
-        <cursor />
+      <inline>
+        two
+        <inline void>
+          four
+          <cursor />
+        </inline>
+        <text />
       </inline>
       three
     </block>

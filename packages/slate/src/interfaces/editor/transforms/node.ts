@@ -22,13 +22,14 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { hanging = false, voids = false } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
       if (Node.isNode(nodes)) {
@@ -86,13 +87,13 @@ export const NodeTransforms = {
           }
         }
 
-        const atMatch = Editor.match(editor, at.path, match)
+        const atMatch = Editor.match(editor, at.path, match, { mode, voids })
 
         if (atMatch) {
           const [, matchPath] = atMatch
           const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
-          Editor.splitNodes(editor, { at, match })
+          Editor.splitNodes(editor, { at, match, mode, voids })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
         } else {
@@ -133,12 +134,12 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { at = editor.selection, mode = 'highest', voids = false } = options
+      const { at = editor.selection, mode = 'lowest', voids = false } = options
       let { match } = options
 
       if (match == null) {
@@ -194,13 +195,14 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
-      const { hanging = false, voids = false } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
 
       if (!at) {
         return
@@ -234,8 +236,8 @@ export const NodeTransforms = {
         }
       }
 
-      const current = Editor.match(editor, at, match, { voids })
-      const prev = Editor.previous(editor, at, match, { voids })
+      const current = Editor.match(editor, at, match, { voids, mode })
+      const prev = Editor.previous(editor, at, match, { voids, mode })
 
       if (!current || !prev) {
         return
@@ -332,7 +334,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
     }
@@ -341,7 +343,7 @@ export const NodeTransforms = {
       const {
         to,
         at = editor.selection,
-        mode = 'highest',
+        mode = 'lowest',
         voids = false,
       } = options
       let { match } = options
@@ -380,14 +382,14 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { hanging = false, voids = false } = options
-      let { at = editor.selection, mode, match } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
+      let { at = editor.selection, match } = options
 
       if (!at) {
         return
@@ -395,10 +397,6 @@ export const NodeTransforms = {
 
       if (match == null) {
         match = Path.isPath(at) ? matchPath(editor, at) : 'block'
-      }
-
-      if (mode == null || mode === 'all') {
-        mode = 'highest'
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -429,7 +427,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
       voids?: boolean
@@ -439,7 +437,7 @@ export const NodeTransforms = {
       let { match, at = editor.selection } = options
       const {
         hanging = false,
-        mode = 'highest',
+        mode = 'lowest',
         split = false,
         voids = false,
       } = options
@@ -459,8 +457,9 @@ export const NodeTransforms = {
       if (split && Range.isRange(at)) {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
-        Editor.splitNodes(editor, { at: end, match, voids })
-        Editor.splitNodes(editor, { at: start, match, voids })
+        const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
+        Editor.splitNodes(editor, { at: end, match, mode: splitMode, voids })
+        Editor.splitNodes(editor, { at: start, match, mode: splitMode, voids })
         at = rangeRef.unref()!
 
         if (options.at == null) {
@@ -514,19 +513,15 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
+      mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let {
-        match,
-        at = editor.selection,
-        height = 0,
-        always = false,
-        voids = false,
-      } = options
+      const { mode = 'lowest', voids = false } = options
+      let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
         match = 'block'
@@ -555,7 +550,7 @@ export const NodeTransforms = {
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const highest = Editor.match(editor, at, match, { voids })
+      const highest = Editor.match(editor, at, match, { mode, voids })
 
       if (!highest) {
         return
@@ -647,7 +642,7 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
@@ -675,13 +670,13 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { mode = 'highest', split = false, voids = false } = options
+      const { mode = 'lowest', split = false, voids = false } = options
       let { at = editor.selection, match } = options
 
       if (!at) {
@@ -733,13 +728,13 @@ export const NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { mode = 'highest', split = false, voids = false } = options
+      const { mode = 'lowest', split = false, voids = false } = options
       let { match, at = editor.selection } = options
 
       if (!at) {

@@ -30,13 +30,13 @@ export const output = (
   <editor>
     <block>
       <text />
-      <inline>wo</inline>
-      <text />
-      <inline void>
-        <cursor />
+      <inline>
+        wo
+        <inline void>
+          <cursor />
+        </inline>
+        rd
       </inline>
-      <text />
-      <inline>rd</inline>
       <text />
     </block>
   </editor>

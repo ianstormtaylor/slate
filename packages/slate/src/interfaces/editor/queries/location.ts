@@ -251,13 +251,15 @@ export const LocationQueries = {
     at: Location,
     match: NodeMatch,
     options: {
+      mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
-    const { voids = false } = options
+    const { voids = false, mode = 'highest' } = options
     const path = Editor.path(editor, at)
+    const reverse = mode === 'lowest'
 
-    for (const entry of Editor.levels(editor, { at: path, voids })) {
+    for (const entry of Editor.levels(editor, { at: path, voids, reverse })) {
       if (Editor.isMatch(editor, entry[0], match)) {
         return entry
       }
@@ -320,7 +322,7 @@ export const LocationQueries = {
     at: Location,
     match?: NodeMatch,
     options: {
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {
@@ -704,7 +706,7 @@ export const LocationQueries = {
     at: Location,
     match?: NodeMatch,
     options: {
-      mode?: 'all' | 'highest'
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ): NodeEntry | undefined {

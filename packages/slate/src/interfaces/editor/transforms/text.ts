@@ -319,6 +319,7 @@ export const TextTransforms = {
       Editor.splitNodes(editor, {
         at,
         match: hasBlocks ? 'block' : ['inline', 'text'],
+        mode: hasBlocks ? 'lowest' : 'highest',
         voids,
       })
 
@@ -332,6 +333,7 @@ export const TextTransforms = {
       Editor.insertNodes(editor, starts, {
         at: startRef.current!,
         match: ['inline', 'text'],
+        mode: 'highest',
         voids,
       })
 
@@ -344,6 +346,7 @@ export const TextTransforms = {
       Editor.insertNodes(editor, ends, {
         at: endRef.current!,
         match: ['inline', 'text'],
+        mode: 'highest',
         voids,
       })
 
