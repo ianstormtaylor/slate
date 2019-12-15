@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Editor, Text } from 'slate'
 import { jsx } from '../..'
 
 export const input = (
@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.next(editor, { at: [0], match: 'text' })
+  return Editor.next(editor, { at: [0], match: Text.isText })
 }
 
 export const output = [<text>two</text>, [1, 0]]

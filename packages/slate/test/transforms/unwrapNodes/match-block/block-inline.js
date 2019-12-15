@@ -4,12 +4,12 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { match: { key: 'a' } })
+  Editor.unwrapNodes(editor, { match: n => n.a })
 }
 
 export const input = (
   <editor>
-    <block key="a">
+    <block a>
       <block>
         <text />
         <inline>

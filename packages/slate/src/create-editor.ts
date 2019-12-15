@@ -133,12 +133,12 @@ export const createEditor = (): Editor => {
                 if (match) {
                   const keys = Object.keys(properties)
                   Editor.unsetNodes(editor, keys, {
-                    match: 'text',
+                    match: Text.isText,
                     split: true,
                   })
                 } else {
                   Editor.setNodes(editor, properties, {
-                    match: 'text',
+                    match: Text.isText,
                     split: true,
                   })
                 }
@@ -193,7 +193,7 @@ export const createEditor = (): Editor => {
               if (Range.isCollapsed(selection)) {
                 const inline = Editor.match(editor, {
                   at: anchor,
-                  match: 'inline',
+                  match: n => Editor.isInline(editor, n),
                 })
 
                 if (inline) {

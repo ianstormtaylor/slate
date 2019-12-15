@@ -90,7 +90,7 @@ export const GeneralQueries = {
 
     if (Range.isExpanded(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: 'text',
+        match: Text.isText,
         mode: 'all',
       })
 
@@ -108,8 +108,12 @@ export const GeneralQueries = {
     let [node] = Editor.leaf(editor, path)
 
     if (anchor.offset === 0) {
-      const prev = Editor.previous(editor, { at: path, match: 'text' })
-      const block = Editor.match(editor, { at: path, match: 'block' })
+      const prev = Editor.previous(editor, { at: path, match: Text.isText })
+      const block = Editor.match(editor, {
+        at: path,
+        match: n => Editor.isBlock(editor, n),
+        mode: 'lowest',
+      })
 
       if (prev && block) {
         const [prevNode, prevPath] = prev

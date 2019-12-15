@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { match: { key: 'a' } })
+  Editor.unwrapNodes(editor, { match: n => n.a })
 }
 
 export const input = (
@@ -12,7 +12,7 @@ export const input = (
     <block>
       <block>
         w<anchor />
-        <inline key="a">
+        <inline a>
           or
           <focus />
         </inline>

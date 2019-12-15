@@ -1,23 +1,27 @@
 /** @jsx jsx */
 
 import { Editor } from 'slate'
-import { jsx } from '../../..'
+import { jsx } from '../..'
 
 export const input = (
   <editor>
     <block>
-      one<inline>two</inline>three
+      <block>one</block>
     </block>
   </editor>
 )
 
 export const run = editor => {
-  return Editor.match(editor, { at: [0, 1, 0], match: 'block' })
+  return Editor.match(editor, {
+    at: [0, 0, 0],
+    match: n => Editor.isBlock(editor, n),
+    mode: 'highest',
+  })
 }
 
 export const output = [
   <block>
-    one<inline>two</inline>three
+    <block>one</block>
   </block>,
   [0],
 ]

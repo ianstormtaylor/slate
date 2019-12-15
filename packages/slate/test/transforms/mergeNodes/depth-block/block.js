@@ -14,7 +14,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.mergeNodes(editor, { match: 'block' })
+  Editor.mergeNodes(editor, { match: n => Editor.isBlock(editor, n) })
 }
 
 export const output = (

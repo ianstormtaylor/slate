@@ -6,7 +6,7 @@ import { jsx } from '../../..'
 export const input = (
   <editor>
     <block>
-      one<inline>two</inline>three<inline>four</inline>five
+      one<inline>two</inline>three
     </block>
   </editor>
 )
@@ -15,14 +15,9 @@ export const run = editor => {
   return Array.from(
     Editor.nodes(editor, {
       at: [],
-      match: 'inline',
-      mode: 'highest',
-      reverse: true,
+      match: n => Editor.isInline(editor, n),
     })
   )
 }
 
-export const output = [
-  [<inline>four</inline>, [0, 3]],
-  [<inline>two</inline>, [0, 1]],
-]
+export const output = [[<inline>two</inline>, [0, 1]]]

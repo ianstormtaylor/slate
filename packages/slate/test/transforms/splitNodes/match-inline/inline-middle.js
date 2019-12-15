@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.splitNodes(editor, { match: 'inline' })
+  Editor.splitNodes(editor, { match: n => Editor.isInline(editor, n) })
 }
 
 export const input = (

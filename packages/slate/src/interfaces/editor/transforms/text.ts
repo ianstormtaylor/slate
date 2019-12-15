@@ -5,6 +5,7 @@ import {
   Node,
   NodeEntry,
   Path,
+  Text,
   Point,
   Range,
 } from '../../..'
@@ -74,12 +75,14 @@ export const TextTransforms = {
       let [start, end] = Range.edges(at)
       const startBlock = Editor.match(editor, {
         at: start.path,
-        match: 'block',
+        match: n => Editor.isBlock(editor, n),
+        mode: 'lowest',
         voids,
       })
       const endBlock = Editor.match(editor, {
         at: end.path,
-        match: 'block',
+        match: n => Editor.isBlock(editor, n),
+        mode: 'lowest',
         voids,
       })
       const isAcrossBlocks =
@@ -234,7 +237,7 @@ export const TextTransforms = {
       // instead since it will need to be split otherwise.
       const inlineElementMatch = Editor.match(editor, {
         at,
-        match: 'inline',
+        match: n => Editor.isInline(editor, n),
         voids,
       })
 
@@ -250,7 +253,13 @@ export const TextTransforms = {
         }
       }
 
-      const blockMatch = Editor.match(editor, { at, match: 'block', voids })!
+      const blockMatch = Editor.match(editor, {
+        at,
+        match: n => Editor.isBlock(editor, n),
+        mode: 'lowest',
+        voids,
+      })!
+
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
@@ -313,9 +322,10 @@ export const TextTransforms = {
 
       const inlineMatch = Editor.match(editor, {
         at,
-        match: ['inline', 'text'],
+        match: n => Text.isText(n) || Editor.isInline(editor, n),
         voids,
       })!
+
       const [, inlinePath] = inlineMatch
       const isInlineStart = Editor.isStart(editor, at, inlinePath)
       const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
@@ -332,7 +342,10 @@ export const TextTransforms = {
 
       Editor.splitNodes(editor, {
         at,
-        match: hasBlocks ? 'block' : ['inline', 'text'],
+        match: n =>
+          hasBlocks
+            ? Editor.isBlock(editor, n)
+            : Text.isText(n) || Editor.isInline(editor, n),
         mode: hasBlocks ? 'lowest' : 'highest',
         voids,
       })
@@ -346,20 +359,21 @@ export const TextTransforms = {
 
       Editor.insertNodes(editor, starts, {
         at: startRef.current!,
-        match: ['inline', 'text'],
+        match: n => Text.isText(n) || Editor.isInline(editor, n),
         mode: 'highest',
         voids,
       })
 
       Editor.insertNodes(editor, middles, {
         at: middleRef.current!,
-        match: 'block',
+        match: n => Editor.isBlock(editor, n),
+        mode: 'lowest',
         voids,
       })
 
       Editor.insertNodes(editor, ends, {
         at: endRef.current!,
-        match: ['inline', 'text'],
+        match: n => Text.isText(n) || Editor.isInline(editor, n),
         mode: 'highest',
         voids,
       })

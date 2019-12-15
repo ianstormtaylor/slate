@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { Editor } from 'slate'
-import { jsx } from '../../..'
+import { jsx } from '../..'
 
 export const input = (
   <editor>
@@ -12,9 +12,10 @@ export const input = (
 )
 
 export const run = editor => {
-  return Array.from(
-    Editor.nodes(editor, { at: [], match: 'inline', mode: 'highest' })
-  )
+  return Editor.match(editor, {
+    at: [0, 1, 0],
+    match: n => Editor.isInline(editor, n),
+  })
 }
 
-export const output = [[<inline>two</inline>, [0, 1]]]
+export const output = [<inline>two</inline>, [0, 1]]

@@ -1,7 +1,7 @@
 /** @jsx jsx */
 
 import { Editor } from 'slate'
-import { jsx } from '../../..'
+import { jsx } from '../..'
 
 export const input = (
   <editor>
@@ -12,7 +12,11 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.match(editor, { at: [0, 0, 0], match: 'block' })
+  return Editor.match(editor, {
+    at: [0, 0, 0],
+    match: n => Editor.isBlock(editor, n),
+    mode: 'lowest',
+  })
 }
 
 export const output = [<block>one</block>, [0, 0]]

@@ -46,11 +46,13 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+              const [match] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
               Editor.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -60,7 +62,7 @@ const App = () => {
               Editor.setNodes(
                 editor,
                 { bold: true },
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -118,12 +120,14 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
+              const [node] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
               const isCodeActive = !!node
               Editor.setNodes(
                 editor,
                 { type: isCodeActive ? null : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -133,7 +137,7 @@ const App = () => {
               Editor.setNodes(
                 editor,
                 { bold: true },
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -160,7 +164,7 @@ const withCustom = editor => {
       Editor.setNodes(
         editor,
         { bold: isActive ? null : true },
-        { match: 'text', split: true }
+        { match: n => Text.isText(n), split: true }
       )
     }
 
@@ -170,7 +174,7 @@ const withCustom = editor => {
       Editor.setNodes(
         editor,
         { type: isActive ? null : 'code' },
-        { match: 'block' }
+        { match: n => Editor.isBlock(editor, n) }
       )
     }
 
@@ -187,7 +191,7 @@ const withCustom = editor => {
 const CustomEditor = {
   isBoldMarkActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: { bold: true },
+      match: n => n.bold === true,
       mode: 'universal',
     })
 
@@ -196,7 +200,7 @@ const CustomEditor = {
 
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: { type: 'code' },
+      match: n => n.type === 'code',
       mode: 'highest',
     })
 

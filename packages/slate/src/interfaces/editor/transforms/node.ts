@@ -79,11 +79,11 @@ export const NodeTransforms = {
       if (Point.isPoint(at)) {
         if (match == null) {
           if (Text.isText(node)) {
-            match = 'text'
+            match = n => Text.isText(n)
           } else if (editor.isInline(node)) {
-            match = ['inline', 'text']
+            match = n => Text.isText(n) || Editor.isInline(editor, n)
           } else {
-            match = 'block'
+            match = n => Editor.isBlock(editor, n)
           }
         }
 
@@ -148,7 +148,9 @@ export const NodeTransforms = {
       let { match } = options
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!at) {
@@ -218,7 +220,7 @@ export const NodeTransforms = {
           const [parent] = Editor.parent(editor, at)
           match = n => parent.children.includes(n)
         } else {
-          match = 'block'
+          match = n => Editor.isBlock(editor, n)
         }
       }
 
@@ -357,7 +359,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       const toRef = Editor.pathRef(editor, to)
@@ -400,7 +404,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -451,7 +457,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -528,7 +536,7 @@ export const NodeTransforms = {
       let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
-        match = 'block'
+        match = n => Editor.isBlock(editor, n)
       }
 
       if (Range.isRange(at)) {
@@ -688,7 +696,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (Path.isPath(at)) {
@@ -749,9 +759,9 @@ export const NodeTransforms = {
         if (Path.isPath(at)) {
           match = matchPath(editor, at)
         } else if (editor.isInline(element)) {
-          match = ['inline', 'text']
+          match = n => Editor.isInline(editor, n) || Text.isText(n)
         } else {
-          match = 'block'
+          match = n => Editor.isBlock(editor, n)
         }
       }
 
@@ -772,7 +782,9 @@ export const NodeTransforms = {
       const roots = Array.from(
         Editor.nodes(editor, {
           at,
-          match: editor.isInline(element) ? 'block' : 'editor',
+          match: editor.isInline(element)
+            ? n => Editor.isBlock(editor, n)
+            : n => Editor.isEditor(n),
           mode: 'highest',
           voids,
         })

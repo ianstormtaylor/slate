@@ -94,6 +94,25 @@ export const LocationQueries = {
   },
 
   /**
+   * Match a block node in the current branch of the editor.
+   */
+
+  block(
+    editor: Editor,
+    options: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) {
+    return Editor.match(editor, {
+      mode: 'lowest',
+      match: n => Editor.isBlock(editor, n),
+      ...options,
+    })
+  },
+
+  /**
    * Get the start and end points of a location.
    */
 
@@ -147,6 +166,25 @@ export const LocationQueries = {
     const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor, range)
     return fragment
+  },
+
+  /**
+   * Match an inline node in the current branch of the editor.
+   */
+
+  inline(
+    editor: Editor,
+    options: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) {
+    return Editor.match(editor, {
+      mode: 'lowest',
+      match: n => Editor.isInline(editor, n),
+      ...options,
+    })
   },
 
   /**
@@ -250,7 +288,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -266,7 +304,7 @@ export const LocationQueries = {
     const reverse = mode === 'lowest'
 
     for (const entry of Editor.levels(editor, { at: path, voids, reverse })) {
-      if (Editor.isMatch(editor, entry[0], match)) {
+      if (match(entry[0])) {
         return entry
       }
     }
@@ -280,7 +318,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       reverse?: boolean
     }
   ): Iterable<NodeEntry> {
@@ -312,7 +350,7 @@ export const LocationQueries = {
         continue
       }
 
-      if (Editor.isMatch(editor, n, match)) {
+      if (match(n)) {
         prevPath = p
         yield [n, p]
       }
@@ -385,7 +423,7 @@ export const LocationQueries = {
     editor: Editor,
     options: {
       at?: Location | Span
-      match?: NodeMatch
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       universal?: boolean
       reverse?: boolean
@@ -429,7 +467,7 @@ export const LocationQueries = {
     let hit: NodeEntry | undefined
 
     for (const entry of iterable) {
-      const isMatch = !match || Editor.isMatch(editor, entry[0], match)
+      const isMatch = !match || match(entry[0])
       const isLower = hit && Path.compare(entry[1], hit[1]) === 0
 
       // If we've arrived at a leaf text node that is not lower than the last

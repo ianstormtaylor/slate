@@ -81,9 +81,6 @@ The `Editor` interface, like all Slate interfaces, exposes helper functions that
 // Get the start point of a specific node at path.
 const point = Editor.start(editor, [0, 0])
 
-// Check whether an element matches a set of properties.
-const isMatch = Editor.isMatch(editor, element, { type: 'quote' })
-
 // Get the fragment (a slice of the document) at a range.
 const fragment = Editor.fragment(editor, range)
 ```
