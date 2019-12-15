@@ -27,6 +27,14 @@ export const Slate = (props: {
     return [editor]
   }, [key, value, ...Object.values(rest)])
 
+  if (!Node.isNodeList(value)) {
+    console.error(`[Slate] value is invalid! Expected a list of elements but got: ${JSON.stringify(value)}`)
+  }
+
+  if (!Editor.isEditor(editor)) {
+    console.error(`[Slate] editor is invalid! you passed: ${JSON.stringify(editor)}`)
+  }
+
   const onContextChange = useCallback(() => {
     onChange(editor.children)
     setKey(key + 1)
