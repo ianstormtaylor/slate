@@ -42,7 +42,7 @@ Editor.nodes(editor, {
 
 **The `Editor.match` helper was renamed to `Editor.above`.** This was just to make it clear how it searched in the tree—it looks through all of the nodes directly above a location in the document.
 
-- **The `Editor.above/previous/next` helpers now take all options in a dictionary.** Previously their APIs did not exactly match the `Editor.nodes` helper which they are shorthand for, but now this is no longer the case. The `at`, `match` and `mode` options are all passed in the `options` argument.
+**The `Editor.above/previous/next` helpers now take all options in a dictionary.** Previously their APIs did not exactly match the `Editor.nodes` helper which they are shorthand for, but now this is no longer the case. The `at`, `match` and `mode` options are all passed in the `options` argument.
 
 Previously you would use:
 
