@@ -33,11 +33,13 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const { selection } = editor
-            const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+            const [match] = Editor.nodes(editor, {
+              match: n => n.type === 'code',
+            })
             Editor.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: 'block' }
+              { match: n => Editor.isBlock(editor, n) }
             )
           }
         }}
@@ -81,11 +83,13 @@ const App = () => {
             // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+              const [match] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
               Editor.setNodes(
                 editor,
                 { type: match ? 'paragraph' : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -98,7 +102,7 @@ const App = () => {
                 { bold: true },
                 // Apply it to text nodes, and split the text node up if the
                 // selection is overlapping only part of it.
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -170,11 +174,13 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+              const [match] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
               Editor.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -184,7 +190,7 @@ const App = () => {
               Editor.setNodes(
                 editor,
                 { bold: true },
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Editor, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -11,7 +11,7 @@ export const input = (
 
 export const run = editor => {
   return Array.from(
-    Editor.nodes(editor, { at: [], match: 'text', voids: true })
+    Editor.nodes(editor, { at: [], match: Text.isText, voids: true })
   )
 }
 

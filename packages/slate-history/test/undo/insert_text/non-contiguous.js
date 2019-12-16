@@ -1,12 +1,13 @@
 /** @jsx jsx */
 
+import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const run = editor => {
   editor.exec({ type: 'insert_text', text: 't' })
-  // editor.move({ reverse: true })
+  Editor.move(editor, { reverse: true })
   editor.exec({ type: 'insert_text', text: 'w' })
-  // editor.move({ reverse: true })
+  Editor.move(editor, { reverse: true })
   editor.exec({ type: 'insert_text', text: 'o' })
 }
 

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, Text, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -49,7 +49,7 @@ const withFormatting = editor => {
         Editor.setNodes(
           editor,
           { [format]: isActive ? null : true },
-          { match: 'text', split: true }
+          { match: Text.isText, split: true }
         )
         break
       }
@@ -66,7 +66,7 @@ const withFormatting = editor => {
 
 const isFormatActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
-    match: { [format]: true },
+    match: n => n[format] === true,
     mode: 'all',
   })
   return !!match

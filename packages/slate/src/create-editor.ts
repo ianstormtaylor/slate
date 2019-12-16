@@ -125,20 +125,19 @@ export const createEditor = (): Editor => {
 
               if (Range.isExpanded(selection)) {
                 const [match] = Editor.nodes(editor, {
-                  at: selection,
                   match: n => Text.isText(n) && Text.matches(n, properties),
-                  // TODO: should be `mode: 'universal'`
+                  universal: true,
                 })
 
                 if (match) {
                   const keys = Object.keys(properties)
                   Editor.unsetNodes(editor, keys, {
-                    match: 'text',
+                    match: Text.isText,
                     split: true,
                   })
                 } else {
                   Editor.setNodes(editor, properties, {
-                    match: 'text',
+                    match: Text.isText,
                     split: true,
                   })
                 }
@@ -186,17 +185,18 @@ export const createEditor = (): Editor => {
 
           case 'insert_text': {
             if (selection) {
-              const { anchor } = selection
-
               // If the cursor is at the end of an inline, move it outside of
               // the inline before inserting
               if (Range.isCollapsed(selection)) {
-                const inline = Editor.match(editor, anchor, 'inline')
+                const inline = Editor.above(editor, {
+                  match: n => Editor.isInline(editor, n),
+                  mode: 'highest',
+                })
 
                 if (inline) {
                   const [, inlinePath] = inline
 
-                  if (Editor.isEnd(editor, anchor, inlinePath)) {
+                  if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
                     const point = Editor.after(editor, inlinePath)!
                     Editor.setSelection(editor, { anchor: point, focus: point })
                   }

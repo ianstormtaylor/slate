@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.previous(editor, [1])
+  return Editor.previous(editor, { at: [1] })
 }
 
 export const output = [<block>one</block>, [0]]

@@ -10,6 +10,7 @@ describe('slate-history', () => {
     run(editor)
     editor.exec({ type: 'undo' })
     assert.deepEqual(editor.children, output.children)
+    assert.deepEqual(editor.selection, output.selection)
   })
 })
 

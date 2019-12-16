@@ -27,8 +27,6 @@ export const output = (
     <block>
       <cursor />
     </block>
-    <block>
-      one
-    </block>
+    <block>one</block>
   </editor>
 )

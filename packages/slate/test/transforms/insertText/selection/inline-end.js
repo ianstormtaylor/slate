@@ -24,8 +24,9 @@ export const output = (
     <block>
       one
       <inline>two</inline>
-      fourthree
+      four
       <cursor />
+      three
     </block>
   </editor>
 )

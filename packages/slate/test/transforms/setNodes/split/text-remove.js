@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Editor, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setNodes(editor, { key: null }, { match: 'text', split: true })
+  Editor.setNodes(editor, { key: null }, { match: Text.isText, split: true })
 }
 
 export const input = (

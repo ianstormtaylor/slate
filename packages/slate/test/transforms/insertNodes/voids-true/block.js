@@ -22,8 +22,9 @@ export const run = editor => {
 export const output = (
   <editor>
     <block void>
-      onetwo
+      one
       <cursor />
+      two
     </block>
   </editor>
 )

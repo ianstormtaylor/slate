@@ -4,13 +4,13 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { match: { key: 'a' }, split: true })
+  Editor.unwrapNodes(editor, { match: n => n.a, split: true })
 }
 
 export const input = (
   <editor>
     <block>
-      <block key="a">
+      <block a>
         <block>one</block>
         <block>two</block>
         <block>
@@ -31,7 +31,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <block key="a">
+      <block a>
         <block>one</block>
         <block>two</block>
       </block>
@@ -43,7 +43,7 @@ export const output = (
         four
         <focus />
       </block>
-      <block key="a">
+      <block a>
         <block>five</block>
         <block>six</block>
       </block>

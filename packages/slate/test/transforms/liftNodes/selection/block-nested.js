@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.liftNodes(editor, { match: { c: true } })
+  Editor.liftNodes(editor, { match: n => n.c })
 }
 
 export const input = (

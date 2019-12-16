@@ -63,12 +63,12 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  const [link] = Editor.nodes(editor, { match: { type: 'link' } })
+  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
   return !!link
 }
 
 const unwrapLink = editor => {
-  Editor.unwrapNodes(editor, { match: { type: 'link' } })
+  Editor.unwrapNodes(editor, { match: n => n.type === 'link' })
 }
 
 const wrapLink = (editor, url) => {

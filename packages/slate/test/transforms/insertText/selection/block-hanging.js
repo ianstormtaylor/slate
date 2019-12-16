@@ -20,7 +20,6 @@ export const input = (
   </editor>
 )
 
-// TODO: the hanging selection here isn't right
 export const output = (
   <editor>
     <block>

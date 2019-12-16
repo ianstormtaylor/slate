@@ -4,7 +4,10 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.splitNodes(editor, { match: 'block', at: { path: [0, 0], offset: 2 } })
+  Editor.splitNodes(editor, {
+    match: n => Editor.isBlock(editor, n),
+    at: { path: [0, 0], offset: 2 },
+  })
 }
 
 export const input = (

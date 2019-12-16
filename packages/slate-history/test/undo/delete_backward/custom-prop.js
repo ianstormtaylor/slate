@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const run = editor => {
-  editor.delete()
+  Editor.delete(editor)
 }
 
 export const input = (
@@ -21,5 +21,3 @@ export const input = (
 )
 
 export const output = input
-
-export const skip = true
