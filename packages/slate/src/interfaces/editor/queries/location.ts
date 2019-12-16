@@ -29,12 +29,12 @@ export const LocationQueries = {
       voids?: boolean
     } = {}
   ): NodeEntry<T> | undefined {
-    const { voids = false, mode = 'lowest', at = editor.selection } = options
-    let { match } = options
-
-    if (!match) {
-      match = () => true
-    }
+    const {
+      voids = false,
+      mode = 'lowest',
+      at = editor.selection,
+      match,
+    } = options
 
     if (!at) {
       return
@@ -43,8 +43,13 @@ export const LocationQueries = {
     const path = Editor.path(editor, at)
     const reverse = mode === 'lowest'
 
-    for (const [n, p] of Editor.levels(editor, { at: path, voids, reverse })) {
-      if (!Text.isText(n) && !Path.equals(path, p) && match(n)) {
+    for (const [n, p] of Editor.levels(editor, {
+      at: path,
+      voids,
+      match,
+      reverse,
+    })) {
+      if (!Text.isText(n) && !Path.equals(path, p)) {
         return [n, p]
       }
     }
@@ -218,24 +223,34 @@ export const LocationQueries = {
    * Iterate through all of the levels at a location.
    */
 
-  *levels(
+  *levels<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
+      match?: NodeMatch<T>
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Iterable<NodeEntry<T>> {
     const { at = editor.selection, reverse = false, voids = false } = options
+    let { match } = options
+
+    if (match == null) {
+      match = () => true
+    }
 
     if (!at) {
       return
     }
 
-    const levels: NodeEntry[] = []
+    const levels: NodeEntry<T>[] = []
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
+      if (!match(n)) {
+        continue
+      }
+
       levels.push([n, p])
 
       if (!voids && Editor.isVoid(editor, n)) {
