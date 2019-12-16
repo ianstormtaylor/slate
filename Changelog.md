@@ -4,6 +4,76 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.55.0` — December 15, 2019
+
+###### BREAKING
+
+**The `match` option must now be a function.** Previously there were a few shorthands, like passing in a plain object. This behavior was removed because it made it harder to reason about exactly what was being matched, it made debugging harder, and it made it hard to type well. Now the `match` option must be a function that receives the `Node` object to match. If you're using TypeScript, and the function you pass in is a type guard, that will be taken into account in the return value!
+
+Previously you might write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: 'text',
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: { type: 'paragraph' },
+})
+```
+
+Now you'd write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Text.isText,
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: node => node.type === 'paragraph',
+})
+```
+
+**The `mode` option now defaults to `'lowest'`.** Previously the default varied depending on where in the codebase it was used. Now it defaults to `'lowest'` everywhere, and you can always pass in `'highest'` to change the behavior. The one exception is the `Editor.nodes` helper which defaults to `'all'` since that's the expected behavior most of the time.
+
+**The `Editor.match` helper was renamed to `Editor.above`.** This was just to make it clear how it searched in the tree—it looks through all of the nodes directly above a location in the document.
+
+- **The `Editor.above/previous/next` helpers now take all options in a dictionary.** Previously their APIs did not exactly match the `Editor.nodes` helper which they are shorthand for, but now this is no longer the case. The `at`, `match` and `mode` options are all passed in the `options` argument.
+
+Previously you would use:
+
+```js
+Editor.previous(editor, path, n => Text.isText(n), {
+  mode: 'lowest',
+})
+```
+
+Now you'd use:
+
+```js
+Editor.previous(editor, {
+  at: path,
+  match: n => Text.isText(n),
+  mode: 'lowest',
+  ...
+})
+```
+
+**The `Editor.elements` and `Editor.texts` helpers were removed.** These were simple convenience helpers that were rarely used. You can now achieve the same thing by using the `Editor.nodes` helper directly along with the `match` option. For example:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Element.isElement,
+})
+```
+
+---
+
 ### `0.54.0` — December 12, 2019
 
 ###### BREAKING
