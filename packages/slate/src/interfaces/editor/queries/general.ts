@@ -7,11 +7,12 @@ import {
   Text,
   PathRef,
   PointRef,
+  Element,
+  NodeEntry,
   Range,
   RangeRef,
   Node,
 } from '../../..'
-import { TextEntry } from '../../text'
 
 export const NORMALIZING: WeakMap<Editor, boolean> = new WeakMap()
 export const PATH_REFS: WeakMap<Editor, Set<PathRef>> = new WeakMap()
@@ -19,6 +20,14 @@ export const POINT_REFS: WeakMap<Editor, Set<PointRef>> = new WeakMap()
 export const RANGE_REFS: WeakMap<Editor, Set<RangeRef>> = new WeakMap()
 
 export const GeneralQueries = {
+  /**
+   * Check if a value is a block `Element` object.
+   */
+
+  isBlock(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && !editor.isInline(value)
+  },
+
   /**
    * Check if a value is an `Editor` object.
    */
@@ -40,12 +49,28 @@ export const GeneralQueries = {
   },
 
   /**
+   * Check if a value is an inline `Element` object.
+   */
+
+  isInline(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && editor.isInline(value)
+  },
+
+  /**
    * Check if the editor is currently normalizing after each operation.
    */
 
   isNormalizing(editor: Editor): boolean {
     const isNormalizing = NORMALIZING.get(editor)
     return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
+   * Check if a value is a void `Element` object.
+   */
+
+  isVoid(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && editor.isVoid(value)
   },
 
   /**
@@ -64,13 +89,10 @@ export const GeneralQueries = {
     }
 
     if (Range.isExpanded(selection)) {
-      const [match] = Editor.nodes(editor, {
-        match: 'text',
-        mode: 'all',
-      })
+      const [match] = Editor.nodes(editor, { match: Text.isText })
 
       if (match) {
-        const [node] = match as TextEntry
+        const [node] = match as NodeEntry<Text>
         const { text, ...rest } = node
         return rest
       } else {
@@ -83,8 +105,10 @@ export const GeneralQueries = {
     let [node] = Editor.leaf(editor, path)
 
     if (anchor.offset === 0) {
-      const prev = Editor.previous(editor, path, 'text')
-      const block = Editor.match(editor, path, 'block')
+      const prev = Editor.previous(editor, { at: path, match: Text.isText })
+      const block = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
 
       if (prev && block) {
         const [prevNode, prevPath] = prev

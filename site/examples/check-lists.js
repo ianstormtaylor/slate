@@ -43,7 +43,7 @@ const withChecklists = editor => {
       Range.isCollapsed(selection)
     ) {
       const [match] = Editor.nodes(editor, {
-        match: { type: 'check-list-item' },
+        match: n => n.type === 'check-list-item',
       })
 
       if (match) {
@@ -54,7 +54,7 @@ const withChecklists = editor => {
           Editor.setNodes(
             editor,
             { type: 'paragraph' },
-            { match: { type: 'check-list-item' } }
+            { match: n => n.type === 'check-list-item' }
           )
           return
         }

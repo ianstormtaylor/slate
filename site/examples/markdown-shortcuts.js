@@ -48,7 +48,9 @@ const withShortcuts = editor => {
       Range.isCollapsed(selection)
     ) {
       const { anchor } = selection
-      const [block] = Editor.nodes(editor, { match: 'block' })
+      const block = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
@@ -58,11 +60,15 @@ const withShortcuts = editor => {
       if (type) {
         Editor.select(editor, range)
         Editor.delete(editor)
-        Editor.setNodes(editor, { type }, { match: 'block' })
+        Editor.setNodes(
+          editor,
+          { type },
+          { match: n => Editor.isBlock(editor, n) }
+        )
 
         if (type === 'list-item') {
           const list = { type: 'bulleted-list', children: [] }
-          Editor.wrapNodes(editor, list, { match: { type: 'list-item' } })
+          Editor.wrapNodes(editor, list, { match: n => n.type === 'list-item' })
         }
 
         return
@@ -74,7 +80,9 @@ const withShortcuts = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const [match] = Editor.nodes(editor, { match: 'block' })
+      const match = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
 
       if (match) {
         const [block, path] = match
@@ -87,7 +95,9 @@ const withShortcuts = editor => {
           Editor.setNodes(editor, { type: 'paragraph' })
 
           if (block.type === 'list-item') {
-            Editor.unwrapNodes(editor, { match: { type: 'bulleted-list' } })
+            Editor.unwrapNodes(editor, {
+              match: n => n.type === 'bulleted-list',
+            })
           }
 
           return

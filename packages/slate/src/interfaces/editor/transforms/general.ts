@@ -8,9 +8,9 @@ import {
   Element,
   Operation,
   Descendant,
+  NodeEntry,
   Path,
 } from '../../..'
-import { TextEntry } from '../../text'
 
 export const DIRTY_PATHS: WeakMap<Editor, Path[]> = new WeakMap()
 
@@ -178,8 +178,8 @@ export const GeneralTransforms = {
             if (selection != null && result != null) {
               selection[key] = result
             } else {
-              let prev: TextEntry | undefined
-              let next: TextEntry | undefined
+              let prev: NodeEntry<Text> | undefined
+              let next: NodeEntry<Text> | undefined
 
               for (const [n, p] of Node.texts(editor)) {
                 if (Path.compare(p, path) === -1) {

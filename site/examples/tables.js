@@ -30,7 +30,9 @@ const withTables = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const [cell] = Editor.nodes(editor, { match: { type: 'table-cell' } })
+      const [cell] = Editor.nodes(editor, {
+        match: n => n.type === 'table-cell',
+      })
 
       if (cell) {
         const [, cellPath] = cell
@@ -46,7 +48,7 @@ const withTables = editor => {
     }
 
     if (type === 'insert_break' && selection) {
-      const [table] = Editor.nodes(editor, { match: { type: 'table' } })
+      const [table] = Editor.nodes(editor, { match: n => n.type === 'table' })
 
       if (table) {
         return

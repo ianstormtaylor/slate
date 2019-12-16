@@ -3,8 +3,6 @@ import {
   Element,
   Location,
   Node,
-  NodeEntry,
-  NodeMatch,
   Path,
   Point,
   Range,
@@ -21,14 +19,15 @@ export const NodeTransforms = {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { hanging = false, voids = false } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
       if (Node.isNode(nodes)) {
@@ -78,21 +77,26 @@ export const NodeTransforms = {
       if (Point.isPoint(at)) {
         if (match == null) {
           if (Text.isText(node)) {
-            match = 'text'
+            match = n => Text.isText(n)
           } else if (editor.isInline(node)) {
-            match = ['inline', 'text']
+            match = n => Text.isText(n) || Editor.isInline(editor, n)
           } else {
-            match = 'block'
+            match = n => Editor.isBlock(editor, n)
           }
         }
 
-        const atMatch = Editor.match(editor, at.path, match)
+        const [entry] = Editor.nodes(editor, {
+          at: at.path,
+          match,
+          mode,
+          voids,
+        })
 
-        if (atMatch) {
-          const [, matchPath] = atMatch
+        if (entry) {
+          const [, matchPath] = entry
           const pathRef = Editor.pathRef(editor, matchPath)
           const isAtEnd = Editor.isEnd(editor, at, matchPath)
-          Editor.splitNodes(editor, { at, match })
+          Editor.splitNodes(editor, { at, match, mode, voids })
           const path = pathRef.unref()!
           at = isAtEnd ? Path.next(path) : path
         } else {
@@ -103,7 +107,7 @@ export const NodeTransforms = {
       const parentPath = Path.parent(at)
       let index = at[at.length - 1]
 
-      if (!voids && Editor.match(editor, parentPath, 'void')) {
+      if (!voids && Editor.void(editor, { at: parentPath })) {
         return
       }
 
@@ -132,17 +136,19 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { at = editor.selection, mode = 'highest', voids = false } = options
+      const { at = editor.selection, mode = 'lowest', voids = false } = options
       let { match } = options
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!at) {
@@ -193,14 +199,15 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
-      const { hanging = false, voids = false } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
 
       if (!at) {
         return
@@ -211,7 +218,7 @@ export const NodeTransforms = {
           const [parent] = Editor.parent(editor, at)
           match = n => parent.children.includes(n)
         } else {
-          match = 'block'
+          match = n => Editor.isBlock(editor, n)
         }
       }
 
@@ -234,8 +241,8 @@ export const NodeTransforms = {
         }
       }
 
-      const current = Editor.match(editor, at, match, { voids })
-      const prev = Editor.previous(editor, at, match, { voids })
+      const [current] = Editor.nodes(editor, { at, match, voids, mode })
+      const prev = Editor.previous(editor, { at, match, voids, mode })
 
       if (!current || !prev) {
         return
@@ -257,12 +264,12 @@ export const NodeTransforms = {
 
       // Determine if the merge will leave an ancestor of the path empty as a
       // result, in which case we'll want to remove it after merging.
-      const emptyAncestor = Editor.match(
-        editor,
-        path,
-        n =>
-          levels.includes(n) && Element.isElement(n) && n.children.length === 1
-      )
+      const emptyAncestor = Editor.above(editor, {
+        at: path,
+        mode: 'highest',
+        match: n =>
+          levels.includes(n) && Element.isElement(n) && n.children.length === 1,
+      })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
       let properties
@@ -331,8 +338,8 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
     }
@@ -341,7 +348,7 @@ export const NodeTransforms = {
       const {
         to,
         at = editor.selection,
-        mode = 'highest',
+        mode = 'lowest',
         voids = false,
       } = options
       let { match } = options
@@ -351,7 +358,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       const toRef = Editor.pathRef(editor, to)
@@ -379,26 +388,24 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { hanging = false, voids = false } = options
-      let { at = editor.selection, mode, match } = options
+      const { hanging = false, voids = false, mode = 'lowest' } = options
+      let { at = editor.selection, match } = options
 
       if (!at) {
         return
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
-      }
-
-      if (mode == null || mode === 'all') {
-        mode = 'highest'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -428,8 +435,8 @@ export const NodeTransforms = {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
       voids?: boolean
@@ -439,7 +446,7 @@ export const NodeTransforms = {
       let { match, at = editor.selection } = options
       const {
         hanging = false,
-        mode = 'highest',
+        mode = 'lowest',
         split = false,
         voids = false,
       } = options
@@ -449,7 +456,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -459,8 +468,9 @@ export const NodeTransforms = {
       if (split && Range.isRange(at)) {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
-        Editor.splitNodes(editor, { at: end, match, voids })
-        Editor.splitNodes(editor, { at: start, match, voids })
+        const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
+        Editor.splitNodes(editor, { at: end, match, mode: splitMode, voids })
+        Editor.splitNodes(editor, { at: start, match, mode: splitMode, voids })
         at = rangeRef.unref()!
 
         if (options.at == null) {
@@ -513,23 +523,19 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      let {
-        match,
-        at = editor.selection,
-        height = 0,
-        always = false,
-        voids = false,
-      } = options
+      const { mode = 'lowest', voids = false } = options
+      let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
-        match = 'block'
+        match = n => Editor.isBlock(editor, n)
       }
 
       if (Range.isRange(at)) {
@@ -555,13 +561,13 @@ export const NodeTransforms = {
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const highest = Editor.match(editor, at, match, { voids })
+      const [highest] = Editor.nodes(editor, { at, match, mode, voids })
 
       if (!highest) {
         return
       }
 
-      const voidMatch = Editor.match(editor, at, 'void')
+      const voidMatch = Editor.void(editor, { at, mode: 'highest' })
       const nudge = 0
 
       if (!voids && voidMatch) {
@@ -603,7 +609,7 @@ export const NodeTransforms = {
         if (
           path.length < highestPath.length ||
           path.length === 0 ||
-          (!voids && Element.isElement(node) && editor.isVoid(node))
+          (!voids && Editor.isVoid(editor, node))
         ) {
           break
         }
@@ -646,8 +652,8 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
@@ -674,14 +680,14 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { mode = 'highest', split = false, voids = false } = options
+      const { mode = 'lowest', split = false, voids = false } = options
       let { at = editor.selection, match } = options
 
       if (!at) {
@@ -689,7 +695,9 @@ export const NodeTransforms = {
       }
 
       if (match == null) {
-        match = Path.isPath(at) ? matchPath(editor, at) : 'block'
+        match = Path.isPath(at)
+          ? matchPath(editor, at)
+          : n => Editor.isBlock(editor, n)
       }
 
       if (Path.isPath(at)) {
@@ -732,14 +740,14 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
   ) {
     Editor.withoutNormalizing(editor, () => {
-      const { mode = 'highest', split = false, voids = false } = options
+      const { mode = 'lowest', split = false, voids = false } = options
       let { match, at = editor.selection } = options
 
       if (!at) {
@@ -750,9 +758,9 @@ export const NodeTransforms = {
         if (Path.isPath(at)) {
           match = matchPath(editor, at)
         } else if (editor.isInline(element)) {
-          match = ['inline', 'text']
+          match = n => Editor.isInline(editor, n) || Text.isText(n)
         } else {
-          match = 'block'
+          match = n => Editor.isBlock(editor, n)
         }
       }
 
@@ -773,7 +781,9 @@ export const NodeTransforms = {
       const roots = Array.from(
         Editor.nodes(editor, {
           at,
-          match: editor.isInline(element) ? 'block' : 'editor',
+          match: editor.isInline(element)
+            ? n => Editor.isBlock(editor, n)
+            : n => Editor.isEditor(n),
           mode: 'highest',
           voids,
         })

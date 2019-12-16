@@ -4,7 +4,11 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setNodes(editor, { key: true }, { match: 'inline' })
+  Editor.setNodes(
+    editor,
+    { key: true },
+    { match: n => Editor.isInline(editor, n) }
+  )
 }
 
 export const input = (
@@ -28,9 +32,9 @@ export const output = (
   <editor>
     <block>
       <text />
-      <inline key>
+      <inline>
         <text />
-        <inline>
+        <inline key>
           <cursor />
           word
         </inline>

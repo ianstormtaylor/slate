@@ -84,10 +84,3 @@ export const Text = {
     return true
   },
 }
-
-/**
- * `TextEntry` objects refer to an `Text` and the `Path` where it can be
- * found inside a root node.
- */
-
-export type TextEntry = [Text, Path]

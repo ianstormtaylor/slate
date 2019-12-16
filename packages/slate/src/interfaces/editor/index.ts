@@ -5,7 +5,6 @@ import { GeneralTransforms } from './transforms/general'
 import { GeneralQueries } from './queries/general'
 import { LocationQueries } from './queries/location'
 import { NodeTransforms } from './transforms/node'
-import { NodeQueries } from './queries/node'
 import { RangeQueries } from './queries/range'
 import { SelectionTransforms } from './transforms/selection'
 import { TextTransforms } from './transforms/text'
@@ -34,7 +33,6 @@ export const Editor = {
   ...GeneralQueries,
   ...GeneralTransforms,
   ...LocationQueries,
-  ...NodeQueries,
   ...NodeTransforms,
   ...RangeQueries,
   ...SelectionTransforms,

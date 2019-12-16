@@ -70,7 +70,7 @@ const withRichText = editor => {
       const isList = LIST_TYPES.includes(format)
 
       for (const f of LIST_TYPES) {
-        Editor.unwrapNodes(editor, { match: { type: f }, split: true })
+        Editor.unwrapNodes(editor, { match: n => n.type === f, split: true })
       }
 
       Editor.setNodes(editor, {
@@ -90,7 +90,7 @@ const withRichText = editor => {
 
 const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
-    match: { type: format },
+    match: n => n.type === format,
     mode: 'all',
   })
 

@@ -11,7 +11,10 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.previous(editor, [1], 'block')
+  return Editor.previous(editor, {
+    at: [1],
+    match: n => Editor.isBlock(editor, n),
+  })
 }
 
 export const output = [<block>one</block>, [0]]

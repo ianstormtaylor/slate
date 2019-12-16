@@ -1,4 +1,4 @@
-import { Editor, Path, Range } from '../../..'
+import { Editor, Text, Path, Range } from '../../..'
 
 export const RangeQueries = {
   /**
@@ -20,14 +20,18 @@ export const RangeQueries = {
       return range
     }
 
-    const closestBlock = Editor.match(editor, end.path, 'block')
-    const blockPath = closestBlock ? closestBlock[1] : []
+    const endBlock = Editor.above(editor, {
+      at: end,
+      match: n => Editor.isBlock(editor, n),
+    })
+    const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }
     let skip = true
 
-    for (const [node, path] of Editor.texts(editor, {
+    for (const [node, path] of Editor.nodes(editor, {
       at: before,
+      match: Text.isText,
       reverse: true,
       voids,
     })) {

@@ -4,7 +4,11 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setNodes(editor, { key: true }, { match: 'inline' })
+  Editor.setNodes(
+    editor,
+    { key: true },
+    { match: n => Editor.isInline(editor, n) }
+  )
 }
 
 export const input = (

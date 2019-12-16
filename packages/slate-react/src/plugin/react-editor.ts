@@ -199,8 +199,7 @@ export const ReactEditor = {
 
     // If we're inside a void node, force the offset to 0, otherwise the zero
     // width spacing character will result in an incorrect offset of 1
-    const [match] = Editor.nodes(editor, { at: point, match: 'void' })
-    if (match) {
+    if (Editor.void(editor, { at: point })) {
       point = { path: point.path, offset: 0 }
     }
 
@@ -301,7 +300,7 @@ export const ReactEditor = {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (Element.isElement(node) && editor.isVoid(node)) {
+    if (Editor.isVoid(editor, node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = editor.isInline(node)
         ? x - rect.left < rect.left + rect.width - x
