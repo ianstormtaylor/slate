@@ -792,6 +792,7 @@ const PUNCTUATION = /[\u0021-\u0023\u0025-\u002A\u002C-\u002F\u003A\u003B\u003F\
 const CHAMELEON = /['\u2018\u2019]/
 const SURROGATE_START = 0xd800
 const SURROGATE_END = 0xdfff
+const ZERO_WIDTH_JOINER = 0x200d
 
 /**
  * Check if a character is a word character. The `remaining` argument is used
@@ -828,9 +829,76 @@ const isWordCharacter = (char: string, remaining: string): boolean => {
  */
 
 const getCharacterDistance = (text: string): number => {
-  const code = text.charCodeAt(0)
-  const isSurrogate = SURROGATE_START <= code && code <= SURROGATE_END
-  return isSurrogate ? 2 : 1
+  let offset = 0
+  // prev types:
+  // SURR: surrogate pair
+  // MOD: modifier (technically also surrogate pair)
+  // ZWJ: zero width joiner
+  // VAR: variation selector
+  // BMP: sequenceable character from basic multilingual plane
+  let prev: 'SURR' | 'MOD' | 'ZWJ' | 'VAR' | 'BMP' | null = null
+  let charCode = text.charCodeAt(0)
+
+  while (charCode) {
+    if (isSurrogate(charCode)) {
+      const modifier = isModifier(charCode, text, offset)
+
+      // Early returns are the heart of this function, where we decide if previous and current
+      // codepoints should form a single character (in terms of how many of them should selection
+      // jump over).
+      if (prev === 'SURR' || prev === 'BMP') {
+        break
+      }
+
+      offset += 2
+      prev = modifier ? 'MOD' : 'SURR'
+      charCode = text.charCodeAt(offset)
+      // Absolutely fine to `continue` without any checks because if `charCode` is NaN (which
+      // is the case when out of `text` range), next `while` loop won"t execute and we"re done.
+      continue
+    }
+
+    if (charCode === ZERO_WIDTH_JOINER) {
+      offset += 1
+      prev = 'ZWJ'
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isBMPEmoji(charCode)) {
+      if (prev && prev !== 'ZWJ' && prev !== 'VAR') {
+        break
+      }
+      offset += 1
+      prev = 'BMP'
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isVariationSelector(charCode)) {
+      if (prev && prev !== 'ZWJ') {
+        break
+      }
+      offset += 1
+      prev = 'VAR'
+      charCode = text.charCodeAt(offset)
+      continue
+    }
+
+    // Modifier 'groups up' with what ever character is before that (even whitespace), need to
+    // look ahead.
+    if (prev === 'MOD') {
+      offset += 1
+      break
+    }
+
+    // If while loop ever gets here, we're done (e.g latin chars).
+    break
+  }
+
+  return offset || 1
 }
 
 /**
@@ -861,6 +929,59 @@ const getWordDistance = (text: string): number => {
   }
 
   return length
+}
+
+/**
+ * Determines if `code` is a surrogate
+ */
+
+const isSurrogate = (code: number): boolean =>
+  SURROGATE_START <= code && code <= SURROGATE_END
+
+/**
+ * Does `code` form Modifier with next one.
+ *
+ * https://emojipedia.org/modifiers/
+ */
+
+const isModifier = (code: number, text: string, offset: number): boolean => {
+  if (code === 0xd83c) {
+    const next = text.charCodeAt(offset + 1)
+    return next <= 0xdfff && next >= 0xdffb
+  }
+  return false
+}
+
+/**
+ * Is `code` a Variation Selector.
+ *
+ * https://codepoints.net/variation_selectors
+ */
+
+const isVariationSelector = (code: number): boolean => {
+  return code <= 0xfe0f && code >= 0xfe00
+}
+
+/**
+ * Is `code` one of the BMP codes used in emoji sequences.
+ *
+ * https://emojipedia.org/emoji-zwj-sequences/
+ */
+
+const isBMPEmoji = (code: number): boolean => {
+  // This requires tiny bit of maintanance, better ideas?
+  // Fortunately it only happens if new Unicode Standard
+  // is released. Fails gracefully if upkeep lags behind,
+  // same way Slate previously behaved with all emojis.
+  return (
+    code === 0x2764 || // heart (❤)
+    code === 0x2642 || // male (♂)
+    code === 0x2640 || // female (♀)
+    code === 0x2620 || // scull (☠)
+    code === 0x2695 || // medical (⚕)
+    code === 0x2708 || // plane (✈️)
+    code === 0x25ef // large circle (◯)
+  )
 }
 
 /**
