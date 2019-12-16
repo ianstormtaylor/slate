@@ -20,7 +20,7 @@
     "slate": "^0.55.2"
   },
   "peerDependencies": {
-    "slate": ">=0.50.0"
+    "slate": ">=0.55.0"
   },
   "umdGlobals": {
     "slate": "Slate"

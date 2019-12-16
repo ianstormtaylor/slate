@@ -15,9 +15,7 @@
   ],
   "dependencies": {
     "@types/debounce": "^1.2.0",
-    "@types/debug": "^4.1.5",
     "@types/is-hotkey": "^0.1.1",
-    "@types/lodash": "^4.14.149",
     "debounce": "^1.2.0",
     "direction": "^1.0.3",
     "is-hotkey": "^0.1.6",
@@ -31,7 +29,7 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "slate": ">=0.50.0"
+    "slate": ">=0.55.0"
   },
   "umdGlobals": {
     "react": "React",
