@@ -73,8 +73,16 @@ export const TextTransforms = {
       }
 
       let [start, end] = Range.edges(at)
-      const startBlock = Editor.block(editor, { at: start, voids })
-      const endBlock = Editor.block(editor, { at: end, voids })
+      const startBlock = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+        at: start,
+        voids,
+      })
+      const endBlock = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+        at: end,
+        voids,
+      })
       const isAcrossBlocks =
         startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
       const isSingleText = Path.equals(start.path, end.path)
@@ -226,8 +234,9 @@ export const TextTransforms = {
 
       // If the insert point is at the edge of an inline node, move it outside
       // instead since it will need to be split otherwise.
-      const inlineElementMatch = Editor.inline(editor, {
+      const inlineElementMatch = Editor.above(editor, {
         at,
+        match: n => Editor.isInline(editor, n),
         mode: 'highest',
         voids,
       })
@@ -244,7 +253,11 @@ export const TextTransforms = {
         }
       }
 
-      const blockMatch = Editor.block(editor, { at, voids })!
+      const blockMatch = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+        at,
+        voids,
+      })!
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)

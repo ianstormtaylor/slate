@@ -48,7 +48,9 @@ const withShortcuts = editor => {
       Range.isCollapsed(selection)
     ) {
       const { anchor } = selection
-      const block = Editor.block(editor)
+      const block = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
@@ -78,7 +80,9 @@ const withShortcuts = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const match = Editor.block(editor)
+      const match = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
 
       if (match) {
         const [block, path] = match

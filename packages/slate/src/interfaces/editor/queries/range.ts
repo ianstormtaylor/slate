@@ -20,7 +20,10 @@ export const RangeQueries = {
       return range
     }
 
-    const endBlock = Editor.block(editor, { at: end })
+    const endBlock = Editor.above(editor, {
+      at: end,
+      match: n => Editor.isBlock(editor, n),
+    })
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }

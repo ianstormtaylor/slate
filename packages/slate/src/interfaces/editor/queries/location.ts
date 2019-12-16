@@ -123,24 +123,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Match a block node in the current branch of the editor.
-   */
-
-  block(
-    editor: Editor,
-    options: {
-      at?: Location
-      mode?: 'highest' | 'lowest'
-      voids?: boolean
-    } = {}
-  ): NodeEntry<Element> | undefined {
-    return Editor.above(editor, {
-      match: n => Editor.isBlock(editor, n),
-      ...options,
-    })
-  },
-
-  /**
    * Get the start and end points of a location.
    */
 
@@ -173,24 +155,6 @@ export const LocationQueries = {
     const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor, range)
     return fragment
-  },
-
-  /**
-   * Match an inline node in the current branch of the editor.
-   */
-
-  inline(
-    editor: Editor,
-    options: {
-      at?: Location
-      mode?: 'highest' | 'lowest'
-      voids?: boolean
-    } = {}
-  ): NodeEntry<Element> | undefined {
-    return Editor.above(editor, {
-      match: n => Editor.isInline(editor, n),
-      ...options,
-    })
   },
 
   /**

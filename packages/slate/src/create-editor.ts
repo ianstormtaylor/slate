@@ -188,7 +188,10 @@ export const createEditor = (): Editor => {
               // If the cursor is at the end of an inline, move it outside of
               // the inline before inserting
               if (Range.isCollapsed(selection)) {
-                const inline = Editor.inline(editor, { mode: 'highest' })
+                const inline = Editor.above(editor, {
+                  match: n => Editor.isInline(editor, n),
+                  mode: 'highest',
+                })
 
                 if (inline) {
                   const [, inlinePath] = inline
