@@ -86,12 +86,21 @@ function configure(pkg, env, target) {
     builtins(),
 
     // Use Babel to transpile the result, limiting it to the source code.
-    babel({
-      runtimeHelpers: true,
-      include: [`packages/${pkg.name}/src/**`],
-      extensions: ['.js', '.ts'],
-      configFile: './config/babel/babel.config.cjs',
-    }),
+    isUmd &&
+      babel({
+        runtimeHelpers: true,
+        include: [`packages/${pkg.name}/src/**`],
+        extensions: ['.js', '.ts'],
+        configFile: './config/babel/babel.umd.config.cjs',
+      }),
+
+    isModule &&
+      babel({
+        runtimeHelpers: true,
+        include: [`packages/${pkg.name}/src/**`],
+        extensions: ['.js', '.ts'],
+        configFile: './config/babel/babel.module.config.cjs',
+      }),
 
     // Register Node.js globals for browserify compatibility.
     globals(),
