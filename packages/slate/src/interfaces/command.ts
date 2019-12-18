@@ -22,6 +22,16 @@ export const Command = {
 }
 
 /**
+ * The `AddMarkCommand` adds properties to the text nodes in the selection.
+ */
+
+export interface AddMarkCommand {
+  type: 'add_mark'
+  key: string
+  value: any
+}
+
+/**
  * The `DeleteBackwardCommand` delete's content backward, meaning before the
  * current selection, by a specific `unit` of distance.
  */
@@ -47,15 +57,6 @@ export interface DeleteForwardCommand {
 
 export interface DeleteFragmentCommand {
   type: 'delete_fragment'
-}
-
-/**
- * The `FormatTextCommand` adds properties to the text nodes in the selection.
- */
-
-export interface FormatTextCommand {
-  type: 'format_text'
-  properties: Record<string, any>
 }
 
 /**
@@ -94,19 +95,29 @@ export interface InsertTextCommand {
 }
 
 /**
+ * The `RemoveMarkCommand` removes properties from text nodes in the selection.
+ */
+
+export interface RemoveMarkCommand {
+  type: 'remove_mark'
+  key: string
+}
+
+/**
  * The `CoreCommand` union is a set of all of the commands that are recognized
  * by Slate's "core" out of the box.
  */
 
 export type CoreCommand =
+  | AddMarkCommand
   | DeleteBackwardCommand
   | DeleteForwardCommand
   | DeleteFragmentCommand
-  | FormatTextCommand
   | InsertBreakCommand
   | InsertFragmentCommand
   | InsertNodeCommand
   | InsertTextCommand
+  | RemoveMarkCommand
 
 export const CoreCommand = {
   /**
@@ -116,14 +127,14 @@ export const CoreCommand = {
   isCoreCommand(value: any): value is CoreCommand {
     if (Command.isCommand(value)) {
       switch (value.type) {
+        case 'add_mark':
+          return typeof value.key === 'string' && value.value != null
         case 'delete_backward':
           return typeof value.unit === 'string'
         case 'delete_forward':
           return typeof value.unit === 'string'
         case 'delete_fragment':
           return true
-        case 'format_text':
-          return isPlainObject(value.properties)
         case 'insert_break':
           return true
         case 'insert_fragment':
@@ -132,6 +143,8 @@ export const CoreCommand = {
           return Node.isNode(value.node)
         case 'insert_text':
           return typeof value.text === 'string'
+        case 'remove_mark':
+          return typeof value.key === 'string'
       }
     }
 

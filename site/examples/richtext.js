@@ -49,8 +49,8 @@ const RichTextExample = () => {
               event.preventDefault()
               const mark = HOTKEYS[hotkey]
               editor.exec({
-                type: 'format_text',
-                properties: { [mark]: true },
+                type: 'toggle_mark',
+                format: mark,
               })
             }
           }
@@ -64,24 +64,41 @@ const withRichText = editor => {
   const { exec } = editor
 
   editor.exec = command => {
-    if (command.type === 'format_block') {
-      const { format } = command
-      const isActive = isBlockActive(editor, format)
-      const isList = LIST_TYPES.includes(format)
+    switch (command.type) {
+      case 'toggle_block': {
+        const { format } = command
+        const isActive = isBlockActive(editor, format)
+        const isList = LIST_TYPES.includes(format)
 
-      for (const f of LIST_TYPES) {
-        Editor.unwrapNodes(editor, { match: n => n.type === f, split: true })
+        Editor.unwrapNodes(editor, {
+          match: n => LIST_ITEMS.includes(n.type),
+          split: true,
+        })
+
+        Editor.setNodes(editor, {
+          type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+        })
+
+        if (!isActive && isList) {
+          const block = { type: format, children: [] }
+          Editor.wrapNodes(editor, block)
+        }
       }
 
-      Editor.setNodes(editor, {
-        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-      })
+      case 'toggle_mark': {
+        const { format } = command
+        const isActive = isMarkActive(editor, format)
 
-      if (!isActive && isList) {
-        Editor.wrapNodes(editor, { type: format, children: [] })
+        if (isActive) {
+          editor.exec({ type: 'remove_mark', key: format })
+        } else {
+          editor.exec({ type: 'add_mark', key: format, value: true })
+        }
       }
-    } else {
-      exec(command)
+
+      default: {
+        exec(command)
+      }
     }
   }
 
@@ -91,7 +108,6 @@ const withRichText = editor => {
 const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format,
-    mode: 'all',
   })
 
   return !!match
@@ -148,7 +164,7 @@ const BlockButton = ({ format, icon }) => {
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'format_block', format })
+        editor.exec({ type: 'toggle_block', format })
       }}
     >
       <Icon>{icon}</Icon>
@@ -163,7 +179,7 @@ const MarkButton = ({ format, icon }) => {
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'format_text', properties: { [format]: true } })
+        editor.exec({ type: 'toggle_mark', format })
       }}
     >
       <Icon>{icon}</Icon>
