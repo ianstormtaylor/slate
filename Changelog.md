@@ -4,6 +4,103 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.57.0` — December 18, 2019
+
+###### BREAKING
+
+**Overrideble commands now live directly on the editor object.** Previously the `Command` concept was implemented as an interface that was passed into the `editor.exec` function, allowing the "core" commands to be overriden in one place. But this introduced a lot of Redux-like indirection when implementing custom commands that wasn't necessary because they are never overridden. Instead, now the core actions that can be overridden are implemented as individual functions on the editor (eg. `editor.insertText`) and they can be overridden just like any other function (eg. `isVoid`).
+
+Previously to override a command you'd do:
+
+```js
+const withPlugin = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    if (command.type === 'insert_text') {
+      const { text } = command
+
+      if (myCustomLogic) {
+        // ...
+        return
+      }
+    }
+
+    exec(command)
+  }
+
+  return editor
+}
+```
+
+Now, you'd override the specific function directly:
+
+```js
+const withPlugin = editor => {
+  const { insertText } = editor
+
+  editor.insertText = text => {
+    if (myCustomLogic) {
+      // ...
+      return
+    }
+
+    insertText(text)
+  }
+
+  return editor
+}
+```
+
+You shouldn't ever need to call these functions directly! They are there for plugins to tap into, but there are higher level helpers for you to call whenever you actually need to invoke them. Read on…
+
+**Transforms now live in a separate namespace of helpers.** Previously the document and selection transformation helpers were available directly on the `Editor` interface as `Editor.*`. But these helpers are fairly low level, and not something that you'd use in your own codebase all over the place, usually only inside specific custom helpers of your own. To make room for custom userland commands, these helpers have been moved to a new `Transforms` namespace.
+
+Previously you'd write:
+
+```js
+Editor.unwrapNodes(editor, ...)
+```
+
+Now you'd write:
+
+```js
+Transforms.unwrapNodes(editor, ...)
+```
+
+**The `Command` interfaces were removed.** As part of those changes, the existing `Command`, `CoreCommand`, `HistoryCommand`, and `ReactCommand` interfaces were all removed. You no longer need to define these "command objects", because you can just call the functions directly. Plugins can still define their own overridable commands by existing the `Editor` interface with new functions. The `slate-react` plugin does this with `insertData` and the `slate-history` plugin does this with `undo` and `redo`.
+
+###### NEW
+
+**User actions helpers now live directly on the `Editor.*` interface.** These are taking the place of the existing `Transforms.*` helpers that were moved. These helpers are equivalent to user actions, and they always operate on the existing selection. There are some defined by core, but you are likely to define your own custom helpers that are specific to your domain as well.
+
+For example, here are some of the built-in actions:
+
+```js
+Editor.insertText(editor, 'a string of text')
+Editor.deleteForward(editor)
+Editor.deleteBackward(editor, { unit: 'word' })
+Editor.addMark(editor, 'bold', true)
+Editor.insertBreak(editor)
+...
+```
+
+Every one of the old "core commands" has an equivalent `Editor.*` helper exposed now. However, you can easily define your own custom helpers and place them in a namespace as well:
+
+```js
+const MyEditor = {
+  ...Editor,
+  insertParagraph(editor) { ... },
+  toggleBoldMark(editor) { ... },
+  formatLink(editor, url) { ... },
+  ...
+}
+```
+
+Whatever makes sense for your specific use case!
+
+---
+
 ### `0.56.0` — December 17, 2019
 
 ###### BREAKING
