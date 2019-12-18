@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { at: [0], voids: true })
+  Transforms.unwrapNodes(editor, { at: [0], voids: true })
 }
 
 export const input = (

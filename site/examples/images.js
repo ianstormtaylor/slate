@@ -76,7 +76,7 @@ const withImages = editor => {
         const { url } = command
         const text = { text: '' }
         const image = { type: 'image', url, children: [text] }
-        Editor.insertNodes(editor, image)
+        Transforms.insertNodes(editor, image)
         break
       }
 

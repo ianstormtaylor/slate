@@ -51,7 +51,7 @@ const withChecklists = editor => {
         const start = Editor.start(editor, path)
 
         if (Point.equals(selection.anchor, start)) {
-          Editor.setNodes(
+          Transforms.setNodes(
             editor,
             { type: 'paragraph' },
             { match: n => n.type === 'check-list-item' }
@@ -106,7 +106,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           checked={checked}
           onChange={event => {
             const path = ReactEditor.findPath(editor, element)
-            Editor.setNodes(
+            Transforms.setNodes(
               editor,
               { checked: event.target.checked },
               { at: path }

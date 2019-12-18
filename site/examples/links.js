@@ -68,7 +68,7 @@ const isLinkActive = editor => {
 }
 
 const unwrapLink = editor => {
-  Editor.unwrapNodes(editor, { match: n => n.type === 'link' })
+  Transforms.unwrapNodes(editor, { match: n => n.type === 'link' })
 }
 
 const wrapLink = (editor, url) => {
@@ -85,10 +85,10 @@ const wrapLink = (editor, url) => {
   }
 
   if (isCollapsed) {
-    Editor.insertNodes(editor, link)
+    Transforms.insertNodes(editor, link)
   } else {
-    Editor.wrapNodes(editor, link, { split: true })
-    Editor.collapse(editor, { edge: 'end' })
+    Transforms.wrapNodes(editor, link, { split: true })
+    Transforms.collapse(editor, { edge: 'end' })
   }
 }
 

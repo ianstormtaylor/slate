@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -15,7 +15,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.mergeNodes(editor, {
+  Transforms.mergeNodes(editor, {
     at: [1],
     withMatch: ([, p]) => p.length === 1,
   })

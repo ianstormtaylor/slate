@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../..'
 
 export const run = editor => {
-  Editor.select(editor, {
+  Transforms.select(editor, {
     path: [0, 0],
     offset: 1,
   })

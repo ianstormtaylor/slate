@@ -70,18 +70,18 @@ const withRichText = editor => {
         const isActive = isBlockActive(editor, format)
         const isList = LIST_TYPES.includes(format)
 
-        Editor.unwrapNodes(editor, {
+        Transforms.unwrapNodes(editor, {
           match: n => LIST_ITEMS.includes(n.type),
           split: true,
         })
 
-        Editor.setNodes(editor, {
+        Transforms.setNodes(editor, {
           type: isActive ? 'paragraph' : isList ? 'list-item' : format,
         })
 
         if (!isActive && isList) {
           const block = { type: format, children: [] }
-          Editor.wrapNodes(editor, block)
+          Transforms.wrapNodes(editor, block)
         }
       }
 

@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.move(editor, { reverse: true, unit: 'word' })
+  Transforms.move(editor, { reverse: true, unit: 'word' })
 }
 
 export const input = (

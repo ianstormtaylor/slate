@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.insertNodes(
+  Transforms.insertNodes(
     editor,
     <inline void>
       <text />

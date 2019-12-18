@@ -15,6 +15,8 @@ export const MERGING = new WeakMap<Editor, boolean | undefined>()
 
 export interface HistoryEditor extends Editor {
   history: History
+  undo: () => void
+  redo: () => void
 }
 
 export const HistoryEditor = {
@@ -30,7 +32,7 @@ export const HistoryEditor = {
    * Get the merge flag's current value.
    */
 
-  isMerging(editor: Editor): boolean | undefined {
+  isMerging(editor: HistoryEditor): boolean | undefined {
     return MERGING.get(editor)
   },
 
@@ -38,8 +40,24 @@ export const HistoryEditor = {
    * Get the saving flag's current value.
    */
 
-  isSaving(editor: Editor): boolean | undefined {
+  isSaving(editor: HistoryEditor): boolean | undefined {
     return SAVING.get(editor)
+  },
+
+  /**
+   * Redo to the previous saved state.
+   */
+
+  redo(editor: HistoryEditor): void {
+    editor.redo()
+  },
+
+  /**
+   * Undo to the previous saved state.
+   */
+
+  undo(editor: HistoryEditor): void {
+    editor.undo()
   },
 
   /**
@@ -47,7 +65,7 @@ export const HistoryEditor = {
    * the new operations into previous save point in the history.
    */
 
-  withoutMerging(editor: Editor, fn: () => void): void {
+  withoutMerging(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
     fn()
@@ -59,7 +77,7 @@ export const HistoryEditor = {
    * their operations into the history.
    */
 
-  withoutSaving(editor: Editor, fn: () => void): void {
+  withoutSaving(editor: HistoryEditor, fn: () => void): void {
     const prev = HistoryEditor.isSaving(editor)
     SAVING.set(editor, false)
     fn()

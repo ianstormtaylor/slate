@@ -45,7 +45,7 @@ const MentionExample = () => {
           case 'Tab':
           case 'Enter':
             event.preventDefault()
-            Editor.select(editor, target)
+            Transforms.select(editor, target)
             editor.exec({ type: 'insert_mention', character: chars[index] })
             setTarget(null)
             break
@@ -157,8 +157,8 @@ const withMentions = editor => {
         children: [{ text: '' }],
       }
 
-      Editor.insertNodes(editor, mention)
-      Editor.move(editor)
+      Transforms.insertNodes(editor, mention)
+      Transforms.move(editor)
     } else {
       exec(command)
     }

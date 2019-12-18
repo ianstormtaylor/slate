@@ -118,7 +118,7 @@ const withHtml = editor => {
       if (html) {
         const parsed = new DOMParser().parseFromString(html, 'text/html')
         const fragment = deserialize(parsed.body)
-        Editor.insertFragment(editor, fragment)
+        Transforms.insertFragment(editor, fragment)
         return
       }
     }

@@ -3,7 +3,7 @@
 import { jsx } from '../..'
 
 export const run = editor => {
-  editor.exec({ type: 'insert_text', text: 'text' })
+  editor.insertText('text')
 }
 
 export const input = (

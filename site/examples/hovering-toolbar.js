@@ -46,7 +46,7 @@ const withFormatting = editor => {
       case 'toggle_format': {
         const { format } = command
         const isActive = isFormatActive(editor, format)
-        Editor.setNodes(
+        Transforms.setNodes(
           editor,
           { [format]: isActive ? null : true },
           { match: Text.isText, split: true }
