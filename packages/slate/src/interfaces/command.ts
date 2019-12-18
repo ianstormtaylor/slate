@@ -42,7 +42,7 @@ export interface DeleteBackwardCommand {
 }
 
 /**
- * The `DeleteBackwardCommand` delete's content forward, meaning after the
+ * The `DeleteForwardCommand` delete's content forward, meaning after the
  * current selection, by a specific `unit` of distance.
  */
 
