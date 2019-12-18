@@ -95,6 +95,30 @@ export const createEditor = (): Editor => {
         const { selection } = editor
 
         switch (command.type) {
+          case 'add_mark': {
+            if (selection) {
+              const { key, value } = command
+
+              if (Range.isExpanded(selection)) {
+                Editor.setNodes(
+                  editor,
+                  { [key]: value },
+                  { match: Text.isText, split: true }
+                )
+              } else {
+                const marks = {
+                  ...(Editor.marks(editor) || {}),
+                  [key]: value,
+                }
+
+                editor.marks = marks
+                editor.onChange()
+              }
+            }
+
+            break
+          }
+
           case 'delete_backward': {
             if (selection && Range.isCollapsed(selection)) {
               Editor.delete(editor, { unit: command.unit, reverse: true })
@@ -114,55 +138,6 @@ export const createEditor = (): Editor => {
           case 'delete_fragment': {
             if (selection && Range.isExpanded(selection)) {
               Editor.delete(editor)
-            }
-
-            break
-          }
-
-          case 'format_text': {
-            if (selection) {
-              const { properties } = command
-
-              if (Range.isExpanded(selection)) {
-                const [match] = Editor.nodes(editor, {
-                  match: n => Text.isText(n) && Text.matches(n, properties),
-                  universal: true,
-                })
-
-                if (match) {
-                  const keys = Object.keys(properties)
-                  Editor.unsetNodes(editor, keys, {
-                    match: Text.isText,
-                    split: true,
-                  })
-                } else {
-                  Editor.setNodes(editor, properties, {
-                    match: Text.isText,
-                    split: true,
-                  })
-                }
-              } else {
-                const marks = { ...(Editor.marks(editor) || {}) }
-                let match = true
-
-                for (const key in properties) {
-                  if (marks[key] !== properties[key]) {
-                    match = false
-                    break
-                  }
-                }
-
-                if (match) {
-                  for (const key in properties) {
-                    delete marks[key]
-                  }
-                } else {
-                  Object.assign(marks, properties)
-                }
-
-                editor.marks = marks
-                editor.onChange()
-              }
             }
 
             break
@@ -215,6 +190,26 @@ export const createEditor = (): Editor => {
 
               editor.marks = null
             }
+            break
+          }
+
+          case 'remove_mark': {
+            if (selection) {
+              const { key } = command
+
+              if (Range.isExpanded(selection)) {
+                Editor.unsetNodes(editor, key, {
+                  match: Text.isText,
+                  split: true,
+                })
+              } else {
+                const marks = { ...(Editor.marks(editor) || {}) }
+                delete marks[key]
+                editor.marks = marks
+                editor.onChange()
+              }
+            }
+
             break
           }
         }
