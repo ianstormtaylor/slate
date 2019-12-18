@@ -441,16 +441,19 @@ export const Editable = (props: EditableProps) => {
           // Allow for passed-in styles to override anything.
           ...style,
         }}
-        onBeforeInput={useCallback((event: React.SyntheticEvent) => {
-          // COMPAT: Firefox doesn't support the `beforeinput` event, so we
-          // fall back to React's leaky polyfill instead just for it. It
-          // only works for the `insertText` input type.
-          if (IS_FIREFOX && !readOnly) {
-            event.preventDefault()
-            const text = (event as any).data as string
-            Editor.insertText(editor, text)
-          }
-        }, [])}
+        onBeforeInput={useCallback(
+          (event: React.SyntheticEvent) => {
+            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+            // fall back to React's leaky polyfill instead just for it. It
+            // only works for the `insertText` input type.
+            if (IS_FIREFOX && !readOnly) {
+              event.preventDefault()
+              const text = (event as any).data as string
+              Editor.insertText(editor, text)
+            }
+          },
+          [readOnly]
+        )}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
@@ -506,7 +509,7 @@ export const Editable = (props: EditableProps) => {
 
             IS_FOCUSED.delete(editor)
           },
-          [attributes.onBlur]
+          [readOnly, attributes.onBlur]
         )}
         onClick={useCallback(
           (event: React.MouseEvent<HTMLDivElement>) => {
@@ -526,7 +529,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onClick]
+          [readOnly, attributes.onClick]
         )}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -586,7 +589,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onCut]
+          [readOnly, attributes.onCut]
         )}
         onDragOver={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
@@ -651,7 +654,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onDrop]
+          [readOnly, attributes.onDrop]
         )}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
@@ -675,7 +678,7 @@ export const Editable = (props: EditableProps) => {
               IS_FOCUSED.set(editor, true)
             }
           },
-          [attributes.onFocus]
+          [readOnly, attributes.onFocus]
         )}
         onKeyDown={useCallback(
           (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -879,7 +882,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onKeyDown]
+          [readOnly, attributes.onKeyDown]
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -895,7 +898,7 @@ export const Editable = (props: EditableProps) => {
               ReactEditor.insertData(editor, event.clipboardData)
             }
           },
-          [attributes.onPaste]
+          [readOnly, attributes.onPaste]
         )}
       >
         <Children
