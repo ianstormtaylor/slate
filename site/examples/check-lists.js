@@ -7,7 +7,7 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Editor, Range, Point, createEditor } from 'slate'
+import { Editor, Transforms, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -32,16 +32,12 @@ const CheckListsExample = () => {
 }
 
 const withChecklists = editor => {
-  const { exec } = editor
+  const { deleteBackward } = editor
 
-  editor.exec = command => {
+  editor.deleteBackward = (...args) => {
     const { selection } = editor
 
-    if (
-      command.type === 'delete_backward' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
         match: n => n.type === 'check-list-item',
       })
@@ -61,7 +57,7 @@ const withChecklists = editor => {
       }
     }
 
-    exec(command)
+    deleteBackward(...args)
   }
 
   return editor

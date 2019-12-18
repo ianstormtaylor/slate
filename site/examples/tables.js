@@ -19,35 +19,54 @@ const TablesExample = () => {
 }
 
 const withTables = editor => {
-  const { exec } = editor
+  const { deleteBackward, deleteForward, insertBreak } = editor
 
-  editor.exec = command => {
+  editor.deleteBackward = unit => {
     const { selection } = editor
-    const { type } = command
 
-    if (
-      (type === 'delete_forward' || type === 'delete_backward') &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    if (selection && Range.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
         match: n => n.type === 'table-cell',
       })
 
       if (cell) {
         const [, cellPath] = cell
-        const edge =
-          type === 'delete_backward'
-            ? Editor.start(editor, cellPath)
-            : Editor.end(editor, cellPath)
+        const start = Editor.start(editor, cellPath)
 
-        if (Point.equals(selection.anchor, edge)) {
+        if (Point.equals(selection.anchor, start)) {
           return
         }
       }
     }
 
-    if (type === 'insert_break' && selection) {
+    deleteBackward(unit)
+  }
+
+  editor.deleteForward = unit => {
+    const { selection } = editor
+
+    if (selection && Range.isCollapsed(selection)) {
+      const [cell] = Editor.nodes(editor, {
+        match: n => n.type === 'table-cell',
+      })
+
+      if (cell) {
+        const [, cellPath] = cell
+        const end = Editor.end(editor, cellPath)
+
+        if (Point.equals(selection.anchor, end)) {
+          return
+        }
+      }
+    }
+
+    deleteForward(unit)
+  }
+
+  editor.insertBreak = () => {
+    const { selection } = editor
+
+    if (selection) {
       const [table] = Editor.nodes(editor, { match: n => n.type === 'table' })
 
       if (table) {
@@ -55,7 +74,7 @@ const withTables = editor => {
       }
     }
 
-    exec(command)
+    insertBreak()
   }
 
   return editor

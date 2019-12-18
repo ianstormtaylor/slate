@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Editor, Range, Point, createEditor } from 'slate'
+import { Editor, Transforms, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -36,17 +36,12 @@ const MarkdownShortcutsExample = () => {
 }
 
 const withShortcuts = editor => {
-  const { exec } = editor
+  const { deleteBackward, insertText } = editor
 
-  editor.exec = command => {
+  editor.insertText = text => {
     const { selection } = editor
 
-    if (
-      command.type === 'insert_text' &&
-      command.text === ' ' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
@@ -77,11 +72,13 @@ const withShortcuts = editor => {
       }
     }
 
-    if (
-      command.type === 'delete_backward' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    insertText(text)
+  }
+
+  editor.deleteBackward = (...args) => {
+    const { selection } = editor
+
+    if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
       })
@@ -105,9 +102,9 @@ const withShortcuts = editor => {
           return
         }
       }
-    }
 
-    exec(command)
+      deleteBackward(...args)
+    }
   }
 
   return editor

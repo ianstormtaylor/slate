@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Editor, Range, createEditor } from 'slate'
+import { Transforms, Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -27,39 +27,37 @@ const LinkExample = () => {
 }
 
 const withLinks = editor => {
-  const { exec, isInline } = editor
+  const { insertData, insertText, isInline } = editor
 
   editor.isInline = element => {
     return element.type === 'link' ? true : isInline(element)
   }
 
-  editor.exec = command => {
-    if (command.type === 'insert_link') {
-      const { url } = command
-
-      if (editor.selection) {
-        wrapLink(editor, url)
-      }
-
-      return
+  editor.insertText = text => {
+    if (text && isUrl(text)) {
+      wrapLink(editor, text)
+    } else {
+      insertText(text)
     }
+  }
 
-    let text
-
-    if (command.type === 'insert_data') {
-      text = command.data.getData('text/plain')
-    } else if (command.type === 'insert_text') {
-      text = command.text
-    }
+  editor.insertData = data => {
+    const text = data.getData('text/plain')
 
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
-      exec(command)
+      insertData(data)
     }
   }
 
   return editor
+}
+
+const insertLink = (editor, url) => {
+  if (editor.selection) {
+    wrapLink(editor, url)
+  }
 }
 
 const isLinkActive = editor => {
@@ -114,7 +112,7 @@ const LinkButton = () => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
-        editor.exec({ type: 'insert_link', url })
+        insertLink(editor, url)
       }}
     >
       <Icon>link</Icon>
