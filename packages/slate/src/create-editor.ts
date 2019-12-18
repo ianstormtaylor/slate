@@ -280,10 +280,7 @@ export const createEditor = (): Editor => {
           Transforms.setNodes(
             editor,
             { [key]: null },
-            {
-              match: Text.isText,
-              split: true,
-            }
+            { match: Text.isText, split: true, }
           )
         } else {
           const marks = { ...(Editor.marks(editor) || {}) }
