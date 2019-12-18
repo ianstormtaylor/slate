@@ -13,7 +13,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.text(editor, [0])
+  return Editor.string(editor, [0])
 }
 
 export const output = ``

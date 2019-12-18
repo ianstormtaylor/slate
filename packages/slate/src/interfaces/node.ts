@@ -464,11 +464,11 @@ export const Node = {
    * computations for a node.
    */
 
-  text(node: Node): string {
+  string(node: Node): string {
     if (Text.isText(node)) {
       return node.text
     } else {
-      return node.children.map(Node.text).join('')
+      return node.children.map(Node.string).join('')
     }
   },
 
