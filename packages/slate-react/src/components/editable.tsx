@@ -393,7 +393,7 @@ export const Editable = (props: EditableProps) => {
     placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
-    Node.text(editor) === ''
+    Node.string(editor) === ''
   ) {
     const start = Editor.start(editor, [])
     decorations.push({

@@ -116,8 +116,8 @@ import { Node } from 'slate'
 const serialize = value => {
   return (
     value
-      // Return the text content of each paragraph in the value's children.
-      .map(n => Node.text(n))
+      // Return the string content of each paragraph in the value's children.
+      .map(n => Node.string(n))
       // Join them all with line breaks denoting paragraphs.
       .join('\n')
   )

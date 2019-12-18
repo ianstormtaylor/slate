@@ -620,7 +620,7 @@ export const LocationQueries = {
             ? start
             : Editor.start(editor, path)
 
-          const text = Editor.text(editor, { anchor: s, focus: e })
+          const text = Editor.string(editor, { anchor: s, focus: e })
           string = reverse ? reverseText(text) : text
           isNewBlock = true
         }
@@ -733,13 +733,13 @@ export const LocationQueries = {
   },
 
   /**
-   * Get the text content of a location.
+   * Get the text string content of a location.
    *
    * Note: the text of void nodes is presumed to be an empty string, regardless
    * of what their actual content is.
    */
 
-  text(editor: Editor, at: Location): string {
+  string(editor: Editor, at: Location): string {
     const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     let text = ''

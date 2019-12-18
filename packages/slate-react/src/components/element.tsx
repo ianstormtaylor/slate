@@ -74,7 +74,7 @@ const Element = (props: {
   // If it's a block node with inline children, add the proper `dir` attribute
   // for text direction.
   if (!isInline && Editor.hasInlines(editor, element)) {
-    const text = Node.text(element)
+    const text = Node.string(element)
     const dir = getDirection(text)
 
     if (dir === 'rtl') {

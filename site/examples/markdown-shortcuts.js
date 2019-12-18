@@ -54,7 +54,7 @@ const withShortcuts = editor => {
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
-      const beforeText = Editor.text(editor, range)
+      const beforeText = Editor.string(editor, range)
       const type = SHORTCUTS[beforeText]
 
       if (type) {

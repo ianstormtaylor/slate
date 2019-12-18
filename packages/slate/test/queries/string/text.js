@@ -6,13 +6,14 @@ import { jsx } from '../..'
 export const input = (
   <editor>
     <block>
-      one<inline>two</inline>three
+      <text>one</text>
+      <text>two</text>
     </block>
   </editor>
 )
 
 export const run = editor => {
-  return Editor.text(editor, [0, 1])
+  return Editor.string(editor, [0, 0])
 }
 
-export const output = `two`
+export const output = `one`

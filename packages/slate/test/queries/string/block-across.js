@@ -17,7 +17,7 @@ export const input = (
 )
 
 export const run = editor => {
-  return Editor.text(editor, [0])
+  return Editor.string(editor, [])
 }
 
-export const output = `onetwo`
+export const output = `onetwothreefour`

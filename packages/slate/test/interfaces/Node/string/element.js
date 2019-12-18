@@ -11,7 +11,7 @@ export const input = (
 )
 
 export const test = value => {
-  return Node.text(value, [1])
+  return Node.string(value, [1])
 }
 
 export const output = `onetwo`
