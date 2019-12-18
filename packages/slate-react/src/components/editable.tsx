@@ -442,7 +442,7 @@ export const Editable = (props: EditableProps) => {
             const text = (event as any).data as string
             editor.exec({ type: 'insert_text', text })
           }
-        }, [])}
+        }, [readOnly])}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
