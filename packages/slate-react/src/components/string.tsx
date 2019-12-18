@@ -1,5 +1,6 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 import { ReactEditor, useEditor } from '..'
 
@@ -58,11 +59,19 @@ const String = (props: {
 
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
-  const editor: any = useEditor()
 
   const ref: React.RefObject<HTMLSpanElement> = useRef() as any
 
-  useEffect(() => {
+  // COMPAT: when use ime to input something at the end of a `decroation`
+  // the compositionEnd event in not default preventable
+  // so the text will put into the real dom first
+  // which at the end of the `decroation` node
+  // but when slate state update, after decroate
+  // we will find the `decroation` node not need to update
+  // this cause the difference of *vdom <-> realdom*
+  // so we need to reset it if needed
+  // https://github.com/ianstormtaylor/slate/pull/3205
+  useIsomorphicLayoutEffect(() => {
     if (ref.current && ref.current.innerText !== text) {
       ref.current.innerText = text
     }

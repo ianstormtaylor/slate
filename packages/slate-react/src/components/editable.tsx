@@ -153,56 +153,50 @@ export const Editable = (props: EditableProps) => {
 
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
+    const { selection } = editor
+    const domSelection = window.getSelection()
+
+    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
+      return
+    }
+
+    const hasDomSelection = domSelection.type !== 'None'
+
+    // If the DOM selection is properly unset, we're done.
+    if (!selection && !hasDomSelection) {
+      return
+    }
+
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+
+    // If the DOM selection is already correct, we're done.
+    if (
+      hasDomSelection &&
+      newDomRange &&
+      isRangeEqual(domSelection.getRangeAt(0), newDomRange)
+    ) {
+      return
+    }
+
+    // Otherwise the DOM selection is out of sync, so update it.
+    const el = ReactEditor.toDOMNode(editor, editor)
+    state.isUpdatingSelection = true
+    domSelection.removeAllRanges()
+
+    if (newDomRange) {
+      domSelection.addRange(newDomRange!)
+      const leafEl = newDomRange.startContainer.parentElement!
+      scrollIntoView(leafEl, { scrollMode: 'if-needed' })
+    }
+
     setTimeout(() => {
-      const { selection } = editor
-      const domSelection = window.getSelection()
-
-      if (
-        state.isComposing ||
-        !domSelection ||
-        !ReactEditor.isFocused(editor)
-      ) {
-        return
+      // COMPAT: In Firefox, it's not enough to create a range, you also need
+      // to focus the contenteditable element too. (2016/11/16)
+      if (newDomRange && IS_FIREFOX) {
+        el.focus()
       }
 
-      const hasDomSelection = domSelection.type !== 'None'
-
-      // If the DOM selection is properly unset, we're done.
-      if (!selection && !hasDomSelection) {
-        return
-      }
-
-      const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-
-      // If the DOM selection is already correct, we're done.
-      if (
-        hasDomSelection &&
-        newDomRange &&
-        isRangeEqual(domSelection.getRangeAt(0), newDomRange)
-      ) {
-        return
-      }
-
-      // Otherwise the DOM selection is out of sync, so update it.
-      const el = ReactEditor.toDOMNode(editor, editor)
-      state.isUpdatingSelection = true
-      domSelection.removeAllRanges()
-
-      if (newDomRange) {
-        domSelection.addRange(newDomRange!)
-        const leafEl = newDomRange.startContainer.parentElement!
-        scrollIntoView(leafEl, { scrollMode: 'if-needed' })
-      }
-
-      setTimeout(() => {
-        // COMPAT: In Firefox, it's not enough to create a range, you also need
-        // to focus the contenteditable element too. (2016/11/16)
-        if (newDomRange && IS_FIREFOX) {
-          el.focus()
-        }
-
-        state.isUpdatingSelection = false
-      })
+      state.isUpdatingSelection = false
     })
   })
 
