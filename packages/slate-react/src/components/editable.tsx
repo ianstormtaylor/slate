@@ -433,16 +433,19 @@ export const Editable = (props: EditableProps) => {
           // Allow for passed-in styles to override anything.
           ...style,
         }}
-        onBeforeInput={useCallback((event: React.SyntheticEvent) => {
-          // COMPAT: Firefox doesn't support the `beforeinput` event, so we
-          // fall back to React's leaky polyfill instead just for it. It
-          // only works for the `insertText` input type.
-          if (IS_FIREFOX && !readOnly) {
-            event.preventDefault()
-            const text = (event as any).data as string
-            editor.exec({ type: 'insert_text', text })
-          }
-        }, [readOnly])}
+        onBeforeInput={useCallback(
+          (event: React.SyntheticEvent) => {
+            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+            // fall back to React's leaky polyfill instead just for it. It
+            // only works for the `insertText` input type.
+            if (IS_FIREFOX && !readOnly) {
+              event.preventDefault()
+              const text = (event as any).data as string
+              editor.exec({ type: 'insert_text', text })
+            }
+          },
+          [readOnly]
+        )}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
