@@ -277,10 +277,14 @@ export const createEditor = (): Editor => {
 
       if (selection) {
         if (Range.isExpanded(selection)) {
-          Transforms.unsetNodes(editor, key, {
-            match: Text.isText,
-            split: true,
-          })
+          Transforms.setNodes(
+            editor,
+            { [key]: null },
+            {
+              match: Text.isText,
+              split: true,
+            }
+          )
         } else {
           const marks = { ...(Editor.marks(editor) || {}) }
           delete marks[key]
