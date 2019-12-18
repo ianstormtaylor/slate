@@ -86,21 +86,42 @@ function configure(pkg, env, target) {
     builtins(),
 
     // Use Babel to transpile the result, limiting it to the source code.
-    isUmd &&
-      babel({
-        runtimeHelpers: true,
-        include: [`packages/${pkg.name}/src/**`],
-        extensions: ['.js', '.ts'],
-        configFile: './config/babel/babel.umd.config.cjs',
-      }),
-
-    isModule &&
-      babel({
-        runtimeHelpers: true,
-        include: [`packages/${pkg.name}/src/**`],
-        extensions: ['.js', '.ts'],
-        configFile: './config/babel/babel.module.config.cjs',
-      }),
+    babel({
+      runtimeHelpers: true,
+      include: [`packages/${pkg.name}/src/**`],
+      extensions: ['.js', '.ts'],
+      presets: [
+        '@babel/preset-typescript',
+        [
+          '@babel/preset-env',
+          isUmd
+            ? { modules: false }
+            : {
+                exclude: [
+                  '@babel/plugin-transform-regenerator',
+                  '@babel/transform-async-to-generator',
+                ],
+                modules: false,
+                targets: {
+                  esmodules: true,
+                },
+              },
+        ],
+        '@babel/preset-react',
+      ],
+      plugins: [
+        [
+          '@babel/plugin-transform-runtime',
+          isUmd
+            ? {}
+            : {
+                regenerator: false,
+                useESModules: true,
+              },
+        ],
+        '@babel/plugin-proposal-class-properties',
+      ],
+    }),
 
     // Register Node.js globals for browserify compatibility.
     globals(),
