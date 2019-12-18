@@ -1,5 +1,6 @@
 import {
   Command,
+  CoreCommand,
   Descendant,
   Editor,
   Element,
@@ -26,6 +27,7 @@ export const createEditor = (): Editor => {
     children: [],
     operations: [],
     selection: null,
+    marks: null,
     isInline: () => false,
     isVoid: () => false,
     onChange: () => {},
@@ -73,6 +75,11 @@ export const createEditor = (): Editor => {
       editor.operations.push(op)
       Editor.normalize(editor)
 
+      // Clear any formats applied to the cursor if the selection changes.
+      if (op.type === 'set_selection') {
+        editor.marks = null
+      }
+
       if (!FLUSHING.get(editor)) {
         FLUSHING.set(editor, true)
 
@@ -84,9 +91,9 @@ export const createEditor = (): Editor => {
       }
     },
     exec: (command: Command) => {
-      const { selection } = editor
+      if (CoreCommand.isCoreCommand(command)) {
+        const { selection } = editor
 
-      if (Command.isCoreCommand(command)) {
         switch (command.type) {
           case 'delete_backward': {
             if (selection && Range.isCollapsed(selection)) {
@@ -112,6 +119,55 @@ export const createEditor = (): Editor => {
             break
           }
 
+          case 'format_text': {
+            if (selection) {
+              const { properties } = command
+
+              if (Range.isExpanded(selection)) {
+                const [match] = Editor.nodes(editor, {
+                  match: n => Text.isText(n) && Text.matches(n, properties),
+                  universal: true,
+                })
+
+                if (match) {
+                  const keys = Object.keys(properties)
+                  Editor.unsetNodes(editor, keys, {
+                    match: Text.isText,
+                    split: true,
+                  })
+                } else {
+                  Editor.setNodes(editor, properties, {
+                    match: Text.isText,
+                    split: true,
+                  })
+                }
+              } else {
+                const marks = { ...(Editor.marks(editor) || {}) }
+                let match = true
+
+                for (const key in properties) {
+                  if (marks[key] !== properties[key]) {
+                    match = false
+                    break
+                  }
+                }
+
+                if (match) {
+                  for (const key in properties) {
+                    delete marks[key]
+                  }
+                } else {
+                  Object.assign(marks, properties)
+                }
+
+                editor.marks = marks
+                editor.onChange()
+              }
+            }
+
+            break
+          }
+
           case 'insert_break': {
             Editor.splitNodes(editor, { always: true })
             break
@@ -123,30 +179,41 @@ export const createEditor = (): Editor => {
           }
 
           case 'insert_node': {
-            Editor.insertNodes(editor, [command.node])
+            Editor.insertNodes(editor, command.node)
             break
           }
 
           case 'insert_text': {
             if (selection) {
-              const { anchor } = selection
-
-              // If the cursor is at the end of an inline, move it outside
-              // of the inline before inserting
+              // If the cursor is at the end of an inline, move it outside of
+              // the inline before inserting
               if (Range.isCollapsed(selection)) {
-                const inline = Editor.match(editor, anchor, 'inline')
+                const inline = Editor.above(editor, {
+                  match: n => Editor.isInline(editor, n),
+                  mode: 'highest',
+                })
 
                 if (inline) {
                   const [, inlinePath] = inline
 
-                  if (Editor.isEnd(editor, anchor, inlinePath)) {
+                  if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
                     const point = Editor.after(editor, inlinePath)!
                     Editor.setSelection(editor, { anchor: point, focus: point })
                   }
                 }
               }
 
-              Editor.insertText(editor, command.text)
+              const { marks } = editor
+              const { text } = command
+
+              if (marks) {
+                const node = { text, ...marks }
+                Editor.insertNodes(editor, node)
+              } else {
+                Editor.insertText(editor, text)
+              }
+
+              editor.marks = null
             }
             break
           }

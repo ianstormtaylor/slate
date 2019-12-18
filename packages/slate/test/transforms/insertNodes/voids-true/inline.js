@@ -28,8 +28,9 @@ export const output = (
     <block>
       one
       <inline void>
-        twofour
+        two
         <cursor />
+        four
       </inline>
       three
     </block>

@@ -6,9 +6,7 @@ export const ElementQueries = {
    */
 
   hasBlocks(editor: Editor, element: Element): boolean {
-    return element.children.some(
-      n => Element.isElement(n) && !editor.isInline(n)
-    )
+    return element.children.some(n => Editor.isBlock(editor, n))
   },
 
   /**
@@ -17,7 +15,7 @@ export const ElementQueries = {
 
   hasInlines(editor: Editor, element: Element): boolean {
     return element.children.some(
-      n => Text.isText(n) || (Element.isElement(n) && editor.isInline(n))
+      n => Text.isText(n) || Editor.isInline(editor, n)
     )
   },
 

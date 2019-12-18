@@ -518,7 +518,7 @@ export const Editable = (props: EditableProps) => {
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
 
-              if (Editor.match(editor, start, 'void')) {
+              if (Editor.void(editor, { at: start })) {
                 const range = Editor.range(editor, start)
                 Editor.select(editor, range)
               }
@@ -597,7 +597,7 @@ export const Editable = (props: EditableProps) => {
               // default, and calling `preventDefault` hides the cursor.
               const node = ReactEditor.toSlateNode(editor, event.target)
 
-              if (Element.isElement(node) && editor.isVoid(node)) {
+              if (Editor.isVoid(editor, node)) {
                 event.preventDefault()
               }
             }
@@ -612,7 +612,7 @@ export const Editable = (props: EditableProps) => {
             ) {
               const node = ReactEditor.toSlateNode(editor, event.target)
               const path = ReactEditor.findPath(editor, node)
-              const voidMatch = Editor.match(editor, path, 'void')
+              const voidMatch = Editor.void(editor, { at: path })
 
               // If starting a drag on a void node, make sure it is selected
               // so that it shows up in the selection's fragment.
@@ -995,8 +995,8 @@ const setFragmentData = (dataTransfer: DataTransfer, editor: Editor): void => {
   }
 
   const [start, end] = Range.edges(selection)
-  const startVoid = Editor.match(editor, start.path, 'void')
-  const endVoid = Editor.match(editor, end.path, 'void')
+  const startVoid = Editor.void(editor, { at: start.path })
+  const endVoid = Editor.void(editor, { at: end.path })
 
   if (Range.isCollapsed(selection) && !startVoid) {
     return

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, Text, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -9,22 +9,13 @@ import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withFormatting(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}
@@ -58,7 +49,7 @@ const withFormatting = editor => {
         Editor.setNodes(
           editor,
           { [format]: isActive ? null : true },
-          { match: 'text', split: true }
+          { match: Text.isText, split: true }
         )
         break
       }
@@ -75,7 +66,7 @@ const withFormatting = editor => {
 
 const isFormatActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
-    match: { [format]: true },
+    match: n => n[format] === true,
     mode: 'all',
   })
   return !!match

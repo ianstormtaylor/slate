@@ -10,7 +10,6 @@ import { css } from 'emotion'
 
 const MarkdownPreviewExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(([node, path]) => {
@@ -52,15 +51,7 @@ const MarkdownPreviewExample = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         decorate={decorate}
         renderLeaf={renderLeaf}

@@ -13,7 +13,6 @@ We'll start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -35,15 +34,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -55,11 +46,13 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+              const [match] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
               Editor.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -69,7 +62,7 @@ const App = () => {
               Editor.setNodes(
                 editor,
                 { bold: true },
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -94,7 +87,6 @@ const withCustom = editor => {
 const App = () => {
   // Wrap the editor with our new `withCustom` plugin.
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -116,15 +108,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -136,12 +120,14 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [node] = Editor.nodes(editor, { match: { type: 'code' } })
-              const isCodeActive = !!node
+              const [match] = Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
+              const isCodeActive = !!match
               Editor.setNodes(
                 editor,
                 { type: isCodeActive ? null : 'code' },
-                { match: 'block' }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -151,7 +137,7 @@ const App = () => {
               Editor.setNodes(
                 editor,
                 { bold: true },
-                { match: 'text', split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -178,7 +164,7 @@ const withCustom = editor => {
       Editor.setNodes(
         editor,
         { bold: isActive ? null : true },
-        { match: 'text', split: true }
+        { match: n => Text.isText(n), split: true }
       )
     }
 
@@ -188,7 +174,7 @@ const withCustom = editor => {
       Editor.setNodes(
         editor,
         { type: isActive ? null : 'code' },
-        { match: 'block' }
+        { match: n => Editor.isBlock(editor, n) }
       )
     }
 
@@ -205,8 +191,8 @@ const withCustom = editor => {
 const CustomEditor = {
   isBoldMarkActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: { bold: true },
-      mode: 'universal',
+      match: n => n.bold === true,
+      universal: true,
     })
 
     return !!match
@@ -214,8 +200,7 @@ const CustomEditor = {
 
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: { type: 'code' },
-      mode: 'highest',
+      match: n => n.type === 'code',
     })
 
     return !!match
@@ -224,7 +209,6 @@ const CustomEditor = {
 
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -246,15 +230,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -289,7 +265,6 @@ Now our commands are clearly defined and you can invoke them from anywhere we ha
 ```js
 const App = () => {
   const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -312,15 +287,7 @@ const App = () => {
 
   return (
     // Add a toolbar with buttons that call the same methods.
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <div>
         <button
           onMouseDown={event => {

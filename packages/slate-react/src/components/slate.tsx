@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useMemo, useState, useCallback } from 'react'
 import { Editor, Node, Range } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
@@ -15,19 +15,24 @@ import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 export const Slate = (props: {
   editor: Editor
   value: Node[]
-  selection: Range | null
   children: React.ReactNode
-  onChange: (children: Node[], selection: Range | null) => void
+  onChange: (value: Node[]) => void
   [key: string]: any
 }) => {
-  const { editor, children, onChange, value, selection, ...rest } = props
+  const { editor, children, onChange, value, ...rest } = props
+  const [key, setKey] = useState(0)
   const context: [Editor] = useMemo(() => {
     editor.children = value
-    editor.selection = selection
+    Object.assign(editor, rest)
     return [editor]
-  }, [value, selection, ...Object.values(rest)])
+  }, [key, value, ...Object.values(rest)])
 
-  EDITOR_TO_ON_CHANGE.set(editor, onChange)
+  const onContextChange = useCallback(() => {
+    onChange(editor.children)
+    setKey(key + 1)
+  }, [key, onChange])
+
+  EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
 
   return (
     <SlateContext.Provider value={context}>

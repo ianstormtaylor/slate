@@ -1,26 +1,60 @@
-import warning from 'tiny-warning'
 import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
-  AncestorEntry,
   Descendant,
   Editor,
   Element,
-  ElementEntry,
   Location,
   Node,
   NodeEntry,
-  NodeMatch,
   Path,
   Point,
   Range,
   Span,
   Text,
-  TextEntry,
 } from '../../..'
 
 export const LocationQueries = {
+  /**
+   * Get the ancestor above a location in the document.
+   */
+
+  above<T extends Ancestor>(
+    editor: Editor,
+    options: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
+  ): NodeEntry<T> | undefined {
+    const {
+      voids = false,
+      mode = 'lowest',
+      at = editor.selection,
+      match,
+    } = options
+
+    if (!at) {
+      return
+    }
+
+    const path = Editor.path(editor, at)
+    const reverse = mode === 'lowest'
+
+    for (const [n, p] of Editor.levels(editor, {
+      at: path,
+      voids,
+      match,
+      reverse,
+    })) {
+      if (!Text.isText(n) && !Path.equals(path, p)) {
+        return [n, p]
+      }
+    }
+  },
+
   /**
    * Get the point after a location.
    */
@@ -102,27 +136,6 @@ export const LocationQueries = {
   },
 
   /**
-   * Iterate through all of the elements in the Editor.
-   */
-
-  *elements(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
-      reverse?: boolean
-      voids?: boolean
-    } = {}
-  ): Iterable<ElementEntry> {
-    for (const [node, path] of Editor.nodes(editor, options)) {
-      if (Element.isElement(node)) {
-        yield [node, path]
-      }
-    }
-  },
-
-  /**
    * Get the end point of a location.
    */
 
@@ -200,7 +213,7 @@ export const LocationQueries = {
       depth?: number
       edge?: 'start' | 'end'
     } = {}
-  ): TextEntry {
+  ): NodeEntry<Text> {
     const path = Editor.path(editor, at, options)
     const node = Node.leaf(editor, path)
     return [node, path]
@@ -210,27 +223,37 @@ export const LocationQueries = {
    * Iterate through all of the levels at a location.
    */
 
-  *levels(
+  *levels<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
+      match?: NodeMatch<T>
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Iterable<NodeEntry<T>> {
     const { at = editor.selection, reverse = false, voids = false } = options
+    let { match } = options
+
+    if (match == null) {
+      match = () => true
+    }
 
     if (!at) {
       return
     }
 
-    const levels: NodeEntry[] = []
+    const levels: NodeEntry<T>[] = []
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
+      if (!match(n)) {
+        continue
+      }
+
       levels.push([n, p])
 
-      if (!voids && Element.isElement(n) && editor.isVoid(n)) {
+      if (!voids && Editor.isVoid(editor, n)) {
         break
       }
     }
@@ -243,88 +266,25 @@ export const LocationQueries = {
   },
 
   /**
-   * Get the first matching node in a single branch of the document.
+   * Get the matching node in the branch of the document after a location.
    */
 
-  match(
-    editor: Editor,
-    at: Location,
-    match: NodeMatch,
-    options: {
-      voids?: boolean
-    } = {}
-  ): NodeEntry | undefined {
-    const { voids = false } = options
-    const path = Editor.path(editor, at)
-
-    for (const entry of Editor.levels(editor, { at: path, voids })) {
-      if (Editor.isMatch(editor, entry[0], match)) {
-        return entry
-      }
-    }
-  },
-
-  /**
-   * Iterate through all of the nodes that match.
-   */
-
-  *matches(
+  next<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      reverse?: boolean
-    }
-  ): Iterable<NodeEntry> {
-    warning(
-      false,
-      'The `Editor.matches` helper is deprecated, use `Editor.nodes` instead.'
-    )
-
-    const { at = editor.selection, reverse = false } = options
-    let { match } = options
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
+  ): NodeEntry<T> | undefined {
+    const { mode = 'lowest', voids = false } = options
+    let { match, at = editor.selection } = options
 
     if (!at) {
       return
     }
 
-    if (match == null) {
-      if (Path.isPath(at)) {
-        const [node] = Editor.node(editor, at)
-        match = n => n === node
-      } else {
-        match = () => true
-      }
-    }
-
-    let prevPath: Path | undefined
-
-    for (const [n, p] of Editor.nodes(editor, { at, reverse })) {
-      if (prevPath && Path.compare(p, prevPath) === 0) {
-        continue
-      }
-
-      if (Editor.isMatch(editor, n, match)) {
-        prevPath = p
-        yield [n, p]
-      }
-    }
-  },
-
-  /**
-   * Get the matching node in the branch of the document after a location.
-   */
-
-  next(
-    editor: Editor,
-    at: Location,
-    match?: NodeMatch,
-    options: {
-      mode?: 'all' | 'highest'
-      voids?: boolean
-    } = {}
-  ): NodeEntry | undefined {
-    const { mode = 'highest', voids = false } = options
     const [, from] = Editor.last(editor, at)
     const [, to] = Editor.last(editor, [])
     const span: Span = [from, to]
@@ -367,23 +327,29 @@ export const LocationQueries = {
    * Iterate through all of the nodes in the Editor.
    */
 
-  *nodes(
+  *nodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location | Span
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Iterable<NodeEntry<T>> {
     const {
       at = editor.selection,
-      match,
       mode = 'all',
+      universal = false,
       reverse = false,
       voids = false,
     } = options
+    let { match } = options
+
+    if (!match) {
+      match = () => true
+    }
 
     if (!at) {
       return
@@ -406,29 +372,65 @@ export const LocationQueries = {
       reverse,
       from,
       to,
-      pass: ([n]) => (voids ? false : Element.isElement(n) && editor.isVoid(n)),
+      pass: ([n]) => (voids ? false : Editor.isVoid(editor, n)),
     })
 
-    let prev: NodeEntry | undefined
+    const matches: NodeEntry<T>[] = []
+    let hit: NodeEntry<T> | undefined
 
-    for (const entry of iterable) {
-      if (match) {
-        if (
-          mode === 'highest' &&
-          prev &&
-          Path.compare(entry[1], prev[1]) === 0
-        ) {
-          continue
-        }
+    for (const [node, path] of iterable) {
+      const isLower = hit && Path.compare(path, hit[1]) === 0
 
-        if (!Editor.isMatch(editor, entry[0], match)) {
-          continue
-        }
-
-        prev = entry
+      // In highest mode any node lower than the last hit is not a match.
+      if (mode === 'highest' && isLower) {
+        continue
       }
 
-      yield entry
+      if (!match(node)) {
+        // If we've arrived at a leaf text node that is not lower than the last
+        // hit, then we've found a branch that doesn't include a match, which
+        // means the match is not universal.
+        if (universal && !isLower && Text.isText(node)) {
+          return
+        } else {
+          continue
+        }
+      }
+
+      // If there's a match and it's lower than the last, update the hit.
+      if (mode === 'lowest' && isLower) {
+        hit = [node, path]
+        continue
+      }
+
+      // In lowest mode we emit the last hit, once it's guaranteed lowest.
+      const emit: NodeEntry<T> | undefined =
+        mode === 'lowest' ? hit : [node, path]
+
+      if (emit) {
+        if (universal) {
+          matches.push(emit)
+        } else {
+          yield emit
+        }
+      }
+
+      hit = [node, path]
+    }
+
+    // Since lowest is always emitting one behind, catch up at the end.
+    if (mode === 'lowest' && hit) {
+      if (universal) {
+        matches.push(hit)
+      } else {
+        yield hit
+      }
+    }
+
+    // Universal defers to ensure that the match occurs in every branch, so we
+    // yield all of the matches after iterating.
+    if (universal) {
+      yield* matches
     }
   },
 
@@ -443,11 +445,11 @@ export const LocationQueries = {
       depth?: number
       edge?: 'start' | 'end'
     } = {}
-  ): AncestorEntry {
+  ): NodeEntry<Ancestor> {
     const path = Editor.path(editor, at, options)
     const parentPath = Path.parent(path)
     const entry = Editor.node(editor, parentPath)
-    return entry as AncestorEntry
+    return entry as NodeEntry<Ancestor>
   },
 
   /**
@@ -664,16 +666,22 @@ export const LocationQueries = {
    * Get the matching node in the branch of the document before a location.
    */
 
-  previous(
+  previous<T extends Node>(
     editor: Editor,
-    at: Location,
-    match?: NodeMatch,
     options: {
-      mode?: 'all' | 'highest'
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): NodeEntry | undefined {
-    const { mode = 'highest', voids = false } = options
+  ): NodeEntry<T> | undefined {
+    const { mode = 'lowest', voids = false } = options
+    let { match, at = editor.selection } = options
+
+    if (!at) {
+      return
+    }
+
     const [, from] = Editor.first(editor, at)
     const [, to] = Editor.first(editor, [])
     const span: Span = [from, to]
@@ -736,7 +744,10 @@ export const LocationQueries = {
     const [start, end] = Range.edges(range)
     let text = ''
 
-    for (const [node, path] of Editor.texts(editor, { at: range })) {
+    for (const [node, path] of Editor.nodes(editor, {
+      at: range,
+      match: Text.isText,
+    })) {
       let t = node.text
 
       if (Path.equals(path, end.path)) {
@@ -754,24 +765,21 @@ export const LocationQueries = {
   },
 
   /**
-   * Iterate through all of the text nodes in the Editor.
+   * Match a void node in the current branch of the editor.
    */
 
-  *texts(
+  void(
     editor: Editor,
     options: {
       at?: Location
-      match?: NodeMatch
-      mode?: 'all' | 'highest'
-      reverse?: boolean
+      mode?: 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ): Iterable<TextEntry> {
-    for (const [node, path] of Editor.nodes(editor, options)) {
-      if (Text.isText(node)) {
-        yield [node, path]
-      }
-    }
+  ): NodeEntry<Element> | undefined {
+    return Editor.above(editor, {
+      ...options,
+      match: n => Editor.isVoid(editor, n),
+    })
   },
 }
 
@@ -784,6 +792,7 @@ const PUNCTUATION = /[\u0021-\u0023\u0025-\u002A\u002C-\u002F\u003A\u003B\u003F\
 const CHAMELEON = /['\u2018\u2019]/
 const SURROGATE_START = 0xd800
 const SURROGATE_END = 0xdfff
+const ZERO_WIDTH_JOINER = 0x200d
 
 /**
  * Check if a character is a word character. The `remaining` argument is used
@@ -820,9 +829,76 @@ const isWordCharacter = (char: string, remaining: string): boolean => {
  */
 
 const getCharacterDistance = (text: string): number => {
-  const code = text.charCodeAt(0)
-  const isSurrogate = SURROGATE_START <= code && code <= SURROGATE_END
-  return isSurrogate ? 2 : 1
+  let offset = 0
+  // prev types:
+  // SURR: surrogate pair
+  // MOD: modifier (technically also surrogate pair)
+  // ZWJ: zero width joiner
+  // VAR: variation selector
+  // BMP: sequenceable character from basic multilingual plane
+  let prev: 'SURR' | 'MOD' | 'ZWJ' | 'VAR' | 'BMP' | null = null
+  let charCode = text.charCodeAt(0)
+
+  while (charCode) {
+    if (isSurrogate(charCode)) {
+      const modifier = isModifier(charCode, text, offset)
+
+      // Early returns are the heart of this function, where we decide if previous and current
+      // codepoints should form a single character (in terms of how many of them should selection
+      // jump over).
+      if (prev === 'SURR' || prev === 'BMP') {
+        break
+      }
+
+      offset += 2
+      prev = modifier ? 'MOD' : 'SURR'
+      charCode = text.charCodeAt(offset)
+      // Absolutely fine to `continue` without any checks because if `charCode` is NaN (which
+      // is the case when out of `text` range), next `while` loop won"t execute and we"re done.
+      continue
+    }
+
+    if (charCode === ZERO_WIDTH_JOINER) {
+      offset += 1
+      prev = 'ZWJ'
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isBMPEmoji(charCode)) {
+      if (prev && prev !== 'ZWJ' && prev !== 'VAR') {
+        break
+      }
+      offset += 1
+      prev = 'BMP'
+      charCode = text.charCodeAt(offset)
+
+      continue
+    }
+
+    if (isVariationSelector(charCode)) {
+      if (prev && prev !== 'ZWJ') {
+        break
+      }
+      offset += 1
+      prev = 'VAR'
+      charCode = text.charCodeAt(offset)
+      continue
+    }
+
+    // Modifier 'groups up' with what ever character is before that (even whitespace), need to
+    // look ahead.
+    if (prev === 'MOD') {
+      offset += 1
+      break
+    }
+
+    // If while loop ever gets here, we're done (e.g latin chars).
+    break
+  }
+
+  return offset || 1
 }
 
 /**
@@ -854,3 +930,64 @@ const getWordDistance = (text: string): number => {
 
   return length
 }
+
+/**
+ * Determines if `code` is a surrogate
+ */
+
+const isSurrogate = (code: number): boolean =>
+  SURROGATE_START <= code && code <= SURROGATE_END
+
+/**
+ * Does `code` form Modifier with next one.
+ *
+ * https://emojipedia.org/modifiers/
+ */
+
+const isModifier = (code: number, text: string, offset: number): boolean => {
+  if (code === 0xd83c) {
+    const next = text.charCodeAt(offset + 1)
+    return next <= 0xdfff && next >= 0xdffb
+  }
+  return false
+}
+
+/**
+ * Is `code` a Variation Selector.
+ *
+ * https://codepoints.net/variation_selectors
+ */
+
+const isVariationSelector = (code: number): boolean => {
+  return code <= 0xfe0f && code >= 0xfe00
+}
+
+/**
+ * Is `code` one of the BMP codes used in emoji sequences.
+ *
+ * https://emojipedia.org/emoji-zwj-sequences/
+ */
+
+const isBMPEmoji = (code: number): boolean => {
+  // This requires tiny bit of maintanance, better ideas?
+  // Fortunately it only happens if new Unicode Standard
+  // is released. Fails gracefully if upkeep lags behind,
+  // same way Slate previously behaved with all emojis.
+  return (
+    code === 0x2764 || // heart (❤)
+    code === 0x2642 || // male (♂)
+    code === 0x2640 || // female (♀)
+    code === 0x2620 || // scull (☠)
+    code === 0x2695 || // medical (⚕)
+    code === 0x2708 || // plane (✈️)
+    code === 0x25ef // large circle (◯)
+  )
+}
+
+/**
+ * A helper type for narrowing matched nodes with a predicate.
+ */
+
+type NodeMatch<T extends Node> =
+  | ((node: Node) => node is T)
+  | ((node: Node) => boolean)

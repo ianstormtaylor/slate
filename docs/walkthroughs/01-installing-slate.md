@@ -45,15 +45,14 @@ const App = () => {
 
 Of course we haven't rendered anything, so you won't see any changes.
 
-Next we want to create state for `value` and `selection`:
+Next we want to create state for `value`:
 
 ```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
 
-  // Keep track of state for the value and selection of the editor.
+  // Keep track of state for the value of the editor.
   const [value, setValue] = useState([])
-  const [selection, setSelection] = useState(null)
   return null
 }
 ```
@@ -66,18 +65,9 @@ The provider component keeps track of your Slate editor, its plugins, its value,
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([])
-  const [selection, setSelection] = useState(null)
   // Render the Slate context.
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    />
+    <Slate editor={editor} value={value} onChange={value => setValue(value)} />
   )
 }
 ```
@@ -94,18 +84,9 @@ Okay, so the next step is to render the `<Editable>` component itself:
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([])
-  const [selection, setSelection] = useState(null)
   return (
     // Add the editable component inside the context.
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable />
     </Slate>
   )
@@ -121,7 +102,6 @@ The value is just plain JSON. Here's one containing a single paragraph block wit
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   // Add the initial value when setting up our state.
   const [value, setValue] = useState([
     {
@@ -131,15 +111,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable />
     </Slate>
   )

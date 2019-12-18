@@ -5,7 +5,6 @@ import { GeneralTransforms } from './transforms/general'
 import { GeneralQueries } from './queries/general'
 import { LocationQueries } from './queries/location'
 import { NodeTransforms } from './transforms/node'
-import { NodeQueries } from './queries/node'
 import { RangeQueries } from './queries/range'
 import { SelectionTransforms } from './transforms/selection'
 import { TextTransforms } from './transforms/text'
@@ -16,15 +15,16 @@ import { TextTransforms } from './transforms/text'
  */
 
 export interface Editor {
-  apply: (operation: Operation) => void
   children: Node[]
+  selection: Range | null
+  operations: Operation[]
+  marks: Record<string, any> | null
+  apply: (operation: Operation) => void
   exec: (command: Command) => void
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-  operations: Operation[]
-  selection: Range | null
   [key: string]: any
 }
 
@@ -33,7 +33,6 @@ export const Editor = {
   ...GeneralQueries,
   ...GeneralTransforms,
   ...LocationQueries,
-  ...NodeQueries,
   ...NodeTransforms,
   ...RangeQueries,
   ...SelectionTransforms,

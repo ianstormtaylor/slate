@@ -38,5 +38,3 @@ export const input = (
 )
 
 export const output = input
-
-export const skip = true

@@ -6,7 +6,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Editor.splitNodes(editor, {
     at: { path: [0, 1, 0], offset: 2 },
-    match: 'inline',
+    match: n => Editor.isInline(editor, n),
   })
 }
 

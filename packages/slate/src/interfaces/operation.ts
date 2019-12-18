@@ -1,14 +1,14 @@
 import { Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
-type InsertNodeOperation = {
+export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
   [key: string]: any
 }
 
-type InsertTextOperation = {
+export type InsertTextOperation = {
   type: 'insert_text'
   path: Path
   offset: number
@@ -16,7 +16,7 @@ type InsertTextOperation = {
   [key: string]: any
 }
 
-type MergeNodeOperation = {
+export type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
@@ -25,21 +25,21 @@ type MergeNodeOperation = {
   [key: string]: any
 }
 
-type MoveNodeOperation = {
+export type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
   [key: string]: any
 }
 
-type RemoveNodeOperation = {
+export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
   [key: string]: any
 }
 
-type RemoveTextOperation = {
+export type RemoveTextOperation = {
   type: 'remove_text'
   path: Path
   offset: number
@@ -47,7 +47,7 @@ type RemoveTextOperation = {
   [key: string]: any
 }
 
-type SetNodeOperation = {
+export type SetNodeOperation = {
   type: 'set_node'
   path: Path
   properties: Partial<Node>
@@ -55,7 +55,7 @@ type SetNodeOperation = {
   [key: string]: any
 }
 
-type SetSelectionOperation =
+export type SetSelectionOperation =
   | {
       type: 'set_selection'
       [key: string]: any
@@ -75,7 +75,7 @@ type SetSelectionOperation =
       newProperties: null
     }
 
-type SplitNodeOperation = {
+export type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
@@ -84,16 +84,7 @@ type SplitNodeOperation = {
   [key: string]: any
 }
 
-/**
- * `Operation` objects define the low-level instructions that Slate editors use
- * to apply changes to their internal state. Representing all changes as
- * operations is what allows Slate editors to easily implement history,
- * collaboration, and other features.
- */
-
-type Operation = NodeOperation | SelectionOperation | TextOperation
-
-type NodeOperation =
+export type NodeOperation =
   | InsertNodeOperation
   | MergeNodeOperation
   | MoveNodeOperation
@@ -101,11 +92,20 @@ type NodeOperation =
   | SetNodeOperation
   | SplitNodeOperation
 
-type SelectionOperation = SetSelectionOperation
+export type SelectionOperation = SetSelectionOperation
 
-type TextOperation = InsertTextOperation | RemoveTextOperation
+export type TextOperation = InsertTextOperation | RemoveTextOperation
 
-const Operation = {
+/**
+ * `Operation` objects define the low-level instructions that Slate editors use
+ * to apply changes to their internal state. Representing all changes as
+ * operations is what allows Slate editors to easily implement history,
+ * collaboration, and other features.
+ */
+
+export type Operation = NodeOperation | SelectionOperation | TextOperation
+
+export const Operation = {
   /**
    * Check of a value is a `NodeOperation` object.
    */
@@ -124,78 +124,53 @@ const Operation = {
     }
 
     switch (value.type) {
-      case 'insert_node': {
+      case 'insert_node':
         return Path.isPath(value.path) && Node.isNode(value.node)
-      }
-
-      case 'insert_text': {
+      case 'insert_text':
         return (
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
         )
-      }
-
-      case 'merge_node': {
+      case 'merge_node':
         return (
           typeof value.position === 'number' &&
           (typeof value.target === 'number' || value.target === null) &&
           Path.isPath(value.path) &&
           isPlainObject(value.properties)
         )
-      }
-
-      case 'move_node': {
+      case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
-      }
-
-      case 'remove_node': {
+      case 'remove_node':
         return Path.isPath(value.path) && Node.isNode(value.node)
-      }
-
-      case 'remove_text': {
+      case 'remove_text':
         return (
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
         )
-      }
-
-      case 'set_node': {
+      case 'set_node':
         return (
           Path.isPath(value.path) &&
           isPlainObject(value.properties) &&
           isPlainObject(value.newProperties)
         )
-      }
-
-      case 'set_selection': {
+      case 'set_selection':
         return (
           (value.properties === null && Range.isRange(value.newProperties)) ||
           (value.newProperties === null && Range.isRange(value.properties)) ||
           (isPlainObject(value.properties) &&
             isPlainObject(value.newProperties))
         )
-      }
-
-      case 'set_value': {
-        return (
-          isPlainObject(value.properties) && isPlainObject(value.newProperties)
-        )
-      }
-
-      case 'split_node': {
+      case 'split_node':
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
           (typeof value.target === 'number' || value.target === null) &&
           isPlainObject(value.properties)
         )
-      }
-
-      default: {
+      default:
         return false
-      }
     }
   },
 
@@ -299,17 +274,4 @@ const Operation = {
       }
     }
   },
-}
-
-export {
-  InsertNodeOperation,
-  InsertTextOperation,
-  MergeNodeOperation,
-  MoveNodeOperation,
-  RemoveNodeOperation,
-  RemoveTextOperation,
-  SetNodeOperation,
-  SetSelectionOperation,
-  SplitNodeOperation,
-  Operation,
 }

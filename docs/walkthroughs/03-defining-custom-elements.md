@@ -9,7 +9,6 @@ We'll show you how. Let's start with our app from earlier:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -18,15 +17,7 @@ const App = () => {
   ])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         onKeyDown={event => {
           if (event.key === '&') {
@@ -76,7 +67,6 @@ Now, let's add that renderer to our `Editor`:
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -96,15 +86,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         // Pass in the `renderElement` function.
         renderElement={renderElement}
@@ -140,7 +122,6 @@ import { Editor } from 'slate'
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -158,15 +139,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -174,7 +147,11 @@ const App = () => {
             // Prevent the "`" from being inserted by default.
             event.preventDefault()
             // Otherwise, set the currently selected blocks type to "code".
-            Editor.setNodes(editor, { type: 'code' }, { match: 'block' })
+            Editor.setNodes(
+              editor,
+              { type: 'code' },
+              { match: n => Editor.isBlock(editor, n) }
+            )
           }
         }}
       />
@@ -220,27 +197,21 @@ const App = () => {
   }, [])
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
-            const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+            const [match] = Editor.nodes(editor, {
+              match: n => n.type === 'code',
+            })
             // Toggle the block type depending on whether there's already a match.
             Editor.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: 'block' }
+              { match: n => Editor.isBlock(editor, n) }
             )
           }
         }}

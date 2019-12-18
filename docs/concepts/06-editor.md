@@ -4,15 +4,16 @@ All of the behaviors, content and state of a Slate editor is rollup up into a si
 
 ```ts
 interface Editor {
+  children: Node[]
+  operations: Operation[]
+  selection: Range | null
+  marks: Record<string, any> | null
   apply: (operation: Operation) => void
   exec: (command: Command) => void
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-  children: Node[]
-  operations: Operation[]
-  selection: Range | null
   [key: string]: any
 }
 ```
@@ -80,9 +81,6 @@ The `Editor` interface, like all Slate interfaces, exposes helper functions that
 // Get the start point of a specific node at path.
 const point = Editor.start(editor, [0, 0])
 
-// Check whether an element matches a set of properties.
-const isMatch = Editor.isMatch(editor, element, { type: 'quote' })
-
 // Get the fragment (a slice of the document) at a range.
 const fragment = Editor.fragment(editor, range)
 ```
@@ -90,8 +88,8 @@ const fragment = Editor.fragment(editor, range)
 There are also many iterator-based helpers, for example:
 
 ```js
-// Iterate over every element in a range.
-for (const [element, path] of Editor.elements(editor, { at: range })) {
+// Iterate over every node in a range.
+for (const [node, path] of Editor.nodes(editor, { at: range })) {
   // ...
 }
 

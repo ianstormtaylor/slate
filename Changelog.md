@@ -4,6 +4,94 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.55.0` — December 15, 2019
+
+###### BREAKING
+
+**The `match` option must now be a function.** Previously there were a few shorthands, like passing in a plain object. This behavior was removed because it made it harder to reason about exactly what was being matched, it made debugging harder, and it made it hard to type well. Now the `match` option must be a function that receives the `Node` object to match. If you're using TypeScript, and the function you pass in is a type guard, that will be taken into account in the return value!
+
+Previously you might write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: 'text',
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: { type: 'paragraph' },
+})
+```
+
+Now you'd write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Text.isText,
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: node => node.type === 'paragraph',
+})
+```
+
+**The `mode` option now defaults to `'lowest'`.** Previously the default varied depending on where in the codebase it was used. Now it defaults to `'lowest'` everywhere, and you can always pass in `'highest'` to change the behavior. The one exception is the `Editor.nodes` helper which defaults to `'all'` since that's the expected behavior most of the time.
+
+**The `Editor.match` helper was renamed to `Editor.above`.** This was just to make it clear how it searched in the tree—it looks through all of the nodes directly above a location in the document.
+
+**The `Editor.above/previous/next` helpers now take all options in a dictionary.** Previously their APIs did not exactly match the `Editor.nodes` helper which they are shorthand for, but now this is no longer the case. The `at`, `match` and `mode` options are all passed in the `options` argument.
+
+Previously you would use:
+
+```js
+Editor.previous(editor, path, n => Text.isText(n), {
+  mode: 'lowest',
+})
+```
+
+Now you'd use:
+
+```js
+Editor.previous(editor, {
+  at: path,
+  match: n => Text.isText(n),
+  mode: 'lowest',
+  ...
+})
+```
+
+**The `Editor.elements` and `Editor.texts` helpers were removed.** These were simple convenience helpers that were rarely used. You can now achieve the same thing by using the `Editor.nodes` helper directly along with the `match` option. For example:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Element.isElement,
+})
+```
+
+---
+
+### `0.54.0` — December 12, 2019
+
+###### BREAKING
+
+**The `<Slate>` `onChange` handler no longer receives the `selection` argument.** Previously it received `(value, selection)`, now it receives simply `(value)`. Instead, you can access any property of the editor directly (including the value as `editor.children`). The `value/onChange` convention is provided purely for form-related use cases that expect it. This is along with the change to how extra props are "controlled". By default they are uncontrolled, but you can pass in any of the other top-level editor properties to take control of them.
+
+**The `Command` and `CoreCommand` interfaces have been split apart.** Previously you could access `Command.isCoreCommand`, however now this helper lives directly on the core command interface as `CoreCommand.isCoreCommand`. This makes it more symmetrical with userland commands.
+
+**Command checkers have been simplified.** Previously Slate exposed command-checking helpers like `Command.isInsertTextCommand`. However these were verbose and not useful most of the time. Instead, you can now check for `CoreCommand.isCoreCommand` and then use the `command.type` property to narrow further. This keeps core more symmetrical with how userland will implement custom commands.
+
+###### NEW
+
+**The `<Slate>` component is now pseudo-controlled.** It requires a `value=` prop to be passed in which is controlled. However, the `selection`, `marks`, `history`, or any other props are not required to be controlled. They default to being uncontrolled. If your use case requires controlling these extra props you can pass them in and they will start being controlled again. This change was made to make using Slate easier, while still allowing for more complex state to be controlled by core or plugins going forward—state that users don't need to concern themselves with most of time.
+
+**The `Editor` now has a `marks` property.** This property represents text-level formatting that will be applied to the next character that is inserted. This is a common richtext editor behavior, where pressing a **Bold** button with a collapsed selection turns on "bold" formatting mode, and then typing a character becomes bold. This state isn't stored in the document, and is instead stored as an extra property on the editor itself.
+
+---
+
 ### `0.53.0` — December 10, 2019
 
 ###### BREAKING

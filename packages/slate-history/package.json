@@ -1,7 +1,7 @@
 {
   "name": "slate-history",
   "description": "An operation-based history implementation for Slate editors.",
-  "version": "0.53.0",
+  "version": "0.55.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -18,11 +18,11 @@
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
-    "slate": "^0.53.0",
-    "slate-hyperscript": "^0.53.0"
+    "slate": "^0.55.2",
+    "slate-hyperscript": "^0.55.3"
   },
   "peerDependencies": {
-    "slate": ">=0.50.0"
+    "slate": ">=0.55.0"
   },
   "umdGlobals": {
     "slate": "Slate"

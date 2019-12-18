@@ -5,7 +5,6 @@ import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -13,15 +12,7 @@ const TablesExample = () => {
     []
   )
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
     </Slate>
   )
@@ -39,7 +30,9 @@ const withTables = editor => {
       selection &&
       Range.isCollapsed(selection)
     ) {
-      const [cell] = Editor.nodes(editor, { match: { type: 'table-cell' } })
+      const [cell] = Editor.nodes(editor, {
+        match: n => n.type === 'table-cell',
+      })
 
       if (cell) {
         const [, cellPath] = cell
@@ -55,7 +48,7 @@ const withTables = editor => {
     }
 
     if (type === 'insert_break' && selection) {
-      const [table] = Editor.nodes(editor, { match: { type: 'table' } })
+      const [table] = Editor.nodes(editor, { match: n => n.type === 'table' })
 
       if (table) {
         return

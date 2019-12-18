@@ -83,7 +83,7 @@ const Element = (props: {
   }
 
   // If it's a void node, wrap the children in extra void-specific elements.
-  if (editor.isVoid(element)) {
+  if (Editor.isVoid(editor, element)) {
     attributes['data-slate-void'] = true
 
     if (!readOnly && isInline) {

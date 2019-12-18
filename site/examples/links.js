@@ -1,29 +1,20 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
   const [value, setValue] = useState(initialValue)
-  const [selection, setSelection] = useState(null)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      selection={selection}
-      onChange={(value, selection) => {
-        setValue(value)
-        setSelection(selection)
-      }}
-    >
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <LinkButton />
       </Toolbar>
@@ -72,12 +63,12 @@ const withLinks = editor => {
 }
 
 const isLinkActive = editor => {
-  const [link] = Editor.nodes(editor, { match: { type: 'link' } })
+  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
   return !!link
 }
 
 const unwrapLink = editor => {
-  Editor.unwrapNodes(editor, { match: { type: 'link' } })
+  Editor.unwrapNodes(editor, { match: n => n.type === 'link' })
 }
 
 const wrapLink = (editor, url) => {
@@ -85,9 +76,20 @@ const wrapLink = (editor, url) => {
     unwrapLink(editor)
   }
 
-  const link = { type: 'link', url, children: [] }
-  Editor.wrapNodes(editor, link, { split: true })
-  Editor.collapse(editor, { edge: 'end' })
+  const { selection } = editor
+  const isCollapsed = selection && Range.isCollapsed(selection)
+  const link = {
+    type: 'link',
+    url,
+    children: isCollapsed ? [{ text: url }] : [],
+  }
+
+  if (isCollapsed) {
+    Editor.insertNodes(editor, link)
+  } else {
+    Editor.wrapNodes(editor, link, { split: true })
+    Editor.collapse(editor, { edge: 'end' })
+  }
 }
 
 const Element = ({ attributes, children, element }) => {

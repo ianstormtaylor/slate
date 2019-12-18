@@ -21,15 +21,15 @@ export const input = (
   </editor>
 )
 
-// TODO: the selection is wrong here
 export const output = (
   <editor>
     <block>one</block>
     <block>
-      <cursor />
+      <text />
     </block>
-    <block>three</block>
+    <block>
+      <cursor />
+      three
+    </block>
   </editor>
 )
-
-export const skip = true

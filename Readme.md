@@ -99,8 +99,6 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 ### Examples
 
-## Examples
-
 To get a sense for how you might use Slate, check out a few of the examples:
 
 - [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/plaintext.js) — showing the most basic case: a glorified `<textarea>`.

@@ -13,11 +13,14 @@ export const withHistory = (editor: Editor): HistoryEditor => {
   editor.history = { undos: [], redos: [] }
 
   editor.exec = (command: Command) => {
-    if (HistoryEditor.isHistoryEditor(editor)) {
+    if (
+      HistoryEditor.isHistoryEditor(editor) &&
+      HistoryCommand.isHistoryCommand(command)
+    ) {
       const { history } = editor
       const { undos, redos } = history
 
-      if (redos.length > 0 && HistoryCommand.isRedoCommand(command)) {
+      if (command.type === 'redo' && redos.length > 0) {
         const batch = redos[redos.length - 1]
 
         HistoryEditor.withoutSaving(editor, () => {
@@ -33,7 +36,7 @@ export const withHistory = (editor: Editor): HistoryEditor => {
         return
       }
 
-      if (undos.length > 0 && HistoryCommand.isUndoCommand(command)) {
+      if (command.type === 'undo' && undos.length > 0) {
         const batch = undos[undos.length - 1]
 
         HistoryEditor.withoutSaving(editor, () => {

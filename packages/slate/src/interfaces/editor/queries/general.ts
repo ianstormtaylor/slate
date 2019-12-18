@@ -4,8 +4,11 @@ import {
   Operation,
   Path,
   Point,
+  Text,
   PathRef,
   PointRef,
+  Element,
+  NodeEntry,
   Range,
   RangeRef,
   Node,
@@ -17,6 +20,14 @@ export const POINT_REFS: WeakMap<Editor, Set<PointRef>> = new WeakMap()
 export const RANGE_REFS: WeakMap<Editor, Set<RangeRef>> = new WeakMap()
 
 export const GeneralQueries = {
+  /**
+   * Check if a value is a block `Element` object.
+   */
+
+  isBlock(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && !editor.isInline(value)
+  },
+
   /**
    * Check if a value is an `Editor` object.
    */
@@ -30,10 +41,19 @@ export const GeneralQueries = {
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
+      (value.marks === null || isPlainObject(value.marks)) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
     )
+  },
+
+  /**
+   * Check if a value is an inline `Element` object.
+   */
+
+  isInline(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && editor.isInline(value)
   },
 
   /**
@@ -43,6 +63,65 @@ export const GeneralQueries = {
   isNormalizing(editor: Editor): boolean {
     const isNormalizing = NORMALIZING.get(editor)
     return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
+   * Check if a value is a void `Element` object.
+   */
+
+  isVoid(editor: Editor, value: any): value is Element {
+    return Element.isElement(value) && editor.isVoid(value)
+  },
+
+  /**
+   * Get the marks that would be added to text at the current selection.
+   */
+
+  marks(editor: Editor): Record<string, any> | null {
+    const { marks, selection } = editor
+
+    if (!selection) {
+      return null
+    }
+
+    if (marks) {
+      return marks
+    }
+
+    if (Range.isExpanded(selection)) {
+      const [match] = Editor.nodes(editor, { match: Text.isText })
+
+      if (match) {
+        const [node] = match as NodeEntry<Text>
+        const { text, ...rest } = node
+        return rest
+      } else {
+        return {}
+      }
+    }
+
+    const { anchor } = selection
+    const { path } = anchor
+    let [node] = Editor.leaf(editor, path)
+
+    if (anchor.offset === 0) {
+      const prev = Editor.previous(editor, { at: path, match: Text.isText })
+      const block = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+      })
+
+      if (prev && block) {
+        const [prevNode, prevPath] = prev
+        const [, blockPath] = block
+
+        if (Path.isAncestor(blockPath, prevPath)) {
+          node = prevNode as Text
+        }
+      }
+    }
+
+    const { text, ...rest } = node
+    return rest
   },
 
   /**
