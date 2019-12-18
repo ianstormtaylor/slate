@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 const fragment = (
@@ -11,7 +11,7 @@ const fragment = (
 )
 
 export const run = editor => {
-  Editor.insertFragment(editor, fragment)
+  Transforms.insertFragment(editor, fragment)
 }
 
 export const input = (

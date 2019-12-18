@@ -92,7 +92,7 @@ const VideoElement = ({ attributes, children, element }) => {
             }}
             onChange={value => {
               const path = editor.findPath(element)
-              Editor.setNodes(editor, { url: value }, { at: path })
+              Transforms.setNodes(editor, { url: value }, { at: path })
             }}
           />
         ) : null}

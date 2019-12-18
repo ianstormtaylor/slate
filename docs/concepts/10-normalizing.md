@@ -41,7 +41,7 @@ const withParagraphs = editor => {
     if (Element.isElement(node) && node.type === 'paragraph') {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (Element.isElement(child) && !editor.isInline(child)) {
-          Editor.unwrapNodes(editor, { at: childPath })
+          Transforms.unwrapNodes(editor, { at: childPath })
           return
         }
       }
@@ -67,7 +67,7 @@ If you check the example above again, you'll notice the `return` statement:
 
 ```js
 if (Element.isElement(child) && !editor.isInline(child)) {
-  Editor.unwrapNodes(editor, { at: childPath })
+  Transforms.unwrapNodes(editor, { at: childPath })
   return
 }
 ```
@@ -135,7 +135,7 @@ const withLinks = editor => {
       node.type === 'link' &&
       typeof node.url !== 'string'
     ) {
-      Editor.setNodes(editor, { url: null }, { at: path })
+      Transforms.setNodes(editor, { url: null }, { at: path })
       return
     }
 

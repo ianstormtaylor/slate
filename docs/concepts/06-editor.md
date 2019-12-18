@@ -103,13 +103,13 @@ Another special group of helper functions exposed on the `Editor` interface are 
 
 ```js
 // Insert an element node at a specific path.
-Editor.insertNodes(editor, [element], { at: path })
+Transforms.insertNodes(editor, [element], { at: path })
 
 // Split the nodes in half at a specific point.
-Editor.splitNodes(editor, { at: point })
+Transforms.splitNodes(editor, { at: point })
 
 // Add a quote format to all the block nodes in the selection.
-Editor.setNodes(editor, { type: 'quote' })
+Transforms.setNodes(editor, { type: 'quote' })
 ```
 
 The editor-specific helpers are the ones you'll use most often when working with Slate editors, so it pays to become very familiar with them.

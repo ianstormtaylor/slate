@@ -36,7 +36,7 @@ const App = () => {
             const [match] = Editor.nodes(editor, {
               match: n => n.type === 'code',
             })
-            Editor.setNodes(
+            Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
               { match: n => Editor.isBlock(editor, n) }
@@ -86,7 +86,7 @@ const App = () => {
               const [match] = Editor.nodes(editor, {
                 match: n => n.type === 'code',
               })
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { type: match ? 'paragraph' : 'code' },
                 { match: n => Editor.isBlock(editor, n) }
@@ -97,7 +97,7 @@ const App = () => {
             // When "B" is pressed, bold the text in the selection.
             case 'b': {
               event.preventDefault()
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { bold: true },
                 // Apply it to text nodes, and split the text node up if the
@@ -177,7 +177,7 @@ const App = () => {
               const [match] = Editor.nodes(editor, {
                 match: n => n.type === 'code',
               })
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
                 { match: n => Editor.isBlock(editor, n) }
@@ -187,7 +187,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { bold: true },
                 { match: n => Text.isText(n), split: true }

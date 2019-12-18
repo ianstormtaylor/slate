@@ -49,7 +49,7 @@ const App = () => {
               const [match] = Editor.nodes(editor, {
                 match: n => n.type === 'code',
               })
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
                 { match: n => Editor.isBlock(editor, n) }
@@ -59,7 +59,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { bold: true },
                 { match: n => Text.isText(n), split: true }
@@ -124,7 +124,7 @@ const App = () => {
                 match: n => n.type === 'code',
               })
               const isCodeActive = !!match
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { type: isCodeActive ? null : 'code' },
                 { match: n => Editor.isBlock(editor, n) }
@@ -134,7 +134,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Editor.setNodes(
+              Transforms.setNodes(
                 editor,
                 { bold: true },
                 { match: n => Text.isText(n), split: true }
@@ -161,7 +161,7 @@ const withCustom = editor => {
     // Define a command to toggle the bold  formatting.
     if (command.type === 'toggle_bold_mark') {
       const isActive = CustomEditor.isBoldMarkActive(editor)
-      Editor.setNodes(
+      Transforms.setNodes(
         editor,
         { bold: isActive ? null : true },
         { match: n => Text.isText(n), split: true }
@@ -171,7 +171,7 @@ const withCustom = editor => {
     // Define a command to toggle the code block formatting.
     else if (command.type === 'toggle_code_block') {
       const isActive = CustomEditor.isCodeBlockActive(editor)
-      Editor.setNodes(
+      Transforms.setNodes(
         editor,
         { type: isActive ? null : 'code' },
         { match: n => Editor.isBlock(editor, n) }

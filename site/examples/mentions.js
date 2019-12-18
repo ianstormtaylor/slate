@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Editor, Range, createEditor } from 'slate'
+import { Editor, Transforms, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -45,8 +45,8 @@ const MentionExample = () => {
           case 'Tab':
           case 'Enter':
             event.preventDefault()
-            Editor.select(editor, target)
-            editor.exec({ type: 'insert_mention', character: chars[index] })
+            Transforms.select(editor, target)
+            insertMention(editor, chars[index])
             setTarget(null)
             break
           case 'Escape':
@@ -75,6 +75,7 @@ const MentionExample = () => {
       value={value}
       onChange={value => {
         setValue(value)
+        const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)
@@ -139,7 +140,7 @@ const MentionExample = () => {
 }
 
 const withMentions = editor => {
-  const { exec, isInline, isVoid } = editor
+  const { isInline, isVoid } = editor
 
   editor.isInline = element => {
     return element.type === 'mention' ? true : isInline(element)
@@ -149,22 +150,13 @@ const withMentions = editor => {
     return element.type === 'mention' ? true : isVoid(element)
   }
 
-  editor.exec = command => {
-    if (command.type === 'insert_mention') {
-      const mention = {
-        type: 'mention',
-        character: command.character,
-        children: [{ text: '' }],
-      }
-
-      Editor.insertNodes(editor, mention)
-      Editor.move(editor)
-    } else {
-      exec(command)
-    }
-  }
-
   return editor
+}
+
+const insertMention = (editor, character) => {
+  const mention = { type: 'mention', character, children: [{ text: '' }] }
+  Transforms.insertNodes(editor, mention)
+  Transforms.move(editor)
 }
 
 const Element = props => {

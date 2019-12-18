@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.splitNodes(editor, { match: () => true, mode: 'highest' })
+  Transforms.splitNodes(editor, { match: () => true, mode: 'highest' })
 }
 
 export const input = (

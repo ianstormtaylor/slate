@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, Text, createEditor } from 'slate'
+import { Editor, Transforms, Text, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -9,10 +9,7 @@ import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
   const [value, setValue] = useState(initialValue)
-  const editor = useMemo(
-    () => withFormatting(withHistory(withReact(createEditor()))),
-    []
-  )
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -23,14 +20,11 @@ const HoveringMenuExample = () => {
         onDOMBeforeInput={event => {
           switch (event.inputType) {
             case 'formatBold':
-              return editor.exec({ type: 'toggle_format', format: 'bold' })
+              return toggleFormat(editor, 'bold')
             case 'formatItalic':
-              return editor.exec({ type: 'toggle_format', format: 'italic' })
+              return toggleFormat(editor, 'italic')
             case 'formatUnderline':
-              return editor.exec({
-                type: 'toggle_format',
-                format: 'underlined',
-              })
+              return toggleFormat(editor, 'underline')
           }
         }}
       />
@@ -38,30 +32,13 @@ const HoveringMenuExample = () => {
   )
 }
 
-const withFormatting = editor => {
-  const { exec } = editor
-
-  editor.exec = command => {
-    switch (command.type) {
-      case 'toggle_format': {
-        const { format } = command
-        const isActive = isFormatActive(editor, format)
-        Editor.setNodes(
-          editor,
-          { [format]: isActive ? null : true },
-          { match: Text.isText, split: true }
-        )
-        break
-      }
-
-      default: {
-        exec(command)
-        break
-      }
-    }
-  }
-
-  return editor
+const toggleFormat = (editor, format) => {
+  const isActive = isFormatActive(editor, format)
+  Transforms.setNodes(
+    editor,
+    { [format]: isActive ? null : true },
+    { match: Text.isText, split: true }
+  )
 }
 
 const isFormatActive = (editor, format) => {
@@ -154,7 +131,7 @@ const FormatButton = ({ format, icon }) => {
       active={isFormatActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'toggle_format', format })
+        toggleFormat(editor, format)
       }}
     >
       <Icon>{icon}</Icon>

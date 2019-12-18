@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Editor, Range, Point, createEditor } from 'slate'
+import { Editor, Transforms, Range, Point, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -36,17 +36,12 @@ const MarkdownShortcutsExample = () => {
 }
 
 const withShortcuts = editor => {
-  const { exec } = editor
+  const { deleteBackward, insertText } = editor
 
-  editor.exec = command => {
+  editor.insertText = text => {
     const { selection } = editor
 
-    if (
-      command.type === 'insert_text' &&
-      command.text === ' ' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
@@ -58,9 +53,9 @@ const withShortcuts = editor => {
       const type = SHORTCUTS[beforeText]
 
       if (type) {
-        Editor.select(editor, range)
-        Editor.delete(editor)
-        Editor.setNodes(
+        Transforms.select(editor, range)
+        Transforms.delete(editor)
+        Transforms.setNodes(
           editor,
           { type },
           { match: n => Editor.isBlock(editor, n) }
@@ -68,18 +63,22 @@ const withShortcuts = editor => {
 
         if (type === 'list-item') {
           const list = { type: 'bulleted-list', children: [] }
-          Editor.wrapNodes(editor, list, { match: n => n.type === 'list-item' })
+          Transforms.wrapNodes(editor, list, {
+            match: n => n.type === 'list-item',
+          })
         }
 
         return
       }
     }
 
-    if (
-      command.type === 'delete_backward' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    insertText(text)
+  }
+
+  editor.deleteBackward = (...args) => {
+    const { selection } = editor
+
+    if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
       })
@@ -92,10 +91,10 @@ const withShortcuts = editor => {
           block.type !== 'paragraph' &&
           Point.equals(selection.anchor, start)
         ) {
-          Editor.setNodes(editor, { type: 'paragraph' })
+          Transforms.setNodes(editor, { type: 'paragraph' })
 
           if (block.type === 'list-item') {
-            Editor.unwrapNodes(editor, {
+            Transforms.unwrapNodes(editor, {
               match: n => n.type === 'bulleted-list',
             })
           }
@@ -103,9 +102,9 @@ const withShortcuts = editor => {
           return
         }
       }
-    }
 
-    exec(command)
+      deleteBackward(...args)
+    }
   }
 
   return editor

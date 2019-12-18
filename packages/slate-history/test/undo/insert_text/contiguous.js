@@ -3,9 +3,9 @@
 import { jsx } from '../..'
 
 export const run = editor => {
-  editor.exec({ type: 'insert_text', text: 't' })
-  editor.exec({ type: 'insert_text', text: 'w' })
-  editor.exec({ type: 'insert_text', text: 'o' })
+  editor.insertText('t')
+  editor.insertText('w')
+  editor.insertText('o')
 }
 
 export const input = (

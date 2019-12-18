@@ -1,6 +1,4 @@
 import {
-  Command,
-  CoreCommand,
   Descendant,
   Editor,
   Element,
@@ -13,10 +11,9 @@ import {
   Range,
   RangeRef,
   Text,
-} from '.'
-import { DIRTY_PATHS } from './interfaces/editor/transforms/general'
-
-const FLUSHING: WeakMap<Editor, boolean> = new WeakMap()
+  Transforms,
+} from './'
+import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
 
 /**
  * Create a new Slate `Editor` object.
@@ -31,6 +28,7 @@ export const createEditor = (): Editor => {
     isInline: () => false,
     isVoid: () => false,
     onChange: () => {},
+
     apply: (op: Operation) => {
       for (const ref of Editor.pathRefs(editor)) {
         PathRef.transform(ref, op)
@@ -90,131 +88,101 @@ export const createEditor = (): Editor => {
         })
       }
     },
-    exec: (command: Command) => {
-      if (CoreCommand.isCoreCommand(command)) {
-        const { selection } = editor
 
-        switch (command.type) {
-          case 'add_mark': {
-            if (selection) {
-              const { key, value } = command
+    addMark: (key: string, value: any) => {
+      const { selection } = editor
 
-              if (Range.isExpanded(selection)) {
-                Editor.setNodes(
-                  editor,
-                  { [key]: value },
-                  { match: Text.isText, split: true }
-                )
-              } else {
-                const marks = {
-                  ...(Editor.marks(editor) || {}),
-                  [key]: value,
-                }
-
-                editor.marks = marks
-                editor.onChange()
-              }
-            }
-
-            break
+      if (selection) {
+        if (Range.isExpanded(selection)) {
+          Transforms.setNodes(
+            editor,
+            { [key]: value },
+            { match: Text.isText, split: true }
+          )
+        } else {
+          const marks = {
+            ...(Editor.marks(editor) || {}),
+            [key]: value,
           }
 
-          case 'delete_backward': {
-            if (selection && Range.isCollapsed(selection)) {
-              Editor.delete(editor, { unit: command.unit, reverse: true })
-            }
-
-            break
-          }
-
-          case 'delete_forward': {
-            if (selection && Range.isCollapsed(selection)) {
-              Editor.delete(editor, { unit: command.unit })
-            }
-
-            break
-          }
-
-          case 'delete_fragment': {
-            if (selection && Range.isExpanded(selection)) {
-              Editor.delete(editor)
-            }
-
-            break
-          }
-
-          case 'insert_break': {
-            Editor.splitNodes(editor, { always: true })
-            break
-          }
-
-          case 'insert_fragment': {
-            Editor.insertFragment(editor, command.fragment)
-            break
-          }
-
-          case 'insert_node': {
-            Editor.insertNodes(editor, command.node)
-            break
-          }
-
-          case 'insert_text': {
-            if (selection) {
-              // If the cursor is at the end of an inline, move it outside of
-              // the inline before inserting
-              if (Range.isCollapsed(selection)) {
-                const inline = Editor.above(editor, {
-                  match: n => Editor.isInline(editor, n),
-                  mode: 'highest',
-                })
-
-                if (inline) {
-                  const [, inlinePath] = inline
-
-                  if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-                    const point = Editor.after(editor, inlinePath)!
-                    Editor.setSelection(editor, { anchor: point, focus: point })
-                  }
-                }
-              }
-
-              const { marks } = editor
-              const { text } = command
-
-              if (marks) {
-                const node = { text, ...marks }
-                Editor.insertNodes(editor, node)
-              } else {
-                Editor.insertText(editor, text)
-              }
-
-              editor.marks = null
-            }
-            break
-          }
-
-          case 'remove_mark': {
-            if (selection) {
-              const { key } = command
-
-              if (Range.isExpanded(selection)) {
-                Editor.unsetNodes(editor, key, {
-                  match: Text.isText,
-                  split: true,
-                })
-              } else {
-                const marks = { ...(Editor.marks(editor) || {}) }
-                delete marks[key]
-                editor.marks = marks
-                editor.onChange()
-              }
-            }
-
-            break
-          }
+          editor.marks = marks
+          editor.onChange()
         }
       }
     },
+
+    deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
+      const { selection } = editor
+
+      if (selection && Range.isCollapsed(selection)) {
+        Transforms.delete(editor, { unit, reverse: true })
+      }
+    },
+
+    deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => {
+      const { selection } = editor
+
+      if (selection && Range.isCollapsed(selection)) {
+        Transforms.delete(editor, { unit })
+      }
+    },
+
+    deleteFragment: () => {
+      const { selection } = editor
+
+      if (selection && Range.isExpanded(selection)) {
+        Transforms.delete(editor)
+      }
+    },
+
+    insertBreak: () => {
+      Transforms.splitNodes(editor, { always: true })
+    },
+
+    insertFragment: (fragment: Node[]) => {
+      Transforms.insertFragment(editor, fragment)
+    },
+
+    insertNode: (node: Node) => {
+      Transforms.insertNodes(editor, node)
+    },
+
+    insertText: (text: string) => {
+      const { selection, marks } = editor
+
+      if (selection) {
+        // If the cursor is at the end of an inline, move it outside of
+        // the inline before inserting
+        if (Range.isCollapsed(selection)) {
+          const inline = Editor.above(editor, {
+            match: n => Editor.isInline(editor, n),
+            mode: 'highest',
+          })
+
+          if (inline) {
+            const [, inlinePath] = inline
+
+            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+              const point = Editor.after(editor, inlinePath)!
+              Transforms.setSelection(editor, {
+                anchor: point,
+                focus: point,
+              })
+            }
+          }
+        }
+
+        if (marks) {
+          const node = { text, ...marks }
+          Transforms.insertNodes(editor, node)
+        } else {
+          Transforms.insertText(editor, text)
+        }
+
+        editor.marks = null
+      }
+    },
+
     normalizeNode: (entry: NodeEntry) => {
       const [node, path] = entry
 
@@ -226,7 +194,10 @@ export const createEditor = (): Editor => {
       // Ensure that block and inline nodes have at least one text child.
       if (Element.isElement(node) && node.children.length === 0) {
         const child = { text: '' }
-        Editor.insertNodes(editor, child, { at: path.concat(0), voids: true })
+        Transforms.insertNodes(editor, child, {
+          at: path.concat(0),
+          voids: true,
+        })
         return
       }
 
@@ -256,21 +227,21 @@ export const createEditor = (): Editor => {
         // other inline nodes, or parent blocks that only contain inlines and
         // text.
         if (isInlineOrText !== shouldHaveInlines) {
-          Editor.removeNodes(editor, { at: path.concat(n), voids: true })
+          Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
           n--
         } else if (Element.isElement(child)) {
           // Ensure that inline nodes are surrounded by text nodes.
           if (editor.isInline(child)) {
             if (prev == null || !Text.isText(prev)) {
               const newChild = { text: '' }
-              Editor.insertNodes(editor, newChild, {
+              Transforms.insertNodes(editor, newChild, {
                 at: path.concat(n),
                 voids: true,
               })
               n++
             } else if (isLast) {
               const newChild = { text: '' }
-              Editor.insertNodes(editor, newChild, {
+              Transforms.insertNodes(editor, newChild, {
                 at: path.concat(n + 1),
                 voids: true,
               })
@@ -281,19 +252,40 @@ export const createEditor = (): Editor => {
           // Merge adjacent text nodes that are empty or match.
           if (prev != null && Text.isText(prev)) {
             if (Text.equals(child, prev, { loose: true })) {
-              Editor.mergeNodes(editor, { at: path.concat(n), voids: true })
+              Transforms.mergeNodes(editor, { at: path.concat(n), voids: true })
               n--
             } else if (prev.text === '') {
-              Editor.removeNodes(editor, {
+              Transforms.removeNodes(editor, {
                 at: path.concat(n - 1),
                 voids: true,
               })
               n--
             } else if (isLast && child.text === '') {
-              Editor.removeNodes(editor, { at: path.concat(n), voids: true })
+              Transforms.removeNodes(editor, {
+                at: path.concat(n),
+                voids: true,
+              })
               n--
             }
           }
+        }
+      }
+    },
+
+    removeMark: (key: string) => {
+      const { selection } = editor
+
+      if (selection) {
+        if (Range.isExpanded(selection)) {
+          Transforms.unsetNodes(editor, key, {
+            match: Text.isText,
+            split: true,
+          })
+        } else {
+          const marks = { ...(Editor.marks(editor) || {}) }
+          delete marks[key]
+          editor.marks = marks
+          editor.onChange()
         }
       }
     },
