@@ -128,7 +128,7 @@ export const CoreCommand = {
     if (Command.isCommand(value)) {
       switch (value.type) {
         case 'add_mark':
-          return typeof value.key === 'string' && typeof value.value != null
+          return typeof value.key === 'string' && value.value != null
         case 'delete_backward':
           return typeof value.unit === 'string'
         case 'delete_forward':
