@@ -4,6 +4,37 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.56.0` — December 17, 2019
+
+###### BREAKING
+
+**The `format_text` command is split into `add_mark` and `remove_mark`.** Although the goal is to keep the number of commands in core to a minimum, having this as a combined command made it very hard to write logic that wanted to guarantee to only ever add or remove a mark from a text node. Now you can be guaranteed that the `add_mark` command will only ever add a custom property to text nodes, and the `remove_mark` command will only ever remove them.
+
+Previously you would write:
+
+```js
+editor.exec({
+  type: 'format_text',
+  properties: { bold: true },
+})
+```
+
+Now you would write:
+
+```js
+if (isActive) {
+  editor.exec({ type: 'add_mark', key: 'bold', value: true })
+} else {
+  editor.exec({ type: 'remove_mark', key: 'bold' })
+}
+```
+
+> 🤖 Note that the "mark" term does not mean what it meant in `0.47` and earlier. It simply means formatting that is applied at the text level—bold, italic, etc. We need a term for it because it's such a common pattern in richtext editor, and "mark" is often the term that is used. For example the `<mark>` tag in HTML.
+
+**The `Node.text` helper was renamed to `Node.string`.** This was simply to reduce the confusion between "the text string" and "text nodes". The helper still just returns the concatenated string content of a node.
+
+---
+
 ### `0.55.0` — December 15, 2019
 
 ###### BREAKING
