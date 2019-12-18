@@ -501,7 +501,7 @@ export const Editable = (props: EditableProps) => {
 
             IS_FOCUSED.delete(editor)
           },
-          [attributes.onBlur]
+          [readOnly, attributes.onBlur]
         )}
         onClick={useCallback(
           (event: React.MouseEvent<HTMLDivElement>) => {
@@ -521,7 +521,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onClick]
+          [readOnly, attributes.onClick]
         )}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
@@ -581,7 +581,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onCut]
+          [readOnly, attributes.onCut]
         )}
         onDragOver={useCallback(
           (event: React.DragEvent<HTMLDivElement>) => {
@@ -646,7 +646,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onDrop]
+          [readOnly, attributes.onDrop]
         )}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
@@ -670,7 +670,7 @@ export const Editable = (props: EditableProps) => {
               IS_FOCUSED.set(editor, true)
             }
           },
-          [attributes.onFocus]
+          [readOnly, attributes.onFocus]
         )}
         onKeyDown={useCallback(
           (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -866,7 +866,7 @@ export const Editable = (props: EditableProps) => {
               }
             }
           },
-          [attributes.onKeyDown]
+          [readOnly, attributes.onKeyDown]
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -885,7 +885,7 @@ export const Editable = (props: EditableProps) => {
               })
             }
           },
-          [attributes.onPaste]
+          [readOnly, attributes.onPaste]
         )}
       >
         <Children
