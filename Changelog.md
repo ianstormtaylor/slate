@@ -23,9 +23,9 @@ Now you would write:
 
 ```js
 if (isActive) {
-  editor.exec({ type: 'add_mark', key: 'bold', value: true })
-} else {
   editor.exec({ type: 'remove_mark', key: 'bold' })
+} else {
+  editor.exec({ type: 'add_mark', key: 'bold', value: true })
 }
 ```
 
