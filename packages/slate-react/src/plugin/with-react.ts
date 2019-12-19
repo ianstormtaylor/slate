@@ -9,8 +9,8 @@ import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY } from '../utils/weak-maps'
  * `withReact` adds React and DOM specific behaviors to the editor.
  */
 
-export const withReact = <T extends Editor>(editor: T): T & ReactEditor => {
-  const e = editor as ReactEditor
+export const withReact = <T extends Editor>(editor: T) => {
+  const e = editor as T & ReactEditor
   const { apply, onChange } = e
 
   e.apply = (op: Operation) => {
