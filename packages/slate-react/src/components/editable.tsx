@@ -76,6 +76,7 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
+  innerRef?: React.Ref<HTMLDivElement>
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   as?: React.ElementType
@@ -95,11 +96,12 @@ export const Editable = (props: EditableProps) => {
     renderElement,
     renderLeaf,
     style = {},
+    innerRef,
     as: Component = 'div',
     ...attributes
   } = props
   const editor = useSlate()
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = innerRef || useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
