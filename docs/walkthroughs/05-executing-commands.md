@@ -76,85 +76,10 @@ const App = () => {
 
 It has the concept of "code blocks" and "bold formatting". But these things are all defined in one-off cases inside the `onKeyDown` handler. If you wanted to reuse that logic elsewhere you'd need to extract it.
 
-We can instead implement these domain-specific concepts by creating custom functions:
+We can instead implement these domain-specific concepts by creating custom helper functions:
 
 ```js
-// Create a custom editor plugin function that will augment the editor.
-const withCustom = editor => {
-  return editor
-}
-
-const App = () => {
-  // Wrap the editor with our new `withCustom` plugin.
-  const editor = useMemo(() => withCustom(withReact(createEditor())), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
-
-  const renderElement = useCallback(props => {
-    switch (props.element.type) {
-      case 'code':
-        return <CodeElement {...props} />
-      default:
-        return <DefaultElement {...props} />
-    }
-  }, [])
-
-  const renderLeaf = useCallback(props => {
-    return <Leaf {...props} />
-  }, [])
-
-  return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
-      <Editable
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        onKeyDown={event => {
-          if (!event.ctrlKey) {
-            return
-          }
-
-          switch (event.key) {
-            case '`': {
-              event.preventDefault()
-              const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
-              })
-              const isCodeActive = !!match
-              Transforms.setNodes(
-                editor,
-                { type: isCodeActive ? null : 'code' },
-                { match: n => Editor.isBlock(editor, n) }
-              )
-              break
-            }
-
-            case 'b': {
-              event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                { match: n => Text.isText(n), split: true }
-              )
-              break
-            }
-          }
-        }}
-      />
-    </Slate>
-  )
-}
-```
-
-Since we haven't yet defined (or overridden) any commands in `withCustom`, nothing will change yet. Our app will still function exactly as it did before.
-
-However, now we can start extract bits of logic into reusable methods:
-
-```js
-// Define our own custom set of helpers for active-checking queries.
+// Define our own custom set of helpers.
 const CustomEditor = {
   isBoldMarkActive(editor) {
     const [match] = Editor.nodes(editor, {
