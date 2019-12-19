@@ -7,7 +7,7 @@ import { HistoryEditor } from './history-editor'
  * editor as operations are applied to it, using undo and redo stacks.
  */
 
-export const withHistory = <T>(editor: T): T & HistoryEditor => {
+export const withHistory = <T extends Editor>(editor: T): T & HistoryEditor => {
   const e = editor as HistoryEditor
   const { apply } = e
   e.history = { undos: [], redos: [] }
