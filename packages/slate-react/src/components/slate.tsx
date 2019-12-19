@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { Node } from 'slate'
+import { Editor, Node } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
@@ -13,7 +13,7 @@ import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
  */
 
 export const Slate = (props: {
-  editor: ReactEditor
+  editor: Editor
   value: Node[]
   children: React.ReactNode
   onChange: (value: Node[]) => void
