@@ -41,23 +41,16 @@ const Children = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
+
     const sel = selection && Range.intersection(range, selection)
-    const ds = decorate([n, p])
-
-    for (const dec of decorations) {
-      const d = Range.intersection(dec, range)
-
-      if (d) {
-        ds.push(d)
-      }
-    }
 
     if (Element.isElement(n)) {
       children.push(
         <ElementComponent
           decorate={decorate}
-          decorations={ds}
+          decorations={decorations}
           element={n}
+          path={p}
           key={key.id}
           renderElement={renderElement}
           renderLeaf={renderLeaf}
@@ -65,6 +58,15 @@ const Children = (props: {
         />
       )
     } else {
+      const ds = decorate([n, p])
+
+      for (const dec of decorations) {
+        const d = Range.intersection(dec, range)
+
+        if (d) {
+          ds.push(d)
+        }
+      }
       children.push(
         <TextComponent
           decorations={ds}

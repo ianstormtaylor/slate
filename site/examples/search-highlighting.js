@@ -1,8 +1,9 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor } from 'slate'
+import React, { useCallback, useMemo, useState } from 'react'
+import { Editable, Slate, withReact } from 'slate-react'
+import { createEditor, Element, Node } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
+import escapeRegExp from 'lodash/escapeRegExp'
 
 import { Icon, Toolbar } from '../components'
 
@@ -14,28 +15,45 @@ const SearchHighlightingExample = () => {
     ([node, path]) => {
       const ranges = []
 
-      if (search && Text.isText(node)) {
-        const { text } = node
-        const parts = text.split(search)
-        let offset = 0
+      if (search && Element.isElement(node)) {
+        const searchRegex = new RegExp(`${escapeRegExp(search)}`, 'gi')
+        const text = Node.string(node)
+        for (const match of text.matchAll(searchRegex)) {
+          const start = match.index
+          const end = match.index + match[0].length
 
-        parts.forEach((part, i) => {
-          if (i !== 0) {
-            ranges.push({
-              anchor: { path, offset: offset - search.length },
-              focus: { path, offset },
-              highlight: true,
-            })
-          }
+          let offset = 0
+          let anchor
+          let focus
+          node.children.forEach((childNode, index) => {
+            const childPath = [path[0], index]
+            if (
+              offset + childNode.text.length > start &&
+              anchor === undefined
+            ) {
+              anchor = { path: childPath, offset: start - offset }
+            }
 
-          offset = offset + part.length + search.length
-        })
+            if (offset + childNode.text.length >= end && focus === undefined) {
+              focus = { path: childPath, offset: end - offset }
+            }
+
+            offset += childNode.text.length
+          })
+          ranges.push({
+            anchor,
+            focus,
+            highlight: true,
+          })
+        }
       }
 
       return ranges
     },
     [search]
   )
+
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [decorate])
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -66,7 +84,7 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable decorate={decorate} renderLeaf={renderLeaf} />
     </Slate>
   )
 }

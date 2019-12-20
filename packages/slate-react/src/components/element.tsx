@@ -1,6 +1,13 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import {
+  Editor,
+  Element as SlateElement,
+  Node,
+  NodeEntry,
+  Range,
+  Path,
+} from 'slate'
 
 import Text from './text'
 import Children from './children'
@@ -8,11 +15,11 @@ import { ReactEditor, useEditor, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
-  NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
-  NODE_TO_PARENT,
-  NODE_TO_INDEX,
   KEY_TO_ELEMENT,
+  NODE_TO_ELEMENT,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
 } from '../utils/weak-maps'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
@@ -24,6 +31,7 @@ const Element = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
+  path: Path
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
@@ -32,12 +40,25 @@ const Element = (props: {
     decorate,
     decorations,
     element,
+    path,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderLeaf,
     selection,
   } = props
-  const ref = useRef<HTMLElement>(null)
+
   const editor = useEditor()
+  const range = Editor.range(editor, element)
+  const ds = decorate([element, path])
+
+  for (const dec of decorations) {
+    const d = Range.intersection(dec, range)
+    if (d) {
+      ds.push(d)
+    }
+  }
+
+  const ref = useRef<HTMLElement>(null)
+
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
@@ -45,7 +66,7 @@ const Element = (props: {
   let children: JSX.Element | null = (
     <Children
       decorate={decorate}
-      decorations={decorations}
+      decorations={ds}
       node={element}
       renderElement={renderElement}
       renderLeaf={renderLeaf}
