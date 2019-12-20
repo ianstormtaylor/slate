@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import { Editor, createEditor } from 'slate'
+import { Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 import {
@@ -100,7 +100,7 @@ const PasteHtmlExample = () => {
 }
 
 const withHtml = editor => {
-  const { exec, isInline, isVoid } = editor
+  const { insertData, isInline, isVoid } = editor
 
   editor.isInline = element => {
     return element.type === 'link' ? true : isInline(element)
@@ -110,20 +110,17 @@ const withHtml = editor => {
     return element.type === 'image' ? true : isVoid(element)
   }
 
-  editor.exec = command => {
-    if (command.type === 'insert_data') {
-      const { data } = command
-      const html = data.getData('text/html')
+  editor.insertData = data => {
+    const html = data.getData('text/html')
 
-      if (html) {
-        const parsed = new DOMParser().parseFromString(html, 'text/html')
-        const fragment = deserialize(parsed.body)
-        Editor.insertFragment(editor, fragment)
-        return
-      }
+    if (html) {
+      const parsed = new DOMParser().parseFromString(html, 'text/html')
+      const fragment = deserialize(parsed.body)
+      Transforms.insertFragment(editor, fragment)
+      return
     }
 
-    exec(command)
+    insertData(data)
   }
 
   return editor

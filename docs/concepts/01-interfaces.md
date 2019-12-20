@@ -60,8 +60,8 @@ For example, when working with nodes:
 ```js
 import { Node } from 'slate'
 
-// Get the text content of an element node.
-const text = Node.text(element)
+// Get the string content of an element node.
+const string = Node.string(element)
 
 // Get the node at a specific path inside a root node.
 const descendant = Node.get(value, path)

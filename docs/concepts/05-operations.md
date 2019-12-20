@@ -1,6 +1,6 @@
 # Operations
 
-Operations are the granular, low-level actions that occur while invoking commands. A single high-level command could result in many low-level operations being applied to the editor.
+Operations are the granular, low-level actions that occur while invoking commands and transforms. A single high-level command could result in many low-level operations being applied to the editor.
 
 Unlike commands, operations aren't extendable. Slate's core defines all of the possible operations that can occur on a richtext document. For example:
 

@@ -22,7 +22,7 @@ const fragment = (
 )
 
 export const run = editor => {
-  editor.exec({ type: 'insert_fragment', fragment })
+  editor.insertFragment(fragment)
 }
 
 export const input = (
@@ -38,3 +38,5 @@ export const input = (
 )
 
 export const output = input
+
+export const skip = true

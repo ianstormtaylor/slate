@@ -16,6 +16,5 @@ export { useSelected } from './hooks/use-selected'
 export { useSlate } from './hooks/use-slate'
 
 // Plugin
-export { InsertDataCommand, ReactCommand } from './plugin/react-command'
 export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'

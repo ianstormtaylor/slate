@@ -36,9 +36,9 @@ In attempt to decrease the maintenance burden, and because the new abstraction a
 
 ### Commands
 
-A new `Command` concept has been introduced. (The old "commands" are now called "transforms".) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
+A new "command" concept has been introduced. (The old "commands" are now called "transforms".) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
 
-Commands are triggered by calling the `editor.exec` function. And they travel through a middleware-like stack, but built from composed functions. Any plugin can override the `exec` behaviors to augment an editor.
+Commands are triggered by calling the `editor.*` core functions. And they travel through a middleware-like stack, but built from composed functions. Any plugin can override the behaviors to augment an editor.
 
 ### Plugins
 

@@ -12,7 +12,7 @@ For example, taking the value of an editor and returning plaintext:
 import { Node } from 'slate'
 
 const serialize = nodes => {
-  return nodes.map(n => Node.text(n)).join('\n')
+  return nodes.map(n => Node.string(n)).join('\n')
 }
 ```
 

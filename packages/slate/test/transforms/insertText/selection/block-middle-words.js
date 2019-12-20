@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.insertText(editor, ' a few words ')
+  Transforms.insertText(editor, ' a few words ')
 }
 
 export const input = (

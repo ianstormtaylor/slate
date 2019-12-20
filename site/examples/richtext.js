@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -19,10 +19,7 @@ const RichTextExample = () => {
   const [value, setValue] = useState(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(
-    () => withRichText(withHistory(withReact(createEditor()))),
-    []
-  )
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -48,10 +45,7 @@ const RichTextExample = () => {
             if (isHotkey(hotkey, event)) {
               event.preventDefault()
               const mark = HOTKEYS[hotkey]
-              editor.exec({
-                type: 'format_text',
-                properties: { [mark]: true },
-              })
+              toggleMark(editor, mark)
             }
           }
         }}
@@ -60,38 +54,38 @@ const RichTextExample = () => {
   )
 }
 
-const withRichText = editor => {
-  const { exec } = editor
+const toggleBlock = (editor, format) => {
+  const isActive = isBlockActive(editor, format)
+  const isList = LIST_TYPES.includes(format)
 
-  editor.exec = command => {
-    if (command.type === 'format_block') {
-      const { format } = command
-      const isActive = isBlockActive(editor, format)
-      const isList = LIST_TYPES.includes(format)
+  Transforms.unwrapNodes(editor, {
+    match: n => LIST_TYPES.includes(n.type),
+    split: true,
+  })
 
-      for (const f of LIST_TYPES) {
-        Editor.unwrapNodes(editor, { match: n => n.type === f, split: true })
-      }
+  Transforms.setNodes(editor, {
+    type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+  })
 
-      Editor.setNodes(editor, {
-        type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-      })
-
-      if (!isActive && isList) {
-        Editor.wrapNodes(editor, { type: format, children: [] })
-      }
-    } else {
-      exec(command)
-    }
+  if (!isActive && isList) {
+    const block = { type: format, children: [] }
+    Transforms.wrapNodes(editor, block)
   }
+}
 
-  return editor
+const toggleMark = (editor, format) => {
+  const isActive = isMarkActive(editor, format)
+
+  if (isActive) {
+    Editor.removeMark(editor, format)
+  } else {
+    Editor.addMark(editor, format, true)
+  }
 }
 
 const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
     match: n => n.type === format,
-    mode: 'all',
   })
 
   return !!match
@@ -148,7 +142,7 @@ const BlockButton = ({ format, icon }) => {
       active={isBlockActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'format_block', format })
+        toggleBlock(editor, format)
       }}
     >
       <Icon>{icon}</Icon>
@@ -163,7 +157,7 @@ const MarkButton = ({ format, icon }) => {
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()
-        editor.exec({ type: 'format_text', properties: { [format]: true } })
+        toggleMark(editor, format)
       }}
     >
       <Icon>{icon}</Icon>

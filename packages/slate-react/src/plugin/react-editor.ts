@@ -1,4 +1,4 @@
-import { Editor, Element, Node, Path, Point, Range } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -22,7 +22,13 @@ import {
   normalizeDOMPoint,
 } from '../utils/dom'
 
-export interface ReactEditor extends Editor {}
+/**
+ * A React and DOM-specific version of the `Editor` interface.
+ */
+
+export interface ReactEditor extends Editor {
+  insertData: (data: DataTransfer) => void
+}
 
 export const ReactEditor = {
   /**
@@ -129,7 +135,7 @@ export const ReactEditor = {
     }
 
     if (selection) {
-      Editor.deselect(editor)
+      Transforms.deselect(editor)
     }
   },
 
@@ -168,6 +174,14 @@ export const ReactEditor = {
       element.closest(`[data-slate-editor]`) === el &&
       (!editable || el.isContentEditable)
     )
+  },
+
+  /**
+   * Insert data from a `DataTransfer` into the editor.
+   */
+
+  insertData(editor: ReactEditor, data: DataTransfer): void {
+    editor.insertData(data)
   },
 
   /**

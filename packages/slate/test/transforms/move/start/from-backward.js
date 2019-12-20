@@ -1,10 +1,10 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.move(editor, { edge: 'start', distance: 7 })
+  Transforms.move(editor, { edge: 'start', distance: 7 })
 }
 
 export const input = (
