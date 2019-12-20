@@ -567,7 +567,10 @@ export const Editable = (props: EditableProps) => {
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onCompositionStart)
             ) {
-              editor.exec({ type: 'delete_fragment' })
+              const { selection } = editor
+              if (selection && Range.isExpanded(selection)) {
+                Editor.deleteFragment(editor)
+              }
             }
           },
           [attributes.onCompositionStart]
