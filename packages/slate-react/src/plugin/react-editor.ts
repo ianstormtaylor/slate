@@ -1,4 +1,5 @@
 import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
+import { IS_FIREFOX } from '../utils/environment'
 
 import { Key } from '../utils/key'
 import {
@@ -481,10 +482,46 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
-    const focus = isCollapsed
+    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    let focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+
+    /**
+     * suppose we have this document:
+     *
+     * { type: 'paragraph',
+     *   children: [
+     *     { text: 'foo' },
+     *     { text: 'bar' },
+     *     { text: 'baz' }
+     *   ]
+     * }
+     *
+     * a double click on "bar" on chrome will create this range:
+     *
+     * anchor -> [0,1] offset 0
+     * focus  -> [0,1] offset 3
+     *
+     * while on firefox will create this range:
+     *
+     * anchor -> [0,0] offset 3
+     * focus  -> [0,2] offset 0
+     *
+     * let's try to fix it...
+     */
+
+    if (IS_FIREFOX && !isCollapsed && anchorNode !== focusNode) {
+      const isEnd = Editor.isEnd(editor, anchor, anchor.path)
+      const isStart = Editor.isStart(editor, focus, focus.path)
+
+      if (isEnd) {
+        anchor = Editor.after(editor, anchor)
+      }
+      if (isStart) {
+        focus = Editor.before(editor, focus)
+      }
+    }
 
     return { anchor, focus }
   },
