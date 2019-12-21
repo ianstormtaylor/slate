@@ -516,10 +516,15 @@ export const ReactEditor = {
       const isStart = Editor.isStart(editor, focus, focus.path)
 
       if (isEnd) {
-        anchor = Editor.after(editor, anchor)
+        const after = Editor.after(editor, anchor)
+
+        // Editor.after() might return undefined
+        anchor = after || anchor
       }
       if (isStart) {
-        focus = Editor.before(editor, focus)
+        const before = Editor.before(editor, focus)
+
+        focus = before || focus
       }
     }
 
