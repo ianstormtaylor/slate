@@ -492,9 +492,9 @@ export const ReactEditor = {
      *
      * { type: 'paragraph',
      *   children: [
-     *     { text: 'foo' },
+     *     { text: 'foo ' },
      *     { text: 'bar' },
-     *     { text: 'baz' }
+     *     { text: ' baz' }
      *   ]
      * }
      *
@@ -505,7 +505,7 @@ export const ReactEditor = {
      *
      * while on firefox will create this range:
      *
-     * anchor -> [0,0] offset 3
+     * anchor -> [0,0] offset 4
      * focus  -> [0,2] offset 0
      *
      * let's try to fix it...
