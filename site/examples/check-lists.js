@@ -32,7 +32,45 @@ const CheckListsExample = () => {
 }
 
 const withChecklists = editor => {
-  const { deleteBackward } = editor
+  const { deleteBackward, insertBreak } = editor
+  editor.insertBreak = () => {
+    const match = Editor.above(editor, {
+      match: n => {
+        return Editor.isBlock(editor, n)
+      },
+    })
+    if (match) {
+      const [matchingNode] = match
+      if (matchingNode.type !== 'paragraph') {
+        if (
+          matchingNode.children[matchingNode.children.length - 1].text
+            .length === 0
+        ) {
+          Transforms.delete(editor)
+          const paragraph = {
+            type: 'paragraph',
+            children: [{ text: '' }],
+          }
+          Transforms.insertNodes(editor, paragraph)
+          Transforms.unwrapNodes(editor, {
+            match: n => n.type === 'check-list-item',
+            split: true,
+          })
+          return
+        }
+        if (matchingNode.type === 'check-list-item') {
+          const checklist = {
+            type: 'check-list-item',
+            checked: false,
+            children: [{ text: '' }],
+          }
+          Transforms.insertNodes(editor, checklist)
+          return
+        }
+      }
+    }
+    insertBreak()
+  }
 
   editor.deleteBackward = (...args) => {
     const { selection } = editor
@@ -116,7 +154,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
         className={css`
           flex: 1;
           opacity: ${checked ? 0.666 : 1};
-          text-decoration: ${checked ? 'none' : 'line-through'};
+          text-decoration: ${checked ? 'line-through' : 'none'};
 
           &:focus {
             outline: none;
