@@ -157,7 +157,9 @@ export const ReactEditor = {
     // stepper arrow on a number input). (2018/05/04)
     // https://github.com/ianstormtaylor/slate/issues/1819
     try {
-      element = isDOMElement(target) ? target : target.parentElement
+      element = (isDOMElement(target)
+        ? target
+        : target.parentElement) as HTMLElement
     } catch (err) {
       if (
         !err.message.includes('Permission denied to access property "nodeType"')
@@ -172,7 +174,7 @@ export const ReactEditor = {
 
     return (
       element.closest(`[data-slate-editor]`) === el &&
-      (!editable || el.isContentEditable)
+      (!editable || element.isContentEditable)
     )
   },
 
