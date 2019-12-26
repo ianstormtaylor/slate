@@ -149,15 +149,15 @@ export const ReactEditor = {
     options: { editable?: boolean } = {}
   ): boolean {
     const { editable = false } = options
-    const el = ReactEditor.toDOMNode(editor, editor)
-    let element
+    const editorEl = ReactEditor.toDOMNode(editor, editor)
+    let targetEl
 
     // COMPAT: In Firefox, reading `target.nodeType` will throw an error if
     // target is originating from an internal "restricted" element (e.g. a
     // stepper arrow on a number input). (2018/05/04)
     // https://github.com/ianstormtaylor/slate/issues/1819
     try {
-      element = (isDOMElement(target)
+      targetEl = (isDOMElement(target)
         ? target
         : target.parentElement) as HTMLElement
     } catch (err) {
@@ -168,13 +168,13 @@ export const ReactEditor = {
       }
     }
 
-    if (!element) {
+    if (!targetEl) {
       return false
     }
 
     return (
-      element.closest(`[data-slate-editor]`) === el &&
-      (!editable || element.isContentEditable)
+      targetEl.closest(`[data-slate-editor]`) === editorEl &&
+      (!editable || targetEl.isContentEditable)
     )
   },
 
