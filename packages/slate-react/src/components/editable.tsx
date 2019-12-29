@@ -886,16 +886,17 @@ export const Editable = (props: EditableProps) => {
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
-            // fall back to React's `onPaste` here instead.
             if (
-              IS_FIREFOX &&
               !readOnly &&
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste)
             ) {
-              event.preventDefault()
-              ReactEditor.insertData(editor, event.clipboardData)
+              // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+              // fall back to React's `onPaste` here instead.
+              if (IS_FIREFOX) {
+                event.preventDefault()
+                ReactEditor.insertData(editor, event.clipboardData)
+              }
             }
           },
           [readOnly, attributes.onPaste]
