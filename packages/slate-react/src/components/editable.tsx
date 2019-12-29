@@ -354,7 +354,7 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    []
+    [readOnly, propsOnDOMBeforeInput]
   )
 
   // Listen on the native `selectionchange` event to be able to update any time
