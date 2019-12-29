@@ -31,16 +31,6 @@ What we need to do is save the changes you make somewhere. For this example, we'
 So, in our `onChange` handler, we need to save the `value`:
 
 ```jsx
-const defaultValue = [
-  {
-    children: [
-      {
-        text: 'A line of text in a paragraph.',
-      },
-    ],
-  },
-]
-
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
