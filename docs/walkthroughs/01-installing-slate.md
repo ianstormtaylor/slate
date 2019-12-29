@@ -16,7 +16,7 @@ _Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add sla
 
 Once you've installed Slate, you'll need to import it.
 
-```js
+```jsx
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -99,7 +99,7 @@ There's only one last step. So far we've been using an empty `[]` array as the i
 
 The value is just plain JSON. Here's one containing a single paragraph block with some text in it:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   // Add the initial value when setting up our state.

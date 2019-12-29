@@ -6,7 +6,7 @@ But that's not all you can do. Slate lets you define any type of custom blocks y
 
 We'll show you how. Let's start with our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -37,7 +37,7 @@ The problem is, code blocks won't just be rendered as a plain paragraph, they'll
 
 Element renderers are just simple React components, like so:
 
-```js
+```jsx
 // Define a React component renderer for our code blocks.
 const CodeElement = props => {
   return (
@@ -56,7 +56,7 @@ And see that `props.children` reference? Slate will automatically render all of 
 
 And here's a component for the "default" elements:
 
-```js
+```jsx
 const DefaultElement = props => {
   return <p {...props.attributes}>{props.children}</p>
 }
@@ -64,7 +64,7 @@ const DefaultElement = props => {
 
 Now, let's add that renderer to our `Editor`:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -116,7 +116,7 @@ const DefaultElement = props => {
 
 Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `` Ctrl-` `` shortcut that does just that:
 
-```js
+```jsx
 // Import the `Editor` helpers from Slate.
 import { Editor } from 'slate'
 
@@ -176,7 +176,7 @@ Now, if you press `` Ctrl-` `` the block your cursor is in should turn into a co
 
 But we forgot one thing. When you hit `` Ctrl-` `` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [selection, setSelection] = useState(null)
