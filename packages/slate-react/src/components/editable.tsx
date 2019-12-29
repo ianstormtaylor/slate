@@ -891,8 +891,10 @@ export const Editable = (props: EditableProps) => {
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste)
             ) {
-              // COMPAT: Firefox doesn't support the `beforeinput` event, so we
-              // fall back to React's `onPaste` here instead.
+              // if the event is not handled do nothing, it will be
+              // dealt with in the onBeforeInput callback
+              // COMPAT: Firefox doesn't support the `beforeinput` event,
+              // so we fall back to React's `onPaste` here instead.
               if (IS_FIREFOX) {
                 event.preventDefault()
                 ReactEditor.insertData(editor, event.clipboardData)
