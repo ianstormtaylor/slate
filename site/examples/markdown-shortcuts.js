@@ -91,11 +91,16 @@ const withShortcuts = editor => {
           block.type !== 'paragraph' &&
           Point.equals(selection.anchor, start)
         ) {
-          Transforms.setNodes(editor, { type: 'paragraph' })
+          let type = block.type
+
+          if (path.length <= 2) {
+            type = 'paragraph'
+            Transforms.setNodes(editor, { type })
+          }
 
           if (block.type === 'list-item') {
-            Transforms.unwrapNodes(editor, {
-              match: n => n.type === 'bulleted-list',
+            Transforms.liftNodes(editor, {
+              match: n => n.type === type,
             })
           }
 
