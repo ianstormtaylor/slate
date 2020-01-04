@@ -19,7 +19,7 @@ const withLayout = editor => {
       }
 
       for (const [child, childPath] of Node.children(editor, path)) {
-        const type = childPath[0] === 0 ? 'title' : 'paragraph'
+        const type = childPath[0] === 0 ? 'title' : child.type
 
         if (child.type !== type) {
           Transforms.setNodes(editor, { type }, { at: childPath })
