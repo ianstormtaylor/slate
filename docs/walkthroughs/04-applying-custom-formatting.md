@@ -62,7 +62,7 @@ const App = () => {
   ])
 
   const renderElement = useCallback(props => {
-    switch (prop.element.type) {
+    switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
       default:
