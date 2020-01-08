@@ -1,6 +1,6 @@
 # Normalizing
 
-Slate editors can editor complex, nested data structures. And for the most part this is great, but in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
+Slate editors can edit complex, nested data structures. And for the most part this is great, but in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
 
 "Normalizing" is how you can ensure that your editor's content is always of a certain shape. It's similar to "validating", except instead of just determining whether the content is valid or invalid, its job is to fix the content to make it valid again.
 
