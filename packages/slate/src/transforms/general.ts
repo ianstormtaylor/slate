@@ -18,7 +18,7 @@ export const GeneralTransforms = {
    * Transform the editor by an operation.
    */
 
-  transform(editor: Editor, op: Operation) {
+  transform<E extends Editor>(editor: E, op: Operation) {
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)
 
@@ -104,7 +104,7 @@ export const GeneralTransforms = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath))
+        const newParent = Node.get(editor, Path.parent(truePath)) as Element
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)

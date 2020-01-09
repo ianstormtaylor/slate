@@ -15,12 +15,12 @@ export const NodeTransforms = {
    * Insert nodes at a specific location in the Editor.
    */
 
-  insertNodes(
-    editor: Editor,
-    nodes: Node | Node[],
+  insertNodes<E extends Editor, N extends Node>(
+    editor: E,
+    nodes: N | N[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: N) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -86,7 +86,7 @@ export const NodeTransforms = {
           }
         }
 
-        const [entry] = Editor.nodes(editor, {
+        const [entry] = Editor.nodes(editor as Editor, {
           at: at.path,
           match,
           mode,

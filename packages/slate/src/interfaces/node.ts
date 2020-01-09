@@ -13,7 +13,7 @@ export const Node = {
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
 
-  ancestor(root: Node, path: Path): Ancestor {
+  ancestor<N extends Node>(root: N, path: Path): Ancestor {
     const node = Node.get(root, path)
 
     if (Text.isText(node)) {
@@ -32,8 +32,8 @@ export const Node = {
    * the tree, but you can pass the `reverse: true` option to go top-down.
    */
 
-  *ancestors(
-    root: Node,
+  *ancestors<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
@@ -50,14 +50,14 @@ export const Node = {
    * Get the child of a node at a specific index.
    */
 
-  child(root: Node, index: number): Descendant {
+  child<N extends Node>(root: N, index: number): Descendant {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get the child of a text node: ${JSON.stringify(root)}`
       )
     }
 
-    const c = root.children[index] as Descendant
+    const c = (root as Editor | Element).children[index] as Descendant
 
     if (c == null) {
       throw new Error(
@@ -74,8 +74,8 @@ export const Node = {
    * Iterate over the children of a node at a specific path.
    */
 
-  *children(
-    root: Node,
+  *children<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
@@ -98,7 +98,7 @@ export const Node = {
    * Get an entry for the common ancesetor node of two paths.
    */
 
-  common(root: Node, path: Path, another: Path): NodeEntry {
+  common<N extends Node>(root: N, path: Path, another: Path): NodeEntry {
     const p = Path.common(path, another)
     const n = Node.get(root, p)
     return [n, p]
@@ -108,7 +108,7 @@ export const Node = {
    * Get the node at a specific path, asserting that it's a descendant node.
    */
 
-  descendant(root: Node, path: Path): Descendant {
+  descendant<N extends Node>(root: N, path: Path): Descendant {
     const node = Node.get(root, path)
 
     if (Editor.isEditor(node)) {
@@ -124,7 +124,7 @@ export const Node = {
    * Return an iterable of all the descendant node entries inside a root node.
    */
 
-  *descendants(
+  *descendants<N extends Node>(
     root: Node,
     options: {
       from?: Path
@@ -148,13 +148,13 @@ export const Node = {
    * root node is an element it will be included in the iteration as well.
    */
 
-  *elements(
-    root: Node,
+  *elements<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
+      pass?: (node: NodeEntry<Node>) => boolean
     } = {}
   ): Iterable<ElementEntry> {
     for (const [node, path] of Node.nodes(root, options)) {
@@ -168,7 +168,7 @@ export const Node = {
    * Get the first node entry in a root node from a path.
    */
 
-  first(root: Node, path: Path): NodeEntry {
+  first<N extends Node>(root: N, path: Path): NodeEntry {
     const p = path.slice()
     let n = Node.get(root, p)
 
@@ -188,7 +188,7 @@ export const Node = {
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  fragment(root: Node, range: Range): Descendant[] {
+  fragment<N extends Node>(root: N, range: Range): Descendant[] {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -222,10 +222,12 @@ export const Node = {
         }
       }
 
-      delete r.selection
+      if (Editor.isEditor(r)) {
+        delete r.selection
+      }
     })
 
-    return newRoot.children
+    return (newRoot as Ancestor).children
   },
 
   /**
@@ -233,8 +235,8 @@ export const Node = {
    * empty array, it refers to the root node itself.
    */
 
-  get(root: Node, path: Path): Node {
-    let node = root
+  get<N extends Node>(root: N, path: Path): Node {
+    let node: Node = root
 
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
@@ -257,8 +259,8 @@ export const Node = {
    * Check if a descendant node exists at a specific path.
    */
 
-  has(root: Node, path: Path): boolean {
-    let node = root
+  has<N extends Node>(root: N, path: Path): boolean {
+    let node: Node = root
 
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
@@ -295,7 +297,7 @@ export const Node = {
    * Get the lash node entry in a root node from a path.
    */
 
-  last(root: Node, path: Path): NodeEntry {
+  last<N extends Node>(root: N, path: Path): NodeEntry<Node> {
     const p = path.slice()
     let n = Node.get(root, p)
 
@@ -316,7 +318,7 @@ export const Node = {
    * Get the node at a specific path, ensuring it's a leaf text node.
    */
 
-  leaf(root: Node, path: Path): Text {
+  leaf<N extends Node>(root: N, path: Path): Text {
     const node = Node.get(root, path)
 
     if (!Text.isText(node)) {
@@ -335,8 +337,8 @@ export const Node = {
    * but you can pass the `reverse: true` option to go bottom-up.
    */
 
-  *levels(
-    root: Node,
+  *levels<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
@@ -352,7 +354,7 @@ export const Node = {
    * Check if a node matches a set of props.
    */
 
-  matches(node: Node, props: Partial<Node>): boolean {
+  matches<N extends Node>(node: N, props: Partial<N>): boolean {
     return (
       (Element.isElement(node) && Element.matches(node, props)) ||
       (Text.isText(node) && Text.matches(node, props))
@@ -365,20 +367,20 @@ export const Node = {
    * position inside the root node.
    */
 
-  *nodes(
-    root: Node,
+  *nodes<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
+      pass?: (entry: NodeEntry<Node>) => boolean
     } = {}
   ): Iterable<NodeEntry> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
     const visited = new Set()
     let p: Path = []
-    let n = root
+    let n: Node = root
 
     while (true) {
       if (to && (reverse ? Path.isBefore(p, to) : Path.isAfter(p, to))) {
@@ -443,7 +445,7 @@ export const Node = {
    * Get the parent of a node at a specific path.
    */
 
-  parent(root: Node, path: Path): Ancestor {
+  parent<N extends Node>(root: N, path: Path): Ancestor {
     const parentPath = Path.parent(path)
     const p = Node.get(root, parentPath)
 
@@ -464,25 +466,27 @@ export const Node = {
    * computations for a node.
    */
 
-  string(node: Node): string {
+  string<N extends Node>(node: N): string {
     if (Text.isText(node)) {
       return node.text
-    } else {
+    }
+    if (Element.isElement(node)) {
       return node.children.map(Node.string).join('')
     }
+    throw new Error('Unexpected Node type')
   },
 
   /**
    * Return an iterable of all leaf text nodes in a root node.
    */
 
-  *texts(
-    root: Node,
+  *texts<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
+      pass?: (node: NodeEntry<Node>) => boolean
     } = {}
   ): Iterable<NodeEntry<Text>> {
     for (const [node, path] of Node.nodes(root, options)) {

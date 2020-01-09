@@ -42,7 +42,7 @@ export const Element = {
    * children are equivalent.
    */
 
-  matches(element: Element, props: Partial<Element>): boolean {
+  matches<E extends Element>(element: E, props: Partial<E>): boolean {
     for (const key in props) {
       if (key === 'children') {
         continue

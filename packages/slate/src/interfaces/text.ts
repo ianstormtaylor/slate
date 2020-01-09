@@ -16,9 +16,9 @@ export const Text = {
    * Check if two text nodes are equal.
    */
 
-  equals(
-    text: Text,
-    another: Text,
+  equals<T extends Text>(
+    text: T,
+    another: T,
     options: { loose?: boolean } = {}
   ): boolean {
     const { loose = false } = options
@@ -69,7 +69,7 @@ export const Text = {
    * the `text` property are two nodes equal.
    */
 
-  matches(text: Text, props: Partial<Text>): boolean {
+  matches<T extends Text>(text: T, props: Partial<T>): boolean {
     for (const key in props) {
       if (key === 'text') {
         continue
@@ -87,8 +87,8 @@ export const Text = {
    * Get the leaves for a text node given decorations.
    */
 
-  decorations(node: Text, decorations: Range[]): Text[] {
-    let leaves: Text[] = [{ ...node }]
+  decorations<T extends Text>(node: T, decorations: Range[]): T[] {
+    let leaves: T[] = [{ ...node }]
 
     for (const dec of decorations) {
       const { anchor, focus, ...rest } = dec

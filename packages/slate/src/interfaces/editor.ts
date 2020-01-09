@@ -1244,7 +1244,7 @@ export const Editor = {
    * Transform the editor by an operation.
    */
 
-  transform(editor: Editor, op: Operation) {
+  transform<E extends Editor>(editor: E, op: Operation): void {
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)
 
@@ -1330,7 +1330,7 @@ export const Editor = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath))
+        const newParent: Ancestor = Node.get(editor, Path.parent(truePath))
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)
