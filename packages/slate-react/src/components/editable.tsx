@@ -26,6 +26,7 @@ import {
   isDOMNode,
   isDOMText,
   DOMStaticRange,
+  isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -230,6 +231,7 @@ export const Editable = (props: EditableProps) => {
         isComposing: boolean
       }
     ) => {
+      console.log('onDOMBeforeInput', event)
       if (
         !readOnly &&
         hasEditableTarget(editor, event.target) &&
@@ -886,6 +888,16 @@ export const Editable = (props: EditableProps) => {
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
+            // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
+            // when "paste without formatting" option is used.
+            // This unfortunately needs to be handled with paste events instead.
+            if (isPlainTextOnlyPaste(event.nativeEvent) && !readOnly) {
+              event.preventDefault()
+              ReactEditor.insertData(editor, event.clipboardData)
+
+              return
+            }
+
             // COMPAT: Firefox doesn't support the `beforeinput` event, so we
             // fall back to React's `onPaste` here instead.
             if (
