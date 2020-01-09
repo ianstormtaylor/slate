@@ -47,14 +47,9 @@ const withChecklists = editor => {
             .length === 0
         ) {
           Transforms.delete(editor)
-          const paragraph = {
+          Transforms.insertNodes(editor, {
             type: 'paragraph',
             children: [{ text: '' }],
-          }
-          Transforms.insertNodes(editor, paragraph)
-          Transforms.unwrapNodes(editor, {
-            match: n => n.type === 'check-list-item',
-            split: true,
           })
           return
         }
