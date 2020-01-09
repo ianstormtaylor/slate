@@ -11,7 +11,6 @@ import { Operation, Path, Point, PointEntry } from '..'
 export interface Range {
   anchor: Point
   focus: Point
-  [key: string]: any
 }
 
 export const Range = {
