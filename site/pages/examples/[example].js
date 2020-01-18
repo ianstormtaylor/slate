@@ -9,6 +9,7 @@ import ErrorBoundary from 'react-error-boundary'
 import { Icon } from '../../components'
 
 import CheckLists from '../../examples/check-lists'
+import EditableVoids from '../../examples/editable-voids'
 import Embeds from '../../examples/embeds'
 import ForcedLayout from '../../examples/forced-layout'
 import HoveringToolbar from '../../examples/hovering-toolbar'
@@ -27,6 +28,7 @@ import Tables from '../../examples/tables'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
+  ['Editable Voids', EditableVoids, 'editable-voids'],
   ['Embeds', Embeds, 'embeds'],
   ['Forced Layout', ForcedLayout, 'forced-layout'],
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],

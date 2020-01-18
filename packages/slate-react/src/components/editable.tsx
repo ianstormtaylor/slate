@@ -442,11 +442,16 @@ export const Editable = (props: EditableProps) => {
           ...style,
         }}
         onBeforeInput={useCallback(
-          (event: React.SyntheticEvent) => {
+          (event: React.FormEvent<HTMLDivElement>) => {
             // COMPAT: Firefox doesn't support the `beforeinput` event, so we
             // fall back to React's leaky polyfill instead just for it. It
             // only works for the `insertText` input type.
-            if (IS_FIREFOX && !readOnly) {
+            if (
+              IS_FIREFOX &&
+              !readOnly &&
+              !isEventHandled(event, attributes.onBeforeInput) &&
+              hasEditableTarget(editor, event.target)
+            ) {
               event.preventDefault()
               const text = (event as any).data as string
               Editor.insertText(editor, text)
