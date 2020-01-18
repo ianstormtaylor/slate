@@ -14,6 +14,7 @@ import {
   NODE_TO_INDEX,
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
+import { isDecoratorRangeListEqual } from '../utils/range-list'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**
@@ -136,7 +137,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isRangeListEqual(prev.decorations, next.decorations) &&
+    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
@@ -157,31 +158,6 @@ export const DefaultElement = (props: RenderElementProps) => {
       {children}
     </Tag>
   )
-}
-
-/**
- * Check if a list of ranges is equal to another.
- *
- * PERF: this requires the two lists to also have the ranges inside them in the
- * same order, but this is an okay constraint for us since decorations are
- * kept in order, and the odd case where they aren't is okay to re-render for.
- */
-
-const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
-  if (list.length !== another.length) {
-    return false
-  }
-
-  for (let i = 0; i < list.length; i++) {
-    const range = list[i]
-    const other = another[i]
-
-    if (!Range.equals(range, other)) {
-      return false
-    }
-  }
-
-  return true
 }
 
 export default MemoizedElement

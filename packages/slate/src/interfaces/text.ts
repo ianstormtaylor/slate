@@ -76,7 +76,7 @@ export const Text = {
         continue
       }
 
-      if (text[key] !== props[key]) {
+      if (!text.hasOwnProperty(key) || text[key] !== props[key]) {
         return false
       }
     }
