@@ -4,6 +4,8 @@ In the previous guide we learned how to create custom block types that render ch
 
 In this guide, we'll show you how to add custom formatting options, like **bold**, _italic_, `code` or ~~strikethrough~~.
 
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-applying-custom-formatting-8k8lb).
+
 So we start with our app from earlier:
 
 ```js
@@ -33,9 +35,11 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const { selection } = editor
-            const [match] = Editor.nodes(editor, {
-              match: n => n.type === 'code',
-            })
+            const [match] = Array.from(
+              Editor.nodes(editor, {
+                match: n => n.type === 'code',
+              })
+            )
             Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
@@ -83,9 +87,11 @@ const App = () => {
             // When "`" is pressed, keep our existing code block logic.
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
-              })
+              const [match] = Array.from(
+                Editor.nodes(editor, {
+                  match: n => n.type === 'code',
+                })
+              )
               Transforms.setNodes(
                 editor,
                 { type: match ? 'paragraph' : 'code' },
@@ -97,13 +103,7 @@ const App = () => {
             // When "B" is pressed, bold the text in the selection.
             case 'b': {
               event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                // Apply it to text nodes, and split the text node up if the
-                // selection is overlapping only part of it.
-                { match: n => Text.isText(n), split: true }
-              )
+              Editor.addMark(editor, 'bold', true)
               break
             }
           }
@@ -174,9 +174,11 @@ const App = () => {
           switch (event.key) {
             case '`': {
               event.preventDefault()
-              const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
-              })
+              const [match] = Array.from(
+                Editor.nodes(editor, {
+                  match: n => n.type === 'code',
+                })
+              )
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
@@ -187,11 +189,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                { match: n => Text.isText(n), split: true }
-              )
+              Editor.addMark(editor, 'bold', true)
               break
             }
           }
@@ -214,3 +212,5 @@ const Leaf = props => {
 ```
 
 Now, if you try selecting a piece of text and hitting `Ctrl-B` you should see it turn bold! Magic!
+
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-applying-custom-formatting-8k8lb).

@@ -6,6 +6,8 @@ What makes Slate great is how easy it is to customize. Just like other React com
 
 Let's use the `onKeyDown` handler to change the editor's content when we press a key.
 
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-adding-event-handlers-1nuv7).
+
 Here's our app from earlier:
 
 ```js
@@ -74,8 +76,8 @@ const App = () => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()
-            // Execute a command to insert text when the event occurs.
-            editor.exec({ type: 'insert_text', text: 'and' })
+            // insert text when the event occurs.
+            editor.insertText('and')
           }
         }}
       />
@@ -85,5 +87,7 @@ const App = () => {
 ```
 
 With that added, try typing `&`, and you should see it suddenly become `and` instead!
+
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-adding-event-handlers-1nuv7).
 
 This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and the `editor` that lets you perform commands. Simple!

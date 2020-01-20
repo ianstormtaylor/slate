@@ -6,6 +6,8 @@ But that's not all you can do. Slate lets you define any type of custom blocks y
 
 We'll show you how. Let's start with our app from earlier:
 
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-adding-custom-elements-eegoq).
+
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
@@ -22,7 +24,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.exec({ type: 'insert_text', text: 'and' })
+            editor.insertText('and')
           }
         }}
       />
@@ -93,7 +95,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.exec({ type: 'insert_text', text: 'and' })
+            editor.insertText('and')
           }
         }}
       />
@@ -222,3 +224,5 @@ const App = () => {
 ```
 
 And there you have it! If you press `` Ctrl-` `` while inside a code block, it should turn back into a paragraph!
+
+You can check a working version [here](https://codesandbox.io/s/slatejs-examples-adding-custom-elements-eegoq).
