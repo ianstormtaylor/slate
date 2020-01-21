@@ -46,8 +46,7 @@ const withChecklists = editor => {
           matchingNode.children[matchingNode.children.length - 1].text
             .length === 0
         ) {
-          Transforms.delete(editor)
-          Transforms.insertNodes(editor, {
+          Transforms.setNodes(editor, {
             type: 'paragraph',
             children: [{ text: '' }],
           })
