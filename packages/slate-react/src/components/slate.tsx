@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback } from 'react'
-import { Node } from 'slate'
+import { Editor, Node } from 'slate'
 import invariant from 'tiny-invariant'
 
 import { ReactEditor } from '../plugin/react-editor'
