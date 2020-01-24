@@ -1,15 +1,15 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { match: { key: 'a' }, split: true })
+  Transforms.unwrapNodes(editor, { match: n => n.a, split: true })
 }
 
 export const input = (
   <editor>
-    <block key="a">
+    <block a>
       <block>
         <anchor />
         one
@@ -36,7 +36,7 @@ export const output = (
       two
       <focus />
     </block>
-    <block key="a">
+    <block a>
       <block>three</block>
       <block>four</block>
       <block>five</block>

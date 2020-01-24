@@ -1,6 +1,5 @@
-import { Editor, Command, Operation, Path } from 'slate'
+import { Editor, Operation, Path } from 'slate'
 
-import { HistoryCommand } from './history-command'
 import { HistoryEditor } from './history-editor'
 
 /**
@@ -8,115 +7,110 @@ import { HistoryEditor } from './history-editor'
  * editor as operations are applied to it, using undo and redo stacks.
  */
 
-export const withHistory = (editor: Editor): HistoryEditor => {
-  const { apply, exec } = editor
-  editor.history = { undos: [], redos: [] }
+export const withHistory = <T extends Editor>(editor: T) => {
+  const e = editor as T & HistoryEditor
+  const { apply } = e
+  e.history = { undos: [], redos: [] }
 
-  editor.exec = (command: Command) => {
-    if (
-      HistoryEditor.isHistoryEditor(editor) &&
-      HistoryCommand.isHistoryCommand(command)
-    ) {
-      const { history } = editor
-      const { undos, redos } = history
+  e.redo = () => {
+    const { history } = e
+    const { redos } = history
 
-      if (command.type === 'redo' && redos.length > 0) {
-        const batch = redos[redos.length - 1]
+    if (redos.length > 0) {
+      const batch = redos[redos.length - 1]
 
-        HistoryEditor.withoutSaving(editor, () => {
-          Editor.withoutNormalizing(editor, () => {
-            for (const op of batch) {
-              editor.apply(op)
-            }
-          })
+      HistoryEditor.withoutSaving(e, () => {
+        Editor.withoutNormalizing(e, () => {
+          for (const op of batch) {
+            e.apply(op)
+          }
         })
+      })
 
-        history.redos.pop()
-        history.undos.push(batch)
-        return
-      }
-
-      if (command.type === 'undo' && undos.length > 0) {
-        const batch = undos[undos.length - 1]
-
-        HistoryEditor.withoutSaving(editor, () => {
-          Editor.withoutNormalizing(editor, () => {
-            const inverseOps = batch.map(Operation.inverse).reverse()
-
-            for (const op of inverseOps) {
-              // If the final operation is deselecting the editor, skip it. This is
-              if (
-                op === inverseOps[inverseOps.length - 1] &&
-                op.type === 'set_selection' &&
-                op.newProperties == null
-              ) {
-                continue
-              } else {
-                editor.apply(op)
-              }
-            }
-          })
-        })
-
-        history.redos.push(batch)
-        history.undos.pop()
-        return
-      }
+      history.redos.pop()
+      history.undos.push(batch)
     }
-
-    exec(command)
   }
 
-  editor.apply = (op: Operation) => {
-    if (HistoryEditor.isHistoryEditor(editor)) {
-      const { operations, history } = editor
-      const { undos } = history
-      const lastBatch = undos[undos.length - 1]
-      const lastOp = lastBatch && lastBatch[lastBatch.length - 1]
-      const overwrite = shouldOverwrite(op, lastOp)
-      let save = HistoryEditor.isSaving(editor)
-      let merge = HistoryEditor.isMerging(editor)
+  e.undo = () => {
+    const { history } = e
+    const { undos } = history
 
-      if (save == null) {
-        save = shouldSave(op, lastOp)
+    if (undos.length > 0) {
+      const batch = undos[undos.length - 1]
+
+      HistoryEditor.withoutSaving(e, () => {
+        Editor.withoutNormalizing(e, () => {
+          const inverseOps = batch.map(Operation.inverse).reverse()
+
+          for (const op of inverseOps) {
+            // If the final operation is deselecting the editor, skip it. This is
+            if (
+              op === inverseOps[inverseOps.length - 1] &&
+              op.type === 'set_selection' &&
+              op.newProperties == null
+            ) {
+              continue
+            } else {
+              e.apply(op)
+            }
+          }
+        })
+      })
+
+      history.redos.push(batch)
+      history.undos.pop()
+    }
+  }
+
+  e.apply = (op: Operation) => {
+    const { operations, history } = e
+    const { undos } = history
+    const lastBatch = undos[undos.length - 1]
+    const lastOp = lastBatch && lastBatch[lastBatch.length - 1]
+    const overwrite = shouldOverwrite(op, lastOp)
+    let save = HistoryEditor.isSaving(e)
+    let merge = HistoryEditor.isMerging(e)
+
+    if (save == null) {
+      save = shouldSave(op, lastOp)
+    }
+
+    if (save) {
+      if (merge == null) {
+        if (lastBatch == null) {
+          merge = false
+        } else if (operations.length !== 0) {
+          merge = true
+        } else {
+          merge = shouldMerge(op, lastOp) || overwrite
+        }
       }
 
-      if (save) {
-        if (merge == null) {
-          if (lastBatch == null) {
-            merge = false
-          } else if (operations.length !== 0) {
-            merge = true
-          } else {
-            merge = shouldMerge(op, lastOp) || overwrite
-          }
+      if (lastBatch && merge) {
+        if (overwrite) {
+          lastBatch.pop()
         }
 
-        if (lastBatch && merge) {
-          if (overwrite) {
-            lastBatch.pop()
-          }
+        lastBatch.push(op)
+      } else {
+        const batch = [op]
+        undos.push(batch)
+      }
 
-          lastBatch.push(op)
-        } else {
-          const batch = [op]
-          undos.push(batch)
-        }
+      while (undos.length > 100) {
+        undos.shift()
+      }
 
-        while (undos.length > 100) {
-          undos.shift()
-        }
-
-        if (shouldClear(op)) {
-          history.redos = []
-        }
+      if (shouldClear(op)) {
+        history.redos = []
       }
     }
 
     apply(op)
   }
 
-  return editor as HistoryEditor
+  return e
 }
 
 /**

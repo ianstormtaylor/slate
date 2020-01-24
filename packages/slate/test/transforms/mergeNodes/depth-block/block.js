@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Editor, Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -14,7 +14,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.mergeNodes(editor, { match: 'block' })
+  Transforms.mergeNodes(editor, { match: n => Editor.isBlock(editor, n) })
 }
 
 export const output = (

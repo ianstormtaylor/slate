@@ -7,7 +7,7 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Editor, Range, Point, createEditor } from 'slate'
+import { Editor, Transforms, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -32,18 +32,14 @@ const CheckListsExample = () => {
 }
 
 const withChecklists = editor => {
-  const { exec } = editor
+  const { deleteBackward } = editor
 
-  editor.exec = command => {
+  editor.deleteBackward = (...args) => {
     const { selection } = editor
 
-    if (
-      command.type === 'delete_backward' &&
-      selection &&
-      Range.isCollapsed(selection)
-    ) {
+    if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: { type: 'check-list-item' },
+        match: n => n.type === 'check-list-item',
       })
 
       if (match) {
@@ -51,17 +47,17 @@ const withChecklists = editor => {
         const start = Editor.start(editor, path)
 
         if (Point.equals(selection.anchor, start)) {
-          Editor.setNodes(
+          Transforms.setNodes(
             editor,
             { type: 'paragraph' },
-            { match: { type: 'check-list-item' } }
+            { match: n => n.type === 'check-list-item' }
           )
           return
         }
       }
     }
 
-    exec(command)
+    deleteBackward(...args)
   }
 
   return editor
@@ -106,7 +102,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           checked={checked}
           onChange={event => {
             const path = ReactEditor.findPath(editor, element)
-            Editor.setNodes(
+            Transforms.setNodes(
               editor,
               { checked: event.target.checked },
               { at: path }

@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -16,7 +16,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.wrapNodes(editor, <block new />, { match: 'text' })
+  Transforms.wrapNodes(editor, <block new />, { match: Text.isText })
 }
 
 export const output = (

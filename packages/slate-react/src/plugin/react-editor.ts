@@ -1,4 +1,4 @@
-import { Editor, Element, Node, Path, Point, Range } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -22,7 +22,13 @@ import {
   normalizeDOMPoint,
 } from '../utils/dom'
 
-export interface ReactEditor extends Editor {}
+/**
+ * A React and DOM-specific version of the `Editor` interface.
+ */
+
+export interface ReactEditor extends Editor {
+  insertData: (data: DataTransfer) => void
+}
 
 export const ReactEditor = {
   /**
@@ -129,7 +135,7 @@ export const ReactEditor = {
     }
 
     if (selection) {
-      Editor.deselect(editor)
+      Transforms.deselect(editor)
     }
   },
 
@@ -171,6 +177,14 @@ export const ReactEditor = {
   },
 
   /**
+   * Insert data from a `DataTransfer` into the editor.
+   */
+
+  insertData(editor: ReactEditor, data: DataTransfer): void {
+    editor.insertData(data)
+  },
+
+  /**
    * Find the native DOM element from a Slate node.
    */
 
@@ -199,8 +213,7 @@ export const ReactEditor = {
 
     // If we're inside a void node, force the offset to 0, otherwise the zero
     // width spacing character will result in an incorrect offset of 1
-    const [match] = Editor.nodes(editor, { at: point, match: 'void' })
-    if (match) {
+    if (Editor.void(editor, { at: point })) {
       point = { path: point.path, offset: 0 }
     }
 
@@ -301,7 +314,7 @@ export const ReactEditor = {
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
     // coordinates are closest to.
-    if (Element.isElement(node) && editor.isVoid(node)) {
+    if (Editor.isVoid(editor, node)) {
       const rect = target.getBoundingClientRect()
       const isPrev = editor.isInline(node)
         ? x - rect.left < rect.left + rect.width - x

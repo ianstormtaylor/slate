@@ -1,10 +1,14 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Editor, Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.setNodes(editor, { key: true }, { match: 'inline' })
+  Transforms.setNodes(
+    editor,
+    { key: true },
+    { match: n => Editor.isInline(editor, n) }
+  )
 }
 
 export const input = (

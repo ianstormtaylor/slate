@@ -36,9 +36,9 @@ In attempt to decrease the maintenance burden, and because the new abstraction a
 
 ### Commands
 
-A new `Command` concept has been introduced. (The old "commands" are now called "transforms".) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
+A new "command" concept has been introduced. (The old "commands" are now called "transforms".) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
 
-Commands are triggered by calling the `editor.exec` function. And they travel through a middleware-like stack, but built from composed functions. Any plugin can override the `exec` behaviors to augment an editor.
+Commands are triggered by calling the `editor.*` core functions. And they travel through a middleware-like stack, but built from composed functions. Any plugin can override the behaviors to augment an editor.
 
 ### Plugins
 
@@ -83,14 +83,14 @@ One of the goals was to dramatically simplify a lot of the logic in Slate to mak
 To give you a sense for the change in total lines of code:
 
 ```
-slate                       8,436  ->  3,724  (48%)
-slate-react                 3,905  ->    627  (18%)
+slate                       8,436  ->  3,958  (47%)
+slate-react                 3,905  ->  1,954  (50%)
 
 slate-base64-serializer        38  ->      0
 slate-dev-benchmark           340  ->      0
 slate-dev-environment         102  ->      0
 slate-dev-test-utils           44  ->      0
-slate-history                   0  ->    209
+slate-history                   0  ->    211
 slate-hotkeys                  62  ->      0
 slate-html-serializer         253  ->      0
 slate-hyperscript             447  ->    345
@@ -98,7 +98,7 @@ slate-plain-serializer         56  ->      0
 slate-prop-types               62  ->      0
 slate-react-placeholder        62  ->      0
 
-total                      13,807  ->  4,905  (36%)
+total                      13,807  ->  6,468  (47%)
 ```
 
 It's quite a big difference! And that doesn't even include the dependencies that were shed in the process too.

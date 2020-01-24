@@ -3,7 +3,7 @@
 import { jsx } from '../..'
 
 export const run = editor => {
-  editor.exec({ type: 'delete_backward' })
+  editor.deleteBackward()
 }
 
 export const input = (

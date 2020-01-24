@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.delete(editor, { at: [0, 0], voids: true })
+  Transforms.delete(editor, { at: [0, 0], voids: true })
 }
 
 export const output = (

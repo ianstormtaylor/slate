@@ -1,22 +1,22 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Editor.unwrapNodes(editor, { match: { key: 'a' } })
+  Transforms.unwrapNodes(editor, { match: n => n.a })
 }
 
 export const input = (
   <editor>
     <block>
       <text />
-      <inline key="a">
+      <inline a>
         <anchor />
         one
       </inline>
       two
-      <inline key="a">
+      <inline a>
         three
         <focus />
       </inline>

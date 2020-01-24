@@ -5,16 +5,28 @@ All of the behaviors, content and state of a Slate editor is rollup up into a si
 ```ts
 interface Editor {
   children: Node[]
-  operations: Operation[]
   selection: Range | null
+  operations: Operation[]
   marks: Record<string, any> | null
-  apply: (operation: Operation) => void
-  exec: (command: Command) => void
+  [key: string]: any
+
+  // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-  [key: string]: any
+
+  // Overrideable core actions.
+  addMark: (key: string, value: any) => void
+  apply: (operation: Operation) => void
+  deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
+  deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
+  deleteFragment: () => void
+  insertBreak: () => void
+  insertFragment: (fragment: Node[]) => void
+  insertNode: (node: Node) => void
+  insertText: (text: string) => void
+  removeMark: (key: string) => void
 }
 ```
 
@@ -24,7 +36,9 @@ The `children` property contains the document tree of nodes that make up the edi
 
 The `selection` property contains the user's current selection, if any.
 
-And the `operations` property contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
+The `operations` property contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
+
+The `marks` property stores formatting that is attached to the cursor, and that will be applied to the text that is inserted next.
 
 ## Overriding Behaviors
 
@@ -40,18 +54,18 @@ editor.isInline = element => {
 }
 ```
 
-Or maybe you want to define a custom command:
+Or maybe you want to override the `insertText` behavior to "linkify" URLs:
 
 ```js
-const { exec } = editor
+const { insertText } = editor
 
-editor.exec = command => {
-  if (command.type === 'insert_link') {
-    const { url } = command
+editor.insertText = text => {
+  if (isUrl(text) {
     // ...
-  } else {
-    exec(command)
+    return
   }
+
+  insertText(text)
 }
 ```
 
@@ -65,6 +79,7 @@ editor.normalizeNode = entry => {
 
   if (Element.isElement(node) && node.type === 'link') {
     // ...
+    return
   }
 
   normalizeNode(entry)
@@ -81,9 +96,6 @@ The `Editor` interface, like all Slate interfaces, exposes helper functions that
 // Get the start point of a specific node at path.
 const point = Editor.start(editor, [0, 0])
 
-// Check whether an element matches a set of properties.
-const isMatch = Editor.isMatch(editor, element, { type: 'quote' })
-
 // Get the fragment (a slice of the document) at a range.
 const fragment = Editor.fragment(editor, range)
 ```
@@ -91,8 +103,8 @@ const fragment = Editor.fragment(editor, range)
 There are also many iterator-based helpers, for example:
 
 ```js
-// Iterate over every element in a range.
-for (const [element, path] of Editor.elements(editor, { at: range })) {
+// Iterate over every node in a range.
+for (const [node, path] of Editor.nodes(editor, { at: range })) {
   // ...
 }
 
@@ -101,18 +113,3 @@ for (const [point] of Editor.positions(editor)) {
   // ...
 }
 ```
-
-Another special group of helper functions exposed on the `Editor` interface are the "transform" helpers. They are the lower-level functions that commands use to define their behaviors. For example:
-
-```js
-// Insert an element node at a specific path.
-Editor.insertNodes(editor, [element], { at: path })
-
-// Split the nodes in half at a specific point.
-Editor.splitNodes(editor, { at: point })
-
-// Add a quote format to all the block nodes in the selection.
-Editor.setNodes(editor, { type: 'quote' })
-```
-
-The editor-specific helpers are the ones you'll use most often when working with Slate editors, so it pays to become very familiar with them.

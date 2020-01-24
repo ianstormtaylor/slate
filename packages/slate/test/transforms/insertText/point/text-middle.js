@@ -1,6 +1,6 @@
 /** @jsx jsx */
 
-import { Editor } from 'slate'
+import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -12,7 +12,7 @@ export const input = (
 )
 
 export const run = editor => {
-  Editor.insertText(editor, 'x', { at: { path: [0, 0], offset: 2 } })
+  Transforms.insertText(editor, 'x', { at: { path: [0, 0], offset: 2 } })
 }
 
 export const output = (

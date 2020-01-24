@@ -8,7 +8,7 @@ describe('slate-history', () => {
     const { input, run, output } = module
     const editor = withTest(withHistory(input))
     run(editor)
-    editor.exec({ type: 'undo' })
+    editor.undo()
     assert.deepEqual(editor.children, output.children)
     assert.deepEqual(editor.selection, output.selection)
   })

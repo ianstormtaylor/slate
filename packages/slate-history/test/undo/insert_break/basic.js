@@ -4,7 +4,7 @@ import { Editor } from 'slate'
 import { jsx } from '../..'
 
 export const run = editor => {
-  editor.exec({ type: 'insert_break' })
+  editor.insertBreak()
 }
 
 export const input = (

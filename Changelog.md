@@ -4,6 +4,204 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ---
 
+### `0.57.0` — December 18, 2019
+
+###### BREAKING
+
+**Overrideble commands now live directly on the editor object.** Previously the `Command` concept was implemented as an interface that was passed into the `editor.exec` function, allowing the "core" commands to be overriden in one place. But this introduced a lot of Redux-like indirection when implementing custom commands that wasn't necessary because they are never overridden. Instead, now the core actions that can be overridden are implemented as individual functions on the editor (eg. `editor.insertText`) and they can be overridden just like any other function (eg. `isVoid`).
+
+Previously to override a command you'd do:
+
+```js
+const withPlugin = editor => {
+  const { exec } = editor
+
+  editor.exec = command => {
+    if (command.type === 'insert_text') {
+      const { text } = command
+
+      if (myCustomLogic) {
+        // ...
+        return
+      }
+    }
+
+    exec(command)
+  }
+
+  return editor
+}
+```
+
+Now, you'd override the specific function directly:
+
+```js
+const withPlugin = editor => {
+  const { insertText } = editor
+
+  editor.insertText = text => {
+    if (myCustomLogic) {
+      // ...
+      return
+    }
+
+    insertText(text)
+  }
+
+  return editor
+}
+```
+
+You shouldn't ever need to call these functions directly! They are there for plugins to tap into, but there are higher level helpers for you to call whenever you actually need to invoke them. Read on…
+
+**Transforms now live in a separate namespace of helpers.** Previously the document and selection transformation helpers were available directly on the `Editor` interface as `Editor.*`. But these helpers are fairly low level, and not something that you'd use in your own codebase all over the place, usually only inside specific custom helpers of your own. To make room for custom userland commands, these helpers have been moved to a new `Transforms` namespace.
+
+Previously you'd write:
+
+```js
+Editor.unwrapNodes(editor, ...)
+```
+
+Now you'd write:
+
+```js
+Transforms.unwrapNodes(editor, ...)
+```
+
+**The `Command` interfaces were removed.** As part of those changes, the existing `Command`, `CoreCommand`, `HistoryCommand`, and `ReactCommand` interfaces were all removed. You no longer need to define these "command objects", because you can just call the functions directly. Plugins can still define their own overridable commands by existing the `Editor` interface with new functions. The `slate-react` plugin does this with `insertData` and the `slate-history` plugin does this with `undo` and `redo`.
+
+###### NEW
+
+**User actions helpers now live directly on the `Editor.*` interface.** These are taking the place of the existing `Transforms.*` helpers that were moved. These helpers are equivalent to user actions, and they always operate on the existing selection. There are some defined by core, but you are likely to define your own custom helpers that are specific to your domain as well.
+
+For example, here are some of the built-in actions:
+
+```js
+Editor.insertText(editor, 'a string of text')
+Editor.deleteForward(editor)
+Editor.deleteBackward(editor, { unit: 'word' })
+Editor.addMark(editor, 'bold', true)
+Editor.insertBreak(editor)
+...
+```
+
+Every one of the old "core commands" has an equivalent `Editor.*` helper exposed now. However, you can easily define your own custom helpers and place them in a namespace as well:
+
+```js
+const MyEditor = {
+  ...Editor,
+  insertParagraph(editor) { ... },
+  toggleBoldMark(editor) { ... },
+  formatLink(editor, url) { ... },
+  ...
+}
+```
+
+Whatever makes sense for your specific use case!
+
+---
+
+### `0.56.0` — December 17, 2019
+
+###### BREAKING
+
+**The `format_text` command is split into `add_mark` and `remove_mark`.** Although the goal is to keep the number of commands in core to a minimum, having this as a combined command made it very hard to write logic that wanted to guarantee to only ever add or remove a mark from a text node. Now you can be guaranteed that the `add_mark` command will only ever add a custom property to text nodes, and the `remove_mark` command will only ever remove them.
+
+Previously you would write:
+
+```js
+editor.exec({
+  type: 'format_text',
+  properties: { bold: true },
+})
+```
+
+Now you would write:
+
+```js
+if (isActive) {
+  editor.exec({ type: 'remove_mark', key: 'bold' })
+} else {
+  editor.exec({ type: 'add_mark', key: 'bold', value: true })
+}
+```
+
+> 🤖 Note that the "mark" term does not mean what it meant in `0.47` and earlier. It simply means formatting that is applied at the text level—bold, italic, etc. We need a term for it because it's such a common pattern in richtext editor, and "mark" is often the term that is used. For example the `<mark>` tag in HTML.
+
+**The `Node.text` helper was renamed to `Node.string`.** This was simply to reduce the confusion between "the text string" and "text nodes". The helper still just returns the concatenated string content of a node.
+
+---
+
+### `0.55.0` — December 15, 2019
+
+###### BREAKING
+
+**The `match` option must now be a function.** Previously there were a few shorthands, like passing in a plain object. This behavior was removed because it made it harder to reason about exactly what was being matched, it made debugging harder, and it made it hard to type well. Now the `match` option must be a function that receives the `Node` object to match. If you're using TypeScript, and the function you pass in is a type guard, that will be taken into account in the return value!
+
+Previously you might write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: 'text',
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: { type: 'paragraph' },
+})
+```
+
+Now you'd write:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Text.isText,
+})
+
+Editor.nodes(editor, {
+  at: range,
+  match: node => node.type === 'paragraph',
+})
+```
+
+**The `mode` option now defaults to `'lowest'`.** Previously the default varied depending on where in the codebase it was used. Now it defaults to `'lowest'` everywhere, and you can always pass in `'highest'` to change the behavior. The one exception is the `Editor.nodes` helper which defaults to `'all'` since that's the expected behavior most of the time.
+
+**The `Editor.match` helper was renamed to `Editor.above`.** This was just to make it clear how it searched in the tree—it looks through all of the nodes directly above a location in the document.
+
+**The `Editor.above/previous/next` helpers now take all options in a dictionary.** Previously their APIs did not exactly match the `Editor.nodes` helper which they are shorthand for, but now this is no longer the case. The `at`, `match` and `mode` options are all passed in the `options` argument.
+
+Previously you would use:
+
+```js
+Editor.previous(editor, path, n => Text.isText(n), {
+  mode: 'lowest',
+})
+```
+
+Now you'd use:
+
+```js
+Editor.previous(editor, {
+  at: path,
+  match: n => Text.isText(n),
+  mode: 'lowest',
+  ...
+})
+```
+
+**The `Editor.elements` and `Editor.texts` helpers were removed.** These were simple convenience helpers that were rarely used. You can now achieve the same thing by using the `Editor.nodes` helper directly along with the `match` option. For example:
+
+```js
+Editor.nodes(editor, {
+  at: range,
+  match: Element.isElement,
+})
+```
+
+---
+
 ### `0.54.0` — December 12, 2019
 
 ###### BREAKING

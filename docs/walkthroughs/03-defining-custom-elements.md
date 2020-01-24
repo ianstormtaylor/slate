@@ -147,7 +147,11 @@ const App = () => {
             // Prevent the "`" from being inserted by default.
             event.preventDefault()
             // Otherwise, set the currently selected blocks type to "code".
-            Editor.setNodes(editor, { type: 'code' }, { match: 'block' })
+            Transforms.setNodes(
+              editor,
+              { type: 'code' },
+              { match: n => Editor.isBlock(editor, n) }
+            )
           }
         }}
       />
@@ -200,12 +204,14 @@ const App = () => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
-            const [match] = Editor.nodes(editor, { match: { type: 'code' } })
+            const [match] = Editor.nodes(editor, {
+              match: n => n.type === 'code',
+            })
             // Toggle the block type depending on whether there's already a match.
-            Editor.setNodes(
+            Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: 'block' }
+              { match: n => Editor.isBlock(editor, n) }
             )
           }
         }}
