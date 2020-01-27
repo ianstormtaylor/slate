@@ -179,7 +179,6 @@ But we forgot one thing. When you hit `` Ctrl-` `` again, it should change the c
 ```js
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
