@@ -110,7 +110,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/tables.js) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/paste-html.js) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js) — showing how to use inline void nodes for simple @-mentions.
-- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js)
+- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
