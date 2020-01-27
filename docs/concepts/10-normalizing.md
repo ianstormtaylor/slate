@@ -1,6 +1,6 @@
 # Normalizing
 
-Slate editors can editor complex, nested data structures. And for the most part this is great, but in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
+Slate editors can edit complex, nested data structures. And for the most part this is great, but in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
 
 "Normalizing" is how you can ensure that your editor's content is always of a certain shape. It's similar to "validating", except instead of just determining whether the content is valid or invalid, its job is to fix the content to make it valid again.
 
@@ -146,6 +146,6 @@ const withLinks = editor => {
 }
 ```
 
-This fix are incorrectly written. It wants to ensure that all `link` elements have a `url` property string. But to fix invalid links it sets the `url` to `null`, which is still not a string!
+This fix is incorrectly written. It wants to ensure that all `link` elements have a `url` property string. But to fix invalid links it sets the `url` to `null`, which is still not a string!
 
 In this case you'd either want to unwrap the link, removing it entirely. _Or_ expand your validation to accept an "empty" `url == null` as well.
