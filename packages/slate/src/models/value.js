@@ -505,12 +505,20 @@ class Value extends Record(DEFAULTS) {
     node = document.assertNode(path)
     value = value.set('document', document)
 
-    value = value.mapPoints(point => {
-      if (point.key === node.key && point.offset >= offset) {
-        return point.setOffset(point.offset + text.length)
-      } else {
+    value = value.mapRanges(range => {
+      const isAnnotation = Annotation.isAnnotation(range)
+      return range.updatePoints(point => {
+        if (point.key === node.key) {
+          if (
+            point.offset > offset ||
+            (point.offset === offset &&
+              (point === range.start || !isAnnotation))
+          ) {
+            return point.setOffset(point.offset + text.length)
+          }
+        }
         return point
-      }
+      })
     })
 
     return value
@@ -818,15 +826,28 @@ class Value extends Record(DEFAULTS) {
     value = value.mapRanges(range => {
       const next = newDocument.getNextText(node.key)
       const { anchor, focus } = range
+      const isAnnotation = Annotation.isAnnotation(range)
 
       // If the anchor was after the split, move it to the next node.
-      if (node.key === anchor.key && position <= anchor.offset) {
-        range = range.moveAnchorTo(next.key, anchor.offset - position)
+      if (node.key === anchor.key) {
+        if (
+          position < anchor.offset ||
+          (position === anchor.offset &&
+            (anchor === range.start || !isAnnotation))
+        ) {
+          range = range.moveAnchorTo(next.key, anchor.offset - position)
+        }
       }
 
       // If the focus was after the split, move it to the next node.
-      if (node.key === focus.key && position <= focus.offset) {
-        range = range.moveFocusTo(next.key, focus.offset - position)
+      if (node.key === focus.key) {
+        if (
+          position < focus.offset ||
+          (position === focus.offset &&
+            (focus === range.start || !isAnnotation))
+        ) {
+          range = range.moveFocusTo(next.key, focus.offset - position)
+        }
       }
 
       range = range.updatePoints(point => point.setPath(null))
