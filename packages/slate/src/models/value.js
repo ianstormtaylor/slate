@@ -507,12 +507,13 @@ class Value extends Record(DEFAULTS) {
 
     value = value.mapRanges(range => {
       const isAnnotation = Annotation.isAnnotation(range)
+      const { isCollapsed } = range
       return range.updatePoints(point => {
         if (point.key === node.key) {
           if (
             point.offset > offset ||
             (point.offset === offset &&
-              (point === range.start || !isAnnotation))
+              (isCollapsed || point === range.start || !isAnnotation))
           ) {
             return point.setOffset(point.offset + text.length)
           }
@@ -825,7 +826,7 @@ class Value extends Record(DEFAULTS) {
 
     value = value.mapRanges(range => {
       const next = newDocument.getNextText(node.key)
-      const { anchor, focus } = range
+      const { anchor, focus, isCollapsed } = range
       const isAnnotation = Annotation.isAnnotation(range)
 
       // If the anchor was after the split, move it to the next node.
@@ -833,7 +834,7 @@ class Value extends Record(DEFAULTS) {
         if (
           position < anchor.offset ||
           (position === anchor.offset &&
-            (anchor === range.start || !isAnnotation))
+            (isCollapsed || anchor === range.start || !isAnnotation))
         ) {
           range = range.moveAnchorTo(next.key, anchor.offset - position)
         }
