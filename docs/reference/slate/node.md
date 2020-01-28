@@ -334,7 +334,7 @@ Get the direction of the text content in the node.
 
 ### `getTexts`
 
-`getTexts(range: Range) => List`
+`getTexts() => List`
 
 Get all of the [`Text`](./text.md) nodes in a node.
 

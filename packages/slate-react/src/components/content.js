@@ -128,6 +128,7 @@ class Content extends React.Component {
     nodeRef: React.createRef(),
     nodeRefs: {},
     contentKey: 0,
+    nativeSelection: {}, // Native selection object stored to check if `onNativeSelectionChange` has triggered yet
   }
 
   /**
@@ -260,11 +261,34 @@ class Content extends React.Component {
 
     // If the Slate selection is unset, but the DOM selection has a range
     // selected in the editor, we need to remove the range.
+    // However we should _not_ remove the range if the selection as
+    // reported by `getSelection` is not equal to `this.tmp.nativeSelection`
+    // as this suggests `onNativeSelectionChange` has not triggered yet (which can occur in Firefox)
+    // See: https://github.com/ianstormtaylor/slate/pull/2995
+
+    const propsToCompare = [
+      'anchorNode',
+      'anchorOffset',
+      'focusNode',
+      'focusOffset',
+      'isCollapsed',
+      'rangeCount',
+      'type',
+    ]
+
+    let selectionsEqual = true
+
+    for (const prop of propsToCompare) {
+      if (this.tmp.nativeSelection[prop] !== native[prop]) {
+        selectionsEqual = false
+      }
+    }
+
     if (
       selection.isUnset &&
       rangeCount &&
       this.isInEditor(anchorNode) &&
-      selectionsEqual(this.nativeSelection, native)
+      selectionsEqual
     ) {
       removeAllRanges(native)
       updated = true
@@ -527,7 +551,7 @@ class Content extends React.Component {
 
     if (activeElement !== this.ref.current) return
 
-    this.nativeSelection = {
+    this.tmp.nativeSelection = {
       anchorNode: native.anchorNode,
       anchorOffset: native.anchorOffset,
       focusNode: native.focusNode,

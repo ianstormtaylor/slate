@@ -20,6 +20,7 @@ These tools are helpful when developing with Slate:
 These products use Slate, and can give you an idea of what's possible:
 
 * [Cake](https://www.cake.co/)
+* [Archbee](https://archbee.io)
 * [Chatterbug](https://chatterbug.com)
 * [GitBook](https://www.gitbook.com/)
 * [Grafana](https://grafana.com/)
@@ -31,6 +32,7 @@ These products use Slate, and can give you an idea of what's possible:
 * [Sanity.io](https://www.sanity.io)
 * [Taskade](https://www.taskade.com/)
 * [Yuque](https://www.yuque.com/)
+* [Thoughts](https://thoughts.teambition.com)
 
 ## Editors
 
