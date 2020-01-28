@@ -131,8 +131,18 @@ Commands.moveAnchorToStartOfText = editor => {
   editor.command(pointEdgeObject, 'anchor', 'start', 'text')
 }
 
-Commands.moveBackward = (editor, ...args) => {
-  editor.moveAnchorBackward(...args).moveFocusBackward(...args)
+Commands.moveBackward = (editor, chars = 1) => {
+  if (chars === 0) return
+
+  const { value } = editor
+  const { document, selection } = value
+  const { start } = selection
+  const startBlock = document.getClosestBlock(start.key)
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
+  const { text } = startBlock
+  const charsOffset = TextUtils.getCharOffsetBackward(text, offset, chars)
+  editor.moveAnchorBackward(charsOffset).moveFocusBackward(charsOffset)
 }
 
 Commands.moveWordBackward = (editor, ...args) => {
@@ -355,8 +365,18 @@ Commands.moveFocusToStartOfText = editor => {
   editor.command(pointEdgeObject, 'focus', 'start', 'text')
 }
 
-Commands.moveForward = (editor, ...args) => {
-  editor.moveAnchorForward(...args).moveFocusForward(...args)
+Commands.moveForward = (editor, chars = 1) => {
+  if (chars === 0) return
+
+  const { value } = editor
+  const { document, selection } = value
+  const { start } = selection
+  const startBlock = document.getClosestBlock(start.path)
+  const o = startBlock.getOffset(start.key)
+  const offset = o + start.offset
+  const { text } = startBlock
+  const charsOffset = TextUtils.getCharOffsetForward(text, offset, chars)
+  editor.moveAnchorForward(charsOffset).moveFocusForward(charsOffset)
 }
 
 Commands.moveWordForward = (editor, ...args) => {

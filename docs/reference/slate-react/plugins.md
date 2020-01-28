@@ -19,6 +19,7 @@ In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-r
   onFocus: Function,
   onKeyDown: Function,
   onKeyUp: Function,
+  onMouseUp: Function,
   onPaste: Function,
   onSelect: Function,
   renderEditor: Function,

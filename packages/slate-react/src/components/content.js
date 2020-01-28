@@ -23,26 +23,6 @@ import removeAllRanges from '../utils/remove-all-ranges'
 
 const FIREFOX_NODE_TYPE_ACCESS_ERROR = /Permission denied to access property "nodeType"/
 
-const selectionsEqual = (sel1, sel2) => {
-  const propsToCompare = [
-    'anchorNode',
-    'anchorOffset',
-    'focusNode',
-    'focusOffset',
-    'isCollapsed',
-    'rangeCount',
-    'type',
-  ]
-
-  for (const prop of propsToCompare) {
-    if (sel1[prop] !== sel2[prop]) {
-      return false
-    }
-  }
-
-  return true
-}
-
 /**
  * Debug.
  *
@@ -222,6 +202,7 @@ class Content extends React.Component {
     debug.update('componentDidUpdate')
 
     this.updateSelection()
+    this.props.editor.clearUserActionPerformed()
 
     this.props.onEvent('onComponentDidUpdate')
   }
@@ -365,8 +346,11 @@ class Content extends React.Component {
         native.addRange(range)
       }
 
-      // Scroll to the selection, in case it's out of view.
-      scrollToSelection(native)
+      // Only scroll to selection when a user action is performed
+      if (editor.userActionPerformed() === true) {
+        // Scroll to the selection, in case it's out of view.
+        scrollToSelection(native)
+      }
 
       // Then unset the `isUpdatingSelection` flag after a delay, to ensure that
       // it is still set when selection-related events from updating it fire.

@@ -77,7 +77,7 @@
     "to-snake-case": "^1.0.0",
     "uglifyjs-webpack-plugin": "^1.1.8",
     "webpack": "^3.11.0",
-    "webpack-dev-server": "^2.11.1"
+    "webpack-dev-server": "^3.1.11"
   },
   "peerDependencies": {
     "slate": "*",

@@ -55,7 +55,7 @@ There are a handful of different categories of commands that ship with Slate by 
 
 ### At a Specific Range
 
-These are commands like `deleteAtRange()`, `addMarkAtArange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](../reference/slate/range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of commands instead...
+These are commands like `deleteAtRange()`, `addMarkAtRange()`, `unwrapBlockAtRange()`, etc. that take in a [`Range`](../reference/slate/range.md) argument and apply a change to the document for all of the content in that range. These aren't used that often, because you'll usually be able to get away with using the next category of commands instead...
 
 ### At the Current Selection
 
