@@ -4,6 +4,8 @@
  * @return {Object}
  */
 
+import scrollToSelectionUtil from '../../utils/scroll-to-selection'
+
 function CommandsPlugin() {
   /**
    * Takes a `node`, find the matching `domNode` and uses it to set the text
@@ -61,10 +63,18 @@ function CommandsPlugin() {
     editor.reconcileNode(node)
   }
 
+  function scrollToSelection(editor) {
+    window.requestAnimationFrame(() => {
+      const selection = window.getSelection()
+      scrollToSelectionUtil(selection)
+    })
+  }
+
   return {
     commands: {
       reconcileNode,
       reconcileDOMNode,
+      scrollToSelection,
     },
   }
 }

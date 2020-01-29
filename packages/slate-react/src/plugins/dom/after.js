@@ -27,6 +27,7 @@ const debug = Debug('slate:after')
 function AfterPlugin(options = {}) {
   let isDraggingInternally = null
   let isMouseDown = false
+  let isFocusFromClick = false
 
   /**
    * On before input.
@@ -393,11 +394,10 @@ function AfterPlugin(options = {}) {
     // the old selection from being set by the `updateSelection` of `<Content>`,
     // preventing the `selectionchange` from firing. (2018/11/07)
     if (isMouseDown && !IS_IE && !IS_EDGE) {
-      editor.deselect().focus()
-    } else {
-      editor.focus()
+      isFocusFromClick = true
     }
 
+    editor.focus()
     next()
   }
 
@@ -669,6 +669,15 @@ function AfterPlugin(options = {}) {
     next()
   }
 
+  function focusFromClick() {
+    return isFocusFromClick
+  }
+
+  function clearFocusFromClick() {
+    isFocusFromClick = false
+    return null
+  }
+
   /**
    * Return the plugin.
    *
@@ -691,6 +700,8 @@ function AfterPlugin(options = {}) {
     onMouseUp,
     onPaste,
     onSelect,
+    queries: { focusFromClick },
+    commands: { clearFocusFromClick },
   }
 }
 

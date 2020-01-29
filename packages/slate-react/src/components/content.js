@@ -201,7 +201,10 @@ class Content extends React.Component {
   componentDidUpdate() {
     debug.update('componentDidUpdate')
 
-    this.updateSelection()
+    if (!this.props.editor.focusFromClick()) {
+      this.updateSelection()
+    }
+
     this.props.editor.clearUserActionPerformed()
 
     this.props.onEvent('onComponentDidUpdate')
@@ -512,16 +515,7 @@ class Content extends React.Component {
     this.props.onEvent(handler, event)
   }
 
-  /**
-   * On native `selectionchange` event, trigger the `onSelect` handler. This is
-   * needed to account for React's `onSelect` being non-standard and not firing
-   * until after a selection has been released. This causes issues in situations
-   * where another change happens while a selection is being made.
-   *
-   * @param {Event} event
-   */
-
-  throttledOnNativeSelectionChange = throttle(event => {
+  unthrottledOnNativeSelectionChange = event => {
     if (this.props.readOnly) return
 
     const window = getWindow(event.target)
@@ -546,7 +540,21 @@ class Content extends React.Component {
     }
 
     this.props.onEvent('onSelect', event)
-  }, 100)
+  }
+
+  throttledOnNativeSelectionChange = throttle(
+    this.unthrottledOnNativeSelectionChange,
+    100
+  )
+
+  /**
+   * On native `selectionchange` event, trigger the `onSelect` handler. This is
+   * needed to account for React's `onSelect` being non-standard and not firing
+   * until after a selection has been released. This causes issues in situations
+   * where another change happens while a selection is being made.
+   *
+   * @param {Event} event
+   */
 
   onNativeSelectionChange = event => {
     if (this.tmp.isUpdatingSelection) return
@@ -574,7 +582,12 @@ class Content extends React.Component {
       }
     }
 
-    this.throttledOnNativeSelectionChange(event)
+    if (this.props.editor.focusFromClick()) {
+      this.props.editor.clearFocusFromClick()
+      this.unthrottledOnNativeSelectionChange(event)
+    } else {
+      this.throttledOnNativeSelectionChange(event)
+    }
   }
 
   /**
