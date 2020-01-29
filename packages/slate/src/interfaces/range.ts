@@ -19,8 +19,8 @@ export const Range = {
    * in the document.
    */
 
-  edges(
-    range: Range,
+  edges<R extends Range>(
+    range: R,
     options: {
       reverse?: boolean
     } = {}

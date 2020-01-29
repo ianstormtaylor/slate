@@ -5,12 +5,12 @@ export const SelectionTransforms = {
    * Collapse the selection.
    */
 
-  collapse(
-    editor: Editor,
+  collapse<E extends Editor>(
+    editor: E,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
-  ) {
+  ): void {
     const { edge = 'anchor' } = options
     const { selection } = editor
 
@@ -33,7 +33,7 @@ export const SelectionTransforms = {
    * Unset the selection.
    */
 
-  deselect(editor: Editor) {
+  deselect<E extends Editor>(editor: E): void {
     const { selection } = editor
 
     if (selection) {
@@ -49,15 +49,15 @@ export const SelectionTransforms = {
    * Move the selection's point forward or backward.
    */
 
-  move(
-    editor: Editor,
+  move<E extends Editor>(
+    editor: E,
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line'
       reverse?: boolean
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
-  ) {
+  ): void {
     const { selection } = editor
     const { distance = 1, unit = 'character', reverse = false } = options
     let { edge = null } = options
@@ -105,7 +105,7 @@ export const SelectionTransforms = {
    * Set the selection to a new value.
    */
 
-  select(editor: Editor, target: Location) {
+  select<E extends Editor>(editor: E, target: Location): void {
     const { selection } = editor
     target = Editor.range(editor, target)
 
@@ -133,13 +133,13 @@ export const SelectionTransforms = {
    * Set new properties on one of the selection's points.
    */
 
-  setPoint(
-    editor: Editor,
-    props: Partial<Point>,
+  setPoint<E extends Editor, P extends Point>(
+    editor: E,
+    props: Partial<P>,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     }
-  ) {
+  ): void {
     const { selection } = editor
     let { edge = 'both' } = options
 
@@ -170,7 +170,7 @@ export const SelectionTransforms = {
    * Set new properties on the selection.
    */
 
-  setSelection(editor: Editor, props: Partial<Range>) {
+  setSelection<E extends Editor>(editor: E, props: Partial<Range>): void {
     const { selection } = editor
     const oldProps: Partial<Range> | null = {}
     const newProps: Partial<Range> = {}

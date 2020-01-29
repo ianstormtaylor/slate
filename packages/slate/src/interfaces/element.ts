@@ -16,7 +16,7 @@ export const Element = {
    * Check if a value implements the `Element` interface.
    */
 
-  isElement(value: any): value is Element {
+  isElement<E extends Element>(value: any): value is E {
     return (
       isPlainObject(value) &&
       Node.isNodeList(value.children) &&
@@ -28,7 +28,7 @@ export const Element = {
    * Check if a value is an array of `Element` objects.
    */
 
-  isElementList(value: any): value is Element[] {
+  isElementList<E extends Element>(value: any): value is E[] {
     return (
       Array.isArray(value) &&
       (value.length === 0 || Element.isElement(value[0]))

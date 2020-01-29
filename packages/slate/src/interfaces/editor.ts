@@ -58,13 +58,15 @@ export interface Editor {
   removeMark: (key: string) => void
 }
 
+interface EditorLike extends Editor {}
+
 export const Editor = {
   /**
    * Get the ancestor above a location in the document.
    */
 
-  above<T extends Ancestor>(
-    editor: Editor,
+  above<A extends Ancestor>(
+    editor: EditorLike,
     options: {
       at?: Location
       match?: NodeMatch<T>
@@ -105,7 +107,7 @@ export const Editor = {
    * `editor.marks` property instead, and applied when text is inserted next.
    */
 
-  addMark(editor: Editor, key: string, value: any): void {
+  addMark<E extends Editor, El extends Element>(editor: Editor, key: string, value: any): void {
     editor.addMark(key, value)
   },
 
@@ -113,7 +115,7 @@ export const Editor = {
    * Get the point after a location.
    */
 
-  after(
+  after<E extends Editor, El extends Element>(
     editor: Editor,
     at: Location,
     options: {
@@ -147,7 +149,7 @@ export const Editor = {
    * Get the point before a location.
    */
 
-  before(
+  before<E extends Editor, El extends Element>(
     editor: Editor,
     at: Location,
     options: {
@@ -185,7 +187,7 @@ export const Editor = {
    * Delete content in the editor backward from the current selection.
    */
 
-  deleteBackward(
+  deleteBackward<E extends Editor, El extends Element>(
     editor: Editor,
     options: {
       unit?: 'character' | 'word' | 'line' | 'block'
@@ -199,7 +201,7 @@ export const Editor = {
    * Delete content in the editor forward from the current selection.
    */
 
-  deleteForward(
+  deleteForward<E extends Editor, El extends Element>(
     editor: Editor,
     options: {
       unit?: 'character' | 'word' | 'line' | 'block'
@@ -213,7 +215,7 @@ export const Editor = {
    * Delete the content in the current selection.
    */
 
-  deleteFragment(editor: Editor): void {
+  deleteFragment<E extends Editor, El extends Element>(editor: Editor): void {
     editor.deleteFragment()
   },
 
@@ -221,7 +223,7 @@ export const Editor = {
    * Get the start and end points of a location.
    */
 
-  edges(editor: Editor, at: Location): [Point, Point] {
+  edges<E extends Editor, El extends Element>(editor: Editor, at: Location): [Point, Point] {
     return [Editor.start(editor, at), Editor.end(editor, at)]
   },
 
@@ -229,7 +231,7 @@ export const Editor = {
    * Get the end point of a location.
    */
 
-  end(editor: Editor, at: Location): Point {
+  end<E extends Editor, El extends Element>(editor: Editor, at: Location): Point {
     return Editor.point(editor, at, { edge: 'end' })
   },
 
@@ -237,7 +239,7 @@ export const Editor = {
    * Get the first node at a location.
    */
 
-  first(editor: Editor, at: Location): NodeEntry {
+  first<E extends Editor>(editor: E, at: Location): NodeEntry {
     const path = Editor.path(editor, at, { edge: 'start' })
     return Editor.node(editor, path)
   },
@@ -246,7 +248,7 @@ export const Editor = {
    * Get the fragment at a location.
    */
 
-  fragment(editor: Editor, at: Location): Descendant[] {
+  fragment<E extends Editor>(editor: E, at: Location): Descendant[] {
     const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor, range)
     return fragment
@@ -255,7 +257,7 @@ export const Editor = {
    * Check if a node has block children.
    */
 
-  hasBlocks(editor: Editor, element: Element): boolean {
+  hasBlocks<E extends Editor, El extends Element>(editor: E, element: El): boolean {
     return element.children.some(n => Editor.isBlock(editor, n))
   },
 
@@ -263,7 +265,7 @@ export const Editor = {
    * Check if a node has inline and text children.
    */
 
-  hasInlines(editor: Editor, element: Element): boolean {
+  hasInlines<E extends Editor, El extends Element>(editor: E, element: El): boolean {
     return element.children.some(
       n => Text.isText(n) || Editor.isInline(editor, n)
     )
@@ -273,7 +275,7 @@ export const Editor = {
    * Check if a node has text children.
    */
 
-  hasTexts(editor: Editor, element: Element): boolean {
+  hasTexts<E extends Editor, El extends Element>(editor: E, element: El): boolean {
     return element.children.every(n => Text.isText(n))
   },
 
@@ -283,7 +285,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertBreak(editor: Editor): void {
+  insertBreak<E extends Editor>(editor: E): void {
     editor.insertBreak()
   },
 
@@ -293,7 +295,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertFragment(editor: Editor, fragment: Node[]): void {
+  insertFragment<E extends Editor>(editor: E, fragment: Node[]): void {
     editor.insertFragment(fragment)
   },
 
@@ -303,7 +305,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertNode(editor: Editor, node: Node): void {
+  insertNode<E extends Editor>(editor: E, node: Node): void {
     editor.insertNode(node)
   },
 
@@ -313,7 +315,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertText(editor: Editor, text: string): void {
+  insertText<E extends Editor>(editor: E, text: string): void {
     editor.insertText(text)
   },
 
@@ -321,7 +323,7 @@ export const Editor = {
    * Check if a value is a block `Element` object.
    */
 
-  isBlock(editor: Editor, value: any): value is Element {
+  isBlock<E extends Editor, El extends Element>(editor: E, value: any): value is Element {
     return Element.isElement(value) && !editor.isInline(value)
   },
 
@@ -1330,7 +1332,7 @@ export const Editor = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent: Ancestor = Node.get(editor, Path.parent(truePath))
+        const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)

@@ -1,4 +1,5 @@
 import {
+  Ancestor,
   Editor,
   Element,
   Location,
@@ -26,7 +27,7 @@ export const NodeTransforms = {
       select?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
@@ -133,8 +134,8 @@ export const NodeTransforms = {
    * their parent in two if necessary.
    */
 
-  liftNodes(
-    editor: Editor,
+  liftNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -196,8 +197,8 @@ export const NodeTransforms = {
    * removing any empty containing nodes after the merge if necessary.
    */
 
-  mergeNodes(
-    editor: Editor,
+  mergeNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -335,8 +336,8 @@ export const NodeTransforms = {
    * Move the nodes at a location to a new location.
    */
 
-  moveNodes(
-    editor: Editor,
+  moveNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -344,7 +345,7 @@ export const NodeTransforms = {
       to: Path
       voids?: boolean
     }
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
         to,
@@ -385,8 +386,8 @@ export const NodeTransforms = {
    * Remove the nodes at a specific location in the document.
    */
 
-  removeNodes(
-    editor: Editor,
+  removeNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -394,7 +395,7 @@ export const NodeTransforms = {
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at = editor.selection, match } = options
@@ -431,9 +432,9 @@ export const NodeTransforms = {
    * Set new properties on the nodes at a location.
    */
 
-  setNodes(
-    editor: Editor,
-    props: Partial<Node>,
+  setNodes<E extends Editor, N extends Node>(
+    editor: E,
+    props: Partial<N>,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -530,8 +531,8 @@ export const NodeTransforms = {
    * Split the nodes at a specific location.
    */
 
-  splitNodes(
-    editor: Editor,
+  splitNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -658,8 +659,8 @@ export const NodeTransforms = {
    * Unset properties on the nodes at a location.
    */
 
-  unsetNodes(
-    editor: Editor,
+  unsetNodes<E extends Editor>(
+    editor: E,
     props: string | string[],
     options: {
       at?: Location
@@ -687,8 +688,8 @@ export const NodeTransforms = {
    * necessary to ensure that only the content in the range is unwrapped.
    */
 
-  unwrapNodes(
-    editor: Editor,
+  unwrapNodes<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -746,9 +747,9 @@ export const NodeTransforms = {
    * of the range first to ensure that only the content in the range is wrapped.
    */
 
-  wrapNodes(
-    editor: Editor,
-    element: Element,
+  wrapNodes<E extends Editor, El extends Element>(
+    editor: E,
+    element: El,
     options: {
       at?: Location
       match?: (node: Node) => boolean
@@ -823,7 +824,7 @@ export const NodeTransforms = {
             : Path.common(firstPath, lastPath)
 
           const range = Editor.range(editor, firstPath, lastPath)
-          const [commonNode] = Editor.node(editor, commonPath)
+          const [commonNode] = Editor.node(editor, commonPath) as Ancestor[]
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
@@ -845,7 +846,7 @@ export const NodeTransforms = {
  * Convert a range into a point by deleting it's content.
  */
 
-const deleteRange = (editor: Editor, range: Range): Point | null => {
+const deleteRange = <E extends Editor>(editor: E, range: Range): Point | null => {
   if (Range.isCollapsed(range)) {
     return range.anchor
   } else {
@@ -856,7 +857,7 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
   }
 }
 
-const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
+const matchPath = <E extends Editor>(editor: E, path: Path): ((node: Node) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }

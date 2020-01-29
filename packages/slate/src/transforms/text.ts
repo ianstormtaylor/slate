@@ -16,8 +16,8 @@ export const TextTransforms = {
    * Delete content in the editor.
    */
 
-  delete(
-    editor: Editor,
+  delete<E extends Editor>(
+    editor: E,
     options: {
       at?: Location
       distance?: number
@@ -26,7 +26,7 @@ export const TextTransforms = {
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
         reverse = false,
@@ -188,15 +188,15 @@ export const TextTransforms = {
    * Insert a fragment at a specific location in the editor.
    */
 
-  insertFragment(
-    editor: Editor,
-    fragment: Node[],
+  insertFragment<E extends Editor, N extends Node>(
+    editor: E,
+    fragment: N[],
     options: {
       at?: Location
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false } = options
       let { at = editor.selection } = options
@@ -403,14 +403,14 @@ export const TextTransforms = {
    * Insert a string of text in the Editor.
    */
 
-  insertText(
-    editor: Editor,
+  insertText<E extends Editor>(
+    editor: E,
     text: string,
     options: {
       at?: Location
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { voids = false } = options
       let { at = editor.selection } = options

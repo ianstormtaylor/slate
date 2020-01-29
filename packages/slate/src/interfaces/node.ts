@@ -125,7 +125,7 @@ export const Node = {
    */
 
   *descendants<N extends Node>(
-    root: Node,
+    root: N,
     options: {
       from?: Path
       to?: Path
@@ -279,7 +279,7 @@ export const Node = {
    * Check if a value implements the `Node` interface.
    */
 
-  isNode(value: any): value is Node {
+  isNode<N extends Node>(value: any): value is N {
     return (
       Text.isText(value) || Element.isElement(value) || Editor.isEditor(value)
     )
@@ -289,7 +289,7 @@ export const Node = {
    * Check if a value is a list of `Node` objects.
    */
 
-  isNodeList(value: any): value is Node[] {
+  isNodeList<N extends Node>(value: any): value is N[] {
     return Array.isArray(value) && (value.length === 0 || Node.isNode(value[0]))
   },
 
