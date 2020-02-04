@@ -10,7 +10,7 @@ You can check a working version [here](https://codesandbox.io/s/slatejs-examples
 
 Here's our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -30,7 +30,7 @@ const App = () => {
 
 Now we add an `onKeyDown` handler:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -59,7 +59,7 @@ Now we want to make it actually change the content. For the purposes of our exam
 
 Our `onKeyDown` handler might look like this:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -76,8 +76,8 @@ const App = () => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()
-            // insert text when the event occurs.
-            editor.insertText('and')
+            // Execute the `insertText` method to insert text when the event occurs.
+            editor.insertText("and")
           }
         }}
       />

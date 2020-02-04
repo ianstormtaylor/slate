@@ -110,7 +110,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/tables.js) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/paste-html.js) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js) — showing how to use inline void nodes for simple @-mentions.
-- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js)
+- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -118,18 +118,18 @@ If you have an idea for an example that shows a common use case, pull request it
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
+If you're using Slate for the first time, check out the [Getting Started](https://docs.slatejs.org/walkthroughs/01-installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
 
-- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
-- [**Concepts**](http://docs.slatejs.org/concepts)
-- [**FAQ**](http://docs.slatejs.org/general/faq)
-- [**Resources**](http://docs.slatejs.org/general/resources)
+- [**Walkthroughs**](https://docs.slatejs.org/walkthroughs/01-installing-slate)
+- [**Concepts**](https://docs.slatejs.org/concepts)
+- [**FAQ**](https://docs.slatejs.org/general/faq)
+- [**Resources**](https://docs.slatejs.org/general/resources)
 
 If even that's not enough, you can always [read the source itself](./packages/slate), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://doodlewind.github.io/slate-doc-cn/)
+- [中文](https://github.com/loveloki/slate-docs-cn): `v0.57.1`
 
 If you're maintaining a translation, feel free to pull request it here!
 

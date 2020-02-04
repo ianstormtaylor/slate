@@ -8,7 +8,7 @@ You can check a working version [here](https://codesandbox.io/s/slatejs-examples
 
 So we start with our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -55,7 +55,7 @@ const App = () => {
 
 And now, we'll edit the `onKeyDown` handler to make it so that when you press `control-B`, it will add a `bold` format to the currently selected text:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -118,7 +118,7 @@ Okay, so we've got the hotkey handler setup... but! If you happen to now try sel
 
 For every format you add, Slate will break up the text content into "leaves", and you need to tell Slate how to read it, just like for elements. So let's define a `Leaf` component:
 
-```js
+```jsx
 // Define a React component to render leaves with bold text.
 const Leaf = props => {
   return (
@@ -136,7 +136,7 @@ Pretty familiar, right?
 
 And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor. Also, let's allow our formatting to be toggled by adding active-checking logic.
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
