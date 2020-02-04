@@ -398,7 +398,7 @@ export const ReactEditor = {
         // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
         offset = contents.textContent!.length
         domNode = textNode
-      } else if ( voidNode ) {
+      } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
         // ancestor, so find it by going down from the nearest void parent.
 
@@ -408,7 +408,7 @@ export const ReactEditor = {
         offset = domNode.textContent!.length
       }else{
         // Sometimes the dom point may be out of leaf node. But actually the node
-        // does contains a leaf node.
+        // does contain a leaf node.
         leafNode = parentNode.querySelector('[data-slate-leaf]')!
         textNode = leafNode.closest('[data-slate-node="text"]')!
         domNode = leafNode
