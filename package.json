@@ -84,5 +84,8 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "typescript": "^3.7.2"
+  },
+  "dependencies": {
+    "yarn": "^1.21.1"
   }
 }
