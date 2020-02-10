@@ -152,13 +152,13 @@ export function createSelection(
   const anchor: AnchorToken = children.find(c => c instanceof AnchorToken)
   const focus: FocusToken = children.find(c => c instanceof FocusToken)
 
-  if (!anchor || !anchor.offset || !anchor.path) {
+  if (!anchor || (!anchor.offset && anchor.offset !== 0) || !anchor.path) {
     throw new Error(
       `The <selection> hyperscript tag must have an <anchor> tag as a child with \`path\` and \`offset\` attributes defined.`
     )
   }
 
-  if (!focus || !focus.offset || !focus.path) {
+  if (!focus || (!focus.offset && focus.offset !== 0) || !focus.path) {
     throw new Error(
       `The <selection> hyperscript tag must have a <focus> tag as a child with \`path\` and \`offset\` attributes defined.`
     )
