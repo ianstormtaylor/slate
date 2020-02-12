@@ -354,7 +354,14 @@ export const TextTransforms = {
         voids,
       })
 
-      if (isBlockStart && isBlockEnd) {
+      const [firstMatch] = matches
+      let firstMatchBlock
+
+      if (firstMatch) {
+        ;[firstMatchBlock] = firstMatch
+      }
+
+      if (isBlockStart && isBlockEnd && Element.isElement(firstMatchBlock)) {
         const [, emptyBlockPath] = Editor.parent(editor, at.path)
         Transforms.delete(editor, {
           at: emptyBlockPath,
