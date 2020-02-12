@@ -262,13 +262,17 @@ export const TextTransforms = {
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
-      const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
+      const mergeStart = !isBlockStart
       const mergeEnd = !isBlockEnd
       const [, firstPath] = Node.first({ children: fragment }, [])
       const [, lastPath] = Node.last({ children: fragment }, [])
 
       const matches: NodeEntry[] = []
       const matcher = ([n, p]: NodeEntry) => {
+        if (!p.length) {
+          return false
+        }
+
         if (
           mergeStart &&
           Path.isAncestor(p, firstPath) &&
@@ -349,6 +353,14 @@ export const TextTransforms = {
         mode: hasBlocks ? 'lowest' : 'highest',
         voids,
       })
+
+      if (isBlockStart && isBlockEnd) {
+        const [, emptyBlockPath] = Editor.parent(editor, at.path)
+        Transforms.delete(editor, {
+          at: emptyBlockPath,
+          unit: 'block',
+        })
+      }
 
       const startRef = Editor.pathRef(
         editor,
