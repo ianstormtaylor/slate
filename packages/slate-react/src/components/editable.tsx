@@ -446,7 +446,7 @@ export const Editable = (props: EditableProps) => {
             // COMPAT: Firefox doesn't support the `beforeinput` event, so we
             // fall back to React's leaky polyfill instead just for it. It
             // only works for the `insertText` input type.
-            if (IS_FIREFOX && !readOnly) {
+            if (IS_FIREFOX && !readOnly && ReactEditor.isFocused(editor)) {
               event.preventDefault()
               const text = (event as any).data as string
               Editor.insertText(editor, text)
