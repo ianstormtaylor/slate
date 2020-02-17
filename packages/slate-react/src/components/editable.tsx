@@ -191,7 +191,7 @@ export const Editable = (props: EditableProps) => {
         ) {
           return
         }
-      } catch {
+      } catch (e) {
         return
       }
     }
