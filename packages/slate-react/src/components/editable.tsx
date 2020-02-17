@@ -178,12 +178,22 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     // If the DOM selection is already correct, we're done.
-    if (
-      hasDomSelection &&
-      newDomRange &&
-      isRangeEqual(domSelection.getRangeAt(0), newDomRange)
-    ) {
-      return
+    if (hasDomSelection) {
+      try {
+        const newEditorRange = ReactEditor.toSlateRange(
+          editor,
+          domSelection.getRangeAt(0)
+        )
+        if (
+          selection &&
+          newEditorRange &&
+          Range.equals(selection, newEditorRange)
+        ) {
+          return
+        }
+      } catch {
+        return
+      }
     }
 
     // Otherwise the DOM selection is out of sync, so update it.
@@ -919,23 +929,6 @@ export const Editable = (props: EditableProps) => {
  */
 
 const defaultDecorate = () => []
-
-/**
- * Check if two DOM range objects are equal.
- */
-
-const isRangeEqual = (a: DOMRange, b: DOMRange) => {
-  return (
-    (a.startContainer === b.startContainer &&
-      a.startOffset === b.startOffset &&
-      a.endContainer === b.endContainer &&
-      a.endOffset === b.endOffset) ||
-    (a.startContainer === b.endContainer &&
-      a.startOffset === b.endOffset &&
-      a.endContainer === b.startContainer &&
-      a.endOffset === b.startOffset)
-  )
-}
 
 /**
  * Check if the target is in the editor.
