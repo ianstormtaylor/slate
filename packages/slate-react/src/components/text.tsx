@@ -5,11 +5,7 @@ import Leaf from './leaf'
 import { ReactEditor, useEditor } from '..'
 import { RenderLeafProps } from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import {
-  KEY_TO_ELEMENT,
-  NODE_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-} from '../utils/maps'
+import { KEY_TO_ELEMENT, NODE_TO_ELEMENT, ELEMENT_TO_NODE } from '../utils/maps'
 
 /**
  * Text.
