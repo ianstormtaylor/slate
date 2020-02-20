@@ -9,7 +9,7 @@ import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
-} from '../utils/weak-maps'
+} from '../utils/maps'
 
 /**
  * Text.
@@ -47,11 +47,11 @@ const Text = (props: {
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
     if (ref.current) {
-      KEY_TO_ELEMENT.set(key, ref.current)
+      KEY_TO_ELEMENT.set(key.id, ref.current)
       NODE_TO_ELEMENT.set(text, ref.current)
       ELEMENT_TO_NODE.set(ref.current, text)
     } else {
-      KEY_TO_ELEMENT.delete(key)
+      KEY_TO_ELEMENT.delete(key.id)
       NODE_TO_ELEMENT.delete(text)
     }
   })

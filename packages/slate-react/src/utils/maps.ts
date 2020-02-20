@@ -11,14 +11,14 @@ export const NODE_TO_INDEX: WeakMap<Node, number> = new WeakMap()
 export const NODE_TO_PARENT: WeakMap<Node, Ancestor> = new WeakMap()
 
 /**
- * Weak maps that allow us to go between Slate nodes and DOM nodes. These
+ * Maps that allow us to go between Slate nodes and DOM nodes. These
  * are used to resolve DOM event-related logic into Slate actions.
  */
 
 export const EDITOR_TO_ELEMENT: WeakMap<Editor, HTMLElement> = new WeakMap()
 export const EDITOR_TO_PLACEHOLDER: WeakMap<Editor, string> = new WeakMap()
 export const ELEMENT_TO_NODE: WeakMap<HTMLElement, Node> = new WeakMap()
-export const KEY_TO_ELEMENT: WeakMap<Key, HTMLElement> = new WeakMap()
+export const KEY_TO_ELEMENT: Map<string, HTMLElement> = new Map()
 export const NODE_TO_ELEMENT: WeakMap<Node, HTMLElement> = new WeakMap()
 export const NODE_TO_KEY: WeakMap<Node, Key> = new WeakMap()
 

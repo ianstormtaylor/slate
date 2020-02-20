@@ -13,7 +13,7 @@ import {
   NODE_TO_PARENT,
   NODE_TO_INDEX,
   KEY_TO_ELEMENT,
-} from '../utils/weak-maps'
+} from '../utils/maps'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**
@@ -114,11 +114,11 @@ const Element = (props: {
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
     if (ref.current) {
-      KEY_TO_ELEMENT.set(key, ref.current)
+      KEY_TO_ELEMENT.set(key.id, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
       ELEMENT_TO_NODE.set(ref.current, element)
     } else {
-      KEY_TO_ELEMENT.delete(key)
+      KEY_TO_ELEMENT.delete(key.id)
       NODE_TO_ELEMENT.delete(element)
     }
   })

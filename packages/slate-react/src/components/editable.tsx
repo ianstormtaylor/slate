@@ -34,7 +34,7 @@ import {
   NODE_TO_ELEMENT,
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
-} from '../utils/weak-maps'
+} from '../utils/maps'
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.

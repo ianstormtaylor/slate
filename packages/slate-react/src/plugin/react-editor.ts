@@ -10,7 +10,7 @@ import {
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
-} from '../utils/weak-maps'
+} from '../utils/maps'
 import {
   DOMElement,
   DOMNode,
@@ -191,7 +191,7 @@ export const ReactEditor = {
   toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
-      : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
+      : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node).id)
 
     if (!domNode) {
       throw new Error(

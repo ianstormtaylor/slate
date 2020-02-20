@@ -5,7 +5,7 @@ import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-editor'
 import { SlateContext } from '../hooks/use-slate'
-import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
+import { EDITOR_TO_ON_CHANGE } from '../utils/maps'
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor

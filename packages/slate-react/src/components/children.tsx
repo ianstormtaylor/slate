@@ -5,7 +5,7 @@ import ElementComponent from './element'
 import TextComponent from './text'
 import { ReactEditor } from '..'
 import { useEditor } from '../hooks/use-editor'
-import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/maps'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**

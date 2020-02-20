@@ -2,7 +2,7 @@ import React from 'react'
 import { Text, Element } from 'slate'
 
 import String from './string'
-import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
+import { PLACEHOLDER_SYMBOL } from '../utils/maps'
 import { RenderLeafProps } from './editable'
 
 /**
