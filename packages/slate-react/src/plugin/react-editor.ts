@@ -36,7 +36,7 @@ export const ReactEditor = {
    */
 
   findKey(editor: ReactEditor, node: Node): Key {
-    let key = NODE_TO_KEY.get(node)
+    let key = node.key || NODE_TO_KEY.get(node)
 
     if (!key) {
       key = new Key()

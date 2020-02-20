@@ -133,7 +133,9 @@ const Element = (props: {
 const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.decorate === next.decorate &&
-    prev.element === next.element &&
+    (prev.element === next.element ||
+      (prev.element.key && next.element.key &&
+        prev.element.key.id === next.element.key.id)) &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
     isRangeListEqual(prev.decorations, next.decorations) &&
