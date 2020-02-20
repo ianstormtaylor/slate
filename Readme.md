@@ -39,7 +39,7 @@ Slate lets you build rich, intuitive editors like those in [Medium](https://medi
 
 It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-> 🤖 **Slate is currently in beta.** Its core API is useable right now, but you might need to pull request improvements for advanced use cases, or fixes for bugs in edge cases. Some of its APIs are not "finalized" and will have breaking changes over time as we discover better solutions. There is not currently a direct path to a `1.0` release, we're still getting the architecture right.
+> 🤖 **Slate is currently in beta.** Its core API is useable right now, but you might need to pull request improvements for advanced use cases, or fixes for some bugs. Some of its APIs are not "finalized" and will have breaking changes over time as we discover better solutions. There isn't currently a `1.0` release schedule, we're still getting the architecture right.
 
 > 🤖 **Slate is also contributor-driven.** It is not backed by any huge company, which means that all contributions are voluntary and done by the people who need them. If you need something improved, added, or fixed, please contribute it yourself or no one will. And if you want to become a more active maintainer, let us know in the Slack channel.
 
