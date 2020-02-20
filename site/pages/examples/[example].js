@@ -24,6 +24,7 @@ import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import Tables from '../../examples/tables'
+import ControlledKeys from '../../examples/controlled-keys'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
@@ -42,6 +43,7 @@ const EXAMPLES = [
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Tables', Tables, 'tables'],
+  ['Controlled Keys', ControlledKeys, 'controlled-keys'],
 ]
 
 const Header = props => (
