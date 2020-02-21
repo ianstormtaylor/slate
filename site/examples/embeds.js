@@ -5,6 +5,7 @@ import {
   Editable,
   withReact,
   useEditor,
+  ReactEditor,
   useFocused,
   useSelected,
 } from 'slate-react'
@@ -91,7 +92,7 @@ const VideoElement = ({ attributes, children, element }) => {
               boxSizing: 'border-box',
             }}
             onChange={value => {
-              const path = editor.findPath(element)
+              const path = ReactEditor.findPath(editor, element)
               Transforms.setNodes(editor, { url: value }, { at: path })
             }}
           />
