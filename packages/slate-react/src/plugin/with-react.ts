@@ -69,12 +69,12 @@ export const withReact = <T extends Editor>(editor: T) => {
     const text = data.getData('text/plain')
 
     if (text) {
-      const lines = text.split('\n')
+      const lines = text.split(/\r\n|\r|\n/)
       let split = false
 
       for (const line of lines) {
         if (split) {
-          Transforms.splitNodes(e)
+          Transforms.splitNodes(e, { always: true })
         }
 
         Transforms.insertText(e, line)
