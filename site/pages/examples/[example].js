@@ -24,7 +24,7 @@ import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import Tables from '../../examples/tables'
-import ImmutableData from '../../examples/immutable-data'
+import ControlledMarkdownShortcuts from '../../examples/controlled-markdown-shortcuts'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
@@ -33,9 +33,13 @@ const EXAMPLES = [
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
   ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
-  ['Immutable Data', ImmutableData, 'immutable-data'],
   ['Links', Links, 'links'],
   ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
+  [
+    'Markdown Shortcuts (Controlled)',
+    ControlledMarkdownShortcuts,
+    'controlled-markdown-shortcuts'
+  ],
   ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
   ['Paste HTML', PasteHtml, 'paste-html'],
