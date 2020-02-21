@@ -1,6 +1,6 @@
 # Editor
 
-All of the behaviors, content and state of a Slate editor is rolled up up into a single, top-level `Editor` object. It has an interface of:
+All of the behaviors, content and state of a Slate editor is rolled up into a single, top-level `Editor` object. It has an interface of:
 
 ```ts
 interface Editor {
