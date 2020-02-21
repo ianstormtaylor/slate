@@ -38,7 +38,7 @@ const EXAMPLES = [
   [
     'Markdown Shortcuts (Controlled)',
     ControlledMarkdownShortcuts,
-    'controlled-markdown-shortcuts'
+    'controlled-markdown-shortcuts',
   ],
   ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
