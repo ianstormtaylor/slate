@@ -1,10 +1,8 @@
 /* eslint-disable no-console */
 
 import React, { useState, useMemo, useCallback, useRef } from 'react'
-import faker from 'faker'
 import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
-import { ENETDOWN } from 'constants'
 
 let i = 0
 
