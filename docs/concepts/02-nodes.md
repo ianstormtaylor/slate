@@ -147,11 +147,11 @@ All nodes have a `key` that is generated automatically by Slate and used interna
 
 The `key` is stored in a [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap), where the map key is the node object from the Editor `value`. This means that the `key` is stable as long as the instance of the node object in `value` remains unchanged.
 
-Because of this, be cautious when using Slate as a controlled input. You should update only the values of the node object, but not the node object instance itself. For example, we cannot manage our state using an [immutable update pattern](https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns/) like Redux, which returns a mutated clone as the new state, because then our underlying object instances would always change after an update even if the node data remained constant. This would lead to a lot of unnecesary re-rendering and re-mounting in the DOM, because all of our node keys will change on every render.  
+Because of this, be cautious when using Slate as a controlled input. You should update only the values of the node object, but not the node object instance itself. For example, we cannot manage our state using an [immutable update pattern](https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns/) like Redux, which returns a mutated clone as the new state, because then our underlying object instances would always change after an update even if the node data remained constant. This would lead to a lot of unnecessary re-rendering and re-mounting in the DOM, because all of our node keys will change on every render.  
 
 ### Overriding keys
 
-If we want to use an immutable update pattern to manage our controlled `value`, we need to make our keys stable across updates by overriding the `editor.getKey` method using the [plugins](/concepts/07-plugins) pattern:
+If we want to use an immutable update pattern to manage our controlled `value`, we need to make our keys stable across updates by overriding the `editor.findKey` method using the [plugins](/concepts/07-plugins) pattern. For example, let's say we wanted to use an `id` field on the node as our `key`. The `editor.findKey` interface expects an object as a return value, so we would write an HOC like `withKeys` in the example below that maps string IDs to key objects.
 
 ```js
 import { createEditor } from 'slate'
