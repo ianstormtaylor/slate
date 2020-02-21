@@ -28,6 +28,7 @@ import {
 
 export interface ReactEditor extends Editor {
   insertData: (data: DataTransfer) => void
+  findKey: (node: Node) => Key
 }
 
 export const ReactEditor = {
@@ -36,14 +37,7 @@ export const ReactEditor = {
    */
 
   findKey(editor: ReactEditor, node: Node): Key {
-    let key = NODE_TO_KEY.get(node)
-
-    if (!key) {
-      key = new Key()
-      NODE_TO_KEY.set(node, key)
-    }
-
-    return key
+    return editor.findKey(node)
   },
 
   /**

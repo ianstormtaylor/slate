@@ -44,3 +44,7 @@ export const Slate = (props: {
     </SlateContext.Provider>
   )
 }
+
+Slate.defaultProps = {
+  onChange: () => {},
+}

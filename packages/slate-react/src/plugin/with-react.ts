@@ -99,5 +99,16 @@ export const withReact = <T extends Editor>(editor: T) => {
     })
   }
 
+  e.findKey = (node: Node): Key => {
+    let key = NODE_TO_KEY.get(node)
+
+    if (!key) {
+      key = new Key()
+      NODE_TO_KEY.set(node, key)
+    }
+
+    return key
+  }
+
   return e
 }

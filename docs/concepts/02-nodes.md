@@ -140,3 +140,43 @@ const text = {
 ```
 
 Text nodes too can contain any custom properties you want, and that's how you implement custom formatting like **bold**, _italic_, `code`, etc.
+
+## Keys
+
+All nodes have a `key` that is generated automatically by Slate and used internally to map Slate nodes to DOM nodes. It is also used as the `key` prop on the React element that contains your node's children. 
+
+The `key` is stored in a [WeakMap](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap), where the map key is the node object from the Editor `value`. This means that the `key` is stable as long as the instance of the node object in `value` remains unchanged.
+
+Because of this, be cautious when using Slate as a controlled input. You should update only the values of the node object, but not the node object instance itself. For example, we cannot manage our state using an [immutable update pattern](https://redux.js.org/recipes/structuring-reducers/immutable-update-patterns/) like Redux, which returns a mutated clone as the new state, because then our underlying object instances would always change after an update even if the node data remained constant. This would lead to a lot of unnecesary re-rendering and re-mounting in the DOM, because all of our node keys will change on every render.  
+
+### Overriding keys
+
+If we want to use an immutable update pattern to manage our controlled `value`, we need to make our keys stable across updates by overriding the `editor.getKey` method using the [plugins](/concepts/07-plugins) pattern:
+
+```js
+import { createEditor } from 'slate'
+import React, { useRef } from 'react'
+
+const nodeKeysRef = useRef({})
+
+const withKeys = editor => {
+  const { findKey } = editor
+  editor.findKey = element => {
+    const { id } = element
+    if (!nodeKeysRef.current[id]) {
+      nodeKeysRef.current[id] = findKey(element)
+    }
+    return nodeKeysRef.current[id]
+  }
+  return editor
+}
+const editor = withKeys(createEditor())
+```
+
+Note that we are now responsible for maintaining our map between `id` strings and `key` objects. For memory efficiency, we should remove the key from our map when we remove a node so that it gets garbage collected correctly. In the example above, this would be achieved by calling `delete` on that map entry, as in:
+
+```js
+const removeKey = id => {
+  delete nodeKeysRef[id]
+}
+```
