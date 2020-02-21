@@ -129,7 +129,7 @@ const ControlledMarkdownShortcutsExample = () => {
       _selection.anchor.offset = 0
     }
 
-    // we bundle our state updates to avoid update race conditions
+    // we batch our state updates so our children and selection stay in sync
     setEditorState({ value: _value, selection: _selection })
   }
 
