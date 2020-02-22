@@ -175,11 +175,12 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    let newDomRange: DOMRange | null = null
+    try {
+      newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
-    // If the DOM selection is already correct, we're done.
-    if (hasDomSelection) {
-      try {
+      // If the DOM selection is already correct, we're done.
+      if (hasDomSelection) {
         const newEditorRange = ReactEditor.toSlateRange(
           editor,
           domSelection.getRangeAt(0)
@@ -191,9 +192,9 @@ export const Editable = (props: EditableProps) => {
         ) {
           return
         }
-      } catch (e) {
-        return
       }
+    } catch (e) {
+      return
     }
 
     // Otherwise the DOM selection is out of sync, so update it.
