@@ -8,7 +8,7 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import debounce from 'debounce'
+import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
@@ -348,7 +348,7 @@ export const Editable = (props: EditableProps) => {
   // released. This causes issues in situations where another change happens
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
-    debounce(() => {
+    throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
