@@ -8,7 +8,7 @@ This directory contains a set of examples that give you an idea for how you migh
 - [**Markdown Shortcuts**](./markdown-shortcuts.js) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](./links.js) — showing how wrap text in inline nodes with associated data.
 - [**Images**](./images.js) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](./hovering-menu.js) — showing how a contextual hovering menu can be implemented.
+- [**Hovering toolbar**](./hovering-toolbar.js) — showing how a hovering toolbar can be implemented.
 - [**Tables**](./tables.js) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](./paste-html.js) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Code Highlighting**](./code-highlighting.js) — showing how to use decorations to dynamically format text.
