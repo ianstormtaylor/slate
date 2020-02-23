@@ -24,9 +24,11 @@ import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import Tables from '../../examples/tables'
+import ControlledUpdates from '../../examples/controlled-updates'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
+  ['Controlled Updates', ControlledUpdates, 'controlled-updates'],
   ['Embeds', Embeds, 'embeds'],
   ['Forced Layout', ForcedLayout, 'forced-layout'],
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
