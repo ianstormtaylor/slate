@@ -108,7 +108,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/markdown-preview.js) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/links.js) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/images.js) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/hovering-menu.js) — showing how a contextual hovering menu can be implemented.
+- [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/hovering-toolbar.js) — showing how a hovering toolbar can be implemented.
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/tables.js) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/paste-html.js) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js) — showing how to use inline void nodes for simple @-mentions.
