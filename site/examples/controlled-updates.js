@@ -18,25 +18,19 @@ const SHORTCUTS = {
   '######': 'heading-six',
 }
 
-let i = 0
-
 const initialValue = [
   {
     type: 'heading-one',
-    id: ++i,
     children: [
       {
-        id: `${i}leaf`,
         text: 'Controlled Update Example',
       },
     ],
   },
   {
     type: 'paragraph',
-    id: ++i,
     children: [
       {
-        id: `${i}leaf`,
         text:
           'This example has the same functionality as the "Markdown Shortcuts" example. However, in our implementation we are using `immer.js` to draft a new state in onChange, mutate it, and render the results.',
       },
@@ -44,10 +38,8 @@ const initialValue = [
   },
   {
     type: 'paragraph',
-    id: ++i,
     children: [
       {
-        id: `${i}leaf`,
         text:
           'Try starting a line with a markdown modifier, like "#", "##", ">" or "-" and then press SPACEBAR to see the formatting applied.',
       },
@@ -55,10 +47,8 @@ const initialValue = [
   },
   {
     type: 'paragraph',
-    id: ++i,
     children: [
       {
-        id: `${i}leaf`,
         text:
           'If you show the console, it should only log `Element.render` once for each keypress.',
       },
