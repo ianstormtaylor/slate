@@ -54,6 +54,7 @@
     "eslint-plugin-react": "^7.16.0",
     "faker": "^4.1.0",
     "image-extensions": "^1.1.0",
+    "immer": "^5.3.6",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
     "lerna": "^3.19.0",
@@ -84,8 +85,5 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "typescript": "^3.7.2"
-  },
-  "dependencies": {
-    "immer": "^5.3.6"
   }
 }
