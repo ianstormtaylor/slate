@@ -4,7 +4,7 @@ Locations are how you refer to specific places in the document when inserting, d
 
 ## `Path`
 
-Paths are the lowest-level way to refer to a location. Each path is a simple array of numbers that refers to a node in the document tree by its indexes in each of its ancestors nodes down the tree:
+Paths are the lowest-level way to refer to a location. Each path is a simple array of numbers that refers to a node in the document tree by its indexes in each of its ancestor nodes down the tree:
 
 ```ts
 type Path = number[]
@@ -92,7 +92,7 @@ One important distinction is that the anchor and focus points of ranges **always
 
 Ranges are used in many places in Slate's API when you need to refer to a span of content between two points. One of the most common though is the user's current "selection".
 
-The selection is a special range that is property of the top-level `Editor`. For example, say someone has the whole sentence currently selected:
+The selection is a special range that is a property of the top-level `Editor`. For example, say someone has the whole sentence currently selected:
 
 ```js
 const editor = {
@@ -115,4 +115,4 @@ const editor = {
 
 > 🤖 The selection concept is also borrowed from the DOM, see [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection), although in a greatly-simplified form because Slate doesn't allow for multiple ranges inside a single selection, which makes things a lot easier to work with.
 
-There isn't a special `Selection` interface, it's just an object that happens to respect the more general-purpose `Range` interface instead.
+There isn't a special `Selection` interface. It's just an object that happens to respect the more general-purpose `Range` interface instead.

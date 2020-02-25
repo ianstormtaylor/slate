@@ -1,6 +1,6 @@
 # Commands
 
-While editing richtext content, your users will be doing things like inserting text, deleteing text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
+While editing richtext content, your users will be doing things like inserting text, deleting text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
 
 Commands are the high-level actions that represent a specific intent of the user. They are represented as helper functions on the `Editor` interface. A handful of helpers are included in core for common richtext behaviors, but you are encouraged to write your own that model your specific domain.
 
@@ -16,9 +16,9 @@ Editor.insertBreak(editor)
 
 But you can (and will!) also define your own custom commands that model your domain. For example, you might want to define a `formatQuote` command, or an `insertImage` command, or a `toggleBold` command depending on what types of content you allow.
 
-Commands always describe an action to be taken as if the **user** themselves was performing the action. For that reason, they never need to define a location to perform the command, because they always act on the user's current selection.
+Commands always describe an action to be taken as if the **user** was performing the action. For that reason, they never need to define a location to perform the command, because they always act on the user's current selection.
 
-> 🤖 The concept of commands are loosely based on the DOM's built-in [`execCommand`](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand) APIs. However Slate defines its own simpler (and extendable!) version of the API, because the DOM's version is too opinionated and inconsistent.
+> 🤖 The concept of commands is loosely based on the DOM's built-in [`execCommand`](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand) APIs. However Slate defines its own simpler (and extendable!) version of the API, because the DOM's version is too opinionated and inconsistent.
 
 Under the covers, Slate takes care of converting each command into a set of low-level "operations" that are applied to produce a new value. This is what makes collaborative editing implementations possible. But you don't have to worry about that, because it happens automatically.
 

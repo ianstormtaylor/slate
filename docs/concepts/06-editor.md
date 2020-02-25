@@ -30,7 +30,7 @@ interface Editor {
 }
 ```
 
-Slightly more complex than the others, because it contains all of the top-level functions that define your custom, domain-specific behaviors.
+It is slightly more complex than the others, because it contains all of the top-level functions that define your custom, domain-specific behaviors.
 
 The `children` property contains the document tree of nodes that make up the editor's content.
 
@@ -42,9 +42,9 @@ The `marks` property stores formatting that is attached to the cursor, and that 
 
 ## Overriding Behaviors
 
-In previous guides we've already hinted at this, but you can override any of the behaviors of an editor by overriding it's function properties.
+In previous guides we've already hinted at this, but you can override any of the behaviors of an editor by overriding its function properties.
 
-For example, if you want define link elements that are inline nodes:
+For example, if you want to define link elements that are inline nodes:
 
 ```js
 const { isInline } = editor
@@ -86,7 +86,7 @@ editor.normalizeNode = entry => {
 }
 ```
 
-Whenever you override behaviors, be sure to call in to the existing functions as a fallback mechanism for the default behavior. Unless you really do want to completely remove the default behaviors (which is rarely a good idea).
+Whenever you override behaviors, be sure to call the existing functions as a fallback mechanism for the default behavior. Unless you really do want to completely remove the default behaviors (which is rarely a good idea).
 
 ## Helper Functions
 
