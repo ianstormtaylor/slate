@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 
-import React, { useState, useMemo, useCallback, useRef } from 'react'
-import { createEditor, Transforms } from 'slate'
+import React, { useState, useMemo, useCallback } from 'react'
+import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { createDraft, finishDraft } from 'immer'
 
@@ -95,12 +95,8 @@ const ControlledUpdatesExample = () => {
     })
   }
 
-  if (editorState.selection) {
-    Transforms.setSelection(editor, editorState.selection)
-  }
-
   return (
-    <Slate editor={editor} value={editorState.value} onChange={onChange}>
+    <Slate editor={editor} onChange={onChange} {...editorState}>
       <Editable renderElement={renderElement} autoFocus />
     </Slate>
   )
