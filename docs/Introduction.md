@@ -65,7 +65,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](https://www.slatejs.org/examples/links) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://www.slatejs.org/examples/images) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](https://www.slatejs.org/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
+- [**Hovering toolbar**](https://www.slatejs.org/examples/hovering-toolbar) — showing how a contextual hovering menu can be implemented.
 - [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](https://www.slatejs.org/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://www.slatejs.org/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
