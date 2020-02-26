@@ -58,25 +58,24 @@ const withChecklists = editor => {
         const after = Editor.after(editor, start, { unit: 'line' })
         const afterRange = Editor.range(editor, start, after)
         const afterText = Editor.string(editor, afterRange)
+        const checklist = {
+          type: 'check-list-item',
+          checked: false,
+          children: [{ text: afterText }],
+        }
         if (afterText.length > 0) {
-          const checklist = {
-            type: 'check-list-item',
-            checked: false,
-            children: [{ text: afterText }],
-          }
           if (selection.anchor.offset === 0) {
             Transforms.delete(editor, { unit: 'line' })
             Transforms.insertNodes(editor, checklist)
+            Transforms.setSelection(editor, {
+              anchor: { path: editor.selection.anchor.path, offset: 0 },
+              focus: { path: editor.selection.anchor.path, offset: 0 },
+            })
             return
           }
           Transforms.splitNodes(editor)
           Transforms.setNodes(editor, checklist)
         } else {
-          const checklist = {
-            type: 'check-list-item',
-            checked: false,
-            children: [{ text: '' }],
-          }
           Transforms.insertNodes(editor, checklist)
         }
         return
