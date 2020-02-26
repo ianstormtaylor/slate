@@ -89,7 +89,7 @@ function configure(pkg, env, target) {
     babel({
       runtimeHelpers: true,
       include: [`packages/${pkg.name}/src/**`],
-      extensions: ['.js', '.ts'],
+      extensions: ['.js', '.ts', '.tsx'],
       presets: [
         '@babel/preset-typescript',
         [

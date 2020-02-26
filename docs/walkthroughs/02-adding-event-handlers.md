@@ -8,7 +8,7 @@ Let's use the `onKeyDown` handler to change the editor's content when we press a
 
 Here's our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -28,7 +28,7 @@ const App = () => {
 
 Now we add an `onKeyDown` handler:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -57,7 +57,7 @@ Now we want to make it actually change the content. For the purposes of our exam
 
 Our `onKeyDown` handler might look like this:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -74,8 +74,8 @@ const App = () => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()
-            // Execute a command to insert text when the event occurs.
-            editor.exec({ type: 'insert_text', text: 'and' })
+            // Execute the `insertText` method when the event occurs.
+            editor.insertText("and")
           }
         }}
       />

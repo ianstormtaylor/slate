@@ -14,14 +14,14 @@
     "dist/"
   ],
   "dependencies": {
-    "@types/debounce": "^1.2.0",
     "@types/is-hotkey": "^0.1.1",
-    "debounce": "^1.2.0",
+    "@types/lodash": "^4.14.149",
     "direction": "^1.0.3",
     "is-hotkey": "^0.1.6",
     "is-plain-object": "^3.0.0",
-    "tiny-invariant": "1.0.6",
-    "scroll-into-view-if-needed": "^2.2.20"
+    "lodash": "^4.17.4",
+    "scroll-into-view-if-needed": "^2.2.20",
+    "tiny-invariant": "1.0.6"
   },
   "devDependencies": {
     "slate": "^0.57.1",
