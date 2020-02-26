@@ -44,9 +44,7 @@ const VideoElement = ({ attributes, children, element }) => {
   const { url } = element
   return (
     <div {...attributes}>
-      <div
-        contentEditable={false}
-      >
+      <div contentEditable={false}>
         <div
           style={{
             padding: '75% 0 0 0',
