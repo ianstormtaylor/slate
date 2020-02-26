@@ -16,7 +16,7 @@ export const input = (
 
 export const test = editor => {
   return Array.from(
-    Editor.nodes(editor, { at: [], match: n => n.a, mode: 'highest' })
+    Editor.nodes(editor, { at: [], match: n => n.a, mode: 'all' })
   )
 }
 
@@ -27,10 +27,12 @@ export const output = [
     </block>,
     [0],
   ],
+  [<block a>one</block>, [0, 0]],
   [
     <block a>
       <block a>two</block>
     </block>,
     [1],
   ],
+  [<block a>two</block>, [1, 0]],
 ]

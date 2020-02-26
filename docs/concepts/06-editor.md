@@ -1,6 +1,6 @@
 # Editor
 
-All of the behaviors, content and state of a Slate editor is rollup up into a single, top-level `Editor` object. It has an interface of:
+All of the behaviors, content and state of a Slate editor is rolled up into a single, top-level `Editor` object. It has an interface of:
 
 ```ts
 interface Editor {
@@ -42,7 +42,7 @@ The `marks` property stores formatting that is attached to the cursor, and that 
 
 ## Overriding Behaviors
 
-In previous guides we've already hinted at this, but you can overriding any of the behaviors of an editor by overriding it's function properties.
+In previous guides we've already hinted at this, but you can override any of the behaviors of an editor by overriding it's function properties.
 
 For example, if you want define link elements that are inline nodes:
 

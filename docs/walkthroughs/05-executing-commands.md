@@ -10,7 +10,7 @@ Let's see how this works.
 
 We'll start with our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -78,7 +78,7 @@ It has the concept of "code blocks" and "bold formatting". But these things are 
 
 We can instead implement these domain-specific concepts by creating custom helper functions:
 
-```js
+```jsx
 // Define our own custom set of helpers.
 const CustomEditor = {
   isBoldMarkActive(editor) {
@@ -172,7 +172,7 @@ const App = () => {
 
 Now our commands are clearly defined and you can invoke them from anywhere we have access to our `editor` object. For example, from hypothetical toolbar buttons:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([

@@ -8,7 +8,7 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import debounce from 'debounce'
+import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
@@ -26,6 +26,7 @@ import {
   isDOMNode,
   isDOMText,
   DOMStaticRange,
+  isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -124,40 +125,6 @@ export const Editable = (props: EditableProps) => {
       NODE_TO_ELEMENT.delete(editor)
     }
   })
-
-  // Attach a native DOM event handler for `selectionchange`, because React's
-  // built-in `onSelect` handler doesn't fire for all selection changes. It's a
-  // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
-  // fire for any change to the selection inside the editor. (2019/11/04)
-  // https://github.com/facebook/react/issues/5785
-  useIsomorphicLayoutEffect(() => {
-    window.document.addEventListener('selectionchange', onDOMSelectionChange)
-
-    return () => {
-      window.document.removeEventListener(
-        'selectionchange',
-        onDOMSelectionChange
-      )
-    }
-  }, [])
-
-  // Attach a native DOM event handler for `beforeinput` events, because React's
-  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
-  // real `beforeinput` events sadly... (2019/11/04)
-  // https://github.com/facebook/react/issues/11211
-  useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
-      // @ts-ignore The `beforeinput` event isn't recognized.
-      ref.current.addEventListener('beforeinput', onDOMBeforeInput)
-    }
-
-    return () => {
-      if (ref.current) {
-        // @ts-ignore The `beforeinput` event isn't recognized.
-        ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
-      }
-    }
-  }, [])
 
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
@@ -354,8 +321,26 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    []
+    [readOnly]
   )
+
+  // Attach a native DOM event handler for `beforeinput` events, because React's
+  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
+  // real `beforeinput` events sadly... (2019/11/04)
+  // https://github.com/facebook/react/issues/11211
+  useIsomorphicLayoutEffect(() => {
+    if (ref.current) {
+      // @ts-ignore The `beforeinput` event isn't recognized.
+      ref.current.addEventListener('beforeinput', onDOMBeforeInput)
+    }
+
+    return () => {
+      if (ref.current) {
+        // @ts-ignore The `beforeinput` event isn't recognized.
+        ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
+      }
+    }
+  }, [onDOMBeforeInput])
 
   // Listen on the native `selectionchange` event to be able to update any time
   // the selection changes. This is required because React's `onSelect` is leaky
@@ -363,7 +348,7 @@ export const Editable = (props: EditableProps) => {
   // released. This causes issues in situations where another change happens
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
-    debounce(() => {
+    throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -392,8 +377,24 @@ export const Editable = (props: EditableProps) => {
         }
       }
     }, 100),
-    []
+    [readOnly]
   )
+
+  // Attach a native DOM event handler for `selectionchange`, because React's
+  // built-in `onSelect` handler doesn't fire for all selection changes. It's a
+  // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
+  // fire for any change to the selection inside the editor. (2019/11/04)
+  // https://github.com/facebook/react/issues/5785
+  useIsomorphicLayoutEffect(() => {
+    window.document.addEventListener('selectionchange', onDOMSelectionChange)
+
+    return () => {
+      window.document.removeEventListener(
+        'selectionchange',
+        onDOMSelectionChange
+      )
+    }
+  }, [onDOMSelectionChange])
 
   const decorations = decorate([editor, []])
 
@@ -442,11 +443,16 @@ export const Editable = (props: EditableProps) => {
           ...style,
         }}
         onBeforeInput={useCallback(
-          (event: React.SyntheticEvent) => {
+          (event: React.FormEvent<HTMLDivElement>) => {
             // COMPAT: Firefox doesn't support the `beforeinput` event, so we
             // fall back to React's leaky polyfill instead just for it. It
             // only works for the `insertText` input type.
-            if (IS_FIREFOX && !readOnly) {
+            if (
+              IS_FIREFOX &&
+              !readOnly &&
+              !isEventHandled(event, attributes.onBeforeInput) &&
+              hasEditableTarget(editor, event.target)
+            ) {
               event.preventDefault()
               const text = (event as any).data as string
               Editor.insertText(editor, text)
@@ -902,8 +908,11 @@ export const Editable = (props: EditableProps) => {
           (event: React.ClipboardEvent<HTMLDivElement>) => {
             // COMPAT: Firefox doesn't support the `beforeinput` event, so we
             // fall back to React's `onPaste` here instead.
+            // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
+            // when "paste without formatting" option is used.
+            // This unfortunately needs to be handled with paste events instead.
             if (
-              IS_FIREFOX &&
+              (IS_FIREFOX || isPlainTextOnlyPaste(event.nativeEvent)) &&
               !readOnly &&
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste)

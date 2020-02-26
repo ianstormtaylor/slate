@@ -39,7 +39,9 @@ Slate lets you build rich, intuitive editors like those in [Medium](https://medi
 
 It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-> 🤖 **Slate is currently in beta**. Its core API is useable now, but you might need to pull request a fix or two for advanced use cases. Some of its APIs are not "finalized" and will (breaking) change over time as we discover better solutions.
+> 🤖 **Slate is currently in beta.** Its core API is useable right now, but you might need to pull request improvements for advanced use cases, or fixes for some bugs. Some of its APIs are not "finalized" and will have breaking changes over time as we discover better solutions. There isn't currently a `1.0` release schedule, we're still getting the architecture right.
+
+> 🤖 **Slate is also contributor-driven.** It is not backed by any huge company, which means that all contributions are voluntary and done by the people who need them. If you need something improved, added, or fixed, please contribute it yourself or no one will. And if you want to become a more active maintainer, let us know in the Slack channel.
 
 <br/>
 
@@ -106,11 +108,11 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/markdown-preview.js) — showing how to add key handlers for Markdown-like shortcuts.
 - [**Links**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/links.js) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/images.js) — showing how to use void (text-less) nodes to add images.
-- [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/hovering-menu.js) — showing how a contextual hovering menu can be implemented.
+- [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/hovering-toolbar.js) — showing how a hovering toolbar can be implemented.
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/tables.js) — showing how to nest blocks to render more advanced components.
 - [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/paste-html.js) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js) — showing how to use inline void nodes for simple @-mentions.
-- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.js)
+- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -118,18 +120,18 @@ If you have an idea for an example that shows a common use case, pull request it
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
+If you're using Slate for the first time, check out the [Getting Started](https://docs.slatejs.org/walkthroughs/01-installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
 
-- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
-- [**Concepts**](http://docs.slatejs.org/concepts)
-- [**FAQ**](http://docs.slatejs.org/general/faq)
-- [**Resources**](http://docs.slatejs.org/general/resources)
+- [**Walkthroughs**](https://docs.slatejs.org/walkthroughs/01-installing-slate)
+- [**Concepts**](https://docs.slatejs.org/concepts)
+- [**FAQ**](https://docs.slatejs.org/general/faq)
+- [**Resources**](https://docs.slatejs.org/general/resources)
 
 If even that's not enough, you can always [read the source itself](./packages/slate), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://doodlewind.github.io/slate-doc-cn/)
+- [中文](https://github.com/loveloki/slate-docs-cn): `v0.57.1`
 
 If you're maintaining a translation, feel free to pull request it here!
 
@@ -137,7 +139,7 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ### Packages
 
-Slate's codebase is monorepo managed with [Lerna](https://lernajs.io/). It consists of a handful of packages—although you won't always use all of them. They are:
+Slate's codebase is monorepo managed with [Lerna](https://lerna.js.org/). It consists of a handful of packages—although you won't always use all of them. They are:
 
 | **Package**                                         | **Version**                                                                                                                         | **Size**                                                                                                                                                                                        | **Description**                                  |
 | --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
