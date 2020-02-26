@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Editor, createEditor } from 'slate'
+import { Transforms, createEditor } from 'slate'
 import {
   Slate,
   Editable,
@@ -41,30 +41,10 @@ const Element = props => {
 
 const VideoElement = ({ attributes, children, element }) => {
   const editor = useEditor()
-  const selected = useSelected()
-  const focused = useFocused()
   const { url } = element
   return (
     <div {...attributes}>
-      <div
-        contentEditable={false}
-        style={{
-          position: 'relative',
-          boxShadow: selected && focused ? '0 0 0 3px #B4D5FF' : 'none',
-        }}
-      >
-        <div
-          style={{
-            display: selected && focused ? 'none' : 'block',
-            position: 'absolute',
-            top: '0',
-            left: '0',
-            height: '100%',
-            width: '100%',
-            cursor: 'cell',
-            zIndex: 1,
-          }}
-        />
+      <div contentEditable={false}>
         <div
           style={{
             padding: '75% 0 0 0',
@@ -83,20 +63,18 @@ const VideoElement = ({ attributes, children, element }) => {
             }}
           />
         </div>
-        {selected && focused ? (
-          <input
-            value={url}
-            onClick={e => e.stopPropagation()}
-            style={{
-              marginTop: '5px',
-              boxSizing: 'border-box',
-            }}
-            onChange={value => {
-              const path = ReactEditor.findPath(editor, element)
-              Transforms.setNodes(editor, { url: value }, { at: path })
-            }}
-          />
-        ) : null}
+        <input
+          value={url}
+          onClick={e => e.stopPropagation()}
+          style={{
+            marginTop: '5px',
+            boxSizing: 'border-box',
+          }}
+          onChange={e => {
+            const path = ReactEditor.findPath(editor, element)
+            Transforms.setNodes(editor, { url: e.target.value }, { at: path })
+          }}
+        />
       </div>
       {children}
     </div>
