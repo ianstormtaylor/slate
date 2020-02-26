@@ -41,27 +41,39 @@ const withChecklists = editor => {
     })
     if (match) {
       const [matchingNode] = match
-      if (matchingNode.type !== 'paragraph') {
-        if (
-          matchingNode.children[matchingNode.children.length - 1].text
-            .length === 0
-        ) {
-          Transforms.delete(editor)
-          Transforms.insertNodes(editor, {
-            type: 'paragraph',
-            children: [{ text: '' }],
-          })
-          return
-        }
-        if (matchingNode.type === 'check-list-item') {
+      if (
+        matchingNode.children[matchingNode.children.length - 1].text.length ===
+        0
+      ) {
+        Transforms.delete(editor)
+        Transforms.insertNodes(editor, {
+          type: 'paragraph',
+          children: [{ text: '' }],
+        })
+        return
+      }
+      if (matchingNode.type === 'check-list-item') {
+        const [start] = Range.edges(editor.selection)
+        const after = Editor.after(editor, start, { unit: 'word' })
+        const afterRange = Editor.range(editor, start, after)
+        const afterText = Editor.string(editor, afterRange)
+        if (afterText.length > 0) {
+          const checklist = {
+            type: 'check-list-item',
+            checked: false,
+            children: [{ text: afterText }],
+          }
+          Transforms.splitNodes(editor)
+          Transforms.setNodes(editor, checklist)
+        } else {
           const checklist = {
             type: 'check-list-item',
             checked: false,
             children: [{ text: '' }],
           }
           Transforms.insertNodes(editor, checklist)
-          return
         }
+        return
       }
     }
     insertBreak()
