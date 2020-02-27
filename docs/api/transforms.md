@@ -1,0 +1,136 @@
+# Transforms
+
+Transforms are helper functions operating on the document. They can be used in defining your own commands.
+
+## Node transforms
+
+###### NodeOptions
+
+All transforms listed below support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify the place in the document that the transform is applied to. 
+
+```typescript
+interface NodeOptions {
+    at?: Location
+    match?: (node: Node) => boolean
+    mode?: 'highest' | 'lowest'
+    voids?: boolean
+}
+```
+
+
+
+###### `insertNodes(editor: Editor, nodes: Node | Node[], options?)`
+
+Insert `nodes` at the specified location in the document.  If no location is specified, insert at the current selection. If there is no selection, insert at the end of the document.
+
+Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`. 
+
+
+
+###### `removeNodes(editor: Editor, options?)`
+
+Remove nodes at the specified location in the document. If no location is specified, remove the nodes in the selection. 
+
+Options supported: `NodeOptions & {hanging?: boolean}` 
+
+
+
+###### `mergeNodes(editor: Editor, options?)`
+
+Merge a node at the specified location with the previous node at the same depth. If no location is specified, use the selection. Resulting empty container nodes are removed.
+
+Options supported: `NodeOptions & {hanging?: boolean}`
+
+###### 
+
+###### `splitNodes(editor: Editor, options?)`
+
+Split nodes at the specified location. If no location is specified, split the selection.
+
+Options supported: `NodeOptions & {height?: number, always?: boolean}` 
+
+###### 
+
+###### `wrapNodes(editor: Editor, element: Element, options?)`
+
+Wrap nodes at the specified location in the `element` container. If no location is specified, wrap the selection.
+
+Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+
+
+
+###### `unwrapNodes(editor: Editor, options?)`
+
+Unwrap nodes at the specified location. If necessary, the parent node is split. If no location is specified, use the selection.
+
+Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+
+###### 
+
+###### `setNodes(editor: Editor, props: Partial<Node>, options?)`
+
+Set properties of nodes at the specified location. If no location is specified, use the selection.
+
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
+
+
+
+###### `unsetNodes(editor: Editor, props: string | string[], options?)`
+
+Unset properties of nodes at the specified location. If no location is specified, use the selection.
+
+Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+
+###### 
+
+###### `liftNodes(editor: Editor, options?)`
+
+Lift nodes at the specified location upwards in the document tree. If necessary, the parent node is split. If no location is specified, use the selection.
+
+Options supported: `NodeOptions`. For `options.mode`, `'all'` is also supported.
+
+
+
+###### `moveNodes(editor: Editor, options)`
+
+Move the nodes from an origin to a destination. A destination must be specified in the `options`.  If no origin is specified, move the selection.
+
+Options supported: `NodeOptions & {to: Path}`. For `options.mode`, `'all'` is also supported.
+
+
+
+## Selection transforms
+
+###### `collapse(editor: Editor, options?)`
+
+Options: 
+
+###### `select(editor: Editor, options?)`
+
+Options:
+
+###### `deselect(editor: Editor, options?)`
+
+Options:
+
+###### `move(editor: Editor, options?)`
+
+Options:
+
+###### `setPoint(editor: Editor, options?)`
+
+Options:
+
+###### `setSelection(editor: Editor, options?)`
+
+Options:
+
+## Text transforms
+
+## General transform
+
+###### `transform(editor: Editor, transform: Transform)`
+
+Transform the `editor` by an `operation`.
+
+
