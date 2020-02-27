@@ -4,6 +4,8 @@ Transforms are helper functions operating on the document. They can be used in d
 
 ## Node transforms
 
+Transforms that operate on nodes.
+
 ###### NodeOptions
 
 All transforms listed below support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify the place in the document that the transform is applied to. 
@@ -41,7 +43,7 @@ Merge a node at the specified location with the previous node at the same depth.
 
 Options supported: `NodeOptions & {hanging?: boolean}`
 
-###### 
+
 
 ###### `splitNodes(editor: Editor, options?)`
 
@@ -49,7 +51,7 @@ Split nodes at the specified location. If no location is specified, split the se
 
 Options supported: `NodeOptions & {height?: number, always?: boolean}` 
 
-###### 
+
 
 ###### `wrapNodes(editor: Editor, element: Element, options?)`
 
@@ -65,7 +67,7 @@ Unwrap nodes at the specified location. If necessary, the parent node is split. 
 
 Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-###### 
+
 
 ###### `setNodes(editor: Editor, props: Partial<Node>, options?)`
 
@@ -81,7 +83,7 @@ Unset properties of nodes at the specified location. If no location is specified
 
 Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
-###### 
+
 
 ###### `liftNodes(editor: Editor, options?)`
 
@@ -101,36 +103,88 @@ Options supported: `NodeOptions & {to: Path}`. For `options.mode`, `'all'` is al
 
 ## Selection transforms
 
+Transforms that operate on the document's selection.
+
 ###### `collapse(editor: Editor, options?)`
 
-Options: 
+Collapse the selection to a single point.
 
-###### `select(editor: Editor, options?)`
+Options:  `{edge?: 'anchor' | 'focus' | 'start' | 'end'}`
 
-Options:
 
-###### `deselect(editor: Editor, options?)`
 
-Options:
+###### `select(editor: Editor, target: Location)`
+
+Set the selection to a new value specified by `target`.
+
+
+
+###### `deselect(editor: Editor)`
+
+Unset the selection.
+
+
 
 ###### `move(editor: Editor, options?)`
 
-Options:
+Move the selection's point forward or backward.
 
-###### `setPoint(editor: Editor, options?)`
+Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line', reverse?: boolean, edge?: 'anchor' | 'focus' | 'start' | 'end'}`
 
-Options:
 
-###### `setSelection(editor: Editor, options?)`
 
-Options:
+###### `setPoint(editor: Editor, props: Partial<Point>, options?)`
+
+Set new properties on one of the selection's points.
+
+Options: `{edge?: 'anchor' | 'focus' | 'start' | 'end'}`
+
+
+
+###### `setSelection(editor: Editor, props: Partial<Range>)`
+
+Set new properties on the selection.
+
+
 
 ## Text transforms
+
+Transforms that operate on text.
+
+
+
+###### `delete(editor: Editor, options?)`
+
+Delete text in the document.
+
+Options: `{at?: Location, distance?: number, unit?: 'character' | 'word' | 'line' | 'block', reverse?: boolean, hanging?: boolean, voids?: boolean}`
+
+
+
+###### `insertFragment(editor: Editor, fragment: Node[], options?)`
+
+Insert of fragment of nodes at the specified location in the document. If no location is specified, insert at the current selection.
+
+Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
+
+
+
+###### `insertText(editor: Editor, text: string, options?)`
+
+Insert a string of text at the specified location in the document. If no location is specified, insert at the current selection.
+
+Options: `{at?: Location, voids?: boolean}`
+
+
 
 ## General transform
 
 ###### `transform(editor: Editor, transform: Transform)`
 
 Transform the `editor` by an `operation`.
+
+
+
+
 
 
