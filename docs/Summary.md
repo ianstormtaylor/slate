@@ -27,7 +27,10 @@
 ## API
 
 - [Transforms](./api/transforms.md)
-- [Interfaces](./api/interfaces.md)
+- [Nodes](./api/nodes.md)
+- [Locations](./api/locations.md)
+- [Refs](./api/refs.md)
+- [Miscellaneous](./api/miscellaneous.md)
 
 ## General
 
