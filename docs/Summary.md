@@ -25,7 +25,9 @@
 - [Migrating](./concepts/XX-migrating.md)
 
 ## API
+
 - [Transforms](./api/transforms.md)
+- [Interfaces](./api/interfaces.md)
 
 ## General
 
