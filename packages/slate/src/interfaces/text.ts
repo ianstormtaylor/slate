@@ -1,4 +1,6 @@
 import isPlainObject from 'is-plain-object'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
 import { Range } from '..'
 
 /**
@@ -24,27 +26,10 @@ export const Text = {
   ): boolean {
     const { loose = false } = options
 
-    for (const key in text) {
-      if (loose && key === 'text') {
-        continue
-      }
-
-      if (text[key] !== another[key]) {
-        return false
-      }
-    }
-
-    for (const key in another) {
-      if (loose && key === 'text') {
-        continue
-      }
-
-      if (text[key] !== another[key]) {
-        return false
-      }
-    }
-
-    return true
+    return isEqual(
+      loose ? omit(text, 'text') : text,
+      loose ? omit(another, 'text') : another
+    )
   },
 
   /**
