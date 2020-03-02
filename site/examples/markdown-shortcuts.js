@@ -96,6 +96,7 @@ const withShortcuts = editor => {
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
               match: n => n.type === 'bulleted-list',
+              split: true,
             })
           }
 
