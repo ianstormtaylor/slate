@@ -24,6 +24,14 @@
 - [Normalizing](./concepts/10-normalizing.md)
 - [Migrating](./concepts/XX-migrating.md)
 
+## API
+
+- [Transforms](./api/transforms.md)
+- [Nodes](./api/nodes.md)
+- [Locations](./api/locations.md)
+- [Refs](./api/refs.md)
+- [Miscellaneous](./api/miscellaneous.md)
+
 ## General
 
 - [Resources](./general/resources.md)
