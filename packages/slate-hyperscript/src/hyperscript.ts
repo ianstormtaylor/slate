@@ -91,8 +91,9 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
       attributes = {}
     }
 
-    children = children.filter(child => Boolean(child)).flat()
-    const ret = creator(tagName, attributes, children)
+    const flattened: any[] = []
+    flattened.push(...children.filter(child => Boolean(child)))
+    const ret = creator(tagName, attributes, flattened)
     return ret
   }
 
