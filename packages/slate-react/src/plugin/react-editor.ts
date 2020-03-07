@@ -146,9 +146,9 @@ export const ReactEditor = {
   hasDOMNode(
     editor: ReactEditor,
     target: DOMNode,
-    options: { editable?: boolean } = {}
+    options: { editable?: boolean; selectable?: boolean } = {}
   ): boolean {
-    const { editable = false } = options
+    const { editable = false, selectable = false } = options
     const editorEl = ReactEditor.toDOMNode(editor, editor)
     let targetEl
 
@@ -174,7 +174,11 @@ export const ReactEditor = {
 
     return (
       targetEl.closest(`[data-slate-editor]`) === editorEl &&
-      (!editable || targetEl.isContentEditable)
+      (!editable || targetEl.isContentEditable) &&
+      // Selectable nodes are editable or the zero width elements for void nodes.
+      (!selectable ||
+        targetEl.isContentEditable ||
+        targetEl.hasAttribute('data-slate-zero-width'))
     )
   },
 

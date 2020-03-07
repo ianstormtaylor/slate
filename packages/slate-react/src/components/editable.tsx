@@ -367,8 +367,8 @@ export const Editable = (props: EditableProps) => {
 
         if (
           domRange &&
-          hasEditableTarget(editor, domRange.startContainer) &&
-          hasEditableTarget(editor, domRange.endContainer)
+          hasSelectableTarget(editor, domRange.startContainer) &&
+          hasSelectableTarget(editor, domRange.endContainer)
         ) {
           const range = ReactEditor.toSlateRange(editor, domRange)
           Transforms.select(editor, range)
@@ -968,6 +968,20 @@ const hasEditableTarget = (
   return (
     isDOMNode(target) &&
     ReactEditor.hasDOMNode(editor, target, { editable: true })
+  )
+}
+
+/**
+ * Check if the target is selectable and in the editor.
+ */
+
+const hasSelectableTarget = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): target is DOMNode => {
+  return (
+    isDOMNode(target) &&
+    ReactEditor.hasDOMNode(editor, target, { selectable: true })
   )
 }
 
