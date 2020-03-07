@@ -1087,13 +1087,18 @@ const setFragmentData = (
   // Add the content to a <div> so that we can get its inner HTML.
   const div = document.createElement('div')
   div.appendChild(contents)
+  div.setAttribute('hidden', 'true')
+  document.body.appendChild(div)
   dataTransfer.setData('text/html', div.innerHTML)
   dataTransfer.setData('text/plain', getPlainText(div))
+  document.body.removeChild(div)
 }
 
 /**
  * Get a plaintext representation of the content of a node, accounting for block
  * elements which get a newline appended.
+ *
+ * The domNode must be attached to the DOM.
  */
 
 const getPlainText = (domNode: DOMNode) => {
