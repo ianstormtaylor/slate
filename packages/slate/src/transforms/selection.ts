@@ -157,13 +157,10 @@ export const SelectionTransforms = {
 
     const { anchor, focus } = selection
     const point = edge === 'anchor' ? anchor : focus
-    const newPoint = Object.assign(point, props)
 
-    if (edge === 'anchor') {
-      Transforms.setSelection(editor, { anchor: newPoint })
-    } else {
-      Transforms.setSelection(editor, { focus: newPoint })
-    }
+    Transforms.setSelection(editor, {
+      [edge === 'anchor' ? 'anchor' : 'focus']: { ...point, ...props },
+    })
   },
 
   /**

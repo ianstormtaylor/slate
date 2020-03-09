@@ -133,4 +133,4 @@ const Toolbar = () => {
 }
 ```
 
-Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will will re-render whenever the editor changes, so that the active state of the buttons stays in sync.
+Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will re-render whenever the editor changes, so that the active state of the buttons stays in sync.
