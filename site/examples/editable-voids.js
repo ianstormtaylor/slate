@@ -73,6 +73,7 @@ const EditableVoidElement = ({ attributes, children, element }) => {
       >
         <h4>Name:</h4>
         <input
+          data-slate-editor
           className={css`
             margin: 8px 0;
           `}
