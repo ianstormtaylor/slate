@@ -16,7 +16,7 @@ Slate editors come with a few built-in constraints out of the box. These constra
 
 4. **The top-level editor node can only contain block nodes.** If any of the top-level children are inline or text nodes they will be removed. This ensures that there are always block nodes in the editor so that behaviors like "splitting a block in two" work as expected.
 
-These default constraints are all mandated because they make working with Slate documents _much_ more preditable.
+These default constraints are all mandated because they make working with Slate documents _much_ more predictable.
 
 > 🤖 Although these constraints are the best we've come up with now, we're always looking for ways to have Slate's built-in constraints be less constraining if possible—as long as it keeps standard behaviors easy to reason about. If you come up with a way to reduce or remove a built-in constraint with a different approach, we're all ears!
 
