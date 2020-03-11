@@ -24,17 +24,6 @@ import {
 
 const STRINGS: WeakSet<Text> = new WeakSet()
 
-function flattenDescendants(array: any[]) {
-  return array.reduce((acc, el) => {
-    if (Array.isArray(el)) {
-      acc.push(...flattenDescendants(el))
-      return acc
-    }
-    acc.push(el)
-    return acc
-  }, [])
-}
-
 const resolveDescendants = (children: any[]): Descendant[] => {
   const nodes: Node[] = []
 
@@ -84,8 +73,7 @@ const resolveDescendants = (children: any[]): Descendant[] => {
     }
   }
 
-  const flattened = flattenDescendants(children)
-  for (const child of flattened) {
+  for (const child of children.flat(Infinity)) {
     addChild(child)
   }
 
