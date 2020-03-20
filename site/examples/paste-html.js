@@ -58,7 +58,6 @@ export const deserialize = el => {
   ) {
     parent = el.childNodes[0]
   }
-
   const children = Array.from(parent.childNodes)
     .map(deserialize)
     .flat()

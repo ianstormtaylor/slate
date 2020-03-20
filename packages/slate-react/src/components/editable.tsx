@@ -13,7 +13,7 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
-import { IS_FIREFOX, IS_SAFARI } from '../utils/environment'
+import { IS_FIREFOX, IS_SAFARI, IS_EDGE_LEGACY } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
@@ -36,6 +36,9 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
+
+// COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
+const HAS_BEFORE_INPUT_SUPPORT = !(IS_FIREFOX || IS_EDGE_LEGACY)
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
@@ -422,11 +425,17 @@ export const Editable = (props: EditableProps) => {
         data-gramm={false}
         role={readOnly ? undefined : 'textbox'}
         {...attributes}
-        // COMPAT: Firefox doesn't support the `beforeinput` event, so we'd
+        // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
         // have to use hacks to make these replacement-based features work.
-        spellCheck={IS_FIREFOX ? undefined : attributes.spellCheck}
-        autoCorrect={IS_FIREFOX ? undefined : attributes.autoCorrect}
-        autoCapitalize={IS_FIREFOX ? undefined : attributes.autoCapitalize}
+        spellCheck={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.spellCheck
+        }
+        autoCorrect={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCorrect
+        }
+        autoCapitalize={
+          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCapitalize
+        }
         data-slate-editor
         data-slate-node="value"
         contentEditable={readOnly ? undefined : true}
@@ -444,11 +453,11 @@ export const Editable = (props: EditableProps) => {
         }}
         onBeforeInput={useCallback(
           (event: React.FormEvent<HTMLDivElement>) => {
-            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
             // fall back to React's leaky polyfill instead just for it. It
             // only works for the `insertText` input type.
             if (
-              IS_FIREFOX &&
+              !HAS_BEFORE_INPUT_SUPPORT &&
               !readOnly &&
               !isEventHandled(event, attributes.onBeforeInput) &&
               hasEditableTarget(editor, event.target)
@@ -658,12 +667,12 @@ export const Editable = (props: EditableProps) => {
               !readOnly &&
               !isEventHandled(event, attributes.onDrop)
             ) {
-              // COMPAT: Firefox doesn't fire `beforeinput` events at all, and
+              // COMPAT: Certain browsers don't fire `beforeinput` events at all, and
               // Chromium browsers don't properly fire them for files being
               // dropped into a `contenteditable`. (2019/11/26)
               // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
               if (
-                IS_FIREFOX ||
+                !HAS_BEFORE_INPUT_SUPPORT ||
                 (!IS_SAFARI && event.dataTransfer.files.length > 0)
               ) {
                 event.preventDefault()
@@ -807,10 +816,10 @@ export const Editable = (props: EditableProps) => {
                 return
               }
 
-              // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
               // fall back to guessing at the input intention for hotkeys.
               // COMPAT: In iOS, some of these hotkeys are handled in the
-              if (IS_FIREFOX) {
+              if (!HAS_BEFORE_INPUT_SUPPORT) {
                 // We don't have a core behavior for these, but they change the
                 // DOM if we don't prevent them, so we have to.
                 if (
@@ -906,13 +915,14 @@ export const Editable = (props: EditableProps) => {
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // COMPAT: Firefox doesn't support the `beforeinput` event, so we
+            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
             // fall back to React's `onPaste` here instead.
             // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
             // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
-              (IS_FIREFOX || isPlainTextOnlyPaste(event.nativeEvent)) &&
+              (!HAS_BEFORE_INPUT_SUPPORT ||
+                isPlainTextOnlyPaste(event.nativeEvent)) &&
               !readOnly &&
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste)
@@ -1101,13 +1111,18 @@ const setFragmentData = (
   // Add the content to a <div> so that we can get its inner HTML.
   const div = document.createElement('div')
   div.appendChild(contents)
+  div.setAttribute('hidden', 'true')
+  document.body.appendChild(div)
   dataTransfer.setData('text/html', div.innerHTML)
   dataTransfer.setData('text/plain', getPlainText(div))
+  document.body.removeChild(div)
 }
 
 /**
  * Get a plaintext representation of the content of a node, accounting for block
  * elements which get a newline appended.
+ *
+ * The domNode must be attached to the DOM.
  */
 
 const getPlainText = (domNode: DOMNode) => {
