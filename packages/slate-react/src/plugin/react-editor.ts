@@ -408,7 +408,7 @@ export const ReactEditor = {
         textNode = leafNode.closest('[data-slate-node="text"]')!
         domNode = leafNode
         offset = domNode.textContent!.length
-      }else{
+      } else {
         // Sometimes the dom point may be out of leaf node. But actually the node
         // does contain a leaf node.
         leafNode = parentNode.querySelector('[data-slate-leaf]')!
