@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Node } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-editor'
 import { SlateContext } from '../hooks/use-slate'
-import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
+import { EDITOR_TO_ON_CHANGE, IS_DESTROYED } from '../utils/weak-maps'
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
@@ -33,6 +33,13 @@ export const Slate = (props: {
   }, [key, onChange])
 
   EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+  IS_DESTROYED.set(editor, false)
+
+  useEffect(() => {
+    return () => {
+      IS_DESTROYED.set(editor, true)
+    }
+  }, [])
 
   return (
     <SlateContext.Provider value={context}>
