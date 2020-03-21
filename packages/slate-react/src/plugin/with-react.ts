@@ -3,7 +3,11 @@ import { Editor, Node, Path, Operation, Transforms } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
-import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY, IS_DESTROYED } from '../utils/weak-maps'
+import {
+  EDITOR_TO_ON_CHANGE,
+  NODE_TO_KEY,
+  IS_DESTROYED,
+} from '../utils/weak-maps'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
