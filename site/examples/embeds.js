@@ -63,21 +63,35 @@ const VideoElement = ({ attributes, children, element }) => {
             }}
           />
         </div>
-        <input
-          value={url}
-          onClick={e => e.stopPropagation()}
-          style={{
-            marginTop: '5px',
-            boxSizing: 'border-box',
-          }}
-          onChange={e => {
+        <UrlInput
+          url={url}
+          onChange={val => {
             const path = ReactEditor.findPath(editor, element)
-            Transforms.setNodes(editor, { url: e.target.value }, { at: path })
+            Transforms.setNodes(editor, { url: val }, { at: path })
           }}
         />
       </div>
       {children}
     </div>
+  )
+}
+
+const UrlInput = ({ url, onChange }) => {
+  const [value, setValue] = React.useState(url)
+  return (
+    <input
+      value={value}
+      onClick={e => e.stopPropagation()}
+      style={{
+        marginTop: '5px',
+        boxSizing: 'border-box',
+      }}
+      onChange={e => {
+        const newUrl = e.target.value
+        setValue(newUrl)
+        onChange(newUrl)
+      }}
+    />
   )
 }
 
