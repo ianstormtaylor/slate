@@ -666,7 +666,7 @@ export const Editable = (props: EditableProps) => {
                 event.preventDefault()
                 const range = ReactEditor.findEventRange(editor, event)
                 const data = event.dataTransfer
-                const dragged = editor.selection;
+                const dragged = editor.selection
                 Transforms.select(editor, range)
                 if (state.isDraggingInternally && dragged) {
                   Transforms.delete(editor, { at: dragged })
@@ -677,11 +677,9 @@ export const Editable = (props: EditableProps) => {
           },
           [readOnly, attributes.onDrop]
         )}
-        onDragEnd={useCallback(
-          (event: React.DragEvent<HTMLDivElement>) => {
-            state.isDraggingInternally = false
-          }
-        , [])}
+        onDragEnd={useCallback((event: React.DragEvent<HTMLDivElement>) => {
+          state.isDraggingInternally = false
+        }, [])}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (

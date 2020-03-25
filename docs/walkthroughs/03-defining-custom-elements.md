@@ -22,7 +22,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.insertText("and")
+            editor.insertText('and')
           }
         }}
       />
@@ -93,7 +93,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.insertText("and")
+            editor.insertText('and')
           }
         }}
       />
