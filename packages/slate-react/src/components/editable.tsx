@@ -114,6 +114,7 @@ export const Editable = (props: EditableProps) => {
       isComposing: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
+      isDraggingInternally: false,
     }),
     []
   )
@@ -240,7 +241,8 @@ export const Editable = (props: EditableProps) => {
         if (
           selection &&
           Range.isExpanded(selection) &&
-          type.startsWith('delete')
+          type.startsWith('delete') &&
+          type !== 'deleteByDrag'
         ) {
           Editor.deleteFragment(editor)
           return
@@ -248,8 +250,7 @@ export const Editable = (props: EditableProps) => {
 
         switch (type) {
           case 'deleteByComposition':
-          case 'deleteByCut':
-          case 'deleteByDrag': {
+          case 'deleteByCut': {
             Editor.deleteFragment(editor)
             break
           }
@@ -642,6 +643,7 @@ export const Editable = (props: EditableProps) => {
               }
 
               setFragmentData(event.dataTransfer, editor)
+              state.isDraggingInternally = true
             }
           },
           [attributes.onDragStart]
@@ -664,13 +666,22 @@ export const Editable = (props: EditableProps) => {
                 event.preventDefault()
                 const range = ReactEditor.findEventRange(editor, event)
                 const data = event.dataTransfer
+                const dragged = editor.selection;
                 Transforms.select(editor, range)
+                if (state.isDraggingInternally && dragged) {
+                  Transforms.delete(editor, { at: dragged })
+                }
                 ReactEditor.insertData(editor, data)
               }
             }
           },
           [readOnly, attributes.onDrop]
         )}
+        onDragEnd={useCallback(
+          (event: React.DragEvent<HTMLDivElement>) => {
+            state.isDraggingInternally = false
+          }
+        , [])}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
