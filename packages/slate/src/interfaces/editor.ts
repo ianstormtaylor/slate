@@ -38,7 +38,7 @@ export interface Editor {
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
-  [key: string]: any
+  [key: string]: unknown
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean

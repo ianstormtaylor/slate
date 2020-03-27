@@ -37,7 +37,7 @@ Points are slightly more specific than paths, and contain an `offset` into a spe
 interface Point {
   path: Path
   offset: number
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 
@@ -71,7 +71,7 @@ Ranges are a way to refer not just to a single point in the document, but to a w
 interface Range {
   anchor: Point
   focus: Point
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 

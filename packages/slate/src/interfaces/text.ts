@@ -9,7 +9,7 @@ import { Range } from '..'
 
 export interface Text {
   text: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export const Text = {

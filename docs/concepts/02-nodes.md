@@ -55,7 +55,7 @@ Elements make up the middle layers of a richtext document. They are the nodes th
 ```ts
 interface Element {
   children: Node[]
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 
@@ -126,7 +126,7 @@ Text nodes are the lowest-level nodes in the tree, containing the text content o
 ```ts
 interface Text {
   text: string
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 
