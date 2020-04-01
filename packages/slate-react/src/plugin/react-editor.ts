@@ -174,11 +174,9 @@ export const ReactEditor = {
 
     return (
       targetEl.closest(`[data-slate-editor]`) === editorEl &&
-      (
-        !editable ||
+      (!editable ||
         targetEl.isContentEditable ||
-        !!targetEl.getAttribute('data-slate-zero-width')
-      )
+        !!targetEl.getAttribute('data-slate-zero-width'))
     )
   },
 
