@@ -19,6 +19,7 @@ import {
   DOMSelection,
   DOMStaticRange,
   isDOMElement,
+  isEmptyTextNode,
   normalizeDOMPoint,
 } from '../utils/dom'
 
@@ -268,10 +269,18 @@ export const ReactEditor = {
       : ReactEditor.toDOMPoint(editor, focus)
 
     const domRange = window.document.createRange()
-    const start = Range.isBackward(range) ? domFocus : domAnchor
-    const end = Range.isBackward(range) ? domAnchor : domFocus
-    domRange.setStart(start[0], start[1])
-    domRange.setEnd(end[0], end[1])
+    const [startNode, startOffset] = Range.isBackward(range)
+      ? domFocus
+      : domAnchor
+    const [endNode, endOffset] = Range.isBackward(range) ? domAnchor : domFocus
+
+    // A slate Point pointing to a Leaf without text will always have an offset of 0.
+    // A native DOM selection point on the other hand will have an offset of 1.
+    // Therefore, DOM selection points are given an offset of 1 instead of 0.
+    // Not doing this causes issues when backward selcting (see issue #3544).
+    domRange.setStart(startNode, isEmptyTextNode(startNode) ? 1 : startOffset)
+    domRange.setEnd(endNode, isEmptyTextNode(endNode) ? 1 : endOffset)
+
     return domRange
   },
 

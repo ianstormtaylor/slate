@@ -69,6 +69,13 @@ export const isPlainTextOnlyPaste = (event: ClipboardEvent) => {
 }
 
 /**
+ * Check if a DOM node is a TextNode without content.
+ */
+
+export const isEmptyTextNode = (node: DOMNode): Boolean =>
+  node.nodeType === 3 && /^\s$/.test(node.textContent!)
+
+/**
  * Normalize a DOM point so that it always refers to a text node.
  */
 
