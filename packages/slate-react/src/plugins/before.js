@@ -375,7 +375,7 @@ function BeforePlugin() {
   }
 
   /**
-   * On input.
+   * On componentDidMount.
    *
    * @param {Event} event
    * @param {Change} change
