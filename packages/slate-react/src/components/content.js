@@ -103,6 +103,8 @@ class Content extends React.Component {
     }
 
     this.updateSelection()
+
+    this.onEvent('onComponentDidMount', { target: this.ref.current })
   }
 
   /**

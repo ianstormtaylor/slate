@@ -375,6 +375,20 @@ function BeforePlugin() {
   }
 
   /**
+   * On input.
+   *
+   * @param {Event} event
+   * @param {Change} change
+   * @param {Editor} editor
+   */
+
+  function onComponentDidMount(event, change, editor) {
+    console.log('did mount');
+
+    debug('onComponentDidMount', { event })
+  }
+
+  /**
    * On key down.
    *
    * @param {Event} event
@@ -464,6 +478,7 @@ function BeforePlugin() {
     onBeforeInput,
     onBlur,
     onChange,
+    onComponentDidMount,
     onCompositionEnd,
     onCompositionStart,
     onCopy,

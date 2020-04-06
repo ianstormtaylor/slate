@@ -11,6 +11,7 @@ const EVENT_HANDLERS = [
   'onContextMenu',
   'onCompositionEnd',
   'onCompositionStart',
+  'onComponentDidMount',
   'onCopy',
   'onCut',
   'onDragEnd',
