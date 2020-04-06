@@ -383,8 +383,6 @@ function BeforePlugin() {
    */
 
   function onComponentDidMount(event, change, editor) {
-    console.log('did mount');
-
     debug('onComponentDidMount', { event })
   }
 
