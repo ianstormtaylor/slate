@@ -1119,15 +1119,25 @@ export const Editor = {
       }
     }
 
-    const [, previous] = Editor.nodes(editor, {
+    const [first, second] = Editor.nodes(editor, {
       reverse: true,
       at: span,
       match,
       mode,
       voids,
     })
-
-    return previous
+    if (first) {
+      // If the first result is the first in the at, it can't be the previous
+      // one. This can happen when the supplied `at` doesn't satisfy the
+      // supplied `match`.
+      // https://github.com/ianstormtaylor/slate/issues/3590
+      const [, firstPath] = first
+      const [, resultPath] = Editor.first(editor, firstPath)
+      if (Path.equals(resultPath, from)) {
+        return second
+      }
+    }
+    return first
   },
 
   /**

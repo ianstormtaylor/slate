@@ -19,9 +19,7 @@ export const input = (
 export const test = editor => {
   const [node] = Editor.previous(editor, {
     at: [0, 5],
-    match: n => {
-      return !n.bold
-    },
+    match: n => !n.bold,
   })
   return node
 }
