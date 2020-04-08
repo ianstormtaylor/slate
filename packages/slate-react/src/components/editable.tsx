@@ -8,10 +8,10 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
+import { throttle } from '../utils/functions'
 import Hotkeys from '../utils/hotkeys'
 import { IS_FIREFOX, IS_SAFARI, IS_EDGE_LEGACY } from '../utils/environment'
 import { ReactEditor } from '..'
