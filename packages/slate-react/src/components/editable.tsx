@@ -145,13 +145,11 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-
     // If the DOM selection is already correct, we're done.
     if (
       hasDomSelection &&
-      newDomRange &&
-      isRangeEqual(domSelection.getRangeAt(0), newDomRange)
+      selection &&
+      Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
     ) {
       return
     }
@@ -160,6 +158,8 @@ export const Editable = (props: EditableProps) => {
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
     domSelection.removeAllRanges()
+
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
@@ -356,10 +356,6 @@ export const Editable = (props: EditableProps) => {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = window.getSelection()
-        const domRange =
-          domSelection &&
-          domSelection.rangeCount > 0 &&
-          domSelection.getRangeAt(0)
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -369,11 +365,11 @@ export const Editable = (props: EditableProps) => {
         }
 
         if (
-          domRange &&
-          hasEditableTarget(editor, domRange.startContainer) &&
-          hasEditableTarget(editor, domRange.endContainer)
+          domSelection &&
+          hasEditableTarget(editor, domSelection.anchorNode) &&
+          hasEditableTarget(editor, domSelection.focusNode)
         ) {
-          const range = ReactEditor.toSlateRange(editor, domRange)
+          const range = ReactEditor.toSlateRange(editor, domSelection)
           Transforms.select(editor, range)
         } else {
           Transforms.deselect(editor)
