@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn build:rollup && yarn build:next",
+    "build": "cross-env NODE_ENV=production yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js",
     "clean": "rm -rf ./node_modules ./packages/*/{dist,lib,node_modules} ./site/{.next,out}",
@@ -46,7 +46,7 @@
     "babel-eslint": "^10.0.3",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
-    "cross-env": "^7.0.2",
+    "cross-env": "6.0.3",
     "emotion": "^10.0.9",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
