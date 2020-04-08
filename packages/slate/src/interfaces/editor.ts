@@ -1126,17 +1126,19 @@ export const Editor = {
       mode,
       voids,
     })
+
     if (first) {
-      // If the first result is the first in the at, it can't be the previous
-      // one. This can happen when the supplied `at` doesn't satisfy the
-      // supplied `match`.
-      // https://github.com/ianstormtaylor/slate/issues/3590
       const [, firstPath] = first
       const [, resultPath] = Editor.first(editor, firstPath)
       if (Path.equals(resultPath, from)) {
+        // The first match was the node of the Location we were
+        // searching from itself, so return the second one.
         return second
       }
     }
+
+    // This can happen when the supplied `at` doesn't satisfy the supplied `match`.
+    // https://github.com/ianstormtaylor/slate/issues/3590
     return first
   },
 
