@@ -221,6 +221,11 @@ export const createEditor = (): Editor => {
         const isInlineOrText =
           Text.isText(child) ||
           (Element.isElement(child) && editor.isInline(child))
+        let prevIsFocused = false
+        if (editor.selection) {
+          const [focusNode] = Editor.node(editor, editor.selection.focus)
+          prevIsFocused = focusNode === prev
+        }
 
         // Only allow block nodes in the top-level children and parent blocks
         // that only contain block nodes. Similarly, only allow inline nodes in
@@ -254,7 +259,9 @@ export const createEditor = (): Editor => {
             if (Text.equals(child, prev, { loose: true })) {
               Transforms.mergeNodes(editor, { at: path.concat(n), voids: true })
               n--
-            } else if (prev.text === '') {
+            } else if (prev.text === '' && !prevIsFocused) {
+              // Only clean up the empty node if it doesn't currently have focus.
+              // This prevents an overly aggressive removal when split happens between nodes.
               Transforms.removeNodes(editor, {
                 at: path.concat(n - 1),
                 voids: true,
