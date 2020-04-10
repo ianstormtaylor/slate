@@ -1,8 +1,8 @@
 # Nodes: Editor, Elements and Texts
 
-The most important type are the `Node` objects:
+The most important types are the `Node` objects:
 
-- A root-level `Editor` node that contains their entire document's content.
+- A root-level `Editor` node that contains the entire document's content.
 - Container `Element` nodes which have semantic meaning in your domain.
 - And leaf-level `Text` nodes which contain the document's text.
 
@@ -33,7 +33,7 @@ Mirroring the DOM as much as possible is one of Slate's principles. People use t
 > - [Inline elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements)
 > - [Text elements](https://developer.mozilla.org/en-US/docs/Web/API/Text)
 
-A Slate document is a nested and recursive structure. In a document, elements can have children nodes—all which may have children nodes without limit. The nested and recursive structure enables you to model simple behaviors such as user mentions and hashtags or complex behaviors such as tables and figures with captions.
+A Slate document is a nested and recursive structure. In a document, elements can have children nodes—all of which may have children nodes without limit. The nested and recursive structure enables you to model simple behaviors such as user mentions and hashtags or complex behaviors such as tables and figures with captions.
 
 ## `Editor`
 
@@ -101,7 +101,7 @@ Depending on your use case, you might want to define another behavior for `Eleme
 
 All elements default to being "block" elements. They each appear separated by vertical space, and they never run into each other.
 
-But in certain cases, like for links, you might want to make as "inline" flowing elements instead. That way they live at the same level as text nodes, and flow.
+But in certain cases, like for links, you might want to make them "inline" flowing elements instead. That way they live at the same level as text nodes, and flow.
 
 > 🤖 This is a concept borrowed from the DOM's behavior, see [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements) and [Inline Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements).
 
@@ -111,13 +111,13 @@ Elements can either contain block elements as children. Or they can contain inli
 
 ## Voids
 
-Similarly to blocks and inlines, there is another element-specific behavior you can define depending on your use case: their "void"-ness.
+Similar to blocks and inlines, there is another element-specific behavior you can define depending on your use case: their "void"-ness.
 
 Elements default to being non-void, meaning that their children are fully editable as text. But in some cases, like for images, you want to ensure that Slate doesn't treat their content as editable text, but instead as a black box.
 
 > 🤖 This is a concept borrowed from the HTML spec, see [Void Elements](https://www.w3.org/TR/2011/WD-html-markup-20110405/syntax.html#void-element).
 
-You can do define which elements are treated as void by overriding the `editor.isVoid` function. (By default it always returns `false`.)
+You can define which elements are treated as void by overriding the `editor.isVoid` function. (By default it always returns `false`.)
 
 ## `Text`
 

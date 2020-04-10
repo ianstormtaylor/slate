@@ -8,7 +8,7 @@ This is a list of changes to Slate with each new release. Until `1.0.0` is relea
 
 ###### BREAKING
 
-**Overrideble commands now live directly on the editor object.** Previously the `Command` concept was implemented as an interface that was passed into the `editor.exec` function, allowing the "core" commands to be overriden in one place. But this introduced a lot of Redux-like indirection when implementing custom commands that wasn't necessary because they are never overridden. Instead, now the core actions that can be overridden are implemented as individual functions on the editor (eg. `editor.insertText`) and they can be overridden just like any other function (eg. `isVoid`).
+**Overridable commands now live directly on the editor object.** Previously the `Command` concept was implemented as an interface that was passed into the `editor.exec` function, allowing the "core" commands to be overridden in one place. But this introduced a lot of Redux-like indirection when implementing custom commands that wasn't necessary because they are never overridden. Instead, now the core actions that can be overridden are implemented as individual functions on the editor (eg. `editor.insertText`) and they can be overridden just like any other function (eg. `isVoid`).
 
 Previously to override a command you'd do:
 
@@ -68,11 +68,11 @@ Now you'd write:
 Transforms.unwrapNodes(editor, ...)
 ```
 
-**The `Command` interfaces were removed.** As part of those changes, the existing `Command`, `CoreCommand`, `HistoryCommand`, and `ReactCommand` interfaces were all removed. You no longer need to define these "command objects", because you can just call the functions directly. Plugins can still define their own overridable commands by existing the `Editor` interface with new functions. The `slate-react` plugin does this with `insertData` and the `slate-history` plugin does this with `undo` and `redo`.
+**The `Command` interfaces were removed.** As part of those changes, the existing `Command`, `CoreCommand`, `HistoryCommand`, and `ReactCommand` interfaces were all removed. You no longer need to define these "command objects", because you can just call the functions directly. Plugins can still define their own overridable commands by extending the `Editor` interface with new functions. The `slate-react` plugin does this with `insertData` and the `slate-history` plugin does this with `undo` and `redo`.
 
 ###### NEW
 
-**User actions helpers now live directly on the `Editor.*` interface.** These are taking the place of the existing `Transforms.*` helpers that were moved. These helpers are equivalent to user actions, and they always operate on the existing selection. There are some defined by core, but you are likely to define your own custom helpers that are specific to your domain as well.
+**User action helpers now live directly on the `Editor.*` interface.** These are taking the place of the existing `Transforms.*` helpers that were moved. These helpers are equivalent to user actions, and they always operate on the existing selection. There are some defined by core, but you are likely to define your own custom helpers that are specific to your domain as well.
 
 For example, here are some of the built-in actions:
 
@@ -105,7 +105,7 @@ Whatever makes sense for your specific use case!
 
 ###### BREAKING
 
-**The `format_text` command is split into `add_mark` and `remove_mark`.** Although the goal is to keep the number of commands in core to a minimum, having this as a combined command made it very hard to write logic that wanted to guarantee to only ever add or remove a mark from a text node. Now you can be guaranteed that the `add_mark` command will only ever add a custom property to text nodes, and the `remove_mark` command will only ever remove them.
+**The `format_text` command is split into `add_mark` and `remove_mark`.** Although the goal is to keep the number of commands in core to a minimum, having this as a combined command made it very hard to write logic that wanted to guarantee to only ever add or remove a mark from a text node. Now you can be guaranteed that the `add_mark` command will only ever add custom properties to text nodes, and the `remove_mark` command will only ever remove them.
 
 Previously you would write:
 
@@ -126,7 +126,7 @@ if (isActive) {
 }
 ```
 
-> 🤖 Note that the "mark" term does not mean what it meant in `0.47` and earlier. It simply means formatting that is applied at the text level—bold, italic, etc. We need a term for it because it's such a common pattern in richtext editor, and "mark" is often the term that is used. For example the `<mark>` tag in HTML.
+> 🤖 Note that the "mark" term does not mean what it meant in `0.47` and earlier. It simply means formatting that is applied at the text level—bold, italic, etc. We need a term for it because it's such a common pattern in richtext editors, and "mark" is often the term that is used. For example the `<mark>` tag in HTML.
 
 **The `Node.text` helper was renamed to `Node.string`.** This was simply to reduce the confusion between "the text string" and "text nodes". The helper still just returns the concatenated string content of a node.
 
@@ -224,7 +224,7 @@ Editor.nodes(editor, {
 
 ###### BREAKING
 
-**The `slate-schema` package has been removed!** This decision was made because with the new helpers on the `Editor.*` interface, and with the changes to `normalizeNode` in the latest version of Slate, adding constraints using `normalizeNode` actually leads to more maintainable code that using `slate-schema`. Previously it was required to keep things from getting too unreadable, but that always came at a large cost of indirection and learning additional APIs. Everything you could do with `slate-schema` you can do with `normalizeNode`, and more.
+**The `slate-schema` package has been removed!** This decision was made because with the new helpers on the `Editor.*` interface, and with the changes to `normalizeNode` in the latest version of Slate, adding constraints using `normalizeNode` actually leads to more maintainable code than using `slate-schema`. Previously it was required to keep things from getting too unreadable, but that always came at a large cost of indirection and learning additional APIs. Everything you could do with `slate-schema` you can do with `normalizeNode`, and more.
 
 **Node matching functions now receive just a `Node`.** Previously they received a `NodeEntry` tuple, which consisted of `[node, path]`. However now they receive only a `node` argument, which makes it easier to write one-off node-checking helpers and pass them in directly as arguments. If you need to ensure a path, lookup the node first.
 

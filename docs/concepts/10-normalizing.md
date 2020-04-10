@@ -1,6 +1,6 @@
 # Normalizing
 
-Slate editors can edit complex, nested data structures. And for the most part this is great, but in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
+Slate editors can edit complex, nested data structures. And for the most part this is great. But in certain cases inconsistencies in the data structure can be introduced—most often when allowing a user to paste arbitrary richtext content.
 
 "Normalizing" is how you can ensure that your editor's content is always of a certain shape. It's similar to "validating", except instead of just determining whether the content is valid or invalid, its job is to fix the content to make it valid again.
 
@@ -37,7 +37,7 @@ const withParagraphs = editor => {
   editor.normalizeNode = entry => {
     const [node, path] = entry
 
-    // If the element is a paragraph, ensure it's children are valid.
+    // If the element is a paragraph, ensure its children are valid.
     if (Element.isElement(node) && node.type === 'paragraph') {
       for (const [child, childPath] of Node.children(editor, path)) {
         if (Element.isElement(child) && !editor.isInline(child)) {
@@ -92,7 +92,7 @@ To see how this works in practice, let's start with this invalid document:
 </editor>
 ```
 
-The editor starts by running `normalizeNode` on `<paragraph c>`. And it is valid, because contains only text nodes as children.
+The editor starts by running `normalizeNode` on `<paragraph c>`. And it is valid, because it contains only text nodes as children.
 
 But then, it moves up the tree, and runs `normalizeNode` on `<paragraph b>`. This paragraph is invalid, since it contains a block element (`<paragraph c>`). So that child block gets unwrapped, resulting in a new document of:
 
@@ -118,7 +118,7 @@ And now when `normalizeNode` runs, no changes are made, so the document is valid
 
 ## Incorrect Fixes
 
-The one pitfall to avoid however it creating an infinite normalization loop. This can happen if you check for a specific invalid structure, but then **don't** actually fix that structure with the change you make to the node. Resulting in an infinite loop because the node continues to be flagged as invalid, but never fixed properly.
+The one pitfall to avoid however is creating an infinite normalization loop. This can happen if you check for a specific invalid structure, but then **don't** actually fix that structure with the change you make to the node. This results in an infinite loop because the node continues to be flagged as invalid, but it is never fixed properly.
 
 For example, consider a normalization that ensured `link` elements have a valid `url` property:
 
@@ -135,6 +135,7 @@ const withLinks = editor => {
       node.type === 'link' &&
       typeof node.url !== 'string'
     ) {
+      // ERROR: null is not a valid value for a url
       Transforms.setNodes(editor, { url: null }, { at: path })
       return
     }
