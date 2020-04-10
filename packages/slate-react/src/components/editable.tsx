@@ -318,13 +318,12 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
-            if (type === 'insertFromComposition' && IS_APPLE) {
-              return
-            }
-
             if (data instanceof DataTransfer) {
               ReactEditor.insertData(editor, data)
             } else if (typeof data === 'string') {
+              if (type === 'insertFromComposition' && IS_APPLE) {
+                return
+              }
               Editor.insertText(editor, data)
             }
             break
