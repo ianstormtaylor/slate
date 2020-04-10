@@ -13,7 +13,12 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
-import { IS_FIREFOX, IS_SAFARI, IS_EDGE_LEGACY } from '../utils/environment'
+import {
+  IS_FIREFOX,
+  IS_SAFARI,
+  IS_EDGE_LEGACY,
+  IS_APPLE,
+} from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
@@ -313,12 +318,15 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
+            if (type === 'insertFromComposition' && IS_APPLE) {
+              return
+            }
+
             if (data instanceof DataTransfer) {
               ReactEditor.insertData(editor, data)
             } else if (typeof data === 'string') {
               Editor.insertText(editor, data)
             }
-
             break
           }
         }
@@ -558,7 +566,7 @@ export const Editable = (props: EditableProps) => {
               // aren't correct and never fire the "insertFromComposition"
               // type that we need. So instead, insert whenever a composition
               // ends since it will already have been committed to the DOM.
-              if (!IS_SAFARI && !IS_FIREFOX && event.data) {
+              if (!IS_FIREFOX && event.data) {
                 Editor.insertText(editor, event.data)
               }
             }
