@@ -76,7 +76,7 @@ export interface RenderLeafProps {
 export type EditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput?: (event: Event) => void
-  placeholder?: string
+  placeholder?: string | React.ReactNode
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
@@ -1041,7 +1041,7 @@ const setFragmentData = (
   let attach = contents.childNodes[0] as HTMLElement
 
   // Make sure attach is non-empty, since empty nodes will not get copied.
-  contents.childNodes.forEach(node => {
+  contents.childNodes.forEach((node) => {
     if (node.textContent && node.textContent.trim() !== '') {
       attach = node as HTMLElement
     }
@@ -1069,7 +1069,7 @@ const setFragmentData = (
   // Remove any zero-width space spans from the cloned DOM so that they don't
   // show up elsewhere when pasted.
   Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
-    zw => {
+    (zw) => {
       const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
       zw.textContent = isNewline ? '\n' : ''
     }

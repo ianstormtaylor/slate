@@ -35,12 +35,10 @@ const Leaf = (props: {
           contentEditable={false}
           style={{
             pointerEvents: 'none',
-            display: 'inline-block',
+            userSelect: 'none',
             verticalAlign: 'text-top',
             width: '0',
             maxWidth: '100%',
-            whiteSpace: 'nowrap',
-            opacity: '0.333',
           }}
         >
           {leaf.placeholder}
