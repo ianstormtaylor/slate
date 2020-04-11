@@ -43,7 +43,7 @@ Please include tests and docs with every pull request!
 
 ## Running Examples
 
-Check out the [Examples readme](https://github.com/ianstormtaylor/slate/blob/master/examples/Readme.md) to see how to get the examples running locally!
+Check out the [Examples readme](examples/Readme.md) to see how to get the examples running locally!
 
 ## Running Tests
 

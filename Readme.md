@@ -132,21 +132,21 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 * [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 * [`slate-soft-break`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-soft-break) adds a soft break when `enter` is pressed.
 * [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-plugins/tree/master/packages/slate-drop-or-paste-images) lets users drop or paste images to insert them!
-* [**See all the plugins...**](./docs/general/plugins.md)
+* [**See all the plugins...**](https://docs.slatejs.org/v/v0.47/general/plugins)
 
 <br/>
 
 ### Documentation
 
-If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/installing-slate) walkthroughs and the [Guides](http://docs.slatejs.org/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](http://docs.slatejs.org/slate-core).
+If you're using Slate for the first time, check out the [Getting Started](https://docs.slatejs.org/v/v0.47/walkthroughs/installing-slate) walkthroughs and the [Guides](https://docs.slatejs.org/v/v0.47/guides) to familiarize yourself with Slate's architecture and mental models. Once you've gotten familiar with those, you'll probably want to check out the full [API Reference](https://docs.slatejs.org/v/v0.47/slate-core).
 
-* [**Walkthroughs**](http://docs.slatejs.org/walkthroughs/installing-slate)
-* [**Guides**](http://docs.slatejs.org/guides)
-* [**Reference**](http://docs.slatejs.org/slate-core)
-* [**FAQ**](http://docs.slatejs.org/general/faq)
-* [**Resources**](http://docs.slatejs.org/general/resources)
+* [**Walkthroughs**](https://docs.slatejs.org/v/v0.47/walkthroughs)
+* [**Guides**](https://docs.slatejs.org/v/v0.47/guides)
+* [**Reference**](https://docs.slatejs.org/v/v0.47/slate-core)
+* [**FAQ**](https://docs.slatejs.org/v/v0.47/general/faq)
+* [**Resources**](https://docs.slatejs.org/v/v0.47/general/resources)
 
-If even that's not enough, you can always [read the source itself](./packages/slate), which is heavily commented.
+If even that's not enough, you can always [read the source itself](packages/slate), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 

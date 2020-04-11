@@ -367,7 +367,7 @@ export default class App extends React.Component {
               <ExampleTitle>
                 {name}
                 <Link
-                  href={`https://github.com/ianstormtaylor/slate/blob/master/examples${path}`}
+                  href={`https://github.com/ianstormtaylor/slate/blob/v0.47/examples${path}`}
                 >
                   (View Source)
                 </Link>
@@ -384,8 +384,8 @@ export default class App extends React.Component {
       <Header>
         <Title>Slate Examples</Title>
         <LinkList>
-          <Link href="https://github.com/ianstormtaylor/slate">GitHub</Link>
-          <Link href="https://docs.slatejs.org/">Docs</Link>
+          <Link href="https://github.com/ianstormtaylor/slate/tree/v0.47">GitHub</Link>
+          <Link href="https://docs.slatejs.org/v/v0.47/">Docs</Link>
         </LinkList>
       </Header>
     )
