@@ -776,7 +776,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isMoveBackward(nativeEvent)) {
                 event.preventDefault()
 
-                if (selection && Range.isCollapsed(selection)) {
+                if (selection && !state.isComposing && Range.isCollapsed(selection)) {
                   Transforms.move(editor, { reverse: true })
                 } else {
                   Transforms.collapse(editor, { edge: 'start' })
