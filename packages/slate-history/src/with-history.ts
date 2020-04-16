@@ -44,16 +44,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
           const inverseOps = batch.map(Operation.inverse).reverse()
 
           for (const op of inverseOps) {
-            // If the final operation is deselecting the editor, skip it. This is
-            if (
-              op === inverseOps[inverseOps.length - 1] &&
-              op.type === 'set_selection' &&
-              op.newProperties == null
-            ) {
-              continue
-            } else {
-              e.apply(op)
-            }
+            e.apply(op)
           }
         })
       })
@@ -150,7 +141,10 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
  */
 
 const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection' && op.newProperties == null) {
+  if (
+    op.type === 'set_selection' &&
+    (op.properties == null || op.newProperties == null)
+  ) {
     return false
   }
 
