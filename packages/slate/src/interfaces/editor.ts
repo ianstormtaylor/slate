@@ -52,6 +52,7 @@ export interface Editor {
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteFragment: () => void
+  getFragment: () => Descendant[]
   insertBreak: () => void
   insertFragment: (fragment: Node[]) => void
   insertNode: (node: Node) => void
