@@ -213,7 +213,12 @@ export const Editable = (props: EditableProps) => {
         // cancelled. Let them through and wait for the composition to end.
         if (
           type === 'insertCompositionText' ||
-          type === 'deleteCompositionText'
+          type === 'deleteCompositionText' ||
+          // COMPAT: in Safari, if we override the insertFromComposition
+          // event, the selection will go to the beginning. To fix this
+          // we don't handle the event here but instead handle it in
+          // onCompositionEnd
+          (type === 'insertFromComposition' && IS_SAFARI)
         ) {
           return
         }
@@ -554,11 +559,15 @@ export const Editable = (props: EditableProps) => {
             ) {
               state.isComposing = false
 
-              // COMPAT: In Chrome, `beforeinput` events for compositions
+              // COMPAT:
+              // 1. In Chrome, `beforeinput` events for compositions
               // aren't correct and never fire the "insertFromComposition"
               // type that we need. So instead, insert whenever a composition
               // ends since it will already have been committed to the DOM.
-              if (!IS_SAFARI && !IS_FIREFOX && event.data) {
+              // 2. In Safari, if we override the "insertFromComposition" event,
+              // the selection will go back to the beginning of the text node,
+              // so we handle it here instead.
+              if (!IS_FIREFOX && event.data) {
                 Editor.insertText(editor, event.data)
               }
             }
