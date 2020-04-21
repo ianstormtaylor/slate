@@ -6,7 +6,6 @@ import { Key } from '../utils/key'
 import {
   EDITOR_TO_ON_CHANGE,
   NODE_TO_KEY,
-  IS_DESTROYED,
 } from '../utils/weak-maps'
 
 /**
@@ -18,9 +17,6 @@ export const withReact = <T extends Editor>(editor: T) => {
   const { apply, onChange } = e
 
   e.apply = (op: Operation) => {
-    if (IS_DESTROYED.get(e)) {
-      return
-    }
 
     const matches: [Path, Key][] = []
 
