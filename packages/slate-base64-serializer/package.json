@@ -13,17 +13,17 @@
     "lib/"
   ],
   "peerDependencies": {
-    "slate": ">=0.32.0"
+    "slate": ">=0.32.0 <0.50.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.47.9"
+    "slate": "^0.47.9 <0.50.0"
   },
   "dependencies": {
     "isomorphic-base64": "^1.0.2"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+    "clean": "rimraf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "slate": "Slate"

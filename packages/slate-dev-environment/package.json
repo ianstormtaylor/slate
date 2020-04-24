@@ -16,6 +16,6 @@
     "is-in-browser": "^1.1.3"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+    "clean": "rimraf ./dist ./lib ./node_modules"
   }
 }

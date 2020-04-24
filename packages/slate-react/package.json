@@ -34,17 +34,17 @@
     "immutable": ">=3.8.1 || >4.0.0-rc",
     "react": ">=16.6.0",
     "react-dom": ">=16.6.0",
-    "slate": ">=0.47.0"
+    "slate": ">=0.47.0 <0.50.0"
   },
   "devDependencies": {
     "immutable": "^3.8.1",
     "mocha": "^2.5.3",
     "react-test-renderer": "^16.6.3",
-    "slate": "^0.47.9",
-    "slate-hyperscript": "^0.13.9"
+    "slate": "^0.47.9 <0.50.0",
+    "slate-hyperscript": "^0.13.9 <0.50.0"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+    "clean": "rimraf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "immutable": "Immutable",

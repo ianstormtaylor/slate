@@ -27,10 +27,10 @@
   },
   "devDependencies": {
     "slate-dev-test-utils": "^0.0.1",
-    "slate-hyperscript": "^0.13.9"
+    "slate-hyperscript": "^0.13.9 <0.50.0"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+    "clean": "rimraf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "immutable": "Immutable"

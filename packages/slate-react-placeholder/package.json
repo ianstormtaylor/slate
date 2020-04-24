@@ -14,16 +14,16 @@
   ],
   "peerDependencies": {
     "react": ">=16.0.0",
-    "slate": ">=0.47.0",
-    "slate-react": ">=0.22.0"
+    "slate": ">=0.47.0 <0.50.0",
+    "slate-react": ">=0.22.0 <0.50.0"
   },
   "devDependencies": {
     "mocha": "^2.5.3",
-    "slate": "^0.47.9",
+    "slate": "^0.47.9 <0.50.0",
     "tiny-invariant": "^1.0.1"
   },
   "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+    "clean": "rimraf ./dist ./lib ./node_modules"
   },
   "umdGlobals": {
     "react": "React",
