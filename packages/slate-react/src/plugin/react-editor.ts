@@ -159,7 +159,7 @@ export const ReactEditor = {
     try {
       targetEl = (isDOMElement(target)
         ? target
-        : target.parentElement) as HTMLElement
+        : target.parentNode) as HTMLElement
     } catch (err) {
       if (
         !err.message.includes('Permission denied to access property "nodeType"')
@@ -279,11 +279,11 @@ export const ReactEditor = {
     // adjust the offset accordingly.
     const startEl = (isDOMElement(startNode)
       ? startNode
-      : startNode.parentElement) as HTMLElement
+      : startNode.parentNode) as HTMLElement
     const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
     const endEl = (isDOMElement(endNode)
       ? endNode
-      : endNode.parentElement) as HTMLElement
+      : endNode.parentNode) as HTMLElement
     const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
 
     domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
@@ -296,7 +296,7 @@ export const ReactEditor = {
    */
 
   toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
-    let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
+    let domEl = isDOMElement(domNode) ? domNode : domNode.parentNode
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
       domEl = domEl.closest(`[data-slate-node]`)

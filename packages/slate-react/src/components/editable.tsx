@@ -163,7 +163,7 @@ export const Editable = (props: EditableProps) => {
 
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
-      const leafEl = newDomRange.startContainer.parentElement!
+      const leafEl = newDomRange.startContainer.parentNode!
       scrollIntoView(leafEl, { scrollMode: 'if-needed' })
     }
 
