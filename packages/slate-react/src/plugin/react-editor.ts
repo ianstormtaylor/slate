@@ -296,7 +296,9 @@ export const ReactEditor = {
    */
 
   toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
-    let domEl = isDOMElement(domNode) ? domNode : domNode.parentNode as HTMLElement
+    let domEl = isDOMElement(domNode)
+      ? domNode
+      : (domNode.parentNode as HTMLElement)
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
       domEl = domEl.closest(`[data-slate-node]`) as HTMLElement
