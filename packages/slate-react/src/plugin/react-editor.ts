@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -28,6 +28,7 @@ import {
 
 export interface ReactEditor extends Editor {
   insertData: (data: DataTransfer) => void
+  setFragmentData: (data: DataTransfer) => void
 }
 
 export const ReactEditor = {
@@ -186,6 +187,14 @@ export const ReactEditor = {
 
   insertData(editor: ReactEditor, data: DataTransfer): void {
     editor.insertData(data)
+  },
+
+  /**
+   * Sets data from the currently selected fragment on a `DataTransfer`.
+   */
+
+  setFragmentData(editor: ReactEditor, data: DataTransfer): void {
+    editor.setFragmentData(data)
   },
 
   /**
