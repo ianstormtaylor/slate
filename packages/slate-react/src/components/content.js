@@ -201,9 +201,7 @@ class Content extends React.Component {
   componentDidUpdate() {
     debug.update('componentDidUpdate')
 
-    if (!this.props.editor.focusFromClick()) {
-      this.updateSelection()
-    }
+    this.updateSelection()
 
     this.props.editor.clearUserActionPerformed()
 
@@ -230,6 +228,14 @@ class Content extends React.Component {
     // COMPAT: In Firefox, there's a but where `getSelection` can return `null`.
     // https://bugzilla.mozilla.org/show_bug.cgi?id=827585 (2018/11/07)
     if (!native) {
+      return
+    }
+
+    // Clicking into the editor needs to set the Slate selection from
+    // the browser selection. If focusFromClick is set, it means
+    // onNativeSelectionChange hasn't run yet. Skip the rest of this
+    // function until it does.
+    if (editor.focusFromClick()) {
       return
     }
 
@@ -544,7 +550,8 @@ class Content extends React.Component {
 
   throttledOnNativeSelectionChange = throttle(
     this.unthrottledOnNativeSelectionChange,
-    100
+    100,
+    { leading: true, trailing: true }
   )
 
   /**
@@ -558,6 +565,8 @@ class Content extends React.Component {
 
   onNativeSelectionChange = event => {
     if (this.tmp.isUpdatingSelection) return
+
+    this.props.editor.clearFocusFromClick()
 
     // COMPAT: IE11 will send onNativeSelection changes even before
     // activeElement changes. That puts the browser selection and
@@ -582,12 +591,7 @@ class Content extends React.Component {
       }
     }
 
-    if (this.props.editor.focusFromClick()) {
-      this.props.editor.clearFocusFromClick()
-      this.unthrottledOnNativeSelectionChange(event)
-    } else {
-      this.throttledOnNativeSelectionChange(event)
-    }
+    this.throttledOnNativeSelectionChange(event)
   }
 
   /**
