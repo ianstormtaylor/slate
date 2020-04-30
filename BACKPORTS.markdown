@@ -7,3 +7,4 @@ branches / PRs:
 - [Force insertText / splitNode operations to occur outside annotations](https://github.com/aha-app/slate/pull/1)
 - [Ignore onSelect when focusing with the mouse](https://github.com/aha-app/slate/pull/2)
 - Support serialization / deserialization of annotations (commit db6effa6c5aaf793ad300995e61d7babf9e862e0, cherry-picked)
+- [Force selectionchange before updateSelection when clicking to focus](https://github.com/aha-app/slate/pull/4)
