@@ -795,7 +795,7 @@ export const NodeTransforms = {
           match: editor.isInline(element)
             ? n => Editor.isBlock(editor, n)
             : n => Editor.isEditor(n),
-          mode: 'highest',
+          mode: 'lowest',
           voids,
         })
       )
