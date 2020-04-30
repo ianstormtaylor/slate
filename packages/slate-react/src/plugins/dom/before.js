@@ -459,7 +459,6 @@ function BeforePlugin() {
     if (isComposing) return
 
     if (editor.readOnly) return
-    if (editor.focusFromClick()) return
 
     // Save the new `activeElement`.
     const window = getWindow(event.target)
