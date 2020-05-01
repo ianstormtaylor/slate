@@ -1059,9 +1059,9 @@ export const Editor = {
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
 
-        if (isFirst && first.offset > 0) {
+        if (isFirst) {
           available = reverse ? first.offset : node.text.length - first.offset
-          offset = first.offset // TODO: no reverse?
+          offset = first.offset // Works for reverse or regular
         } else {
           available = node.text.length
           offset = reverse ? available : 0
