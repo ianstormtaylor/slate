@@ -32,6 +32,12 @@
 - [Refs](./api/refs.md)
 - [Miscellaneous](./api/miscellaneous.md)
 
+## Libraries
+
+- [Slate React](./libraries/slate-react.md)
+- [Slate History](./libraries/slate-history.md)
+- [Slate Hyperscript](./libraries/slate-hyperscript.md)
+
 ## General
 
 - [Resources](./general/resources.md)
