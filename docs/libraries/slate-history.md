@@ -1,6 +1,6 @@
 # Slate History
 
-This sub-library contains the core logic of Slate.
+This sub-library tracks changes to the Slate value state over time, and enables undo and redo functionality.
 
 ## `History`
 
