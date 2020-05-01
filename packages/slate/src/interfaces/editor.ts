@@ -965,7 +965,7 @@ export const Editor = {
    * Iterate through all of the positions in the document where a `Point` can be
    * placed.
    *
-   * By default it will move forward by individual offsets at a time,  but you
+   * By default it will move forward by individual offsets at a time, but you
    * can pass the `unit: 'character'` option to moved forward one character, word,
    * or line at at time.
    *
@@ -995,6 +995,7 @@ export const Editor = {
     let offset = 0
     let distance: number | null = null
     let isNewBlock = false
+    let textOverflowed = false
 
     const advance = () => {
       if (distance == null) {
@@ -1017,7 +1018,15 @@ export const Editor = {
       available = available - distance!
       // If the available had room to spare, reset the distance so that it will
       // advance again next time. Otherwise, set it to the overflow amount.
-      distance = available >= 0 ? null : 0 - available
+      // Also record whether overflow happened so we can let the next text
+      // node advance even if we're out of string.
+      if (available >= 0) {
+        distance = null
+        textOverflowed = false
+      } else {
+        distance = 0 - available
+        textOverflowed = true
+      }
     }
 
     for (const [node, path] of Editor.nodes(editor, { at, reverse })) {
@@ -1049,12 +1058,13 @@ export const Editor = {
 
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
-        available = node.text.length
-        offset = reverse ? available : 0
 
-        if (isFirst) {
-          available = reverse ? first.offset : available - first.offset
-          offset = first.offset
+        if (isFirst && first.offset > 0) {
+          available = reverse ? first.offset : node.text.length - first.offset
+          offset = first.offset // TODO: no reverse?
+        } else {
+          available = node.text.length
+          offset = reverse ? available : 0
         }
 
         if (isFirst || isNewBlock || unit === 'offset') {
@@ -1063,19 +1073,14 @@ export const Editor = {
 
         while (true) {
           // If there's no more string, continue to the next block.
-          if (string === '') {
-            break
-          } else {
-            advance()
-          }
+          if (string === '' && !textOverflowed) break
+          advance()
 
           // If the available space hasn't overflow, we have another point to
           // yield in the current text node.
-          if (available >= 0) {
-            yield { path, offset }
-          } else {
-            break
-          }
+          if (available < 0) break
+
+          yield { path, offset }
         }
 
         isNewBlock = false
