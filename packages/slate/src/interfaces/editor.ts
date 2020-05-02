@@ -988,18 +988,18 @@ export const Editor = {
 
     /**
      * Algorithm notes:
-     * 
+     *
      * Each step `distance` is dynamic depending on the underlying text
      * and the `unit` specified.  Each step, e.g., a line or word, may
      * span multiple text nodes, so we iterate through the text both on
      * two levels in step-sync:
-     * 
+     *
      * `leafText` stores the text on a text leaf level, and is advanced
      * through using the counters `leafTextOffset` and `leafTextRemaining`.
-     * 
+     *
      * `blockText` stores the text on a block level, and is shortened
      * by `distance` every time it is advanced.
-     * 
+     *
      * We only keep a window of one blockText and one leafText because
      * a block node always appears before all of its leaf nodes.
      */
@@ -1009,7 +1009,7 @@ export const Editor = {
     const first = reverse ? end : start
     let isNewBlock = false
     let blockText = ''
-    let distance = 0      // Distance for leafText to catch up to blockText.
+    let distance = 0 // Distance for leafText to catch up to blockText.
     let leafTextRemaining = 0
     let leafTextOffset = 0
 
@@ -1020,10 +1020,11 @@ export const Editor = {
     // through the blockText and leafText we just need to remember a window of
     // one block node and leaf node, respectively.
     for (const [node, path] of Editor.nodes(editor, { at, reverse })) {
-
-      // ELEMENT NODE - Yield position for voids, collect blockText for blocks
+      /*
+       * ELEMENT NODE - Yield position for voids, collect blockText for blocks
+       */
       if (Element.isElement(node)) {
-        // Void nodes are a special case in that tey are not iterated over,
+        // Void nodes are a special case in that they are not iterated over,
         // but instead always have their first point yielded.
         if (editor.isVoid(node)) {
           yield Editor.start(editor, path)
@@ -1060,8 +1061,10 @@ export const Editor = {
         }
       }
 
-      // TEXT LEAF NODE - Iterate through text content, yielding
-      // yielding positions every `distance` offset according to `unit`.
+      /*
+       * TEXT LEAF NODE - Iterate through text content, yielding
+       * yielding positions every `distance` offset according to `unit`.
+       */
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
 
@@ -1072,7 +1075,9 @@ export const Editor = {
 
         // Reset leafText counters for new text node.
         if (isFirst) {
-          leafTextRemaining = reverse ? first.offset : node.text.length - first.offset
+          leafTextRemaining = reverse
+            ? first.offset
+            : node.text.length - first.offset
           leafTextOffset = first.offset // Works for reverse too.
         } else {
           leafTextRemaining = node.text.length
@@ -1090,15 +1095,17 @@ export const Editor = {
           // If leafText has caught up with blockText (distance=0),
           // if blockText is exhausted, break to get another block node,
           // otherwise advance blockText forward by the new `distance`.
-          if (distance == 0) {
+          if (distance === 0) {
             if (blockText === '') break
             distance = calcDistance(blockText, unit)
             blockText = blockText.slice(distance)
           }
 
           // Advance leafText by the current `distance`.
-          leafTextOffset = reverse ? leafTextOffset - distance : leafTextOffset + distance
-          leafTextRemaining = leafTextRemaining - distance!
+          leafTextOffset = reverse
+            ? leafTextOffset - distance
+            : leafTextOffset + distance
+          leafTextRemaining = leafTextRemaining - distance
 
           // If leafText is exhausted, break to get a new leaf node
           // and set distance to the overflow amount, so we'll (maybe)
