@@ -1075,6 +1075,11 @@ export const Editor = {
 
         // Block element node - set blockText to its text content.
         if (Editor.hasInlines(editor, node)) {
+          // We always exhaust block nodes before encountering a new one:
+          //   console.assert(blockText === '',
+          //     `blockText='${blockText}' - `+
+          //     `not exhausted before new block node`, path)
+
           // Ensure range considered is capped to `range`, in the
           // start/end edge cases  where block extends beyond range.
           // Equivalent to this, but more performant:
@@ -1086,6 +1091,7 @@ export const Editor = {
           const s = Path.isAncestor(path, start.path)
             ? start
             : Editor.start(editor, path)
+
           blockText = Editor.string(editor, { anchor: s, focus: e })
           blockText = reverse ? reverseText(blockText) : blockText
           isNewBlock = true
@@ -1096,6 +1102,11 @@ export const Editor = {
       // content, yielding positions every `distance` offset.
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
+
+        // We always exhaust text nodes before encountering a new one:
+        //   console.assert(leafTextRemaining <= 0,
+        //     `leafTextRemaining=${leafTextRemaining} - `+
+        //     `not exhausted before new leaf text node`, path)
 
         // Reset leafText counters for new text node.
         if (isFirst) {
@@ -1132,7 +1143,7 @@ export const Editor = {
         isNewBlock = false
       }
     }
-    // Upon completion, text should be exhausted on both block and leaf level:
+    // Upon completion, text is exahusted on both block and leaf level:
     //   console.assert(leafTextRemaining <= 0, "leafText wasn't exhausted")
     //   console.assert(blockText === '', "blockText wasn't exhausted")
   },
