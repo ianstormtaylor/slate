@@ -1007,51 +1007,11 @@ export const Editor = {
     const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     const first = reverse ? end : start
+    let isNewBlock = false
     let blockText = ''
+    let distance = 0      // Distance for leafText to catch up to blockText.
     let leafTextRemaining = 0
     let leafTextOffset = 0
-    let leafTextOverflowed = false
-    let distance: number | null = null
-    let isNewBlock = false
-
-    // Advance blockText and leafText as needed.
-    const advance = () => {
-
-      // Advance part 1: Advance blockText, calculate distance.
-      // But only if signalled to do so through setting distance=null.
-      if (distance == null) {
-        if (unit === 'character') {
-          distance = getCharacterDistance(blockText)
-        } else if (unit === 'word') {
-          distance = getWordDistance(blockText)
-        } else if (unit === 'line' || unit === 'block') {
-          distance = blockText.length
-        } else {
-          distance = 1
-        }
-
-        blockText = blockText.slice(distance)
-      }
-
-      // Advance part 2: Advance leafText.
-
-      // Step leafText offset and remaining counters by distance.
-      leafTextOffset = reverse ? leafTextOffset - distance : leafTextOffset + distance
-      leafTextRemaining = leafTextRemaining - distance!
-
-      // If leafText has room to spare, reset distance to signal blockText
-      // to advance the next time.  Otherwise, set it to the overflow amount.
-      // Also flag whether leafText overflowed so the next text node can advance
-      // even if we're out of blockText, which is necessary in the case where
-      // blockText is exhausted and we're out of leafText.
-      if (leafTextRemaining >= 0) {
-        distance = null
-        leafTextOverflowed = false
-      } else {
-        distance = 0 - leafTextRemaining
-        leafTextOverflowed = true
-      }
-    }
 
     // Iterate through all nodes in range, grabbing the entire textual content
     // of block nodes in blockText, and text nodes in leafText.
@@ -1060,6 +1020,8 @@ export const Editor = {
     // through the blockText and leafText we just need to remember a window of
     // one block node and leaf node, respectively.
     for (const [node, path] of Editor.nodes(editor, { at, reverse })) {
+
+      // ELEMENT NODE - Yield position for voids, collect blockText for blocks
       if (Element.isElement(node)) {
         // Void nodes are a special case in that tey are not iterated over,
         // but instead always have their first point yielded.
@@ -1098,8 +1060,8 @@ export const Editor = {
         }
       }
 
-      // We are on new text leaf node.  Iterate through its text
-      // content, yielding positions every `distance` offset.
+      // TEXT LEAF NODE - Iterate through text content, yielding
+      // yielding positions every `distance` offset according to `unit`.
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
 
@@ -1120,32 +1082,55 @@ export const Editor = {
         // Yield position at the start of node (potentially).
         if (isFirst || isNewBlock || unit === 'offset') {
           yield { path, offset: leafTextOffset }
+          isNewBlock = false
         }
-        
-        // Yield positions every `distance` step.
+
+        // Yield positions every (dynamically calculated) `distance` offset.
         while (true) {
-          // Break to grab a new (block) node IF
-          // - there's no more blockText, AND
-          // - leafText didn't just overflow (edge case for trailing text nodes).
-          if (blockText === '' && !leafTextOverflowed) break
+          // If leafText has caught up with blockText (distance=0),
+          // if blockText is exhausted, break to get another block node,
+          // otherwise advance blockText forward by the new `distance`.
+          if (distance == 0) {
+            if (blockText === '') break
+            distance = calcDistance(blockText, unit)
+            blockText = blockText.slice(distance)
+          }
 
-          // Advance by `distance` leafText, and if needed, blockText.
-          advance()
+          // Advance leafText by the current `distance`.
+          leafTextOffset = reverse ? leafTextOffset - distance : leafTextOffset + distance
+          leafTextRemaining = leafTextRemaining - distance!
 
-          // Break to grab a new (text/leaf) node if leafText is exhausted.
-          if (leafTextRemaining < 0) break
+          // If leafText is exhausted, break to get a new leaf node
+          // and set distance to the overflow amount, so we'll (maybe)
+          // catch up to blockText in the next leaf text node.
+          if (leafTextRemaining < 0) {
+            distance = -leafTextRemaining
+            break
+          }
 
-          // Successfully took a `distance` step through text on both a
-          // block and leaf level, so yield another position in this leaf node.
+          // Successfully walked `distance` offsets through leafText to catch up with
+          // blockText, so we can reset distance and yield this position in this node.
+          distance = 0
           yield { path, offset: leafTextOffset }
         }
-
-        isNewBlock = false
       }
     }
     // Upon completion, text is exahusted on both block and leaf level:
     //   console.assert(leafTextRemaining <= 0, "leafText wasn't exhausted")
     //   console.assert(blockText === '', "blockText wasn't exhausted")
+
+    // Helper:
+    // Return the distance in offsets for a step of size `unit` on given string.
+    function calcDistance(text: string, unit: string) {
+      if (unit === 'character') {
+        return getCharacterDistance(text)
+      } else if (unit === 'word') {
+        return getWordDistance(text)
+      } else if (unit === 'line' || unit === 'block') {
+        return text.length
+      }
+      return 1
+    }
   },
 
   /**
