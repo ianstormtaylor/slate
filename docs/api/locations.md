@@ -28,7 +28,7 @@ type Path = number[]
 interface Point {
     path: Path
     offset: number  
-    [key: string]: any
+    [key: string]: unknown
 }
 ```
 
@@ -68,7 +68,7 @@ Options: `{affinity?: 'forward' | 'backward' | null}`
 interface Range {
     anchor: Point
     focus: Point
-    [key: string]: any
+    [key: string]: unknown
 }
 ```
 
