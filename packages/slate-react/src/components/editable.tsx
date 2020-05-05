@@ -144,10 +144,20 @@ export const Editable = (props: EditableProps) => {
     if (!selection && !hasDomSelection) {
       return
     }
+    
+    let hasDomSelectionInEditor = false
+    if (domSelection) {
+      const anchor = domSelection.anchorNode
+      const focus = domSelection.focusNode
+      // assume this isnt undefined if we have an editor
+      const editorElement = EDITOR_TO_ELEMENT.get(editor) as HTMLElement
+      hasDomSelectionInEditor = editorElement.contains(anchor) && editorElement.contains(focus)
+    }
 
-    // If the DOM selection is already correct, we're done.
+    // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (
-      hasDomSelection &&
+      hasDomSelection && 
+      hasDomSelectionInEditor &&
       selection &&
       Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
     ) {
