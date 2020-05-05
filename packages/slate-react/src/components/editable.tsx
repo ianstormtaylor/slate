@@ -364,11 +364,21 @@ export const Editable = (props: EditableProps) => {
           IS_FOCUSED.delete(editor)
         }
 
-        if (
-          domSelection &&
-          hasEditableTarget(editor, domSelection.anchorNode) &&
-          hasEditableTarget(editor, domSelection.focusNode)
-        ) {
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideVoid(editor, focusNode)
+
+        if (anchorNodeSelectable && focusNodeSelectable) {
           const range = ReactEditor.toSlateRange(editor, domSelection)
           Transforms.select(editor, range)
         } else {
@@ -975,6 +985,19 @@ const hasEditableTarget = (
     isDOMNode(target) &&
     ReactEditor.hasDOMNode(editor, target, { editable: true })
   )
+}
+
+/**
+ * Check if the target is inside void and in the editor.
+ */
+
+const isTargetInsideVoid = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): boolean => {
+  const slateNode =
+    hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
+  return Editor.isVoid(editor, slateNode)
 }
 
 /**
