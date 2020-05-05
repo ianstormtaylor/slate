@@ -43,7 +43,7 @@ const Leaf = (props: {
             opacity: '0.333',
           }}
         >
-          {leaf.placeholder as React.ReactNode}
+          {leaf.placeholder}
         </span>
         {children}
       </React.Fragment>

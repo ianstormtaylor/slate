@@ -123,7 +123,7 @@ interface Editor {
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
-  [key: string]: unknown
+  [key: string]: any
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -212,7 +212,7 @@ Apply an operation in the editor.
 ```typescript
 interface Element {
   children: Node[]
-  [key: string]: unknown
+  [key: string]: any
 }
 ```
 
@@ -237,7 +237,7 @@ Check if an element matches a set of `props`. Note: This checks custom propertie
 ```typescript
 interface Text {
     text: string,
-    [key: string]: unknown
+    [key: string]: any
 }
 ```
 

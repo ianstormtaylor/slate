@@ -708,7 +708,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isRedo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.redo === 'function') {
+                if (editor.redo) {
                   editor.redo()
                 }
 
@@ -718,7 +718,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isUndo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.undo === 'function') {
+                if (editor.undo) {
                   editor.undo()
                 }
 
