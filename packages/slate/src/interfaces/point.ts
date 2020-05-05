@@ -12,7 +12,7 @@ import { Operation, Path } from '..'
 export interface Point {
   path: Path
   offset: number
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export const Point = {

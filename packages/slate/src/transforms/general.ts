@@ -10,7 +10,7 @@ import {
   Descendant,
   NodeEntry,
   Path,
-  Transforms,
+  Ancestor,
 } from '..'
 
 export const GeneralTransforms = {
@@ -104,7 +104,7 @@ export const GeneralTransforms = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath))
+        const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)
