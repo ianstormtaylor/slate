@@ -145,7 +145,7 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    // assume this isnt undefined if we have an editor
+    // verify that the dom selection is in the editor
     const editorElement = EDITOR_TO_ELEMENT.get(editor)!
     let hasDomSelectionInEditor = false
     if (
