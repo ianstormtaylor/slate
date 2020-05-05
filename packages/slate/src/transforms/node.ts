@@ -8,8 +8,6 @@ import {
   Range,
   Text,
   Transforms,
-  NodeEntry,
-  Ancestor,
 } from '..'
 
 export const NodeTransforms = {
@@ -170,8 +168,7 @@ export const NodeTransforms = {
           )
         }
 
-        const parentNodeEntry = Editor.node(editor, Path.parent(path))
-        const [parent, parentPath] = parentNodeEntry as NodeEntry<Ancestor>
+        const [parent, parentPath] = Editor.node(editor, Path.parent(path))
         const index = path[path.length - 1]
         const { length } = parent.children
 
@@ -724,7 +721,7 @@ export const NodeTransforms = {
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const [node] = Editor.node(editor, path) as NodeEntry<Ancestor>
+        const [node] = Editor.node(editor, path)
         let range = Editor.range(editor, path)
 
         if (split && rangeRef) {
@@ -826,8 +823,7 @@ export const NodeTransforms = {
             : Path.common(firstPath, lastPath)
 
           const range = Editor.range(editor, firstPath, lastPath)
-          const commonNodeEntry = Editor.node(editor, commonPath)
-          const [commonNode] = commonNodeEntry as NodeEntry<Ancestor>
+          const [commonNode] = Editor.node(editor, commonPath)
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
