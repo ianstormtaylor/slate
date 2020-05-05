@@ -150,7 +150,7 @@ export const Editable = (props: EditableProps) => {
       const anchor = domSelection.anchorNode
       const focus = domSelection.focusNode
       // assume this isnt undefined if we have an editor
-      const editorElement = EDITOR_TO_ELEMENT.get(editor) as HTMLElement
+      const editorElement = EDITOR_TO_ELEMENT.get(editor)!
       hasDomSelectionInEditor = editorElement.contains(anchor) && editorElement.contains(focus)
     }
 
