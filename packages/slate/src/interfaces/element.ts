@@ -9,7 +9,7 @@ import { Editor, Node, Path } from '..'
 
 export interface Element {
   children: Node[]
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export const Element = {

@@ -17,7 +17,7 @@ export const Slate = (props: {
   value: Node[]
   children: React.ReactNode
   onChange: (value: Node[]) => void
-  [key: string]: any
+  [key: string]: unknown
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
