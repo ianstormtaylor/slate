@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -28,6 +28,7 @@ import {
 
 export interface ReactEditor extends Editor {
   insertData: (data: DataTransfer) => void
+  setFragmentData: (data: DataTransfer) => void
 }
 
 export const ReactEditor = {
@@ -189,6 +190,14 @@ export const ReactEditor = {
   },
 
   /**
+   * Sets data from the currently selected fragment on a `DataTransfer`.
+   */
+
+  setFragmentData(editor: ReactEditor, data: DataTransfer): void {
+    editor.setFragmentData(data)
+  },
+
+  /**
    * Find the native DOM element from a Slate node.
    */
 
@@ -264,16 +273,30 @@ export const ReactEditor = {
 
   toDOMRange(editor: ReactEditor, range: Range): DOMRange {
     const { anchor, focus } = range
+    const isBackward = Range.isBackward(range)
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
     const domRange = window.document.createRange()
-    const start = Range.isBackward(range) ? domFocus : domAnchor
-    const end = Range.isBackward(range) ? domAnchor : domFocus
-    domRange.setStart(start[0], start[1])
-    domRange.setEnd(end[0], end[1])
+    const [startNode, startOffset] = isBackward ? domFocus : domAnchor
+    const [endNode, endOffset] = isBackward ? domAnchor : domFocus
+
+    // A slate Point at zero-width Leaf always has an offset of 0 but a native DOM selection at
+    // zero-width node has an offset of 1 so we have to check if we are in a zero-width node and
+    // adjust the offset accordingly.
+    const startEl = (isDOMElement(startNode)
+      ? startNode
+      : startNode.parentElement) as HTMLElement
+    const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
+    const endEl = (isDOMElement(endNode)
+      ? endNode
+      : endNode.parentElement) as HTMLElement
+    const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
+
+    domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
+    domRange.setEnd(endNode, isEndAtZeroWidth ? 1 : endOffset)
     return domRange
   },
 

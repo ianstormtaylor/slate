@@ -135,6 +135,15 @@ export const createEditor = (): Editor => {
       }
     },
 
+    getFragment: () => {
+      const { selection } = editor
+
+      if (selection && Range.isExpanded(selection)) {
+        return Node.fragment(editor, selection)
+      }
+      return []
+    },
+
     insertBreak: () => {
       Transforms.splitNodes(editor, { always: true })
     },

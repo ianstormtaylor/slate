@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback } from 'react'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Node } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
@@ -17,7 +17,7 @@ export const Slate = (props: {
   value: Node[]
   children: React.ReactNode
   onChange: (value: Node[]) => void
-  [key: string]: any
+  [key: string]: unknown
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
@@ -33,6 +33,12 @@ export const Slate = (props: {
   }, [key, onChange])
 
   EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+
+  useEffect(() => {
+    return () => {
+      EDITOR_TO_ON_CHANGE.set(editor, () => {})
+    }
+  }, [])
 
   return (
     <SlateContext.Provider value={context}>
