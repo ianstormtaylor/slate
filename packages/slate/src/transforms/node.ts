@@ -442,6 +442,7 @@ export const NodeTransforms = {
       match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
+      hangingAnchor?: boolean
       split?: boolean
       voids?: boolean
     } = {}
@@ -450,6 +451,7 @@ export const NodeTransforms = {
       let { match, at = editor.selection } = options
       const {
         hanging = false,
+        hangingAnchor = true,
         mode = 'lowest',
         split = false,
         voids = false,
@@ -467,6 +469,10 @@ export const NodeTransforms = {
 
       if (!hanging && Range.isRange(at)) {
         at = Editor.unhangRange(editor, at)
+
+        if (!hangingAnchor) {
+          at = Editor.unhangAnchor(editor, at)
+        }
       }
 
       if (split && Range.isRange(at)) {

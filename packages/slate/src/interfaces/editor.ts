@@ -1515,19 +1515,64 @@ export const Editor = {
    * Convert a range into a non-hanging one.
    */
 
-  unhangRange(
+  unhangAnchor(
     editor: Editor,
     range: Range,
     options: {
       voids?: boolean
     } = {}
-  ): Range {
+  ): Point {
+    const { voids = false } = options
+    let [start] = Range.edges(range)
+
+    const [startNode] = Editor.node(editor, start)
+
+    // PERF: exit early if we can guarantee that the range isn't hanging.
+    if (start.offset !== startNode.text.length || Range.isCollapsed(range)) {
+      return start
+    }
+
+    const startBlock = Editor.above(editor, {
+      at: start,
+      match: n => Editor.isBlock(editor, n),
+    })
+    const blockPath = startBlock ? startBlock[1] : []
+    const last = Editor.end(editor, [])
+    const after = { anchor: start, focus: last }
+    let skip = true
+
+    for (const [node, path] of Editor.nodes(editor, {
+      at: after,
+      match: Text.isText,
+      voids,
+    })) {
+      if (skip) {
+        skip = false
+        continue
+      }
+
+      if (node.text !== '' || Path.isAfter(path, blockPath)) {
+        start = { path, offset: 0 }
+        break
+      }
+    }
+
+    return start
+  },
+
+  unhangFocus(
+    editor: Editor,
+    range: Range,
+    options: {
+      voids?: boolean
+    } = {}
+  ): Point {
     const { voids = false } = options
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
     if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
-      return range
+      return end
     }
 
     const endBlock = Editor.above(editor, {
@@ -1556,7 +1601,21 @@ export const Editor = {
       }
     }
 
-    return { anchor: start, focus: end }
+    return end
+  },
+
+  unhangRange(
+    editor: Editor,
+    range: Range,
+    options: {
+      voids?: boolean
+    } = {}
+  ): Range {
+    const [start] = Range.edges(range)
+    return {
+      anchor: start,
+      focus: Editor.unhangFocus(editor, range, options),
+    }
   },
 
   /**
