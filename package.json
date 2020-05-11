@@ -69,6 +69,7 @@
     "react-error-boundary": "^1.2.5",
     "react-router-dom": "^5.1.2",
     "react-values": "^0.3.0",
+    "rimraf": "^3.0.2",
     "rollup": "^1.27.5",
     "rollup-plugin-babel": "^4.3.3",
     "rollup-plugin-commonjs": "^10.1.0",
