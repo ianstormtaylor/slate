@@ -22,6 +22,7 @@ function configure(pkg, env, target) {
   const isProd = env === 'production'
   const isUmd = target === 'umd'
   const isModule = target === 'module'
+  const isCommonJs = target === 'cjs'
   const input = `packages/${pkg.name}/src/index.ts`
   const deps = []
     .concat(pkg.dependencies ? Object.keys(pkg.dependencies) : [])
@@ -103,7 +104,7 @@ function configure(pkg, env, target) {
                 ],
                 modules: false,
                 targets: {
-                  esmodules: true,
+                  esmodules: isModule,
                 },
               },
         ],
@@ -116,7 +117,7 @@ function configure(pkg, env, target) {
             ? {}
             : {
                 regenerator: false,
-                useESModules: true,
+                useESModules: isModule,
               },
         ],
         '@babel/plugin-proposal-class-properties',
@@ -147,6 +148,28 @@ function configure(pkg, env, target) {
     }
   }
 
+  if (isCommonJs) {
+    return {
+      plugins,
+      input,
+      onwarn,
+      output: [
+        {
+          file: `packages/${pkg.name}/${pkg.main}`,
+          format: 'cjs',
+          exports: 'named',
+          sourcemap: true,
+        },
+      ],
+      // We need to explicitly state which modules are external, meaning that
+      // they are present at runtime. In the case of non-UMD configs, this means
+      // all non-Slate packages.
+      external: id => {
+        return !!deps.find(dep => dep === id || id.startsWith(`${dep}/`))
+      },
+    }
+  }
+
   if (isModule) {
     return {
       plugins,
@@ -157,13 +180,7 @@ function configure(pkg, env, target) {
           file: `packages/${pkg.name}/${pkg.module}`,
           format: 'es',
           sourcemap: true,
-        },
-        {
-          file: `packages/${pkg.name}/${pkg.main}`,
-          format: 'cjs',
-          exports: 'named',
-          sourcemap: true,
-        },
+        }
       ],
       // We need to explicitly state which modules are external, meaning that
       // they are present at runtime. In the case of non-UMD configs, this means
@@ -182,6 +199,7 @@ function configure(pkg, env, target) {
 function factory(pkg, options = {}) {
   const isProd = process.env.NODE_ENV === 'production'
   return [
+    configure(pkg, 'development', 'cjs', options),
     configure(pkg, 'development', 'module', options),
     isProd && configure(pkg, 'development', 'umd', options),
     isProd && configure(pkg, 'production', 'umd', options),
