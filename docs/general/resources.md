@@ -20,6 +20,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Grafana](https://grafana.com/)
 - [Guilded](https://www.guilded.gg)
 - [Guru](https://www.getguru.com/)
+- [Kitemaker](https://kitemaker.co)
 - [Netlify CMS](https://www.netlifycms.org)
 - [Outline](https://www.getoutline.com/)
 - [Prezly](https://www.prezly.com/)
