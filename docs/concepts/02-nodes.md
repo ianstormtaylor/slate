@@ -107,7 +107,7 @@ But in certain cases, like for links, you might want to make them "inline" flowi
 
 You can define which nodes are treated as inline nodes by overriding the `editor.isInline` function. (By default it always returns `false`.) Note that inline nodes cannot be the first or last child of a parent block, nor can it be next to another inline node in the children array. Slate will automatically space these with `{ text: '' }` children by default with [`normalizeNode`](https://docs.slatejs.org/concepts/10-normalizing#built-in-constraints).
 
-Elements can either contain block elements as children. Or they can contain inline elements intermingled with text nodes as children. But elements **cannot** contain some children that are blocks and some that are inlines.
+Elements can either contain block elements or inline elements intermingled with text nodes as children. But elements **cannot** contain some children that are blocks and some that are inlines.
 
 ## Voids
 
