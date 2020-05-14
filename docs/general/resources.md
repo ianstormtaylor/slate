@@ -34,7 +34,7 @@ These products use Slate, and can give you an idea of what's possible:
 
 These pre-packaged editors are built on top of Slate, and can be helpful to see how you might structure your code:
 
-- [Accord Project Markdown Editor](https://github.com/accordproject/markdown-editor/) is a WYSIWYG editor for [CommonMark](https://commonmark.org/).
+- [Accord Project Markdown Editor](https://github.com/accordproject/web-components) is a WYSIWYG editor for [CommonMark](https://commonmark.org/).
 - [Canner Editor](https://github.com/Canner/canner-slate-editor) is a rich text editor.
 - [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com).
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
