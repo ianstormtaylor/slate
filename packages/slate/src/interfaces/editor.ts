@@ -1528,7 +1528,10 @@ export const Editor = {
     const [startNode] = Editor.node(editor, start)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== startNode.text.length || Range.isCollapsed(range)) {
+    if (
+      (Text.isText(startNode) && start.offset !== startNode.text.length) ||
+      Range.isCollapsed(range)
+    ) {
       return start
     }
 
@@ -1609,12 +1612,18 @@ export const Editor = {
     range: Range,
     options: {
       voids?: boolean
+      unhangAnchor?: boolean
     } = {}
   ): Range {
     const [start] = Range.edges(range)
+    const focus = Editor.unhangFocus(editor, range, options)
+    let anchor = start
+    if (options.unhangAnchor) {
+      anchor = Editor.unhangAnchor(editor, { anchor, focus })
+    }
     return {
-      anchor: start,
-      focus: Editor.unhangFocus(editor, range, options),
+      anchor,
+      focus,
     }
   },
 

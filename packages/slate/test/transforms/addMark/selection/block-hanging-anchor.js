@@ -25,11 +25,9 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text>
-        zero
-        <anchor />
-      </text>
+      <text>zero</text>
       <text bold italic>
+        <anchor />
         one two
         <focus />
       </text>

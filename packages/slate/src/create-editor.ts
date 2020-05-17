@@ -97,7 +97,7 @@ export const createEditor = (): Editor => {
           Transforms.setNodes(
             editor,
             { [key]: value },
-            { match: Text.isText, split: true, hangingAnchor: false }
+            { match: Text.isText, split: true }
           )
         } else {
           const marks = {
