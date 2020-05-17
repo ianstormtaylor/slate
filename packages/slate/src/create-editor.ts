@@ -219,11 +219,7 @@ export const createEditor = (): Editor => {
             Text.isText(node.children[0]) ||
             editor.isInline(node.children[0]))
 
-      // Since we'll be applying operations while iterating, keep track of an
-      // index that accounts for any added/removed nodes.
-      let n = 0
-
-      for (let i = 0; i < node.children.length; i++, n++) {
+      for (let i = 0; i < node.children.length; i++) {
         const child = node.children[i] as Descendant
         const prev = node.children[i - 1] as Descendant
         const isLast = i === node.children.length - 1
@@ -236,45 +232,45 @@ export const createEditor = (): Editor => {
         // other inline nodes, or parent blocks that only contain inlines and
         // text.
         if (isInlineOrText !== shouldHaveInlines) {
-          Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
-          n--
+          Transforms.removeNodes(editor, { at: path.concat(i), voids: true })
+          break
         } else if (Element.isElement(child)) {
           // Ensure that inline nodes are surrounded by text nodes.
           if (editor.isInline(child)) {
             if (prev == null || !Text.isText(prev)) {
               const newChild = { text: '' }
               Transforms.insertNodes(editor, newChild, {
-                at: path.concat(n),
+                at: path.concat(i),
                 voids: true,
               })
-              n++
+              break
             } else if (isLast) {
               const newChild = { text: '' }
               Transforms.insertNodes(editor, newChild, {
-                at: path.concat(n + 1),
+                at: path.concat(i + 1),
                 voids: true,
               })
-              n++
+              break
             }
           }
         } else {
           // Merge adjacent text nodes that are empty or match.
           if (prev != null && Text.isText(prev)) {
             if (Text.equals(child, prev, { loose: true })) {
-              Transforms.mergeNodes(editor, { at: path.concat(n), voids: true })
-              n--
+              Transforms.mergeNodes(editor, { at: path.concat(i), voids: true })
+              break
             } else if (prev.text === '') {
               Transforms.removeNodes(editor, {
-                at: path.concat(n - 1),
+                at: path.concat(i - 1),
                 voids: true,
               })
-              n--
+              break
             } else if (isLast && child.text === '') {
               Transforms.removeNodes(editor, {
-                at: path.concat(n),
+                at: path.concat(i),
                 voids: true,
               })
-              n--
+              break
             }
           }
         }
