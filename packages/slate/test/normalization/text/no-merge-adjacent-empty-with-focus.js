@@ -9,7 +9,7 @@ export const input = (
       <text b>
         <cursor />
       </text>
-      <text c>1</text>
+      <text c>2</text>
     </block>
   </editor>
 )
@@ -21,7 +21,7 @@ export const output = (
       <text b>
         <cursor />
       </text>
-      <text c>1</text>
+      <text c>2</text>
     </block>
   </editor>
 )
