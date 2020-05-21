@@ -924,11 +924,11 @@ export const Editable = (props: EditableProps) => {
             // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
+              !isEventHandled(event, attributes.onPaste) &&
               (!HAS_BEFORE_INPUT_SUPPORT ||
                 isPlainTextOnlyPaste(event.nativeEvent)) &&
               !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste)
+              hasEditableTarget(editor, event.target)
             ) {
               event.preventDefault()
               ReactEditor.insertData(editor, event.clipboardData)
