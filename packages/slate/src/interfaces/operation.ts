@@ -235,9 +235,9 @@ export const Operation = {
         }
 
         // If the move does not happen within a single parent it is possible
-        // that the move impact the true path to the location of where the node
-        // was removed and where it was inserted. We have to adjust for this
-        // and the original path. We can accomplish this (only in non-sibling)
+        // for the move to impact the true path to the location where the node
+        // was removed from and where it was inserted. We have to adjust for this
+        // and find the original path. We can accomplish this (only in non-sibling)
         // moves by looking at the impact of the move operation on the node
         // after the original move path.
         const inversePath = Path.transform(path, op)!
