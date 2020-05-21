@@ -228,9 +228,18 @@ export const Operation = {
           return op
         }
 
-        // We need to get the original path here, but sometimes the `newPath`
-        // is a younger sibling of (or ends before) the original, and this
-        // accounts for it.
+        // If the move happens completely within a single parent the path and
+        // newPath are stable with respect to each other.
+        if (Path.isSibling(path, newPath)) {
+          return { ...op, path: newPath, newPath: path }
+        }
+
+        // If the move does not happen within a single parent it is possible
+        // that the move impact the true path to the location of where the node
+        // was removed and where it was inserted. We have to adjust for this
+        // and the original path. We can accomplish this (only in non-sibling)
+        // moves by looking at the impact of the move operation on the node
+        // after the original move path.
         const inversePath = Path.transform(path, op)!
         const inverseNewPath = Path.transform(Path.next(path), op)!
         return { ...op, path: inversePath, newPath: inverseNewPath }
