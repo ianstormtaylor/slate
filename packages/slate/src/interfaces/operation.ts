@@ -1,15 +1,27 @@
 import { Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
+export enum OperationType {
+  InsertNode = 'insert_node',
+  InsertText = 'insert_text',
+  MergeNode = 'merge_node',
+  MoveNode = 'move_node',
+  RemoveNode = 'remove_node',
+  RemoveText = 'remove_text',
+  SetNode = 'set_node',
+  SetSelection = 'set_selection',
+  SplitNode = 'split_node',
+}
+
 export type InsertNodeOperation = {
-  type: 'insert_node'
+  type: OperationType.InsertNode
   path: Path
   node: Node
   [key: string]: unknown
 }
 
 export type InsertTextOperation = {
-  type: 'insert_text'
+  type: OperationType.InsertText
   path: Path
   offset: number
   text: string
@@ -17,7 +29,7 @@ export type InsertTextOperation = {
 }
 
 export type MergeNodeOperation = {
-  type: 'merge_node'
+  type: OperationType.MergeNode
   path: Path
   position: number
   target: number | null
@@ -26,21 +38,21 @@ export type MergeNodeOperation = {
 }
 
 export type MoveNodeOperation = {
-  type: 'move_node'
+  type: OperationType.MoveNode
   path: Path
   newPath: Path
   [key: string]: unknown
 }
 
 export type RemoveNodeOperation = {
-  type: 'remove_node'
+  type: OperationType.RemoveNode
   path: Path
   node: Node
   [key: string]: unknown
 }
 
 export type RemoveTextOperation = {
-  type: 'remove_text'
+  type: OperationType.RemoveText
   path: Path
   offset: number
   text: string
@@ -48,7 +60,7 @@ export type RemoveTextOperation = {
 }
 
 export type SetNodeOperation = {
-  type: 'set_node'
+  type: OperationType.SetNode
   path: Path
   properties: Partial<Node>
   newProperties: Partial<Node>
@@ -57,26 +69,26 @@ export type SetNodeOperation = {
 
 export type SetSelectionOperation =
   | {
-      type: 'set_selection'
+      type: OperationType.SetSelection
       [key: string]: unknown
       properties: null
       newProperties: Range
     }
   | {
-      type: 'set_selection'
+      type: OperationType.SetSelection
       [key: string]: unknown
       properties: Partial<Range>
       newProperties: Partial<Range>
     }
   | {
-      type: 'set_selection'
+      type: OperationType.SetSelection
       [key: string]: unknown
       properties: Range
       newProperties: null
     }
 
 export type SplitNodeOperation = {
-  type: 'split_node'
+  type: OperationType.SplitNode
   path: Path
   position: number
   target: number | null
@@ -124,45 +136,45 @@ export const Operation = {
     }
 
     switch (value.type) {
-      case 'insert_node':
+      case OperationType.InsertNode:
         return Path.isPath(value.path) && Node.isNode(value.node)
-      case 'insert_text':
+      case OperationType.InsertText:
         return (
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
         )
-      case 'merge_node':
+      case OperationType.MergeNode:
         return (
           typeof value.position === 'number' &&
           (typeof value.target === 'number' || value.target === null) &&
           Path.isPath(value.path) &&
           isPlainObject(value.properties)
         )
-      case 'move_node':
+      case OperationType.MoveNode:
         return Path.isPath(value.path) && Path.isPath(value.newPath)
-      case 'remove_node':
+      case OperationType.RemoveNode:
         return Path.isPath(value.path) && Node.isNode(value.node)
-      case 'remove_text':
+      case OperationType.RemoveText:
         return (
           typeof value.offset === 'number' &&
           typeof value.text === 'string' &&
           Path.isPath(value.path)
         )
-      case 'set_node':
+      case OperationType.SetNode:
         return (
           Path.isPath(value.path) &&
           isPlainObject(value.properties) &&
           isPlainObject(value.newProperties)
         )
-      case 'set_selection':
+      case OperationType.SetSelection:
         return (
           (value.properties === null && Range.isRange(value.newProperties)) ||
           (value.newProperties === null && Range.isRange(value.properties)) ||
           (isPlainObject(value.properties) &&
             isPlainObject(value.newProperties))
         )
-      case 'split_node':
+      case OperationType.SplitNode:
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
@@ -208,19 +220,23 @@ export const Operation = {
 
   inverse(op: Operation): Operation {
     switch (op.type) {
-      case 'insert_node': {
-        return { ...op, type: 'remove_node' }
+      case OperationType.InsertNode: {
+        return { ...op, type: OperationType.RemoveNode }
       }
 
-      case 'insert_text': {
-        return { ...op, type: 'remove_text' }
+      case OperationType.InsertText: {
+        return { ...op, type: OperationType.RemoveText }
       }
 
-      case 'merge_node': {
-        return { ...op, type: 'split_node', path: Path.previous(op.path) }
+      case OperationType.MergeNode: {
+        return {
+          ...op,
+          type: OperationType.SplitNode,
+          path: Path.previous(op.path),
+        }
       }
 
-      case 'move_node': {
+      case OperationType.MoveNode: {
         const { newPath, path } = op
 
         // PERF: in this case the move operation is a no-op anyways.
@@ -245,20 +261,20 @@ export const Operation = {
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
-      case 'remove_node': {
-        return { ...op, type: 'insert_node' }
+      case OperationType.RemoveNode: {
+        return { ...op, type: OperationType.InsertNode }
       }
 
-      case 'remove_text': {
-        return { ...op, type: 'insert_text' }
+      case OperationType.RemoveText: {
+        return { ...op, type: OperationType.InsertText }
       }
 
-      case 'set_node': {
+      case OperationType.SetNode: {
         const { properties, newProperties } = op
         return { ...op, properties: newProperties, newProperties: properties }
       }
 
-      case 'set_selection': {
+      case OperationType.SetSelection: {
         const { properties, newProperties } = op
 
         if (properties == null) {
@@ -278,8 +294,12 @@ export const Operation = {
         }
       }
 
-      case 'split_node': {
-        return { ...op, type: 'merge_node', path: Path.next(op.path) }
+      case OperationType.SplitNode: {
+        return {
+          ...op,
+          type: OperationType.MergeNode,
+          path: Path.next(op.path),
+        }
       }
     }
   },

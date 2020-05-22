@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'remove_node',
+  type: OperationType.RemoveNode,
   path: [0],
   node: {
     children: [],

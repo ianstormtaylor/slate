@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'insert_text',
+  type: OperationType.InsertText,
   path: [0],
   offset: 0,
   text: 'string',

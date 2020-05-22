@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'remove_text',
+  type: OperationType.RemoveText,
   path: [0],
   offset: 0,
   text: 'string',

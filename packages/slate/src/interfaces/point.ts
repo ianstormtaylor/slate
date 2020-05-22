@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { produce } from 'immer'
-import { Operation, Path } from '..'
+import { Operation, OperationType, Path } from '..'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -86,13 +86,13 @@ export const Point = {
       const { path, offset } = p
 
       switch (op.type) {
-        case 'insert_node':
-        case 'move_node': {
+        case OperationType.InsertNode:
+        case OperationType.MoveNode: {
           p.path = Path.transform(path, op, options)!
           break
         }
 
-        case 'insert_text': {
+        case OperationType.InsertText: {
           if (Path.equals(op.path, path) && op.offset <= offset) {
             p.offset += op.text.length
           }
@@ -100,7 +100,7 @@ export const Point = {
           break
         }
 
-        case 'merge_node': {
+        case OperationType.MergeNode: {
           if (Path.equals(op.path, path)) {
             p.offset += op.position
           }
@@ -109,7 +109,7 @@ export const Point = {
           break
         }
 
-        case 'remove_text': {
+        case OperationType.RemoveText: {
           if (Path.equals(op.path, path) && op.offset <= offset) {
             p.offset -= Math.min(offset - op.offset, op.text.length)
           }
@@ -117,7 +117,7 @@ export const Point = {
           break
         }
 
-        case 'remove_node': {
+        case OperationType.RemoveNode: {
           if (Path.equals(op.path, path) || Path.isAncestor(op.path, path)) {
             return null
           }
@@ -126,7 +126,7 @@ export const Point = {
           break
         }
 
-        case 'split_node': {
+        case OperationType.SplitNode: {
           if (Path.equals(op.path, path)) {
             if (op.position === offset && affinity == null) {
               return null

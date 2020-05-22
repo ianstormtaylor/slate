@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'set_selection',
+  type: OperationType.SetSelection,
   properties: {},
   newProperties: {},
 }

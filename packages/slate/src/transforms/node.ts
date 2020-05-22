@@ -3,6 +3,7 @@ import {
   Element,
   Location,
   Node,
+  OperationType,
   Path,
   Point,
   Range,
@@ -117,7 +118,7 @@ export const NodeTransforms = {
       for (const node of nodes) {
         const path = parentPath.concat(index)
         index++
-        editor.apply({ type: 'insert_node', path, node })
+        editor.apply({ type: OperationType.InsertNode, path, node })
       }
 
       if (select) {
@@ -320,7 +321,7 @@ export const NodeTransforms = {
         Transforms.removeNodes(editor, { at: prevPath, voids })
       } else {
         editor.apply({
-          type: 'merge_node',
+          type: OperationType.MergeNode,
           path: newPath,
           position,
           target: null,
@@ -376,7 +377,7 @@ export const NodeTransforms = {
         const newPath = toRef.current!
 
         if (path.length !== 0) {
-          editor.apply({ type: 'move_node', path, newPath })
+          editor.apply({ type: OperationType.MoveNode, path, newPath })
         }
       }
 
@@ -424,7 +425,7 @@ export const NodeTransforms = {
 
         if (path) {
           const [node] = Editor.node(editor, path)
-          editor.apply({ type: 'remove_node', path, node })
+          editor.apply({ type: OperationType.RemoveNode, path, node })
         }
       }
     })
@@ -519,7 +520,7 @@ export const NodeTransforms = {
 
         if (Object.keys(newProperties).length !== 0) {
           editor.apply({
-            type: 'set_node',
+            type: OperationType.SetNode,
             path,
             properties,
             newProperties,
@@ -635,7 +636,7 @@ export const NodeTransforms = {
           split = true
           const { text, children, ...properties } = node
           editor.apply({
-            type: 'split_node',
+            type: OperationType.SplitNode,
             path,
             position,
             target,

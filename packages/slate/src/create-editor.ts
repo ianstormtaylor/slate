@@ -5,6 +5,7 @@ import {
   Node,
   NodeEntry,
   Operation,
+  OperationType,
   Path,
   PathRef,
   PointRef,
@@ -74,7 +75,7 @@ export const createEditor = (): Editor => {
       Editor.normalize(editor)
 
       // Clear any formats applied to the cursor if the selection changes.
-      if (op.type === 'set_selection') {
+      if (op.type === OperationType.SetSelection) {
         editor.marks = null
       }
 
@@ -309,14 +310,14 @@ export const createEditor = (): Editor => {
 
 const getDirtyPaths = (op: Operation) => {
   switch (op.type) {
-    case 'insert_text':
-    case 'remove_text':
-    case 'set_node': {
+    case OperationType.InsertText:
+    case OperationType.RemoveText:
+    case OperationType.SetNode: {
       const { path } = op
       return Path.levels(path)
     }
 
-    case 'insert_node': {
+    case OperationType.InsertNode: {
       const { node, path } = op
       const levels = Path.levels(path)
       const descendants = Text.isText(node)
@@ -326,14 +327,14 @@ const getDirtyPaths = (op: Operation) => {
       return [...levels, ...descendants]
     }
 
-    case 'merge_node': {
+    case OperationType.MergeNode: {
       const { path } = op
       const ancestors = Path.ancestors(path)
       const previousPath = Path.previous(path)
       return [...ancestors, previousPath]
     }
 
-    case 'move_node': {
+    case OperationType.MoveNode: {
       const { path, newPath } = op
 
       if (Path.equals(path, newPath)) {
@@ -356,13 +357,13 @@ const getDirtyPaths = (op: Operation) => {
       return [...oldAncestors, ...newAncestors]
     }
 
-    case 'remove_node': {
+    case OperationType.RemoveNode: {
       const { path } = op
       const ancestors = Path.ancestors(path)
       return [...ancestors]
     }
 
-    case 'split_node': {
+    case OperationType.SplitNode: {
       const { path } = op
       const levels = Path.levels(path)
       const nextPath = Path.next(path)

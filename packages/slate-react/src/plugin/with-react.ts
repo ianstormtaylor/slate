@@ -1,5 +1,13 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
+import {
+  Editor,
+  Node,
+  Path,
+  Operation,
+  OperationType,
+  Transforms,
+  Range,
+} from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
@@ -18,9 +26,9 @@ export const withReact = <T extends Editor>(editor: T) => {
     const matches: [Path, Key][] = []
 
     switch (op.type) {
-      case 'insert_text':
-      case 'remove_text':
-      case 'set_node': {
+      case OperationType.InsertText:
+      case OperationType.RemoveText:
+      case OperationType.SetNode: {
         for (const [node, path] of Editor.levels(e, { at: op.path })) {
           const key = ReactEditor.findKey(e, node)
           matches.push([path, key])
@@ -29,10 +37,10 @@ export const withReact = <T extends Editor>(editor: T) => {
         break
       }
 
-      case 'insert_node':
-      case 'remove_node':
-      case 'merge_node':
-      case 'split_node': {
+      case OperationType.InsertNode:
+      case OperationType.RemoveNode:
+      case OperationType.MergeNode:
+      case OperationType.SplitNode: {
         for (const [node, path] of Editor.levels(e, {
           at: Path.parent(op.path),
         })) {
@@ -43,7 +51,7 @@ export const withReact = <T extends Editor>(editor: T) => {
         break
       }
 
-      case 'move_node': {
+      case OperationType.MoveNode: {
         // TODO
         break
       }

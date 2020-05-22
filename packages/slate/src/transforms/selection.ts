@@ -1,4 +1,4 @@
-import { Editor, Location, Point, Range, Transforms } from '..'
+import { Editor, Location, OperationType, Point, Range, Transforms } from '..'
 
 export const SelectionTransforms = {
   /**
@@ -38,7 +38,7 @@ export const SelectionTransforms = {
 
     if (selection) {
       editor.apply({
-        type: 'set_selection',
+        type: OperationType.SetSelection,
         properties: selection,
         newProperties: null,
       })
@@ -123,7 +123,7 @@ export const SelectionTransforms = {
     }
 
     editor.apply({
-      type: 'set_selection',
+      type: OperationType.SetSelection,
       properties: selection,
       newProperties: target,
     })
@@ -193,7 +193,7 @@ export const SelectionTransforms = {
 
     if (Object.keys(oldProps).length > 0) {
       editor.apply({
-        type: 'set_selection',
+        type: OperationType.SetSelection,
         properties: oldProps,
         newProperties: newProps,
       })

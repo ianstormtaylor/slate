@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'move_node',
+  type: OperationType.MoveNode,
   path: [0],
   newPath: [1],
 }

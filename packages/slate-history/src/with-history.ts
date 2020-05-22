@@ -1,4 +1,4 @@
-import { Editor, Operation, Path } from 'slate'
+import { Editor, Operation, OperationType, Path } from 'slate'
 
 import { HistoryEditor } from './history-editor'
 
@@ -47,7 +47,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
             // If the final operation is deselecting the editor, skip it. This is
             if (
               op === inverseOps[inverseOps.length - 1] &&
-              op.type === 'set_selection' &&
+              op.type === OperationType.SetSelection &&
               op.newProperties == null
             ) {
               continue
@@ -118,14 +118,14 @@ export const withHistory = <T extends Editor>(editor: T) => {
  */
 
 const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection') {
+  if (op.type === OperationType.SetSelection) {
     return true
   }
 
   if (
     prev &&
-    op.type === 'insert_text' &&
-    prev.type === 'insert_text' &&
+    op.type === OperationType.InsertText &&
+    prev.type === OperationType.InsertText &&
     op.offset === prev.offset + prev.text.length &&
     Path.equals(op.path, prev.path)
   ) {
@@ -134,8 +134,8 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
 
   if (
     prev &&
-    op.type === 'remove_text' &&
-    prev.type === 'remove_text' &&
+    op.type === OperationType.RemoveText &&
+    prev.type === OperationType.RemoveText &&
     op.offset + op.text.length === prev.offset &&
     Path.equals(op.path, prev.path)
   ) {
@@ -150,7 +150,7 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
  */
 
 const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection' && op.newProperties == null) {
+  if (op.type === OperationType.SetSelection && op.newProperties == null) {
     return false
   }
 
@@ -165,7 +165,11 @@ const shouldOverwrite = (
   op: Operation,
   prev: Operation | undefined
 ): boolean => {
-  if (prev && op.type === 'set_selection' && prev.type === 'set_selection') {
+  if (
+    prev &&
+    op.type === OperationType.SetSelection &&
+    prev.type === OperationType.SetSelection
+  ) {
     return true
   }
 
@@ -177,7 +181,7 @@ const shouldOverwrite = (
  */
 
 const shouldClear = (op: Operation): boolean => {
-  if (op.type === 'set_selection') {
+  if (op.type === OperationType.SetSelection) {
     return false
   }
 

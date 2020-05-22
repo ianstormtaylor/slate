@@ -1,9 +1,9 @@
-import { Path } from 'slate'
+import { OperationType, Path } from 'slate'
 
 const path = [3, 3, 3]
 
 const op = {
-  type: 'move_node',
+  type: OperationType.MoveNode,
   path: [3, 2],
   newPath: [3, 0, 0],
 }

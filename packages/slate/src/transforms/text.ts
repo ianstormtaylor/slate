@@ -4,6 +4,7 @@ import {
   Location,
   Node,
   NodeEntry,
+  OperationType,
   Path,
   Text,
   Point,
@@ -146,7 +147,7 @@ export const TextTransforms = {
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: OperationType.RemoveText, path, offset, text })
       }
 
       for (const pathRef of pathRefs) {
@@ -160,7 +161,7 @@ export const TextTransforms = {
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        editor.apply({ type: OperationType.RemoveText, path, offset, text })
       }
 
       if (
@@ -445,7 +446,7 @@ export const TextTransforms = {
       }
 
       const { path, offset } = at
-      editor.apply({ type: 'insert_text', path, offset, text })
+      editor.apply({ type: OperationType.InsertText, path, offset, text })
     })
   },
 }

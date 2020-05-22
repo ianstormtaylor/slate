@@ -1,5 +1,6 @@
 /** @jsx jsx */
 
+import { OperationType } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -11,7 +12,7 @@ export const input = (
 
 export const operations = [
   {
-    type: 'move_node',
+    type: OperationType.MoveNode,
     path: [0],
     newPath: [0],
   },

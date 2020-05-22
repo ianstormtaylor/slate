@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'merge_node',
+  type: OperationType.MergeNode,
   path: [0],
   position: 0,
   target: 0,

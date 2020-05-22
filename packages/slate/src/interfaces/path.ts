@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Operation } from '..'
+import { Operation, OperationType } from '..'
 
 /**
  * `Path` arrays are a list of indexes that describe a node's exact position in
@@ -314,7 +314,7 @@ export const Path = {
       }
 
       switch (operation.type) {
-        case 'insert_node': {
+        case OperationType.InsertNode: {
           const { path: op } = operation
 
           if (
@@ -328,7 +328,7 @@ export const Path = {
           break
         }
 
-        case 'remove_node': {
+        case OperationType.RemoveNode: {
           const { path: op } = operation
 
           if (Path.equals(op, p) || Path.isAncestor(op, p)) {
@@ -340,7 +340,7 @@ export const Path = {
           break
         }
 
-        case 'merge_node': {
+        case OperationType.MergeNode: {
           const { path: op, position } = operation
 
           if (Path.equals(op, p) || Path.endsBefore(op, p)) {
@@ -353,7 +353,7 @@ export const Path = {
           break
         }
 
-        case 'split_node': {
+        case OperationType.SplitNode: {
           const { path: op, position } = operation
 
           if (Path.equals(op, p)) {
@@ -374,7 +374,7 @@ export const Path = {
           break
         }
 
-        case 'move_node': {
+        case OperationType.MoveNode: {
           const { path: op, newPath: onp } = operation
 
           // If the old and new path are the same, it's a no-op.

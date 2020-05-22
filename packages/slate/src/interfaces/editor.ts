@@ -10,6 +10,7 @@ import {
   Node,
   NodeEntry,
   Operation,
+  OperationType,
   Path,
   PathRef,
   Point,
@@ -1251,7 +1252,7 @@ export const Editor = {
     let selection = editor.selection && createDraft(editor.selection)
 
     switch (op.type) {
-      case 'insert_node': {
+      case OperationType.InsertNode: {
         const { path, node } = op
         const parent = Node.parent(editor, path)
         const index = path[path.length - 1]
@@ -1266,7 +1267,7 @@ export const Editor = {
         break
       }
 
-      case 'insert_text': {
+      case OperationType.InsertText: {
         const { path, offset, text } = op
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
@@ -1282,7 +1283,7 @@ export const Editor = {
         break
       }
 
-      case 'merge_node': {
+      case OperationType.MergeNode: {
         const { path } = op
         const node = Node.get(editor, path)
         const prevPath = Path.previous(path)
@@ -1311,7 +1312,7 @@ export const Editor = {
         break
       }
 
-      case 'move_node': {
+      case OperationType.MoveNode: {
         const { path, newPath } = op
 
         if (Path.isAncestor(path, newPath)) {
@@ -1346,7 +1347,7 @@ export const Editor = {
         break
       }
 
-      case 'remove_node': {
+      case OperationType.RemoveNode: {
         const { path } = op
         const index = path[path.length - 1]
         const parent = Node.parent(editor, path)
@@ -1389,7 +1390,7 @@ export const Editor = {
         break
       }
 
-      case 'remove_text': {
+      case OperationType.RemoveText: {
         const { path, offset, text } = op
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
@@ -1405,7 +1406,7 @@ export const Editor = {
         break
       }
 
-      case 'set_node': {
+      case OperationType.SetNode: {
         const { path, newProperties } = op
 
         if (path.length === 0) {
@@ -1431,7 +1432,7 @@ export const Editor = {
         break
       }
 
-      case 'set_selection': {
+      case OperationType.SetSelection: {
         const { newProperties } = op
 
         if (newProperties == null) {
@@ -1453,7 +1454,7 @@ export const Editor = {
         break
       }
 
-      case 'split_node': {
+      case OperationType.SplitNode: {
         const { path, position, properties } = op
 
         if (path.length === 0) {

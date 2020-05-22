@@ -1,5 +1,6 @@
 /** @jsx jsx */
 
+import { OperationType } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -14,7 +15,7 @@ export const input = (
 
 export const operations = [
   {
-    type: 'remove_text',
+    type: OperationType.RemoveText,
     path: [0, 0],
     offset: 1,
     text: 'or',

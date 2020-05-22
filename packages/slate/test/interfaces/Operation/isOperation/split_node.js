@@ -1,7 +1,7 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = {
-  type: 'split_node',
+  type: OperationType.SplitNode,
   path: [0],
   position: 0,
   target: 0,

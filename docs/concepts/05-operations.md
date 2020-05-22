@@ -6,14 +6,14 @@ Unlike commands, operations aren't extendable. Slate's core defines all of the p
 
 ```js
 editor.apply({
-  type: 'insert_text',
+  type: OperationType.InsertText,
   path: [0, 0],
   offset: 15,
   text: 'A new string of text to be inserted.',
 })
 
 editor.apply({
-  type: 'remove_node',
+  type: OperationType.RemoveNode,
   path: [0, 0],
   node: {
     text: 'A line of text!',
@@ -21,7 +21,7 @@ editor.apply({
 })
 
 editor.apply({
-  type: 'set_selection',
+  type: OperationType.SetSelection,
   properties: {
     anchor: { path: [0, 0], offset: 0 },
   },

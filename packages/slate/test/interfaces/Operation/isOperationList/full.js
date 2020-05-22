@@ -1,8 +1,8 @@
-import { Operation } from 'slate'
+import { Operation, OperationType } from 'slate'
 
 export const input = [
   {
-    type: 'set_node',
+    type: OperationType.SetNode,
     path: [0],
     properties: {},
     newProperties: {},
