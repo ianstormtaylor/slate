@@ -322,7 +322,15 @@ export const Editable = (props: EditableProps) => {
             break
           }
 
-          case 'insertFromComposition':
+          case 'insertFromComposition': {
+            // COMPAT: in safari, `compositionend` event is dispatched after
+            // the beforeinput event with the inputType "insertFromComposition" has been dispatched.
+            // https://www.w3.org/TR/input-events-2/
+            // so the following code is the right logic
+            // because DOM selection in sync will be exec before `compositionend` event
+            // isComposing is true will prevent DOM selection being update correctly.
+            state.isComposing = false
+          }
           case 'insertFromDrop':
           case 'insertFromPaste':
           case 'insertFromYank':
