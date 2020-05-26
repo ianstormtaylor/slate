@@ -21,16 +21,17 @@ export const withReact = <T extends Editor>(editor: T) => {
     }
 
     if (editor.selection && Range.isCollapsed(editor.selection)) {
-      const parentBlockElement = Editor.above(editor, {
+      const parentBlockEntry = Editor.above(editor, {
         match: (n) => Editor.isBlock(editor, n),
         at: editor.selection,
       })
 
-      if (parentBlockElement) {
+      if (parentBlockEntry) {
+        const [, parentBlockPath] = parentBlockEntry
         const parentElementRange = Editor.range(
           editor,
-          parentBlockElement[1],
-          editor.selection
+          parentBlockPath,
+          editor.selection.anchor
         )
 
         const currentLineRange = findCurrentLineRange(e, parentElementRange)
