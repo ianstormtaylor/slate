@@ -307,7 +307,7 @@ class Point extends Record(DEFAULTS) {
       key = path
       path = key === this.key ? this.path : null
     } else {
-      key = path.equals(this.path) ? this.key : null
+      key = (path && path.equals(this.path)) ? this.key : null
     }
 
     const point = this.merge({ key, path, offset })
