@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -36,7 +36,7 @@ export const ReactEditor = {
    * Find a key for a Slate node.
    */
 
-  findKey(editor: ReactEditor, node: Node): Key {
+  findKey(_editor: ReactEditor, node: Node): Key {
     let key = NODE_TO_KEY.get(node)
 
     if (!key) {
@@ -51,7 +51,7 @@ export const ReactEditor = {
    * Find the path of Slate node.
    */
 
-  findPath(editor: ReactEditor, node: Node): Path {
+  findPath(_editor: ReactEditor, node: Node): Path {
     const path: Path = []
     let child = node
 
@@ -248,10 +248,10 @@ export const ReactEditor = {
       const attr = text.getAttribute('data-slate-length')
       const trueLength = attr == null ? length : parseInt(attr, 10)
       const end = start + trueLength
+      const offset = Math.min(length, Math.max(0, point.offset - start))
+      domPoint = [domNode, offset]
 
       if (point.offset <= end) {
-        const offset = Math.min(length, Math.max(0, point.offset - start))
-        domPoint = [domNode, offset]
         break
       }
 
@@ -304,7 +304,7 @@ export const ReactEditor = {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
+  toSlateNode(_editor: ReactEditor, domNode: DOMNode): Node {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
