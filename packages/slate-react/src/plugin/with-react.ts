@@ -15,14 +15,14 @@ export const withReact = <T extends Editor>(editor: T) => {
   const e = editor as T & ReactEditor
   const { apply, onChange, deleteBackward } = e
 
-  e.deleteBackward = (unit) => {
+  e.deleteBackward = unit => {
     if (unit !== 'line') {
       return deleteBackward(unit)
     }
 
     if (editor.selection && Range.isCollapsed(editor.selection)) {
       const parentBlockEntry = Editor.above(editor, {
-        match: (n) => Editor.isBlock(editor, n),
+        match: n => Editor.isBlock(editor, n),
         at: editor.selection,
       })
 
@@ -108,7 +108,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     let attach = contents.childNodes[0] as HTMLElement
 
     // Make sure attach is non-empty, since empty nodes will not get copied.
-    contents.childNodes.forEach((node) => {
+    contents.childNodes.forEach(node => {
       if (node.textContent && node.textContent.trim() !== '') {
         attach = node as HTMLElement
       }
@@ -136,7 +136,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     // Remove any zero-width space spans from the cloned DOM so that they don't
     // show up elsewhere when pasted.
     Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
-      (zw) => {
+      zw => {
         const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
         zw.textContent = isNewline ? '\n' : ''
       }
