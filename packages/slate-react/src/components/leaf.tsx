@@ -42,6 +42,9 @@ const Leaf = (props: {
             whiteSpace: 'nowrap',
             opacity: '0.333',
             userSelect: 'none',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            textDecoration: 'none',
           }}
         >
           {leaf.placeholder as React.ReactNode}
