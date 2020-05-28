@@ -32,6 +32,7 @@ const Leaf = (props: {
     children = (
       <React.Fragment>
         <span
+          className="slate-placeholder"
           contentEditable={false}
           style={{
             pointerEvents: 'none',
