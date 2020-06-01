@@ -386,12 +386,14 @@ export const Path = {
             const copy = onp.slice()
 
             if (Path.endsBefore(op, onp) && op.length < onp.length) {
-              const i = Math.min(onp.length, op.length) - 1
-              copy[i] -= 1
+              copy[op.length - 1] -= 1
             }
 
             return copy.concat(p.slice(op.length))
-          } else if (Path.isSibling(op, p) && Path.equals(onp, p)) {
+          } else if (
+            Path.isSibling(op, onp) &&
+            (Path.isAncestor(onp, p) || Path.equals(onp, p))
+          ) {
             if (Path.endsBefore(op, p)) {
               p[op.length - 1] -= 1
             } else {
