@@ -111,7 +111,7 @@ export const Text = {
 
         // If the range starts after the leaf, or ends before it, continue.
         if (
-          start.offset > offset + length ||
+          start.offset >= offset + length ||
           end.offset < offset ||
           (end.offset === offset && offset !== 0)
         ) {
