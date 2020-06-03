@@ -138,7 +138,7 @@ export const createEditor = (): Editor => {
     getFragment: () => {
       const { selection } = editor
 
-      if (selection && Range.isExpanded(selection)) {
+      if (selection) {
         return Node.fragment(editor, selection)
       }
       return []
