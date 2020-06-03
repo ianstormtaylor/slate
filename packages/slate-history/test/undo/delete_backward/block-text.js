@@ -2,6 +2,7 @@
 
 import { Transforms } from 'slate'
 import { jsx } from '../..'
+import { cloneDeep } from 'lodash'
 
 export const run = editor => {
   Transforms.delete(editor)
@@ -17,4 +18,4 @@ export const input = (
   </editor>
 )
 
-export const output = input
+export const output = cloneDeep(input)
