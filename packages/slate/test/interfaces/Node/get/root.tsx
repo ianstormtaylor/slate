@@ -1,6 +1,7 @@
 /** @jsx jsx  */
 import { Node } from 'slate'
 import { jsx } from 'slate-hyperscript'
+import { cloneDeep } from 'lodash'
 
 export const input = (
   <editor>
@@ -12,4 +13,4 @@ export const input = (
 export const test = value => {
   return Node.get(value, [])
 }
-export const output = input
+export const output = cloneDeep(input)
