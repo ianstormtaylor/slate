@@ -7,6 +7,7 @@ import {
   Range,
   Text,
   Transforms,
+  Path,
 } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
@@ -175,7 +176,10 @@ export const Editable = (props: EditableProps) => {
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollIntoView(leafEl, { scrollMode: 'if-needed' })
+      scrollIntoView(leafEl, {
+        scrollMode: 'if-needed',
+        boundary: el,
+      })
     }
 
     setTimeout(() => {
@@ -554,8 +558,16 @@ export const Editable = (props: EditableProps) => {
               const node = ReactEditor.toSlateNode(editor, event.target)
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
+              const end = Editor.end(editor, path)
 
-              if (Editor.void(editor, { at: start })) {
+              const startVoid = Editor.void(editor, { at: start })
+              const endVoid = Editor.void(editor, { at: end })
+
+              if (
+                startVoid &&
+                endVoid &&
+                Path.equals(startVoid[1], endVoid[1])
+              ) {
                 const range = Editor.range(editor, start)
                 Transforms.select(editor, range)
               }
@@ -924,11 +936,11 @@ export const Editable = (props: EditableProps) => {
             // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
+              !isEventHandled(event, attributes.onPaste) &&
               (!HAS_BEFORE_INPUT_SUPPORT ||
                 isPlainTextOnlyPaste(event.nativeEvent)) &&
               !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste)
+              hasEditableTarget(editor, event.target)
             ) {
               event.preventDefault()
               ReactEditor.insertData(editor, event.clipboardData)
