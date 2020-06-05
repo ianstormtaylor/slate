@@ -38,7 +38,7 @@ export interface Editor {
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
-  [key: string]: any
+  [key: string]: unknown
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -52,6 +52,7 @@ export interface Editor {
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteFragment: () => void
+  getFragment: () => Descendant[]
   insertBreak: () => void
   insertFragment: (fragment: Node[]) => void
   insertNode: (node: Node) => void
@@ -1331,7 +1332,7 @@ export const Editor = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath))
+        const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)

@@ -22,13 +22,13 @@ type Path = number[]
 
 ## Point
 
-`Point` objects refer to a specific location in a text node in a Slate document. Its `path` refers to the lcoation of the node in the tree, and its offset refers to distance into the node's string of text. Points may only refer to `Text` nodes.
+`Point` objects refer to a specific location in a text node in a Slate document. Its `path` refers to the location of the node in the tree, and its offset refers to distance into the node's string of text. Points may only refer to `Text` nodes.
 
 ```typescript
 interface Point {
-  path: Path
-  offset: number
-  [key: string]: any
+    path: Path
+    offset: number  
+    [key: string]: unknown
 }
 ```
 
@@ -66,9 +66,9 @@ Options: `{affinity?: 'forward' | 'backward' | null}`
 
 ```typescript
 interface Range {
-  anchor: Point
-  focus: Point
-  [key: string]: any
+    anchor: Point
+    focus: Point
+    [key: string]: unknown
 }
 ```
 

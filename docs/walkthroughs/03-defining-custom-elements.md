@@ -117,8 +117,8 @@ const DefaultElement = props => {
 Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `` Ctrl-` `` shortcut that does just that:
 
 ```jsx
-// Import the `Editor` helpers from Slate.
-import { Editor } from 'slate'
+// Import the `Editor` and `Transforms` helpers from Slate.
+import { Editor, Transforms } from 'slate'
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])

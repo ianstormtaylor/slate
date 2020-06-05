@@ -41,9 +41,13 @@ const Leaf = (props: {
             maxWidth: '100%',
             whiteSpace: 'nowrap',
             opacity: '0.333',
+            userSelect: 'none',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            textDecoration: 'none',
           }}
         >
-          {leaf.placeholder}
+          {leaf.placeholder as React.ReactNode}
         </span>
         {children}
       </React.Fragment>

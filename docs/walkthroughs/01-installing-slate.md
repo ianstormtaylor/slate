@@ -1,6 +1,6 @@
 # Installing Slate
 
-Slate is a monorepo divided up into multi npm packages, so to install it you do:
+Slate is a monorepo divided up into multiple npm packages, so to install it you do:
 
 ```
 yarn add slate slate-react
@@ -69,7 +69,7 @@ const App = () => {
   const [value, setValue] = useState([])
   // Render the Slate context.
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)} />
+    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)} />
   )
 }
 ```
@@ -88,7 +88,7 @@ const App = () => {
   const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
       <Editable />
     </Slate>
   )
@@ -113,7 +113,7 @@ const App = () => {
   ])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
       <Editable />
     </Slate>
   )
@@ -122,4 +122,4 @@ const App = () => {
 
 There you have it!
 
-That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
+That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.` And when you type, you should see the text change!

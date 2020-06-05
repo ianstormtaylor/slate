@@ -52,7 +52,7 @@ yarn build
 
 ## Running Examples
 
-To run the examples, start by building the mono repo as described in the [Repository Setup](#repository-setup) section.
+To run the examples, start by building the monorepo as described in the [Repository Setup](#repository-setup) section.
 
 Then you can start the examples server with:
 
@@ -62,7 +62,7 @@ yarn start
 
 ## Running Tests
 
-To run the tests, start by building the mono repo as described in the [Repository Setup](#repository-setup) section.
+To run the tests, start by building the monorepo as described in the [Repository Setup](#repository-setup) section.
 
 Then you can rerun the tests with:
 
@@ -80,7 +80,7 @@ If you only want to run a specific test or tests, you can run `yarn test --fgrep
 
 ## Publishing Releases
 
-Since we use [Lerna](https://lernajs.io) to manage the Slate packages this is fairly easy, just run:
+Since we use [Lerna](https://lerna.js.org) to manage the Slate packages this is fairly easy, just run:
 
 ```js
 yarn release

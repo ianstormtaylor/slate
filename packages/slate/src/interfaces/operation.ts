@@ -5,7 +5,7 @@ export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type InsertTextOperation = {
@@ -13,7 +13,7 @@ export type InsertTextOperation = {
   path: Path
   offset: number
   text: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type MergeNodeOperation = {
@@ -22,21 +22,21 @@ export type MergeNodeOperation = {
   position: number
   target: number | null
   properties: Partial<Node>
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type RemoveTextOperation = {
@@ -44,7 +44,7 @@ export type RemoveTextOperation = {
   path: Path
   offset: number
   text: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type SetNodeOperation = {
@@ -52,25 +52,25 @@ export type SetNodeOperation = {
   path: Path
   properties: Partial<Node>
   newProperties: Partial<Node>
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type SetSelectionOperation =
   | {
       type: 'set_selection'
-      [key: string]: any
+      [key: string]: unknown
       properties: null
       newProperties: Range
     }
   | {
       type: 'set_selection'
-      [key: string]: any
+      [key: string]: unknown
       properties: Partial<Range>
       newProperties: Partial<Range>
     }
   | {
       type: 'set_selection'
-      [key: string]: any
+      [key: string]: unknown
       properties: Range
       newProperties: null
     }
@@ -81,7 +81,7 @@ export type SplitNodeOperation = {
   position: number
   target: number | null
   properties: Partial<Node>
-  [key: string]: any
+  [key: string]: unknown
 }
 
 export type NodeOperation =
@@ -228,9 +228,18 @@ export const Operation = {
           return op
         }
 
-        // We need to get the original path here, but sometimes the `newPath`
-        // is a younger sibling of (or ends before) the original, and this
-        // accounts for it.
+        // If the move happens completely within a single parent the path and
+        // newPath are stable with respect to each other.
+        if (Path.isSibling(path, newPath)) {
+          return { ...op, path: newPath, newPath: path }
+        }
+
+        // If the move does not happen within a single parent it is possible
+        // for the move to impact the true path to the location where the node
+        // was removed from and where it was inserted. We have to adjust for this
+        // and find the original path. We can accomplish this (only in non-sibling)
+        // moves by looking at the impact of the move operation on the node
+        // after the original move path.
         const inversePath = Path.transform(path, op)!
         const inverseNewPath = Path.transform(Path.next(path), op)!
         return { ...op, path: inversePath, newPath: inverseNewPath }

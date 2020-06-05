@@ -7,13 +7,19 @@ import {
   Range,
   Text,
   Transforms,
+  Path,
 } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
-import { IS_FIREFOX, IS_SAFARI, IS_EDGE_LEGACY } from '../utils/environment'
+import {
+  IS_FIREFOX,
+  IS_SAFARI,
+  IS_EDGE_LEGACY,
+  IS_CHROME_LEGACY,
+} from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
@@ -38,7 +44,12 @@ import {
 } from '../utils/weak-maps'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
-const HAS_BEFORE_INPUT_SUPPORT = !(IS_FIREFOX || IS_EDGE_LEGACY)
+// Chrome Legacy doesn't support `beforeinput` correctly
+const HAS_BEFORE_INPUT_SUPPORT = !(
+  IS_FIREFOX ||
+  IS_EDGE_LEGACY ||
+  IS_CHROME_LEGACY
+)
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
@@ -146,13 +157,22 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    // verify that the dom selection is in the editor
+    const editorElement = EDITOR_TO_ELEMENT.get(editor)!
+    let hasDomSelectionInEditor = false
+    if (
+      editorElement.contains(domSelection.anchorNode) &&
+      editorElement.contains(domSelection.focusNode)
+    ) {
+      hasDomSelectionInEditor = true
+    }
 
-    // If the DOM selection is already correct, we're done.
+    // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (
       hasDomSelection &&
-      newDomRange &&
-      isRangeEqual(domSelection.getRangeAt(0), newDomRange)
+      hasDomSelectionInEditor &&
+      selection &&
+      Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
     ) {
       return
     }
@@ -162,10 +182,15 @@ export const Editable = (props: EditableProps) => {
     state.isUpdatingSelection = true
     domSelection.removeAllRanges()
 
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollIntoView(leafEl, { scrollMode: 'if-needed' })
+      scrollIntoView(leafEl, {
+        scrollMode: 'if-needed',
+        boundary: el,
+      })
     }
 
     setTimeout(() => {
@@ -332,13 +357,13 @@ export const Editable = (props: EditableProps) => {
   // real `beforeinput` events sadly... (2019/11/04)
   // https://github.com/facebook/react/issues/11211
   useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
+    if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
       // @ts-ignore The `beforeinput` event isn't recognized.
       ref.current.addEventListener('beforeinput', onDOMBeforeInput)
     }
 
     return () => {
-      if (ref.current) {
+      if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
         // @ts-ignore The `beforeinput` event isn't recognized.
         ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
       }
@@ -356,10 +381,6 @@ export const Editable = (props: EditableProps) => {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = window.getSelection()
-        const domRange =
-          domSelection &&
-          domSelection.rangeCount > 0 &&
-          domSelection.getRangeAt(0)
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -368,12 +389,22 @@ export const Editable = (props: EditableProps) => {
           IS_FOCUSED.delete(editor)
         }
 
-        if (
-          domRange &&
-          hasEditableTarget(editor, domRange.startContainer) &&
-          hasEditableTarget(editor, domRange.endContainer)
-        ) {
-          const range = ReactEditor.toSlateRange(editor, domRange)
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideVoid(editor, focusNode)
+
+        if (anchorNodeSelectable && focusNodeSelectable) {
+          const range = ReactEditor.toSlateRange(editor, domSelection)
           Transforms.select(editor, range)
         } else {
           Transforms.deselect(editor)
@@ -537,8 +568,16 @@ export const Editable = (props: EditableProps) => {
               const node = ReactEditor.toSlateNode(editor, event.target)
               const path = ReactEditor.findPath(editor, node)
               const start = Editor.start(editor, path)
+              const end = Editor.end(editor, path)
 
-              if (Editor.void(editor, { at: start })) {
+              const startVoid = Editor.void(editor, { at: start })
+              const endVoid = Editor.void(editor, { at: end })
+
+              if (
+                startVoid &&
+                endVoid &&
+                Path.equals(startVoid[1], endVoid[1])
+              ) {
                 const range = Editor.range(editor, start)
                 Transforms.select(editor, range)
               }
@@ -583,7 +622,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onCopy)
             ) {
               event.preventDefault()
-              setFragmentData(event.clipboardData, editor)
+              ReactEditor.setFragmentData(editor, event.clipboardData)
             }
           },
           [attributes.onCopy]
@@ -596,7 +635,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onCut)
             ) {
               event.preventDefault()
-              setFragmentData(event.clipboardData, editor)
+              ReactEditor.setFragmentData(editor, event.clipboardData)
               const { selection } = editor
 
               if (selection && Range.isExpanded(selection)) {
@@ -641,8 +680,11 @@ export const Editable = (props: EditableProps) => {
                 Transforms.select(editor, range)
               }
 
-              setFragmentData(event.dataTransfer, editor)
+
               state.isDraggingInternally = true
+
+              ReactEditor.setFragmentData(editor, event.dataTransfer)
+
             }
           },
           [attributes.onDragStart]
@@ -711,7 +753,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isRedo(nativeEvent)) {
                 event.preventDefault()
 
-                if (editor.redo) {
+                if (typeof editor.redo === 'function') {
                   editor.redo()
                 }
 
@@ -721,7 +763,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isUndo(nativeEvent)) {
                 event.preventDefault()
 
-                if (editor.undo) {
+                if (typeof editor.undo === 'function') {
                   editor.undo()
                 }
 
@@ -906,11 +948,11 @@ export const Editable = (props: EditableProps) => {
             // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
+              !isEventHandled(event, attributes.onPaste) &&
               (!HAS_BEFORE_INPUT_SUPPORT ||
                 isPlainTextOnlyPaste(event.nativeEvent)) &&
               !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste)
+              hasEditableTarget(editor, event.target)
             ) {
               event.preventDefault()
               ReactEditor.insertData(editor, event.clipboardData)
@@ -981,6 +1023,19 @@ const hasEditableTarget = (
 }
 
 /**
+ * Check if the target is inside void and in the editor.
+ */
+
+const isTargetInsideVoid = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): boolean => {
+  const slateNode =
+    hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
+  return Editor.isVoid(editor, slateNode)
+}
+
+/**
  * Check if an event is overrided by a handler.
  */
 
@@ -1009,125 +1064,4 @@ const isDOMEventHandled = (event: Event, handler?: (event: Event) => void) => {
 
   handler(event)
   return event.defaultPrevented
-}
-
-/**
- * Set the currently selected fragment to the clipboard.
- */
-
-const setFragmentData = (
-  dataTransfer: DataTransfer,
-  editor: ReactEditor
-): void => {
-  const { selection } = editor
-
-  if (!selection) {
-    return
-  }
-
-  const [start, end] = Range.edges(selection)
-  const startVoid = Editor.void(editor, { at: start.path })
-  const endVoid = Editor.void(editor, { at: end.path })
-
-  if (Range.isCollapsed(selection) && !startVoid) {
-    return
-  }
-
-  // Create a fake selection so that we can add a Base64-encoded copy of the
-  // fragment to the HTML, to decode on future pastes.
-  const domRange = ReactEditor.toDOMRange(editor, selection)
-  let contents = domRange.cloneContents()
-  let attach = contents.childNodes[0] as HTMLElement
-
-  // Make sure attach is non-empty, since empty nodes will not get copied.
-  contents.childNodes.forEach(node => {
-    if (node.textContent && node.textContent.trim() !== '') {
-      attach = node as HTMLElement
-    }
-  })
-
-  // COMPAT: If the end node is a void node, we need to move the end of the
-  // range from the void node's spacer span, to the end of the void node's
-  // content, since the spacer is before void's content in the DOM.
-  if (endVoid) {
-    const [voidNode] = endVoid
-    const r = domRange.cloneRange()
-    const domNode = ReactEditor.toDOMNode(editor, voidNode)
-    r.setEndAfter(domNode)
-    contents = r.cloneContents()
-  }
-
-  // COMPAT: If the start node is a void node, we need to attach the encoded
-  // fragment to the void node's content node instead of the spacer, because
-  // attaching it to empty `<div>/<span>` nodes will end up having it erased by
-  // most browsers. (2018/04/27)
-  if (startVoid) {
-    attach = contents.querySelector('[data-slate-spacer]')! as HTMLElement
-  }
-
-  // Remove any zero-width space spans from the cloned DOM so that they don't
-  // show up elsewhere when pasted.
-  Array.from(contents.querySelectorAll('[data-slate-zero-width]')).forEach(
-    zw => {
-      const isNewline = zw.getAttribute('data-slate-zero-width') === 'n'
-      zw.textContent = isNewline ? '\n' : ''
-    }
-  )
-
-  // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
-  // in the HTML, and can be used for intra-Slate pasting. If it's a text
-  // node, wrap it in a `<span>` so we have something to set an attribute on.
-  if (isDOMText(attach)) {
-    const span = document.createElement('span')
-    // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
-    // then leading and trailing spaces will be ignored. (2017/09/21)
-    span.style.whiteSpace = 'pre'
-    span.appendChild(attach)
-    contents.appendChild(span)
-    attach = span
-  }
-
-  const fragment = Node.fragment(editor, selection)
-  const string = JSON.stringify(fragment)
-  const encoded = window.btoa(encodeURIComponent(string))
-  attach.setAttribute('data-slate-fragment', encoded)
-  dataTransfer.setData('application/x-slate-fragment', encoded)
-
-  // Add the content to a <div> so that we can get its inner HTML.
-  const div = document.createElement('div')
-  div.appendChild(contents)
-  div.setAttribute('hidden', 'true')
-  document.body.appendChild(div)
-  dataTransfer.setData('text/html', div.innerHTML)
-  dataTransfer.setData('text/plain', getPlainText(div))
-  document.body.removeChild(div)
-}
-
-/**
- * Get a plaintext representation of the content of a node, accounting for block
- * elements which get a newline appended.
- *
- * The domNode must be attached to the DOM.
- */
-
-const getPlainText = (domNode: DOMNode) => {
-  let text = ''
-
-  if (isDOMText(domNode) && domNode.nodeValue) {
-    return domNode.nodeValue
-  }
-
-  if (isDOMElement(domNode)) {
-    for (const childNode of Array.from(domNode.childNodes)) {
-      text += getPlainText(childNode)
-    }
-
-    const display = getComputedStyle(domNode).getPropertyValue('display')
-
-    if (display === 'block' || display === 'list' || domNode.tagName === 'BR') {
-      text += '\n'
-    }
-  }
-
-  return text
 }
