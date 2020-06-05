@@ -36,7 +36,6 @@ const Leaf = (props: {
           style={{
             pointerEvents: 'none',
             display: 'inline-block',
-            verticalAlign: 'text-top',
             width: '0',
             maxWidth: '100%',
             whiteSpace: 'nowrap',
