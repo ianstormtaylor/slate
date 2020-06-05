@@ -309,7 +309,6 @@ export const Editable = (props: EditableProps) => {
           }
 
           case 'insertFromComposition':
-          case 'insertFromDrop':
           case 'insertFromPaste':
           case 'insertFromYank':
           case 'insertReplacementText':
@@ -655,24 +654,15 @@ export const Editable = (props: EditableProps) => {
               !readOnly &&
               !isEventHandled(event, attributes.onDrop)
             ) {
-              // COMPAT: Certain browsers don't fire `beforeinput` events at all, and
-              // Chromium browsers don't properly fire them for files being
-              // dropped into a `contenteditable`. (2019/11/26)
-              // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
-              if (
-                !HAS_BEFORE_INPUT_SUPPORT ||
-                (!IS_SAFARI && event.dataTransfer.files.length > 0)
-              ) {
-                event.preventDefault()
-                const range = ReactEditor.findEventRange(editor, event)
-                const data = event.dataTransfer
-                const dragged = editor.selection
-                Transforms.select(editor, range)
-                if (state.isDraggingInternally && dragged) {
-                  Transforms.delete(editor, { at: dragged })
-                }
-                ReactEditor.insertData(editor, data)
+              event.preventDefault()
+              const range = ReactEditor.findEventRange(editor, event)
+              const dragged = editor.selection
+              const data = event.dataTransfer
+              Transforms.select(editor, range)
+              if (state.isDraggingInternally && dragged) {
+                Transforms.delete(editor, { at: dragged })
               }
+              ReactEditor.insertData(editor, data)
             }
           },
           [readOnly, attributes.onDrop]
