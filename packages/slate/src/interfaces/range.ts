@@ -160,7 +160,7 @@ export const Range = {
    * Iterate through all of the point entries in a range.
    */
 
-  *points(range: Range): Iterable<PointEntry> {
+  *points(range: Range): Generator<PointEntry> {
     yield [range.anchor, 'anchor']
     yield [range.focus, 'focus']
   },

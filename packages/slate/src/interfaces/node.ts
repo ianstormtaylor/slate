@@ -26,7 +26,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the ancestor nodes above a specific path.
+   * Return a generator of all the ancestor nodes above a specific path.
    *
    * By default the order is bottom-up, from lowest to highest ancestor in
    * the tree, but you can pass the `reverse: true` option to go top-down.
@@ -38,7 +38,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry<Ancestor>> {
+  ): Generator<NodeEntry<Ancestor>> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
       const entry: NodeEntry<Ancestor> = [n, p]
@@ -80,7 +80,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -121,7 +121,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the descendant node entries inside a root node.
+   * Return a generator of all the descendant node entries inside a root node.
    */
 
   *descendants(
@@ -132,7 +132,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
@@ -143,7 +143,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the element nodes inside a root node. Each iteration
+   * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
    */
@@ -156,7 +156,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<ElementEntry> {
+  ): Generator<ElementEntry> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Element.isElement(node)) {
         yield [node, path]
@@ -199,12 +199,12 @@ export const Node = {
 
     const newRoot = produce(root, r => {
       const [start, end] = Range.edges(range)
-      const iterable = Node.nodes(r, {
+      const nodeEntries = Node.nodes(r, {
         reverse: true,
         pass: ([, path]) => !Range.includes(range, path),
       })
 
-      for (const [, path] of iterable) {
+      for (const [, path] of nodeEntries) {
         if (!Range.includes(range, path)) {
           const parent = Node.parent(r, path)
           const index = path[path.length - 1]
@@ -329,7 +329,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of the in a branch of the tree, from a specific path.
+   * Return a generator of the in a branch of the tree, from a specific path.
    *
    * By default the order is top-down, from lowest to highest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
@@ -341,7 +341,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Generator<NodeEntry> {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
@@ -360,7 +360,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the node entries of a root node. Each entry is
+   * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
    */
@@ -373,7 +373,7 @@ export const Node = {
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Generator<NodeEntry> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
     const visited = new Set()
@@ -473,7 +473,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all leaf text nodes in a root node.
+   * Return a generator of all leaf text nodes in a root node.
    */
 
   *texts(
@@ -484,7 +484,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry<Text>> {
+  ): Generator<NodeEntry<Text>> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
         yield [node, path]
