@@ -680,11 +680,9 @@ export const Editable = (props: EditableProps) => {
                 Transforms.select(editor, range)
               }
 
-
               state.isDraggingInternally = true
 
               ReactEditor.setFragmentData(editor, event.dataTransfer)
-
             }
           },
           [attributes.onDragStart]
