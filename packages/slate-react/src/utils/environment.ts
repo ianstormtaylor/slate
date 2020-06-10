@@ -24,3 +24,8 @@ export const IS_EDGE_LEGACY =
 export const IS_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&
   /Chrome?\/(?:[0-7][0-5]|[0-6][0-9])/i.test(navigator.userAgent)
+
+
+// qq browser
+export const IS_QQBROWSER =
+  typeof navigator !== 'undefined' && /.*QQBrowser/.test(navigator.userAgent)
