@@ -103,15 +103,17 @@ export const Text = {
         o += length
 
         // If the range encompases the entire leaf, add the range.
-        if (start.offset <= offset && end.offset >= offset + length) {
+        if (start.offset <= offset && end.offset >= o) {
           Object.assign(leaf, rest)
           next.push(leaf)
           continue
         }
 
-        // If the range starts after the leaf, or ends before it, continue.
+        // If the range expanded and match the leaf, or starts after, or ends before it, continue.
         if (
-          start.offset > offset + length ||
+          (start.offset !== end.offset &&
+            (start.offset === o || end.offset === offset)) ||
+          start.offset > o ||
           end.offset < offset ||
           (end.offset === offset && offset !== 0)
         ) {
@@ -126,7 +128,7 @@ export const Text = {
         let before
         let after
 
-        if (end.offset < offset + length) {
+        if (end.offset < o) {
           const off = end.offset - offset
           after = { ...middle, text: middle.text.slice(off) }
           middle = { ...middle, text: middle.text.slice(0, off) }
