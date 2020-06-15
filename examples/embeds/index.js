@@ -3,7 +3,15 @@ import { Value } from 'slate'
 
 import React from 'react'
 import Video from './video'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * The images example.
@@ -13,23 +21,17 @@ import initialValue from './value.json'
 
 class Embeds extends React.Component {
   /**
-   * Deserialize the raw initial value.
+   * The editor's schema.
    *
    * @type {Object}
    */
 
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
+  schema = {
+    blocks: {
+      video: {
+        isVoid: true,
+      },
+    },
   }
 
   /**
@@ -40,14 +42,12 @@ class Embeds extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        defaultValue={initialValue}
+        schema={this.schema}
+        renderNode={this.renderNode}
+      />
     )
   }
 
@@ -55,13 +55,16 @@ class Embeds extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
-   * @return {Element}
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'video':
         return <Video {...props} />
+      default:
+        return next()
     }
   }
 }

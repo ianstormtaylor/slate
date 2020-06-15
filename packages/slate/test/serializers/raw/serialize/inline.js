@@ -6,7 +6,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link>one</link>
+        <text />
       </paragraph>
     </document>
   </value>
@@ -21,46 +23,29 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {},
             nodes: [
               {
                 object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'one',
-                    marks: [],
-                  },
-                ],
+                text: 'one',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
         ],
       },

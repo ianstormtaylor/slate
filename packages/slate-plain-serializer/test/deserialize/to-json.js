@@ -11,18 +11,12 @@ export const output = {
       {
         object: 'block',
         type: 'line',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'one',
-                marks: [],
-              },
-            ],
+            text: 'one',
+            marks: [],
           },
         ],
       },

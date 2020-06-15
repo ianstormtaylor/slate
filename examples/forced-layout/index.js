@@ -1,9 +1,16 @@
 import { Editor } from 'slate-react'
 import { Block, Value } from 'slate'
-import { CHILD_REQUIRED, CHILD_TYPE_INVALID } from 'slate-schema-violations'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * A simple schema to enforce the nodes in the Slate document.
@@ -14,20 +21,18 @@ import initialValue from './value.json'
 const schema = {
   document: {
     nodes: [
-      { types: ['title'], min: 1, max: 1 },
-      { types: ['paragraph'], min: 1 },
+      { match: { type: 'title' }, min: 1, max: 1 },
+      { match: { type: 'paragraph' }, min: 1 },
     ],
-    normalize: (change, violation, { node, child, index }) => {
-      switch (violation) {
-        case CHILD_TYPE_INVALID: {
-          return change.setNodeByKey(
-            child.key,
-            index == 0 ? 'title' : 'paragraph'
-          )
+    normalize: (editor, { code, node, child, index }) => {
+      switch (code) {
+        case 'child_type_invalid': {
+          const type = index === 0 ? 'title' : 'paragraph'
+          return editor.setNodeByKey(child.key, type)
         }
-        case CHILD_REQUIRED: {
-          const block = Block.create(index == 0 ? 'title' : 'paragraph')
-          return change.insertNodeByKey(node.key, index, block)
+        case 'child_min_invalid': {
+          const block = Block.create(index === 0 ? 'title' : 'paragraph')
+          return editor.insertNodeByKey(node.key, index, block)
         }
       }
     },
@@ -42,26 +47,6 @@ const schema = {
 
 class ForcedLayout extends React.Component {
   /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -69,15 +54,12 @@ class ForcedLayout extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter a title..."
-          value={this.state.value}
-          schema={schema}
-          onChange={this.onChange}
-          renderNode={this.renderNode}
-        />
-      </div>
+      <Editor
+        placeholder="Enter a title..."
+        defaultValue={initialValue}
+        schema={schema}
+        renderNode={this.renderNode}
+      />
     )
   }
 
@@ -85,16 +67,21 @@ class ForcedLayout extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'title':
         return <h2 {...attributes}>{children}</h2>
       case 'paragraph':
         return <p {...attributes}>{children}</p>
+      default:
+        return next()
     }
   }
 }

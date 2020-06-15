@@ -37,21 +37,21 @@ Please use the Slack instead of asking questions in issues, since we want to res
 
 ## Submitting Pull Requests
 
-All pull requests are super welcomed and greatly appreciated! Easy issues are marked with an [`easy-one`](https://github.com/ianstormtaylor/slate/issues?q=is%3Aopen+is%3Aissue+label%3Aeasy-one) label if you're looking for a simple place to get familiar with the code base.
+All pull requests are super welcomed and greatly appreciated! Issues in need of a solution are marked with a [`♥ help please`](https://github.com/ianstormtaylor/slate/issues?q=is%3Aissue+is%3Aopen+label%3A%22%E2%99%A5+help+please%22) label if you're looking for somewhere to start.
 
 Please include tests and docs with every pull request!
 
 ## Running Examples
 
-Check out the [Examples readme](./examples) to see how to get the examples running locally!
+Check out the [Examples readme](https://github.com/ianstormtaylor/slate/blob/master/examples/Readme.md) to see how to get the examples running locally!
 
 ## Running Tests
 
-To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and bootstrap the monorepo:
+To run the tests, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
 ```
 yarn install
-yarn bootstrap
+yarn build
 ```
 
 Then run the tests with:
@@ -89,6 +89,16 @@ yarn benchmark
 ```
 
 There will be some subtle changes in iteration speed always, but the comparison reporter will highlight any changes that seem meaningful. You can run `benchmark` multiple times to ensure the speed up persists.
+
+### Run Selected Benchmarks
+
+To run selected benchmarks, create `tmp/benchmark-config.js` with `module.exports.include`. For example, to run slate-core benchmarks only with `get-*`, we can create a `tmp/benchmark-config.js` as
+
+```
+module.exports.include = {
+  slate: /^get/
+}
+```
 
 ## Adding Browser Support
 

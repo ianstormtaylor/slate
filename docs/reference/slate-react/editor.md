@@ -10,14 +10,18 @@ The top-level React component that renders the Slate editor itself.
 
 ```js
 <Editor
+  id={String}
   autoCorrect={Boolean}
   autoFocus={Boolean}
   className={String}
+  commands={Object}
   onChange={Function}
-  placeholder={String || Element}
+  placeholder={String | Element}
   plugins={Array}
+  queries={Object}
   readOnly={Boolean}
   role={String}
+  schema={Object}
   spellCheck={Boolean}
   value={Value}
   style={Object}
@@ -25,23 +29,29 @@ The top-level React component that renders the Slate editor itself.
 />
 ```
 
+### `id`
+
+`String`
+
+Id for the top-level rendered HTML element of the editor.
+
 ### `autoCorrect`
 
 `Boolean`
 
-Whether the editor should attempt to autocorrect spellcheck errors.
+Whether or not the editor should attempt to autocorrect spellcheck errors.
 
 ### `autoFocus`
 
 `Boolean`
 
-An optional attribute that, when set to true, attempts to give the content editable element focus when it's loaded onto the page.
+Whether or not the editor should attempt to give the contenteditable element focus when it's loaded onto the page.
 
 ### `className`
 
 `String`
 
-An optional class name to apply to the content editable element.
+An optional class name to apply to the contenteditable element.
 
 ### `onChange`
 
@@ -53,7 +63,7 @@ A change handler that will be called with the `change` that applied the change. 
 
 `String || Element`
 
-A placeholder string (or React element) that will be rendered as the default block type's placeholder.
+A placeholder string (or React element) that will be rendered if the document only contains a single empty block.
 
 ### `plugins`
 
@@ -77,13 +87,13 @@ ARIA property to define the role of the editor, it defaults to `textbox` when ed
 
 `Boolean`
 
-Whether spellcheck is turned on for the editor.
+Whether or not spellcheck is turned on for the editor.
 
 ### `style`
 
 `Object`
 
-An optional dictionary of styles to apply to the content editable element.
+An optional dictionary of styles to apply to the contenteditable element.
 
 ### `tabIndex`
 
@@ -156,46 +166,3 @@ const plugins = [
 ### `schema`
 
 To see how these properties behave, check out the [Plugins reference](./plugins.md).
-
-## Instance Methods
-
-### `blur`
-
-`blur() => Void`
-
-Programmatically blur the editor.
-
-### `change`
-
-`change(fn) => Void`
-`change(fn, ...args) => Void`
-
-Programmatically invoke a change `fn` on the editor. The function will be invokved with a new `change` object representing the editor's current value.
-
-If extra `...args` are passed in, the change `fn` will be invoked with `(change, ...args)`, so you can use this as a shorthand for performing single-function changes.
-
-### `focus`
-
-`focus() => Void`
-
-Programmatically focus the editor.
-
-## Instance Properties
-
-### `schema`
-
-`Schema`
-
-The editor's current schema.
-
-### `stack`
-
-`Stack`
-
-The editor's current stack.
-
-### `value`
-
-`Value`
-
-The editor's current value.

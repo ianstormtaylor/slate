@@ -1,10 +1,7 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { Map, Record, Set } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
 import Data from './data'
-import memoize from '../utils/memoize'
 
 /**
  * Default properties.
@@ -13,7 +10,7 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  data: new Map(),
+  data: undefined,
   type: undefined,
 }
 
@@ -36,7 +33,7 @@ class Mark extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { type: attrs }
     }
 
@@ -63,7 +60,7 @@ class Mark extends Record(DEFAULTS) {
     }
 
     if (elements == null) {
-      return new Set()
+      return Set()
     }
 
     throw new Error(
@@ -86,7 +83,7 @@ class Mark extends Record(DEFAULTS) {
       }
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       return { type: attrs }
     }
 
@@ -112,7 +109,7 @@ class Mark extends Record(DEFAULTS) {
   static fromJSON(object) {
     const { data = {}, type } = object
 
-    if (typeof type != 'string') {
+    if (typeof type !== 'string') {
       throw new Error('`Mark.fromJS` requires a `type` string.')
     }
 
@@ -125,23 +122,6 @@ class Mark extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Mark.fromJSON
-
-  /**
-   * Check if `any` is a `Mark`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isMark(any) {
-    return !!(any && any[MODEL_TYPES.MARK])
-  }
-
-  /**
    * Check if `any` is a set of marks.
    *
    * @param {Any} any
@@ -150,33 +130,6 @@ class Mark extends Record(DEFAULTS) {
 
   static isMarkSet(any) {
     return Set.isSet(any) && any.every(item => Mark.isMark(item))
-  }
-
-  /**
-   * Object.
-   */
-
-  get object() {
-    return 'mark'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Get the component for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Component|Void}
-   */
-
-  getComponent(schema) {
-    return schema.__getComponent(this)
   }
 
   /**
@@ -194,27 +147,7 @@ class Mark extends Record(DEFAULTS) {
 
     return object
   }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS() {
-    return this.toJSON()
-  }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Mark.prototype[MODEL_TYPES.MARK] = true
-
-/**
- * Memoize read methods.
- */
-
-memoize(Mark.prototype, ['getComponent'])
 
 /**
  * Export.

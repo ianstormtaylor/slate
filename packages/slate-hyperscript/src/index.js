@@ -1,117 +1,19 @@
-import isEmpty from 'is-empty'
 import isPlainObject from 'is-plain-object'
 
-import { Block, Document, Inline, Mark, Node, Range, Text, Value } from 'slate'
-
-/**
- * Create selection point constants, for comparison by reference.
- *
- * @type {Object}
- */
-
-const ANCHOR = {}
-const CURSOR = {}
-const FOCUS = {}
-
-/**
- * The default Slate hyperscript creator functions.
- *
- * @type {Object}
- */
-
-const CREATORS = {
-  anchor(tagName, attributes, children) {
-    return ANCHOR
-  },
-
-  block(tagName, attributes, children) {
-    return Block.create({
-      ...attributes,
-      nodes: createChildren(children),
-    })
-  },
-
-  cursor(tagName, attributes, children) {
-    return CURSOR
-  },
-
-  document(tagName, attributes, children) {
-    return Document.create({
-      ...attributes,
-      nodes: createChildren(children),
-    })
-  },
-
-  focus(tagName, attributes, children) {
-    return FOCUS
-  },
-
-  inline(tagName, attributes, children) {
-    return Inline.create({
-      ...attributes,
-      nodes: createChildren(children),
-    })
-  },
-
-  mark(tagName, attributes, children) {
-    const marks = Mark.createSet([attributes])
-    const nodes = createChildren(children, { marks })
-    return nodes
-  },
-
-  selection(tagName, attributes, children) {
-    return Range.create(attributes)
-  },
-
-  value(tagName, attributes, children) {
-    const { data } = attributes
-    const document = children.find(Document.isDocument)
-    let selection = children.find(Range.isRange) || Range.create()
-    const props = {}
-
-    // Search the document's texts to see if any of them have the anchor or
-    // focus information saved, so we can set the selection.
-    if (document) {
-      document.getTexts().forEach(text => {
-        if (text.__anchor != null) {
-          props.anchorKey = text.key
-          props.anchorOffset = text.__anchor
-          props.isFocused = true
-        }
-
-        if (text.__focus != null) {
-          props.focusKey = text.key
-          props.focusOffset = text.__focus
-          props.isFocused = true
-        }
-      })
-    }
-
-    if (props.anchorKey && !props.focusKey) {
-      throw new Error(
-        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<anchor/>\`. For collapsed selections, use \`<cursor/>\`.`
-      )
-    }
-
-    if (!props.anchorKey && props.focusKey) {
-      throw new Error(
-        `Slate hyperscript must have both \`<anchor/>\` and \`<focus/>\` defined if one is defined, but you only defined \`<focus/>\`. For collapsed selections, use \`<cursor/>\`.`
-      )
-    }
-
-    if (!isEmpty(props)) {
-      selection = selection.merge(props).normalize(document)
-    }
-
-    const value = Value.create({ data, document, selection })
-    return value
-  },
-
-  text(tagName, attributes, children) {
-    const nodes = createChildren(children, { key: attributes.key })
-    return nodes
-  },
-}
+import {
+  createAnchor,
+  createBlock,
+  createCursor,
+  createDecoration,
+  createDocument,
+  createFocus,
+  createInline,
+  createMark,
+  createNode,
+  createSelection,
+  createText,
+  createValue,
+} from './creators'
 
 /**
  * Create a Slate hyperscript function with `options`.
@@ -121,7 +23,39 @@ const CREATORS = {
  */
 
 function createHyperscript(options = {}) {
-  const creators = resolveCreators(options)
+  const { blocks = {}, inlines = {}, marks = {}, decorations = {} } = options
+
+  const creators = {
+    anchor: createAnchor,
+    block: createBlock,
+    cursor: createCursor,
+    decoration: createDecoration,
+    document: createDocument,
+    focus: createFocus,
+    inline: createInline,
+    mark: createMark,
+    node: createNode,
+    selection: createSelection,
+    text: createText,
+    value: createValue,
+    ...(options.creators || {}),
+  }
+
+  for (const key in blocks) {
+    creators[key] = normalizeCreator(blocks[key], createBlock)
+  }
+
+  for (const key in inlines) {
+    creators[key] = normalizeCreator(inlines[key], createInline)
+  }
+
+  for (const key in marks) {
+    creators[key] = normalizeCreator(marks[key], createMark)
+  }
+
+  for (const key in decorations) {
+    creators[key] = normalizeCreator(decorations[key], createDecoration)
+  }
 
   function create(tagName, attributes, ...children) {
     const creator = creators[tagName]
@@ -143,194 +77,48 @@ function createHyperscript(options = {}) {
       .filter(child => Boolean(child))
       .reduce((memo, child) => memo.concat(child), [])
 
-    const element = creator(tagName, attributes, children)
-    return element
+    const ret = creator(tagName, attributes, children)
+    return ret
   }
 
   return create
 }
 
 /**
- * Create an array of `children`, storing selection anchor and focus.
+ * Normalize a `creator` of `value`.
  *
- * @param {Array} children
- * @param {Object} options
- * @return {Array}
- */
-
-function createChildren(children, options = {}) {
-  const array = []
-  let length = 0
-
-  // When creating the new node, try to preserve a key if one exists.
-  const firstText = children.find(c => Text.isText(c))
-  const key = options.key ? options.key : firstText ? firstText.key : undefined
-  let node = Text.create({ key })
-
-  // Create a helper to update the current node while preserving any stored
-  // anchor or focus information.
-  function setNode(next) {
-    const { __anchor, __focus } = node
-    if (__anchor != null) next.__anchor = __anchor
-    if (__focus != null) next.__focus = __focus
-    node = next
-  }
-
-  children.forEach(child => {
-    // If the child is a non-text node, push the current node and the new child
-    // onto the array, then creating a new node for future selection tracking.
-    if (Node.isNode(child) && !Text.isText(child)) {
-      if (node.text.length || node.__anchor != null || node.__focus != null)
-        array.push(node)
-      array.push(child)
-      node = Text.create()
-      length = 0
-    }
-
-    // If the child is a string insert it into the node.
-    if (typeof child == 'string') {
-      setNode(node.insertText(node.text.length, child, options.marks))
-      length += child.length
-    }
-
-    // If the node is a `Text` add its text and marks to the existing node. If
-    // the existing node is empty, and the `key` option wasn't set, preserve the
-    // child's key when updating the node.
-    if (Text.isText(child)) {
-      const { __anchor, __focus } = child
-      let i = node.text.length
-
-      if (!options.key && node.text.length == 0) {
-        setNode(node.set('key', child.key))
-      }
-
-      child.getLeaves().forEach(leaf => {
-        let { marks } = leaf
-        if (options.marks) marks = marks.union(options.marks)
-        setNode(node.insertText(i, leaf.text, marks))
-        i += leaf.text.length
-      })
-
-      if (__anchor != null) node.__anchor = __anchor + length
-      if (__focus != null) node.__focus = __focus + length
-
-      length += child.text.length
-    }
-
-    // If the child is a selection object store the current position.
-    if (child == ANCHOR || child == CURSOR) node.__anchor = length
-    if (child == FOCUS || child == CURSOR) node.__focus = length
-  })
-
-  // Make sure the most recent node is added.
-  array.push(node)
-
-  return array
-}
-
-/**
- * Resolve a set of hyperscript creators an `options` object.
- *
- * @param {Object} options
- * @return {Object}
- */
-
-function resolveCreators(options) {
-  const { blocks = {}, inlines = {}, marks = {} } = options
-
-  const creators = {
-    ...CREATORS,
-    ...(options.creators || {}),
-  }
-
-  Object.keys(blocks).map(key => {
-    creators[key] = normalizeNode(key, blocks[key], 'block')
-  })
-
-  Object.keys(inlines).map(key => {
-    creators[key] = normalizeNode(key, inlines[key], 'inline')
-  })
-
-  Object.keys(marks).map(key => {
-    creators[key] = normalizeMark(key, marks[key])
-  })
-
-  return creators
-}
-
-/**
- * Normalize a node creator with `key` and `value`, of `object`.
- *
- * @param {String} key
  * @param {Function|Object|String} value
- * @param {String} object
+ * @param {Function} creator
  * @return {Function}
  */
 
-function normalizeNode(key, value, object) {
-  if (typeof value == 'function') {
+function normalizeCreator(value, creator) {
+  if (typeof value === 'function') {
     return value
   }
 
-  if (typeof value == 'string') {
+  if (typeof value === 'string') {
     value = { type: value }
   }
 
   if (isPlainObject(value)) {
     return (tagName, attributes, children) => {
-      const { key: attrKey, ...rest } = attributes
+      const { key, ...rest } = attributes
       const attrs = {
         ...value,
-        object,
-        key: attrKey,
+        key,
         data: {
           ...(value.data || {}),
           ...rest,
         },
       }
 
-      return CREATORS[object](tagName, attrs, children)
+      return creator(tagName, attrs, children)
     }
   }
 
   throw new Error(
-    `Slate hyperscript ${object} creators can be either functions, objects or strings, but you passed: ${value}`
-  )
-}
-
-/**
- * Normalize a mark creator with `key` and `value`.
- *
- * @param {String} key
- * @param {Function|Object|String} value
- * @return {Function}
- */
-
-function normalizeMark(key, value) {
-  if (typeof value == 'function') {
-    return value
-  }
-
-  if (typeof value == 'string') {
-    value = { type: value }
-  }
-
-  if (isPlainObject(value)) {
-    return (tagName, attributes, children) => {
-      const attrs = {
-        ...value,
-        data: {
-          ...(value.data || {}),
-          ...attributes,
-        },
-      }
-
-      return CREATORS.mark(tagName, attrs, children)
-    }
-  }
-
-  throw new Error(
-    `Slate hyperscript mark creators can be either functions, objects or strings, but you passed: ${value}`
+    `Slate hyperscript creators can be either functions, objects or strings, but you passed: ${value}`
   )
 }
 

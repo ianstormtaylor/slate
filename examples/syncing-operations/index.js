@@ -3,7 +3,21 @@ import { Value } from 'slate'
 
 import React from 'react'
 import initialValue from './value.json'
+import styled from 'react-emotion'
 import { isKeyHotkey } from 'is-hotkey'
+import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * A spacer component.
+ *
+ * @type {Component}
+ */
+
+const Spacer = styled('div')`
+  height: 20px;
+  background-color: #eee;
+  margin: 20px -20px;
+`
 
 /**
  * Hotkey matchers.
@@ -41,9 +55,9 @@ class SyncingEditor extends React.Component {
    */
 
   applyOperations = operations => {
-    const { value } = this.state
-    const change = value.change().applyOperations(operations)
-    this.onChange(change, { remote: true })
+    this.remote = true
+    operations.forEach(o => this.editor.applyOperation(o))
+    this.remote = false
   }
 
   /**
@@ -55,65 +69,17 @@ class SyncingEditor extends React.Component {
 
   hasMark = type => {
     const { value } = this.state
-    return value.activeMarks.some(mark => mark.type == type)
+    return value.activeMarks.some(mark => mark.type === type)
   }
 
   /**
-   * On change, save the new `value`. And if it's a local change, call the
-   * passed-in `onChange` handler.
+   * Store a reference to the `editor`.
    *
-   * @param {Change} change
-   * @param {Object} options
+   * @param {Editor} editor
    */
 
-  onChange = (change, options = {}) => {
-    this.setState({ value: change.value })
-
-    if (!options.remote) {
-      this.props.onChange(change)
-    }
-  }
-
-  /**
-   * On key down, if it's a formatting command toggle a mark.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @return {Change}
-   */
-
-  onKeyDown = (event, change) => {
-    let mark
-
-    if (isBoldHotkey(event)) {
-      mark = 'bold'
-    } else if (isItalicHotkey(event)) {
-      mark = 'italic'
-    } else if (isUnderlinedHotkey(event)) {
-      mark = 'underlined'
-    } else if (isCodeHotkey(event)) {
-      mark = 'code'
-    } else {
-      return
-    }
-
-    event.preventDefault()
-    change.toggleMark(mark)
-    return true
-  }
-
-  /**
-   * When a mark button is clicked, toggle the current mark.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  onClickMark = (event, type) => {
-    event.preventDefault()
-    const { value } = this.state
-    const change = value.change().toggleMark(type)
-    this.onChange(change)
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -125,25 +91,21 @@ class SyncingEditor extends React.Component {
   render() {
     return (
       <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element}
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        {this.renderButton('bold', 'format_bold')}
-        {this.renderButton('italic', 'format_italic')}
-        {this.renderButton('underlined', 'format_underlined')}
-        {this.renderButton('code', 'code')}
+        <Toolbar>
+          {this.renderMarkButton('bold', 'format_bold')}
+          {this.renderMarkButton('italic', 'format_italic')}
+          {this.renderMarkButton('underlined', 'format_underlined')}
+          {this.renderMarkButton('code', 'code')}
+        </Toolbar>
+        <Editor
+          placeholder="Enter some text..."
+          ref={this.ref}
+          value={this.state.value}
+          onChange={this.onChange}
+          onKeyDown={this.onKeyDown}
+          renderMark={this.renderMark}
+          spellCheck
+        />
       </div>
     )
   }
@@ -156,36 +118,14 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderButton = (type, icon) => {
-    const isActive = this.hasMark(type)
-    const onMouseDown = event => this.onClickMark(event, type)
-
+  renderMarkButton = (type, icon) => {
     return (
-      // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderMark={this.renderMark}
-          spellCheck
-        />
-      </div>
+      <Button
+        active={this.hasMark(type)}
+        onMouseDown={event => this.onClickMark(event, type)}
+      >
+        <Icon>{icon}</Icon>
+      </Button>
     )
   }
 
@@ -196,18 +136,76 @@ class SyncingEditor extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
+  }
+
+  /**
+   * On change, save the new `value`. And if it's a local change, call the
+   * passed-in `onChange` handler.
+   *
+   * @param {Editor} editor
+   * @param {Object} options
+   */
+
+  onChange = (change, options = {}) => {
+    this.setState({ value: change.value })
+
+    if (!this.remote) {
+      this.props.onChange(change)
+    }
+  }
+
+  /**
+   * On key down, if it's a formatting command toggle a mark.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @return {Change}
+   */
+
+  onKeyDown = (event, editor, next) => {
+    let mark
+
+    if (isBoldHotkey(event)) {
+      mark = 'bold'
+    } else if (isItalicHotkey(event)) {
+      mark = 'italic'
+    } else if (isUnderlinedHotkey(event)) {
+      mark = 'underlined'
+    } else if (isCodeHotkey(event)) {
+      mark = 'code'
+    } else {
+      return next()
+    }
+
+    event.preventDefault()
+    editor.toggleMark(mark)
+  }
+
+  /**
+   * When a mark button is clicked, toggle the current mark.
+   *
+   * @param {Event} event
+   * @param {String} type
+   */
+
+  onClickMark = (event, type) => {
+    event.preventDefault()
+    this.editor.toggleMark(type)
   }
 }
 
@@ -219,58 +217,6 @@ class SyncingEditor extends React.Component {
 
 class SyncingOperationsExample extends React.Component {
   /**
-   * Save a reference to editor `one`.
-   *
-   * @param {SyncingEditor} one
-   */
-
-  oneRef = one => {
-    this.one = one
-  }
-
-  /**
-   * Save a reference to editor `two`.
-   *
-   * @param {SyncingEditor} two
-   */
-
-  twoRef = two => {
-    this.two = two
-  }
-
-  /**
-   * When editor one changes, send document-alterting operations to edtior two.
-   *
-   * @param {Array} operations
-   */
-
-  onOneChange = change => {
-    const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
-      .toJS()
-
-    setTimeout(() => {
-      this.two.applyOperations(ops)
-    })
-  }
-
-  /**
-   * When editor two changes, send document-alterting operations to edtior one.
-   *
-   * @param {Array} operations
-   */
-
-  onTwoChange = change => {
-    const ops = change.operations
-      .filter(o => o.type != 'set_selection' && o.type != 'set_value')
-      .toJS()
-
-    setTimeout(() => {
-      this.one.applyOperations(ops)
-    })
-  }
-
-  /**
    * Render both editors.
    *
    * @return {Element}
@@ -279,17 +225,57 @@ class SyncingOperationsExample extends React.Component {
   render() {
     return (
       <div>
-        <SyncingEditor ref={this.oneRef} onChange={this.onOneChange} />
-        <div
-          style={{
-            height: '20px',
-            backgroundColor: '#eee',
-            margin: '20px -20px',
-          }}
+        <SyncingEditor
+          ref={one => (this.one = one)}
+          onChange={this.onOneChange}
         />
-        <SyncingEditor ref={this.twoRef} onChange={this.onTwoChange} />
+        <Spacer />
+        <SyncingEditor
+          ref={two => (this.two = two)}
+          onChange={this.onTwoChange}
+        />
       </div>
     )
+  }
+
+  /**
+   * When editor one changes, send document-altering operations to editor two.
+   *
+   * @param {Array} operations
+   */
+
+  onOneChange = change => {
+    const ops = change.operations
+      .filter(
+        o =>
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
+      .toJS()
+      .map(o => ({ ...o, data: { source: 'one' } }))
+
+    setTimeout(() => this.two.applyOperations(ops))
+  }
+
+  /**
+   * When editor two changes, send document-altering operations to editor one.
+   *
+   * @param {Array} operations
+   */
+
+  onTwoChange = change => {
+    const ops = change.operations
+      .filter(
+        o =>
+          o.type !== 'set_selection' &&
+          o.type !== 'set_value' &&
+          (!o.data || !o.data.has('source'))
+      )
+      .toJS()
+      .map(o => ({ ...o, data: { source: 'two' } }))
+
+    setTimeout(() => this.one.applyOperations(ops))
   }
 }
 

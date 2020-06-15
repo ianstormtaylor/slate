@@ -4,38 +4,54 @@ import { Value } from 'slate'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import initialValue from './value.json'
+import styled from 'react-emotion'
+import { Button, Icon, Menu } from '../components'
 
 /**
- * The menu.
+ * Give the menu some styles.
  *
  * @type {Component}
  */
 
-class Menu extends React.Component {
+const StyledMenu = styled(Menu)`
+  padding: 8px 7px 6px;
+  position: absolute;
+  z-index: 1;
+  top: -10000px;
+  left: -10000px;
+  margin-top: -6px;
+  opacity: 0;
+  background-color: #222;
+  border-radius: 4px;
+  transition: opacity 0.75s;
+`
+
+/**
+ * The hovering menu.
+ *
+ * @type {Component}
+ */
+
+class HoverMenu extends React.Component {
   /**
-   * Check if the current selection has a mark with `type` in it.
+   * Render.
    *
-   * @param {String} type
-   * @return {Boolean}
+   * @return {Element}
    */
 
-  hasMark(type) {
-    const { value } = this.props
-    return value.activeMarks.some(mark => mark.type == type)
-  }
+  render() {
+    const { className, innerRef } = this.props
+    const root = window.document.getElementById('root')
 
-  /**
-   * When a mark button is clicked, toggle the current mark.
-   *
-   * @param {Event} event
-   * @param {String} type
-   */
-
-  onClickMark(event, type) {
-    const { value, onChange } = this.props
-    event.preventDefault()
-    const change = value.change().toggleMark(type)
-    onChange(change)
+    return ReactDOM.createPortal(
+      <StyledMenu className={className} innerRef={innerRef}>
+        {this.renderMarkButton('bold', 'format_bold')}
+        {this.renderMarkButton('italic', 'format_italic')}
+        {this.renderMarkButton('underlined', 'format_underlined')}
+        {this.renderMarkButton('code', 'code')}
+      </StyledMenu>,
+      root
+    )
   }
 
   /**
@@ -47,35 +63,31 @@ class Menu extends React.Component {
    */
 
   renderMarkButton(type, icon) {
-    const isActive = this.hasMark(type)
-    const onMouseDown = event => this.onClickMark(event, type)
-
+    const { editor } = this.props
+    const { value } = editor
+    const isActive = value.activeMarks.some(mark => mark.type === type)
     return (
-      // eslint-disable-next-line react/jsx-no-bind
-      <span className="button" onMouseDown={onMouseDown} data-active={isActive}>
-        <span className="material-icons">{icon}</span>
-      </span>
+      <Button
+        reversed
+        active={isActive}
+        onMouseDown={event => this.onClickMark(event, type)}
+      >
+        <Icon>{icon}</Icon>
+      </Button>
     )
   }
 
   /**
-   * Render.
+   * When a mark button is clicked, toggle the current mark.
    *
-   * @return {Element}
+   * @param {Event} event
+   * @param {String} type
    */
 
-  render() {
-    const root = window.document.getElementById('root')
-
-    return ReactDOM.createPortal(
-      <div className="menu hover-menu" ref={this.props.menuRef}>
-        {this.renderMarkButton('bold', 'format_bold')}
-        {this.renderMarkButton('italic', 'format_italic')}
-        {this.renderMarkButton('underlined', 'format_underlined')}
-        {this.renderMarkButton('code', 'code')}
-      </div>,
-      root
-    )
+  onClickMark(event, type) {
+    const { editor } = this.props
+    event.preventDefault()
+    editor.toggleMark(type)
   }
 }
 
@@ -113,44 +125,27 @@ class HoveringMenu extends React.Component {
    */
 
   updateMenu = () => {
-    const { value } = this.state
     const menu = this.menu
     if (!menu) return
 
-    if (value.isBlurred || value.isEmpty) {
+    const { value } = this.state
+    const { fragment, selection } = value
+
+    if (selection.isBlurred || selection.isCollapsed || fragment.text === '') {
       menu.removeAttribute('style')
       return
     }
 
-    const selection = window.getSelection()
-    const range = selection.getRangeAt(0)
+    const native = window.getSelection()
+    const range = native.getRangeAt(0)
     const rect = range.getBoundingClientRect()
     menu.style.opacity = 1
     menu.style.top = `${rect.top + window.pageYOffset - menu.offsetHeight}px`
+
     menu.style.left = `${rect.left +
       window.pageXOffset -
       menu.offsetWidth / 2 +
       rect.width / 2}px`
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * Save the `menu` ref.
-   *
-   * @param {Menu} menu
-   */
-
-  menuRef = menu => {
-    this.menu = menu
   }
 
   /**
@@ -162,20 +157,32 @@ class HoveringMenu extends React.Component {
   render() {
     return (
       <div>
-        <Menu
-          menuRef={this.menuRef}
+        <Editor
+          placeholder="Enter some text..."
           value={this.state.value}
           onChange={this.onChange}
+          renderEditor={this.renderEditor}
+          renderMark={this.renderMark}
         />
-        <div className="editor">
-          <Editor
-            placeholder="Enter some text..."
-            value={this.state.value}
-            onChange={this.onChange}
-            renderMark={this.renderMark}
-          />
-        </div>
       </div>
+    )
+  }
+
+  /**
+   * Render the editor.
+   *
+   * @param {Object} props
+   * @param {Function} next
+   * @return {Element}
+   */
+
+  renderEditor = (props, editor, next) => {
+    const children = next()
+    return (
+      <React.Fragment>
+        {children}
+        <HoverMenu innerRef={menu => (this.menu = menu)} editor={editor} />
+      </React.Fragment>
     )
   }
 
@@ -183,21 +190,36 @@ class HoveringMenu extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Editor} editor
+   */
+
+  onChange = ({ value }) => {
+    this.setState({ value })
   }
 }
 

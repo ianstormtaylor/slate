@@ -1,0 +1,21 @@
+{
+  "name": "slate-dev-environment",
+  "description": "INTERNAL: A set of environment-related constants for Slate's core.",
+  "version": "0.2.2",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "lib/slate-dev-environment.js",
+  "module": "lib/slate-dev-environment.es.js",
+  "umd": "dist/slate-dev-environment.js",
+  "umdMin": "dist/slate-dev-environment.min.js",
+  "files": [
+    "dist/",
+    "lib/"
+  ],
+  "dependencies": {
+    "is-in-browser": "^1.1.3"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist ./lib ./node_modules"
+  }
+}

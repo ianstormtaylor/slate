@@ -1,5 +1,7 @@
 {
+  "objcet": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,44 +9,34 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "This is editable "
-              },
-              {
-                "text": "rich",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text": " text, "
-              },
-              {
-                "text": "much",
-                "marks": [
-                  {
-                    "type": "italic"
-                  }
-                ]
-              },
-              {
-                "text": " better than a "
-              },
-              {
-                "text": "<textarea>",
-                "marks": [
-                  {
-                    "type": "code"
-                  }
-                ]
-              },
-              {
-                "text": "!"
-              }
-            ]
+            "text": "This is editable "
+          },
+          {
+            "object": "text",
+            "text": "rich",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " text, "
+          },
+          {
+            "object": "text",
+            "text": "much",
+            "marks": [{ "type": "italic" }]
+          },
+          {
+            "object": "text",
+            "text": " better than a "
+          },
+          {
+            "object": "text",
+            "text": "<textarea>",
+            "marks": [{ "type": "code" }]
+          },
+          {
+            "object": "text",
+            "text": "!"
           }
         ]
       },
@@ -54,24 +46,18 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "Since it's rich text, you can do things like turn a selection of text "
-              },
-              {
-                "text": "bold",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text":
-                  ", or add a semantically rendered block quote in the middle of the page, like this:"
-              }
-            ]
+            "text":
+              "Since it's rich text, you can do things like turn a selection of text "
+          },
+          {
+            "object": "text",
+            "text": "bold",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text":
+              ", or add a semantically rendered block quote in the middle of the page, like this:"
           }
         ]
       },
@@ -81,11 +67,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "A wise quote."
-              }
-            ]
+            "text": "A wise quote."
           }
         ]
       },
@@ -95,11 +77,7 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Try it out for yourself!"
-              }
-            ]
+            "text": "Try it out for yourself!"
           }
         ]
       }

@@ -1,14 +1,12 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
-import { Record, Set, List, Map } from 'immutable'
+import invariant from 'tiny-invariant'
+import { Record, Set, List } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
-import Change from './change'
+import Mark from './mark'
+import PathUtils from '../utils/path-utils'
 import Data from './data'
+import Decoration from './decoration'
 import Document from './document'
-import History from './history'
-import Range from './range'
-import Schema from './schema'
 
 /**
  * Default properties.
@@ -17,12 +15,10 @@ import Schema from './schema'
  */
 
 const DEFAULTS = {
-  data: new Map(),
-  decorations: null,
-  document: Document.create(),
-  history: History.create(),
-  schema: Schema.create(),
-  selection: Range.create(),
+  data: undefined,
+  decorations: undefined,
+  document: undefined,
+  selection: undefined,
 }
 
 /**
@@ -46,7 +42,7 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (isPlainObject(attrs)) {
-      return Value.fromJSON(attrs)
+      return Value.fromJSON(attrs, options)
     }
 
     throw new Error(
@@ -61,26 +57,24 @@ class Value extends Record(DEFAULTS) {
    * @return {Object}
    */
 
-  static createProperties(attrs = {}) {
-    if (Value.isValue(attrs)) {
+  static createProperties(a = {}) {
+    if (Value.isValue(a)) {
       return {
-        data: attrs.data,
-        decorations: attrs.decorations,
-        schema: attrs.schema,
+        data: a.data,
+        decorations: a.decorations,
       }
     }
 
-    if (isPlainObject(attrs)) {
-      const props = {}
-      if ('data' in attrs) props.data = Data.create(attrs.data)
-      if ('decorations' in attrs)
-        props.decorations = Range.createList(attrs.decorations)
-      if ('schema' in attrs) props.schema = Schema.create(attrs.schema)
-      return props
+    if (isPlainObject(a)) {
+      const p = {}
+      if ('data' in a) p.data = Data.create(a.data)
+      if ('decorations' in a)
+        p.decorations = Decoration.createList(a.decorations)
+      return p
     }
 
     throw new Error(
-      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${attrs}`
+      `\`Value.createProperties\` only accepts objects or values, but you passed it: ${a}`
     )
   }
 
@@ -95,238 +89,26 @@ class Value extends Record(DEFAULTS) {
    */
 
   static fromJSON(object, options = {}) {
-    let { document = {}, selection = {}, schema = {} } = object
-
-    let data = new Map()
-
+    let { data = {}, decorations = [], document = {}, selection = {} } = object
+    data = Data.fromJSON(data)
     document = Document.fromJSON(document)
-    selection = Range.fromJSON(selection)
-    schema = Schema.fromJSON(schema)
-
-    // Allow plugins to set a default value for `data`.
-    if (options.plugins) {
-      for (const plugin of options.plugins) {
-        if (plugin.data) data = data.merge(plugin.data)
-      }
-    }
-
-    // Then merge in the `data` provided.
-    if ('data' in object) {
-      data = data.merge(object.data)
-    }
+    selection = document.createSelection(selection)
+    decorations = List(decorations.map(d => Decoration.fromJSON(d)))
 
     if (selection.isUnset) {
       const text = document.getFirstText()
-      if (text) selection = selection.collapseToStartOf(text)
+      if (text) selection = selection.moveToStartOfNode(text)
+      selection = document.createSelection(selection)
     }
 
-    let value = new Value({
+    const value = new Value({
       data,
+      decorations,
       document,
       selection,
-      schema,
     })
 
-    if (options.normalize !== false) {
-      value = value.change({ save: false }).normalize().value
-    }
-
     return value
-  }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Value.fromJSON
-
-  /**
-   * Check if a `value` is a `Value`.
-   *
-   * @param {Any} value
-   * @return {Boolean}
-   */
-
-  static isValue(value) {
-    return !!(value && value[MODEL_TYPES.VALUE])
-  }
-
-  /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'value'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Are there undoable events?
-   *
-   * @return {Boolean}
-   */
-
-  get hasUndos() {
-    return this.history.undos.size > 0
-  }
-
-  /**
-   * Are there redoable events?
-   *
-   * @return {Boolean}
-   */
-
-  get hasRedos() {
-    return this.history.redos.size > 0
-  }
-
-  /**
-   * Is the current selection blurred?
-   *
-   * @return {Boolean}
-   */
-
-  get isBlurred() {
-    return this.selection.isBlurred
-  }
-
-  /**
-   * Is the current selection focused?
-   *
-   * @return {Boolean}
-   */
-
-  get isFocused() {
-    return this.selection.isFocused
-  }
-
-  /**
-   * Is the current selection collapsed?
-   *
-   * @return {Boolean}
-   */
-
-  get isCollapsed() {
-    return this.selection.isCollapsed
-  }
-
-  /**
-   * Is the current selection expanded?
-   *
-   * @return {Boolean}
-   */
-
-  get isExpanded() {
-    return this.selection.isExpanded
-  }
-
-  /**
-   * Is the current selection backward?
-   *
-   * @return {Boolean} isBackward
-   */
-
-  get isBackward() {
-    return this.selection.isBackward
-  }
-
-  /**
-   * Is the current selection forward?
-   *
-   * @return {Boolean}
-   */
-
-  get isForward() {
-    return this.selection.isForward
-  }
-
-  /**
-   * Get the current start key.
-   *
-   * @return {String}
-   */
-
-  get startKey() {
-    return this.selection.startKey
-  }
-
-  /**
-   * Get the current end key.
-   *
-   * @return {String}
-   */
-
-  get endKey() {
-    return this.selection.endKey
-  }
-
-  /**
-   * Get the current start offset.
-   *
-   * @return {String}
-   */
-
-  get startOffset() {
-    return this.selection.startOffset
-  }
-
-  /**
-   * Get the current end offset.
-   *
-   * @return {String}
-   */
-
-  get endOffset() {
-    return this.selection.endOffset
-  }
-
-  /**
-   * Get the current anchor key.
-   *
-   * @return {String}
-   */
-
-  get anchorKey() {
-    return this.selection.anchorKey
-  }
-
-  /**
-   * Get the current focus key.
-   *
-   * @return {String}
-   */
-
-  get focusKey() {
-    return this.selection.focusKey
-  }
-
-  /**
-   * Get the current anchor offset.
-   *
-   * @return {String}
-   */
-
-  get anchorOffset() {
-    return this.selection.anchorOffset
-  }
-
-  /**
-   * Get the current focus offset.
-   *
-   * @return {String}
-   */
-
-  get focusOffset() {
-    return this.selection.focusOffset
   }
 
   /**
@@ -336,7 +118,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get startBlock() {
-    return this.startKey && this.document.getClosestBlock(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getClosestBlock(this.selection.start.key)
+    )
   }
 
   /**
@@ -346,7 +131,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endBlock() {
-    return this.endKey && this.document.getClosestBlock(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getClosestBlock(this.selection.end.key)
+    )
   }
 
   /**
@@ -356,7 +144,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorBlock() {
-    return this.anchorKey && this.document.getClosestBlock(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getClosestBlock(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -366,7 +157,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusBlock() {
-    return this.focusKey && this.document.getClosestBlock(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getClosestBlock(this.selection.focus.key)
+    )
   }
 
   /**
@@ -376,7 +170,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get startInline() {
-    return this.startKey && this.document.getClosestInline(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getClosestInline(this.selection.start.key)
+    )
   }
 
   /**
@@ -386,7 +183,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endInline() {
-    return this.endKey && this.document.getClosestInline(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getClosestInline(this.selection.end.key)
+    )
   }
 
   /**
@@ -396,7 +196,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorInline() {
-    return this.anchorKey && this.document.getClosestInline(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getClosestInline(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -406,7 +209,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusInline() {
-    return this.focusKey && this.document.getClosestInline(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getClosestInline(this.selection.focus.key)
+    )
   }
 
   /**
@@ -416,7 +222,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get startText() {
-    return this.startKey && this.document.getDescendant(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getDescendant(this.selection.start.key)
+    )
   }
 
   /**
@@ -426,7 +235,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get endText() {
-    return this.endKey && this.document.getDescendant(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getDescendant(this.selection.end.key)
+    )
   }
 
   /**
@@ -436,7 +248,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get anchorText() {
-    return this.anchorKey && this.document.getDescendant(this.anchorKey)
+    return (
+      this.selection.anchor.key &&
+      this.document.getDescendant(this.selection.anchor.key)
+    )
   }
 
   /**
@@ -446,7 +261,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get focusText() {
-    return this.focusKey && this.document.getDescendant(this.focusKey)
+    return (
+      this.selection.focus.key &&
+      this.document.getDescendant(this.selection.focus.key)
+    )
   }
 
   /**
@@ -456,7 +274,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextBlock() {
-    return this.endKey && this.document.getNextBlock(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextBlock(this.selection.end.key)
+    )
   }
 
   /**
@@ -466,7 +287,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousBlock() {
-    return this.startKey && this.document.getPreviousBlock(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousBlock(this.selection.start.key)
+    )
   }
 
   /**
@@ -476,7 +300,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextInline() {
-    return this.endKey && this.document.getNextInline(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextInline(this.selection.end.key)
+    )
   }
 
   /**
@@ -486,7 +313,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousInline() {
-    return this.startKey && this.document.getPreviousInline(this.startKey)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousInline(this.selection.start.key)
+    )
   }
 
   /**
@@ -496,7 +326,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get nextText() {
-    return this.endKey && this.document.getNextText(this.endKey)
+    return (
+      this.selection.end.key &&
+      this.document.getNextText(this.selection.end.key)
+    )
   }
 
   /**
@@ -506,19 +339,10 @@ class Value extends Record(DEFAULTS) {
    */
 
   get previousText() {
-    return this.startKey && this.document.getPreviousText(this.startKey)
-  }
-
-  /**
-   * Get the characters in the current selection.
-   *
-   * @return {List<Character>}
-   */
-
-  get characters() {
-    return this.selection.isUnset
-      ? new List()
-      : this.document.getCharactersAtRange(this.selection)
+    return (
+      this.selection.start.key &&
+      this.document.getPreviousText(this.selection.start.key)
+    )
   }
 
   /**
@@ -555,7 +379,7 @@ class Value extends Record(DEFAULTS) {
   get blocks() {
     return this.selection.isUnset
       ? new List()
-      : this.document.getBlocksAtRange(this.selection)
+      : this.document.getLeafBlocksAtRange(this.selection)
   }
 
   /**
@@ -571,7 +395,7 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Get the inline nodes in the current selection.
+   * Get the bottom-most inline nodes in the current selection.
    *
    * @return {List<Inline>}
    */
@@ -579,7 +403,7 @@ class Value extends Record(DEFAULTS) {
   get inlines() {
     return this.selection.isUnset
       ? new List()
-      : this.document.getInlinesAtRange(this.selection)
+      : this.document.getLeafInlinesAtRange(this.selection)
   }
 
   /**
@@ -595,37 +419,378 @@ class Value extends Record(DEFAULTS) {
   }
 
   /**
-   * Check whether the selection is empty.
+   * Add `mark` to text at `path`.
    *
-   * @return {Boolean}
+   * @param {List|String} path
+   * @param {Mark} mark
+   * @return {Value}
    */
 
-  get isEmpty() {
-    if (this.isCollapsed) return true
-    if (this.endOffset != 0 && this.startOffset != 0) return false
-    return this.fragment.isEmpty
+  addMark(path, mark) {
+    mark = Mark.create(mark)
+    let value = this
+    let { document } = value
+    document = document.addMark(path, mark)
+    value = value.set('document', document)
+    return value
   }
 
   /**
-   * Check whether the selection is collapsed in a void node.
+   * Insert a `node`.
    *
-   * @return {Boolean}
+   * @param {List|String} path
+   * @param {Node} node
+   * @return {Value}
    */
 
-  get isInVoid() {
-    if (this.isExpanded) return false
-    return this.document.hasVoidParent(this.startKey)
+  insertNode(path, node) {
+    let value = this
+    let { document } = value
+    document = document.insertNode(path, node)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range =>
+      range.updatePoints(point => point.setPath(null))
+    )
+
+    return value
   }
 
   /**
-   * Create a new `Change` with the current value as a starting point.
+   * Insert `text` at `offset` in node by `path`.
    *
-   * @param {Object} attrs
-   * @return {Change}
+   * @param {List|String} path
+   * @param {Number} offset
+   * @param {String} text
+   * @return {Value}
    */
 
-  change(attrs = {}) {
-    return new Change({ ...attrs, value: this })
+  insertText(path, offset, text) {
+    let value = this
+    let { document } = value
+    let node = document.assertNode(path)
+    document = document.insertText(path, offset, text)
+    node = document.assertNode(path)
+    value = value.set('document', document)
+
+    value = value.mapPoints(point => {
+      if (point.key === node.key && point.offset >= offset) {
+        return point.setOffset(point.offset + text.length)
+      } else {
+        return point
+      }
+    })
+
+    return value
+  }
+
+  /**
+   * Merge a node backwards its previous sibling.
+   *
+   * @param {List|Key} path
+   * @return {Value}
+   */
+
+  mergeNode(path) {
+    let value = this
+    const { document } = value
+    const newDocument = document.mergeNode(path)
+    path = document.resolvePath(path)
+    const withPath = PathUtils.decrement(path)
+    const one = document.getNode(withPath)
+    const two = document.getNode(path)
+    value = value.set('document', newDocument)
+
+    value = value.mapRanges(range => {
+      if (two.object === 'text') {
+        const max = one.text.length
+
+        if (range.anchor.key === two.key) {
+          range = range.moveAnchorTo(one.key, max + range.anchor.offset)
+        }
+
+        if (range.focus.key === two.key) {
+          range = range.moveFocusTo(one.key, max + range.focus.offset)
+        }
+      }
+
+      range = range.updatePoints(point => point.setPath(null))
+
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Move a node by `path` to `newPath`.
+   *
+   * A `newIndex` can be provided when move nodes by `key`, to account for not
+   * being able to have a key for a location in the tree that doesn't exist yet.
+   *
+   * @param {List|Key} path
+   * @param {List|Key} newPath
+   * @param {Number} newIndex
+   * @return {Value}
+   */
+
+  moveNode(path, newPath, newIndex = 0) {
+    let value = this
+    let { document } = value
+
+    if (PathUtils.isEqual(path, newPath)) {
+      return value
+    }
+
+    document = document.moveNode(path, newPath, newIndex)
+    value = value.set('document', document)
+    value = value.mapPoints(point => point.setPath(null))
+    return value
+  }
+
+  /**
+   * Remove `mark` at `path`.
+   *
+   * @param {List|String} path
+   * @param {Mark} mark
+   * @return {Value}
+   */
+
+  removeMark(path, mark) {
+    mark = Mark.create(mark)
+    let value = this
+    let { document } = value
+    document = document.removeMark(path, mark)
+    value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Remove a node by `path`.
+   *
+   * @param {List|String} path
+   * @return {Value}
+   */
+
+  removeNode(path) {
+    let value = this
+    let { document } = value
+    const node = document.assertNode(path)
+    const first = node.object === 'text' ? node : node.getFirstText() || node
+    const last = node.object === 'text' ? node : node.getLastText() || node
+    const prev = document.getPreviousText(first.key)
+    const next = document.getNextText(last.key)
+
+    document = document.removeNode(path)
+    value = value.set('document', document)
+
+    value = value.mapRanges(range => {
+      const { start, end } = range
+
+      if (node.hasNode(start.key)) {
+        range = prev
+          ? range.moveStartTo(prev.key, prev.text.length)
+          : next ? range.moveStartTo(next.key, 0) : range.unset()
+      }
+
+      if (node.hasNode(end.key)) {
+        range = prev
+          ? range.moveEndTo(prev.key, prev.text.length)
+          : next ? range.moveEndTo(next.key, 0) : range.unset()
+      }
+
+      range = range.updatePoints(point => point.setPath(null))
+
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Remove `text` at `offset` in node by `path`.
+   *
+   * @param {List|Key} path
+   * @param {Number} offset
+   * @param {String} text
+   * @return {Value}
+   */
+
+  removeText(path, offset, text) {
+    let value = this
+    let { document } = value
+    const node = document.assertNode(path)
+    document = document.removeText(path, offset, text)
+    value = value.set('document', document)
+
+    const { length } = text
+    const start = offset
+    const end = offset + length
+
+    value = value.mapPoints(point => {
+      if (point.key !== node.key) {
+        return point
+      }
+
+      if (point.offset >= end) {
+        return point.setOffset(point.offset - length)
+      }
+
+      if (point.offset > start) {
+        return point.setOffset(start)
+      }
+
+      return point
+    })
+
+    return value
+  }
+
+  /**
+   * Set `properties` on a node.
+   *
+   * @param {List|String} path
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setNode(path, properties) {
+    let value = this
+    let { document } = value
+    document = document.setNode(path, properties)
+    value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Set `properties` on `mark` on text at `offset` and `length` in node.
+   *
+   * @param {List|String} path
+   * @param {Mark} mark
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setMark(path, mark, properties) {
+    let value = this
+    let { document } = value
+    document = document.setMark(path, mark, properties)
+    value = value.set('document', document)
+    return value
+  }
+
+  /**
+   * Set `properties` on the value.
+   *
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  setProperties(properties) {
+    let value = this
+    const { document } = value
+    const { data, decorations } = properties
+    const props = {}
+
+    if (data) {
+      props.data = data
+    }
+
+    if (decorations) {
+      props.decorations = decorations.map(d => {
+        return d.isSet ? d : document.resolveDecoration(d)
+      })
+    }
+
+    value = value.merge(props)
+    return value
+  }
+
+  /**
+   * Set `properties` on the selection.
+   *
+   * @param {Value} value
+   * @param {Operation} operation
+   * @return {Value}
+   */
+
+  setSelection(properties) {
+    let value = this
+    let { document, selection } = value
+    const next = selection.setProperties(properties)
+    selection = document.resolveSelection(next)
+    value = value.set('selection', selection)
+    return value
+  }
+
+  /**
+   * Split a node by `path` at `position` with optional `properties` to apply
+   * to the newly split node.
+   *
+   * @param {List|String} path
+   * @param {Number} position
+   * @param {Object} properties
+   * @return {Value}
+   */
+
+  splitNode(path, position, properties) {
+    let value = this
+    const { document } = value
+    const newDocument = document.splitNode(path, position, properties)
+    const node = document.assertNode(path)
+    value = value.set('document', newDocument)
+
+    value = value.mapRanges(range => {
+      const next = newDocument.getNextText(node.key)
+      const { start, end } = range
+
+      // If the start was after the split, move it to the next node.
+      if (node.key === start.key && position <= start.offset) {
+        range = range.moveStartTo(next.key, start.offset - position)
+      }
+
+      // If the end was after the split, move it to the next node.
+      if (node.key === end.key && position <= end.offset) {
+        range = range.moveEndTo(next.key, end.offset - position)
+      }
+
+      range = range.updatePoints(point => point.setPath(null))
+
+      return range
+    })
+
+    return value
+  }
+
+  /**
+   * Map all range objects to apply adjustments with an `iterator`.
+   *
+   * @param {Function} iterator
+   * @return {Value}
+   */
+
+  mapRanges(iterator) {
+    let value = this
+    const { document, selection, decorations } = value
+
+    let sel = selection.isSet ? iterator(selection) : selection
+    if (!sel) sel = selection.unset()
+    if (sel !== selection) sel = document.createSelection(sel)
+    value = value.set('selection', sel)
+
+    let decs = decorations.map(decoration => {
+      let n = decoration.isSet ? iterator(decoration) : decoration
+      if (n && n !== decoration) n = document.createDecoration(n)
+      return n
+    })
+
+    decs = decs.filter(decoration => !!decoration)
+    value = value.set('decorations', decs)
+    return value
+  }
+
+  mapPoints(iterator) {
+    return this.mapRanges(range => range.updatePoints(iterator))
   }
 
   /**
@@ -642,56 +807,40 @@ class Value extends Record(DEFAULTS) {
     }
 
     if (options.preserveData) {
-      object.data = this.data.toJSON()
+      object.data = this.data.toJSON(options)
     }
 
     if (options.preserveDecorations) {
       object.decorations = this.decorations
-        ? this.decorations.toArray().map(d => d.toJSON())
-        : null
-    }
-
-    if (options.preserveHistory) {
-      object.history = this.history.toJSON()
+        .toArray()
+        .map(d => d.toJSON(options))
     }
 
     if (options.preserveSelection) {
-      object.selection = this.selection.toJSON()
-    }
-
-    if (options.preserveSchema) {
-      object.schema = this.schema.toJSON()
-    }
-
-    if (options.preserveSelection && !options.preserveKeys) {
-      const { document, selection } = this
-      object.selection.anchorPath = selection.isSet
-        ? document.getPath(selection.anchorKey)
-        : null
-      object.selection.focusPath = selection.isSet
-        ? document.getPath(selection.focusKey)
-        : null
-      delete object.selection.anchorKey
-      delete object.selection.focusKey
+      object.selection = this.selection.toJSON(options)
     }
 
     return object
   }
 
   /**
-   * Alias `toJS`.
+   * Deprecated.
    */
 
-  toJS(options) {
-    return this.toJSON(options)
+  get history() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, the `value.history` model no longer exists, and the history is stored in `value.data` instead using plugins.'
+    )
+  }
+
+  change() {
+    invariant(
+      false,
+      'As of Slate 0.42.0, value object are no longer schema-aware, and the `value.change()` method is no longer available. Use the `editor.change()` method on the new `Editor` controller instead.'
+    )
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Value.prototype[MODEL_TYPES.VALUE] = true
 
 /**
  * Export.

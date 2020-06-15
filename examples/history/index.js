@@ -3,18 +3,7 @@ import { Editor } from 'slate-react'
 
 import React from 'react'
 import initialValue from './value.json'
-
-/**
- * Toolbar button component.
- *
- * @type {Function}
- */
-
-const ToolbarButton = props => (
-  <span className="button" onMouseDown={props.onMouseDown}>
-    <span className="material-icons">{props.icon}</span>
-  </span>
-)
+import { Button, Icon, Toolbar } from '../components'
 
 /**
  * The history example.
@@ -34,37 +23,13 @@ class History extends React.Component {
   }
 
   /**
-   * On change.
+   * Store a reference to the `editor`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On redo in history.
-   *
-   */
-
-  onClickRedo = event => {
-    event.preventDefault()
-    const { value } = this.state
-    const change = value.change().redo()
-    this.onChange(change)
-  }
-
-  /**
-   * On undo in history.
-   *
-   */
-
-  onClickUndo = event => {
-    event.preventDefault()
-    const { value } = this.state
-    const change = value.change().undo()
-    this.onChange(change)
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -74,48 +39,60 @@ class History extends React.Component {
    */
 
   render() {
-    return (
-      <div className="editor">
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element}
-   */
-
-  renderToolbar = () => {
     const { value } = this.state
+    const { data } = value
+    const undos = data.get('undos')
+    const redos = data.get('redos')
     return (
-      <div className="menu toolbar-menu">
-        <ToolbarButton icon="undo" onMouseDown={this.onClickUndo} />
-        <ToolbarButton icon="redo" onMouseDown={this.onClickRedo} />
-        <span className="button">Undos: {value.history.undos.size}</span>
-        <span className="button">Redos: {value.history.redos.size}</span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the Slate editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
+      <div>
+        <Toolbar>
+          <Button onMouseDown={this.onClickUndo}>
+            <Icon>undo</Icon>
+          </Button>
+          <Button onMouseDown={this.onClickRedo}>
+            <Icon>redo</Icon>
+          </Button>
+          <span>Undos: {undos ? undos.size : 0}</span>
+          <span>Redos: {redos ? redos.size : 0}</span>
+        </Toolbar>
         <Editor
           placeholder="Enter some text..."
+          ref={this.ref}
           value={this.state.value}
           onChange={this.onChange}
         />
       </div>
     )
+  }
+
+  /**
+   * On change.
+   *
+   * @param {Editor} editor
+   */
+
+  onChange = change => {
+    this.setState({ value: change.value })
+  }
+
+  /**
+   * On redo in history.
+   *
+   */
+
+  onClickRedo = event => {
+    event.preventDefault()
+    this.editor.redo()
+  }
+
+  /**
+   * On undo in history.
+   *
+   */
+
+  onClickUndo = event => {
+    event.preventDefault()
+    this.editor.undo()
   }
 }
 

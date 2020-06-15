@@ -1,7 +1,7 @@
 import Debug from 'debug'
-import pick from 'lodash/pick'
 
 import Operation from '../models/operation'
+import PathUtils from '../utils/path-utils'
 
 /**
  * Debug.
@@ -23,213 +23,90 @@ function invertOperation(op) {
   const { type } = op
   debug(type, op)
 
-  /**
-   * Insert node.
-   */
-
-  if (type == 'insert_node') {
-    const inverse = op.set('type', 'remove_node')
-    return inverse
-  }
-
-  /**
-   * Remove node.
-   */
-
-  if (type == 'remove_node') {
-    const inverse = op.set('type', 'insert_node')
-    return inverse
-  }
-
-  /**
-   * Move node.
-   */
-
-  if (type == 'move_node') {
-    const { newPath, path } = op
-    let inversePath = newPath
-    let inverseNewPath = path
-
-    const pathLast = path.length - 1
-    const newPathLast = newPath.length - 1
-
-    // If the node's old position was a left sibling of an ancestor of
-    // its new position, we need to adjust part of the path by -1.
-    if (
-      path.length < inversePath.length &&
-      path.slice(0, pathLast).every((e, i) => e == inversePath[i]) &&
-      path[pathLast] < inversePath[pathLast]
-    ) {
-      inversePath = inversePath
-        .slice(0, pathLast)
-        .concat([inversePath[pathLast] - 1])
-        .concat(inversePath.slice(pathLast + 1, inversePath.length))
+  switch (type) {
+    case 'insert_node': {
+      const inverse = op.set('type', 'remove_node')
+      return inverse
     }
 
-    // If the node's new position is an ancestor of the old position,
-    // or a left sibling of an ancestor of its old position, we need
-    // to adjust part of the path by 1.
-    if (
-      newPath.length < inverseNewPath.length &&
-      newPath.slice(0, newPathLast).every((e, i) => e == inverseNewPath[i]) &&
-      newPath[newPathLast] <= inverseNewPath[newPathLast]
-    ) {
-      inverseNewPath = inverseNewPath
-        .slice(0, newPathLast)
-        .concat([inverseNewPath[newPathLast] + 1])
-        .concat(inverseNewPath.slice(newPathLast + 1, inverseNewPath.length))
+    case 'remove_node': {
+      const inverse = op.set('type', 'insert_node')
+      return inverse
     }
 
-    const inverse = op.set('path', inversePath).set('newPath', inverseNewPath)
-    return inverse
-  }
+    case 'move_node': {
+      const { newPath, path } = op
 
-  /**
-   * Merge node.
-   */
+      if (PathUtils.isEqual(newPath, path)) {
+        return op
+      }
 
-  if (type == 'merge_node') {
-    const { path } = op
-    const { length } = path
-    const last = length - 1
-    const inversePath = path.slice(0, last).concat([path[last] - 1])
-    const inverse = op.set('type', 'split_node').set('path', inversePath)
-    return inverse
-  }
+      // Get the true path that the moved node ended up at
+      const inversePath = PathUtils.transform(path, op).first()
 
-  /**
-   * Split node.
-   */
+      // Get the true path we are trying to move back to
+      // We transform the right-sibling of the path
+      // This will end up at the operation.path most of the time
+      // But if the newPath is a left-sibling or left-ancestor-sibling, this will account for it
+      const transformedSibling = PathUtils.transform(
+        PathUtils.increment(path),
+        op
+      ).first()
 
-  if (type == 'split_node') {
-    const { path } = op
-    const { length } = path
-    const last = length - 1
-    const inversePath = path.slice(0, last).concat([path[last] + 1])
-    const inverse = op.set('type', 'merge_node').set('path', inversePath)
-    return inverse
-  }
-
-  /**
-   * Set node.
-   */
-
-  if (type == 'set_node') {
-    const { properties, node } = op
-    const inverseNode = node.merge(properties)
-    const inverseProperties = pick(node, Object.keys(properties))
-    const inverse = op
-      .set('node', inverseNode)
-      .set('properties', inverseProperties)
-    return inverse
-  }
-
-  /**
-   * Insert text.
-   */
-
-  if (type == 'insert_text') {
-    const inverse = op.set('type', 'remove_text')
-    return inverse
-  }
-
-  /**
-   * Remove text.
-   */
-
-  if (type == 'remove_text') {
-    const inverse = op.set('type', 'insert_text')
-    return inverse
-  }
-
-  /**
-   * Add mark.
-   */
-
-  if (type == 'add_mark') {
-    const inverse = op.set('type', 'remove_mark')
-    return inverse
-  }
-
-  /**
-   * Remove mark.
-   */
-
-  if (type == 'remove_mark') {
-    const inverse = op.set('type', 'add_mark')
-    return inverse
-  }
-
-  /**
-   * Set mark.
-   */
-
-  if (type == 'set_mark') {
-    const { properties, mark } = op
-    const inverseMark = mark.merge(properties)
-    const inverseProperties = pick(mark, Object.keys(properties))
-    const inverse = op
-      .set('mark', inverseMark)
-      .set('properties', inverseProperties)
-    return inverse
-  }
-
-  /**
-   * Set selection.
-   */
-
-  if (type == 'set_selection') {
-    const { properties, selection, value } = op
-    const { anchorPath, focusPath, ...props } = properties
-    const { document } = value
-
-    if (anchorPath !== undefined) {
-      props.anchorKey =
-        anchorPath === null ? null : document.assertPath(anchorPath).key
+      const inverse = op
+        .set('path', inversePath)
+        .set('newPath', transformedSibling)
+      return inverse
     }
 
-    if (focusPath !== undefined) {
-      props.focusKey =
-        focusPath === null ? null : document.assertPath(focusPath).key
+    case 'merge_node': {
+      const { path } = op
+      const inversePath = PathUtils.decrement(path)
+      const inverse = op.set('type', 'split_node').set('path', inversePath)
+      return inverse
     }
 
-    const inverseSelection = selection.merge(props)
-    const inverseProps = pick(selection, Object.keys(props))
-
-    if (anchorPath !== undefined) {
-      inverseProps.anchorPath =
-        inverseProps.anchorKey === null
-          ? null
-          : document.getPath(inverseProps.anchorKey)
-      delete inverseProps.anchorKey
+    case 'split_node': {
+      const { path } = op
+      const inversePath = PathUtils.increment(path)
+      const inverse = op.set('type', 'merge_node').set('path', inversePath)
+      return inverse
     }
 
-    if (focusPath !== undefined) {
-      inverseProps.focusPath =
-        inverseProps.focusKey === null
-          ? null
-          : document.getPath(inverseProps.focusKey)
-      delete inverseProps.focusKey
+    case 'set_node':
+    case 'set_value':
+    case 'set_selection':
+    case 'set_mark': {
+      const { properties, newProperties } = op
+      const inverse = op
+        .set('properties', newProperties)
+        .set('newProperties', properties)
+      return inverse
     }
 
-    const inverse = op
-      .set('selection', inverseSelection)
-      .set('properties', inverseProps)
-    return inverse
-  }
+    case 'insert_text': {
+      const inverse = op.set('type', 'remove_text')
+      return inverse
+    }
 
-  /**
-   * Set value.
-   */
+    case 'remove_text': {
+      const inverse = op.set('type', 'insert_text')
+      return inverse
+    }
 
-  if (type == 'set_value') {
-    const { properties, value } = op
-    const inverseValue = value.merge(properties)
-    const inverseProperties = pick(value, Object.keys(properties))
-    const inverse = op
-      .set('value', inverseValue)
-      .set('properties', inverseProperties)
-    return inverse
+    case 'add_mark': {
+      const inverse = op.set('type', 'remove_mark')
+      return inverse
+    }
+
+    case 'remove_mark': {
+      const inverse = op.set('type', 'add_mark')
+      return inverse
+    }
+
+    default: {
+      throw new Error(`Unknown operation type: "${type}".`)
+    }
   }
 }
 

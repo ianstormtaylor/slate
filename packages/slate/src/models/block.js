@@ -1,20 +1,8 @@
-/**
- * Prevent circular dependencies.
- */
-
-import './document'
-
-/**
- * Dependencies.
- */
-
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
 import { List, Map, Record } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
+import KeyUtils from '../utils/key-utils'
 import Node from './node'
-import generateKey from '../utils/generate-key'
 
 /**
  * Default properties.
@@ -23,10 +11,9 @@ import generateKey from '../utils/generate-key'
  */
 
 const DEFAULTS = {
-  data: new Map(),
-  isVoid: false,
+  data: undefined,
   key: undefined,
-  nodes: new List(),
+  nodes: undefined,
   type: undefined,
 }
 
@@ -49,7 +36,7 @@ class Block extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
+    if (typeof attrs === 'string') {
       attrs = { type: attrs }
     }
 
@@ -92,44 +79,20 @@ class Block extends Record(DEFAULTS) {
       return object
     }
 
-    const {
-      data = {},
-      isVoid = false,
-      key = generateKey(),
-      nodes = [],
-      type,
-    } = object
+    const { data = {}, key = KeyUtils.create(), nodes = [], type } = object
 
-    if (typeof type != 'string') {
+    if (typeof type !== 'string') {
       throw new Error('`Block.fromJSON` requires a `type` string.')
     }
 
     const block = new Block({
       key,
       type,
-      isVoid: !!isVoid,
-      data: new Map(data),
-      nodes: new List(nodes.map(Node.fromJSON)),
+      data: Map(data),
+      nodes: Node.createList(nodes),
     })
 
     return block
-  }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Block.fromJSON
-
-  /**
-   * Check if `any` is a `Block`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isBlock(any) {
-    return !!(any && any[MODEL_TYPES.BLOCK])
   }
 
   /**
@@ -144,46 +107,6 @@ class Block extends Record(DEFAULTS) {
   }
 
   /**
-   * Object.
-   *
-   * @return {String}
-   */
-
-  get object() {
-    return 'block'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Check if the block is empty.
-   * Returns true if block is not void and all it's children nodes are empty.
-   * Void node is never empty, regardless of it's content.
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    return !this.isVoid && !this.nodes.some(child => !child.isEmpty)
-  }
-
-  /**
-   * Get the concatenated text of all the block's children.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.getText()
-  }
-
-  /**
    * Return a JSON representation of the block.
    *
    * @param {Object} options
@@ -194,7 +117,6 @@ class Block extends Record(DEFAULTS) {
     const object = {
       object: this.object,
       type: this.type,
-      isVoid: this.isVoid,
       data: this.data.toJSON(),
       nodes: this.nodes.toArray().map(n => n.toJSON(options)),
     }
@@ -205,30 +127,7 @@ class Block extends Record(DEFAULTS) {
 
     return object
   }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
-  }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Block.prototype[MODEL_TYPES.BLOCK] = true
-
-/**
- * Mix in `Node` methods.
- */
-
-Object.getOwnPropertyNames(Node.prototype).forEach(method => {
-  if (method == 'constructor') return
-  Block.prototype[method] = Node.prototype[method]
-})
 
 /**
  * Export.

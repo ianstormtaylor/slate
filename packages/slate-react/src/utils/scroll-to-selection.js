@@ -1,6 +1,6 @@
 import getWindow from 'get-window'
 import isBackward from 'selection-is-backward'
-import { IS_SAFARI, IS_IOS } from '../constants/environment'
+import { IS_SAFARI, IS_IOS } from 'slate-dev-environment'
 
 /**
  * CSS overflow values that would cause scrolling.
@@ -65,8 +65,8 @@ function scrollToSelection(selection) {
   const window = getWindow(selection.anchorNode)
   const scroller = findScrollContainer(selection.anchorNode, window)
   const isWindow =
-    scroller == window.document.body ||
-    scroller == window.document.documentElement
+    scroller === window.document.body ||
+    scroller === window.document.documentElement
   const backward = isBackward(selection)
 
   const range = selection.getRangeAt(0).cloneRange()
@@ -79,8 +79,8 @@ function scrollToSelection(selection) {
   // https://bugs.webkit.org/show_bug.cgi?id=138949
   // https://bugs.chromium.org/p/chromium/issues/detail?id=435438
   if (IS_SAFARI) {
-    if (range.collapsed && cursorRect.top == 0 && cursorRect.height == 0) {
-      if (range.startOffset == 0) {
+    if (range.collapsed && cursorRect.top === 0 && cursorRect.height === 0) {
+      if (range.startOffset === 0) {
         range.setEnd(range.endContainer, 1)
       } else {
         range.setStart(range.startContainer, range.startOffset - 1)
@@ -88,7 +88,7 @@ function scrollToSelection(selection) {
 
       cursorRect = range.getBoundingClientRect()
 
-      if (cursorRect.top == 0 && cursorRect.height == 0) {
+      if (cursorRect.top === 0 && cursorRect.height === 0) {
         if (range.getClientRects().length) {
           cursorRect = range.getClientRects()[0]
         }
@@ -133,10 +133,13 @@ function scrollToSelection(selection) {
     height = offsetHeight
     scrollerTop = scrollerRect.top + parseInt(borderTopWidth, 10)
     scrollerLeft = scrollerRect.left + parseInt(borderLeftWidth, 10)
+
     scrollerBordersY =
       parseInt(borderTopWidth, 10) + parseInt(borderBottomWidth, 10)
+
     scrollerBordersX =
       parseInt(borderLeftWidth, 10) + parseInt(borderRightWidth, 10)
+
     scrollerPaddingTop = parseInt(paddingTop, 10)
     scrollerPaddingBottom = parseInt(paddingBottom, 10)
     scrollerPaddingLeft = parseInt(paddingLeft, 10)

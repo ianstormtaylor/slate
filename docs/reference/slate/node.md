@@ -44,15 +44,16 @@ Deeply filter the descendant nodes of a node by `iterator`.
 
 ### `findDescendant`
 
-`findDescendant(iterator: Function) => Node || Void`
+`findDescendant(iterator: Function) => Node|Void`
 
 Deeply find a descendant node by `iterator`.
 
-### `getBlocksAtRange`
+### `getAncestors`
 
-`getBlocksAtRange(range: Range) => List`
+`getAncestors(path: List|Array) => List|Void`
+`getAncestors(key: String) => List|Void`
 
-Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
+Get the ancestors of a descendant by `path` or `key`.
 
 ### `getBlocks`
 
@@ -60,51 +61,77 @@ Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
 
 Get all of the bottom-most [`Block`](./block.md) node descendants.
 
-### `getCharactersAtRange`
+### `getLeafBlocksAtRange`
 
-`getCharactersAtRange(range: Range) => List`
+`getLeafBlocksAtRange(range: Range) => List`
 
-Get a list of all of the [`Characters`](./character.md) in a `range`.
+Get all of the bottom-most [`Block`](./block.md) nodes in a `range`.
+
+### `getBlocksByType`
+
+`getBlocksByType(type: String) => List`
+
+Get all of the bottom-most [`Block`](./block.md) nodes by `type`.
 
 ### `getChild`
 
-`getChild(key: String || Node) => Node || Void`
+`getChild(path: List|Array) => Node|Void`
+`getChild(key: String) => Node|Void`
 
-Get a child by `key`.
-
-### `getClosestBlock`
-
-`getClosestBlock(key: String || Node) => Node || Void`
-
-Get the closest [`Block`](./block.md) node to a descendant node by `key`.
-
-### `getClosestInline`
-
-`getClosestInline(key: String || Node) => Node || Void`
-
-Get the closest [`Inline`](./inline.md) node to a descendant node by `key`.
+Get a child by `path` or `key`.
 
 ### `getClosest`
 
-`getClosest(key: String || Node, match: Function) => Node || Void`
+`getClosest(path: List|Array, match: Function) => Node|Void`
+`getClosest(key: String, match: Function) => Node|Void`
 
-Get the closest parent node of a descendant node by `key` that matches a `match` function.
+Get the closest parent node of a descendant node by `path` or `key` that matches a `match` function.
+
+### `getClosestBlock`
+
+`getClosestBlock(path: List|Array) => Node|Void`
+`getClosestBlock(key: String) => Node|Void`
+
+Get the closest [`Block`](./block.md) node to a descendant node by `path` or `key`.
+
+### `getClosestInline`
+
+`getClosestInline(path: List|Array) => Node|Void`
+`getClosestInline(key: String) => Node|Void`
+
+Get the closest [`Inline`](./inline.md) node to a descendant node by `path` or `key`.
+
+### `getClosestVoid`
+
+`getClosestVoid(path: List|Array) => Node|Void`
+`getClosestVoid(key: String) => Node|Void`
+
+Get the closest void parent of a descendant node by `path` or `key`.
+
+### `getCommonAncestor`
+
+`getCommonAncestor(path: List|Array) => Number`
+`getCommonAncestor(key: String) => Number`
+
+Get the lowest common ancestor of a descendant node by `path` or `key`.
 
 ### `getDepth`
 
-`getDepth(key: String || Node) => Number`
+`getDepth(path: List|Array) => Number`
+`getDepth(key: String) => Number`
 
-Get the depth of a descendant node by `key`.
+Get the depth of a descendant node by `path` or `key`.
 
 ### `getDescendant`
 
-`getDescendant(key: String || Node) => Node || Void`
+`getDescendant(path: List|Array) => Node|Void`
+`getDescendant(key: String) => Node|Void`
 
-Get a descendant node by `key`.
+Get a descendant node by `path` or `key`.
 
 ### `getFirstText`
 
-`getFirstText() => Node || Void`
+`getFirstText() => Text|Void`
 
 Get the first child text node inside a node.
 
@@ -116,45 +143,68 @@ Get a document fragment of the nodes in a `range`.
 
 ### `getFurthest`
 
-`getFurthest(key: String, iterator: Function) => Node || Null`
+`getFurthest(path: List|Array, iterator: Function) => Node|Null`
+`getFurthest(key: String, iterator: Function) => Node|Null`
 
-Get the furthest parent of a node by `key` that matches an `iterator`.
+Get the furthest parent of a node by `path` or `key` that matches an `iterator`.
 
 ### `getFurthestAncestor`
 
-`getFurthestAncestor(key: String) => Node || Null`
+`getFurthestAncestor(path: List|Array) => Node|Null`
+`getFurthestAncestor(key: String) => Node|Null`
 
-Get the furthest ancestor of a node by `key`.
+Get the furthest ancestor of a node by `path` or `key`.
 
 ### `getFurthestBlock`
 
-`getFurthestBlock(key: String) => Node || Null`
+`getFurthestBlock(path: List|Array) => Node|Null`
+`getFurthestBlock(key: String) => Node|Null`
 
-Get the furthest block parent of a node by `key`.
+Get the furthest block parent of a node by `path` or `key`.
 
 ### `getFurthestInline`
 
-`getFurthestInline(key: String) => Node || Null`
+`getFurthestInline(path: List|Array) => Node|Null`
+`getFurthestInline(key: String) => Node|Null`
 
-Get the furthest inline parent of a node by `key`.
+Get the furthest inline parent of a node by `path` or `key`.
 
 ### `getFurthestOnlyChildAncestor`
 
-`getFurthestOnlyChildAncestor(key: String) => Node || Null`
+`getFurthestOnlyChildAncestor(path: List|Array) => Node|Null`
+`getFurthestOnlyChildAncestor(key: String) => Node|Null`
 
-Get the furthest ancestor of a node by `key` that has only one child.
+Get the furthest ancestor of a node by `path` or `key` that has only one child.
 
-### `getInlinesAtRange`
+### `getInlines`
 
-`getInlinesAtRange(range: Range) => List`
+`getInlines() => List`
 
-Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
+Get all of the top-most [`Inline`](./inline.md) nodes in a node.
+
+### `getLeafInlinesAtRange`
+
+`getLeafInlinesAtRange(range: Range) => List`
+
+Get all of the bottom-most [`Inline`](./inline.md) nodes in a `range`.
+
+### `getInlinesByType`
+
+`getInlinesByType(type: string) => List`
+
+Get all of the top-most [`Inline`](./inline.md) nodes by `type`.
 
 ### `getLastText`
 
-`getLastText() => Node || Void`
+`getLastText() => Node|Void`
 
 Get the last child text node inside a node.
+
+### `getMarks`
+
+`getMarks(range: Range) => Set`
+
+Get a set of all of the marks in a node.
 
 ### `getMarksAtRange`
 
@@ -162,53 +212,131 @@ Get the last child text node inside a node.
 
 Get a set of all of the marks in a `range`.
 
+### `getMarksByType`
+
+`getMarksByType(type: String) => Set`
+
+Get a set of all of the marks by `type`.
+
 ### `getNextBlock`
 
-`getNextBlock(key: String || Node) => Node || Void`
+`getNextBlock(path: List|Array) => Node|Void`
+`getNextBlock(key: String) => Node|Void`
 
-Get the next, bottom-most [`Block`](./block.md) node after a descendant by `key`.
+Get the next, bottom-most [`Block`](./block.md) node after a descendant by `path` or `key`.
+
+### `getNextNode`
+
+`getNextNode(path: List|Array) => Node|Void`
+`getNextNode(key: String) => Node|Void`
+
+Get the next node in the tree of a descendant by `path` or `key`. This will not only check for siblings but instead move up the tree returning the next ancestor if no sibling is found.
 
 ### `getNextSibling`
 
-`getNextSibling(key: String || Node) => Node || Void`
+`getNextSibling(path: List|Array) => Node|Void`
+`getNextSibling(key: String) => Node|Void`
 
-Get the next sibling of a descendant by `key`.
+Get the next sibling of a descendant by `path` or `key`.
 
 ### `getNextText`
 
-`getNextText(key: String || Node) => Node || Void`
+`getNextText(path: List|Array) => Node|Void`
+`getNextText(key: String) => Node|Void`
 
-Get the next [`Text`](./text.md) node after a descendant by `key`.
+Get the next [`Text`](./text.md) node after a descendant by `path` or `key`.
+
+### `getNode`
+
+`getNode(path: List|Array) => Node|Void`
+`getNode(key: String) => Node|Void`
+
+Get a node in the tree by `path` or `key`.
+
+### `getNodesAtRange`
+
+`getNodesAtRange(range: Range) => List`
+
+Get all of the nodes in a `range`. This includes all of the [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.
+
+### `getOffset`
+
+`getOffset(path: List|Array) => Number`
+`getOffset(key: String) => Number`
+
+Get the text offset of a descendant in the tree by `path` or `key`.
 
 ### `getParent`
 
-`getParent(key: String || Node) => Node || Void`
+`getParent(path: List|Array) => Node|Void`
+`getParent(key: String) => Node|Void`
 
-Get the parent node of a descendant by `key`.
+Get the parent node of a descendant by `path` or `key`.
+
+### `getPath`
+
+`getPath(path: List|Array) => Node|Void`
+`getPath(key: String) => Node|Void`
+
+Get the path to a descendant by `path` or `key`.
 
 ### `getPreviousBlock`
 
-`getPreviousBlock(key: String || Node) => Node || Void`
+`getPreviousBlock(path: List|Array) => Node|Void`
+`getPreviousBlock(key: String) => Node|Void`
 
-Get the previous, bottom-most [`Block`](./block.md) node before a descendant by `key`.
+Get the previous, bottom-most [`Block`](./block.md) node before a descendant by `path` or `key`.
+
+### `getPreviousNode`
+
+`getPreviousNode(path: List|Array) => Node|Void`
+`getPreviousNode(key: String) => Node|Void`
+
+Get the previous node in the tree of a descendant by `path` or `key`. This will not only check for siblings but instead move up the tree returning the previous ancestor if no sibling is found.
 
 ### `getPreviousSibling`
 
-`getPreviousSibling(key: String || Node) => Node || Void`
+`getPreviousSibling(path: List|Array) => Node|Void`
+`getPreviousSibling(key: String) => Node|Void`
 
-Get the previous sibling of a descendant by `key`.
+Get the previous sibling of a descendant by `path` or `key`.
 
 ### `getPreviousText`
 
-`getPreviousText(key: String || Node) => Node || Void`
+`getPreviousText(path: List|Array) => Node|Void`
+`getPreviousText(key: String) => Node|Void`
 
-Get the previous [`Text`](./text.md) node before a descendant by `key`.
+Get the previous [`Text`](./text.md) node before a descendant by `path` or `key`.
+
+### `getRootBlocksAtRange`
+
+`getRootBlocksAtRange(range: Range) => List`
+
+Get all of the top-most [`Block`](./block.md) nodes in a `range`.
+
+### `getRootInlinesAtRange`
+
+`getRootInlinesAtRange(range: Range) => List`
+
+Get all of the top-most [`Inline`](./inline.md) nodes in a `range`.
 
 ### `getTextAtOffset`
 
 `getTextAtOffset(offset: Number) => Text || Void`
 
 Get the [`Text`](./text.md) node at an `offset`.
+
+### `getTextDirection`
+
+`getTextDirection() => String`
+
+Get the direction of the text content in the node.
+
+### `getTexts`
+
+`getTexts(range: Range) => List`
+
+Get all of the [`Text`](./text.md) nodes in a node.
 
 ### `getTextsAtRange`
 
@@ -218,12 +346,28 @@ Get all of the [`Text`](./text.md) nodes in a `range`.
 
 ### `hasChild`
 
-`hasChild(key: String || Node) => Boolean`
+`hasChild(path: List|Array) => Boolean`
+`hasChild(key: String) => Boolean`
 
-Check whether the node has a child node by `key`.
+Check whether the node has a child node by `path` or `key`.
 
 ### `hasDescendant`
 
-`hasDescendant(key: String || Node) => Boolean`
+`hasDescendant(path: List|Array) => Boolean`
+`hasDescendant(key: String) => Boolean`
 
-Check whether the node has a descendant node by `key`.
+Check whether the node has a descendant node by `path` or `key`.
+
+### `hasNode`
+
+`hasNode(path: List|Array) => Boolean`
+`hasNode(key: String) => Boolean`
+
+Check whether a node exists in the tree by `path` or `key`.
+
+### `isNodeInRange`
+
+`isNodeInRange(path: List|Array, range: Range) => Boolean`
+`isNodeInRange(key: String, range: Range) => Boolean`
+
+Check whether a node is inside a `range`. This will return true for all [`Text`](./text.md) nodes inside the range and all ancestors of those [`Text`](./text.md) nodes up to this node.

@@ -4,31 +4,32 @@ import { Value } from 'slate'
 import React from 'react'
 import initialValue from './value.json'
 import isUrl from 'is-url'
+import { Button, Icon, Toolbar } from '../components'
 
 /**
  * A change helper to standardize wrapping links.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {String} href
  */
 
-function wrapLink(change, href) {
-  change.wrapInline({
+function wrapLink(editor, href) {
+  editor.wrapInline({
     type: 'link',
     data: { href },
   })
 
-  change.collapseToEnd()
+  editor.moveToEnd()
 }
 
 /**
  * A change helper to standardize unwrapping links.
  *
- * @param {Change} change
+ * @param {Editor} editor
  */
 
-function unwrapLink(change) {
-  change.unwrapInline('link')
+function unwrapLink(editor) {
+  editor.unwrapInline('link')
 }
 
 /**
@@ -56,13 +57,78 @@ class Links extends React.Component {
 
   hasLinks = () => {
     const { value } = this.state
-    return value.inlines.some(inline => inline.type == 'link')
+    return value.inlines.some(inline => inline.type === 'link')
+  }
+
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
+  }
+
+  /**
+   * Render the app.
+   *
+   * @return {Element} element
+   */
+
+  render() {
+    return (
+      <div>
+        <Toolbar>
+          <Button active={this.hasLinks()} onMouseDown={this.onClickLink}>
+            <Icon>link</Icon>
+          </Button>
+        </Toolbar>
+        <Editor
+          placeholder="Enter some text..."
+          ref={this.ref}
+          value={this.state.value}
+          onChange={this.onChange}
+          onPaste={this.onPaste}
+          renderNode={this.renderNode}
+        />
+      </div>
+    )
+  }
+
+  /**
+   * Render a Slate node.
+   *
+   * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
+   * @return {Element}
+   */
+
+  renderNode = (props, editor, next) => {
+    const { attributes, children, node } = props
+
+    switch (node.type) {
+      case 'link': {
+        const { data } = node
+        const href = data.get('href')
+        return (
+          <a {...attributes} href={href}>
+            {children}
+          </a>
+        )
+      }
+
+      default: {
+        return next()
+      }
+    }
   }
 
   /**
    * On change.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
   onChange = ({ value }) => {
@@ -78,126 +144,62 @@ class Links extends React.Component {
 
   onClickLink = event => {
     event.preventDefault()
-    const { value } = this.state
+
+    const { editor } = this
+    const { value } = editor
     const hasLinks = this.hasLinks()
-    const change = value.change()
 
     if (hasLinks) {
-      change.call(unwrapLink)
-    } else if (value.isExpanded) {
+      editor.command(unwrapLink)
+    } else if (value.selection.isExpanded) {
       const href = window.prompt('Enter the URL of the link:')
-      change.call(wrapLink, href)
+
+      if (href == null) {
+        return
+      }
+
+      editor.command(wrapLink, href)
     } else {
       const href = window.prompt('Enter the URL of the link:')
-      const text = window.prompt('Enter the text for the link:')
-      change
-        .insertText(text)
-        .extend(0 - text.length)
-        .call(wrapLink, href)
-    }
 
-    this.onChange(change)
+      if (href == null) {
+        return
+      }
+
+      const text = window.prompt('Enter the text for the link:')
+
+      if (text == null) {
+        return
+      }
+
+      editor
+        .insertText(text)
+        .moveFocusBackward(text.length)
+        .command(wrapLink, href)
+    }
   }
 
   /**
    * On paste, if the text is a link, wrap the selection in a link.
    *
    * @param {Event} event
-   * @param {Change} change
+   * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onPaste = (event, change) => {
-    if (change.value.isCollapsed) return
+  onPaste = (event, editor, next) => {
+    if (editor.value.selection.isCollapsed) return next()
 
     const transfer = getEventTransfer(event)
     const { type, text } = transfer
-    if (type != 'text' && type != 'html') return
-    if (!isUrl(text)) return
+    if (type !== 'text' && type !== 'html') return next()
+    if (!isUrl(text)) return next()
 
     if (this.hasLinks()) {
-      change.call(unwrapLink)
+      editor.command(unwrapLink)
     }
 
-    change.call(wrapLink, text)
-    return true
-  }
-
-  /**
-   * Render the app.
-   *
-   * @return {Element} element
-   */
-
-  render() {
-    return (
-      <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar = () => {
-    const hasLinks = this.hasLinks()
-    return (
-      <div className="menu toolbar-menu">
-        <span
-          className="button"
-          onMouseDown={this.onClickLink}
-          data-active={hasLinks}
-        >
-          <span className="material-icons">link</span>
-        </span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onPaste={this.onPaste}
-          renderNode={this.renderNode}
-        />
-      </div>
-    )
-  }
-
-  /**
-   * Render a Slate node.
-   *
-   * @param {Object} props
-   * @return {Element}
-   */
-
-  renderNode = props => {
-    const { attributes, children, node } = props
-    switch (node.type) {
-      case 'link': {
-        const { data } = node
-        const href = data.get('href')
-        return (
-          <a {...attributes} href={href}>
-            {children}
-          </a>
-        )
-      }
-    }
+    editor.command(wrapLink, text)
   }
 }
 

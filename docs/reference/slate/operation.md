@@ -2,9 +2,15 @@
 
 An operation is the lowest-level description of a specific change to a part of Slate's value. They are designed to be collaborative-editing friendly.
 
-All of the [`Change`](./change.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `change.operations` property.
+All of the [`Commands`](./commands.md) methods result in operations being created and applied to a [`Value`](./value.md) They're accessible via the `editor.operations` property.
 
 There are a handful of Slate operation types. The goal is to have the fewest possible types, while still maintaining the necessary semantics for collaborative editing to work.
+
+## Properties
+
+See each operation separately below to see what they consist of.
+
+Note that all operations have a `data` property which can be used to attach arbitrary data to the operation, just like the [`Node`](./node.md) models ([`Block`](./block.md), [`Inline`](./inline.md), etc).
 
 ## Text Operations
 
@@ -13,10 +19,11 @@ There are a handful of Slate operation types. The goal is to have the fewest pos
 ```js
 {
   type: 'insert_text',
-  path: Array,
+  path: List,
   offset: Number,
   text: String,
-  marks: Array,
+  marks: List,
+  data: Map,
 }
 ```
 
@@ -27,9 +34,10 @@ Inserts a `text` string at `offset` into a text node at `path`, with optional `m
 ```js
 {
   type: 'remove_text',
-  path: Array,
+  path: List,
   offset: Number,
   text: String,
+  data: Map,
 }
 ```
 
@@ -42,10 +50,11 @@ Removes a string of `text` at `offset` into a text node at `path`.
 ```js
 {
   type: 'add_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
+  mark: Mark,
+  data: Map,
 }
 ```
 
@@ -56,10 +65,11 @@ Adds a `mark` to the text node at `path` starting at an `offset` and spanning `l
 ```js
 {
   type: 'remove_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
+  mark: Mark,
+  data: Map,
 }
 ```
 
@@ -70,15 +80,16 @@ Removes a `mark` from a text node at `path` starting at an `offset` and spanning
 ```js
 {
   type: 'set_mark',
-  path: Array,
+  path: List,
   offset: Number,
   length: Number,
-  mark: Object,
   properties: Object,
+  newProperties: Object,
+  data: Map,
 }
 ```
 
-Set new `properties` on any marks that match an existing `mark` in a text node at `path`, starting at an `offset` and spanning `length` characters.
+Set new `newProperties` on any marks that match an existing `properties` mark in a text node at `path`, starting at an `offset` and spanning `length` characters.
 
 ## Node Operations
 
@@ -87,8 +98,9 @@ Set new `properties` on any marks that match an existing `mark` in a text node a
 ```js
 {
   type: 'insert_node',
-  path: Array,
-  node: Object,
+  path: List,
+  node: Node,
+  data: Map,
 }
 ```
 
@@ -99,9 +111,10 @@ Insert a new `node` at `path`.
 ```js
 {
   type: 'merge_node',
-  path: Array,
+  path: List,
   position: Number,
   properties: Object,
+  data: Map,
 }
 ```
 
@@ -112,8 +125,9 @@ Merge the node at `path` with its previous sibling. The `position` refers to eit
 ```js
 {
   type: 'move_node',
-  path: Array,
+  path: List,
   newPath: Array,
+  data: Map,
 }
 ```
 
@@ -124,8 +138,9 @@ Move the node at `path` to a `newPath`.
 ```js
 {
   type: 'remove_node',
-  path: Array,
-  node: Object,
+  path: List,
+  node: Node,
+  data: Map,
 }
 ```
 
@@ -136,9 +151,10 @@ Remove the node at `path`.
 ```js
 {
   type: 'set_node',
-  path: Array,
+  path: List,
   properties: Object,
-  node: Object,
+  newProperties: Object,
+  data: Map,
 }
 ```
 
@@ -149,10 +165,11 @@ Set new `properties` on the node at `path`.
 ```js
 {
   type: 'split_node',
-  path: Array,
+  path: List,
   position: Number,
   target: Number,
   properties: Object,
+  data: Map,
 }
 ```
 
@@ -166,7 +183,8 @@ Split the node at `path` at `position`. The `position` refers to either the inde
 {
   type: 'set_selection',
   properties: Object,
-  selection: Object,
+  newProperties: Object,
+  data: Map,
 }
 ```
 
@@ -178,7 +196,8 @@ Set new `properties` on the selection.
 {
   type: 'set_value',
   properties: Object,
-  value: Object,
+  newProperties: Object,
+  data: Map,
 }
 ```
 

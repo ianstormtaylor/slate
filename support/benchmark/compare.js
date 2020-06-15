@@ -1,14 +1,24 @@
 /* eslint-disable no-console */
 
 import chalk from 'chalk'
+import figures from 'figures'
+import emojis from 'emojis'
 import baseline from '../../tmp/benchmark-baseline'
 import comparison from '../../tmp/benchmark-comparison'
+import { existsSync } from 'fs'
 
 /**
  * Constants.
  */
 
-const THRESHOLD = 0.333
+let THRESHOLD = 0.333
+const configPath = '../../tmp/benchmark-config.js'
+if (existsSync(configPath)) {
+  const alternative = require(configPath).THRESHOLD
+  if (typeof alternative === 'number' && alternative > 0) {
+    THRESHOLD = alternative
+  }
+}
 
 /**
  * Print.
@@ -21,27 +31,72 @@ baseline.forEach((suite, i) => {
   console.log(`    ${suite.name}`)
 
   suite.benchmarks.forEach((base, j) => {
-    const comp = comparison[i].benchmarks[j]
-    if (!comp) return
+    const compared = { user: {}, hr: {} }
 
-    const b = base.iterations / base.elapsed * 1000
-    const c = comp.iterations / comp.elapsed * 1000
-    const threshold = b * THRESHOLD
-    const slower = b - c > threshold
-    const faster = b - c < 0 - threshold
-    const percent = Math.round(Math.abs(b - c) / b * 100)
+    for (const key of Object.keys(compared)) {
+      const comp = comparison[i].benchmarks[j]
+      if (!comp) return
+      const b = base.iterations / base[key] * 1000
+      const c = comp.iterations / comp[key] * 1000
+      const balancePercent =
+        b > c ? Math.round(Math.abs(b - c) / c * 100) : (c - b) / b * 100
 
-    let output = `${b.toFixed(2)} → ${c.toFixed(2)} ops/sec`
-    if (slower) output = chalk.red(`${output} (${percent}% slower)`)
-    else if (faster) output = chalk.green(`${output} (${percent}% faster)`)
-    else output = chalk.gray(output)
+      const output = `${b.toFixed(2)} -> ${c.toFixed(2)} ops/sec`
+      compared[key].baseOutput = output
+      compared[key].percentOutput = `${balancePercent.toFixed(2)}% ${
+        c > b ? 'faster' : 'slower'
+      }`
+      compared[key].percentValue = balancePercent
+      compared[key].b = b
+      compared[key].c = c
+      compared[key].isFaster = c > b
+      if (balancePercent > 1000) {
+        compared[key].percentOutput += emojis.unicode(' :scream: ')
+      } else if (balancePercent > 100) {
+        if (c > b) {
+          compared[key].percentOutput += emojis.unicode(' :raised_hands: ')
+        } else {
+          compared[key].percentOutput += emojis.unicode(' :worried: ')
+        }
+      }
+    }
 
-    if (percent > 1000) output += ' 😱'
-    else if (faster && percent > 100) output += ' 🙌'
-    else if (slower && percent > 100) output += ' 😟'
+    const { user, hr } = compared
 
-    console.log(`      ${base.title}`)
-    console.log(`        ${output}`)
+    if (
+      user.percentValue < THRESHOLD * 100 &&
+      hr.percentValue < THRESHOLD * 100
+    ) {
+      console.log(
+        chalk.grey(
+          `      ${figures.tick} ${base.name}: ${user.baseOutput} (${
+            user.percentOutput
+          })`
+        )
+      )
+      return
+    }
+
+    if (user.isFaster === hr.isFaster) {
+      if (user.isFaster) {
+        console.log(chalk.green(`      ${figures.star} ${base.name}:`))
+        console.log(
+          `            user: ${user.baseOutput} (${user.percentOutput})`
+        )
+        console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
+        return
+      }
+      console.log(chalk.red(`      ${figures.cross} ${base.name}:`))
+      console.log(
+        `            user: ${user.baseOutput} (${user.percentOutput})`
+      )
+      console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
+      return
+    }
+
+    console.log(chalk.red(`      ${figures.questionMarkPrefix} ${base.name}:`))
+    console.log(`            user: ${user.baseOutput} (${user.percentOutput})`)
+    console.log(`            real: ${hr.baseOutput} (${hr.percentOutput})`)
   })
 })
 

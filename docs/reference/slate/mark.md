@@ -4,7 +4,7 @@
 import { Mark } from 'slate'
 ```
 
-A formatting mark that can be associated with [`Characters`](./character.md). Marks are how Slate represents rich formatting like **bold** or _italic_.
+A formatting mark that can be associated with characters. Marks are how Slate represents rich formatting like **bold** or _italic_.
 
 ## Properties
 
@@ -39,13 +39,13 @@ The custom type of the mark (eg. `bold` or `italic`).
 
 `Mark.create(properties: Object) => Mark`
 
-Create a mark from a plain Javascript object of `properties`.
+Create a mark from a plain JavaScript object of `properties`.
 
 ### `Mark.createSet`
 
 `Mark.createSet(array: Array) => Set`
 
-Create a set of marks from a plain Javascript `array`.
+Create a set of marks from a plain JavaScript `array`.
 
 ### `Mark.fromJSON`
 

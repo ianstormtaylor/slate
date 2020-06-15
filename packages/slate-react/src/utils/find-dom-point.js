@@ -1,35 +1,38 @@
 import findDOMNode from './find-dom-node'
 
 /**
- * Find a native DOM selection point from a Slate `key` and `offset`.
+ * Find a native DOM selection point from a Slate `point`.
  *
- * @param {String} key
- * @param {Number} offset
+ * @param {Point} point
  * @param {Window} win (optional)
  * @return {Object|Null}
  */
 
-function findDOMPoint(key, offset, win = window) {
-  const el = findDOMNode(key, win)
+function findDOMPoint(point, win = window) {
+  const el = findDOMNode(point.key, win)
   let start = 0
-  let n
 
-  // COMPAT: In IE, this method's arguments are not optional, so we have to
-  // pass in all four even though the last two are defaults. (2017/10/25)
-  const iterator = win.document.createNodeIterator(
-    el,
-    NodeFilter.SHOW_TEXT,
-    () => NodeFilter.FILTER_ACCEPT,
-    false
+  // For each leaf, we need to isolate its content, which means filtering to its
+  // direct text and zero-width spans. (We have to filter out any other siblings
+  // that may have been rendered alongside them.)
+  const texts = Array.from(
+    el.querySelectorAll('[data-slate-content], [data-slate-zero-width]')
   )
 
-  while ((n = iterator.nextNode())) {
-    const { length } = n.textContent
-    const end = start + length
+  for (const text of texts) {
+    const node = text.childNodes[0]
+    const domLength = node.textContent.length
+    let slateLength = domLength
 
-    if (offset <= end) {
-      const o = offset - start
-      return { node: n, offset: o >= 0 ? o : 0 }
+    if (text.hasAttribute('data-slate-length')) {
+      slateLength = parseInt(text.getAttribute('data-slate-length'), 10)
+    }
+
+    const end = start + slateLength
+
+    if (point.offset <= end) {
+      const offset = Math.min(domLength, Math.max(0, point.offset - start))
+      return { node, offset }
     }
 
     start = end

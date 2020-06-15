@@ -6,7 +6,12 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ types: ['paragraph'], max: 1 }],
+      nodes: [
+        {
+          match: [{ type: 'paragraph' }],
+          max: 1,
+        },
+      ],
     },
   },
 }
@@ -16,7 +21,7 @@ export const input = (
     <document>
       <quote>
         <paragraph>one</paragraph>
-        <paragraph>two</paragraph>
+        <block type="title">two</block>
       </quote>
     </document>
   </value>

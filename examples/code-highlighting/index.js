@@ -3,7 +3,16 @@ import { Value } from 'slate'
 
 import Prism from 'prismjs'
 import React from 'react'
-import initialValue from './value.json'
+
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * Define our code components.
@@ -17,9 +26,7 @@ function CodeBlock(props) {
   const language = node.data.get('language')
 
   function onChange(event) {
-    editor.change(c =>
-      c.setNodeByKey(node.key, { data: { language: event.target.value } })
-    )
+    editor.setNodeByKey(node.key, { data: { language: event.target.value } })
   }
 
   return (
@@ -46,6 +53,23 @@ function CodeBlockLine(props) {
 }
 
 /**
+ * A helper function to return the content of a Prism `token`.
+ *
+ * @param {Object} token
+ * @return {String}
+ */
+
+function getContent(token) {
+  if (typeof token === 'string') {
+    return token
+  } else if (typeof token.content === 'string') {
+    return token.content
+  } else {
+    return token.content.map(getContent).join('')
+  }
+}
+
+/**
  * The code highlighting example.
  *
  * @type {Component}
@@ -53,62 +77,21 @@ function CodeBlockLine(props) {
 
 class CodeHighlighting extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * On change, save the new value.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On key down inside code blocks, insert soft new lines.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   * @return {Change}
-   */
-
-  onKeyDown = (event, change) => {
-    const { value } = change
-    const { startBlock } = value
-    if (event.key != 'Enter') return
-    if (startBlock.type != 'code') return
-    if (value.isExpanded) change.delete()
-    change.insertText('\n')
-    return true
-  }
-
-  /**
    * Render.
    *
    * @return {Component}
    */
 
-  render = () => {
+  render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Write some code..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-          decorateNode={this.decorateNode}
-        />
-      </div>
+      <Editor
+        placeholder="Write some code..."
+        defaultValue={initialValue}
+        onKeyDown={this.onKeyDown}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+        decorateNode={this.decorateNode}
+      />
     )
   }
 
@@ -119,12 +102,14 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     switch (props.node.type) {
       case 'code':
         return <CodeBlock {...props} />
       case 'code_line':
         return <CodeBlockLine {...props} />
+      default:
+        return next()
     }
   }
 
@@ -135,28 +120,57 @@ class CodeHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'comment':
-        return <span style={{ opacity: '0.33' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ opacity: '0.33' }}>
+            {children}
+          </span>
+        )
       case 'keyword':
-        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
       case 'tag':
-        return <span style={{ fontWeight: 'bold' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ fontWeight: 'bold' }}>
+            {children}
+          </span>
+        )
       case 'punctuation':
-        return <span style={{ opacity: '0.75' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ opacity: '0.75' }}>
+            {children}
+          </span>
+        )
+      default:
+        return next()
     }
   }
 
-  tokenToContent = token => {
-    if (typeof token == 'string') {
-      return token
-    } else if (typeof token.content == 'string') {
-      return token.content
-    } else {
-      return token.content.map(this.tokenToContent).join('')
+  /**
+   * On key down inside code blocks, insert soft new lines.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   * @param {Function} next
+   */
+
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
+    const { startBlock } = value
+
+    if (event.key === 'Enter' && startBlock.type === 'code') {
+      editor.insertText('\n')
+      return
     }
+
+    next()
   }
 
   /**
@@ -166,9 +180,11 @@ class CodeHighlighting extends React.Component {
    * @return {Array}
    */
 
-  decorateNode = node => {
-    if (node.type != 'code') return
+  decorateNode = (node, editor, next) => {
+    const others = next() || []
+    if (node.type !== 'code') return others
 
+    const { document } = editor.value
     const language = node.data.get('language')
     const texts = node.getTexts().toArray()
     const string = texts.map(t => t.text).join('\n')
@@ -185,7 +201,7 @@ class CodeHighlighting extends React.Component {
       startText = endText
       startOffset = endOffset
 
-      const content = this.tokenToContent(token)
+      const content = getContent(token)
       const newlines = content.split('\n').length - 1
       const length = content.length - newlines
       const end = start + length
@@ -202,22 +218,33 @@ class CodeHighlighting extends React.Component {
         endOffset = remaining
       }
 
-      if (typeof token != 'string') {
-        const range = {
-          anchorKey: startText.key,
-          anchorOffset: startOffset,
-          focusKey: endText.key,
-          focusOffset: endOffset,
-          marks: [{ type: token.type }],
+      if (typeof token !== 'string') {
+        const startPath = document.assertPath(startText.key)
+        const endPath = document.assertPath(endText.key)
+
+        const dec = {
+          anchor: {
+            key: startText.key,
+            path: startPath,
+            offset: startOffset,
+          },
+          focus: {
+            key: endText.key,
+            path: endPath,
+            offset: endOffset,
+          },
+          mark: {
+            type: token.type,
+          },
         }
 
-        decorations.push(range)
+        decorations.push(dec)
       }
 
       start = end
     }
 
-    return decorations
+    return [...others, ...decorations]
   }
 }
 

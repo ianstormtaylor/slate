@@ -12,19 +12,14 @@ const h = createHyperscript({
     paragraph: 'paragraph',
     quote: 'quote',
     code: 'code',
-    image: {
-      type: 'image',
-      isVoid: true,
-    },
+    image: 'image',
   },
   inlines: {
     link: 'link',
     hashtag: 'hashtag',
     comment: 'comment',
-    emoji: {
-      type: 'emoji',
-      isVoid: true,
-    },
+    emoji: 'emoji',
+    linebreak: 'linebreak',
   },
   marks: {
     b: 'bold',

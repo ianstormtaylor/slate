@@ -11,20 +11,14 @@ export const input = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {
           thing: 'value',
         },
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: 'one',
-                marks: [],
-              },
-            ],
+            text: 'one',
+            marks: [],
           },
         ],
       },

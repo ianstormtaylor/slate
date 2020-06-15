@@ -1,16 +1,19 @@
 /** @jsx h */
 
-import { CHILD_OBJECT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ objects: ['block'] }],
-      normalize: (change, reason, { child }) => {
-        if (reason == CHILD_OBJECT_INVALID) {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      nodes: [
+        {
+          match: [{ object: 'block' }],
+        },
+      ],
+      normalize: (editor, { code, child }) => {
+        if (code === 'child_object_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

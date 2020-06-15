@@ -1,28 +1,39 @@
 import Base64 from 'slate-base64-serializer'
-
-import getWindow from 'get-window'
+import Plain from 'slate-plain-serializer'
+import TRANSFER_TYPES from '../constants/transfer-types'
 import findDOMNode from './find-dom-node'
+import getWindow from 'get-window'
+import invariant from 'tiny-invariant'
+import removeAllRanges from './remove-all-ranges'
+import { IS_IE } from 'slate-dev-environment'
+import { Value } from 'slate'
 import { ZERO_WIDTH_SELECTOR, ZERO_WIDTH_ATTRIBUTE } from './find-point'
-import { IS_CHROME, IS_SAFARI } from '../constants/environment'
+
+const { FRAGMENT, HTML, TEXT } = TRANSFER_TYPES
 
 /**
  * Prepares a Slate document fragment to be copied to the clipboard.
  *
  * @param {Event} event
- * @param {Value} value
- * @param {Document} [fragment]
+ * @param {Editor} editor
  */
 
-function cloneFragment(event, value, fragment = value.fragment) {
+function cloneFragment(event, editor, callback = () => undefined) {
+  invariant(
+    !Value.isValue(editor),
+    'As of Slate 0.42.0, the `cloneFragment` utility takes an `editor` instead of a `value`.'
+  )
+
   const window = getWindow(event.target)
   const native = window.getSelection()
-  const { startKey, endKey, startText, endBlock, endInline } = value
-  const isVoidBlock = endBlock && endBlock.isVoid
-  const isVoidInline = endInline && endInline.isVoid
-  const isVoid = isVoidBlock || isVoidInline
+  const { value } = editor
+  const { document, fragment, selection } = value
+  const { start, end } = selection
+  const startVoid = document.getClosestVoid(start.key, editor)
+  const endVoid = document.getClosestVoid(end.key, editor)
 
   // If the selection is collapsed, and it isn't inside a void node, abort.
-  if (native.isCollapsed && !isVoid) return
+  if (native.isCollapsed && !startVoid) return
 
   // Create a fake selection so that we can add a Base64-encoded copy of the
   // fragment to the HTML, to decode on future pastes.
@@ -31,34 +42,29 @@ function cloneFragment(event, value, fragment = value.fragment) {
   let contents = range.cloneContents()
   let attach = contents.childNodes[0]
 
-  // If the end node is a void node, we need to move the end of the range from
-  // the void node's spacer span, to the end of the void node's content.
-  if (isVoid) {
+  // Make sure attach is a non-empty node, since empty nodes will not get copied
+  contents.childNodes.forEach(node => {
+    if (node.textContent && node.textContent.trim() !== '') {
+      attach = node
+    }
+  })
+
+  // COMPAT: If the end node is a void node, we need to move the end of the
+  // range from the void node's spacer span, to the end of the void node's
+  // content, since the spacer is before void's content in the DOM.
+  if (endVoid) {
     const r = range.cloneRange()
-    const n = isVoidBlock ? endBlock : endInline
-    const node = findDOMNode(n, window)
+    const node = findDOMNode(endVoid, window)
     r.setEndAfter(node)
     contents = r.cloneContents()
-    attach = contents.childNodes[contents.childNodes.length - 1].firstChild
   }
 
-  // COMPAT: in Safari and Chrome when selecting a single marked word,
-  // marks are not preserved when copying.
-  // If the attatched is not void, and the startKey and endKey is the same,
-  // check if there is marks involved. If so, set the range start just before the
-  // startText node
-  if ((IS_CHROME || IS_SAFARI) && !isVoid && startKey === endKey) {
-    const hasMarks =
-      startText.characters
-        .slice(value.selection.anchorOffset, value.selection.focusOffset)
-        .filter(char => char.marks.size !== 0).size !== 0
-    if (hasMarks) {
-      const r = range.cloneRange()
-      const node = findDOMNode(startText, window)
-      r.setStartBefore(node)
-      contents = r.cloneContents()
-      attach = contents.childNodes[contents.childNodes.length - 1].firstChild
-    }
+  // COMPAT: If the start node is a void node, we need to attach the encoded
+  // fragment to the void node's content node instead of the spacer, because
+  // attaching it to empty `<div>/<span>` nodes will end up having it erased by
+  // most browsers. (2018/04/27)
+  if (startVoid) {
+    attach = contents.childNodes[0].childNodes[1].firstChild
   }
 
   // Remove any zero-width space spans from the cloned DOM so that they don't
@@ -68,20 +74,10 @@ function cloneFragment(event, value, fragment = value.fragment) {
     zw.textContent = isNewline ? '\n' : ''
   })
 
-  // COMPAT: In Chrome and Safari, if the last element in the selection to
-  // copy has `contenteditable="false"` the copy will fail, and nothing will
-  // be put in the clipboard. So we remove them all. (2017/05/04)
-  if (IS_CHROME || IS_SAFARI) {
-    const els = [].slice.call(
-      contents.querySelectorAll('[contenteditable="false"]')
-    )
-    els.forEach(el => el.removeAttribute('contenteditable'))
-  }
-
   // Set a `data-slate-fragment` attribute on a non-empty node, so it shows up
   // in the HTML, and can be used for intra-Slate pasting. If it's a text
   // node, wrap it in a `<span>` so we have something to set an attribute on.
-  if (attach.nodeType == 3) {
+  if (attach.nodeType === 3) {
     const span = window.document.createElement('span')
 
     // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
@@ -95,37 +91,48 @@ function cloneFragment(event, value, fragment = value.fragment) {
 
   attach.setAttribute('data-slate-fragment', encoded)
 
-  // Add the phony content to the DOM, and select it, so it will be copied.
-  const editor = event.target.closest('[data-slate-editor]')
+  //  Creates value from only the selected blocks
+  //  Then gets plaintext for clipboard with proper linebreaks for BLOCK elements
+  //  Via Plain serializer
+  const valFromSelection = Value.create({ document: fragment })
+  const plainText = Plain.serialize(valFromSelection)
+
+  // Add the phony content to a div element. This is needed to copy the
+  // contents into the html clipboard register.
   const div = window.document.createElement('div')
+  div.appendChild(contents)
+
+  // For browsers supporting it, we set the clipboard registers manually,
+  // since the result is more predictable.
+  // COMPAT: IE supports the setData method, but only in restricted sense.
+  // IE doesn't support arbitrary MIME types or common ones like 'text/plain';
+  // it only accepts "Text" (which gets mapped to 'text/plain') and "Url"
+  // (mapped to 'text/url-list'); so, we should only enter block if !IS_IE
+  if (event.clipboardData && event.clipboardData.setData && !IS_IE) {
+    event.preventDefault()
+    event.clipboardData.setData(TEXT, plainText)
+    event.clipboardData.setData(FRAGMENT, encoded)
+    event.clipboardData.setData(HTML, div.innerHTML)
+    callback()
+    return
+  }
+
+  // COMPAT: For browser that don't support the Clipboard API's setData method,
+  // we must rely on the browser to natively copy what's selected.
+  // So we add the div (containing our content) to the DOM, and select it.
+  const editorEl = event.target.closest('[data-slate-editor]')
   div.setAttribute('contenteditable', true)
   div.style.position = 'absolute'
   div.style.left = '-9999px'
-
-  // COMPAT: In Firefox, the viewport jumps to find the phony div, so it
-  // should be created at the current scroll offset with `style.top`.
-  // The box model attributes which can interact with 'top' are also reset.
-  div.style.border = '0px'
-  div.style.padding = '0px'
-  div.style.margin = '0px'
-  div.style.top = `${window.pageYOffset ||
-    window.document.documentElement.scrollTop}px`
-
-  div.appendChild(contents)
-  editor.appendChild(div)
-
-  // COMPAT: In Firefox, trying to use the terser `native.selectAllChildren`
-  // throws an error, so we use the older `range` equivalent. (2016/06/21)
-  const r = window.document.createRange()
-  r.selectNodeContents(div)
-  native.removeAllRanges()
-  native.addRange(r)
+  editorEl.appendChild(div)
+  native.selectAllChildren(div)
 
   // Revert to the previous selection right after copying.
   window.requestAnimationFrame(() => {
-    editor.removeChild(div)
-    native.removeAllRanges()
+    editorEl.removeChild(div)
+    removeAllRanges(native)
     native.addRange(range)
+    callback()
   })
 }
 

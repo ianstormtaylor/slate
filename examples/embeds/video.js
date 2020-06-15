@@ -16,7 +16,7 @@ class Video extends React.Component {
   onChange = e => {
     const video = e.target.value
     const { node, editor } = this.props
-    editor.change(c => c.setNodeByKey(node.key, { data: { video } }))
+    editor.setNodeByKey(node.key, { data: { video } })
   }
 
   /**
@@ -37,10 +37,12 @@ class Video extends React.Component {
    */
 
   render() {
+    const { isSelected } = this.props
+
     return (
       <div {...this.props.attributes}>
         {this.renderVideo()}
-        {this.renderInput()}
+        {isSelected ? this.renderInput() : null}
       </div>
     )
   }
@@ -52,16 +54,16 @@ class Video extends React.Component {
    */
 
   renderVideo = () => {
-    const { node, isSelected } = this.props
+    const { node, isFocused } = this.props
     const video = node.data.get('video')
 
     const wrapperStyle = {
       position: 'relative',
-      outline: isSelected ? '2px solid blue' : 'none',
+      outline: isFocused ? '2px solid blue' : 'none',
     }
 
     const maskStyle = {
-      display: isSelected ? 'none' : 'block',
+      display: isFocused ? 'none' : 'block',
       position: 'absolute',
       top: '0',
       left: '0',

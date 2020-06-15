@@ -2,12 +2,9 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .insertBlock('quote')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.insertBlock('quote')
+  editor.flush().undo()
 }
 
 export const input = (

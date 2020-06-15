@@ -2,6 +2,8 @@
 
 import h from '../../../helpers/h'
 
+export const skip = true
+
 export const input = (
   <value>
     <document>
@@ -14,7 +16,7 @@ export const output = {
   object: 'value',
   document: {
     object: 'document',
-    key: '4',
+    key: '3',
     data: {},
     nodes: [
       {
@@ -22,18 +24,12 @@ export const output = {
         key: '1',
         type: 'paragraph',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'text',
             key: '0',
-            leaves: [
-              {
-                text: 'one',
-                object: 'leaf',
-                marks: [],
-              },
-            ],
+            text: 'one',
+            marks: [],
           },
         ],
       },

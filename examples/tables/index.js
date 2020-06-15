@@ -1,8 +1,17 @@
-import { Editor } from 'slate-react'
+import Plain from 'slate-plain-serializer'
+import { Editor, getEventTransfer } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
 
 /**
  * The tables example.
@@ -12,103 +21,6 @@ import initialValue from './value.json'
 
 class Tables extends React.Component {
   /**
-   * Deserialize the raw initial value.
-   *
-   * @type {Object}
-   */
-
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * On backspace, do nothing if at the start of a table cell.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   */
-
-  onBackspace = (event, change) => {
-    const { value } = change
-    if (value.startOffset != 0) return
-    event.preventDefault()
-    return true
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On delete, do nothing if at the end of a table cell.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   */
-
-  onDelete = (event, change) => {
-    const { value } = change
-    if (value.endOffset != value.startText.text.length) return
-    event.preventDefault()
-    return true
-  }
-
-  /**
-   * On return, do nothing if inside a table cell.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   */
-
-  onEnter = (event, change) => {
-    event.preventDefault()
-    return true
-  }
-
-  /**
-   * On key down, check for our specific key shortcuts.
-   *
-   * @param {Event} event
-   * @param {Change} change
-   */
-
-  onKeyDown = (event, change) => {
-    const { value } = change
-    const { document, selection } = value
-    const { startKey } = selection
-    const startNode = document.getDescendant(startKey)
-
-    if (selection.isAtStartOf(startNode)) {
-      const previous = document.getPreviousText(startNode.key)
-      const prevBlock = document.getClosestBlock(previous.key)
-
-      if (prevBlock.type == 'table-cell') {
-        event.preventDefault()
-        return true
-      }
-    }
-
-    if (value.startBlock.type != 'table-cell') {
-      return
-    }
-
-    switch (event.key) {
-      case 'Backspace':
-        return this.onBackspace(event, change)
-      case 'Delete':
-        return this.onDelete(event, change)
-      case 'Enter':
-        return this.onEnter(event, change)
-    }
-  }
-
-  /**
    * Render the example.
    *
    * @return {Component} component
@@ -116,16 +28,15 @@ class Tables extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        defaultValue={initialValue}
+        onKeyDown={this.onKeyDown}
+        onDrop={this.onDropOrPaste}
+        onPaste={this.onDropOrPaste}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+      />
     )
   }
 
@@ -136,8 +47,9 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'table':
         return (
@@ -149,6 +61,8 @@ class Tables extends React.Component {
         return <tr {...attributes}>{children}</tr>
       case 'table-cell':
         return <td {...attributes}>{children}</td>
+      default:
+        return next()
     }
   }
 
@@ -159,11 +73,125 @@ class Tables extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
+      default:
+        return next()
+    }
+  }
+
+  /**
+   * On backspace, do nothing if at the start of a table cell.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   */
+
+  onBackspace = (event, editor, next) => {
+    const { value } = editor
+    const { selection } = value
+    if (selection.start.offset !== 0) return next()
+    event.preventDefault()
+  }
+
+  /**
+   * On delete, do nothing if at the end of a table cell.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   */
+
+  onDelete = (event, editor, next) => {
+    const { value } = editor
+    const { selection } = value
+    if (selection.end.offset !== value.startText.text.length) return next()
+    event.preventDefault()
+  }
+
+  /**
+   * On paste or drop, only support plain text for this example.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   */
+
+  onDropOrPaste = (event, editor, next) => {
+    const transfer = getEventTransfer(event)
+    const { value } = editor
+    const { text = '' } = transfer
+
+    if (value.startBlock.type !== 'table-cell') {
+      return next()
+    }
+
+    if (!text) {
+      return next()
+    }
+
+    const lines = text.split('\n')
+    const { document } = Plain.deserialize(lines[0] || '')
+    editor.insertFragment(document)
+  }
+
+  /**
+   * On return, do nothing if inside a table cell.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   */
+
+  onEnter = (event, editor, next) => {
+    event.preventDefault()
+  }
+
+  /**
+   * On key down, check for our specific key shortcuts.
+   *
+   * @param {Event} event
+   * @param {Editor} editor
+   */
+
+  onKeyDown = (event, editor, next) => {
+    const { value } = editor
+    const { document, selection } = value
+    const { start, isCollapsed } = selection
+    const startNode = document.getDescendant(start.key)
+
+    if (isCollapsed && start.isAtStartOfNode(startNode)) {
+      const previous = document.getPreviousText(startNode.key)
+
+      if (!previous) {
+        return next()
+      }
+
+      const prevBlock = document.getClosestBlock(previous.key)
+
+      if (prevBlock.type === 'table-cell') {
+        if (['Backspace', 'Delete', 'Enter'].includes(event.key)) {
+          event.preventDefault()
+        } else {
+          return next()
+        }
+      }
+    }
+
+    if (value.startBlock.type !== 'table-cell') {
+      return next()
+    }
+
+    switch (event.key) {
+      case 'Backspace':
+        return this.onBackspace(event, editor, next)
+      case 'Delete':
+        return this.onDelete(event, editor, next)
+      case 'Enter':
+        return this.onEnter(event, editor, next)
+      default:
+        return next()
     }
   }
 }

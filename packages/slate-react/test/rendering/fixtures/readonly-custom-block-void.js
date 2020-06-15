@@ -10,22 +10,33 @@ function Image(props) {
   })
 }
 
-function renderNode(props) {
+function renderNode(props, editor, next) {
   switch (props.node.type) {
     case 'image':
       return Image(props)
+    default:
+      return next()
   }
 }
 
 export const props = {
   readOnly: true,
   renderNode,
+  schema: {
+    blocks: {
+      image: {
+        isVoid: true,
+      },
+    },
+  },
 }
 
 export const value = (
   <value>
     <document>
-      <image src="https://example.com/image.png" />
+      <image src="https://example.com/image.png">
+        <text />
+      </image>
     </document>
   </value>
 )

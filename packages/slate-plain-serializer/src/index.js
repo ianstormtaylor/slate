@@ -13,7 +13,12 @@ import { Set } from 'immutable'
  */
 
 function deserialize(string, options = {}) {
-  let { defaultBlock = 'line', defaultMarks = [], toJSON = false } = options
+  let {
+    defaultBlock = 'line',
+    defaultMarks = [],
+    delimiter = '\n',
+    toJSON = false,
+  } = options
 
   if (Set.isSet(defaultMarks)) {
     defaultMarks = defaultMarks.toArray()
@@ -27,22 +32,16 @@ function deserialize(string, options = {}) {
     document: {
       object: 'document',
       data: {},
-      nodes: string.split('\n').map(line => {
+      nodes: string.split(delimiter).map(line => {
         return {
           ...defaultBlock,
           object: 'block',
-          isVoid: false,
           data: {},
           nodes: [
             {
               object: 'text',
-              leaves: [
-                {
-                  object: 'leaf',
-                  text: line,
-                  marks: defaultMarks,
-                },
-              ],
+              text: line,
+              marks: defaultMarks,
             },
           ],
         }
@@ -61,8 +60,8 @@ function deserialize(string, options = {}) {
  * @return {String}
  */
 
-function serialize(value) {
-  return serializeNode(value.document)
+function serialize(value, options = {}) {
+  return serializeNode(value.document, options)
 }
 
 /**
@@ -72,12 +71,14 @@ function serialize(value) {
  * @return {String}
  */
 
-function serializeNode(node) {
+function serializeNode(node, options = {}) {
+  const { delimiter = '\n' } = options
+
   if (
-    node.object == 'document' ||
-    (node.object == 'block' && Block.isBlockList(node.nodes))
+    node.object === 'document' ||
+    (node.object === 'block' && Block.isBlockList(node.nodes))
   ) {
-    return node.nodes.map(serializeNode).join('\n')
+    return node.nodes.map(serializeNode).join(delimiter)
   } else {
     return node.text
   }

@@ -147,7 +147,7 @@ class App extends React.Component {
 
 Now you should be able to save changes across refreshes!
 
-However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage this doesn't really matter, but if you're saving things to a database via HTTP request this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
+However, if you inspect the change handler, you'll notice that it's actually saving the Local Storage value on _every_ change to the editor, even when only the selection changes! This is because `onChange` is called for _every_ change. For Local Storage, this doesn't really matter, but if you're saving things to a database via HTTP request, this would result in a lot of unnecessary requests. You can fix this by checking against the previous `document` value.
 
 ```js
 const existingValue = JSON.parse(localStorage.getItem('content'))
@@ -195,7 +195,7 @@ class App extends React.Component {
 }
 ```
 
-Now you're content will be saved only when the content itself changes!
+Now your content will be saved only when the content itself changes!
 
 Success—you've got JSON in your database.
 

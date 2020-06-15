@@ -4,11 +4,19 @@ This document maintains a list of changes to the `slate-prop-types` package with
 
 ---
 
+### `0.5.0` — October 9, 2018
+
+###### BREAKING
+
+**Updated to the latest version of `slate`.** The `slate-react` codebase has been updated to be compatible with the latest version of `slate`, `0.42.0`. This is a backward incompatible upgrade, and so the peer dependency range has been bumped.
+
+---
+
 ### `0.4.0` — October 27, 2017
 
 ###### BREAKING
 
-* **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+**Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
 
 ---
 
@@ -16,11 +24,11 @@ This document maintains a list of changes to the `slate-prop-types` package with
 
 ###### BREAKING
 
-* **Updated to work with `slate@0.29.0`.** This is required because `slate-prop-types` needs access to the new `Value` model.
+**Updated to work with `slate@0.29.0`.** This is required because `slate-prop-types` needs access to the new `Value` model.
 
 ###### DEPRECATED
 
-* **The `state` prop type has been renamed to `value`.** This is to stay in line with `slate-react@0.29.0` where the `State` object was renamed.
+**The `state` prop type has been renamed to `value`.** This is to stay in line with `slate-react@0.29.0` where the `State` object was renamed.
 
 ---
 
@@ -28,7 +36,7 @@ This document maintains a list of changes to the `slate-prop-types` package with
 
 ###### BREAKING
 
-* **Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
+**Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
 
 ---
 

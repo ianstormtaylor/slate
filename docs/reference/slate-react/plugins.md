@@ -1,49 +1,46 @@
 # Plugins
 
-Plugins can be attached to an editor to alter its behavior in different ways. Plugins are just simple Javascript objects, containing a set of properties that control different behaviors—event handling, change handling, rendering, etc.
+Plugins can be attached to an editor to alter its behavior in different ways. Each editor has a "stack" of plugins, which has a specific order, which it runs through when certain hooks are triggered.
 
-Each editor has a "middleware stack" of plugins, which has a specific order.
+Plugins are plain JavaScript objects, containing a set of middleware functions that run for each hook they choose to implement.
 
-When the editor needs to resolve a plugin-related handler, it will loop through its plugin stack, searching for the first plugin that successfully returns a value. After receiving that value, the editor will **not** continue to search the remaining plugins; it returns early. If you'd like for the stack to continue, a plugin handler should return `undefined`.
+## Hooks
 
-## Conventions
-
-A plugin should always export a function that takes options. This way even if it doesn't take any options now, it won't be a breaking API change to take more options in the future. So a basic plugin might look like this:
-
-```js
-export default function MySlatePlugin(options) {
-  return {
-    // Return properties that describe your logic here...
-  }
-}
-```
-
-## Event Handler Properties
+In addition to the [core plugin hooks](../slate/plugins.md), when using `slate-react` there are additional browser-specific event handling hooks, and React-specific rendering hooks available to plugins.
 
 ```js
 {
+  decorateNode: Function,
   onBeforeInput: Function,
   onBlur: Function,
-  onFocus: Function,
   onCopy: Function,
   onCut: Function,
   onDrop: Function,
+  onFocus: Function,
   onKeyDown: Function,
   onKeyUp: Function,
   onPaste: Function,
-  onSelect: Function
+  onSelect: Function,
+  renderEditor: Function,
+  renderMark: Function,
+  renderNode: Function,
+  shouldNodeComponentUpdate: Function,
 }
 ```
 
-All of the event handler properties are passed the same React `event` object you are used to from React's event handlers. They are also passed a `change` object representing any changes that have resulted from the event, and the `editor` instance itself.
+The event hooks have a signature of `(event, editor, next)`—the `event` is a React object that you are used to from React's event handlers.
 
-Each event handler can choose to call methods on the `change` object, in which case the editor's value will be updated.
+The rendering hooks are just like render props common to other React API's, and receive `(props, editor, next)`. For more information, see the [Rendering](./rendering.md) reference.
 
-If the return value of a plugin handler is `null`, the editor will simply continue resolving the plugin stack. However, if you return a non-null value, the editor will break out of the loop.
+### `decorateNode`
+
+`Function decorateNode(node: Node, editor: Editor, next: Function) => Array<Decoration>|Void`
+
+The `decorateNode` hook takes a `node` and returns an array of decorations with marks to be applied to the node when it is rendered.
 
 ### `onBeforeInput`
 
-`Function onBeforeInput(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onBeforeInput(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called right before a string of text is inserted into the `contenteditable` element.
 
@@ -51,37 +48,37 @@ Make sure to `event.preventDefault()` if you do not want the default insertion b
 
 ### `onBlur`
 
-`Function onBlur(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onBlur(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the editor's `contenteditable` element is blurred.
 
 ### `onFocus`
 
-`Function onFocus(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onFocus(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the editor's `contenteditable` element is focused.
 
 ### `onCopy`
 
-`Function onCopy(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onCopy(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when there is a copy event in the editor's `contenteditable` element.
 
 ### `onCut`
 
-`Function onCut(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onCut(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is equivalent to the `onCopy` handler.
 
 ### `onDrop`
 
-`Function onDrop(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onDrop(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the user drops content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onKeyDown`
 
-`Function onKeyDown(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onKeyDown(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when any key is pressed in the `contenteditable` element, before any action is taken.
 
@@ -89,46 +86,87 @@ Make sure to `event.preventDefault()` if you do not want the default insertion b
 
 ### `onKeyUp`
 
-`Function onKeyUp(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onKeyUp(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when any key is released in the `contenteditable` element.
 
 ### `onPaste`
 
-`Function onPaste(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onPaste(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called when the user pastes content into the `contenteditable` element. The event is already prevented by default, so you must define a value change to have any affect occur.
 
 ### `onSelect`
 
-`Function onSelect(event: Event, change: Change, editor: Editor) => Change || Void`
+`Function onSelect(event: Event, editor: Editor, next: Function) => Boolean`
 
 This handler is called whenever the native DOM selection changes.
 
-_Note: This is **not** Slate's internal selection representation (although it mirrors it). If you want to get notified when Slate's selection changes, use the [`onChange`](../slate-react/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect._
-
-## Other Properties
-
-```js
-{
-  onChange: Function
-}
-```
-
-### `onChange`
-
-`Function onChange(change: Change) => Any || Void`
-
-The `onChange` handler isn't a native browser event handler. Instead, it is invoked whenever the editor value changes. This allows plugins to augment a change however they want.
+> 🤖 This is **not** Slate's internal selection representation. If you want to get notified when Slate's `value.selection` changes, use the [`onChange`](../slate-react/editor.md#onchange) property of the `<Editor>`. This handler is instead meant to give you lower-level access to the DOM selection handling, which **is not always triggered** as you'd expect.
 
 ### `renderEditor`
 
-`Function renderEditor(props: Object, editor: Editor) => Object || Void`
+`Function renderEditor(props: Object, editor: Editor, next: Function) => ReactNode|Void`
 
-The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `props.children`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. This can be useful for rendering toolbars, styling the editor, rendering validation, etc. Remember that the `renderEditor` function has to render `props.children` for editor's children to render.
+The `renderEditor` property allows you to define higher-order-component-like behavior. It is passed all of the properties of the editor, including `children`, which you can access as `next()`. You can then choose to wrap the existing `children` in any custom elements or proxy the properties however you choose. Note, that multiple plugins can define `renderEditor` and each one can add a specific behaviour to the editor, as `next()` refers to `children` from another plugin in the stack. This can be useful for rendering toolbars, styling the editor, rendering validation, etc, and each plugin can be responsible for a given functionality only, keeping your code dry and well organized. Just remember that the `renderEditor` function has to render `children` for editor's content to render. For example:
 
-### `schema`
+```js
+renderEditor: (props, editor, next) => {
+  const children = next()
 
-`Object`
+  return (
+    <div>
+      <MyToolbarComponent editor={editor} />
+      <MyEditorComponent editor={editor}>{children}</MyEditorComponent>
+    </div>
+  )
+}
+```
 
-The `schema` property allows you to define a set of rules that will be added to the editor's schema. The rules from each of the schemas returned by the plugins are collected into a single schema for the editor.
+### `renderMark`
+
+`Function renderMark(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render a `Mark` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  mark: Mark,
+  marks: Set<Mark>,
+  node: Node,
+  offset: Number,
+  text: String,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the mark.
+
+### `renderNode`
+
+`Function renderNode(props: Object, editor: Editor, next: Function) => ReactNode|Void`
+
+Render a `Node` with `props`. The `props` object contains:
+
+```js
+{
+  attributes: Object,
+  children: ReactNode,
+  editor: Editor,
+  isFocused: Boolean,
+  isSelected: BOolean,
+  node: Node,
+  parent: Node,
+  readOnly: Boolean,
+}
+```
+
+You must spread the `props.attributes` onto the top-level DOM node you use to render the node.
+
+### `shouldNodeComponentUpdate`
+
+`Function shouldNodeComponentUpdate(previousProps: Object, props: Object, editor: Editor, next: Function) => Boolean|Void`
+
+If this function returns `true`, it can force updating the node's component where otherwise it wouldn't for performance.

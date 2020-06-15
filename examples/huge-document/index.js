@@ -23,17 +23,25 @@ for (let h = 0; h < HEADINGS; h++) {
   nodes.push({
     object: 'block',
     type: 'heading',
-    nodes: [{ object: 'text', leaves: [{ text: faker.lorem.sentence() }] }],
+    nodes: [{ object: 'text', text: faker.lorem.sentence() }],
   })
 
   for (let p = 0; p < PARAGRAPHS; p++) {
     nodes.push({
       object: 'block',
       type: 'paragraph',
-      nodes: [{ object: 'text', leaves: [{ text: faker.lorem.paragraph() }] }],
+      nodes: [{ object: 'text', text: faker.lorem.paragraph() }],
     })
   }
 }
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(json, { normalize: false })
 
 /**
  * The huge document example.
@@ -43,29 +51,6 @@ for (let h = 0; h < HEADINGS; h++) {
 
 class HugeDocument extends React.Component {
   /**
-   * Deserialize the initial editor value.
-   *
-   * @type {Object}
-   */
-
-  constructor() {
-    super()
-    console.time('deserializeHugeDocument')
-    this.state = { value: Value.fromJSON(json, { normalize: false }) }
-    console.timeEnd('deserializeHugeDocument')
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
    * Render the editor.
    *
    * @return {Component} component
@@ -73,17 +58,13 @@ class HugeDocument extends React.Component {
 
   render() {
     return (
-      <div className="editor">
-        <Editor
-          placeholder="Enter some text..."
-          spellCheck={false}
-          value={this.state.value}
-          onChange={this.onChange}
-          onKeyDown={this.onKeyDown}
-          renderNode={this.renderNode}
-          renderMark={this.renderMark}
-        />
-      </div>
+      <Editor
+        placeholder="Enter some text..."
+        spellCheck={false}
+        defaultValue={initialValue}
+        renderNode={this.renderNode}
+        renderMark={this.renderMark}
+      />
     )
   }
 
@@ -91,14 +72,19 @@ class HugeDocument extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
+  renderNode = (props, editor, next) => {
     const { attributes, children, node } = props
+
     switch (node.type) {
       case 'heading':
         return <h1 {...attributes}>{children}</h1>
+      default:
+        return next()
     }
   }
 
@@ -106,20 +92,25 @@ class HugeDocument extends React.Component {
    * Render a Slate mark.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'bold':
-        return <strong>{children}</strong>
+        return <strong {...attributes}>{children}</strong>
       case 'code':
-        return <code>{children}</code>
+        return <code {...attributes}>{children}</code>
       case 'italic':
-        return <em>{children}</em>
+        return <em {...attributes}>{children}</em>
       case 'underlined':
-        return <u>{children}</u>
+        return <u {...attributes}>{children}</u>
+      default:
+        return next()
     }
   }
 }

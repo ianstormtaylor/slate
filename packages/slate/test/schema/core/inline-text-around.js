@@ -8,123 +8,23 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <link>
-          <link>one</link>
-          <link>two</link>
-        </link>
+        <link>one</link>
+        <link>two</link>
       </paragraph>
     </document>
   </value>
 )
 
-export const output = {
-  object: 'value',
-  document: {
-    object: 'document',
-    data: {},
-    nodes: [
-      {
-        object: 'block',
-        type: 'paragraph',
-        isVoid: false,
-        data: {},
-        nodes: [
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-          {
-            object: 'inline',
-            type: 'link',
-            isVoid: false,
-            data: {},
-            nodes: [
-              {
-                object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
-              },
-              {
-                object: 'inline',
-                type: 'link',
-                isVoid: false,
-                data: {},
-                nodes: [
-                  {
-                    object: 'text',
-                    leaves: [
-                      {
-                        object: 'leaf',
-                        text: 'one',
-                        marks: [],
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
-              },
-              {
-                object: 'inline',
-                type: 'link',
-                isVoid: false,
-                data: {},
-                nodes: [
-                  {
-                    object: 'text',
-                    leaves: [
-                      {
-                        object: 'leaf',
-                        text: 'two',
-                        marks: [],
-                      },
-                    ],
-                  },
-                ],
-              },
-              {
-                object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
-              },
-            ],
-          },
-          {
-            object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
-          },
-        ],
-      },
-    ],
-  },
-}
+export const output = (
+  <value>
+    <document>
+      <paragraph>
+        <text />
+        <link>one</link>
+        <text />
+        <link>two</link>
+        <text />
+      </paragraph>
+    </document>
+  </value>
+)

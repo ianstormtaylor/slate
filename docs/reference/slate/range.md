@@ -10,54 +10,28 @@ The "anchor" is the fixed point in a range, and the "focus" is the non-fixed poi
 
 Often times, you don't need to specifically know which point is the "anchor" and which is the "focus", and you just need to know which comes first and last in the document. For these cases, there are many convenience equivalent properties and methods referring to the "start" and "end" points.
 
+The `Range` model is also used as an interface and implemented by the [`Decoration`](./decoration.md) and [`Selection`](./selection.md) models.
+
 ## Properties
 
 ```js
 Range({
-  anchorKey: String,
-  anchorOffset: Number,
-  focusKey: String,
-  focusOffset: Number,
-  isFocused: Boolean,
-  isBackward: Boolean,
+  anchor: Point,
+  focus: Point,
 })
 ```
 
-### `anchorKey`
+### `anchor`
 
-`String`
+`Point`
 
-The key of the text node at the range's anchor point.
+The range's anchor point.
 
-### `anchorOffset`
+### `focus`
 
-`Number`
+`Point`
 
-The number of characters from the start of the text node at the range's anchor point.
-
-### `focusKey`
-
-`String`
-
-The key of the text node at the range's focus point.
-
-### `focusOffset`
-
-`Number`
-
-The number of characters from the start of the text node at the range's focus point.
-
-### `isBackward`
-
-`Boolean`
-
-Whether the range is backward. A range is considered "backward" when its focus point references a location earlier in the document than its anchor point.
-
-### `isFocused`
-
-`Boolean`
-
-Whether the range currently has focus.
+The range's focus point.
 
 ### `object`
 
@@ -69,11 +43,15 @@ A string with a value of `'range'`.
 
 These properties aren't supplied when creating a range, but are instead computed based on the real properties.
 
-### `isBlurred`
+### `end`
+
+Either the `anchor` or the `focus` point, depending on which comes last in the document order.
+
+### `isBackward`
 
 `Boolean`
 
-The opposite of `isFocused`, for convenience.
+Whether the range is backward. A range is considered "backward" when its focus point references a location earlier in the document than its anchor point.
 
 ### `isCollapsed`
 
@@ -93,15 +71,21 @@ The opposite of `isCollapsed`, for convenience.
 
 The opposite of `isBackward`, for convenience.
 
-### `startKey`
+### `isSet`
 
-### `startOffset`
+`Boolean`
 
-### `endKey`
+Whether both the `anchor` and `focus` points are set.
 
-### `endOffset`
+### `isUnset`
 
-A few convenience properties for accessing the first and last point of the range. When the range is forward, `start` refers to the `anchor` point and `end` refers to the `focus` point. And when it's backward they are reversed.
+`Boolean`
+
+Whether either the `anchor` and `focus` points are unset.
+
+### `start`
+
+Either the `anchor` or the `focus` point, depending on which comes first in the document order.
 
 ## Static Methods
 
@@ -111,6 +95,12 @@ A few convenience properties for accessing the first and last point of the range
 
 Create a new `Range` instance with `properties`.
 
+### `Range.createProperties`
+
+`Range.createProperties(object: Object|Range) => Object`
+
+Create a new dictionary of range properties from an `object`.
+
 ### `Range.fromJSON`
 
 `Range.fromJSON(object: Object) => Range`
@@ -119,9 +109,9 @@ Create a range from a JSON `object`.
 
 ### `Range.isRange`
 
-`Range.isRange(maybeRange: Any) => Boolean`
+`Range.isRange(value: Any) => Boolean`
 
-Returns a boolean if the passed in argument is a `Range`.
+Check whether a `value` is a `Range`.
 
 ## Instance Methods
 
@@ -129,42 +119,100 @@ Returns a boolean if the passed in argument is a `Range`.
 
 `toJSON() => Object`
 
-Returns a JSON representation of the range.
+Return a JSON representation of the range.
 
-## Checking Methods
+## Mutating Methods
 
-### `has{Edge}AtStartOf`
+### `move{Point}Backward`
 
-`has{Edge}AtStartOf(node: Node) => Boolean`
+`move{Point}Backward(n: Number) => Range`
 
-Determine whether a range has an edge at the start of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+Move the `{Point}` of the range backwards by `n` characters. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-### `has{Edge}AtEndOf`
+### `move{Point}Forward`
 
-`has{Edge}AtEndOf(node: Node) => Boolean`
+`move{Point}Forward(n: Number) => Range`
 
-Determine whether a range has an edge at the end of a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+Move the `{Point}` of the range forwards by `n` characters. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-### `has{Edge}Between`
+### `move{Point}To`
 
-`has{Edge}Between(node: Node, start: Number, end: Number) => Boolean`
+`move{Point}To(path: List, offset: Number) => Range`
+`move{Point}To(key: String, offset: Number) => Range`
+`move{Point}To(offset: Number) => Range`
 
-Determine whether a range has an edge in a `node` between its `start` and `end` offset. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+Move the `{Point}` of the range to a new `key`, `path` and `offset`. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-### `has{Edge}In`
+> 🤖 When using `range.move{Point}To`, since the range isn't aware of the document, it's possible it will become "unset" if the path or key changes and need to be re-normalized relative to the document using `range.normalize(document)`.
 
-`has{Edge}In(node: Node) => Boolean`
+### `move{Point}ToEndOfNode`
 
-Determine whether a range has an edge inside a `node`. Where `{Edge}` can be one of: `Anchor`, `Focus`, `Start`, `End` or `Edge` (referring to either point).
+`move{Point}ToEndOfNode(node: Node) => Range`
 
-### `isAtStartOf`
+Move the `{Point}` to the end of a `node`. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-`isAtStartOf(node: Node) => Boolean`
+> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
 
-Determine whether the range is at the start of a `node`.
+### `move{Point}ToStartOfNode`
 
-### `isAtEndOf`
+`move{Point}ToStartOfNode(node: Node) => Range`
 
-`isAtEndOf(node: Node) => Boolean`
+Move the `{Point}` to the start of a `node`. The `{Point}` can be one of: `Anchor`, `Focus`, `Start`, `End`, or ommited to move both the `anchor` and `focus` point at once.
 
-Determine whether the range is at the end of a `node`.
+> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
+
+### `moveTo{Point}`
+
+`moveTo{Point}() => Range`
+
+Move both points of the range to `{Point}`, collapsing it. The `{Point}` can be one of: `Anchor`, `Focus`, `Start` or `End`.
+
+### `moveToRangeOfNode`
+
+`moveToRangeOfNode(node: Node) => Range`
+
+Move the range to be spanning the entirity of a `node`, by placing its `anchor` point at the start of the node and its `focus` point at the end of the node.
+
+> 🤖 This method may need to be followed by `point.normalize(document)`, like [`move{Point}To`](#movepointto).
+
+### `normalize`
+
+`normalize(node: Node) => Range`
+
+Normalize the range relative to a `node`, ensuring that its anchor and focus points exist in the `node`, that their keys and paths are in sync, that their offsets are valid, and that they references leaf text nodes.
+
+### `setAnchor`
+
+`setAnchor(anchor: Point) => Range`
+
+Return a new range with a new `anchor` point.
+
+### `setEnd`
+
+`setEnd(end: Point) => Range`
+
+Return a new range with a new `end` point.
+
+### `setFocus`
+
+`setFocus(focus: Point) => Range`
+
+Return a new range with a new `focus` point.
+
+### `setProperties`
+
+`setProperties(properties: Object|Range) => Range`
+
+Return a new range with new `properties` set.
+
+### `setStart`
+
+`setStart(start: Point) => Range`
+
+Return a new range with a new `start` point.
+
+### `unset`
+
+`unset() => Range`
+
+Return a new range with both of its point unset.

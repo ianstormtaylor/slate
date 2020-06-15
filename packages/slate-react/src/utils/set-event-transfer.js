@@ -34,6 +34,9 @@ function setEventTransfer(event, type, content) {
 
   try {
     transfer.setData(mime, content)
+    // COMPAT: Safari needs to have the 'text' (and not 'text/plain') value in dataTransfer
+    // to display the cursor while dragging internally.
+    transfer.setData('text', transfer.getData('text'))
   } catch (err) {
     const prefix = 'SLATE-DATA-EMBED::'
     const text = transfer.getData(TEXT)

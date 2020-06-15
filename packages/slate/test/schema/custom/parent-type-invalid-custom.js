@@ -1,16 +1,15 @@
 /** @jsx h */
 
-import { PARENT_TYPE_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     list: {},
     item: {
-      parent: { types: ['list'] },
-      normalize: (change, reason, { node }) => {
-        if (reason == PARENT_TYPE_INVALID) {
-          change.wrapBlockByKey(node.key, 'list')
+      parent: { type: 'list' },
+      normalize: (editor, { code, node }) => {
+        if (code === 'parent_type_invalid') {
+          editor.wrapBlockByKey(node.key, 'list')
         }
       },
     },
@@ -21,7 +20,9 @@ export const input = (
   <value>
     <document>
       <paragraph>
-        <item />
+        <item>
+          <text />
+        </item>
       </paragraph>
     </document>
   </value>
@@ -32,7 +33,9 @@ export const output = (
     <document>
       <paragraph>
         <list>
-          <item />
+          <item>
+            <text />
+          </item>
         </list>
       </paragraph>
     </document>

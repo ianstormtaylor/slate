@@ -2,7 +2,27 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+import styled from 'react-emotion'
+import { Button, Icon, Toolbar } from '../components'
+
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
+
+/**
+ * A styled emoji inline component.
+ *
+ * @type {Component}
+ */
+
+const Emoji = styled('span')`
+  outline: ${props => (props.selected ? '2px solid blue' : 'none')};
+`
 
 /**
  * Emojis.
@@ -27,7 +47,6 @@ const EMOJIS = [
   '👻',
   '🍔',
   '🍑',
-  '🍆',
   '🔑',
 ]
 
@@ -47,46 +66,27 @@ const noop = e => e.preventDefault()
 
 class Emojis extends React.Component {
   /**
-   * Deserialize the raw initial value.
+   * The editor's schema.
    *
    * @type {Object}
    */
 
-  state = {
-    value: Value.fromJSON(initialValue),
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * When clicking a emoji, insert it
-   *
-   * @param {Event} e
-   */
-
-  onClickEmoji = (e, code) => {
-    e.preventDefault()
-    const { value } = this.state
-    const change = value.change()
-
-    change
-      .insertInline({
-        type: 'emoji',
+  schema = {
+    inlines: {
+      emoji: {
         isVoid: true,
-        data: { code },
-      })
-      .collapseToStartOfNextText()
-      .focus()
+      },
+    },
+  }
 
-    this.onChange(change)
+  /**
+   * Store a reference to the `editor`.
+   *
+   * @param {Editor} editor
+   */
+
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -95,50 +95,21 @@ class Emojis extends React.Component {
    * @return {Element} element
    */
 
-  render = () => {
+  render() {
     return (
       <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        {EMOJIS.map((emoji, i) => {
-          const onMouseDown = e => this.onClickEmoji(e, emoji)
-          return (
-            // eslint-disable-next-line react/jsx-no-bind
-            <span key={i} className="button" onMouseDown={onMouseDown}>
-              <span className="material-icons">{emoji}</span>
-            </span>
-          )
-        })}
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
+        <Toolbar>
+          {EMOJIS.map((emoji, i) => (
+            <Button key={i} onMouseDown={e => this.onClickEmoji(e, emoji)}>
+              <Icon>{emoji}</Icon>
+            </Button>
+          ))}
+        </Toolbar>
         <Editor
           placeholder="Write some 😍👋🎉..."
-          value={this.state.value}
-          onChange={this.onChange}
+          ref={this.ref}
+          defaultValue={initialValue}
+          schema={this.schema}
           renderNode={this.renderNode}
         />
       </div>
@@ -149,30 +120,52 @@ class Emojis extends React.Component {
    * Render a Slate node.
    *
    * @param {Object} props
+   * @param {Editor} editor
+   * @param {Function} next
    * @return {Element}
    */
 
-  renderNode = props => {
-    const { attributes, children, node, isSelected } = props
+  renderNode = (props, editor, next) => {
+    const { attributes, children, node, isFocused } = props
+
     switch (node.type) {
       case 'paragraph': {
         return <p {...attributes}>{children}</p>
       }
+
       case 'emoji': {
-        const { data } = node
-        const code = data.get('code')
+        const code = node.data.get('code')
         return (
-          <span
-            className={`emoji ${isSelected ? 'selected' : ''}`}
+          <Emoji
             {...props.attributes}
+            selected={isFocused}
             contentEditable={false}
             onDrop={noop}
           >
             {code}
-          </span>
+          </Emoji>
         )
       }
+
+      default: {
+        return next()
+      }
     }
+  }
+
+  /**
+   * When clicking a emoji, insert it
+   *
+   * @param {Event} e
+   */
+
+  onClickEmoji = (e, code) => {
+    e.preventDefault()
+
+    this.editor
+      .insertInline({ type: 'emoji', data: { code } })
+      .moveToStartOfNextText()
+      .focus()
   }
 }
 

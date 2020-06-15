@@ -21,34 +21,28 @@ export const output = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
-            leaves: [
+            text: 'o',
+            marks: [],
+          },
+          {
+            object: 'text',
+            text: 'n',
+            marks: [
               {
-                object: 'leaf',
-                text: 'o',
-                marks: [],
-              },
-              {
-                object: 'leaf',
-                text: 'n',
-                marks: [
-                  {
-                    object: 'mark',
-                    type: 'bold',
-                    data: {},
-                  },
-                ],
-              },
-              {
-                object: 'leaf',
-                text: 'e',
-                marks: [],
+                object: 'mark',
+                type: 'bold',
+                data: {},
               },
             ],
+          },
+          {
+            object: 'text',
+            text: 'e',
+            marks: [],
           },
         ],
       },

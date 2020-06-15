@@ -1,13 +1,35 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
-import { List, Record } from 'immutable'
+import { List, Record, Map } from 'immutable'
 
-import MODEL_TYPES from '../constants/model-types'
-import OPERATION_ATTRIBUTES from '../constants/operation-attributes'
 import Mark from './mark'
 import Node from './node'
-import Range from './range'
+import PathUtils from '../utils/path-utils'
+import Selection from './selection'
 import Value from './value'
+import apply from '../operations/apply'
+import invert from '../operations/invert'
+
+/**
+ * Operation attributes.
+ *
+ * @type {Array}
+ */
+
+const OPERATION_ATTRIBUTES = {
+  add_mark: ['path', 'mark', 'data'],
+  insert_node: ['path', 'node', 'data'],
+  insert_text: ['path', 'offset', 'text', 'data'],
+  merge_node: ['path', 'position', 'properties', 'target', 'data'],
+  move_node: ['path', 'newPath', 'data'],
+  remove_mark: ['path', 'mark', 'data'],
+  remove_node: ['path', 'node', 'data'],
+  remove_text: ['path', 'offset', 'text', 'data'],
+  set_mark: ['path', 'properties', 'newProperties', 'data'],
+  set_node: ['path', 'properties', 'newProperties', 'data'],
+  set_selection: ['properties', 'newProperties', 'data'],
+  set_value: ['properties', 'newProperties', 'data'],
+  split_node: ['path', 'position', 'properties', 'target', 'data'],
+}
 
 /**
  * Default properties.
@@ -25,11 +47,11 @@ const DEFAULTS = {
   path: undefined,
   position: undefined,
   properties: undefined,
-  selection: undefined,
+  newProperties: undefined,
   target: undefined,
   text: undefined,
   type: undefined,
-  value: undefined,
+  data: undefined,
 }
 
 /**
@@ -90,7 +112,7 @@ class Operation extends Record(DEFAULTS) {
       return object
     }
 
-    const { type, value } = object
+    const { type } = object
     const ATTRIBUTES = OPERATION_ATTRIBUTES[type]
     const attrs = { type }
 
@@ -103,72 +125,71 @@ class Operation extends Record(DEFAULTS) {
     for (const key of ATTRIBUTES) {
       let v = object[key]
 
-      if (v === undefined) {
-        // Skip keys for objects that should not be serialized, and are only used
-        // for providing the local-only invert behavior for the history stack.
-        if (key == 'document') continue
-        if (key == 'selection') continue
-        if (key == 'value') continue
-        if (key == 'node' && type != 'insert_node') continue
+      // Default `data` to an empty object.
+      if (key === 'data' && v === undefined) {
+        v = {}
+      }
 
+      if (v === undefined) {
         throw new Error(
           `\`Operation.fromJSON\` was passed a "${type}" operation without the required "${key}" attribute.`
         )
       }
 
-      if (key == 'mark') {
+      if (key === 'path' || key === 'newPath') {
+        v = PathUtils.create(v)
+      }
+
+      if (key === 'mark') {
         v = Mark.create(v)
       }
 
-      if (key == 'marks' && v != null) {
+      if (key === 'marks' && v != null) {
         v = Mark.createSet(v)
       }
 
-      if (key == 'node') {
+      if (key === 'node') {
         v = Node.create(v)
       }
 
-      if (key == 'selection') {
-        v = Range.create(v)
-      }
-
-      if (key == 'value') {
-        v = Value.create(v)
-      }
-
-      if (key == 'properties' && type == 'merge_node') {
+      if (key === 'properties' && type === 'merge_node') {
         v = Node.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_mark') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_mark'
+      ) {
         v = Mark.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_node') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_node'
+      ) {
         v = Node.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_selection') {
-        const { anchorKey, focusKey, ...rest } = v
-        v = Range.createProperties(rest)
-
-        if (anchorKey !== undefined) {
-          v.anchorPath =
-            anchorKey === null ? null : value.document.getPath(anchorKey)
-        }
-
-        if (focusKey !== undefined) {
-          v.focusPath =
-            focusKey === null ? null : value.document.getPath(focusKey)
-        }
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_selection'
+      ) {
+        v = Selection.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'set_value') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_value'
+      ) {
         v = Value.createProperties(v)
       }
 
-      if (key == 'properties' && type == 'split_node') {
+      if (key === 'properties' && type === 'split_node') {
         v = Node.createProperties(v)
+      }
+
+      if (key === 'data') {
+        v = Map(v)
       }
 
       attrs[key] = v
@@ -176,23 +197,6 @@ class Operation extends Record(DEFAULTS) {
 
     const node = new Operation(attrs)
     return node
-  }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Operation.fromJSON
-
-  /**
-   * Check if `any` is a `Operation`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isOperation(any) {
-    return !!(any && any[MODEL_TYPES.OPERATION])
   }
 
   /**
@@ -207,21 +211,26 @@ class Operation extends Record(DEFAULTS) {
   }
 
   /**
-   * Object.
+   * Apply the operation to a `value`.
    *
-   * @return {String}
+   * @param {Value} value
+   * @return {Value}
    */
 
-  get object() {
-    return 'operation'
+  apply(value) {
+    const next = apply(value, this)
+    return next
   }
 
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
+  /**
+   * Invert the operation.
+   *
+   * @return {Operation}
+   */
+
+  invert() {
+    const inverted = invert(this)
+    return inverted
   }
 
   /**
@@ -239,65 +248,74 @@ class Operation extends Record(DEFAULTS) {
     for (const key of ATTRIBUTES) {
       let value = this[key]
 
-      // Skip keys for objects that should not be serialized, and are only used
-      // for providing the local-only invert behavior for the history stack.
-      if (key == 'document') continue
-      if (key == 'selection') continue
-      if (key == 'value') continue
-      if (key == 'node' && type != 'insert_node') continue
-
-      if (key == 'mark' || key == 'marks' || key == 'node') {
+      if (
+        key === 'mark' ||
+        key === 'marks' ||
+        key === 'node' ||
+        key === 'path' ||
+        key === 'newPath'
+      ) {
         value = value.toJSON()
       }
 
-      if (key == 'properties' && type == 'merge_node') {
+      if (key === 'properties' && type === 'merge_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_mark') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_mark'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_node') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_node'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
-        if ('isVoid' in value) v.isVoid = value.isVoid
         if ('type' in value) v.type = value.type
         value = v
       }
 
-      if (key == 'properties' && type == 'set_selection') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_selection'
+      ) {
         const v = {}
-        if ('anchorOffset' in value) v.anchorOffset = value.anchorOffset
-        if ('anchorPath' in value) v.anchorPath = value.anchorPath
-        if ('focusOffset' in value) v.focusOffset = value.focusOffset
-        if ('focusPath' in value) v.focusPath = value.focusPath
-        if ('isBackward' in value) v.isBackward = value.isBackward
+        if ('anchor' in value) v.anchor = value.anchor.toJSON()
+        if ('focus' in value) v.focus = value.focus.toJSON()
         if ('isFocused' in value) v.isFocused = value.isFocused
-        if ('marks' in value)
-          v.marks = value.marks == null ? null : value.marks.toJSON()
+        if ('marks' in value) v.marks = value.marks && value.marks.toJSON()
         value = v
       }
 
-      if (key == 'properties' && type == 'set_value') {
+      if (
+        (key === 'properties' || key === 'newProperties') &&
+        type === 'set_value'
+      ) {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('decorations' in value) v.decorations = value.decorations.toJS()
-        if ('schema' in value) v.schema = value.schema.toJS()
         value = v
       }
 
-      if (key == 'properties' && type == 'split_node') {
+      if (key === 'properties' && type === 'split_node') {
         const v = {}
         if ('data' in value) v.data = value.data.toJS()
         if ('type' in value) v.type = value.type
         value = v
+      }
+
+      if (key === 'data') {
+        value = value.toJSON()
       }
 
       json[key] = value
@@ -305,21 +323,7 @@ class Operation extends Record(DEFAULTS) {
 
     return json
   }
-
-  /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
-  }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Operation.prototype[MODEL_TYPES.OPERATION] = true
 
 /**
  * Export.

@@ -4,11 +4,27 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ---
 
+### `0.8.0` — May 1, 2019
+
+###### BREAKING
+
+**Updated to work with `slate@0.46`.** The HTML serializer has been updated to work alongside the new text data model in the latest version of slate. For serializing it requires you pass in the new format for text nodes. And for deserializing it will return the new format.
+
+---
+
+### `0.7.0` — August 22, 2018
+
+###### BREAKING
+
+**Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+
+---
+
 ### `0.6.0` — March 22, 2018
 
 ###### BREAKING
 
-* **Returning `null` now ignores the node.** Previously it would be treated the same as `undefined`, which will move on to the next rule in the stack. Now it ignores the node and moves onto the next node instead.
+**Returning `null` now ignores the node.** Previously it would be treated the same as `undefined`, which will move on to the next rule in the stack. Now it ignores the node and moves onto the next node instead.
 
 ---
 
@@ -16,9 +32,9 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ###### BREAKING
 
-* **The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
+**The `kind` property of Slate objects has been renamed to `object`.** This is to reduce the confusion over the difference between "kind" and "type" which are practically synonyms. The "object" name was chosen to match the Stripe API, since it seems like a sensible choice and reads much more nicely when looking through JSON.
 
-* **Serializing with `parse5` is no longer possible.** The codebase previously made concessions to allow this, but it was never a good idea because `parse5` does not match the `DOMParser` behavior exactly. Instead, you should use `jsdom` to get a matching behavior, otherwise your serialization rules need to account for two slightly different syntax trees.
+**Serializing with `parse5` is no longer possible.** The codebase previously made concessions to allow this, but it was never a good idea because `parse5` does not match the `DOMParser` behavior exactly. Instead, you should use `jsdom` to get a matching behavior, otherwise your serialization rules need to account for two slightly different syntax trees.
 
 ---
 
@@ -26,7 +42,7 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ###### BREAKING
 
-* **Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
+**Remove all previously deprecated code paths.** This helps to reduce some of the complexity in Slate by not having to handle these code paths anymore. And it helps to reduce file size. When upgrading, it's _highly_ recommended that you upgrade to the previous version first and ensure there are no deprecation warnings being logged, then upgrade to this version.
 
 ---
 
@@ -34,7 +50,7 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ###### BREAKING
 
-* **Updated to work with `slate@0.29.0`.** This is required because `slate-html-serializer` needs access to the new `Value` model.
+**Updated to work with `slate@0.29.0`.** This is required because `slate-html-serializer` needs access to the new `Value` model.
 
 ---
 
@@ -42,7 +58,7 @@ This document maintains a list of changes to the `slate-html-serializer` package
 
 ###### BREAKING
 
-* **Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
+**Updated work with `slate@0.27.0`.** The new version of Slate renames the old `Range` model to `Leaf`, and the old `Selection` model to `Range`.
 
 ---
 

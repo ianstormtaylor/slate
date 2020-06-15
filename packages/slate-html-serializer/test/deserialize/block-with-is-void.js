@@ -11,7 +11,6 @@ export const config = {
             return {
               object: 'block',
               type: 'image',
-              isVoid: true,
             }
           }
         }

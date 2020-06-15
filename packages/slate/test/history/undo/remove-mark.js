@@ -2,21 +2,18 @@
 
 import h from '../../helpers/h'
 
-export default function(value) {
-  return value
-    .change()
-    .removeMark('bold')
-    .value.change()
-    .undo().value
+export default function(editor) {
+  editor.removeMark('bold')
+  editor.flush().undo()
 }
 
 export const input = (
   <value>
     <document>
       <paragraph>
-        <anchor />
-        <b>one</b>
-        <focus />
+        <b>
+          <anchor />one<focus />
+        </b>
       </paragraph>
     </document>
   </value>

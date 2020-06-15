@@ -4,11 +4,11 @@
 
 # Using Plugins
 
-Up to now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most beautiful things about Slate is actually its plugin system, and how it lets you write less one-off code.
+Up until now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most beautiful things about Slate is actually its plugin system and how it lets you write less one-off code.
 
 In the previous guide, we actually wrote some pretty useful code for adding **bold** formatting to ranges of text when a key is pressed. But most of that code wasn't really specific to **bold** text; it could just as easily have applied to _italic_ text or `code` text if we switched a few variables.
 
-So let's break that logic out into it's a reusable plugin that can toggle _any_ mark on _any_ key press.
+So let's break that logic out into a reusable plugin that can toggle _any_ mark on _any_ key press.
 
 Starting with our app from earlier:
 
@@ -22,11 +22,10 @@ class App extends React.Component {
     this.setState({ value })
   }
 
-  onKeyDown = (event, change) => {
-    if (event.key != 'b' || !event.ctrlKey) return
+  onKeyDown = (event, editor, next) => {
+    if (event.key != 'b' || !event.ctrlKey) return next()
     event.preventDefault()
-    change.toggleMark('bold')
-    return true
+    editor.toggleMark('bold')
   }
 
   render() {
@@ -40,16 +39,18 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     switch (props.mark.type) {
       case 'bold':
-        return <strong>{props.children}</strong>
+        return <strong {...props.attributes}>{props.children}</strong>
+      default:
+        return next()
     }
   }
 }
 ```
 
-Let's write a new function, that takes a set of options: the mark `type` to toggle and the `key` to press.
+Let's write a new function that takes a set of options: the mark `type` to toggle and the `key` to press.
 
 ```js
 function MarkHotkey(options) {
@@ -60,9 +61,9 @@ function MarkHotkey(options) {
 
 Okay, that was easy. But it doesn't do anything.
 
-To fix that, we need our plugin function to return a "plugin object" that Slate recognizes. Slate's plugin objects are just plain objects that have properties that map to the same handler on the `Editor`.
+To fix that, we need our plugin function to return a "plugin object" that Slate recognizes. Slate's plugin objects are just plain JavaScript objects whose properties map to the same handlers on the `Editor`.
 
-In this case our plugin object will have one property: a `onKeyDown` handler, with its logic copied right from our current app's code:
+In this case, our plugin object will have one property, an `onKeyDown` handler, with its logic copied right from our current app's code:
 
 ```js
 function MarkHotkey(options) {
@@ -70,16 +71,15 @@ function MarkHotkey(options) {
 
   // Return our "plugin" object, containing the `onKeyDown` handler.
   return {
-    onKeyDown(event, change) {
-      // Check that the key pressed matches our `key` option.
-      if (!event.ctrlKey || event.key != key) return
+    onKeyDown(event, editor, next) {
+      // If it doesn't match our `key`, let other plugins handle it.
+      if (!event.ctrlKey || event.key != key) return next()
 
       // Prevent the default characters from being inserted.
       event.preventDefault()
 
       // Toggle the mark `type`.
-      change.toggleMark(type)
-      return true
+      editor.toggleMark(type)
     },
   }
 }
@@ -87,7 +87,7 @@ function MarkHotkey(options) {
 
 Boom! Now we're getting somewhere. That code is reusable for any type of mark.
 
-Now that we have our plugin, let's remove the hard-coded logic from our app, and replace it with our brand new `MarkHotkey` plugin instead, passing in the same options that will keep our **bold** functionality intact:
+Now that we have our plugin, let's remove the hard-coded logic from our app and replace it with our brand new `MarkHotkey` plugin instead, passing in the same options that will keep our **bold** functionality intact:
 
 ```js
 // Initialize our bold-mark-adding plugin.
@@ -120,10 +120,12 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <strong>{props.children}</strong>
+      default:
+        return next()
     }
   }
 }
@@ -163,7 +165,7 @@ class App extends React.Component {
     )
   }
 
-  renderMark = props => {
+  renderMark = (props, editor, next) => {
     switch (props.mark.type) {
       case 'bold':
         return <strong>{props.children}</strong>
@@ -176,12 +178,14 @@ class App extends React.Component {
         return <del>{props.children}</del>
       case 'underline':
         return <u>{props.children}</u>
+      default:
+        return next()
     }
   }
 }
 ```
 
-And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our mark hotkey logic tested and isolated in a single place, making maintaining the code easier.
+And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our mark hotkey logic tested and isolated in a single place, making the code easier to maintain.
 
 That's why plugins are awesome. They let you get really expressive while also making your codebase easier to manage. And since Slate is built with plugins as a primary consideration, using them is dead simple!
 

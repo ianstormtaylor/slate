@@ -1,5 +1,7 @@
 {
+  "object": "value",
   "document": {
+    "object": "document",
     "nodes": [
       {
         "object": "block",
@@ -7,22 +9,16 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "These two editors are kept "
-              },
-              {
-                "text": "in sync",
-                "marks": [
-                  {
-                    "type": "bold"
-                  }
-                ]
-              },
-              {
-                "text": " with one another as you type!"
-              }
-            ]
+            "text": "These two editors are kept "
+          },
+          {
+            "object": "text",
+            "text": "in sync",
+            "marks": [{ "type": "bold" }]
+          },
+          {
+            "object": "text",
+            "text": " with one another as you type!"
           }
         ]
       },
@@ -32,23 +28,17 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text":
-                  "They achieve this by sending any document-altering operations to each other whenever a change occurs, and then applying them locally with "
-              },
-              {
-                "text": "change.applyOperations()",
-                "marks": [
-                  {
-                    "type": "code"
-                  }
-                ]
-              },
-              {
-                "text": "."
-              }
-            ]
+            "text":
+              "They achieve this by sending any document-altering operations to each other whenever a change occurs, and then applying them locally with "
+          },
+          {
+            "object": "text",
+            "text": "editor.applyOperation()",
+            "marks": [{ "type": "code" }]
+          },
+          {
+            "object": "text",
+            "text": "."
           }
         ]
       },
@@ -58,20 +48,13 @@
         "nodes": [
           {
             "object": "text",
-            "leaves": [
-              {
-                "text": "Note: ",
-                "marks": [
-                  {
-                    "type": "italic"
-                  }
-                ]
-              },
-              {
-                "text":
-                  "this example doesn't showcase operational transforms or network communication, which are required for realtime editing with multiple people at once."
-              }
-            ]
+            "text": "Note: ",
+            "marks": [{ "type": "italic" }]
+          },
+          {
+            "object": "text",
+            "text":
+              "this example doesn't showcase operational transforms or network communication, which are required for realtime editing with multiple people at once."
           }
         ]
       }

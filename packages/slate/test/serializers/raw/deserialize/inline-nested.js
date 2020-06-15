@@ -12,73 +12,45 @@ export const input = {
         object: 'block',
         type: 'paragraph',
         data: {},
-        isVoid: false,
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
           {
             object: 'inline',
             type: 'link',
             data: {},
-            isVoid: false,
             nodes: [
               {
                 object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
+                text: '',
+                marks: [],
               },
               {
                 object: 'inline',
                 type: 'hashtag',
                 data: {},
-                isVoid: false,
                 nodes: [
                   {
                     object: 'text',
-                    leaves: [
-                      {
-                        object: 'leaf',
-                        text: 'one',
-                        marks: [],
-                      },
-                    ],
+                    text: 'one',
+                    marks: [],
                   },
                 ],
               },
               {
                 object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: '',
-                    marks: [],
-                  },
-                ],
+                text: '',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
         ],
       },
@@ -90,9 +62,13 @@ export const output = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link>
+          <text />
           <hashtag>one</hashtag>
+          <text />
         </link>
+        <text />
       </paragraph>
     </document>
   </value>

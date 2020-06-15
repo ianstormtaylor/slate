@@ -1,13 +1,10 @@
 import isPlainObject from 'is-plain-object'
-import logger from 'slate-dev-logger'
-import { List, OrderedSet, Record, Set, is } from 'immutable'
+import invariant from 'tiny-invariant'
+import { List, Record } from 'immutable'
 
-import Character from './character'
-import Mark from './mark'
 import Leaf from './leaf'
-import MODEL_TYPES from '../constants/model-types'
-import generateKey from '../utils/generate-key'
-import memoize from '../utils/memoize'
+import Mark from './mark'
+import KeyUtils from '../utils/key-utils'
 
 /**
  * Default properties.
@@ -16,8 +13,9 @@ import memoize from '../utils/memoize'
  */
 
 const DEFAULTS = {
-  characters: new List(),
   key: undefined,
+  marks: undefined,
+  text: undefined,
 }
 
 /**
@@ -39,16 +37,11 @@ class Text extends Record(DEFAULTS) {
       return attrs
     }
 
-    if (typeof attrs == 'string') {
-      attrs = { leaves: [{ text: attrs }] }
+    if (typeof attrs === 'string') {
+      attrs = { text: attrs }
     }
 
     if (isPlainObject(attrs)) {
-      if (attrs.text) {
-        const { text, marks, key } = attrs
-        attrs = { key, leaves: [{ text, marks }] }
-      }
-
       return Text.fromJSON(attrs)
     }
 
@@ -87,35 +80,19 @@ class Text extends Record(DEFAULTS) {
       return object
     }
 
-    const { leaves = [], key = generateKey() } = object
+    invariant(
+      object.leaves == null,
+      'As of slate@0.46, the `leaves` property of text nodes has been removed! Each individual leaf should be created as a text node instead.'
+    )
 
-    const characters = leaves
-      .map(Leaf.fromJSON)
-      .reduce((l, r) => l.concat(r.getCharacters()), new List())
-
+    const { text = '', marks = [], key = KeyUtils.create() } = object
     const node = new Text({
-      characters,
       key,
+      text,
+      marks: Mark.createSet(marks),
     })
 
     return node
-  }
-
-  /**
-   * Alias `fromJS`.
-   */
-
-  static fromJS = Text.fromJSON
-
-  /**
-   * Check if `any` is a `Text`.
-   *
-   * @param {Any} any
-   * @return {Boolean}
-   */
-
-  static isText(any) {
-    return !!(any && any[MODEL_TYPES.TEXT])
   }
 
   /**
@@ -130,286 +107,113 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Object.
+   * Add a `mark`.
    *
-   * @return {String}
-   */
-
-  get object() {
-    return 'text'
-  }
-
-  get kind() {
-    logger.deprecate(
-      'slate@0.32.0',
-      'The `kind` property of Slate objects has been renamed to `object`.'
-    )
-    return this.object
-  }
-
-  /**
-   * Is the node empty?
-   *
-   * @return {Boolean}
-   */
-
-  get isEmpty() {
-    return this.text == ''
-  }
-
-  /**
-   * Get the concatenated text of the node.
-   *
-   * @return {String}
-   */
-
-  get text() {
-    return this.characters.reduce((string, char) => string + char.text, '')
-  }
-
-  /**
-   * Add a `mark` at `index` and `length`.
-   *
-   * @param {Number} index
-   * @param {Number} length
    * @param {Mark} mark
    * @return {Text}
    */
 
-  addMark(index, length, mark) {
-    const marks = new Set([mark])
-    return this.addMarks(index, length, marks)
+  addMark(mark) {
+    mark = Mark.create(mark)
+    const { marks } = this
+    const next = marks.add(mark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
-   * Add a `set` of marks at `index` and `length`.
+   * Add a set of `marks`.
    *
-   * @param {Number} index
-   * @param {Number} length
-   * @param {Set<Mark>} set
+   * @param {Set<Mark>} marks
    * @return {Text}
    */
 
-  addMarks(index, length, set) {
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      marks = marks.union(set)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
+  addMarks(marks) {
+    marks = Mark.createSet(marks)
+    const node = this.set('marks', this.marks.union(marks))
+    return node
   }
 
   /**
-   * Derive a set of decorated characters with `decorations`.
+   * Get the leaves for the text node, with `decorations`.
    *
    * @param {List<Decoration>} decorations
-   * @return {List<Character>}
-   */
-
-  getDecoratedCharacters(decorations) {
-    let node = this
-    const { key, characters } = node
-
-    // PERF: Exit early if there are no characters to be decorated.
-    if (characters.size == 0) return characters
-
-    decorations.forEach(range => {
-      const { startKey, endKey, startOffset, endOffset, marks } = range
-      const hasStart = startKey == key
-      const hasEnd = endKey == key
-      const index = hasStart ? startOffset : 0
-      const length = hasEnd ? endOffset - index : characters.size
-      node = node.addMarks(index, length, marks)
-    })
-
-    return node.characters
-  }
-
-  /**
-   * Get the decorations for the node from a `schema`.
-   *
-   * @param {Schema} schema
-   * @return {Array}
-   */
-
-  getDecorations(schema) {
-    return schema.__getDecorations(this)
-  }
-
-  /**
-   * Derive the leaves for a list of `characters`.
-   *
-   * @param {Array|Void} decorations (optional)
    * @return {List<Leaf>}
    */
 
-  getLeaves(decorations = []) {
-    const characters = this.getDecoratedCharacters(decorations)
-    let leaves = []
+  getLeaves(decorations) {
+    const { key, text, marks } = this
+    const leaf = Leaf.create({ text, marks })
+    let leaves = Leaf.createList([leaf])
 
-    // PERF: cache previous values for faster lookup.
-    let prevChar
-    let prevLeaf
-
-    // If there are no characters, return one empty range.
-    if (characters.size == 0) {
-      leaves.push({})
-    } else {
-      // Otherwise, loop the characters and build the leaves...
-      characters.forEach((char, i) => {
-        const { marks, text } = char
-
-        // The first one can always just be created.
-        if (i == 0) {
-          prevChar = char
-          prevLeaf = { text, marks }
-          leaves.push(prevLeaf)
-          return
-        }
-
-        // Otherwise, compare the current and previous marks.
-        const prevMarks = prevChar.marks
-        const isSame = is(marks, prevMarks)
-
-        // If the marks are the same, add the text to the previous range.
-        if (isSame) {
-          prevChar = char
-          prevLeaf.text += text
-          return
-        }
-
-        // Otherwise, create a new range.
-        prevChar = char
-        prevLeaf = { text, marks }
-        leaves.push(prevLeaf)
-      }, [])
+    // PERF: We can exit early without decorations.
+    if (!decorations || decorations.size === 0) {
+      return leaves
     }
 
-    // PERF: convert the leaves to immutable objects after iterating.
-    leaves = new List(leaves.map(object => new Leaf(object)))
+    // HACK: this shouldn't be necessary, because the loop below should handle
+    // the `0` case without failures. It may already even, not sure.
+    if (text === '') {
+      const decMarks = decorations.map(d => d.mark)
+      const l = Leaf.create({ marks: decMarks })
+      return List([l])
+    }
 
-    // Return the leaves.
-    return leaves
-  }
+    decorations.forEach(dec => {
+      const { start, end, mark } = dec
+      const hasStart = start.key === key
+      const hasEnd = end.key === key
 
-  /**
-   * Get all of the marks on the text.
-   *
-   * @return {OrderedSet<Mark>}
-   */
+      if (hasStart && hasEnd) {
+        const index = hasStart ? start.offset : 0
+        const length = hasEnd ? end.offset - index : text.length - index
 
-  getMarks() {
-    const array = this.getMarksAsArray()
-    return new OrderedSet(array)
-  }
+        if (length < 1) return
+        if (index >= text.length) return
 
-  /**
-   * Get all of the marks on the text as an array
-   *
-   * @return {Array}
-   */
+        if (index !== 0 || length < text.length) {
+          const [before, bundle] = Leaf.splitLeaves(leaves, index)
+          const [middle, after] = Leaf.splitLeaves(bundle, length)
+          leaves = before.concat(middle.map(x => x.addMark(mark)), after)
+          return
+        }
+      }
 
-  getMarksAsArray() {
-    return this.characters.reduce((array, char) => {
-      return array.concat(char.marks.toArray())
-    }, [])
-  }
+      leaves = leaves.map(x => x.addMark(mark))
+    })
 
-  /**
-   * Get the marks on the text at `index`.
-   *
-   * @param {Number} index
-   * @return {Set<Mark>}
-   */
-
-  getMarksAtIndex(index) {
-    if (index == 0) return Mark.createSet()
-    const { characters } = this
-    const char = characters.get(index - 1)
-    if (!char) return Mark.createSet()
-    return char.marks
-  }
-
-  /**
-   * Get a node by `key`, to parallel other nodes.
-   *
-   * @param {String} key
-   * @return {Node|Null}
-   */
-
-  getNode(key) {
-    return this.key == key ? this : null
-  }
-
-  /**
-   * Check if the node has a node by `key`, to parallel other nodes.
-   *
-   * @param {String} key
-   * @return {Boolean}
-   */
-
-  hasNode(key) {
-    return !!this.getNode(key)
+    if (leaves === this.leaves) return leaves
+    return Leaf.createLeaves(leaves)
   }
 
   /**
    * Insert `text` at `index`.
    *
-   * @param {Numbder} index
-   * @param {String} text
-   * @param {String} marks (optional)
-   * @return {Text}
-   */
-
-  insertText(index, text, marks) {
-    let { characters } = this
-    const chars = Character.createList(
-      text.split('').map(char => ({ text: char, marks }))
-    )
-
-    characters = characters
-      .slice(0, index)
-      .concat(chars)
-      .concat(characters.slice(index))
-
-    return this.set('characters', characters)
-  }
-
-  /**
-   * Regenerate the node's key.
-   *
-   * @return {Text}
-   */
-
-  regenerateKey() {
-    const key = generateKey()
-    return this.set('key', key)
-  }
-
-  /**
-   * Remove a `mark` at `index` and `length`.
-   *
    * @param {Number} index
-   * @param {Number} length
+   * @param {String} string
+   * @return {Text}
+   */
+
+  insertText(index, string) {
+    const { text } = this
+    const next = text.slice(0, index) + string + text.slice(index)
+    const node = this.set('text', next)
+    return node
+  }
+
+  /**
+   * Remove a `mark`.
+   *
    * @param {Mark} mark
    * @return {Text}
    */
 
-  removeMark(index, length, mark) {
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      marks = marks.remove(mark)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
+  removeMark(mark) {
+    mark = Mark.create(mark)
+    const { marks } = this
+    const next = marks.remove(mark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
@@ -421,11 +225,10 @@ class Text extends Record(DEFAULTS) {
    */
 
   removeText(index, length) {
-    let { characters } = this
-    const start = index
-    const end = index + length
-    characters = characters.filterNot((char, i) => start <= i && i < end)
-    return this.set('characters', characters)
+    const { text } = this
+    const next = text.slice(0, index) + text.slice(index + length)
+    const node = this.set('text', next)
+    return node
   }
 
   /**
@@ -438,9 +241,8 @@ class Text extends Record(DEFAULTS) {
   toJSON(options = {}) {
     const object = {
       object: this.object,
-      leaves: this.getLeaves()
-        .toArray()
-        .map(r => r.toJSON()),
+      text: this.text,
+      marks: this.marks.toArray().map(m => m.toJSON()),
     }
 
     if (options.preserveKeys) {
@@ -451,85 +253,49 @@ class Text extends Record(DEFAULTS) {
   }
 
   /**
-   * Alias `toJS`.
-   */
-
-  toJS(options) {
-    return this.toJSON(options)
-  }
-
-  /**
-   * Update a `mark` at `index` and `length` with `properties`.
+   * Set a `newProperties` on an existing `mark`.
    *
-   * @param {Number} index
-   * @param {Number} length
-   * @param {Mark} mark
-   * @param {Object} properties
+   * @param {Object} mark
+   * @param {Object} newProperties
    * @return {Text}
    */
 
-  updateMark(index, length, mark, properties) {
-    const newMark = mark.merge(properties)
-
-    const characters = this.characters.map((char, i) => {
-      if (i < index) return char
-      if (i >= index + length) return char
-      let { marks } = char
-      if (!marks.has(mark)) return char
-      marks = marks.remove(mark)
-      marks = marks.add(newMark)
-      char = char.set('marks', marks)
-      return char
-    })
-
-    return this.set('characters', characters)
+  setMark(properties, newProperties) {
+    const { marks } = this
+    const mark = Mark.create(properties)
+    const newMark = mark.merge(newProperties)
+    const next = marks.remove(mark).add(newMark)
+    const node = this.set('marks', next)
+    return node
   }
 
   /**
-   * Validate the text node against a `schema`.
+   * Split the node into two at `index`.
    *
-   * @param {Schema} schema
-   * @return {Object|Void}
+   * @param {Number} index
+   * @returns {Array<Text>}
    */
 
-  validate(schema) {
-    return schema.validateNode(this)
+  splitText(index) {
+    const { text } = this
+    const one = this.set('text', text.slice(0, index))
+    const two = this.set('text', text.slice(index)).regenerateKey()
+    return [one, two]
   }
 
   /**
-   * Get the first invalid descendant
-   * PREF: Do not cache this method; because it can cause cycle reference
+   * Merge the node with an `other` text node.
    *
-   * @param {Schema} schema
-   * @returns {Text|Null}
+   * @param {Text} other
+   * @returns {Text}
    */
 
-  getFirstInvalidDescendant(schema) {
-    return this.validate(schema) ? this : null
+  mergeText(other) {
+    const next = this.text + other.text
+    const node = this.set('text', next)
+    return node
   }
 }
-
-/**
- * Attach a pseudo-symbol for type checking.
- */
-
-Text.prototype[MODEL_TYPES.TEXT] = true
-
-/**
- * Memoize read methods.
- */
-
-memoize(Text.prototype, ['getMarks', 'getMarksAsArray'], {
-  takesArguments: false,
-})
-
-memoize(Text.prototype, [
-  'getDecoratedCharacters',
-  'getDecorations',
-  'getLeaves',
-  'getMarksAtIndex',
-  'validate',
-])
 
 /**
  * Export.

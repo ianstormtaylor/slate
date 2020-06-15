@@ -11,46 +11,29 @@ export const input = {
       {
         object: 'block',
         type: 'paragraph',
-        isVoid: false,
         data: {},
         nodes: [
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
           {
             object: 'inline',
             type: 'link',
-            isVoid: false,
             data: {},
             nodes: [
               {
                 object: 'text',
-                leaves: [
-                  {
-                    object: 'leaf',
-                    text: 'one',
-                    marks: [],
-                  },
-                ],
+                text: 'one',
+                marks: [],
               },
             ],
           },
           {
             object: 'text',
-            leaves: [
-              {
-                object: 'leaf',
-                text: '',
-                marks: [],
-              },
-            ],
+            text: '',
+            marks: [],
           },
         ],
       },
@@ -62,7 +45,9 @@ export const output = (
   <value>
     <document>
       <paragraph>
+        <text />
         <link>one</link>
+        <text />
       </paragraph>
     </document>
   </value>

@@ -2,77 +2,69 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
+import styled from 'react-emotion'
+import { Icon, Toolbar } from '../components'
 
 /**
- * The rich text example.
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
+
+/**
+ * Some styled components for the search box.
+ *
+ * @type {Component}
+ */
+
+const SearchWrapper = styled('div')`
+  position: relative;
+`
+
+const SearchIcon = styled(Icon)`
+  position: absolute;
+  top: 0.5em;
+  left: 0.5em;
+  color: #ccc;
+`
+
+const SearchInput = styled('input')`
+  padding-left: 2em;
+  width: 100%;
+`
+
+/**
+ * The search highlighting example.
  *
  * @type {Component}
  */
 
 class SearchHighlighting extends React.Component {
   /**
-   * Deserialize the initial editor value.
+   * The editor's schema.
    *
    * @type {Object}
    */
 
-  state = {
-    value: Value.fromJSON(initialValue),
+  schema = {
+    marks: {
+      highlight: {
+        isAtomic: true,
+      },
+    },
   }
 
   /**
-   * On change, save the new `value`.
+   * Store a reference to the `editor`.
    *
-   * @param {Change} change
+   * @param {Editor} editor
    */
 
-  onChange = ({ value }) => {
-    this.setState({ value })
-  }
-
-  /**
-   * On input change, update the decorations.
-   *
-   * @param {Event} event
-   */
-
-  onInputChange = event => {
-    const { value } = this.state
-    const string = event.target.value
-    const texts = value.document.getTexts()
-    const decorations = []
-
-    texts.forEach(node => {
-      const { key, text } = node
-      const parts = text.split(string)
-      let offset = 0
-
-      parts.forEach((part, i) => {
-        if (i != 0) {
-          decorations.push({
-            anchorKey: key,
-            anchorOffset: offset - string.length,
-            focusKey: key,
-            focusOffset: offset,
-            marks: [{ type: 'highlight' }],
-          })
-        }
-
-        offset = offset + part.length + string.length
-      })
-    })
-
-    // setting the `save` option to false prevents this change from being added
-    // to the undo/redo stack and clearing the redo stack if the user has undone
-    // changes.
-
-    const change = value
-      .change()
-      .setOperationFlag('save', false)
-      .setValue({ decorations })
-      .setOperationFlag('save', true)
-    this.onChange(change)
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -84,47 +76,21 @@ class SearchHighlighting extends React.Component {
   render() {
     return (
       <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element}
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        <div className="search">
-          <span className="search-icon material-icons">search</span>
-          <input
-            className="search-box"
-            type="search"
-            placeholder="Search the text..."
-            onChange={this.onInputChange}
-          />
-        </div>
-      </div>
-    )
-  }
-
-  /**
-   * Render the Slate editor.
-   *
-   * @return {Element}
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
+        <Toolbar>
+          <SearchWrapper>
+            <SearchIcon>search</SearchIcon>
+            <SearchInput
+              type="search"
+              placeholder="Search the text..."
+              onChange={this.onInputChange}
+            />
+          </SearchWrapper>
+        </Toolbar>
         <Editor
           placeholder="Enter some rich text..."
-          value={this.state.value}
-          onChange={this.onChange}
+          ref={this.ref}
+          defaultValue={initialValue}
+          schema={this.schema}
           renderMark={this.renderMark}
           spellCheck
         />
@@ -139,12 +105,57 @@ class SearchHighlighting extends React.Component {
    * @return {Element}
    */
 
-  renderMark = props => {
-    const { children, mark } = props
+  renderMark = (props, editor, next) => {
+    const { children, mark, attributes } = props
+
     switch (mark.type) {
       case 'highlight':
-        return <span style={{ backgroundColor: '#ffeeba' }}>{children}</span>
+        return (
+          <span {...attributes} style={{ backgroundColor: '#ffeeba' }}>
+            {children}
+          </span>
+        )
+      default:
+        return next()
     }
+  }
+
+  /**
+   * On input change, update the decorations.
+   *
+   * @param {Event} event
+   */
+
+  onInputChange = event => {
+    const { editor } = this
+    const { value } = editor
+    const string = event.target.value
+    const texts = value.document.getTexts()
+    const decorations = []
+
+    texts.forEach(node => {
+      const { key, text } = node
+      const parts = text.split(string)
+      let offset = 0
+
+      parts.forEach((part, i) => {
+        if (i !== 0) {
+          decorations.push({
+            anchor: { key, offset: offset - string.length },
+            focus: { key, offset },
+            mark: { type: 'highlight' },
+          })
+        }
+
+        offset = offset + part.length + string.length
+      })
+    })
+
+    // Make the change to decorations without saving it into the undo history,
+    // so that there isn't a confusing behavior when undoing.
+    editor.withoutSaving(() => {
+      editor.setDecorations(decorations)
+    })
   }
 }
 

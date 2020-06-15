@@ -5,7 +5,7 @@ import App from './app'
 import './index.css'
 
 /**
- * Mount the router.
+ * Render the app.
  */
 
 const root = window.document.createElement('div')
@@ -23,7 +23,10 @@ const render = Component => {
 
 render(App)
 
-// Webpack Hot Module Replacement API
+/**
+ * Re-render for hot module replacement in development.
+ */
+
 if (module.hot) {
   module.hot.accept('./app', () => render(App))
 }

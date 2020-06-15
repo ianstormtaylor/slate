@@ -1,13 +1,35 @@
 import { Editor, getEventRange, getEventTransfer } from 'slate-react'
 import { Block, Value } from 'slate'
-import { LAST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 
 import React from 'react'
-import initialValue from './value.json'
+import initialValueAsJson from './value.json'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import styled from 'react-emotion'
+import { Button, Icon, Toolbar } from '../components'
 
-/*
+/**
+ * Deserialize the initial editor value.
+ *
+ * @type {Object}
+ */
+
+const initialValue = Value.fromJSON(initialValueAsJson)
+
+/**
+ * A styled image block component.
+ *
+ * @type {Component}
+ */
+
+const Image = styled('img')`
+  display: block;
+  max-width: 100%;
+  max-height: 20em;
+  box-shadow: ${props => (props.selected ? '0 0 0 2px blue;' : 'none')};
+`
+
+/**
  * A function to determine whether a URL has an image extension.
  *
  * @param {String} url
@@ -15,45 +37,60 @@ import isUrl from 'is-url'
  */
 
 function isImage(url) {
-  return !!imageExtensions.find(url.endsWith)
+  return imageExtensions.includes(getExtension(url))
+}
+
+/**
+ * Get the extension of the URL, using the URL API.
+ *
+ * @param {String} url
+ * @return {String}
+ */
+
+function getExtension(url) {
+  return new URL(url).pathname.split('.').pop()
 }
 
 /**
  * A change function to standardize inserting images.
  *
- * @param {Change} change
+ * @param {Editor} editor
  * @param {String} src
  * @param {Range} target
  */
 
-function insertImage(change, src, target) {
+function insertImage(editor, src, target) {
   if (target) {
-    change.select(target)
+    editor.select(target)
   }
 
-  change.insertBlock({
+  editor.insertBlock({
     type: 'image',
-    isVoid: true,
     data: { src },
   })
 }
 
 /**
- * A schema to enforce that there's always a paragraph as the last block.
+ * The editor's schema.
  *
  * @type {Object}
  */
 
 const schema = {
   document: {
-    last: { types: ['paragraph'] },
-    normalize: (change, reason, { node, child }) => {
-      switch (reason) {
-        case LAST_CHILD_TYPE_INVALID: {
+    last: { type: 'paragraph' },
+    normalize: (editor, { code, node, child }) => {
+      switch (code) {
+        case 'last_child_type_invalid': {
           const paragraph = Block.create('paragraph')
-          return change.insertNodeByKey(node.key, node.nodes.size, paragraph)
+          return editor.insertNodeByKey(node.key, node.nodes.size, paragraph)
         }
       }
+    },
+  },
+  blocks: {
+    image: {
+      isVoid: true,
     },
   },
 }
@@ -66,13 +103,13 @@ const schema = {
 
 class Images extends React.Component {
   /**
-   * Deserialize the raw initial value.
+   * Store a reference to the `editor`.
    *
-   * @type {Object}
+   * @param {Editor} editor
    */
 
-  state = {
-    value: Value.fromJSON(initialValue),
+  ref = editor => {
+    this.editor = editor
   }
 
   /**
@@ -84,42 +121,16 @@ class Images extends React.Component {
   render() {
     return (
       <div>
-        {this.renderToolbar()}
-        {this.renderEditor()}
-      </div>
-    )
-  }
-
-  /**
-   * Render the toolbar.
-   *
-   * @return {Element} element
-   */
-
-  renderToolbar = () => {
-    return (
-      <div className="menu toolbar-menu">
-        <span className="button" onMouseDown={this.onClickImage}>
-          <span className="material-icons">image</span>
-        </span>
-      </div>
-    )
-  }
-
-  /**
-   * Render the editor.
-   *
-   * @return {Element} element
-   */
-
-  renderEditor = () => {
-    return (
-      <div className="editor">
+        <Toolbar>
+          <Button onMouseDown={this.onClickImage}>
+            <Icon>image</Icon>
+          </Button>
+        </Toolbar>
         <Editor
           placeholder="Enter some text..."
-          value={this.state.value}
+          ref={this.ref}
+          defaultValue={initialValue}
           schema={schema}
-          onChange={this.onChange}
           onDrop={this.onDropOrPaste}
           onPaste={this.onDropOrPaste}
           renderNode={this.renderNode}
@@ -135,28 +146,19 @@ class Images extends React.Component {
    * @return {Element}
    */
 
-  renderNode = props => {
-    const { attributes, node, isSelected } = props
+  renderNode = (props, editor, next) => {
+    const { attributes, node, isFocused } = props
+
     switch (node.type) {
       case 'image': {
         const src = node.data.get('src')
-        const className = isSelected ? 'active' : null
-        const style = { display: 'block' }
-        return (
-          <img src={src} className={className} style={style} {...attributes} />
-        )
+        return <Image src={src} selected={isFocused} {...attributes} />
+      }
+
+      default: {
+        return next()
       }
     }
-  }
-
-  /**
-   * On change.
-   *
-   * @param {Change} change
-   */
-
-  onChange = ({ value }) => {
-    this.setState({ value })
   }
 
   /**
@@ -169,48 +171,47 @@ class Images extends React.Component {
     event.preventDefault()
     const src = window.prompt('Enter the URL of the image:')
     if (!src) return
-
-    const change = this.state.value.change().call(insertImage, src)
-
-    this.onChange(change)
+    this.editor.command(insertImage, src)
   }
 
   /**
    * On drop, insert the image wherever it is dropped.
    *
    * @param {Event} event
-   * @param {Change} change
    * @param {Editor} editor
+   * @param {Function} next
    */
 
-  onDropOrPaste = (event, change, editor) => {
-    const target = getEventRange(event, change.value)
-    if (!target && event.type == 'drop') return
+  onDropOrPaste = (event, editor, next) => {
+    const target = getEventRange(event, editor)
+    if (!target && event.type === 'drop') return next()
 
     const transfer = getEventTransfer(event)
     const { type, text, files } = transfer
 
-    if (type == 'files') {
+    if (type === 'files') {
       for (const file of files) {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
-        if (mime != 'image') continue
+        if (mime !== 'image') continue
 
         reader.addEventListener('load', () => {
-          editor.change(c => {
-            c.call(insertImage, reader.result, target)
-          })
+          editor.command(insertImage, reader.result, target)
         })
 
         reader.readAsDataURL(file)
       }
+      return
     }
 
-    if (type == 'text') {
-      if (!isUrl(text)) return
-      if (!isImage(text)) return
-      change.call(insertImage, text, target)
+    if (type === 'text') {
+      if (!isUrl(text)) return next()
+      if (!isImage(text)) return next()
+      editor.command(insertImage, text, target)
+      return
     }
+
+    next()
   }
 }
 

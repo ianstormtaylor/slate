@@ -4,9 +4,9 @@
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
-It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/) and [Immutable](https://facebook.github.io/immutable-js/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
+It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/) and [Immutable](https://immutable-js.github.io/immutable-js/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-_**Slate is currently in beta**. It's useable now, but you might need to pull request a fix or two for advanced use cases._
+> 🤖 **Slate is currently in beta**. Its core API is useable now, but you might need to pull request fixes for advanced use cases. Some of its APIs are not "finalized" and will (breaking) change over time as we find better solutions.
 
 ## Why?
 
@@ -70,7 +70,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 * [**Hovering menu**](https://github.com/ianstormtaylor/slate/tree/master/examples/hovering-menu) — showing how a contextual hovering menu can be implemented.
 * [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/examples/tables) — showing how to nest blocks to render more advanced components.
 * [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-* [**Code Highlighting**](https://github.com/ianstormtaylor/slate/tree/master/examples/code-highlighting) — showing how to use decorators to dynamically mark text.
+* [**Code Highlighting**](https://github.com/ianstormtaylor/slate/tree/master/examples/code-highlighting) — showing how to use decorations to dynamically mark text.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -80,11 +80,7 @@ Slate encourages you to write small, reusable modules. Check out the public ones
 
 * [`slate-auto-replace`](https://github.com/ianstormtaylor/slate-auto-replace) auto-replaces text as the user types. Useful for "smart" typography!
 * [`slate-collapse-on-escape`](https://github.com/ianstormtaylor/slate-collapse-on-escape) simply collapses the selection when `escape` is pressed.
-* [`slate-edit-code`](https://github.com/GitbookIO/slate-edit-code) adds code editing behavior like tab-to-indent, and enter-to-soft-break.
-* [`slate-edit-list`](https://github.com/GitbookIO/slate-edit-list) adds rich, nested list editing behavior.
-* [`slate-edit-table`](https://github.com/GitbookIO/slate-edit-table) adds complex table editing behavior!
 * [`slate-paste-linkify`](https://github.com/ianstormtaylor/slate-paste-linkify) wraps the selected text in a link when a URL is pasted from the clipboard.
-* [`slate-prism`](https://github.com/GitbookIO/slate-prism) highlights code blocks with [Prism.js](http://prismjs.com/)!
 * [`slate-soft-break`](https://github.com/ianstormtaylor/slate-soft-break) adds a soft break when `enter` is pressed.
 * [`slate-drop-or-paste-images`](https://github.com/ianstormtaylor/slate-drop-or-paste-images) lets users drop or paste images to insert them!
 * [**View all plugins...**](https://github.com/ianstormtaylor/slate/blob/master/docs/general/plugins.md)
@@ -99,7 +95,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 * [**FAQ**](http://docs.slatejs.org/general/faq)
 * [**Resources**](http://docs.slatejs.org/general/resources)
 
-If even that's not enough, you can always [read the source itself](./src), which is heavily commented.
+If even that's not enough, you can always [read the source itself](https://github.com/ianstormtaylor/slate/tree/master/packages), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
@@ -109,6 +105,6 @@ If you're maintaining a translation, feel free to pull request it here!
 
 ## Contributing!
 
-All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
+All contributions are super welcome! Check out the [Contributing instructions](../Contributing.md) for more info!
 
-Slate is [MIT-licensed](./License.md).
+Slate is [MIT-licensed](../License.md).

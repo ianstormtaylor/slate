@@ -6,7 +6,7 @@ export const schema = {
   blocks: {
     paragraph: {
       data: {
-        thing: v => v == null || v == 'value',
+        thing: v => v == null || v === 'value',
       },
     },
   },
@@ -15,7 +15,9 @@ export const schema = {
 export const input = (
   <value>
     <document>
-      <paragraph thing="invalid" />
+      <paragraph thing="invalid">
+        <text />
+      </paragraph>
     </document>
   </value>
 )
@@ -23,7 +25,9 @@ export const input = (
 export const output = (
   <value>
     <document>
-      <paragraph />
+      <paragraph>
+        <text />
+      </paragraph>
     </document>
   </value>
 )

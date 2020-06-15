@@ -6,7 +6,11 @@ export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      nodes: [{ types: ['paragraph'] }],
+      nodes: [
+        {
+          match: [{ type: 'paragraph' }],
+        },
+      ],
     },
   },
 }
@@ -15,7 +19,9 @@ export const input = (
   <value>
     <document>
       <quote>
-        <image />
+        <image>
+          <text />
+        </image>
       </quote>
     </document>
   </value>

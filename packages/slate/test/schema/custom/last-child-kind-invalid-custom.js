@@ -1,16 +1,15 @@
 /** @jsx h */
 
-import { LAST_CHILD_OBJECT_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      last: { objects: ['block'] },
-      normalize: (change, reason, { child }) => {
-        if (reason == LAST_CHILD_OBJECT_INVALID) {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      last: [{ object: 'block' }],
+      normalize: (editor, { code, child }) => {
+        if (code === 'last_child_object_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },

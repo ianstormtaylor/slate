@@ -1,16 +1,15 @@
 /** @jsx h */
 
-import { FIRST_CHILD_TYPE_INVALID } from 'slate-schema-violations'
 import h from '../../helpers/h'
 
 export const schema = {
   blocks: {
     paragraph: {},
     quote: {
-      first: { types: ['paragraph'] },
-      normalize: (change, reason, { child }) => {
-        if (reason == FIRST_CHILD_TYPE_INVALID) {
-          change.wrapBlockByKey(child.key, 'paragraph')
+      first: [{ type: 'paragraph' }],
+      normalize: (editor, { code, child }) => {
+        if (code === 'first_child_type_invalid') {
+          editor.wrapBlockByKey(child.key, 'paragraph')
         }
       },
     },
@@ -21,9 +20,15 @@ export const input = (
   <value>
     <document>
       <quote>
-        <image />
-        <paragraph />
-        <paragraph />
+        <image>
+          <text />
+        </image>
+        <paragraph>
+          <text />
+        </paragraph>
+        <paragraph>
+          <text />
+        </paragraph>
       </quote>
     </document>
   </value>
@@ -34,10 +39,16 @@ export const output = (
     <document>
       <quote>
         <paragraph>
-          <image />
+          <image>
+            <text />
+          </image>
         </paragraph>
-        <paragraph />
-        <paragraph />
+        <paragraph>
+          <text />
+        </paragraph>
+        <paragraph>
+          <text />
+        </paragraph>
       </quote>
     </document>
   </value>

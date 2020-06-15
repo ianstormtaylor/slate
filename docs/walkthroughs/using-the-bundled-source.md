@@ -47,6 +47,7 @@ To make things easier, for quick prototyping, you can also use the [`unpkg.com`]
 <script src="https://unpkg.com/react-dom/umd/react-dom-server.browser.production.min.js"></script>
 <script src="https://unpkg.com/immutable/dist/immutable.js"></script>
 <script src="https://unpkg.com/slate/dist/slate.js"></script>
+<script src="https://unpkg.com/slate-react/dist/slate-react.js"></script>
 ```
 
 That's it, you're ready to go!

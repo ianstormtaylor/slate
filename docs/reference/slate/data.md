@@ -4,7 +4,7 @@
 import { Data } from 'slate'
 ```
 
-Data is simply a thin wrapper around [`Immutable.Map`](https://facebook.github.io/immutable-js/docs/#/Map), so that you don't need to ever depend on Immutable directly, and for future compatibility.
+Data is simply a thin wrapper around [`Immutable.Map`](https://immutable-js.github.io/immutable-js/docs/#/Map), so that you don't need to ever depend on Immutable directly, and for future compatibility.
 
 A data object can have any properties associated with it.
 
@@ -14,7 +14,7 @@ A data object can have any properties associated with it.
 
 `Data.create(properties: Object) => Data`
 
-Create a data object from a plain Javascript object of `properties`.
+Create a data object from a plain JavaScript object of `properties`.
 
 ### `Data.fromJSON`
 

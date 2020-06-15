@@ -1,0 +1,32 @@
+/** @jsx h */
+
+import h from '../../../helpers/h'
+
+export default function(editor) {
+  editor.addMarks(['bold', 'italic'])
+}
+
+export const input = (
+  <value>
+    <document>
+      <paragraph>
+        wor<anchor />d<focus />
+      </paragraph>
+    </document>
+  </value>
+)
+
+export const output = (
+  <value>
+    <document>
+      <paragraph>
+        wor
+        <i>
+          <b>
+            <anchor />d<focus />
+          </b>
+        </i>
+      </paragraph>
+    </document>
+  </value>
+)
