@@ -38,7 +38,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry<Ancestor>> {
+  ): Generator<NodeEntry<Ancestor>, void, undefined> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
       const entry: NodeEntry<Ancestor> = [n, p]
@@ -80,7 +80,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -132,7 +132,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Generator<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
@@ -156,7 +156,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Generator<ElementEntry> {
+  ): Generator<ElementEntry, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Element.isElement(node)) {
         yield [node, path]
@@ -341,7 +341,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry> {
+  ): Generator<NodeEntry, void, undefined> {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
@@ -373,7 +373,7 @@ export const Node = {
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
-  ): Generator<NodeEntry> {
+  ): Generator<NodeEntry, void, undefined> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
     const visited = new Set()
@@ -484,7 +484,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Generator<NodeEntry<Text>> {
+  ): Generator<NodeEntry<Text>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
         yield [node, path]

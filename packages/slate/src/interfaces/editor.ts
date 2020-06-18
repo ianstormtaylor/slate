@@ -465,7 +465,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Generator<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
 
@@ -622,7 +622,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Generator<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const {
       at = editor.selection,
       mode = 'all',
@@ -980,7 +980,7 @@ export const Editor = {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
-  ): Generator<Point> {
+  ): Generator<Point, void, undefined> {
     const { at = editor.selection, unit = 'offset', reverse = false } = options
 
     if (!at) {
