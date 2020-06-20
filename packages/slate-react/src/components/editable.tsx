@@ -186,10 +186,14 @@ export const Editable = (props: EditableProps) => {
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
       const leafEl = newDomRange.startContainer.parentElement!
+      leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
+        newDomRange
+      )
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
         boundary: el,
       })
+      delete leafEl.getBoundingClientRect
     }
 
     setTimeout(() => {
