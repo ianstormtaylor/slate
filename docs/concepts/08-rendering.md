@@ -103,7 +103,7 @@ Decorations are another type of text-level formatting. They are similar to regul
 
 However, decorations are computed at **render-time** based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.
 
-They are different from marks in that they are not stored on editor state.
+Decorations are different from Marks in that they are not stored on editor state.
 
 ## Toolbars, Menus, Overlays, and more!
 
