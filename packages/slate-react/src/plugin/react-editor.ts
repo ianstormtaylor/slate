@@ -20,6 +20,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
+  getDocumentOrShadowRoot,
 } from '../utils/dom'
 
 /**
@@ -105,7 +106,7 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, false)
 
-    if (window.document.activeElement === el) {
+    if (getDocumentOrShadowRoot().activeElement === el) {
       el.blur()
     }
   },
@@ -118,7 +119,7 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, true)
 
-    if (window.document.activeElement !== el) {
+    if (getDocumentOrShadowRoot().activeElement !== el) {
       el.focus({ preventScroll: true })
     }
   },
@@ -129,7 +130,7 @@ export const ReactEditor = {
 
   deselect(editor: ReactEditor): void {
     const { selection } = editor
-    const domSelection = window.getSelection()
+    const domSelection = getDocumentOrShadowRoot().getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()

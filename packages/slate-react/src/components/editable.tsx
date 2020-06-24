@@ -33,6 +33,7 @@ import {
   isDOMNode,
   DOMStaticRange,
   isPlainTextOnlyPaste,
+  getDocumentOrShadowRoot,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -143,7 +144,7 @@ export const Editable = (props: EditableProps) => {
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
     const { selection } = editor
-    const domSelection = window.getSelection()
+    const domSelection = getDocumentOrShadowRoot().getSelection()
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
@@ -393,9 +394,9 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
-        const { activeElement } = window.document
+        const { activeElement } = getDocumentOrShadowRoot()
         const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = window.getSelection()
+        const domSelection = getDocumentOrShadowRoot().getSelection()
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -435,10 +436,13 @@ export const Editable = (props: EditableProps) => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
-    window.document.addEventListener('selectionchange', onDOMSelectionChange)
+    getDocumentOrShadowRoot().addEventListener(
+      'selectionchange',
+      onDOMSelectionChange
+    )
 
     return () => {
-      window.document.removeEventListener(
+      getDocumentOrShadowRoot().removeEventListener(
         'selectionchange',
         onDOMSelectionChange
       )
@@ -530,7 +534,9 @@ export const Editable = (props: EditableProps) => {
             // one, this is due to the window being blurred when the tab
             // itself becomes unfocused, so we want to abort early to allow to
             // editor to stay focused when the tab becomes focused again.
-            if (state.latestElement === window.document.activeElement) {
+            if (
+              state.latestElement === getDocumentOrShadowRoot().activeElement
+            ) {
               return
             }
 
@@ -734,7 +740,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onFocus)
             ) {
               const el = ReactEditor.toDOMNode(editor, editor)
-              state.latestElement = window.document.activeElement
+              state.latestElement = getDocumentOrShadowRoot().activeElement
 
               // COMPAT: If the editor has nested editable elements, the focus
               // can go to them. In Firefox, this must be prevented because it

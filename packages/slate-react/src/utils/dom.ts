@@ -100,6 +100,15 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
+ * Returns ShadowRoot if active element is renderd within Shadow DOM,
+ * otherwise it returns the Document Object.
+ */
+
+export const getDocumentOrShadowRoot = (): Document | ShadowRoot => {
+  return window.document.activeElement?.shadowRoot ?? window.document
+}
+
+/**
  * Get the nearest editable child at `index` in a `parent`, preferring
  * `direction`.
  */
