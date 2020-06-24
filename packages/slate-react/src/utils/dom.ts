@@ -100,6 +100,16 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
+ * Determines wether the active element is nested within a shadowRoot
+ */
+
+export const hasShadowRoot = () => {
+  return !!(
+    window.document.activeElement && window.document.activeElement.shadowRoot
+  )
+}
+
+/**
  * Returns ShadowRoot if active element is renderd within Shadow DOM,
  * otherwise it returns the Document Object.
  */

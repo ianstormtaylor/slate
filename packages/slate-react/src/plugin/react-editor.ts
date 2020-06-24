@@ -21,6 +21,7 @@ import {
   isDOMElement,
   normalizeDOMPoint,
   getDocumentOrShadowRoot,
+  hasShadowRoot,
 } from '../utils/dom'
 
 /**
@@ -493,7 +494,16 @@ export const ReactEditor = {
         anchorOffset = domRange.anchorOffset
         focusNode = domRange.focusNode
         focusOffset = domRange.focusOffset
-        isCollapsed = domRange.isCollapsed
+        // There's a bug in chrome that always returns `true` for `isCollapsed`
+        // for a Selection that comes from a ShadowRoot.
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
+        if (hasShadowRoot()) {
+          isCollapsed =
+            domRange.anchorNode === domRange.focusNode &&
+            domRange.anchorOffset === domRange.focusOffset
+        } else {
+          isCollapsed = domRange.isCollapsed
+        }
       } else {
         anchorNode = domRange.startContainer
         anchorOffset = domRange.startOffset
