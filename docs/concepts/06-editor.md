@@ -60,7 +60,7 @@ Or maybe you want to override the `insertText` behavior to "linkify" URLs:
 const { insertText } = editor
 
 editor.insertText = text => {
-  if (isUrl(text) {
+  if (isUrl(text)) {
     // ...
     return
   }
