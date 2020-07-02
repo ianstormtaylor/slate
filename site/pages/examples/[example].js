@@ -24,8 +24,7 @@ import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
-import SyntaxHighlighting from '../../examples/syntax-highlighting'
-// import SearchHighlightingOld from '../../examples/search-highlighting-old'
+import CodeHighlighting from '../../examples/code-highlighting'
 import Tables from '../../examples/tables'
 
 const EXAMPLES = [
@@ -45,7 +44,7 @@ const EXAMPLES = [
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  ['Syntax Highlighting', SyntaxHighlighting, 'syntax-highlighting'],
+  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
   ['Tables', Tables, 'tables'],
 ]
 
@@ -240,10 +239,7 @@ const ExamplePage = () => {
   const [showTabs, setShowTabs] = useState()
   const router = useRouter()
   const { example = router.asPath.replace('/examples/', '') } = router.query
-  console.log(example)
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
-  console.log(EXAMPLE)
-
   const [name, Component, path] = EXAMPLE
   return (
     <ErrorBoundary
@@ -316,10 +312,10 @@ const ExamplePage = () => {
             </pre>
           </Warning>
         ) : (
-            <ExampleContent>
-              <Component />
-            </ExampleContent>
-          )}
+          <ExampleContent>
+            <Component />
+          </ExampleContent>
+        )}
         <TabListUnderlay
           isVisible={showTabs}
           onClick={() => setShowTabs(false)}
