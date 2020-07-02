@@ -336,4 +336,3 @@ NoSsrExamplePage.getInitialProps = () => {
 }
 
 export default NoSsrExamplePage
-
