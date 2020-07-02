@@ -24,8 +24,7 @@ import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
-import SyntaxHighlighting from '../../examples/syntax-highlighting'
-// import SearchHighlightingOld from '../../examples/search-highlighting-old'
+import CodeHighlighting from '../../examples/code-highlighting'
 import Tables from '../../examples/tables'
 
 const EXAMPLES = [
@@ -45,7 +44,7 @@ const EXAMPLES = [
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  ['Syntax Highlighting', SyntaxHighlighting, 'syntax-highlighting'],
+  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
   ['Tables', Tables, 'tables'],
 ]
 
