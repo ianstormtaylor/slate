@@ -239,10 +239,7 @@ const ExamplePage = () => {
   const [showTabs, setShowTabs] = useState()
   const router = useRouter()
   const { example = router.asPath.replace('/examples/', '') } = router.query
-  console.log(example)
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
-  console.log(EXAMPLE)
-
   const [name, Component, path] = EXAMPLE
   return (
     <ErrorBoundary
@@ -315,10 +312,10 @@ const ExamplePage = () => {
             </pre>
           </Warning>
         ) : (
-            <ExampleContent>
-              <Component />
-            </ExampleContent>
-          )}
+          <ExampleContent>
+            <Component />
+          </ExampleContent>
+        )}
         <TabListUnderlay
           isVisible={showTabs}
           onClick={() => setShowTabs(false)}
@@ -339,3 +336,4 @@ NoSsrExamplePage.getInitialProps = () => {
 }
 
 export default NoSsrExamplePage
+
