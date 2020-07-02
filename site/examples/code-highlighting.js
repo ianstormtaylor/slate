@@ -106,20 +106,20 @@ const Leaf = ({ attributes, children, leaf }) => {
             background: hsla(0, 0%, 100%, .5);
 
         ${leaf.comment &&
-        css`
+          css`
             color: slategray;
           `} 
 
         ${(leaf.operator || leaf.url) &&
-        css`
+          css`
             color: #9a6e3a;
           `}
         ${leaf.keyword &&
-        css`
+          css`
             color: #07a;
           `}
         ${(leaf.variable || leaf.regex) &&
-        css`
+          css`
             color: #e90;
           `}
         ${(leaf.number ||
@@ -129,19 +129,19 @@ const Leaf = ({ attributes, children, leaf }) => {
           leaf.symbol ||
           leaf.attr - name ||
           leaf.selector) &&
-        css`
+          css`
             color: #905;
           `}
         ${leaf.punctuation &&
-        css`
+          css`
             color: #999;
           `}
         ${(leaf.string || leaf.char) &&
-        css`
+          css`
             color: #690;
           `}
         ${(leaf.function || leaf.class - name) &&
-        css`
+          css`
             color: #dd4a68;
           `}
         `}
