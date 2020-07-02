@@ -20,7 +20,6 @@ export type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
   [key: string]: unknown
 }
@@ -79,7 +78,6 @@ export type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
   [key: string]: unknown
 }
@@ -135,7 +133,6 @@ export const Operation = {
       case 'merge_node':
         return (
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           Path.isPath(value.path) &&
           isPlainObject(value.properties)
         )
@@ -166,7 +163,6 @@ export const Operation = {
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           isPlainObject(value.properties)
         )
       default:
