@@ -67,6 +67,7 @@
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "react-error-boundary": "^1.2.5",
+    "react-js-to-ts": "^1.4.0",
     "react-router-dom": "^5.1.2",
     "react-values": "^0.3.0",
     "rimraf": "^3.0.2",
@@ -86,8 +87,7 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2",
-    "react-js-to-ts": "^1.4.0"
+    "typescript": "^3.7.2"
   },
   "dependencies": {
     "react-js-to-ts": "^1.4.0"
