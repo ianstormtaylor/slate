@@ -1,23 +1,24 @@
 /** @jsx jsx */
-import { Editor } from "slate";
-import { jsx } from "../../../..";
+import { Editor } from 'slate'
+import { jsx } from '../../../..'
+
 export const input = (
   <editor>
     <block>
       one<inline>two</inline>three<inline>four</inline>five
     </block>
   </editor>
-);
+)
 export const test = editor => {
-  return Array.from(Editor.nodes(editor, { at: [], reverse: true }));
-};
+  return Array.from(Editor.nodes(editor, { at: [], reverse: true }))
+}
 export const output = [
   [input, []],
   [
     <block>
       one<inline>two</inline>three<inline>four</inline>five
     </block>,
-    [0]
+    [0],
   ],
   [<text>five</text>, [0, 4]],
   [<inline>four</inline>, [0, 3]],
@@ -25,5 +26,5 @@ export const output = [
   [<text>three</text>, [0, 2]],
   [<inline>two</inline>, [0, 1]],
   [<text>two</text>, [0, 1, 0]],
-  [<text>one</text>, [0, 0]]
-];
+  [<text>one</text>, [0, 0]],
+]

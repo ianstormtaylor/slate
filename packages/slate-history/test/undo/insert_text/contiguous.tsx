@@ -1,10 +1,11 @@
 /** @jsx jsx */
-import { jsx } from "../..";
+import { jsx } from '../..'
+
 export const run = editor => {
-  editor.insertText("t");
-  editor.insertText("w");
-  editor.insertText("o");
-};
+  editor.insertText('t')
+  editor.insertText('w')
+  editor.insertText('o')
+}
 export const input = (
   <editor>
     <block>
@@ -12,5 +13,5 @@ export const input = (
       <cursor />
     </block>
   </editor>
-);
-export const output = input;
+)
+export const output = input

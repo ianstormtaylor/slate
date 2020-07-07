@@ -1,6 +1,7 @@
-import { Point } from "slate";
-export const input = {};
+import { Point } from 'slate'
+
+export const input = {}
 export const test = value => {
-  return Point.isPoint(value);
-};
-export const output = false;
+  return Point.isPoint(value)
+}
+export const output = false

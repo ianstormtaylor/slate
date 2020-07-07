@@ -1,32 +1,33 @@
-import { Text } from "slate";
+import { Text } from 'slate'
+
 export const input = [
   {
     anchor: {
       path: [0],
-      offset: 1
+      offset: 1,
     },
     focus: {
       path: [0],
-      offset: 2
+      offset: 2,
     },
-    decoration: "decoration"
-  }
-];
+    decoration: 'decoration',
+  },
+]
 export const test = decorations => {
-  return Text.decorations({ text: "abc", mark: "mark" }, decorations);
-};
+  return Text.decorations({ text: 'abc', mark: 'mark' }, decorations)
+}
 export const output = [
   {
-    text: "a",
-    mark: "mark"
+    text: 'a',
+    mark: 'mark',
   },
   {
-    text: "b",
-    mark: "mark",
-    decoration: "decoration"
+    text: 'b',
+    mark: 'mark',
+    decoration: 'decoration',
   },
   {
-    text: "c",
-    mark: "mark"
-  }
-];
+    text: 'c',
+    mark: 'mark',
+  },
+]

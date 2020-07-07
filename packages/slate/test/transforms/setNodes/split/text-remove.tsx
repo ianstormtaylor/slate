@@ -1,13 +1,14 @@
 /** @jsx jsx */
-import { Transforms, Text } from "slate";
-import { jsx } from "../../..";
+import { Transforms, Text } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.setNodes(
     editor,
     { key: null },
     { match: Text.isText, split: true }
-  );
-};
+  )
+}
 export const input = (
   <editor>
     <block>
@@ -18,7 +19,7 @@ export const input = (
       </text>
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -31,4 +32,4 @@ export const output = (
       <text key>d</text>
     </block>
   </editor>
-);
+)

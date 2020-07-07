@@ -1,13 +1,14 @@
 /** @jsx jsx */
-import { Editor, Transforms } from "slate";
-import { jsx } from "../../..";
+import { Editor, Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.setNodes(
     editor,
     { key: true },
     { match: n => Editor.isInline(editor, n) }
-  );
-};
+  )
+}
 export const input = (
   <editor>
     <block>
@@ -19,7 +20,7 @@ export const input = (
       <focus />
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -31,4 +32,4 @@ export const output = (
       <focus />
     </block>
   </editor>
-);
+)

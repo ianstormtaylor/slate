@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
-  Transforms.delete(editor, { unit: "word", reverse: true });
-};
+  Transforms.delete(editor, { unit: 'word', reverse: true })
+}
 export const input = (
   <editor>
     <block>
@@ -12,7 +13,7 @@ export const input = (
       ee
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -20,4 +21,4 @@ export const output = (
       ee
     </block>
   </editor>
-);
+)

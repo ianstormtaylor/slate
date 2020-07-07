@@ -1,10 +1,11 @@
-import { Element } from "slate";
+import { Element } from 'slate'
+
 export const input = [
   {
-    text: ""
-  }
-];
+    text: '',
+  },
+]
 export const test = value => {
-  return Element.isElementList(value);
-};
-export const output = false;
+  return Element.isElementList(value)
+}
+export const output = false

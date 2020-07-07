@@ -1,12 +1,13 @@
-import { Operation } from "slate";
+import { Operation } from 'slate'
+
 export const input = {
-  type: "remove_node",
+  type: 'remove_node',
   path: [0],
   node: {
-    children: []
-  }
-};
+    children: [],
+  },
+}
 export const test = value => {
-  return Operation.isOperation(value);
-};
-export const output = true;
+  return Operation.isOperation(value)
+}
+export const output = true

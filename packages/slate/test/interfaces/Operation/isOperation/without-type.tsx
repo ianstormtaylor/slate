@@ -1,10 +1,11 @@
-import { Operation } from "slate";
+import { Operation } from 'slate'
+
 export const input = {
   path: [0],
   properties: {},
-  newProperties: {}
-};
+  newProperties: {},
+}
 export const test = value => {
-  return Operation.isOperation(value);
-};
-export const output = false;
+  return Operation.isOperation(value)
+}
+export const output = false

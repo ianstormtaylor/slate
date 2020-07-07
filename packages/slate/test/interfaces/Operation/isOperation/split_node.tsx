@@ -1,12 +1,13 @@
-import { Operation } from "slate";
+import { Operation } from 'slate'
+
 export const input = {
-  type: "split_node",
+  type: 'split_node',
   path: [0],
   position: 0,
   target: 0,
-  properties: {}
-};
+  properties: {},
+}
 export const test = value => {
-  return Operation.isOperation(value);
-};
-export const output = true;
+  return Operation.isOperation(value)
+}
+export const output = true

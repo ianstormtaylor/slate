@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { Transforms, Text } from "slate";
-import { jsx } from "../../..";
+import { Transforms, Text } from 'slate'
+import { jsx } from '../../..'
+
 export const input = (
   <editor>
     <block>
@@ -11,10 +12,10 @@ export const input = (
       </text>
     </block>
   </editor>
-);
+)
 export const run = editor => {
-  Transforms.wrapNodes(editor, <block new />, { match: Text.isText });
-};
+  Transforms.wrapNodes(editor, <block new />, { match: Text.isText })
+}
 export const output = (
   <editor>
     <block>
@@ -25,4 +26,4 @@ export const output = (
       </block>
     </block>
   </editor>
-);
+)

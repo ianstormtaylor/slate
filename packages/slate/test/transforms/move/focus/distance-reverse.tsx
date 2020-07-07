@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
-  Transforms.move(editor, { edge: "focus", reverse: true, distance: 6 });
-};
+  Transforms.move(editor, { edge: 'focus', reverse: true, distance: 6 })
+}
 export const input = (
   <editor>
     <block>
@@ -13,7 +14,7 @@ export const input = (
       ee
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -21,4 +22,4 @@ export const output = (
       wo three
     </block>
   </editor>
-);
+)

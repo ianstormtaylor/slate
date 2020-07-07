@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
-  Transforms.splitNodes(editor);
-};
+  Transforms.splitNodes(editor)
+}
 export const input = (
   <editor>
     <block>one</block>
@@ -16,7 +17,7 @@ export const input = (
       three
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>one</block>
@@ -28,4 +29,4 @@ export const output = (
       three
     </block>
   </editor>
-);
+)

@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
-  Transforms.insertText(editor, "a");
-};
+  Transforms.insertText(editor, 'a')
+}
 export const input = (
   <editor>
     <block>
@@ -15,7 +16,7 @@ export const input = (
       two
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -23,5 +24,5 @@ export const output = (
     </block>
     <block>two</block>
   </editor>
-);
-export const skip = true;
+)
+export const skip = true

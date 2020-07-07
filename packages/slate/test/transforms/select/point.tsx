@@ -1,12 +1,13 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../..";
+import { Transforms } from 'slate'
+import { jsx } from '../..'
+
 export const run = editor => {
   Transforms.select(editor, {
     path: [0, 0],
-    offset: 1
-  });
-};
+    offset: 1,
+  })
+}
 export const input = (
   <editor>
     <block>
@@ -14,7 +15,7 @@ export const input = (
       one
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -22,4 +23,4 @@ export const output = (
       ne
     </block>
   </editor>
-);
+)

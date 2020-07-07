@@ -1,12 +1,13 @@
 /** @jsx jsx */
-import { jsx } from "slate-hyperscript";
+import { jsx } from 'slate-hyperscript'
+
 export const input = (
   <text b>
     <text a>word</text>
   </text>
-);
+)
 export const output = {
-  text: "word",
+  text: 'word',
   a: true,
-  b: true
-};
+  b: true,
+}

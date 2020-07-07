@@ -1,9 +1,10 @@
-import { Element } from "slate";
+import { Element } from 'slate'
+
 export const input = {
   element: { children: [] },
-  props: {}
-};
+  props: {},
+}
 export const test = ({ element, props }) => {
-  return Element.matches(element, props);
-};
-export const output = true;
+  return Element.matches(element, props)
+}
+export const output = true

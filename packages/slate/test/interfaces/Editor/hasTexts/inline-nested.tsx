@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { Editor } from "slate";
-import { jsx } from "../../..";
+import { Editor } from 'slate'
+import { jsx } from '../../..'
+
 export const input = (
   <editor>
     <block>
@@ -11,9 +12,9 @@ export const input = (
       five
     </block>
   </editor>
-);
+)
 export const test = editor => {
-  const inline = editor.children[0].children[1];
-  return Editor.hasTexts(editor, inline);
-};
-export const output = false;
+  const inline = editor.children[0].children[1]
+  return Editor.hasTexts(editor, inline)
+}
+export const output = false

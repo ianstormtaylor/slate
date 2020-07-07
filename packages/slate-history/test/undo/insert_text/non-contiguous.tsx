@@ -1,13 +1,14 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../..";
+import { Transforms } from 'slate'
+import { jsx } from '../..'
+
 export const run = editor => {
-  editor.insertText("t");
-  Transforms.move(editor, { reverse: true });
-  editor.insertText("w");
-  Transforms.move(editor, { reverse: true });
-  editor.insertText("o");
-};
+  editor.insertText('t')
+  Transforms.move(editor, { reverse: true })
+  editor.insertText('w')
+  Transforms.move(editor, { reverse: true })
+  editor.insertText('o')
+}
 export const input = (
   <editor>
     <block>
@@ -15,7 +16,7 @@ export const input = (
       <cursor />
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>
@@ -23,5 +24,5 @@ export const output = (
       <cursor />t
     </block>
   </editor>
-);
-export const skip = true;
+)
+export const skip = true

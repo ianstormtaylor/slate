@@ -1,5 +1,6 @@
 /** @jsx jsx */
-import { jsx } from "slate-hyperscript";
+import { jsx } from 'slate-hyperscript'
+
 export const input = (
   <editor>
     <element>
@@ -7,19 +8,19 @@ export const input = (
       ord
     </element>
   </editor>
-);
+)
 export const operations = [
   {
-    type: "remove_text",
+    type: 'remove_text',
     path: [0, 0],
     offset: 1,
-    text: "or"
-  }
-];
+    text: 'or',
+  },
+]
 export const output = (
   <editor>
     <element>
       <anchor />w<focus />d
     </element>
   </editor>
-);
+)

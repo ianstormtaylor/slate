@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
-  Transforms.delete(editor, { unit: "line" });
-};
+  Transforms.delete(editor, { unit: 'line' })
+}
 export const input = (
   <editor>
     <block>
@@ -11,5 +12,5 @@ export const input = (
       <cursor />
     </block>
   </editor>
-);
-export const output = input;
+)
+export const output = input
