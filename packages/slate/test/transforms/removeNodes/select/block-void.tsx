@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const input = (
   <editor>
     <block void>
@@ -10,10 +11,10 @@ export const input = (
     <block>two</block>
     <block>three</block>
   </editor>
-);
+)
 export const run = editor => {
-  Transforms.removeNodes(editor, { at: [0] });
-};
+  Transforms.removeNodes(editor, { at: [0] })
+}
 export const output = (
   <editor>
     <block>
@@ -22,4 +23,4 @@ export const output = (
     </block>
     <block>three</block>
   </editor>
-);
+)

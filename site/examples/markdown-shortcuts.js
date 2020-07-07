@@ -36,7 +36,7 @@ const MarkdownShortcutsExample = () => {
 }
 
 const withShortcuts = editor => {
-  console.log("here")
+  console.log('here')
   const { deleteBackward, insertText } = editor
 
   editor.insertText = text => {

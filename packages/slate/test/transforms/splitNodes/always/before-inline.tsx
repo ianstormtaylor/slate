@@ -1,12 +1,13 @@
 /** @jsx jsx */
-import { Editor, Transforms } from "slate";
-import { jsx } from "../../..";
+import { Editor, Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.splitNodes(editor, {
     match: n => Editor.isBlock(editor, n),
-    always: true
-  });
-};
+    always: true,
+  })
+}
 export const input = (
   <editor>
     <block>
@@ -16,7 +17,7 @@ export const input = (
       word
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>word</block>
@@ -26,4 +27,4 @@ export const output = (
       word
     </block>
   </editor>
-);
+)

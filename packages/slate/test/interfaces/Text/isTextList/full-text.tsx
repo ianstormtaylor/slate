@@ -1,10 +1,11 @@
-import { Text } from "slate";
+import { Text } from 'slate'
+
 export const input = [
   {
-    text: ""
-  }
-];
+    text: '',
+  },
+]
 export const test = value => {
-  return Text.isTextList(value);
-};
-export const output = true;
+  return Text.isTextList(value)
+}
+export const output = true

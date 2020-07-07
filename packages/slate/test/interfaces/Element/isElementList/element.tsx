@@ -1,8 +1,9 @@
-import { Element } from "slate";
+import { Element } from 'slate'
+
 export const input = {
-  children: []
-};
+  children: [],
+}
 export const test = value => {
-  return Element.isElementList(value);
-};
-export const output = false;
+  return Element.isElementList(value)
+}
+export const output = false

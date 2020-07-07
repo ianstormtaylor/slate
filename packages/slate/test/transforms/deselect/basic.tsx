@@ -1,9 +1,10 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../..";
+import { Transforms } from 'slate'
+import { jsx } from '../..'
+
 export const run = editor => {
-  Transforms.deselect(editor);
-};
+  Transforms.deselect(editor)
+}
 export const input = (
   <editor>
     <block>
@@ -11,9 +12,9 @@ export const input = (
       one
     </block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block>one</block>
   </editor>
-);
+)

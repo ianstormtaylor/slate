@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const input = (
   <editor>
     <block>
@@ -10,10 +11,10 @@ export const input = (
       <focus />
     </block>
   </editor>
-);
+)
 export const run = editor => {
-  Transforms.wrapNodes(editor, <block new />, { split: true });
-};
+  Transforms.wrapNodes(editor, <block new />, { split: true })
+}
 export const output = (
   <editor>
     <block>wo</block>
@@ -25,4 +26,4 @@ export const output = (
       </block>
     </block>
   </editor>
-);
+)

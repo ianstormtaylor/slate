@@ -1,9 +1,10 @@
-import { Path } from "slate";
+import { Path } from 'slate'
+
 export const input = {
   path: [0],
-  another: [0, 1]
-};
+  another: [0, 1],
+}
 export const test = ({ path, another }) => {
-  return Path.isAncestor(path, another);
-};
-export const output = true;
+  return Path.isAncestor(path, another)
+}
+export const output = true

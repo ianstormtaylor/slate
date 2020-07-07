@@ -1,5 +1,6 @@
 /** @jsx jsx */
-import { jsx } from "slate-hyperscript";
+import { jsx } from 'slate-hyperscript'
+
 export const input = (
   <editor>
     <element>
@@ -11,32 +12,32 @@ export const input = (
       <focus />
     </element>
   </editor>
-);
+)
 export const output = {
   children: [
     {
       children: [
         {
-          text: "one"
-        }
-      ]
+          text: 'one',
+        },
+      ],
     },
     {
       children: [
         {
-          text: "two"
-        }
-      ]
-    }
+          text: 'two',
+        },
+      ],
+    },
   ],
   selection: {
     anchor: {
       path: [0, 0],
-      offset: 3
+      offset: 3,
     },
     focus: {
       path: [1, 0],
-      offset: 3
-    }
-  }
-};
+      offset: 3,
+    },
+  },
+}

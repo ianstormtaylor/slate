@@ -1,6 +1,7 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.insertFragment(
     editor,
@@ -12,8 +13,8 @@ export const run = editor => {
         </block>
       </block>
     </block>
-  );
-};
+  )
+}
 export const input = (
   <editor>
     <block>
@@ -29,7 +30,7 @@ export const input = (
       </block>
     </block>
   </editor>
-);
+)
 // TODO: paste "2" into second cell instead of creating new one?
 export const output = (
   <editor>
@@ -47,5 +48,5 @@ export const output = (
       </block>
     </block>
   </editor>
-);
-export const skip = true;
+)
+export const skip = true

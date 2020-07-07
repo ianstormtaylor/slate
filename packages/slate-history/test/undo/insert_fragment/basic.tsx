@@ -1,5 +1,6 @@
 /** @jsx jsx */
-import { jsx } from "../..";
+import { jsx } from '../..'
+
 const fragment = (
   <block type="d">
     <block>A</block>
@@ -17,10 +18,10 @@ const fragment = (
       </block>
     </block>
   </block>
-);
+)
 export const run = editor => {
-  editor.insertFragment(fragment);
-};
+  editor.insertFragment(fragment)
+}
 export const input = (
   <editor>
     <block type="d">
@@ -31,6 +32,6 @@ export const input = (
       </block>
     </block>
   </editor>
-);
-export const output = input;
-export const skip = true;
+)
+export const output = input
+export const skip = true

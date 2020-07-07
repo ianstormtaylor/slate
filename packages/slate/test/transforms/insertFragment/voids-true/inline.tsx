@@ -1,11 +1,12 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.insertFragment(editor, <fragment>fragment</fragment>, {
-    voids: true
-  });
-};
+    voids: true,
+  })
+}
 export const input = (
   <editor>
     <block>
@@ -18,7 +19,7 @@ export const input = (
       <text />
     </block>
   </editor>
-);
+)
 // TODO: argument to made that fragment should go into the inline
 export const output = (
   <editor>
@@ -31,4 +32,4 @@ export const output = (
       <text />
     </block>
   </editor>
-);
+)

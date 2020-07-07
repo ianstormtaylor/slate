@@ -1,8 +1,9 @@
-import { Node } from "slate";
+import { Node } from 'slate'
+
 export const input = {
-  text: ""
-};
+  text: '',
+}
 export const test = value => {
-  return Node.isNode(value);
-};
-export const output = true;
+  return Node.isNode(value)
+}
+export const output = true

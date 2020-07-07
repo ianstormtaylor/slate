@@ -1,14 +1,15 @@
 /** @jsx jsx */
-import { Transforms } from "slate";
-import { jsx } from "../../..";
+import { Transforms } from 'slate'
+import { jsx } from '../../..'
+
 export const run = editor => {
   Transforms.insertNodes(
     editor,
     <block>
       <text />
     </block>
-  );
-};
+  )
+}
 export const input = (
   <editor>
     <block void>
@@ -17,7 +18,7 @@ export const input = (
     </block>
     <block>text</block>
   </editor>
-);
+)
 export const output = (
   <editor>
     <block void>text</block>
@@ -26,4 +27,4 @@ export const output = (
     </block>
     <block>text</block>
   </editor>
-);
+)

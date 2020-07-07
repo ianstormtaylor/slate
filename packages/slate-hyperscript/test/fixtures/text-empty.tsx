@@ -1,7 +1,8 @@
 /** @jsx jsx */
-import { jsx } from "slate-hyperscript";
-export const input = <text a />;
+import { jsx } from 'slate-hyperscript'
+
+export const input = <text a />
 export const output = {
-  text: "",
-  a: true
-};
+  text: '',
+  a: true,
+}
