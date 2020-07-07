@@ -1,9 +1,7 @@
 /** @jsx jsx */
-
-import { Editor } from 'slate'
-import { jsx } from '../../..'
-
-const input = (
+import { Editor } from "slate";
+import { jsx } from "../../..";
+export const input = (
   <editor>
     <block>
       <block>one</block>
