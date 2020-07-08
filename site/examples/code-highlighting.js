@@ -8,7 +8,6 @@ import { Slate, Editable, withReact } from 'slate-react'
 import { Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
-import { render } from 'react-dom'
 
 // eslint-disable-next-line
 Prism.languages.python = Prism.languages.extend('python', {}), Prism.languages.insertBefore('python', 'prolog', { comment: { pattern: /##[^\n]*/, alias: 'comment' }, })
