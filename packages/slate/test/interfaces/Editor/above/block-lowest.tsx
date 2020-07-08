@@ -5,10 +5,10 @@ import { jsx } from '../../..'
 
 export const input = (
   <editor>
-  <block>
-  <block>one < /block>
-  < /block>
-  < /editor>
+    <block>
+      <block>one </block>
+    </block>
+  </editor>
 )
 
 export const test = editor => {
@@ -19,4 +19,4 @@ export const test = editor => {
   })
 }
 
-export const output = [<block>one < /block>, [0, 0]]
+export const output = [<block>one </block>, [0, 0]]

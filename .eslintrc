@@ -123,7 +123,7 @@
   },
   "overrides": [
     {
-      "files": "**/test/**/*.js",
+      "files": "**/test/**/*.{js,jsx,ts,tsx}",
       "rules": {
         "import/no-extraneous-dependencies": "off",
         "import/no-unresolved": "off"
