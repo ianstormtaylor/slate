@@ -1,3 +1,4 @@
+import { enableES5 } from 'immer'
 import {
   Descendant,
   Editor,
@@ -20,6 +21,10 @@ import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
  */
 
 export const createEditor = (): Editor => {
+  if (typeof window !== 'undefined' && (window as any).msCrypto) {
+    enableES5()
+  }
+
   const editor: Editor = {
     children: [],
     operations: [],
