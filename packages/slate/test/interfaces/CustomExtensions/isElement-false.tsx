@@ -9,8 +9,8 @@ import {
 declare module 'slate' {
   interface CustomExtensions {
     Element:
-    | { type: 'heading'; level: number; children: Node[] }
-    | { type: 'list-item'; depth: number; children: Node[] }
+      | { type: 'heading'; level: number; children: Node[] }
+      | { type: 'list-item'; depth: number; children: Node[] }
     Text: { bold?: boolean; italic?: boolean }
   }
 }
