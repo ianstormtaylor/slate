@@ -23,10 +23,9 @@ export const fixtures = (...args) => {
       if (stat.isDirectory()) {
         fixtures(path, file, fn)
       }
-
       if (
         stat.isFile() &&
-        file.endsWith('.js') &&
+        (file.endsWith('.js') || file.endsWith('.ts') || file.endsWith('.tsx')) &&
         !file.startsWith('.') &&
         // Ignoring `index.js` files allows us to use the fixtures directly
         // from the top-level directory itself, instead of only children.
@@ -35,7 +34,7 @@ export const fixtures = (...args) => {
         const name = basename(file, extname(file))
 
         // This needs to be a non-arrow function to use `this.skip()`.
-        it(`${name} `, function() {
+        it(`${name} `, function () {
           const module = require(p)
 
           if (module.skip) {
