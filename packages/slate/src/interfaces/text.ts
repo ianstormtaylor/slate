@@ -1,16 +1,18 @@
 import isPlainObject from 'is-plain-object'
 import { Range } from '..'
+import { BaseText, ExtendedType } from "./custom-extensions"
+
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
  * Slate document along with any formatting properties. They are always leaf
  * nodes in the document tree as they cannot contain any children.
  */
-
-export interface Text {
-  text: string
-  [key: string]: unknown
-}
+export type Text = ExtendedType<'Text', BaseText>
+// export interface Text {
+//   text: string
+//   [key: string]: unknown
+// }
 
 export const Text = {
   /**
@@ -61,6 +63,14 @@ export const Text = {
 
   isTextList(value: any): value is Text[] {
     return Array.isArray(value) && (value.length === 0 || Text.isText(value[0]))
+  },
+
+  /**
+  * Check if some props are a partial of element.
+  */
+
+  isTextProps(props: any): props is Partial<Text> {
+    return !!props.children
   },
 
   /**

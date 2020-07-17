@@ -354,8 +354,8 @@ export const Node = {
 
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Element.isElement(node) && Element.matches(node, props)) ||
-      (Text.isText(node) && Text.matches(node, props))
+      (Element.isElement(node) && Element.isElementProps(props) && Element.matches(node, props)) ||
+      (Text.isText(node) && Text.isTextProps(props) && Text.matches(node, props))
     )
   },
 
@@ -468,7 +468,8 @@ export const Node = {
     if (Text.isText(node)) {
       return node.text
     } else {
-      return node.children.map(Node.string).join('')
+      let children = node.children as Array<Descendant>
+      return children.map(Node.string).join('')
     }
   },
 
@@ -476,7 +477,7 @@ export const Node = {
    * Return an iterable of all leaf text nodes in a root node.
    */
 
-  *texts(
+  * texts(
     root: Node,
     options: {
       from?: Path
