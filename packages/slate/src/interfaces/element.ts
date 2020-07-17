@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path } from '..'
+import { Editor, Node, Path, BaseElement, ExtendedType } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -7,10 +7,7 @@ import { Editor, Node, Path } from '..'
  * depending on the Slate editor's configuration.
  */
 
-export interface Element {
-  children: Node[]
-  [key: string]: unknown
-}
+export type Element = ExtendedType<'Element', BaseElement>
 
 export const Element = {
   /**
@@ -34,6 +31,14 @@ export const Element = {
       Array.isArray(value) &&
       (value.length === 0 || Element.isElement(value[0]))
     )
+  },
+
+  /**
+  * Check if some props are a partial of element.
+  */
+
+  isElementProps(props: any): props is Partial<Element> {
+    return !!props.children
   },
 
   /**
