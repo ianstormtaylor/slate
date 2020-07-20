@@ -7,7 +7,6 @@ import {
   Location,
   Node,
   NodeEntry,
-  Descendant,
   Operation,
   Path,
   PathRef,
@@ -26,6 +25,7 @@ import {
   RANGE_REFS,
 } from '../utils/weak-maps'
 import { getWordDistance, getCharacterDistance } from '../utils/string'
+import { Descendant } from './node'
 import { Element } from './element'
 
 /**
@@ -34,7 +34,7 @@ import { Element } from './element'
  */
 
 export interface Editor {
-  children: Node[]
+  children: Element[]
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
@@ -465,7 +465,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<Descendant> {
+  ): Iterable<NodeEntry<T>> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
 
@@ -554,7 +554,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Node>(
+  next<T extends Element>(
     editor: Editor,
     options: {
       at?: Location
@@ -581,7 +581,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n)
+        match = n => parent.children.includes(n as Element) // question: should these functions return element or descendent
       } else {
         match = () => true
       }
@@ -1114,7 +1114,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n)
+        match = n => parent.children.includes(n as Element)
       } else {
         match = () => true
       }
@@ -1293,7 +1293,8 @@ export const Editor = {
         if (Text.isText(node) && Text.isText(prev)) {
           prev.text += node.text
         } else if (!Text.isText(node) && !Text.isText(prev)) {
-          prev.children.push(...node.children)
+          const children = node.children as Element[]
+          prev.children.push(...children)
         } else {
           throw new Error(
             `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
@@ -1500,7 +1501,7 @@ export const Editor = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Node[]
+    editor.children = finishDraft(editor.children) as Element[]
 
     if (selection) {
       editor.selection = isDraft(selection)
@@ -1594,6 +1595,6 @@ export const Editor = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+type NodeMatch<T extends Descendant> =
+  | ((node: Descendant) => node is T)
+  | ((node: Descendant) => boolean)
