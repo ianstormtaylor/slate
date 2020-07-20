@@ -1,6 +1,6 @@
 import React from 'react'
-import { Text, Element } from 'slate'
-
+import { Element, Text, BaseText } from 'slate'
+// import { Text } from './custom-extensions'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps } from './editable'
@@ -28,6 +28,8 @@ const Leaf = (props: {
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
+  const placeholder = 'placeholder' in leaf && leaf.placeholder
+
   if (leaf[PLACEHOLDER_SYMBOL]) {
     children = (
       <React.Fragment>
@@ -46,7 +48,7 @@ const Leaf = (props: {
             textDecoration: 'none',
           }}
         >
-          {leaf.placeholder as React.ReactNode}
+          {placeholder as React.ReactNode}
         </span>
         {children}
       </React.Fragment>
@@ -66,12 +68,15 @@ const Leaf = (props: {
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
+  const nextLeaf = next.leaf as BaseText
+  const prevLeaf = prev.leaf as BaseText
+
   return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
-    Text.matches(next.leaf, prev.leaf)
+    Text.matches(nextLeaf, prevLeaf)
   )
 })
 
