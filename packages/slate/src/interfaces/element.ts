@@ -34,8 +34,8 @@ export const Element = {
   },
 
   /**
-  * Check if some props are a partial of element.
-  */
+   * Check if a value is an array of `Element` objects.
+   */
 
   isElementProps(props: any): props is Partial<Element> {
     return !!props.children
