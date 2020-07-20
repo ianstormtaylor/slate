@@ -1,9 +1,5 @@
 // show that regular methods that are imported work as expected
-import {
-  CustomExtensions,
-  Element as BaseElement,
-  Node,
-} from 'slate'
+import { CustomExtensions, Element as BaseElement, Node } from 'slate'
 
 declare module 'slate' {
   interface CustomExtensions {
@@ -11,10 +7,9 @@ declare module 'slate' {
   }
 }
 
-
 // if Element does not have a 'children' property, it is not an element
 const extension: CustomExtensions = {
-  5: "I'm a number"
+  5: "I'm a number",
 }
 
 export const input = extension

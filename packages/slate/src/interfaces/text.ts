@@ -1,7 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Range } from '..'
-import { BaseText, ExtendedType } from "./custom-extensions"
-
+import { BaseText, ExtendedType } from './custom-extensions'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -66,8 +65,8 @@ export const Text = {
   },
 
   /**
-  * Check if some props are a partial of element.
-  */
+   * Check if some props are a partial of element.
+   */
 
   isTextProps(props: any): props is Partial<Text> {
     return !!props.children

@@ -3,17 +3,17 @@ import {
   Element,
   Node,
   CustomExtensions,
-  ExtendedType, Descendant
+  ExtendedType,
+  Descendant,
 } from 'slate'
 
 declare module 'slate' {
   interface CustomExtensions {
     Element:
-    | { type: 'heading'; level: number; children: Descendant[] }
-    | { type: 'list-item'; depth: number; children: Descendant[] }
+      | { type: 'heading'; level: number; children: Descendant[] }
+      | { type: 'list-item'; depth: number; children: Descendant[] }
   }
 }
-
 
 const extension: CustomExtensions = {
   Element: { type: 'heading', level: 5, children: [] },
