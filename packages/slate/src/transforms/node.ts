@@ -1,6 +1,5 @@
 import {
   Editor,
-  Element,
   Location,
   Node,
   Path,
@@ -11,6 +10,7 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
+import { Element } from '../interfaces/element'
 
 export const NodeTransforms = {
   /**
