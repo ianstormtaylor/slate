@@ -4,11 +4,10 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
-  Descendant,
-  Element,
   Location,
   Node,
   NodeEntry,
+  Descendant,
   Operation,
   Path,
   PathRef,
@@ -27,6 +26,7 @@ import {
   RANGE_REFS,
 } from '../utils/weak-maps'
 import { getWordDistance, getCharacterDistance } from '../utils/string'
+import { Element } from './element'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -465,7 +465,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry<T>> {
+  ): Iterable<Descendant> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
 
