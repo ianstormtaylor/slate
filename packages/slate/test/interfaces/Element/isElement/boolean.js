@@ -6,4 +6,4 @@ export const test = value => {
   return Element.isElement(value)
 } // $ExpectType string
 
-export const output = false 
+export const output = false

@@ -1,6 +1,6 @@
 import { produce } from 'immer'
-import { Editor, ElementEntry, Path, Range, Text } from '..'
-import { Element } from './element'
+import { Editor, Path, Range, Text } from '..'
+import { Element, ElementEntry } from './element'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -473,7 +473,7 @@ export const Node = {
     if (Text.isText(node)) {
       return node.text
     } else {
-      const children = node.children as Array<Descendant>
+      const children = node.children as Descendant[]
       return children.map(Node.string).join('')
     }
   },

@@ -1,6 +1,7 @@
 import {
   Editor,
   Location,
+  Descendant,
   Node,
   Path,
   Point,
@@ -139,7 +140,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: Descendant) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -203,7 +204,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: Descendant) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -220,7 +221,8 @@ export const NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          match = n => parent.children.includes(n)
+          const children = parent.children as Descendant[]
+          match = n => children.includes(n)
         } else {
           match = n => Editor.isBlock(editor, n)
         }
@@ -342,7 +344,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: Descendant) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -633,7 +635,7 @@ export const NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const { text, children, ...properties } = node
+          const { ...properties } = node
           editor.apply({
             type: 'split_node',
             path,
@@ -731,9 +733,10 @@ export const NodeTransforms = {
           range = Range.intersection(rangeRef.current!, range)!
         }
 
+        const children = node.children as Array<Descendant>
         Transforms.liftNodes(editor, {
           at: range,
-          match: n => node.children.includes(n),
+          match: n => children.includes(n),
           voids,
         })
       }
@@ -833,9 +836,10 @@ export const NodeTransforms = {
           const wrapper = { ...element, children: [] }
           Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
 
+          const children = commonNode.children as Descendant[]
           Transforms.moveNodes(editor, {
             at: range,
-            match: n => commonNode.children.includes(n),
+            match: n => children.includes(n),
             to: wrapperPath.concat(0),
             voids,
           })
