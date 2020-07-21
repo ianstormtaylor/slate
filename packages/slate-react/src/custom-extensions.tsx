@@ -1,5 +1,5 @@
-import { ExtendedType, Text as BaseText } from 'slate'
-// import { CustomExtensions, Text } from '../../slate'
+import { CustomExtensions, Text } from 'slate'
+
 declare module 'slate' {
   export interface CustomExtensions {
     Text: {

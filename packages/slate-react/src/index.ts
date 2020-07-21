@@ -18,6 +18,3 @@ export { useSlate } from './hooks/use-slate'
 // Plugin
 export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
-
-// Custom Extension for placeholder property in Leaf
-export * from './components/custom-extensions'

@@ -1,6 +1,5 @@
 import React from 'react'
 import { Element, Text, BaseText } from 'slate'
-// import { Text } from './custom-extensions'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps } from './editable'
@@ -28,7 +27,7 @@ const Leaf = (props: {
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  const placeholder = 'placeholder' in leaf && leaf.placeholder
+  // const placeholder = 'placeholder' in leaf && leaf.placeholder
 
   if (leaf[PLACEHOLDER_SYMBOL]) {
     children = (
@@ -48,7 +47,7 @@ const Leaf = (props: {
             textDecoration: 'none',
           }}
         >
-          {placeholder as React.ReactNode}
+          {leaf.placeholder}
         </span>
         {children}
       </React.Fragment>
@@ -80,10 +79,13 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   )
 })
 
-/**
- * The default custom leaf renderer.
- */
-
+// function getPlaceHolder(text: Text) {
+//   if ('placholder' in text) {
+//     return text.placeholder
+//   } else {
+//     throw Error('No placeholder property')
+//   }
+// }
 export const DefaultLeaf = (props: RenderLeafProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>

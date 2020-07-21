@@ -204,7 +204,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Descendant) => boolean
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -221,7 +221,7 @@ export const NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          const children = parent.children as Descendant[]
+          const children = <Descendant[]>parent.children
           match = n => children.includes(n)
         } else {
           match = n => Editor.isBlock(editor, n)
@@ -722,17 +722,20 @@ export const NodeTransforms = {
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const [node] = Editor.node(editor, path) as NodeEntry<Ancestor>
+        const [node] = Editor.node(editor, path)
         let range = Editor.range(editor, path)
 
         if (split && rangeRef) {
           range = Range.intersection(rangeRef.current!, range)!
         }
 
-        const children = node.children as Array<Descendant>
+        // const children = <Descendant[]>node.children
         Transforms.liftNodes(editor, {
           at: range,
-          match: n => children.includes(n),
+          match: n =>
+            !Editor.isEditor(node) &&
+            Element.isElement(node) &&
+            node.children.includes(n),
           voids,
         })
       }

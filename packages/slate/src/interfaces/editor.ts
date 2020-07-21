@@ -554,7 +554,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Element>(
+  next<T extends Descendant>(
     editor: Editor,
     options: {
       at?: Location
@@ -581,7 +581,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n as Element) // question: should these functions return element or descendent
+        match = n => Element.isElement(n) && parent.children.includes(n) // unsure about this
       } else {
         match = () => true
       }
@@ -1114,7 +1114,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n as Element)
+        match = n => Element.isElement(n) && parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1293,7 +1293,7 @@ export const Editor = {
         if (Text.isText(node) && Text.isText(prev)) {
           prev.text += node.text
         } else if (!Text.isText(node) && !Text.isText(prev)) {
-          const children = node.children as Element[]
+          const children = <Element[]>node.children
           prev.children.push(...children)
         } else {
           throw new Error(
@@ -1595,6 +1595,6 @@ export const Editor = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Descendant> =
-  | ((node: Descendant) => node is T)
-  | ((node: Descendant) => boolean)
+type NodeMatch<T extends Node> =
+  | ((node: Node) => node is T)
+  | ((node: Node) => boolean)

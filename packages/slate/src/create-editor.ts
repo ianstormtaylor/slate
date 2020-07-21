@@ -217,7 +217,7 @@ export const createEditor = (): Editor => {
           (editor.isInline(node) ||
             node.children.length === 0 ||
             Text.isText(node.children[0]) ||
-            editor.isInline(node.children[0] as Element))
+            editor.isInline(node.children[0]))
 
       // Since we'll be applying operations while iterating, keep track of an
       // index that accounts for any added/removed nodes.
