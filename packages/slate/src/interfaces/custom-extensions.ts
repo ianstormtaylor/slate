@@ -24,4 +24,4 @@ export interface CustomExtensions {
 export type ExtendedType<K extends string, B> =
   unknown extends CustomExtensions[K]
   ? B
-  : B | CustomExtensions[K]
+  : B & CustomExtensions[K]
