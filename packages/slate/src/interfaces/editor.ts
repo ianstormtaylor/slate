@@ -587,7 +587,7 @@ export const Editor = {
       }
     }
 
-    const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
+    const [next] = Editor.nodes(editor, { at: span, match, mode, voids })
     return next
   },
 
@@ -1120,7 +1120,7 @@ export const Editor = {
       }
     }
 
-    const [, previous] = Editor.nodes(editor, {
+    const [previous] = Editor.nodes(editor, {
       reverse: true,
       at: span,
       match,
