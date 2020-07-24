@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path, ExtendedType, Descendant } from '..'
+import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -13,6 +13,14 @@ export interface BaseElement {
 export type Element = ExtendedType<'Element', BaseElement>
 
 export const Element = {
+  /**
+   * Check if a value implements the 'Ancestor' interface.
+   */
+
+  isAncestor(value: any): value is Ancestor {
+    return isPlainObject(value) && Node.isNodeList(value.children)
+  },
+
   /**
    * Check if a value implements the `Element` interface.
    */
@@ -37,11 +45,11 @@ export const Element = {
   },
 
   /**
-   * Check if a value is an array of `Element` objects.
+   * Check if a set of props is a partial of Element.
    */
 
   isElementProps(props: any): props is Partial<Element> {
-    return !!props.children
+    return (props as Partial<Element>).children !== undefined
   },
 
   /**
