@@ -1,12 +1,16 @@
 import isPlainObject from 'is-plain-object'
 import { Range } from '..'
-import { BaseText, ExtendedType } from './custom-types'
+import { ExtendedType } from './custom-types'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
  * Slate document along with any formatting properties. They are always leaf
  * nodes in the document tree as they cannot contain any children.
  */
+
+export interface BaseText {
+  text: string
+}
 export type Text = ExtendedType<'Text', BaseText>
 
 export const Text = {

@@ -27,8 +27,6 @@ const Leaf = (props: {
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  // const placeholder = 'placeholder' in leaf && leaf.placeholder
-
   if (leaf[PLACEHOLDER_SYMBOL]) {
     children = (
       <React.Fragment>
