@@ -6,7 +6,6 @@ import { Editor, Node, Path, BaseElement, ExtendedType } from '..'
  * element nodes or text nodes. They can be either "blocks" or "inlines"
  * depending on the Slate editor's configuration.
  */
-
 export type Element = ExtendedType<'Element', BaseElement>
 
 export const Element = {

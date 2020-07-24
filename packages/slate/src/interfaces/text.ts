@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Range } from '..'
-import { BaseText, ExtendedType } from './custom-extensions'
+import { BaseText, ExtendedType } from './custom-types'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -8,10 +8,6 @@ import { BaseText, ExtendedType } from './custom-extensions'
  * nodes in the document tree as they cannot contain any children.
  */
 export type Text = ExtendedType<'Text', BaseText>
-// export interface Text {
-//   text: string
-//   [key: string]: unknown
-// }
 
 export const Text = {
   /**
