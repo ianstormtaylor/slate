@@ -17,7 +17,6 @@ export const Slate = (props: {
   value: Element[]
   children: React.ReactNode
   onChange: (value: Node[]) => void
-  [key: string]: unknown
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
@@ -36,7 +35,7 @@ export const Slate = (props: {
 
   useEffect(() => {
     return () => {
-      EDITOR_TO_ON_CHANGE.set(editor, () => {})
+      EDITOR_TO_ON_CHANGE.set(editor, () => { })
     }
   }, [])
 
