@@ -4,7 +4,7 @@ import {isBoldText} from './type-guards'
 
 export const input: Text = {
   bold: true,
-  text: 'mytext',
+  text: 'mytext'
 }
 
 export const test = isBoldText

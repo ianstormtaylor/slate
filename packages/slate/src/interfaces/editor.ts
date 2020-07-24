@@ -4,6 +4,7 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
+  ExtendedType,
   Location,
   Node,
   NodeEntry,
@@ -33,12 +34,11 @@ import { Element } from './element'
  * by plugins that wish to add their own helpers and implement new behaviors.
  */
 
-export interface Editor {
+export interface BaseEditor {
   children: Descendant[]
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
-  [key: string]: unknown
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -59,6 +59,8 @@ export interface Editor {
   insertText: (text: string) => void
   removeMark: (key: string) => void
 }
+
+export type Editor = ExtendedType<'Editor', BaseEditor>;
 
 export const Editor = {
   /**
