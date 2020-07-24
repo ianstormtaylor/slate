@@ -1,12 +1,7 @@
-import { Descendant } from './node'
 
-export interface BaseElement {
-  children: Descendant[]
-}
-
-export interface BaseText {
-  text: string
-}
+/**
+ * Extendable Custom Types Interface
+ */
 
 export interface CustomTypes {
   [key: string]: unknown
