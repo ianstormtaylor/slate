@@ -1,5 +1,5 @@
 import React from 'react'
-import { Element, Text, BaseText } from 'slate'
+import { Element, Text } from 'slate'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps } from './editable'
@@ -67,25 +67,15 @@ const Leaf = (props: {
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
-  const nextLeaf = next.leaf as BaseText
-  const prevLeaf = prev.leaf as BaseText
-
   return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
-    Text.matches(nextLeaf, prevLeaf)
+    Text.matches(next.leaf, prev.leaf)
   )
 })
 
-// function getPlaceHolder(text: Text) {
-//   if ('placholder' in text) {
-//     return text.placeholder
-//   } else {
-//     throw Error('No placeholder property')
-//   }
-// }
 export const DefaultLeaf = (props: RenderLeafProps) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>

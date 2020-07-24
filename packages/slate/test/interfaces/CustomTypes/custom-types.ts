@@ -1,4 +1,4 @@
-import { CustomExtensions, Descendant, Element, Text } from 'slate'
+import { Descendant, Element, Text, CustomTypes } from 'slate'
 
 export interface HeadingElement {
   type: 'heading'
@@ -23,7 +23,7 @@ export interface BoldCustomText {
 }
 
 declare module 'slate' {
-  interface CustomExtensions {
+  interface CustomTypes {
     Element: HeadingElement | ListItemElement
     Text: CustomText | BoldCustomText
   }
