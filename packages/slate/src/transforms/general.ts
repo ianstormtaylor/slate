@@ -65,8 +65,7 @@ export const GeneralTransforms = {
         if (Text.isText(node) && Text.isText(prev)) {
           prev.text += node.text
         } else if (!Text.isText(node) && !Text.isText(prev)) {
-          const children = node.children as Element[]
-          prev.children.push(...children)
+          prev.children.push(...node.children)
         } else {
           throw new Error(
             `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
@@ -273,7 +272,7 @@ export const GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Element[]
+    editor.children = finishDraft(editor.children)
 
     if (selection) {
       editor.selection = isDraft(selection)

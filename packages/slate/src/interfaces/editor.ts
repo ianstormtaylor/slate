@@ -34,7 +34,7 @@ import { Element } from './element'
  */
 
 export interface Editor {
-  children: Element[]
+  children: Descendant[]
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
@@ -581,7 +581,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => Element.isElement(n) && parent.children.includes(n) // unsure about this
+        match = n => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1114,7 +1114,7 @@ export const Editor = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => Element.isElement(n) && parent.children.includes(n)
+        match = n => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1293,11 +1293,10 @@ export const Editor = {
         if (Text.isText(node) && Text.isText(prev)) {
           prev.text += node.text
         } else if (!Text.isText(node) && !Text.isText(prev)) {
-          const children = <Element[]>node.children
-          prev.children.push(...children)
+          prev.children.push(...node.children)
         } else {
           throw new Error(
-            `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
+            `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${node} ${prev}`
           )
         }
 
@@ -1501,7 +1500,7 @@ export const Editor = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Element[]
+    editor.children = finishDraft(editor.children)
 
     if (selection) {
       editor.selection = isDraft(selection)

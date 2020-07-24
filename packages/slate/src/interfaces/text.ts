@@ -61,11 +61,11 @@ export const Text = {
   },
 
   /**
-   * Check if some props are a partial of element.
+   * Check if some props are a partial of Text.
    */
 
   isTextProps(props: any): props is Partial<Text> {
-    return !!props.children
+    return (props as Partial<Text>).text !== undefined;
   },
 
   /**

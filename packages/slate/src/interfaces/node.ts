@@ -166,6 +166,22 @@ export const Node = {
   },
 
   /**
+   * Extract props from a Node.
+   */
+
+  extractProps(node: Node): Partial<Node> {
+    if (Element.isAncestor(node)) {
+      const {children, ...properties} = node;
+
+      return properties;
+    } else {
+      const {text, ...properties} = node;
+
+      return properties;
+    }
+  },
+
+  /**
    * Get the first node entry in a root node from a path.
    */
 
@@ -473,8 +489,7 @@ export const Node = {
     if (Text.isText(node)) {
       return node.text
     } else {
-      const children = node.children as Descendant[]
-      return children.map(Node.string).join('')
+      return node.children.map(Node.string).join('')
     }
   },
 

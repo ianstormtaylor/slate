@@ -140,7 +140,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Descendant) => boolean
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -221,8 +221,7 @@ export const NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          const children = <Descendant[]>parent.children
-          match = n => children.includes(n)
+          match = n => parent.children.includes(n)
         } else {
           match = n => Editor.isBlock(editor, n)
         }
@@ -344,7 +343,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Descendant) => boolean
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -635,7 +634,7 @@ export const NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const { ...properties } = node
+          const properties = Node.extractProps(node);
           editor.apply({
             type: 'split_node',
             path,
@@ -733,13 +732,9 @@ export const NodeTransforms = {
           range = Range.intersection(rangeRef.current!, range)!
         }
 
-        // const children = <Descendant[]>node.children
         Transforms.liftNodes(editor, {
           at: range,
-          match: n =>
-            !Editor.isEditor(node) &&
-            Element.isElement(node) &&
-            node.children.includes(n),
+          match: n => Element.isAncestor(node) && node.children.includes(n),
           voids,
         })
       }
@@ -833,16 +828,15 @@ export const NodeTransforms = {
 
           const range = Editor.range(editor, firstPath, lastPath)
           const commonNodeEntry = Editor.node(editor, commonPath)
-          const [commonNode] = commonNodeEntry as NodeEntry<Ancestor>
+          const [commonNode] = commonNodeEntry
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
           Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
 
-          const children = commonNode.children as Descendant[]
           Transforms.moveNodes(editor, {
             at: range,
-            match: n => children.includes(n),
+            match: n => Element.isAncestor(commonNode) && commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
           })
