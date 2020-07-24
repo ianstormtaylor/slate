@@ -69,7 +69,7 @@ export const Text = {
    */
 
   isTextProps(props: any): props is Partial<Text> {
-    return !!props.children
+    return (props as Partial<Text>).text !== undefined;
   },
 
   /**
