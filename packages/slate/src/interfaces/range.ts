@@ -181,7 +181,9 @@ export const Range = {
   transform(
     range: Range,
     op: Operation,
-    options: { affinity: 'forward' | 'backward' | 'outward' | 'inward' | null }
+    options: {
+      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
+    } = {}
   ): Range | null {
     const { affinity = 'inward' } = options
     let affinityAnchor: 'forward' | 'backward' | null
