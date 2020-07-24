@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { produce } from 'immer'
-import { Operation, Path } from '..'
+import { ExtendedType, Operation, Path } from '..'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -9,11 +9,12 @@ import { Operation, Path } from '..'
  * only refer to `Text` nodes.
  */
 
-export interface Point {
+export interface BasePoint {
   path: Path
   offset: number
-  [key: string]: unknown
 }
+
+export type Point = ExtendedType<'Point', BasePoint>
 
 export const Point = {
   /**
