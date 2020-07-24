@@ -1,11 +1,12 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path, BaseElement, ExtendedType, Ancestor, Descendant } from '..'
+import { Editor, Node, Path, ExtendedType, Ancestor, Descendant } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
  * element nodes or text nodes. They can be either "blocks" or "inlines"
  * depending on the Slate editor's configuration.
  */
+
 export interface BaseElement {
   children: Descendant[]
 }

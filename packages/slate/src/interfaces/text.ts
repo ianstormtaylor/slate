@@ -11,6 +11,7 @@ import { ExtendedType } from './custom-types'
 export interface BaseText {
   text: string
 }
+
 export type Text = ExtendedType<'Text', BaseText>
 
 export const Text = {
