@@ -267,7 +267,8 @@ export const Editable = (props: EditableProps) => {
           Range.isExpanded(selection) &&
           type.startsWith('delete')
         ) {
-          Editor.deleteFragment(editor)
+          const direction = type.endsWith('Backward') ? 'backward' : 'forward'
+          Editor.deleteFragment(editor, direction)
           return
         }
 
@@ -866,7 +867,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'backward')
                   } else {
                     Editor.deleteBackward(editor)
                   }
@@ -878,7 +879,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'forward')
                   } else {
                     Editor.deleteForward(editor)
                   }
@@ -890,7 +891,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'backward')
                   } else {
                     Editor.deleteBackward(editor, { unit: 'line' })
                   }
@@ -902,7 +903,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'forward')
                   } else {
                     Editor.deleteForward(editor, { unit: 'line' })
                   }
@@ -914,7 +915,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'backward')
                   } else {
                     Editor.deleteBackward(editor, { unit: 'word' })
                   }
@@ -926,7 +927,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (selection && Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
+                    Editor.deleteFragment(editor, 'forward')
                   } else {
                     Editor.deleteForward(editor, { unit: 'word' })
                   }

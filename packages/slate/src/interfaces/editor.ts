@@ -51,7 +51,7 @@ export interface Editor {
   apply: (operation: Operation) => void
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
-  deleteFragment: () => void
+  deleteFragment: (direction?: 'forward' | 'backward') => void
   getFragment: () => Descendant[]
   insertBreak: () => void
   insertFragment: (fragment: Node[]) => void
@@ -215,8 +215,8 @@ export const Editor = {
    * Delete the content in the current selection.
    */
 
-  deleteFragment(editor: Editor): void {
-    editor.deleteFragment()
+  deleteFragment(editor: Editor, direction?: 'forward' | 'backward'): void {
+    editor.deleteFragment(direction)
   },
 
   /**
