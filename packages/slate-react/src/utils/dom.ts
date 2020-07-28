@@ -174,3 +174,13 @@ export const getPlainText = (domNode: DOMNode) => {
 
   return text
 }
+
+export const setReverseDomSelection = (
+  domRange: DOMRange,
+  domSelection: Selection
+) => {
+  const newRange = domRange.cloneRange()
+  newRange.collapse()
+  domSelection.addRange(newRange)
+  domSelection.extend(newRange.startContainer, newRange.startOffset)
+}
