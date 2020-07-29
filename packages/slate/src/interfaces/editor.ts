@@ -38,7 +38,7 @@ export interface BaseEditor {
   children: Descendant[]
   selection: Range | null
   operations: Operation[]
-  marks: Record<string, any> | null
+  marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
