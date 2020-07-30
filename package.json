@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/*"
   ],
+  "version": "100.0.0",
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
