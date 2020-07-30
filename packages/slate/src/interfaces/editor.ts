@@ -60,7 +60,7 @@ export interface BaseEditor {
   removeMark: (key: string) => void
 }
 
-export type Editor = ExtendedType<'Editor', BaseEditor>;
+export type Editor = ExtendedType<'Editor', BaseEditor>
 
 export const Editor = {
   /**

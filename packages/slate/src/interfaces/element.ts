@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path, ExtendedType, Ancestor, Descendant } from '..'
+import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -10,7 +10,6 @@ import { Editor, Node, Path, ExtendedType, Ancestor, Descendant } from '..'
 export interface BaseElement {
   children: Descendant[]
 }
-
 export type Element = ExtendedType<'Element', BaseElement>
 
 export const Element = {
@@ -19,10 +18,7 @@ export const Element = {
    */
 
   isAncestor(value: any): value is Ancestor {
-   return (
-     isPlainObject(value) &&
-     Node.isNodeList(value.children)
-   )
+    return isPlainObject(value) && Node.isNodeList(value.children)
   },
 
   /**

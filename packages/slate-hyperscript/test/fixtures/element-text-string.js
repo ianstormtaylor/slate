@@ -1,5 +1,4 @@
 /** @jsx jsx */
-
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -7,7 +6,6 @@ export const input = (
     <text>word</text>
   </element>
 )
-
 export const output = {
   children: [
     {

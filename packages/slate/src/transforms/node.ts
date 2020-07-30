@@ -324,7 +324,6 @@ export const NodeTransforms = {
           type: 'merge_node',
           path: newPath,
           position,
-          target: null,
           properties,
         })
       }
@@ -612,7 +611,6 @@ export const NodeTransforms = {
       const [, highestPath] = highest
       const lowestPath = at.path.slice(0, depth)
       let position = height === 0 ? at.offset : at.path[depth] + nudge
-      let target: number | null = null
 
       for (const [node, path] of Editor.levels(editor, {
         at: lowestPath,
@@ -634,17 +632,15 @@ export const NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const properties = Node.extractProps(node);
+          const properties = Node.extractProps(node)
           editor.apply({
             type: 'split_node',
             path,
             position,
-            target,
             properties,
           })
         }
 
-        target = position
         position = path[path.length - 1] + (split || isEnd ? 1 : 0)
       }
 
@@ -836,7 +832,8 @@ export const NodeTransforms = {
 
           Transforms.moveNodes(editor, {
             at: range,
-            match: n => Element.isAncestor(commonNode) && commonNode.children.includes(n),
+            match: n =>
+              Element.isAncestor(commonNode) && commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
           })

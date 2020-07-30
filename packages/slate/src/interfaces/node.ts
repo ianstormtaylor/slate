@@ -171,13 +171,13 @@ export const Node = {
 
   extractProps(node: Node): Partial<Node> {
     if (Element.isAncestor(node)) {
-      const {children, ...properties} = node;
+      const { children, ...properties } = node
 
-      return properties;
+      return properties
     } else {
-      const {text, ...properties} = node;
+      const { text, ...properties } = node
 
-      return properties;
+      return properties
     }
   },
 

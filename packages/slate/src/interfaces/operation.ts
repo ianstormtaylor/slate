@@ -7,7 +7,10 @@ export type BaseInsertNodeOperation = {
   node: Node
 }
 
-export type InsertNodeOperation = ExtendedType<'InsertNodeOperation', BaseInsertNodeOperation>
+export type InsertNodeOperation = ExtendedType<
+  'InsertNodeOperation',
+  BaseInsertNodeOperation
+>
 
 export type BaseInsertTextOperation = {
   type: 'insert_text'
@@ -16,17 +19,22 @@ export type BaseInsertTextOperation = {
   text: string
 }
 
-export type InsertTextOperation = ExtendedType<'InsertTextOperation', BaseInsertTextOperation>
+export type InsertTextOperation = ExtendedType<
+  'InsertTextOperation',
+  BaseInsertTextOperation
+>
 
 export type BaseMergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
 }
 
-export type MergeNodeOperation = ExtendedType<'MergeNodeOperation', BaseMergeNodeOperation>
+export type MergeNodeOperation = ExtendedType<
+  'MergeNodeOperation',
+  BaseMergeNodeOperation
+>
 
 export type BaseMoveNodeOperation = {
   type: 'move_node'
@@ -34,7 +42,10 @@ export type BaseMoveNodeOperation = {
   newPath: Path
 }
 
-export type MoveNodeOperation = ExtendedType<'MoveNodeOperation', BaseMoveNodeOperation>
+export type MoveNodeOperation = ExtendedType<
+  'MoveNodeOperation',
+  BaseMoveNodeOperation
+>
 
 export type BaseRemoveNodeOperation = {
   type: 'remove_node'
@@ -42,7 +53,10 @@ export type BaseRemoveNodeOperation = {
   node: Node
 }
 
-export type RemoveNodeOperation = ExtendedType<'RemoveNodeOperation', BaseRemoveNodeOperation>
+export type RemoveNodeOperation = ExtendedType<
+  'RemoveNodeOperation',
+  BaseRemoveNodeOperation
+>
 
 export type BaseRemoveTextOperation = {
   type: 'remove_text'
@@ -51,7 +65,10 @@ export type BaseRemoveTextOperation = {
   text: string
 }
 
-export type RemoveTextOperation = ExtendedType<'RemoveTextOperation', BaseRemoveTextOperation>
+export type RemoveTextOperation = ExtendedType<
+  'RemoveTextOperation',
+  BaseRemoveTextOperation
+>
 
 export type BaseSetNodeOperation = {
   type: 'set_node'
@@ -60,7 +77,10 @@ export type BaseSetNodeOperation = {
   newProperties: Partial<Node>
 }
 
-export type SetNodeOperation = ExtendedType<'SetNodeOperation', BaseSetNodeOperation>
+export type SetNodeOperation = ExtendedType<
+  'SetNodeOperation',
+  BaseSetNodeOperation
+>
 
 export type BaseSetSelectionOperation =
   | {
@@ -79,17 +99,22 @@ export type BaseSetSelectionOperation =
       newProperties: null
     }
 
-    export type SetSelectionOperation = ExtendedType<'SetSelectionOperation', BaseSetSelectionOperation>
+export type SetSelectionOperation = ExtendedType<
+  'SetSelectionOperation',
+  BaseSetSelectionOperation
+>
 
 export type BaseSplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
 }
 
-export type SplitNodeOperation = ExtendedType<'SplitNodeOperation', BaseSplitNodeOperation>
+export type SplitNodeOperation = ExtendedType<
+  'SplitNodeOperation',
+  BaseSplitNodeOperation
+>
 
 export type NodeOperation =
   | InsertNodeOperation
@@ -142,7 +167,6 @@ export const Operation = {
       case 'merge_node':
         return (
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           Path.isPath(value.path) &&
           isPlainObject(value.properties)
         )
@@ -173,7 +197,6 @@ export const Operation = {
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           isPlainObject(value.properties)
         )
       default:

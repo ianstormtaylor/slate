@@ -1,6 +1,6 @@
 # Location
 
-The `Location` interface is a union of the ways to refer to a specific location in a Slate document: paths, points or ranges. Methods will often accept a `Location` instead of requiring only a `Path`, `Point` or `Range`. 
+The `Location` interface is a union of the ways to refer to a specific location in a Slate document: paths, points or ranges. Methods will often accept a `Location` instead of requiring only a `Path`, `Point` or `Range`.
 
 ```typescript
 type Location = Path | Point | Range
@@ -26,9 +26,9 @@ type Path = number[]
 
 ```typescript
 interface Point {
-    path: Path
-    offset: number  
-    [key: string]: unknown
+  path: Path
+  offset: number
+  [key: string]: unknown
 }
 ```
 
@@ -66,9 +66,9 @@ Options: `{affinity?: 'forward' | 'backward' | null}`
 
 ```typescript
 interface Range {
-    anchor: Point
-    focus: Point
-    [key: string]: unknown
+  anchor: Point
+  focus: Point
+  [key: string]: unknown
 }
 ```
 
@@ -96,7 +96,7 @@ Get the intersection of one `range` with `another`.
 
 ###### `Range.isBackward(range: Range): boolean`
 
-Check if a `range` is backward, meaning that its anchor point appears *after* its focus point in the document.
+Check if a `range` is backward, meaning that its anchor point appears _after_ its focus point in the document.
 
 ###### `Range.isCollapsed(range: Range): boolean`
 
@@ -126,5 +126,4 @@ Get the start point of a `range`
 
 Transform a `range` by an `op`.
 
-Options: `{affinity: 'forward' | 'backward' | 
-'outward' | 'inward' | null}`
+Options: `{affinity: 'forward' | 'backward' | 'outward' | 'inward' | null}`

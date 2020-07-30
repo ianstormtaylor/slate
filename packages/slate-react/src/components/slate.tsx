@@ -35,7 +35,7 @@ export const Slate = (props: {
 
   useEffect(() => {
     return () => {
-      EDITOR_TO_ON_CHANGE.set(editor, () => { })
+      EDITOR_TO_ON_CHANGE.set(editor, () => {})
     }
   }, [])
 
