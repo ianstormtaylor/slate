@@ -42,6 +42,7 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
+import { HistoryEditor } from 'slate-history'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -751,7 +752,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isRedo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.redo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.redo()
                 }
 
@@ -761,7 +762,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isUndo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.undo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.undo()
                 }
 
