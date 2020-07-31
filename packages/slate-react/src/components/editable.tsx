@@ -248,7 +248,7 @@ export const Editable = (props: EditableProps) => {
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
         // and those commands determine that for themselves.
-        if (!type.startsWith('delete') || !type.startsWith('deleteBy')) {
+        if (!(type.startsWith('delete') || type.startsWith('deleteBy'))) {
           const [targetRange] = event.getTargetRanges()
 
           if (targetRange) {
