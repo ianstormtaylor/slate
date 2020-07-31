@@ -200,7 +200,7 @@ const Leaf = ({ attributes, children, leaf }) => {
     children = <em>{children}</em>
   }
 
-  if (leaf.underlined) {
+  if (leaf.underline) {
     children = <u>{children}</u>
   }
 
