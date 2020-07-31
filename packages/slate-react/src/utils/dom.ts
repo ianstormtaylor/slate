@@ -182,5 +182,5 @@ export const setReverseDomSelection = (
   const newRange = domRange.cloneRange()
   newRange.collapse()
   domSelection.addRange(newRange)
-  domSelection.extend(newRange.startContainer, newRange.startOffset)
+  domSelection.extend(domRange.startContainer, domRange.startOffset)
 }
