@@ -9,6 +9,7 @@ import {
   Transforms,
   Path,
 } from 'slate'
+import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -42,7 +43,6 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
-import { HistoryEditor } from 'slate-history'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly

@@ -24,6 +24,7 @@
   },
   "devDependencies": {
     "slate": "^0.58.4",
+    "slate-history": "^0.58.4",
     "slate-hyperscript": "^0.58.4"
   },
   "peerDependencies": {
