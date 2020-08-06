@@ -664,6 +664,7 @@ export const NodeTransforms = {
       at?: Location
       match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     } = {}
