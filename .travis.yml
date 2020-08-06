@@ -1,4 +1,3 @@
-
 language: node_js
 node_js: [node]
 
@@ -6,18 +5,27 @@ before_install:
   # Export the C++11 compiler.
   - if [[ $TRAVIS_OS_NAME == "linux" ]]; then export CXX=g++-4.8; fi
 
-cache:
-  # Cache yarn packages.
-  yarn: true
+cache: yarn
 
 env:
-  # Do two runs, one for testing and one for linting.
+  # Do multiple runs for testing and linting.
   matrix:
     - TEST_TYPE=test
-    - TEST_TYPE=lint
+    - TEST_TYPE=lint:eslint
+    - TEST_TYPE=lint:prettier
+
+before_script:
+  # When linting, build the dependencies so they can be resolved.
+  - |
+    set -e
+    if [[ $TEST_TYPE == 'lint:eslint' ]]; then
+      yarn build
+    fi
+    set +e
 
 script:
-  # Build all of the packages so they are resolvable by each other.
-  - yarn build
   # Run testing or linting depending on the environment.
-  - yarn $TEST_TYPE
+  - |
+    set -e
+    yarn $TEST_TYPE
+    set +e

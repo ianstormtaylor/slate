@@ -1,0 +1,10 @@
+*.md
+.github/
+.next/
+build/
+dist/
+lib/
+node_modules/
+site/out/
+tmp/
+next.config.js

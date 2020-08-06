@@ -1,46 +1,29 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.34.2",
+  "version": "0.58.4",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/slate.js",
-  "module": "lib/slate.es.js",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "umd": "dist/slate.js",
   "umdMin": "dist/slate.min.js",
+  "sideEffects": false,
   "files": [
-    "dist/",
-    "lib/"
+    "dist/"
   ],
   "dependencies": {
-    "debug": "^3.1.0",
-    "direction": "^0.1.5",
+    "@types/esrever": "^0.2.0",
     "esrever": "^0.2.0",
-    "is-empty": "^1.0.0",
-    "is-plain-object": "^2.0.4",
-    "lodash": "^4.17.4",
-    "slate-dev-logger": "^0.1.39",
-    "slate-schema-violations": "^0.1.15",
-    "type-of": "^2.0.1"
-  },
-  "peerDependencies": {
-    "immutable": ">=3.8.1",
-    "react": ">=0.14.0"
-  },
-  "devDependencies": {
-    "slate-hyperscript": "^0.5.17"
-  },
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
-  },
-  "umdGlobals": {
-    "immutable": "Immutable"
+    "immer": "^5.0.0",
+    "is-plain-object": "^3.0.0",
+    "tiny-warning": "^1.0.3"
   },
   "keywords": [
     "canvas",
     "contenteditable",
-    "doc",
-    "docs",
+    "custom",
     "document",
     "edit",
     "editor",
@@ -51,7 +34,7 @@
     "paper",
     "react",
     "rich",
-    "rich-text",
+    "richtext",
     "richtext",
     "slate",
     "text",

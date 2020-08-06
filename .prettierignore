@@ -1,6 +1,9 @@
+.babelrc
+.next/
 build/
+dist/
+lib/
 node_modules/
 package.json
-packages/*/dist/
-packages/*/lib/
+site/out/
 tmp/

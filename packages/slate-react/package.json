@@ -1,64 +1,48 @@
 {
   "name": "slate-react",
-  "description": "A set of React components for building completely customizable rich-text editors.",
-  "version": "0.12.11",
+  "description": "Tools for building completely customizable richtext editors with React.",
+  "version": "0.58.4",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
-  "main": "lib/slate-react.js",
-  "module": "lib/slate-react.es.js",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
   "umd": "dist/slate-react.js",
   "umdMin": "dist/slate-react.min.js",
+  "sideEffects": false,
   "files": [
-    "dist/",
-    "lib/"
+    "dist/"
   ],
   "dependencies": {
-    "debug": "^3.1.0",
-    "get-window": "^1.1.1",
-    "is-window": "^1.0.2",
-    "keycode": "^2.1.2",
-    "lodash": "^4.1.1",
-    "prop-types": "^15.5.8",
-    "react-immutable-proptypes": "^2.1.0",
-    "react-portal": "^3.1.0",
-    "selection-is-backward": "^1.0.0",
-    "slate-base64-serializer": "^0.2.36",
-    "slate-dev-environment": "^0.1.2",
-    "slate-dev-logger": "^0.1.39",
-    "slate-hotkeys": "^0.1.2",
-    "slate-plain-serializer": "^0.5.17",
-    "slate-prop-types": "^0.4.34"
-  },
-  "peerDependencies": {
-    "immutable": ">=3.8.1",
-    "react": ">=0.14.0",
-    "react-dom": ">=0.14.0",
-    "slate": ">=0.32.0"
+    "@types/is-hotkey": "^0.1.1",
+    "@types/lodash": "^4.14.149",
+    "direction": "^1.0.3",
+    "is-hotkey": "^0.1.6",
+    "is-plain-object": "^3.0.0",
+    "lodash": "^4.17.4",
+    "scroll-into-view-if-needed": "^2.2.20"
   },
   "devDependencies": {
-    "immutable": "^3.8.1",
-    "mocha": "^2.5.3",
-    "slate": "^0.34.2",
-    "slate-hyperscript": "^0.5.17",
-    "slate-simulator": "^0.4.34"
+    "slate": "^0.58.4",
+    "slate-hyperscript": "^0.58.4"
   },
-  "scripts": {
-    "clean": "rm -rf ./dist ./lib ./node_modules"
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "slate": ">=0.55.0"
   },
   "umdGlobals": {
-    "immutable": "Immutable",
     "react": "React",
-    "react-dom": "ReactDOM",
     "slate": "Slate"
   },
   "keywords": [
     "canvas",
     "contenteditable",
-    "doc",
     "docs",
     "document",
     "edit",
     "editor",
+    "editable",
     "html",
     "immutable",
     "markdown",
@@ -66,7 +50,7 @@
     "paper",
     "react",
     "rich",
-    "rich-text",
+    "richtext",
     "richtext",
     "slate",
     "text",

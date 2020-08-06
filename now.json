@@ -1,0 +1,9 @@
+{
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "./site/out/$1",
+      "continue": true
+    }
+  ]
+}
