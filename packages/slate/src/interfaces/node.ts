@@ -292,7 +292,7 @@ export const Node: NodeInterface = {
       )
     }
 
-    const newRoot = produce(root, r => {
+    const newRoot = produce({ children: root.children }, r => {
       const [start, end] = Range.edges(range)
       const nodeEntries = Node.nodes(r, {
         reverse: true,
