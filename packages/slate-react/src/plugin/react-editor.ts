@@ -84,6 +84,28 @@ export const ReactEditor = {
   },
 
   /**
+   * Find the DOM node that implements DocumentOrShadowRoot for the editor.
+   */
+
+  findDocumentOrShadowRoot(editor: ReactEditor): DocumentOrShadowRoot {
+    const el = ReactEditor.toDOMNode(editor, editor)
+    const root = el.getRootNode()
+
+    if (!(root instanceof Document || root instanceof ShadowRoot))
+      throw new Error(
+        `Unable to find DocumentOrShadowRoot for editor element: ${el}`
+      )
+
+    // COMPAT: Only Chrome implements the DocumentOrShadowRoot mixin for
+    // ShadowRoot; other browsers still implement it on the Document
+    // interface. (2020/08/08)
+    // https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot#Properties
+    if (root.getSelection === undefined) return el.ownerDocument
+
+    return root
+  },
+
+  /**
    * Check if the editor is focused.
    */
 
@@ -105,9 +127,10 @@ export const ReactEditor = {
 
   blur(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, false)
 
-    if (getDocumentOrShadowRoot().activeElement === el) {
+    if (root.activeElement === el) {
       el.blur()
     }
   },
@@ -118,9 +141,10 @@ export const ReactEditor = {
 
   focus(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, true)
 
-    if (getDocumentOrShadowRoot().activeElement !== el) {
+    if (root.activeElement !== el) {
       el.focus({ preventScroll: true })
     }
   },
@@ -130,8 +154,10 @@ export const ReactEditor = {
    */
 
   deselect(editor: ReactEditor): void {
+    const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
-    const domSelection = getDocumentOrShadowRoot().getSelection()
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    const domSelection = root.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()

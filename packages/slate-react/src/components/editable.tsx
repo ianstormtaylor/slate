@@ -144,7 +144,8 @@ export const Editable = (props: EditableProps) => {
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
     const { selection } = editor
-    const domSelection = getDocumentOrShadowRoot().getSelection()
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    const domSelection = root.getSelection()
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
@@ -394,9 +395,10 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
-        const { activeElement } = getDocumentOrShadowRoot()
+        const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = getDocumentOrShadowRoot().getSelection()
+        const domSelection = root.getSelection()
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -534,9 +536,8 @@ export const Editable = (props: EditableProps) => {
             // one, this is due to the window being blurred when the tab
             // itself becomes unfocused, so we want to abort early to allow to
             // editor to stay focused when the tab becomes focused again.
-            if (
-              state.latestElement === getDocumentOrShadowRoot().activeElement
-            ) {
+            const root = ReactEditor.findDocumentOrShadowRoot(editor)
+            if (state.latestElement === root.activeElement) {
               return
             }
 
@@ -740,7 +741,8 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onFocus)
             ) {
               const el = ReactEditor.toDOMNode(editor, editor)
-              state.latestElement = getDocumentOrShadowRoot().activeElement
+              const root = ReactEditor.findDocumentOrShadowRoot(editor)
+              state.latestElement = root.activeElement
 
               // COMPAT: If the editor has nested editable elements, the focus
               // can go to them. In Firefox, this must be prevented because it
