@@ -1,6 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, PropsWithChildren, Ref } from 'react'
 import { cx, css } from 'emotion'
-import { useRouter } from 'next/router'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
@@ -26,6 +25,9 @@ import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import CodeHighlighting from '../../examples/code-highlighting'
 import Tables from '../../examples/tables'
+
+// node
+import { getAllExamples } from '../api'
 
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
@@ -149,26 +151,39 @@ const TabButton = props => (
   />
 )
 
-const Tab = React.forwardRef(({ active, href, ...props }, ref) => (
-  <a
-    ref={ref}
-    href={href}
-    {...props}
-    className={css`
-      display: inline-block;
-      margin-bottom: 0.2em;
-      padding: 0.2em 1em;
-      border-radius: 0.2em;
-      text-decoration: none;
-      color: ${active ? 'white' : '#777'};
-      background: ${active ? '#333' : 'transparent'};
+const Tab = React.forwardRef(
+  (
+    {
+      active,
+      href,
+      ...props
+    }: PropsWithChildren<{
+      active: boolean
+      href: string
+      [key: string]: unknown
+    }>,
+    ref: Ref<HTMLAnchorElement | null>
+  ) => (
+    <a
+      ref={ref}
+      href={href}
+      {...props}
+      className={css`
+        display: inline-block;
+        margin-bottom: 0.2em;
+        padding: 0.2em 1em;
+        border-radius: 0.2em;
+        text-decoration: none;
+        color: ${active ? 'white' : '#777'};
+        background: ${active ? '#333' : 'transparent'};
 
-      &:hover {
-        background: #333;
-      }
-    `}
-  />
-))
+        &:hover {
+          background: #333;
+        }
+      `}
+    />
+  )
+)
 
 const Wrapper = ({ className, ...props }) => (
   <div
@@ -233,12 +248,10 @@ const Warning = props => (
   />
 )
 
-const ExamplePage = () => {
-  const [error, setError] = useState()
-  const [stacktrace, setStacktrace] = useState()
-  const [showTabs, setShowTabs] = useState()
-  const router = useRouter()
-  const { example = router.asPath.replace('/examples/', '') } = router.query
+const ExamplePage = ({ example }: { example: string }) => {
+  const [error, setError] = useState<Error | undefined>()
+  const [stacktrace, setStacktrace] = useState<string | undefined>()
+  const [showTabs, setShowTabs] = useState<boolean>()
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
   return (
@@ -291,7 +304,7 @@ const ExamplePage = () => {
         <TabList isVisible={showTabs}>
           {EXAMPLES.map(([n, , p]) => (
             <Link
-              key={p}
+              key={p as string}
               href="/examples/[example]"
               as={`/examples/${p}`}
               passHref
@@ -331,8 +344,29 @@ const NoSsrExamplePage = dynamic(() => Promise.resolve(ExamplePage), {
   ssr: false,
 })
 
-NoSsrExamplePage.getInitialProps = () => {
-  return {}
+export async function getStaticPaths() {
+  const paths = getAllExamples()
+
+  return {
+    paths: paths.map(path => ({
+      params: {
+        example: path,
+      },
+    })),
+    fallback: false,
+  }
+}
+
+export async function getStaticProps({
+  params,
+}: {
+  params: { example: string }
+}) {
+  return {
+    props: {
+      example: params.example,
+    },
+  }
 }
 
 export default NoSsrExamplePage
