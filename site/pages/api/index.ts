@@ -1,4 +1,4 @@
-import { readdirSync, fstat } from 'fs'
+import { readdirSync } from 'fs'
 import { join } from 'path'
 
 const examplePath = join(process.cwd(), 'examples')
