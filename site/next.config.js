@@ -10,11 +10,12 @@ module.exports = {
     }
 
     for (const file of examples) {
-      if (!file.endsWith('.js')) {
+      if (!file.endsWith('.tsx') || !file.endsWith('.js')) {
         continue
       }
 
-      const example = file.replace('.js', '')
+      let example = file.replace('.js', '')
+      example = file.replace('.tsx', '')
       pages[`/examples/${example}`] = { page: '/examples/[example]', example }
     }
 
