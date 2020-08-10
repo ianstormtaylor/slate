@@ -14,8 +14,7 @@ module.exports = {
         continue
       }
 
-      let example = file.replace('.js', '')
-      example = file.replace('.tsx', '')
+      const example = file.replace('.tsx', '')
       pages[`/examples/${example}`] = { page: '/examples/[example]', example }
     }
 
