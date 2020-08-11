@@ -33,7 +33,7 @@ declare global {
 export type DOMPoint = [Node, number]
 
 /**
- * Returns the host window of a a DOM node
+ * Returns the host window of a DOM node
  */
 
 export const getDefaultView = (value: any): Window | null => {
