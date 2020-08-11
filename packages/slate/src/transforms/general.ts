@@ -272,7 +272,7 @@ export const GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Node[]
+    editor.children = finishDraft(editor.children)
 
     if (selection) {
       editor.selection = isDraft(selection)

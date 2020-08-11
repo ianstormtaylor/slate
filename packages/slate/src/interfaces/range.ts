@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
-import { Operation, Path, Point, PointEntry } from '..'
+import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -8,11 +8,12 @@ import { Operation, Path, Point, PointEntry } from '..'
  * multiple nodes.
  */
 
-export interface Range {
+export interface BaseRange {
   anchor: Point
   focus: Point
-  [key: string]: unknown
 }
+
+export type Range = ExtendedType<'Range', BaseRange>
 
 export const Range = {
   /**

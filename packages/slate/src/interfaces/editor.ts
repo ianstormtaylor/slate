@@ -4,8 +4,7 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
-  Descendant,
-  Element,
+  ExtendedType,
   Location,
   Node,
   NodeEntry,
@@ -27,18 +26,19 @@ import {
   RANGE_REFS,
 } from '../utils/weak-maps'
 import { getWordDistance, getCharacterDistance } from '../utils/string'
+import { Descendant } from './node'
+import { Element } from './element'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
  * by plugins that wish to add their own helpers and implement new behaviors.
  */
 
-export interface Editor {
-  children: Node[]
+export interface BaseEditor {
+  children: Descendant[]
   selection: Range | null
   operations: Operation[]
-  marks: Record<string, any> | null
-  [key: string]: unknown
+  marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -59,6 +59,8 @@ export interface Editor {
   insertText: (text: string) => void
   removeMark: (key: string) => void
 }
+
+export type Editor = ExtendedType<'Editor', BaseEditor>
 
 export const Editor = {
   /**
@@ -554,7 +556,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Node>(
+  next<T extends Descendant>(
     editor: Editor,
     options: {
       at?: Location

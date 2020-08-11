@@ -1,5 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Range } from '..'
+import { ExtendedType } from './custom-types'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -7,10 +8,11 @@ import { Range } from '..'
  * nodes in the document tree as they cannot contain any children.
  */
 
-export interface Text {
+export interface BaseText {
   text: string
-  [key: string]: unknown
 }
+
+export type Text = ExtendedType<'Text', BaseText>
 
 export const Text = {
   /**
@@ -61,6 +63,14 @@ export const Text = {
 
   isTextList(value: any): value is Text[] {
     return Array.isArray(value) && (value.length === 0 || Text.isText(value[0]))
+  },
+
+  /**
+   * Check if some props are a partial of Text.
+   */
+
+  isTextProps(props: any): props is Partial<Text> {
+    return (props as Partial<Text>).text !== undefined
   },
 
   /**

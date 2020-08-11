@@ -1,5 +1,6 @@
 import { produce } from 'immer'
-import { Editor, Element, ElementEntry, Path, Range, Text } from '..'
+import { Editor, Path, Range, Text } from '..'
+import { Element, ElementEntry } from './element'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -165,6 +166,22 @@ export const Node = {
   },
 
   /**
+   * Extract props from a Node.
+   */
+
+  extractProps(node: Node): Partial<Node> {
+    if (Element.isAncestor(node)) {
+      const { children, ...properties } = node
+
+      return properties
+    } else {
+      const { text, ...properties } = node
+
+      return properties
+    }
+  },
+
+  /**
    * Get the first node entry in a root node from a path.
    */
 
@@ -222,7 +239,7 @@ export const Node = {
         }
       }
 
-      delete r.selection
+      if (Editor.isEditor(r)) delete r.selection
     })
 
     return newRoot.children
@@ -354,8 +371,12 @@ export const Node = {
 
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Element.isElement(node) && Element.matches(node, props)) ||
-      (Text.isText(node) && Text.matches(node, props))
+      (Element.isElement(node) &&
+        Element.isElementProps(props) &&
+        Element.matches(node, props)) ||
+      (Text.isText(node) &&
+        Text.isTextProps(props) &&
+        Text.matches(node, props))
     )
   },
 

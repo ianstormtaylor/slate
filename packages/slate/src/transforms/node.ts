@@ -1,7 +1,7 @@
 import {
   Editor,
-  Element,
   Location,
+  Descendant,
   Node,
   Path,
   Point,
@@ -11,6 +11,7 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
+import { Element } from '../interfaces/element'
 
 export const NodeTransforms = {
   /**
@@ -631,7 +632,7 @@ export const NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const { text, children, ...properties } = node
+          const properties = Node.extractProps(node)
           editor.apply({
             type: 'split_node',
             path,
@@ -720,7 +721,7 @@ export const NodeTransforms = {
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
-        const [node] = Editor.node(editor, path) as NodeEntry<Ancestor>
+        const [node] = Editor.node(editor, path)
         let range = Editor.range(editor, path)
 
         if (split && rangeRef) {
@@ -729,7 +730,7 @@ export const NodeTransforms = {
 
         Transforms.liftNodes(editor, {
           at: range,
-          match: n => node.children.includes(n),
+          match: n => Element.isAncestor(node) && node.children.includes(n),
           voids,
         })
       }
@@ -823,7 +824,7 @@ export const NodeTransforms = {
 
           const range = Editor.range(editor, firstPath, lastPath)
           const commonNodeEntry = Editor.node(editor, commonPath)
-          const [commonNode] = commonNodeEntry as NodeEntry<Ancestor>
+          const [commonNode] = commonNodeEntry
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
@@ -831,7 +832,8 @@ export const NodeTransforms = {
 
           Transforms.moveNodes(editor, {
             at: range,
-            match: n => commonNode.children.includes(n),
+            match: n =>
+              Element.isAncestor(commonNode) && commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
           })

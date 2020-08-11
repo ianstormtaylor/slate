@@ -18,11 +18,11 @@ React components for rendering Slate editors
 
 The main Slate editor.
 
-###### `DefaultElement(props: RenderElementProps)` 
+###### `DefaultElement(props: RenderElementProps)`
 
 The default element renderer.
 
-###### `DefaultLeaf(props: RenderLeafProps)` 
+###### `DefaultLeaf(props: RenderLeafProps)`
 
 The default custom leaf renderer.
 
@@ -137,4 +137,3 @@ Adds React and DOM specific behaviors to the editor.
 ## Utils
 
 Private convenience modules
-
