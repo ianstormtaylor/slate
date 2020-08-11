@@ -716,7 +716,9 @@ export const NodeTransforms = {
 
       const rangeRef = Range.isRange(at) ? Editor.rangeRef(editor, at) : null
       const matches = Editor.nodes(editor, { at, match, mode, voids })
-      const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
+      const pathRefs = Array.from(matches, ([, p]) =>
+        Editor.pathRef(editor, p)
+      ).reverse()
 
       for (const pathRef of pathRefs) {
         const path = pathRef.unref()!
