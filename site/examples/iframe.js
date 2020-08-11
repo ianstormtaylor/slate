@@ -16,7 +16,10 @@ const HOTKEYS = {
 
 const IFrameExample = () => {
   const [value, setValue] = useState(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback(
+    ({ attributes, children }) => <p {...attributes}>{children}</p>,
+    []
+  )
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
@@ -64,17 +67,6 @@ const toggleMark = (editor, format) => {
 const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
-}
-
-const Element = ({ attributes, children, element }) => {
-  switch (element.type) {
-    case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>
-    case 'heading-one':
-      return <h1 {...attributes}>{children}</h1>
-    default:
-      return <p {...attributes}>{children}</p>
-  }
 }
 
 const Leaf = ({ attributes, children, leaf }) => {
