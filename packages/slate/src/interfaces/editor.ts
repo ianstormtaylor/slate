@@ -465,7 +465,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
 
@@ -622,7 +622,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const {
       at = editor.selection,
       mode = 'all',
@@ -653,7 +653,7 @@ export const Editor = {
       to = reverse ? first : last
     }
 
-    const iterable = Node.nodes(editor, {
+    const nodeEntries = Node.nodes(editor, {
       reverse,
       from,
       to,
@@ -663,7 +663,7 @@ export const Editor = {
     const matches: NodeEntry<T>[] = []
     let hit: NodeEntry<T> | undefined
 
-    for (const [node, path] of iterable) {
+    for (const [node, path] of nodeEntries) {
       const isLower = hit && Path.compare(path, hit[1]) === 0
 
       // In highest mode any node lower than the last hit is not a match.
@@ -980,7 +980,7 @@ export const Editor = {
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
     } = {}
-  ): Iterable<Point> {
+  ): Generator<Point, void, undefined> {
     const { at = editor.selection, unit = 'offset', reverse = false } = options
 
     if (!at) {
