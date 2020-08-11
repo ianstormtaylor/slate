@@ -22,7 +22,25 @@ export {
   DOMStaticRange,
 }
 
+declare global {
+  interface Window {
+    Selection: typeof Selection['constructor']
+    DataTransfer: typeof DataTransfer['constructor']
+    Node: typeof Node['constructor']
+  }
+}
+
 export type DOMPoint = [Node, number]
+
+/**
+ * Returns the host window of a a DOM node
+ */
+
+export const getDefaultView = (value: any): Window | null => {
+  return (
+    (value && value.ownerDocument && value.ownerDocument.defaultView) || null
+  )
+}
 
 /**
  * Check if a DOM node is a comment node.
@@ -45,7 +63,17 @@ export const isDOMElement = (value: any): value is DOMElement => {
  */
 
 export const isDOMNode = (value: any): value is DOMNode => {
-  return value instanceof Node
+  const window = getDefaultView(value)
+  return !!window && value instanceof window.Node
+}
+
+/**
+ * Check if a value is a DOM selection.
+ */
+
+export const isDOMSelection = (value: any): value is DOMSelection => {
+  const window = value && value.anchorNode && getDefaultView(value.anchorNode)
+  return !!window && value instanceof window.Selection
 }
 
 /**
