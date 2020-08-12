@@ -1461,10 +1461,12 @@ export const Editor = {
             `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`
           )
         }
-
+        const index = path[path.length - 1]
+        if (index === 0) {
+          return
+        }
         const node = Node.get(editor, path)
         const parent = Node.parent(editor, path)
-        const index = path[path.length - 1]
         let newNode: Descendant
 
         if (Text.isText(node)) {
