@@ -20,7 +20,6 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
-  getDocumentOrShadowRoot,
   hasShadowRoot,
 } from '../utils/dom'
 import { IS_CHROME } from '../utils/environment'
@@ -526,10 +525,7 @@ export const ReactEditor = {
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)
         // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
-        if (
-          IS_CHROME &&
-          ReactEditor.findDocumentOrShadowRoot(editor) instanceof ShadowRoot
-        ) {
+        if (IS_CHROME && hasShadowRoot()) {
           isCollapsed =
             domRange.anchorNode === domRange.focusNode &&
             domRange.anchorOffset === domRange.focusOffset
