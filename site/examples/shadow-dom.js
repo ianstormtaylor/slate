@@ -4,8 +4,6 @@ import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 
-import PlainTextExample from './plaintext'
-
 const ShadowDOM = () => {
   const container = useRef(null)
 
@@ -23,10 +21,27 @@ const ShadowDOM = () => {
     innerShadowRoot.appendChild(reactRoot)
 
     // Render the editor within the nested shadow DOM
-    ReactDOM.render(<PlainTextExample />, reactRoot)
+    ReactDOM.render(<ShadowEditor />, reactRoot)
   })
 
   return <div ref={container} />
 }
+
+const ShadowEditor = () => {
+  const [value, setValue] = useState(initialValue)
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+
+  return (
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+      <Editable placeholder="Enter some plain text..." />
+    </Slate>
+  )
+}
+
+const initialValue = [
+  {
+    children: [{ text: 'This Editor is rendered within a nested Shadow DOM.' }],
+  },
+]
 
 export default ShadowDOM
