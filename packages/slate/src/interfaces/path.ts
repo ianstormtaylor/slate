@@ -377,28 +377,19 @@ export const Path = {
         case 'move_node': {
           const { path: op, newPath: onp } = operation
 
-          // If the old and new path are the same, it's a no-op.
-          if (Path.equals(op, onp)) {
+          // If the old and new path are the same or next sibling, it's a no-op.
+          if (Path.equals(op, onp) || Path.equals(Path.next(op), onp)) {
             return
           }
 
           if (Path.isAncestor(op, p) || Path.equals(op, p)) {
             const copy = onp.slice()
 
-            if (Path.endsBefore(op, onp) && op.length < onp.length) {
+            if (Path.endsBefore(op, onp)) {
               copy[op.length - 1] -= 1
             }
 
             return copy.concat(p.slice(op.length))
-          } else if (
-            Path.isSibling(op, onp) &&
-            (Path.isAncestor(onp, p) || Path.equals(onp, p))
-          ) {
-            if (Path.endsBefore(op, p)) {
-              p[op.length - 1] -= 1
-            } else {
-              p[op.length - 1] += 1
-            }
           } else if (
             Path.endsBefore(onp, p) ||
             Path.equals(onp, p) ||
@@ -410,7 +401,11 @@ export const Path = {
 
             p[onp.length - 1] += 1
           } else if (Path.endsBefore(op, p)) {
-            if (Path.equals(onp, p)) {
+            if (
+              Path.endsBefore(onp, p) ||
+              Path.equals(onp, p) ||
+              Path.isAncestor(onp, p)
+            ) {
               p[onp.length - 1] += 1
             }
 

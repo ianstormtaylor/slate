@@ -14,7 +14,7 @@ export const input = (
 export const run = editor => {
   Transforms.moveNodes(editor, {
     match: n => Editor.isBlock(editor, n),
-    to: [1],
+    to: [2],
   })
 }
 export const output = (

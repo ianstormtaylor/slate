@@ -17,7 +17,7 @@ export const input = (
   </editor>
 )
 export const run = editor => {
-  Transforms.moveNodes(editor, { at: [0, 1], to: [0, 3] })
+  Transforms.moveNodes(editor, { at: [0, 1], to: [0, 4] })
 }
 export const output = (
   <editor>

@@ -9,4 +9,4 @@ const op = {
 export const test = () => {
   return Path.transform(path, op)
 }
-export const output = [2, 3, 3]
+export const output = [3, 3, 3]

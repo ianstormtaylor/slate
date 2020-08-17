@@ -1,12 +1,12 @@
 import { Path } from 'slate'
 
-const path = [0, 1]
+const path = [3, 3, 3]
 const op = {
   type: 'move_node',
-  path: [0, 0],
-  newPath: [0, 1],
+  path: [3, 2],
+  newPath: [3, 3, 3],
 }
 export const test = () => {
   return Path.transform(path, op)
 }
-export const output = [0, 1]
+export const output = [3, 2, 4]
