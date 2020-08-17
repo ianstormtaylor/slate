@@ -87,7 +87,7 @@ export const ReactEditor = {
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
 
-  findDocumentOrShadowRoot(editor: ReactEditor): DocumentOrShadowRoot {
+  findDocumentOrShadowRoot(editor: ReactEditor): Document | ShadowRoot {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 

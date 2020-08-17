@@ -33,7 +33,6 @@ import {
   isDOMNode,
   DOMStaticRange,
   isPlainTextOnlyPaste,
-  getDocumentOrShadowRoot,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -396,9 +395,12 @@ export const Editable = (props: EditableProps) => {
     throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        console.log('root', root)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = root.getSelection()
+
+        console.log('domSelection', domSelection)
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -438,16 +440,11 @@ export const Editable = (props: EditableProps) => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
-    getDocumentOrShadowRoot().addEventListener(
-      'selectionchange',
-      onDOMSelectionChange
-    )
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    root.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
-      getDocumentOrShadowRoot().removeEventListener(
-        'selectionchange',
-        onDOMSelectionChange
-      )
+      root.removeEventListener('selectionchange', onDOMSelectionChange)
     }
   }, [onDOMSelectionChange])
 
