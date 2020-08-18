@@ -18,6 +18,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Clause](https://clause.io)
 - [GitBook](https://www.gitbook.com/)
 - [Grafana](https://grafana.com/)
+- [GraphCMS](https://graphcms.com)
 - [Guilded](https://www.guilded.gg)
 - [Guru](https://www.getguru.com/)
 - [Kitemaker](https://kitemaker.co)

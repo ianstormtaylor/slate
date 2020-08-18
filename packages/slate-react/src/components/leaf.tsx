@@ -36,11 +36,14 @@ const Leaf = (props: {
           style={{
             pointerEvents: 'none',
             display: 'inline-block',
-            verticalAlign: 'text-top',
             width: '0',
             maxWidth: '100%',
             whiteSpace: 'nowrap',
             opacity: '0.333',
+            userSelect: 'none',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            textDecoration: 'none',
           }}
         >
           {leaf.placeholder as React.ReactNode}

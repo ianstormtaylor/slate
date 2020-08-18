@@ -103,6 +103,8 @@ Decorations are another type of text-level formatting. They are similar to regul
 
 However, decorations are computed at **render-time** based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.
 
+Decorations are different from Marks in that they are not stored on editor state.
+
 ## Toolbars, Menus, Overlays, and more!
 
 In addition to controlling the rendering of nodes inside Slate, you can also retrieve the current editor context from inside other components using the `useSlate` hook.

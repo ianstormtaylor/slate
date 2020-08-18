@@ -160,7 +160,7 @@ export const Range = {
    * Iterate through all of the point entries in a range.
    */
 
-  *points(range: Range): Iterable<PointEntry> {
+  *points(range: Range): Generator<PointEntry, void, undefined> {
     yield [range.anchor, 'anchor']
     yield [range.focus, 'focus']
   },
@@ -181,7 +181,9 @@ export const Range = {
   transform(
     range: Range,
     op: Operation,
-    options: { affinity: 'forward' | 'backward' | 'outward' | 'inward' | null }
+    options: {
+      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
+    } = {}
   ): Range | null {
     const { affinity = 'inward' } = options
     let affinityAnchor: 'forward' | 'backward' | null

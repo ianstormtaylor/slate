@@ -31,7 +31,7 @@ To do this, you extend the `normalizeNode` function on the editor. The `normaliz
 For example here's a plugin that ensures `paragraph` blocks only have text or inline elements as children:
 
 ```js
-import { Element, Node } from 'slate'
+import { Transforms, Element, Node } from 'slate'
 
 const withParagraphs = editor => {
   const { normalizeNode } = editor
