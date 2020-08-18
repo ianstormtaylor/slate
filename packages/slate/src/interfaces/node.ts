@@ -292,7 +292,7 @@ export const Node = {
   },
 
   /**
-   * Get the lash node entry in a root node from a path.
+   * Get the last node entry in a root node from a path.
    */
 
   last(root: Node, path: Path): NodeEntry {
