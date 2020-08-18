@@ -69,7 +69,7 @@ export const createEditor = (): Editor => {
       }
 
       DIRTY_PATHS.set(editor, dirtyPaths)
-      Editor.transform(editor, op)
+      Transforms.transform(editor, op)
       editor.operations.push(op)
       Editor.normalize(editor)
 
