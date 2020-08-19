@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
+import { Editor, Node, Path, Operation, Transforms, Range, Text } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
@@ -15,7 +15,7 @@ export const withReact = <T extends Editor>(editor: T) => {
   const { apply, onChange } = e
 
   e.apply = (op: Operation) => {
-    const matches: [Path, Key][] = []
+    const matches: Map<Key, Path> = new Map()
 
     switch (op.type) {
       case 'insert_text':
@@ -23,21 +23,64 @@ export const withReact = <T extends Editor>(editor: T) => {
       case 'set_node': {
         for (const [node, path] of Editor.levels(e, { at: op.path })) {
           const key = ReactEditor.findKey(e, node)
-          matches.push([path, key])
+          matches.set(key, path)
         }
 
         break
       }
 
       case 'insert_node':
-      case 'remove_node':
-      case 'merge_node':
-      case 'split_node': {
+      case 'remove_node': {
         for (const [node, path] of Editor.levels(e, {
           at: Path.parent(op.path),
         })) {
           const key = ReactEditor.findKey(e, node)
-          matches.push([path, key])
+          matches.set(key, path)
+        }
+
+        break
+      }
+
+      case 'merge_node': {
+        const [opNode] = Editor.node(e, op.path)
+        const prevPath = Path.previous(op.path)
+        const [prevNode] = Editor.node(e, prevPath)
+        let at: Path
+        if (Text.isText(opNode) && Text.isText(prevNode)) {
+          at = Path.parent(prevPath)
+        } else if (!Text.isText(opNode) && !Text.isText(prevNode)) {
+          at = prevPath
+        } else {
+          throw new Error(
+            `Cannot apply a "merge_node" operation at path [${op.path}] to nodes of different interaces: ${opNode} ${prevNode}`
+          )
+        }
+
+        for (const [node, path] of Editor.levels(e, {
+          at,
+        })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.set(key, path)
+        }
+
+        for (const [node, path] of Editor.levels(e, {
+          at: Path.parent(op.path),
+        })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.set(key, path)
+        }
+
+        break
+      }
+
+      case 'split_node': {
+        const [opNode] = Editor.node(e, op.path)
+        const at = Text.isText(opNode) ? Path.parent(op.path) : op.path
+        for (const [node, path] of Editor.levels(e, {
+          at,
+        })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.set(key, path)
         }
 
         break
@@ -51,7 +94,7 @@ export const withReact = <T extends Editor>(editor: T) => {
 
     apply(op)
 
-    for (const [path, key] of matches) {
+    for (const [key, path] of matches) {
       const [node] = Editor.node(e, path)
       NODE_TO_KEY.set(node, key)
     }
