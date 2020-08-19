@@ -5,7 +5,14 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor, Node } from 'slate'
+import {
+  Text,
+  createEditor,
+  Node,
+  Element as SlateElement,
+  BaseEditor,
+  Descendant,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 

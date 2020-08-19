@@ -7,9 +7,64 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Node, Editor, Transforms, Range, Point, createEditor } from 'slate'
+import {
+  Node,
+  Editor,
+  Transforms,
+  Range,
+  Point,
+  createEditor,
+  Descendant,
+  Element as SlateElement,
+} from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
+
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
+      },
+    ],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Slide to the left.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Slide to the right.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: 'Criss-cross.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Criss-cross!' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: 'Cha cha real smooth…' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: "Let's go to work!" }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: 'Try it out for yourself!' }],
+  },
+]
 
 const CheckListsExample = () => {
   const [value, setValue] = useState<Node[]>(initialValue)
@@ -128,49 +183,5 @@ const CheckListItemElement = ({ attributes, children, element }) => {
     </div>
   )
 }
-
-const initialValue = [
-  {
-    children: [
-      {
-        text:
-          'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
-      },
-    ],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Slide to the left.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Slide to the right.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: 'Criss-cross.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Criss-cross!' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: 'Cha cha real smooth…' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: "Let's go to work!" }],
-  },
-  {
-    children: [{ text: 'Try it out for yourself!' }],
-  },
-]
 
 export default CheckListsExample
