@@ -1,13 +1,15 @@
 import { produce } from 'immer'
 import { Editor, Path, Range, Text } from '..'
 import { Element, ElementEntry } from './element'
+import { ExtendedType } from './custom-types'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
  * occur in a Slate document tree.
  */
 
-export type Node = Editor | Element | Text
+export type BaseNode = Editor | Element | Text
+export type Node = ExtendedType<'Node', BaseNode>
 
 export const Node = {
   /**
