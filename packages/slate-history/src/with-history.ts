@@ -22,7 +22,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       HistoryEditor.withoutSaving(e, () => {
         Editor.withoutNormalizing(e, () => {
           for (const op of batch) {
-            e.apply(op)
+            editor.apply(op)
           }
         })
       })
