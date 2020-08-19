@@ -14,6 +14,7 @@
       "jsx": true
     }
   },
+  "ignorePatterns": ["**/next-env.d.ts"],
   "settings": {
     "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
     "react": {

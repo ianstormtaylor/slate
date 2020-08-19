@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
-import { Editor, Transforms, createEditor } from 'slate'
+import { Editor, Transforms, createEditor, Node } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -16,7 +16,7 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const RichTextExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -42,7 +42,7 @@ const RichTextExample = () => {
         autoFocus
         onKeyDown={event => {
           for (const hotkey in HOTKEYS) {
-            if (isHotkey(hotkey, event)) {
+            if (isHotkey(hotkey, event as any)) {
               event.preventDefault()
               const mark = HOTKEYS[hotkey]
               toggleMark(editor, mark)
@@ -59,7 +59,7 @@ const toggleBlock = (editor, format) => {
   const isList = LIST_TYPES.includes(format)
 
   Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(n.type),
+    match: n => LIST_TYPES.includes(n.type as string),
     split: true,
   })
 
