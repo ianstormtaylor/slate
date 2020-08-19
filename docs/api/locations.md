@@ -114,7 +114,7 @@ Check if a `range` is forward. This is the opposite of `Range.isBackward` and is
 
 Check if a `value` implements the `Range` interface.
 
-###### `Range.points(range: Range): Iterable<PointEntry>`
+###### `Range.points(range: Range): Generator<PointEntry>`
 
 Iterate through all the point entries in a `range`.
 

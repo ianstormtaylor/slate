@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Transforms, createEditor } from 'slate'
+import { Node, Transforms, createEditor } from 'slate'
 import {
   Slate,
   Editable,
@@ -16,7 +16,7 @@ import { css } from 'emotion'
 import { Button, Icon, Toolbar } from '../components'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []

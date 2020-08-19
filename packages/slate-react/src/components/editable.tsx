@@ -350,7 +350,7 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    [readOnly]
+    [readOnly, propsOnDOMBeforeInput]
   )
 
   // Attach a native DOM event handler for `beforeinput` events, because React's
