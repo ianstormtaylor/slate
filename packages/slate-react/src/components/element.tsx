@@ -133,7 +133,7 @@ const Element = (props: {
 const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.decorate === next.decorate &&
-    prev.element === next.element &&
+    isElementEqual(prev.element, next.element) &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
     isRangeListEqual(prev.decorations, next.decorations) &&
@@ -157,6 +157,30 @@ export const DefaultElement = (props: RenderElementProps) => {
       {children}
     </Tag>
   )
+}
+
+const isElementEqual = (
+  element: SlateElement,
+  another: SlateElement
+): boolean => {
+  if (element !== another) {
+    return false
+  }
+
+  if (element.children.length !== another.children.length) {
+    return false
+  }
+
+  for (let i = 0; i < element.children.length; i++) {
+    const childNode = element.children[i]
+    const other = another.children[i]
+
+    if (childNode !== other) {
+      return false
+    }
+  }
+
+  return true
 }
 
 /**
