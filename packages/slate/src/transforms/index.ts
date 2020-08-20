@@ -8,10 +8,14 @@ type TransformsType = typeof GeneralTransforms &
   typeof SelectionTransforms &
   typeof TextTransforms
 
-export const Transforms: TransformsType = Object.assign(
-  {},
+const Transforms: TransformsType = {} as TransformsType
+
+Object.assign(
+  Transforms,
   GeneralTransforms,
   NodeTransforms,
   SelectionTransforms,
   TextTransforms
 )
+
+export { Transforms }
