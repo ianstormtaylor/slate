@@ -1,4 +1,4 @@
-import { CustomTypes } from 'slate'
+import { Text, Range } from 'slate'
 
 declare module 'slate' {
   interface CustomTypes {
