@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, Node, Element as SlateElement } from 'slate'
 import {
   Slate,
   Editable,
@@ -67,7 +67,10 @@ const VideoElement = ({ attributes, children, element }) => {
           url={url}
           onChange={val => {
             const path = ReactEditor.findPath(editor, element)
-            Transforms.setNodes(editor, { url: val }, { at: path })
+            const newProperties: Partial<SlateElement> = {
+              url: val,
+            }
+            Transforms.setNodes(editor, newProperties, { at: path })
           }}
         />
       </div>

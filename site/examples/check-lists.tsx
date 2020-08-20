@@ -20,7 +20,7 @@ import {
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
@@ -67,7 +67,7 @@ const initialValue = [
 ]
 
 const CheckListsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
@@ -94,7 +94,10 @@ const withChecklists = editor => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n => n.type === 'check-list-item',
+        match: n =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === 'check-list-item',
       })
 
       if (match) {
@@ -102,11 +105,15 @@ const withChecklists = editor => {
         const start = Editor.start(editor, path)
 
         if (Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(
-            editor,
-            { type: 'paragraph' },
-            { match: n => n.type === 'check-list-item' }
-          )
+          const newProperties: Partial<SlateElement> = {
+            type: 'paragraph',
+          }
+          Transforms.setNodes(editor, newProperties, {
+            match: n =>
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === 'check-list-item',
+          })
           return
         }
       }
@@ -157,11 +164,10 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           checked={checked}
           onChange={event => {
             const path = ReactEditor.findPath(editor, element)
-            Transforms.setNodes(
-              editor,
-              { checked: event.target.checked },
-              { at: path }
-            )
+            const newProperties: Partial<SlateElement> = {
+              checked: event.target.checked,
+            }
+            Transforms.setNodes(editor, newProperties, { at: path })
           }}
         />
       </span>
