@@ -25,7 +25,9 @@ export const fixtures = (...args) => {
       }
       if (
         stat.isFile() &&
-        (file.endsWith('.js') || file.endsWith('.tsx')) &&
+        (file.endsWith('.js') ||
+          file.endsWith('.tsx') ||
+          file.endsWith('.ts')) &&
         !file.startsWith('.') &&
         // Ignoring `index.js` files allows us to use the fixtures directly
         // from the top-level directory itself, instead of only children.
