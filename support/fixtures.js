@@ -28,6 +28,8 @@ export const fixtures = (...args) => {
         (file.endsWith('.js') ||
           file.endsWith('.tsx') ||
           file.endsWith('.ts')) &&
+        !file.endsWith('custom-types.ts') &&
+        !file.endsWith('type-guards.ts') &&
         !file.startsWith('.') &&
         // Ignoring `index.js` files allows us to use the fixtures directly
         // from the top-level directory itself, instead of only children.
