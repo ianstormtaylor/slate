@@ -188,7 +188,10 @@ export const setReverseDomSelection = (
   domSelection: Selection
 ) => {
   const newRange = domRange.cloneRange()
+  // collapses the range to end
   newRange.collapse()
+  // set both anchor and focus of the selection to domRange's focus
   domSelection.addRange(newRange)
+  // moves the focus of the selection to domRange's anchor
   domSelection.extend(domRange.startContainer, domRange.startOffset)
 }
