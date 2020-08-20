@@ -52,7 +52,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
             ) {
               continue
             } else {
-              e.apply(op)
+              editor.apply(op)
             }
           }
         })
