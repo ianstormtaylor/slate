@@ -8,10 +8,7 @@ type TransformsType = typeof GeneralTransforms &
   typeof SelectionTransforms &
   typeof TextTransforms
 
-const Transforms: TransformsType = {} as TransformsType
-
-Object.assign(
-  Transforms,
+const Transforms: TransformsType = Object.assign(
   GeneralTransforms,
   NodeTransforms,
   SelectionTransforms,

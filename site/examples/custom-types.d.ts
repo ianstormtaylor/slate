@@ -1,9 +1,8 @@
-import { Text, createEditor, Node, Element, Editor, Descendant } from 'slate'
+import { Text, Editor, Descendant } from 'slate'
 
 declare module 'slate' {
   interface CustomTypes {
     Element: CustomElement
-
     Node: CustomNode
   }
 }
