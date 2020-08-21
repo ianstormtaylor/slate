@@ -137,7 +137,16 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
 
 export type Operation = NodeOperation | SelectionOperation | TextOperation
 
-export const Operation = {
+export interface OperationInterface {
+  isNodeOperation: (value: any) => value is NodeOperation
+  isOperation: (value: any) => value is Operation
+  isOperationList: (value: any) => value is Operation[]
+  isSelectionOperation: (value: any) => value is SelectionOperation
+  isTextOperation: (value: any) => value is TextOperation
+  inverse: (op: Operation) => Operation
+}
+
+export const Operation: OperationInterface = {
   /**
    * Check of a value is a `NodeOperation` object.
    */

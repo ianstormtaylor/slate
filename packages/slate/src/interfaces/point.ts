@@ -16,7 +16,20 @@ export interface BasePoint {
 
 export type Point = ExtendedType<'Point', BasePoint>
 
-export const Point = {
+export interface PointInterface {
+  compare: (point: Point, another: Point) => -1 | 0 | 1
+  isAfter: (point: Point, another: Point) => boolean
+  isBefore: (point: Point, another: Point) => boolean
+  equals: (point: Point, another: Point) => boolean
+  isPoint: (value: any) => value is Point
+  transform: (
+    point: Point,
+    op: Operation,
+    options?: { affinity?: 'forward' | 'backward' | null }
+  ) => Point | null
+}
+
+export const Point: PointInterface = {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.

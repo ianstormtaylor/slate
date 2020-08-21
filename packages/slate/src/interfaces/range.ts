@@ -15,7 +15,34 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
-export const Range = {
+export interface RangeInterface {
+  edges: (
+    range: Range,
+    options?: {
+      reverse?: boolean
+    }
+  ) => [Point, Point]
+  end: (range: Range) => Point
+  equals: (range: Range, another: Range) => boolean
+  includes: (range: Range, target: Path | Point | Range) => boolean
+  intersection: (range: Range, another: Range) => Range | null
+  isBackward: (range: Range) => boolean
+  isCollapsed: (range: Range) => boolean
+  isExpanded: (range: Range) => boolean
+  isForward: (range: Range) => boolean
+  isRange: (value: any) => value is Range
+  points: (range: Range) => Generator<PointEntry, void, undefined>
+  start: (range: Range) => Point
+  transform: (
+    range: Range,
+    op: Operation,
+    options?: {
+      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
+    }
+  ) => Range | null
+}
+
+export const Range: RangeInterface = {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.

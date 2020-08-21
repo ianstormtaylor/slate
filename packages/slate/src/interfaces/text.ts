@@ -14,7 +14,16 @@ export interface BaseText {
 
 export type Text = ExtendedType<'Text', BaseText>
 
-export const Text = {
+export interface TextInterface {
+  equals: (text: Text, another: Text, options?: { loose?: boolean }) => boolean
+  isText: (value: any) => value is Text
+  isTextList: (value: any) => value is Text[]
+  isTextProps: (props: any) => props is Partial<Text>
+  matches: (text: Text, props: Partial<Text>) => boolean
+  decorations: (node: Text, decorations: Range[]) => Text[]
+}
+
+export const Text: TextInterface = {
   /**
    * Check if two text nodes are equal.
    */

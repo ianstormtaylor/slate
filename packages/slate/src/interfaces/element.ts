@@ -10,9 +10,18 @@ import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
 export interface BaseElement {
   children: Descendant[]
 }
+
 export type Element = ExtendedType<'Element', BaseElement>
 
-export const Element = {
+export interface ElementInterface {
+  isAncestor: (value: any) => value is Ancestor
+  isElement: (value: any) => value is Element
+  isElementList: (value: any) => value is Element[]
+  isElementProps: (props: any) => props is Partial<Element>
+  matches: (element: Element, props: Partial<Element>) => boolean
+}
+
+export const Element: ElementInterface = {
   /**
    * Check if a value implements the 'Ancestor' interface.
    */
