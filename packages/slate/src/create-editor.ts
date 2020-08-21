@@ -307,7 +307,7 @@ export const createEditor = (): Editor => {
  * Get the "dirty" paths generated from an operation.
  */
 
-const getDirtyPaths = (op: Operation) => {
+const getDirtyPaths = (op: Operation): Path[] => {
   switch (op.type) {
     case 'insert_text':
     case 'remove_text':
