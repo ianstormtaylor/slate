@@ -3,26 +3,9 @@ import { NodeTransforms } from './node'
 import { SelectionTransforms } from './selection'
 import { TextTransforms } from './text'
 
-type TransformsType = typeof GeneralTransforms &
-  typeof NodeTransforms &
-  typeof SelectionTransforms &
-  typeof TextTransforms
-
-// export const Transforms = {
-//   ...GeneralTransforms,
-//   ...NodeTransforms,
-//   ...SelectionTransforms,
-//   ...TextTransforms,
-// }
-
-const Transforms: TransformsType = {} as TransformsType
-
-Object.assign(
-  Transforms,
-  GeneralTransforms,
-  NodeTransforms,
-  SelectionTransforms,
-  TextTransforms
-)
-
-export { Transforms }
+export const Transforms = {
+  ...GeneralTransforms,
+  ...NodeTransforms,
+  ...SelectionTransforms,
+  ...TextTransforms,
+}

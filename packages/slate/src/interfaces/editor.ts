@@ -29,6 +29,10 @@ import { getWordDistance, getCharacterDistance } from '../utils/string'
 import { Descendant } from './node'
 import { Element } from './element'
 
+export type BaseSelection = Range | null
+
+export type Selection = ExtendedType<'Selection', BaseSelection>
+
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
  * by plugins that wish to add their own helpers and implement new behaviors.
@@ -36,7 +40,7 @@ import { Element } from './element'
 
 export interface BaseEditor {
   children: Descendant[]
-  selection: Range | null
+  selection: Selection
   operations: Operation[]
   marks: Omit<Text, 'text'> | null
 

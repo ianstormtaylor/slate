@@ -12,21 +12,116 @@ import {
   Ancestor,
 } from '..'
 
-/**
- * This type is necessary due to a bug in the TypeScript compiler.
- * 
- * If we don't have a separate type for `MatchFunc` and instead place the
- * definition directly in `options`, TypeScript will compile `Location`
- * down to the types that exist in `CustomTypes` at compile time which is
- * nothing.
- * 
- * We will get `Path | BasePoint | BaseRange`
- * 
- * instead of `Path | Point | Range`
- */
-type MatchFunc = (node: Node) => boolean
+export interface NodeTransforms {
+  insertNodes: (
+    editor: Editor,
+    nodes: Node | Node[],
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
+      hanging?: boolean
+      select?: boolean
+      voids?: boolean
+    }
+  ) => void
+  liftNodes: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => void
+  mergeNodes: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
+      hanging?: boolean
+      voids?: boolean
+    }
+  ) => void
+  moveNodes: (
+    editor: Editor,
+    options: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      to: Path
+      voids?: boolean
+    }
+  ) => void
+  removeNodes: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
+      hanging?: boolean
+      voids?: boolean
+    }
+  ) => void
+  setNodes: (
+    editor: Editor,
+    props: Partial<Node>,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      hanging?: boolean
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
+  splitNodes: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'highest' | 'lowest'
+      always?: boolean
+      height?: number
+      voids?: boolean
+    }
+  ) => void
+  unsetNodes: (
+    editor: Editor,
+    props: string | string[],
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
+  unwrapNodes: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
+  wrapNodes: (
+    editor: Editor,
+    element: Element,
+    options?: {
+      at?: Location
+      match?: (node: Node) => boolean
+      mode?: 'all' | 'highest' | 'lowest'
+      split?: boolean
+      voids?: boolean
+    }
+  ) => void
+}
 
-export const NodeTransforms = {
+export const NodeTransforms: NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.
    */
@@ -36,13 +131,13 @@ export const NodeTransforms = {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
@@ -153,11 +248,11 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { at = editor.selection, mode = 'lowest', voids = false } = options
       let { match } = options
@@ -217,12 +312,12 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
       const { hanging = false, voids = false, mode = 'lowest' } = options
@@ -355,12 +450,12 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
     }
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
         to,
@@ -405,12 +500,12 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at = editor.selection, match } = options
@@ -452,13 +547,13 @@ export const NodeTransforms = {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       let { match, at = editor.selection } = options
       const {
@@ -550,13 +645,13 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', voids = false } = options
       let { match, at = editor.selection, height = 0, always = false } = options
@@ -676,12 +771,12 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     if (!Array.isArray(props)) {
       props = [props]
     }
@@ -704,12 +799,12 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
-    }
-  ) {
+    } = {}
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', split = false, voids = false } = options
       let { at = editor.selection, match } = options
@@ -764,12 +859,12 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: MatchFunc
+      match?: (node: Node) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { mode = 'lowest', split = false, voids = false } = options
       let { match, at = editor.selection } = options
