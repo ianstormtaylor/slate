@@ -12,6 +12,20 @@ import {
   Ancestor,
 } from '..'
 
+/**
+ * This type is necessary due to a bug in the TypeScript compiler.
+ * 
+ * If we don't have a separate type for `MatchFunc` and instead place the
+ * definition directly in `options`, TypeScript will compile `Location`
+ * down to the types that exist in `CustomTypes` at compile time which is
+ * nothing.
+ * 
+ * We will get `Path | BasePoint | BaseRange`
+ * 
+ * instead of `Path | Point | Range`
+ */
+type MatchFunc = (node: Node) => boolean
+
 export const NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.
@@ -22,7 +36,7 @@ export const NodeTransforms = {
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -139,7 +153,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -203,7 +217,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -341,7 +355,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -391,7 +405,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -438,7 +452,7 @@ export const NodeTransforms = {
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -536,7 +550,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -662,7 +676,7 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -690,7 +704,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -750,7 +764,7 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: MatchFunc
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
