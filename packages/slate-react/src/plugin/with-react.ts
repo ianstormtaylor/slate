@@ -213,20 +213,18 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.onChange = () => {
-    setTimeout(() => {
-      // COMPAT: React doesn't batch `setState` hook calls, which means that the
-      // children and selection can get out of sync for one render pass. So we
-      // have to use this unstable API to ensure it batches them. (2019/12/03)
-      // https://github.com/facebook/react/issues/14259#issuecomment-439702367
-      ReactDOM.unstable_batchedUpdates(() => {
-        const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
+    // COMPAT: React doesn't batch `setState` hook calls, which means that the
+    // children and selection can get out of sync for one render pass. So we
+    // have to use this unstable API to ensure it batches them. (2019/12/03)
+    // https://github.com/facebook/react/issues/14259#issuecomment-439702367
+    ReactDOM.unstable_batchedUpdates(() => {
+      const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
 
-        if (onContextChange) {
-          onContextChange()
-        }
+      if (onContextChange) {
+        onContextChange()
+      }
 
-        onChange()
-      })
+      onChange()
     })
   }
 
