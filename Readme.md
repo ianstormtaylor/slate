@@ -35,6 +35,14 @@
 </p>
 <br/>
 
+> **Note on Android support 📱**<br/>
+> The Slate community needs your help to add Android support to the latest version of Slate. We’ve successfully added Android support to a previous version of Slate, but due to an important but immense rewrite, the previous Android fixes could not be ported over.<br/><br/>
+> Due to the high time and monetory cost required to create the previous Android support we have resorted to trying to raise CAD \$30,000 to fund the development and testing of the new Android implementation. (We are currently at \$17,000!)<br/><br/>
+> If you are a corporation that benefits from Slate, please consider contributing to the Kickstarter [here](https://www.kickstarter.com/projects/sunnyhirai/add-android-support-for-the-slate-wysiwyg-editor).<br/><br/>
+> [Read more](br/)
+
+<br/>
+
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
 It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
