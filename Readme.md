@@ -38,7 +38,8 @@
 > **Note on Android support 📱**<br/>
 > The Slate community needs your help to add Android support to the latest version of Slate. We’ve successfully added Android support to a previous version of Slate, but due to an important but immense rewrite, the previous Android fixes could not be ported over.<br/><br/>
 > Due to the high time and monetory cost required to create the previous Android support we have resorted to trying to raise CAD \$30,000 to fund the development and testing of the new Android implementation. (We are currently at \$17,000!)<br/><br/>
-> If you are a corporation that benefits from Slate, please consider contributing to the Kickstarter [here](https://www.kickstarter.com/projects/sunnyhirai/add-android-support-for-the-slate-wysiwyg-editor).<br/><br/> > [Read more](https://github.com/ianstormtaylor/slate/issues/3786)
+> If you are a corporation that benefits from Slate, please consider contributing to the Kickstarter [here](https://www.kickstarter.com/projects/sunnyhirai/add-android-support-for-the-slate-wysiwyg-editor).<br/><br/>
+> [Read more](https://github.com/ianstormtaylor/slate/issues/3786)
 
 <br/>
 
