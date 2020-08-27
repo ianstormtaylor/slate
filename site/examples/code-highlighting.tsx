@@ -93,26 +93,26 @@ const Leaf = ({ attributes, children, leaf }) => {
     <span
       {...attributes}
       className={css`
-            font-family: monospace;
-            background: hsla(0, 0%, 100%, .5);
+        font-family: monospace;
+        background: hsla(0, 0%, 100%, 0.5);
 
         ${leaf.comment &&
-          css`
-            color: slategray;
-          `} 
+        css`
+          color: slategray;
+        `}
 
         ${(leaf.operator || leaf.url) &&
-          css`
-            color: #9a6e3a;
-          `}
+        css`
+          color: #9a6e3a;
+        `}
         ${leaf.keyword &&
-          css`
-            color: #07a;
-          `}
+        css`
+          color: #07a;
+        `}
         ${(leaf.variable || leaf.regex) &&
-          css`
-            color: #e90;
-          `}
+        css`
+          color: #e90;
+        `}
         ${(leaf.number ||
           leaf.boolean ||
           leaf.tag ||
@@ -120,22 +120,22 @@ const Leaf = ({ attributes, children, leaf }) => {
           leaf.symbol ||
           leaf.attr - name ||
           leaf.selector) &&
-          css`
-            color: #905;
-          `}
-        ${leaf.punctuation &&
-          css`
-            color: #999;
-          `}
-        ${(leaf.string || leaf.char) &&
-          css`
-            color: #690;
-          `}
-        ${(leaf.function || leaf.class - name) &&
-          css`
-            color: #dd4a68;
-          `}
+        css`
+          color: #905;
         `}
+        ${leaf.punctuation &&
+        css`
+          color: #999;
+        `}
+        ${(leaf.string || leaf.char) &&
+        css`
+          color: #690;
+        `}
+        ${(leaf.function || leaf.class - name) &&
+        css`
+          color: #dd4a68;
+        `}
+      `}
     >
       {children}
     </span>
