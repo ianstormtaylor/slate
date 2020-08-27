@@ -3,7 +3,7 @@ import { cx, css } from 'emotion'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import ErrorBoundary from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import { Icon } from '../../components'
 
@@ -248,6 +248,17 @@ const Warning = props => (
   />
 )
 
+function ErrorFallback({ error, componentStack, resetErrorBoundary }) {
+  return (
+    <div role="alert">
+      <p>Something went wrong:</p>
+      <pre>{error.message}</pre>
+      <pre>{componentStack}</pre>
+      <button onClick={resetErrorBoundary}>Try again</button>
+    </div>
+  )
+}
+
 const ExamplePage = ({ example }: { example: string }) => {
   const [error, setError] = useState<Error | undefined>()
   const [stacktrace, setStacktrace] = useState<string | undefined>()
@@ -256,6 +267,7 @@ const ExamplePage = ({ example }: { example: string }) => {
   const [name, Component, path] = EXAMPLE
   return (
     <ErrorBoundary
+      FallbackComponent={ErrorFallback}
       onError={(error, stacktrace) => {
         setError(error)
         setStacktrace(stacktrace)
