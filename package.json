@@ -86,5 +86,12 @@
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.7.2"
+  },
+  "resolutions": {
+    "bl": "^2.2.1",
+    "dot-prop": "^4.2.1",
+    "kind-of": "^6.0.3",
+    "minimist": "^0.2.1",
+    "serialize-javascript": "^4.0.0"
   }
 }
