@@ -828,13 +828,13 @@ export const Editable = (props: EditableProps) => {
 
               if (Hotkeys.isMoveWordBackward(nativeEvent)) {
                 event.preventDefault()
-                Transforms.move(editor, { unit: 'word', reverse: true })
+                Transforms.move(editor, { unit: 'word', reverse: !isRTL })
                 return
               }
 
               if (Hotkeys.isMoveWordForward(nativeEvent)) {
                 event.preventDefault()
-                Transforms.move(editor, { unit: 'word' })
+                Transforms.move(editor, { unit: 'word', reverse: isRTL })
                 return
               }
 
