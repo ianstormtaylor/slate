@@ -169,11 +169,36 @@ export const TextTransforms = {
         endRef.current &&
         startRef.current
       ) {
-        Transforms.mergeNodes(editor, {
-          at: endRef.current,
-          hanging: true,
-          voids,
-        })
+        // If the blocks being merged aren't siblings and the start block is empty then we need to avoid
+        // merging these nodes. When a start node is empty it is removed. When the node being merged is not a
+        // sibling of the start node it will be moved up a level to become a sibling, however it won't be merged (since
+        // the start node was empty and therefore deleted). This leaves the child nodes properties intact, which
+        // is a problem if the child type only makes sense within it's parent (e.g. a list item inside a bulleted list).
+        if (
+          Path.isSibling(startRef.current.path, endRef.current.path) ||
+          (startBlock && !Editor.isEmpty(editor, startBlock[0]))
+        ) {
+          Transforms.mergeNodes(editor, {
+            at: endRef.current,
+            hanging: true,
+            voids,
+          })
+        } else {
+          // If the blocks being merged aren't siblings and the start block is empty then we can simply
+          // delete the start block and leave the block to be merged as is. In the case of an empty
+          // paragraph followed by a bulleted list, we would only delete the paragraph, which is the
+          // desired outcome.
+          const startBlockMatch = Editor.above(editor, {
+            at: startRef.current.path,
+            match: n => Editor.isBlock(editor, n),
+            mode: 'lowest',
+          })
+
+          if (startBlockMatch) {
+            const [, startBlockPath] = startBlockMatch
+            Transforms.delete(editor, { at: startBlockPath })
+          }
+        }
       }
 
       const point = endRef.unref() || startRef.unref()
