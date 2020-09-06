@@ -34,7 +34,7 @@ const withLayout = editor => {
 }
 
 const ForcedLayoutExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),

@@ -269,6 +269,11 @@ export const ReactEditor = {
 
   /**
    * Find a native DOM range from a Slate `range`.
+   *
+   * Notice: the returned range will always be ordinal regardless of the direction of Slate `range` due to DOM API limit.
+   *
+   * there is no way to create a reverse DOM Range using Range.setStart/setEnd
+   * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
 
   toDOMRange(editor: ReactEditor, range: Range): DOMRange {

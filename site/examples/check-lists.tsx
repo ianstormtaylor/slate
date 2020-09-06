@@ -7,12 +7,12 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Editor, Transforms, Range, Point, createEditor } from 'slate'
+import { Node, Editor, Transforms, Range, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 const CheckListsExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),

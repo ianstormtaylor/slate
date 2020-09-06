@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Editor, Transforms, Range, createEditor } from 'slate'
+import { Node, Editor, Transforms, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -13,9 +13,9 @@ import {
 import { Portal } from '../components'
 
 const MentionExample = () => {
-  const ref = useRef()
-  const [value, setValue] = useState(initialValue)
-  const [target, setTarget] = useState()
+  const ref = useRef<HTMLDivElement | null>()
+  const [value, setValue] = useState<Node[]>(initialValue)
+  const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])

@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, Transforms, Text, createEditor } from 'slate'
+import { Editor, Transforms, Text, createEditor, Node } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -8,7 +8,7 @@ import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -17,7 +17,7 @@ const HoveringMenuExample = () => {
       <Editable
         renderLeaf={props => <Leaf {...props} />}
         placeholder="Enter some text..."
-        onDOMBeforeInput={event => {
+        onDOMBeforeInput={(event: InputEvent) => {
           event.preventDefault()
           switch (event.inputType) {
             case 'formatBold':
@@ -67,7 +67,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 }
 
 const HoveringToolbar = () => {
-  const ref = useRef()
+  const ref = useRef<HTMLDivElement | null>()
   const editor = useSlate()
 
   useEffect(() => {
@@ -91,7 +91,7 @@ const HoveringToolbar = () => {
     const domSelection = window.getSelection()
     const domRange = domSelection.getRangeAt(0)
     const rect = domRange.getBoundingClientRect()
-    el.style.opacity = 1
+    el.style.opacity = '1'
     el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`
     el.style.left = `${rect.left +
       window.pageXOffset -

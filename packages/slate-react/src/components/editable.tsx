@@ -33,6 +33,7 @@ import {
   isDOMText,
   DOMStaticRange,
   isPlainTextOnlyPaste,
+  setReverseDomSelection,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -184,7 +185,11 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      domSelection.addRange(newDomRange!)
+      if (Range.isBackward(selection!)) {
+        setReverseDomSelection(newDomRange, domSelection)
+      } else {
+        domSelection.addRange(newDomRange!)
+      }
       const leafEl = newDomRange.startContainer.parentElement!
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
@@ -357,7 +362,7 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    [readOnly]
+    [readOnly, propsOnDOMBeforeInput]
   )
 
   // Attach a native DOM event handler for `beforeinput` events, because React's
