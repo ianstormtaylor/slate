@@ -174,24 +174,3 @@ export const getPlainText = (domNode: DOMNode) => {
 
   return text
 }
-
-/**
- * there is no way to create a reverse DOM Range using Range.setStart/setEnd
- * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
- * Luckily it's possible to create a reverse selection via Selection.extend
- *
- * Note: Selection.extend is not implement in any version of IE (up to and including version 11)
- */
-
-export const setReverseDomSelection = (
-  domRange: DOMRange,
-  domSelection: Selection
-) => {
-  const newRange = domRange.cloneRange()
-  // collapses the range to end
-  newRange.collapse()
-  // set both anchor and focus of the selection to domRange's focus
-  domSelection.addRange(newRange)
-  // moves the focus of the selection to domRange's anchor
-  domSelection.extend(domRange.startContainer, domRange.startOffset)
-}

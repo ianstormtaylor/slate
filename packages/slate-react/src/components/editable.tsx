@@ -33,7 +33,6 @@ import {
   isDOMText,
   DOMStaticRange,
   isPlainTextOnlyPaste,
-  setReverseDomSelection,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -180,21 +179,18 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
-    domSelection.removeAllRanges()
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      if (Range.isBackward(selection!)) {
-        setReverseDomSelection(newDomRange, domSelection)
-      } else {
-        domSelection.addRange(newDomRange!)
-      }
+      domSelection.setBaseAndExtent(newDomRange.startContainer, newDomRange.startOffset, newDomRange.endContainer, newDomRange.endOffset)
       const leafEl = newDomRange.startContainer.parentElement!
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
         boundary: el,
       })
+    } else {
+      domSelection.removeAllRanges()
     }
 
     setTimeout(() => {
