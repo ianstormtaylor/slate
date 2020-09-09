@@ -183,7 +183,12 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      domSelection.setBaseAndExtent(newDomRange.startContainer, newDomRange.startOffset, newDomRange.endContainer, newDomRange.endOffset)
+      domSelection.setBaseAndExtent(
+        newDomRange.startContainer,
+        newDomRange.startOffset,
+        newDomRange.endContainer,
+        newDomRange.endOffset
+      )
       const leafEl = newDomRange.startContainer.parentElement!
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
