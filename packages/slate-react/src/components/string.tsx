@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
@@ -55,43 +55,32 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
-type TextStringProps = { text: string; isTrailing?: boolean }
-class TextString extends React.Component<TextStringProps> {
-  ref: { current: HTMLSpanElement | null } = React.createRef()
+const TextString = React.memo(
+  (props: { text: string; isTrailing?: boolean }) => {
+    const { text, isTrailing = false } = props
 
-  // This component may have skipped rendering due to native operations being
-  // applied. If an undo is performed React will see the old and new shadow DOM
-  // match and not apply an update. Forces each render to actually reconcile.
-  forceUpdateFlag = false
+    const ref = useRef<HTMLSpanElement>(null)
+    const forceUpdateFlag = useRef(false)
 
-  shouldComponentUpdate(nextProps: TextStringProps) {
-    return this.ref.current
-      ? this.ref.current.textContent !== nextProps.text
-      : true
-  }
+    if (ref.current && ref.current.textContent !== text) {
+      forceUpdateFlag.current = !forceUpdateFlag.current
+    }
 
-  componentDidMount() {
-    this.forceUpdateFlag = !this.forceUpdateFlag
-  }
-
-  componentDidUpdate() {
-    this.forceUpdateFlag = !this.forceUpdateFlag
-  }
-
-  render() {
-    const { text, isTrailing = false } = this.props
+    // This component may have skipped rendering due to native operations being
+    // applied. If an undo is performed React will see the old and new shadow DOM
+    // match and not apply an update. Forces each render to actually reconcile.
     return (
       <span
         data-slate-string
-        ref={this.ref}
-        key={this.forceUpdateFlag ? 'A' : 'B'}
+        ref={ref}
+        key={forceUpdateFlag.current ? 'A' : 'B'}
       >
         {text}
         {isTrailing ? '\n' : null}
       </span>
     )
   }
-}
+)
 
 /**
  * Leaf strings without text, render as zero-width strings.
