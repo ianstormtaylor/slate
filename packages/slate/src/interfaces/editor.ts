@@ -990,6 +990,7 @@ export const Editor = {
     const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     const first = reverse ? end : start
+    const last = reverse ? start : end
     let string = ''
     let available = 0
     let offset = 0
@@ -1040,7 +1041,6 @@ export const Editor = {
           const s = Path.isAncestor(path, start.path)
             ? start
             : Editor.start(editor, path)
-
           const text = Editor.string(editor, { anchor: s, focus: e })
           string = reverse ? reverseText(text) : text
           isNewBlock = true
@@ -1062,8 +1062,12 @@ export const Editor = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string (and we've exhausted the available space
+          // or we're at the end of the range), break from the current node.
+          if (
+            string === '' &&
+            (available === 0 || Point.equals(last, { path, offset }))
+          ) {
             break
           } else {
             advance()
