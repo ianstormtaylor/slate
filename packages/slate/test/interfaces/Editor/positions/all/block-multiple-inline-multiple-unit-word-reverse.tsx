@@ -21,7 +21,7 @@ export const test = editor => {
     Editor.positions(editor, {
       at: [],
       reverse: true,
-      unit: 'word'
+      unit: 'word',
     })
   )
 }

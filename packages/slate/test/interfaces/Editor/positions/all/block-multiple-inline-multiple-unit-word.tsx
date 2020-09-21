@@ -20,7 +20,7 @@ export const test = editor => {
   return Array.from(
     Editor.positions(editor, {
       at: [],
-      unit: 'word'
+      unit: 'word',
     })
   )
 }
