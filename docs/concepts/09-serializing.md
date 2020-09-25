@@ -166,6 +166,10 @@ const deserialize = el => {
   }
 
   const children = Array.from(el.childNodes).map(deserialize)
+  
+  if (children.length === 0) {
+    children = [{ text: '' }]
+  }
 
   switch (el.nodeName) {
     case 'BODY':
