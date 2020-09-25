@@ -180,17 +180,32 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
-    domSelection.removeAllRanges()
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      domSelection.addRange(newDomRange!)
+      if (Range.isBackward(selection!)) {
+        domSelection.setBaseAndExtent(
+          newDomRange.endContainer,
+          newDomRange.endOffset,
+          newDomRange.startContainer,
+          newDomRange.startOffset
+        )
+      } else {
+        domSelection.setBaseAndExtent(
+          newDomRange.startContainer,
+          newDomRange.startOffset,
+          newDomRange.endContainer,
+          newDomRange.endOffset
+        )
+      }
       const leafEl = newDomRange.startContainer.parentElement!
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
         boundary: el,
       })
+    } else {
+      domSelection.removeAllRanges()
     }
 
     setTimeout(() => {
