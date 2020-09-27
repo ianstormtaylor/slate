@@ -68,7 +68,7 @@ export const GeneralTransforms = {
           prev.children.push(...node.children)
         } else {
           throw new Error(
-            `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
+            `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${node} ${prev}`
           )
         }
 
