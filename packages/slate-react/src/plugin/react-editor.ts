@@ -435,9 +435,13 @@ export const ReactEditor = {
         // ancestor, so find it by going down from the nearest void parent.
 
         leafNode = voidNode.querySelector('[data-slate-leaf]')!
-        textNode = leafNode.closest('[data-slate-node="text"]')!
-        domNode = leafNode
-        offset = domNode.textContent!.length
+        if (!leafNode) {
+          offset = 1
+        } else {
+          textNode = leafNode.closest('[data-slate-node="text"]')!
+          domNode = leafNode
+          offset = domNode.textContent!.length
+        }
       }
 
       // COMPAT: If the parent node is a Slate zero-width space, editor is
