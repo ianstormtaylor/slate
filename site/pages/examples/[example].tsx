@@ -49,7 +49,7 @@ const EXAMPLES = [
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
   ['Tables', Tables, 'tables'],
-  ['Rendering in iframes', IFrames, 'iframes'],
+  ['Rendering in iframes', IFrames, 'iframe'],
 ]
 
 const Header = props => (
