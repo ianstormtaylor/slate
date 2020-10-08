@@ -652,8 +652,9 @@ export const Editable = (props: EditableProps) => {
               event.preventDefault()
               ReactEditor.setFragmentData(editor, event.clipboardData)
               const { selection } = editor
+              const node = ReactEditor.toSlateNode(editor, event.target)
 
-              if (selection && Range.isExpanded(selection)) {
+              if (selection && (Range.isExpanded(selection) || Editor.isVoid(editor, node))) {
                 Editor.deleteFragment(editor)
               }
             }
