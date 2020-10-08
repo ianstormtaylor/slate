@@ -653,9 +653,14 @@ export const Editable = (props: EditableProps) => {
               ReactEditor.setFragmentData(editor, event.clipboardData)
               const { selection } = editor
               const node = ReactEditor.toSlateNode(editor, event.target)
+              const path = ReactEditor.findPath(editor, node)
+              const voidMatch = Editor.void(editor, { at: path })
 
-              if (selection && (Range.isExpanded(selection) || Editor.isVoid(editor, node))) {
+              if (selection && Range.isExpanded(selection)) {
                 Editor.deleteFragment(editor)
+              }
+              else if (selection && voidMatch) {
+                Transforms.delete(editor, {at: voidMatch[1]});
               }
             }
           },
