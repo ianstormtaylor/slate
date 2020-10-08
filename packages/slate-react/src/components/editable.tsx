@@ -658,9 +658,8 @@ export const Editable = (props: EditableProps) => {
 
               if (selection && Range.isExpanded(selection)) {
                 Editor.deleteFragment(editor)
-              }
-              else if (selection && voidMatch) {
-                Transforms.delete(editor, {at: voidMatch[1]});
+              } else if (selection && voidMatch) {
+                Transforms.delete(editor, { at: voidMatch[1] })
               }
             }
           },
