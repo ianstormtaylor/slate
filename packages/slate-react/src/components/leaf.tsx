@@ -31,14 +31,14 @@ const Leaf = (props: {
   if (leaf[PLACEHOLDER_SYMBOL]) {
     children = (
       <React.Fragment>
-        <span
+        <div
           contentEditable={false}
           style={{
             pointerEvents: 'none',
-            display: 'inline-block',
-            width: '0',
+            height: '0',
             maxWidth: '100%',
             whiteSpace: 'nowrap',
+            overflowX: 'clip',
             opacity: '0.333',
             userSelect: 'none',
             fontStyle: 'normal',
@@ -47,7 +47,7 @@ const Leaf = (props: {
           }}
         >
           {leaf.placeholder as React.ReactNode}
-        </span>
+        </div>
         {children}
       </React.Fragment>
     )
