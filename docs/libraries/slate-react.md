@@ -36,7 +36,7 @@ React hooks for Slate editors
 
 ###### `useEditor`
 
-Get the current editor object from the React context.
+Get the current editor object from the React context. Differs from `useSlate` in that this is a context for sharing the editor object in a way that does **not** re-render the context whenever changes occur. To be used in most cases as `useSlate` can cause unnecessary re-renders of components that consume it.
 
 ###### `useFocused`
 
@@ -52,7 +52,7 @@ Get the current `selected` state of an element.
 
 ###### `useSlate`
 
-Get the current editor object from the React context.
+Get the current editor object from the React context. Differs from `useEditor` in that this is a context for sharing the editor object in a way that re-renders the context whenever changes occur. To be used if you need the component consuming it to re-render on `onChange`.
 
 ## ReactEditor
 
