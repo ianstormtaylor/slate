@@ -45,7 +45,11 @@ export const isDOMElement = (value: any): value is DOMElement => {
  */
 
 export const isDOMNode = (value: any): value is DOMNode => {
-  return value instanceof Node
+  const frame = document.querySelector('iframe')
+  return (
+    value instanceof Node ||
+    !!(frame && value instanceof frame.contentWindow.Node)
+  )
 }
 
 /**
