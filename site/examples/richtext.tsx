@@ -93,6 +93,8 @@ const isBlockActive = (editor, format) => {
 
 const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor)
+  const returnVal = marks ? marks[format] === true : false
+  console.log(returnVal)
   return marks ? marks[format] === true : false
 }
 
