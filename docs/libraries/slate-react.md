@@ -52,7 +52,7 @@ Get the current `selected` state of an element.
 
 ###### `useSlate`
 
-Get the current editor object from the React context. Differs from `useEditor` in that this is a context for sharing the editor object in a way that re-renders the context whenever changes occur. To be used if you need the component consuming it to re-render on `onChange`.
+Get the current editor object from the React context. Differs from `useEditor` in that this is a context for sharing the editor object in a way that re-renders the context whenever changes occur. To be used if you need the component consuming it to re-render on `onChange` calls or computations based on the `editor.selection` value.
 
 ## ReactEditor
 
