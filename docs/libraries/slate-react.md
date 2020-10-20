@@ -36,7 +36,7 @@ React hooks for Slate editors
 
 ###### `useEditor`
 
-Get the current editor object from the React context. Differs from `useSlate` in that this is a context for sharing the editor object in a way that does **not** re-render the context whenever changes occur. To be used in most cases as `useSlate` can cause unnecessary re-renders of components that consume it.
+Get the current editor object from the React context. Differs from `useSlate` in that this is a context for sharing the editor object in a way that does **not** re-render the context whenever changes occur. Consider using `useEditor` if you do not explicitly need to trigger a re-render of the consuming component as it can result in improved performance.
 
 ###### `useFocused`
 
@@ -137,4 +137,3 @@ Adds React and DOM specific behaviors to the editor.
 ## Utils
 
 Private convenience modules
-
