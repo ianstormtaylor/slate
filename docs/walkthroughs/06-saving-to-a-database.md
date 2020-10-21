@@ -8,7 +8,7 @@ Let's start with a basic editor:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -32,7 +32,7 @@ So, in our `onChange` handler, we need to save the `value`:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -64,7 +64,7 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   // Update the initial content to be pulled from Local Storage if it exists.
   const [value, setValue] = useState(
     JSON.parse(localStorage.getItem('content')) || [
@@ -123,7 +123,7 @@ const deserialize = string => {
 }
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   // Use our deserializing function to read the data from Local Storage.
   const [value, setValue] = useState(
     deserialize(localStorage.getItem('content')) || ''

@@ -10,7 +10,7 @@ Here's our app from earlier:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -30,7 +30,7 @@ Now we add an `onKeyDown` handler:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -59,7 +59,7 @@ Our `onKeyDown` handler might look like this:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',

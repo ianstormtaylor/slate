@@ -8,7 +8,7 @@ We'll show you how. Let's start with our app from earlier:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -66,7 +66,7 @@ Now, let's add that renderer to our `Editor`:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -121,7 +121,7 @@ Okay, but now we'll need a way for the user to actually turn a block into a code
 import { Editor, Transforms } from 'slate'
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -178,7 +178,7 @@ But we forgot one thing. When you hit `` Ctrl-` `` again, it should change the c
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',

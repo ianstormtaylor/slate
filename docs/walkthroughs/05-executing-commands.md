@@ -12,7 +12,7 @@ We'll start with our app from earlier:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -118,7 +118,7 @@ const CustomEditor = {
 }
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -174,7 +174,7 @@ Now our commands are clearly defined and you can invoke them from anywhere we ha
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',

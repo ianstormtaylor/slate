@@ -8,7 +8,7 @@ So we start with our app from earlier:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -53,7 +53,7 @@ And now, we'll edit the `onKeyDown` handler to make it so that when you press `c
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
@@ -138,7 +138,7 @@ And now, let's tell Slate about that leaf. To do that, we'll pass in the `render
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const editor = useStable(() => withReact(createEditor()))
   const [value, setValue] = useState([
     {
       type: 'paragraph',
