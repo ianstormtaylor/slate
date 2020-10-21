@@ -14,6 +14,7 @@ export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'
 export { useSelected } from './hooks/use-selected'
 export { useSlate } from './hooks/use-slate'
+export { useStable } from './hooks/use-stable'
 
 // Plugin
 export { ReactEditor } from './plugin/react-editor'
