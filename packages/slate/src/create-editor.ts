@@ -27,7 +27,7 @@ export const createEditor = (): Editor => {
     marks: null,
     isInline: () => false,
     isVoid: () => false,
-    onChange: () => {},
+    onChange: () => { },
 
     apply: (op: Operation) => {
       for (const ref of Editor.pathRefs(editor)) {
@@ -90,6 +90,7 @@ export const createEditor = (): Editor => {
     },
 
     addMark: (key: string, value: any) => {
+      console.log("selection before:", editor.selection)
       const { selection } = editor
 
       if (selection) {
@@ -109,6 +110,8 @@ export const createEditor = (): Editor => {
           editor.onChange()
         }
       }
+
+      console.log("selection after:", selection)
     },
 
     deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
@@ -214,10 +217,10 @@ export const createEditor = (): Editor => {
       const shouldHaveInlines = Editor.isEditor(node)
         ? false
         : Element.isElement(node) &&
-          (editor.isInline(node) ||
-            node.children.length === 0 ||
-            Text.isText(node.children[0]) ||
-            editor.isInline(node.children[0]))
+        (editor.isInline(node) ||
+          node.children.length === 0 ||
+          Text.isText(node.children[0]) ||
+          editor.isInline(node.children[0]))
 
       // Since we'll be applying operations while iterating, keep track of an
       // index that accounts for any added/removed nodes.
