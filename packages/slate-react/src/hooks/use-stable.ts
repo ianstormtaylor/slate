@@ -7,7 +7,7 @@ const UNINITIALIZED = {}
 const isUninitialized = (v: unknown): v is typeof UNINITIALIZED =>
   v === UNINITIALIZED
 
-export function useStable<T>(init: () => T): T {
+export const useStable = <T>(init: () => T): T => {
   const ref = useRef<T | typeof UNINITIALIZED>(UNINITIALIZED)
   // If the ref hasn't been initialized, initialize it; else don't. then return the initialized value
   // This is written as a single expression to help typescript understand what's going on.
