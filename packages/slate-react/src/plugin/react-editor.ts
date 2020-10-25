@@ -525,10 +525,17 @@ export const ReactEditor = {
       anchorNode.nodeValue != null &&
       anchorNode.nodeValue.length === anchorOffset
     ) {
-      // move anchor to the start of the next node.
-      anchor.path = Path.next(anchor.path)
-      anchor.offset = 0
+      // Get the new path
+      const newNodeEntry = Editor.next(editor, { at: anchor.path })
+
+      // move anchor to the start of the next node if there is a next node.
+      if (newNodeEntry) {
+        anchor.path = newNodeEntry[1]
+        anchor.offset = 0
+      }
     }
+
+    console.log(anchor, focus, domRange)
 
     return { anchor, focus }
   },
