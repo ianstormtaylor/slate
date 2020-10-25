@@ -525,10 +525,10 @@ export const ReactEditor = {
       anchorNode.nodeValue != null &&
       anchorNode.nodeValue.length === anchorOffset
     ) {
-      // Get the new path
+      // Get the next node
       const newNodeEntry = Editor.next(editor, { at: anchor.path })
 
-      // move anchor to the start of the next node if there is a next node.
+      // If there is a next node, move anchor to the start of the next node
       if (newNodeEntry) {
         anchor.path = newNodeEntry[1]
         anchor.offset = 0
