@@ -535,8 +535,6 @@ export const ReactEditor = {
       }
     }
 
-    console.log(anchor, focus, domRange)
-
     return { anchor, focus }
   },
 }
