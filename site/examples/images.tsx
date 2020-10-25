@@ -128,16 +128,16 @@ const isImageUrl = url => {
   if (!url) return false
   if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()
-  if(imageExtensions.includes(ext)) return true // catch when url has image extension
-  //last resort to check if url has an image content type
+  if (imageExtensions.includes(ext)) return true // catch when url has image extension
+  // last resort to check if url has an image content type
   return nonAsyncIsHeaderImage(url)
 }
 
 const nonAsyncIsHeaderImage = url => {
-  const proxyurl = "https://cors-anywhere.herokuapp.com/"; // need proxyurl to bypass CORS
-  var req = new XMLHttpRequest()
-  req.open('GET', proxyurl+url, false)
-  req.send(null) //will fire CORS error if no proxy is used
+  const proxyurl = 'https://cors-anywhere.herokuapp.com/' // need proxyurl to bypass CORS
+  const req = new XMLHttpRequest()
+  req.open('GET', proxyurl + url, false)
+  req.send(null) // will fire CORS error if no proxy is used
   return req.getResponseHeader('Content-Type').includes('image')
 }
 
