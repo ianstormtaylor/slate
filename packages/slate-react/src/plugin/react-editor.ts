@@ -513,10 +513,22 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+
+    // If the selection is at the very end of the anchor node, when the anchor and focus are not the same node.
+    if (
+      !isCollapsed &&
+      anchorNode !== focusNode &&
+      anchorNode.nodeValue != null &&
+      anchorNode.nodeValue.length === anchorOffset
+    ) {
+      // move anchor to the start of the next node.
+      anchor.path = Path.next(anchor.path);
+      anchor.offset = 0;
+    }
 
     return { anchor, focus }
   },

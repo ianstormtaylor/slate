@@ -520,10 +520,8 @@ export const Editor = {
       if (match) {
         const [node] = match as NodeEntry<Text>
         const { text, ...rest } = node
-        console.log("rest", match, node, rest, editor.selection)
         return rest
       } else {
-        console.log("empty {}")
         return {}
       }
     }
@@ -549,7 +547,6 @@ export const Editor = {
     }
 
     const { text, ...rest } = node
-    console.log("rest at end", Editor.leaf(editor, path), node, rest, editor.selection)
     return rest
   },
 

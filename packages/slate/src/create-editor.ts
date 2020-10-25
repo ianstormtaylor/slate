@@ -90,7 +90,6 @@ export const createEditor = (): Editor => {
     },
 
     addMark: (key: string, value: any) => {
-      console.log("selection before:", editor.selection)
       const { selection } = editor
 
       if (selection) {
@@ -110,8 +109,6 @@ export const createEditor = (): Editor => {
           editor.onChange()
         }
       }
-
-      console.log("selection after:", selection)
     },
 
     deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
