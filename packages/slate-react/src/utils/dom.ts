@@ -5,13 +5,22 @@
 // COMPAT: This is required to prevent TypeScript aliases from doing some very
 // weird things for Slate's types with the same name as globals. (2019/11/27)
 // https://github.com/microsoft/TypeScript/issues/35002
-import DOMNode = globalThis.Node
-import DOMComment = globalThis.Comment
-import DOMElement = globalThis.Element
-import DOMText = globalThis.Text
-import DOMRange = globalThis.Range
-import DOMSelection = globalThis.Selection
-import DOMStaticRange = globalThis.StaticRange
+// import DOMNode1 = globalThis.Node
+// import DOMComment1 = globalThis.Comment
+// import DOMElement1 = globalThis.Element
+// import DOMText1 = globalThis.Text
+// import DOMRange1 = globalThis.Range
+// import DOMSelection1 = globalThis.Selection
+// import DOMStaticRange1 = globalThis.StaticRange
+
+type DOMNode = Node
+type DOMComment = Comment
+type DOMElement = Element
+type DOMText = Text
+type DOMRange = Range
+type DOMSelection = Selection
+type DOMStaticRange = StaticRange
+
 export {
   DOMNode,
   DOMComment,

@@ -60,6 +60,7 @@
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
     "jest": "^26.6.1",
+    "jest-mock-extended": "^1.0.10",
     "lerna": "^3.19.0",
     "lodash": "^4.17.4",
     "mocha": "^6.2.0",
