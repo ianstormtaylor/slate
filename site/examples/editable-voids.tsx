@@ -28,6 +28,7 @@ const EditableVoidsExample = () => {
   )
 }
 
+
 const withEditableVoids = editor => {
   const { isVoid } = editor
 
@@ -71,7 +72,7 @@ const EditableVoidElement = ({ attributes, children, element }) => {
           padding: 8px;
         `}
       >
-        <h4>Name:</h4>
+        <h4 tabIndex={-1}>Name:</h4>
         <input
           className={css`
             margin: 8px 0;
@@ -82,7 +83,7 @@ const EditableVoidElement = ({ attributes, children, element }) => {
             setInputValue(e.target.value)
           }}
         />
-        <h4>Left or right handed:</h4>
+        <h4 tabIndex={-1}>Left or right handed:</h4>
         <input
           className={unsetWidthStyle}
           type="radio"
@@ -98,7 +99,7 @@ const EditableVoidElement = ({ attributes, children, element }) => {
           value="right"
         />{' '}
         Right
-        <h4>Tell us about yourself:</h4>
+        <h4 tabIndex={-1}>Tell us about yourself:</h4>
         <div
           className={css`
             padding: 20px;
