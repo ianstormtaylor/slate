@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, RefObject } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Node, Transforms, createEditor } from 'slate'
@@ -14,6 +14,7 @@ import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import { Button, Icon, Toolbar } from '../components'
+
 
 const ImagesExample = () => {
   const [value, setValue] = useState<Node[]>(initialValue)
@@ -54,6 +55,7 @@ const withImages = editor => {
         if (mime === 'image') {
           reader.addEventListener('load', () => {
             const url = reader.result
+            console.log(url);
             insertImage(editor, url)
           })
 
@@ -108,9 +110,34 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
+let inputOpenFileRef : RefObject<HTMLInputElement>
+
+const showOpenFileDlg = (event) => {
+  inputOpenFileRef.current.click()
+  let file = event.target.files[0];
+  console.log(file);
+}
+const uploadFile = event => {
+  let file = event.target.files[0];
+  console.log(file);
+  const reader = new FileReader();
+
+  reader.addEventListener("load", function () {
+    // convert image file to base64 string
+    const url = reader.result;
+    console.log(url);
+  }, false);
+
+  if (file) {
+    reader.readAsDataURL(file);
+  }
+}
+
 const InsertImageButton = () => {
   const editor = useEditor()
+  inputOpenFileRef = React.createRef();
   return (
+    <>
     <Button
       onMouseDown={event => {
         event.preventDefault()
@@ -121,6 +148,14 @@ const InsertImageButton = () => {
     >
       <Icon>image</Icon>
     </Button>
+    {/* <input ref={inputOpenFileRef} type="file" style={{ display: "none" }}/>
+    <button onClick={showOpenFileDlg}>Open</button> */}
+    <p></p>
+     <input type="file"
+        name="myFile"
+        style={{ width:'30%'}}
+        onChange={uploadFile} />
+    </>
   )
 }
 
