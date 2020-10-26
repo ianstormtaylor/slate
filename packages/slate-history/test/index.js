@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { createHyperscript } from 'slate-hyperscript'
 import { withHistory } from '..'
@@ -9,8 +8,8 @@ describe('slate-history', () => {
     const editor = withTest(withHistory(input))
     run(editor)
     editor.undo()
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
+    expect(editor.children).toEqual(output.children)
+    expect(editor.selection).toEqual(output.selection)
   })
 })
 
