@@ -20,6 +20,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
+  SlateRangeDescription
 } from '../utils/dom'
 
 /**
@@ -129,10 +130,10 @@ export const ReactEditor = {
 
   deselect(editor: ReactEditor): void {
     const { selection } = editor
-    const domSelection = window.getSelection()
+    const domRange = window.getSelection()
 
-    if (domSelection && domSelection.rangeCount > 0) {
-      domSelection.removeAllRanges()
+    if (domRange && domRange.rangeCount > 0) {
+      domRange.removeAllRanges()
     }
 
     if (selection) {
@@ -468,6 +469,42 @@ export const ReactEditor = {
     return { path, offset }
   },
 
+  // Function introduced for testability
+  domRangeToSlateRange(
+    domRange: DOMRange | DOMStaticRange | DOMSelection
+  ): SlateRangeDescription {
+    const el = domRange instanceof Selection
+      ? domRange.anchorNode
+      : domRange.startContainer
+    let anchorNode
+    let anchorOffset
+    let focusNode
+    let focusOffset
+    let isCollapsed
+
+    if (domRange instanceof Selection) {
+      anchorNode = domRange.anchorNode
+      anchorOffset = domRange.anchorOffset
+      focusNode = domRange.focusNode
+      focusOffset = domRange.focusOffset
+      isCollapsed = domRange.isCollapsed
+    } else {
+      anchorNode = domRange.startContainer
+      anchorOffset = domRange.startOffset
+      focusNode = domRange.endContainer
+      focusOffset = domRange.endOffset
+      isCollapsed = domRange.collapsed
+    }
+
+    return {
+      anchorNode,
+      anchorOffset,
+      focusNode,
+      focusOffset,
+      isCollapsed
+    }
+  },
+
   /**
    * Find a Slate range from a DOM range or selection.
    */
@@ -476,47 +513,23 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): Range {
-    const el =
-      domRange instanceof Selection
-        ? domRange.anchorNode
-        : domRange.startContainer
-    let anchorNode
-    let anchorOffset
-    let focusNode
-    let focusOffset
-    let isCollapsed
-
-    if (el) {
-      if (domRange instanceof Selection) {
-        anchorNode = domRange.anchorNode
-        anchorOffset = domRange.anchorOffset
-        focusNode = domRange.focusNode
-        focusOffset = domRange.focusOffset
-        isCollapsed = domRange.isCollapsed
-      } else {
-        anchorNode = domRange.startContainer
-        anchorOffset = domRange.startOffset
-        focusNode = domRange.endContainer
-        focusOffset = domRange.endOffset
-        isCollapsed = domRange.collapsed
-      }
-    }
+    const slateRangeDescription = ReactEditor.domRangeToSlateRange(domRange)
 
     if (
-      anchorNode == null ||
-      focusNode == null ||
-      anchorOffset == null ||
-      focusOffset == null
+      slateRangeDescription.anchorNode == null ||
+      slateRangeDescription.focusNode == null ||
+      slateRangeDescription.anchorOffset == null ||
+      slateRangeDescription.focusOffset == null
     ) {
       throw new Error(
         `Cannot resolve a Slate range from DOM range: ${domRange}`
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
-    const focus = isCollapsed
+    const anchor = ReactEditor.toSlatePoint(editor, [slateRangeDescription.anchorNode, slateRangeDescription.anchorOffset])
+    const focus = slateRangeDescription.isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+      : ReactEditor.toSlatePoint(editor, [slateRangeDescription.focusNode, slateRangeDescription.focusOffset])
 
     return { anchor, focus }
   },

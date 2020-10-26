@@ -33,6 +33,14 @@ export {
 
 export type DOMPoint = [Node, number]
 
+export type SlateRangeDescription = {
+  anchorNode: Node | null
+  anchorOffset: number | null
+  focusNode: Node | null
+  focusOffset: number | null
+  isCollapsed: boolean
+}
+
 /**
  * Check if a DOM node is a comment node.
  */
