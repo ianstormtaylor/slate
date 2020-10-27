@@ -3,11 +3,8 @@ import { createContext, useContext } from 'react'
 import { ReactEditor } from '../plugin/react-editor'
 
 /**
- * @deprecated Use useSlateStatic instead.
- */
- 
-/**
  * A React context for sharing the editor object.
+ * @deprecated Use useSlateStatic instead.
  */
 
 export const EditorContext = createContext<ReactEditor | null>(null)

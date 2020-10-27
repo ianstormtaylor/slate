@@ -52,7 +52,7 @@ Get the current editor object from the React context. Re-renders the context whe
 
 ###### `useSlateStatic`
 
-Get the current editor object from the React context. A version of useSlate that does not re-render the context.
+Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
 
 ## ReactEditor
 
