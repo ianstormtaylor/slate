@@ -3,7 +3,7 @@ import {
   Slate,
   Editable,
   withReact,
-  useEditor,
+  useSlateStatic,
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
@@ -75,7 +75,7 @@ const Element = props => {
 }
 
 const CheckListItemElement = ({ attributes, children, element }) => {
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const { checked } = element
   return (
