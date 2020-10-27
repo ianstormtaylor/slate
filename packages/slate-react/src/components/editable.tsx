@@ -474,13 +474,13 @@ export const Editable = (props: EditableProps) => {
         // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
         // have to use hacks to make these replacement-based features work.
         spellCheck={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.spellCheck
+          !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck
         }
         autoCorrect={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCorrect
+          !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCorrect
         }
         autoCapitalize={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCapitalize
+          !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCapitalize
         }
         data-slate-editor
         data-slate-node="value"
