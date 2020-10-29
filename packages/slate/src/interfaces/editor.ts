@@ -121,16 +121,21 @@ export const Editor = {
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     } = {}
   ): Point | undefined {
     const anchor = Editor.point(editor, at, { edge: 'end' })
     const focus = Editor.end(editor, [])
     const range = { anchor, focus }
-    const { distance = 1 } = options
+    const { distance = 1, voids = false } = options
     let d = 0
     let target
 
-    for (const p of Editor.positions(editor, { ...options, at: range })) {
+    for (const p of Editor.positions(editor, {
+      ...options,
+      at: range,
+      voids,
+    })) {
       if (d > distance) {
         break
       }
@@ -155,12 +160,13 @@ export const Editor = {
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     } = {}
   ): Point | undefined {
     const anchor = Editor.start(editor, [])
     const focus = Editor.point(editor, at, { edge: 'start' })
     const range = { anchor, focus }
-    const { distance = 1 } = options
+    const { distance = 1, voids = false } = options
     let d = 0
     let target
 
@@ -168,6 +174,7 @@ export const Editor = {
       ...options,
       at: range,
       reverse: true,
+      voids,
     })) {
       if (d > distance) {
         break
@@ -570,9 +577,13 @@ export const Editor = {
       return
     }
 
-    const [, from] = Editor.last(editor, at)
+    const pointAfterLocation = Editor.after(editor, at, { voids })
+
+    if (!pointAfterLocation) return
+
     const [, to] = Editor.last(editor, [])
-    const span: Span = [from, to]
+
+    const span: Span = [pointAfterLocation.path, to]
 
     if (Path.isPath(at) && at.length === 0) {
       throw new Error(`Cannot get the next node from the root node!`)
@@ -587,7 +598,7 @@ export const Editor = {
       }
     }
 
-    const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
+    const [next] = Editor.nodes(editor, { at: span, match, mode, voids })
     return next
   },
 
@@ -973,8 +984,9 @@ export const Editor = {
    * can pass the `unit: 'character'` option to moved forward one character, word,
    * or line at at time.
    *
-   * Note: void nodes are treated as a single point, and iteration will not
-   * happen inside their content.
+   * Note: By default void nodes are treated as a single point and iteration
+   * will not happen inside their content unless you pass in true for the
+   * voids option, then iteration will occur.
    */
 
   *positions(
@@ -983,9 +995,15 @@ export const Editor = {
       at?: Location
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
+      voids?: boolean
     } = {}
   ): Generator<Point, void, undefined> {
-    const { at = editor.selection, unit = 'offset', reverse = false } = options
+    const {
+      at = editor.selection,
+      unit = 'offset',
+      reverse = false,
+      voids = false,
+    } = options
 
     if (!at) {
       return
@@ -1024,11 +1042,12 @@ export const Editor = {
       distance = available >= 0 ? null : 0 - available
     }
 
-    for (const [node, path] of Editor.nodes(editor, { at, reverse })) {
+    for (const [node, path] of Editor.nodes(editor, { at, reverse, voids })) {
       if (Element.isElement(node)) {
-        // Void nodes are a special case, since we don't want to iterate over
-        // their content. We instead always just yield their first point.
-        if (editor.isVoid(node)) {
+        // Void nodes are a special case, so by default we will always
+        // yield their first point. If the voids option is set to true,
+        // then we will iterate over their content
+        if (!voids && editor.isVoid(node)) {
           yield Editor.start(editor, path)
           continue
         }
@@ -1045,7 +1064,7 @@ export const Editor = {
             ? start
             : Editor.start(editor, path)
 
-          const text = Editor.string(editor, { anchor: s, focus: e })
+          const text = Editor.string(editor, { anchor: s, focus: e }, { voids })
           string = reverse ? reverseText(text) : text
           isNewBlock = true
         }
@@ -1107,8 +1126,18 @@ export const Editor = {
       return
     }
 
-    const [, from] = Editor.first(editor, at)
+    const pointBeforeLocation = Editor.before(editor, at, { voids })
+
+    const from = pointBeforeLocation && pointBeforeLocation.path
+
+    if (!from) {
+      return
+    }
+
     const [, to] = Editor.first(editor, [])
+
+    // The search location is from the start of the document to the path of
+    // the point before the location passed in
     const span: Span = [from, to]
 
     if (Path.isPath(at) && at.length === 0) {
@@ -1124,7 +1153,7 @@ export const Editor = {
       }
     }
 
-    const [, previous] = Editor.nodes(editor, {
+    const [previous] = Editor.nodes(editor, {
       reverse: true,
       at: span,
       match,
@@ -1217,11 +1246,18 @@ export const Editor = {
   /**
    * Get the text string content of a location.
    *
-   * Note: the text of void nodes is presumed to be an empty string, regardless
-   * of what their actual content is.
+   * Note: by default the text of void nodes is considered to be an empty
+   * string, regardless of content, unless you pass in true for the voids option
    */
 
-  string(editor: Editor, at: Location): string {
+  string(
+    editor: Editor,
+    at: Location,
+    options: {
+      voids?: boolean
+    } = {}
+  ): string {
+    const { voids = false } = options
     const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     let text = ''
@@ -1229,6 +1265,7 @@ export const Editor = {
     for (const [node, path] of Editor.nodes(editor, {
       at: range,
       match: Text.isText,
+      voids,
     })) {
       let t = node.text
 
