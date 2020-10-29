@@ -469,8 +469,8 @@ export const ReactEditor = {
     return { path, offset }
   },
 
-  // Function introduced for testability
-  domRangeToSlateRange(
+  // Function introduced for testability since the `Selection` class is not available during test runs (Cannot be mocked)
+  domRangeToSlateRangeDescription(
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): SlateRangeDescription {
     const el = domRange instanceof Selection
@@ -482,18 +482,20 @@ export const ReactEditor = {
     let focusOffset
     let isCollapsed
 
-    if (domRange instanceof Selection) {
-      anchorNode = domRange.anchorNode
-      anchorOffset = domRange.anchorOffset
-      focusNode = domRange.focusNode
-      focusOffset = domRange.focusOffset
-      isCollapsed = domRange.isCollapsed
-    } else {
-      anchorNode = domRange.startContainer
-      anchorOffset = domRange.startOffset
-      focusNode = domRange.endContainer
-      focusOffset = domRange.endOffset
-      isCollapsed = domRange.collapsed
+    if (el) {
+      if (domRange instanceof Selection) {
+        anchorNode = domRange.anchorNode
+        anchorOffset = domRange.anchorOffset
+        focusNode = domRange.focusNode
+        focusOffset = domRange.focusOffset
+        isCollapsed = domRange.isCollapsed
+      } else {
+        anchorNode = domRange.startContainer
+        anchorOffset = domRange.startOffset
+        focusNode = domRange.endContainer
+        focusOffset = domRange.endOffset
+        isCollapsed = domRange.collapsed
+      }
     }
 
     return {
@@ -513,7 +515,7 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): Range {
-    const slateRangeDescription = ReactEditor.domRangeToSlateRange(domRange)
+    const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(domRange)
 
     if (
       slateRangeDescription.anchorNode == null ||

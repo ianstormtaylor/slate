@@ -1,46 +1,34 @@
 /** @jsx jsx */
 import { Editor, Point } from 'slate'
 import { ReactEditor } from '../../src/plugin/react-editor'
-import { jsx } from 'slate-hyperscript'
-import { DOMSelection, DOMNode } from '../../src/utils/dom'
+import { DOMSelection, DOMNode, SlateRangeDescription } from '../../src/utils/dom'
 import { mock } from 'jest-mock-extended'
 import { Selection } from '../selection'
 
-export const input = (
-  <editor>
-    <text>one</text>
-    <text>two</text>
-    <text>three</text>
-  </editor>
-)
+const mockNode1 = mock<DOMNode>()
 
-export const selection = {}
+export const input = {
+  anchorNode: mockNode1,
+  anchorOffset: 0,
+  focusNode: mockNode1,
+  focusOffset: 2,
+  isCollapsed: false,
+}
 
-export const test = (editor: ReactEditor) => {
-  //ReactEditor.toSlateRange = jest.fn((editor: Editor, domRange: Range | StaticRange | Selection) => )
-
-  // Create our mock for the function toSlateRange is dependent on
+export const test = (editor: ReactEditor, input: DOMSelection) => {
+  // Create our mocks for the functions toSlateRange is dependent on
   const mockToSlatePoint = jest.fn()
     .mockReturnValueOnce({ path: [0], offset: 0 })
     .mockReturnValueOnce({ path: [0], offset: 2 })
 
-  // replace implementation with mock
+  const mockDomRangeToSlateRangeDescription = jest.fn()
+    .mockReturnValueOnce(input) // Our input will already be in the form we are expecting
+
+  // replace dependancies with mocked implementations
   ReactEditor.toSlatePoint = mockToSlatePoint
+  ReactEditor.domRangeToSlateRangeDescription = mockDomRangeToSlateRangeDescription
 
-  // create a selection obj to copy the parameters from
-  const selectionObj = mock<DOMSelection>()
-
-  // create our mock selection object
-  const mockSelection = {
-    anchorNode: mock<DOMNode>(),
-    anchorOffset: 0,
-    focusNode: mock<DOMNode>(),
-    focusOffset: 2,
-    isCollapsed: false,
-    ...selectionObj as Selection
-  }
-
-  return ReactEditor.toSlateRange(editor, mockSelection)
+  return ReactEditor.toSlateRange(editor, input)
 }
 
 export const output = {

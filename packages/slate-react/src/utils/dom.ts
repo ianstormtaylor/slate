@@ -13,13 +13,13 @@
 // import DOMSelection1 = globalThis.Selection
 // import DOMStaticRange1 = globalThis.StaticRange
 
-type DOMNode = Node
-type DOMComment = Comment
-type DOMElement = Element
-type DOMText = Text
-type DOMRange = Range
-type DOMSelection = Selection
-type DOMStaticRange = StaticRange
+type DOMNode = globalThis.Node
+type DOMComment = globalThis.Comment
+type DOMElement = globalThis.Element
+type DOMText = globalThis.Text
+type DOMRange = globalThis.Range
+type DOMSelection = globalThis.Selection
+type DOMStaticRange = globalThis.StaticRange
 
 export {
   DOMNode,
@@ -34,11 +34,11 @@ export {
 export type DOMPoint = [Node, number]
 
 export type SlateRangeDescription = {
-  anchorNode: Node | null
-  anchorOffset: number | null
-  focusNode: Node | null
-  focusOffset: number | null
-  isCollapsed: boolean
+  anchorNode: Node | null | undefined
+  anchorOffset: number | undefined
+  focusNode: Node | null | undefined
+  focusOffset: number | undefined
+  isCollapsed: boolean | undefined
 }
 
 /**
