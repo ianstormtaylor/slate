@@ -18,17 +18,13 @@ export const input = (
       two
       <focus />
     </block>
-    <block>
-      three
-    </block>
+    <block>three</block>
   </editor>
 )
 
 export const output = (
   <editor>
-    <block>
-      three
-    </block>
+    <block>three</block>
     <block>
       <anchor />
       one
