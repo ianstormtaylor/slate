@@ -758,13 +758,13 @@ export const Editor = {
         }
 
         const dirtyPath = getDirtyPaths(editor).pop()!
-        m++
 
         // If the node doesn't exist in the tree, it does not need to be normalized.
-        if (!Node.has(editor, dirtyPath)) continue
-
-        const entry = Editor.node(editor, dirtyPath)
-        editor.normalizeNode(entry)
+        if (Node.has(editor, dirtyPath)) {
+          const entry = Editor.node(editor, dirtyPath)
+          editor.normalizeNode(entry)
+        }
+        m++
       }
     })
   },
