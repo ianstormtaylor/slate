@@ -2,7 +2,7 @@ import {
   Editor,
   Element,
   Location,
-  Node,
+  SlateNode,
   NodeEntry,
   Path,
   Text,
@@ -190,7 +190,7 @@ export const TextTransforms = {
 
   insertFragment(
     editor: Editor,
-    fragment: Node[],
+    fragment: SlateNode[],
     options: {
       at?: Location
       hanging?: boolean
@@ -264,8 +264,8 @@ export const TextTransforms = {
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
-      const [, firstPath] = Node.first({ children: fragment }, [])
-      const [, lastPath] = Node.last({ children: fragment }, [])
+      const [, firstPath] = SlateNode.first({ children: fragment }, [])
+      const [, lastPath] = SlateNode.last({ children: fragment }, [])
 
       const matches: NodeEntry[] = []
       const matcher = ([n, p]: NodeEntry) => {
@@ -292,7 +292,7 @@ export const TextTransforms = {
         return true
       }
 
-      for (const entry of Node.nodes(
+      for (const entry of SlateNode.nodes(
         { children: fragment },
         { pass: matcher }
       )) {

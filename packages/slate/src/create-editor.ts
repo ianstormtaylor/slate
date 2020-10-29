@@ -2,7 +2,7 @@ import {
   Descendant,
   Editor,
   Element,
-  Node,
+  SlateNode,
   NodeEntry,
   Operation,
   Path,
@@ -139,7 +139,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        return Node.fragment(editor, selection)
+        return SlateNode.fragment(editor, selection)
       }
       return []
     },
@@ -148,11 +148,11 @@ export const createEditor = (): Editor => {
       Transforms.splitNodes(editor, { always: true })
     },
 
-    insertFragment: (fragment: Node[]) => {
+    insertFragment: (fragment: SlateNode[]) => {
       Transforms.insertFragment(editor, fragment)
     },
 
-    insertNode: (node: Node) => {
+    insertNode: (node: SlateNode) => {
       Transforms.insertNodes(editor, node)
     },
 
@@ -321,7 +321,7 @@ const getDirtyPaths = (op: Operation) => {
       const levels = Path.levels(path)
       const descendants = Text.isText(node)
         ? []
-        : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
+        : Array.from(SlateNode.nodes(node), ([, p]) => path.concat(p))
 
       return [...levels, ...descendants]
     }

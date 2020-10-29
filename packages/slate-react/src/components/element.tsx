@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, SlateNode, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import Children from './children'

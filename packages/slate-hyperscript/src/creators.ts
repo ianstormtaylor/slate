@@ -1,7 +1,7 @@
 import {
   Element,
   Descendant,
-  Node,
+  SlateNode,
   Range,
   Text,
   Editor,
@@ -25,9 +25,9 @@ import {
 const STRINGS: WeakSet<Text> = new WeakSet()
 
 const resolveDescendants = (children: any[]): Descendant[] => {
-  const nodes: Node[] = []
+  const nodes: SlateNode[] = []
 
-  const addChild = (child: Node | Token): void => {
+  const addChild = (child: SlateNode | Token): void => {
     if (child == null) {
       return
     }
@@ -241,7 +241,7 @@ export function createEditor(
 
   // Search the document's texts to see if any of them have tokens associated
   // that need incorporated into the selection.
-  for (const [node, path] of Node.texts(editor)) {
+  for (const [node, path] of SlateNode.texts(editor)) {
     const anchor = getAnchorOffset(node)
     const focus = getFocusOffset(node)
 

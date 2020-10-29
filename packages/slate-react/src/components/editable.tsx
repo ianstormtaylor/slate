@@ -3,7 +3,7 @@ import {
   Editor,
   Element,
   NodeEntry,
-  Node,
+  SlateNode,
   Range,
   Text,
   Transforms,
@@ -450,8 +450,8 @@ export const Editable = (props: EditableProps) => {
   if (
     placeholder &&
     editor.children.length === 1 &&
-    Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === ''
+    Array.from(SlateNode.texts(editor)).length === 1 &&
+    SlateNode.string(editor) === ''
   ) {
     const start = Editor.start(editor, [])
     decorations.push({

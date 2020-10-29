@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path } from '..'
+import { Editor, SlateNode, Path } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -8,7 +8,7 @@ import { Editor, Node, Path } from '..'
  */
 
 export interface Element {
-  children: Node[]
+  children: SlateNode[]
   [key: string]: unknown
 }
 
@@ -20,7 +20,7 @@ export const Element = {
   isElement(value: any): value is Element {
     return (
       isPlainObject(value) &&
-      Node.isNodeList(value.children) &&
+      SlateNode.isNodeList(value.children) &&
       !Editor.isEditor(value)
     )
   },

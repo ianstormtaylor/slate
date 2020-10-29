@@ -1,6 +1,6 @@
 import { createDraft, finishDraft, isDraft } from 'immer'
 import {
-  Node,
+  SlateNode,
   Editor,
   Range,
   Point,
@@ -25,7 +25,7 @@ export const GeneralTransforms = {
     switch (op.type) {
       case 'insert_node': {
         const { path, node } = op
-        const parent = Node.parent(editor, path)
+        const parent = SlateNode.parent(editor, path)
         const index = path[path.length - 1]
         parent.children.splice(index, 0, node)
 
@@ -40,7 +40,7 @@ export const GeneralTransforms = {
 
       case 'insert_text': {
         const { path, offset, text } = op
-        const node = Node.leaf(editor, path)
+        const node = SlateNode.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset)
         node.text = before + text + after
@@ -56,10 +56,10 @@ export const GeneralTransforms = {
 
       case 'merge_node': {
         const { path } = op
-        const node = Node.get(editor, path)
+        const node = SlateNode.get(editor, path)
         const prevPath = Path.previous(path)
-        const prev = Node.get(editor, prevPath)
-        const parent = Node.parent(editor, path)
+        const prev = SlateNode.get(editor, prevPath)
+        const parent = SlateNode.parent(editor, path)
         const index = path[path.length - 1]
 
         if (Text.isText(node) && Text.isText(prev)) {
@@ -92,8 +92,8 @@ export const GeneralTransforms = {
           )
         }
 
-        const node = Node.get(editor, path)
-        const parent = Node.parent(editor, path)
+        const node = SlateNode.get(editor, path)
+        const parent = SlateNode.parent(editor, path)
         const index = path[path.length - 1]
 
         // This is tricky, but since the `path` and `newPath` both refer to
@@ -104,7 +104,7 @@ export const GeneralTransforms = {
         // the operation was applied.
         parent.children.splice(index, 1)
         const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
+        const newParent = SlateNode.get(editor, Path.parent(truePath)) as Ancestor
         const newIndex = truePath[truePath.length - 1]
 
         newParent.children.splice(newIndex, 0, node)
@@ -121,7 +121,7 @@ export const GeneralTransforms = {
       case 'remove_node': {
         const { path } = op
         const index = path[path.length - 1]
-        const parent = Node.parent(editor, path)
+        const parent = SlateNode.parent(editor, path)
         parent.children.splice(index, 1)
 
         // Transform all of the points in the value, but if the point was in the
@@ -136,7 +136,7 @@ export const GeneralTransforms = {
               let prev: NodeEntry<Text> | undefined
               let next: NodeEntry<Text> | undefined
 
-              for (const [n, p] of Node.texts(editor)) {
+              for (const [n, p] of SlateNode.texts(editor)) {
                 if (Path.compare(p, path) === -1) {
                   prev = [n, p]
                 } else {
@@ -163,7 +163,7 @@ export const GeneralTransforms = {
 
       case 'remove_text': {
         const { path, offset, text } = op
-        const node = Node.leaf(editor, path)
+        const node = SlateNode.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset + text.length)
         node.text = before + after
@@ -184,7 +184,7 @@ export const GeneralTransforms = {
           throw new Error(`Cannot set properties on the root node!`)
         }
 
-        const node = Node.get(editor, path)
+        const node = SlateNode.get(editor, path)
 
         for (const key in newProperties) {
           if (key === 'children' || key === 'text') {
@@ -234,8 +234,8 @@ export const GeneralTransforms = {
           )
         }
 
-        const node = Node.get(editor, path)
-        const parent = Node.parent(editor, path)
+        const node = SlateNode.get(editor, path)
+        const parent = SlateNode.parent(editor, path)
         const index = path[path.length - 1]
         let newNode: Descendant
 
@@ -272,7 +272,7 @@ export const GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Node[]
+    editor.children = finishDraft(editor.children) as SlateNode[]
 
     if (selection) {
       editor.selection = isDraft(selection)

@@ -2,7 +2,7 @@ import {
   Editor,
   Element,
   Location,
-  Node,
+  SlateNode,
   Path,
   Point,
   Range,
@@ -19,10 +19,10 @@ export const NodeTransforms = {
 
   insertNodes(
     editor: Editor,
-    nodes: Node | Node[],
+    nodes: SlateNode | SlateNode[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -33,7 +33,7 @@ export const NodeTransforms = {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
-      if (Node.isNode(nodes)) {
+      if (SlateNode.isNode(nodes)) {
         nodes = [nodes]
       }
 
@@ -139,7 +139,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -203,7 +203,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -341,7 +341,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -391,7 +391,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -435,10 +435,10 @@ export const NodeTransforms = {
 
   setNodes(
     editor: Editor,
-    props: Partial<Node>,
+    props: Partial<SlateNode>,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -497,8 +497,8 @@ export const NodeTransforms = {
         mode,
         voids,
       })) {
-        const properties: Partial<Node> = {}
-        const newProperties: Partial<Node> = {}
+        const properties: Partial<SlateNode> = {}
+        const newProperties: Partial<SlateNode> = {}
 
         // You can't set properties on the editor node.
         if (path.length === 0) {
@@ -536,7 +536,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -662,7 +662,7 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -690,7 +690,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -750,7 +750,7 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -856,7 +856,7 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
   }
 }
 
-const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
+const matchPath = (editor: Editor, path: Path): ((node: SlateNode) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }

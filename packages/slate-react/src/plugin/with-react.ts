@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
+import { Editor, SlateNode, Path, Operation, Transforms, Range } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
@@ -147,7 +147,7 @@ export const withReact = <T extends Editor>(editor: T) => {
 
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))
-      const parsed = JSON.parse(decoded) as Node[]
+      const parsed = JSON.parse(decoded) as SlateNode[]
       e.insertFragment(parsed)
       return
     }

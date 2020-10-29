@@ -1,10 +1,10 @@
-import { Node, Path, Range } from '..'
+import { SlateNode, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
 export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
-  node: Node
+  node: SlateNode
   [key: string]: unknown
 }
 
@@ -20,7 +20,7 @@ export type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -34,7 +34,7 @@ export type MoveNodeOperation = {
 export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
-  node: Node
+  node: SlateNode
   [key: string]: unknown
 }
 
@@ -49,8 +49,8 @@ export type RemoveTextOperation = {
 export type SetNodeOperation = {
   type: 'set_node'
   path: Path
-  properties: Partial<Node>
-  newProperties: Partial<Node>
+  properties: Partial<SlateNode>
+  newProperties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -78,7 +78,7 @@ export type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -123,7 +123,7 @@ export const Operation = {
 
     switch (value.type) {
       case 'insert_node':
-        return Path.isPath(value.path) && Node.isNode(value.node)
+        return Path.isPath(value.path) && SlateNode.isNode(value.node)
       case 'insert_text':
         return (
           typeof value.offset === 'number' &&
@@ -139,7 +139,7 @@ export const Operation = {
       case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
       case 'remove_node':
-        return Path.isPath(value.path) && Node.isNode(value.node)
+        return Path.isPath(value.path) && SlateNode.isNode(value.node)
       case 'remove_text':
         return (
           typeof value.offset === 'number' &&
