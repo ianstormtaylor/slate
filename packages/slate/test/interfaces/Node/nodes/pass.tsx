@@ -1,5 +1,5 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
+import { SlateNode } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -12,7 +12,7 @@ export const input = (
   </editor>
 )
 export const test = value => {
-  return Array.from(Node.nodes(value, { pass: ([n, p]) => p.length > 1 }))
+  return Array.from(SlateNode.nodes(value, { pass: ([n, p]) => p.length > 1 }))
 }
 export const output = [
   [input, []],

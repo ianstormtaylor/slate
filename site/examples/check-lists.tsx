@@ -7,12 +7,12 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Node, Editor, Transforms, Range, Point, createEditor } from 'slate'
+import { SlateNode, Editor, Transforms, SlateRange, Point, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 const CheckListsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
@@ -37,7 +37,7 @@ const withChecklists = editor => {
   editor.deleteBackward = (...args) => {
     const { selection } = editor
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (selection &&SlateRange.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
         match: n => n.type === 'check-list-item',
       })

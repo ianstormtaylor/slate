@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { fixtures } from '../../../support/fixtures'
 import { Editor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
@@ -10,7 +9,7 @@ describe('slate', () => {
       input = withTest(input)
     }
     const result = test(input)
-    assert.deepEqual(result, output)
+    expect(result).toEqual(output)
   })
   fixtures(__dirname, 'operations', ({ module }) => {
     const { input, operations, output } = module
@@ -20,22 +19,22 @@ describe('slate', () => {
         editor.apply(op)
       }
     })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
+    expect(editor.children).toEqual(output.children)
+    expect(editor.selection).toEqual(output.selection)
   })
   fixtures(__dirname, 'normalization', ({ module }) => {
     const { input, output } = module
     const editor = withTest(input)
     Editor.normalize(editor, { force: true })
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
+    expect(editor.children).toEqual(output.children)
+    expect(editor.selection).toEqual(output.selection)
   })
   fixtures(__dirname, 'transforms', ({ module }) => {
     const { input, run, output } = module
     const editor = withTest(input)
     run(editor)
-    assert.deepEqual(editor.children, output.children)
-    assert.deepEqual(editor.selection, output.selection)
+    expect(editor.children).toEqual(output.children)
+    expect(editor.selection).toEqual(output.selection)
   })
 })
 const withTest = editor => {

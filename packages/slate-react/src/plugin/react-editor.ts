@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, SlateNode, Path, Point, SlateRange, Transforms, Descendant } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -20,6 +20,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
+  SlateRangeDescription
 } from '../utils/dom'
 
 /**
@@ -36,7 +37,7 @@ export const ReactEditor = {
    * Find a key for a Slate node.
    */
 
-  findKey(editor: ReactEditor, node: Node): Key {
+  findKey(editor: ReactEditor, node: SlateNode): Key {
     let key = NODE_TO_KEY.get(node)
 
     if (!key) {
@@ -51,7 +52,7 @@ export const ReactEditor = {
    * Find the path of Slate node.
    */
 
-  findPath(editor: ReactEditor, node: Node): Path {
+  findPath(editor: ReactEditor, node: SlateNode): Path {
     const path: Path = []
     let child = node
 
@@ -129,10 +130,10 @@ export const ReactEditor = {
 
   deselect(editor: ReactEditor): void {
     const { selection } = editor
-    const domSelection = window.getSelection()
+    const domRange = window.getSelection()
 
-    if (domSelection && domSelection.rangeCount > 0) {
-      domSelection.removeAllRanges()
+    if (domRange && domRange.rangeCount > 0) {
+      domRange.removeAllRanges()
     }
 
     if (selection) {
@@ -201,7 +202,7 @@ export const ReactEditor = {
    * Find the native DOM element from a Slate node.
    */
 
-  toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
+  toDOMNode(editor: ReactEditor, node: SlateNode): HTMLElement {
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
@@ -272,15 +273,15 @@ export const ReactEditor = {
    *
    * Notice: the returned range will always be ordinal regardless of the direction of Slate `range` due to DOM API limit.
    *
-   * there is no way to create a reverse DOM Range using Range.setStart/setEnd
+   * there is no way to create a reverse DOMSlateRange.usingSlateRange.setStart/setEnd
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
 
-  toDOMRange(editor: ReactEditor, range: Range): DOMRange {
+  toDOMRange(editor: ReactEditor, range: SlateRange): DOMRange {
     const { anchor, focus } = range
-    const isBackward = Range.isBackward(range)
+    const isBackward =SlateRange.isBackward(range)
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
-    const domFocus = Range.isCollapsed(range)
+    const domFocus =SlateRange.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
@@ -309,7 +310,7 @@ export const ReactEditor = {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
+  toSlateNode(editor: ReactEditor, domNode: DOMNode): SlateNode {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
@@ -329,7 +330,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): Range {
+  findEventRange(editor: ReactEditor, event: any): SlateRange {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -423,7 +424,7 @@ export const ReactEditor = {
           el!.parentNode!.removeChild(el)
         })
 
-        // COMPAT: Edge has a bug where Range.prototype.toString() will
+        // COMPAT: Edge has a bug whereSlateRange.prototype.toString() will
         // convert \n into \r\n. The bug causes a loop when slate-react
         // attempts to reposition its cursor to match the native position. Use
         // textContent.length instead.
@@ -468,18 +469,13 @@ export const ReactEditor = {
     return { path, offset }
   },
 
-  /**
-   * Find a Slate range from a DOM range or selection.
-   */
-
-  toSlateRange(
-    editor: ReactEditor,
+  // Function introduced for testability since the `Selection` class is not available during test runs (Cannot be mocked)
+  domRangeToSlateRangeDescription(
     domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): Range {
-    const el =
-      domRange instanceof Selection
-        ? domRange.anchorNode
-        : domRange.startContainer
+  ): SlateRangeDescription {
+    const el = domRange instanceof Selection
+      ? domRange.anchorNode
+      : domRange.startContainer
     let anchorNode
     let anchorOffset
     let focusNode
@@ -502,21 +498,40 @@ export const ReactEditor = {
       }
     }
 
+    return {
+      anchorNode,
+      anchorOffset,
+      focusNode,
+      focusOffset,
+      isCollapsed
+    }
+  },
+
+  /**
+   * Find a Slate range from a DOM range or selection.
+   */
+
+  toSlateRange(
+    editor: ReactEditor,
+    domRange: DOMRange | DOMStaticRange | DOMSelection
+  ): SlateRange {
+    const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(domRange)
+
     if (
-      anchorNode == null ||
-      focusNode == null ||
-      anchorOffset == null ||
-      focusOffset == null
+      slateRangeDescription.anchorNode == null ||
+      slateRangeDescription.focusNode == null ||
+      slateRangeDescription.anchorOffset == null ||
+      slateRangeDescription.focusOffset == null
     ) {
       throw new Error(
         `Cannot resolve a Slate range from DOM range: ${domRange}`
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
-    const focus = isCollapsed
+    const anchor = ReactEditor.toSlatePoint(editor, [slateRangeDescription.anchorNode, slateRangeDescription.anchorOffset])
+    const focus = slateRangeDescription.isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+      : ReactEditor.toSlatePoint(editor, [slateRangeDescription.focusNode, slateRangeDescription.focusOffset])
 
     // If the selection is at the very end of the anchor node, when the anchor and focus are not the same node.
     if (

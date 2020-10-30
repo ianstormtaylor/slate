@@ -19,8 +19,8 @@
     "release": "cross-env NODE_ENV=production yarn build:rollup && yarn test && yarn lint && lerna publish",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
-    "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
-    "test:inspect": "yarn test --inspect-brk",
+    "test": "jest",
+    "test:inspect": "yarn test jest --inspect-brk",
     "watch": "yarn build:rollup --watch"
   },
   "devDependencies": {
@@ -31,11 +31,12 @@
     "@babel/plugin-transform-modules-commonjs": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.7.4",
     "@babel/polyfill": "^7.6.0",
-    "@babel/preset-env": "^7.7.4",
+    "@babel/preset-env": "^7.12.1",
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.7.4",
     "@babel/register": "^7.7.4",
     "@babel/runtime": "^7.7.4",
+    "@types/jest": "^26.0.15",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
     "@types/node": "^12.12.14",
@@ -44,6 +45,7 @@
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-eslint": "^10.0.3",
+    "babel-jest": "^26.6.1",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
     "cross-env": "6.0.3",
@@ -57,6 +59,8 @@
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
+    "jest": "^26.6.1",
+    "jest-mock-extended": "^1.0.10",
     "lerna": "^3.19.0",
     "lodash": "^4.17.4",
     "mocha": "^6.2.0",
@@ -85,6 +89,8 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
+    "ts-jest": "^26.4.2",
     "typescript": "^3.7.2"
-  }
+  },
+  "dependencies": {}
 }

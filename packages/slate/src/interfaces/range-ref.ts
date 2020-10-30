@@ -1,4 +1,4 @@
-import { Operation, Range } from '..'
+import { Operation, SlateRange } from '..'
 
 /**
  * `RangeRef` objects keep a specific range in a document synced over time as new
@@ -7,9 +7,9 @@ import { Operation, Range } from '..'
  */
 
 export interface RangeRef {
-  current: Range | null
+  current: SlateRange | null
   affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
-  unref(): Range | null
+  unref(): SlateRange | null
 }
 
 export const RangeRef = {
@@ -24,7 +24,7 @@ export const RangeRef = {
       return
     }
 
-    const path = Range.transform(current, op, { affinity })
+    const path = SlateRange.transform(current, op, { affinity })
     ref.current = path
 
     if (path == null) {

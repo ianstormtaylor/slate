@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import {SlateRange} from 'slate'
 
 export const input = {
   anchor: {
@@ -11,6 +11,6 @@ export const input = {
   },
 }
 export const test = range => {
-  return Range.isBackward(range)
+  return SlateRange.isBackward(range)
 }
 export const output = true

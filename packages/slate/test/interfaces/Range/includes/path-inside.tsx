@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import {SlateRange} from 'slate'
 
 export const input = {
   range: {
@@ -14,6 +14,6 @@ export const input = {
   target: [2],
 }
 export const test = ({ range, target }) => {
-  return Range.includes(range, target)
+  return SlateRange.includes(range, target)
 }
 export const output = true

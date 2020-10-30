@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, Node, createEditor } from 'slate'
+import { Text, SlateNode, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(

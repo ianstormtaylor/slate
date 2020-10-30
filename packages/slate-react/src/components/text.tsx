@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
+import { SlateRange, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { ReactEditor, useEditor } from '..'
@@ -16,7 +16,7 @@ import {
  */
 
 const Text = (props: {
-  decorations: Range[]
+  decorations: SlateRange[]
   isLast: boolean
   parent: Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element

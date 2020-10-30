@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import { SlateRange } from 'slate'
 
 export const input = {
   anchor: {
@@ -11,7 +11,7 @@ export const input = {
   },
 }
 export const test = value => {
-  return Array.from(Range.points(value))
+  return Array.from(SlateRange.points(value))
 }
 export const output = [
   [input.anchor, 'anchor'],

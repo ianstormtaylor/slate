@@ -1,8 +1,8 @@
 import {
   Element,
   Descendant,
-  Node,
-  Range,
+  SlateNode,
+  SlateRange,
   Text,
   Editor,
   createEditor as makeEditor,
@@ -25,9 +25,9 @@ import {
 const STRINGS: WeakSet<Text> = new WeakSet()
 
 const resolveDescendants = (children: any[]): Descendant[] => {
-  const nodes: Node[] = []
+  const nodes: SlateNode[] = []
 
-  const addChild = (child: Node | Token): void => {
+  const addChild = (child: SlateNode | Token): void => {
     if (child == null) {
       return
     }
@@ -148,7 +148,7 @@ export function createSelection(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Range {
+): SlateRange {
   const anchor: AnchorToken = children.find(c => c instanceof AnchorToken)
   const focus: FocusToken = children.find(c => c instanceof FocusToken)
 
@@ -223,10 +223,10 @@ export function createEditor(
   children: any[]
 ): Editor {
   const otherChildren: any[] = []
-  let selectionChild: Range | undefined
+  let selectionChild: SlateRange | undefined
 
   for (const child of children) {
-    if (Range.isRange(child)) {
+    if (SlateRange.isRange(child)) {
       selectionChild = child
     } else {
       otherChildren.push(child)
@@ -234,14 +234,14 @@ export function createEditor(
   }
 
   const descendants = resolveDescendants(otherChildren)
-  const selection: Partial<Range> = {}
+  const selection: Partial<SlateRange> = {}
   const editor = makeEditor()
   Object.assign(editor, attributes)
   editor.children = descendants
 
   // Search the document's texts to see if any of them have tokens associated
   // that need incorporated into the selection.
-  for (const [node, path] of Node.texts(editor)) {
+  for (const [node, path] of SlateNode.texts(editor)) {
     const anchor = getAnchorOffset(node)
     const focus = getFocusOffset(node)
 
@@ -270,7 +270,7 @@ export function createEditor(
 
   if (selectionChild != null) {
     editor.selection = selectionChild
-  } else if (Range.isRange(selection)) {
+  } else if (SlateRange.isRange(selection)) {
     editor.selection = selection
   }
 

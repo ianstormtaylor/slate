@@ -2,13 +2,13 @@ import {
   Descendant,
   Editor,
   Element,
-  Node,
+  SlateNode,
   NodeEntry,
   Operation,
   Path,
   PathRef,
   PointRef,
-  Range,
+  SlateRange,
   RangeRef,
   Text,
   Transforms,
@@ -93,7 +93,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        if (SlateRange.isExpanded(selection)) {
           Transforms.setNodes(
             editor,
             { [key]: value },
@@ -114,7 +114,7 @@ export const createEditor = (): Editor => {
     deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
-      if (selection && Range.isCollapsed(selection)) {
+      if (selection && SlateRange.isCollapsed(selection)) {
         Transforms.delete(editor, { unit, reverse: true })
       }
     },
@@ -122,7 +122,7 @@ export const createEditor = (): Editor => {
     deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
-      if (selection && Range.isCollapsed(selection)) {
+      if (selection && SlateRange.isCollapsed(selection)) {
         Transforms.delete(editor, { unit })
       }
     },
@@ -130,7 +130,7 @@ export const createEditor = (): Editor => {
     deleteFragment: () => {
       const { selection } = editor
 
-      if (selection && Range.isExpanded(selection)) {
+      if (selection && SlateRange.isExpanded(selection)) {
         Transforms.delete(editor)
       }
     },
@@ -139,7 +139,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        return Node.fragment(editor, selection)
+        return SlateNode.fragment(editor, selection)
       }
       return []
     },
@@ -148,11 +148,11 @@ export const createEditor = (): Editor => {
       Transforms.splitNodes(editor, { always: true })
     },
 
-    insertFragment: (fragment: Node[]) => {
+    insertFragment: (fragment: SlateNode[]) => {
       Transforms.insertFragment(editor, fragment)
     },
 
-    insertNode: (node: Node) => {
+    insertNode: (node: SlateNode) => {
       Transforms.insertNodes(editor, node)
     },
 
@@ -162,7 +162,7 @@ export const createEditor = (): Editor => {
       if (selection) {
         // If the cursor is at the end of an inline, move it outside of
         // the inline before inserting
-        if (Range.isCollapsed(selection)) {
+        if (SlateRange.isCollapsed(selection)) {
           const inline = Editor.above(editor, {
             match: n => Editor.isInline(editor, n),
             mode: 'highest',
@@ -285,7 +285,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        if (SlateRange.isExpanded(selection)) {
           Transforms.unsetNodes(editor, key, {
             match: Text.isText,
             split: true,
@@ -321,7 +321,7 @@ const getDirtyPaths = (op: Operation) => {
       const levels = Path.levels(path)
       const descendants = Text.isText(node)
         ? []
-        : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
+        : Array.from(SlateNode.nodes(node), ([, p]) => path.concat(p))
 
       return [...levels, ...descendants]
     }

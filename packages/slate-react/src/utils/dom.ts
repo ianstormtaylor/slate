@@ -5,13 +5,22 @@
 // COMPAT: This is required to prevent TypeScript aliases from doing some very
 // weird things for Slate's types with the same name as globals. (2019/11/27)
 // https://github.com/microsoft/TypeScript/issues/35002
-import DOMNode = globalThis.Node
-import DOMComment = globalThis.Comment
-import DOMElement = globalThis.Element
-import DOMText = globalThis.Text
-import DOMRange = globalThis.Range
-import DOMSelection = globalThis.Selection
-import DOMStaticRange = globalThis.StaticRange
+// import DOMNode1 = globalThis.Node
+// import DOMComment1 = globalThis.Comment
+// import DOMElement1 = globalThis.Element
+// import DOMText1 = globalThis.Text
+// import DOMRange1 = globalThis.Range
+// import DOMSelection1 = globalThis.Selection
+// import DOMStaticRange1 = globalThis.StaticRange
+
+type DOMNode = globalThis.Node
+type DOMComment = globalThis.Comment
+type DOMElement = globalThis.Element
+type DOMText = globalThis.Text
+type DOMRange = globalThis.Range
+type DOMSelection = globalThis.Selection
+type DOMStaticRange = globalThis.StaticRange
+
 export {
   DOMNode,
   DOMComment,
@@ -23,6 +32,14 @@ export {
 }
 
 export type DOMPoint = [Node, number]
+
+export type SlateRangeDescription = {
+  anchorNode: Node | null | undefined
+  anchorOffset: number | undefined
+  focusNode: Node | null | undefined
+  focusOffset: number | undefined
+  isCollapsed: boolean | undefined
+}
 
 /**
  * Check if a DOM node is a comment node.

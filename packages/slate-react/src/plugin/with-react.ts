@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
+import { Editor, SlateNode, Path, Operation, Transforms, SlateRange } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
@@ -64,11 +64,11 @@ export const withReact = <T extends Editor>(editor: T) => {
       return
     }
 
-    const [start, end] = Range.edges(selection)
+    const [start, end] =SlateRange.edges(selection)
     const startVoid = Editor.void(e, { at: start.path })
     const endVoid = Editor.void(e, { at: end.path })
 
-    if (Range.isCollapsed(selection) && !startVoid) {
+    if (SlateRange.isCollapsed(selection) && !startVoid) {
       return
     }
 
@@ -147,7 +147,7 @@ export const withReact = <T extends Editor>(editor: T) => {
 
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))
-      const parsed = JSON.parse(decoded) as Node[]
+      const parsed = JSON.parse(decoded) as SlateNode[]
       e.insertFragment(parsed)
       return
     }

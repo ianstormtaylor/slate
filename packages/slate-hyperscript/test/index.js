@@ -1,4 +1,3 @@
-import assert from 'assert'
 import { resolve } from 'path'
 import { fixtures } from '../../../support/fixtures'
 
@@ -15,6 +14,6 @@ describe('slate-hyperscript', () => {
       }
     }
 
-    assert.deepEqual(actual, output)
+    expect(actual).toEqual(output)
   })
 })

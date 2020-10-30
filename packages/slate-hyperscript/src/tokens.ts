@@ -1,16 +1,16 @@
-import { Node, Path, Text } from 'slate'
+import { SlateNode, Path, Text } from 'slate'
 
 /**
  * A weak map to hold anchor tokens.
  */
 
-const ANCHOR: WeakMap<Node, [number, AnchorToken]> = new WeakMap()
+const ANCHOR: WeakMap<SlateNode, [number, AnchorToken]> = new WeakMap()
 
 /**
  * A weak map to hold focus tokens.
  */
 
-const FOCUS: WeakMap<Node, [number, FocusToken]> = new WeakMap()
+const FOCUS: WeakMap<SlateNode, [number, FocusToken]> = new WeakMap()
 
 /**
  * All tokens inherit from a single constructor for `instanceof` checking.

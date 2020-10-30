@@ -37,18 +37,11 @@ export const fixtures = (...args) => {
         it(`${name} `, function () {
           const module = require(p)
 
-          if (module.skip) {
-            this.skip()
-            return
+          if (!module.skip) {
+            fn({ name, path, module })
           }
-
-          fn({ name, path, module })
         })
       }
     }
   })
-}
-
-fixtures.skip = (...args) => {
-  fixtures(...args, { skip: true })
 }

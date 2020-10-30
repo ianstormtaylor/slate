@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import { Range } from '..'
+import { SlateRange } from '..'
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -88,12 +88,12 @@ export const Text = {
    * Get the leaves for a text node given decorations.
    */
 
-  decorations(node: Text, decorations: Range[]): Text[] {
+  decorations(node: Text, decorations: SlateRange[]): Text[] {
     let leaves: Text[] = [{ ...node }]
 
     for (const dec of decorations) {
       const { anchor, focus, ...rest } = dec
-      const [start, end] = Range.edges(dec)
+      const [start, end] = SlateRange.edges(dec)
       const next = []
       let o = 0
 

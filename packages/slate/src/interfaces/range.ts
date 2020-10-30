@@ -8,27 +8,27 @@ import { Operation, Path, Point, PointEntry } from '..'
  * multiple nodes.
  */
 
-export interface Range {
+export interface SlateRange {
   anchor: Point
   focus: Point
   [key: string]: unknown
 }
 
-export const Range = {
+export const SlateRange = {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
    */
 
   edges(
-    range: Range,
+    range: SlateRange,
     options: {
       reverse?: boolean
     } = {}
   ): [Point, Point] {
     const { reverse = false } = options
     const { anchor, focus } = range
-    return Range.isBackward(range) === reverse
+    return SlateRange.isBackward(range) === reverse
       ? [anchor, focus]
       : [focus, anchor]
   },
@@ -37,8 +37,8 @@ export const Range = {
    * Get the end point of a range.
    */
 
-  end(range: Range): Point {
-    const [, end] = Range.edges(range)
+  end(range: SlateRange): Point {
+    const [, end] = SlateRange.edges(range)
     return end
   },
 
@@ -46,7 +46,7 @@ export const Range = {
    * Check if a range is exactly equal to another.
    */
 
-  equals(range: Range, another: Range): boolean {
+  equals(range: SlateRange, another: SlateRange): boolean {
     return (
       Point.equals(range.anchor, another.anchor) &&
       Point.equals(range.focus, another.focus)
@@ -57,21 +57,21 @@ export const Range = {
    * Check if a range includes a path, a point or part of another range.
    */
 
-  includes(range: Range, target: Path | Point | Range): boolean {
-    if (Range.isRange(target)) {
+  includes(range: SlateRange, target: Path | Point | SlateRange): boolean {
+    if (SlateRange.isRange(target)) {
       if (
-        Range.includes(range, target.anchor) ||
-        Range.includes(range, target.focus)
+        SlateRange.includes(range, target.anchor) ||
+        SlateRange.includes(range, target.focus)
       ) {
         return true
       }
 
-      const [rs, re] = Range.edges(range)
-      const [ts, te] = Range.edges(target)
+      const [rs, re] = SlateRange.edges(range)
+      const [ts, te] = SlateRange.edges(target)
       return Point.isBefore(rs, ts) && Point.isAfter(re, te)
     }
 
-    const [start, end] = Range.edges(range)
+    const [start, end] = SlateRange.edges(range)
     let isAfterStart = false
     let isBeforeEnd = false
 
@@ -90,10 +90,10 @@ export const Range = {
    * Get the intersection of a range with another.
    */
 
-  intersection(range: Range, another: Range): Range | null {
+  intersection(range: SlateRange, another: SlateRange): SlateRange | null {
     const { anchor, focus, ...rest } = range
-    const [s1, e1] = Range.edges(range)
-    const [s2, e2] = Range.edges(another)
+    const [s1, e1] = SlateRange.edges(range)
+    const [s2, e2] = SlateRange.edges(another)
     const start = Point.isBefore(s1, s2) ? s2 : s1
     const end = Point.isBefore(e1, e2) ? e1 : e2
 
@@ -109,7 +109,7 @@ export const Range = {
    * document _after_ its focus point.
    */
 
-  isBackward(range: Range): boolean {
+  isBackward(range: SlateRange): boolean {
     const { anchor, focus } = range
     return Point.isAfter(anchor, focus)
   },
@@ -119,7 +119,7 @@ export const Range = {
    * points refer to the exact same position in the document.
    */
 
-  isCollapsed(range: Range): boolean {
+  isCollapsed(range: SlateRange): boolean {
     const { anchor, focus } = range
     return Point.equals(anchor, focus)
   },
@@ -130,8 +130,8 @@ export const Range = {
    * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
    */
 
-  isExpanded(range: Range): boolean {
-    return !Range.isCollapsed(range)
+  isExpanded(range: SlateRange): boolean {
+    return !SlateRange.isCollapsed(range)
   },
 
   /**
@@ -140,15 +140,15 @@ export const Range = {
    * This is the opposite of [[Range.isBackward]] and is provided for legibility.
    */
 
-  isForward(range: Range): boolean {
-    return !Range.isBackward(range)
+  isForward(range: SlateRange): boolean {
+    return !SlateRange.isBackward(range)
   },
 
   /**
    * Check if a value implements the [[Range]] interface.
    */
 
-  isRange(value: any): value is Range {
+  isRange(value: any): value is SlateRange {
     return (
       isPlainObject(value) &&
       Point.isPoint(value.anchor) &&
@@ -160,7 +160,7 @@ export const Range = {
    * Iterate through all of the point entries in a range.
    */
 
-  *points(range: Range): Generator<PointEntry, void, undefined> {
+  *points(range: SlateRange): Generator<PointEntry, void, undefined> {
     yield [range.anchor, 'anchor']
     yield [range.focus, 'focus']
   },
@@ -169,8 +169,8 @@ export const Range = {
    * Get the start point of a range.
    */
 
-  start(range: Range): Point {
-    const [start] = Range.edges(range)
+  start(range: SlateRange): Point {
+    const [start] = SlateRange.edges(range)
     return start
   },
 
@@ -179,18 +179,18 @@ export const Range = {
    */
 
   transform(
-    range: Range,
+    range: SlateRange,
     op: Operation,
     options: {
       affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
     } = {}
-  ): Range | null {
+  ): SlateRange | null {
     const { affinity = 'inward' } = options
     let affinityAnchor: 'forward' | 'backward' | null
     let affinityFocus: 'forward' | 'backward' | null
 
     if (affinity === 'inward') {
-      if (Range.isForward(range)) {
+      if (SlateRange.isForward(range)) {
         affinityAnchor = 'forward'
         affinityFocus = 'backward'
       } else {
@@ -198,7 +198,7 @@ export const Range = {
         affinityFocus = 'forward'
       }
     } else if (affinity === 'outward') {
-      if (Range.isForward(range)) {
+      if (SlateRange.isForward(range)) {
         affinityAnchor = 'backward'
         affinityFocus = 'forward'
       } else {

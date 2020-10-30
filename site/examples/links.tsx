@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Node, Transforms, Editor, Range, createEditor } from 'slate'
+import { SlateNode, Transforms, Editor, SlateRange, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
@@ -75,7 +75,7 @@ const wrapLink = (editor, url) => {
   }
 
   const { selection } = editor
-  const isCollapsed = selection && Range.isCollapsed(selection)
+  const isCollapsed = selection &&SlateRange.isCollapsed(selection)
   const link = {
     type: 'link',
     url,

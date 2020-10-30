@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, SlateNode, SlateRange, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import Children from './children'
@@ -21,12 +21,12 @@ import { RenderElementProps, RenderLeafProps } from './editable'
  */
 
 const Element = (props: {
-  decorate: (entry: NodeEntry) => Range[]
-  decorations: Range[]
+  decorate: (entry: NodeEntry) => SlateRange[]
+  decorations: SlateRange[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  selection: Range | null
+  selection: SlateRange | null
 }) => {
   const {
     decorate,
@@ -74,7 +74,7 @@ const Element = (props: {
   // If it's a block node with inline children, add the proper `dir` attribute
   // for text direction.
   if (!isInline && Editor.hasInlines(editor, element)) {
-    const text = Node.string(element)
+    const text = SlateNode.string(element)
     const dir = getDirection(text)
 
     if (dir === 'rtl') {
@@ -91,7 +91,7 @@ const Element = (props: {
     }
 
     const Tag = isInline ? 'span' : 'div'
-    const [[text]] = Node.texts(element)
+    const [[text]] = SlateNode.texts(element)
 
     children = readOnly ? null : (
       <Tag
@@ -140,7 +140,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
-        Range.equals(prev.selection, next.selection)))
+       SlateRange.equals(prev.selection, next.selection)))
   )
 })
 
@@ -167,7 +167,7 @@ export const DefaultElement = (props: RenderElementProps) => {
  * kept in order, and the odd case where they aren't is okay to re-render for.
  */
 
-const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
+const isRangeListEqual = (list: SlateRange[], another: SlateRange[]): boolean => {
   if (list.length !== another.length) {
     return false
   }
@@ -176,7 +176,7 @@ const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
     const range = list[i]
     const other = another[i]
 
-    if (!Range.equals(range, other)) {
+    if (!SlateRange.equals(range, other)) {
       return false
     }
   }

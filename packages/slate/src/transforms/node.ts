@@ -2,10 +2,10 @@ import {
   Editor,
   Element,
   Location,
-  Node,
+  SlateNode,
   Path,
   Point,
-  Range,
+  SlateRange,
   Text,
   Transforms,
   NodeEntry,
@@ -19,10 +19,10 @@ export const NodeTransforms = {
 
   insertNodes(
     editor: Editor,
-    nodes: Node | Node[],
+    nodes: SlateNode | SlateNode[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -33,7 +33,7 @@ export const NodeTransforms = {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
-      if (Node.isNode(nodes)) {
+      if (SlateNode.isNode(nodes)) {
         nodes = [nodes]
       }
 
@@ -62,15 +62,15 @@ export const NodeTransforms = {
         select = false
       }
 
-      if (Range.isRange(at)) {
+      if (SlateRange.isRange(at)) {
         if (!hanging) {
           at = Editor.unhangRange(editor, at)
         }
 
-        if (Range.isCollapsed(at)) {
+        if (SlateRange.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.edges(at)
+          const [, end] = SlateRange.edges(at)
           const pointRef = Editor.pointRef(editor, end)
           Transforms.delete(editor, { at })
           at = pointRef.unref()!
@@ -139,7 +139,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -203,7 +203,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -226,15 +226,15 @@ export const NodeTransforms = {
         }
       }
 
-      if (!hanging && Range.isRange(at)) {
+      if (!hanging && SlateRange.isRange(at)) {
         at = Editor.unhangRange(editor, at)
       }
 
-      if (Range.isRange(at)) {
-        if (Range.isCollapsed(at)) {
+      if (SlateRange.isRange(at)) {
+        if (SlateRange.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.edges(at)
+          const [, end] = SlateRange.edges(at)
           const pointRef = Editor.pointRef(editor, end)
           Transforms.delete(editor, { at })
           at = pointRef.unref()!
@@ -341,7 +341,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -391,7 +391,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -411,7 +411,7 @@ export const NodeTransforms = {
           : n => Editor.isBlock(editor, n)
       }
 
-      if (!hanging && Range.isRange(at)) {
+      if (!hanging && SlateRange.isRange(at)) {
         at = Editor.unhangRange(editor, at)
       }
 
@@ -435,10 +435,10 @@ export const NodeTransforms = {
 
   setNodes(
     editor: Editor,
-    props: Partial<Node>,
+    props: Partial<SlateNode>,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -464,13 +464,13 @@ export const NodeTransforms = {
           : n => Editor.isBlock(editor, n)
       }
 
-      if (!hanging && Range.isRange(at)) {
+      if (!hanging && SlateRange.isRange(at)) {
         at = Editor.unhangRange(editor, at)
       }
 
-      if (split && Range.isRange(at)) {
+      if (split && SlateRange.isRange(at)) {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
-        const [start, end] = Range.edges(at)
+        const [start, end] = SlateRange.edges(at)
         const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
         Transforms.splitNodes(editor, {
           at: end,
@@ -497,8 +497,8 @@ export const NodeTransforms = {
         mode,
         voids,
       })) {
-        const properties: Partial<Node> = {}
-        const newProperties: Partial<Node> = {}
+        const properties: Partial<SlateNode> = {}
+        const newProperties: Partial<SlateNode> = {}
 
         // You can't set properties on the editor node.
         if (path.length === 0) {
@@ -536,7 +536,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -551,7 +551,7 @@ export const NodeTransforms = {
         match = n => Editor.isBlock(editor, n)
       }
 
-      if (Range.isRange(at)) {
+      if (SlateRange.isRange(at)) {
         at = deleteRange(editor, at)
       }
 
@@ -662,7 +662,7 @@ export const NodeTransforms = {
     props: string | string[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -690,7 +690,7 @@ export const NodeTransforms = {
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -714,7 +714,7 @@ export const NodeTransforms = {
         at = Editor.range(editor, at)
       }
 
-      const rangeRef = Range.isRange(at) ? Editor.rangeRef(editor, at) : null
+      const rangeRef = SlateRange.isRange(at) ? Editor.rangeRef(editor, at) : null
       const matches = Editor.nodes(editor, { at, match, mode, voids })
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
@@ -724,7 +724,7 @@ export const NodeTransforms = {
         let range = Editor.range(editor, path)
 
         if (split && rangeRef) {
-          range = Range.intersection(rangeRef.current!, range)!
+          range = SlateRange.intersection(rangeRef.current!, range)!
         }
 
         Transforms.liftNodes(editor, {
@@ -750,7 +750,7 @@ export const NodeTransforms = {
     element: Element,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: (node: SlateNode) => boolean
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -774,8 +774,8 @@ export const NodeTransforms = {
         }
       }
 
-      if (split && Range.isRange(at)) {
-        const [start, end] = Range.edges(at)
+      if (split && SlateRange.isRange(at)) {
+        const [start, end] = SlateRange.edges(at)
         const rangeRef = Editor.rangeRef(editor, at, {
           affinity: 'inward',
         })
@@ -800,8 +800,8 @@ export const NodeTransforms = {
       )
 
       for (const [, rootPath] of roots) {
-        const a = Range.isRange(at)
-          ? Range.intersection(at, Editor.range(editor, rootPath))
+        const a = SlateRange.isRange(at)
+          ? SlateRange.intersection(at, Editor.range(editor, rootPath))
           : at
 
         if (!a) {
@@ -845,18 +845,18 @@ export const NodeTransforms = {
  * Convert a range into a point by deleting it's content.
  */
 
-const deleteRange = (editor: Editor, range: Range): Point | null => {
-  if (Range.isCollapsed(range)) {
+const deleteRange = (editor: Editor, range: SlateRange): Point | null => {
+  if (SlateRange.isCollapsed(range)) {
     return range.anchor
   } else {
-    const [, end] = Range.edges(range)
+    const [, end] = SlateRange.edges(range)
     const pointRef = Editor.pointRef(editor, end)
     Transforms.delete(editor, { at: range })
     return pointRef.unref()
   }
 }
 
-const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
+const matchPath = (editor: Editor, path: Path): ((node: SlateNode) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }

@@ -1,10 +1,10 @@
-import { Node, Path, Range } from '..'
+import { SlateNode, Path, SlateRange } from '..'
 import isPlainObject from 'is-plain-object'
 
 export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
-  node: Node
+  node: SlateNode
   [key: string]: unknown
 }
 
@@ -20,7 +20,7 @@ export type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -34,7 +34,7 @@ export type MoveNodeOperation = {
 export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
-  node: Node
+  node: SlateNode
   [key: string]: unknown
 }
 
@@ -49,8 +49,8 @@ export type RemoveTextOperation = {
 export type SetNodeOperation = {
   type: 'set_node'
   path: Path
-  properties: Partial<Node>
-  newProperties: Partial<Node>
+  properties: Partial<SlateNode>
+  newProperties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -59,18 +59,18 @@ export type SetSelectionOperation =
       type: 'set_selection'
       [key: string]: unknown
       properties: null
-      newProperties: Range
+      newProperties: SlateRange
     }
   | {
       type: 'set_selection'
       [key: string]: unknown
-      properties: Partial<Range>
-      newProperties: Partial<Range>
+      properties: Partial<SlateRange>
+      newProperties: Partial<SlateRange>
     }
   | {
       type: 'set_selection'
       [key: string]: unknown
-      properties: Range
+      properties: SlateRange
       newProperties: null
     }
 
@@ -78,7 +78,7 @@ export type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: Partial<SlateNode>
   [key: string]: unknown
 }
 
@@ -123,7 +123,7 @@ export const Operation = {
 
     switch (value.type) {
       case 'insert_node':
-        return Path.isPath(value.path) && Node.isNode(value.node)
+        return Path.isPath(value.path) && SlateNode.isNode(value.node)
       case 'insert_text':
         return (
           typeof value.offset === 'number' &&
@@ -139,7 +139,7 @@ export const Operation = {
       case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
       case 'remove_node':
-        return Path.isPath(value.path) && Node.isNode(value.node)
+        return Path.isPath(value.path) && SlateNode.isNode(value.node)
       case 'remove_text':
         return (
           typeof value.offset === 'number' &&
@@ -154,8 +154,8 @@ export const Operation = {
         )
       case 'set_selection':
         return (
-          (value.properties === null && Range.isRange(value.newProperties)) ||
-          (value.newProperties === null && Range.isRange(value.properties)) ||
+          (value.properties === null && SlateRange.isRange(value.newProperties)) ||
+          (value.newProperties === null && SlateRange.isRange(value.properties)) ||
           (isPlainObject(value.properties) &&
             isPlainObject(value.newProperties))
         )
@@ -260,14 +260,14 @@ export const Operation = {
         if (properties == null) {
           return {
             ...op,
-            properties: newProperties as Range,
+            properties: newProperties as SlateRange,
             newProperties: null,
           }
         } else if (newProperties == null) {
           return {
             ...op,
             properties: null,
-            newProperties: properties as Range,
+            newProperties: properties as SlateRange,
           }
         } else {
           return { ...op, properties: newProperties, newProperties: properties }

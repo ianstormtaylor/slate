@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, SlateNode } from 'slate'
 import { withHistory } from 'slate-history'
 
 const withLayout = editor => {
@@ -18,7 +18,7 @@ const withLayout = editor => {
         Transforms.insertNodes(editor, paragraph, { at: path.concat(1) })
       }
 
-      for (const [child, childPath] of Node.children(editor, path)) {
+      for (const [child, childPath] of SlateNode.children(editor, path)) {
         const type = childPath[0] === 0 ? 'title' : 'paragraph'
 
         if (child.type !== type) {
@@ -34,7 +34,7 @@ const withLayout = editor => {
 }
 
 const ForcedLayoutExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),

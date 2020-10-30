@@ -7,14 +7,14 @@ import {
   Descendant,
   Element,
   Location,
-  Node,
+  SlateNode,
   NodeEntry,
   Operation,
   Path,
   PathRef,
   Point,
   PointRef,
-  Range,
+  SlateRange,
   RangeRef,
   Span,
   Text,
@@ -34,8 +34,8 @@ import { getWordDistance, getCharacterDistance } from '../utils/string'
  */
 
 export interface Editor {
-  children: Node[]
-  selection: Range | null
+  children: SlateNode[]
+  selection: SlateRange | null
   operations: Operation[]
   marks: Record<string, any> | null
   [key: string]: unknown
@@ -54,8 +54,8 @@ export interface Editor {
   deleteFragment: () => void
   getFragment: () => Descendant[]
   insertBreak: () => void
-  insertFragment: (fragment: Node[]) => void
-  insertNode: (node: Node) => void
+  insertFragment: (fragment: SlateNode[]) => void
+  insertNode: (node: SlateNode) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
 }
@@ -250,7 +250,7 @@ export const Editor = {
 
   fragment(editor: Editor, at: Location): Descendant[] {
     const range = Editor.range(editor, at)
-    const fragment = Node.fragment(editor, range)
+    const fragment = SlateNode.fragment(editor, range)
     return fragment
   },
   /**
@@ -295,7 +295,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertFragment(editor: Editor, fragment: Node[]): void {
+  insertFragment(editor: Editor, fragment: SlateNode[]): void {
     editor.insertFragment(fragment)
   },
 
@@ -305,7 +305,7 @@ export const Editor = {
    * If the selection is currently expanded, it will be deleted first.
    */
 
-  insertNode(editor: Editor, node: Node): void {
+  insertNode(editor: Editor, node: SlateNode): void {
     editor.insertNode(node)
   },
 
@@ -349,8 +349,8 @@ export const Editor = {
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
       (value.marks === null || isPlainObject(value.marks)) &&
-      (value.selection === null || Range.isRange(value.selection)) &&
-      Node.isNodeList(value.children) &&
+      (value.selection === null || SlateRange.isRange(value.selection)) &&
+      SlateNode.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
     )
   },
@@ -449,7 +449,7 @@ export const Editor = {
     } = {}
   ): NodeEntry<Text> {
     const path = Editor.path(editor, at, options)
-    const node = Node.leaf(editor, path)
+    const node = SlateNode.leaf(editor, path)
     return [node, path]
   },
 
@@ -457,7 +457,7 @@ export const Editor = {
    * Iterate through all of the levels at a location.
    */
 
-  *levels<T extends Node>(
+  *levels<T extends SlateNode>(
     editor: Editor,
     options: {
       at?: Location
@@ -480,7 +480,7 @@ export const Editor = {
     const levels: NodeEntry<T>[] = []
     const path = Editor.path(editor, at)
 
-    for (const [n, p] of Node.levels(editor, path)) {
+    for (const [n, p] of SlateNode.levels(editor, path)) {
       if (!match(n)) {
         continue
       }
@@ -514,7 +514,7 @@ export const Editor = {
       return marks
     }
 
-    if (Range.isExpanded(selection)) {
+    if (SlateRange.isExpanded(selection)) {
       const [match] = Editor.nodes(editor, { match: Text.isText })
 
       if (match) {
@@ -554,7 +554,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Node>(
+  next<T extends SlateNode>(
     editor: Editor,
     options: {
       at?: Location
@@ -604,7 +604,7 @@ export const Editor = {
     } = {}
   ): NodeEntry {
     const path = Editor.path(editor, at, options)
-    const node = Node.get(editor, path)
+    const node = SlateNode.get(editor, path)
     return [node, path]
   },
 
@@ -612,7 +612,7 @@ export const Editor = {
    * Iterate through all of the nodes in the Editor.
    */
 
-  *nodes<T extends Node>(
+  *nodes<T extends SlateNode>(
     editor: Editor,
     options: {
       at?: Location | Span
@@ -653,7 +653,7 @@ export const Editor = {
       to = reverse ? first : last
     }
 
-    const nodeEntries = Node.nodes(editor, {
+    const nodeEntries = SlateNode.nodes(editor, {
       reverse,
       from,
       to,
@@ -738,7 +738,7 @@ export const Editor = {
     }
 
     if (force) {
-      const allPaths = Array.from(Node.nodes(editor), ([, p]) => p)
+      const allPaths = Array.from(SlateNode.nodes(editor), ([, p]) => p)
       DIRTY_PATHS.set(editor, allPaths)
     }
 
@@ -799,19 +799,19 @@ export const Editor = {
 
     if (Path.isPath(at)) {
       if (edge === 'start') {
-        const [, firstPath] = Node.first(editor, at)
+        const [, firstPath] = SlateNode.first(editor, at)
         at = firstPath
       } else if (edge === 'end') {
-        const [, lastPath] = Node.last(editor, at)
+        const [, lastPath] = SlateNode.last(editor, at)
         at = lastPath
       }
     }
 
-    if (Range.isRange(at)) {
+    if (SlateRange.isRange(at)) {
       if (edge === 'start') {
-        at = Range.start(at)
+        at = SlateRange.start(at)
       } else if (edge === 'end') {
-        at = Range.end(at)
+        at = SlateRange.end(at)
       } else {
         at = Path.common(at.anchor.path, at.focus.path)
       }
@@ -890,14 +890,14 @@ export const Editor = {
       let path
 
       if (edge === 'end') {
-        const [, lastPath] = Node.last(editor, at)
+        const [, lastPath] = SlateNode.last(editor, at)
         path = lastPath
       } else {
-        const [, firstPath] = Node.first(editor, at)
+        const [, firstPath] = SlateNode.first(editor, at)
         path = firstPath
       }
 
-      const node = Node.get(editor, path)
+      const node = SlateNode.get(editor, path)
 
       if (!Text.isText(node)) {
         throw new Error(
@@ -908,8 +908,8 @@ export const Editor = {
       return { path, offset: edge === 'end' ? node.text.length : 0 }
     }
 
-    if (Range.isRange(at)) {
-      const [start, end] = Range.edges(at)
+    if (SlateRange.isRange(at)) {
+      const [start, end] = SlateRange.edges(at)
       return edge === 'start' ? start : end
     }
 
@@ -988,7 +988,7 @@ export const Editor = {
     }
 
     const range = Editor.range(editor, at)
-    const [start, end] = Range.edges(range)
+    const [start, end] = SlateRange.edges(range)
     const first = reverse ? end : start
     let string = ''
     let available = 0
@@ -1087,7 +1087,7 @@ export const Editor = {
    * Get the matching node in the branch of the document before a location.
    */
 
-  previous<T extends Node>(
+  previous<T extends SlateNode>(
     editor: Editor,
     options: {
       at?: Location
@@ -1135,8 +1135,8 @@ export const Editor = {
    * Get a range of a location.
    */
 
-  range(editor: Editor, at: Location, to?: Location): Range {
-    if (Range.isRange(at) && !to) {
+  range(editor: Editor, at: Location, to?: Location): SlateRange {
+    if (SlateRange.isRange(at) && !to) {
       return at
     }
 
@@ -1152,7 +1152,7 @@ export const Editor = {
 
   rangeRef(
     editor: Editor,
-    range: Range,
+    range: SlateRange,
     options: {
       affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
     } = {}
@@ -1219,7 +1219,7 @@ export const Editor = {
 
   string(editor: Editor, at: Location): string {
     const range = Editor.range(editor, at)
-    const [start, end] = Range.edges(range)
+    const [start, end] = SlateRange.edges(range)
     let text = ''
 
     for (const [node, path] of Editor.nodes(editor, {
@@ -1248,16 +1248,16 @@ export const Editor = {
 
   unhangRange(
     editor: Editor,
-    range: Range,
+    range: SlateRange,
     options: {
       voids?: boolean
     } = {}
-  ): Range {
+  ): SlateRange {
     const { voids = false } = options
-    let [start, end] = Range.edges(range)
+    let [start, end] = SlateRange.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (start.offset !== 0 || end.offset !== 0 || SlateRange.isCollapsed(range)) {
       return range
     }
 
@@ -1325,6 +1325,6 @@ export const Editor = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+type NodeMatch<T extends SlateNode> =
+  | ((node: SlateNode) => node is T)
+  | ((node: SlateNode) => boolean)
