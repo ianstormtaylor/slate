@@ -1,14 +1,14 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, Transforms, Text, createEditor, Node } from 'slate'
+import { Editor, Transforms, Text, createEditor, SlateNode } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
-import { Range } from 'slate'
+import {SlateRange} from 'slate'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -81,7 +81,7 @@ const HoveringToolbar = () => {
     if (
       !selection ||
       !ReactEditor.isFocused(editor) ||
-      Range.isCollapsed(selection) ||
+     SlateRange.isCollapsed(selection) ||
       Editor.string(editor, selection) === ''
     ) {
       el.removeAttribute('style')

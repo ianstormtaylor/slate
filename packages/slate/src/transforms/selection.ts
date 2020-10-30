@@ -1,4 +1,4 @@
-import { Editor, Location, Point, Range, Transforms } from '..'
+import { Editor, Location, Point, SlateRange, Transforms } from '..'
 
 export const SelectionTransforms = {
   /**
@@ -21,10 +21,10 @@ export const SelectionTransforms = {
     } else if (edge === 'focus') {
       Transforms.select(editor, selection.focus)
     } else if (edge === 'start') {
-      const [start] = Range.edges(selection)
+      const [start] = SlateRange.edges(selection)
       Transforms.select(editor, start)
     } else if (edge === 'end') {
-      const [, end] = Range.edges(selection)
+      const [, end] = SlateRange.edges(selection)
       Transforms.select(editor, end)
     }
   },
@@ -67,16 +67,16 @@ export const SelectionTransforms = {
     }
 
     if (edge === 'start') {
-      edge = Range.isBackward(selection) ? 'focus' : 'anchor'
+      edge = SlateRange.isBackward(selection) ? 'focus' : 'anchor'
     }
 
     if (edge === 'end') {
-      edge = Range.isBackward(selection) ? 'anchor' : 'focus'
+      edge = SlateRange.isBackward(selection) ? 'anchor' : 'focus'
     }
 
     const { anchor, focus } = selection
     const opts = { distance, unit }
-    const props: Partial<Range> = {}
+    const props: Partial<SlateRange> = {}
 
     if (edge == null || edge === 'anchor') {
       const point = reverse
@@ -114,7 +114,7 @@ export const SelectionTransforms = {
       return
     }
 
-    if (!Range.isRange(target)) {
+    if (!SlateRange.isRange(target)) {
       throw new Error(
         `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${JSON.stringify(
           target
@@ -148,11 +148,11 @@ export const SelectionTransforms = {
     }
 
     if (edge === 'start') {
-      edge = Range.isBackward(selection) ? 'focus' : 'anchor'
+      edge = SlateRange.isBackward(selection) ? 'focus' : 'anchor'
     }
 
     if (edge === 'end') {
-      edge = Range.isBackward(selection) ? 'anchor' : 'focus'
+      edge = SlateRange.isBackward(selection) ? 'anchor' : 'focus'
     }
 
     const { anchor, focus } = selection
@@ -167,10 +167,10 @@ export const SelectionTransforms = {
    * Set new properties on the selection.
    */
 
-  setSelection(editor: Editor, props: Partial<Range>) {
+  setSelection(editor: Editor, props: Partial<SlateRange>) {
     const { selection } = editor
-    const oldProps: Partial<Range> | null = {}
-    const newProps: Partial<Range> = {}
+    const oldProps: Partial<SlateRange> | null = {}
+    const newProps: Partial<SlateRange> = {}
 
     if (!selection) {
       return

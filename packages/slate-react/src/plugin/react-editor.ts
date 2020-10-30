@@ -1,4 +1,4 @@
-import { Editor, SlateNode, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, SlateNode, Path, Point, SlateRange, Transforms, Descendant } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -273,15 +273,15 @@ export const ReactEditor = {
    *
    * Notice: the returned range will always be ordinal regardless of the direction of Slate `range` due to DOM API limit.
    *
-   * there is no way to create a reverse DOM Range using Range.setStart/setEnd
+   * there is no way to create a reverse DOMSlateRange.usingSlateRange.setStart/setEnd
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
 
-  toDOMRange(editor: ReactEditor, range: Range): DOMRange {
+  toDOMRange(editor: ReactEditor, range: SlateRange): DOMRange {
     const { anchor, focus } = range
-    const isBackward = Range.isBackward(range)
+    const isBackward =SlateRange.isBackward(range)
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
-    const domFocus = Range.isCollapsed(range)
+    const domFocus =SlateRange.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
@@ -330,7 +330,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): Range {
+  findEventRange(editor: ReactEditor, event: any): SlateRange {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -424,7 +424,7 @@ export const ReactEditor = {
           el!.parentNode!.removeChild(el)
         })
 
-        // COMPAT: Edge has a bug where Range.prototype.toString() will
+        // COMPAT: Edge has a bug whereSlateRange.prototype.toString() will
         // convert \n into \r\n. The bug causes a loop when slate-react
         // attempts to reposition its cursor to match the native position. Use
         // textContent.length instead.
@@ -514,7 +514,7 @@ export const ReactEditor = {
   toSlateRange(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): Range {
+  ): SlateRange {
     const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(domRange)
 
     if (

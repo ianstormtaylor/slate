@@ -2,7 +2,7 @@ import { createDraft, finishDraft, isDraft } from 'immer'
 import {
   SlateNode,
   Editor,
-  Range,
+  SlateRange,
   Point,
   Text,
   Element,
@@ -30,7 +30,7 @@ export const GeneralTransforms = {
         parent.children.splice(index, 0, node)
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -46,7 +46,7 @@ export const GeneralTransforms = {
         node.text = before + text + after
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -75,7 +75,7 @@ export const GeneralTransforms = {
         parent.children.splice(index, 1)
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -110,7 +110,7 @@ export const GeneralTransforms = {
         newParent.children.splice(newIndex, 0, node)
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -127,7 +127,7 @@ export const GeneralTransforms = {
         // Transform all of the points in the value, but if the point was in the
         // node that was removed we need to update the range or remove it.
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             const result = Point.transform(point, op)
 
             if (selection != null && result != null) {
@@ -169,7 +169,7 @@ export const GeneralTransforms = {
         node.text = before + after
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -209,7 +209,7 @@ export const GeneralTransforms = {
         if (newProperties == null) {
           selection = newProperties
         } else if (selection == null) {
-          if (!Range.isRange(newProperties)) {
+          if (!SlateRange.isRange(newProperties)) {
             throw new Error(
               `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
                 newProperties
@@ -263,7 +263,7 @@ export const GeneralTransforms = {
         parent.children.splice(index + 1, 0, newNode)
 
         if (selection) {
-          for (const [point, key] of Range.points(selection)) {
+          for (const [point, key] of SlateRange.points(selection)) {
             selection[key] = Point.transform(point, op)!
           }
         }
@@ -276,7 +276,7 @@ export const GeneralTransforms = {
 
     if (selection) {
       editor.selection = isDraft(selection)
-        ? (finishDraft(selection) as Range)
+        ? (finishDraft(selection) as SlateRange)
         : selection
     } else {
       editor.selection = null

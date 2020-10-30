@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, SlateNode } from 'slate'
 import { Slate, Editable, useEditor, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
@@ -8,7 +8,7 @@ import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from '../components'
 
 const EditableVoidsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),
     []

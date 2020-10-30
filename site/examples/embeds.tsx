@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, SlateNode } from 'slate'
 import {
   Slate,
   Editable,
@@ -11,7 +11,7 @@ import {
 } from 'slate-react'
 
 const EmbedsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>

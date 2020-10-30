@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import { createEditor, Node } from 'slate'
+import { createEditor, SlateNode } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>

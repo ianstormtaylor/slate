@@ -1,5 +1,5 @@
 import React from 'react'
-import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
+import { Editor, SlateRange, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 
 import ElementComponent from './element'
 import TextComponent from './text'
@@ -13,12 +13,12 @@ import { RenderElementProps, RenderLeafProps } from './editable'
  */
 
 const Children = (props: {
-  decorate: (entry: NodeEntry) => Range[]
-  decorations: Range[]
+  decorate: (entry: NodeEntry) => SlateRange[]
+  decorations: SlateRange[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  selection: Range | null
+  selection: SlateRange | null
 }) => {
   const {
     decorate,
@@ -41,11 +41,11 @@ const Children = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
-    const sel = selection && Range.intersection(range, selection)
+    const sel = selection &&SlateRange.intersection(range, selection)
     const ds = decorate([n, p])
 
     for (const dec of decorations) {
-      const d = Range.intersection(dec, range)
+      const d =SlateRange.intersection(dec, range)
 
       if (d) {
         ds.push(d)

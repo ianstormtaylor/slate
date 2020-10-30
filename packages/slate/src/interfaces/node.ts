@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Editor, Element, ElementEntry, Path, Range, Text } from '..'
+import { Editor, Element, ElementEntry, Path, SlateRange, Text } from '..'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
@@ -188,7 +188,7 @@ export const SlateNode = {
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  fragment(root: SlateNode, range: Range): Descendant[] {
+  fragment(root: SlateNode, range: SlateRange): Descendant[] {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -198,14 +198,14 @@ export const SlateNode = {
     }
 
     const newRoot = produce(root, r => {
-      const [start, end] = Range.edges(range)
+      const [start, end] = SlateRange.edges(range)
       const nodeEntries = SlateNode.nodes(r, {
         reverse: true,
-        pass: ([, path]) => !Range.includes(range, path),
+        pass: ([, path]) => !SlateRange.includes(range, path),
       })
 
       for (const [, path] of nodeEntries) {
-        if (!Range.includes(range, path)) {
+        if (!SlateRange.includes(range, path)) {
           const parent = SlateNode.parent(r, path)
           const index = path[path.length - 1]
           parent.children.splice(index, 1)

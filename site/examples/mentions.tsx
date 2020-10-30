@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Node, Editor, Transforms, Range, createEditor } from 'slate'
+import { SlateNode, Editor, Transforms,  SlateRange, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -14,8 +14,8 @@ import { Portal } from '../components'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [value, setValue] = useState<Node[]>(initialValue)
-  const [target, setTarget] = useState<Range | undefined>()
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
+  const [target, setTarget] = useState<SlateRange | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -77,8 +77,8 @@ const MentionExample = () => {
         setValue(value)
         const { selection } = editor
 
-        if (selection && Range.isCollapsed(selection)) {
-          const [start] = Range.edges(selection)
+        if (selection &&SlateRange.isCollapsed(selection)) {
+          const [start] =SlateRange.edges(selection)
           const wordBefore = Editor.before(editor, start, { unit: 'word' })
           const before = wordBefore && Editor.before(editor, wordBefore)
           const beforeRange = before && Editor.range(editor, before, start)

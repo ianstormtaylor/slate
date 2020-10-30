@@ -1,10 +1,10 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Editor, Range, Point, Node, createEditor } from 'slate'
+import { Editor, SlateRange, Point, SlateNode, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<SlateNode[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -24,7 +24,7 @@ const withTables = editor => {
   editor.deleteBackward = unit => {
     const { selection } = editor
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (selection &&SlateRange.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
         match: n => n.type === 'table-cell',
       })
@@ -45,7 +45,7 @@ const withTables = editor => {
   editor.deleteForward = unit => {
     const { selection } = editor
 
-    if (selection && Range.isCollapsed(selection)) {
+    if (selection &&SlateRange.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
         match: n => n.type === 'table-cell',
       })

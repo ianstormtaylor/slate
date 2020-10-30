@@ -1,4 +1,4 @@
-import { Path, Point, Range } from '..'
+import { Path, Point, SlateRange } from '..'
 
 /**
  * The `Location` interface is a union of the ways to refer to a specific
@@ -9,7 +9,7 @@ import { Path, Point, Range } from '..'
  * converting between the different interfaces in their own code base.
  */
 
-export type Location = Path | Point | Range
+export type Location = Path | Point | SlateRange
 
 export const Location = {
   /**
@@ -17,7 +17,7 @@ export const Location = {
    */
 
   isLocation(value: any): value is Location {
-    return Path.isPath(value) || Point.isPoint(value) || Range.isRange(value)
+    return Path.isPath(value) || Point.isPoint(value) || SlateRange.isRange(value)
   },
 }
 

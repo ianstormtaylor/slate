@@ -7,7 +7,7 @@ import {
   Path,
   Text,
   Point,
-  Range,
+  SlateRange,
   Transforms,
 } from '..'
 
@@ -40,7 +40,7 @@ export const TextTransforms = {
         return
       }
 
-      if (Range.isRange(at) && Range.isCollapsed(at)) {
+      if (SlateRange.isRange(at) && SlateRange.isCollapsed(at)) {
         at = at.anchor
       }
 
@@ -65,7 +65,7 @@ export const TextTransforms = {
         return
       }
 
-      if (Range.isCollapsed(at)) {
+      if (SlateRange.isCollapsed(at)) {
         return
       }
 
@@ -73,7 +73,7 @@ export const TextTransforms = {
         at = Editor.unhangRange(editor, at, { voids })
       }
 
-      let [start, end] = Range.edges(at)
+      let [start, end] = SlateRange.edges(at)
       const startBlock = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
         at: start,
@@ -207,15 +207,15 @@ export const TextTransforms = {
 
       if (!at) {
         return
-      } else if (Range.isRange(at)) {
+      } else if (SlateRange.isRange(at)) {
         if (!hanging) {
           at = Editor.unhangRange(editor, at)
         }
 
-        if (Range.isCollapsed(at)) {
+        if (SlateRange.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const [, end] = Range.edges(at)
+          const [, end] = SlateRange.edges(at)
 
           if (!voids && Editor.void(editor, { at: end })) {
             return
@@ -423,11 +423,11 @@ export const TextTransforms = {
         at = Editor.range(editor, at)
       }
 
-      if (Range.isRange(at)) {
-        if (Range.isCollapsed(at)) {
+      if (SlateRange.isRange(at)) {
+        if (SlateRange.isCollapsed(at)) {
           at = at.anchor
         } else {
-          const end = Range.end(at)
+          const end = SlateRange.end(at)
 
           if (!voids && Editor.void(editor, { at: end })) {
             return

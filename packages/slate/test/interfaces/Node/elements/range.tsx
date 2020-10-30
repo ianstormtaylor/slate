@@ -1,5 +1,5 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
+import { SlateNode } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -14,7 +14,7 @@ export const input = (
 )
 export const test = value => {
   return Array.from(
-    Node.elements(value, {
+    SlateNode.elements(value, {
       range: {
         anchor: {
           path: [0, 1],

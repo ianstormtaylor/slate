@@ -21,7 +21,7 @@ const String = (props: {
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
   if (editor.isVoid(parent)) {
-    return <ZeroWidthString length={Node.string(parent).length} />
+    return <ZeroWidthString length={SlateNode.string(parent).length} />
   }
 
   // COMPAT: If this is the last text node in an empty block, render a zero-

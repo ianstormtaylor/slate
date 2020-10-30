@@ -1,4 +1,4 @@
-import { SlateNode, Ancestor, Editor, Range } from 'slate'
+import { SlateNode, Ancestor, Editor, SlateRange } from 'slate'
 
 import { Key } from './key'
 

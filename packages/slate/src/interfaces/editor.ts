@@ -14,7 +14,7 @@ import {
   PathRef,
   Point,
   PointRef,
-  Range,
+  SlateRange,
   RangeRef,
   Span,
   Text,
@@ -35,7 +35,7 @@ import { getWordDistance, getCharacterDistance } from '../utils/string'
 
 export interface Editor {
   children: SlateNode[]
-  selection: Range | null
+  selection: SlateRange | null
   operations: Operation[]
   marks: Record<string, any> | null
   [key: string]: unknown
@@ -349,7 +349,7 @@ export const Editor = {
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
       (value.marks === null || isPlainObject(value.marks)) &&
-      (value.selection === null || Range.isRange(value.selection)) &&
+      (value.selection === null || SlateRange.isRange(value.selection)) &&
       SlateNode.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
     )
@@ -514,7 +514,7 @@ export const Editor = {
       return marks
     }
 
-    if (Range.isExpanded(selection)) {
+    if (SlateRange.isExpanded(selection)) {
       const [match] = Editor.nodes(editor, { match: Text.isText })
 
       if (match) {
@@ -807,11 +807,11 @@ export const Editor = {
       }
     }
 
-    if (Range.isRange(at)) {
+    if (SlateRange.isRange(at)) {
       if (edge === 'start') {
-        at = Range.start(at)
+        at = SlateRange.start(at)
       } else if (edge === 'end') {
-        at = Range.end(at)
+        at = SlateRange.end(at)
       } else {
         at = Path.common(at.anchor.path, at.focus.path)
       }
@@ -908,8 +908,8 @@ export const Editor = {
       return { path, offset: edge === 'end' ? node.text.length : 0 }
     }
 
-    if (Range.isRange(at)) {
-      const [start, end] = Range.edges(at)
+    if (SlateRange.isRange(at)) {
+      const [start, end] = SlateRange.edges(at)
       return edge === 'start' ? start : end
     }
 
@@ -988,7 +988,7 @@ export const Editor = {
     }
 
     const range = Editor.range(editor, at)
-    const [start, end] = Range.edges(range)
+    const [start, end] = SlateRange.edges(range)
     const first = reverse ? end : start
     let string = ''
     let available = 0
@@ -1135,8 +1135,8 @@ export const Editor = {
    * Get a range of a location.
    */
 
-  range(editor: Editor, at: Location, to?: Location): Range {
-    if (Range.isRange(at) && !to) {
+  range(editor: Editor, at: Location, to?: Location): SlateRange {
+    if (SlateRange.isRange(at) && !to) {
       return at
     }
 
@@ -1152,7 +1152,7 @@ export const Editor = {
 
   rangeRef(
     editor: Editor,
-    range: Range,
+    range: SlateRange,
     options: {
       affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
     } = {}
@@ -1219,7 +1219,7 @@ export const Editor = {
 
   string(editor: Editor, at: Location): string {
     const range = Editor.range(editor, at)
-    const [start, end] = Range.edges(range)
+    const [start, end] = SlateRange.edges(range)
     let text = ''
 
     for (const [node, path] of Editor.nodes(editor, {
@@ -1248,16 +1248,16 @@ export const Editor = {
 
   unhangRange(
     editor: Editor,
-    range: Range,
+    range: SlateRange,
     options: {
       voids?: boolean
     } = {}
-  ): Range {
+  ): SlateRange {
     const { voids = false } = options
-    let [start, end] = Range.edges(range)
+    let [start, end] = SlateRange.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (start.offset !== 0 || end.offset !== 0 || SlateRange.isCollapsed(range)) {
       return range
     }
 

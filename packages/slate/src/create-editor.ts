@@ -8,7 +8,7 @@ import {
   Path,
   PathRef,
   PointRef,
-  Range,
+  SlateRange,
   RangeRef,
   Text,
   Transforms,
@@ -93,7 +93,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        if (SlateRange.isExpanded(selection)) {
           Transforms.setNodes(
             editor,
             { [key]: value },
@@ -114,7 +114,7 @@ export const createEditor = (): Editor => {
     deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
-      if (selection && Range.isCollapsed(selection)) {
+      if (selection && SlateRange.isCollapsed(selection)) {
         Transforms.delete(editor, { unit, reverse: true })
       }
     },
@@ -122,7 +122,7 @@ export const createEditor = (): Editor => {
     deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
-      if (selection && Range.isCollapsed(selection)) {
+      if (selection && SlateRange.isCollapsed(selection)) {
         Transforms.delete(editor, { unit })
       }
     },
@@ -130,7 +130,7 @@ export const createEditor = (): Editor => {
     deleteFragment: () => {
       const { selection } = editor
 
-      if (selection && Range.isExpanded(selection)) {
+      if (selection && SlateRange.isExpanded(selection)) {
         Transforms.delete(editor)
       }
     },
@@ -162,7 +162,7 @@ export const createEditor = (): Editor => {
       if (selection) {
         // If the cursor is at the end of an inline, move it outside of
         // the inline before inserting
-        if (Range.isCollapsed(selection)) {
+        if (SlateRange.isCollapsed(selection)) {
           const inline = Editor.above(editor, {
             match: n => Editor.isInline(editor, n),
             mode: 'highest',
@@ -285,7 +285,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        if (SlateRange.isExpanded(selection)) {
           Transforms.unsetNodes(editor, key, {
             match: Text.isText,
             split: true,

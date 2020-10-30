@@ -1,5 +1,5 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
+import { SlateNode } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -10,7 +10,7 @@ export const input = (
   </editor>
 )
 export const test = value => {
-  return Array.from(Node.ancestors(value, [0, 0], { reverse: true }))
+  return Array.from(SlateNode.ancestors(value, [0, 0], { reverse: true }))
 }
 export const output = [
   [input.children[0], [0]],

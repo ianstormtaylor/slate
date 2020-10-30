@@ -4,7 +4,7 @@ import {
   Element,
   NodeEntry,
   SlateNode,
-  Range,
+  SlateRange,
   Text,
   Transforms,
   Path,
@@ -85,7 +85,7 @@ export interface RenderLeafProps {
  */
 
 export type EditableProps = {
-  decorate?: (entry: NodeEntry) => Range[]
+  decorate?: (entry: NodeEntry) => SlateRange[]
   onDOMBeforeInput?: (event: Event) => void
   placeholder?: string
   readOnly?: boolean
@@ -171,7 +171,7 @@ export const Editable = (props: EditableProps) => {
       hasDomSelection &&
       hasDomSelectionInEditor &&
       selection &&
-      Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
+      SlateRange.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
     ) {
       return
     }
@@ -183,7 +183,7 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      if (Range.isBackward(selection!)) {
+      if (SlateRange.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
           newDomRange.endOffset,
@@ -269,7 +269,7 @@ export const Editable = (props: EditableProps) => {
           if (targetRange) {
             const range = ReactEditor.toSlateRange(editor, targetRange)
 
-            if (!selection || !Range.equals(selection, range)) {
+            if (!selection || !SlateRange.equals(selection, range)) {
               Transforms.select(editor, range)
             }
           }
@@ -279,7 +279,7 @@ export const Editable = (props: EditableProps) => {
         // a delete forward/backward command it should delete the selection.
         if (
           selection &&
-          Range.isExpanded(selection) &&
+         SlateRange.isExpanded(selection) &&
           type.startsWith('delete')
         ) {
           Editor.deleteFragment(editor)
@@ -653,7 +653,7 @@ export const Editable = (props: EditableProps) => {
               ReactEditor.setFragmentData(editor, event.clipboardData)
               const { selection } = editor
 
-              if (selection && Range.isExpanded(selection)) {
+              if (selection &&SlateRange.isExpanded(selection)) {
                 Editor.deleteFragment(editor)
               }
             }
@@ -823,7 +823,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isMoveBackward(nativeEvent)) {
                 event.preventDefault()
 
-                if (selection && Range.isCollapsed(selection)) {
+                if (selection &&SlateRange.isCollapsed(selection)) {
                   Transforms.move(editor, { reverse: true })
                 } else {
                   Transforms.collapse(editor, { edge: 'start' })
@@ -835,7 +835,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isMoveForward(nativeEvent)) {
                 event.preventDefault()
 
-                if (selection && Range.isCollapsed(selection)) {
+                if (selection &&SlateRange.isCollapsed(selection)) {
                   Transforms.move(editor)
                 } else {
                   Transforms.collapse(editor, { edge: 'end' })
@@ -880,7 +880,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteBackward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteBackward(editor)
@@ -892,7 +892,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteForward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteForward(editor)
@@ -904,7 +904,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteBackward(editor, { unit: 'line' })
@@ -916,7 +916,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteLineForward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteForward(editor, { unit: 'line' })
@@ -928,7 +928,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteBackward(editor, { unit: 'word' })
@@ -940,7 +940,7 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isDeleteWordForward(nativeEvent)) {
                   event.preventDefault()
 
-                  if (selection && Range.isExpanded(selection)) {
+                  if (selection &&SlateRange.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
                   } else {
                     Editor.deleteForward(editor, { unit: 'word' })

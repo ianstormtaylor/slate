@@ -1,5 +1,5 @@
 /** @jsx jsx  */
-import { Node } from 'slate'
+import { SlateNode } from 'slate'
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -10,6 +10,6 @@ export const input = (
   </editor>
 )
 export const test = value => {
-  return Node.get(value, [])
+  return SlateNode.get(value, [])
 }
 export const output = input

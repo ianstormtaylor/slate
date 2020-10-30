@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import {SlateRange} from 'slate'
 
 export const input = {
   range: {
@@ -23,6 +23,6 @@ export const input = {
   },
 }
 export const test = ({ range, another }) => {
-  return Range.equals(range, another)
+  return SlateRange.equals(range, another)
 }
 export const output = true

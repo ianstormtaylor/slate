@@ -2,7 +2,7 @@ import {
   Element,
   Descendant,
   SlateNode,
-  Range,
+  SlateRange,
   Text,
   Editor,
   createEditor as makeEditor,
@@ -148,7 +148,7 @@ export function createSelection(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Range {
+): SlateRange {
   const anchor: AnchorToken = children.find(c => c instanceof AnchorToken)
   const focus: FocusToken = children.find(c => c instanceof FocusToken)
 
@@ -223,10 +223,10 @@ export function createEditor(
   children: any[]
 ): Editor {
   const otherChildren: any[] = []
-  let selectionChild: Range | undefined
+  let selectionChild: SlateRange | undefined
 
   for (const child of children) {
-    if (Range.isRange(child)) {
+    if (SlateRange.isRange(child)) {
       selectionChild = child
     } else {
       otherChildren.push(child)
@@ -234,7 +234,7 @@ export function createEditor(
   }
 
   const descendants = resolveDescendants(otherChildren)
-  const selection: Partial<Range> = {}
+  const selection: Partial<SlateRange> = {}
   const editor = makeEditor()
   Object.assign(editor, attributes)
   editor.children = descendants
@@ -270,7 +270,7 @@ export function createEditor(
 
   if (selectionChild != null) {
     editor.selection = selectionChild
-  } else if (Range.isRange(selection)) {
+  } else if (SlateRange.isRange(selection)) {
     editor.selection = selection
   }
 
