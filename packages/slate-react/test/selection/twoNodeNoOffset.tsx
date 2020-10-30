@@ -3,15 +3,17 @@ import { DOMNode, SlateRangeDescription } from '../../src/utils/dom'
 import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 
-const mockNode1 = mock<DOMNode>()
-const mockNode2 = mock<DOMNode>()
+const anchorNode = mock<DOMNode>()
+anchorNode.nodeValue = "length" // length of 6
+
+const focusNode = mock<DOMNode>()
 
 // It appears it is not possible to mock a `Selection`, so we will instead mock the parts of the code that
 // Handle selections. This is not as high coverage, but at least we can test the behavior after getting a selection.
 export const selection: SlateRangeDescription = {
-  anchorNode: mockNode1,
+  anchorNode: anchorNode,
   anchorOffset: 0,
-  focusNode: mockNode2,
+  focusNode: focusNode,
   focusOffset: 0,
   isCollapsed: false,
 }
@@ -21,6 +23,8 @@ export const slateRangeSelection: SlateRange = {
   anchor: { path: [0], offset: 0 },
   focus: { path: [1], offset: 0 }
 }
+
+export const nextNodeEntry = [0, [1]]
 
 export const output = {
   anchor: { path: [0], offset: 0 },
