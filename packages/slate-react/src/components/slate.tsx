@@ -3,7 +3,7 @@ import { SlateNode } from 'slate'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
-import { EditorContext } from '../hooks/use-editor'
+import { EditorContext } from '../hooks/use-slate-static'
 import { SlateContext } from '../hooks/use-slate'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
