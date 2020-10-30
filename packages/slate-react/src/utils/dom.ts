@@ -2,17 +2,8 @@
  * Types.
  */
 
-// COMPAT: This is required to prevent TypeScript aliases from doing some very
-// weird things for Slate's types with the same name as globals. (2019/11/27)
-// https://github.com/microsoft/TypeScript/issues/35002
-// import DOMNode1 = globalThis.Node
-// import DOMComment1 = globalThis.Comment
-// import DOMElement1 = globalThis.Element
-// import DOMText1 = globalThis.Text
-// import DOMRange1 = globalThis.Range
-// import DOMSelection1 = globalThis.Selection
-// import DOMStaticRange1 = globalThis.StaticRange
-
+// The syntax `import DOMNode1 = globalThis.Node` does not work with the test runner, there may be a workaround but I cannot find it.
+// To fix it, I renamed the slate `Node` type to `SlateNode` and the slate `Range` type to `SlateRange` to avoid conflicting with the global type.
 type DOMNode = globalThis.Node
 type DOMComment = globalThis.Comment
 type DOMElement = globalThis.Element
