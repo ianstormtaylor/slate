@@ -154,8 +154,10 @@ export const Operation = {
         )
       case 'set_selection':
         return (
-          (value.properties === null && SlateRange.isRange(value.newProperties)) ||
-          (value.newProperties === null && SlateRange.isRange(value.properties)) ||
+          (value.properties === null &&
+            SlateRange.isRange(value.newProperties)) ||
+          (value.newProperties === null &&
+            SlateRange.isRange(value.properties)) ||
           (isPlainObject(value.properties) &&
             isPlainObject(value.newProperties))
         )

@@ -75,7 +75,7 @@ const wrapLink = (editor, url) => {
   }
 
   const { selection } = editor
-  const isCollapsed = selection &&SlateRange.isCollapsed(selection)
+  const isCollapsed = selection && SlateRange.isCollapsed(selection)
   const link = {
     type: 'link',
     url,

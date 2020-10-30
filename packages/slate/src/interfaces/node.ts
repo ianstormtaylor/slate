@@ -288,7 +288,9 @@ export const SlateNode = {
    */
 
   isNodeList(value: any): value is SlateNode[] {
-    return Array.isArray(value) && (value.length === 0 || SlateNode.isNode(value[0]))
+    return (
+      Array.isArray(value) && (value.length === 0 || SlateNode.isNode(value[0]))
+    )
   },
 
   /**

@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { SlateNode, Editor, Transforms,  SlateRange, createEditor } from 'slate'
+import { SlateNode, Editor, Transforms, SlateRange, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -77,8 +77,8 @@ const MentionExample = () => {
         setValue(value)
         const { selection } = editor
 
-        if (selection &&SlateRange.isCollapsed(selection)) {
-          const [start] =SlateRange.edges(selection)
+        if (selection && SlateRange.isCollapsed(selection)) {
+          const [start] = SlateRange.edges(selection)
           const wordBefore = Editor.before(editor, start, { unit: 'word' })
           const before = wordBefore && Editor.before(editor, wordBefore)
           const beforeRange = before && Editor.range(editor, before, start)

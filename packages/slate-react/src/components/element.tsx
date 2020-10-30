@@ -1,6 +1,12 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, SlateNode, SlateRange, NodeEntry, Element as SlateElement } from 'slate'
+import {
+  Editor,
+  SlateNode,
+  SlateRange,
+  NodeEntry,
+  Element as SlateElement,
+} from 'slate'
 
 import Text from './text'
 import Children from './children'
@@ -140,7 +146,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
-       SlateRange.equals(prev.selection, next.selection)))
+        SlateRange.equals(prev.selection, next.selection)))
   )
 })
 
@@ -167,7 +173,10 @@ export const DefaultElement = (props: RenderElementProps) => {
  * kept in order, and the odd case where they aren't is okay to re-render for.
  */
 
-const isRangeListEqual = (list: SlateRange[], another: SlateRange[]): boolean => {
+const isRangeListEqual = (
+  list: SlateRange[],
+  another: SlateRange[]
+): boolean => {
   if (list.length !== another.length) {
     return false
   }

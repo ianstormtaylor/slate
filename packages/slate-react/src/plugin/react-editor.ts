@@ -1,4 +1,12 @@
-import { Editor, SlateNode, Path, Point, SlateRange, Transforms, Descendant } from 'slate'
+import {
+  Editor,
+  SlateNode,
+  Path,
+  Point,
+  SlateRange,
+  Transforms,
+  Descendant,
+} from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -20,7 +28,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
-  SlateRangeDescription
+  SlateRangeDescription,
 } from '../utils/dom'
 
 /**
@@ -473,9 +481,10 @@ export const ReactEditor = {
   domRangeToSlateRangeDescription(
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): SlateRangeDescription {
-    const el = domRange instanceof Selection
-      ? domRange.anchorNode
-      : domRange.startContainer
+    const el =
+      domRange instanceof Selection
+        ? domRange.anchorNode
+        : domRange.startContainer
     let anchorNode
     let anchorOffset
     let focusNode
@@ -503,7 +512,7 @@ export const ReactEditor = {
       anchorOffset,
       focusNode,
       focusOffset,
-      isCollapsed
+      isCollapsed,
     }
   },
 
@@ -515,13 +524,15 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): SlateRange {
-    const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(domRange)
+    const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(
+      domRange
+    )
 
-    let anchorNode = slateRangeDescription.anchorNode
-    let anchorOffset = slateRangeDescription.anchorOffset
-    let focusNode = slateRangeDescription.focusNode
-    let focusOffset = slateRangeDescription.focusOffset
-    let isCollapsed = slateRangeDescription.isCollapsed
+    const anchorNode = slateRangeDescription.anchorNode
+    const anchorOffset = slateRangeDescription.anchorOffset
+    const focusNode = slateRangeDescription.focusNode
+    const focusOffset = slateRangeDescription.focusOffset
+    const isCollapsed = slateRangeDescription.isCollapsed
 
     if (
       anchorNode == null ||
@@ -558,5 +569,5 @@ export const ReactEditor = {
 
     return { anchor, focus }
   },
-  ...Editor
+  ...Editor,
 }

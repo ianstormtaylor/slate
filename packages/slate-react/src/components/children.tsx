@@ -1,5 +1,12 @@
 import React from 'react'
-import { Editor, SlateRange, Element, NodeEntry, Ancestor, Descendant } from 'slate'
+import {
+  Editor,
+  SlateRange,
+  Element,
+  NodeEntry,
+  Ancestor,
+  Descendant,
+} from 'slate'
 
 import ElementComponent from './element'
 import TextComponent from './text'
@@ -41,11 +48,11 @@ const Children = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
-    const sel = selection &&SlateRange.intersection(range, selection)
+    const sel = selection && SlateRange.intersection(range, selection)
     const ds = decorate([n, p])
 
     for (const dec of decorations) {
-      const d =SlateRange.intersection(dec, range)
+      const d = SlateRange.intersection(dec, range)
 
       if (d) {
         ds.push(d)

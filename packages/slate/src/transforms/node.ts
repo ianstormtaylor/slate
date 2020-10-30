@@ -714,7 +714,9 @@ export const NodeTransforms = {
         at = Editor.range(editor, at)
       }
 
-      const rangeRef = SlateRange.isRange(at) ? Editor.rangeRef(editor, at) : null
+      const rangeRef = SlateRange.isRange(at)
+        ? Editor.rangeRef(editor, at)
+        : null
       const matches = Editor.nodes(editor, { at, match, mode, voids })
       const pathRefs = Array.from(matches, ([, p]) => Editor.pathRef(editor, p))
 
@@ -856,7 +858,10 @@ const deleteRange = (editor: Editor, range: SlateRange): Point | null => {
   }
 }
 
-const matchPath = (editor: Editor, path: Path): ((node: SlateNode) => boolean) => {
+const matchPath = (
+  editor: Editor,
+  path: Path
+): ((node: SlateNode) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }

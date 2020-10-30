@@ -17,7 +17,9 @@ export const Location = {
    */
 
   isLocation(value: any): value is Location {
-    return Path.isPath(value) || Point.isPoint(value) || SlateRange.isRange(value)
+    return (
+      Path.isPath(value) || Point.isPoint(value) || SlateRange.isRange(value)
+    )
   },
 }
 

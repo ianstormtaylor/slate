@@ -24,7 +24,7 @@ const withTables = editor => {
   editor.deleteBackward = unit => {
     const { selection } = editor
 
-    if (selection &&SlateRange.isCollapsed(selection)) {
+    if (selection && SlateRange.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
         match: n => n.type === 'table-cell',
       })
@@ -45,7 +45,7 @@ const withTables = editor => {
   editor.deleteForward = unit => {
     const { selection } = editor
 
-    if (selection &&SlateRange.isCollapsed(selection)) {
+    if (selection && SlateRange.isCollapsed(selection)) {
       const [cell] = Editor.nodes(editor, {
         match: n => n.type === 'table-cell',
       })

@@ -1,6 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { SlateNode, Editor, Transforms, SlateRange, Point, createEditor } from 'slate'
+import {
+  SlateNode,
+  Editor,
+  Transforms,
+  SlateRange,
+  Point,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -41,7 +48,7 @@ const withShortcuts = editor => {
   editor.insertText = text => {
     const { selection } = editor
 
-    if (text === ' ' && selection &&SlateRange.isCollapsed(selection)) {
+    if (text === ' ' && selection && SlateRange.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
@@ -78,7 +85,7 @@ const withShortcuts = editor => {
   editor.deleteBackward = (...args) => {
     const { selection } = editor
 
-    if (selection &&SlateRange.isCollapsed(selection)) {
+    if (selection && SlateRange.isCollapsed(selection)) {
       const match = Editor.above(editor, {
         match: n => Editor.isBlock(editor, n),
       })

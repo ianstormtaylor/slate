@@ -1,4 +1,4 @@
-import {SlateRange} from 'slate'
+import { SlateRange } from 'slate'
 
 export const input = {
   anchor: {

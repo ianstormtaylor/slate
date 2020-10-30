@@ -5,7 +5,7 @@ import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
-import {SlateRange} from 'slate'
+import { SlateRange } from 'slate'
 
 const HoveringMenuExample = () => {
   const [value, setValue] = useState<SlateNode[]>(initialValue)
@@ -81,7 +81,7 @@ const HoveringToolbar = () => {
     if (
       !selection ||
       !ReactEditor.isFocused(editor) ||
-     SlateRange.isCollapsed(selection) ||
+      SlateRange.isCollapsed(selection) ||
       Editor.string(editor, selection) === ''
     ) {
       el.removeAttribute('style')
