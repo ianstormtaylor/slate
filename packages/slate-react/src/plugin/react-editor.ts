@@ -203,7 +203,7 @@ export const ReactEditor = {
    */
 
   toDOMNode(editor: ReactEditor, node: SlateNode): HTMLElement {
-    const domNode = Editor.isEditor(node)
+    const domNode = ReactEditor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
 
@@ -221,13 +221,13 @@ export const ReactEditor = {
    */
 
   toDOMPoint(editor: ReactEditor, point: Point): DOMPoint {
-    const [node] = Editor.node(editor, point.path)
+    const [node] = ReactEditor.node(editor, point.path)
     const el = ReactEditor.toDOMNode(editor, node)
     let domPoint: DOMPoint | undefined
 
     // If we're inside a void node, force the offset to 0, otherwise the zero
     // width spacing character will result in an incorrect offset of 1
-    if (Editor.void(editor, { at: point })) {
+    if (ReactEditor.void(editor, { at: point })) {
       point = { path: point.path, offset: 0 }
     }
 
@@ -279,9 +279,9 @@ export const ReactEditor = {
 
   toDOMRange(editor: ReactEditor, range: SlateRange): DOMRange {
     const { anchor, focus } = range
-    const isBackward =SlateRange.isBackward(range)
+    const isBackward = SlateRange.isBackward(range)
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
-    const domFocus =SlateRange.isCollapsed(range)
+    const domFocus = SlateRange.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
@@ -353,15 +353,15 @@ export const ReactEditor = {
         ? x - rect.left < rect.left + rect.width - x
         : y - rect.top < rect.top + rect.height - y
 
-      const edge = Editor.point(editor, path, {
+      const edge = ReactEditor.point(editor, path, {
         edge: isPrev ? 'start' : 'end',
       })
       const point = isPrev
-        ? Editor.before(editor, edge)
-        : Editor.after(editor, edge)
+        ? ReactEditor.before(editor, edge)
+        : ReactEditor.after(editor, edge)
 
       if (point) {
-        const range = Editor.range(editor, point)
+        const range = ReactEditor.range(editor, point)
         return range
       }
     }
@@ -517,31 +517,37 @@ export const ReactEditor = {
   ): SlateRange {
     const slateRangeDescription = ReactEditor.domRangeToSlateRangeDescription(domRange)
 
+    let anchorNode = slateRangeDescription.anchorNode
+    let anchorOffset = slateRangeDescription.anchorOffset
+    let focusNode = slateRangeDescription.focusNode
+    let focusOffset = slateRangeDescription.focusOffset
+    let isCollapsed = slateRangeDescription.isCollapsed
+
     if (
-      slateRangeDescription.anchorNode == null ||
-      slateRangeDescription.focusNode == null ||
-      slateRangeDescription.anchorOffset == null ||
-      slateRangeDescription.focusOffset == null
+      anchorNode == null ||
+      focusNode == null ||
+      anchorOffset == null ||
+      focusOffset == null
     ) {
       throw new Error(
         `Cannot resolve a Slate range from DOM range: ${domRange}`
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [slateRangeDescription.anchorNode, slateRangeDescription.anchorOffset])
+    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
     const focus = slateRangeDescription.isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [slateRangeDescription.focusNode, slateRangeDescription.focusOffset])
+      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
 
     // If the selection is at the very end of the anchor node, when the anchor and focus are not the same node.
     if (
-      !isCollapsed &&
-      anchorNode !== focusNode &&
+      !slateRangeDescription.isCollapsed &&
+      slateRangeDescription.anchorNode !== slateRangeDescription.focusNode &&
       anchorNode.nodeValue != null &&
       anchorNode.nodeValue.length === anchorOffset
     ) {
       // Get the next node
-      const newNodeEntry = Editor.next(editor, { at: anchor.path })
+      const newNodeEntry = ReactEditor.next(editor, { at: anchor.path })
 
       // If there is a next node, move anchor to the start of the next node
       if (newNodeEntry) {
@@ -552,4 +558,5 @@ export const ReactEditor = {
 
     return { anchor, focus }
   },
+  ...Editor
 }
