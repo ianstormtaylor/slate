@@ -1,11 +1,13 @@
 /** @jsx jsx */
-import { ReactEditor } from '../../src/plugin/react-editor'
-import { DOMSelection, DOMNode, SlateRangeDescription } from '../../src/utils/dom'
+import { DOMNode, SlateRangeDescription } from '../../src/utils/dom'
+import { SlateRange } from 'slate'
 import { mock } from 'jest-mock-extended'
 
 const mockNode1 = mock<DOMNode>()
 
-export const selection = {
+// It appears it is not possible to mock a `Selection`, so we will instead mock the parts of the code that
+// Handle selections. This is not as high coverage, but at least we can test the behavior after getting a selection.
+export const selection: SlateRangeDescription = {
   anchorNode: mockNode1,
   anchorOffset: 0,
   focusNode: mockNode1,
@@ -13,22 +15,10 @@ export const selection = {
   isCollapsed: false,
 }
 
-export const test = (inputSelection: DOMSelection) => {
-  // Create our mocks for the functions toSlateRange is dependent on
-  const mockToSlatePoint = jest.fn()
-    .mockReturnValueOnce({ path: [0], offset: 0 })
-    .mockReturnValueOnce({ path: [0], offset: 2 })
-
-  const mockDomRangeToSlateRangeDescription = jest.fn()
-    .mockReturnValue(inputSelection) // Our input will already be in the form we are expecting
-
-  const mockEditor = mock<ReactEditor>()
-
-  // replace dependancies with mocked implementations
-  ReactEditor.toSlatePoint = mockToSlatePoint
-  ReactEditor.domRangeToSlateRangeDescription = mockDomRangeToSlateRangeDescription
-
-  return ReactEditor.toSlateRange(mockEditor, inputSelection)
+// Here is the part that matters from the `selection` above, we will manually extract the information.
+export const slateRangeSelection: SlateRange = {
+  anchor: { path: [0], offset: 0 },
+  focus: { path: [0], offset: 2 }
 }
 
 export const output = {
