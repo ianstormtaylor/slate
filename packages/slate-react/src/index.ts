@@ -9,6 +9,7 @@ export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
 
 // Hooks
+export { useEditor } from './hooks/use-editor'
 export { useSlateStatic } from './hooks/use-slate-static'
 export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'
