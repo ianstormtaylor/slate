@@ -123,7 +123,7 @@ export const Path = {
    */
 
   hasPrevious(path: Path): boolean {
-    return path.length !== 0 && path[path.length - 1] > 0
+    return path[path.length - 1] > 0
   },
 
   /**
