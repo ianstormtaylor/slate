@@ -119,6 +119,14 @@ export const Path = {
   },
 
   /**
+   * Check if the path of previous sibling node exists
+   */
+
+  hasPrevious(path: Path): boolean {
+    return path[path.length - 1] > 0
+  },
+
+  /**
    * Check if a path is after another.
    */
 
