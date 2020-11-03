@@ -13,7 +13,7 @@ All transforms listed below support a parameter `options`. This includes options
 ```typescript
 interface NodeOptions {
   at?: Location
-  match?: (node: Node) => boolean
+  match?: (node: Node, path: Path) => boolean
   mode?: 'highest' | 'lowest'
   voids?: boolean
 }
