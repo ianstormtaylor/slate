@@ -127,14 +127,13 @@ export const Editor = {
     const anchor = Editor.point(editor, at, { edge: 'end' })
     const focus = Editor.end(editor, [])
     const range = { anchor, focus }
-    const { distance = 1, voids = false } = options
+    const { distance = 1 } = options
     let d = 0
     let target
 
     for (const p of Editor.positions(editor, {
       ...options,
       at: range,
-      voids,
     })) {
       if (d > distance) {
         break
@@ -166,7 +165,7 @@ export const Editor = {
     const anchor = Editor.start(editor, [])
     const focus = Editor.point(editor, at, { edge: 'start' })
     const range = { anchor, focus }
-    const { distance = 1, voids = false } = options
+    const { distance = 1 } = options
     let d = 0
     let target
 
@@ -174,7 +173,6 @@ export const Editor = {
       ...options,
       at: range,
       reverse: true,
-      voids,
     })) {
       if (d > distance) {
         break
@@ -1128,9 +1126,7 @@ export const Editor = {
 
     const pointBeforeLocation = Editor.before(editor, at, { voids })
 
-    const from = pointBeforeLocation && pointBeforeLocation.path
-
-    if (!from) {
+    if (!pointBeforeLocation) {
       return
     }
 
@@ -1138,7 +1134,7 @@ export const Editor = {
 
     // The search location is from the start of the document to the path of
     // the point before the location passed in
-    const span: Span = [from, to]
+    const span: Span = [pointBeforeLocation.path, to]
 
     if (Path.isPath(at) && at.length === 0) {
       throw new Error(`Cannot get the previous node from the root node!`)
