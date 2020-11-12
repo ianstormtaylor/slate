@@ -17,6 +17,7 @@ const LinkExample = () => {
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <LinkButton />
+        <RemoveLinkButton />
       </Toolbar>
       <Editable
         renderElement={props => <Element {...props} />}
@@ -116,6 +117,23 @@ const LinkButton = () => {
       }}
     >
       <Icon>link</Icon>
+    </Button>
+  )
+}
+
+const RemoveLinkButton = () => {
+  const editor = useSlate()
+
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor)
+        }
+      }}
+    >
+      <Icon>link_off</Icon>
     </Button>
   )
 }
