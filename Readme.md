@@ -131,7 +131,12 @@ If even that's not enough, you can always [read the source itself](./packages/sl
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://github.com/loveloki/slate-docs-cn): `v0.57.1`
+- [ ] [中文](https://rain120.github.io/athena/zh/slate/Introduction.html): `v0.59.0` WIP in `api`, `Concepts`
+  - [x] [**Walkthroughs**](https://rain120.github.io/athena/zh/slate/walkthroughs/01-installing-slate.html)
+  - [ ] [**Apis**](https://rain120.github.io/athena/zh/slate/api/locations.html)
+  - [ ] [**Concepts**](https://rain120.github.io/athena/zh/slate/concepts/01-interfaces.html)
+  - [x] [**FAQ**](https://rain120.github.io/athena/zh/slate/general/faq.html)
+  - [x] [**Resources**](https://rain120.github.io/athena/zh/slate/general/resources.html)
 
 If you're maintaining a translation, feel free to pull request it here!
 
