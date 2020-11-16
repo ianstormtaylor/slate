@@ -32,6 +32,9 @@
   <a href="./packages/slate/package.json">
     <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6">
   </a>
+  <a href="https://gitpod.io#https://github.com/ianstormtaylor/slate/">
+    <img src="https://img.shields.io/badge/Gitpod-Ready--to--Code-blue?logo=gitpod">
+  </a>
 </p>
 <br/>
 

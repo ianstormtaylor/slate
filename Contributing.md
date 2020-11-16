@@ -50,6 +50,18 @@ yarn install
 yarn build
 ```
 
+### Online one-click setup
+
+You can use Gitpod (an online IDE which is free for Open Source) for contributing. With a single click, it will launch a workspace and automatically: 
+
+- clone the slate repo.
+- install the dependencies.
+- run `yarn build && yarn start`.
+
+So that you can start straight away.
+
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io#https://github.com/ianstormtaylor/slate/)
+
 ## Running Examples
 
 To run the examples, start by building the monorepo as described in the [Repository Setup](#repository-setup) section.
