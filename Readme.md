@@ -131,9 +131,9 @@ If even that's not enough, you can always [read the source itself](./packages/sl
 
 There are also translations of the documentation into other languages:
 
-- [ ] [中文](https://rain120.github.io/athena/zh/slate/Introduction.html): `v0.59.0` WIP in `api`
+- [x] [中文](https://rain120.github.io/athena/zh/slate/Introduction.html): `v0.59.0` 
   - [x] [**Walkthroughs**](https://rain120.github.io/athena/zh/slate/walkthroughs/01-installing-slate.html)
-  - [ ] [**Apis**](https://rain120.github.io/athena/zh/slate/api/locations.html)
+  - [x] [**Apis**](https://rain120.github.io/athena/zh/slate/api/locations.html)
   - [x] [**Concepts**](https://rain120.github.io/athena/zh/slate/concepts/01-interfaces.html)
   - [x] [**FAQ**](https://rain120.github.io/athena/zh/slate/general/faq.html)
   - [x] [**Resources**](https://rain120.github.io/athena/zh/slate/general/resources.html)
