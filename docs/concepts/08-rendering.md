@@ -125,7 +125,7 @@ const MyEditor = () => {
 }
 
 const Toolbar = () => {
-  const editor = useSlate()
+  const editor = useState()
   return (
     <div>
       <Button active={isBoldActive(editor)}>B</Button>
