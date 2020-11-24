@@ -1,86 +1,120 @@
-import { Node, Path, Range } from '..'
+import { ExtendedType, Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
-export type InsertNodeOperation = {
+export type BaseInsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
-  [key: string]: unknown
 }
 
-export type InsertTextOperation = {
+export type InsertNodeOperation = ExtendedType<
+  'InsertNodeOperation',
+  BaseInsertNodeOperation
+>
+
+export type BaseInsertTextOperation = {
   type: 'insert_text'
   path: Path
   offset: number
   text: string
-  [key: string]: unknown
 }
 
-export type MergeNodeOperation = {
+export type InsertTextOperation = ExtendedType<
+  'InsertTextOperation',
+  BaseInsertTextOperation
+>
+
+export type BaseMergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
   properties: Partial<Node>
-  [key: string]: unknown
 }
 
-export type MoveNodeOperation = {
+export type MergeNodeOperation = ExtendedType<
+  'MergeNodeOperation',
+  BaseMergeNodeOperation
+>
+
+export type BaseMoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
-  [key: string]: unknown
 }
 
-export type RemoveNodeOperation = {
+export type MoveNodeOperation = ExtendedType<
+  'MoveNodeOperation',
+  BaseMoveNodeOperation
+>
+
+export type BaseRemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
-  [key: string]: unknown
 }
 
-export type RemoveTextOperation = {
+export type RemoveNodeOperation = ExtendedType<
+  'RemoveNodeOperation',
+  BaseRemoveNodeOperation
+>
+
+export type BaseRemoveTextOperation = {
   type: 'remove_text'
   path: Path
   offset: number
   text: string
-  [key: string]: unknown
 }
 
-export type SetNodeOperation = {
+export type RemoveTextOperation = ExtendedType<
+  'RemoveTextOperation',
+  BaseRemoveTextOperation
+>
+
+export type BaseSetNodeOperation = {
   type: 'set_node'
   path: Path
   properties: Partial<Node>
   newProperties: Partial<Node>
-  [key: string]: unknown
 }
 
-export type SetSelectionOperation =
+export type SetNodeOperation = ExtendedType<
+  'SetNodeOperation',
+  BaseSetNodeOperation
+>
+
+export type BaseSetSelectionOperation =
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: null
       newProperties: Range
     }
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: Partial<Range>
       newProperties: Partial<Range>
     }
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: Range
       newProperties: null
     }
 
-export type SplitNodeOperation = {
+export type SetSelectionOperation = ExtendedType<
+  'SetSelectionOperation',
+  BaseSetSelectionOperation
+>
+
+export type BaseSplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
   properties: Partial<Node>
-  [key: string]: unknown
 }
+
+export type SplitNodeOperation = ExtendedType<
+  'SplitNodeOperation',
+  BaseSplitNodeOperation
+>
 
 export type NodeOperation =
   | InsertNodeOperation
@@ -103,7 +137,16 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
 
 export type Operation = NodeOperation | SelectionOperation | TextOperation
 
-export const Operation = {
+export interface OperationInterface {
+  isNodeOperation: (value: any) => value is NodeOperation
+  isOperation: (value: any) => value is Operation
+  isOperationList: (value: any) => value is Operation[]
+  isSelectionOperation: (value: any) => value is SelectionOperation
+  isTextOperation: (value: any) => value is TextOperation
+  inverse: (op: Operation) => Operation
+}
+
+export const Operation: OperationInterface = {
   /**
    * Check of a value is a `NodeOperation` object.
    */

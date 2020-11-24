@@ -4,8 +4,7 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
-  Descendant,
-  Element,
+  ExtendedType,
   Location,
   Node,
   NodeEntry,
@@ -27,18 +26,23 @@ import {
   RANGE_REFS,
 } from '../utils/weak-maps'
 import { getWordDistance, getCharacterDistance } from '../utils/string'
+import { Descendant } from './node'
+import { Element } from './element'
+
+export type BaseSelection = Range | null
+
+export type Selection = ExtendedType<'Selection', BaseSelection>
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
  * by plugins that wish to add their own helpers and implement new behaviors.
  */
 
-export interface Editor {
-  children: Node[]
-  selection: Range | null
+export interface BaseEditor {
+  children: Descendant[]
+  selection: Selection
   operations: Operation[]
-  marks: Record<string, any> | null
-  [key: string]: unknown
+  marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -60,7 +64,208 @@ export interface Editor {
   removeMark: (key: string) => void
 }
 
-export const Editor = {
+export type Editor = ExtendedType<'Editor', BaseEditor>
+
+export interface EditorInterface {
+  above: <T extends Ancestor>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  addMark: (editor: Editor, key: string, value: any) => void
+  after: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    }
+  ) => Point | undefined
+  before: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+    }
+  ) => Point | undefined
+  deleteBackward: (
+    editor: Editor,
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
+  ) => void
+  deleteForward: (
+    editor: Editor,
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
+  ) => void
+  deleteFragment: (editor: Editor) => void
+  edges: (editor: Editor, at: Location) => [Point, Point]
+  end: (editor: Editor, at: Location) => Point
+  first: (editor: Editor, at: Location) => NodeEntry
+  fragment: (editor: Editor, at: Location) => Descendant[]
+  hasBlocks: (editor: Editor, element: Element) => boolean
+  hasInlines: (editor: Editor, element: Element) => boolean
+  hasTexts: (editor: Editor, element: Element) => boolean
+  insertBreak: (editor: Editor) => void
+  insertFragment: (editor: Editor, fragment: Node[]) => void
+  insertNode: (editor: Editor, node: Node) => void
+  insertText: (editor: Editor, text: string) => void
+  isBlock: (editor: Editor, value: any) => value is Element
+  isEditor: (value: any) => value is Editor
+  isEnd: (editor: Editor, point: Point, at: Location) => boolean
+  isEdge: (editor: Editor, point: Point, at: Location) => boolean
+  isEmpty: (editor: Editor, element: Element) => boolean
+  isInline: (editor: Editor, value: any) => value is Element
+  isNormalizing: (editor: Editor) => boolean
+  isStart: (editor: Editor, point: Point, at: Location) => boolean
+  isVoid: (editor: Editor, value: any) => value is Element
+  last: (editor: Editor, at: Location) => NodeEntry
+  leaf: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry<Text>
+  levels: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      reverse?: boolean
+      voids?: boolean
+    }
+  ) => Generator<NodeEntry<T>, void, undefined>
+  marks: (editor: Editor) => Omit<Text, 'text'> | null
+  next: <T extends Descendant>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  node: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry
+  nodes: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location | Span
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
+      reverse?: boolean
+      voids?: boolean
+    }
+  ) => Generator<NodeEntry<T>, void, undefined>
+  normalize: (
+    editor: Editor,
+    options?: {
+      force?: boolean
+    }
+  ) => void
+  parent: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry<Ancestor>
+  path: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => Path
+  pathRef: (
+    editor: Editor,
+    path: Path,
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
+  ) => PathRef
+  pathRefs: (editor: Editor) => Set<PathRef>
+  point: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      edge?: 'start' | 'end'
+    }
+  ) => Point
+  pointRef: (
+    editor: Editor,
+    point: Point,
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
+  ) => PointRef
+  pointRefs: (editor: Editor) => Set<PointRef>
+  positions: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+    }
+  ) => Generator<Point, void, undefined>
+  previous: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  range: (editor: Editor, at: Location, to?: Location) => Range
+  rangeRef: (
+    editor: Editor,
+    range: Range,
+    options?: {
+      affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
+    }
+  ) => RangeRef
+  rangeRefs: (editor: Editor) => Set<RangeRef>
+  removeMark: (editor: Editor, key: string) => void
+  start: (editor: Editor, at: Location) => Point
+  string: (editor: Editor, at: Location) => string
+  unhangRange: (
+    editor: Editor,
+    range: Range,
+    options?: {
+      voids?: boolean
+    }
+  ) => Range
+  void: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<Element> | undefined
+  withoutNormalizing: (editor: Editor, fn: () => void) => void
+}
+
+export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
    */
@@ -508,7 +713,7 @@ export const Editor = {
    * Get the marks that would be added to text at the current selection.
    */
 
-  marks(editor: Editor): Record<string, any> | null {
+  marks(editor: Editor): Omit<Text, 'text'> | null {
     const { marks, selection } = editor
 
     if (!selection) {
@@ -559,7 +764,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Node>(
+  next<T extends Descendant>(
     editor: Editor,
     options: {
       at?: Location
@@ -736,7 +941,7 @@ export const Editor = {
     options: {
       force?: boolean
     } = {}
-  ) {
+  ): void {
     const { force = false } = options
     const getDirtyPaths = (editor: Editor) => {
       return DIRTY_PATHS.get(editor) || []
