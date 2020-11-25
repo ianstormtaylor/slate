@@ -9,6 +9,7 @@ import {
   Transforms,
   Path,
 } from 'slate'
+import getDirection from 'direction'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -815,6 +816,8 @@ export const Editable = (props: EditableProps) => {
                 return
               }
 
+              const isRTL = getDirection(Node.string(element)) === 'rtl'
+              
               // COMPAT: If a void node is selected, or a zero-width text node
               // adjacent to an inline is selected, we need to handle these
               // hotkeys manually because browsers won't be able to skip over
@@ -824,7 +827,7 @@ export const Editable = (props: EditableProps) => {
                 event.preventDefault()
 
                 if (selection && Range.isCollapsed(selection)) {
-                  Transforms.move(editor, { reverse: true })
+                  Transforms.move(editor, { reverse: !isRTL })
                 } else {
                   Transforms.collapse(editor, { edge: 'start' })
                 }
@@ -836,7 +839,7 @@ export const Editable = (props: EditableProps) => {
                 event.preventDefault()
 
                 if (selection && Range.isCollapsed(selection)) {
-                  Transforms.move(editor)
+                  Transforms.move(editor, { reverse: isRTL })
                 } else {
                   Transforms.collapse(editor, { edge: 'end' })
                 }
@@ -846,13 +849,13 @@ export const Editable = (props: EditableProps) => {
 
               if (Hotkeys.isMoveWordBackward(nativeEvent)) {
                 event.preventDefault()
-                Transforms.move(editor, { unit: 'word', reverse: true })
+                Transforms.move(editor, { unit: 'word', reverse: !isRTL })
                 return
               }
 
               if (Hotkeys.isMoveWordForward(nativeEvent)) {
                 event.preventDefault()
-                Transforms.move(editor, { unit: 'word' })
+                Transforms.move(editor, { unit: 'word', reverse: isRTL })
                 return
               }
 
