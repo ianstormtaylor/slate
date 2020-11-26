@@ -4,7 +4,7 @@ import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import Children from './children'
-import { ReactEditor, useEditor, useReadOnly } from '..'
+import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -37,7 +37,7 @@ const Element = (props: {
     selection,
   } = props
   const ref = useRef<HTMLElement>(null)
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
@@ -150,7 +150,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
 
 export const DefaultElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const Tag = editor.isInline(element) ? 'span' : 'div'
   return (
     <Tag {...attributes} style={{ position: 'relative' }}>

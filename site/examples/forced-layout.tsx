@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, Node, Element as SlateElement } from 'slate'
 import { withHistory } from 'slate-history'
 
 const withLayout = editor => {
@@ -21,8 +21,9 @@ const withLayout = editor => {
       for (const [child, childPath] of Node.children(editor, path)) {
         const type = childPath[0] === 0 ? 'title' : 'paragraph'
 
-        if (child.type !== type) {
-          Transforms.setNodes(editor, { type }, { at: childPath })
+        if (SlateElement.isElement(child) && child.type !== type) {
+          const newProperties: Partial<SlateElement> = { type }
+          Transforms.setNodes(editor, newProperties, { at: childPath })
         }
       }
     }

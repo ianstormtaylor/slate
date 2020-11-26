@@ -237,7 +237,7 @@ export function createEditor(
   const selection: Partial<Range> = {}
   const editor = makeEditor()
   Object.assign(editor, attributes)
-  editor.children = descendants
+  editor.children = descendants as Element[]
 
   // Search the document's texts to see if any of them have tokens associated
   // that need incorporated into the selection.

@@ -4,6 +4,7 @@ import { ReactEditor } from '../plugin/react-editor'
 
 /**
  * A React context for sharing the editor object.
+ * @deprecated Use useSlateStatic instead.
  */
 
 export const EditorContext = createContext<ReactEditor | null>(null)
