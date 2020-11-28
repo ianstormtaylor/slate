@@ -1,6 +1,6 @@
 # Node
 
-The `Node` union type represents all of the different types of nodes that occur in a Slate document tree. 
+The `Node` union type represents all of the different types of nodes that occur in a Slate document tree.
 
 ```typescript
 type Node = Editor | Element | Text
@@ -57,7 +57,7 @@ Get the first node entry in a root node from a `path`.
 
 ###### `Node.fragment(root: Node, range: Range): Descendant[]`
 
-Get the sliced fragment represented by the  `range`.
+Get the sliced fragment represented by the `range`.
 
 ###### `Node.get(root: Node, path: Path): Node`
 
@@ -85,7 +85,7 @@ Get the node at a specific `path`, ensuring it's a leaf text node. If the node i
 
 ###### `Node.levels(root: Node, path: Path, options?): Generator<NodeEntry>`
 
-Return a generator of the nodes in a branch of the tree, from a specific `path`.  By default, the order is top-down, from the lowest to the highest node in the tree, but you can pass the `reverse: true` option to go bottom-up.
+Return a generator of the nodes in a branch of the tree, from a specific `path`. By default, the order is top-down, from the lowest to the highest node in the tree, but you can pass the `reverse: true` option to go bottom-up.
 
 Options: `{reverse?: boolean}`
 
@@ -236,8 +236,8 @@ Check if an element matches a set of `props`. Note: This checks custom propertie
 
 ```typescript
 interface Text {
-    text: string,
-    [key: string]: unknown
+  text: string
+  [key: string]: unknown
 }
 ```
 

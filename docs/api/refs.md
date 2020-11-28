@@ -8,9 +8,9 @@
 
 ```typescript
 interface PointRef {
-    current: Point | null
-    affinity: 'forward' | 'backward' | null
-    unref(): Point | null
+  current: Point | null
+  affinity: 'forward' | 'backward' | null
+  unref(): Point | null
 }
 ```
 
@@ -26,9 +26,9 @@ Transform the point refs current value by an `op`.
 
 ```typescript
 interface RangeRef {
-    current: Range | null
-    affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
-    unref(): Range | null
+  current: Range | null
+  affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
+  unref(): Range | null
 }
 ```
 

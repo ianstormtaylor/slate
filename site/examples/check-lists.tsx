@@ -7,12 +7,67 @@ import {
   useReadOnly,
   ReactEditor,
 } from 'slate-react'
-import { Node, Editor, Transforms, Range, Point, createEditor } from 'slate'
+import {
+  Node,
+  Editor,
+  Transforms,
+  Range,
+  Point,
+  createEditor,
+  Descendant,
+  Element as SlateElement,
+} from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
+const initialValue: Descendant[] = [
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
+      },
+    ],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Slide to the left.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Slide to the right.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: 'Criss-cross.' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: true,
+    children: [{ text: 'Criss-cross!' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: 'Cha cha real smooth…' }],
+  },
+  {
+    type: 'check-list-item',
+    checked: false,
+    children: [{ text: "Let's go to work!" }],
+  },
+  {
+    type: 'paragraph',
+    children: [{ text: 'Try it out for yourself!' }],
+  },
+]
+
 const CheckListsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
@@ -39,7 +94,10 @@ const withChecklists = editor => {
 
     if (selection && Range.isCollapsed(selection)) {
       const [match] = Editor.nodes(editor, {
-        match: n => n.type === 'check-list-item',
+        match: n =>
+          !Editor.isEditor(n) &&
+          SlateElement.isElement(n) &&
+          n.type === 'check-list-item',
       })
 
       if (match) {
@@ -47,11 +105,15 @@ const withChecklists = editor => {
         const start = Editor.start(editor, path)
 
         if (Point.equals(selection.anchor, start)) {
-          Transforms.setNodes(
-            editor,
-            { type: 'paragraph' },
-            { match: n => n.type === 'check-list-item' }
-          )
+          const newProperties: Partial<SlateElement> = {
+            type: 'paragraph',
+          }
+          Transforms.setNodes(editor, newProperties, {
+            match: n =>
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === 'check-list-item',
+          })
           return
         }
       }
@@ -102,11 +164,10 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           checked={checked}
           onChange={event => {
             const path = ReactEditor.findPath(editor, element)
-            Transforms.setNodes(
-              editor,
-              { checked: event.target.checked },
-              { at: path }
-            )
+            const newProperties: Partial<SlateElement> = {
+              checked: event.target.checked,
+            }
+            Transforms.setNodes(editor, newProperties, { at: path })
           }}
         />
       </span>
@@ -128,49 +189,5 @@ const CheckListItemElement = ({ attributes, children, element }) => {
     </div>
   )
 }
-
-const initialValue = [
-  {
-    children: [
-      {
-        text:
-          'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
-      },
-    ],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Slide to the left.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Slide to the right.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: 'Criss-cross.' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: true,
-    children: [{ text: 'Criss-cross!' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: 'Cha cha real smooth…' }],
-  },
-  {
-    type: 'check-list-item',
-    checked: false,
-    children: [{ text: "Let's go to work!" }],
-  },
-  {
-    children: [{ text: 'Try it out for yourself!' }],
-  },
-]
 
 export default CheckListsExample
