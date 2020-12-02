@@ -201,6 +201,8 @@ export const Editable = (props: EditableProps) => {
       const leafEl = newDomRange.startContainer.parentElement!
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
+        behavior: 'smooth',
+        block: 'nearest',
         boundary: el,
       })
     } else {

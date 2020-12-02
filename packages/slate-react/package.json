@@ -20,7 +20,7 @@
     "is-hotkey": "^0.1.6",
     "is-plain-object": "^3.0.0",
     "lodash": "^4.17.4",
-    "scroll-into-view-if-needed": "^2.2.20"
+    "scroll-into-view-if-needed": "^2.2.26"
   },
   "devDependencies": {
     "slate": "^0.59.0",
