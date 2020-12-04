@@ -1,5 +1,4 @@
 /** @jsx jsx */
-
 import { jsx } from 'slate-hyperscript'
 
 export const input = (
@@ -11,7 +10,6 @@ export const input = (
     </element>
   </editor>
 )
-
 export const output = {
   children: [
     {

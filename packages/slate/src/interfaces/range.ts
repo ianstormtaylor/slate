@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
-import { Operation, Path, Point, PointEntry } from '..'
+import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -8,13 +8,41 @@ import { Operation, Path, Point, PointEntry } from '..'
  * multiple nodes.
  */
 
-export interface Range {
+export interface BaseRange {
   anchor: Point
   focus: Point
-  [key: string]: unknown
 }
 
-export const Range = {
+export type Range = ExtendedType<'Range', BaseRange>
+
+export interface RangeInterface {
+  edges: (
+    range: Range,
+    options?: {
+      reverse?: boolean
+    }
+  ) => [Point, Point]
+  end: (range: Range) => Point
+  equals: (range: Range, another: Range) => boolean
+  includes: (range: Range, target: Path | Point | Range) => boolean
+  intersection: (range: Range, another: Range) => Range | null
+  isBackward: (range: Range) => boolean
+  isCollapsed: (range: Range) => boolean
+  isExpanded: (range: Range) => boolean
+  isForward: (range: Range) => boolean
+  isRange: (value: any) => value is Range
+  points: (range: Range) => Generator<PointEntry, void, undefined>
+  start: (range: Range) => Point
+  transform: (
+    range: Range,
+    op: Operation,
+    options?: {
+      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
+    }
+  ) => Range | null
+}
+
+export const Range: RangeInterface = {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
@@ -160,7 +188,7 @@ export const Range = {
    * Iterate through all of the point entries in a range.
    */
 
-  *points(range: Range): Iterable<PointEntry> {
+  *points(range: Range): Generator<PointEntry, void, undefined> {
     yield [range.anchor, 'anchor']
     yield [range.focus, 'focus']
   },
@@ -181,7 +209,9 @@ export const Range = {
   transform(
     range: Range,
     op: Operation,
-    options: { affinity: 'forward' | 'backward' | 'outward' | 'inward' | null }
+    options: {
+      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
+    } = {}
   ): Range | null {
     const { affinity = 'inward' } = options
     let affinityAnchor: 'forward' | 'backward' | null
