@@ -28,8 +28,10 @@ export const flushNativeEvents = (editor: Editor) => {
   NATIVE_OPERATIONS.set(editor, [])
 
   if (nativeOps) {
-    nativeOps.forEach(op => {
-      editor.apply(op)
+    Editor.withoutNormalizing(editor, () => {
+      nativeOps.forEach(op => {
+        editor.apply(op)
+      })
     })
   }
 }
