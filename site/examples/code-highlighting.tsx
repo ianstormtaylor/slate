@@ -125,7 +125,7 @@ const Leaf = ({ attributes, children, leaf }) => {
           leaf.tag ||
           leaf.constant ||
           leaf.symbol ||
-          leaf.attr - name ||
+          leaf['attr-name'] ||
           leaf.selector) &&
           css`
             color: #905;
@@ -138,7 +138,7 @@ const Leaf = ({ attributes, children, leaf }) => {
           css`
             color: #690;
           `}
-        ${(leaf.function || leaf.class - name) &&
+        ${(leaf.function || leaf['class-name']) &&
           css`
             color: #dd4a68;
           `}
