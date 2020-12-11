@@ -1266,12 +1266,6 @@ export const Editor = {
       match: n => Editor.isBlock(editor, n),
     })
 
-    // If last element is a void node, unhang range by including void node in range
-    if (Editor.isVoid(editor, endBlock[0])) {
-      end = { path: end.path, offset: 1 }
-      return { anchor: start, focus: end }
-    }
-
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }

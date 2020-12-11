@@ -70,7 +70,15 @@ export const TextTransforms = {
       }
 
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endBlock = Editor.above(editor, {
+          at: end,
+          match: n => Editor.isBlock(editor, n),
+        })
+
+        if (endBlock && !Editor.isVoid(editor, endBlock[0])) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       let [start, end] = Range.edges(at)
