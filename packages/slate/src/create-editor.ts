@@ -115,7 +115,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {
-        Transforms.delete(editor, { unit, reverse: true })
+        Transforms.deleteContent(editor, { unit, reverse: true })
       }
     },
 
@@ -123,7 +123,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {
-        Transforms.delete(editor, { unit })
+        Transforms.deleteContent(editor, { unit })
       }
     },
 
@@ -131,7 +131,7 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection && Range.isExpanded(selection)) {
-        Transforms.delete(editor)
+        Transforms.deleteContent(editor)
       }
     },
 
@@ -164,7 +164,7 @@ export const createEditor = (): Editor => {
         // the inline before inserting
         if (Range.isCollapsed(selection)) {
           const inline = Editor.above(editor, {
-            match: n => Editor.isInline(editor, n),
+            match: (n) => Editor.isInline(editor, n),
             mode: 'highest',
           })
 

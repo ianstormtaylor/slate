@@ -26,13 +26,13 @@ const SHORTCUTS = {
 
 const MarkdownShortcutsExample = () => {
   const [value, setValue] = useState<Node[]>(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props) => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={value} onChange={(value) => setValue(value)}>
       <Editable
         renderElement={renderElement}
         placeholder="Write some markdown..."
@@ -43,16 +43,16 @@ const MarkdownShortcutsExample = () => {
   )
 }
 
-const withShortcuts = editor => {
+const withShortcuts = (editor) => {
   const { deleteBackward, insertText } = editor
 
-  editor.insertText = text => {
+  editor.insertText = (text) => {
     const { selection } = editor
 
     if (text === ' ' && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: (n) => Editor.isBlock(editor, n),
       })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
@@ -62,18 +62,18 @@ const withShortcuts = editor => {
 
       if (type) {
         Transforms.select(editor, range)
-        Transforms.delete(editor)
+        Transforms.deleteContent(editor)
         const newProperties: Partial<SlateElement> = {
           type,
         }
         Transforms.setNodes(editor, newProperties, {
-          match: n => Editor.isBlock(editor, n),
+          match: (n) => Editor.isBlock(editor, n),
         })
 
         if (type === 'list-item') {
           const list = { type: 'bulleted-list', children: [] }
           Transforms.wrapNodes(editor, list, {
-            match: n =>
+            match: (n) =>
               !Editor.isEditor(n) &&
               SlateElement.isElement(n) &&
               n.type === 'list-item',
@@ -92,7 +92,7 @@ const withShortcuts = editor => {
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: (n) => Editor.isBlock(editor, n),
       })
 
       if (match) {
@@ -112,7 +112,7 @@ const withShortcuts = editor => {
 
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
-              match: n =>
+              match: (n) =>
                 !Editor.isEditor(n) &&
                 SlateElement.isElement(n) &&
                 n.type === 'bulleted-list',

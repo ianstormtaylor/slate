@@ -14,7 +14,7 @@ export const input = (
     </block>
   </editor>
 )
-export const test = editor => {
+export const test = (editor) => {
   return Editor.string(editor, [])
 }
 export const output = `onetwothreefour`

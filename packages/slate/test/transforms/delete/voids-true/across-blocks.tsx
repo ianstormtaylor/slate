@@ -18,8 +18,8 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
-  Transforms.delete(editor, { voids: true })
+export const run = (editor) => {
+  Transforms.deleteContent(editor, { voids: true })
 }
 export const output = (
   <editor>

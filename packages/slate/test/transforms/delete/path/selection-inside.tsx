@@ -13,8 +13,8 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
-  Transforms.delete(editor, { at: [1, 0] })
+export const run = (editor) => {
+  Transforms.deleteContent(editor, { at: [1, 0] })
 }
 export const output = (
   <editor>

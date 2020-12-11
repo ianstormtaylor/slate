@@ -8,8 +8,8 @@ export const input = (
     <block>two</block>
   </editor>
 )
-export const run = editor => {
-  Transforms.delete(editor, { at: [1] })
+export const run = (editor) => {
+  Transforms.deleteContent(editor, { at: [1] })
 }
 export const output = (
   <editor>
