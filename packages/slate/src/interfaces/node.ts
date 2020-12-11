@@ -1,14 +1,93 @@
 import { produce } from 'immer'
-import { Editor, Element, ElementEntry, Path, Range, Text } from '..'
+import { Editor, Path, Range, Text } from '..'
+import { Element, ElementEntry } from './element'
+import { ExtendedType } from './custom-types'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
  * occur in a Slate document tree.
  */
 
-export type Node = Editor | Element | Text
+export type BaseNode = Editor | Element | Text
+export type Node = ExtendedType<'Node', BaseNode>
 
-export const Node = {
+export interface NodeInterface {
+  ancestor: (root: Node, path: Path) => Ancestor
+  ancestors: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry<Ancestor>, void, undefined>
+  child: (root: Node, index: number) => Descendant
+  children: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  common: (root: Node, path: Path, another: Path) => NodeEntry
+  descendant: (root: Node, path: Path) => Descendant
+  descendants: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  elements: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<ElementEntry, void, undefined>
+  extractProps: (node: Node) => NodeProps
+  first: (root: Node, path: Path) => NodeEntry
+  fragment: (root: Node, range: Range) => Descendant[]
+  get: (root: Node, path: Path) => Node
+  has: (root: Node, path: Path) => boolean
+  isNode: (value: any) => value is Node
+  isNodeList: (value: any) => value is Node[]
+  last: (root: Node, path: Path) => NodeEntry
+  leaf: (root: Node, path: Path) => Text
+  levels: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry, void, undefined>
+  matches: (node: Node, props: Partial<Node>) => boolean
+  nodes: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (entry: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry, void, undefined>
+  parent: (root: Node, path: Path) => Ancestor
+  string: (node: Node) => string
+  texts: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry<Text>, void, undefined>
+}
+
+export const Node: NodeInterface = {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
@@ -165,6 +244,22 @@ export const Node = {
   },
 
   /**
+   * Extract props from a Node.
+   */
+
+  extractProps(node: Node): NodeProps {
+    if (Element.isAncestor(node)) {
+      const { children, ...properties } = node
+
+      return properties
+    } else {
+      const { text, ...properties } = node
+
+      return properties
+    }
+  },
+
+  /**
    * Get the first node entry in a root node from a path.
    */
 
@@ -222,7 +317,7 @@ export const Node = {
         }
       }
 
-      delete r.selection
+      if (Editor.isEditor(r)) delete r.selection
     })
 
     return newRoot.children
@@ -354,8 +449,12 @@ export const Node = {
 
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Element.isElement(node) && Element.matches(node, props)) ||
-      (Text.isText(node) && Text.matches(node, props))
+      (Element.isElement(node) &&
+        Element.isElementProps(props) &&
+        Element.matches(node, props)) ||
+      (Text.isText(node) &&
+        Text.isTextProps(props) &&
+        Text.matches(node, props))
     )
   },
 
@@ -516,3 +615,11 @@ export type Ancestor = Editor | Element
  */
 
 export type NodeEntry<T extends Node = Node> = [T, Path]
+
+/**
+ * Convenience type for returning the props of a node.
+ */
+export type NodeProps =
+  | Omit<Editor, 'children'>
+  | Omit<Element, 'children'>
+  | Omit<Text, 'text'>

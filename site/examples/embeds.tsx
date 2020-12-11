@@ -1,10 +1,10 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, Node, Element as SlateElement } from 'slate'
 import {
   Slate,
   Editable,
   withReact,
-  useEditor,
+  useSlateStatic,
   ReactEditor,
   useFocused,
   useSelected,
@@ -40,7 +40,7 @@ const Element = props => {
 }
 
 const VideoElement = ({ attributes, children, element }) => {
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const { url } = element
   return (
     <div {...attributes}>
@@ -67,7 +67,10 @@ const VideoElement = ({ attributes, children, element }) => {
           url={url}
           onChange={val => {
             const path = ReactEditor.findPath(editor, element)
-            Transforms.setNodes(editor, { url: val }, { at: path })
+            const newProperties: Partial<SlateElement> = {
+              url: val,
+            }
+            Transforms.setNodes(editor, newProperties, { at: path })
           }}
         />
       </div>
