@@ -495,6 +495,8 @@ export const Editable = (props: EditableProps) => {
           whiteSpace: 'pre-wrap',
           // Allow words to break if they are too long.
           wordWrap: 'break-word',
+          // Allow implementer to position absolutely against editor div
+          position: 'relative',
           // Allow for passed-in styles to override anything.
           ...style,
         }}
