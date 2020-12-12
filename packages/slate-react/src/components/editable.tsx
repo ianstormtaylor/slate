@@ -274,10 +274,12 @@ export const Editable = (props: EditableProps) => {
           type === 'insertText' &&
           selection &&
           Range.isCollapsed(selection) &&
-          // Only do it for single character events, for the simplest scenario,
-          // for now.
+          // Only do it for single character a-z or space for now.
+          // Long-press events (hold a + press 4 = ä) to choose a special character otherwise
+          // causes duplicate inserts.
           event.data &&
           event.data.length === 1 &&
+          /[a-z ]/i.test(event.data) &&
           // Chrome seems to have issues correctly editing the start of nodes.
           // I see this when there is an inline element, like a link, and you select
           // right after it (the start of the next node).
