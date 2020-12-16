@@ -83,6 +83,7 @@ export interface EditorInterface {
     options?: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     }
   ) => Point | undefined
   before: (
@@ -91,6 +92,7 @@ export interface EditorInterface {
     options?: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     }
   ) => Point | undefined
   deleteBackward: (
@@ -246,7 +248,13 @@ export interface EditorInterface {
   rangeRefs: (editor: Editor) => Set<RangeRef>
   removeMark: (editor: Editor, key: string) => void
   start: (editor: Editor, at: Location) => Point
-  string: (editor: Editor, at: Location) => string
+  string: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      voids?: boolean
+    }
+  ) => string
   unhangRange: (
     editor: Editor,
     range: Range,

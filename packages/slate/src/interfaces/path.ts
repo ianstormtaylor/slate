@@ -17,6 +17,7 @@ export interface PathInterface {
   endsAt: (path: Path, another: Path) => boolean
   endsBefore: (path: Path, another: Path) => boolean
   equals: (path: Path, another: Path) => boolean
+  hasPrevious: (path: Path) => boolean
   isAfter: (path: Path, another: Path) => boolean
   isAncestor: (path: Path, another: Path) => boolean
   isBefore: (path: Path, another: Path) => boolean
