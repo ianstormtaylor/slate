@@ -10,7 +10,6 @@ import {
   Path,
 } from 'slate'
 import throttle from 'lodash/throttle'
-import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
@@ -186,10 +185,7 @@ export const Editable = (props: EditableProps) => {
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollIntoView(leafEl, {
-        scrollMode: 'if-needed',
-        boundary: el,
-      })
+      scrollToRect(el, leafEl)
     }
 
     setTimeout(() => {
@@ -202,7 +198,31 @@ export const Editable = (props: EditableProps) => {
       state.isUpdatingSelection = false
     })
   })
+  // scroll to rect position
+  const scrollToRect = (editorEl: Element, leafEl: Element) => {
+    requestAnimationFrame(()=>{
+      const { selection } = editor
+      if (!selection) return
+      if (!Range.isCollapsed(selection)) return
+      const domSelection = ReactEditor.toDOMRange(editor, selection)
+      if(!domSelection)return
+      const selectionRect = domSelection.getBoundingClientRect()
+      const editorRect = editorEl.getBoundingClientRect()
+      const leafRect = leafEl.getBoundingClientRect()
+      if(selectionRect.bottom - editorRect.top > editorRect.height - 20 || 
+        selectionRect.bottom < editorRect.top
+      ){
+        let editorTop = leafEl.offsetTop + (selectionRect.top + leafRect.top)
+        if(editorEl.scrollTop > editorTop){
+          editorTop -= selectionRect.height
+        }else{
+          editorTop += selectionRect.height
+        }
+        editorEl.scrollTop = editorTop
+      }
+    })
 
+  }
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
   useEffect(() => {
