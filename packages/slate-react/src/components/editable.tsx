@@ -200,28 +200,28 @@ export const Editable = (props: EditableProps) => {
   })
   // scroll to rect position
   const scrollToRect = (editorEl: Element, leafEl: Element) => {
-    requestAnimationFrame(()=>{
+    requestAnimationFrame(() => {
       const { selection } = editor
       if (!selection) return
       if (!Range.isCollapsed(selection)) return
       const domSelection = ReactEditor.toDOMRange(editor, selection)
-      if(!domSelection)return
+      if (!domSelection) return
       const selectionRect = domSelection.getBoundingClientRect()
       const editorRect = editorEl.getBoundingClientRect()
       const leafRect = leafEl.getBoundingClientRect()
-      if(selectionRect.bottom - editorRect.top > editorRect.height - 20 || 
+      if (
+        selectionRect.bottom - editorRect.top > editorRect.height - 20 ||
         selectionRect.bottom < editorRect.top
-      ){
+      ) {
         let editorTop = leafEl.offsetTop + (selectionRect.top + leafRect.top)
-        if(editorEl.scrollTop > editorTop){
+        if (editorEl.scrollTop > editorTop) {
           editorTop -= selectionRect.height
-        }else{
+        } else {
           editorTop += selectionRect.height
         }
         editorEl.scrollTop = editorTop
       }
     })
-
   }
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
