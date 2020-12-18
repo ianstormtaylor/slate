@@ -185,7 +185,7 @@ export const Editable = (props: EditableProps) => {
     if (newDomRange) {
       domSelection.addRange(newDomRange!)
       const leafEl = newDomRange.startContainer.parentElement!
-      scrollToRect(el, leafEl)
+      scrollToCaret(el, leafEl)
     }
 
     setTimeout(() => {
@@ -198,8 +198,8 @@ export const Editable = (props: EditableProps) => {
       state.isUpdatingSelection = false
     })
   })
-  // scroll to rect position
-  const scrollToRect = (editorEl: Element, leafEl: Element) => {
+  // scroll to Caret position
+  const scrollToCaret = (editorEl: Element, leafEl: Element) => {
     requestAnimationFrame(() => {
       const { selection } = editor
       if (!selection) return
