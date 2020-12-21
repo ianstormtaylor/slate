@@ -16,10 +16,9 @@ _Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add sla
 
 Once you've installed Slate, you'll need to import it.
 
-
 ```jsx
 // Import React dependencies.
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react'
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -70,7 +69,11 @@ const App = () => {
   const [value, setValue] = useState([])
   // Render the Slate context.
   return (
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)} />
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    />
   )
 }
 ```
@@ -89,7 +92,11 @@ const App = () => {
   const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )
@@ -114,7 +121,11 @@ const App = () => {
   ])
 
   return (
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )

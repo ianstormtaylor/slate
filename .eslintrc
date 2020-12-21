@@ -5,7 +5,12 @@
     "prettier/@typescript-eslint",
     "prettier/react"
   ],
-  "plugins": ["@typescript-eslint", "import", "react", "prettier"],
+  "plugins": [
+    "@typescript-eslint",
+    "import",
+    "react",
+    "prettier"
+  ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
@@ -16,7 +21,12 @@
   },
   "ignorePatterns": ["**/next-env.d.ts"],
   "settings": {
-    "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
+    "import/extensions": [
+      ".js",
+      ".ts",
+      ".jsx",
+      ".tsx"
+    ],
     "react": {
       "version": "detect"
     }
@@ -29,8 +39,16 @@
   },
   "rules": {
     "constructor-super": "error",
-    "dot-notation": ["error", { "allowKeywords": true }],
-    "eqeqeq": ["error", "smart"],
+    "dot-notation": [
+      "error",
+      {
+        "allowKeywords": true
+      }
+    ],
+    "eqeqeq": [
+      "error",
+      "smart"
+    ],
     "import/default": "error",
     "import/export": "error",
     "import/first": "error",
@@ -40,7 +58,9 @@
     "import/no-deprecated": "error",
     "import/no-extraneous-dependencies": [
       "error",
-      { "peerDependencies": true }
+      {
+        "peerDependencies": true
+      }
     ],
     "import/no-mutable-exports": "error",
     "import/no-named-as-default": "error",
@@ -86,18 +106,27 @@
     "no-var": "error",
     "no-void": "error",
     "no-with": "error",
-    "object-shorthand": ["error", "always"],
+    "object-shorthand": [
+      "error",
+      "always"
+    ],
     "prefer-arrow-callback": "error",
     "prefer-const": [
       "error",
-      { "destructuring": "all", "ignoreReadBeforeAssign": true }
+      {
+        "destructuring": "all",
+        "ignoreReadBeforeAssign": true
+      }
     ],
     "prefer-rest-params": "error",
     "prefer-spread": "error",
     "prefer-template": "error",
     "prettier/prettier": "error",
     "radix": "error",
-    "react/jsx-boolean-value": ["error", "never"],
+    "react/jsx-boolean-value": [
+      "error",
+      "never"
+    ],
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-undef": "error",
@@ -112,15 +141,34 @@
     "react/react-in-jsx-scope": "error",
     "react/self-closing-comp": "error",
     "react/sort-prop-types": "error",
-    "spaced-comment": ["error", "always", { "exceptions": ["-"] }],
+    "spaced-comment": [
+      "error",
+      "always",
+      {
+        "exceptions": [
+          "-"
+        ]
+      }
+    ],
     "use-isnan": "error",
     "valid-jsdoc": [
       "error",
-      { "prefer": { "return": "returns" }, "requireReturn": false }
+      {
+        "prefer": {
+          "return": "returns"
+        },
+        "requireReturn": false
+      }
     ],
     "valid-typeof": "error",
-    "yield-star-spacing": ["error", "after"],
-    "yoda": ["error", "never"]
+    "yield-star-spacing": [
+      "error",
+      "after"
+    ],
+    "yoda": [
+      "error",
+      "never"
+    ]
   },
   "overrides": [
     {

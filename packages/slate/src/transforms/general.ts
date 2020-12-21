@@ -13,12 +13,16 @@ import {
   Ancestor,
 } from '..'
 
-export const GeneralTransforms = {
+export interface GeneralTransforms {
+  transform: (editor: Editor, op: Operation) => void
+}
+
+export const GeneralTransforms: GeneralTransforms = {
   /**
    * Transform the editor by an operation.
    */
 
-  transform(editor: Editor, op: Operation) {
+  transform(editor: Editor, op: Operation): void {
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)
 
@@ -272,7 +276,7 @@ export const GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Node[]
+    editor.children = finishDraft(editor.children)
 
     if (selection) {
       editor.selection = isDraft(selection)
