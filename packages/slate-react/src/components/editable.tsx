@@ -9,6 +9,7 @@ import {
   Transforms,
   Path,
 } from 'slate'
+import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 
 import Children from './children'
@@ -178,14 +179,29 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
-    domSelection.removeAllRanges()
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      domSelection.addRange(newDomRange!)
+      if (Range.isBackward(selection!)) {
+        domSelection.setBaseAndExtent(
+          newDomRange.endContainer,
+          newDomRange.endOffset,
+          newDomRange.startContainer,
+          newDomRange.startOffset
+        )
+      } else {
+        domSelection.setBaseAndExtent(
+          newDomRange.startContainer,
+          newDomRange.startOffset,
+          newDomRange.endContainer,
+          newDomRange.endOffset
+        )
+      }
       const leafEl = newDomRange.startContainer.parentElement!
       scrollToCaret(el, leafEl)
+    } else {
+      domSelection.removeAllRanges()
     }
 
     setTimeout(() => {
@@ -369,7 +385,7 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    [readOnly]
+    [readOnly, propsOnDOMBeforeInput]
   )
 
   // Attach a native DOM event handler for `beforeinput` events, because React's
@@ -771,7 +787,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isRedo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.redo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.redo()
                 }
 
@@ -781,7 +797,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isUndo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.undo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.undo()
                 }
 
