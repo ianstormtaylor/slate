@@ -70,7 +70,7 @@ export const createEditor = (): Editor => {
 
       DIRTY_PATHS.set(editor, dirtyPaths)
       Transforms.transform(editor, op)
-      editor.operations.push(op)
+      editor.operations = [...editor.operations, op]
       Editor.normalize(editor)
 
       // Clear any formats applied to the cursor if the selection changes.
