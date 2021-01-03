@@ -87,7 +87,7 @@ If even that's not enough, you can always [read the source itself](https://githu
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://doodlewind.github.io/slate-doc-cn/)
+- [中文](https://www.yuque.com/jacob.lcs/slatejs)
 
 If you're maintaining a translation, feel free to pull request it here!
 
