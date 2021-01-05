@@ -487,11 +487,15 @@ export const NodeTransforms: NodeTransforms = {
           editor.apply({ type: 'move_node', path, newPath })
         }
 
-        if (Path.isSibling(newPath, path) && Path.isAfter(newPath, path)) {
+        if (
+          toRef.current &&
+          Path.isSibling(newPath, path) &&
+          Path.isAfter(newPath, path)
+        ) {
           // When performing a sibling move to a later index, the path at the destination is shifted
           // to before the insertion point instead of after. To ensure our group of nodes are inserted
           // in the correct order we increment toRef to account for that
-          toRef.current = Path.next(toRef.current!)
+          toRef.current = Path.next(toRef.current)
         }
       }
 
