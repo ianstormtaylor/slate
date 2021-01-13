@@ -197,7 +197,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
           const value = newProperties[key]
 
-          if (value == null) {
+          if (value === undefined) {
             delete node[key]
           } else {
             node[key] = value

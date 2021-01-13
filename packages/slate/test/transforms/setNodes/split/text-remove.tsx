@@ -5,7 +5,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Transforms.setNodes(
     editor,
-    { key: null },
+    { key: undefined },
     { match: Text.isText, split: true }
   )
 }
