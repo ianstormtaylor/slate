@@ -1,16 +1,10 @@
-import { createContext, useContext } from 'react'
+import { useContext } from 'react'
 
-import { ReactEditor } from '../plugin/react-editor'
-
-/**
- * A React context for sharing the editor object.
- * @deprecated Use useSlateStatic instead.
- */
-
-export const EditorContext = createContext<ReactEditor | null>(null)
+import { EditorContext } from './use-slate-static'
 
 /**
  * Get the current editor object from the React context.
+ * @deprecated Use useSlateStatic instead.
  */
 
 export const useEditor = () => {
