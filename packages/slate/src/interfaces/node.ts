@@ -488,7 +488,7 @@ export const Node: NodeInterface = {
         yield [n, p]
       }
 
-      // If we're allowed to go downward and we haven't decsended yet, do.
+      // If we're allowed to go downward and we haven't descended yet, do.
       if (
         !visited.has(n) &&
         !Text.isText(n) &&
