@@ -109,7 +109,7 @@ for (const [node, path] of Editor.nodes(editor, { at: range })) {
 }
 
 // Iterate over every point in every text node in the current selection.
-for (const [point] of Editor.positions(editor)) {
+for (const point of Editor.positions(editor)) {
   // ...
 }
 ```
