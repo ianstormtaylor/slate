@@ -88,14 +88,24 @@ yarn release:latest
 
 And follow the prompts Lerna gives you.
 
+Note that this will automatically run the prelease script first that will build, test and lint before attempting to publish.
+
+## Publishing `@next` Releases
+
 If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
 
 ```shell
 yarn release:next
 ```
 
-If we want to make sure that Slate code follows the prerequisites for a release but without actually publishing, run:
+And follow the prompts Lerna gives you.
+
+## Running Prerelease Script
+
+If we want to make sure that Slate code follows the preparations for a release but without actually publishing, run:
 
 ```shell
 yarn prerelease
 ```
+
+Which will build, test and lint Slate code.
