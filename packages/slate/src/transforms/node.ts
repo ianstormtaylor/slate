@@ -11,109 +11,110 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
+import { NodeMatch } from '../interfaces/editor'
 
 export interface NodeTransforms {
-  insertNodes: (
+  insertNodes: <T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
       voids?: boolean
     }
   ) => void
-  liftNodes: (
+  liftNodes: <T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     }
   ) => void
-  mergeNodes: (
+  mergeNodes: <T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     }
   ) => void
-  moveNodes: (
+  moveNodes: <T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
     }
   ) => void
-  removeNodes: (
+  removeNodes: <T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
     }
   ) => void
-  setNodes: (
+  setNodes: <T extends Node>(
     editor: Editor,
     props: Partial<Node>,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
       voids?: boolean
     }
   ) => void
-  splitNodes: (
+  splitNodes: <T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
       voids?: boolean
     }
   ) => void
-  unsetNodes: (
+  unsetNodes: <T extends Node>(
     editor: Editor,
     props: string | string[],
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
   ) => void
-  unwrapNodes: (
+  unwrapNodes: <T extends Node>(
     editor: Editor,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
     }
   ) => void
-  wrapNodes: (
+  wrapNodes: <T extends Node>(
     editor: Editor,
     element: Element,
     options?: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -126,12 +127,12 @@ export const NodeTransforms: NodeTransforms = {
    * Insert nodes at a specific location in the Editor.
    */
 
-  insertNodes(
+  insertNodes<T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -189,11 +190,11 @@ export const NodeTransforms: NodeTransforms = {
       if (Point.isPoint(at)) {
         if (match == null) {
           if (Text.isText(node)) {
-            match = n => Text.isText(n)
+            match = (n) => Text.isText(n)
           } else if (editor.isInline(node)) {
-            match = n => Text.isText(n) || Editor.isInline(editor, n)
+            match = (n) => Text.isText(n) || Editor.isInline(editor, n)
           } else {
-            match = n => Editor.isBlock(editor, n)
+            match = (n) => Editor.isBlock(editor, n)
           }
         }
 
@@ -244,11 +245,11 @@ export const NodeTransforms: NodeTransforms = {
    * their parent in two if necessary.
    */
 
-  liftNodes(
+  liftNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -260,7 +261,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : (n) => Editor.isBlock(editor, n)
       }
 
       if (!at) {
@@ -308,11 +309,11 @@ export const NodeTransforms: NodeTransforms = {
    * removing any empty containing nodes after the merge if necessary.
    */
 
-  mergeNodes(
+  mergeNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -329,9 +330,9 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          match = n => parent.children.includes(n)
+          match = (n) => parent.children.includes(n)
         } else {
-          match = n => Editor.isBlock(editor, n)
+          match = (n) => Editor.isBlock(editor, n)
         }
       }
 
@@ -380,7 +381,7 @@ export const NodeTransforms: NodeTransforms = {
       const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
-        match: n =>
+        match: (n) =>
           levels.includes(n) && Element.isElement(n) && n.children.length === 1,
       })
 
@@ -446,11 +447,11 @@ export const NodeTransforms: NodeTransforms = {
    * Move the nodes at a location to a new location.
    */
 
-  moveNodes(
+  moveNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -472,7 +473,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : (n) => Editor.isBlock(editor, n)
       }
 
       const toRef = Editor.pathRef(editor, to)
@@ -496,11 +497,11 @@ export const NodeTransforms: NodeTransforms = {
    * Remove the nodes at a specific location in the document.
    */
 
-  removeNodes(
+  removeNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -517,7 +518,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : (n) => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -542,12 +543,12 @@ export const NodeTransforms: NodeTransforms = {
    * Set new properties on the nodes at a location.
    */
 
-  setNodes(
+  setNodes<T extends Node>(
     editor: Editor,
     props: Partial<Node>,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -570,7 +571,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : (n) => Editor.isBlock(editor, n)
       }
 
       if (!hanging && Range.isRange(at)) {
@@ -641,11 +642,11 @@ export const NodeTransforms: NodeTransforms = {
    * Split the nodes at a specific location.
    */
 
-  splitNodes(
+  splitNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -657,7 +658,7 @@ export const NodeTransforms: NodeTransforms = {
       let { match, at = editor.selection, height = 0, always = false } = options
 
       if (match == null) {
-        match = n => Editor.isBlock(editor, n)
+        match = (n) => Editor.isBlock(editor, n)
       }
 
       if (Range.isRange(at)) {
@@ -670,7 +671,7 @@ export const NodeTransforms: NodeTransforms = {
         const path = at
         const point = Editor.point(editor, path)
         const [parent] = Editor.parent(editor, path)
-        match = n => n === parent
+        match = (n) => n === parent
         height = point.path.length - path.length + 1
         at = point
         always = true
@@ -766,12 +767,12 @@ export const NodeTransforms: NodeTransforms = {
    * Unset properties on the nodes at a location.
    */
 
-  unsetNodes(
+  unsetNodes<T extends Node>(
     editor: Editor,
     props: string | string[],
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -795,11 +796,11 @@ export const NodeTransforms: NodeTransforms = {
    * necessary to ensure that only the content in the range is unwrapped.
    */
 
-  unwrapNodes(
+  unwrapNodes<T extends Node>(
     editor: Editor,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -816,7 +817,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         match = Path.isPath(at)
           ? matchPath(editor, at)
-          : n => Editor.isBlock(editor, n)
+          : (n) => Editor.isBlock(editor, n)
       }
 
       if (Path.isPath(at)) {
@@ -838,7 +839,7 @@ export const NodeTransforms: NodeTransforms = {
 
         Transforms.liftNodes(editor, {
           at: range,
-          match: n => Element.isAncestor(node) && node.children.includes(n),
+          match: (n) => Element.isAncestor(node) && node.children.includes(n),
           voids,
         })
       }
@@ -854,12 +855,12 @@ export const NodeTransforms: NodeTransforms = {
    * of the range first to ensure that only the content in the range is wrapped.
    */
 
-  wrapNodes(
+  wrapNodes<T extends Node>(
     editor: Editor,
     element: Element,
     options: {
       at?: Location
-      match?: (node: Node) => boolean
+      match?: NodeMatch<T>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -877,9 +878,9 @@ export const NodeTransforms: NodeTransforms = {
         if (Path.isPath(at)) {
           match = matchPath(editor, at)
         } else if (editor.isInline(element)) {
-          match = n => Editor.isInline(editor, n) || Text.isText(n)
+          match = (n) => Editor.isInline(editor, n) || Text.isText(n)
         } else {
-          match = n => Editor.isBlock(editor, n)
+          match = (n) => Editor.isBlock(editor, n)
         }
       }
 
@@ -901,8 +902,8 @@ export const NodeTransforms: NodeTransforms = {
         Editor.nodes(editor, {
           at,
           match: editor.isInline(element)
-            ? n => Editor.isBlock(editor, n)
-            : n => Editor.isEditor(n),
+            ? (n) => Editor.isBlock(editor, n)
+            : (n) => Editor.isEditor(n),
           mode: 'lowest',
           voids,
         })
@@ -940,7 +941,7 @@ export const NodeTransforms: NodeTransforms = {
 
           Transforms.moveNodes(editor, {
             at: range,
-            match: n =>
+            match: (n) =>
               Element.isAncestor(commonNode) && commonNode.children.includes(n),
             to: wrapperPath.concat(0),
             voids,
@@ -968,5 +969,5 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
 
 const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
   const [node] = Editor.node(editor, path)
-  return n => n === node
+  return (n) => n === node
 }
