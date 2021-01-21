@@ -476,7 +476,7 @@ export const Editor: EditorInterface = {
    */
 
   hasBlocks(editor: Editor, element: Element): boolean {
-    return element.children.some(n => Editor.isBlock(editor, n))
+    return element.children.some((n) => Editor.isBlock(editor, n))
   },
 
   /**
@@ -485,7 +485,7 @@ export const Editor: EditorInterface = {
 
   hasInlines(editor: Editor, element: Element): boolean {
     return element.children.some(
-      n => Text.isText(n) || Editor.isInline(editor, n)
+      (n) => Text.isText(n) || Editor.isInline(editor, n)
     )
   },
 
@@ -494,7 +494,7 @@ export const Editor: EditorInterface = {
    */
 
   hasTexts(editor: Editor, element: Element): boolean {
-    return element.children.every(n => Text.isText(n))
+    return element.children.every((n) => Text.isText(n))
   },
 
   /**
@@ -699,7 +699,7 @@ export const Editor: EditorInterface = {
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
-      if (!match(n)) {
+      if (!match(n, p)) {
         continue
       }
 
@@ -751,7 +751,7 @@ export const Editor: EditorInterface = {
     if (anchor.offset === 0) {
       const prev = Editor.previous(editor, { at: path, match: Text.isText })
       const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: (n) => Editor.isBlock(editor, n),
       })
 
       if (prev && block) {
@@ -803,7 +803,7 @@ export const Editor: EditorInterface = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n)
+        match = (n) => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -893,7 +893,7 @@ export const Editor: EditorInterface = {
         continue
       }
 
-      if (!match(node)) {
+      if (!match(node, path)) {
         // If we've arrived at a leaf text node that is not lower than the last
         // hit, then we've found a branch that doesn't include a match, which
         // means the match is not universal.
@@ -1356,7 +1356,7 @@ export const Editor: EditorInterface = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = n => parent.children.includes(n)
+        match = (n) => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1513,7 +1513,7 @@ export const Editor: EditorInterface = {
 
     const endBlock = Editor.above(editor, {
       at: end,
-      match: n => Editor.isBlock(editor, n),
+      match: (n) => Editor.isBlock(editor, n),
     })
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
@@ -1554,7 +1554,7 @@ export const Editor: EditorInterface = {
   ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       ...options,
-      match: n => Editor.isVoid(editor, n),
+      match: (n) => Editor.isVoid(editor, n),
     })
   },
 
@@ -1575,6 +1575,6 @@ export const Editor: EditorInterface = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+export type NodeMatch<T extends Node> =
+  | ((node: Node, path: Path) => node is T)
+  | ((node: Node, path: Path) => boolean)
