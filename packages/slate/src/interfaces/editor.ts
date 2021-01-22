@@ -476,7 +476,7 @@ export const Editor: EditorInterface = {
    */
 
   hasBlocks(editor: Editor, element: Element): boolean {
-    return element.children.some((n) => Editor.isBlock(editor, n))
+    return element.children.some(n => Editor.isBlock(editor, n))
   },
 
   /**
@@ -485,7 +485,7 @@ export const Editor: EditorInterface = {
 
   hasInlines(editor: Editor, element: Element): boolean {
     return element.children.some(
-      (n) => Text.isText(n) || Editor.isInline(editor, n)
+      n => Text.isText(n) || Editor.isInline(editor, n)
     )
   },
 
@@ -494,7 +494,7 @@ export const Editor: EditorInterface = {
    */
 
   hasTexts(editor: Editor, element: Element): boolean {
-    return element.children.every((n) => Text.isText(n))
+    return element.children.every(n => Text.isText(n))
   },
 
   /**
@@ -751,7 +751,7 @@ export const Editor: EditorInterface = {
     if (anchor.offset === 0) {
       const prev = Editor.previous(editor, { at: path, match: Text.isText })
       const block = Editor.above(editor, {
-        match: (n) => Editor.isBlock(editor, n),
+        match: n => Editor.isBlock(editor, n),
       })
 
       if (prev && block) {
@@ -803,7 +803,7 @@ export const Editor: EditorInterface = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = (n) => parent.children.includes(n)
+        match = n => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1356,7 +1356,7 @@ export const Editor: EditorInterface = {
     if (match == null) {
       if (Path.isPath(at)) {
         const [parent] = Editor.parent(editor, at)
-        match = (n) => parent.children.includes(n)
+        match = n => parent.children.includes(n)
       } else {
         match = () => true
       }
@@ -1513,7 +1513,7 @@ export const Editor: EditorInterface = {
 
     const endBlock = Editor.above(editor, {
       at: end,
-      match: (n) => Editor.isBlock(editor, n),
+      match: n => Editor.isBlock(editor, n),
     })
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
@@ -1554,7 +1554,7 @@ export const Editor: EditorInterface = {
   ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       ...options,
-      match: (n) => Editor.isVoid(editor, n),
+      match: n => Editor.isVoid(editor, n),
     })
   },
 
