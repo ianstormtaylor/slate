@@ -292,7 +292,7 @@ export const Node: NodeInterface = {
       )
     }
 
-    const newRoot = produce(root, r => {
+    const newRoot = produce({ children: root.children }, r => {
       const [start, end] = Range.edges(range)
       const nodeEntries = Node.nodes(r, {
         reverse: true,
@@ -488,7 +488,7 @@ export const Node: NodeInterface = {
         yield [n, p]
       }
 
-      // If we're allowed to go downward and we haven't decsended yet, do.
+      // If we're allowed to go downward and we haven't descended yet, do.
       if (
         !visited.has(n) &&
         !Text.isText(n) &&
