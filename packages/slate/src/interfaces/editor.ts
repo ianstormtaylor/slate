@@ -45,7 +45,6 @@ export interface BaseEditor {
   marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
-  getDirtyPaths: (op: Operation) => Path[]
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
@@ -558,7 +557,6 @@ export const Editor: EditorInterface = {
       typeof value.deleteBackward === 'function' &&
       typeof value.deleteForward === 'function' &&
       typeof value.deleteFragment === 'function' &&
-      typeof value.getDirtyPaths === 'function' &&
       typeof value.insertBreak === 'function' &&
       typeof value.insertFragment === 'function' &&
       typeof value.insertNode === 'function' &&

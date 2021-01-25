@@ -11,7 +11,6 @@ export const input = [
     deleteBackward() {},
     deleteForward() {},
     deleteFragment() {},
-    getDirtyPaths() {},
     insertBreak() {},
     insertFragment() {},
     insertNode() {},

@@ -131,7 +131,7 @@ If even that's not enough, you can always [read the source itself](./packages/sl
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://www.yuque.com/jacob.lcs/slatejs): `v0.57.1`
+- [中文](https://github.com/loveloki/slate-docs-cn): `v0.57.1`
 
 If you're maintaining a translation, feel free to pull request it here!
 
