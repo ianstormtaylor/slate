@@ -33,7 +33,6 @@ import {
   isDOMNode,
   DOMStaticRange,
   isPlainTextOnlyPaste,
-  getDocumentOrShadowRoot,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
@@ -438,13 +437,10 @@ export const Editable = (props: EditableProps) => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
-    getDocumentOrShadowRoot().addEventListener(
-      'selectionchange',
-      onDOMSelectionChange
-    )
+    window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
-      getDocumentOrShadowRoot().removeEventListener(
+      window.document.removeEventListener(
         'selectionchange',
         onDOMSelectionChange
       )
