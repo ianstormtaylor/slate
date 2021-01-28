@@ -225,7 +225,8 @@ export interface EditorInterface {
     options?: {
       at?: Location
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
+      reverse?: boolean,
+      voids?: boolean;
     }
   ) => Generator<Point, void, undefined>
   previous: <T extends Node>(
