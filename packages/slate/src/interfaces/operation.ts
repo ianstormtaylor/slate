@@ -218,10 +218,15 @@ export const Operation: OperationInterface = {
    */
 
   isOperationList(value: any): value is Operation[] {
-    return (
-      Array.isArray(value) &&
-      (value.length === 0 || Operation.isOperation(value[0]))
-    )
+    if (!Array.isArray(value)) {
+      return false
+    }
+    for (const valueItem of value) {
+      if (!Operation.isOperation(valueItem)) {
+        return false
+      }
+    }
+    return true
   },
 
   /**
