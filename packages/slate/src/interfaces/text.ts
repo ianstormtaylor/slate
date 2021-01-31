@@ -71,7 +71,7 @@ export const Text: TextInterface = {
    */
 
   isTextList(value: any): value is Text[] {
-    return Array.isArray(value) && (value.length === 0 || Text.isText(value[0]))
+    return Array.isArray(value) && value.every(val => Text.isText(val))
   },
 
   /**
