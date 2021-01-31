@@ -218,15 +218,9 @@ export const Operation: OperationInterface = {
    */
 
   isOperationList(value: any): value is Operation[] {
-    if (!Array.isArray(value)) {
-      return false
-    }
-    for (const valueItem of value) {
-      if (!Operation.isOperation(valueItem)) {
-        return false
-      }
-    }
-    return true
+    return (
+      Array.isArray(value) && value.every(val => Operation.isOperation(val))
+    )
   },
 
   /**
