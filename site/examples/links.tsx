@@ -1,7 +1,14 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Node, Transforms, Editor, Range, createEditor } from 'slate'
+import {
+  Node,
+  Transforms,
+  Editor,
+  Range,
+  createEditor,
+  Element as SlateElement,
+} from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -61,12 +68,18 @@ const insertLink = (editor, url) => {
 }
 
 const isLinkActive = editor => {
-  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
+  const [link] = Editor.nodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+  })
   return !!link
 }
 
 const unwrapLink = editor => {
-  Transforms.unwrapNodes(editor, { match: n => n.type === 'link' })
+  Transforms.unwrapNodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+  })
 }
 
 const wrapLink = (editor, url) => {
