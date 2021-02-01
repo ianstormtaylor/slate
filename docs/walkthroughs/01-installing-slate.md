@@ -61,7 +61,7 @@ const App = () => {
 
 Next up is to render a `<Slate>` context provider.
 
-The provider component keeps track of your Slate editor, its plugins, its value, its selection, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
+The provider component keeps track of your Slate editor, its plugins, its value, its selection, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using React's `useState` hook.
 
 ```jsx
 const App = () => {
