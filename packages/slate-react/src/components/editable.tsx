@@ -14,14 +14,15 @@ import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
+import { useInputStrategy } from '../input-strategy'
+import { hasEditableTarget, isEventHandled } from '../utils/helpers'
 import Hotkeys from '../utils/hotkeys'
 import {
+  HAS_BEFORE_INPUT_SUPPORT,
   IS_FIREFOX,
   IS_SAFARI,
-  IS_EDGE_LEGACY,
-  IS_CHROME_LEGACY,
 } from '../utils/environment'
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -31,8 +32,6 @@ import {
   DOMRange,
   isDOMElement,
   isDOMNode,
-  isDOMText,
-  DOMStaticRange,
   isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
@@ -43,14 +42,6 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
-
-// COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
-// Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT = !(
-  IS_FIREFOX ||
-  IS_EDGE_LEGACY ||
-  IS_CHROME_LEGACY
-)
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
@@ -105,7 +96,7 @@ export const Editable = (props: EditableProps) => {
   const {
     autoFocus,
     decorate = defaultDecorate,
-    onDOMBeforeInput: propsOnDOMBeforeInput,
+    onDOMBeforeInput: onDOMBeforeInputProp,
     placeholder,
     readOnly = false,
     renderElement,
@@ -115,15 +106,23 @@ export const Editable = (props: EditableProps) => {
     ...attributes
   } = props
   const editor = useSlate()
-  const ref = useRef<HTMLDivElement>(null)
+  const nodeRef = useRef<HTMLDivElement>(null)
+
+  const inputStrategy = useInputStrategy({
+    handlers: attributes as any,
+    nodeRef,
+    readOnly,
+  })
+  const { isComposing } = inputStrategy
 
   // Update internal state on each render.
+  // To-do: Why is this called directly in the render method?
   IS_READ_ONLY.set(editor, readOnly)
 
   // Keep track of some state for the event handler logic.
+  // To-do: This should be using a ref
   const state = useMemo(
     () => ({
-      isComposing: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
     }),
@@ -132,10 +131,10 @@ export const Editable = (props: EditableProps) => {
 
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
-      EDITOR_TO_ELEMENT.set(editor, ref.current)
-      NODE_TO_ELEMENT.set(editor, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, editor)
+    if (nodeRef.current) {
+      EDITOR_TO_ELEMENT.set(editor, nodeRef.current)
+      NODE_TO_ELEMENT.set(editor, nodeRef.current)
+      ELEMENT_TO_NODE.set(nodeRef.current, editor)
     } else {
       NODE_TO_ELEMENT.delete(editor)
     }
@@ -146,7 +145,11 @@ export const Editable = (props: EditableProps) => {
     const { selection } = editor
     const domSelection = window.getSelection()
 
-    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
+    if (
+      isComposing.current ||
+      !domSelection ||
+      !ReactEditor.isFocused(editor)
+    ) {
       return
     }
 
@@ -222,169 +225,10 @@ export const Editable = (props: EditableProps) => {
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
   useEffect(() => {
-    if (ref.current && autoFocus) {
-      ref.current.focus()
+    if (nodeRef.current && autoFocus) {
+      nodeRef.current.focus()
     }
   }, [autoFocus])
-
-  // Listen on the native `beforeinput` event to get real "Level 2" events. This
-  // is required because React's `beforeinput` is fake and never really attaches
-  // to the real event sadly. (2019/11/01)
-  // https://github.com/facebook/react/issues/11211
-  const onDOMBeforeInput = useCallback(
-    (
-      event: Event & {
-        data: string | null
-        dataTransfer: DataTransfer | null
-        getTargetRanges(): DOMStaticRange[]
-        inputType: string
-        isComposing: boolean
-      }
-    ) => {
-      if (
-        !readOnly &&
-        hasEditableTarget(editor, event.target) &&
-        !isDOMEventHandled(event, propsOnDOMBeforeInput)
-      ) {
-        const { selection } = editor
-        const { inputType: type } = event
-        const data = event.dataTransfer || event.data || undefined
-
-        // These two types occur while a user is composing text and can't be
-        // cancelled. Let them through and wait for the composition to end.
-        if (
-          type === 'insertCompositionText' ||
-          type === 'deleteCompositionText'
-        ) {
-          return
-        }
-
-        event.preventDefault()
-
-        // COMPAT: For the deleting forward/backward input types we don't want
-        // to change the selection because it is the range that will be deleted,
-        // and those commands determine that for themselves.
-        if (!type.startsWith('delete') || type.startsWith('deleteBy')) {
-          const [targetRange] = event.getTargetRanges()
-
-          if (targetRange) {
-            const range = ReactEditor.toSlateRange(editor, targetRange)
-
-            if (!selection || !Range.equals(selection, range)) {
-              Transforms.select(editor, range)
-            }
-          }
-        }
-
-        // COMPAT: If the selection is expanded, even if the command seems like
-        // a delete forward/backward command it should delete the selection.
-        if (
-          selection &&
-          Range.isExpanded(selection) &&
-          type.startsWith('delete')
-        ) {
-          Editor.deleteFragment(editor)
-          return
-        }
-
-        switch (type) {
-          case 'deleteByComposition':
-          case 'deleteByCut':
-          case 'deleteByDrag': {
-            Editor.deleteFragment(editor)
-            break
-          }
-
-          case 'deleteContent':
-          case 'deleteContentForward': {
-            Editor.deleteForward(editor)
-            break
-          }
-
-          case 'deleteContentBackward': {
-            Editor.deleteBackward(editor)
-            break
-          }
-
-          case 'deleteEntireSoftLine': {
-            Editor.deleteBackward(editor, { unit: 'line' })
-            Editor.deleteForward(editor, { unit: 'line' })
-            break
-          }
-
-          case 'deleteHardLineBackward': {
-            Editor.deleteBackward(editor, { unit: 'block' })
-            break
-          }
-
-          case 'deleteSoftLineBackward': {
-            Editor.deleteBackward(editor, { unit: 'line' })
-            break
-          }
-
-          case 'deleteHardLineForward': {
-            Editor.deleteForward(editor, { unit: 'block' })
-            break
-          }
-
-          case 'deleteSoftLineForward': {
-            Editor.deleteForward(editor, { unit: 'line' })
-            break
-          }
-
-          case 'deleteWordBackward': {
-            Editor.deleteBackward(editor, { unit: 'word' })
-            break
-          }
-
-          case 'deleteWordForward': {
-            Editor.deleteForward(editor, { unit: 'word' })
-            break
-          }
-
-          case 'insertLineBreak':
-          case 'insertParagraph': {
-            Editor.insertBreak(editor)
-            break
-          }
-
-          case 'insertFromComposition':
-          case 'insertFromDrop':
-          case 'insertFromPaste':
-          case 'insertFromYank':
-          case 'insertReplacementText':
-          case 'insertText': {
-            if (data instanceof DataTransfer) {
-              ReactEditor.insertData(editor, data)
-            } else if (typeof data === 'string') {
-              Editor.insertText(editor, data)
-            }
-
-            break
-          }
-        }
-      }
-    },
-    [readOnly, propsOnDOMBeforeInput]
-  )
-
-  // Attach a native DOM event handler for `beforeinput` events, because React's
-  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
-  // real `beforeinput` events sadly... (2019/11/04)
-  // https://github.com/facebook/react/issues/11211
-  useIsomorphicLayoutEffect(() => {
-    if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-      // @ts-ignore The `beforeinput` event isn't recognized.
-      ref.current.addEventListener('beforeinput', onDOMBeforeInput)
-    }
-
-    return () => {
-      if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-        // @ts-ignore The `beforeinput` event isn't recognized.
-        ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
-      }
-    }
-  }, [onDOMBeforeInput])
 
   // Listen on the native `selectionchange` event to be able to update any time
   // the selection changes. This is required because React's `onSelect` is leaky
@@ -393,7 +237,7 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
+      if (!readOnly && !isComposing.current && !state.isUpdatingSelection) {
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = window.getSelection()
@@ -472,6 +316,7 @@ export const Editable = (props: EditableProps) => {
         data-gramm={false}
         role={readOnly ? undefined : 'textbox'}
         {...attributes}
+        {...inputStrategy.attributes}
         // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
         // have to use hacks to make these replacement-based features work.
         spellCheck={
@@ -487,7 +332,7 @@ export const Editable = (props: EditableProps) => {
         data-slate-node="value"
         contentEditable={readOnly ? undefined : true}
         suppressContentEditableWarning
-        ref={ref}
+        ref={nodeRef}
         style={{
           // Prevent the default outline styles.
           outline: 'none',
@@ -498,24 +343,6 @@ export const Editable = (props: EditableProps) => {
           // Allow for passed-in styles to override anything.
           ...style,
         }}
-        onBeforeInput={useCallback(
-          (event: React.FormEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's leaky polyfill instead just for it. It
-            // only works for the `insertText` input type.
-            if (
-              !HAS_BEFORE_INPUT_SUPPORT &&
-              !readOnly &&
-              !isEventHandled(event, attributes.onBeforeInput) &&
-              hasEditableTarget(editor, event.target)
-            ) {
-              event.preventDefault()
-              const text = (event as any).data as string
-              Editor.insertText(editor, text)
-            }
-          },
-          [readOnly]
-        )}
         onBlur={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
@@ -600,36 +427,6 @@ export const Editable = (props: EditableProps) => {
             }
           },
           [readOnly, attributes.onClick]
-        )}
-        onCompositionEnd={useCallback(
-          (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionEnd)
-            ) {
-              state.isComposing = false
-
-              // COMPAT: In Chrome, `beforeinput` events for compositions
-              // aren't correct and never fire the "insertFromComposition"
-              // type that we need. So instead, insert whenever a composition
-              // ends since it will already have been committed to the DOM.
-              if (!IS_SAFARI && !IS_FIREFOX && event.data) {
-                Editor.insertText(editor, event.data)
-              }
-            }
-          },
-          [attributes.onCompositionEnd]
-        )}
-        onCompositionStart={useCallback(
-          (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionStart)
-            ) {
-              state.isComposing = true
-            }
-          },
-          [attributes.onCompositionStart]
         )}
         onCopy={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
@@ -1023,20 +820,6 @@ const hasTarget = (
 }
 
 /**
- * Check if the target is editable and in the editor.
- */
-
-const hasEditableTarget = (
-  editor: ReactEditor,
-  target: EventTarget | null
-): target is DOMNode => {
-  return (
-    isDOMNode(target) &&
-    ReactEditor.hasDOMNode(editor, target, { editable: true })
-  )
-}
-
-/**
  * Check if the target is inside void and in the editor.
  */
 
@@ -1047,35 +830,4 @@ const isTargetInsideVoid = (
   const slateNode =
     hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
   return Editor.isVoid(editor, slateNode)
-}
-
-/**
- * Check if an event is overrided by a handler.
- */
-
-const isEventHandled = <
-  EventType extends React.SyntheticEvent<unknown, unknown>
->(
-  event: EventType,
-  handler?: (event: EventType) => void
-) => {
-  if (!handler) {
-    return false
-  }
-
-  handler(event)
-  return event.isDefaultPrevented() || event.isPropagationStopped()
-}
-
-/**
- * Check if a DOM event is overrided by a handler.
- */
-
-const isDOMEventHandled = (event: Event, handler?: (event: Event) => void) => {
-  if (!handler) {
-    return false
-  }
-
-  handler(event)
-  return event.defaultPrevented
 }
