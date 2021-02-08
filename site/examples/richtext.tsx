@@ -56,6 +56,7 @@ const RichTextExample = () => {
           }
         }}
       />
+      <pre>{JSON.stringify(value, undefined, 2)}</pre>
     </Slate>
   )
 }

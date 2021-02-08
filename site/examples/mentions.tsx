@@ -105,6 +105,7 @@ const MentionExample = () => {
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
       />
+      <pre>{JSON.stringify(value, undefined, 2)}</pre>
       {target && chars.length > 0 && (
         <Portal>
           <div
