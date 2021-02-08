@@ -1,3 +1,5 @@
+import { Path } from 'slate'
+
 /**
  * Returns the number of characters that are the same at the beginning of the
  * String.
@@ -107,4 +109,13 @@ export function diffText(prev: string, next: string): Diff | null {
     insertText,
     removeText,
   }
+}
+
+export interface InsertedText {
+  text: Diff
+  path: Path
+}
+
+export function getInsertedText(insertedText: InsertedText[]): string {
+  return insertedText.reduce((acc, { text }) => `${acc}${text.insertText}`, '')
 }

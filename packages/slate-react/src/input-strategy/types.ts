@@ -1,4 +1,4 @@
-import { RefObject, TextareaHTMLAttributes } from 'react'
+import { Key, RefObject, TextareaHTMLAttributes } from 'react'
 
 export interface InputStrategyArguments {
   nodeRef: RefObject<HTMLDivElement>
@@ -13,7 +13,9 @@ export interface InputStrategyArguments {
 
 export interface InputStrategyReturnValue {
   isComposing: RefObject<boolean>
-  attributes: TextareaHTMLAttributes<HTMLDivElement>
+  attributes: TextareaHTMLAttributes<HTMLDivElement> & {
+    key?: Key
+  }
 }
 
 export type InputStrategy = (

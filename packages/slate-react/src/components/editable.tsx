@@ -552,7 +552,8 @@ export const Editable = (props: EditableProps) => {
             if (
               !readOnly &&
               hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onKeyDown)
+              !isEventHandled(event, attributes.onKeyDown) &&
+              !isEventHandled(event, inputStrategy.attributes.onKeyDown)
             ) {
               const { nativeEvent } = event
               const { selection } = editor
