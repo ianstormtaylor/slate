@@ -1241,8 +1241,7 @@ export const Editor: EditorInterface = {
           distance = 1
         }
 
-        // Slice from the available characters in text node
-        string = string.slice(Math.min(distance, available))
+        string = string.slice(distance)
       }
 
       // Add or substract the offset.
@@ -1285,7 +1284,6 @@ export const Editor: EditorInterface = {
       if (Text.isText(node)) {
         const isFirst = Path.equals(path, first.path)
         available = node.text.length
-        distance = null
         offset = reverse ? available : 0
 
         if (isFirst) {
@@ -1298,8 +1296,8 @@ export const Editor: EditorInterface = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string and there is no more characters to skip, continue to the next block.
+          if (string === '' && distance === null) {
             break
           } else {
             advance()
