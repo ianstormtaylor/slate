@@ -1,6 +1,14 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Node, Editor, Transforms, Range, Point, createEditor } from 'slate'
+import {
+  Node,
+  Editor,
+  Transforms,
+  Range,
+  Point,
+  createEditor,
+  Element as SlateElement,
+} from 'slate'
 import { withHistory } from 'slate-history'
 
 const SHORTCUTS = {
@@ -55,16 +63,20 @@ const withShortcuts = editor => {
       if (type) {
         Transforms.select(editor, range)
         Transforms.delete(editor)
-        Transforms.setNodes(
-          editor,
-          { type },
-          { match: n => Editor.isBlock(editor, n) }
-        )
+        const newProperties: Partial<SlateElement> = {
+          type,
+        }
+        Transforms.setNodes(editor, newProperties, {
+          match: n => Editor.isBlock(editor, n),
+        })
 
         if (type === 'list-item') {
           const list = { type: 'bulleted-list', children: [] }
           Transforms.wrapNodes(editor, list, {
-            match: n => n.type === 'list-item',
+            match: n =>
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === 'list-item',
           })
         }
 
@@ -88,14 +100,22 @@ const withShortcuts = editor => {
         const start = Editor.start(editor, path)
 
         if (
+          !Editor.isEditor(block) &&
+          SlateElement.isElement(block) &&
           block.type !== 'paragraph' &&
           Point.equals(selection.anchor, start)
         ) {
-          Transforms.setNodes(editor, { type: 'paragraph' })
+          const newProperties: Partial<SlateElement> = {
+            type: 'paragraph',
+          }
+          Transforms.setNodes(editor, newProperties)
 
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
-              match: n => n.type === 'bulleted-list',
+              match: n =>
+                !Editor.isEditor(n) &&
+                SlateElement.isElement(n) &&
+                n.type === 'bulleted-list',
               split: true,
             })
           }

@@ -4,7 +4,7 @@ import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 import ElementComponent from './element'
 import TextComponent from './text'
 import { ReactEditor } from '..'
-import { useEditor } from '../hooks/use-editor'
+import { useSlateStatic } from '../hooks/use-slate-static'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
@@ -28,7 +28,7 @@ const Children = (props: {
     renderLeaf,
     selection,
   } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []
   const isLeafBlock =

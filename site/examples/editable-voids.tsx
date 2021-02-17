@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { Transforms, createEditor, Node } from 'slate'
-import { Slate, Editable, useEditor, withReact } from 'slate-react'
+import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
@@ -114,7 +114,7 @@ const EditableVoidElement = ({ attributes, children, element }) => {
 }
 
 const InsertEditableVoidButton = () => {
-  const editor = useEditor()
+  const editor = useSlateStatic()
   return (
     <Button
       onMouseDown={event => {
