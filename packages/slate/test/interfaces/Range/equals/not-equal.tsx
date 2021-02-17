@@ -10,6 +10,7 @@ export const input = {
       path: [0, 4],
       offset: 7,
     },
+    placeholder: 1,
   },
   another: {
     anchor: {
@@ -20,6 +21,7 @@ export const input = {
       path: [0, 1],
       offset: 0,
     },
+    placeholder: 0,
   },
 }
 export const test = ({ range, another }) => {

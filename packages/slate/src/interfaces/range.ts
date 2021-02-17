@@ -1,5 +1,7 @@
 import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
+import isEqual from 'lodash/isEqual'
+import omit from 'lodash/omit'
 import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
 
 /**
@@ -77,7 +79,11 @@ export const Range: RangeInterface = {
   equals(range: Range, another: Range): boolean {
     return (
       Point.equals(range.anchor, another.anchor) &&
-      Point.equals(range.focus, another.focus)
+      Point.equals(range.focus, another.focus) &&
+      isEqual(
+        omit(range, ['anchor', 'focus']),
+        omit(another, ['anchor', 'focus'])
+      )
     )
   },
 
