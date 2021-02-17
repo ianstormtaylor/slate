@@ -10,7 +10,7 @@ export const input = {
       path: [0, 1],
       offset: 0,
     },
-    placeholder: 1,
+    sameProp: 1,
   },
   another: {
     anchor: {
@@ -21,10 +21,11 @@ export const input = {
       path: [0, 1],
       offset: 0,
     },
-    placeholder: 2,
+    sameProp: 1,
+    extraProp: 1,
   },
 }
 export const test = ({ range, another }) => {
-  return Range.equals(range, another)
+  return [Range.equals(range, another), Range.equals(another, range)]
 }
-export const output = false
+export const output = [false, false]
