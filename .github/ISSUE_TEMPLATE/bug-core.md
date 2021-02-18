@@ -1,5 +1,5 @@
 ---
-name: "\U0001F6A8 Core bug"
+name: "\U0001F6A8 Bug: Core"
 about: A bug that occurs in Slate's core logic, on all platforms
 title: ''
 labels: bug
