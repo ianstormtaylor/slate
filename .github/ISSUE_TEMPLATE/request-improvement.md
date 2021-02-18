@@ -1,5 +1,5 @@
 ---
-name: "\U0001F6E0 Improvement"
+name: "\U0001F6E0 Request: Improvement"
 about: An improvement to existing functionality
 title: ''
 labels: improvement
