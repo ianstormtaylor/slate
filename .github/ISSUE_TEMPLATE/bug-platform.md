@@ -1,5 +1,5 @@
 ---
-name: "\U0001F5A5 Platform bug"
+name: "\U0001F5A5 Bug: Platform"
 about: A bug that occurs in a specific browser or platform
 title: ''
 labels: bug, ⚑ cross platform
