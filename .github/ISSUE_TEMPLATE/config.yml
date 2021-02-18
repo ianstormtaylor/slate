@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: "💬 Support: Slack"
+    url: https://slate-slack.herokuapp.com/
+    about: Please ask and answer questions in our Slack channel.
