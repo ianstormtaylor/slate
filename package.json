@@ -22,6 +22,7 @@
     "release:publish:experimental": "lerna publish --dist-tag experimental",
     "release:latest": "yarn prerelease && lerna publish",
     "release:next": "yarn prerelease && lerna publish --dist-tag next",
+    "release:experimental": "yarn prerelease && lerna publish --dist-tag experimental",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
     "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
