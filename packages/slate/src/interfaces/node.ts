@@ -9,7 +9,7 @@ import { ExtendedType } from './custom-types'
  */
 
 export type BaseNode = Editor | Element | Text
-export type Node = ExtendedType<'Node', BaseNode>
+export type Node = Editor | Element | Text //ExtendedType<'Node', BaseNode>
 
 export interface NodeInterface {
   ancestor: (root: Node, path: Path) => Ancestor
@@ -317,7 +317,9 @@ export const Node: NodeInterface = {
         }
       }
 
-      if (Editor.isEditor(r)) delete r.selection
+      if (Editor.isEditor(r)) {
+        r.selection = null
+      }
     })
 
     return newRoot.children

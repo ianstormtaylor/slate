@@ -19,6 +19,7 @@
     "prerelease": "cross-env NODE_ENV=production yarn build:rollup && yarn test && yarn lint",
     "release:publish:latext": "lerna publish",
     "release:publish:next": "lerna publish --dist-tag next",
+    "release:publish:experimental": "lerna publish --dist-tag experimental",
     "release:latest": "yarn prerelease && lerna publish",
     "release:next": "yarn prerelease && lerna publish --dist-tag next",
     "serve": "cd ./site && next",
