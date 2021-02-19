@@ -9,7 +9,7 @@ import { ExtendedType } from './custom-types'
  */
 
 export type BaseNode = Editor | Element | Text
-export type Node = Editor | Element | Text //ExtendedType<'Node', BaseNode>
+export type Node = Editor | Element | Text
 
 export interface NodeInterface {
   ancestor: (root: Node, path: Path) => Ancestor
