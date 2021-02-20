@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Text, Node, createEditor } from 'slate'
@@ -5,6 +6,8 @@ import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Icon, Toolbar } from '../components'
+import { chain, toUpper } from 'lodash'
+import { listenerCount } from 'process'
 
 const SearchHighlightingExample = () => {
   const [value, setValue] = useState<Node[]>(initialValue)
@@ -15,23 +18,30 @@ const SearchHighlightingExample = () => {
       const ranges = []
 
       if (search && Text.isText(node)) {
-        const { text } = node
-        const parts = text.split(search)
-        let offset = 0
+        let beg = 0
+        let end = search.length
+        while (search[beg] === "\\" && beg < end) beg += 1
+        while (end >= beg && search[end] === "\\") end -= 1
+        const pattern = search.substring(beg, end)
+        if (pattern !== "") {
+          const re = new RegExp(pattern, 'i')
+          const { text } = node
+          const parts = text.split(re)
+          let offset = 0
 
-        parts.forEach((part, i) => {
-          if (i !== 0) {
-            ranges.push({
-              anchor: { path, offset: offset - search.length },
-              focus: { path, offset },
-              highlight: true,
-            })
-          }
+          parts.forEach((part, i) => {
+            if (i !== 0) {
+              ranges.push({
+                anchor: { path, offset: offset - search.length },
+                focus: { path, offset },
+                highlight: true,
+              })
+            }
 
-          offset = offset + part.length + search.length
-        })
+            offset = offset + part.length + search.length
+          })
+        }
       }
-
       return ranges
     },
     [search]
@@ -66,12 +76,16 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+
+      <Editable
+        decorate={decorate}
+        // eslint-disable-next-line prettier/prettier
+        renderLeaf={(props) => <Leaf {...props} />}
+      />
     </Slate>
   )
 }
-
-const Leaf = ({ attributes, children, leaf }) => {
+function Leaf({ attributes, children, leaf }) {
   return (
     <span
       {...attributes}
