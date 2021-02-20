@@ -9,6 +9,10 @@ import { Icon, Toolbar } from '../components'
 import { chain, toUpper } from 'lodash'
 import { listenerCount } from 'process'
 
+let c = '#bbb'
+function clicked(event) {
+  c = event.target.value
+}
 const SearchHighlightingExample = () => {
   const [value, setValue] = useState<Node[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
@@ -20,10 +24,10 @@ const SearchHighlightingExample = () => {
       if (search && Text.isText(node)) {
         let beg = 0
         let end = search.length
-        while (search[beg] === "\\" && beg < end) beg += 1
-        while (end >= beg && search[end] === "\\") end -= 1
+        while (search[beg] === '\\' && beg < end) beg += 1
+        while (end >= beg && search[end] === '\\') end -= 1
         const pattern = search.substring(beg, end)
-        if (pattern !== "") {
+        if (pattern !== '') {
           const re = new RegExp(pattern, 'i')
           const { text } = node
           const parts = text.split(re)
@@ -75,12 +79,24 @@ const SearchHighlightingExample = () => {
             `}
           />
         </div>
+        <div>
+          <input
+            id="ColorPicker"
+            type="color"
+            className={css`
+              height: 30px;
+              width: 30px;
+              border-radius: 50%;
+            `}
+            onChange={clicked}
+          />
+        </div>
       </Toolbar>
 
       <Editable
         decorate={decorate}
         // eslint-disable-next-line prettier/prettier
-        renderLeaf={(props) => <Leaf {...props} />}
+        renderLeaf={props => <Leaf {...props} />}
       />
     </Slate>
   )
@@ -91,7 +107,7 @@ function Leaf({ attributes, children, leaf }) {
       {...attributes}
       className={css`
         font-weight: ${leaf.bold && 'bold'};
-        background-color: ${leaf.highlight && '#ffeeba'};
+        background-color: ${leaf.highlight && c};
       `}
     >
       {children}
