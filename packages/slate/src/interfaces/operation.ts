@@ -219,8 +219,7 @@ export const Operation: OperationInterface = {
 
   isOperationList(value: any): value is Operation[] {
     return (
-      Array.isArray(value) &&
-      (value.length === 0 || Operation.isOperation(value[0]))
+      Array.isArray(value) && value.every(val => Operation.isOperation(val))
     )
   },
 

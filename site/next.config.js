@@ -7,6 +7,7 @@ module.exports = {
       test: /\.js$/,
       use: ['source-map-loader'],
       enforce: 'pre',
+      exclude: [/node_modules\/@next/, /node_modules\/next/],
     })
     return config
   },

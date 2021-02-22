@@ -10,6 +10,7 @@ import {
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
+  EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -20,6 +21,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   normalizeDOMPoint,
+  isDOMSelection,
 } from '../utils/dom'
 
 /**
@@ -32,6 +34,18 @@ export interface ReactEditor extends Editor {
 }
 
 export const ReactEditor = {
+  /**
+   * Return the host window of the current editor.
+   */
+
+  getWindow(editor: ReactEditor): Window {
+    const window = EDITOR_TO_WINDOW.get(editor)
+    if (!window) {
+      throw new Error('Unable to find a host window element for this editor')
+    }
+    return window
+  },
+
   /**
    * Find a key for a Slate node.
    */
@@ -104,7 +118,7 @@ export const ReactEditor = {
   blur(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, false)
-
+    const window = ReactEditor.getWindow(editor)
     if (window.document.activeElement === el) {
       el.blur()
     }
@@ -118,6 +132,7 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     IS_FOCUSED.set(editor, true)
 
+    const window = ReactEditor.getWindow(editor)
     if (window.document.activeElement !== el) {
       el.focus({ preventScroll: true })
     }
@@ -129,6 +144,7 @@ export const ReactEditor = {
 
   deselect(editor: ReactEditor): void {
     const { selection } = editor
+    const window = ReactEditor.getWindow(editor)
     const domSelection = window.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
@@ -284,6 +300,7 @@ export const ReactEditor = {
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
 
+    const window = ReactEditor.getWindow(editor)
     const domRange = window.document.createRange()
     const [startNode, startOffset] = isBackward ? domFocus : domAnchor
     const [endNode, endOffset] = isBackward ? domAnchor : domFocus
@@ -410,6 +427,7 @@ export const ReactEditor = {
       // can determine what the offset relative to the text node is.
       if (leafNode) {
         textNode = leafNode.closest('[data-slate-node="text"]')!
+        const window = ReactEditor.getWindow(editor)
         const range = window.document.createRange()
         range.setStart(textNode, 0)
         range.setEnd(nearestNode, nearestOffset)
@@ -476,10 +494,9 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): Range {
-    const el =
-      domRange instanceof Selection
-        ? domRange.anchorNode
-        : domRange.startContainer
+    const el = isDOMSelection(domRange)
+      ? domRange.anchorNode
+      : domRange.startContainer
     let anchorNode
     let anchorOffset
     let focusNode
@@ -487,7 +504,7 @@ export const ReactEditor = {
     let isCollapsed
 
     if (el) {
-      if (domRange instanceof Selection) {
+      if (isDOMSelection(domRange)) {
         anchorNode = domRange.anchorNode
         anchorOffset = domRange.anchorOffset
         focusNode = domRange.focusNode

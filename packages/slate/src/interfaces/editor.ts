@@ -699,7 +699,7 @@ export const Editor: EditorInterface = {
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
-      if (!match(n)) {
+      if (!match(n, p)) {
         continue
       }
 
@@ -893,7 +893,7 @@ export const Editor: EditorInterface = {
         continue
       }
 
-      if (!match(node)) {
+      if (!match(node, path)) {
         // If we've arrived at a leaf text node that is not lower than the last
         // hit, then we've found a branch that doesn't include a match, which
         // means the match is not universal.
@@ -1575,6 +1575,6 @@ export const Editor: EditorInterface = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+export type NodeMatch<T extends Node> =
+  | ((node: Node, path: Path) => node is T)
+  | ((node: Node, path: Path) => boolean)
