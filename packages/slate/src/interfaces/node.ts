@@ -1,14 +1,93 @@
 import { produce } from 'immer'
-import { Editor, Element, ElementEntry, Path, Range, Text } from '..'
+import { Editor, Path, Range, Text } from '..'
+import { Element, ElementEntry } from './element'
+import { ExtendedType } from './custom-types'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
  * occur in a Slate document tree.
  */
 
-export type Node = Editor | Element | Text
+export type BaseNode = Editor | Element | Text
+export type Node = ExtendedType<'Node', BaseNode>
 
-export const Node = {
+export interface NodeInterface {
+  ancestor: (root: Node, path: Path) => Ancestor
+  ancestors: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry<Ancestor>, void, undefined>
+  child: (root: Node, index: number) => Descendant
+  children: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  common: (root: Node, path: Path, another: Path) => NodeEntry
+  descendant: (root: Node, path: Path) => Descendant
+  descendants: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry<Descendant>, void, undefined>
+  elements: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<ElementEntry, void, undefined>
+  extractProps: (node: Node) => NodeProps
+  first: (root: Node, path: Path) => NodeEntry
+  fragment: (root: Node, range: Range) => Descendant[]
+  get: (root: Node, path: Path) => Node
+  has: (root: Node, path: Path) => boolean
+  isNode: (value: any) => value is Node
+  isNodeList: (value: any) => value is Node[]
+  last: (root: Node, path: Path) => NodeEntry
+  leaf: (root: Node, path: Path) => Text
+  levels: (
+    root: Node,
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Generator<NodeEntry, void, undefined>
+  matches: (node: Node, props: Partial<Node>) => boolean
+  nodes: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (entry: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry, void, undefined>
+  parent: (root: Node, path: Path) => Ancestor
+  string: (node: Node) => string
+  texts: (
+    root: Node,
+    options?: {
+      from?: Path
+      to?: Path
+      reverse?: boolean
+      pass?: (node: NodeEntry) => boolean
+    }
+  ) => Generator<NodeEntry<Text>, void, undefined>
+}
+
+export const Node: NodeInterface = {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
@@ -26,7 +105,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the ancestor nodes above a specific path.
+   * Return a generator of all the ancestor nodes above a specific path.
    *
    * By default the order is bottom-up, from lowest to highest ancestor in
    * the tree, but you can pass the `reverse: true` option to go top-down.
@@ -38,7 +117,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry<Ancestor>> {
+  ): Generator<NodeEntry<Ancestor>, void, undefined> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
       const entry: NodeEntry<Ancestor> = [n, p]
@@ -80,7 +159,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -121,7 +200,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the descendant node entries inside a root node.
+   * Return a generator of all the descendant node entries inside a root node.
    */
 
   *descendants(
@@ -132,7 +211,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry<Descendant>> {
+  ): Generator<NodeEntry<Descendant>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
         // NOTE: we have to coerce here because checking the path's length does
@@ -143,7 +222,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all the element nodes inside a root node. Each iteration
+   * Return a generator of all the element nodes inside a root node. Each iteration
    * will return an `ElementEntry` tuple consisting of `[Element, Path]`. If the
    * root node is an element it will be included in the iteration as well.
    */
@@ -156,11 +235,27 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<ElementEntry> {
+  ): Generator<ElementEntry, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Element.isElement(node)) {
         yield [node, path]
       }
+    }
+  },
+
+  /**
+   * Extract props from a Node.
+   */
+
+  extractProps(node: Node): NodeProps {
+    if (Element.isAncestor(node)) {
+      const { children, ...properties } = node
+
+      return properties
+    } else {
+      const { text, ...properties } = node
+
+      return properties
     }
   },
 
@@ -197,14 +292,14 @@ export const Node = {
       )
     }
 
-    const newRoot = produce(root, r => {
+    const newRoot = produce({ children: root.children }, r => {
       const [start, end] = Range.edges(range)
-      const iterable = Node.nodes(r, {
+      const nodeEntries = Node.nodes(r, {
         reverse: true,
         pass: ([, path]) => !Range.includes(range, path),
       })
 
-      for (const [, path] of iterable) {
+      for (const [, path] of nodeEntries) {
         if (!Range.includes(range, path)) {
           const parent = Node.parent(r, path)
           const index = path[path.length - 1]
@@ -222,7 +317,7 @@ export const Node = {
         }
       }
 
-      delete r.selection
+      if (Editor.isEditor(r)) delete r.selection
     })
 
     return newRoot.children
@@ -288,11 +383,11 @@ export const Node = {
    */
 
   isNodeList(value: any): value is Node[] {
-    return Array.isArray(value) && (value.length === 0 || Node.isNode(value[0]))
+    return Array.isArray(value) && value.every(val => Node.isNode(val))
   },
 
   /**
-   * Get the lash node entry in a root node from a path.
+   * Get the last node entry in a root node from a path.
    */
 
   last(root: Node, path: Path): NodeEntry {
@@ -329,7 +424,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of the in a branch of the tree, from a specific path.
+   * Return a generator of the in a branch of the tree, from a specific path.
    *
    * By default the order is top-down, from lowest to highest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
@@ -341,7 +436,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Generator<NodeEntry, void, undefined> {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
@@ -354,13 +449,17 @@ export const Node = {
 
   matches(node: Node, props: Partial<Node>): boolean {
     return (
-      (Element.isElement(node) && Element.matches(node, props)) ||
-      (Text.isText(node) && Text.matches(node, props))
+      (Element.isElement(node) &&
+        Element.isElementProps(props) &&
+        Element.matches(node, props)) ||
+      (Text.isText(node) &&
+        Text.isTextProps(props) &&
+        Text.matches(node, props))
     )
   },
 
   /**
-   * Return an iterable of all the node entries of a root node. Each entry is
+   * Return a generator of all the node entries of a root node. Each entry is
    * returned as a `[Node, Path]` tuple, with the path referring to the node's
    * position inside the root node.
    */
@@ -373,7 +472,7 @@ export const Node = {
       reverse?: boolean
       pass?: (entry: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry> {
+  ): Generator<NodeEntry, void, undefined> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
     const visited = new Set()
@@ -389,7 +488,7 @@ export const Node = {
         yield [n, p]
       }
 
-      // If we're allowed to go downward and we haven't decsended yet, do.
+      // If we're allowed to go downward and we haven't descended yet, do.
       if (
         !visited.has(n) &&
         !Text.isText(n) &&
@@ -473,7 +572,7 @@ export const Node = {
   },
 
   /**
-   * Return an iterable of all leaf text nodes in a root node.
+   * Return a generator of all leaf text nodes in a root node.
    */
 
   *texts(
@@ -484,7 +583,7 @@ export const Node = {
       reverse?: boolean
       pass?: (node: NodeEntry) => boolean
     } = {}
-  ): Iterable<NodeEntry<Text>> {
+  ): Generator<NodeEntry<Text>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
         yield [node, path]
@@ -516,3 +615,11 @@ export type Ancestor = Editor | Element
  */
 
 export type NodeEntry<T extends Node = Node> = [T, Path]
+
+/**
+ * Convenience type for returning the props of a node.
+ */
+export type NodeProps =
+  | Omit<Editor, 'children'>
+  | Omit<Element, 'children'>
+  | Omit<Text, 'text'>

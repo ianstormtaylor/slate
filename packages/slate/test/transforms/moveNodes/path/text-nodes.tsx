@@ -4,10 +4,13 @@ import { jsx } from '../../..'
 
 export const input = (
   <editor>
-    <block>one</block>
+    <block>
+      <text>bar</text>
+      <text>foo</text>
+    </block>
     <block>
       <cursor />
-      two
+      baz
     </block>
   </editor>
 )
@@ -17,12 +20,14 @@ export const run = editor => {
 export const output = (
   <editor>
     <block>
-      <text />
+      <text>foo</text>
     </block>
     <block>
-      one
-      <cursor />
-      two
+      <text>
+        bar
+        <cursor />
+        baz
+      </text>
     </block>
   </editor>
 )

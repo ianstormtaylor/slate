@@ -18,11 +18,11 @@ React components for rendering Slate editors
 
 The main Slate editor.
 
-###### `DefaultElement(props: RenderElementProps)` 
+###### `DefaultElement(props: RenderElementProps)`
 
 The default element renderer.
 
-###### `DefaultLeaf(props: RenderLeafProps)` 
+###### `DefaultLeaf(props: RenderLeafProps)`
 
 The default custom leaf renderer.
 
@@ -33,10 +33,6 @@ A wrapper around the provider to handle `onChange` events, because the editor is
 ## Hooks
 
 React hooks for Slate editors
-
-###### `useEditor`
-
-Get the current editor object from the React context.
 
 ###### `useFocused`
 
@@ -52,7 +48,11 @@ Get the current `selected` state of an element.
 
 ###### `useSlate`
 
-Get the current editor object from the React context.
+Get the current editor object from the React context. Re-renders the context whenever changes occur in the editor.
+
+###### `useSlateStatic`
+
+Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
 
 ## ReactEditor
 
@@ -137,4 +137,3 @@ Adds React and DOM specific behaviors to the editor.
 ## Utils
 
 Private convenience modules
-

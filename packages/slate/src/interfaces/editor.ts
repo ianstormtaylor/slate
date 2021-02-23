@@ -4,8 +4,7 @@ import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
-  Descendant,
-  Element,
+  ExtendedType,
   Location,
   Node,
   NodeEntry,
@@ -27,18 +26,23 @@ import {
   RANGE_REFS,
 } from '../utils/weak-maps'
 import { getWordDistance, getCharacterDistance } from '../utils/string'
+import { Descendant } from './node'
+import { Element } from './element'
+
+export type BaseSelection = Range | null
+
+export type Selection = ExtendedType<'Selection', BaseSelection>
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
  * by plugins that wish to add their own helpers and implement new behaviors.
  */
 
-export interface Editor {
-  children: Node[]
-  selection: Range | null
+export interface BaseEditor {
+  children: Descendant[]
+  selection: Selection
   operations: Operation[]
-  marks: Record<string, any> | null
-  [key: string]: unknown
+  marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -60,7 +64,216 @@ export interface Editor {
   removeMark: (key: string) => void
 }
 
-export const Editor = {
+export type Editor = ExtendedType<'Editor', BaseEditor>
+
+export interface EditorInterface {
+  above: <T extends Ancestor>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  addMark: (editor: Editor, key: string, value: any) => void
+  after: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    }
+  ) => Point | undefined
+  before: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    }
+  ) => Point | undefined
+  deleteBackward: (
+    editor: Editor,
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
+  ) => void
+  deleteForward: (
+    editor: Editor,
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
+  ) => void
+  deleteFragment: (editor: Editor) => void
+  edges: (editor: Editor, at: Location) => [Point, Point]
+  end: (editor: Editor, at: Location) => Point
+  first: (editor: Editor, at: Location) => NodeEntry
+  fragment: (editor: Editor, at: Location) => Descendant[]
+  hasBlocks: (editor: Editor, element: Element) => boolean
+  hasInlines: (editor: Editor, element: Element) => boolean
+  hasTexts: (editor: Editor, element: Element) => boolean
+  insertBreak: (editor: Editor) => void
+  insertFragment: (editor: Editor, fragment: Node[]) => void
+  insertNode: (editor: Editor, node: Node) => void
+  insertText: (editor: Editor, text: string) => void
+  isBlock: (editor: Editor, value: any) => value is Element
+  isEditor: (value: any) => value is Editor
+  isEnd: (editor: Editor, point: Point, at: Location) => boolean
+  isEdge: (editor: Editor, point: Point, at: Location) => boolean
+  isEmpty: (editor: Editor, element: Element) => boolean
+  isInline: (editor: Editor, value: any) => value is Element
+  isNormalizing: (editor: Editor) => boolean
+  isStart: (editor: Editor, point: Point, at: Location) => boolean
+  isVoid: (editor: Editor, value: any) => value is Element
+  last: (editor: Editor, at: Location) => NodeEntry
+  leaf: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry<Text>
+  levels: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      reverse?: boolean
+      voids?: boolean
+    }
+  ) => Generator<NodeEntry<T>, void, undefined>
+  marks: (editor: Editor) => Omit<Text, 'text'> | null
+  next: <T extends Descendant>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  node: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry
+  nodes: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location | Span
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
+      reverse?: boolean
+      voids?: boolean
+    }
+  ) => Generator<NodeEntry<T>, void, undefined>
+  normalize: (
+    editor: Editor,
+    options?: {
+      force?: boolean
+    }
+  ) => void
+  parent: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry<Ancestor>
+  path: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => Path
+  pathRef: (
+    editor: Editor,
+    path: Path,
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
+  ) => PathRef
+  pathRefs: (editor: Editor) => Set<PathRef>
+  point: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      edge?: 'start' | 'end'
+    }
+  ) => Point
+  pointRef: (
+    editor: Editor,
+    point: Point,
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
+  ) => PointRef
+  pointRefs: (editor: Editor) => Set<PointRef>
+  positions: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+    }
+  ) => Generator<Point, void, undefined>
+  previous: <T extends Node>(
+    editor: Editor,
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<T> | undefined
+  range: (editor: Editor, at: Location, to?: Location) => Range
+  rangeRef: (
+    editor: Editor,
+    range: Range,
+    options?: {
+      affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
+    }
+  ) => RangeRef
+  rangeRefs: (editor: Editor) => Set<RangeRef>
+  removeMark: (editor: Editor, key: string) => void
+  start: (editor: Editor, at: Location) => Point
+  string: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      voids?: boolean
+    }
+  ) => string
+  unhangRange: (
+    editor: Editor,
+    range: Range,
+    options?: {
+      voids?: boolean
+    }
+  ) => Range
+  void: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
+  ) => NodeEntry<Element> | undefined
+  withoutNormalizing: (editor: Editor, fn: () => void) => void
+}
+
+export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
    */
@@ -121,6 +334,7 @@ export const Editor = {
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     } = {}
   ): Point | undefined {
     const anchor = Editor.point(editor, at, { edge: 'end' })
@@ -130,7 +344,10 @@ export const Editor = {
     let d = 0
     let target
 
-    for (const p of Editor.positions(editor, { ...options, at: range })) {
+    for (const p of Editor.positions(editor, {
+      ...options,
+      at: range,
+    })) {
       if (d > distance) {
         break
       }
@@ -155,6 +372,7 @@ export const Editor = {
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
     } = {}
   ): Point | undefined {
     const anchor = Editor.start(editor, [])
@@ -465,7 +683,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
 
@@ -481,7 +699,7 @@ export const Editor = {
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
-      if (!match(n)) {
+      if (!match(n, p)) {
         continue
       }
 
@@ -503,7 +721,7 @@ export const Editor = {
    * Get the marks that would be added to text at the current selection.
    */
 
-  marks(editor: Editor): Record<string, any> | null {
+  marks(editor: Editor): Omit<Text, 'text'> | null {
     const { marks, selection } = editor
 
     if (!selection) {
@@ -554,7 +772,7 @@ export const Editor = {
    * Get the matching node in the branch of the document after a location.
    */
 
-  next<T extends Node>(
+  next<T extends Descendant>(
     editor: Editor,
     options: {
       at?: Location
@@ -570,9 +788,13 @@ export const Editor = {
       return
     }
 
-    const [, from] = Editor.last(editor, at)
+    const pointAfterLocation = Editor.after(editor, at, { voids })
+
+    if (!pointAfterLocation) return
+
     const [, to] = Editor.last(editor, [])
-    const span: Span = [from, to]
+
+    const span: Span = [pointAfterLocation.path, to]
 
     if (Path.isPath(at) && at.length === 0) {
       throw new Error(`Cannot get the next node from the root node!`)
@@ -587,7 +809,7 @@ export const Editor = {
       }
     }
 
-    const [, next] = Editor.nodes(editor, { at: span, match, mode, voids })
+    const [next] = Editor.nodes(editor, { at: span, match, mode, voids })
     return next
   },
 
@@ -622,7 +844,7 @@ export const Editor = {
       reverse?: boolean
       voids?: boolean
     } = {}
-  ): Iterable<NodeEntry<T>> {
+  ): Generator<NodeEntry<T>, void, undefined> {
     const {
       at = editor.selection,
       mode = 'all',
@@ -653,7 +875,7 @@ export const Editor = {
       to = reverse ? first : last
     }
 
-    const iterable = Node.nodes(editor, {
+    const nodeEntries = Node.nodes(editor, {
       reverse,
       from,
       to,
@@ -663,7 +885,7 @@ export const Editor = {
     const matches: NodeEntry<T>[] = []
     let hit: NodeEntry<T> | undefined
 
-    for (const [node, path] of iterable) {
+    for (const [node, path] of nodeEntries) {
       const isLower = hit && Path.compare(path, hit[1]) === 0
 
       // In highest mode any node lower than the last hit is not a match.
@@ -671,7 +893,7 @@ export const Editor = {
         continue
       }
 
-      if (!match(node)) {
+      if (!match(node, path)) {
         // If we've arrived at a leaf text node that is not lower than the last
         // hit, then we've found a branch that doesn't include a match, which
         // means the match is not universal.
@@ -727,7 +949,7 @@ export const Editor = {
     options: {
       force?: boolean
     } = {}
-  ) {
+  ): void {
     const { force = false } = options
     const getDirtyPaths = (editor: Editor) => {
       return DIRTY_PATHS.get(editor) || []
@@ -757,9 +979,13 @@ export const Editor = {
           `)
         }
 
-        const path = getDirtyPaths(editor).pop()!
-        const entry = Editor.node(editor, path)
-        editor.normalizeNode(entry)
+        const dirtyPath = getDirtyPaths(editor).pop()!
+
+        // If the node doesn't exist in the tree, it does not need to be normalized.
+        if (Node.has(editor, dirtyPath)) {
+          const entry = Editor.node(editor, dirtyPath)
+          editor.normalizeNode(entry)
+        }
         m++
       }
     })
@@ -969,8 +1195,9 @@ export const Editor = {
    * can pass the `unit: 'character'` option to moved forward one character, word,
    * or line at at time.
    *
-   * Note: void nodes are treated as a single point, and iteration will not
-   * happen inside their content.
+   * Note: By default void nodes are treated as a single point and iteration
+   * will not happen inside their content unless you pass in true for the
+   * voids option, then iteration will occur.
    */
 
   *positions(
@@ -979,9 +1206,15 @@ export const Editor = {
       at?: Location
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
+      voids?: boolean
     } = {}
-  ): Iterable<Point> {
-    const { at = editor.selection, unit = 'offset', reverse = false } = options
+  ): Generator<Point, void, undefined> {
+    const {
+      at = editor.selection,
+      unit = 'offset',
+      reverse = false,
+      voids = false,
+    } = options
 
     if (!at) {
       return
@@ -1020,11 +1253,12 @@ export const Editor = {
       distance = available >= 0 ? null : 0 - available
     }
 
-    for (const [node, path] of Editor.nodes(editor, { at, reverse })) {
+    for (const [node, path] of Editor.nodes(editor, { at, reverse, voids })) {
       if (Element.isElement(node)) {
-        // Void nodes are a special case, since we don't want to iterate over
-        // their content. We instead always just yield their first point.
-        if (editor.isVoid(node)) {
+        // Void nodes are a special case, so by default we will always
+        // yield their first point. If the voids option is set to true,
+        // then we will iterate over their content
+        if (!voids && editor.isVoid(node)) {
           yield Editor.start(editor, path)
           continue
         }
@@ -1041,7 +1275,7 @@ export const Editor = {
             ? start
             : Editor.start(editor, path)
 
-          const text = Editor.string(editor, { anchor: s, focus: e })
+          const text = Editor.string(editor, { anchor: s, focus: e }, { voids })
           string = reverse ? reverseText(text) : text
           isNewBlock = true
         }
@@ -1103,9 +1337,17 @@ export const Editor = {
       return
     }
 
-    const [, from] = Editor.first(editor, at)
+    const pointBeforeLocation = Editor.before(editor, at, { voids })
+
+    if (!pointBeforeLocation) {
+      return
+    }
+
     const [, to] = Editor.first(editor, [])
-    const span: Span = [from, to]
+
+    // The search location is from the start of the document to the path of
+    // the point before the location passed in
+    const span: Span = [pointBeforeLocation.path, to]
 
     if (Path.isPath(at) && at.length === 0) {
       throw new Error(`Cannot get the previous node from the root node!`)
@@ -1120,7 +1362,7 @@ export const Editor = {
       }
     }
 
-    const [, previous] = Editor.nodes(editor, {
+    const [previous] = Editor.nodes(editor, {
       reverse: true,
       at: span,
       match,
@@ -1213,11 +1455,18 @@ export const Editor = {
   /**
    * Get the text string content of a location.
    *
-   * Note: the text of void nodes is presumed to be an empty string, regardless
-   * of what their actual content is.
+   * Note: by default the text of void nodes is considered to be an empty
+   * string, regardless of content, unless you pass in true for the voids option
    */
 
-  string(editor: Editor, at: Location): string {
+  string(
+    editor: Editor,
+    at: Location,
+    options: {
+      voids?: boolean
+    } = {}
+  ): string {
+    const { voids = false } = options
     const range = Editor.range(editor, at)
     const [start, end] = Range.edges(range)
     let text = ''
@@ -1225,6 +1474,7 @@ export const Editor = {
     for (const [node, path] of Editor.nodes(editor, {
       at: range,
       match: Text.isText,
+      voids,
     })) {
       let t = node.text
 
@@ -1240,275 +1490,6 @@ export const Editor = {
     }
 
     return text
-  },
-
-  /**
-   * Transform the editor by an operation.
-   */
-
-  transform(editor: Editor, op: Operation) {
-    editor.children = createDraft(editor.children)
-    let selection = editor.selection && createDraft(editor.selection)
-
-    switch (op.type) {
-      case 'insert_node': {
-        const { path, node } = op
-        const parent = Node.parent(editor, path)
-        const index = path[path.length - 1]
-        parent.children.splice(index, 0, node)
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-
-      case 'insert_text': {
-        const { path, offset, text } = op
-        const node = Node.leaf(editor, path)
-        const before = node.text.slice(0, offset)
-        const after = node.text.slice(offset)
-        node.text = before + text + after
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-
-      case 'merge_node': {
-        const { path } = op
-        const node = Node.get(editor, path)
-        const prevPath = Path.previous(path)
-        const prev = Node.get(editor, prevPath)
-        const parent = Node.parent(editor, path)
-        const index = path[path.length - 1]
-
-        if (Text.isText(node) && Text.isText(prev)) {
-          prev.text += node.text
-        } else if (!Text.isText(node) && !Text.isText(prev)) {
-          prev.children.push(...node.children)
-        } else {
-          throw new Error(
-            `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interaces: ${node} ${prev}`
-          )
-        }
-
-        parent.children.splice(index, 1)
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-
-      case 'move_node': {
-        const { path, newPath } = op
-
-        if (Path.isAncestor(path, newPath)) {
-          throw new Error(
-            `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`
-          )
-        }
-
-        const node = Node.get(editor, path)
-        const parent = Node.parent(editor, path)
-        const index = path[path.length - 1]
-
-        // This is tricky, but since the `path` and `newPath` both refer to
-        // the same snapshot in time, there's a mismatch. After either
-        // removing the original position, the second step's path can be out
-        // of date. So instead of using the `op.newPath` directly, we
-        // transform `op.path` to ascertain what the `newPath` would be after
-        // the operation was applied.
-        parent.children.splice(index, 1)
-        const truePath = Path.transform(path, op)!
-        const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
-        const newIndex = truePath[truePath.length - 1]
-
-        newParent.children.splice(newIndex, 0, node)
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-
-      case 'remove_node': {
-        const { path } = op
-        const index = path[path.length - 1]
-        const parent = Node.parent(editor, path)
-        parent.children.splice(index, 1)
-
-        // Transform all of the points in the value, but if the point was in the
-        // node that was removed we need to update the range or remove it.
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            const result = Point.transform(point, op)
-
-            if (selection != null && result != null) {
-              selection[key] = result
-            } else {
-              let prev: NodeEntry<Text> | undefined
-              let next: NodeEntry<Text> | undefined
-
-              for (const [n, p] of Node.texts(editor)) {
-                if (Path.compare(p, path) === -1) {
-                  prev = [n, p]
-                } else {
-                  next = [n, p]
-                  break
-                }
-              }
-
-              if (prev) {
-                point.path = prev[1]
-                point.offset = prev[0].text.length
-              } else if (next) {
-                point.path = next[1]
-                point.offset = 0
-              } else {
-                selection = null
-              }
-            }
-          }
-        }
-
-        break
-      }
-
-      case 'remove_text': {
-        const { path, offset, text } = op
-        const node = Node.leaf(editor, path)
-        const before = node.text.slice(0, offset)
-        const after = node.text.slice(offset + text.length)
-        node.text = before + after
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-
-      case 'set_node': {
-        const { path, newProperties } = op
-
-        if (path.length === 0) {
-          throw new Error(`Cannot set properties on the root node!`)
-        }
-
-        const node = Node.get(editor, path)
-
-        for (const key in newProperties) {
-          if (key === 'children' || key === 'text') {
-            throw new Error(`Cannot set the "${key}" property of nodes!`)
-          }
-
-          const value = newProperties[key]
-
-          if (value == null) {
-            delete node[key]
-          } else {
-            node[key] = value
-          }
-        }
-
-        break
-      }
-
-      case 'set_selection': {
-        const { newProperties } = op
-
-        if (newProperties == null) {
-          selection = newProperties
-        } else if (selection == null) {
-          if (!Range.isRange(newProperties)) {
-            throw new Error(
-              `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
-                newProperties
-              )} when there is no current selection.`
-            )
-          }
-
-          selection = newProperties
-        } else {
-          Object.assign(selection, newProperties)
-        }
-
-        break
-      }
-
-      case 'split_node': {
-        const { path, position, properties } = op
-
-        if (path.length === 0) {
-          throw new Error(
-            `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`
-          )
-        }
-
-        const node = Node.get(editor, path)
-        const parent = Node.parent(editor, path)
-        const index = path[path.length - 1]
-        let newNode: Descendant
-
-        if (Text.isText(node)) {
-          const before = node.text.slice(0, position)
-          const after = node.text.slice(position)
-          node.text = before
-          newNode = {
-            ...node,
-            ...(properties as Partial<Text>),
-            text: after,
-          }
-        } else {
-          const before = node.children.slice(0, position)
-          const after = node.children.slice(position)
-          node.children = before
-
-          newNode = {
-            ...node,
-            ...(properties as Partial<Element>),
-            children: after,
-          }
-        }
-
-        parent.children.splice(index + 1, 0, newNode)
-
-        if (selection) {
-          for (const [point, key] of Range.points(selection)) {
-            selection[key] = Point.transform(point, op)!
-          }
-        }
-
-        break
-      }
-    }
-
-    editor.children = finishDraft(editor.children) as Node[]
-
-    if (selection) {
-      editor.selection = isDraft(selection)
-        ? (finishDraft(selection) as Range)
-        : selection
-    } else {
-      editor.selection = null
-    }
   },
 
   /**
@@ -1594,6 +1575,6 @@ export const Editor = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+export type NodeMatch<T extends Node> =
+  | ((node: Node, path: Path) => node is T)
+  | ((node: Node, path: Path) => boolean)
