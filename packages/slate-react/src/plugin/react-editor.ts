@@ -433,8 +433,12 @@ export const ReactEditor = {
         range.setEnd(nearestNode, nearestOffset)
         const contents = range.cloneContents()
         const removals = [
-          ...contents.querySelectorAll('[data-slate-zero-width]'),
-          ...contents.querySelectorAll('[contenteditable=false]'),
+          ...Array.prototype.slice.call(
+            contents.querySelectorAll('[data-slate-zero-width]')
+          ),
+          ...Array.prototype.slice.call(
+            contents.querySelectorAll('[contenteditable=false]')
+          ),
         ]
 
         removals.forEach(el => {
