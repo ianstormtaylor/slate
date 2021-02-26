@@ -248,7 +248,6 @@ export const GeneralTransforms: GeneralTransforms = {
           const after = node.text.slice(position)
           node.text = before
           newNode = {
-            ...node,
             ...(properties as Partial<Text>),
             text: after,
           }
@@ -258,7 +257,6 @@ export const GeneralTransforms: GeneralTransforms = {
           node.children = before
 
           newNode = {
-            ...node,
             ...(properties as Partial<Element>),
             children: after,
           }

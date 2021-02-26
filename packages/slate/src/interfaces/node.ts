@@ -383,7 +383,7 @@ export const Node: NodeInterface = {
    */
 
   isNodeList(value: any): value is Node[] {
-    return Array.isArray(value) && (value.length === 0 || Node.isNode(value[0]))
+    return Array.isArray(value) && value.every(val => Node.isNode(val))
   },
 
   /**
