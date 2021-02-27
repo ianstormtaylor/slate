@@ -17,6 +17,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Chatterbug](https://chatterbug.com)
 - [Clause](https://clause.io)
 - [GitBook](https://www.gitbook.com/)
+- [Discord](https://discord.com/)
 - [Grafana](https://grafana.com/)
 - [GraphCMS](https://graphcms.com)
 - [Guilded](https://www.guilded.gg)
