@@ -3,7 +3,7 @@ import getDirection from 'direction'
 import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
-import Children from './children'
+import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -42,16 +42,14 @@ const Element = (props: {
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
 
-  let children: JSX.Element | null = (
-    <Children
-      decorate={decorate}
-      decorations={decorations}
-      node={element}
-      renderElement={renderElement}
-      renderLeaf={renderLeaf}
-      selection={selection}
-    />
-  )
+  let children: JSX.Element | null = useChildren({
+    decorate,
+    decorations,
+    node: element,
+    renderElement,
+    renderLeaf,
+    selection,
+  })
 
   // Attributes that the developer must mix into the element in their
   // custom node renderer component.

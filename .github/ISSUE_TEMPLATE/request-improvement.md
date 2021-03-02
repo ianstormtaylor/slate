@@ -4,10 +4,7 @@ about: An improvement to existing functionality
 title: ''
 labels: improvement
 assignees: ''
-
----
-
-**Problem**
+---**Problem**
 A clear and concise description of what the problem is. (Eg. I'm always frustrated when [...])
 
 **Solution**

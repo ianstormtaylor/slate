@@ -11,8 +11,8 @@ A GIF or video showing the old and new behaviors after this pull request is merg
 If your change is non-trivial, please include a description of how the new logic works, and why you decided to solve it the way you did. (This is incredibly helpful so that reviewers don't have to guess your intentions based on the code, and without it your pull request will likely not be reviewed as quickly.)
 
 **Checks**
+
 - [ ] The new code matches the existing patterns and styles.
 - [ ] The tests pass with `yarn test`.
 - [ ] The linter passes with `yarn lint`. (Fix errors with `yarn fix`.)
 - [ ] The relevant examples still work. (Run examples with `yarn start`.)
-

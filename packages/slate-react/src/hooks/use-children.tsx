@@ -4,7 +4,7 @@ import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 import ElementComponent from './element'
 import TextComponent from './text'
 import { ReactEditor } from '..'
-import { useSlateStatic } from '../hooks/use-slate-static'
+import { useSlateStatic } from './use-slate-static'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import { RenderElementProps, RenderLeafProps } from './editable'
 

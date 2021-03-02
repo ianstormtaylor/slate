@@ -4,10 +4,7 @@ about: An idea or request for new functionality
 title: ''
 labels: feature
 assignees: ''
-
----
-
-**Problem**
+---**Problem**
 A clear and concise description of what the problem is. (Eg. I'm always frustrated when [...])
 
 **Solution**
