@@ -1,18 +1,18 @@
 import React from 'react'
 import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
 
-import ElementComponent from './element'
-import TextComponent from './text'
+import ElementComponent from '../components/element'
+import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
-import { RenderElementProps, RenderLeafProps } from './editable'
+import { RenderElementProps, RenderLeafProps } from '../components/editable'
 
 /**
  * Children.
  */
 
-const Children = (props: {
+const useChildren = (props: {
   decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
@@ -81,7 +81,7 @@ const Children = (props: {
     NODE_TO_PARENT.set(n, node)
   }
 
-  return <React.Fragment>{children}</React.Fragment>
+  return children
 }
 
-export default Children
+export default useChildren
