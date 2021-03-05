@@ -534,7 +534,8 @@ export const ReactEditor = {
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
-
-    return { anchor, focus }
+      
+      let unhangedRange = Editor.unhangRange(editor, {anchor, focus})
+      return unhangedRange
   },
 }
