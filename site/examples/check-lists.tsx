@@ -20,7 +20,7 @@ import {
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
-const initialValue: Descendant[] = [
+const initialValue: SlateElement[] = [
   {
     type: 'paragraph',
     children: [
