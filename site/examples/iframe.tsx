@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
-import { Editor, createEditor } from 'slate'
+import { Editor, createEditor, Node } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -15,7 +15,7 @@ const HOTKEYS = {
 }
 
 const IFrameExample = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Node[]>(initialValue)
   const renderElement = useCallback(
     ({ attributes, children }) => <p {...attributes}>{children}</p>,
     []
@@ -42,7 +42,7 @@ const IFrameExample = () => {
           autoFocus
           onKeyDown={event => {
             for (const hotkey in HOTKEYS) {
-              if (isHotkey(hotkey, event)) {
+              if (isHotkey(hotkey, event as any)) {
                 event.preventDefault()
                 const mark = HOTKEYS[hotkey]
                 toggleMark(editor, mark)
