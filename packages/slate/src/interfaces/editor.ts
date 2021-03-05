@@ -1505,21 +1505,32 @@ export const Editor: EditorInterface = {
   ): Range {
     const { voids = false } = options
     let [start, end] = Range.edges(range)
+    const startPointAtEndOfNode = Editor.isEnd(editor, start, start.path);
+    const endPointAtStartOfNode = Editor.isStart(editor, end, end.path);
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (!(startPointAtEndOfNode || endPointAtStartOfNode) || Range.isCollapsed(range)) {
       return range
     }
 
+    const startBlock = Editor.above(editor, {
+      at: start,
+      match: n => Editor.isBlock(editor, n),
+    })
+    const startBlockPath = startBlock ? startBlock[1] : []
     const endBlock = Editor.above(editor, {
       at: end,
       match: n => Editor.isBlock(editor, n),
     })
-    const blockPath = endBlock ? endBlock[1] : []
+    const endBlockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
+    const last = Editor.end(editor, [])
     const before = { anchor: first, focus: end }
-    let skip = true
+    const after = { anchor: start, focus: last }
 
+    //Unhang from the end if it lies at the start of a node (end.offset = 0) and move to the next text node.
+    let skip = true;
+    if(endPointAtStartOfNode)
     for (const [node, path] of Editor.nodes(editor, {
       at: before,
       match: Text.isText,
@@ -1530,9 +1541,26 @@ export const Editor: EditorInterface = {
         skip = false
         continue
       }
-
-      if (node.text !== '' || Path.isBefore(path, blockPath)) {
+      if (node.text !== '' || Path.isBefore(path, endBlockPath)) {
         end = { path, offset: node.text.length }
+        break
+      }
+    }
+    
+    //Unhang from the start if it lies on the end of a node (start.offset = startNode.length) and move to the next text node.
+    skip = true
+    if(startPointAtEndOfNode)
+    for (const [node, path] of Editor.nodes(editor, {
+      at: after,
+      match: Text.isText,
+      voids,
+    })) {
+      if (skip) {
+        skip = false
+        continue
+      }
+      if (node.text !== '' || Path.isAfter(path, startBlockPath)) {
+        start = { path, offset: 0 }
         break
       }
     }
