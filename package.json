@@ -93,6 +93,6 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2"
+    "typescript": "3.9.7"
   }
 }
