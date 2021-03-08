@@ -18,7 +18,6 @@ import Hotkeys from '../utils/hotkeys'
 import {
   IS_FIREFOX,
   IS_SAFARI,
-  IS_EDGE_LEGACY,
   IS_CHROME_LEGACY,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -48,11 +47,8 @@ import {
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT = !(
-  IS_FIREFOX ||
-  IS_EDGE_LEGACY ||
-  IS_CHROME_LEGACY
-)
+const HAS_BEFORE_INPUT_SUPPORT = !IS_CHROME_LEGACY && 
+  window.InputEvent && typeof InputEvent.prototype.getTargetRanges === "function";
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
