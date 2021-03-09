@@ -15,11 +15,7 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 
 import Children from './children'
 import Hotkeys from '../utils/hotkeys'
-import {
-  IS_FIREFOX,
-  IS_SAFARI,
-  IS_CHROME_LEGACY,
-} from '../utils/environment'
+import { IS_FIREFOX, IS_SAFARI, IS_CHROME_LEGACY } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
@@ -50,7 +46,7 @@ import {
 const HAS_BEFORE_INPUT_SUPPORT =
   !IS_CHROME_LEGACY &&
   globalThis.InputEvent &&
-  //@ts-ignore The `getTargetRanges` property isn't recognized.
+  // @ts-ignore The `getTargetRanges` property isn't recognized.
   typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
 
 /**
