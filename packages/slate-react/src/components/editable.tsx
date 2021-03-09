@@ -47,8 +47,11 @@ import {
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT = !IS_CHROME_LEGACY && 
-  window.InputEvent && typeof InputEvent.prototype.getTargetRanges === "function";
+const HAS_BEFORE_INPUT_SUPPORT =
+  !IS_CHROME_LEGACY &&
+  globalThis.InputEvent &&
+  //@ts-ignore The `getTargetRanges` property isn't recognized.
+  typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
