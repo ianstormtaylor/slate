@@ -80,6 +80,10 @@ If you only want to run a specific test or tests, you can run `yarn test --fgrep
 
 ## Publishing Releases
 
+**Important**: When creating releases using Lerna with the instructions below, you will be given choices around how to increase version numbers. You should always use a `major`, `minor` or `patch` release and must never use a `prerelease`. If a prerelease is used, the root package will not link to the packages in the `packages` directory creating hard to diagnose issues.
+
+### Publishing Normal `@latest` Release
+
 Since we use [Lerna](https://lerna.js.org) to manage the Slate packages this is fairly easy, just run:
 
 ```shell
@@ -90,7 +94,7 @@ And follow the prompts Lerna gives you.
 
 Note that this will automatically run the prelease script first that will build, test and lint before attempting to publish.
 
-## Publishing `@next` Releases
+### Publishing `@next` Release
 
 If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
 
@@ -100,7 +104,15 @@ yarn release:next
 
 And follow the prompts Lerna gives you.
 
-## Running Prerelease Script
+### Publishing `@experimental` Release
+
+If you need to create an experimental release to see how a published package will behave during an actual publish, release with the `@experimental` tag. End users should have no expectation that an `@experimental` release will be usable.
+
+```shell
+yarn release:experimental
+```
+
+### Running Prerelease Script
 
 If we want to make sure that Slate code follows the preparations for a release but without actually publishing, run:
 
