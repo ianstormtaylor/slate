@@ -44,7 +44,12 @@ export const withReact = <T extends Editor>(editor: T) => {
       }
 
       case 'move_node': {
-        // TODO
+        for (const [node, path] of Editor.levels(e, {
+          at: Path.common(Path.parent(op.path), Path.parent(op.newPath)),
+        })) {
+          const key = ReactEditor.findKey(e, node)
+          matches.push([path, key])
+        }
         break
       }
     }
