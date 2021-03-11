@@ -5,8 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "build": "yarn bootstrap && yarn build:rollup && yarn build:next",
+    "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js",
     "clean": "rimraf ./node_modules ./packages/*/{dist,lib,node_modules} ./site/{.next,out}",
