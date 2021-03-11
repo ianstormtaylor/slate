@@ -1,6 +1,14 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import { Editor, Transforms, Text, createEditor, Node } from 'slate'
+import {
+  Editor,
+  Transforms,
+  Text,
+  createEditor,
+  Node,
+  Element,
+  Descendant,
+} from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -8,7 +16,7 @@ import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -140,8 +148,9 @@ const FormatButton = ({ format, icon }) => {
   )
 }
 
-const initialValue = [
+const initialValue: Element[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -154,6 +163,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       { text: 'Try it out yourself! Just ' },
       { text: 'select any piece of text and the menu will appear', bold: true },

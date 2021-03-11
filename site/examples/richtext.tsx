@@ -5,6 +5,7 @@ import {
   Editor,
   Transforms,
   createEditor,
+  Descendant,
   Node,
   Element as SlateElement,
 } from 'slate'
@@ -22,7 +23,7 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const RichTextExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -175,7 +176,7 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
     type: 'paragraph',
     children: [

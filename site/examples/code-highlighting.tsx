@@ -17,7 +17,7 @@ import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 const CodeHighlightingExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [language, setLanguage] = useState('html')
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -149,8 +149,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: '<h1>Hi!</h1>',

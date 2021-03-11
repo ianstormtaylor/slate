@@ -19,8 +19,10 @@
     "prerelease": "cross-env NODE_ENV=production yarn build:rollup && yarn test && yarn lint",
     "release:publish:latext": "lerna publish",
     "release:publish:next": "lerna publish --dist-tag next",
+    "release:publish:experimental": "lerna publish --dist-tag experimental",
     "release:latest": "yarn prerelease && lerna publish",
     "release:next": "yarn prerelease && lerna publish --dist-tag next",
+    "release:experimental": "yarn prerelease && lerna publish --dist-tag experimental",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
     "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
@@ -91,6 +93,6 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
-    "typescript": "^3.7.2"
+    "typescript": "3.9.7"
   }
 }

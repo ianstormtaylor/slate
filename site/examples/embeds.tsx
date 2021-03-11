@@ -1,5 +1,11 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node, Element as SlateElement } from 'slate'
+import {
+  Transforms,
+  createEditor,
+  Node,
+  Element as SlateElement,
+  Descendant,
+} from 'slate'
 import {
   Slate,
   Editable,
@@ -11,7 +17,7 @@ import {
 } from 'slate-react'
 
 const EmbedsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -98,8 +104,9 @@ const UrlInput = ({ url, onChange }) => {
   )
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -113,6 +120,7 @@ const initialValue = [
     children: [{ text: '' }],
   },
   {
+    type: 'paragraph',
     children: [
       {
         text:
