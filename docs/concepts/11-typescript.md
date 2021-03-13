@@ -9,6 +9,8 @@ If you need to support more than one document model, see the section Multiple Do
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
 ```ts
+import { Descendant } from 'slate'
+
 declare module 'slate' {
   interface CustomTypes {
     Element: { type: 'paragraph'; children: Descendant[] }
