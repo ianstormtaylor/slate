@@ -43,7 +43,7 @@ export type HeadingElement = {
 
 export type CustomElement = ParagraphElement | HeadingElement
 
-export type FormattedText = { text: 'string'; bold: boolean; italic: boolean }
+export type FormattedText = { text: string; bold: boolean; italic: boolean }
 
 export type CustomText = FormattedText
 
