@@ -32,13 +32,13 @@ Using best practices, the custom types will look something like:
 ```ts
 export type ParagraphElement = {
   type: 'paragraph'
-  children: Descendant
+  children: CustomText[]
 }
 
 export type HeadingElement = {
-  type: 'paragraph'
+  type: 'heading'
   level: number
-  children: Descendant
+  children: CustomText[]
 }
 
 export type CustomElement = ParagraphElement | HeadingElement
