@@ -4,7 +4,7 @@ Slate supports typing of one Slate document model (eg. one set of custom `Elemen
 
 If you need to support more than one document model, see the section Multiple Document Models.
 
-## Defining Custom Element and Text Types
+## Defining `Element` and Text Types
 
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
@@ -17,7 +17,7 @@ declare module 'slate' {
 }
 ```
 
-## Recommended Custom Element and Text
+## Best Practices for `Element` and `Text` Types
 
 While you can define types directly in the `CustomTypes` interface, best practice is to:
 
@@ -71,11 +71,11 @@ For more information see [Proposal: Add Custom TypeScript Types to Slate](https:
 
 ## Multiple Document Models
 
-At the moment, Slate only supports types for a single document model at a time. For example, it cannot support a full Rich Text Editor for editing documents while also having a less featured Editor for editing comments.
+At the moment, Slate supports types for a single document model at a time. For example, it cannot support a full Rich Text Editor for editing documents while also having a different Editor for editing comments.
 
-Slate's TypeScript support was designed this way because some improved typing support was better than none. The goal is to also support typing for multiple editor definitions but this will depend on community support.
+Slate's TypeScript support was designed this way because some improved typing support was better than none. The goal is to support typing for multiple editor definitions in the future but this will depend on community input.
 
-One workaround for support multiple document models is to create each editor in a separate package and then import them. This hasn't been tested but should work.
+One workaround for supporting multiple document models is to create each editor in a separate package and then import them. This hasn't been tested but should work.
 
 ## Extending Other Types
 
@@ -86,6 +86,6 @@ Currently there is also support for extending:
 - `Range`
 - `Point`
 
-Feel free to extend these types but extended these types should be considered experimental. We are actively looking for better ways to implement this.
+Feel free to extend these types but extended these types should be considered experimental. We are looking for better ways to implement this.
 
-For some examples of how to extend these types, see `packages/slate-react/src/custom-types.ts` in the slate repository.
+For some examples of how to use types, see `packages/slate-react/src/custom-types.ts` in the slate repository.
