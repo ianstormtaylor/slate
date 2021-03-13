@@ -88,4 +88,6 @@ Currently there is also support for extending:
 
 Feel free to extend these types but extended these types should be considered experimental. We are looking for better ways to implement this.
 
+## TypeScript Examples
+
 For some examples of how to use types, see `packages/slate-react/src/custom-types.ts` in the slate repository.
