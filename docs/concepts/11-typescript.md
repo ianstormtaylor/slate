@@ -11,10 +11,12 @@ To define a custom `Element` or `Text` type, extend the `CustomTypes` interface 
 ```ts
 import { Descendant } from 'slate'
 
+type CustomText = { text: string; bold: boolean; italic: boolean }
+
 declare module 'slate' {
   interface CustomTypes {
-    Element: { type: 'paragraph'; children: Descendant[] }
-    Text: { text: string; bold: boolean; italic: boolean }
+    Element: { type: 'paragraph'; children: CustomText[] }
+    Text: CustomText
   }
 }
 ```
