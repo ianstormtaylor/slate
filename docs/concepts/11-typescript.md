@@ -4,7 +4,7 @@ Slate supports typing of one Slate document model (eg. one set of custom `Elemen
 
 If you need to support more than one document model, see the section Multiple Document Models.
 
-## Defining `Element` and Text Types
+## Defining `Element` and `Text` Types
 
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
