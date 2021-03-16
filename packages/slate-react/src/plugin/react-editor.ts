@@ -190,7 +190,7 @@ export const ReactEditor = {
     }
 
     return (
-      targetEl.closest(`[data-slate-editor]`) === editorEl &&
+      targetEl.closest(`[data-slate-react-editor]`) === editorEl &&
       (!editable ||
         targetEl.isContentEditable ||
         !!targetEl.getAttribute('data-slate-zero-width'))

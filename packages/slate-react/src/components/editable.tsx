@@ -491,7 +491,7 @@ export const Editable = (props: EditableProps) => {
         autoCapitalize={
           !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCapitalize
         }
-        data-slate-editor
+        data-slate-react-editor
         data-slate-node="value"
         contentEditable={readOnly ? undefined : true}
         suppressContentEditableWarning

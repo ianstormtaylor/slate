@@ -75,6 +75,6 @@ iframe {
   border: 1px solid #eee;
 }
 
-[data-slate-editor] > * + * {
+[data-slate-react-editor] > * + * {
   margin-top: 1em;
 }
