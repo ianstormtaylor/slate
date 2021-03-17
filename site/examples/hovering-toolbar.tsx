@@ -126,7 +126,7 @@ const HoveringToolbar = () => {
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
-        <FormatButton format="underlined" icon="format_underlined" />
+        <FormatButton format="underline" icon="format_underlined" />
       </Menu>
     </Portal>
   )
