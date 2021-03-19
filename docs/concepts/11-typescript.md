@@ -1,5 +1,15 @@
 # TypeScript
 
+Extended TypeScript support is currently available in the `@next` release of Slate only but should be a regular release soon. You will need to install it before using.:
+
+```sh
+# for npm
+npm install --save slate@next
+
+# for yarn
+yarn add slate@next
+```
+
 Slate supports typing of one Slate document model (eg. one set of custom `Element` and `Text` types).
 
 If you need to support more than one document model, see the section Multiple Document Models.
