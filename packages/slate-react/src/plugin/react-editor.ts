@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, BaseEditor } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -28,7 +28,7 @@ import {
  * A React and DOM-specific version of the `Editor` interface.
  */
 
-export interface ReactEditor extends Editor {
+export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
 }
