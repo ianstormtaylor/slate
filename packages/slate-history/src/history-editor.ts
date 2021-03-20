@@ -1,4 +1,4 @@
-import { Editor } from 'slate'
+import { BaseEditor, Editor } from 'slate'
 import { History } from './history'
 
 /**
@@ -13,7 +13,7 @@ export const MERGING = new WeakMap<Editor, boolean | undefined>()
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
 
-export interface HistoryEditor extends Editor {
+export interface HistoryEditor extends BaseEditor {
   history: History
   undo: () => void
   redo: () => void
