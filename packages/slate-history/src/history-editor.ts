@@ -13,7 +13,7 @@ export const MERGING = new WeakMap<Editor, boolean | undefined>()
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
 
-export type HistoryEditor = Editor & {
+export interface HistoryEditor extends Editor {
   history: History
   undo: () => void
   redo: () => void
