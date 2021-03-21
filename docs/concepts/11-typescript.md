@@ -10,21 +10,25 @@ npm install --save slate@next
 yarn add slate@next
 ```
 
-Slate supports typing of one Slate document model (eg. one set of custom `Element` and `Text` types).
+Slate supports typing of one Slate document model (eg. one set of custom `Editor`, `Element` and `Text` types).
 
 If you need to support more than one document model, see the section Multiple Document Models.
 
-## Defining `Element` and `Text` Types
+## Defining `Editor`, `Element` and `Text` Types
 
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
 ```ts
-import { Descendant } from 'slate'
+// This example is for an Editor with `ReactEditor` and `HistoryEditor`
+import { BaseEditor } from 'slate'
+import { ReactEditor } from 'slate-react'
+import { HistoryEditor } from 'slate-history'
 
 type CustomText = { text: string; bold: boolean; italic: boolean }
 
 declare module 'slate' {
   interface CustomTypes {
+    Editor: BaseEditor & ReactEditor & HistoryEditor
     Element: { type: 'paragraph'; children: CustomText[] }
     Text: CustomText
   }
@@ -33,17 +37,18 @@ declare module 'slate' {
 
 ## Best Practices for `Element` and `Text` Types
 
-While you can define types directly in the `CustomTypes` interface, best practice is to:
+While you can define types directly in the `CustomTypes` interface, best practice is to define and export each type separately so that you can reference individual types like a `ParagraphElement`.
 
-- define and export each custom `Element`/`Text` type
-- merge these into and export `CustomElement`/`CustomText` type
-- Use the `CustomElement`/`CustomText` in the `CustomTypes` definition
-
-These are best practices because elsewhere in your code, you may want to directly reference a specific `Element` type like a bullet or image.
-
-Using best practices, the custom types will look something like:
+Using best practices, the custom types might look something like:
 
 ```ts
+// This example is for an Editor with `ReactEditor` and `HistoryEditor`
+import { BaseEditor } from 'slate'
+import { ReactEditor } from 'slate-react'
+import { HistoryEditor } from 'slate-history'
+
+export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
+
 export type ParagraphElement = {
   type: 'paragraph'
   children: CustomText[]
@@ -63,6 +68,7 @@ export type CustomText = FormattedText
 
 declare module 'slate' {
   interface CustomTypes {
+    Editor: CustomEditor
     Element: CustomElement
     Text: CustomText
   }
@@ -93,14 +99,13 @@ One workaround for supporting multiple document models is to create each editor 
 
 ## Extending Other Types
 
-Currently there is also support for extending:
+Currently there is also support for extending other types but these haven't been tested as thoroughly as the ones documented above:
 
-- `Editor`
 - `Selection`
 - `Range`
 - `Point`
 
-Feel free to extend these types but extended these types should be considered experimental. We are looking for better ways to implement this.
+Feel free to extend these types but extending these types should be considered experimental.
 
 ## TypeScript Examples
 
