@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
 import { Range, Element, Text as SlateText } from 'slate'
+import isEqual from 'lodash/isEqual'
 
 import Leaf from './leaf'
 import { ReactEditor, useSlateStatic } from '..'
@@ -68,8 +69,34 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
-    next.text === prev.text
+    next.text === prev.text &&
+    isRangeListEqual(prev.decorations, next.decorations)
   )
 })
+
+/**
+ * Check if a list of ranges is equal to another.
+ *
+ * PERF: this requires the two lists to also have the ranges inside them in the
+ * same order, but this is an okay constraint for us since decorations are
+ * kept in order, and the odd case where they aren't is okay to re-render for.
+ */
+
+const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
+  if (list.length !== another.length) {
+    return false
+  }
+
+  for (let i = 0; i < list.length; i++) {
+    const range = list[i]
+    const other = another[i]
+
+    if (!isEqual(range, other)) {
+      return false
+    }
+  }
+
+  return true
+}
 
 export default MemoizedText
