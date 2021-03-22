@@ -22,7 +22,6 @@ import { RenderElementProps, RenderLeafProps } from './editable'
  */
 
 const Element = (props: {
-  decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
@@ -30,7 +29,6 @@ const Element = (props: {
   selection: Range | null
 }) => {
   const {
-    decorate,
     decorations,
     element,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
@@ -44,7 +42,6 @@ const Element = (props: {
   const key = ReactEditor.findKey(editor, element)
 
   let children: JSX.Element | null = useChildren({
-    decorate,
     decorations,
     node: element,
     renderElement,
@@ -131,7 +128,6 @@ const Element = (props: {
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
-    prev.decorate === next.decorate &&
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
