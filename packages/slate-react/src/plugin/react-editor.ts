@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -534,8 +534,17 @@ export const ReactEditor = {
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
-      
-      let unhangedRange = Editor.unhangRange(editor, {anchor, focus})
-      return unhangedRange
+
+    // return {anchor, focus}
+    const isReversed = Range.isBackward({ anchor, focus })
+    const unhangedRange = Editor.unhangRange(editor, { anchor, focus })
+    if (isReversed) {
+      const reversedRange = {
+        anchor: unhangedRange.focus,
+        focus: unhangedRange.anchor,
+      }
+      return reversedRange
+    }
+    return unhangedRange
   },
 }
