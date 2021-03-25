@@ -8,13 +8,15 @@ import {
   Range,
   createEditor,
   Element as SlateElement,
+  Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { LinkElement } from './custom-types'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
@@ -89,7 +91,7 @@ const wrapLink = (editor, url) => {
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
+  const link: LinkElement = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: url }] : [],
@@ -133,8 +135,9 @@ const LinkButton = () => {
   )
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: 'In addition to block nodes, you can create inline nodes, like ',
@@ -150,6 +153,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       {
         text:

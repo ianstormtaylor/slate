@@ -38,7 +38,7 @@ The `selection` property contains the user's current selection, if any.
 
 The `operations` property contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
 
-The `marks` property stores formatting that is attached to the cursor, and that will be applied to the text that is inserted next.
+The `marks` property stores formatting to be applied when the editor inserts text. If `marks` is `null`, the formatting will be taken from the current selection.
 
 ## Overriding Behaviors
 

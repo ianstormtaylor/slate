@@ -1,5 +1,13 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Node, Editor, Transforms, Range, createEditor } from 'slate'
+import {
+  Node,
+  Editor,
+  Transforms,
+  Range,
+  createEditor,
+  Element as SlateElement,
+  Descendant,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -11,10 +19,11 @@ import {
 } from 'slate-react'
 
 import { Portal } from '../components'
+import { MentionElement } from './custom-types'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
@@ -154,7 +163,11 @@ const withMentions = editor => {
 }
 
 const insertMention = (editor, character) => {
-  const mention = { type: 'mention', character, children: [{ text: '' }] }
+  const mention: MentionElement = {
+    type: 'mention',
+    character,
+    children: [{ text: '' }],
+  }
   Transforms.insertNodes(editor, mention)
   Transforms.move(editor)
 }
@@ -163,13 +176,13 @@ const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'mention':
-      return <MentionElement {...props} />
+      return <Mention {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
 }
 
-const MentionElement = ({ attributes, children, element }) => {
+const Mention = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -193,8 +206,9 @@ const MentionElement = ({ attributes, children, element }) => {
   )
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -203,6 +217,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       { text: 'Try mentioning characters, like ' },
       {

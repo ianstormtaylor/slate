@@ -1,7 +1,13 @@
 import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Node, Transforms, createEditor } from 'slate'
+import {
+  Node,
+  Transforms,
+  createEditor,
+  Element as SlateElement,
+  Descendant,
+} from 'slate'
 import {
   Slate,
   Editable,
@@ -14,9 +20,10 @@ import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import { Button, Icon, Toolbar } from '../components'
+import { ImageElement } from './custom-types'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
@@ -72,7 +79,7 @@ const withImages = editor => {
 
 const insertImage = (editor, url) => {
   const text = { text: '' }
-  const image = { type: 'image', url, children: [text] }
+  const image: ImageElement = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image)
 }
 
@@ -81,13 +88,13 @@ const Element = props => {
 
   switch (element.type) {
     case 'image':
-      return <ImageElement {...props} />
+      return <Image {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
 }
 
-const ImageElement = ({ attributes, children, element }) => {
+const Image = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -131,7 +138,7 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-const initialValue = [
+const initialValue: SlateElement[] = [
   {
     type: 'paragraph',
     children: [
