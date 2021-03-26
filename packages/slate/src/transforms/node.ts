@@ -1001,7 +1001,3 @@ const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }
-
-const updateNode = (prevProps: NodeProps, updatedProps: Partial<Node>) => {
-  return { ...prevProps, ...updatedProps }
-}
