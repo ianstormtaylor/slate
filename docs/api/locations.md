@@ -27,7 +27,7 @@ type Path = number[]
 ###### `ancestors(path: Path, options: { reverse?: boolean } = {}): Path[]`
 
 Get a list of ancestor paths for a given path.
-   *
+
 The paths are sorted from deepest to shallowest ancestor. However, if the
 `reverse: true` option is passed, they are reversed.
 
