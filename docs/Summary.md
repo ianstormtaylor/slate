@@ -28,9 +28,9 @@
 ## API
 
 - [Transforms](./api/transforms.md)
-- [Nodes `Node`, `Editor`, `Element`, `Text`](./api/nodes.md)
-- [Locations `Path`, `Point`, `Range`](./api/locations.md)
-- [Refs `PointRef`, `RangeRef`](./api/refs.md)
+- [Nodes (Node, Editor, Element, Text)](./api/nodes.md)
+- [Locations (Path, Point, Range)](./api/locations.md)
+- [Refs (PointRef, RangeRef)](./api/refs.md)
 - [Miscellaneous](./api/miscellaneous.md)
 
 ## Libraries
