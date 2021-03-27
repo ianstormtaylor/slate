@@ -29,6 +29,7 @@
 
 - [Transforms](./api/transforms.md)
 - [Nodes](./api/nodes.md)
+  (Node, Editor, Element, Text)
 - [Locations](./api/locations.md)
 - [Refs](./api/refs.md)
 - [Miscellaneous](./api/miscellaneous.md)
