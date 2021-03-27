@@ -429,7 +429,7 @@ Call a function, deferring normalization until after it completes.
 
 ### Instance methods
 
-#### Schema-specific actions
+#### Schema-specific methods to override
 
 ###### `isInline(element: Element)`
 
@@ -444,6 +444,9 @@ Check if a value is a void `Element` object.
 Normalize a Node according to the schema.
 
 ###### `onChange()`
+
+Called when there is a change in the editor.
+
 
 #### Core actions
 
