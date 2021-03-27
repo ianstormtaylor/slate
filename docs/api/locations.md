@@ -6,7 +6,9 @@ The `Location` interface is a union of the ways to refer to a specific location 
 type Location = Path | Point | Range
 ```
 
-## Static methods
+## Location
+
+### Static methods
 
 ###### `Location.isLocation(value: any): value is Location`
 
@@ -32,7 +34,7 @@ interface Point {
 }
 ```
 
-## Static methods
+### Static methods
 
 ###### `Point.compare(point: Point, another: Point): -1 | 0 | 1`
 
@@ -71,6 +73,8 @@ interface Range {
   [key: string]: unknown
 }
 ```
+
+### Static methods
 
 ###### `Range.edges(range: Range, options?): [Point, Point]`
 
