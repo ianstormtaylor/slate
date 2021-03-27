@@ -1,4 +1,4 @@
-# Node
+# Node (Editor, Element, Text)
 
 The `Node` union type represents all of the different types of nodes that occur in a Slate document tree.
 
@@ -9,7 +9,9 @@ type Descendant = Element | Text
 type Ancestor = Editor | Element
 ```
 
-## Static methods
+## Node
+
+### Static methods
 
 ###### `Node.ancestor(root: Node, path: Path): Ancestor`
 
@@ -446,7 +448,6 @@ Normalize a Node according to the schema.
 ###### `onChange()`
 
 Called when there is a change in the editor.
-
 
 #### Core actions
 
