@@ -202,7 +202,7 @@ deserialize(document.body)
 
 With this input:
 
-```js
+```html
 <p>An opening paragraph with a <a href="https://example.com">link</a> in it.</p>
 <blockquote><p>A wise quote.</p></blockquote>
 <p>A closing paragraph!</p>
