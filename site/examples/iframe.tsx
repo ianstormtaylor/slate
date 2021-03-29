@@ -2,12 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
-import {
-  Editor,
-  Element as SlateElement,
-  createEditor,
-  Descendant,
-} from 'slate'
+import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -122,7 +117,7 @@ const IFrame = ({ children, ...props }) => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

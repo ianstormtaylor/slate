@@ -109,7 +109,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

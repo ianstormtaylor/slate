@@ -134,7 +134,7 @@ const LinkButton = () => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

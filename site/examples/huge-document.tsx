@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import faker from 'faker'
-import { Element as SlateElement, Node, createEditor, Descendant } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
-const initialValue: SlateElement[] = []
+const initialValue: Descendant[] = []
 
 for (let h = 0; h < HEADINGS; h++) {
   initialValue.push({

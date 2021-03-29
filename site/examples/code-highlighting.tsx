@@ -142,7 +142,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

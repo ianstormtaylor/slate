@@ -12,7 +12,7 @@ const ReadOnlyExample = () => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

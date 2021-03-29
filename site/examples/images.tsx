@@ -1,12 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import {
-  Transforms,
-  createEditor,
-  Element as SlateElement,
-  Descendant,
-} from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
   Editable,
@@ -137,7 +132,7 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

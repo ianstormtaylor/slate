@@ -160,7 +160,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

@@ -175,7 +175,7 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

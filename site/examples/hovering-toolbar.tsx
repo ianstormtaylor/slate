@@ -147,7 +147,7 @@ const FormatButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

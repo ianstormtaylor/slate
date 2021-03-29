@@ -1,10 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Transforms,
-  createEditor,
-  Element as SlateElement,
-  Descendant,
-} from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
@@ -136,7 +131,7 @@ const InsertEditableVoidButton = () => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
