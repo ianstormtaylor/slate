@@ -1,7 +1,6 @@
 import { produce } from 'immer'
 import { Editor, Path, Range, Text } from '..'
 import { Element, ElementEntry } from './element'
-import { ExtendedType } from './custom-types'
 
 /**
  * The `Node` union type represents all of the different types of nodes that
