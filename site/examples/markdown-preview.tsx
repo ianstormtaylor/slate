@@ -1,7 +1,7 @@
 import Prism from 'prismjs'
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Node, Text, createEditor, Element, Descendant } from 'slate'
+import { Text, createEditor, Element, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 

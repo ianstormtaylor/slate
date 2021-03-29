@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import {
-  Node,
   Transforms,
   createEditor,
   Element as SlateElement,

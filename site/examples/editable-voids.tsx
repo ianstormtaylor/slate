@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import {
   Transforms,
   createEditor,
-  Node,
   Element as SlateElement,
   Descendant,
 } from 'slate'

@@ -1,6 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,

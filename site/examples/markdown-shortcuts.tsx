@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,

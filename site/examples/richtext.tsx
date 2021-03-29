@@ -6,7 +6,6 @@ import {
   Transforms,
   createEditor,
   Descendant,
-  Node,
   Element as SlateElement,
 } from 'slate'
 import { withHistory } from 'slate-history'

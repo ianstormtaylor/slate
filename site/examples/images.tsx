@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import {
-  Node,
   Transforms,
   createEditor,
   Element as SlateElement,

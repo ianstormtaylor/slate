@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
 import {
-  Node,
   Transforms,
   Editor,
   Range,

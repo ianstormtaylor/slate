@@ -5,7 +5,6 @@ import {
   Transforms,
   Text,
   createEditor,
-  Node,
   Element,
   Descendant,
 } from 'slate'
