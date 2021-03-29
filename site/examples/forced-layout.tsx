@@ -75,7 +75,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'title',
     children: [{ text: 'Enforce Your Layout!' }],

@@ -8,7 +8,6 @@ import {
   ReactEditor,
 } from 'slate-react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,
@@ -20,7 +19,7 @@ import {
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

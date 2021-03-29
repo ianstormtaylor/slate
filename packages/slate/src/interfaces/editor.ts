@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import { createDraft, finishDraft, isDraft } from 'immer'
 import { reverse as reverseText } from 'esrever'
 
 import {

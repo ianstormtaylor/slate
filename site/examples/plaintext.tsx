@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { createEditor, Element, Descendant } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 
@@ -13,7 +13,7 @@ const PlainTextExample = () => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

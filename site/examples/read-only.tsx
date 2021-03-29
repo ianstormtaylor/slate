@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { createEditor, Descendant, Element, Node } from 'slate'
+import { createEditor, Descendant, Element } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
@@ -12,7 +12,7 @@ const ReadOnlyExample = () => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

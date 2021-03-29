@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import {
   Transforms,
   createEditor,
-  Node,
   Element as SlateElement,
   Descendant,
 } from 'slate'
@@ -12,8 +11,6 @@ import {
   withReact,
   useSlateStatic,
   ReactEditor,
-  useFocused,
-  useSelected,
 } from 'slate-react'
 
 const EmbedsExample = () => {
@@ -104,7 +101,7 @@ const UrlInput = ({ url, onChange }) => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

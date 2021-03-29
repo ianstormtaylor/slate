@@ -5,7 +5,6 @@ import {
   Transforms,
   Text,
   createEditor,
-  Node,
   Element,
   Descendant,
 } from 'slate'
@@ -148,7 +147,7 @@ const FormatButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
