@@ -30,6 +30,10 @@ interface Editor {
 }
 ```
 
+- [Instantiation methods](#instantiation-methods)
+- [Static methods](#static-methods)
+- [Instance methods](#instance-methods)
+
 ## Instantiation methods
 
 ###### `createEditor(): Editor`
