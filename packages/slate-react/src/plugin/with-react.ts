@@ -8,10 +8,10 @@ import { isDOMText, getPlainText } from '../utils/dom'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
- * 
+ *
  * If you are using TypeScript, you must extend Slate's CustomTypes to use
  * this plugin.
- * 
+ *
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
