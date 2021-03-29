@@ -15,6 +15,11 @@ type Ancestor = Editor | Element
 
 ## Static methods
 
+- [Node Transforms](#node-transforms)
+- [Selection Transforms](#selection-transforms)
+- [Text Transforms](#text-transforms)
+- [Editor Transforms](#general-transforms)
+
 ###### `Node.ancestor(root: Node, path: Path): Ancestor`
 
 Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, throw an error.
