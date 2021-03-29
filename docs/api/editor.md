@@ -316,7 +316,7 @@ Call a function, deferring normalization until after it completes.
 
 ### Schema-specific methods to override
 
-These methods can and should be replaced to modify the original behavior of the editor which is a part of building [Plugins](/concepts/07-plugins). When you modify behavior, call the original method where appropriate. For example, a plugin that marks image nodes as "void":
+Replace these methods to modify the original behavior of the editor when building [Plugins](/concepts/07-plugins). When modifying behavior, call the original method when appropriate. For example, a plugin that marks image nodes as "void":
 
 ```js
 const withImages = editor => {
