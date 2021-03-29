@@ -2,20 +2,17 @@
 
 Transforms are helper functions operating on the document. They can be used in defining your own commands.
 
-Jump to section:
+Jump to:
 
+- [Node Options](#node-options)
 - [Node Transforms](#node-transforms)
 - [Selection Transforms](#selection-transforms)
 - [Text Transforms](#text-transforms)
 - [Editor Transforms](#general-transforms)
 
-## Node transforms
+## Node Options
 
-Transforms that operate on nodes.
-
-###### NodeOptions
-
-All transforms listed below support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify the place in the document that the transform is applied to.
+All transforms support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify the place in the document that the transform is applied to.
 
 ```typescript
 interface NodeOptions {
@@ -25,6 +22,10 @@ interface NodeOptions {
   voids?: boolean
 }
 ```
+
+## Node transforms
+
+Transforms that operate on nodes.
 
 ###### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 

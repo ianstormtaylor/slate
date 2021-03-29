@@ -30,6 +30,8 @@ interface Editor {
 }
 ```
 
+Jump to:
+
 - [Instantiation methods](#instantiation-methods)
 - [Static methods](#static-methods)
 - [Instance methods](#instance-methods)
