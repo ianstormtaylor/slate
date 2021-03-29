@@ -28,6 +28,10 @@
 ## API
 
 - [Transforms](./api/transforms.md)
+  - [Node Transforms](./api/transforms.md#node-transforms)
+  - [Selection Transforms](./api/transforms.md#selection-transforms)
+  - [Text Transforms](./api/transforms.md#text-transforms)
+  - [Editor Transforms](./api/transforms.md#general-transforms)
 - [Node](./api/nodes.md)
   - [Editor](./api/editor.md)
   - [Element](./api/element.md)
