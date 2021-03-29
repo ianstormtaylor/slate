@@ -13,5 +13,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: '14'
-      - run: yarn && yarn internal:release:next
+      - run: |
+          git config --global user.name 'Automation'
+          git config --global user.email 'ianstormtaylor@users.noreply.github.com'
+          yarn
+          yarn internal:release:next
 
