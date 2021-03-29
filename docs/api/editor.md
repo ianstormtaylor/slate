@@ -32,214 +32,214 @@ interface Editor {
 
 ## Static methods
 
-###### `above<T extends Ancestor>(editor: Editor, options?): NodeEntry | undefined`
+###### `Editor.above<T extends Ancestor>(editor: Editor, options?): NodeEntry | undefined`
 
 Get the ancestor above a location in the document.
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'highest' | 'lowest', voids?: boolean}`
 
-###### `addMark(editor: Editor, key: string, value: any): void`
+###### `Editor.addMark(editor: Editor, key: string, value: any): void`
 
 Add a custom property to the leaf text nodes in the current selection.
 
 If the selection is currently collapsed, the marks will be added to the
 `editor.marks` property instead, and applied when text is inserted next.
 
-###### `after(editor: Editor, at: Location, options?): Point | undefined`
+###### `Editor.after(editor: Editor, at: Location, options?): Point | undefined`
 
 Get the point after a location.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
-###### `before(editor: Editor, at: Location, options?): Point | undefined`
+###### `Editor.before(editor: Editor, at: Location, options?): Point | undefined`
 
 Get the point before a location.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
-###### `deleteBackward(editor: Editor, options?): void`
+###### `Editor.deleteBackward(editor: Editor, options?): void`
 
 Delete content in the editor backward from the current selection.
 
 Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
 
-###### `deleteForward(editor: Editor, options?): void`
+###### `Editor.deleteForward(editor: Editor, options?): void`
 
 Delete content in the editor forward from the current selection.
 
 Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
 
-###### `deleteFragment(editor: Editor): void`
+###### `Editor.deleteFragment(editor: Editor): void`
 
 Delete the content in the current selection.
 
-###### `edges(editor: Editor, at: Location): [Point, Point]`
+###### `Editor.edges(editor: Editor, at: Location): [Point, Point]`
 
 Get the start and end points of a location.
 
-###### `end(editor: Editor, at: Location): Point`
+###### `Editor.end(editor: Editor, at: Location): Point`
 
 Get the end point of a location.
 
-###### `first(editor: Editor, at: Location): NodeEntry`
+###### `Editor.first(editor: Editor, at: Location): NodeEntry`
 
 Get the first node at a location.
 
-###### `fragment(editor: Editor, at: Location): Descendant[]`
+###### `Editor.fragment(editor: Editor, at: Location): Descendant[]`
 
 Get the fragment at a location.
 
-###### `hasBlocks(editor: Editor, element: Element): boolean`
+###### `Editor.hasBlocks(editor: Editor, element: Element): boolean`
 
 Check if a node has block children.
 
-###### `hasInlines(editor: Editor, element: Element): boolean`
+###### `Editor.hasInlines(editor: Editor, element: Element): boolean`
 
 Check if a node has inline and text children.
 
-###### `hasTexts(editor: Editor, element: Element): boolean`
+###### `Editor.hasTexts(editor: Editor, element: Element): boolean`
 
 Check if a node has text children.
 
-###### `insertBreak(editor: Editor): void`
+###### `Editor.insertBreak(editor: Editor): void`
 
 Insert a block break at the current selection.
 
-###### `insertFragment(editor: Editor, fragment: Node[]): void`
+###### `Editor.insertFragment(editor: Editor, fragment: Node[]): void`
 
 Insert a fragment at the current selection.
 
 If the selection is currently expanded, it will be deleted first.
 
-###### `insertNode(editor: Editor, node: Node): void`
+###### `Editor.insertNode(editor: Editor, node: Node): void`
 
 Insert a node at the current selection.
 
 If the selection is currently expanded, it will be deleted first.
 
-###### `insertText(editor: Editor, text: string): void`
+###### `Editor.insertText(editor: Editor, text: string): void`
 
 Insert text at the current selection.
 
 If the selection is currently expanded, it will be deleted first.
 
-###### `isBlock(editor: Editor, value: any): value is Element`
+###### `Editor.isBlock(editor: Editor, value: any): value is Element`
 
 Check if a value is a block `Element` object.
 
-###### `isEditor(value: any): value is Editor`
+###### `Editor.isEditor(value: any): value is Editor`
 
 Check if a value is an `Editor` object.
 
-###### `isEnd(editor: Editor, point: Point, at: Location): boolean`
+###### `Editor.isEnd(editor: Editor, point: Point, at: Location): boolean`
 
 Check if a point is the end point of a location.
 
-###### `isEdge(editor: Editor, point: Point, at: Location): boolean`
+###### `Editor.isEdge(editor: Editor, point: Point, at: Location): boolean`
 
 Check if a point is an edge of a location.
 
-###### `isEmpty(editor: Editor, element: Element): boolean`
+###### `Editor.isEmpty(editor: Editor, element: Element): boolean`
 
 Check if an element is empty, accounting for void nodes.
 
-###### `isInline(editor: Editor, value: any): value is Element`
+###### `Editor.isInline(editor: Editor, value: any): value is Element`
 
 Check if a value is an inline `Element` object.
 
-###### `isNormalizing(editor: Editor): boolean`
+###### `Editor.isNormalizing(editor: Editor): boolean`
 
 Check if the editor is currently normalizing after each operation.
 
-###### `isStart(editor: Editor, point: Point, at: Location): boolean`
+###### `Editor.isStart(editor: Editor, point: Point, at: Location): boolean`
 
 Check if a point is the start point of a location.
 
-###### `isVoid(editor: Editor, value: any): value is Element`
+###### `Editor.isVoid(editor: Editor, value: any): value is Element`
 
 Check if a value is a void `Element` object.
 
-###### `last(editor: Editor, at: Location): NodeEntry`
+###### `Editor.last(editor: Editor, at: Location): NodeEntry`
 
 Get the last node at a location.
 
-###### `leaf(editor: Editor, at: Location, options?): NodeEntry`
+###### `Editor.leaf(editor: Editor, at: Location, options?): NodeEntry`
 
 Get the leaf text node at a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-###### `levels<T extends Node>(editor: Editor, options?): Generator<NodeEntry, void, undefined>`
+###### `Editor.levels<T extends Node>(editor: Editor, options?): Generator<NodeEntry, void, undefined>`
 
 Iterate through all of the levels at a location.
 
 Options: `{at?: Location, match?: NodeMatch, reverse?: boolean, voids?: boolean}`
 
-###### `next<T extends Descendant>(editor: Editor, options?): NodeEntry<T> | undefined`
+###### `Editor.next<T extends Descendant>(editor: Editor, options?): NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document after a location.
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
-###### `node(editor: Editor, at: Location, options?): NodeEntry`
+###### `Editor.node(editor: Editor, at: Location, options?): NodeEntry`
 
 Get the node at a location.
 
 Options: `depth?: number, edge?: 'start' | 'end'`
 
-###### `nodes(editor: Editor, options?): Generator<NodeEntry<T>, void, undefined>`
+###### `Editor.nodes(editor: Editor, options?): Generator<NodeEntry<T>, void, undefined>`
 
 Iterate through all of the nodes in the Editor.
 
 Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
 
-###### `normalize(editor: Editor, options?): void`
+###### `Editor.normalize(editor: Editor, options?): void`
 
 Normalize any dirty objects in the editor.
 
 Options: `{force?: boolean}`
 
-###### `parent(editor: Editor, at: Location, options?): NodeEntry<Ancestor>`
+###### `Editor.parent(editor: Editor, at: Location, options?): NodeEntry<Ancestor>`
 
 Get the parent node of a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-###### `path(editor: Editor, at: Location, options?): Path`
+###### `Editor.path(editor: Editor, at: Location, options?): Path`
 
 Get the path of a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-###### `pathRef(editor: Editor, path: Path, options?): PathRef`
+###### `Editor.pathRef(editor: Editor, path: Path, options?): PathRef`
 
 Create a mutable ref for a `Path` object, which will stay in sync as new
 operations are applied to the editor.
 
 Options: `{affinity?: 'backward' | 'forward' | null}`
 
-###### `pathRefs(editor: Editor): Set<PathRef>`
+###### `Editor.pathRefs(editor: Editor): Set<PathRef>`
 
 Get the set of currently tracked path refs of the editor.
 
-###### `point(editor: Editor, at: Location, options?): Point`
+###### `Editor.point(editor: Editor, at: Location, options?): Point`
 
 Get the start or end point of a location.
 
 Options: `{edge?: 'start' | 'end'}`
 
-###### `pointRef(editor: Editor, point: Point, options?): PointRef`
+###### `Editor.pointRef(editor: Editor, point: Point, options?): PointRef`
 
 Create a mutable ref for a `Point` object, which will stay in sync as new
 operations are applied to the editor.
 
 Options: `{affinity?: 'backward' | 'forward' | null}`
 
-###### `pointRefs(editor: Editor): Set<PointRef>`
+###### `Editor.pointRefs(editor: Editor): Set<PointRef>`
 
 Get the set of currently tracked point refs of the editor.
 
-###### `positions(editor: Editor, options?): Generator<Point, void, undefined>`
+###### `Editor.positions(editor: Editor, options?): Generator<Point, void, undefined>`
 
 Iterate through all of the positions in the document where a `Point` can be
 placed.
@@ -254,28 +254,28 @@ voids option, then iteration will occur.
 
 Options: `{at?: Location, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', reverse?: boolean, voids?: boolean}`
 
-###### `previous(editor: Editor, options?): NodeEntry<T> | undefined`
+###### `Editor.previous(editor: Editor, options?): NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document before a location.
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
-###### `range(editor: Editor, at: Location, to?: Location): Range`
+###### `Editor.range(editor: Editor, at: Location, to?: Location): Range`
 
 Get a range of a location.
 
-###### `rangeRef(editor: Editor, range: Range, options?): RangeRef`
+###### `Editor.rangeRef(editor: Editor, range: Range, options?): RangeRef`
 
 Create a mutable ref for a `Range` object, which will stay in sync as new
 operations are applied to the editor.
 
 Options: `{affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null}`
 
-###### `rangeRefs(editor: Editor): Set<RangeRef>`
+###### `Editor.rangeRefs(editor: Editor): Set<RangeRef>`
 
 Get the set of currently tracked range refs of the editor.
 
-###### `removeMark(editor: Editor, key: string): void`
+###### `Editor.removeMark(editor: Editor, key: string): void`
 
 Remove a custom property from all of the leaf text nodes in the current
 selection.
@@ -283,11 +283,11 @@ selection.
 If the selection is currently collapsed, the removal will be stored on
 `editor.marks` and applied to the text inserted next.
 
-###### `start(editor: Editor, at: Location): Point`
+###### `Editor.start(editor: Editor, at: Location): Point`
 
 Get the start point of a location.
 
-###### `string(editor: Editor, at: Location, options?): string`
+###### `Editor.string(editor: Editor, at: Location, options?): string`
 
 Get the text string content of a location.
 
@@ -296,23 +296,23 @@ string, regardless of content, unless you pass in true for the voids option
 
 Options: : `{voids?: boolean}`
 
-###### `unhangRange(editor: Editor, range: Range, options?): Range`
+###### `Editor.unhangRange(editor: Editor, range: Range, options?): Range`
 
 Convert a range into a non-hanging one.
 
 Options: `{voids?: boolean}`
 
-###### `void(editor: Editor, options?): NodeEntry<Element> | undefined`
+###### `Editor.void(editor: Editor, options?): NodeEntry<Element> | undefined`
 
 Match a void node in the current branch of the editor.
 
 Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
-###### `withoutNormalizing(editor: Editor, fn: () => void): void`
+###### `Editor.withoutNormalizing(editor: Editor, fn: () => void): void`
 
 Call a function, deferring normalization until after it completes.
 
-### Instance methods
+## Instance methods
 
 ### Schema-specific methods to override
 
