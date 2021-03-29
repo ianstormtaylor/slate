@@ -30,6 +30,14 @@ interface Editor {
 }
 ```
 
+## Instantiation methods
+
+###### `createEditor(): Editor`
+
+Note: This method is imported directly from Slate and is not part of the Editor object.
+
+Creates a new, empty `Editor` object.
+
 ## Static methods
 
 ###### `Editor.above<T extends Ancestor>(editor: Editor, options?): NodeEntry | undefined`
