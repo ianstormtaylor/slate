@@ -2,6 +2,13 @@
 
 Transforms are helper functions operating on the document. They can be used in defining your own commands.
 
+Jump to section:
+
+- [Node Transforms](#node-transforms)
+- [Selection Transforms](#selection-transforms)
+- [Text Transforms](#text-transforms)
+- [Editor Transforms](#general-transforms)
+
 ## Node transforms
 
 Transforms that operate on nodes.
