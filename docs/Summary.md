@@ -36,7 +36,6 @@
   - [Path](./api/path.md)
   - [Point](./api/point.md)
   - [Range](./api/range.md)
-- [Refs](./api/refs.md)
   - [PointRef](./api/point-ref.md)
   - [RangeRef](./api/range-ref.md)
 - [Miscellaneous](./api/miscellaneous.md)
