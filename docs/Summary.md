@@ -28,11 +28,13 @@
 ## API
 
 - [Transforms](./api/transforms.md)
-- [Node](./api/nodes.md)
+- [Node Types](./api/nodes.md)
+  - [Node](./api/node.md)
   - [Editor](./api/editor.md)
   - [Element](./api/element.md)
   - [Text](./api/text.md)
-- [Location](./api/locations.md)
+- [Location Types](./api/locations.md)
+  - [Location](./api/location.md)
   - [Path](./api/path.md)
   - [Point](./api/point.md)
   - [Range](./api/range.md)
