@@ -40,7 +40,7 @@
   - [PointRef](./api/point-ref.md)
   - [Range](./api/range.md)
   - [RangeRef](./api/range-ref.md)
-- [Miscellaneous](./api/miscellaneous.md)
+- [Operation](./api/operation.md)
 
 ## Libraries
 
