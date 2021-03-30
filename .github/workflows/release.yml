@@ -26,8 +26,9 @@ jobs:
 
       - name: Release as @dev
         run: |
+          yarn prerelease
           yarn changeset version --snapshot
-          yarn prerelease && yarn changeset publish --tag dev
+          yarn changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
