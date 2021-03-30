@@ -1,16 +1,34 @@
 name: Release
 
+on:
+  push:
+    branches:
+      - add-changesets
+
 jobs:
   release:
+    name: Release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout repo
+        uses: actions/checkout@master
         with:
-          node-version: '14'
-      - run: |
-          git config --global user.name 'Automation'
-          git config --global user.email 'ianstormtaylor@users.noreply.github.com'
-          yarn
-          yarn internal:release:next
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
 
+      - name: Setup node.js
+        uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Create release pull request
+        uses: changesets/action@master
+        with:
+          version: yarn changeset version --snapshot
+          publish: yarn prerelease && yarn changeset publish --tag dev
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
