@@ -8,6 +8,14 @@ type Path = number[]
 
 ## Static methods
 
+- [Relationship methods](#relationship-methods)
+- [Check methods](#check-methods)
+- [Transform method](#transform-method)
+
+### Relationship methods
+
+The relationships around the Path like its ancestors, next sibling, etc.
+
 ###### `Path.ancestors(path: Path, options: { reverse?: boolean } = {}): Path[]`
 
 Get a list of ancestor paths for a given path.
@@ -27,6 +35,35 @@ was before, at, or after the other.
 Note: Two paths of unequal length can still receive a `0` result if one is
 directly above or below the other. If you want exact matching, use
 [[Path.equals]] instead.
+
+###### `Path.levels(path: Path, options?): Path[]`
+
+Get a list of paths at every level down to a path. Note: this is the same
+as `Path.ancestors`, but including the path itself.
+
+The paths are sorted from shallowest to deepest. However, if the `reverse: true` option is passed, they are reversed.
+
+Options: `{reverse?: boolean}`
+
+###### `Path.next(path: Path): Path`
+
+Given a path, get the path to the next sibling node.
+
+###### `Path.parent(path: Path): Path`
+
+Given a path, return a new path referring to the parent node above it.
+
+###### `Path.previous(path: Path): Path`
+
+Given a path, get the path to the previous sibling node.
+
+###### `Path.relative(path: Path, ancestor: Path): Path`
+
+Get a path relative to an ancestor.
+
+### Check methods
+
+Check some attribute of a path. Always returns a boolean.
 
 ###### `Path.endsAfter(path: Path, another: Path): boolean`
 
@@ -84,30 +121,7 @@ Check is a value implements the `Path` interface.
 
 Check if a path is a sibling of another.
 
-###### `Path.levels(path: Path, options?): Path[]`
-
-Get a list of paths at every level down to a path. Note: this is the same
-as `Path.ancestors`, but including the path itself.
-
-The paths are sorted from shallowest to deepest. However, if the `reverse: true` option is passed, they are reversed.
-
-Options: `{reverse?: boolean}`
-
-###### `Path.next(path: Path): Path`
-
-Given a path, get the path to the next sibling node.
-
-###### `Path.parent(path: Path): Path`
-
-Given a path, return a new path referring to the parent node above it.
-
-###### `Path.previous(path: Path): Path`
-
-Given a path, get the path to the previous sibling node.
-
-###### `Path.relative(path: Path, ancestor: Path): Path`
-
-Get a path relative to an ancestor.
+### Transform method
 
 ###### `Path.transform(path: Path, operation: Operation, options?): Path | null`
 
