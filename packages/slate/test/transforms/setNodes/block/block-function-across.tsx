@@ -26,11 +26,11 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block key={true}>
+    <block key>
       <anchor />
       word
     </block>
-    <block key={true}>
+    <block key>
       a<focus />
       nother
     </block>
