@@ -90,6 +90,14 @@ Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry =>
 
 Get the parent of a node at a specific `path`.
 
+### Text methods
+
+Methods related to Text.
+
+###### `Node.string(root: Node): string`
+
+Get the concatenated text string of a node's content. Note that this will not include spaces or line breaks between block nodes. This is not intended as a user-facing string, but as a string for performing offset-related computations for a node.
+
 ###### `Node.texts(root: Node, options?): Generator<NodeEntry<Text>>`
 
 Return a generator of all leaf text nodes in a root node.
@@ -111,9 +119,3 @@ Check if a `value` implements the `Node` interface.
 ###### `Node.isNodeList(value: any): value is Node[]`
 
 Check if a `value` is a list of `Node` objects.
-
-### Other method
-
-###### `Node.string(root: Node): string`
-
-Get the concatenated text string of a node's content. Note that this will not include spaces or line breaks between block nodes. This is not intended as a user-facing string, but as a string for performing offset-related computations for a node.
