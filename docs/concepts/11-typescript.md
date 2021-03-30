@@ -1,10 +1,9 @@
 # TypeScript
 
-Slate supports typing of one Slate document model (eg. one set of custom `Editor`, `Element` and `Text` types).
+Slate supports typing of one Slate document model (ie. one set of custom `Editor`, `Element` and `Text` types). If you need to support more than one document model, see the section Multiple Document Models.
 
-You must define `CustomTypes` when using TypeScript or Slate will display typing errors.
+**Warning:** You must define `CustomTypes` when using TypeScript or Slate will display typing errors.
 
-If you need to support more than one document model, see the section Multiple Document Models.
 
 ## Defining `Editor`, `Element` and `Text` Types
 
