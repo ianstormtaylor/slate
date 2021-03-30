@@ -13,7 +13,7 @@ interface Point {
 - [Static methods](#static-methods)
   - [Retrieval methods](#retrieval-methods)
   - [Check methods](#check-methods)
-  - [Transform method](#transform-method)
+  - [Transform methods](#transform-methods)
 
 ## Static methods
 
