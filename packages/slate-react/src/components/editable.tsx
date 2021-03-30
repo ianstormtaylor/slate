@@ -20,6 +20,7 @@ import {
   IS_SAFARI,
   IS_EDGE_LEGACY,
   IS_CHROME_LEGACY,
+  IS_FIREFOX_LEGACY,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -49,7 +50,7 @@ import {
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
 const HAS_BEFORE_INPUT_SUPPORT = !(
-  IS_FIREFOX ||
+  IS_FIREFOX_LEGACY ||
   IS_EDGE_LEGACY ||
   IS_CHROME_LEGACY
 )

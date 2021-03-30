@@ -24,3 +24,10 @@ export const IS_EDGE_LEGACY =
 export const IS_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&
   /Chrome?\/(?:[0-7][0-5]|[0-6][0-9])/i.test(navigator.userAgent)
+
+// beforeInput event was not supported till 87.x
+export const IS_FIREFOX_LEGACY =
+  typeof navigator !== 'undefined' &&
+  /^(?!.*Seamonkey)(?=.*Firefox\/(?:[0-7][0-9]|[0-8][0-6])).*/i.test(
+    navigator.userAgent
+  )
