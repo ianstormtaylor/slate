@@ -30,11 +30,15 @@ interface Editor {
 }
 ```
 
-Jump to:
-
 - [Instantiation methods](#instantiation-methods)
 - [Static methods](#static-methods)
+  - [Retrieval methods](#retrieval-methods)
+  - [Manipulation methods](#manipulation-methods)
+  - [Check methods](#check-methods)
+  - [Normalization methods](#normalization-methods)
 - [Instance methods](#instance-methods)
+  - [Schema-specific methods to override](#schema-specific-methods-to-override)
+  - [Core actions](#core-actions)
 
 ## Instantiation methods
 
@@ -45,11 +49,6 @@ Note: This method is imported directly from Slate and is not part of the Editor 
 Creates a new, empty `Editor` object.
 
 ## Static methods
-
-- [Retrieval methods](#retrieval-methods)
-- [Manipulation methods](#manipulation-methods)
-- [Check methods](#check-methods)
-- [Normalization methods](#normalization-methods)
 
 ### Retrieval methods
 
