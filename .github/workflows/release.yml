@@ -24,11 +24,14 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Release as @dev
+      - name: Prepare release
+        run: yarn prerelease
+
+      - name: Release to @dev channel
         run: |
-          yarn prerelease
           yarn changeset version --snapshot
           yarn changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
