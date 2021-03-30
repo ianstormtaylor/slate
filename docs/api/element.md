@@ -11,6 +11,9 @@ interface Element {
 
 ## Static methods
 
+- [Retrieval methods](#retrieval-methods)
+- [Check methods](#check-methods)
+
 ### Retrieval methods
 
 ###### `Element.matches(element: Element, props: Partial<Element>): boolean`
