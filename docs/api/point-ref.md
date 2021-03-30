@@ -10,7 +10,12 @@ interface PointRef {
 }
 ```
 
+- [Static methods](#static-methods)
+  - [Transform methods](#trasnform-methods)
+
 ## Static methods
+
+### Transform methods
 
 ###### `PointRef.transform(ref: PointRef, op: Operation)`
 

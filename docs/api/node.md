@@ -1,10 +1,11 @@
 # Node
 
-## Static methods
+- [Static methods](#static-methods)
+  - [Retrieval methods](#retrieval-methods)
+  - [Text methods](#text-methods)
+  - [Check methods](#check-methods)
 
-- [Retrieval methods](#retrieval-methods)
-- [Text methods](#text-methods)
-- [Check methods](#check-methods)
+## Static methods
 
 ### Retrieval methods
 

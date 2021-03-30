@@ -1,8 +1,15 @@
 # Location
 
-## Static methods
+The Location interface is a union of the ways to refer to a specific location in a Slate document: paths, points or ranges. Methods will often accept a Location instead of requiring only a Path, Point or Range.
 
-- [Check methods](#check-methods)
+```typescript
+type Location = Path | Point | Range
+```
+
+- [Static methods](static-methods)
+  - [Check methods](#check-methods)
+
+## Static methods
 
 ### Check methods
 

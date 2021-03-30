@@ -6,11 +6,12 @@
 type Path = number[]
 ```
 
-## Static methods
+- [Static methods](#static-methods)
+  - [Retrieval methods](#retrieval-methods)
+  - [Check methods](#check-methods)
+  - [Transform method](#transform-method)
 
-- [Retrieval methods](#retrieval-methods)
-- [Check methods](#check-methods)
-- [Transform method](#transform-method)
+## Static methods
 
 ### Retrieval methods
 
