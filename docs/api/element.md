@@ -9,7 +9,7 @@ interface Element {
 }
 ```
 
-- [Static methods](static-methods)
+- [Static methods](#static-methods)
   - [Retrieval methods](#retrieval-methods)
   - [Check methods](#check-methods)
 
