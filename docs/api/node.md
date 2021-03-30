@@ -3,8 +3,8 @@
 ## Static methods
 
 - [Getter methods](#getter-methods)
+- [Text methods](#text-method)
 - [Check methods](#check-methods)
-- [Other method](#other-method)
 
 ### Getter methods
 
