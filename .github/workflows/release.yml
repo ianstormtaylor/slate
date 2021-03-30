@@ -1,4 +1,4 @@
-name: Release
+name: Auto-release @dev
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: Release
+    name: Auto-release @dev
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -16,7 +16,7 @@ jobs:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
 
-      - name: Setup node.js
+      - name: Setup node
         uses: actions/setup-node@master
         with:
           node-version: 12.x
@@ -24,11 +24,10 @@ jobs:
       - name: Install dependencies
         run: yarn
 
-      - name: Create release pull request
-        uses: changesets/action@master
-        with:
-          version: yarn changeset version --snapshot
-          publish: yarn prerelease && yarn changeset publish --tag dev
+      - name: Release as @dev
+        run: |
+          yarn changeset version --snapshot
+          yarn prerelease && yarn changeset publish --tag dev
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
