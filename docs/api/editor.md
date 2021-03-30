@@ -46,18 +46,18 @@ Creates a new, empty `Editor` object.
 
 ## Static methods
 
+- [Retrieval methods](#retrieval-methods)
+- [Manipulation methods](#manipulation-methods)
+- [Check methods](#check-methods)
+- [Normalization methods](#normalization-methods)
+
+### Retrieval methods
+
 ###### `Editor.above<T extends Ancestor>(editor: Editor, options?): NodeEntry | undefined`
 
 Get the ancestor above a location in the document.
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'highest' | 'lowest', voids?: boolean}`
-
-###### `Editor.addMark(editor: Editor, key: string, value: any): void`
-
-Add a custom property to the leaf text nodes in the current selection.
-
-If the selection is currently collapsed, the marks will be added to the
-`editor.marks` property instead, and applied when text is inserted next.
 
 ###### `Editor.after(editor: Editor, at: Location, options?): Point | undefined`
 
@@ -70,22 +70,6 @@ Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 
 Get the point before a location.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
-
-###### `Editor.deleteBackward(editor: Editor, options?): void`
-
-Delete content in the editor backward from the current selection.
-
-Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
-
-###### `Editor.deleteForward(editor: Editor, options?): void`
-
-Delete content in the editor forward from the current selection.
-
-Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
-
-###### `Editor.deleteFragment(editor: Editor): void`
-
-Delete the content in the current selection.
 
 ###### `Editor.edges(editor: Editor, at: Location): [Point, Point]`
 
@@ -102,76 +86,6 @@ Get the first node at a location.
 ###### `Editor.fragment(editor: Editor, at: Location): Descendant[]`
 
 Get the fragment at a location.
-
-###### `Editor.hasBlocks(editor: Editor, element: Element): boolean`
-
-Check if a node has block children.
-
-###### `Editor.hasInlines(editor: Editor, element: Element): boolean`
-
-Check if a node has inline and text children.
-
-###### `Editor.hasTexts(editor: Editor, element: Element): boolean`
-
-Check if a node has text children.
-
-###### `Editor.insertBreak(editor: Editor): void`
-
-Insert a block break at the current selection.
-
-###### `Editor.insertFragment(editor: Editor, fragment: Node[]): void`
-
-Insert a fragment at the current selection.
-
-If the selection is currently expanded, it will be deleted first.
-
-###### `Editor.insertNode(editor: Editor, node: Node): void`
-
-Insert a node at the current selection.
-
-If the selection is currently expanded, it will be deleted first.
-
-###### `Editor.insertText(editor: Editor, text: string): void`
-
-Insert text at the current selection.
-
-If the selection is currently expanded, it will be deleted first.
-
-###### `Editor.isBlock(editor: Editor, value: any): value is Element`
-
-Check if a value is a block `Element` object.
-
-###### `Editor.isEditor(value: any): value is Editor`
-
-Check if a value is an `Editor` object.
-
-###### `Editor.isEnd(editor: Editor, point: Point, at: Location): boolean`
-
-Check if a point is the end point of a location.
-
-###### `Editor.isEdge(editor: Editor, point: Point, at: Location): boolean`
-
-Check if a point is an edge of a location.
-
-###### `Editor.isEmpty(editor: Editor, element: Element): boolean`
-
-Check if an element is empty, accounting for void nodes.
-
-###### `Editor.isInline(editor: Editor, value: any): value is Element`
-
-Check if a value is an inline `Element` object.
-
-###### `Editor.isNormalizing(editor: Editor): boolean`
-
-Check if the editor is currently normalizing after each operation.
-
-###### `Editor.isStart(editor: Editor, point: Point, at: Location): boolean`
-
-Check if a point is the start point of a location.
-
-###### `Editor.isVoid(editor: Editor, value: any): value is Element`
-
-Check if a value is a void `Element` object.
 
 ###### `Editor.last(editor: Editor, at: Location): NodeEntry`
 
@@ -206,12 +120,6 @@ Options: `depth?: number, edge?: 'start' | 'end'`
 Iterate through all of the nodes in the Editor.
 
 Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
-
-###### `Editor.normalize(editor: Editor, options?): void`
-
-Normalize any dirty objects in the editor.
-
-Options: `{force?: boolean}`
 
 ###### `Editor.parent(editor: Editor, at: Location, options?): NodeEntry<Ancestor>`
 
@@ -289,14 +197,6 @@ Options: `{affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null}`
 
 Get the set of currently tracked range refs of the editor.
 
-###### `Editor.removeMark(editor: Editor, key: string): void`
-
-Remove a custom property from all of the leaf text nodes in the current
-selection.
-
-If the selection is currently collapsed, the removal will be stored on
-`editor.marks` and applied to the text inserted next.
-
 ###### `Editor.start(editor: Editor, at: Location): Point`
 
 Get the start point of a location.
@@ -310,17 +210,130 @@ string, regardless of content, unless you pass in true for the voids option
 
 Options: : `{voids?: boolean}`
 
+###### `Editor.void(editor: Editor, options?): NodeEntry<Element> | undefined`
+
+Match a void node in the current branch of the editor.
+
+Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
+
+### Manipulation methods
+
+###### `Editor.addMark(editor: Editor, key: string, value: any): void`
+
+Add a custom property to the leaf text nodes in the current selection.
+
+If the selection is currently collapsed, the marks will be added to the
+`editor.marks` property instead, and applied when text is inserted next.
+
+###### `Editor.deleteBackward(editor: Editor, options?): void`
+
+Delete content in the editor backward from the current selection.
+
+Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
+
+###### `Editor.deleteForward(editor: Editor, options?): void`
+
+Delete content in the editor forward from the current selection.
+
+Options: `{unit?: 'character' | 'word' | 'line' | 'block'}`
+
+###### `Editor.deleteFragment(editor: Editor): void`
+
+Delete the content in the current selection.
+
+###### `Editor.insertBreak(editor: Editor): void`
+
+Insert a block break at the current selection.
+
+###### `Editor.insertFragment(editor: Editor, fragment: Node[]): void`
+
+Insert a fragment at the current selection.
+
+If the selection is currently expanded, it will be deleted first.
+
+###### `Editor.insertNode(editor: Editor, node: Node): void`
+
+Insert a node at the current selection.
+
+If the selection is currently expanded, it will be deleted first.
+
+###### `Editor.insertText(editor: Editor, text: string): void`
+
+Insert text at the current selection.
+
+If the selection is currently expanded, it will be deleted first.
+
+###### `Editor.removeMark(editor: Editor, key: string): void`
+
+Remove a custom property from all of the leaf text nodes in the current
+selection.
+
+If the selection is currently collapsed, the removal will be stored on
+`editor.marks` and applied to the text inserted next.
+
 ###### `Editor.unhangRange(editor: Editor, range: Range, options?): Range`
 
 Convert a range into a non-hanging one.
 
 Options: `{voids?: boolean}`
 
-###### `Editor.void(editor: Editor, options?): NodeEntry<Element> | undefined`
+### Check methods
 
-Match a void node in the current branch of the editor.
+###### `Editor.hasBlocks(editor: Editor, element: Element): boolean`
 
-Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
+Check if a node has block children.
+
+###### `Editor.hasInlines(editor: Editor, element: Element): boolean`
+
+Check if a node has inline and text children.
+
+###### `Editor.hasTexts(editor: Editor, element: Element): boolean`
+
+Check if a node has text children.
+
+###### `Editor.isBlock(editor: Editor, value: any): value is Element`
+
+Check if a value is a block `Element` object.
+
+###### `Editor.isEditor(value: any): value is Editor`
+
+Check if a value is an `Editor` object.
+
+###### `Editor.isEnd(editor: Editor, point: Point, at: Location): boolean`
+
+Check if a point is the end point of a location.
+
+###### `Editor.isEdge(editor: Editor, point: Point, at: Location): boolean`
+
+Check if a point is an edge of a location.
+
+###### `Editor.isEmpty(editor: Editor, element: Element): boolean`
+
+Check if an element is empty, accounting for void nodes.
+
+###### `Editor.isInline(editor: Editor, value: any): value is Element`
+
+Check if a value is an inline `Element` object.
+
+###### `Editor.isNormalizing(editor: Editor): boolean`
+
+Check if the editor is currently normalizing after each operation.
+
+###### `Editor.isStart(editor: Editor, point: Point, at: Location): boolean`
+
+Check if a point is the start point of a location.
+
+###### `Editor.isVoid(editor: Editor, value: any): value is Element`
+
+Check if a value is a void `Element` object.
+
+### Normalization methods
+
+###### `Editor.normalize(editor: Editor, options?): void`
+
+Normalize any dirty objects in the editor.
+
+Options: `{force?: boolean}`
 
 ###### `Editor.withoutNormalizing(editor: Editor, fn: () => void): void`
 
