@@ -6,7 +6,7 @@ The Location interface is a union of the ways to refer to a specific location in
 type Location = Path | Point | Range
 ```
 
-- [Static methods](static-methods)
+- [Static methods](#static-methods)
   - [Check methods](#check-methods)
 
 ## Static methods
