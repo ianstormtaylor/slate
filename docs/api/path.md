@@ -8,13 +8,11 @@ type Path = number[]
 
 ## Static methods
 
-- [Relationship methods](#relationship-methods)
+- [Retrieval methods](#retrieval-methods)
 - [Check methods](#check-methods)
 - [Transform method](#transform-method)
 
-### Relationship methods
-
-The relationships around the Path like its ancestors, next sibling, etc.
+### Retrieval methods
 
 ###### `Path.ancestors(path: Path, options: { reverse?: boolean } = {}): Path[]`
 

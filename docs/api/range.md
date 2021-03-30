@@ -12,13 +12,11 @@ interface Range {
 
 ## Static methods
 
-- [Relationship methods](#relationship-methods)
+- [Retrieval methods](#retrieval-methods)
 - [Check methods](#check-methods)
 - [Transform method](#transform-method)
 
-### Relationship methods
-
-Relationship of a Range like its start and end points and the intersection with another Range.
+### Retrieval methods
 
 ###### `Range.edges(range: Range, options?): [Point, Point]`
 

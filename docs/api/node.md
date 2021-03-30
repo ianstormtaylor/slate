@@ -2,13 +2,11 @@
 
 ## Static methods
 
-- [Getter methods](#getter-methods)
+- [Retrieval methods](#retrieval-methods)
 - [Text methods](#text-methods)
 - [Check methods](#check-methods)
 
-### Getter methods
-
-Methods used to retrieve nodes.
+### Retrieval methods
 
 ###### `Node.ancestor(root: Node, path: Path): Ancestor`
 

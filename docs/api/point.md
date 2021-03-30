@@ -12,11 +12,11 @@ interface Point {
 
 ## Static methods
 
-- [Relationship methods](#relationship-methods)
+- [Retrieval methods](#retrieval-methods)
 - [Check methods](#check-methods)
 - [Transform method](#transform-method)
 
-### Relationship methods
+### Retrieval methods
 
 ###### `Point.compare(point: Point, another: Point): -1 | 0 | 1`
 
