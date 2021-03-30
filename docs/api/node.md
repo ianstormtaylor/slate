@@ -2,6 +2,14 @@
 
 ## Static methods
 
+- [Getter methods](#getter-methods)
+- [Check methods](#check-methods)
+- [Other method](#other-method)
+
+### Getter methods
+
+Methods used to retrieve nodes.
+
 ###### `Node.ancestor(root: Node, path: Path): Ancestor`
 
 Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, throw an error.
@@ -54,18 +62,6 @@ Get the sliced fragment represented by the `range`.
 
 Get the descendant node referred to by a specific `path`. If the path is an empty array, get the root node itself.
 
-###### `Node.has(root: Node, path: Path): boolean`
-
-Check if a descendant node exists at a specific `path`.
-
-###### `Node.isNode(value: any): value is Node`
-
-Check if a `value` implements the `Node` interface.
-
-###### `Node.isNodeList(value: any): value is Node[]`
-
-Check if a `value` is a list of `Node` objects.
-
 ###### `Node.last(root: Node, path: Path): NodeEntry`
 
 Get the last node entry in a root node at a specific `path`.
@@ -94,12 +90,30 @@ Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry =>
 
 Get the parent of a node at a specific `path`.
 
-###### `Node.string(root: Node): string`
-
-Get the concatenated text string of a node's content. Note that this will not include spaces or line breaks between block nodes. This is not intended as a user-facing string, but as a string for performing offset-related computations for a node.
-
 ###### `Node.texts(root: Node, options?): Generator<NodeEntry<Text>>`
 
 Return a generator of all leaf text nodes in a root node.
 
 Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry => boolean)}`
+
+### Check methods
+
+Methods used to check some attribute of a Node.
+
+###### `Node.has(root: Node, path: Path): boolean`
+
+Check if a descendant node exists at a specific `path`.
+
+###### `Node.isNode(value: any): value is Node`
+
+Check if a `value` implements the `Node` interface.
+
+###### `Node.isNodeList(value: any): value is Node[]`
+
+Check if a `value` is a list of `Node` objects.
+
+### Other method
+
+###### `Node.string(root: Node): string`
+
+Get the concatenated text string of a node's content. Note that this will not include spaces or line breaks between block nodes. This is not intended as a user-facing string, but as a string for performing offset-related computations for a node.
