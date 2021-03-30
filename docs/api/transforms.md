@@ -28,6 +28,12 @@ interface NodeOptions {
 
 Transforms that operate on nodes.
 
+###### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
+
+Insert of fragment of nodes at the specified location in the document. If no location is specified, insert at the current selection.
+
+Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
+
 ###### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
 Insert `nodes` at the specified location in the document. If no location is specified, insert at the current selection. If there is no selection, insert at the end of the document.
@@ -131,12 +137,6 @@ Transforms that operate on text.
 Delete text in the document.
 
 Options: `{at?: Location, distance?: number, unit?: 'character' | 'word' | 'line' | 'block', reverse?: boolean, hanging?: boolean, voids?: boolean}`
-
-###### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
-
-Insert of fragment of nodes at the specified location in the document. If no location is specified, insert at the current selection.
-
-Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 ###### `Transforms.insertText(editor: Editor, text: string, options?)`
 
