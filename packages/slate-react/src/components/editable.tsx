@@ -13,7 +13,7 @@ import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import Children from './children'
+import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   IS_FIREFOX,
@@ -986,14 +986,14 @@ export const Editable = (props: EditableProps) => {
           [readOnly, attributes.onPaste]
         )}
       >
-        <Children
-          decorate={decorate}
-          decorations={decorations}
-          node={editor}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          selection={editor.selection}
-        />
+        {useChildren({
+          decorate,
+          decorations,
+          node: editor,
+          renderElement,
+          renderLeaf,
+          selection: editor.selection,
+        })}
       </Component>
     </ReadOnlyContext.Provider>
   )
