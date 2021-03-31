@@ -478,14 +478,19 @@ export const ReactEditor = {
       } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
         // ancestor, so find it by going down from the nearest void parent.
-
         leafNode = voidNode.querySelector('[data-slate-leaf]')!
-        textNode = leafNode.closest('[data-slate-node="text"]')!
-        domNode = leafNode
-        offset = domNode.textContent!.length
-        domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
-          offset -= el.textContent!.length
-        })
+
+        // COMPAT: In read-only editors the leaf is not rendered.
+        if (!leafNode) {
+          offset = 1
+        } else {
+          textNode = leafNode.closest('[data-slate-node="text"]')!
+          domNode = leafNode
+          offset = domNode.textContent!.length
+          domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
+            offset -= el.textContent!.length
+          })
+        }
       }
 
       // COMPAT: If the parent node is a Slate zero-width space, editor is
