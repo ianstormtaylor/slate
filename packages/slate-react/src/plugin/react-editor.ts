@@ -435,6 +435,8 @@ export const ReactEditor = {
         // ancestor, so find it by going down from the nearest void parent.
 
         leafNode = voidNode.querySelector('[data-slate-leaf]')!
+
+        // COMPAT: In read-only editors the leaf is not rendered.
         if (!leafNode) {
           offset = 1
         } else {
