@@ -1295,8 +1295,8 @@ export const Editor: EditorInterface = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string and there is no more characters to skip, continue to the next block.
+          if (string === '' && distance === null) {
             break
           } else {
             advance()
