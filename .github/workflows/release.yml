@@ -20,12 +20,20 @@ jobs:
         uses: actions/setup-node@master
         with:
           node-version: 12.x
+          registry-url: https://registry.npmjs.org
 
       - name: Install dependencies
         run: yarn
 
       - name: Prepare release
         run: yarn prerelease
+
+      - name: Check auth
+        run: npm whoami
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Release to @dev channel
         run: |
