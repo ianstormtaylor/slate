@@ -133,6 +133,7 @@ There are also translations of the documentation into other languages:
 
 - [中文](https://doodlewind.github.io/slate-doc-cn/) (`v0.47`)
 - [中文](https://github.com/loveloki/slate-docs-cn) (`v0.57`)
+- [中文](https://rain120.github.io/athena/zh/slate/Introduction.html) (`v0.59`)
 
 If you're maintaining a translation, feel free to pull request it here!
 
