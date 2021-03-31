@@ -353,7 +353,11 @@ const getDirtyPaths = (op: Operation): Path[] => {
         newAncestors.push(p!)
       }
 
-      return [...oldAncestors, ...newAncestors]
+      const newParent = newAncestors[newAncestors.length - 1]
+      const newIndex = newPath[newPath.length - 1]
+      const resultPath = newParent.concat(newIndex)
+
+      return [...oldAncestors, ...newAncestors, resultPath]
     }
 
     case 'remove_node': {
