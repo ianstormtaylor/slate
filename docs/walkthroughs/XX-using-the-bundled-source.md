@@ -1,6 +1,6 @@
 # Using the Bundled Source
 
-For most folks, you'll want to install Slate via `npm`, in which case you can follow the regular [Installing Slate](./installing-slate.md) guide.
+For most folks, you'll want to install Slate via `npm`, in which case you can follow the regular [Installing Slate](./01-installing-slate.md) guide.
 
 But, if you'd rather install Slate by simply adding a `<script>` tag to your application, this guide will help you. To make the "bundled" use case simpler, each version of Slate ships with a bundled source file called `slate.js`.
 
@@ -30,7 +30,7 @@ Before you can add `slate.js` to your page, you need to bring your own copy of `
 <script src="./vendor/react-dom-server.js"></script>
 ```
 
-This ensures that Slate isn't bundling its own copy of Immutable and React, which would greatly increase the file size of your application.
+This ensures that Slate isn't bundling its own copy of React, which would greatly increase the file size of your application.
 
 Then you can add `slate.js` after those includes:
 

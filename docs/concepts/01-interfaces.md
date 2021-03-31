@@ -5,7 +5,7 @@ Slate works with pure JSON objects. All it requires is that those JSON objects c
 ```ts
 interface Text {
   text: string
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 
@@ -22,7 +22,7 @@ To take another example, the `Element` node interface in Slate is:
 ```ts
 interface Element {
   children: Node[]
-  [key: string]: any
+  [key: string]: unknown
 }
 ```
 

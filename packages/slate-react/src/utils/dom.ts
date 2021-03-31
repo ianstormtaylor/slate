@@ -12,6 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
+
 export {
   DOMNode,
   DOMComment,
@@ -22,7 +23,25 @@ export {
   DOMStaticRange,
 }
 
+declare global {
+  interface Window {
+    Selection: typeof Selection['constructor']
+    DataTransfer: typeof DataTransfer['constructor']
+    Node: typeof Node['constructor']
+  }
+}
+
 export type DOMPoint = [Node, number]
+
+/**
+ * Returns the host window of a DOM node
+ */
+
+export const getDefaultView = (value: any): Window | null => {
+  return (
+    (value && value.ownerDocument && value.ownerDocument.defaultView) || null
+  )
+}
 
 /**
  * Check if a DOM node is a comment node.
@@ -45,7 +64,17 @@ export const isDOMElement = (value: any): value is DOMElement => {
  */
 
 export const isDOMNode = (value: any): value is DOMNode => {
-  return value instanceof Node
+  const window = getDefaultView(value)
+  return !!window && value instanceof window.Node
+}
+
+/**
+ * Check if a value is a DOM selection.
+ */
+
+export const isDOMSelection = (value: any): value is DOMSelection => {
+  const window = value && value.anchorNode && getDefaultView(value.anchorNode)
+  return !!window && value instanceof window.Selection
 }
 
 /**
@@ -99,6 +128,16 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
+ * Determines wether the active element is nested within a shadowRoot
+ */
+
+export const hasShadowRoot = () => {
+  return !!(
+    window.document.activeElement && window.document.activeElement.shadowRoot
+  )
+}
+
+/**
  * Get the nearest editable child at `index` in a `parent`, preferring
  * `direction`.
  */
@@ -144,4 +183,33 @@ export const getEditableChild = (
   }
 
   return child
+}
+
+/**
+ * Get a plaintext representation of the content of a node, accounting for block
+ * elements which get a newline appended.
+ *
+ * The domNode must be attached to the DOM.
+ */
+
+export const getPlainText = (domNode: DOMNode) => {
+  let text = ''
+
+  if (isDOMText(domNode) && domNode.nodeValue) {
+    return domNode.nodeValue
+  }
+
+  if (isDOMElement(domNode)) {
+    for (const childNode of Array.from(domNode.childNodes)) {
+      text += getPlainText(childNode)
+    }
+
+    const display = getComputedStyle(domNode).getPropertyValue('display')
+
+    if (display === 'block' || display === 'list' || domNode.tagName === 'BR') {
+      text += '\n'
+    }
+  }
+
+  return text
 }

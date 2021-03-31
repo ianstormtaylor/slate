@@ -1,10 +1,10 @@
-import React, { useMemo, useState, useCallback } from 'react'
-import { Editor, Node } from 'slate'
+import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import { Editor, Node, Element, Descendant } from 'slate'
 import invariant from 'tiny-invariant'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
-import { EditorContext } from '../hooks/use-editor'
+import { EditorContext } from '../hooks/use-slate-static'
 import { SlateContext } from '../hooks/use-slate'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
@@ -15,10 +15,9 @@ import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 export const Slate = (props: {
   editor: ReactEditor
-  value: Node[]
+  value: Descendant[]
   children: React.ReactNode
-  onChange: (value: Node[]) => void
-  [key: string]: any
+  onChange: (value: Descendant[]) => void
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
@@ -45,6 +44,12 @@ export const Slate = (props: {
   }, [key, onChange])
 
   EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+
+  useEffect(() => {
+    return () => {
+      EDITOR_TO_ON_CHANGE.set(editor, () => {})
+    }
+  }, [])
 
   return (
     <SlateContext.Provider value={context}>
