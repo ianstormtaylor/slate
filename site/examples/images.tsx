@@ -116,7 +116,10 @@ const InsertImageButton = () => {
       onMouseDown={event => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
-        if (!url) return
+        if (url && !isImageUrl(url)) {
+          alert('URL is not an image')
+          return
+        }
         insertImage(editor, url)
       }}
     >
