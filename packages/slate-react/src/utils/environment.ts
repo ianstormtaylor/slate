@@ -20,6 +20,9 @@ export const IS_EDGE_LEGACY =
   typeof navigator !== 'undefined' &&
   /Edge?\/(?:[0-6][0-9]|[0-7][0-8])/i.test(navigator.userAgent)
 
+export const IS_CHROME =
+  typeof navigator !== 'undefined' && /Chrome/i.test(navigator.userAgent)
+
 // Native beforeInput events don't work well with react on Chrome 75 and older, Chrome 76+ can use beforeInput
 export const IS_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&

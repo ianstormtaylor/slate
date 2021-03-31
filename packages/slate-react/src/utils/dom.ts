@@ -128,6 +128,16 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
+ * Determines wether the active element is nested within a shadowRoot
+ */
+
+export const hasShadowRoot = () => {
+  return !!(
+    window.document.activeElement && window.document.activeElement.shadowRoot
+  )
+}
+
+/**
  * Get the nearest editable child at `index` in a `parent`, preferring
  * `direction`.
  */
