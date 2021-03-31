@@ -89,7 +89,7 @@ export interface RenderLeafProps {
 
 export type EditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
-  onDOMBeforeInput?: (event: Event) => void
+  onDOMBeforeInput?: (event: InputEvent) => void
   placeholder?: string
   readOnly?: boolean
   role?: string
