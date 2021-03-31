@@ -381,8 +381,7 @@ export const NodeTransforms: NodeTransforms = {
       const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
-        match: n =>
-          levels.includes(n) && Element.isElement(n) && n.children.length === 1,
+        match: n => levels.includes(n) && hasSingleChildNest(editor, n),
       })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
@@ -961,6 +960,23 @@ export const NodeTransforms: NodeTransforms = {
       }
     })
   },
+}
+
+const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
+  if (Element.isElement(node)) {
+    const element = node as Element
+    if (Editor.isVoid(editor, node)) {
+      return true
+    } else if (element.children.length === 1) {
+      return hasSingleChildNest(editor, element.children[0])
+    } else {
+      return false
+    }
+  } else if (Editor.isEditor(node)) {
+    return false
+  } else {
+    return true
+  }
 }
 
 /**
