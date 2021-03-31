@@ -22,15 +22,25 @@
 - [Rendering](./concepts/08-rendering.md)
 - [Serializing](./concepts/09-serializing.md)
 - [Normalizing](./concepts/10-normalizing.md)
+- [TypeScript](./concepts/11-typescript.md)
 - [Migrating](./concepts/XX-migrating.md)
 
 ## API
 
 - [Transforms](./api/transforms.md)
-- [Nodes](./api/nodes.md)
-- [Locations](./api/locations.md)
-- [Refs](./api/refs.md)
-- [Miscellaneous](./api/miscellaneous.md)
+- [Node Types](./api/nodes.md)
+  - [Editor](./api/editor.md)
+  - [Element](./api/element.md)
+  - [Node](./api/node.md)
+  - [Text](./api/text.md)
+- [Location Types](./api/locations.md)
+  - [Location](./api/location.md)
+  - [Path](./api/path.md)
+  - [Point](./api/point.md)
+  - [PointRef](./api/point-ref.md)
+  - [Range](./api/range.md)
+  - [RangeRef](./api/range-ref.md)
+- [Operation](./api/operation.md)
 
 ## Libraries
 

@@ -1,13 +1,21 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import { Node, Transforms, Editor, Range, createEditor } from 'slate'
+import {
+  Transforms,
+  Editor,
+  Range,
+  createEditor,
+  Element as SlateElement,
+  Descendant,
+} from 'slate'
 import { withHistory } from 'slate-history'
+import { LinkElement } from './custom-types'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
@@ -61,12 +69,18 @@ const insertLink = (editor, url) => {
 }
 
 const isLinkActive = editor => {
-  const [link] = Editor.nodes(editor, { match: n => n.type === 'link' })
+  const [link] = Editor.nodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+  })
   return !!link
 }
 
 const unwrapLink = editor => {
-  Transforms.unwrapNodes(editor, { match: n => n.type === 'link' })
+  Transforms.unwrapNodes(editor, {
+    match: n =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+  })
 }
 
 const wrapLink = (editor, url) => {
@@ -76,7 +90,7 @@ const wrapLink = (editor, url) => {
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
+  const link: LinkElement = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: url }] : [],
@@ -120,8 +134,9 @@ const LinkButton = () => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: 'In addition to block nodes, you can create inline nodes, like ',
@@ -137,6 +152,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       {
         text:

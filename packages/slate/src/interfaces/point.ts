@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { produce } from 'immer'
-import { Operation, Path } from '..'
+import { ExtendedType, Operation, Path } from '..'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -9,13 +9,27 @@ import { Operation, Path } from '..'
  * only refer to `Text` nodes.
  */
 
-export interface Point {
+export interface BasePoint {
   path: Path
   offset: number
-  [key: string]: unknown
 }
 
-export const Point = {
+export type Point = ExtendedType<'Point', BasePoint>
+
+export interface PointInterface {
+  compare: (point: Point, another: Point) => -1 | 0 | 1
+  isAfter: (point: Point, another: Point) => boolean
+  isBefore: (point: Point, another: Point) => boolean
+  equals: (point: Point, another: Point) => boolean
+  isPoint: (value: any) => value is Point
+  transform: (
+    point: Point,
+    op: Operation,
+    options?: { affinity?: 'forward' | 'backward' | null }
+  ) => Point | null
+}
+
+export const Point: PointInterface = {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.

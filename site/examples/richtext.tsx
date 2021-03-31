@@ -1,7 +1,13 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
-import { Editor, Transforms, createEditor, Node } from 'slate'
+import {
+  Editor,
+  Transforms,
+  createEditor,
+  Descendant,
+  Element as SlateElement,
+} from 'slate'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Toolbar } from '../components'
@@ -16,7 +22,7 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 
 const RichTextExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -59,13 +65,16 @@ const toggleBlock = (editor, format) => {
   const isList = LIST_TYPES.includes(format)
 
   Transforms.unwrapNodes(editor, {
-    match: n => LIST_TYPES.includes(n.type as string),
+    match: n =>
+      LIST_TYPES.includes(
+        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type
+      ),
     split: true,
   })
-
-  Transforms.setNodes(editor, {
+  const newProperties: Partial<SlateElement> = {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
-  })
+  }
+  Transforms.setNodes(editor, newProperties)
 
   if (!isActive && isList) {
     const block = { type: format, children: [] }
@@ -85,7 +94,8 @@ const toggleMark = (editor, format) => {
 
 const isBlockActive = (editor, format) => {
   const [match] = Editor.nodes(editor, {
-    match: n => n.type === format,
+    match: n =>
+      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
   })
 
   return !!match
@@ -165,7 +175,7 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

@@ -1,41 +1,19 @@
-#### Is this adding or improving a _feature_ or fixing a _bug_?
+**Description**
+A clear and concise description of what this pull request solves. (Please do not just link to a long issue thread. Instead include a clear description here or your pull request will likely not be reviewed as quickly.)
 
-<!--
-If you have a question, ask it in our Slack channel instead:
+**Issue**
+Fixes: (link to issue)
 
-https://slate-slack.herokuapp.com/
--->
+**Example**
+A GIF or video showing the old and new behaviors after this pull request is merged. Or a code sample showing the usage of a new API. (If you don't include this, your pull request will not be reviewed as quickly, because it's much too hard to figure out exactly what is going wrong, and it makes maintenance much harder.)
 
-#### What's the new behavior?
+**Context**
+If your change is non-trivial, please include a description of how the new logic works, and why you decided to solve it the way you did. (This is incredibly helpful so that reviewers don't have to guess your intentions based on the code, and without it your pull request will likely not be reviewed as quickly.)
 
-<!--
-Please include at least one of the following:
-
-- A GIF showing the new behavior in action.
-- A code sample showing the new API in action.
-- A description of how the new behavior works.
-
-If you don't include one of these, there's a very good chance your pull request will take longer to review. Thank you!
--->
-
-#### How does this change work?
-
-<!--
-If your change is non-trivial, please include a short description of how the new logic works, and why you decided to solve it the way you did. This is incredibly helpful so that reviewers don't have to guess based on the code.
--->
-
-#### Have you checked that...?
-
-<!--
-Please run through this checklist for your pull request:
--->
-
+**Checks**
 - [ ] The new code matches the existing patterns and styles.
 - [ ] The tests pass with `yarn test`.
 - [ ] The linter passes with `yarn lint`. (Fix errors with `yarn fix`.)
 - [ ] The relevant examples still work. (Run examples with `yarn start`.)
+- [ ] You've [added a changeset](https://github.com/atlassian/changesets/blob/master/docs/adding-a-changeset.md) if changing functionality. (Add one with `yarn changeset add`.)
 
-#### Does this fix any issues or need any specific reviewers?
-
-Fixes: #
-Reviewers: @
