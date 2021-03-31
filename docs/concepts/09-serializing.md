@@ -53,7 +53,7 @@ For example, here's a similar `serialize` function for HTML:
 
 ```js
 import escapeHtml from 'escape-html'
-import { Node, Text } from 'slate'
+import { Text } from 'slate'
 
 const serialize = node => {
   if (Text.isText(node)) {

@@ -10,6 +10,7 @@ import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
 } from '../utils/weak-maps'
+import { isDecoratorRangeListEqual } from '../utils/range-list'
 
 /**
  * Text.
@@ -68,7 +69,8 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
-    next.text === prev.text
+    next.text === prev.text &&
+    isDecoratorRangeListEqual(next.decorations, prev.decorations)
   )
 })
 

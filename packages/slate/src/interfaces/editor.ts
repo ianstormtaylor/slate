@@ -272,6 +272,8 @@ export interface EditorInterface {
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
 
+const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
+
 export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
@@ -549,8 +551,12 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    return (
-      isPlainObject(value) &&
+    if (!isPlainObject(value)) return false
+    const cachedIsEditor = IS_EDITOR_CACHE.get(value)
+    if (cachedIsEditor !== undefined) {
+      return cachedIsEditor
+    }
+    const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
       typeof value.deleteBackward === 'function' &&
@@ -569,7 +575,8 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
-    )
+    IS_EDITOR_CACHE.set(value, isEditor)
+    return isEditor
   },
 
   /**
@@ -1053,6 +1060,10 @@ export const Editor: EditorInterface = {
     return at
   },
 
+  hasPath(editor: Editor, path: Path): boolean {
+    return Node.has(editor, path)
+  },
+
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
@@ -1295,8 +1306,8 @@ export const Editor: EditorInterface = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string and there is no more characters to skip, continue to the next block.
+          if (string === '' && distance === null) {
             break
           } else {
             advance()

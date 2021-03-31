@@ -70,7 +70,9 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
-    Text.matches(next.leaf, prev.leaf)
+    next.leaf.text === prev.leaf.text &&
+    Text.matches(next.leaf, prev.leaf) &&
+    next.leaf[PLACEHOLDER_SYMBOL] === prev.leaf[PLACEHOLDER_SYMBOL]
   )
 })
 
