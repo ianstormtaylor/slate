@@ -521,8 +521,10 @@ export const Editable = (props: EditableProps) => {
               hasEditableTarget(editor, event.target)
             ) {
               event.preventDefault()
-              const text = (event as any).data as string
-              Editor.insertText(editor, text)
+              if (!state.isComposing) {
+                const text = (event as any).data as string
+                Editor.insertText(editor, text)
+              }
             }
           },
           [readOnly]
