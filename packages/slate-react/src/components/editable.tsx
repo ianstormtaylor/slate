@@ -13,7 +13,7 @@ import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import Children from './children'
+import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   IS_FIREFOX,
@@ -29,6 +29,7 @@ import {
   DOMElement,
   DOMNode,
   DOMRange,
+  getDefaultView,
   isDOMElement,
   isDOMNode,
   DOMStaticRange,
@@ -41,6 +42,7 @@ import {
   NODE_TO_ELEMENT,
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
+  EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
@@ -131,7 +133,9 @@ export const Editable = (props: EditableProps) => {
 
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
+    let window
+    if (ref.current && (window = getDefaultView(ref.current))) {
+      EDITOR_TO_WINDOW.set(editor, window)
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
       ELEMENT_TO_NODE.set(ref.current, editor)
@@ -354,8 +358,9 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
-            if (data instanceof DataTransfer) {
-              ReactEditor.insertData(editor, data)
+            const window = ReactEditor.getWindow(editor)
+            if (data instanceof window.DataTransfer) {
+              ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
               Editor.insertText(editor, data)
             }
@@ -437,6 +442,7 @@ export const Editable = (props: EditableProps) => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
+    const window = ReactEditor.getWindow(editor)
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
@@ -527,6 +533,8 @@ export const Editable = (props: EditableProps) => {
             ) {
               return
             }
+
+            const window = ReactEditor.getWindow(editor)
 
             // COMPAT: If the current `activeElement` is still the previous
             // one, this is due to the window being blurred when the tab
@@ -978,14 +986,14 @@ export const Editable = (props: EditableProps) => {
           [readOnly, attributes.onPaste]
         )}
       >
-        <Children
-          decorate={decorate}
-          decorations={decorations}
-          node={editor}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          selection={editor.selection}
-        />
+        {useChildren({
+          decorate,
+          decorations,
+          node: editor,
+          renderElement,
+          renderLeaf,
+          selection: editor.selection,
+        })}
       </Component>
     </ReadOnlyContext.Provider>
   )

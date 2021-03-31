@@ -47,10 +47,7 @@ export const Element: ElementInterface = {
    */
 
   isElementList(value: any): value is Element[] {
-    return (
-      Array.isArray(value) &&
-      (value.length === 0 || Element.isElement(value[0]))
-    )
+    return Array.isArray(value) && value.every(val => Element.isElement(val))
   },
 
   /**

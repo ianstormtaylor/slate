@@ -122,7 +122,7 @@ Get the target range from a DOM `event`.
 
 Find a Slate point from a DOM selection's `domNode` and `domOffset`.
 
-###### `toSlatePoint(editor: ReactEditor, domPoint: DOMPoint)`
+###### `toSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection)`
 
 Find a Slate range from a DOM range or selection.
 

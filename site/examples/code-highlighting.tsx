@@ -5,19 +5,12 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import {
-  Text,
-  createEditor,
-  Node,
-  Element as SlateElement,
-  BaseEditor,
-  Descendant,
-} from 'slate'
+import { Text, createEditor, Element as SlateElement, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 const CodeHighlightingExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [language, setLanguage] = useState('html')
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -125,7 +118,7 @@ const Leaf = ({ attributes, children, leaf }) => {
           leaf.tag ||
           leaf.constant ||
           leaf.symbol ||
-          leaf.attr - name ||
+          leaf['attr-name'] ||
           leaf.selector) &&
           css`
             color: #905;
@@ -138,7 +131,7 @@ const Leaf = ({ attributes, children, leaf }) => {
           css`
             color: #690;
           `}
-        ${(leaf.function || leaf.class - name) &&
+        ${(leaf.function || leaf['class-name']) &&
           css`
             color: #dd4a68;
           `}
@@ -149,8 +142,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: '<h1>Hi!</h1>',

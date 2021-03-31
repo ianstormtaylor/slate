@@ -25,6 +25,7 @@ import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
 import Tables from '../../examples/tables'
+import IFrames from '../../examples/iframe'
 
 // node
 import { getAllExamples } from '../api'
@@ -48,6 +49,7 @@ const EXAMPLES = [
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Tables', Tables, 'tables'],
+  ['Rendering in iframes', IFrames, 'iframe'],
 ]
 
 const Header = props => (

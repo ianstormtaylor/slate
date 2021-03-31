@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import { createDraft, finishDraft, isDraft } from 'immer'
 import { reverse as reverseText } from 'esrever'
 
 import {
@@ -272,6 +271,8 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
+
+const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
 
 export const Editor: EditorInterface = {
   /**
@@ -550,8 +551,12 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    return (
-      isPlainObject(value) &&
+    if (!isPlainObject(value)) return false
+    const cachedIsEditor = IS_EDITOR_CACHE.get(value)
+    if (cachedIsEditor !== undefined) {
+      return cachedIsEditor
+    }
+    const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
       typeof value.deleteBackward === 'function' &&
@@ -570,7 +575,8 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
-    )
+    IS_EDITOR_CACHE.set(value, isEditor)
+    return isEditor
   },
 
   /**
@@ -699,7 +705,7 @@ export const Editor: EditorInterface = {
     const path = Editor.path(editor, at)
 
     for (const [n, p] of Node.levels(editor, path)) {
-      if (!match(n)) {
+      if (!match(n, p)) {
         continue
       }
 
@@ -893,7 +899,7 @@ export const Editor: EditorInterface = {
         continue
       }
 
-      if (!match(node)) {
+      if (!match(node, path)) {
         // If we've arrived at a leaf text node that is not lower than the last
         // hit, then we've found a branch that doesn't include a match, which
         // means the match is not universal.
@@ -1296,8 +1302,8 @@ export const Editor: EditorInterface = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string and there is no more characters to skip, continue to the next block.
+          if (string === '' && distance === null) {
             break
           } else {
             advance()
@@ -1575,6 +1581,6 @@ export const Editor: EditorInterface = {
  * A helper type for narrowing matched nodes with a predicate.
  */
 
-type NodeMatch<T extends Node> =
-  | ((node: Node) => node is T)
-  | ((node: Node) => boolean)
+export type NodeMatch<T extends Node> =
+  | ((node: Node, path: Path) => node is T)
+  | ((node: Node, path: Path) => boolean)

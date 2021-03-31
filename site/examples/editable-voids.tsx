@@ -1,14 +1,15 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Node } from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from '../components'
+import { EditableVoidElement } from './custom-types'
 
 const EditableVoidsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),
     []
@@ -40,7 +41,10 @@ const withEditableVoids = editor => {
 
 const insertEditableVoid = editor => {
   const text = { text: '' }
-  const voidNode = { type: 'editable-void', children: [text] }
+  const voidNode: EditableVoidElement = {
+    type: 'editable-void',
+    children: [text],
+  }
   Transforms.insertNodes(editor, voidNode)
 }
 
@@ -49,7 +53,7 @@ const Element = props => {
 
   switch (element.type) {
     case 'editable-void':
-      return <EditableVoidElement {...props} />
+      return <EditableVoid {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
@@ -59,7 +63,7 @@ const unsetWidthStyle = css`
   width: unset;
 `
 
-const EditableVoidElement = ({ attributes, children, element }) => {
+const EditableVoid = ({ attributes, children, element }) => {
   const [inputValue, setInputValue] = useState('')
 
   return (
@@ -127,7 +131,7 @@ const InsertEditableVoidButton = () => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
