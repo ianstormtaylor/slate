@@ -433,7 +433,6 @@ export const ReactEditor = {
       } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
         // ancestor, so find it by going down from the nearest void parent.
-
         leafNode = voidNode.querySelector('[data-slate-leaf]')!
 
         // COMPAT: In read-only editors the leaf is not rendered.
