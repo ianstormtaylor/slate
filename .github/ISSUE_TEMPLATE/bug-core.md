@@ -30,7 +30,6 @@ A clear and concise description of what you expected to happen. (Often it's help
 - Slate Version: [e.g. 0.59]
 - Operating System: [e.g. iOS]
 - Browser: [e.g. Chrome, Safari]
-- TypeScript Version: [e.g. 3.9.7 - required only if it's a TypeScript issue]
 
 **Context**
 Add any other context about the problem here. (The fastest way to have an issue fixed is to create a pull request with working, tested code and we'll help merge it. Slate is solving a pretty complex problem, and we can't do it without active contributors, so thank you so much for your help!)
