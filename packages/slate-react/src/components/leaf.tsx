@@ -1,6 +1,5 @@
 import React from 'react'
-import { Text, Element } from 'slate'
-
+import { Element, Text } from 'slate'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps } from './editable'
@@ -36,11 +35,14 @@ const Leaf = (props: {
           style={{
             pointerEvents: 'none',
             display: 'inline-block',
-            verticalAlign: 'text-top',
             width: '0',
             maxWidth: '100%',
             whiteSpace: 'nowrap',
             opacity: '0.333',
+            userSelect: 'none',
+            fontStyle: 'normal',
+            fontWeight: 'normal',
+            textDecoration: 'none',
           }}
         >
           {leaf.placeholder}
@@ -71,10 +73,6 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     Text.matches(next.leaf, prev.leaf)
   )
 })
-
-/**
- * The default custom leaf renderer.
- */
 
 export const DefaultLeaf = (props: RenderLeafProps) => {
   const { attributes, children } = props

@@ -1,6 +1,6 @@
 # Installing Slate
 
-Slate is a monorepo divided up into multi npm packages, so to install it you do:
+Slate is a monorepo divided up into multiple npm packages, so to install it you do:
 
 ```
 yarn add slate slate-react
@@ -12,11 +12,14 @@ You'll also need to be sure to install Slate's peer dependencies:
 yarn add react react-dom
 ```
 
-_Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add slate` and retrieve the bundled `dist/slate.js` file! Check out the [Using the Bundled Source](./using-the-bundled-source.md) guide for more information._
+_Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add slate` and retrieve the bundled `dist/slate.js` file! Check out the [Using the Bundled Source](./XX-using-the-bundled-source.md) guide for more information._
 
 Once you've installed Slate, you'll need to import it.
 
 ```jsx
+// Import React dependencies.
+import React, { useEffect, useMemo, useState } from 'react'
+
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -45,6 +48,25 @@ const App = () => {
 
 Of course we haven't rendered anything, so you won't see any changes.
 
+> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` as per the documentation on [TypeScript](/concepts/11-typescript). The example below also includes the custom types required for the rest of this example.
+
+```ts
+// TypeScript Users only add this code
+import { BaseEditor } from 'slate'
+import { ReactEditor } from 'slate-react'
+
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string }
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor & HistoryEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
+```
+
 Next we want to create state for `value`:
 
 ```jsx
@@ -67,7 +89,11 @@ const App = () => {
   const [value, setValue] = useState([])
   // Render the Slate context.
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)} />
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    />
   )
 }
 ```
@@ -86,7 +112,11 @@ const App = () => {
   const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )
@@ -111,7 +141,11 @@ const App = () => {
   ])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )
@@ -120,4 +154,4 @@ const App = () => {
 
 There you have it!
 
-That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.`. And when you type, you should see the text change!
+That's the most basic example of Slate. If you render that onto the page, you should see a paragraph with the text `A line of text in a paragraph.` And when you type, you should see the text change!

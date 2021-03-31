@@ -62,7 +62,7 @@ const App = () => {
   ])
 
   const renderElement = useCallback(props => {
-    switch (prop.element.type) {
+    switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
       default:
@@ -134,7 +134,7 @@ const Leaf = props => {
 
 Pretty familiar, right?
 
-And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor. Also, let's allow our formatting to be toggled by adding active-checking logic.
+And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor.
 
 ```jsx
 const App = () => {

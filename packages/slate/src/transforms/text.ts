@@ -11,7 +11,38 @@ import {
   Transforms,
 } from '..'
 
-export const TextTransforms = {
+export interface TextTransforms {
+  delete: (
+    editor: Editor,
+    options?: {
+      at?: Location
+      distance?: number
+      unit?: 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+      hanging?: boolean
+      voids?: boolean
+    }
+  ) => void
+  insertFragment: (
+    editor: Editor,
+    fragment: Node[],
+    options?: {
+      at?: Location
+      hanging?: boolean
+      voids?: boolean
+    }
+  ) => void
+  insertText: (
+    editor: Editor,
+    text: string,
+    options?: {
+      at?: Location
+      voids?: boolean
+    }
+  ) => void
+}
+
+export const TextTransforms: TextTransforms = {
   /**
    * Delete content in the editor.
    */
@@ -26,7 +57,7 @@ export const TextTransforms = {
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const {
         reverse = false,
@@ -196,7 +227,7 @@ export const TextTransforms = {
       hanging?: boolean
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false } = options
       let { at = editor.selection } = options
@@ -410,7 +441,7 @@ export const TextTransforms = {
       at?: Location
       voids?: boolean
     } = {}
-  ) {
+  ): void {
     Editor.withoutNormalizing(editor, () => {
       const { voids = false } = options
       let { at = editor.selection } = options

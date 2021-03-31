@@ -22,7 +22,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.insertText("and")
+            editor.insertText('and')
           }
         }}
       />
@@ -93,7 +93,7 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '&') {
             event.preventDefault()
-            editor.insertText("and")
+            editor.insertText('and')
           }
         }}
       />
@@ -117,8 +117,8 @@ const DefaultElement = props => {
 Okay, but now we'll need a way for the user to actually turn a block into a code block. So let's change our `onKeyDown` function to add a `` Ctrl-` `` shortcut that does just that:
 
 ```jsx
-// Import the `Editor` helpers from Slate.
-import { Editor } from 'slate'
+// Import the `Editor` and `Transforms` helpers from Slate.
+import { Editor, Transforms } from 'slate'
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
@@ -179,7 +179,6 @@ But we forgot one thing. When you hit `` Ctrl-` `` again, it should change the c
 ```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [selection, setSelection] = useState(null)
   const [value, setValue] = useState([
     {
       type: 'paragraph',
