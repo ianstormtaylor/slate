@@ -1,7 +1,7 @@
 import React from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
-import { ReactEditor, useEditor } from '..'
+import { ReactEditor, useSlateStatic } from '..'
 
 /**
  * Leaf content strings.
@@ -14,7 +14,7 @@ const String = (props: {
   text: Text
 }) => {
   const { isLast, leaf, parent, text } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
   const parentPath = Path.parent(path)
 

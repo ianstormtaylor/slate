@@ -16,10 +16,9 @@ _Note, if you'd rather use a pre-bundled version of Slate, you can `yarn add sla
 
 Once you've installed Slate, you'll need to import it.
 
-
 ```jsx
 // Import React dependencies.
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from 'react'
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -48,6 +47,25 @@ const App = () => {
 
 Of course we haven't rendered anything, so you won't see any changes.
 
+> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` as per the documentation on [TypeScript](/concepts/11-typescript). The example below also includes the custom types required for the rest of this example.
+
+```ts
+// TypeScript Users only add this code
+import { BaseEditor } from 'slate'
+import { ReactEditor } from 'slate-react'
+
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string }
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor & HistoryEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
+```
+
 Next we want to create state for `value`:
 
 ```jsx
@@ -70,7 +88,11 @@ const App = () => {
   const [value, setValue] = useState([])
   // Render the Slate context.
   return (
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)} />
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    />
   )
 }
 ```
@@ -89,7 +111,11 @@ const App = () => {
   const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )
@@ -114,7 +140,11 @@ const App = () => {
   ])
 
   return (
-    <Slate editor={editor} value={value} onChange={newValue => setValue(newValue)}>
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={newValue => setValue(newValue)}
+    >
       <Editable />
     </Slate>
   )

@@ -12,6 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
+
 export {
   DOMNode,
   DOMComment,
@@ -22,7 +23,25 @@ export {
   DOMStaticRange,
 }
 
+declare global {
+  interface Window {
+    Selection: typeof Selection['constructor']
+    DataTransfer: typeof DataTransfer['constructor']
+    Node: typeof Node['constructor']
+  }
+}
+
 export type DOMPoint = [Node, number]
+
+/**
+ * Returns the host window of a DOM node
+ */
+
+export const getDefaultView = (value: any): Window | null => {
+  return (
+    (value && value.ownerDocument && value.ownerDocument.defaultView) || null
+  )
+}
 
 /**
  * Check if a DOM node is a comment node.
@@ -45,7 +64,17 @@ export const isDOMElement = (value: any): value is DOMElement => {
  */
 
 export const isDOMNode = (value: any): value is DOMNode => {
-  return value instanceof Node
+  const window = getDefaultView(value)
+  return !!window && value instanceof window.Node
+}
+
+/**
+ * Check if a value is a DOM selection.
+ */
+
+export const isDOMSelection = (value: any): value is DOMSelection => {
+  const window = value && value.anchorNode && getDefaultView(value.anchorNode)
+  return !!window && value instanceof window.Selection
 }
 
 /**
@@ -96,6 +125,16 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 
   // Return the node and offset.
   return [node, offset]
+}
+
+/**
+ * Determines wether the active element is nested within a shadowRoot
+ */
+
+export const hasShadowRoot = () => {
+  return !!(
+    window.document.activeElement && window.document.activeElement.shadowRoot
+  )
 }
 
 /**
@@ -173,25 +212,4 @@ export const getPlainText = (domNode: DOMNode) => {
   }
 
   return text
-}
-
-/**
- * there is no way to create a reverse DOM Range using Range.setStart/setEnd
- * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
- * Luckily it's possible to create a reverse selection via Selection.extend
- *
- * Note: Selection.extend is not implement in any version of IE (up to and including version 11)
- */
-
-export const setReverseDomSelection = (
-  domRange: DOMRange,
-  domSelection: Selection
-) => {
-  const newRange = domRange.cloneRange()
-  // collapses the range to end
-  newRange.collapse()
-  // set both anchor and focus of the selection to domRange's focus
-  domSelection.addRange(newRange)
-  // moves the focus of the selection to domRange's anchor
-  domSelection.extend(domRange.startContainer, domRange.startOffset)
 }

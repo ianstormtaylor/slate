@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import { Node, Transforms, createEditor } from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 import {
@@ -80,7 +80,7 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -211,8 +211,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -228,9 +229,11 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [{ text: 'This is an example of doing exactly that!' }],
   },
   {
+    type: 'paragraph',
     children: [
       {
         text:

@@ -13,12 +13,16 @@ import {
   Ancestor,
 } from '..'
 
-export const GeneralTransforms = {
+export interface GeneralTransforms {
+  transform: (editor: Editor, op: Operation) => void
+}
+
+export const GeneralTransforms: GeneralTransforms = {
   /**
    * Transform the editor by an operation.
    */
 
-  transform(editor: Editor, op: Operation) {
+  transform(editor: Editor, op: Operation): void {
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)
 
@@ -244,7 +248,6 @@ export const GeneralTransforms = {
           const after = node.text.slice(position)
           node.text = before
           newNode = {
-            ...node,
             ...(properties as Partial<Text>),
             text: after,
           }
@@ -254,7 +257,6 @@ export const GeneralTransforms = {
           node.children = before
 
           newNode = {
-            ...node,
             ...(properties as Partial<Element>),
             children: after,
           }
@@ -272,7 +274,7 @@ export const GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children) as Node[]
+    editor.children = finishDraft(editor.children)
 
     if (selection) {
       editor.selection = isDraft(selection)

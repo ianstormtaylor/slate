@@ -12,7 +12,11 @@ export interface RangeRef {
   unref(): Range | null
 }
 
-export const RangeRef = {
+export interface RangeRefInterface {
+  transform: (ref: RangeRef, op: Operation) => void
+}
+
+export const RangeRef: RangeRefInterface = {
   /**
    * Transform the range ref's current value by an operation.
    */
