@@ -45,6 +45,7 @@
     "@babel/preset-typescript": "^7.7.4",
     "@babel/register": "^7.7.4",
     "@babel/runtime": "^7.7.4",
+    "@changesets/changelog-github": "^0.3.0",
     "@changesets/cli": "^2.14.1",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
