@@ -1,11 +1,13 @@
 ---
-
 name: "\U0001F5A5 Bug: Platform"
 about: A bug that occurs in a specific browser or platform
 title: ''
 labels: bug, ⚑ cross platform
 assignees: ''
----**Description**
+
+---
+
+**Description**
 A clear and concise description of what the bug is.
 
 **Recording**
@@ -16,7 +18,6 @@ A link to a sandbox where the error can be reproduced. (You can start from the b
 
 **Steps**
 To reproduce the behavior:
-
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
@@ -26,7 +27,6 @@ To reproduce the behavior:
 A clear and concise description of what you expected to happen. (Often it's helpful to test out the behavior of other editors like Google Docs, Medium, Notion, etc. to see how they handle the same issue.)
 
 **Environment**
-
 - Slate Version: [e.g. 0.59]
 - Operating System: [e.g. iOS]
 - Browser: [e.g. Chrome, Safari]
