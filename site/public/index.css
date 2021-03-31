@@ -70,6 +70,11 @@ input:focus {
   border-color: blue;
 }
 
+iframe {
+  width: 100%;
+  border: 1px solid #eee;
+}
+
 [data-slate-editor] > * + * {
   margin-top: 1em;
 }

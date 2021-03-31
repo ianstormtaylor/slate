@@ -76,7 +76,7 @@ const renderLeaf = useCallback(({ attributes, children, leaf }) => {
 }, [])
 ```
 
-Notice though how we've handled it slightly differently than `renderElement`. Since text formatting texts to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. (But there's nothing preventing you from using custom components if you'd like!)
+Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. (But there's nothing preventing you from using custom components if you'd like!)
 
 One disadvantage of text-level formatting is that you cannot guarantee that any given format is "contiguous"—meaning that it stays as a single leaf. This limitation with respect to leaves is similar to the DOM, where this is invalid:
 
@@ -102,6 +102,8 @@ Of course, this leaf stuff sounds pretty complex. But, you do not have to think 
 Decorations are another type of text-level formatting. They are similar to regular old custom properties, except each one applies to a `Range` of the document instead of being associated with a given text node.
 
 However, decorations are computed at **render-time** based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.
+
+Decorations are different from Marks in that they are not stored on editor state.
 
 ## Toolbars, Menus, Overlays, and more!
 
