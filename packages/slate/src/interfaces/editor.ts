@@ -1060,6 +1060,10 @@ export const Editor: EditorInterface = {
     return at
   },
 
+  hasPath(editor: Editor, path: Path): boolean {
+    return Node.has(editor, path)
+  },
+
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.

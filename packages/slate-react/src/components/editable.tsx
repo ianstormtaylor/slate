@@ -182,6 +182,15 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
+    // when <Editable/> is being controlled through external value
+    // then its children might just change - DOM responds to it on its own
+    // but Slate's value is not being updated through any operation
+    // and thus it doesn't transform selection on its own
+    if (selection && !ReactEditor.hasRange(editor, selection)) {
+      editor.selection = ReactEditor.toSlateRange(editor, domSelection)
+      return
+    }
+
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
