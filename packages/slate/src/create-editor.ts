@@ -69,7 +69,7 @@ export const createEditor = (): Editor => {
       }
 
       DIRTY_PATHS.set(editor, dirtyPaths)
-      Editor.transform(editor, op)
+      Transforms.transform(editor, op)
       editor.operations.push(op)
       Editor.normalize(editor)
 
@@ -138,7 +138,7 @@ export const createEditor = (): Editor => {
     getFragment: () => {
       const { selection } = editor
 
-      if (selection && Range.isExpanded(selection)) {
+      if (selection) {
         return Node.fragment(editor, selection)
       }
       return []
@@ -307,7 +307,7 @@ export const createEditor = (): Editor => {
  * Get the "dirty" paths generated from an operation.
  */
 
-const getDirtyPaths = (op: Operation) => {
+const getDirtyPaths = (op: Operation): Path[] => {
   switch (op.type) {
     case 'insert_text':
     case 'remove_text':

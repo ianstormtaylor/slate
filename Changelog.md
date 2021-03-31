@@ -2,6 +2,20 @@
 
 This is a list of changes to Slate with each new release. Until `1.0.0` is released, breaking changes will be added as minor version bumps, and smaller, patch-level changes won't be noted since the library is moving quickly while in beta.
 
+### `0.61.0` - March 29, 2021
+
+###### BREAKING
+
+**New CustomTypes for Editor, Element, Text and other implementation specific objects** Improved typing with TypeScript lets you add CustomTypes for the Slate Editor. This change requires you to set up your types at the start. It's a new concept so please read the new TypeScript documentation here:
+
+https://docs.slatejs.org/concepts/11-typescript
+
+### `0.58.0` - May 5th, 2020
+
+###### BREAKING
+
+**User properties on Elements and Texts now have an unknown type instead of any.** Previously, the arbitrary user defined keys on the `Text` and `Element` interface had a type of `any` which effectively removed any potential type checking on those properties. Now these have a type of `unknown` so that type checking can be done by consumers of the API when they are applying their own custom properties to the `Text`s and `Element`s.
+
 ---
 
 ### `0.57.0` — December 18, 2019

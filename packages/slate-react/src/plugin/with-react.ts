@@ -5,14 +5,48 @@ import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
 import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY } from '../utils/weak-maps'
 import { isDOMText, getPlainText } from '../utils/dom'
+import { findCurrentLineRange } from '../utils/lines'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
+ *
+ * If you are using TypeScript, you must extend Slate's CustomTypes to use
+ * this plugin.
+ *
+ * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
 export const withReact = <T extends Editor>(editor: T) => {
   const e = editor as T & ReactEditor
-  const { apply, onChange } = e
+  const { apply, onChange, deleteBackward } = e
+
+  e.deleteBackward = unit => {
+    if (unit !== 'line') {
+      return deleteBackward(unit)
+    }
+
+    if (editor.selection && Range.isCollapsed(editor.selection)) {
+      const parentBlockEntry = Editor.above(editor, {
+        match: n => Editor.isBlock(editor, n),
+        at: editor.selection,
+      })
+
+      if (parentBlockEntry) {
+        const [, parentBlockPath] = parentBlockEntry
+        const parentElementRange = Editor.range(
+          editor,
+          parentBlockPath,
+          editor.selection.anchor
+        )
+
+        const currentLineRange = findCurrentLineRange(e, parentElementRange)
+
+        if (!Range.isCollapsed(currentLineRange)) {
+          Transforms.delete(editor, { at: currentLineRange })
+        }
+      }
+    }
+  }
 
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
@@ -148,7 +182,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))
       const parsed = JSON.parse(decoded) as Node[]
-      Transforms.insertFragment(e, parsed)
+      e.insertFragment(parsed)
       return
     }
 
@@ -163,7 +197,7 @@ export const withReact = <T extends Editor>(editor: T) => {
           Transforms.splitNodes(e, { always: true })
         }
 
-        Transforms.insertText(e, line)
+        e.insertText(line)
         split = true
       }
     }

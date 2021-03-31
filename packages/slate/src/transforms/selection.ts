@@ -1,6 +1,34 @@
 import { Editor, Location, Point, Range, Transforms } from '..'
 
-export const SelectionTransforms = {
+export interface SelectionTransforms {
+  collapse: (
+    editor: Editor,
+    options?: {
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
+    }
+  ) => void
+  deselect: (editor: Editor) => void
+  move: (
+    editor: Editor,
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line'
+      reverse?: boolean
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
+    }
+  ) => void
+  select: (editor: Editor, target: Location) => void
+  setPoint: (
+    editor: Editor,
+    props: Partial<Point>,
+    options?: {
+      edge?: 'anchor' | 'focus' | 'start' | 'end'
+    }
+  ) => void
+  setSelection: (editor: Editor, props: Partial<Range>) => void
+}
+
+export const SelectionTransforms: SelectionTransforms = {
   /**
    * Collapse the selection.
    */
@@ -10,7 +38,7 @@ export const SelectionTransforms = {
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
-  ) {
+  ): void {
     const { edge = 'anchor' } = options
     const { selection } = editor
 
@@ -33,7 +61,7 @@ export const SelectionTransforms = {
    * Unset the selection.
    */
 
-  deselect(editor: Editor) {
+  deselect(editor: Editor): void {
     const { selection } = editor
 
     if (selection) {
@@ -57,7 +85,7 @@ export const SelectionTransforms = {
       reverse?: boolean
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
-  ) {
+  ): void {
     const { selection } = editor
     const { distance = 1, unit = 'character', reverse = false } = options
     let { edge = null } = options
@@ -105,7 +133,7 @@ export const SelectionTransforms = {
    * Set the selection to a new value.
    */
 
-  select(editor: Editor, target: Location) {
+  select(editor: Editor, target: Location): void {
     const { selection } = editor
     target = Editor.range(editor, target)
 
@@ -138,8 +166,8 @@ export const SelectionTransforms = {
     props: Partial<Point>,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) {
+    } = {}
+  ): void {
     const { selection } = editor
     let { edge = 'both' } = options
 
@@ -167,7 +195,7 @@ export const SelectionTransforms = {
    * Set new properties on the selection.
    */
 
-  setSelection(editor: Editor, props: Partial<Range>) {
+  setSelection(editor: Editor, props: Partial<Range>): void {
     const { selection } = editor
     const oldProps: Partial<Range> | null = {}
     const newProps: Partial<Range> = {}

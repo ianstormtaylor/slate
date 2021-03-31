@@ -53,7 +53,7 @@ For example, here's a similar `serialize` function for HTML:
 
 ```js
 import escapeHtml from 'escape-html'
-import { Node, Text } from 'slate'
+import { Text } from 'slate'
 
 const serialize = node => {
   if (Text.isText(node)) {
@@ -167,6 +167,10 @@ const deserialize = el => {
 
   const children = Array.from(el.childNodes).map(deserialize)
 
+  if (children.length === 0) {
+    children = [{ text: '' }]
+  }
+
   switch (el.nodeName) {
     case 'BODY':
       return jsx('fragment', {}, children)
@@ -198,7 +202,7 @@ deserialize(document.body)
 
 With this input:
 
-```js
+```html
 <p>An opening paragraph with a <a href="https://example.com">link</a> in it.</p>
 <blockquote><p>A wise quote.</p></blockquote>
 <p>A closing paragraph!</p>
