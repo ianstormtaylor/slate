@@ -9,10 +9,11 @@ import {
   Transforms,
   Path,
 } from 'slate'
+import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import Children from './children'
+import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   IS_FIREFOX,
@@ -28,6 +29,7 @@ import {
   DOMElement,
   DOMNode,
   DOMRange,
+  getDefaultView,
   isDOMElement,
   isDOMNode,
   isDOMText,
@@ -41,6 +43,7 @@ import {
   NODE_TO_ELEMENT,
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
+  EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
@@ -131,7 +134,9 @@ export const Editable = (props: EditableProps) => {
 
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
+    let window
+    if (ref.current && (window = getDefaultView(ref.current))) {
+      EDITOR_TO_WINDOW.set(editor, window)
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
       ELEMENT_TO_NODE.set(ref.current, editor)
@@ -143,6 +148,7 @@ export const Editable = (props: EditableProps) => {
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
     const { selection } = editor
+    const window = ReactEditor.getWindow(editor)
     const domSelection = window.getSelection()
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
@@ -179,12 +185,25 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
-    domSelection.removeAllRanges()
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
-      domSelection.addRange(newDomRange!)
+      if (Range.isBackward(selection!)) {
+        domSelection.setBaseAndExtent(
+          newDomRange.endContainer,
+          newDomRange.endOffset,
+          newDomRange.startContainer,
+          newDomRange.startOffset
+        )
+      } else {
+        domSelection.setBaseAndExtent(
+          newDomRange.startContainer,
+          newDomRange.startOffset,
+          newDomRange.endContainer,
+          newDomRange.endOffset
+        )
+      }
       const leafEl = newDomRange.startContainer.parentElement!
       leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
         newDomRange
@@ -194,6 +213,8 @@ export const Editable = (props: EditableProps) => {
         boundary: el,
       })
       delete leafEl.getBoundingClientRect
+    } else {
+      domSelection.removeAllRanges()
     }
 
     setTimeout(() => {
@@ -342,8 +363,9 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
-            if (data instanceof DataTransfer) {
-              ReactEditor.insertData(editor, data)
+            const window = ReactEditor.getWindow(editor)
+            if (data instanceof window.DataTransfer) {
+              ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
               Editor.insertText(editor, data)
             }
@@ -353,7 +375,7 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    [readOnly]
+    [readOnly, propsOnDOMBeforeInput]
   )
 
   // Attach a native DOM event handler for `beforeinput` events, because React's
@@ -382,6 +404,7 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
+        const window = ReactEditor.getWindow(editor)
         const { activeElement } = window.document
         const el = ReactEditor.toDOMNode(editor, editor)
         const domSelection = window.getSelection()
@@ -424,6 +447,7 @@ export const Editable = (props: EditableProps) => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
+    const window = ReactEditor.getWindow(editor)
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
@@ -514,6 +538,8 @@ export const Editable = (props: EditableProps) => {
             ) {
               return
             }
+
+            const window = ReactEditor.getWindow(editor)
 
             // COMPAT: If the current `activeElement` is still the previous
             // one, this is due to the window being blurred when the tab
@@ -723,6 +749,7 @@ export const Editable = (props: EditableProps) => {
               !isEventHandled(event, attributes.onFocus)
             ) {
               const el = ReactEditor.toDOMNode(editor, editor)
+              const window = ReactEditor.getWindow(editor)
               state.latestElement = window.document.activeElement
 
               // COMPAT: If the editor has nested editable elements, the focus
@@ -755,7 +782,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isRedo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.redo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.redo()
                 }
 
@@ -765,7 +792,7 @@ export const Editable = (props: EditableProps) => {
               if (Hotkeys.isUndo(nativeEvent)) {
                 event.preventDefault()
 
-                if (typeof editor.undo === 'function') {
+                if (HistoryEditor.isHistoryEditor(editor)) {
                   editor.undo()
                 }
 
@@ -950,11 +977,11 @@ export const Editable = (props: EditableProps) => {
             // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
+              hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste) &&
               (!HAS_BEFORE_INPUT_SUPPORT ||
                 isPlainTextOnlyPaste(event.nativeEvent)) &&
-              !readOnly &&
-              hasEditableTarget(editor, event.target)
+              !readOnly
             ) {
               event.preventDefault()
               ReactEditor.insertData(editor, event.clipboardData)
@@ -963,14 +990,14 @@ export const Editable = (props: EditableProps) => {
           [readOnly, attributes.onPaste]
         )}
       >
-        <Children
-          decorate={decorate}
-          decorations={decorations}
-          node={editor}
-          renderElement={renderElement}
-          renderLeaf={renderLeaf}
-          selection={editor.selection}
-        />
+        {useChildren({
+          decorate,
+          decorations,
+          node: editor,
+          renderElement,
+          renderLeaf,
+          selection: editor.selection,
+        })}
       </Component>
     </ReadOnlyContext.Provider>
   )

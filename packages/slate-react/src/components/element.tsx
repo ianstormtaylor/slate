@@ -3,8 +3,8 @@ import getDirection from 'direction'
 import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
-import Children from './children'
-import { ReactEditor, useEditor, useReadOnly } from '..'
+import useChildren from '../hooks/use-children'
+import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -14,6 +14,7 @@ import {
   NODE_TO_INDEX,
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
+import { isDecoratorRangeListEqual } from '../utils/range-list'
 import { RenderElementProps, RenderLeafProps } from './editable'
 
 /**
@@ -37,21 +38,19 @@ const Element = (props: {
     selection,
   } = props
   const ref = useRef<HTMLElement>(null)
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
 
-  let children: JSX.Element | null = (
-    <Children
-      decorate={decorate}
-      decorations={decorations}
-      node={element}
-      renderElement={renderElement}
-      renderLeaf={renderLeaf}
-      selection={selection}
-    />
-  )
+  let children: JSX.Element | null = useChildren({
+    decorate,
+    decorations,
+    node: element,
+    renderElement,
+    renderLeaf,
+    selection,
+  })
 
   // Attributes that the developer must mix into the element in their
   // custom node renderer component.
@@ -136,7 +135,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isRangeListEqual(prev.decorations, next.decorations) &&
+    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
@@ -150,38 +149,13 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
 
 export const DefaultElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const Tag = editor.isInline(element) ? 'span' : 'div'
   return (
     <Tag {...attributes} style={{ position: 'relative' }}>
       {children}
     </Tag>
   )
-}
-
-/**
- * Check if a list of ranges is equal to another.
- *
- * PERF: this requires the two lists to also have the ranges inside them in the
- * same order, but this is an okay constraint for us since decorations are
- * kept in order, and the odd case where they aren't is okay to re-render for.
- */
-
-const isRangeListEqual = (list: Range[], another: Range[]): boolean => {
-  if (list.length !== another.length) {
-    return false
-  }
-
-  for (let i = 0; i < list.length; i++) {
-    const range = list[i]
-    const other = another[i]
-
-    if (!Range.equals(range, other)) {
-      return false
-    }
-  }
-
-  return true
 }
 
 export default MemoizedElement
