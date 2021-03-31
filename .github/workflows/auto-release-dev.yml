@@ -1,0 +1,36 @@
+name: Auto-release @dev
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  release:
+    name: Auto-release @dev
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@master
+        with:
+          # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@master
+        with:
+          node-version: 12.x
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Prepare release
+        run: yarn prerelease
+
+      - name: Release to @dev channel
+        run: |
+          yarn changeset version --snapshot
+          yarn changeset publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
