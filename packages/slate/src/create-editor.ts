@@ -127,11 +127,11 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteFragment: () => {
+    deleteFragment: (direction?: 'forward' | 'backward') => {
       const { selection } = editor
 
       if (selection && Range.isExpanded(selection)) {
-        Transforms.delete(editor)
+        Transforms.delete(editor, { reverse: direction === 'backward' })
       }
     },
 

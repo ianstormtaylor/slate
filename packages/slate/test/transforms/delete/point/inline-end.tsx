@@ -3,21 +3,21 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.delete(editor, { reverse: true })
+  Transforms.delete(editor)
 }
 export const input = (
   <editor>
     <block>
       one
-      <inline>two</inline>
+      <inline>
+        two
+        <cursor />
+      </inline>
       <text />
     </block>
     <block>
       <text />
-      <inline>
-        <cursor />
-        three
-      </inline>
+      <inline>three</inline>
       four
     </block>
   </editor>

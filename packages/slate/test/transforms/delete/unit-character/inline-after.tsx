@@ -3,26 +3,23 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.delete(editor, { unit: 'character' })
+  Transforms.delete(editor)
 }
 export const input = (
   <editor>
     <block>
-      a<cursor />
+      one
       <inline>two</inline>
-      three
+      <cursor />a
     </block>
   </editor>
 )
 export const output = (
   <editor>
     <block>
-      a
-      <inline>
-        <cursor />
-        wo
-      </inline>
-      three
+      one
+      <inline>two</inline>
+      <cursor />
     </block>
   </editor>
 )

@@ -207,7 +207,9 @@ export const TextTransforms: TextTransforms = {
         })
       }
 
-      const point = endRef.unref() || startRef.unref()
+      const point = reverse
+        ? startRef.unref() || endRef.unref()
+        : endRef.unref() || startRef.unref()
 
       if (options.at == null && point) {
         Transforms.select(editor, point)
