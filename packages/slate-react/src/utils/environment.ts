@@ -23,7 +23,7 @@ export const IS_EDGE_LEGACY =
 export const IS_CHROME =
   typeof navigator !== 'undefined' && /Chrome/i.test(navigator.userAgent)
 
-// Native `beforeInput` events don't work well with react on Chrome 75 
+// Native `beforeInput` events don't work well with react on Chrome 75
 // and older, Chrome 76+ can use `beforeInput` though.
 export const IS_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&
