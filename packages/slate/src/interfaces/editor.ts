@@ -272,6 +272,8 @@ export interface EditorInterface {
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
 
+const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
+
 export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
@@ -549,8 +551,12 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    return (
-      isPlainObject(value) &&
+    if (!isPlainObject(value)) return false
+    const cachedIsEditor = IS_EDITOR_CACHE.get(value)
+    if (cachedIsEditor !== undefined) {
+      return cachedIsEditor
+    }
+    const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
       typeof value.deleteBackward === 'function' &&
@@ -569,7 +575,8 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
-    )
+    IS_EDITOR_CACHE.set(value, isEditor)
+    return isEditor
   },
 
   /**

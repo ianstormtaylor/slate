@@ -86,6 +86,8 @@ export interface NodeInterface {
   ) => Generator<NodeEntry<Text>, void, undefined>
 }
 
+const IS_NODE_LIST_CACHE = new WeakMap<any[], boolean>()
+
 export const Node: NodeInterface = {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
@@ -384,7 +386,16 @@ export const Node: NodeInterface = {
    */
 
   isNodeList(value: any): value is Node[] {
-    return Array.isArray(value) && value.every(val => Node.isNode(val))
+    if (!Array.isArray(value)) {
+      return false
+    }
+    const cachedResult = IS_NODE_LIST_CACHE.get(value)
+    if (cachedResult !== undefined) {
+      return cachedResult
+    }
+    const isNodeList = value.every(val => Node.isNode(val))
+    IS_NODE_LIST_CACHE.set(value, isNodeList)
+    return isNodeList
   },
 
   /**
