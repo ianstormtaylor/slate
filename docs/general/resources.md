@@ -28,6 +28,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Sanity.io](https://www.sanity.io)
 - [Slite](https://slite.com)
 - [Taskade](https://www.taskade.com/)
+- [TRPG Engine](https://trpg.moonrailgun.com)
 - [Yuque](https://www.yuque.com/)
 - [Thoughts](https://thoughts.teambition.com)
 
