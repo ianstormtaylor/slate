@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { Node, Element, Descendant } from 'slate'
+import { Editor, Node, Element, Descendant } from 'slate'
+import invariant from 'tiny-invariant'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
@@ -21,6 +22,17 @@ export const Slate = (props: {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
   const context: [ReactEditor] = useMemo(() => {
+    invariant(
+      Node.isNodeList(value),
+      `[Slate] value is invalid! Expected a list of elements but got: ${JSON.stringify(
+        value
+      )}`
+    )
+    invariant(
+      Editor.isEditor(editor),
+      `[Slate] editor is invalid! you passed: ${JSON.stringify(editor)}`
+    )
+
     editor.children = value
     Object.assign(editor, rest)
     return [editor]
