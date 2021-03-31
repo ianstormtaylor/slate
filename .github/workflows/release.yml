@@ -3,7 +3,7 @@ name: Auto-release @dev
 on:
   push:
     branches:
-      - add-changesets
+      - master
 
 jobs:
   release:
