@@ -3,8 +3,8 @@ import getDirection from 'direction'
 import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 
 import Text from './text'
-import Children from './children'
-import { ReactEditor, useEditor, useReadOnly } from '..'
+import useChildren from '../hooks/use-children'
+import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -37,21 +37,19 @@ const Element = (props: {
     selection,
   } = props
   const ref = useRef<HTMLElement>(null)
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
 
-  let children: JSX.Element | null = (
-    <Children
-      decorate={decorate}
-      decorations={decorations}
-      node={element}
-      renderElement={renderElement}
-      renderLeaf={renderLeaf}
-      selection={selection}
-    />
-  )
+  let children: JSX.Element | null = useChildren({
+    decorate,
+    decorations,
+    node: element,
+    renderElement,
+    renderLeaf,
+    selection,
+  })
 
   // Attributes that the developer must mix into the element in their
   // custom node renderer component.
@@ -150,7 +148,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
 
 export const DefaultElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const Tag = editor.isInline(element) ? 'span' : 'div'
   return (
     <Tag {...attributes} style={{ position: 'relative' }}>

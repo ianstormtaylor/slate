@@ -8,6 +8,11 @@ import { isDOMText, getPlainText } from '../utils/dom'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
+ *
+ * If you are using TypeScript, you must extend Slate's CustomTypes to use
+ * this plugin.
+ *
+ * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
 export const withReact = <T extends Editor>(editor: T) => {
@@ -148,7 +153,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))
       const parsed = JSON.parse(decoded) as Node[]
-      Transforms.insertFragment(e, parsed)
+      e.insertFragment(parsed)
       return
     }
 
@@ -163,7 +168,7 @@ export const withReact = <T extends Editor>(editor: T) => {
           Transforms.splitNodes(e, { always: true })
         }
 
-        Transforms.insertText(e, line)
+        e.insertText(line)
         split = true
       }
     }

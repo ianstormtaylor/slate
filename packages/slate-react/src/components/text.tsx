@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
-import { ReactEditor, useEditor } from '..'
+import { ReactEditor, useSlateStatic } from '..'
 import { RenderLeafProps } from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -23,7 +23,7 @@ const Text = (props: {
   text: SlateText
 }) => {
   const { decorations, isLast, parent, renderLeaf, text } = props
-  const editor = useEditor()
+  const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
