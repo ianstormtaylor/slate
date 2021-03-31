@@ -8,7 +8,7 @@ Let's use the `onKeyDown` handler to change the editor's content when we press a
 
 Here's our app from earlier:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -28,7 +28,7 @@ const App = () => {
 
 Now we add an `onKeyDown` handler:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -57,7 +57,7 @@ Now we want to make it actually change the content. For the purposes of our exam
 
 Our `onKeyDown` handler might look like this:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -74,8 +74,8 @@ const App = () => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()
-            // Execute a command to insert text when the event occurs.
-            editor.exec({ type: 'insert_text', text: 'and' })
+            // Execute the `insertText` method when the event occurs.
+            editor.insertText('and')
           }
         }}
       />
@@ -86,4 +86,4 @@ const App = () => {
 
 With that added, try typing `&`, and you should see it suddenly become `and` instead!
 
-This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and the `editor` that lets you perform commands. Simple!
+This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and you can use your `editor` to perform commands in response. Simple!

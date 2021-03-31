@@ -1,7 +1,11 @@
-name: actions
-on: [push, pull_request]
+name: Test
+
+on:
+  - push
+  - pull_request
+
 jobs:
-  ci:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1

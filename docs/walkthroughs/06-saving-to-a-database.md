@@ -6,7 +6,7 @@ In this guide, we'll show you how to add logic to save your Slate content to a d
 
 Let's start with a basic editor:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -30,17 +30,7 @@ What we need to do is save the changes you make somewhere. For this example, we'
 
 So, in our `onChange` handler, we need to save the `value`:
 
-```js
-const defaultValue = [
-  {
-    children: [
-      {
-        text: 'A line of text in a paragraph.',
-      },
-    ],
-  },
-]
-
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -54,7 +44,6 @@ const App = () => {
     <Slate
       editor={editor}
       value={value}
-      selection={selection}
       onChange={value => {
         setValue(value)
 
@@ -73,7 +62,7 @@ Now whenever you edit the page, if you look in Local Storage, you should see the
 
 But... if you refresh the page, everything is still reset. That's because we need to make sure the initial value is pulled from that same Local Storage location, like so:
 
-```js
+```jsx
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   // Update the initial content to be pulled from Local Storage if it exists.
@@ -108,7 +97,7 @@ Success—you've got JSON in your database.
 
 But what if you want something other than JSON? Well, you'd need to serialize your value differently. For example, if you want to save your content as plain text instead of JSON, we can write some logic to serialize and deserialize plain text values:
 
-```js
+```jsx
 // Import the `Node` helper interface from Slate.
 import { Node } from 'slate'
 

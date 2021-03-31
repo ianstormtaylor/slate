@@ -152,13 +152,13 @@ export function createSelection(
   const anchor: AnchorToken = children.find(c => c instanceof AnchorToken)
   const focus: FocusToken = children.find(c => c instanceof FocusToken)
 
-  if (!anchor || !anchor.offset || !anchor.path) {
+  if (!anchor || anchor.offset == null || anchor.path == null) {
     throw new Error(
       `The <selection> hyperscript tag must have an <anchor> tag as a child with \`path\` and \`offset\` attributes defined.`
     )
   }
 
-  if (!focus || !focus.offset || !focus.path) {
+  if (!focus || focus.offset == null || focus.path == null) {
     throw new Error(
       `The <selection> hyperscript tag must have a <focus> tag as a child with \`path\` and \`offset\` attributes defined.`
     )
@@ -237,7 +237,7 @@ export function createEditor(
   const selection: Partial<Range> = {}
   const editor = makeEditor()
   Object.assign(editor, attributes)
-  editor.children = descendants
+  editor.children = descendants as Element[]
 
   // Search the document's texts to see if any of them have tokens associated
   // that need incorporated into the selection.

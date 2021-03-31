@@ -26,13 +26,13 @@ The codebase now uses TypeScript. Working with pure JSON as a data model, and us
 
 ### Fewer Concepts
 
-The number of interfaces and commands has been reduced. Previously `Selection`, `Annotation`, `Decoration` used to all be separate classes. Now they are simply objects that implement the `Range` interface. Previously `Block` and `Inline` were separate, now they are objects that implement the `Element` interface. Previously there was a `Document` and `Value`, but now the top-level `Editor` contains the children nodes of the document itself.
+The number of interfaces and commands has been reduced. Previously `Selection`, `Annotation`, and `Decoration` used to all be separate classes. Now they are simply objects that implement the `Range` interface. Previously `Block` and `Inline` were separate; now they are objects that implement the `Element` interface. Previously there was a `Document` and `Value`, but now the top-level `Editor` contains the children nodes of the document itself.
 
 The number of commands has been reduced too. Previously we had commands for every type of input, like `insertText`, `insertTextAtRange`, `insertTextAtPath`. These have been merged into a smaller set of more customizable commands, eg. `insertText` which can take `at: Path | Range | Point`.
 
 ### Fewer Packages
 
-In attempt to decrease the maintenance burden, and because the new abstraction and APIs in Slate's core packages make things much easier, the total number of packages has been reduced. Things like `slate-plain-serializer`, `slate-base64-serializer`, etc. have been removed and can be implemented in userland easily if needed. Even the `slate-html-deserializer` can now be implemented in userland (in ~10 LOC leveraging `slate-hyperscript`). And internal packages like `slate-dev-environment`, `slate-dev-test-utils`, etc. are no longer exposed because they are implementation details.
+In an attempt to decrease the maintenance burden, and because the new abstraction and APIs in Slate's core packages make things much easier, the total number of packages has been reduced. Things like `slate-plain-serializer`, `slate-base64-serializer`, etc. have been removed and can be implemented in userland easily if needed. Even the `slate-html-deserializer` can now be implemented in userland (in ~10 LOC leveraging `slate-hyperscript`). And internal packages like `slate-dev-environment`, `slate-dev-test-utils`, etc. are no longer exposed because they are implementation details.
 
 ### Commands
 
@@ -42,7 +42,7 @@ Commands are triggered by calling the `editor.*` core functions. And they travel
 
 ### Plugins
 
-Plugins are now plain functions that augment the `Editor` object they receive and return it again. For example can augment the command execution by composing the `editor.exec` function. Or listen to operations by composing `editor.apply`. Previously they relied on a custom middleware stack, and they were just bags of handlers that got merged onto an editor. Now we're using plain old function composition (aka wrapping) instead.
+Plugins are now plain functions that augment the `Editor` object they receive and return it again. For example, they can augment the command execution by composing the `editor.exec` function or listen to operations by composing `editor.apply`. Previously they relied on a custom middleware stack, and they were just bags of handlers that got merged onto an editor. Now we're using plain old function composition (aka wrapping) instead.
 
 ### Elements
 
@@ -50,7 +50,7 @@ Block-ness and inline-ness is now a runtime choice. Previously it was baked into
 
 ### More React-ish
 
-Rendering and event-handling is no longer a plugin's concern. Previously plugins had full control over the rendering logic, and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the richtext aspects, and leaves the rendering and event handling aspects to React.
+Rendering and event-handling are no longer a plugin's concern. Previously plugins had full control over the rendering and event-handling logic in the editor. This creates a bad incentive to start putting **all** rendering logic in plugins, which puts Slate in a position of being a wrapper around all of React, which is very hard to do well. Instead, the new architecture has plugins focused purely on the richtext aspects, and leaves the rendering and event handling aspects to React.
 
 ### Context
 
@@ -62,7 +62,7 @@ In addition to the `useSlate` hook, there are a handful of other hooks. For exam
 
 ### `beforeinput`
 
-We now use the `beforeinput` event almost exclusively. Instead of having relying on a series of shims and the quirks of React synthetic events, we're now using the standardized `beforeinput` event as our baseline. It is fully supported in Safari and Chrome, will soon be supported in the new Chromium-based Edge, and is currently being worked on in Firefox. In the meantime there are a few patches to make Firefox work. Internet Explorer is no longer supported in core out of the box.
+We now use the `beforeinput` event almost exclusively. Instead of relying on a series of shims and the quirks of React synthetic events, we're now using the standardized `beforeinput` event as our baseline. It is fully supported in Safari and Chrome, will soon be supported in the new Chromium-based Edge, and is currently being worked on in Firefox. In the meantime there are a few patches to make Firefox work. Internet Explorer is no longer supported in core out of the box.
 
 ### History-less
 
@@ -70,11 +70,11 @@ The core history logic has now finally been extracted into a standalone plugin. 
 
 ### Mark-less
 
-Marks have been removed the Slate data model. Now that we have the ability to define custom properties right on the nodes themselves, you can model marks as custom properties of text nodes. For example bold can be modelled simply as a `bold: true` property.
+Marks have been removed from the Slate data model. Now that we have the ability to define custom properties right on the nodes themselves, you can model marks as custom properties of text nodes. For example bold can be modelled simply as a `bold: true` property.
 
 ### Annotation-less
 
-Similarly, annotations have been removed from Slate's core. They can be fully implemented now in userland by defining custom operations and rendering annotated ranges using decorations. But most cases should be using custom text node properties or decorations anyways. There were not that many use cases that benefitted from annotations.
+Similarly, annotations have been removed from Slate's core. They can be fully implemented now in userland by defining custom operations and rendering annotated ranges using decorations. But most cases should be using custom text node properties or decorations anyways. There were not that many use cases that benefited from annotations.
 
 ## Reductions
 

@@ -9,7 +9,42 @@ import { Operation } from '..'
 
 export type Path = number[]
 
-export const Path = {
+export interface PathInterface {
+  ancestors: (path: Path, options?: { reverse?: boolean }) => Path[]
+  common: (path: Path, another: Path) => Path
+  compare: (path: Path, another: Path) => -1 | 0 | 1
+  endsAfter: (path: Path, another: Path) => boolean
+  endsAt: (path: Path, another: Path) => boolean
+  endsBefore: (path: Path, another: Path) => boolean
+  equals: (path: Path, another: Path) => boolean
+  hasPrevious: (path: Path) => boolean
+  isAfter: (path: Path, another: Path) => boolean
+  isAncestor: (path: Path, another: Path) => boolean
+  isBefore: (path: Path, another: Path) => boolean
+  isChild: (path: Path, another: Path) => boolean
+  isCommon: (path: Path, another: Path) => boolean
+  isDescendant: (path: Path, another: Path) => boolean
+  isParent: (path: Path, another: Path) => boolean
+  isPath: (value: any) => value is Path
+  isSibling: (path: Path, another: Path) => boolean
+  levels: (
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Path[]
+  next: (path: Path) => Path
+  parent: (path: Path) => Path
+  previous: (path: Path) => Path
+  relative: (path: Path, ancestor: Path) => Path
+  transform: (
+    path: Path,
+    operation: Operation,
+    options?: { affinity?: 'forward' | 'backward' | null }
+  ) => Path | null
+}
+
+export const Path: PathInterface = {
   /**
    * Get a list of ancestor paths for a given path.
    *
@@ -116,6 +151,14 @@ export const Path = {
     return (
       path.length === another.length && path.every((n, i) => n === another[i])
     )
+  },
+
+  /**
+   * Check if the path of previous sibling node exists
+   */
+
+  hasPrevious(path: Path): boolean {
+    return path[path.length - 1] > 0
   },
 
   /**
@@ -386,11 +429,19 @@ export const Path = {
             const copy = onp.slice()
 
             if (Path.endsBefore(op, onp) && op.length < onp.length) {
-              const i = Math.min(onp.length, op.length) - 1
-              copy[i] -= 1
+              copy[op.length - 1] -= 1
             }
 
             return copy.concat(p.slice(op.length))
+          } else if (
+            Path.isSibling(op, onp) &&
+            (Path.isAncestor(onp, p) || Path.equals(onp, p))
+          ) {
+            if (Path.endsBefore(op, p)) {
+              p[op.length - 1] -= 1
+            } else {
+              p[op.length - 1] += 1
+            }
           } else if (
             Path.endsBefore(onp, p) ||
             Path.equals(onp, p) ||

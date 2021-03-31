@@ -33,4 +33,4 @@ editor.apply({
 
 Under the covers Slate converts complex commands into the low-level operations and applies them to the editor automatically, so you rarely have to think about them.
 
-> 🤖 Slate's editing behaviors being defined as operations is what makes things like collaborative editing possible, because each change is easily define-able, apply-able, compose-able and event undo-able!
+> 🤖 Slate's editing behaviors being defined as operations is what makes things like collaborative editing possible, because each change is easily define-able, apply-able, compose-able and even undo-able!
