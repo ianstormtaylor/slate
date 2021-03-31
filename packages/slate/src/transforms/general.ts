@@ -212,18 +212,32 @@ export const GeneralTransforms: GeneralTransforms = {
 
         if (newProperties == null) {
           selection = newProperties
-        } else if (selection == null) {
-          if (!Range.isRange(newProperties)) {
-            throw new Error(
-              `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
-                newProperties
-              )} when there is no current selection.`
-            )
+        } else {
+          if (selection == null) {
+            if (!Range.isRange(newProperties)) {
+              throw new Error(
+                `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
+                  newProperties
+                )} when there is no current selection.`
+              )
+            }
+
+            selection = { ...newProperties }
           }
 
-          selection = newProperties
-        } else {
-          Object.assign(selection, newProperties)
+          for (const key in newProperties) {
+            const value = newProperties[key]
+
+            if (value == null) {
+              if (key === 'anchor' || key === 'focus') {
+                throw new Error(`Cannot remove the "${key}" selection property`)
+              }
+
+              delete selection[key]
+            } else {
+              selection[key] = value
+            }
+          }
         }
 
         break
