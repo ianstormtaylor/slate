@@ -1017,20 +1017,22 @@ export const Editable = (props: EditableProps) => {
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's `onPaste` here instead.
-            // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
-            // when "paste without formatting" option is used.
-            // This unfortunately needs to be handled with paste events instead.
             if (
+              !readOnly &&
               hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste) &&
-              (!HAS_BEFORE_INPUT_SUPPORT ||
-                isPlainTextOnlyPaste(event.nativeEvent)) &&
-              !readOnly
+              !isEventHandled(event, attributes.onPaste)
             ) {
-              event.preventDefault()
-              ReactEditor.insertData(editor, event.clipboardData)
+              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
+              // fall back to React's `onPaste` here instead.
+              // COMPAT: Firefox, Chrome and Safari don't emit `beforeinput` events
+              // when "paste without formatting" is used, so fallback. (2020/02/20)
+              if (
+                !HAS_BEFORE_INPUT_SUPPORT ||
+                isPlainTextOnlyPaste(event.nativeEvent)
+              ) {
+                event.preventDefault()
+                ReactEditor.insertData(editor, event.clipboardData)
+              }
             }
           },
           [readOnly, attributes.onPaste]
