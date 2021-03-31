@@ -204,10 +204,14 @@ export const Editable = (props: EditableProps) => {
         )
       }
       const leafEl = newDomRange.startContainer.parentElement!
+      leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
+        newDomRange
+      )
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
         boundary: el,
       })
+      delete leafEl.getBoundingClientRect
     } else {
       domSelection.removeAllRanges()
     }
