@@ -8,7 +8,7 @@ And, because Slate uses plain JSON for its data, you can write serialization log
 
 For example, taking the value of an editor and returning plaintext:
 
-```js
+```javascript
 import { Node } from 'slate'
 
 const serialize = nodes => {
@@ -20,7 +20,7 @@ Here we're taking the children nodes of an `Editor` as a `nodes` argument, and r
 
 For an input of:
 
-```js
+```javascript
 const nodes = [
   {
     type: 'paragraph',
@@ -39,7 +39,7 @@ const nodes = [
 
 You'd end up with:
 
-```txt
+```text
 An opening paragraph...
 A wise quote.
 A closing paragraph!
@@ -51,7 +51,7 @@ Notice how the quote block isn't distinguishable in any way, that's because we'r
 
 For example, here's a similar `serialize` function for HTML:
 
-```js
+```javascript
 import escapeHtml from 'escape-html'
 import { Text } from 'slate'
 
@@ -83,7 +83,7 @@ This one is a bit more aware than the plaintext serializer above. It's actually 
 
 It also takes a single node as input instead of an array, so if you passed in an editor like:
 
-```js
+```javascript
 const editor = {
   children: [
     {
@@ -111,9 +111,9 @@ const editor = {
 }
 ```
 
-You'd receive back (line breaks added for legibility):
+You'd receive back \(line breaks added for legibility\):
 
-```html
+```markup
 <p>An opening paragraph with a <a href="https://example.com">link</a> in it.</p>
 <blockquote><p>A wise quote.</p></blockquote>
 <p>A closing paragraph!</p>
@@ -140,9 +140,9 @@ const input = (
 )
 ```
 
-And the JSX feature of your compiler (Babel, TypeScript, etc.) would turn that `input` variable into:
+And the JSX feature of your compiler \(Babel, TypeScript, etc.\) would turn that `input` variable into:
 
-```js
+```javascript
 const input = [
   {
     type: 'paragraph',
@@ -159,7 +159,7 @@ But `slate-hyperscript` isn't only for JSX. It's just a way to build _trees of S
 
 For example, here's a `deserialize` function for HTML:
 
-```js
+```javascript
 import { jsx } from 'slate-hyperscript'
 
 const deserialize = el => {
@@ -198,7 +198,7 @@ const deserialize = el => {
 
 It takes in an `el` HTML element object and returns a Slate fragment. So if you have an HTML string, you can parse and deserialize it like so:
 
-```js
+```javascript
 const html = '...'
 const document = new DOMParser().parseFromString(html, 'text/html')
 deserialize(document.body)
@@ -206,7 +206,7 @@ deserialize(document.body)
 
 With this input:
 
-```html
+```markup
 <p>An opening paragraph with a <a href="https://example.com">link</a> in it.</p>
 <blockquote><p>A wise quote.</p></blockquote>
 <p>A closing paragraph!</p>
@@ -214,7 +214,7 @@ With this input:
 
 You'd end up with this output:
 
-```js
+```javascript
 const fragment = [
   {
     type: 'paragraph',
@@ -245,3 +245,4 @@ const fragment = [
 ```
 
 And just like the serializing function, you can extend it to fit your exact domain model's needs.
+

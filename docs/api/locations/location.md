@@ -6,13 +6,14 @@ The Location interface is a union of the ways to refer to a specific location in
 type Location = Path | Point | Range
 ```
 
-- [Static methods](#static-methods)
-  - [Check methods](#check-methods)
+* [Static methods](location.md#static-methods)
+  * [Check methods](location.md#check-methods)
 
 ## Static methods
 
 ### Check methods
 
-###### `Location.isLocation(value: any): value is Location`
+#### `Location.isLocation(value: any): value is Location`
 
 Check if a value implements the `Location` interface.
+

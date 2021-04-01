@@ -2,7 +2,7 @@
 
 Migrating from earlier versions of Slate to the `0.50.x` versions is not a simple task. The entire framework was re-considered from the ground up. This has resulted in a **much** better set of abstractions, which will result in you writing less code. But the migration process is not simple.
 
-It's highly recommended that after reading this guide you read through the original [Walkthroughs](../walkthroughs/01-installing-slate.md) and the other [Concepts](./01-interfaces.md) to see how all of the new concepts get applied.
+It's highly recommended that after reading this guide you read through the original [Walkthroughs](../walkthroughs/01-installing-slate.md) and the other [Concepts](01-interfaces.md) to see how all of the new concepts get applied.
 
 ## Major Differences
 
@@ -22,7 +22,7 @@ A lot of helper functions are exposed as a collection of helper functions on a n
 
 ### TypeScript
 
-The codebase now uses TypeScript. Working with pure JSON as a data model, and using an interface-based API are two things that have been made easier by migrating to TypeScript. You don't need to use it yourself, but if you do you'll get a lot more security when using the APIs. (And if you use VS Code you'll get nice autocompletion regardless!)
+The codebase now uses TypeScript. Working with pure JSON as a data model, and using an interface-based API are two things that have been made easier by migrating to TypeScript. You don't need to use it yourself, but if you do you'll get a lot more security when using the APIs. \(And if you use VS Code you'll get nice autocompletion regardless!\)
 
 ### Fewer Concepts
 
@@ -32,17 +32,17 @@ The number of commands has been reduced too. Previously we had commands for ever
 
 ### Fewer Packages
 
-In an attempt to decrease the maintenance burden, and because the new abstraction and APIs in Slate's core packages make things much easier, the total number of packages has been reduced. Things like `slate-plain-serializer`, `slate-base64-serializer`, etc. have been removed and can be implemented in userland easily if needed. Even the `slate-html-deserializer` can now be implemented in userland (in ~10 LOC leveraging `slate-hyperscript`). And internal packages like `slate-dev-environment`, `slate-dev-test-utils`, etc. are no longer exposed because they are implementation details.
+In an attempt to decrease the maintenance burden, and because the new abstraction and APIs in Slate's core packages make things much easier, the total number of packages has been reduced. Things like `slate-plain-serializer`, `slate-base64-serializer`, etc. have been removed and can be implemented in userland easily if needed. Even the `slate-html-deserializer` can now be implemented in userland \(in ~10 LOC leveraging `slate-hyperscript`\). And internal packages like `slate-dev-environment`, `slate-dev-test-utils`, etc. are no longer exposed because they are implementation details.
 
 ### Commands
 
-A new "command" concept has been introduced. (The old "commands" are now called "transforms".) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
+A new "command" concept has been introduced. \(The old "commands" are now called "transforms".\) This new concept expresses the semantic intent of a user editing the document. And they allow for the right abstraction to tap into user behaviors—for example to change what happens when a user presses enter, or backspace, etc. Instead of using `keydown` events you should likely override command behaviors instead.
 
 Commands are triggered by calling the `editor.*` core functions. And they travel through a middleware-like stack, but built from composed functions. Any plugin can override the behaviors to augment an editor.
 
 ### Plugins
 
-Plugins are now plain functions that augment the `Editor` object they receive and return it again. For example, they can augment the command execution by composing the `editor.exec` function or listen to operations by composing `editor.apply`. Previously they relied on a custom middleware stack, and they were just bags of handlers that got merged onto an editor. Now we're using plain old function composition (aka wrapping) instead.
+Plugins are now plain functions that augment the `Editor` object they receive and return it again. For example, they can augment the command execution by composing the `editor.exec` function or listen to operations by composing `editor.apply`. Previously they relied on a custom middleware stack, and they were just bags of handlers that got merged onto an editor. Now we're using plain old function composition \(aka wrapping\) instead.
 
 ### Elements
 
@@ -58,7 +58,7 @@ Previously the `<Editor>` component was doing double duty as a sort of "controll
 
 ### Hooks
 
-In addition to the `useSlate` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states (often for void nodes). And since they use React's Context API they will automatically re-render when their state changes.
+In addition to the `useSlate` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states \(often for void nodes\). And since they use React's Context API they will automatically re-render when their state changes.
 
 ### `beforeinput`
 
@@ -82,7 +82,7 @@ One of the goals was to dramatically simplify a lot of the logic in Slate to mak
 
 To give you a sense for the change in total lines of code:
 
-```
+```text
 slate                       8,436  ->  3,958  (47%)
 slate-react                 3,905  ->  1,954  (50%)
 
@@ -102,3 +102,4 @@ total                      13,807  ->  6,468  (47%)
 ```
 
 It's quite a big difference! And that doesn't even include the dependencies that were shed in the process too.
+

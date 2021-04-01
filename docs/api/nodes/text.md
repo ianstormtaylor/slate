@@ -5,34 +5,34 @@
 ```typescript
 interface Text {
   text: string
-  [key: string]: unknown
 }
 ```
 
-- [Static methods](#static-methods)
-  - [Retrieval methods](#retrieval-methods)
-  - [Check methods](#check-methods)
+* [Static methods](text.md#static-methods)
+  * [Retrieval methods](text.md#retrieval-methods)
+  * [Check methods](text.md#check-methods)
 
 ## Static methods
 
 ### Retrieval methods
 
-###### `Text.matches(text: Text, props: Partial<Text>): boolean`
+#### `Text.matches(text: Text, props: Partial<Text>): boolean`
 
 Check if a `text` matches a set of `props`.
 
-###### `Text.decorations(node: Text, decorations: Range[]): Text[]`
+#### `Text.decorations(node: Text, decorations: Range[]): Text[]`
 
 Get the leaves for a text node, given `decorations`.
 
 ### Check methods
 
-###### `Text.equals(text: Text, another: Text, options?): boolean`
+#### `Text.equals(text: Text, another: Text, options?): boolean`
 
 Check if two text nodes are equal.
 
 Options: `{loose?: boolean}`
 
-###### `Text.isText(value: any): value is Text`
+#### `Text.isText(value: any): value is Text`
 
 Check if a `value` implements the `Text` interface.
+

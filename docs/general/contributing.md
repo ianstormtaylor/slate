@@ -2,19 +2,19 @@
 
 Want to contribute to Slate? That would be awesome!
 
-- [Contributing](#contributing)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Asking Questions](#asking-questions)
-  - [Submitting Pull Requests](#submitting-pull-requests)
-  - [Repository Setup](#repository-setup)
-  - [Running Examples](#running-examples)
-  - [Running Tests](#running-tests)
-  - [Testing Input Methods](#testing-input-methods)
-  - [Publishing Releases](#publishing-releases)
-    - [Publishing Normal `@latest` Release](#publishing-normal-latest-release)
-    - [Publishing `@next` Release](#publishing-next-release)
-    - [Publishing `@experimental` Release](#publishing-experimental-release)
-    - [Running Prerelease Script](#running-prerelease-script)
+* [Contributing](contributing.md#contributing)
+  * [Reporting Bugs](contributing.md#reporting-bugs)
+  * [Asking Questions](contributing.md#asking-questions)
+  * [Submitting Pull Requests](contributing.md#submitting-pull-requests)
+  * [Repository Setup](contributing.md#repository-setup)
+  * [Running Examples](contributing.md#running-examples)
+  * [Running Tests](contributing.md#running-tests)
+  * [Testing Input Methods](contributing.md#testing-input-methods)
+  * [Publishing Releases](contributing.md#publishing-releases)
+    * [Publishing Normal `@latest` Release](contributing.md#publishing-normal-latest-release)
+    * [Publishing `@next` Release](contributing.md#publishing-next-release)
+    * [Publishing `@experimental` Release](contributing.md#publishing-experimental-release)
+    * [Running Prerelease Script](contributing.md#running-prerelease-script)
 
 ## Reporting Bugs
 
@@ -22,19 +22,19 @@ If you run into any weird behavior while using Slate, feel free to open a new is
 
 Any issue you open must include:
 
-- A [JSFiddle](https://jsfiddle.net/01pLxfzu/) that reproduces the bug with a minimal setup.
-- A GIF showing the issue in action. (Using something like [RecordIt](http://recordit.co/).)
-- A clear explanation of what the issue is.
+* A [JSFiddle](https://jsfiddle.net/01pLxfzu/) that reproduces the bug with a minimal setup.
+* A GIF showing the issue in action. \(Using something like [RecordIt](http://recordit.co/).\)
+* A clear explanation of what the issue is.
 
 Here's a [JSFiddle template for Slate](https://jsfiddle.net/01pLxfzu/) to get you started:
 
-[![](./docs/images/jsfiddle.png)](https://jsfiddle.net/01pLxfzu/)
+[![](../.gitbook/assets/jsfiddle.png)](https://jsfiddle.net/01pLxfzu/)
 
 ## Asking Questions
 
 We've also got a [Slate Slack team](https://slate-slack.herokuapp.com) where you can ask questions and get answers from other people using Slate:
 
-[![](./docs/images/slack.png)](https://slate-slack.herokuapp.com)
+[![](../.gitbook/assets/slack.png)](https://slate-slack.herokuapp.com)
 
 Please use the Slack instead of asking questions in issues, since we want to reserve issues for keeping track of bugs and features. We close questions in issues so that maintaining the project isn't overwhelming.
 
@@ -50,38 +50,38 @@ The slate repository is a monorepo that is managed with [lerna](https://github.c
 
 To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
-```shell
+```text
 yarn install
 yarn build
 ```
 
 ## Running Examples
 
-To run the examples, start by building the monorepo as described in the [Repository Setup](#repository-setup) section.
+To run the examples, start by building the monorepo as described in the [Repository Setup](contributing.md#repository-setup) section.
 
 Then you can start the examples server with:
 
-```shell
+```text
 yarn start
 ```
 
 ## Running Tests
 
-To run the tests, start by building the monorepo as described in the [Repository Setup](#repository-setup) section.
+To run the tests, start by building the monorepo as described in the [Repository Setup](contributing.md#repository-setup) section.
 
 Then you can rerun the tests with:
 
-```shell
+```text
 yarn test
 ```
 
 If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:inspect`.
 
-If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. (This is a Mocha flag that gets passed through.)
+If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
 
 In addition to tests you should also run the linter:
 
-```shell
+```text
 yarn lint
 ```
 
@@ -99,7 +99,7 @@ This will catch TypeScript, Prettier, and Eslint errors.
 
 Since we use [Lerna](https://lerna.js.org) to manage the Slate packages this is fairly easy, just run:
 
-```shell
+```text
 yarn release:latest
 ```
 
@@ -111,7 +111,7 @@ Note that this will automatically run the prelease script first that will build,
 
 If we are unsure as to the stability of a release because there are significant changes and/or particularly complex changes, release with the `@next` tag.
 
-```shell
+```text
 yarn release:next
 ```
 
@@ -121,7 +121,7 @@ And follow the prompts Lerna gives you.
 
 If you need to create an experimental release to see how a published package will behave during an actual publish, release with the `@experimental` tag. End users should have no expectation that an `@experimental` release will be usable.
 
-```shell
+```text
 yarn release:experimental
 ```
 
@@ -129,8 +129,9 @@ yarn release:experimental
 
 If we want to make sure that Slate code follows the preparations for a release but without actually publishing, run:
 
-```shell
+```text
 yarn prerelease
 ```
 
 Which will build, test and lint Slate code.
+

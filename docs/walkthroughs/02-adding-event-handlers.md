@@ -87,3 +87,4 @@ const App = () => {
 With that added, try typing `&`, and you should see it suddenly become `and` instead!
 
 This offers a sense of what can be done with Slate's event handlers. Each one will be called with the `event` object, and you can use your `editor` to perform commands in response. Simple!
+

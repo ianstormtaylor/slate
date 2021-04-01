@@ -6,7 +6,7 @@ A plugin is simply a function that takes an `Editor` object and returns it after
 
 For example, a plugin that marks image nodes as "void":
 
-```js
+```javascript
 const withImages = editor => {
   const { isVoid } = editor
 
@@ -20,7 +20,7 @@ const withImages = editor => {
 
 And then to use the plugin, simply:
 
-```js
+```javascript
 import { createEditor } from 'slate'
 
 const editor = withImages(createEditor())
@@ -32,7 +32,7 @@ This plugin composition model makes Slate extremely easy to extend!
 
 In addition to the plugin functions, you might want to expose helper functions that are used alongside your plugins. For example:
 
-```js
+```javascript
 import { Editor, Element } from 'slate'
 
 const MyEditor = {
@@ -52,3 +52,4 @@ const MyElement = {
 ```
 
 Then you can use `MyEditor` and `MyElement` everywhere and have access to all your helpers in one place.
+

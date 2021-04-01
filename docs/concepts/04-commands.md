@@ -6,7 +6,7 @@ Commands are the high-level actions that represent a specific intent of the user
 
 For example, here are some of the built-in commands:
 
-```js
+```javascript
 Editor.insertText(editor, 'A new string of text to be inserted.')
 
 Editor.deleteBackward(editor, { unit: 'word' })
@@ -14,11 +14,11 @@ Editor.deleteBackward(editor, { unit: 'word' })
 Editor.insertBreak(editor)
 ```
 
-But you can (and will!) also define your own custom commands that model your domain. For example, you might want to define a `formatQuote` command, or an `insertImage` command, or a `toggleBold` command depending on what types of content you allow.
+But you can \(and will!\) also define your own custom commands that model your domain. For example, you might want to define a `formatQuote` command, or an `insertImage` command, or a `toggleBold` command depending on what types of content you allow.
 
 Commands always describe an action to be taken as if the **user** was performing the action. For that reason, they never need to define a location to perform the command, because they always act on the user's current selection.
 
-> 🤖 The concept of commands is loosely based on the DOM's built-in [`execCommand`](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand) APIs. However Slate defines its own simpler (and extendable!) version of the API, because the DOM's version is too opinionated and inconsistent.
+> 🤖 The concept of commands is loosely based on the DOM's built-in [`execCommand`](https://developer.mozilla.org/en-US/docs/Web/API/Document/execCommand) APIs. However Slate defines its own simpler \(and extendable!\) version of the API, because the DOM's version is too opinionated and inconsistent.
 
 Under the covers, Slate takes care of converting each command into a set of low-level "operations" that are applied to produce a new value. This is what makes collaborative editing implementations possible. But you don't have to worry about that, because it happens automatically.
 
@@ -26,7 +26,7 @@ Under the covers, Slate takes care of converting each command into a set of low-
 
 When defining custom commands, you can create your own namespace:
 
-```js
+```javascript
 const MyEditor = {
   ...Editor,
 
@@ -42,7 +42,7 @@ When writing your own commands, you'll often make use of the `Transforms` helper
 
 Transforms are a specific set of helpers that allow you to perform a wide variety of specific changes to the document, for example:
 
-```js
+```javascript
 // Set a "bold" format on all of the text nodes in a range.
 Transforms.setNodes(
   editor,
@@ -72,3 +72,4 @@ Transforms.insertText(editor, 'A new string of text.', { at: path })
 ```
 
 The transform helpers are designed to be composed together. So you might use a handful of them for each command.
+

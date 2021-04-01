@@ -214,3 +214,4 @@ const Leaf = props => {
 ```
 
 Now, if you try selecting a piece of text and hitting `Ctrl-B` you should see it turn bold! Magic!
+

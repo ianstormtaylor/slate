@@ -2,14 +2,12 @@
 
 All of the behaviors, content and state of a Slate editor is rolled up into a single, top-level `Editor` object. It has an interface of:
 
-```ts
+```typescript
 interface Editor {
   children: Node[]
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
-  [key: string]: unknown
-
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
@@ -36,7 +34,7 @@ The `children` property contains the document tree of nodes that make up the edi
 
 The `selection` property contains the user's current selection, if any.
 
-The `operations` property contains all of the operations that have been applied since the last "change" was flushed. (Since Slate batches operations up into ticks of the event loop.)
+The `operations` property contains all of the operations that have been applied since the last "change" was flushed. \(Since Slate batches operations up into ticks of the event loop.\)
 
 The `marks` property stores formatting to be applied when the editor inserts text. If `marks` is `null`, the formatting will be taken from the current selection.
 
@@ -46,7 +44,7 @@ In previous guides we've already hinted at this, but you can override any of the
 
 For example, if you want to define link elements that are inline nodes:
 
-```js
+```javascript
 const { isInline } = editor
 
 editor.isInline = element => {
@@ -56,7 +54,7 @@ editor.isInline = element => {
 
 Or maybe you want to override the `insertText` behavior to "linkify" URLs:
 
-```js
+```javascript
 const { insertText } = editor
 
 editor.insertText = text => {
@@ -71,7 +69,7 @@ editor.insertText = text => {
 
 Or you can even define custom "normalizations" that take place to ensure that links obey certain constraints:
 
-```js
+```javascript
 const { normalizeNode } = editor
 
 editor.normalizeNode = entry => {
@@ -86,13 +84,13 @@ editor.normalizeNode = entry => {
 }
 ```
 
-Whenever you override behaviors, be sure to call the existing functions as a fallback mechanism for the default behavior. Unless you really do want to completely remove the default behaviors (which is rarely a good idea).
+Whenever you override behaviors, be sure to call the existing functions as a fallback mechanism for the default behavior. Unless you really do want to completely remove the default behaviors \(which is rarely a good idea\).
 
 ## Helper Functions
 
 The `Editor` interface, like all Slate interfaces, exposes helper functions that are useful when implementing certain behaviors. There are many, many editor-related helpers. For example:
 
-```js
+```javascript
 // Get the start point of a specific node at path.
 const point = Editor.start(editor, [0, 0])
 
@@ -102,7 +100,7 @@ const fragment = Editor.fragment(editor, range)
 
 There are also many iterator-based helpers, for example:
 
-```js
+```javascript
 // Iterate over every node in a range.
 for (const [node, path] of Editor.nodes(editor, { at: range })) {
   // ...
@@ -113,3 +111,4 @@ for (const point of Editor.positions(editor)) {
   // ...
 }
 ```
+

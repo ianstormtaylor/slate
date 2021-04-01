@@ -1,4 +1,4 @@
-# Using Commands
+# Executing Commands
 
 Up until now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most powerful things about Slate is that it lets you model your specific rich text "domain" however you'd like, and write less one-off code.
 
@@ -248,3 +248,4 @@ const App = () => {
 That's the benefit of extracting the logic.
 
 And there you have it! We just added a ton of functionality to the editor with very little work. And we can keep all of our command logic tested and isolated in a single place, making the code easier to maintain.
+
