@@ -1,4 +1,4 @@
-name: Test
+name: Continuous Integration
 
 on:
   - push
@@ -8,10 +8,26 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
         with:
           node-version: 12
-      - run: yarn && yarn build:rollup && yarn test && yarn lint
+      - name: Run tests
+        run: yarn && yarn build:rollup && yarn test && yarn lint
+        env:
+          CI: true
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12
+      - name: Run linters
+        run: yarn && yarn lint
         env:
           CI: true

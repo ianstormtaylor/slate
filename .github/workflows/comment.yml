@@ -1,5 +1,5 @@
 # https://github.com/marketplace/actions/automatic-rebase  (https://github.com/cirrus-actions/rebase)
-name: Rebase
+name: Comment Automation
 
 on:
   issue_comment:
