@@ -498,6 +498,7 @@ export const Editable = (props: EditableProps) => {
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
+      <DecorateContext.Provider value={decorate}>
       <Component
         // COMPAT: The Grammarly Chrome extension works by changing the DOM
         // out from under `contenteditable` elements, which leads to weird
@@ -1039,16 +1040,15 @@ export const Editable = (props: EditableProps) => {
           [readOnly, attributes.onPaste]
         )}
       >
-        <DecorateContext.Provider value={decorate}>
-          {useChildren({
-            decorations,
-            node: editor,
-            renderElement,
-            renderLeaf,
-            selection: editor.selection,
-          })}
-        </DecorateContext.Provider>
+        {useChildren({
+          decorations,
+          node: editor,
+          renderElement,
+          renderLeaf,
+          selection: editor.selection,
+        })}
       </Component>
+      </DecorateContext.Provider>
     </ReadOnlyContext.Provider>
   )
 }
