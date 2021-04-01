@@ -2,14 +2,19 @@
 
 Want to contribute to Slate? That would be awesome!
 
-- [Reporting Bugs](#reporting-bugs)
-- [Asking Questions](#asking-questions)
-- [Submitting Pull Requests](#submitting-pull-requests)
-- [Repository Setup](#repository-setup)
-- [Running Examples](#running-examples)
-- [Running Tests](#running-tests)
-- [Testing Input Methods](#testing-input-methods)
-- [Publishing Releases](#publishing-releases)
+- [Contributing](#contributing)
+  - [Reporting Bugs](#reporting-bugs)
+  - [Asking Questions](#asking-questions)
+  - [Submitting Pull Requests](#submitting-pull-requests)
+  - [Repository Setup](#repository-setup)
+  - [Running Examples](#running-examples)
+  - [Running Tests](#running-tests)
+  - [Testing Input Methods](#testing-input-methods)
+  - [Publishing Releases](#publishing-releases)
+    - [Publishing Normal `@latest` Release](#publishing-normal-latest-release)
+    - [Publishing `@next` Release](#publishing-next-release)
+    - [Publishing `@experimental` Release](#publishing-experimental-release)
+    - [Running Prerelease Script](#running-prerelease-script)
 
 ## Reporting Bugs
 
@@ -73,6 +78,14 @@ yarn test
 If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:inspect`.
 
 If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. (This is a Mocha flag that gets passed through.)
+
+In addition to tests you should also run the linter:
+
+```shell
+yarn lint
+```
+
+This will catch TypeScript, Prettier, and Eslint errors.
 
 ## Testing Input Methods
 
