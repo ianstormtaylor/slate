@@ -521,6 +521,8 @@ export const Editable = (props: EditableProps) => {
           suppressContentEditableWarning
           ref={ref}
           style={{
+            // Allow positioning relative to the editable element.
+            position: 'relative',
             // Prevent the default outline styles.
             outline: 'none',
             // Preserve adjacent whitespace and new lines.

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
@@ -23,6 +23,25 @@ const Leaf = (props: {
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
+  const placeholderRef = useRef<HTMLSpanElement | null>(null)
+
+  useEffect(() => {
+    const placeholderEl = placeholderRef?.current
+    const editorEl = document.querySelector<HTMLDivElement>(
+      '[data-slate-editor="true"]'
+    )
+
+    if (!placeholderEl || !editorEl) {
+      return
+    }
+
+    editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
+
+    return () => {
+      editorEl.style.minHeight = 'auto'
+    }
+  }, [placeholderRef])
+
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
@@ -31,11 +50,12 @@ const Leaf = (props: {
     children = (
       <React.Fragment>
         <span
+          ref={placeholderRef}
           contentEditable={false}
           style={{
             pointerEvents: 'none',
             display: 'inline-block',
-            width: '0',
+            width: '100%',
             maxWidth: '100%',
             whiteSpace: 'nowrap',
             opacity: '0.333',
@@ -43,6 +63,7 @@ const Leaf = (props: {
             fontStyle: 'normal',
             fontWeight: 'normal',
             textDecoration: 'none',
+            position: 'absolute',
           }}
         >
           {leaf.placeholder}
