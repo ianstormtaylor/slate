@@ -70,7 +70,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Paste HTML**](https://www.slatejs.org/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
 - [**Mentions**](https://www.slatejs.org/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
 
-Each example includes a **View Source** link to the code that implements it. And we have [other examples](https://github.com/ianstormtaylor/slate/tree/master/site/examples) too.
+Each example includes a **View Source** link to the code that implements it. And we have [other examples](https://github.com/ianstormtaylor/slate/tree/main/site/examples) too.
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -83,7 +83,7 @@ If you're using Slate for the first time, check out the [Getting Started](http:/
 - [**FAQ**](http://docs.slatejs.org/general/faq)
 - [**Resources**](http://docs.slatejs.org/general/resources)
 
-If even that's not enough, you can always [read the source itself](https://github.com/ianstormtaylor/slate/tree/master/packages), which is heavily commented.
+If even that's not enough, you can always [read the source itself](https://github.com/ianstormtaylor/slate/tree/main/packages), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 

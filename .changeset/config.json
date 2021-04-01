@@ -7,7 +7,7 @@
   "commit": false,
   "linked": [["slate", "slate-history", "slate-hyperscript", "slate-react"]],
   "access": "public",
-  "baseBranch": "master",
+  "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": [],
   "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
