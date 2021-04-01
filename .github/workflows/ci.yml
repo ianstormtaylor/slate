@@ -1,3 +1,5 @@
+name: Continuous Integration
+
 on:
   - push
   - pull_request
@@ -8,10 +10,12 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+
       - name: Setup node
         uses: actions/setup-node@v2
         with:
           node-version: 12
+
       - name: Run tests
         run: yarn && yarn build:rollup && yarn test
         env:
@@ -21,10 +25,12 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
+
       - name: Setup node
         uses: actions/setup-node@v2
         with:
           node-version: 12
+
       - name: Run linters
         run: yarn && yarn build:rollup && yarn lint
         env:
