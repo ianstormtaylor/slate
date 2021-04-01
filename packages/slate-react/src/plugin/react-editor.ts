@@ -22,6 +22,7 @@ import {
   isDOMElement,
   isDOMSelection,
   normalizeDOMPoint,
+  hasShadowRoot,
 } from '../utils/dom'
 import { IS_CHROME } from '../utils/environment'
 

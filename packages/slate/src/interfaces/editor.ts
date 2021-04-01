@@ -106,13 +106,19 @@ export interface EditorInterface {
       unit?: 'character' | 'word' | 'line' | 'block'
     }
   ) => void
-  deleteFragment: (editor: Editor) => void
+  deleteFragment: (
+    editor: Editor,
+    options?: {
+      direction?: 'forward' | 'backward'
+    }
+  ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
   end: (editor: Editor, at: Location) => Point
   first: (editor: Editor, at: Location) => NodeEntry
   fragment: (editor: Editor, at: Location) => Descendant[]
   hasBlocks: (editor: Editor, element: Element) => boolean
   hasInlines: (editor: Editor, element: Element) => boolean
+  hasPath: (editor: Editor, path: Path) => boolean
   hasTexts: (editor: Editor, element: Element) => boolean
   insertBreak: (editor: Editor) => void
   insertFragment: (editor: Editor, fragment: Node[]) => void
@@ -435,7 +441,13 @@ export const Editor: EditorInterface = {
    * Delete the content in the current selection.
    */
 
-  deleteFragment(editor: Editor, direction?: 'forward' | 'backward'): void {
+  deleteFragment(
+    editor: Editor,
+    options: {
+      direction?: 'forward' | 'backward'
+    } = {}
+  ): void {
+    const { direction = 'forward' } = options
     editor.deleteFragment(direction)
   },
 

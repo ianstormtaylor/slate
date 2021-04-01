@@ -40,8 +40,7 @@ const Element = (props: {
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
-
-  let children: JSX.Element | null = useChildren({
+  let children: React.ReactNode = useChildren({
     decorations,
     node: element,
     renderElement,
