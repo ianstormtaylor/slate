@@ -5,7 +5,7 @@ This is a list of changes to Slate with each new release. Until `1.0` is release
 ---
 
 > ⚠️ Until https://github.com/atlassian/changesets/issues/264 is solved, each package will maintain its own individual changelog, which you can find here:
-
+>
 > - [slate](./packages/slate/CHANGELOG.md)
 > - [slate-history](./packages/slate-history/CHANGELOG.md)
 > - [slate-hyperscript](./packages/slate-hyperscript/CHANGELOG.md)
