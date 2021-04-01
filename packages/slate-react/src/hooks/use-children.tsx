@@ -5,6 +5,7 @@ import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
+import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import { RenderElementProps, RenderLeafProps } from '../components/editable'
 
@@ -13,21 +14,14 @@ import { RenderElementProps, RenderLeafProps } from '../components/editable'
  */
 
 const useChildren = (props: {
-  decorate: (entry: NodeEntry) => Range[]
   decorations: Range[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {
-  const {
-    decorate,
-    decorations,
-    node,
-    renderElement,
-    renderLeaf,
-    selection,
-  } = props
+  const { decorations, node, renderElement, renderLeaf, selection } = props
+  const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []
@@ -55,7 +49,6 @@ const useChildren = (props: {
     if (Element.isElement(n)) {
       children.push(
         <ElementComponent
-          decorate={decorate}
           decorations={ds}
           element={n}
           key={key.id}
