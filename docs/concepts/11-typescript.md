@@ -8,7 +8,7 @@ Slate supports typing of one Slate document model (ie. one set of custom `Editor
 >
 > Please read the guide below first to understand CustomTypes.
 >
-> If you are having issues, here are the most common migration gotchas:
+> If you are having issues, here are common migration gotchas:
 >
 > - You get typing errors when referring to `node.type` (Property `type` does not exist on type `Node`). To fix this, you need something like `Element.isElement(node) && node.type === 'paragraph'`. This is because a `Node` can be an `Element` or `Text` and `Text` does not have a `type` property.
 >
