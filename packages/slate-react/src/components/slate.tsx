@@ -7,6 +7,7 @@ import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
 import { SlateContext } from '../hooks/use-slate'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
@@ -51,10 +52,28 @@ export const Slate = (props: {
     }
   }, [])
 
+  const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
+
+  useEffect(() => {
+    setIsFocused(ReactEditor.isFocused(editor))
+  })
+
+  useIsomorphicLayoutEffect(() => {
+    const fn = () => setIsFocused(ReactEditor.isFocused(editor))
+    document.addEventListener('focus', fn, true)
+    return () => document.removeEventListener('focus', fn, true)
+  }, [])
+
+  useIsomorphicLayoutEffect(() => {
+    const fn = () => setIsFocused(ReactEditor.isFocused(editor))
+    document.addEventListener('blur', fn, true)
+    return () => document.removeEventListener('blur', fn, true)
+  }, [])
+
   return (
     <SlateContext.Provider value={context}>
       <EditorContext.Provider value={editor}>
-        <FocusedContext.Provider value={ReactEditor.isFocused(editor)}>
+        <FocusedContext.Provider value={isFocused}>
           {children}
         </FocusedContext.Provider>
       </EditorContext.Provider>
