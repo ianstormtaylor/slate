@@ -432,7 +432,9 @@ export const ReactEditor = {
     }
 
     // Resolve a Slate range from the DOM range.
-    const range = ReactEditor.toSlateRange(editor, domRange)
+    const range = ReactEditor.toSlateRange(editor, domRange, {
+      extractMatch: false,
+    })
     return range
   },
 
@@ -440,8 +442,14 @@ export const ReactEditor = {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
-    const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
+  toSlatePoint<T extends boolean>(
+    editor: ReactEditor,
+    domPoint: DOMPoint,
+    extractMatch: T
+  ): T extends true ? Point | null : Point {
+    const [nearestNode, nearestOffset] = extractMatch
+      ? domPoint
+      : normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
     let offset = 0
@@ -513,9 +521,7 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
-      throw new Error(
-        `Cannot resolve a Slate point from DOM point: ${domPoint}`
-      )
+      return null as T extends true ? Point | null : Point
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
@@ -523,17 +529,21 @@ export const ReactEditor = {
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = ReactEditor.toSlateNode(editor, textNode!)
     const path = ReactEditor.findPath(editor, slateNode)
-    return { path, offset }
+    return { path, offset } as T extends true ? Point | null : Point
   },
 
   /**
    * Find a Slate range from a DOM range or selection.
    */
 
-  toSlateRange(
+  toSlateRange<T extends boolean>(
     editor: ReactEditor,
-    domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): Range {
+    domRange: DOMRange | DOMStaticRange | DOMSelection,
+    option: {
+      extractMatch: T
+    }
+  ): T extends true ? Range | null : Range {
+    const { extractMatch } = option
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
@@ -580,12 +590,25 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    const anchor = ReactEditor.toSlatePoint(
+      editor,
+      [anchorNode, anchorOffset],
+      extractMatch
+    )
+    if (!anchor) {
+      return null as T extends true ? Range | null : Range
+    }
+
     const focus = isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], extractMatch)
+    if (!focus) {
+      return null as T extends true ? Range | null : Range
+    }
 
-    return { anchor, focus }
+    return ({ anchor, focus } as unknown) as T extends true
+      ? Range | null
+      : Range
   },
 
   hasRange(editor: ReactEditor, range: Range): boolean {

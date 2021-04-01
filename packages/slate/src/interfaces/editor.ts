@@ -276,6 +276,7 @@ export interface EditorInterface {
       voids?: boolean
     }
   ) => NodeEntry<Element> | undefined
+
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
 
