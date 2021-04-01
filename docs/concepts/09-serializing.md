@@ -57,7 +57,11 @@ import { Text } from 'slate'
 
 const serialize = node => {
   if (Text.isText(node)) {
-    return escapeHtml(node.text)
+    let string = escapeHtml(node.text)
+    if (node.bold) {
+      string = `<strong>${string}</strong>`
+    }
+    return string
   }
 
   const children = node.children.map(n => serialize(n)).join('')
