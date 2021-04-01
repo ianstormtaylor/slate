@@ -1,5 +1,3 @@
-name: Continuous Integration
-
 on:
   - push
   - pull_request
@@ -15,7 +13,7 @@ jobs:
         with:
           node-version: 12
       - name: Run tests
-        run: yarn && yarn build:rollup && yarn test && yarn lint
+        run: yarn && yarn build:rollup && yarn test
         env:
           CI: true
   lint:
@@ -28,6 +26,6 @@ jobs:
         with:
           node-version: 12
       - name: Run linters
-        run: yarn && yarn lint
+        run: yarn && yarn build:rollup && yarn lint
         env:
           CI: true
