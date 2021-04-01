@@ -43,7 +43,13 @@ const Leaf = (props: {
   }, [placeholderRef])
 
   let children = (
-    <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
+    <String
+      key={Math.random()}
+      isLast={isLast}
+      leaf={leaf}
+      parent={parent}
+      text={text}
+    />
   )
 
   if (leaf[PLACEHOLDER_SYMBOL]) {
