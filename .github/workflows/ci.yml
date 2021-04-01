@@ -7,6 +7,13 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        command:
+          - 'test'
+          - 'lint:eslint'
+          - 'lint:prettier'
+          - 'lint:typescript'
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -16,22 +23,7 @@ jobs:
         with:
           node-version: 12
 
-      - name: Run tests
-        run: yarn && yarn build:rollup && yarn test
-        env:
-          CI: true
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
-
-      - name: Setup node
-        uses: actions/setup-node@v2
-        with:
-          node-version: 12
-
-      - name: Run linters
-        run: yarn && yarn build:rollup && yarn lint
+      - name: Run ${{ matrix.command }}
+        run: yarn && yarn build:rollup && yarn ${{ matrix.command }}
         env:
           CI: true
