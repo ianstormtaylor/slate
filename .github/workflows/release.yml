@@ -6,7 +6,8 @@ on:
       - main
 
 jobs:
-  run:
+  release:
+    name: ${{ matrix.channel }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
