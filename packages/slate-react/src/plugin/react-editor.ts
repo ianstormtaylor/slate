@@ -544,11 +544,11 @@ export const ReactEditor = {
   toSlateRange<T extends boolean>(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
-    option: {
+    options: {
       exactMatch: T
     }
   ): T extends true ? Range | null : Range {
-    const { exactMatch } = option
+    const { exactMatch } = options
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
