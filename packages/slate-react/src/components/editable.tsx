@@ -177,7 +177,7 @@ export const Editable = (props: EditableProps) => {
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        extractMatch: true,
+        exactMatch: true,
       })
       if (slateRange && Range.equals(slateRange, selection)) {
         return
@@ -190,7 +190,7 @@ export const Editable = (props: EditableProps) => {
     // and thus it doesn't transform selection on its own
     if (selection && !ReactEditor.hasRange(editor, selection)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
-        extractMatch: false,
+        exactMatch: false,
       })
       return
     }
@@ -283,7 +283,7 @@ export const Editable = (props: EditableProps) => {
 
           if (targetRange) {
             const range = ReactEditor.toSlateRange(editor, targetRange, {
-              extractMatch: false,
+              exactMatch: false,
             })
 
             if (!selection || !Range.equals(selection, range)) {
@@ -449,7 +449,7 @@ export const Editable = (props: EditableProps) => {
 
         if (anchorNodeSelectable && focusNodeSelectable) {
           const range = ReactEditor.toSlateRange(editor, domSelection, {
-            extractMatch: false,
+            exactMatch: false,
           })
           Transforms.select(editor, range)
         } else {

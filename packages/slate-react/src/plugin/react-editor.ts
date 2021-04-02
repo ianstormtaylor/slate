@@ -433,7 +433,7 @@ export const ReactEditor = {
 
     // Resolve a Slate range from the DOM range.
     const range = ReactEditor.toSlateRange(editor, domRange, {
-      extractMatch: false,
+      exactMatch: false,
     })
     return range
   },
@@ -545,10 +545,10 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     option: {
-      extractMatch: T
+      exactMatch: T
     }
   ): T extends true ? Range | null : Range {
-    const { extractMatch } = option
+    const { exactMatch } = option
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
@@ -598,7 +598,7 @@ export const ReactEditor = {
     const anchor = ReactEditor.toSlatePoint(
       editor,
       [anchorNode, anchorOffset],
-      extractMatch
+      exactMatch
     )
     if (!anchor) {
       return null as T extends true ? Range | null : Range
@@ -606,7 +606,7 @@ export const ReactEditor = {
 
     const focus = isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], extractMatch)
+      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], exactMatch)
     if (!focus) {
       return null as T extends true ? Range | null : Range
     }
