@@ -265,6 +265,12 @@ export const GeneralTransforms: GeneralTransforms = {
             ...(properties as Partial<Text>),
             text: after,
           }
+
+          if (newNode.text) {
+            parent.children.splice(index + 1, node.text ? 0 : 1, newNode)
+          } else {
+            parent.children.splice(index + 1, node.text ? 0 : 1)
+          }
         } else {
           const before = node.children.slice(0, position)
           const after = node.children.slice(position)
@@ -274,9 +280,8 @@ export const GeneralTransforms: GeneralTransforms = {
             ...(properties as Partial<Element>),
             children: after,
           }
+          parent.children.splice(index + 1, 0, newNode)
         }
-
-        parent.children.splice(index + 1, 0, newNode)
 
         if (selection) {
           for (const [point, key] of Range.points(selection)) {
