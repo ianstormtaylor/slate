@@ -41,7 +41,7 @@ const MyEditor = () => {
 
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
-```js
+```javascript
 const renderElement = useCallback(props => {
   switch (props.element.type) {
     case 'quote':
@@ -76,17 +76,17 @@ const renderLeaf = useCallback(({ attributes, children, leaf }) => {
 }, [])
 ```
 
-Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. (But there's nothing preventing you from using custom components if you'd like!)
+Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. \(But there's nothing preventing you from using custom components if you'd like!\)
 
 One disadvantage of text-level formatting is that you cannot guarantee that any given format is "contiguous"—meaning that it stays as a single leaf. This limitation with respect to leaves is similar to the DOM, where this is invalid:
 
-```html
+```markup
 <em>t<strong>e</em>x</strong>t
 ```
 
 Because the elements in the above example do not properly close themselves they are invalid. Instead, you would write the above HTML as follows:
 
-```html
+```markup
 <em>t</em><strong><em>e</em>x</strong>t
 ```
 
@@ -101,7 +101,7 @@ Of course, this leaf stuff sounds pretty complex. But, you do not have to think 
 
 Decorations are another type of text-level formatting. They are similar to regular old custom properties, except each one applies to a `Range` of the document instead of being associated with a given text node.
 
-However, decorations are computed at **render-time** based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content (or some external data) has the potential to change the formatting.
+However, decorations are computed at **render-time** based on the content itself. This is helpful for dynamic formatting like syntax highlighting or search keywords, where changes to the content \(or some external data\) has the potential to change the formatting.
 
 Decorations are different from Marks in that they are not stored on editor state.
 

@@ -10,13 +10,13 @@ interface RangeRef {
 }
 ```
 
-- [Static methods](#static-methods)
-  - [Transform methods](#transform-methods)
+- [Static methods](range-ref.md#static-methods)
+  - [Transform methods](range-ref.md#transform-methods)
 
 ## Static methods
 
 ### Transform methods
 
-###### `RangeRef.transform(ref: RangeRef, op: Operation)`
+#### `RangeRef.transform(ref: RangeRef, op: Operation)`
 
 Transform the range refs current value by an `op`.

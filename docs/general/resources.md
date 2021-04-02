@@ -6,7 +6,7 @@ A few resources that are helpful for building with Slate.
 
 These libraries are helpful when developing with Slate:
 
-- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like <kbd>cmd</kbd> vs. <kbd>ctrl</kbd> keys for you automatically.
+- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like cmd vs. ctrl keys for you automatically.
 
 ## Products
 
@@ -45,4 +45,4 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 - [React Force Slate Editor](https://github.com/nareshbhatia/react-force/tree/master/packages/slate-editor) is a light-weight medium-style editor with no editor chrome.
 - [Slate Plugins Next](https://github.com/zbeyens/slate-plugins-next) provides an editor with configurable and extendable plugins.
 
-(Or, if you have their exact use case, can be a drop-in editor for you.)
+\(Or, if you have their exact use case, can be a drop-in editor for you.\)

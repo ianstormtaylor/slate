@@ -4,7 +4,7 @@ Operations are the granular, low-level actions that occur while invoking command
 
 Unlike commands, operations aren't extendable. Slate's core defines all of the possible operations that can occur on a richtext document. For example:
 
-```js
+```javascript
 editor.apply({
   type: 'insert_text',
   path: [0, 0],

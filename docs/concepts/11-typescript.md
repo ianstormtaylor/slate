@@ -1,25 +1,15 @@
 # TypeScript
 
-Slate supports typing of one Slate document model (ie. one set of custom `Editor`, `Element` and `Text` types). If you need to support more than one document model, see the section Multiple Document Models.
+Slate supports typing of one Slate document model \(ie. one set of custom `Editor`, `Element` and `Text` types\). If you need to support more than one document model, see the section Multiple Document Models.
 
 **Warning:** You must define `CustomTypes` when using TypeScript or Slate will display typing errors.
-
-> Migrating from 0.47.x?
->
-> Please read the guide below first to understand CustomTypes.
->
-> If you are having issues, here are common migration gotchas:
->
-> - You get typing errors when referring to `node.type` (Property `type` does not exist on type `Node`). To fix this, you need something like `Element.isElement(node) && node.type === 'paragraph'`. This is because a `Node` can be an `Element` or `Text` and `Text` does not have a `type` property.
->
-> - You may have defined CustomType for `Editor` incorrectly. Make sure to define the CustomType for `Editor` as `BaseEditor & ...`. It should not be `Editor & ...`
 
 ## Defining `Editor`, `Element` and `Text` Types
 
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
-```ts
-// This example is for an Editor that uses `ReactEditor` and `HistoryEditor`
+```typescript
+// This example is for an Editor with `ReactEditor` and `HistoryEditor`
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
@@ -41,7 +31,7 @@ While you can define types directly in the `CustomTypes` interface, best practic
 
 Using best practices, the custom types might look something like:
 
-```ts
+```typescript
 // This example is for an Editor with `ReactEditor` and `HistoryEditor`
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
@@ -81,7 +71,7 @@ In this example, `CustomText` is equal to `FormattedText` but in a real editor, 
 
 Because it gets asked often, this section explains why Slate's type definition is atypical.
 
-Slate needs to support a feature called type discrimination which is available when using union types (e.g. `ParagraphElement | HeadingElement`). This allows a user to narrow a type. If presented with code like `if (node.type === 'paragraph') { ... }` the inside of the block, will narrow the type of node to `ParagraphElement`.
+Slate needs to support a feature called type discrimination which is available when using union types \(e.g. `ParagraphElement | HeadingElement`\). This allows a user to narrow a type. If presented with code like `if (node.type === 'paragraph') { ... }` the inside of the block, will narrow the type of node to `ParagraphElement`.
 
 Slate also needs a way to allow developers to get their custom types into Slate. This is done through declaration merging which is a feature of an `interface`.
 
