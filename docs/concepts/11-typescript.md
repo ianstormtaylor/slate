@@ -6,12 +6,10 @@ Slate supports typing of one Slate document model \(ie. one set of custom `Edito
 
 ## Migrating from 0.47.x
 
-If you are migrating from 0.47.x, you should read the guide below first.
+When migrating from 0.47.x, read the guide below first. Also keep in mind these common migration issues:
 
-Furthermore, these are some common migration issues:
-
-- You have typing errors when referring to `node.type` which say "Property `type` does not exist on type `Node`". To fix this, you need to add code like `Element.isElement(node) && node.type === 'paragraph'`. This is because a `Node` can be an `Element` or `Text` and `Text` does not have a `type` property.
-- You may have defined CustomType for `Editor` incorrectly. Make sure to define the CustomType for `Editor` as `BaseEditor & ...`. It should not be `Editor & ...`
+- When referring to `node.type`, you may see the error `Property 'type' does not exist on type 'Node'`. To fix this, you need to add code like `Element.isElement(node) && node.type === 'paragraph'`. This is necessary because a `Node` can be an `Element` or `Text` and `Text` does not have a `type` property.
+- Be careful when you define the CustomType for `Editor`. Make sure to define the CustomType for `Editor` as `BaseEditor & ...`. It should not be `Editor & ...`
 
 ## Defining `Editor`, `Element` and `Text` Types
 
