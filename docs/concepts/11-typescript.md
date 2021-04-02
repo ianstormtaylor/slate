@@ -19,7 +19,7 @@ Slate supports typing of one Slate document model (ie. one set of custom `Editor
 To define a custom `Element` or `Text` type, extend the `CustomTypes` interface in the `slate` module like this.
 
 ```ts
-// This example is for an Editor with `ReactEditor` and `HistoryEditor`
+// This example is for an Editor that uses `ReactEditor` and `HistoryEditor`
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
