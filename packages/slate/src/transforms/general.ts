@@ -266,15 +266,16 @@ export const GeneralTransforms: GeneralTransforms = {
             text: after,
           }
 
-          if (newNode.text) {
-            parent.children.splice(index + 1, node.text ? 0 : 1, newNode)
-          } else {
-            parent.children.splice(index + 1, node.text ? 0 : 1)
-          }
+          newNode.text && parent.children.splice(index + 1, 0, newNode)
+          !node.text && index && parent.children.splice(index, 1)
         } else {
           const before = node.children.slice(0, position)
           const after = node.children.slice(position)
           node.children = before
+
+          if (after.length === 0) {
+            after.push({ ...before[before.length - 1], text: '' })
+          }
 
           newNode = {
             ...(properties as Partial<Element>),
