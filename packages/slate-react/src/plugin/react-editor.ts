@@ -521,7 +521,12 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
-      return null as T extends true ? Point | null : Point
+      if (extractMatch) {
+        return null as T extends true ? Point | null : Point
+      }
+      throw new Error(
+        `Cannot resolve a Slate point from DOM point: ${domPoint}`
+      )
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
