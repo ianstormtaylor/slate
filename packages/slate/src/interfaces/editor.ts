@@ -885,8 +885,8 @@ export const Editor: EditorInterface = {
     let to
 
     if (Span.isSpan(at)) {
-      from = at[0]
-      to = at[1]
+      from = reverse ? at[1] : at[0]
+      to = reverse ? at[0] : at[1]
     } else {
       const first = Editor.path(editor, at, { edge: 'start' })
       const last = Editor.path(editor, at, { edge: 'end' })
