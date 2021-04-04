@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
+import { Slate, Editable, ReactEditor, withReact, useEditor } from 'slate-react'
 import {
   Editor,
   Transforms,
@@ -75,7 +75,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 
 const HoveringToolbar = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const editor = useSlate()
+  const editor = useEditor()
 
   useEffect(() => {
     const el = ref.current
@@ -132,7 +132,7 @@ const HoveringToolbar = () => {
 }
 
 const FormatButton = ({ format, icon }) => {
-  const editor = useSlate()
+  const editor = useEditor()
   return (
     <Button
       reversed

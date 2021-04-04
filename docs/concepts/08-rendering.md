@@ -107,7 +107,7 @@ Decorations are different from Marks in that they are not stored on editor state
 
 ## Toolbars, Menus, Overlays, and more!
 
-In addition to controlling the rendering of nodes inside Slate, you can also retrieve the current editor context from inside other components using the `useSlate` hook.
+In addition to controlling the rendering of nodes inside Slate, you can also retrieve the current editor context from inside other components using the `useEditor` hook.
 
 That way other components can execute commands, query the editor state, or anything else.
 
@@ -125,7 +125,7 @@ const MyEditor = () => {
 }
 
 const Toolbar = () => {
-  const editor = useSlate()
+  const editor = useEditor()
   return (
     <div>
       <Button active={isBoldActive(editor)}>B</Button>
@@ -135,4 +135,4 @@ const Toolbar = () => {
 }
 ```
 
-Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will re-render whenever the editor changes, so that the active state of the buttons stays in sync.
+Because the `<Toolbar>` uses the `useEditor` hook to retrieve the context, it will re-render whenever the editor changes, so that the active state of the buttons stays in sync.

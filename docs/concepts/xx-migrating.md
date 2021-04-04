@@ -54,11 +54,11 @@ Rendering and event-handling are no longer a plugin's concern. Previously plugin
 
 ### Context
 
-Previously the `<Editor>` component was doing double duty as a sort of "controller" object and also the `contenteditable` DOM element. This led to a lot of awkwardness in how other components worked with Slate. In the new version, there is a new `<Slate>` context provider and a simpler `<Editable>` `contenteditable`-like component. By putting the `<Slate>` provider higher up in your component tree, you can share the editor directly with toolbars, buttons, etc. using the `useSlate` hook.
+Previously the `<Editor>` component was doing double duty as a sort of "controller" object and also the `contenteditable` DOM element. This led to a lot of awkwardness in how other components worked with Slate. In the new version, there is a new `<Slate>` context provider and a simpler `<Editable>` `contenteditable`-like component. By putting the `<Slate>` provider higher up in your component tree, you can share the editor directly with toolbars, buttons, etc. using the `useEditor` hook.
 
 ### Hooks
 
-In addition to the `useSlate` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states \(often for void nodes\). And since they use React's Context API they will automatically re-render when their state changes.
+In addition to the `useEditor` hook, there are a handful of other hooks. For example the `useSelected` and `useFocused` hooks help with knowing when to render selected states \(often for void nodes\). And since they use React's Context API they will automatically re-render when their state changes.
 
 ### `beforeinput`
 

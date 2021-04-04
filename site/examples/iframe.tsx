@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
+import { Editable, withReact, useEditor, Slate, ReactEditor } from 'slate-react'
 import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 
@@ -90,7 +90,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 }
 
 const MarkButton = ({ format, icon }) => {
-  const editor = useSlate()
+  const editor = useEditor()
   return (
     <Button
       active={isMarkActive(editor, format)}

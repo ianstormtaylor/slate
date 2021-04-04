@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
-import { Slate, Editable, withReact, useSlate } from 'slate-react'
+import { Slate, Editable, withReact, useEditor } from 'slate-react'
 import {
   Transforms,
   Editor,
@@ -119,7 +119,7 @@ const Element = ({ attributes, children, element }) => {
 }
 
 const LinkButton = () => {
-  const editor = useSlate()
+  const editor = useEditor()
   return (
     <Button
       active={isLinkActive(editor)}
@@ -136,7 +136,7 @@ const LinkButton = () => {
 }
 
 const RemoveLinkButton = () => {
-  const editor = useSlate()
+  const editor = useEditor()
 
   return (
     <Button

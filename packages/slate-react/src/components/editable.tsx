@@ -25,7 +25,7 @@ import {
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
-import { useSlate } from '../hooks/use-slate'
+import { useEditor } from '../hooks/use-editor'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
 import {
@@ -118,7 +118,7 @@ export const Editable = (props: EditableProps) => {
     as: Component = 'div',
     ...attributes
   } = props
-  const editor = useSlate()
+  const editor = useEditor()
   const ref = useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
