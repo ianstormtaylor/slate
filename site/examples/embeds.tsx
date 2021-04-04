@@ -9,7 +9,7 @@ import {
   Slate,
   Editable,
   withReact,
-  useSlateStatic,
+  useEditorStatic,
   ReactEditor,
 } from 'slate-react'
 
@@ -43,7 +43,7 @@ const Element = props => {
 }
 
 const VideoElement = ({ attributes, children, element }) => {
-  const editor = useSlateStatic()
+  const editor = useEditorStatic()
   const { url } = element
   return (
     <div {...attributes}>

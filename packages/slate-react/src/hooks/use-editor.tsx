@@ -1,10 +1,10 @@
 import { useContext } from 'react'
 
-import { EditorContext } from './use-slate-static'
+import { EditorContext } from './use-editor-static'
 
 /**
  * Get the current editor object from the React context.
- * @deprecated Use useSlateStatic instead.
+ * @deprecated Use useEditorStatic instead.
  */
 
 export const useEditor = () => {

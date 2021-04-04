@@ -5,7 +5,7 @@ import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
   Editable,
-  useSlateStatic,
+  useEditorStatic,
   useSelected,
   useFocused,
   withReact,
@@ -110,7 +110,7 @@ const Image = ({ attributes, children, element }) => {
 }
 
 const InsertImageButton = () => {
-  const editor = useSlateStatic()
+  const editor = useEditorStatic()
   return (
     <Button
       onMouseDown={event => {

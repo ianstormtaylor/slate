@@ -50,7 +50,7 @@ Get the current `selected` state of an element.
 
 Get the current editor object from the React context. Re-renders the context whenever changes occur in the editor.
 
-### `useSlateStatic`
+### `useEditorStatic`
 
 Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
 

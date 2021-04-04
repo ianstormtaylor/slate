@@ -12,12 +12,12 @@ export const EditorContext = createContext<ReactEditor | null>(null)
  * Get the current editor object from the React context.
  */
 
-export const useSlateStatic = (): Editor => {
+export const useEditorStatic = (): Editor => {
   const editor = useContext(EditorContext)
 
   if (!editor) {
     throw new Error(
-      `The \`useSlateStatic\` hook must be used inside the <Slate> component's context.`
+      `The \`useEditorStatic\` hook must be used inside the <Slate> component's context.`
     )
   }
 

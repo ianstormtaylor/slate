@@ -4,7 +4,7 @@ import invariant from 'tiny-invariant'
 
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
-import { EditorContext } from '../hooks/use-slate-static'
+import { EditorContext } from '../hooks/use-editor-static'
 import { SlateContext } from '../hooks/use-slate'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
