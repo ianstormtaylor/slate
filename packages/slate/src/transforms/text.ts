@@ -10,9 +10,9 @@ import {
   Range,
   Transforms,
   Value,
-  DescendantOf,
 } from '..'
-import { NodeOf } from '../interfaces/node'
+import { ElementOf } from '../interfaces/element'
+import { TextOf } from '../interfaces/text'
 
 export const TextTransforms = {
   /**
@@ -200,7 +200,7 @@ export const TextTransforms = {
 
   insertFragment<V extends Value>(
     editor: Editor<V>,
-    fragment: DescendantOf<Editor<V>>[],
+    fragment: Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>,
     options: {
       at?: Location
       hanging?: boolean
@@ -274,11 +274,15 @@ export const TextTransforms = {
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
-      const [, firstPath] = Node.first({ children: fragment }, [])
-      const [, lastPath] = Node.last({ children: fragment }, [])
+      const [, firstPath] = Node.first({ children: fragment } as any, [])
+      const [, lastPath] = Node.last({ children: fragment } as any, [])
 
-      const matches: NodeEntry<DescendantOf<Editor<V>>>[] = []
-      const matcher = ([n, p]: NodeEntry<typeof fragment[number]>) => {
+      const matches: NodeEntry<
+        Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+      >[] = []
+      const matcher = ([n, p]: NodeEntry<
+        Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+      >) => {
         if (
           mergeStart &&
           Path.isAncestor(p, firstPath) &&
@@ -304,11 +308,15 @@ export const TextTransforms = {
 
       const root = { children: fragment }
 
-      for (const entry of Node.nodes<typeof root>(root, {
+      for (const entry of Node.nodes(root as any, {
         pass: matcher as any,
       })) {
         if (entry[1].length > 0 && matcher(entry as any)) {
-          matches.push(entry as NodeEntry<DescendantOf<Editor<V>>>)
+          matches.push(
+            entry as NodeEntry<
+              Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+            >
+          )
         }
       }
 
@@ -375,7 +383,7 @@ export const TextTransforms = {
         voids,
       })
 
-      Transforms.insertNodes(editor, middles, {
+      Transforms.insertNodes<V>(editor, middles, {
         at: middleRef.current!,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',

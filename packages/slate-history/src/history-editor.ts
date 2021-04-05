@@ -5,9 +5,9 @@ import { History } from './history'
  * Weakmaps for attaching state to the editor.
  */
 
-export const HISTORY = new WeakMap<HistoryEditor<Value>, History>()
-export const SAVING = new WeakMap<HistoryEditor<Value>, boolean | undefined>()
-export const MERGING = new WeakMap<HistoryEditor<Value>, boolean | undefined>()
+export const HISTORY = new WeakMap<HistoryEditor<any>, History>()
+export const SAVING = new WeakMap<HistoryEditor<any>, boolean | undefined>()
+export const MERGING = new WeakMap<HistoryEditor<any>, boolean | undefined>()
 
 /**
  * `HistoryEditor` contains helpers for history-enabled editors.

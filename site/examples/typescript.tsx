@@ -48,7 +48,7 @@ type Link = {
 
 type ListItem = {
   type: 'list-item'
-  children: FormattedText[]
+  children: (Link | FormattedText)[]
 }
 
 type NumberedList = {
@@ -58,12 +58,12 @@ type NumberedList = {
 
 type Paragraph = {
   type: 'paragraph'
-  children: FormattedText[]
+  children: (Link | FormattedText)[]
 }
 
 type Quote = {
   type: 'quote'
-  children: FormattedText[]
+  children: (Link | FormattedText)[]
 }
 
 type MyElements =
@@ -151,7 +151,7 @@ const toggleBlock = (
   Transforms.setNodes(editor, { type: newType })
 
   if (!isActive && isList) {
-    const block = { type: format, children: [] }
+    const block = { type: format, children: [] } as any
     Transforms.wrapNodes(editor, block)
   }
 }
@@ -204,6 +204,12 @@ const renderElement: EditableProps<MyValue>['renderElement'] = ({
       return <ol {...attributes}>{children}</ol>
     case 'list-item':
       return <li {...attributes}>{children}</li>
+    case 'link':
+      return (
+        <a href={element.url} {...attributes}>
+          {children}
+        </a>
+      )
     case 'image':
       return (
         <Image attributes={attributes} children={children} element={element} />

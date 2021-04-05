@@ -13,11 +13,11 @@ import {
   RangeRef,
   Text,
   Transforms,
-  DescendantOf,
   Value,
   MarksOf,
+  ElementOf,
+  TextOf,
 } from './'
-import { ElementOf } from './interfaces/element'
 
 /**
  * Create a new Slate `Editor` object.
@@ -93,10 +93,7 @@ export const createEditor = <V extends Value>(): Editor<V> => {
       }
     },
 
-    addMark: <K extends keyof MarksOf<Editor<V>>>(
-      key: K,
-      value: MarksOf<Editor<V>>[K]
-    ) => {
+    addMark: (key: string, value: any) => {
       const { selection } = editor
 
       if (selection) {
@@ -145,8 +142,10 @@ export const createEditor = <V extends Value>(): Editor<V> => {
       const { selection } = editor
 
       if (selection) {
-        return Node.fragment(editor, selection)
+        const fragment = Node.fragment(editor, selection)
+        return fragment
       }
+
       return []
     },
 
@@ -155,12 +154,19 @@ export const createEditor = <V extends Value>(): Editor<V> => {
     },
 
     // @ts-ignore
-    insertFragment: (fragment: DescendantOf<Editor<V>>[]) => {
+    insertFragment: (
+      fragment: Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>
+    ) => {
       Transforms.insertFragment(editor, fragment)
     },
 
     // @ts-ignore
-    insertNode: (node: DescendantOf<Editor<V>>) => {
+    insertNode: (
+      node:
+        | ElementOf<Editor<V>>
+        | TextOf<Editor<V>>
+        | Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>
+    ) => {
       Transforms.insertNodes(editor, node)
     },
 
@@ -289,7 +295,7 @@ export const createEditor = <V extends Value>(): Editor<V> => {
       }
     },
 
-    removeMark: (key: keyof MarksOf<Editor<V>>) => {
+    removeMark: (key: string) => {
       const { selection } = editor
 
       if (selection) {

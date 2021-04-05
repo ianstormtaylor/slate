@@ -12,6 +12,7 @@ import { Operation, Node, Path, Text } from '..'
 export type Point = {
   path: Path
   offset: number
+  [key: string]: unknown
 }
 
 export const Point = {

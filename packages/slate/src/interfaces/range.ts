@@ -11,6 +11,7 @@ import { Operation, Node, Path, Point, PointEntry } from '..'
 export type Range = {
   anchor: Point
   focus: Point
+  [key: string]: unknown
 }
 
 export const Range = {

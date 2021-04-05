@@ -90,7 +90,7 @@ export const Node = {
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry<DescendantOf<N>>, void, undefined> {
+  ): Generator<NodeEntry<ChildOf<N>>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -99,7 +99,7 @@ export const Node = {
     while (reverse ? index >= 0 : index < children.length) {
       const child = Node.child(ancestor, index)
       const childPath = path.concat(index)
-      yield [child, childPath] as NodeEntry<DescendantOf<N>>
+      yield [child, childPath] as NodeEntry<ChildOf<N>>
       index = reverse ? index - 1 : index + 1
     }
   },
@@ -210,7 +210,10 @@ export const Node = {
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  fragment<N extends Node>(root: N, range: Range): DescendantOf<N>[] {
+  fragment<N extends Node>(
+    root: N,
+    range: Range
+  ): Array<ElementOf<N> | TextOf<N>> {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -219,7 +222,7 @@ export const Node = {
       )
     }
 
-    const children = (root as Ancestor).children as DescendantOf<N>[]
+    const children = (root as any).children as Array<ElementOf<N> | TextOf<N>>
     const newRoot = produce({ children }, draft => {
       // HACK: get TypeScript not to complain about the draft being special.
       const r = (draft as any) as Ancestor
@@ -566,13 +569,7 @@ export type NodeEntry<N extends Node = Node> = [N, Path]
  * A utility type to get all the node types from a root node type.
  */
 
-export type NodeOf<N extends Node> = Editor<Value> extends N
-  ? Editor<Value> | Element | Text
-  : Element extends N
-  ? Element | Text
-  : Text extends N
-  ? Text
-  : N | DescendantOf<N>
+export type NodeOf<N extends Node> = N | ElementOf<N> | TextOf<N>
 
 /**
  * Convenience type for returning the props of a node.

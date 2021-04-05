@@ -5,6 +5,7 @@ export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
+  [key: string]: unknown
 }
 
 export type InsertTextOperation = {
@@ -12,6 +13,7 @@ export type InsertTextOperation = {
   path: Path
   offset: number
   text: string
+  [key: string]: unknown
 }
 
 export type MergeNodeOperation = {
@@ -19,18 +21,21 @@ export type MergeNodeOperation = {
   path: Path
   position: number
   properties: object
+  [key: string]: unknown
 }
 
 export type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
+  [key: string]: unknown
 }
 
 export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
+  [key: string]: unknown
 }
 
 export type RemoveTextOperation = {
@@ -38,6 +43,7 @@ export type RemoveTextOperation = {
   path: Path
   offset: number
   text: string
+  [key: string]: unknown
 }
 
 export type SetNodeOperation = {
@@ -45,6 +51,7 @@ export type SetNodeOperation = {
   path: Path
   properties: object
   newProperties: object
+  [key: string]: unknown
 }
 
 export type SetSelectionOperation =
@@ -52,16 +59,19 @@ export type SetSelectionOperation =
       type: 'set_selection'
       properties: null
       newProperties: Range
+      [key: string]: unknown
     }
   | {
       type: 'set_selection'
       properties: Partial<Range>
       newProperties: Partial<Range>
+      [key: string]: unknown
     }
   | {
       type: 'set_selection'
       properties: Range
       newProperties: null
+      [key: string]: unknown
     }
 
 export type SplitNodeOperation = {
@@ -69,6 +79,7 @@ export type SplitNodeOperation = {
   path: Path
   position: number
   properties: object
+  [key: string]: unknown
 }
 
 export type NodeOperation =

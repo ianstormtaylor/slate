@@ -1,6 +1,6 @@
 import isPlainObject from 'is-plain-object'
 import { Editor, Node, Path, Text, Value } from '..'
-import { DescendantOf } from './node'
+import { DescendantOf, NodeOf } from './node'
 
 /**
  * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
@@ -18,27 +18,13 @@ export type ElementOf<N extends Node> = Editor<Value> extends N
   : Element extends N
   ? Element
   : N extends Editor<Value>
-  ? N['children'][number] | ElementOf<N['children'][number]>
+  ? Extract<N['children'][number], Element> | ElementOf<N['children'][number]>
   : N extends Element
   ?
       | N
       | Extract<N['children'][number], Element>
-      | ElementOf<Extract<N['children'][number], Element>>
+      | ElementOf<N['children'][number]>
   : never
-
-function isElement<V extends Value>(
-  value: DescendantOf<Editor<V>>
-): value is ElementOf<Editor<V>>
-function isElement<E extends Element>(value: E): value is E
-function isElement<N extends Node>(value: N): value is Extract<N, Element>
-function isElement(value: any): value is Element
-function isElement(value: any) {
-  return (
-    isPlainObject(value) &&
-    Node.isNodeList(value.children) &&
-    !Editor.isEditor(value)
-  )
-}
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -48,6 +34,7 @@ function isElement(value: any) {
 
 export interface Element {
   children: Array<Element | Text>
+  [key: string]: unknown
 }
 
 export const Element = {
@@ -55,7 +42,13 @@ export const Element = {
    * Check if a value implements the `Element` interface.
    */
 
-  isElement,
+  isElement(value: any): value is Element {
+    return (
+      isPlainObject(value) &&
+      Node.isNodeList(value.children) &&
+      !Editor.isEditor(value)
+    )
+  },
 
   /**
    * Check if a value is an array of `Element` objects.

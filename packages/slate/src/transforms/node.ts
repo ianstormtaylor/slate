@@ -13,9 +13,9 @@ import {
   NodeMatch,
   NodeOf,
   ElementOf,
+  TextOf,
   Value,
 } from '..'
-import { DescendantOf } from '../interfaces/node'
 
 export const NodeTransforms = {
   /**
@@ -24,7 +24,10 @@ export const NodeTransforms = {
 
   insertNodes<V extends Value>(
     editor: Editor<V>,
-    nodes: DescendantOf<Editor<V>> | DescendantOf<Editor<V>>[],
+    nodes:
+      | ElementOf<Editor<V>>
+      | TextOf<Editor<V>>
+      | Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>,
     options: {
       at?: Location
       match?: NodeMatch<NodeOf<Editor<V>>>
@@ -39,7 +42,7 @@ export const NodeTransforms = {
       let { at, match, select } = options
 
       if (!Array.isArray(nodes)) {
-        nodes = [nodes] as DescendantOf<Editor<V>>[]
+        nodes = [nodes] as Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>
       }
 
       if (nodes.length === 0) {
@@ -513,8 +516,8 @@ export const NodeTransforms = {
         mode,
         voids,
       })) {
-        const properties: Partial<NodeOf<Editor<V>>> = {}
-        const newProperties: Partial<NodeOf<Editor<V>>> = {}
+        const properties = {}
+        const newProperties = {}
 
         // You can't set properties on the editor node.
         if (path.length === 0) {

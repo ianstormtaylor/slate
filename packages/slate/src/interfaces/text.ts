@@ -28,6 +28,7 @@ export type TextOf<N extends Node> = Editor<Value> extends N
 
 export interface Text {
   text: string
+  [key: string]: unknown
 }
 
 export const Text = {

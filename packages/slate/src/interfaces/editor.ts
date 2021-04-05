@@ -14,14 +14,12 @@ import {
   Span,
   Text,
   AncestorOf,
-  DescendantOf,
   ElementOf,
   NodeOf,
   MarksOf,
   TextOf,
   Element,
   NodeMatch,
-  NodeProps,
 } from '..'
 import {
   DIRTY_PATHS,
@@ -45,31 +43,27 @@ export type Editor<V extends Value> = {
   children: V
   selection: Selection
   operations: Operation[]
-  marks: Partial<NodeProps<TextOf<V[number]>>> | null
+  marks: Record<string, any> | null
+  [key: string]: unknown
 
   // Schema-specific node behaviors.
-  isInline: (element: ElementOf<Editor<V>>) => boolean
-  isVoid: (element: ElementOf<Editor<V>>) => boolean
+  isInline: (element: Element) => boolean
+  isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
 
   // Overrideable core actions.
-  addMark: <M extends MarksOf<Editor<V>>, K extends keyof M>(
-    key: {} extends M ? string : K,
-    value: {} extends M ? unknown : M[K]
-  ) => void
+  addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteFragment: (direction?: 'forward' | 'backward') => void
-  getFragment: () => DescendantOf<Editor<V>>[]
+  getFragment: () => Array<Element | Text>
   insertBreak: () => void
-  insertFragment: (fragment: DescendantOf<Editor<V>>[]) => void
-  insertNode: (node: DescendantOf<Editor<V>>) => void
+  insertFragment: (fragment: Array<Element | Text>) => void
+  insertNode: (node: Element | Text | Array<Element | Text>) => void
   insertText: (text: string) => void
-  removeMark: <M extends MarksOf<Editor<V>>>(
-    key: {} extends M ? string : keyof M
-  ) => void
+  removeMark: (key: string) => void
 }
 
 export const Editor = {
@@ -119,7 +113,11 @@ export const Editor = {
    * `editor.marks` property instead, and applied when text is inserted next.
    */
 
-  addMark<V extends Value, M extends MarksOf<Editor<V>>, K extends keyof M>(
+  addMark<
+    V extends Value,
+    M extends MarksOf<Editor<V>>,
+    K extends keyof M & string
+  >(
     editor: Editor<V>,
     key: {} extends M ? string : K,
     value: {} extends M ? unknown : M[K]
@@ -282,7 +280,7 @@ export const Editor = {
   fragment<V extends Value>(
     editor: Editor<V>,
     at: Location
-  ): DescendantOf<Editor<V>>[] {
+  ): Array<ElementOf<Editor<V>> | TextOf<Editor<V>>> {
     const range = Editor.range(editor, at)
     const fragment = Node.fragment(editor, range)
     return fragment
@@ -332,7 +330,7 @@ export const Editor = {
 
   insertFragment<V extends Value>(
     editor: Editor<V>,
-    fragment: DescendantOf<Editor<V>>[]
+    fragment: Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>
   ): void {
     editor.insertFragment(fragment)
   },
@@ -345,7 +343,10 @@ export const Editor = {
 
   insertNode<V extends Value>(
     editor: Editor<V>,
-    node: DescendantOf<Editor<V>>
+    node:
+      | ElementOf<Editor<V>>
+      | TextOf<Editor<V>>
+      | Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>
   ): void {
     editor.insertNode(node)
   },
@@ -1296,7 +1297,7 @@ export const Editor = {
 
   removeMark<V extends Value, M extends MarksOf<Editor<V>>>(
     editor: Editor<V>,
-    key: {} extends M ? string : keyof M
+    key: {} extends M ? string : keyof M & string
   ): void {
     editor.removeMark(key)
   },
