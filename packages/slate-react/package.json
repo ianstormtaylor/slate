@@ -21,7 +21,8 @@
     "is-plain-object": "^3.0.0",
     "lodash": "^4.17.4",
     "scroll-into-view-if-needed": "^2.2.20",
-    "tiny-invariant": "1.0.6"
+    "tiny-invariant": "^1.0.6",
+    "tiny-warning": "^1.0.3"
   },
   "devDependencies": {
     "slate": "^0.62.0",

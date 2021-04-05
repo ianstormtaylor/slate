@@ -1,15 +1,15 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useState, useMemo } from 'react'
 import faker from 'faker'
-import { createEditor, Descendant } from 'slate'
+import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
-const initialValue: Descendant[] = []
+const initialValue = []
 
 for (let h = 0; h < HEADINGS; h++) {
   initialValue.push({
-    type: 'heading',
+    type: 'heading-one',
     children: [{ text: faker.lorem.sentence() }],
   })
 
@@ -22,8 +22,7 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 const HugeDocumentExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -32,9 +31,9 @@ const HugeDocumentExample = () => {
   )
 }
 
-const Element = ({ attributes, children, element }) => {
+const renderElement = ({ attributes, children, element }) => {
   switch (element.type) {
-    case 'heading':
+    case 'heading-one':
       return <h1 {...attributes}>{children}</h1>
     default:
       return <p {...attributes}>{children}</p>

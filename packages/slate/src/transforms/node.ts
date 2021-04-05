@@ -10,129 +10,24 @@ import {
   Transforms,
   NodeEntry,
   Ancestor,
+  NodeMatch,
+  NodeOf,
+  ElementOf,
+  Value,
 } from '..'
-import { NodeMatch } from '../interfaces/editor'
+import { DescendantOf } from '../interfaces/node'
 
-export interface NodeTransforms {
-  insertNodes: <T extends Node>(
-    editor: Editor,
-    nodes: Node | Node[],
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
-      hanging?: boolean
-      select?: boolean
-      voids?: boolean
-    }
-  ) => void
-  liftNodes: <T extends Node>(
-    editor: Editor,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      voids?: boolean
-    }
-  ) => void
-  mergeNodes: <T extends Node>(
-    editor: Editor,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
-      hanging?: boolean
-      voids?: boolean
-    }
-  ) => void
-  moveNodes: <T extends Node>(
-    editor: Editor,
-    options: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      to: Path
-      voids?: boolean
-    }
-  ) => void
-  removeNodes: <T extends Node>(
-    editor: Editor,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
-      hanging?: boolean
-      voids?: boolean
-    }
-  ) => void
-  setNodes: <T extends Node>(
-    editor: Editor,
-    props: Partial<Node>,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      hanging?: boolean
-      split?: boolean
-      voids?: boolean
-    }
-  ) => void
-  splitNodes: <T extends Node>(
-    editor: Editor,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
-      always?: boolean
-      height?: number
-      voids?: boolean
-    }
-  ) => void
-  unsetNodes: <T extends Node>(
-    editor: Editor,
-    props: string | string[],
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      split?: boolean
-      voids?: boolean
-    }
-  ) => void
-  unwrapNodes: <T extends Node>(
-    editor: Editor,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      split?: boolean
-      voids?: boolean
-    }
-  ) => void
-  wrapNodes: <T extends Node>(
-    editor: Editor,
-    element: Element,
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
-      split?: boolean
-      voids?: boolean
-    }
-  ) => void
-}
-
-export const NodeTransforms: NodeTransforms = {
+export const NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.
    */
 
-  insertNodes<T extends Node>(
-    editor: Editor,
-    nodes: Node | Node[],
+  insertNodes<V extends Value>(
+    editor: Editor<V>,
+    nodes: DescendantOf<Editor<V>> | DescendantOf<Editor<V>>[],
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       select?: boolean
@@ -143,8 +38,8 @@ export const NodeTransforms: NodeTransforms = {
       const { hanging = false, voids = false, mode = 'lowest' } = options
       let { at, match, select } = options
 
-      if (Node.isNode(nodes)) {
-        nodes = [nodes]
+      if (!Array.isArray(nodes)) {
+        nodes = [nodes] as DescendantOf<Editor<V>>[]
       }
 
       if (nodes.length === 0) {
@@ -191,7 +86,7 @@ export const NodeTransforms: NodeTransforms = {
         if (match == null) {
           if (Text.isText(node)) {
             match = n => Text.isText(n)
-          } else if (editor.isInline(node)) {
+          } else if (editor.isInline(node as ElementOf<Editor<V>>)) {
             match = n => Text.isText(n) || Editor.isInline(editor, n)
           } else {
             match = n => Editor.isBlock(editor, n)
@@ -245,11 +140,11 @@ export const NodeTransforms: NodeTransforms = {
    * their parent in two if necessary.
    */
 
-  liftNodes<T extends Node>(
-    editor: Editor,
+  liftNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       voids?: boolean
     } = {}
@@ -309,11 +204,11 @@ export const NodeTransforms: NodeTransforms = {
    * removing any empty containing nodes after the merge if necessary.
    */
 
-  mergeNodes<T extends Node>(
-    editor: Editor,
+  mergeNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -330,7 +225,7 @@ export const NodeTransforms: NodeTransforms = {
       if (match == null) {
         if (Path.isPath(at)) {
           const [parent] = Editor.parent(editor, at)
-          match = n => parent.children.includes(n)
+          match = n => parent.children.includes(n as any)
         } else {
           match = n => Editor.isBlock(editor, n)
         }
@@ -381,7 +276,7 @@ export const NodeTransforms: NodeTransforms = {
       const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
-        match: n => levels.includes(n) && hasSingleChildNest(editor, n),
+        match: n => levels.includes(n as any) && hasSingleChildNest(editor, n),
       })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
@@ -395,8 +290,8 @@ export const NodeTransforms: NodeTransforms = {
         position = prevNode.text.length
         properties = rest as Partial<Text>
       } else if (Element.isElement(node) && Element.isElement(prevNode)) {
-        const { children, ...rest } = node
-        position = prevNode.children.length
+        const { children, ...rest } = node as ElementOf<Editor<V>>
+        position = (prevNode as ElementOf<Editor<V>>).children.length
         properties = rest as Partial<Element>
       } else {
         throw new Error(
@@ -423,7 +318,8 @@ export const NodeTransforms: NodeTransforms = {
       // prevent losing formatting when deleting entire nodes when you have a
       // hanging selection.
       if (
-        (Element.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
+        (Element.isElement(prevNode) &&
+          Editor.isEmpty(editor, prevNode as ElementOf<Editor<V>>)) ||
         (Text.isText(prevNode) && prevNode.text === '')
       ) {
         Transforms.removeNodes(editor, { at: prevPath, voids })
@@ -446,11 +342,11 @@ export const NodeTransforms: NodeTransforms = {
    * Move the nodes at a location to a new location.
    */
 
-  moveNodes<T extends Node>(
-    editor: Editor,
+  moveNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       to: Path
       voids?: boolean
@@ -507,11 +403,11 @@ export const NodeTransforms: NodeTransforms = {
    * Remove the nodes at a specific location in the document.
    */
 
-  removeNodes<T extends Node>(
-    editor: Editor,
+  removeNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'highest' | 'lowest'
       hanging?: boolean
       voids?: boolean
@@ -553,12 +449,12 @@ export const NodeTransforms: NodeTransforms = {
    * Set new properties on the nodes at a location.
    */
 
-  setNodes<T extends Node>(
-    editor: Editor,
-    props: Partial<Node>,
+  setNodes<V extends Value>(
+    editor: Editor<V>,
+    props: Partial<NodeOf<Editor<V>>>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       hanging?: boolean
       split?: boolean
@@ -617,8 +513,8 @@ export const NodeTransforms: NodeTransforms = {
         mode,
         voids,
       })) {
-        const properties: Partial<Node> = {}
-        const newProperties: Partial<Node> = {}
+        const properties: Partial<NodeOf<Editor<V>>> = {}
+        const newProperties: Partial<NodeOf<Editor<V>>> = {}
 
         // You can't set properties on the editor node.
         if (path.length === 0) {
@@ -626,6 +522,7 @@ export const NodeTransforms: NodeTransforms = {
         }
 
         for (const k in props) {
+          // @ts-ignore
           if (k === 'children' || k === 'text') {
             continue
           }
@@ -652,11 +549,11 @@ export const NodeTransforms: NodeTransforms = {
    * Split the nodes at a specific location.
    */
 
-  splitNodes<T extends Node>(
-    editor: Editor,
+  splitNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'highest' | 'lowest'
       always?: boolean
       height?: number
@@ -712,7 +609,10 @@ export const NodeTransforms: NodeTransforms = {
           if (!after) {
             const text = { text: '' }
             const afterPath = Path.next(voidPath)
-            Transforms.insertNodes(editor, text, { at: afterPath, voids })
+            Transforms.insertNodes(editor, text as any, {
+              at: afterPath,
+              voids,
+            })
             after = Editor.point(editor, afterPath)!
           }
 
@@ -751,7 +651,7 @@ export const NodeTransforms: NodeTransforms = {
 
         if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
           split = true
-          const properties = Node.extractProps(node)
+          const properties = Node.props(node as Element)
           editor.apply({
             type: 'split_node',
             path,
@@ -777,12 +677,12 @@ export const NodeTransforms: NodeTransforms = {
    * Unset properties on the nodes at a location.
    */
 
-  unsetNodes<T extends Node>(
-    editor: Editor,
+  unsetNodes<V extends Value>(
+    editor: Editor<V>,
     props: string | string[],
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -806,11 +706,11 @@ export const NodeTransforms: NodeTransforms = {
    * necessary to ensure that only the content in the range is unwrapped.
    */
 
-  unwrapNodes<T extends Node>(
-    editor: Editor,
+  unwrapNodes<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -849,7 +749,7 @@ export const NodeTransforms: NodeTransforms = {
 
         Transforms.liftNodes(editor, {
           at: range,
-          match: n => Element.isAncestor(node) && node.children.includes(n),
+          match: n => Node.isAncestor(node) && node.children.includes(n as any),
           voids,
         })
       }
@@ -865,12 +765,12 @@ export const NodeTransforms: NodeTransforms = {
    * of the range first to ensure that only the content in the range is wrapped.
    */
 
-  wrapNodes<T extends Node>(
-    editor: Editor,
-    element: Element,
+  wrapNodes<V extends Value>(
+    editor: Editor<V>,
+    element: ElementOf<Editor<V>>,
     options: {
       at?: Location
-      match?: NodeMatch<T>
+      match?: NodeMatch<NodeOf<Editor<V>>>
       mode?: 'all' | 'highest' | 'lowest'
       split?: boolean
       voids?: boolean
@@ -947,12 +847,15 @@ export const NodeTransforms: NodeTransforms = {
           const depth = commonPath.length + 1
           const wrapperPath = Path.next(lastPath.slice(0, depth))
           const wrapper = { ...element, children: [] }
-          Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
-
+          Transforms.insertNodes(editor, wrapper as any, {
+            at: wrapperPath,
+            voids,
+          })
           Transforms.moveNodes(editor, {
             at: range,
             match: n =>
-              Element.isAncestor(commonNode) && commonNode.children.includes(n),
+              Node.isAncestor(commonNode) &&
+              commonNode.children.includes(n as any),
             to: wrapperPath.concat(0),
             voids,
           })
@@ -962,7 +865,10 @@ export const NodeTransforms: NodeTransforms = {
   },
 }
 
-const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
+const hasSingleChildNest = <V extends Value>(
+  editor: Editor<V>,
+  node: Node
+): boolean => {
   if (Element.isElement(node)) {
     const element = node as Element
     if (Editor.isVoid(editor, node)) {
@@ -983,7 +889,10 @@ const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
  * Convert a range into a point by deleting it's content.
  */
 
-const deleteRange = (editor: Editor, range: Range): Point | null => {
+const deleteRange = <V extends Value>(
+  editor: Editor<V>,
+  range: Range
+): Point | null => {
   if (Range.isCollapsed(range)) {
     return range.anchor
   } else {
@@ -994,7 +903,10 @@ const deleteRange = (editor: Editor, range: Range): Point | null => {
   }
 }
 
-const matchPath = (editor: Editor, path: Path): ((node: Node) => boolean) => {
+const matchPath = <V extends Value>(
+  editor: Editor<V>,
+  path: Path
+): ((node: Node) => boolean) => {
   const [node] = Editor.node(editor, path)
   return n => n === node
 }

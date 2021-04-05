@@ -1,28 +1,19 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
-import {
-  Editor,
-  Transforms,
-  Text,
-  createEditor,
-  Element,
-  Descendant,
-} from 'slate'
+import { Editor, Transforms, Text, createEditor, Value } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
-
 import { Button, Icon, Menu, Portal } from '../components'
 import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <HoveringToolbar />
       <Editable
-        renderLeaf={props => <Leaf {...props} />}
+        renderLeaf={renderLeaf}
         placeholder="Enter some text..."
         onDOMBeforeInput={(event: InputEvent) => {
           event.preventDefault()
@@ -38,6 +29,22 @@ const HoveringMenuExample = () => {
       />
     </Slate>
   )
+}
+
+const renderLeaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underlined) {
+    children = <u>{children}</u>
+  }
+
+  return <span {...attributes}>{children}</span>
 }
 
 const toggleFormat = (editor, format) => {
@@ -57,22 +64,6 @@ const isFormatActive = (editor, format) => {
   return !!match
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
-  if (leaf.bold) {
-    children = <strong>{children}</strong>
-  }
-
-  if (leaf.italic) {
-    children = <em>{children}</em>
-  }
-
-  if (leaf.underlined) {
-    children = <u>{children}</u>
-  }
-
-  return <span {...attributes}>{children}</span>
-}
-
 const HoveringToolbar = () => {
   const ref = useRef<HTMLDivElement | null>()
   const editor = useSlate()
@@ -80,10 +71,7 @@ const HoveringToolbar = () => {
   useEffect(() => {
     const el = ref.current
     const { selection } = editor
-
-    if (!el) {
-      return
-    }
+    if (!el) return
 
     if (
       !selection ||
@@ -147,7 +135,7 @@ const FormatButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [
@@ -165,7 +153,10 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       { text: 'Try it out yourself! Just ' },
-      { text: 'select any piece of text and the menu will appear', bold: true },
+      {
+        text: 'select any piece of text and the menu will appear',
+        bold: true,
+      },
       { text: '.' },
     ],
   },

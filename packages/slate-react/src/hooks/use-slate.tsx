@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { Editor } from 'slate'
+import { Value } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
 
 /**
@@ -7,13 +7,13 @@ import { ReactEditor } from '../plugin/react-editor'
  * context whenever changes occur.
  */
 
-export const SlateContext = createContext<[ReactEditor] | null>(null)
+export const SlateContext = createContext<[ReactEditor<Value>] | null>(null)
 
 /**
  * Get the current editor object from the React context.
  */
 
-export const useSlate = (): Editor => {
+export const useSlate = <V extends Value>(): ReactEditor<V> => {
   const context = useContext(SlateContext)
 
   if (!context) {
@@ -23,5 +23,5 @@ export const useSlate = (): Editor => {
   }
 
   const [editor] = context
-  return editor
+  return editor as ReactEditor<V>
 }

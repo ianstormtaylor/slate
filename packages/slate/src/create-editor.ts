@@ -1,3 +1,4 @@
+import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
 import {
   Descendant,
   Editor,
@@ -12,16 +13,19 @@ import {
   RangeRef,
   Text,
   Transforms,
+  DescendantOf,
+  Value,
+  MarksOf,
 } from './'
-import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
+import { ElementOf } from './interfaces/element'
 
 /**
  * Create a new Slate `Editor` object.
  */
 
-export const createEditor = (): Editor => {
-  const editor: Editor = {
-    children: [],
+export const createEditor = <V extends Value>(): Editor<V> => {
+  const editor: Editor<V> = {
+    children: ([] as unknown) as V,
     operations: [],
     selection: null,
     marks: null,
@@ -89,16 +93,18 @@ export const createEditor = (): Editor => {
       }
     },
 
-    addMark: (key: string, value: any) => {
+    addMark: <K extends keyof MarksOf<Editor<V>>>(
+      key: K,
+      value: MarksOf<Editor<V>>[K]
+    ) => {
       const { selection } = editor
 
       if (selection) {
         if (Range.isExpanded(selection)) {
-          Transforms.setNodes(
-            editor,
-            { [key]: value },
-            { match: Text.isText, split: true }
-          )
+          Transforms.setNodes(editor, { [key]: value } as any, {
+            match: Text.isText,
+            split: true,
+          })
         } else {
           const marks = {
             ...(Editor.marks(editor) || {}),
@@ -148,11 +154,13 @@ export const createEditor = (): Editor => {
       Transforms.splitNodes(editor, { always: true })
     },
 
-    insertFragment: (fragment: Node[]) => {
+    // @ts-ignore
+    insertFragment: (fragment: DescendantOf<Editor<V>>[]) => {
       Transforms.insertFragment(editor, fragment)
     },
 
-    insertNode: (node: Node) => {
+    // @ts-ignore
+    insertNode: (node: DescendantOf<Editor<V>>) => {
       Transforms.insertNodes(editor, node)
     },
 
@@ -182,7 +190,7 @@ export const createEditor = (): Editor => {
         }
 
         if (marks) {
-          const node = { text, ...marks }
+          const node = { text, ...marks } as any
           Transforms.insertNodes(editor, node)
         } else {
           Transforms.insertText(editor, text)
@@ -202,7 +210,7 @@ export const createEditor = (): Editor => {
 
       // Ensure that block and inline nodes have at least one text child.
       if (Element.isElement(node) && node.children.length === 0) {
-        const child = { text: '' }
+        const child = { text: '' } as any
         Transforms.insertNodes(editor, child, {
           at: path.concat(0),
           voids: true,
@@ -214,10 +222,10 @@ export const createEditor = (): Editor => {
       const shouldHaveInlines = Editor.isEditor(node)
         ? false
         : Element.isElement(node) &&
-          (editor.isInline(node) ||
+          (editor.isInline(node as any) ||
             node.children.length === 0 ||
             Text.isText(node.children[0]) ||
-            editor.isInline(node.children[0]))
+            editor.isInline((node as any).children[0]))
 
       // Since we'll be applying operations while iterating, keep track of an
       // index that accounts for any added/removed nodes.
@@ -229,7 +237,7 @@ export const createEditor = (): Editor => {
         const isLast = i === node.children.length - 1
         const isInlineOrText =
           Text.isText(child) ||
-          (Element.isElement(child) && editor.isInline(child))
+          (Element.isElement(child) && editor.isInline(child as any))
 
         // Only allow block nodes in the top-level children and parent blocks
         // that only contain block nodes. Similarly, only allow inline nodes in
@@ -240,16 +248,16 @@ export const createEditor = (): Editor => {
           n--
         } else if (Element.isElement(child)) {
           // Ensure that inline nodes are surrounded by text nodes.
-          if (editor.isInline(child)) {
+          if (editor.isInline(child as any)) {
             if (prev == null || !Text.isText(prev)) {
-              const newChild = { text: '' }
+              const newChild = { text: '' } as any
               Transforms.insertNodes(editor, newChild, {
                 at: path.concat(n),
                 voids: true,
               })
               n++
             } else if (isLast) {
-              const newChild = { text: '' }
+              const newChild = { text: '' } as any
               Transforms.insertNodes(editor, newChild, {
                 at: path.concat(n + 1),
                 voids: true,
@@ -281,7 +289,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    removeMark: (key: string) => {
+    removeMark: (key: keyof MarksOf<Editor<V>>) => {
       const { selection } = editor
 
       if (selection) {

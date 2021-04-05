@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { Editor, Node, Element, Descendant } from 'slate'
+import { Editor, Node, Value, ValueOf } from 'slate'
 import invariant from 'tiny-invariant'
 
 import { ReactEditor } from '../plugin/react-editor'
@@ -14,15 +14,15 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
  * is a mutable singleton so it won't ever register as "changed" otherwise.
  */
 
-export const Slate = (props: {
-  editor: ReactEditor
-  value: Descendant[]
+export const Slate = <V extends Value>(props: {
+  editor: ReactEditor<V>
+  value: V
   children: React.ReactNode
-  onChange: (value: Descendant[]) => void
+  onChange: (value: V) => void
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
-  const context: [ReactEditor] = useMemo(() => {
+  const context: [ReactEditor<V>] = useMemo(() => {
     invariant(
       Node.isNodeList(value),
       `[Slate] value is invalid! Expected a list of elements but got: ${JSON.stringify(

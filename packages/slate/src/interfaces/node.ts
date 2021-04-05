@@ -1,99 +1,30 @@
 import { produce } from 'immer'
-import { Editor, Path, Range, Text } from '..'
-import { Element, ElementEntry } from './element'
+import isPlainObject from 'is-plain-object'
+import {
+  Editor,
+  Path,
+  Range,
+  Text,
+  Element,
+  ElementOf,
+  TextOf,
+  Value,
+} from '..'
 
+const IS_NODE_LIST_CACHE = new WeakMap<any[], boolean>()
 /**
  * The `Node` union type represents all of the different types of nodes that
  * occur in a Slate document tree.
  */
 
-export type BaseNode = Editor | Element | Text
-export type Node = Editor | Element | Text
+export type Node = Editor<Value> | Element | Text
 
-export interface NodeInterface {
-  ancestor: (root: Node, path: Path) => Ancestor
-  ancestors: (
-    root: Node,
-    path: Path,
-    options?: {
-      reverse?: boolean
-    }
-  ) => Generator<NodeEntry<Ancestor>, void, undefined>
-  child: (root: Node, index: number) => Descendant
-  children: (
-    root: Node,
-    path: Path,
-    options?: {
-      reverse?: boolean
-    }
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
-  common: (root: Node, path: Path, another: Path) => NodeEntry
-  descendant: (root: Node, path: Path) => Descendant
-  descendants: (
-    root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
-  ) => Generator<NodeEntry<Descendant>, void, undefined>
-  elements: (
-    root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
-  ) => Generator<ElementEntry, void, undefined>
-  extractProps: (node: Node) => NodeProps
-  first: (root: Node, path: Path) => NodeEntry
-  fragment: (root: Node, range: Range) => Descendant[]
-  get: (root: Node, path: Path) => Node
-  has: (root: Node, path: Path) => boolean
-  isNode: (value: any) => value is Node
-  isNodeList: (value: any) => value is Node[]
-  last: (root: Node, path: Path) => NodeEntry
-  leaf: (root: Node, path: Path) => Text
-  levels: (
-    root: Node,
-    path: Path,
-    options?: {
-      reverse?: boolean
-    }
-  ) => Generator<NodeEntry, void, undefined>
-  matches: (node: Node, props: Partial<Node>) => boolean
-  nodes: (
-    root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
-    }
-  ) => Generator<NodeEntry, void, undefined>
-  parent: (root: Node, path: Path) => Ancestor
-  string: (node: Node) => string
-  texts: (
-    root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
-  ) => Generator<NodeEntry<Text>, void, undefined>
-}
-
-const IS_NODE_LIST_CACHE = new WeakMap<any[], boolean>()
-
-export const Node: NodeInterface = {
+export const Node = {
   /**
    * Get the node at a specific path, asserting that it's an ancestor node.
    */
 
-  ancestor(root: Node, path: Path): Ancestor {
+  ancestor<N extends Node>(root: N, path: Path): AncestorOf<N> {
     const node = Node.get(root, path)
 
     if (Text.isText(node)) {
@@ -102,7 +33,7 @@ export const Node: NodeInterface = {
       )
     }
 
-    return node
+    return node as AncestorOf<N>
   },
 
   /**
@@ -112,17 +43,16 @@ export const Node: NodeInterface = {
    * the tree, but you can pass the `reverse: true` option to go top-down.
    */
 
-  *ancestors(
-    root: Node,
+  *ancestors<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry<Ancestor>, void, undefined> {
+  ): Generator<NodeEntry<AncestorOf<N>>, void, undefined> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
-      const entry: NodeEntry<Ancestor> = [n, p]
-      yield entry
+      yield [n, p] as NodeEntry<AncestorOf<N>>
     }
   },
 
@@ -130,14 +60,14 @@ export const Node: NodeInterface = {
    * Get the child of a node at a specific index.
    */
 
-  child(root: Node, index: number): Descendant {
+  child<N extends Node, I extends number>(root: N, index: I): ChildOf<N, I> {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get the child of a text node: ${JSON.stringify(root)}`
       )
     }
 
-    const c = root.children[index] as Descendant
+    const c = (root as AncestorOf<N>).children[index] as ChildOf<N, I>
 
     if (c == null) {
       throw new Error(
@@ -154,13 +84,13 @@ export const Node: NodeInterface = {
    * Iterate over the children of a node at a specific path.
    */
 
-  *children(
-    root: Node,
+  *children<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry<Descendant>, void, undefined> {
+  ): Generator<NodeEntry<DescendantOf<N>>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
     const { children } = ancestor
@@ -169,7 +99,7 @@ export const Node: NodeInterface = {
     while (reverse ? index >= 0 : index < children.length) {
       const child = Node.child(ancestor, index)
       const childPath = path.concat(index)
-      yield [child, childPath]
+      yield [child, childPath] as NodeEntry<DescendantOf<N>>
       index = reverse ? index - 1 : index + 1
     }
   },
@@ -178,7 +108,11 @@ export const Node: NodeInterface = {
    * Get an entry for the common ancesetor node of two paths.
    */
 
-  common(root: Node, path: Path, another: Path): NodeEntry {
+  common<N extends Node>(
+    root: N,
+    path: Path,
+    another: Path
+  ): NodeEntry<NodeOf<N>> {
     const p = Path.common(path, another)
     const n = Node.get(root, p)
     return [n, p]
@@ -188,7 +122,7 @@ export const Node: NodeInterface = {
    * Get the node at a specific path, asserting that it's a descendant node.
    */
 
-  descendant(root: Node, path: Path): Descendant {
+  descendant<N extends Node>(root: N, path: Path): DescendantOf<N> {
     const node = Node.get(root, path)
 
     if (Editor.isEditor(node)) {
@@ -197,27 +131,30 @@ export const Node: NodeInterface = {
       )
     }
 
-    return node
+    return node as DescendantOf<N>
   },
 
   /**
    * Return a generator of all the descendant node entries inside a root node.
    */
 
-  *descendants(
-    root: Node,
+  *descendants<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
+      pass?: (node: NodeEntry<DescendantOf<N>>) => boolean
     } = {}
-  ): Generator<NodeEntry<Descendant>, void, undefined> {
-    for (const [node, path] of Node.nodes(root, options)) {
+  ): Generator<NodeEntry<DescendantOf<N>>, void, undefined> {
+    const { pass, ...rest } = options
+
+    for (const [node, path] of Node.nodes(root, rest)) {
       if (path.length !== 0) {
-        // NOTE: we have to coerce here because checking the path's length does
-        // guarantee that `node` is not a `Editor`, but TypeScript doesn't know.
-        yield [node, path] as NodeEntry<Descendant>
+        const e = [node, path] as NodeEntry<DescendantOf<N>>
+        if (pass == null || pass(e)) {
+          yield e
+        }
       }
     }
   },
@@ -228,35 +165,24 @@ export const Node: NodeInterface = {
    * root node is an element it will be included in the iteration as well.
    */
 
-  *elements(
-    root: Node,
+  *elements<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
+      pass?: (node: NodeEntry<ElementOf<N>>) => boolean
     } = {}
-  ): Generator<ElementEntry, void, undefined> {
-    for (const [node, path] of Node.nodes(root, options)) {
+  ): Generator<NodeEntry<ElementOf<N>>, void, undefined> {
+    const { pass, ...rest } = options
+
+    for (const [node, path] of Node.nodes(root, rest)) {
       if (Element.isElement(node)) {
-        yield [node, path]
+        const e = [node, path] as NodeEntry<ElementOf<N>>
+        if (pass == null || pass(e)) {
+          yield e
+        }
       }
-    }
-  },
-
-  /**
-   * Extract props from a Node.
-   */
-
-  extractProps(node: Node): NodeProps {
-    if (Element.isAncestor(node)) {
-      const { children, ...properties } = node
-
-      return properties
-    } else {
-      const { text, ...properties } = node
-
-      return properties
     }
   },
 
@@ -264,15 +190,15 @@ export const Node: NodeInterface = {
    * Get the first node entry in a root node from a path.
    */
 
-  first(root: Node, path: Path): NodeEntry {
+  first<N extends Node>(root: N, path: Path): NodeEntry<NodeOf<N>> {
     const p = path.slice()
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.children.length === 0) {
+      if (Text.isText(n) || (n as AncestorOf<N>).children.length === 0) {
         break
       } else {
-        n = n.children[0]
+        n = Node.child(n, 0) as NodeOf<N>
         p.push(0)
       }
     }
@@ -284,7 +210,7 @@ export const Node: NodeInterface = {
    * Get the sliced fragment represented by a range inside a root node.
    */
 
-  fragment(root: Node, range: Range): Descendant[] {
+  fragment<N extends Node>(root: N, range: Range): DescendantOf<N>[] {
     if (Text.isText(root)) {
       throw new Error(
         `Cannot get a fragment starting from a root text node: ${JSON.stringify(
@@ -293,7 +219,11 @@ export const Node: NodeInterface = {
       )
     }
 
-    const newRoot = produce({ children: root.children }, r => {
+    const children = (root as Ancestor).children as DescendantOf<N>[]
+    const newRoot = produce({ children }, draft => {
+      // HACK: get TypeScript not to complain about the draft being special.
+      const r = (draft as any) as Ancestor
+
       const [start, end] = Range.edges(range)
       const nodeEntries = Node.nodes(r, {
         reverse: true,
@@ -304,7 +234,7 @@ export const Node: NodeInterface = {
         if (!Range.includes(range, path)) {
           const parent = Node.parent(r, path)
           const index = path[path.length - 1]
-          parent.children.splice(index, 1)
+          ;(parent as Ancestor).children.splice(index, 1)
         }
 
         if (Path.equals(path, end.path)) {
@@ -313,7 +243,7 @@ export const Node: NodeInterface = {
         }
 
         if (Path.equals(path, start.path)) {
-          const leaf = Node.leaf(r, path)
+          const leaf = Node.leaf(r, path) as Text
           leaf.text = leaf.text.slice(start.offset)
         }
       }
@@ -331,13 +261,14 @@ export const Node: NodeInterface = {
    * empty array, it refers to the root node itself.
    */
 
-  get(root: Node, path: Path): Node {
-    let node = root
+  get<N extends Node>(root: N, path: Path): NodeOf<N> {
+    // @ts-ignore
+    let node: NodeOf<N> = root
 
     for (let i = 0; i < path.length; i++) {
       const p = path[i]
 
-      if (Text.isText(node) || !node.children[p]) {
+      if (Text.isText(node) || !(node as Ancestor).children[p]) {
         throw new Error(
           `Cannot find a descendant at path [${path}] in node: ${JSON.stringify(
             root
@@ -345,7 +276,7 @@ export const Node: NodeInterface = {
         )
       }
 
-      node = node.children[p]
+      node = (node as Ancestor).children[p] as NodeOf<N>
     }
 
     return node
@@ -369,6 +300,14 @@ export const Node: NodeInterface = {
     }
 
     return true
+  },
+
+  /**
+   * Check if a value implements the 'Ancestor' interface.
+   */
+
+  isAncestor(value: any): value is Ancestor {
+    return isPlainObject(value) && Node.isNodeList(value.children)
   },
 
   /**
@@ -402,16 +341,16 @@ export const Node: NodeInterface = {
    * Get the last node entry in a root node from a path.
    */
 
-  last(root: Node, path: Path): NodeEntry {
+  last<N extends Node>(root: N, path: Path): NodeEntry<NodeOf<N>> {
     const p = path.slice()
     let n = Node.get(root, p)
 
     while (n) {
-      if (Text.isText(n) || n.children.length === 0) {
+      if (Text.isText(n) || (n as Ancestor).children.length === 0) {
         break
       } else {
-        const i = n.children.length - 1
-        n = n.children[i]
+        const i = (n as Ancestor).children.length - 1
+        n = (n as Ancestor).children[i] as NodeOf<N>
         p.push(i)
       }
     }
@@ -423,7 +362,7 @@ export const Node: NodeInterface = {
    * Get the node at a specific path, ensuring it's a leaf text node.
    */
 
-  leaf(root: Node, path: Path): Text {
+  leaf<N extends Node>(root: N, path: Path): TextOf<N> {
     const node = Node.get(root, path)
 
     if (!Text.isText(node)) {
@@ -432,7 +371,7 @@ export const Node: NodeInterface = {
       )
     }
 
-    return node
+    return node as TextOf<N>
   },
 
   /**
@@ -442,13 +381,13 @@ export const Node: NodeInterface = {
    * but you can pass the `reverse: true` option to go bottom-up.
    */
 
-  *levels(
-    root: Node,
+  *levels<N extends Node>(
+    root: N,
     path: Path,
     options: {
       reverse?: boolean
     } = {}
-  ): Generator<NodeEntry, void, undefined> {
+  ): Generator<NodeEntry<NodeOf<N>>, void, undefined> {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
       yield [n, p]
@@ -459,14 +398,10 @@ export const Node: NodeInterface = {
    * Check if a node matches a set of props.
    */
 
-  matches(node: Node, props: Partial<Node>): boolean {
+  matches(node: Node, props: object): boolean {
     return (
-      (Element.isElement(node) &&
-        Element.isElementProps(props) &&
-        Element.matches(node, props)) ||
-      (Text.isText(node) &&
-        Text.isTextProps(props) &&
-        Text.matches(node, props))
+      (Element.isElement(node) && Element.matches(node, props)) ||
+      (Text.isText(node) && Text.matches(node, props))
     )
   },
 
@@ -476,20 +411,21 @@ export const Node: NodeInterface = {
    * position inside the root node.
    */
 
-  *nodes(
-    root: Node,
+  *nodes<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
+      pass?: (entry: NodeEntry<NodeOf<N>>) => boolean
     } = {}
-  ): Generator<NodeEntry, void, undefined> {
+  ): Generator<NodeEntry<NodeOf<N>>, void, undefined> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
     const visited = new Set()
+    // @ts-ignore
+    let n: NodeOf<N> = root
     let p: Path = []
-    let n = root
 
     while (true) {
       if (to && (reverse ? Path.isBefore(p, to) : Path.isAfter(p, to))) {
@@ -504,11 +440,11 @@ export const Node: NodeInterface = {
       if (
         !visited.has(n) &&
         !Text.isText(n) &&
-        n.children.length !== 0 &&
+        (n as Ancestor).children.length !== 0 &&
         (pass == null || pass([n, p]) === false)
       ) {
         visited.add(n)
-        let nextIndex = reverse ? n.children.length - 1 : 0
+        let nextIndex = reverse ? (n as Ancestor).children.length - 1 : 0
 
         if (Path.isAncestor(p, from)) {
           nextIndex = from[p.length]
@@ -554,7 +490,7 @@ export const Node: NodeInterface = {
    * Get the parent of a node at a specific path.
    */
 
-  parent(root: Node, path: Path): Ancestor {
+  parent<N extends Node>(root: N, path: Path): AncestorOf<N> {
     const parentPath = Path.parent(path)
     const p = Node.get(root, parentPath)
 
@@ -564,7 +500,21 @@ export const Node: NodeInterface = {
       )
     }
 
-    return p
+    return p as AncestorOf<N>
+  },
+
+  /**
+   * Extract the custom properties from a node.
+   */
+
+  props<N extends Node>(node: N): NodeProps<N> {
+    if (Text.isText(node)) {
+      const { text, ...props } = node
+      return props as NodeProps<N>
+    } else {
+      const { children, ...props } = node as AncestorOf<N>
+      return (props as unknown) as NodeProps<N>
+    }
   },
 
   /**
@@ -587,22 +537,82 @@ export const Node: NodeInterface = {
    * Return a generator of all leaf text nodes in a root node.
    */
 
-  *texts(
-    root: Node,
+  *texts<N extends Node>(
+    root: N,
     options: {
       from?: Path
       to?: Path
       reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
+      pass?: (node: NodeEntry<NodeOf<N>>) => boolean
     } = {}
-  ): Generator<NodeEntry<Text>, void, undefined> {
+  ): Generator<NodeEntry<TextOf<N>>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
-        yield [node, path]
+        yield [node as TextOf<N>, path]
       }
     }
   },
 }
+
+/**
+ * `NodeEntry` objects are returned when iterating over the nodes in a Slate
+ * document tree. They consist of the node and its `Path` relative to the root
+ * node in the document.
+ */
+
+export type NodeEntry<N extends Node = Node> = [N, Path]
+
+/**
+ * A utility type to get all the node types from a root node type.
+ */
+
+export type NodeOf<N extends Node> = Editor<Value> extends N
+  ? Editor<Value> | Element | Text
+  : Element extends N
+  ? Element | Text
+  : Text extends N
+  ? Text
+  : N | DescendantOf<N>
+
+/**
+ * Convenience type for returning the props of a node.
+ */
+
+export type NodeProps<N extends Node> = N extends Editor<Value>
+  ? Omit<N, 'children'>
+  : N extends Element
+  ? Omit<N, 'children'>
+  : Omit<N, 'text'>
+
+/**
+ * A helper type for narrowing matched nodes with a predicate.
+ */
+
+export type NodeMatch<T extends Node> =
+  | ((node: Node, path: Path) => node is T)
+  | ((node: Node, path: Path) => boolean)
+
+/**
+ * The `Ancestor` union type represents nodes that are ancestors in the tree.
+ * It is returned as a convenience in certain cases to narrow a value further
+ * than the more generic `Node` union.
+ */
+
+export type Ancestor = Editor<Value> | Element
+
+/**
+ * A utility type to get all the ancestor node types from a root node type.
+ */
+
+export type AncestorOf<N extends Node> = Editor<Value> extends N
+  ? Editor<Value> | Element
+  : Element extends N
+  ? Element
+  : N extends Editor<Value>
+  ? N | N['children'][number] | ElementOf<N['children'][number]>
+  : N extends Element
+  ? N | ElementOf<N>
+  : never
 
 /**
  * The `Descendant` union type represents nodes that are descendants in the
@@ -613,25 +623,24 @@ export const Node: NodeInterface = {
 export type Descendant = Element | Text
 
 /**
- * The `Ancestor` union type represents nodes that are ancestors in the tree.
- * It is returned as a convenience in certain cases to narrow a value further
- * than the more generic `Node` union.
+ * A utility type to get all the descendant node types from a root node type.
  */
 
-export type Ancestor = Editor | Element
+export type DescendantOf<N extends Node> = N extends Editor<Value>
+  ? ElementOf<N> | TextOf<N>
+  : N extends Element
+  ? ElementOf<N['children'][number]> | TextOf<N>
+  : never
 
 /**
- * `NodeEntry` objects are returned when iterating over the nodes in a Slate
- * document tree. They consist of the node and its `Path` relative to the root
- * node in the document.
+ * A utility type to get the child node types from a root node type.
  */
 
-export type NodeEntry<T extends Node = Node> = [T, Path]
-
-/**
- * Convenience type for returning the props of a node.
- */
-export type NodeProps =
-  | Omit<Editor, 'children'>
-  | Omit<Element, 'children'>
-  | Omit<Text, 'text'>
+export type ChildOf<
+  N extends Node,
+  I extends number = number
+> = N extends Editor<Value>
+  ? N['children'][I]
+  : N extends Element
+  ? N['children'][I]
+  : never

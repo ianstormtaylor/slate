@@ -1,10 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import {
-  Transforms,
-  createEditor,
-  Element as SlateElement,
-  Descendant,
-} from 'slate'
+import { Transforms, createEditor, Value } from 'slate'
 import {
   Slate,
   Editable,
@@ -14,12 +9,12 @@ import {
 } from 'slate-react'
 
 const EmbedsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
-        renderElement={props => <Element {...props} />}
+        renderElement={renderElement}
         placeholder="Enter some text..."
       />
     </Slate>
@@ -32,7 +27,7 @@ const withEmbeds = editor => {
   return editor
 }
 
-const Element = props => {
+const renderElement = props => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'video':
@@ -70,10 +65,7 @@ const VideoElement = ({ attributes, children, element }) => {
           url={url}
           onChange={val => {
             const path = ReactEditor.findPath(editor, element)
-            const newProperties: Partial<SlateElement> = {
-              url: val,
-            }
-            Transforms.setNodes(editor, newProperties, { at: path })
+            Transforms.setNodes(editor, { url: val }, { at: path })
           }}
         />
       </div>
@@ -101,7 +93,7 @@ const UrlInput = ({ url, onChange }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

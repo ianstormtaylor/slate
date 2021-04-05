@@ -5,9 +5,12 @@ import {
   NodeEntry,
   Node,
   Range,
-  Text,
   Transforms,
   Path,
+  ElementOf,
+  TextOf,
+  NodeOf,
+  Value,
 } from 'slate'
 import getDirection from 'direction'
 import { HistoryEditor } from 'slate-history'
@@ -28,6 +31,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
+import { PLACEHOLDER_SYMBOL } from '../utils/symbols'
 import {
   DOMElement,
   DOMNode,
@@ -35,7 +39,6 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  DOMStaticRange,
   isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
@@ -44,7 +47,6 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   IS_FOCUSED,
-  PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
@@ -60,9 +62,9 @@ const HAS_BEFORE_INPUT_SUPPORT = !(
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
-export interface RenderElementProps {
+export interface RenderElementProps<V extends Value> {
   children: any
-  element: Element
+  element: ElementOf<Editor<V>>
   attributes: {
     'data-slate-node': 'element'
     'data-slate-inline'?: true
@@ -72,32 +74,40 @@ export interface RenderElementProps {
   }
 }
 
+export type RenderElementFn<V extends Value> = (
+  props: RenderElementProps<V>
+) => JSX.Element
+
 /**
  * `RenderLeafProps` are passed to the `renderLeaf` handler.
  */
 
-export interface RenderLeafProps {
+export interface RenderLeafProps<V extends Value> {
   children: any
-  leaf: Text
-  text: Text
+  leaf: TextOf<Editor<V>>
+  text: TextOf<Editor<V>>
   attributes: {
     'data-slate-leaf': true
   }
 }
 
+export type RenderLeafFn<V extends Value> = (
+  props: RenderLeafProps<V>
+) => JSX.Element
+
 /**
  * `EditableProps` are passed to the `<Editable>` component.
  */
 
-export type EditableProps = {
-  decorate?: (entry: NodeEntry) => Range[]
+export type EditableProps<V extends Value> = {
+  decorate?: (entry: NodeEntry<NodeOf<Editor<V>>>) => Range[]
   onDOMBeforeInput?: (event: InputEvent) => void
   placeholder?: string
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: RenderElementFn<V>
+  renderLeaf?: RenderLeafFn<V>
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
@@ -105,7 +115,7 @@ export type EditableProps = {
  * Editable.
  */
 
-export const Editable = (props: EditableProps) => {
+export const Editable = <V extends Value>(props: EditableProps<V>) => {
   const {
     autoFocus,
     decorate = defaultDecorate,
@@ -118,7 +128,7 @@ export const Editable = (props: EditableProps) => {
     as: Component = 'div',
     ...attributes
   } = props
-  const editor = useSlate()
+  const editor = useSlate<V>()
   const ref = useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
@@ -188,7 +198,7 @@ export const Editable = (props: EditableProps) => {
     // then its children might just change - DOM responds to it on its own
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
-    if (selection && !ReactEditor.hasRange(editor, selection)) {
+    if (selection && !Range.exists(selection, editor)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection)
       return
     }
@@ -223,6 +233,7 @@ export const Editable = (props: EditableProps) => {
         scrollMode: 'if-needed',
         boundary: el,
       })
+      // @ts-ignore
       delete leafEl.getBoundingClientRect
     } else {
       domSelection.removeAllRanges()
@@ -471,7 +482,7 @@ export const Editable = (props: EditableProps) => {
     }
   }, [onDOMSelectionChange])
 
-  const decorations = decorate([editor, []])
+  const decorations = decorate([editor as NodeOf<Editor<V>>, []])
 
   if (
     placeholder &&
@@ -480,17 +491,19 @@ export const Editable = (props: EditableProps) => {
     Node.string(editor) === ''
   ) {
     const start = Editor.start(editor, [])
-    decorations.push({
-      [PLACEHOLDER_SYMBOL]: true,
+    const range = {
+      [PLACEHOLDER_SYMBOL]: placeholder,
       placeholder,
       anchor: start,
       focus: start,
-    })
+    }
+
+    decorations.push(range)
   }
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <DecorateContext.Provider value={decorate}>
+      <DecorateContext.Provider value={decorate as any}>
         <Component
           // COMPAT: The Grammarly Chrome extension works by changing the DOM
           // out from under `contenteditable` elements, which leads to weird
@@ -827,7 +840,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.redo()
+                    ;(editor as any).redo()
                   }
 
                   return
@@ -837,7 +850,7 @@ export const Editable = (props: EditableProps) => {
                   event.preventDefault()
 
                   if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.undo()
+                    ;(editor as any).undo()
                   }
 
                   return
@@ -1039,7 +1052,9 @@ export const Editable = (props: EditableProps) => {
           {useChildren({
             decorations,
             node: editor,
+            // @ts-ignore
             renderElement,
+            // @ts-ignore
             renderLeaf,
             selection: editor.selection,
           })}
@@ -1056,28 +1071,11 @@ export const Editable = (props: EditableProps) => {
 const defaultDecorate: (entry: NodeEntry) => Range[] = () => []
 
 /**
- * Check if two DOM range objects are equal.
- */
-
-const isRangeEqual = (a: DOMRange, b: DOMRange) => {
-  return (
-    (a.startContainer === b.startContainer &&
-      a.startOffset === b.startOffset &&
-      a.endContainer === b.endContainer &&
-      a.endOffset === b.endOffset) ||
-    (a.startContainer === b.endContainer &&
-      a.startOffset === b.endOffset &&
-      a.endContainer === b.startContainer &&
-      a.endOffset === b.startOffset)
-  )
-}
-
-/**
  * Check if the target is in the editor.
  */
 
-const hasTarget = (
-  editor: ReactEditor,
+const hasTarget = <V extends Value>(
+  editor: ReactEditor<V>,
   target: EventTarget | null
 ): target is DOMNode => {
   return isDOMNode(target) && ReactEditor.hasDOMNode(editor, target)
@@ -1087,8 +1085,8 @@ const hasTarget = (
  * Check if the target is editable and in the editor.
  */
 
-const hasEditableTarget = (
-  editor: ReactEditor,
+const hasEditableTarget = <V extends Value>(
+  editor: ReactEditor<V>,
   target: EventTarget | null
 ): target is DOMNode => {
   return (
@@ -1101,8 +1099,8 @@ const hasEditableTarget = (
  * Check if the target is inside void and in the editor.
  */
 
-const isTargetInsideVoid = (
-  editor: ReactEditor,
+const isTargetInsideVoid = <V extends Value>(
+  editor: ReactEditor<V>,
   target: EventTarget | null
 ): boolean => {
   const slateNode =

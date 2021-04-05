@@ -11,19 +11,18 @@ import {
   NodeEntry,
   Path,
   Ancestor,
+  Value,
+  AncestorOf,
 } from '..'
+import { ElementOf } from '../interfaces/element'
 
-export interface GeneralTransforms {
-  transform: (editor: Editor, op: Operation) => void
-}
-
-export const GeneralTransforms: GeneralTransforms = {
+export const GeneralTransforms = {
   /**
    * Transform the editor by an operation.
    */
 
-  transform(editor: Editor, op: Operation): void {
-    editor.children = createDraft(editor.children)
+  transform<V extends Value>(editor: Editor<V>, op: Operation): void {
+    editor.children = createDraft(editor.children) as V
     let selection = editor.selection && createDraft(editor.selection)
 
     switch (op.type) {
@@ -69,6 +68,7 @@ export const GeneralTransforms: GeneralTransforms = {
         if (Text.isText(node) && Text.isText(prev)) {
           prev.text += node.text
         } else if (!Text.isText(node) && !Text.isText(prev)) {
+          // @ts-ignore
           prev.children.push(...node.children)
         } else {
           throw new Error(
@@ -200,6 +200,7 @@ export const GeneralTransforms: GeneralTransforms = {
           if (value == null) {
             delete node[key]
           } else {
+            // @ts-ignore
             node[key] = value
           }
         }
@@ -266,9 +267,12 @@ export const GeneralTransforms: GeneralTransforms = {
             text: after,
           }
         } else {
-          const before = node.children.slice(0, position)
-          const after = node.children.slice(position)
-          node.children = before
+          const before = (node as AncestorOf<Editor<V>>).children.slice(
+            0,
+            position
+          )
+          const after = (node as AncestorOf<Editor<V>>).children.slice(position)
+          ;(node as ElementOf<Editor<V>>).children = before
 
           newNode = {
             ...(properties as Partial<Element>),
@@ -288,7 +292,7 @@ export const GeneralTransforms: GeneralTransforms = {
       }
     }
 
-    editor.children = finishDraft(editor.children)
+    editor.children = finishDraft(editor.children) as V
 
     if (selection) {
       editor.selection = isDraft(selection)

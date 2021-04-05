@@ -1,19 +1,19 @@
-import { BaseEditor, Editor } from 'slate'
+import { Editor, Value } from 'slate'
 import { History } from './history'
 
 /**
  * Weakmaps for attaching state to the editor.
  */
 
-export const HISTORY = new WeakMap<Editor, History>()
-export const SAVING = new WeakMap<Editor, boolean | undefined>()
-export const MERGING = new WeakMap<Editor, boolean | undefined>()
+export const HISTORY = new WeakMap<HistoryEditor<Value>, History>()
+export const SAVING = new WeakMap<HistoryEditor<Value>, boolean | undefined>()
+export const MERGING = new WeakMap<HistoryEditor<Value>, boolean | undefined>()
 
 /**
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
 
-export interface HistoryEditor extends BaseEditor {
+export type HistoryEditor<V extends Value> = Editor<V> & {
   history: History
   undo: () => void
   redo: () => void
@@ -24,7 +24,7 @@ export const HistoryEditor = {
    * Check if a value is a `HistoryEditor` object.
    */
 
-  isHistoryEditor(value: any): value is HistoryEditor {
+  isHistoryEditor(value: any): value is HistoryEditor<Value> {
     return History.isHistory(value.history) && Editor.isEditor(value)
   },
 
@@ -32,7 +32,7 @@ export const HistoryEditor = {
    * Get the merge flag's current value.
    */
 
-  isMerging(editor: HistoryEditor): boolean | undefined {
+  isMerging<V extends Value>(editor: HistoryEditor<V>): boolean | undefined {
     return MERGING.get(editor)
   },
 
@@ -40,7 +40,7 @@ export const HistoryEditor = {
    * Get the saving flag's current value.
    */
 
-  isSaving(editor: HistoryEditor): boolean | undefined {
+  isSaving<V extends Value>(editor: HistoryEditor<V>): boolean | undefined {
     return SAVING.get(editor)
   },
 
@@ -48,7 +48,7 @@ export const HistoryEditor = {
    * Redo to the previous saved state.
    */
 
-  redo(editor: HistoryEditor): void {
+  redo<V extends Value>(editor: HistoryEditor<V>): void {
     editor.redo()
   },
 
@@ -56,7 +56,7 @@ export const HistoryEditor = {
    * Undo to the previous saved state.
    */
 
-  undo(editor: HistoryEditor): void {
+  undo<V extends Value>(editor: HistoryEditor<V>): void {
     editor.undo()
   },
 
@@ -65,7 +65,10 @@ export const HistoryEditor = {
    * the new operations into previous save point in the history.
    */
 
-  withoutMerging(editor: HistoryEditor, fn: () => void): void {
+  withoutMerging<V extends Value>(
+    editor: HistoryEditor<V>,
+    fn: () => void
+  ): void {
     const prev = HistoryEditor.isMerging(editor)
     MERGING.set(editor, false)
     fn()
@@ -77,7 +80,10 @@ export const HistoryEditor = {
    * their operations into the history.
    */
 
-  withoutSaving(editor: HistoryEditor, fn: () => void): void {
+  withoutSaving<V extends Value>(
+    editor: HistoryEditor<V>,
+    fn: () => void
+  ): void {
     const prev = HistoryEditor.isSaving(editor)
     SAVING.set(editor, false)
     fn()

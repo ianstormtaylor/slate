@@ -1,5 +1,5 @@
 import React from 'react'
-import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
+import { Editor, Range, Element, Ancestor, Descendant, Value } from 'slate'
 
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
@@ -7,7 +7,7 @@ import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
 import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
-import { RenderElementProps, RenderLeafProps } from '../components/editable'
+import { RenderElementFn, RenderLeafFn } from '../components/editable'
 
 /**
  * Children.
@@ -16,8 +16,8 @@ import { RenderElementProps, RenderLeafProps } from '../components/editable'
 const useChildren = (props: {
   decorations: Range[]
   node: Ancestor
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: RenderElementFn<Value>
+  renderLeaf?: RenderLeafFn<Value>
   selection: Range | null
 }) => {
   const { decorations, node, renderElement, renderLeaf, selection } = props

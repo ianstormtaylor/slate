@@ -1,5 +1,44 @@
 import isPlainObject from 'is-plain-object'
-import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
+import { Editor, Node, Path, Text, Value } from '..'
+import { DescendantOf } from './node'
+
+/**
+ * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
+ * found inside a root node.
+ */
+
+export type ElementEntry = [Element, Path]
+
+/**
+ * A utility type to get all the element nodes type from a root node.
+ */
+
+export type ElementOf<N extends Node> = Editor<Value> extends N
+  ? Element
+  : Element extends N
+  ? Element
+  : N extends Editor<Value>
+  ? N['children'][number] | ElementOf<N['children'][number]>
+  : N extends Element
+  ?
+      | N
+      | Extract<N['children'][number], Element>
+      | ElementOf<Extract<N['children'][number], Element>>
+  : never
+
+function isElement<V extends Value>(
+  value: DescendantOf<Editor<V>>
+): value is ElementOf<Editor<V>>
+function isElement<E extends Element>(value: E): value is E
+function isElement<N extends Node>(value: N): value is Extract<N, Element>
+function isElement(value: any): value is Element
+function isElement(value: any) {
+  return (
+    isPlainObject(value) &&
+    Node.isNodeList(value.children) &&
+    !Editor.isEditor(value)
+  )
+}
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -7,40 +46,16 @@ import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
  * depending on the Slate editor's configuration.
  */
 
-export interface BaseElement {
-  children: Descendant[]
+export interface Element {
+  children: Array<Element | Text>
 }
 
-export type Element = ExtendedType<'Element', BaseElement>
-
-export interface ElementInterface {
-  isAncestor: (value: any) => value is Ancestor
-  isElement: (value: any) => value is Element
-  isElementList: (value: any) => value is Element[]
-  isElementProps: (props: any) => props is Partial<Element>
-  matches: (element: Element, props: Partial<Element>) => boolean
-}
-
-export const Element: ElementInterface = {
-  /**
-   * Check if a value implements the 'Ancestor' interface.
-   */
-
-  isAncestor(value: any): value is Ancestor {
-    return isPlainObject(value) && Node.isNodeList(value.children)
-  },
-
+export const Element = {
   /**
    * Check if a value implements the `Element` interface.
    */
 
-  isElement(value: any): value is Element {
-    return (
-      isPlainObject(value) &&
-      Node.isNodeList(value.children) &&
-      !Editor.isEditor(value)
-    )
-  },
+  isElement,
 
   /**
    * Check if a value is an array of `Element` objects.
@@ -51,21 +66,13 @@ export const Element: ElementInterface = {
   },
 
   /**
-   * Check if a set of props is a partial of Element.
-   */
-
-  isElementProps(props: any): props is Partial<Element> {
-    return (props as Partial<Element>).children !== undefined
-  },
-
-  /**
    * Check if an element matches set of properties.
    *
    * Note: this checks custom properties, and it does not ensure that any
    * children are equivalent.
    */
 
-  matches(element: Element, props: Partial<Element>): boolean {
+  matches(element: Element, props: object): boolean {
     for (const key in props) {
       if (key === 'children') {
         continue
@@ -79,10 +86,3 @@ export const Element: ElementInterface = {
     return true
   },
 }
-
-/**
- * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
- * found inside a root node.
- */
-
-export type ElementEntry = [Element, Path]

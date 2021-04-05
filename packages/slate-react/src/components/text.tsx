@@ -1,9 +1,9 @@
 import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
+import { Range, Element, Text as SlateText, Value } from 'slate'
 
 import Leaf from './leaf'
 import { ReactEditor, useSlateStatic } from '..'
-import { RenderLeafProps } from './editable'
+import { RenderLeafFn } from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   KEY_TO_ELEMENT,
@@ -16,13 +16,13 @@ import { isDecoratorRangeListEqual } from '../utils/range-list'
  * Text.
  */
 
-const Text = (props: {
+const Text: React.FC<{
   decorations: Range[]
   isLast: boolean
   parent: Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: RenderLeafFn<Value>
   text: SlateText
-}) => {
+}> = props => {
   const { decorations, isLast, parent, renderLeaf, text } = props
   const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement>(null)

@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, Node, Range, Element as SlateElement, Value } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
@@ -15,23 +15,23 @@ import {
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
-import { RenderElementProps, RenderLeafProps } from './editable'
+import { RenderElementFn, RenderElementProps, RenderLeafFn } from './editable'
 
 /**
  * Element.
  */
 
-const Element = (props: {
+const Element: React.FC<{
   decorations: Range[]
   element: SlateElement
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: RenderElementFn<Value>
+  renderLeaf?: RenderLeafFn<Value>
   selection: Range | null
-}) => {
+}> = props => {
   const {
     decorations,
     element,
-    renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
+    renderElement = (p: RenderElementProps<Value>) => <DefaultElement {...p} />,
     renderLeaf,
     selection,
   } = props
@@ -142,7 +142,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
  * The default element renderer.
  */
 
-export const DefaultElement = (props: RenderElementProps) => {
+export const DefaultElement: React.FC<RenderElementProps<Value>> = props => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
   const Tag = editor.isInline(element) ? 'span' : 'div'

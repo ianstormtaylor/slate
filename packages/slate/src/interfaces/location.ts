@@ -11,11 +11,7 @@ import { Path, Point, Range } from '..'
 
 export type Location = Path | Point | Range
 
-export interface LocationInterface {
-  isLocation: (value: any) => value is Location
-}
-
-export const Location: LocationInterface = {
+export const Location = {
   /**
    * Check if a value implements the `Location` interface.
    */
@@ -32,11 +28,7 @@ export const Location: LocationInterface = {
 
 export type Span = [Path, Path]
 
-export interface SpanInterface {
-  isSpan: (value: any) => value is Span
-}
-
-export const Span: SpanInterface = {
+export const Span = {
   /**
    * Check if a value implements the `Span` interface.
    */

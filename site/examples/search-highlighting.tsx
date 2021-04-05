@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, Descendant, createEditor } from 'slate'
+import { Text, createEditor, Value } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const [search, setSearch] = useState<string | undefined>()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -66,12 +66,12 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable decorate={decorate} renderLeaf={renderLeaf} />
     </Slate>
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const renderLeaf = ({ attributes, children, leaf }) => {
   return (
     <span
       {...attributes}
@@ -85,7 +85,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

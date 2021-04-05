@@ -1,8 +1,24 @@
 import isPlainObject from 'is-plain-object'
 import isEqual from 'lodash/isEqual'
 import omit from 'lodash/omit'
-import { Range } from '..'
-import { ExtendedType } from './custom-types'
+import { Range, Editor, Element, Node, Value, NodeProps } from '..'
+import { Simplify, UnionToIntersection } from '../utils/types'
+
+/**
+ * A utility type to get all the text node types from a root node type.
+ */
+
+export type TextOf<N extends Node> = Editor<Value> extends N
+  ? Text
+  : Element extends N
+  ? Text
+  : N extends Editor<Value>
+  ? TextOf<N['children'][number]>
+  : N extends Element
+  ? Extract<N['children'][number], Text> | TextOf<N['children'][number]>
+  : N extends Text
+  ? N
+  : never
 
 /**
  * `Text` objects represent the nodes that contain the actual text content of a
@@ -10,22 +26,11 @@ import { ExtendedType } from './custom-types'
  * nodes in the document tree as they cannot contain any children.
  */
 
-export interface BaseText {
+export interface Text {
   text: string
 }
 
-export type Text = ExtendedType<'Text', BaseText>
-
-export interface TextInterface {
-  equals: (text: Text, another: Text, options?: { loose?: boolean }) => boolean
-  isText: (value: any) => value is Text
-  isTextList: (value: any) => value is Text[]
-  isTextProps: (props: any) => props is Partial<Text>
-  matches: (text: Text, props: Partial<Text>) => boolean
-  decorations: (node: Text, decorations: Range[]) => Text[]
-}
-
-export const Text: TextInterface = {
+export const Text = {
   /**
    * Check if two text nodes are equal.
    */
@@ -36,7 +41,6 @@ export const Text: TextInterface = {
     options: { loose?: boolean } = {}
   ): boolean {
     const { loose = false } = options
-
     return isEqual(
       loose ? omit(text, 'text') : text,
       loose ? omit(another, 'text') : another
@@ -60,21 +64,13 @@ export const Text: TextInterface = {
   },
 
   /**
-   * Check if some props are a partial of Text.
-   */
-
-  isTextProps(props: any): props is Partial<Text> {
-    return (props as Partial<Text>).text !== undefined
-  },
-
-  /**
    * Check if an text matches set of properties.
    *
    * Note: this is for matching custom properties, and it does not ensure that
    * the `text` property are two nodes equal.
    */
 
-  matches(text: Text, props: Partial<Text>): boolean {
+  matches<T extends Text>(text: T, props: object): boolean {
     for (const key in props) {
       if (key === 'text') {
         continue
@@ -92,8 +88,8 @@ export const Text: TextInterface = {
    * Get the leaves for a text node given decorations.
    */
 
-  decorations(node: Text, decorations: Range[]): Text[] {
-    let leaves: Text[] = [{ ...node }]
+  decorations<T extends Text>(node: T, decorations: Range[]): T[] {
+    let leaves: T[] = [{ ...node }]
 
     for (const dec of decorations) {
       const { anchor, focus, ...rest } = dec
@@ -163,3 +159,17 @@ export const Text: TextInterface = {
     return leaves
   },
 }
+
+/**
+ * A utility type to get all the mark types from a root node type.
+ */
+
+// export type MarksOf<N extends Node> = NodeProps<TextOf<N>> | {}
+
+export type MarksOf<N extends Node> = Simplify<
+  UnionToIntersection<NodeProps<TextOf<N>>>
+>
+
+export type MarkKeysOf<N extends Node> = {} extends MarksOf<N>
+  ? unknown
+  : keyof MarksOf<N>

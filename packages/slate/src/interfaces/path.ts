@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Operation } from '..'
+import { Operation, Node } from '..'
 
 /**
  * `Path` arrays are a list of indexes that describe a node's exact position in
@@ -9,42 +9,7 @@ import { Operation } from '..'
 
 export type Path = number[]
 
-export interface PathInterface {
-  ancestors: (path: Path, options?: { reverse?: boolean }) => Path[]
-  common: (path: Path, another: Path) => Path
-  compare: (path: Path, another: Path) => -1 | 0 | 1
-  endsAfter: (path: Path, another: Path) => boolean
-  endsAt: (path: Path, another: Path) => boolean
-  endsBefore: (path: Path, another: Path) => boolean
-  equals: (path: Path, another: Path) => boolean
-  hasPrevious: (path: Path) => boolean
-  isAfter: (path: Path, another: Path) => boolean
-  isAncestor: (path: Path, another: Path) => boolean
-  isBefore: (path: Path, another: Path) => boolean
-  isChild: (path: Path, another: Path) => boolean
-  isCommon: (path: Path, another: Path) => boolean
-  isDescendant: (path: Path, another: Path) => boolean
-  isParent: (path: Path, another: Path) => boolean
-  isPath: (value: any) => value is Path
-  isSibling: (path: Path, another: Path) => boolean
-  levels: (
-    path: Path,
-    options?: {
-      reverse?: boolean
-    }
-  ) => Path[]
-  next: (path: Path) => Path
-  parent: (path: Path) => Path
-  previous: (path: Path) => Path
-  relative: (path: Path, ancestor: Path) => Path
-  transform: (
-    path: Path,
-    operation: Operation,
-    options?: { affinity?: 'forward' | 'backward' | null }
-  ) => Path | null
-}
-
-export const Path: PathInterface = {
+export const Path = {
   /**
    * Get a list of ancestor paths for a given path.
    *
@@ -151,6 +116,14 @@ export const Path: PathInterface = {
     return (
       path.length === another.length && path.every((n, i) => n === another[i])
     )
+  },
+
+  /**
+   * Check if a path exists in a root node.
+   */
+
+  exists(path: Path, root: Node): boolean {
+    return Node.has(root, path)
   },
 
   /**

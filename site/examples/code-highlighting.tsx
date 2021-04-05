@@ -1,21 +1,19 @@
 import Prism from 'prismjs'
+import React, { useState, useCallback, useMemo } from 'react'
+import { Slate, Editable, withReact } from 'slate-react'
+import { Text, createEditor, Value } from 'slate'
+import { withHistory } from 'slate-history'
+import { css } from 'emotion'
+
 import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
-import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor, Element as SlateElement, Descendant } from 'slate'
-import { withHistory } from 'slate-history'
-import { css } from 'emotion'
 
 const CodeHighlightingExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const [language, setLanguage] = useState('html')
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
-  // decorate function depends on the language selected
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []
@@ -87,8 +85,7 @@ const getLength = token => {
   }
 }
 
-// different token types, styles found on Prismjs website
-const Leaf = ({ attributes, children, leaf }) => {
+const renderLeaf = ({ attributes, children, leaf }) => {
   return (
     <span
       {...attributes}
@@ -99,7 +96,7 @@ const Leaf = ({ attributes, children, leaf }) => {
         ${leaf.comment &&
           css`
             color: slategray;
-          `} 
+          `}
 
         ${(leaf.operator || leaf.url) &&
           css`
@@ -142,9 +139,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
-    type: 'paragraph',
+    type: 'code',
     children: [
       {
         text: '<h1>Hi!</h1>',
@@ -153,7 +150,7 @@ const initialValue: Descendant[] = [
   },
 ]
 
-// modifications and additions to prism library
+export default CodeHighlightingExample
 
 Prism.languages.python = Prism.languages.extend('python', {})
 Prism.languages.insertBefore('python', 'prolog', {
@@ -234,5 +231,3 @@ Prism.languages.markdown.bold.inside.italic = Prism.util.clone(
   Prism.languages.markdown.italic
 )
 Prism.languages.markdown.italic.inside.bold = Prism.util.clone(Prism.languages.markdown.bold); // prettier-ignore
-
-export default CodeHighlightingExample

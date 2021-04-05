@@ -6,17 +6,13 @@ import { Operation, Range } from '..'
  * at any time for the up-to-date range value.
  */
 
-export interface RangeRef {
+export type RangeRef = {
   current: Range | null
   affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
   unref(): Range | null
 }
 
-export interface RangeRefInterface {
-  transform: (ref: RangeRef, op: Operation) => void
-}
-
-export const RangeRef: RangeRefInterface = {
+export const RangeRef = {
   /**
    * Transform the range ref's current value by an operation.
    */

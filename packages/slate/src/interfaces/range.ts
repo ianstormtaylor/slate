@@ -1,6 +1,6 @@
 import { produce } from 'immer'
 import isPlainObject from 'is-plain-object'
-import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
+import { Operation, Node, Path, Point, PointEntry } from '..'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -8,41 +8,12 @@ import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
  * multiple nodes.
  */
 
-export interface BaseRange {
+export type Range = {
   anchor: Point
   focus: Point
 }
 
-export type Range = ExtendedType<'Range', BaseRange>
-
-export interface RangeInterface {
-  edges: (
-    range: Range,
-    options?: {
-      reverse?: boolean
-    }
-  ) => [Point, Point]
-  end: (range: Range) => Point
-  equals: (range: Range, another: Range) => boolean
-  includes: (range: Range, target: Path | Point | Range) => boolean
-  intersection: (range: Range, another: Range) => Range | null
-  isBackward: (range: Range) => boolean
-  isCollapsed: (range: Range) => boolean
-  isExpanded: (range: Range) => boolean
-  isForward: (range: Range) => boolean
-  isRange: (value: any) => value is Range
-  points: (range: Range) => Generator<PointEntry, void, undefined>
-  start: (range: Range) => Point
-  transform: (
-    range: Range,
-    op: Operation,
-    options?: {
-      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
-    }
-  ) => Range | null
-}
-
-export const Range: RangeInterface = {
+export const Range = {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
@@ -79,6 +50,15 @@ export const Range: RangeInterface = {
       Point.equals(range.anchor, another.anchor) &&
       Point.equals(range.focus, another.focus)
     )
+  },
+
+  /**
+   * Check if a range exists in a root node.
+   */
+
+  exists(range: Range, root: Node): boolean {
+    const { anchor, focus } = range
+    return Point.exists(anchor, root) && Point.exists(focus, root)
   },
 
   /**

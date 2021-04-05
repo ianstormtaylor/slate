@@ -1,26 +1,26 @@
 import React, { useRef, useEffect } from 'react'
-import { Element, Text } from 'slate'
+import { Element, Text, Value } from 'slate'
 import String from './string'
-import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
-import { RenderLeafProps } from './editable'
+import { PLACEHOLDER_SYMBOL } from '../utils/symbols'
+import { RenderLeafFn, RenderLeafProps } from './editable'
 
 /**
  * Individual leaves in a text node with unique formatting.
  */
 
-const Leaf = (props: {
+const Leaf: React.FC<{
   isLast: boolean
   leaf: Text
   parent: Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: RenderLeafFn<Value>
   text: Text
-}) => {
+}> = props => {
   const {
     leaf,
     isLast,
     text,
     parent,
-    renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
+    renderLeaf = (props: RenderLeafProps<Value>) => <DefaultLeaf {...props} />,
   } = props
 
   const placeholderRef = useRef<HTMLSpanElement | null>(null)
@@ -66,7 +66,7 @@ const Leaf = (props: {
             position: 'absolute',
           }}
         >
-          {leaf.placeholder}
+          {leaf.placeholder as string}
         </span>
         {children}
       </React.Fragment>
@@ -97,7 +97,7 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
   )
 })
 
-export const DefaultLeaf = (props: RenderLeafProps) => {
+export const DefaultLeaf = (props: RenderLeafProps<Value>) => {
   const { attributes, children } = props
   return <span {...attributes}>{children}</span>
 }

@@ -1,18 +1,18 @@
 import { createContext, useContext } from 'react'
+import { Value } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
-import { Editor } from 'slate'
 
 /**
  * A React context for sharing the editor object.
  */
 
-export const EditorContext = createContext<ReactEditor | null>(null)
+export const EditorContext = createContext<ReactEditor<Value> | null>(null)
 
 /**
  * Get the current editor object from the React context.
  */
 
-export const useSlateStatic = (): Editor => {
+export const useSlateStatic = <V extends Value>(): ReactEditor<V> => {
   const editor = useContext(EditorContext)
 
   if (!editor) {
@@ -21,5 +21,5 @@ export const useSlateStatic = (): Editor => {
     )
   }
 
-  return editor
+  return editor as ReactEditor<V>
 }
