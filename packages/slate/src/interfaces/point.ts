@@ -99,78 +99,66 @@ export const Point = {
   ): Point | null {
     return produce(point, p => {
       const { affinity = 'forward' } = options
+      const { path, offset } = p
 
       switch (op.type) {
         case 'insert_node':
         case 'move_node': {
-          p.path = Path.transform(point.path, op, options)!
+          p.path = Path.transform(path, op, options)!
           break
         }
 
         case 'insert_text': {
-          const { path, text, offset } = op
-
-          if (Path.equals(path, path) && offset <= offset) {
-            p.offset += text.length
+          if (Path.equals(op.path, path) && op.offset <= offset) {
+            p.offset += op.text.length
           }
 
           break
         }
 
         case 'merge_node': {
-          const { path, position } = op
-
-          if (Path.equals(path, point.path)) {
-            p.offset += position
+          if (Path.equals(op.path, path)) {
+            p.offset += op.position
           }
 
-          p.path = Path.transform(point.path, op, options)!
+          p.path = Path.transform(path, op, options)!
           break
         }
 
         case 'remove_text': {
-          const { path, offset, text } = op
-
-          if (Path.equals(path, point.path) && offset <= point.offset) {
-            p.offset -= Math.min(point.offset - offset, text.length)
+          if (Path.equals(op.path, path) && op.offset <= offset) {
+            p.offset -= Math.min(offset - op.offset, op.text.length)
           }
 
           break
         }
 
         case 'remove_node': {
-          const { path } = op
-
-          if (
-            Path.equals(path, point.path) ||
-            Path.isAncestor(path, point.path)
-          ) {
+          if (Path.equals(op.path, path) || Path.isAncestor(op.path, path)) {
             return null
           }
 
-          p.path = Path.transform(point.path, op, options)!
+          p.path = Path.transform(path, op, options)!
           break
         }
 
         case 'split_node': {
-          const { path, position } = op
-
-          if (Path.equals(path, point.path)) {
-            if (position === point.offset && affinity == null) {
+          if (Path.equals(op.path, path)) {
+            if (op.position === offset && affinity == null) {
               return null
             } else if (
-              position < point.offset ||
-              (position === point.offset && affinity === 'forward')
+              op.position < offset ||
+              (op.position === offset && affinity === 'forward')
             ) {
-              p.offset -= position
+              p.offset -= op.position
 
-              p.path = Path.transform(point.path, op, {
+              p.path = Path.transform(path, op, {
                 ...options,
                 affinity: 'forward',
               })!
             }
           } else {
-            p.path = Path.transform(point.path, op, options)!
+            p.path = Path.transform(path, op, options)!
           }
 
           break
