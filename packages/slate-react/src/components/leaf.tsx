@@ -81,8 +81,9 @@ const Leaf = (props: {
   } = {
     'data-slate-leaf': true,
   }
+  let element = parent
 
-  return renderLeaf({ attributes, children, leaf, text })
+  return renderLeaf({ attributes, children, leaf, text, element })
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
