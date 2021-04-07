@@ -133,9 +133,9 @@ Transforms.moveNodes(editor, {
 })
 ```
 
-Although it looks like it simply takes a path and moves it to another place. Under the hood two things are happening:
+Although it looks like it simply takes a path and moves it to another place. Under the hood two things are happening…
 
-1. The `at` option is expanded to be a range representing all of the content inside the node at `[2]`. Which might look something like:
+First, the `at` option is expanded to be a range representing all of the content inside the node at `[2]`. Which might look something like:
 
 ```js
 at: {
@@ -144,7 +144,7 @@ at: {
 }
 ```
 
-2. The `match` option is defaulted to a function that only matches the specific path, in this case `[2]`:
+Second, the `match` option is defaulted to a function that only matches the specific path, in this case `[2]`:
 
 ```js
 match: (node, path) => Path.equals(path, [2])
