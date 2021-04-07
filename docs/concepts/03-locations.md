@@ -83,7 +83,7 @@ Here's how Mozilla Developer Network explains it:
 
 One important distinction is that the anchor and focus points of ranges **always reference the leaf-level text nodes** in a document and never reference elements. This behavior is different than the DOM, but it simplifies working with ranges as there are fewer edge cases for you to handle.
 
-> 🤖 For more info, check out the [`Range` reference](https://github.com/ianstormtaylor/slate/tree/d82ffe49a5253de08adab8f36ac7f07879037977/docs/reference/slate/range.md).
+> 🤖 For more info, check out the [`Range` reference](../api/range.md).
 
 ## Selection
 
