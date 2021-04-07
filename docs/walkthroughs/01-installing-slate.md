@@ -47,7 +47,7 @@ const App = () => {
 
 Of course we haven't rendered anything, so you won't see any changes.
 
-> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` as per the documentation on [TypeScript](https://github.com/ianstormtaylor/slate/tree/4b92b752ef234dae57149c713a260b7bacb3f810/concepts/11-typescript/README.md). The example below also includes the custom types required for the rest of this example.
+> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` as per the documentation on [TypeScript](../concepts/11-typescript/README.md). The example below also includes the custom types required for the rest of this example.
 
 ```typescript
 // TypeScript Users only add this code
