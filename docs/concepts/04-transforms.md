@@ -175,7 +175,7 @@ For example, consider wanting to add a bold mark to any text nodes that aren't a
 
 ```js
 Transform.setNodes(editor, {
-  // This path references the editor, and is expanded to a range that range
+  // This path references the editor, and is expanded to a range that
   // will encompass all the content of the editor.
   at: [],
   // This only matches text nodes that are not already italic.
