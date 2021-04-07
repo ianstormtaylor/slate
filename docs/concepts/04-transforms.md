@@ -4,6 +4,8 @@ Slate's data structure is immutable, so you can't modify or delete nodes directl
 
 Slate's transform functions are designed to be very flexible, to make it possible to represent all kinds of changes you might need to make to your editor. However, that flexibility can be hard to understand at first.
 
+> 🤖 Check out the [Transforms](../api/transforms.md) reference for a full list of Slate's transforms.
+
 ## Selection Transforms
 
 Selection-related transforms are some of the simpler ones. For example, here's how you set the selection to a new range:
@@ -27,8 +29,6 @@ Transforms.move(editor, {
 })
 ```
 
-> 🤖
-
 ## Text Transforms
 
 Text transforms act on the text content of the editor. For example, here's how you'd insert a string of text as a specific point:
@@ -49,8 +49,6 @@ Transforms.delete(editor, {
   },
 })
 ```
-
-> 🤖
 
 ## Node Transforms
 
@@ -76,8 +74,6 @@ Transforms.moveNodes(editor, {
   to: [0, 1],
 })
 ```
-
-> 🤖
 
 ## The `at` Option
 
