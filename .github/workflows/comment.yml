@@ -11,7 +11,7 @@ jobs:
     name: rebase
     runs-on: ubuntu-latest
     if: |
-      github.event.issue.pull_request &&
+      github.event.issue.pull_request != ''  &&
       startsWith(github.event.comment.body, '/rebase')
     steps:
       - name: Checkout repo
@@ -28,7 +28,7 @@ jobs:
     name: release:next
     runs-on: ubuntu-latest
     if: |
-      github.event.issue.pull_request &&
+      github.event.issue.pull_request != '' &&
       github.event.sender.login === 'ianstormtaylor' &&
       startsWith(github.event.comment.body, '/release:next')
     steps:
