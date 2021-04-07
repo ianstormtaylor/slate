@@ -75,16 +75,22 @@ export const Text: TextInterface = {
    */
 
   matches(text: Text, props: Partial<Text>): boolean {
-    for (const key in props) {
+    const keySet = new Set<string>()
+    Object.keys(text).forEach(key => {
+      keySet.add(key)
+    })
+    Object.keys(props).forEach(key => {
+      keySet.add(key)
+    })
+    for (let key of keySet.keys()) {
       if (key === 'text') {
         continue
       }
 
-      if (!text.hasOwnProperty(key) || text[key] !== props[key]) {
+      if (text[key] !== props[key]) {
         return false
       }
     }
-
     return true
   },
 
