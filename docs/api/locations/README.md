@@ -6,7 +6,7 @@ The `Location` interface is a union of the ways to refer to a specific location 
 type Location = Path | Point | Range
 ```
 
-- [Location](https://github.com/ianstormtaylor/slate/tree/5b6b29d33ddcdb9f7f3601477f1ae93c7d5fe45b/docs/api/api/location.md)
-- [Path](https://github.com/ianstormtaylor/slate/tree/5b6b29d33ddcdb9f7f3601477f1ae93c7d5fe45b/docs/api/api/path.md)
-- [Point](https://github.com/ianstormtaylor/slate/tree/5b6b29d33ddcdb9f7f3601477f1ae93c7d5fe45b/docs/api/api/point.md)
-- [Range](https://github.com/ianstormtaylor/slate/tree/5b6b29d33ddcdb9f7f3601477f1ae93c7d5fe45b/docs/api/api/range.md)
+- [Location](/api/location.md)
+- [Path](/api/path.md)
+- [Point](/api/point.md)
+- [Range](/api/range.md)
