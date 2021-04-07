@@ -1,6 +1,6 @@
 # Commands
 
-While editing richtext content, your users will be doing things like inserting text, deleting text, splitting paragraphs, adding formatting, etc. These edits are expressed using two concepts: commands and operations.
+While editing richtext content, your users will be doing things like inserting text, deleting text, splitting paragraphs, adding formatting, etc. Under the cover these edits are expressed using transforms and operations. But at a high level we talk about them as "commands".
 
 Commands are the high-level actions that represent a specific intent of the user. They are represented as helper functions on the `Editor` interface. A handful of helpers are included in core for common richtext behaviors, but you are encouraged to write your own that model your specific domain.
 
