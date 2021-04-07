@@ -174,13 +174,17 @@ Using `match` can make representing complex logic a lot simpler.
 For example, consider wanting to add a bold mark to any text nodes that aren't already italic:
 
 ```js
-Transform.setNodes(editor, {
-  // This path references the editor, and is expanded to a range that
-  // will encompass all the content of the editor.
-  at: [],
-  // This only matches text nodes that are not already italic.
-  match: (node, path) => Text.isText(node) && node.italic !== true,
-})
+Transform.setNodes(
+  editor,
+  { bold: true },
+  {
+    // This path references the editor, and is expanded to a range that
+    // will encompass all the content of the editor.
+    at: [],
+    // This only matches text nodes that are not already italic.
+    match: (node, path) => Text.isText(node) && node.italic !== true,
+  }
+)
 ```
 
 When performing transforms, if you're ever looping over nodes and transforming them one at a time, consider seeing if `match` can solve your use case, and offload the complexity of managing loops to Slate instead.
