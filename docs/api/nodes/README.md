@@ -9,7 +9,7 @@ type Descendant = Element | Text
 type Ancestor = Editor | Element
 ```
 
-- [Node](./api/node.md)
-- [Editor](./api/editor.md)
-- [Element](./api/element.md)
-- [Text](./api/text.md)
+- [Node](./node.md)
+- [Editor](./editor.md)
+- [Element](./element.md)
+- [Text](./text.md)

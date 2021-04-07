@@ -6,7 +6,7 @@ The `Location` interface is a union of the ways to refer to a specific location 
 type Location = Path | Point | Range
 ```
 
-- [Location](./api/location.md)
-- [Path](./api/path.md)
-- [Point](./api/point.md)
-- [Range](./api/range.md)
+- [Location](./location.md)
+- [Path](./path.md)
+- [Point](./point.md)
+- [Range](./range.md)

@@ -2,10 +2,9 @@
 
 Slate works with pure JSON objects. All it requires is that those JSON objects conform to certain interfaces. For example, a text node in Slate must obey the `Text` interface:
 
-```ts
+```typescript
 interface Text {
   text: string
-  [key: string]: unknown
 }
 ```
 
@@ -19,18 +18,17 @@ This interface-based approach separates Slate from most other richtext editors w
 
 To take another example, the `Element` node interface in Slate is:
 
-```ts
+```typescript
 interface Element {
   children: Node[]
-  [key: string]: unknown
 }
 ```
 
 This is a very permissive interface. All it requires is that the `children` property be defined containing the element's child nodes.
 
-But you can extend elements (or any other interface) with your own custom properties that are specific to your domain. For example, you might have "paragraph" and "link" elements:
+But you can extend elements \(or any other interface\) with your own custom properties that are specific to your domain. For example, you might have "paragraph" and "link" elements:
 
-```js
+```javascript
 const paragraph = {
   type: 'paragraph',
   children: [...],
@@ -57,7 +55,7 @@ In addition to the typing information, each interface in Slate also exposes a se
 
 For example, when working with nodes:
 
-```js
+```javascript
 import { Node } from 'slate'
 
 // Get the string content of an element node.
@@ -69,7 +67,7 @@ const descendant = Node.get(value, path)
 
 Or, when working with ranges:
 
-```js
+```javascript
 import { Range } from 'slate'
 
 // Get the start and end points of a range in order.
@@ -89,7 +87,7 @@ In addition to the built-in helper functions, you might want to define your own 
 
 For example, if your editor supports images, you might want a helper that determines if an element is an image element:
 
-```js
+```javascript
 const isImageElement = element => {
   return element.type === 'image' && typeof element.url === 'string'
 }
@@ -97,7 +95,7 @@ const isImageElement = element => {
 
 You can define these as one-off functions easily. But you might also bundle them up into namespaces, just like the core interfaces do, and use them instead. For example:
 
-```js
+```javascript
 import { Element } from 'slate'
 
 // You can use `MyElement` everywhere to have access to your extensions.
