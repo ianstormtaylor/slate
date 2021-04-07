@@ -10,7 +10,9 @@ jobs:
   rebase:
     name: rebase
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request != '' && startsWith(github.event.comment.body, '/rebase')
+    if: |
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/rebase')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -25,7 +27,10 @@ jobs:
   release_next:
     name: release:next
     runs-on: ubuntu-latest
-    if: github.event.issue.pull_request != '' && github.event.sender.login === 'ianstormtaylor' && startsWith(github.event.comment.body, '/release:next')
+    if: |
+      github.event.issue.pull_request &&
+      github.event.sender.login == 'ianstormtaylor' &&
+      startsWith(github.event.comment.body, '/release:next')
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
