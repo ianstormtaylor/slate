@@ -70,12 +70,8 @@
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
     "lerna": "^3.19.0",
-<<<<<<< HEAD
     "lint-staged": ">=10",
-    "lodash": "^4.17.4",
-=======
     "lodash": "^4.17.21",
->>>>>>> 489669a4 (Fix linting issues)
     "mocha": "^6.2.0",
     "next": "^9.4.0",
     "npm-run-all": "^4.1.2",
