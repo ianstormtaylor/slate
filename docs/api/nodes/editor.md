@@ -118,7 +118,7 @@ Iterate through all of the nodes in the Editor.
 
 Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
 
-`mode` option:
+`options.mode`:
 
 - `all` (default): all matching nodes
 - `highest`: in a hierarchy of nodes, only return the highest level matching nodes
