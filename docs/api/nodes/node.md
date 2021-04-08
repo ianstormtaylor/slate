@@ -75,10 +75,6 @@ Return a generator of the nodes in a branch of the tree, from a specific `path`.
 
 Options: `{reverse?: boolean}`
 
-#### `Node.matches(root: Node, props: Partial<Node>): boolean`
-
-Check if a node matches a set of `props`.
-
 #### `Node.nodes(root: Node, options?): Generator<NodeEntry>`
 
 Return a generator of all the node entries of a root node. Each entry is returned as a `[Node, Path]` tuple, with the path referring to the node's position inside the root node.
@@ -118,3 +114,7 @@ Check if a `value` implements the `Node` interface.
 #### `Node.isNodeList(value: any): value is Node[]`
 
 Check if a `value` is a list of `Node` objects.
+
+#### `Node.matches(root: Node, props: Partial<Node>): boolean`
+
+Check if a node matches a set of `props`.
