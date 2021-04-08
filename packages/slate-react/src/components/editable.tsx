@@ -1,13 +1,20 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react'
+import React, {
+  ReactNode,
+  ReactNodeArray,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react'
 import {
   Editor,
   Element,
-  NodeEntry,
   Node,
+  NodeEntry,
+  Path,
   Range,
   Text,
   Transforms,
-  Path,
 } from 'slate'
 import getDirection from 'direction'
 import { HistoryEditor } from 'slate-history'
@@ -17,11 +24,11 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
-  IS_FIREFOX,
-  IS_SAFARI,
-  IS_EDGE_LEGACY,
   IS_CHROME_LEGACY,
+  IS_EDGE_LEGACY,
+  IS_FIREFOX,
   IS_FIREFOX_LEGACY,
+  IS_SAFARI,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -35,17 +42,16 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  DOMStaticRange,
   isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
+  EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
+  IS_FOCUSED,
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
-  IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
-  EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
@@ -85,39 +91,36 @@ export interface RenderLeafProps {
   }
 }
 
-/**
- * `EditableProps` are passed to the `<Editable>` component.
- */
-
-export type EditableProps = {
+type IEditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput?: (event: InputEvent) => void
-  placeholder?: string
+  placeholder?: ReactNode | ReactNodeArray
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   as?: React.ElementType
-} & React.TextareaHTMLAttributes<HTMLDivElement>
+}
 
 /**
- * Editable.
+ * `EditableProps` are passed to the `<Editable>` component.
  */
+type EditableProps = IEditableProps &
+  Omit<React.TextareaHTMLAttributes<HTMLDivElement>, keyof IEditableProps>
 
-export const Editable = (props: EditableProps) => {
-  const {
-    autoFocus,
-    decorate = defaultDecorate,
-    onDOMBeforeInput: propsOnDOMBeforeInput,
-    placeholder,
-    readOnly = false,
-    renderElement,
-    renderLeaf,
-    style = {},
-    as: Component = 'div',
-    ...attributes
-  } = props
+export const Editable: React.FC<EditableProps> = ({
+  autoFocus,
+  decorate = defaultDecorate,
+  onDOMBeforeInput: propsOnDOMBeforeInput,
+  placeholder,
+  readOnly = false,
+  renderElement,
+  renderLeaf,
+  style = {},
+  as: Component = 'div',
+  ...attributes
+}) => {
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
 
