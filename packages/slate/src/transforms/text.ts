@@ -101,7 +101,12 @@ export const TextTransforms: TextTransforms = {
       }
 
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       let [start, end] = Range.edges(at)
@@ -207,7 +212,9 @@ export const TextTransforms: TextTransforms = {
         })
       }
 
-      const point = endRef.unref() || startRef.unref()
+      const point = reverse
+        ? startRef.unref() || endRef.unref()
+        : endRef.unref() || startRef.unref()
 
       if (options.at == null && point) {
         Transforms.select(editor, point)

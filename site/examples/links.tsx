@@ -2,19 +2,20 @@ import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
 import {
-  Node,
   Transforms,
   Editor,
   Range,
   createEditor,
   Element as SlateElement,
+  Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { LinkElement } from './custom-types'
 
 import { Button, Icon, Toolbar } from '../components'
 
 const LinkExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
@@ -24,6 +25,7 @@ const LinkExample = () => {
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <LinkButton />
+        <RemoveLinkButton />
       </Toolbar>
       <Editable
         renderElement={props => <Element {...props} />}
@@ -89,7 +91,7 @@ const wrapLink = (editor, url) => {
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link = {
+  const link: LinkElement = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: url }] : [],
@@ -133,8 +135,26 @@ const LinkButton = () => {
   )
 }
 
-const initialValue = [
+const RemoveLinkButton = () => {
+  const editor = useSlate()
+
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor)
+        }
+      }}
+    >
+      <Icon>link_off</Icon>
+    </Button>
+  )
+}
+
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text: 'In addition to block nodes, you can create inline nodes, like ',
@@ -150,6 +170,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       {
         text:

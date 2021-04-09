@@ -1,13 +1,13 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, Node, createEditor } from 'slate'
+import { Text, Descendant, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -85,8 +85,9 @@ const Leaf = ({ attributes, children, leaf }) => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -97,6 +98,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       { text: 'Try it out for yourself by typing in the search box above!' },
     ],

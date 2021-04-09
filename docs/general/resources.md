@@ -6,7 +6,7 @@ A few resources that are helpful for building with Slate.
 
 These libraries are helpful when developing with Slate:
 
-- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like <kbd>cmd</kbd> vs. <kbd>ctrl</kbd> keys for you automatically.
+- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like cmd vs. ctrl keys for you automatically.
 
 ## Products
 
@@ -17,6 +17,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Chatterbug](https://chatterbug.com)
 - [Clause](https://clause.io)
 - [GitBook](https://www.gitbook.com/)
+- [Discord](https://discord.com/)
 - [Grafana](https://grafana.com/)
 - [GraphCMS](https://graphcms.com)
 - [Guilded](https://www.guilded.gg)
@@ -27,6 +28,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Sanity.io](https://www.sanity.io)
 - [Slite](https://slite.com)
 - [Taskade](https://www.taskade.com/)
+- [TRPG Engine](https://trpg.moonrailgun.com)
 - [Yuque](https://www.yuque.com/)
 - [Thoughts](https://thoughts.teambition.com)
 
@@ -40,6 +42,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
 - [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
 - [ORY Editor](https://editor.ory.am/) is a self-contained, inline WYSIWYG editor library.
+- [React Force Slate Editor](https://github.com/nareshbhatia/react-force/tree/master/packages/slate-editor) is a light-weight medium-style editor with no editor chrome.
 - [Slate Plugins Next](https://github.com/zbeyens/slate-plugins-next) provides an editor with configurable and extendable plugins.
 
-(Or, if you have their exact use case, can be a drop-in editor for you.)
+\(Or, if you have their exact use case, can be a drop-in editor for you.\)

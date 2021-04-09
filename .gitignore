@@ -2,6 +2,7 @@
 .next/
 .vscode/
 .idea/
+*.tsbuildinfo
 build/
 dist/
 lib/

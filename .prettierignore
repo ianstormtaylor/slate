@@ -1,4 +1,5 @@
 .babelrc
+.github
 .next/
 build/
 dist/

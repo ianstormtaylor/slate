@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import { createDraft, finishDraft, isDraft } from 'immer'
 import { reverse as reverseText } from 'esrever'
 
 import {
@@ -55,7 +54,7 @@ export interface BaseEditor {
   apply: (operation: Operation) => void
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
-  deleteFragment: () => void
+  deleteFragment: (direction?: 'forward' | 'backward') => void
   getFragment: () => Descendant[]
   insertBreak: () => void
   insertFragment: (fragment: Node[]) => void
@@ -107,13 +106,19 @@ export interface EditorInterface {
       unit?: 'character' | 'word' | 'line' | 'block'
     }
   ) => void
-  deleteFragment: (editor: Editor) => void
+  deleteFragment: (
+    editor: Editor,
+    options?: {
+      direction?: 'forward' | 'backward'
+    }
+  ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
   end: (editor: Editor, at: Location) => Point
   first: (editor: Editor, at: Location) => NodeEntry
   fragment: (editor: Editor, at: Location) => Descendant[]
   hasBlocks: (editor: Editor, element: Element) => boolean
   hasInlines: (editor: Editor, element: Element) => boolean
+  hasPath: (editor: Editor, path: Path) => boolean
   hasTexts: (editor: Editor, element: Element) => boolean
   insertBreak: (editor: Editor) => void
   insertFragment: (editor: Editor, fragment: Node[]) => void
@@ -226,6 +231,7 @@ export interface EditorInterface {
       at?: Location
       unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
       reverse?: boolean
+      voids?: boolean
     }
   ) => Generator<Point, void, undefined>
   previous: <T extends Node>(
@@ -272,6 +278,8 @@ export interface EditorInterface {
   ) => NodeEntry<Element> | undefined
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
+
+const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
 
 export const Editor: EditorInterface = {
   /**
@@ -433,8 +441,14 @@ export const Editor: EditorInterface = {
    * Delete the content in the current selection.
    */
 
-  deleteFragment(editor: Editor): void {
-    editor.deleteFragment()
+  deleteFragment(
+    editor: Editor,
+    options: {
+      direction?: 'forward' | 'backward'
+    } = {}
+  ): void {
+    const { direction = 'forward' } = options
+    editor.deleteFragment(direction)
   },
 
   /**
@@ -550,8 +564,12 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    return (
-      isPlainObject(value) &&
+    if (!isPlainObject(value)) return false
+    const cachedIsEditor = IS_EDITOR_CACHE.get(value)
+    if (cachedIsEditor !== undefined) {
+      return cachedIsEditor
+    }
+    const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
       typeof value.deleteBackward === 'function' &&
@@ -570,7 +588,8 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
-    )
+    IS_EDITOR_CACHE.set(value, isEditor)
+    return isEditor
   },
 
   /**
@@ -1054,6 +1073,10 @@ export const Editor: EditorInterface = {
     return at
   },
 
+  hasPath(editor: Editor, path: Path): boolean {
+    return Node.has(editor, path)
+  },
+
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
@@ -1296,8 +1319,8 @@ export const Editor: EditorInterface = {
         }
 
         while (true) {
-          // If there's no more string, continue to the next block.
-          if (string === '') {
+          // If there's no more string and there is no more characters to skip, continue to the next block.
+          if (string === '' && distance === null) {
             break
           } else {
             advance()

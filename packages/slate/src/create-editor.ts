@@ -127,11 +127,11 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteFragment: () => {
+    deleteFragment: (direction?: 'forward' | 'backward') => {
       const { selection } = editor
 
       if (selection && Range.isExpanded(selection)) {
-        Transforms.delete(editor)
+        Transforms.delete(editor, { reverse: direction === 'backward' })
       }
     },
 
@@ -353,7 +353,11 @@ const getDirtyPaths = (op: Operation): Path[] => {
         newAncestors.push(p!)
       }
 
-      return [...oldAncestors, ...newAncestors]
+      const newParent = newAncestors[newAncestors.length - 1]
+      const newIndex = newPath[newPath.length - 1]
+      const resultPath = newParent.concat(newIndex)
+
+      return [...oldAncestors, ...newAncestors, resultPath]
     }
 
     case 'remove_node': {
