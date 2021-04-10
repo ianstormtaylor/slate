@@ -94,7 +94,7 @@ export interface RenderLeafProps {
 type IEditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput?: (event: InputEvent) => void
-  placeholder?: ReactNode | ReactNodeArray
+  placeholder?: ReactNode | ReactNodeArray | (ReactNode | ReactNodeArray)[]
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
@@ -250,6 +250,67 @@ export const Editable: React.FC<EditableProps> = ({
     }
   }, [autoFocus])
 
+  const decorations = decorate([editor, []])
+
+  const placeholders = Array.isArray(placeholder) ? placeholder : [placeholder]
+
+  if (placeholders.length) {
+    const currentTexts = Array.from(Node.texts(editor))
+
+    // add missing toplevel nodes so there is a place to add placeholders
+    for (let i = currentTexts.length; i < placeholders.length; i++) {
+      Transforms.splitNodes(editor, {
+        at: Editor.end(editor, [i - 1]),
+        always: true,
+      })
+    }
+
+    placeholders.forEach((placeholder, idx) => {
+      const currentText = currentTexts[idx]
+      if (!currentText || currentText[0].text.length) return
+
+      const start = Editor.start(editor, [idx])
+
+      decorations.push({
+        [PLACEHOLDER_SYMBOL]: true,
+        placeholder,
+        anchor: start,
+        focus: start,
+      })
+    })
+  }
+
+  const moveCursorOrLineBeak = useCallback(() => {
+    const sel = editor.selection
+    // When multiple placeholders defined we dont want to create new line if we're at the
+    // end of a line and there is empty placeholder ahead.
+    if (
+      placeholders.length &&
+      sel &&
+      Range.isCollapsed(sel) &&
+      Editor.isEnd(editor, sel.anchor, sel.anchor.path)
+    ) {
+      const { path } = sel.anchor
+      const nextPath = [(path[0] ?? 0) + 1, path[1] ?? 0]
+
+      // in case next line within placeholders and within content
+      if (
+        nextPath[0] < placeholders.length &&
+        nextPath[0] < editor.children.length
+      ) {
+        const node = Editor.node(editor, nextPath)
+        const texts = Array.from(Node.texts(node[0]))
+        const nextText = (texts[0] ?? [])[0]
+
+        if (nextText && !nextText.text.length) {
+          return Transforms.move(editor, { unit: 'line' })
+        }
+      }
+    }
+
+    Editor.insertBreak(editor)
+  }, [placeholders, editor])
+
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
   // to the real event sadly. (2019/11/01)
@@ -360,7 +421,8 @@ export const Editable: React.FC<EditableProps> = ({
 
           case 'insertLineBreak':
           case 'insertParagraph': {
-            Editor.insertBreak(editor)
+            moveCursorOrLineBeak()
+
             break
           }
 
@@ -391,7 +453,7 @@ export const Editable: React.FC<EditableProps> = ({
         }
       }
     },
-    [readOnly, propsOnDOMBeforeInput]
+    [readOnly, propsOnDOMBeforeInput, moveCursorOrLineBeak]
   )
 
   // Attach a native DOM event handler for `beforeinput` events, because React's
@@ -473,23 +535,6 @@ export const Editable: React.FC<EditableProps> = ({
       )
     }
   }, [onDOMSelectionChange])
-
-  const decorations = decorate([editor, []])
-
-  if (
-    placeholder &&
-    editor.children.length === 1 &&
-    Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === ''
-  ) {
-    const start = Editor.start(editor, [])
-    decorations.push({
-      [PLACEHOLDER_SYMBOL]: true,
-      placeholder,
-      anchor: start,
-      focus: start,
-    })
-  }
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
@@ -936,7 +981,9 @@ export const Editable: React.FC<EditableProps> = ({
 
                   if (Hotkeys.isSplitBlock(nativeEvent)) {
                     event.preventDefault()
-                    Editor.insertBreak(editor)
+
+                    moveCursorOrLineBeak()
+
                     return
                   }
 
@@ -1014,7 +1061,7 @@ export const Editable: React.FC<EditableProps> = ({
                 }
               }
             },
-            [readOnly, attributes.onKeyDown]
+            [readOnly, attributes.onKeyDown, moveCursorOrLineBeak]
           )}
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
