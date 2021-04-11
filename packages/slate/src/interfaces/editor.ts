@@ -119,6 +119,7 @@ export interface EditorInterface {
   hasBlocks: (editor: Editor, element: Element) => boolean
   hasInlines: (editor: Editor, element: Element) => boolean
   hasPath: (editor: Editor, path: Path) => boolean
+  hasRange: (editor: Editor, range: Range) => boolean
   hasTexts: (editor: Editor, element: Element) => boolean
   insertBreak: (editor: Editor) => void
   insertFragment: (editor: Editor, fragment: Node[]) => void
@@ -485,6 +486,18 @@ export const Editor: EditorInterface = {
     const fragment = Node.fragment(editor, range)
     return fragment
   },
+
+  /**
+   * Check if range exists
+   */
+
+  hasRange(editor: Editor, range: Range): boolean {
+    const { anchor, focus } = range
+    return (
+      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
+    )
+  },
+
   /**
    * Check if a node has block children.
    */

@@ -33,7 +33,6 @@ import { IS_CHROME } from '../utils/environment'
 export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
-  hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
 export const ReactEditor = {
@@ -586,12 +585,5 @@ export const ReactEditor = {
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
 
     return { anchor, focus }
-  },
-
-  hasRange(editor: ReactEditor, range: Range): boolean {
-    const { anchor, focus } = range
-    return (
-      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
-    )
   },
 }

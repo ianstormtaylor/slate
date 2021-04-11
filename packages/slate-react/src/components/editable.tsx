@@ -188,7 +188,7 @@ export const Editable = (props: EditableProps) => {
     // then its children might just change - DOM responds to it on its own
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
-    if (selection && !ReactEditor.hasRange(editor, selection)) {
+    if (selection && !Editor.hasRange(editor, selection)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection)
       return
     }
