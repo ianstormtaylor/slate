@@ -48,6 +48,22 @@ import {
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
+const defaultPlaceholderProps: {
+  style: React.CSSProperties
+} = {
+  style: {
+    display: 'block',
+    width: '100%',
+    maxWidth: '100%',
+    whiteSpace: 'nowrap',
+    opacity: '0.333',
+    userSelect: 'none',
+    fontStyle: 'normal',
+    fontWeight: 'normal',
+    textDecoration: 'none',
+  },
+}
+
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
 const HAS_BEFORE_INPUT_SUPPORT = !(
@@ -98,6 +114,7 @@ export type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderPlaceholder?: (props: typeof defaultPlaceholderProps) => JSX.Element
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
@@ -114,6 +131,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
+    renderPlaceholder,
     style = {},
     as: Component = 'div',
     ...attributes
@@ -223,6 +241,7 @@ export const Editable = (props: EditableProps) => {
         scrollMode: 'if-needed',
         boundary: el,
       })
+      // @ts-ignore
       delete leafEl.getBoundingClientRect
     } else {
       domSelection.removeAllRanges()
@@ -473,8 +492,12 @@ export const Editable = (props: EditableProps) => {
 
   const decorations = decorate([editor, []])
 
+  const renderedPlaceholder =
+    renderPlaceholder?.(defaultPlaceholderProps) ||
+    (placeholder && <span {...defaultPlaceholderProps}>{placeholder}</span>)
+
   if (
-    placeholder &&
+    renderedPlaceholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === ''
@@ -482,7 +505,7 @@ export const Editable = (props: EditableProps) => {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
-      placeholder,
+      placeholder: renderedPlaceholder,
       anchor: start,
       focus: start,
     })

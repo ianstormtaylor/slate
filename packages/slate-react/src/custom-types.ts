@@ -5,10 +5,10 @@ declare module 'slate' {
   interface CustomTypes {
     Editor: ReactEditor
     Text: BaseText & {
-      placeholder: string
+      placeholder: string | JSX.Element
     }
     Range: BaseRange & {
-      placeholder?: string
+      placeholder?: string | JSX.Element
     }
   }
 }

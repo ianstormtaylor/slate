@@ -40,7 +40,7 @@ const Leaf = (props: {
     return () => {
       editorEl.style.minHeight = 'auto'
     }
-  }, [placeholderRef])
+  }, [placeholderRef, leaf])
 
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
@@ -53,17 +53,10 @@ const Leaf = (props: {
           ref={placeholderRef}
           contentEditable={false}
           style={{
+            position: 'absolute',
             pointerEvents: 'none',
-            display: 'inline-block',
             width: '100%',
             maxWidth: '100%',
-            whiteSpace: 'nowrap',
-            opacity: '0.333',
-            userSelect: 'none',
-            fontStyle: 'normal',
-            fontWeight: 'normal',
-            textDecoration: 'none',
-            position: 'absolute',
           }}
         >
           {leaf.placeholder}
