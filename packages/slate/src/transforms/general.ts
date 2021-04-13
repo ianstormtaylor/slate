@@ -44,6 +44,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
       case 'insert_text': {
         const { path, offset, text } = op
+        if (text.length === 0) break
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset)
@@ -167,7 +168,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
       case 'remove_text': {
         const { path, offset, text } = op
-        if (!text || text.length === 0) break
+        if (text.length === 0) break
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset + text.length)
