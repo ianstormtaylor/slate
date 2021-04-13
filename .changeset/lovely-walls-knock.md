@@ -2,4 +2,4 @@
 'slate-react': major
 ---
 
-refresh String element to avoid double input using IME
+Fixed a bug that resulted in doubly-input characters when using an IME.
