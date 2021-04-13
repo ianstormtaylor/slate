@@ -15,4 +15,5 @@ export const input = (
     </block>
   </editor>
 )
+export const skip = true // TODO: see https://github.com/ianstormtaylor/slate/pull/4188
 export const output = cloneDeep(input)

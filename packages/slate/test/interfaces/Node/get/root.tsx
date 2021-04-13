@@ -13,4 +13,5 @@ export const input = (
 export const test = value => {
   return Node.get(value, [])
 }
+export const skip = true // TODO: see https://github.com/ianstormtaylor/slate/pull/4188
 export const output = cloneDeep(input)
