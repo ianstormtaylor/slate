@@ -592,17 +592,21 @@ export const NodeTransforms: NodeTransforms = {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
         const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
+        const endAtEndOfNode = Editor.isEnd(editor, end, end.path)
         Transforms.splitNodes(editor, {
           at: end,
           match,
           mode: splitMode,
           voids,
+          always: !endAtEndOfNode,
         })
+        const startAtStartOfNode = Editor.isStart(editor, start, start.path)
         Transforms.splitNodes(editor, {
           at: start,
           match,
           mode: splitMode,
           voids,
+          always: !startAtStartOfNode,
         })
         at = rangeRef.unref()!
 
