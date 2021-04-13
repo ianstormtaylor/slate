@@ -56,7 +56,6 @@ const HAS_BEFORE_INPUT_SUPPORT =
   // @ts-ignore The `getTargetRanges` property isn't recognized.
   typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
 
-
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
