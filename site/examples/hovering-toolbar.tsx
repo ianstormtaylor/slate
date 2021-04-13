@@ -33,7 +33,7 @@ const HoveringMenuExample = () => {
             case 'formatItalic':
               return toggleFormat(editor, 'italic')
             case 'formatUnderline':
-              return toggleFormat(editor, 'underline')
+              return toggleFormat(editor, 'underlined')
           }
         }}
       />
@@ -126,7 +126,7 @@ const HoveringToolbar = () => {
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
-        <FormatButton format="underline" icon="format_underlined" />
+        <FormatButton format="underlined" icon="format_underlined" />
       </Menu>
     </Portal>
   )
