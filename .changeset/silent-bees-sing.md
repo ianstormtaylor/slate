@@ -2,4 +2,4 @@
 'slate': patch
 ---
 
-set_node operations did not invert correctly after serialization
+Fixed inversion of `set_node` operations that delete properties on nodes.
