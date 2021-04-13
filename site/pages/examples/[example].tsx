@@ -23,7 +23,7 @@ import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
-import CodeHighlighting from '../../examples/code-highlighting'
+import ShadowDOM from '../../examples/shadow-dom'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
 
@@ -47,7 +47,7 @@ const EXAMPLES = [
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
+  ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
 ]
@@ -297,7 +297,7 @@ const ExamplePage = ({ example }: { example: string }) => {
           <ExampleTitle>
             {name}
             <A
-              href={`https://github.com/ianstormtaylor/slate/blob/master/site/examples/${path}.tsx`}
+              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/${path}.tsx`}
             >
               (View Source)
             </A>

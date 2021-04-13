@@ -1,7 +1,7 @@
 {
   "name": "slate",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.60.4",
+  "version": "0.62.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -18,6 +18,7 @@
     "esrever": "^0.2.0",
     "immer": "^7.0.0",
     "is-plain-object": "^3.0.0",
+    "lodash": "^4.17.4",
     "tiny-warning": "^1.0.3"
   },
   "keywords": [

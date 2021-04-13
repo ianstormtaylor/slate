@@ -20,19 +20,19 @@ If you have an idea for an example that shows a common use case, pull request it
 
 To get the examples running on your machine, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
-```
+```sh
 yarn install
 yarn build
 ```
 
 Then start the watcher and examples server:
 
-```
+```sh
 yarn start
 ```
 
 Now you can open up `http://localhost:3000` in your browser and you'll see the examples site. Any changes you make to the source code will be immediately reflected when you refresh the page. You can open the examples URL quickly with:
 
-```
+```sh
 yarn open
 ```

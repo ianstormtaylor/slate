@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, Descendant } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, BaseEditor } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -20,17 +20,20 @@ import {
   DOMSelection,
   DOMStaticRange,
   isDOMElement,
-  normalizeDOMPoint,
   isDOMSelection,
+  normalizeDOMPoint,
+  hasShadowRoot,
 } from '../utils/dom'
+import { IS_CHROME } from '../utils/environment'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
  */
 
-export interface ReactEditor extends Editor {
+export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
+  hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
 export const ReactEditor = {
@@ -96,6 +99,29 @@ export const ReactEditor = {
   },
 
   /**
+   * Find the DOM node that implements DocumentOrShadowRoot for the editor.
+   */
+
+  findDocumentOrShadowRoot(editor: ReactEditor): Document | ShadowRoot {
+    const el = ReactEditor.toDOMNode(editor, editor)
+    const root = el.getRootNode()
+
+    if (!(root instanceof Document || root instanceof ShadowRoot))
+      throw new Error(
+        `Unable to find DocumentOrShadowRoot for editor element: ${el}`
+      )
+
+    // COMPAT: Only Chrome implements the DocumentOrShadowRoot mixin for
+    // ShadowRoot; other browsers still implement it on the Document
+    // interface. (2020/08/08)
+    // https://developer.mozilla.org/en-US/docs/Web/API/ShadowRoot#Properties
+    if (root.getSelection === undefined && el.ownerDocument !== null)
+      return el.ownerDocument
+
+    return root
+  },
+
+  /**
    * Check if the editor is focused.
    */
 
@@ -117,9 +143,10 @@ export const ReactEditor = {
 
   blur(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, false)
-    const window = ReactEditor.getWindow(editor)
-    if (window.document.activeElement === el) {
+
+    if (root.activeElement === el) {
       el.blur()
     }
   },
@@ -130,10 +157,10 @@ export const ReactEditor = {
 
   focus(editor: ReactEditor): void {
     const el = ReactEditor.toDOMNode(editor, editor)
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, true)
 
-    const window = ReactEditor.getWindow(editor)
-    if (window.document.activeElement !== el) {
+    if (root.activeElement !== el) {
       el.focus({ preventScroll: true })
     }
   },
@@ -143,9 +170,10 @@ export const ReactEditor = {
    */
 
   deselect(editor: ReactEditor): void {
+    const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
-    const window = ReactEditor.getWindow(editor)
-    const domSelection = window.getSelection()
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    const domSelection = root.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()
@@ -433,8 +461,12 @@ export const ReactEditor = {
         range.setEnd(nearestNode, nearestOffset)
         const contents = range.cloneContents()
         const removals = [
-          ...contents.querySelectorAll('[data-slate-zero-width]'),
-          ...contents.querySelectorAll('[contenteditable=false]'),
+          ...Array.prototype.slice.call(
+            contents.querySelectorAll('[data-slate-zero-width]')
+          ),
+          ...Array.prototype.slice.call(
+            contents.querySelectorAll('[contenteditable=false]')
+          ),
         ]
 
         removals.forEach(el => {
@@ -451,11 +483,19 @@ export const ReactEditor = {
       } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
         // ancestor, so find it by going down from the nearest void parent.
-
         leafNode = voidNode.querySelector('[data-slate-leaf]')!
-        textNode = leafNode.closest('[data-slate-node="text"]')!
-        domNode = leafNode
-        offset = domNode.textContent!.length
+
+        // COMPAT: In read-only editors the leaf is not rendered.
+        if (!leafNode) {
+          offset = 1
+        } else {
+          textNode = leafNode.closest('[data-slate-node="text"]')!
+          domNode = leafNode
+          offset = domNode.textContent!.length
+          domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
+            offset -= el.textContent!.length
+          })
+        }
       }
 
       // COMPAT: If the parent node is a Slate zero-width space, editor is
@@ -509,7 +549,17 @@ export const ReactEditor = {
         anchorOffset = domRange.anchorOffset
         focusNode = domRange.focusNode
         focusOffset = domRange.focusOffset
-        isCollapsed = domRange.isCollapsed
+        // COMPAT: There's a bug in chrome that always returns `true` for
+        // `isCollapsed` for a Selection that comes from a ShadowRoot.
+        // (2020/08/08)
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
+        if (IS_CHROME && hasShadowRoot()) {
+          isCollapsed =
+            domRange.anchorNode === domRange.focusNode &&
+            domRange.anchorOffset === domRange.focusOffset
+        } else {
+          isCollapsed = domRange.isCollapsed
+        }
       } else {
         anchorNode = domRange.startContainer
         anchorOffset = domRange.startOffset
@@ -536,5 +586,12 @@ export const ReactEditor = {
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
 
     return { anchor, focus }
+  },
+
+  hasRange(editor: ReactEditor, range: Range): boolean {
+    const { anchor, focus } = range
+    return (
+      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
+    )
   },
 }
