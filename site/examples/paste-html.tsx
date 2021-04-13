@@ -1,6 +1,6 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import { Transforms, createEditor, Descendant } from 'slate'
+import { Transforms, createEditor, Value } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 import {
@@ -80,9 +80,7 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withHtml(withReact(withHistory(createEditor()))),
     []
@@ -125,7 +123,7 @@ const withHtml = editor => {
   return editor
 }
 
-const Element = props => {
+const renderElement = props => {
   const { attributes, children, element } = props
 
   switch (element.type) {
@@ -187,7 +185,7 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const renderLeaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -211,7 +209,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

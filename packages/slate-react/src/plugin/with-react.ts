@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
+import { Editor, Node, Path, Operation, Transforms, Range, Value } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
@@ -16,8 +16,10 @@ import { findCurrentLineRange } from '../utils/lines'
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-export const withReact = <T extends Editor>(editor: T) => {
-  const e = editor as T & ReactEditor
+export const withReact = <V extends Value, E extends Editor<V>>(
+  editor: E
+): E & ReactEditor<V> => {
+  const e = (editor as unknown) as E & ReactEditor<V>
   const { apply, onChange, deleteBackward } = e
 
   e.deleteBackward = unit => {

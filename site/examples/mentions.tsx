@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Editor, Transforms, Range, createEditor, Descendant } from 'slate'
+import { Editor, Transforms, Range, createEditor, Value } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -11,15 +11,13 @@ import {
 } from 'slate-react'
 
 import { Portal } from '../components'
-import { MentionElement } from './custom-types'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
-  const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withMentions(withReact(withHistory(createEditor()))),
     []
@@ -155,16 +153,16 @@ const withMentions = editor => {
 }
 
 const insertMention = (editor, character) => {
-  const mention: MentionElement = {
+  Transforms.insertNodes(editor, {
     type: 'mention',
     character,
     children: [{ text: '' }],
-  }
-  Transforms.insertNodes(editor, mention)
+  })
+
   Transforms.move(editor)
 }
 
-const Element = props => {
+const renderElement = props => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'mention':
@@ -198,7 +196,7 @@ const Mention = ({ attributes, children, element }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

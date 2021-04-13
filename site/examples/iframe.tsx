@@ -1,10 +1,9 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
-import { Editor, createEditor, Descendant } from 'slate'
+import { Editor, createEditor, Value } from 'slate'
 import { withHistory } from 'slate-history'
-
 import { Button, Icon, Toolbar } from '../components'
 
 const HOTKEYS = {
@@ -14,17 +13,9 @@ const HOTKEYS = {
   'mod+`': 'code',
 }
 
-const IFrameExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderElement = useCallback(
-    ({ attributes, children }) => <p {...attributes}>{children}</p>,
-    []
-  )
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+const IframeExample = () => {
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
-  const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
-
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
@@ -33,9 +24,8 @@ const IFrameExample = () => {
         <MarkButton format="underline" icon="format_underlined" />
         <MarkButton format="code" icon="code" />
       </Toolbar>
-      <IFrame onBlur={handleBlur}>
+      <Iframe onBlur={() => ReactEditor.deselect(editor)}>
         <Editable
-          renderElement={renderElement}
           renderLeaf={renderLeaf}
           placeholder="Enter some rich text…"
           spellCheck
@@ -50,7 +40,7 @@ const IFrameExample = () => {
             }
           }}
         />
-      </IFrame>
+      </Iframe>
     </Slate>
   )
 }
@@ -69,7 +59,7 @@ const isMarkActive = (editor, format) => {
   return marks ? marks[format] === true : false
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const renderLeaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -104,7 +94,7 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const IFrame = ({ children, ...props }) => {
+const Iframe = ({ children, ...props }) => {
   const [contentRef, setContentRef] = useState(null)
   const mountNode =
     contentRef &&
@@ -117,7 +107,7 @@ const IFrame = ({ children, ...props }) => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [
@@ -155,4 +145,4 @@ const initialValue: Descendant[] = [
   },
 ]
 
-export default IFrameExample
+export default IframeExample

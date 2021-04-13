@@ -7,12 +7,12 @@ import { ReactEditor, useSlateStatic } from '..'
  * Leaf content strings.
  */
 
-const String = (props: {
+const String: React.FC<{
   isLast: boolean
   leaf: Text
   parent: Element
   text: Text
-}) => {
+}> = props => {
   const { isLast, leaf, parent, text } = props
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)

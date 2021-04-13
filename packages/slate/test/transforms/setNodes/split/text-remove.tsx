@@ -3,16 +3,12 @@ import { Transforms, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.setNodes(
-    editor,
-    { key: null },
-    { match: Text.isText, split: true }
-  )
+  Transforms.setNodes(editor, { a: null }, { match: Text.isText, split: true })
 }
 export const input = (
   <editor>
     <block>
-      <text key>
+      <text a>
         w<anchor />
         or
         <focus />d
@@ -23,13 +19,13 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text key>w</text>
+      <text a>w</text>
       <text>
         <anchor />
         or
         <focus />
       </text>
-      <text key>d</text>
+      <text a>d</text>
     </block>
   </editor>
 )

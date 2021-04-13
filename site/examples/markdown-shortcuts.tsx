@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
   Editor,
@@ -6,17 +6,16 @@ import {
   Range,
   Point,
   createEditor,
-  Element as SlateElement,
-  Descendant,
+  Element,
+  Value,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {
   '*': 'list-item',
   '-': 'list-item',
   '+': 'list-item',
-  '>': 'block-quote',
+  '>': 'quote',
   '#': 'heading-one',
   '##': 'heading-two',
   '###': 'heading-three',
@@ -26,8 +25,7 @@ const SHORTCUTS = {
 }
 
 const MarkdownShortcutsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
@@ -64,24 +62,23 @@ const withShortcuts = editor => {
       if (type) {
         Transforms.select(editor, range)
         Transforms.delete(editor)
-        const newProperties: Partial<SlateElement> = {
-          type,
-        }
-        Transforms.setNodes(editor, newProperties, {
-          match: n => Editor.isBlock(editor, n),
-        })
+        Transforms.setNodes(
+          editor,
+          { type },
+          { match: n => Editor.isBlock(editor, n) }
+        )
 
         if (type === 'list-item') {
-          const list: BulletedListElement = {
-            type: 'bulleted-list',
-            children: [],
-          }
-          Transforms.wrapNodes(editor, list, {
-            match: n =>
-              !Editor.isEditor(n) &&
-              SlateElement.isElement(n) &&
-              n.type === 'list-item',
-          })
+          Transforms.wrapNodes(
+            editor,
+            { type: 'bulleted-list', children: [] },
+            {
+              match: n =>
+                !Editor.isEditor(n) &&
+                Element.isElement(n) &&
+                n.type === 'list-item',
+            }
+          )
         }
 
         return
@@ -105,20 +102,17 @@ const withShortcuts = editor => {
 
         if (
           !Editor.isEditor(block) &&
-          SlateElement.isElement(block) &&
+          Element.isElement(block) &&
           block.type !== 'paragraph' &&
           Point.equals(selection.anchor, start)
         ) {
-          const newProperties: Partial<SlateElement> = {
-            type: 'paragraph',
-          }
-          Transforms.setNodes(editor, newProperties)
+          Transforms.setNodes(editor, { type: 'paragraph' })
 
           if (block.type === 'list-item') {
             Transforms.unwrapNodes(editor, {
               match: n =>
                 !Editor.isEditor(n) &&
-                SlateElement.isElement(n) &&
+                Element.isElement(n) &&
                 n.type === 'bulleted-list',
               split: true,
             })
@@ -135,9 +129,9 @@ const withShortcuts = editor => {
   return editor
 }
 
-const Element = ({ attributes, children, element }) => {
+const renderElement = ({ attributes, children, element }) => {
   switch (element.type) {
-    case 'block-quote':
+    case 'quote':
       return <blockquote {...attributes}>{children}</blockquote>
     case 'bulleted-list':
       return <ul {...attributes}>{children}</ul>
@@ -160,7 +154,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [
@@ -171,7 +165,7 @@ const initialValue: Descendant[] = [
     ],
   },
   {
-    type: 'block-quote',
+    type: 'quote',
     children: [{ text: 'A wise quote.' }],
   },
   {

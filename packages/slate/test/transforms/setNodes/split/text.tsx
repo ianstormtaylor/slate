@@ -3,11 +3,7 @@ import { Transforms, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.setNodes(
-    editor,
-    { key: true },
-    { match: Text.isText, split: true }
-  )
+  Transforms.setNodes(editor, { a: true }, { match: Text.isText, split: true })
 }
 export const input = (
   <editor>
@@ -22,7 +18,7 @@ export const output = (
   <editor>
     <block>
       <text>w</text>
-      <text key>
+      <text a>
         <anchor />
         or
         <focus />

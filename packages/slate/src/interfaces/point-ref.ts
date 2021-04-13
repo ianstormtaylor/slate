@@ -6,17 +6,13 @@ import { Operation, Point } from '..'
  * at any time for the up-to-date point value.
  */
 
-export interface PointRef {
+export type PointRef = {
   current: Point | null
   affinity: 'forward' | 'backward' | null
   unref(): Point | null
 }
 
-export interface PointRefInterface {
-  transform: (ref: PointRef, op: Operation) => void
-}
-
-export const PointRef: PointRefInterface = {
+export const PointRef = {
   /**
    * Transform the point ref's current value by an operation.
    */

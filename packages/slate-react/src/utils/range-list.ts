@@ -1,5 +1,5 @@
 import { Range } from 'slate'
-import { PLACEHOLDER_SYMBOL } from './weak-maps'
+import { PLACEHOLDER_SYMBOL } from './symbols'
 
 export const shallowCompare = (obj1: {}, obj2: {}) =>
   Object.keys(obj1).length === Object.keys(obj2).length &&

@@ -5,12 +5,7 @@
     "prettier/@typescript-eslint",
     "prettier/react"
   ],
-  "plugins": [
-    "@typescript-eslint",
-    "import",
-    "react",
-    "prettier"
-  ],
+  "plugins": ["@typescript-eslint", "import", "react", "prettier"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
@@ -21,12 +16,7 @@
   },
   "ignorePatterns": ["**/next-env.d.ts"],
   "settings": {
-    "import/extensions": [
-      ".js",
-      ".ts",
-      ".jsx",
-      ".tsx"
-    ],
+    "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
     "react": {
       "version": "detect"
     }
@@ -45,10 +35,7 @@
         "allowKeywords": true
       }
     ],
-    "eqeqeq": [
-      "error",
-      "smart"
-    ],
+    "eqeqeq": ["error", "smart"],
     "import/default": "error",
     "import/export": "error",
     "import/first": "error",
@@ -65,7 +52,6 @@
     "import/no-mutable-exports": "error",
     "import/no-named-as-default": "error",
     "import/no-named-as-default-member": "error",
-    "import/no-unresolved": "error",
     "linebreak-style": "error",
     "no-array-constructor": "error",
     "no-class-assign": "error",
@@ -89,7 +75,6 @@
     "no-new-object": "error",
     "no-new-symbol": "error",
     "no-path-concat": "error",
-    "no-redeclare": "error",
     "no-regex-spaces": "error",
     "no-sequences": "error",
     "no-tabs": "error",
@@ -106,10 +91,7 @@
     "no-var": "error",
     "no-void": "error",
     "no-with": "error",
-    "object-shorthand": [
-      "error",
-      "always"
-    ],
+    "object-shorthand": ["error", "always"],
     "prefer-arrow-callback": "error",
     "prefer-const": [
       "error",
@@ -123,10 +105,7 @@
     "prefer-template": "error",
     "prettier/prettier": "error",
     "radix": "error",
-    "react/jsx-boolean-value": [
-      "error",
-      "never"
-    ],
+    "react/jsx-boolean-value": ["error", "never"],
     "react/jsx-no-duplicate-props": "error",
     "react/jsx-no-target-blank": "error",
     "react/jsx-no-undef": "error",
@@ -145,9 +124,7 @@
       "error",
       "always",
       {
-        "exceptions": [
-          "-"
-        ]
+        "exceptions": ["-"]
       }
     ],
     "use-isnan": "error",
@@ -161,14 +138,8 @@
       }
     ],
     "valid-typeof": "error",
-    "yield-star-spacing": [
-      "error",
-      "after"
-    ],
-    "yoda": [
-      "error",
-      "never"
-    ]
+    "yield-star-spacing": ["error", "after"],
+    "yoda": ["error", "never"]
   },
   "overrides": [
     {

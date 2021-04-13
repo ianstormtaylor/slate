@@ -1,120 +1,86 @@
-import { ExtendedType, Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
+import { Node, Path, Range } from '..'
 
-export type BaseInsertNodeOperation = {
+export type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
+  [key: string]: unknown
 }
 
-export type InsertNodeOperation = ExtendedType<
-  'InsertNodeOperation',
-  BaseInsertNodeOperation
->
-
-export type BaseInsertTextOperation = {
+export type InsertTextOperation = {
   type: 'insert_text'
   path: Path
   offset: number
   text: string
+  [key: string]: unknown
 }
 
-export type InsertTextOperation = ExtendedType<
-  'InsertTextOperation',
-  BaseInsertTextOperation
->
-
-export type BaseMergeNodeOperation = {
+export type MergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: object
+  [key: string]: unknown
 }
 
-export type MergeNodeOperation = ExtendedType<
-  'MergeNodeOperation',
-  BaseMergeNodeOperation
->
-
-export type BaseMoveNodeOperation = {
+export type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
+  [key: string]: unknown
 }
 
-export type MoveNodeOperation = ExtendedType<
-  'MoveNodeOperation',
-  BaseMoveNodeOperation
->
-
-export type BaseRemoveNodeOperation = {
+export type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
+  [key: string]: unknown
 }
 
-export type RemoveNodeOperation = ExtendedType<
-  'RemoveNodeOperation',
-  BaseRemoveNodeOperation
->
-
-export type BaseRemoveTextOperation = {
+export type RemoveTextOperation = {
   type: 'remove_text'
   path: Path
   offset: number
   text: string
+  [key: string]: unknown
 }
 
-export type RemoveTextOperation = ExtendedType<
-  'RemoveTextOperation',
-  BaseRemoveTextOperation
->
-
-export type BaseSetNodeOperation = {
+export type SetNodeOperation = {
   type: 'set_node'
   path: Path
-  properties: Partial<Node>
-  newProperties: Partial<Node>
+  properties: object
+  newProperties: object
+  [key: string]: unknown
 }
 
-export type SetNodeOperation = ExtendedType<
-  'SetNodeOperation',
-  BaseSetNodeOperation
->
-
-export type BaseSetSelectionOperation =
+export type SetSelectionOperation =
   | {
       type: 'set_selection'
       properties: null
       newProperties: Range
+      [key: string]: unknown
     }
   | {
       type: 'set_selection'
       properties: Partial<Range>
       newProperties: Partial<Range>
+      [key: string]: unknown
     }
   | {
       type: 'set_selection'
       properties: Range
       newProperties: null
+      [key: string]: unknown
     }
 
-export type SetSelectionOperation = ExtendedType<
-  'SetSelectionOperation',
-  BaseSetSelectionOperation
->
-
-export type BaseSplitNodeOperation = {
+export type SplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  properties: Partial<Node>
+  properties: object
+  [key: string]: unknown
 }
-
-export type SplitNodeOperation = ExtendedType<
-  'SplitNodeOperation',
-  BaseSplitNodeOperation
->
 
 export type NodeOperation =
   | InsertNodeOperation
@@ -137,16 +103,7 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
 
 export type Operation = NodeOperation | SelectionOperation | TextOperation
 
-export interface OperationInterface {
-  isNodeOperation: (value: any) => value is NodeOperation
-  isOperation: (value: any) => value is Operation
-  isOperationList: (value: any) => value is Operation[]
-  isSelectionOperation: (value: any) => value is SelectionOperation
-  isTextOperation: (value: any) => value is TextOperation
-  inverse: (op: Operation) => Operation
-}
-
-export const Operation: OperationInterface = {
+export const Operation = {
   /**
    * Check of a value is a `NodeOperation` object.
    */
@@ -255,7 +212,8 @@ export const Operation: OperationInterface = {
       }
 
       case 'merge_node': {
-        return { ...op, type: 'split_node', path: Path.previous(op.path) }
+        const { path } = op
+        return { ...op, type: 'split_node', path: Path.previous(path) }
       }
 
       case 'move_node': {
@@ -317,7 +275,8 @@ export const Operation: OperationInterface = {
       }
 
       case 'split_node': {
-        return { ...op, type: 'merge_node', path: Path.next(op.path) }
+        const { path } = op
+        return { ...op, type: 'merge_node', path: Path.next(path) }
       }
     }
   },

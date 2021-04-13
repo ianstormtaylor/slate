@@ -2,7 +2,7 @@
  * Utilities for single-line deletion
  */
 
-import { Range, Editor } from 'slate'
+import { Range, Editor, Value } from 'slate'
 import { ReactEditor } from '..'
 
 const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
@@ -11,8 +11,8 @@ const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
   return rect.top <= middle && rect.bottom >= middle
 }
 
-const areRangesSameLine = (
-  editor: ReactEditor,
+const areRangesSameLine = <V extends Value>(
+  editor: ReactEditor<V>,
   range1: Range,
   range2: Range
 ) => {
@@ -30,8 +30,8 @@ const areRangesSameLine = (
  * @param {Range} parentRange The parent range to compare against
  * @returns {Range} A valid portion of the parentRange which is one a single line
  */
-export const findCurrentLineRange = (
-  editor: ReactEditor,
+export const findCurrentLineRange = <V extends Value>(
+  editor: ReactEditor<V>,
   parentRange: Range
 ): Range => {
   const parentRangeBoundary = Editor.range(editor, Range.end(parentRange))

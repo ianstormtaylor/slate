@@ -1,19 +1,10 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import {
-  Editor,
-  Range,
-  Point,
-  Descendant,
-  createEditor,
-  Element as SlateElement,
-} from 'slate'
+import { Editor, Range, Point, createEditor, Element, Value } from 'slate'
 import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withTables(withHistory(withReact(createEditor()))),
     []
@@ -35,7 +26,7 @@ const withTables = editor => {
       const [cell] = Editor.nodes(editor, {
         match: n =>
           !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
+          Element.isElement(n) &&
           n.type === 'table-cell',
       })
 
@@ -59,7 +50,7 @@ const withTables = editor => {
       const [cell] = Editor.nodes(editor, {
         match: n =>
           !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
+          Element.isElement(n) &&
           n.type === 'table-cell',
       })
 
@@ -82,9 +73,7 @@ const withTables = editor => {
     if (selection) {
       const [table] = Editor.nodes(editor, {
         match: n =>
-          !Editor.isEditor(n) &&
-          SlateElement.isElement(n) &&
-          n.type === 'table',
+          !Editor.isEditor(n) && Element.isElement(n) && n.type === 'table',
       })
 
       if (table) {
@@ -98,7 +87,7 @@ const withTables = editor => {
   return editor
 }
 
-const Element = ({ attributes, children, element }) => {
+const renderElement = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'table':
       return (
@@ -115,7 +104,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const renderLeaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -123,9 +112,8 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
-    type: 'paragraph',
     children: [
       {
         text:
@@ -202,7 +190,6 @@ const initialValue: Descendant[] = [
     ],
   },
   {
-    type: 'paragraph',
     children: [
       {
         text:

@@ -9,46 +9,18 @@ import {
   Point,
   Range,
   Transforms,
+  Value,
 } from '..'
+import { ElementOf } from '../interfaces/element'
+import { TextOf } from '../interfaces/text'
 
-export interface TextTransforms {
-  delete: (
-    editor: Editor,
-    options?: {
-      at?: Location
-      distance?: number
-      unit?: 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
-      hanging?: boolean
-      voids?: boolean
-    }
-  ) => void
-  insertFragment: (
-    editor: Editor,
-    fragment: Node[],
-    options?: {
-      at?: Location
-      hanging?: boolean
-      voids?: boolean
-    }
-  ) => void
-  insertText: (
-    editor: Editor,
-    text: string,
-    options?: {
-      at?: Location
-      voids?: boolean
-    }
-  ) => void
-}
-
-export const TextTransforms: TextTransforms = {
+export const TextTransforms = {
   /**
    * Delete content in the editor.
    */
 
-  delete(
-    editor: Editor,
+  delete<V extends Value>(
+    editor: Editor<V>,
     options: {
       at?: Location
       distance?: number
@@ -226,9 +198,9 @@ export const TextTransforms: TextTransforms = {
    * Insert a fragment at a specific location in the editor.
    */
 
-  insertFragment(
-    editor: Editor,
-    fragment: Node[],
+  insertFragment<V extends Value>(
+    editor: Editor<V>,
+    fragment: Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>,
     options: {
       at?: Location
       hanging?: boolean
@@ -302,17 +274,21 @@ export const TextTransforms: TextTransforms = {
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
-      const [, firstPath] = Node.first({ children: fragment }, [])
-      const [, lastPath] = Node.last({ children: fragment }, [])
+      const [, firstPath] = Node.first({ children: fragment } as any, [])
+      const [, lastPath] = Node.last({ children: fragment } as any, [])
 
-      const matches: NodeEntry[] = []
-      const matcher = ([n, p]: NodeEntry) => {
+      const matches: NodeEntry<
+        Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+      >[] = []
+      const matcher = ([n, p]: NodeEntry<
+        Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+      >) => {
         if (
           mergeStart &&
           Path.isAncestor(p, firstPath) &&
           Element.isElement(n) &&
-          !editor.isVoid(n) &&
-          !editor.isInline(n)
+          !editor.isVoid(n as any) &&
+          !editor.isInline(n as any)
         ) {
           return false
         }
@@ -321,8 +297,8 @@ export const TextTransforms: TextTransforms = {
           mergeEnd &&
           Path.isAncestor(p, lastPath) &&
           Element.isElement(n) &&
-          !editor.isVoid(n) &&
-          !editor.isInline(n)
+          !editor.isVoid(n as any) &&
+          !editor.isInline(n as any)
         ) {
           return false
         }
@@ -330,12 +306,17 @@ export const TextTransforms: TextTransforms = {
         return true
       }
 
-      for (const entry of Node.nodes(
-        { children: fragment },
-        { pass: matcher }
-      )) {
-        if (entry[1].length > 0 && matcher(entry)) {
-          matches.push(entry)
+      const root = { children: fragment }
+
+      for (const entry of Node.nodes(root as any, {
+        pass: matcher as any,
+      })) {
+        if (entry[1].length > 0 && matcher(entry as any)) {
+          matches.push(
+            entry as NodeEntry<
+              Array<ElementOf<Editor<V>> | TextOf<Editor<V>>>[number]
+            >
+          )
         }
       }
 
@@ -402,7 +383,7 @@ export const TextTransforms: TextTransforms = {
         voids,
       })
 
-      Transforms.insertNodes(editor, middles, {
+      Transforms.insertNodes<V>(editor, middles, {
         at: middleRef.current!,
         match: n => Editor.isBlock(editor, n),
         mode: 'lowest',
@@ -441,8 +422,8 @@ export const TextTransforms: TextTransforms = {
    * Insert a string of text in the Editor.
    */
 
-  insertText(
-    editor: Editor,
+  insertText<V extends Value>(
+    editor: Editor<V>,
     text: string,
     options: {
       at?: Location

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Transforms, createEditor, Descendant } from 'slate'
+import { Transforms, createEditor, Value } from 'slate'
 import {
   Slate,
   Editable,
@@ -12,12 +12,10 @@ import {
 } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
-
 import { Button, Icon, Toolbar } from '../components'
-import { ImageElement } from './custom-types'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
@@ -29,7 +27,7 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
-        renderElement={props => <Element {...props} />}
+        renderElement={renderElement}
         placeholder="Enter some text..."
       />
     </Slate>
@@ -72,14 +70,15 @@ const withImages = editor => {
 }
 
 const insertImage = (editor, url) => {
-  const text = { text: '' }
-  const image: ImageElement = { type: 'image', url, children: [text] }
-  Transforms.insertNodes(editor, image)
+  Transforms.insertNodes(editor, {
+    type: 'image',
+    url,
+    children: [{ text: '' }],
+  })
 }
 
-const Element = props => {
+const renderElement = props => {
   const { attributes, children, element } = props
-
   switch (element.type) {
     case 'image':
       return <Image {...props} />
@@ -135,7 +134,7 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

@@ -1,40 +1,12 @@
-import { Editor, Location, Point, Range, Transforms } from '..'
+import { Editor, Location, Point, Range, Transforms, Value } from '..'
 
-export interface SelectionTransforms {
-  collapse: (
-    editor: Editor,
-    options?: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) => void
-  deselect: (editor: Editor) => void
-  move: (
-    editor: Editor,
-    options?: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) => void
-  select: (editor: Editor, target: Location) => void
-  setPoint: (
-    editor: Editor,
-    props: Partial<Point>,
-    options?: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) => void
-  setSelection: (editor: Editor, props: Partial<Range>) => void
-}
-
-export const SelectionTransforms: SelectionTransforms = {
+export const SelectionTransforms = {
   /**
    * Collapse the selection.
    */
 
-  collapse(
-    editor: Editor,
+  collapse<V extends Value>(
+    editor: Editor<V>,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
     } = {}
@@ -61,7 +33,7 @@ export const SelectionTransforms: SelectionTransforms = {
    * Unset the selection.
    */
 
-  deselect(editor: Editor): void {
+  deselect<V extends Value>(editor: Editor<V>): void {
     const { selection } = editor
 
     if (selection) {
@@ -77,8 +49,8 @@ export const SelectionTransforms: SelectionTransforms = {
    * Move the selection's point forward or backward.
    */
 
-  move(
-    editor: Editor,
+  move<V extends Value>(
+    editor: Editor<V>,
     options: {
       distance?: number
       unit?: 'offset' | 'character' | 'word' | 'line'
@@ -133,7 +105,7 @@ export const SelectionTransforms: SelectionTransforms = {
    * Set the selection to a new value.
    */
 
-  select(editor: Editor, target: Location): void {
+  select<V extends Value>(editor: Editor<V>, target: Location): void {
     const { selection } = editor
     target = Editor.range(editor, target)
 
@@ -161,8 +133,8 @@ export const SelectionTransforms: SelectionTransforms = {
    * Set new properties on one of the selection's points.
    */
 
-  setPoint(
-    editor: Editor,
+  setPoint<V extends Value>(
+    editor: Editor<V>,
     props: Partial<Point>,
     options: {
       edge?: 'anchor' | 'focus' | 'start' | 'end'
@@ -195,7 +167,10 @@ export const SelectionTransforms: SelectionTransforms = {
    * Set new properties on the selection.
    */
 
-  setSelection(editor: Editor, props: Partial<Range>): void {
+  setSelection<V extends Value>(
+    editor: Editor<V>,
+    props: Partial<Range>
+  ): void {
     const { selection } = editor
     const oldProps: Partial<Range> | null = {}
     const newProps: Partial<Range> = {}

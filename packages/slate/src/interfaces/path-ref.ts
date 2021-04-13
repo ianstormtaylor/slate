@@ -6,17 +6,13 @@ import { Operation, Path } from '..'
  * at any time for the up-to-date path value.
  */
 
-export interface PathRef {
+export type PathRef = {
   current: Path | null
   affinity: 'forward' | 'backward' | null
   unref(): Path | null
 }
 
-export interface PathRefInterface {
-  transform: (ref: PathRef, op: Operation) => void
-}
-
-export const PathRef: PathRefInterface = {
+export const PathRef = {
   /**
    * Transform the path ref's current value by an operation.
    */

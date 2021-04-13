@@ -1,4 +1,4 @@
-import { Editor, Operation, Path } from 'slate'
+import { Editor, Operation, Path, Value } from 'slate'
 
 import { HistoryEditor } from './history-editor'
 
@@ -12,8 +12,10 @@ import { HistoryEditor } from './history-editor'
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-export const withHistory = <T extends Editor>(editor: T) => {
-  const e = editor as T & HistoryEditor
+export const withHistory = <V extends Value, E extends Editor<V>>(
+  editor: E
+): E & HistoryEditor<V> => {
+  const e = (editor as unknown) as E & HistoryEditor<V>
   const { apply } = e
   e.history = { undos: [], redos: [] }
 

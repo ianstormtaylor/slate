@@ -1,21 +1,12 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
-import {
-  Transforms,
-  Editor,
-  Range,
-  createEditor,
-  Element as SlateElement,
-  Descendant,
-} from 'slate'
+import { Transforms, Editor, Range, createEditor, Element, Value } from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkElement } from './custom-types'
-
 import { Button, Icon, Toolbar } from '../components'
 
-const LinkExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+export default function() {
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withLinks(withHistory(withReact(createEditor()))),
     []
@@ -25,10 +16,9 @@ const LinkExample = () => {
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <LinkButton />
-        <RemoveLinkButton />
       </Toolbar>
       <Editable
-        renderElement={props => <Element {...props} />}
+        renderElement={renderElement}
         placeholder="Enter some text..."
       />
     </Slate>
@@ -52,7 +42,6 @@ const withLinks = editor => {
 
   editor.insertData = data => {
     const text = data.getData('text/plain')
-
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
@@ -72,7 +61,7 @@ const insertLink = (editor, url) => {
 const isLinkActive = editor => {
   const [link] = Editor.nodes(editor, {
     match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+      !Editor.isEditor(n) && Element.isElement(n) && n.type === 'link',
   })
   return !!link
 }
@@ -80,7 +69,7 @@ const isLinkActive = editor => {
 const unwrapLink = editor => {
   Transforms.unwrapNodes(editor, {
     match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
+      !Editor.isEditor(n) && Element.isElement(n) && n.type === 'link',
   })
 }
 
@@ -91,7 +80,7 @@ const wrapLink = (editor, url) => {
 
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link: LinkElement = {
+  const link = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: url }] : [],
@@ -105,14 +94,10 @@ const wrapLink = (editor, url) => {
   }
 }
 
-const Element = ({ attributes, children, element }) => {
+const renderElement = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'link':
-      return (
-        <a {...attributes} href={element.url}>
-          {children}
-        </a>
-      )
+      return <a {...attributes} href={element.url} children={children} />
     default:
       return <p {...attributes}>{children}</p>
   }
@@ -135,24 +120,7 @@ const LinkButton = () => {
   )
 }
 
-const RemoveLinkButton = () => {
-  const editor = useSlate()
-
-  return (
-    <Button
-      active={isLinkActive(editor)}
-      onMouseDown={event => {
-        if (isLinkActive(editor)) {
-          unwrapLink(editor)
-        }
-      }}
-    >
-      <Icon>link_off</Icon>
-    </Button>
-  )
-}
-
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [
@@ -164,9 +132,7 @@ const initialValue: Descendant[] = [
         url: 'https://en.wikipedia.org/wiki/Hypertext',
         children: [{ text: 'hyperlinks' }],
       },
-      {
-        text: '!',
-      },
+      { text: '!' },
     ],
   },
   {
@@ -179,5 +145,3 @@ const initialValue: Descendant[] = [
     ],
   },
 ]
-
-export default LinkExample

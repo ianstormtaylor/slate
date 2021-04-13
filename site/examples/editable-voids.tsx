@@ -1,28 +1,25 @@
 import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Descendant } from 'slate'
+import { Transforms, createEditor, Value } from 'slate'
 import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
-
 import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from '../components'
-import { EditableVoidElement } from './custom-types'
 
 const EditableVoidsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={setValue}>
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <InsertEditableVoidButton />
       </Toolbar>
-
       <Editable
-        renderElement={props => <Element {...props} />}
+        renderElement={renderElement}
         placeholder="Enter some text..."
       />
     </Slate>
@@ -40,17 +37,14 @@ const withEditableVoids = editor => {
 }
 
 const insertEditableVoid = editor => {
-  const text = { text: '' }
-  const voidNode: EditableVoidElement = {
+  Transforms.insertNodes(editor, {
     type: 'editable-void',
-    children: [text],
-  }
-  Transforms.insertNodes(editor, voidNode)
+    children: [{ text: '' }],
+  })
 }
 
-const Element = props => {
+const renderElement = props => {
   const { attributes, children, element } = props
-
   switch (element.type) {
     case 'editable-void':
       return <EditableVoid {...props} />
@@ -59,13 +53,8 @@ const Element = props => {
   }
 }
 
-const unsetWidthStyle = css`
-  width: unset;
-`
-
-const EditableVoid = ({ attributes, children, element }) => {
+const EditableVoid = ({ attributes, children }) => {
   const [inputValue, setInputValue] = useState('')
-
   return (
     // Need contentEditable=false or Firefox has issues with certain input types.
     <div {...attributes} contentEditable={false}>
@@ -88,7 +77,9 @@ const EditableVoid = ({ attributes, children, element }) => {
         />
         <h4>Left or right handed:</h4>
         <input
-          className={unsetWidthStyle}
+          className={css`
+            width: unset;
+          `}
           type="radio"
           name="handedness"
           value="left"
@@ -96,7 +87,9 @@ const EditableVoid = ({ attributes, children, element }) => {
         Left
         <br />
         <input
-          className={unsetWidthStyle}
+          className={css`
+            width: unset;
+          `}
           type="radio"
           name="handedness"
           value="right"
@@ -131,7 +124,7 @@ const InsertEditableVoidButton = () => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [

@@ -6,6 +6,7 @@ import {
   Text,
   Editor,
   createEditor as makeEditor,
+  Value,
 } from 'slate'
 import {
   AnchorToken,
@@ -221,7 +222,7 @@ export function createEditor(
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Editor {
+): Editor<Value> {
   const otherChildren: any[] = []
   let selectionChild: Range | undefined
 

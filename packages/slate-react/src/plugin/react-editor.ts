@@ -1,4 +1,4 @@
-import { Editor, Node, Path, Point, Range, Transforms, BaseEditor } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, Value } from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -30,10 +30,9 @@ import { IS_CHROME } from '../utils/environment'
  * A React and DOM-specific version of the `Editor` interface.
  */
 
-export interface ReactEditor extends BaseEditor {
+export type ReactEditor<V extends Value> = Editor<V> & {
   insertData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
-  hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
 export const ReactEditor = {
@@ -41,7 +40,7 @@ export const ReactEditor = {
    * Return the host window of the current editor.
    */
 
-  getWindow(editor: ReactEditor): Window {
+  getWindow<V extends Value>(editor: ReactEditor<V>): Window {
     const window = EDITOR_TO_WINDOW.get(editor)
     if (!window) {
       throw new Error('Unable to find a host window element for this editor')
@@ -53,7 +52,7 @@ export const ReactEditor = {
    * Find a key for a Slate node.
    */
 
-  findKey(editor: ReactEditor, node: Node): Key {
+  findKey<V extends Value>(editor: ReactEditor<V>, node: Node): Key {
     let key = NODE_TO_KEY.get(node)
 
     if (!key) {
@@ -68,7 +67,7 @@ export const ReactEditor = {
    * Find the path of Slate node.
    */
 
-  findPath(editor: ReactEditor, node: Node): Path {
+  findPath<V extends Value>(editor: ReactEditor<V>, node: Node): Path {
     const path: Path = []
     let child = node
 
@@ -102,7 +101,9 @@ export const ReactEditor = {
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
 
-  findDocumentOrShadowRoot(editor: ReactEditor): Document | ShadowRoot {
+  findDocumentOrShadowRoot<V extends Value>(
+    editor: ReactEditor<V>
+  ): Document | ShadowRoot {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 
@@ -125,7 +126,7 @@ export const ReactEditor = {
    * Check if the editor is focused.
    */
 
-  isFocused(editor: ReactEditor): boolean {
+  isFocused<V extends Value>(editor: ReactEditor<V>): boolean {
     return !!IS_FOCUSED.get(editor)
   },
 
@@ -133,7 +134,7 @@ export const ReactEditor = {
    * Check if the editor is in read-only mode.
    */
 
-  isReadOnly(editor: ReactEditor): boolean {
+  isReadOnly<V extends Value>(editor: ReactEditor<V>): boolean {
     return !!IS_READ_ONLY.get(editor)
   },
 
@@ -141,7 +142,7 @@ export const ReactEditor = {
    * Blur the editor.
    */
 
-  blur(editor: ReactEditor): void {
+  blur<V extends Value>(editor: ReactEditor<V>): void {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, false)
@@ -155,7 +156,7 @@ export const ReactEditor = {
    * Focus the editor.
    */
 
-  focus(editor: ReactEditor): void {
+  focus<V extends Value>(editor: ReactEditor<V>): void {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, true)
@@ -169,7 +170,7 @@ export const ReactEditor = {
    * Deselect the editor.
    */
 
-  deselect(editor: ReactEditor): void {
+  deselect<V extends Value>(editor: ReactEditor<V>): void {
     const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
@@ -188,8 +189,8 @@ export const ReactEditor = {
    * Check if a DOM node is within the editor.
    */
 
-  hasDOMNode(
-    editor: ReactEditor,
+  hasDOMNode<V extends Value>(
+    editor: ReactEditor<V>,
     target: DOMNode,
     options: { editable?: boolean } = {}
   ): boolean {
@@ -229,7 +230,10 @@ export const ReactEditor = {
    * Insert data from a `DataTransfer` into the editor.
    */
 
-  insertData(editor: ReactEditor, data: DataTransfer): void {
+  insertData<V extends Value>(
+    editor: ReactEditor<V>,
+    data: DataTransfer
+  ): void {
     editor.insertData(data)
   },
 
@@ -237,7 +241,10 @@ export const ReactEditor = {
    * Sets data from the currently selected fragment on a `DataTransfer`.
    */
 
-  setFragmentData(editor: ReactEditor, data: DataTransfer): void {
+  setFragmentData<V extends Value>(
+    editor: ReactEditor<V>,
+    data: DataTransfer
+  ): void {
     editor.setFragmentData(data)
   },
 
@@ -245,7 +252,7 @@ export const ReactEditor = {
    * Find the native DOM element from a Slate node.
    */
 
-  toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
+  toDOMNode<V extends Value>(editor: ReactEditor<V>, node: Node): HTMLElement {
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
       : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
@@ -263,7 +270,7 @@ export const ReactEditor = {
    * Find a native DOM selection point from a Slate point.
    */
 
-  toDOMPoint(editor: ReactEditor, point: Point): DOMPoint {
+  toDOMPoint<V extends Value>(editor: ReactEditor<V>, point: Point): DOMPoint {
     const [node] = Editor.node(editor, point.path)
     const el = ReactEditor.toDOMNode(editor, node)
     let domPoint: DOMPoint | undefined
@@ -320,7 +327,7 @@ export const ReactEditor = {
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
 
-  toDOMRange(editor: ReactEditor, range: Range): DOMRange {
+  toDOMRange<V extends Value>(editor: ReactEditor<V>, range: Range): DOMRange {
     const { anchor, focus } = range
     const isBackward = Range.isBackward(range)
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
@@ -354,7 +361,7 @@ export const ReactEditor = {
    * Find a Slate node from a native DOM `element`.
    */
 
-  toSlateNode(editor: ReactEditor, domNode: DOMNode): Node {
+  toSlateNode<V extends Value>(editor: ReactEditor<V>, domNode: DOMNode): Node {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
     if (domEl && !domEl.hasAttribute('data-slate-node')) {
@@ -374,7 +381,7 @@ export const ReactEditor = {
    * Get the target range from a DOM `event`.
    */
 
-  findEventRange(editor: ReactEditor, event: any): Range {
+  findEventRange<V extends Value>(editor: ReactEditor<V>, event: any): Range {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
     }
@@ -440,7 +447,10 @@ export const ReactEditor = {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
+  toSlatePoint<V extends Value>(
+    editor: ReactEditor<V>,
+    domPoint: DOMPoint
+  ): Point {
     const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
@@ -530,8 +540,8 @@ export const ReactEditor = {
    * Find a Slate range from a DOM range or selection.
    */
 
-  toSlateRange(
-    editor: ReactEditor,
+  toSlateRange<V extends Value>(
+    editor: ReactEditor<V>,
     domRange: DOMRange | DOMStaticRange | DOMSelection
   ): Range {
     const el = isDOMSelection(domRange)
@@ -586,12 +596,5 @@ export const ReactEditor = {
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
 
     return { anchor, focus }
-  },
-
-  hasRange(editor: ReactEditor, range: Range): boolean {
-    const { anchor, focus } = range
-    return (
-      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
-    )
   },
 }

@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import { createEditor, Descendant, Element } from 'slate'
+import { createEditor, Value } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+  const [value, setValue] = useState(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -12,7 +12,7 @@ const ReadOnlyExample = () => {
   )
 }
 
-const initialValue: Descendant[] = [
+const initialValue: Value = [
   {
     type: 'paragraph',
     children: [
