@@ -631,7 +631,8 @@ export const NodeTransforms: NodeTransforms = {
           }
 
           if (props[k] !== node[k]) {
-            properties[k] = node[k]
+            // Omit new properties from the old property list rather than set them to undefined
+            if (node.hasOwnProperty(k)) properties[k] = node[k]
             newProperties[k] = props[k]
           }
         }
