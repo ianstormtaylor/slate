@@ -1,5 +1,5 @@
 ---
-'slate-react': major
+'slate-react': patch
 ---
 
-sync to extractly matched DOM selection with editor.selection
+Fixed a bug when syncing the selection for IME-based editing.
