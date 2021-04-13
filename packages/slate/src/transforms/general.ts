@@ -182,7 +182,7 @@ export const GeneralTransforms: GeneralTransforms = {
       }
 
       case 'set_node': {
-        const { path, newProperties } = op
+        const { path, properties, newProperties } = op
 
         if (path.length === 0) {
           throw new Error(`Cannot set properties on the root node!`)
@@ -201,6 +201,13 @@ export const GeneralTransforms: GeneralTransforms = {
             delete node[key]
           } else {
             node[key] = value
+          }
+        }
+
+        // properties that were previously defined, but are now missing, must be deleted
+        for (const key in properties) {
+          if (!newProperties.hasOwnProperty(key)) {
+            delete node[key]
           }
         }
 
