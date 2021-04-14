@@ -12,6 +12,7 @@ export const input = (
       <anchor />
     </block>
     <block>
+      extra text
       <focus />
       two<inline>three</inline>four
     </block>

@@ -16,6 +16,7 @@ export const input = (
     </block>
     <block>
       <block>
+        extra text
         <focus />
         three
       </block>

@@ -14,6 +14,7 @@ export const input = (
       </block>
     </block>
     <block>
+      extra text
       <focus />
       two
     </block>

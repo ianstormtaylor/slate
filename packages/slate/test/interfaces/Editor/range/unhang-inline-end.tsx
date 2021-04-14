@@ -1,0 +1,29 @@
+/** @jsx jsx */
+import { Editor, Transforms } from 'slate'
+import { jsx } from '../../..'
+
+export const input: Editor = (
+  <editor>
+    <block>one</block>
+    <block>
+      <text />
+      <inline>two</inline>
+      <text />
+    </block>
+  </editor>
+)
+
+export const inputCursor = {
+  anchor: { path: [0, 0], offset: 0 },
+  focus: { path: [1, 1, 0], offset: 0 },
+}
+
+export const test = editor => {
+  Transforms.select(editor, inputCursor)
+  return Editor.unhangRange(editor, editor.selection)
+}
+
+export const output = {
+  anchor: { path: [0, 0], offset: 0 },
+  focus: { path: [0, 0], offset: 3 },
+}
