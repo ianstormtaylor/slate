@@ -35,9 +35,9 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  DOMStaticRange,
   isPlainTextOnlyPaste,
 } from '../utils/dom'
+
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -47,22 +47,7 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
-
-const defaultPlaceholderProps: {
-  style: React.CSSProperties
-} = {
-  style: {
-    display: 'block',
-    width: '100%',
-    maxWidth: '100%',
-    whiteSpace: 'nowrap',
-    opacity: '0.333',
-    userSelect: 'none',
-    fontStyle: 'normal',
-    fontWeight: 'normal',
-    textDecoration: 'none',
-  },
-}
+import { RenderPlaceholderProps } from './leaf'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -114,7 +99,7 @@ export type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderPlaceholder?: (props: typeof defaultPlaceholderProps) => JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
@@ -492,12 +477,8 @@ export const Editable = (props: EditableProps) => {
 
   const decorations = decorate([editor, []])
 
-  const renderedPlaceholder =
-    renderPlaceholder?.(defaultPlaceholderProps) ||
-    (placeholder && <span {...defaultPlaceholderProps}>{placeholder}</span>)
-
   if (
-    renderedPlaceholder &&
+    (renderPlaceholder || placeholder) &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === ''
@@ -505,7 +486,7 @@ export const Editable = (props: EditableProps) => {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
-      placeholder: renderedPlaceholder,
+      placeholder: renderPlaceholder || placeholder,
       anchor: start,
       focus: start,
     })

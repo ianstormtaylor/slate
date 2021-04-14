@@ -5,6 +5,24 @@ import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps } from './editable'
 
 /**
+ * The props that get passed to renderPlaceholder
+ */
+export type RenderPlaceholderProps = {
+  style: React.CSSProperties
+  contentEditable: boolean
+  children?: React.ReactNode
+  ref: React.RefObject<any>
+}
+
+/**
+ * The default placeholder render method
+ */
+
+export const defaultRenderPlaceholder = (props: RenderPlaceholderProps) => (
+  <span {...props} />
+)
+
+/**
  * Individual leaves in a text node with unique formatting.
  */
 
@@ -47,20 +65,31 @@ const Leaf = (props: {
   )
 
   if (leaf[PLACEHOLDER_SYMBOL]) {
+    const placeholderProps = {
+      ref: placeholderRef,
+      contentEditable: false,
+      style: {
+        position: 'absolute',
+        pointerEvents: 'none',
+        width: '100%',
+        maxWidth: '100%',
+        display: 'block',
+        opacity: '0.333',
+        userSelect: 'none',
+        fontStyle: 'normal',
+        fontWeight: 'normal',
+        textDecoration: 'none',
+      } as React.CSSProperties,
+    }
+
     children = (
       <React.Fragment>
-        <span
-          ref={placeholderRef}
-          contentEditable={false}
-          style={{
-            position: 'absolute',
-            pointerEvents: 'none',
-            width: '100%',
-            maxWidth: '100%',
-          }}
-        >
-          {leaf.placeholder}
-        </span>
+        {typeof leaf.placeholder === 'string'
+          ? defaultRenderPlaceholder({
+              ...placeholderProps,
+              children: leaf.placeholder,
+            })
+          : leaf.placeholder(placeholderProps)}
         {children}
       </React.Fragment>
     )
