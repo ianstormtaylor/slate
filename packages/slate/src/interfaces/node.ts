@@ -635,3 +635,7 @@ export type NodeProps =
   | Omit<Editor, 'children'>
   | Omit<Element, 'children'>
   | Omit<Text, 'text'>
+
+// export type NodeProps<T extends Node> = T extends Element
+//   ? Omit<T, 'children'>
+//   : Omit<T, 'text'>

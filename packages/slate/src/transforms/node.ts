@@ -12,6 +12,7 @@ import {
   Ancestor,
 } from '..'
 import { NodeMatch } from '../interfaces/editor'
+import { NodeProps } from '../interfaces/node'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -67,7 +68,7 @@ export interface NodeTransforms {
   ) => void
   setNodes: <T extends Node>(
     editor: Editor,
-    props: Partial<Node>,
+    props: Partial<T> | ((existingProps: NodeProps) => Partial<T>),
     options?: {
       at?: Location
       match?: NodeMatch<T>
@@ -555,7 +556,7 @@ export const NodeTransforms: NodeTransforms = {
 
   setNodes<T extends Node>(
     editor: Editor,
-    props: Partial<Node>,
+    props: Partial<T> | ((existingProps: NodeProps) => Partial<T>),
     options: {
       at?: Location
       match?: NodeMatch<T>
@@ -621,23 +622,24 @@ export const NodeTransforms: NodeTransforms = {
         mode,
         voids,
       })) {
-        const properties: Partial<Node> = {}
-        const newProperties: Partial<Node> = {}
+        const properties: Partial<T> = {}
+        const newProperties: Partial<T> = {}
+        const propsToApply = typeof props === 'function' ? props(node) : props
 
         // You can't set properties on the editor node.
         if (path.length === 0) {
           continue
         }
 
-        for (const k in props) {
+        for (const k in propsToApply) {
           if (k === 'children' || k === 'text') {
             continue
           }
 
-          if (props[k] !== node[k]) {
+          if (propsToApply[k] !== node[k]) {
             // Omit new properties from the old property list rather than set them to undefined
             if (node.hasOwnProperty(k)) properties[k] = node[k]
-            newProperties[k] = props[k]
+            newProperties[k] = propsToApply[k]
           }
         }
 
