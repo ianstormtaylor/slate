@@ -24,3 +24,6 @@ packages/*/yarn.lock
 
 # Editor files
 .tern-port
+
+
+tags*
