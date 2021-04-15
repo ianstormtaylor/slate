@@ -1,5 +1,5 @@
 {
-  "projectId": "slate-react",
+  "projectId": "slate",
   "env": {
     "SITE_URL": "localhost:3000"
   },
