@@ -1,0 +1,7 @@
+{
+  "projectId": "slate-react",
+  "env": {
+    "SITE_URL": "localhost:3000"
+  },
+  "chromeWebSecurity": false
+}
