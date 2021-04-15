@@ -87,6 +87,10 @@ yarn lint
 
 This will catch TypeScript, Prettier, and Eslint errors.
 
+## Running integration tests
+
+To run integrations with [cypress](https://github.com/cypress-io/cypress), first run `yarn start` to run the examples website, then run `yarn cypress:open` to open the cypress GUI.
+
 ## Testing Input Methods
 
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
