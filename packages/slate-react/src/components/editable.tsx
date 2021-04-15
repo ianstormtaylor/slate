@@ -646,11 +646,14 @@ export const Editable = (props: EditableProps) => {
               ) {
                 state.isComposing = false
 
+                // https://github.com/ianstormtaylor/slate/issues/4060
+                document.execCommand('undo')
+
                 // COMPAT: In Chrome, `beforeinput` events for compositions
                 // aren't correct and never fire the "insertFromComposition"
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && !IS_FIREFOX && event.data) {
+                if (!IS_SAFARI && event.data) {
                   Editor.insertText(editor, event.data)
                 }
               }
