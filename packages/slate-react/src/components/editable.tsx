@@ -47,7 +47,6 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
-import { RenderPlaceholderProps } from './leaf'
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
@@ -116,7 +115,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
-    renderPlaceholder,
+    renderPlaceholder = defaultRenderPlaceholder,
     style = {},
     as: Component = 'div',
     ...attributes
@@ -478,7 +477,7 @@ export const Editable = (props: EditableProps) => {
   const decorations = decorate([editor, []])
 
   if (
-    (renderPlaceholder || placeholder) &&
+    placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === ''
@@ -486,7 +485,7 @@ export const Editable = (props: EditableProps) => {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
-      placeholder: renderPlaceholder || placeholder,
+      placeholder,
       anchor: start,
       focus: start,
     })
@@ -1044,6 +1043,7 @@ export const Editable = (props: EditableProps) => {
             decorations,
             node: editor,
             renderElement,
+            renderPlaceholder,
             renderLeaf,
             selection: editor.selection,
           })}
@@ -1052,6 +1052,37 @@ export const Editable = (props: EditableProps) => {
     </ReadOnlyContext.Provider>
   )
 }
+
+/**
+ * The props that get passed to renderPlaceholder
+ */
+export type RenderPlaceholderProps = {
+  contentEditable: boolean
+  children?: React.ReactNode
+  ref: React.RefObject<any>
+}
+
+/**
+ * Default placeholder style object.
+ */
+export const defaultPlaceholderStyle: React.CSSProperties = {
+  position: 'absolute',
+  pointerEvents: 'none',
+  width: '100%',
+  maxWidth: '100%',
+  display: 'block',
+  opacity: '0.333',
+  userSelect: 'none',
+  textDecoration: 'none',
+}
+
+/**
+ * The default placeholder render method
+ */
+
+export const defaultRenderPlaceholder = (props: RenderPlaceholderProps) => (
+  <span style={defaultPlaceholderStyle} {...props} />
+)
 
 /**
  * A default memoized decorate function.

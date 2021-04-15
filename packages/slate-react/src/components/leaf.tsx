@@ -2,25 +2,7 @@ import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
-import { RenderLeafProps } from './editable'
-
-/**
- * The props that get passed to renderPlaceholder
- */
-export type RenderPlaceholderProps = {
-  style: React.CSSProperties
-  contentEditable: boolean
-  children?: React.ReactNode
-  ref: React.RefObject<any>
-}
-
-/**
- * The default placeholder render method
- */
-
-export const defaultRenderPlaceholder = (props: RenderPlaceholderProps) => (
-  <span {...props} />
-)
+import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -30,6 +12,7 @@ const Leaf = (props: {
   isLast: boolean
   leaf: Text
   parent: Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: Text
 }) => {
@@ -38,6 +21,7 @@ const Leaf = (props: {
     isLast,
     text,
     parent,
+    renderPlaceholder,
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
@@ -68,28 +52,12 @@ const Leaf = (props: {
     const placeholderProps = {
       ref: placeholderRef,
       contentEditable: false,
-      style: {
-        position: 'absolute',
-        pointerEvents: 'none',
-        width: '100%',
-        maxWidth: '100%',
-        display: 'block',
-        opacity: '0.333',
-        userSelect: 'none',
-        fontStyle: 'normal',
-        fontWeight: 'normal',
-        textDecoration: 'none',
-      } as React.CSSProperties,
+      children: leaf.placeholder,
     }
 
     children = (
       <React.Fragment>
-        {typeof leaf.placeholder === 'string'
-          ? defaultRenderPlaceholder({
-              ...placeholderProps,
-              children: leaf.placeholder,
-            })
-          : leaf.placeholder(placeholderProps)}
+        {renderPlaceholder(placeholderProps)}
         {children}
       </React.Fragment>
     )

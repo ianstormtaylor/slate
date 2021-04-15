@@ -3,13 +3,12 @@ export {
   RenderElementProps,
   RenderLeafProps,
   Editable,
+  RenderPlaceholderProps,
+  defaultRenderPlaceholder,
+  defaultPlaceholderStyle,
 } from './components/editable'
 export { DefaultElement } from './components/element'
-export {
-  DefaultLeaf,
-  defaultRenderPlaceholder,
-  RenderPlaceholderProps,
-} from './components/leaf'
+export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
 
 // Hooks
