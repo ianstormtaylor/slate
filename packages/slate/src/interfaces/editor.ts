@@ -1648,16 +1648,16 @@ export const Editor: EditorInterface = {
 
     for (const [node, path] of Editor.nodes(editor, {
       at: before,
-      match: Text.isText,
+      match: n => Text.isText(n) || (editor.isInline(n) && editor.isVoid(n)),
       reverse: true,
       voids,
     })) {
       if (skip) {
         skip = false
         continue
-      }
-
-      if (node.text !== '' || Path.isBefore(path, blockPath)) {
+      } else if (!Text.isText(node)) {
+        break
+      } else if (node.text !== '' || Path.isBefore(path, blockPath)) {
         end = { path, offset: node.text.length }
         break
       }
