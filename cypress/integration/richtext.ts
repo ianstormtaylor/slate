@@ -1,6 +1,6 @@
 describe('On richtext example', () => {
   it('inserts text when typed', () => {
-    cy.goTo('examples/richtext')
+    cy.visit('examples/richtext')
 
     cy.findByRole('textbox')
       .type('{movetostart}')
