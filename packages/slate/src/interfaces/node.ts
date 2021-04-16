@@ -631,11 +631,6 @@ export type NodeEntry<T extends Node = Node> = [T, Path]
 /**
  * Convenience type for returning the props of a node.
  */
-export type NodeProps =
-  | Omit<Editor, 'children'>
-  | Omit<Element, 'children'>
-  | Omit<Text, 'text'>
-
-// export type NodeProps<T extends Node> = T extends Element
-//   ? Omit<T, 'children'>
-//   : Omit<T, 'text'>
+export type NodeProps<T extends Node = Node> = T extends Element
+  ? Omit<T, 'children'>
+  : Omit<T, 'text'>
