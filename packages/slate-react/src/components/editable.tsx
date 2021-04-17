@@ -21,7 +21,6 @@ import {
   IS_SAFARI,
   IS_EDGE_LEGACY,
   IS_CHROME_LEGACY,
-  IS_FIREFOX_LEGACY,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -50,11 +49,12 @@ import {
 
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT = !(
-  IS_FIREFOX_LEGACY ||
-  IS_EDGE_LEGACY ||
-  IS_CHROME_LEGACY
-)
+const HAS_BEFORE_INPUT_SUPPORT =
+  !IS_CHROME_LEGACY &&
+  !IS_EDGE_LEGACY &&
+  globalThis.InputEvent &&
+  // @ts-ignore The `getTargetRanges` property isn't recognized.
+  typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
@@ -175,13 +175,13 @@ export const Editable = (props: EditableProps) => {
     }
 
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (
-      hasDomSelection &&
-      hasDomSelectionInEditor &&
-      selection &&
-      Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
-    ) {
-      return
+    if (hasDomSelection && hasDomSelectionInEditor && selection) {
+      const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
+        exactMatch: true,
+      })
+      if (slateRange && Range.equals(slateRange, selection)) {
+        return
+      }
     }
 
     // when <Editable/> is being controlled through external value
@@ -189,7 +189,9 @@ export const Editable = (props: EditableProps) => {
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
     if (selection && !ReactEditor.hasRange(editor, selection)) {
-      editor.selection = ReactEditor.toSlateRange(editor, domSelection)
+      editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
+        exactMatch: false,
+      })
       return
     }
 
@@ -280,7 +282,9 @@ export const Editable = (props: EditableProps) => {
           const [targetRange] = (event as any).getTargetRanges()
 
           if (targetRange) {
-            const range = ReactEditor.toSlateRange(editor, targetRange)
+            const range = ReactEditor.toSlateRange(editor, targetRange, {
+              exactMatch: false,
+            })
 
             if (!selection || !Range.equals(selection, range)) {
               Transforms.select(editor, range)
@@ -444,7 +448,9 @@ export const Editable = (props: EditableProps) => {
           isTargetInsideVoid(editor, focusNode)
 
         if (anchorNodeSelectable && focusNodeSelectable) {
-          const range = ReactEditor.toSlateRange(editor, domSelection)
+          const range = ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+          })
           Transforms.select(editor, range)
         } else {
           Transforms.deselect(editor)

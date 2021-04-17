@@ -32,7 +32,7 @@ const HoveringMenuExample = () => {
             case 'formatItalic':
               return toggleFormat(editor, 'italic')
             case 'formatUnderline':
-              return toggleFormat(editor, 'underline')
+              return toggleFormat(editor, 'underlined')
           }
         }}
       />
