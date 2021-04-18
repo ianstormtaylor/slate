@@ -154,7 +154,6 @@ export class AndroidInputManager {
     this.observer.observe(rootEl, {
       childList: true,
       characterData: true,
-      attributes: true,
       subtree: true,
       characterDataOldValue: true,
     })
@@ -542,7 +541,10 @@ export class AndroidInputManager {
       }
 
       debug('onSelect:save-data', {
-        domSelection: normalizeDOMSelection(domSelection),
+        anchorNode: domSelection.anchorNode,
+        anchorOffset: domSelection.anchorOffset,
+        focusNode: domSelection.focusNode,
+        focusOffset: domSelection.focusOffset,
         range,
       })
 
@@ -565,15 +567,6 @@ export class AndroidInputManager {
       this.lastRange = range
       this.lastDomNode = domSelection.anchorNode
     })
-  }
-}
-
-function normalizeDOMSelection(selection: Selection) {
-  return {
-    anchorNode: selection.anchorNode,
-    anchorOffset: selection.anchorOffset,
-    focusNode: selection.focusNode,
-    focusOffset: selection.focusOffset,
   }
 }
 
