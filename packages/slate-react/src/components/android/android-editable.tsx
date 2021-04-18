@@ -19,12 +19,6 @@ import {
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import {
-  IS_CHROME_LEGACY,
-  IS_EDGE_LEGACY,
-  IS_FIREFOX,
-  IS_SAFARI,
-} from '../../utils/environment'
 import { ReactEditor } from '../..'
 import { ReadOnlyContext } from '../../hooks/use-read-only'
 import { useSlate } from '../../hooks/use-slate'
@@ -52,14 +46,15 @@ import { AndroidInputManager } from './android-input-manager'
 import { EditableProps } from '../editable'
 import { ErrorBoundary } from './ErrorBoundary'
 import useChildren from '../../hooks/use-children'
+import {
+  defaultDecorate,
+  hasEditableTarget,
+  hasTarget,
+  isEventHandled,
+  isTargetInsideVoid,
+} from '../default-editable'
 
-// COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
-// Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT = !(
-  IS_FIREFOX ||
-  IS_EDGE_LEGACY ||
-  IS_CHROME_LEGACY
-)
+const HAS_BEFORE_INPUT_SUPPORT = true
 
 export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
   return (
@@ -196,12 +191,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       }
 
       setTimeout(() => {
-        // COMPAT: In Firefox, it's not enough to create a range, you also need
-        // to focus the contenteditable element too. (2016/11/16)
-        if (newDomRange && IS_FIREFOX) {
-          el.focus()
-        }
-
         state.isUpdatingSelection = false
       })
     } catch (err) {
@@ -334,24 +323,12 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   return (
     <ReadOnlyContext.Provider value={readOnly}>
       <Component
-        // COMPAT: The Grammarly Chrome extension works by changing the DOM
-        // out from under `contenteditable` elements, which leads to weird
-        // behaviors so we have to disable it like editor. (2017/04/24)
-        data-gramm={false}
         key={contentKey}
         role={readOnly ? undefined : 'textbox'}
         {...attributes}
-        // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
-        // have to use hacks to make these replacement-based features work.
-        spellCheck={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.spellCheck
-        }
-        autoCorrect={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCorrect
-        }
-        autoCapitalize={
-          !HAS_BEFORE_INPUT_SUPPORT ? undefined : attributes.autoCapitalize
-        }
+        spellCheck={attributes.spellCheck}
+        autoCorrect={attributes.autoCorrect}
+        autoCapitalize={attributes.autoCapitalize}
         data-slate-editor
         data-slate-node="value"
         contentEditable={readOnly ? undefined : true}
@@ -367,30 +344,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           // Allow for passed-in styles to override anything.
           ...style,
         }}
-        onBeforeInput={useCallback(
-          (event: React.FormEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's leaky polyfill instead just for it. It
-            // only works for the `insertText` input type.
-            if (
-              !HAS_BEFORE_INPUT_SUPPORT &&
-              !readOnly &&
-              !isEventHandled(event, attributes.onBeforeInput) &&
-              hasEditableTarget(editor, event.target)
-            ) {
-              return
-            }
-          },
-          [readOnly]
-        )}
-        onBlur={useCallback((event: React.FocusEvent<HTMLDivElement>) => {}, [
-          readOnly,
-          attributes.onBlur,
-        ])}
-        onClick={useCallback((event: React.MouseEvent<HTMLDivElement>) => {}, [
-          readOnly,
-          attributes.onClick,
-        ])}
         onCompositionEnd={useCallback(
           (event: React.CompositionEvent<HTMLDivElement>) => {
             if (
@@ -447,71 +400,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           },
           [readOnly, attributes.onCut]
         )}
-        onDragOver={useCallback(
-          (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onDragOver)
-            ) {
-              // Only when the target is void, call `preventDefault` to signal
-              // that drops are allowed. Editable content is droppable by
-              // default, and calling `preventDefault` hides the cursor.
-              const node = ReactEditor.toSlateNode(editor, event.target)
-
-              if (Editor.isVoid(editor, node)) {
-                event.preventDefault()
-              }
-            }
-          },
-          [attributes.onDragOver]
-        )}
-        onDragStart={useCallback(
-          (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onDragStart)
-            ) {
-              const node = ReactEditor.toSlateNode(editor, event.target)
-              const path = ReactEditor.findPath(editor, node)
-              const voidMatch = Editor.void(editor, { at: path })
-
-              // If starting a drag on a void node, make sure it is selected
-              // so that it shows up in the selection's fragment.
-              if (voidMatch) {
-                const range = Editor.range(editor, path)
-                Transforms.select(editor, range)
-              }
-
-              ReactEditor.setFragmentData(editor, event.dataTransfer)
-            }
-          },
-          [attributes.onDragStart]
-        )}
-        onDrop={useCallback(
-          (event: React.DragEvent<HTMLDivElement>) => {
-            if (
-              hasTarget(editor, event.target) &&
-              !readOnly &&
-              !isEventHandled(event, attributes.onDrop)
-            ) {
-              // COMPAT: Certain browsers don't fire `beforeinput` events at all, and
-              // Chromium browsers don't properly fire them for files being
-              // dropped into a `contenteditable`. (2019/11/26)
-              // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
-              if (
-                !HAS_BEFORE_INPUT_SUPPORT ||
-                (!IS_SAFARI && event.dataTransfer.files.length > 0)
-              ) {
-                event.preventDefault()
-                const range = ReactEditor.findEventRange(editor, event)
-                const data = event.dataTransfer
-                Transforms.select(editor, range)
-                ReactEditor.insertData(editor, data)
-              }
-            }
-          },
-          [readOnly, attributes.onDrop]
-        )}
         onFocus={useCallback(
           (event: React.FocusEvent<HTMLDivElement>) => {
             if (
@@ -522,14 +410,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
             ) {
               const el = ReactEditor.toDOMNode(editor, editor)
               state.latestElement = window.document.activeElement
-
-              // COMPAT: If the editor has nested editable elements, the focus
-              // can go to them. In Firefox, this must be prevented because it
-              // results in issues with keyboard navigation. (2017/03/30)
-              if (IS_FIREFOX && event.target !== el) {
-                el.focus()
-                return
-              }
 
               IS_FOCUSED.set(editor, true)
             }
@@ -542,16 +422,11 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-            // fall back to React's `onPaste` here instead.
-            // COMPAT: Firefox, Chrome and Safari are not emitting `beforeinput` events
-            // when "paste without formatting" option is used.
             // This unfortunately needs to be handled with paste events instead.
             if (
               hasEditableTarget(editor, event.target) &&
               !isEventHandled(event, attributes.onPaste) &&
-              (!HAS_BEFORE_INPUT_SUPPORT ||
-                isPlainTextOnlyPaste(event.nativeEvent)) &&
+              isPlainTextOnlyPaste(event.nativeEvent) &&
               !readOnly
             ) {
               event.preventDefault()
@@ -571,66 +446,4 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       </Component>
     </ReadOnlyContext.Provider>
   )
-}
-
-/**
- * A default memoized decorate function.
- */
-
-const defaultDecorate = () => []
-
-/**
- * Check if the target is in the editor.
- */
-
-const hasTarget = (
-  editor: ReactEditor,
-  target: EventTarget | null
-): target is DOMNode => {
-  return isDOMNode(target) && ReactEditor.hasDOMNode(editor, target)
-}
-
-/**
- * Check if the target is editable and in the editor.
- */
-
-const hasEditableTarget = (
-  editor: ReactEditor,
-  target: EventTarget | null
-): target is DOMNode => {
-  return (
-    isDOMNode(target) &&
-    ReactEditor.hasDOMNode(editor, target, { editable: true })
-  )
-}
-
-/**
- * Check if the target is inside void and in the editor.
- */
-
-const isTargetInsideVoid = (
-  editor: ReactEditor,
-  target: EventTarget | null
-): boolean => {
-  const slateNode =
-    hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
-  return Editor.isVoid(editor, slateNode)
-}
-
-/**
- * Check if an event is overrided by a handler.
- */
-
-const isEventHandled = <
-  EventType extends React.SyntheticEvent<unknown, unknown>
->(
-  event: EventType,
-  handler?: (event: EventType) => void
-) => {
-  if (!handler) {
-    return false
-  }
-
-  handler(event)
-  return event.isDefaultPrevented() || event.isPropagationStopped()
 }

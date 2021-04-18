@@ -1096,13 +1096,13 @@ export const DefaultPlaceholder = ({
  * A default memoized decorate function.
  */
 
-const defaultDecorate: (entry: NodeEntry) => Range[] = () => []
+export const defaultDecorate: (entry: NodeEntry) => Range[] = () => []
 
 /**
  * Check if two DOM range objects are equal.
  */
 
-const isRangeEqual = (a: DOMRange, b: DOMRange) => {
+export const isRangeEqual = (a: DOMRange, b: DOMRange) => {
   return (
     (a.startContainer === b.startContainer &&
       a.startOffset === b.startOffset &&
@@ -1119,7 +1119,7 @@ const isRangeEqual = (a: DOMRange, b: DOMRange) => {
  * Check if the target is in the editor.
  */
 
-const hasTarget = (
+export const hasTarget = (
   editor: ReactEditor,
   target: EventTarget | null
 ): target is DOMNode => {
@@ -1130,7 +1130,7 @@ const hasTarget = (
  * Check if the target is editable and in the editor.
  */
 
-const hasEditableTarget = (
+export const hasEditableTarget = (
   editor: ReactEditor,
   target: EventTarget | null
 ): target is DOMNode => {
@@ -1144,7 +1144,7 @@ const hasEditableTarget = (
  * Check if the target is inside void and in the editor.
  */
 
-const isTargetInsideVoid = (
+export const isTargetInsideVoid = (
   editor: ReactEditor,
   target: EventTarget | null
 ): boolean => {
@@ -1157,7 +1157,7 @@ const isTargetInsideVoid = (
  * Check if an event is overrided by a handler.
  */
 
-const isEventHandled = <
+export const isEventHandled = <
   EventType extends React.SyntheticEvent<unknown, unknown>
 >(
   event: EventType,
@@ -1175,7 +1175,7 @@ const isEventHandled = <
  * Check if a DOM event is overrided by a handler.
  */
 
-const isDOMEventHandled = <E extends Event>(
+export const isDOMEventHandled = <E extends Event>(
   event: E,
   handler?: (event: E) => void
 ) => {
