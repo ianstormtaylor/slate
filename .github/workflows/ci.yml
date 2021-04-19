@@ -12,6 +12,7 @@ jobs:
       matrix:
         command:
           - 'test'
+          - 'test:integration'
           - 'lint:eslint'
           - 'lint:prettier'
           - 'lint:typescript'
@@ -25,6 +26,6 @@ jobs:
           node-version: 12
 
       - name: Run ${{ matrix.command }}
-        run: yarn && yarn build:rollup && yarn ${{ matrix.command }}
+        run: yarn && yarn build && yarn ${{ matrix.command }}
         env:
           CI: true

@@ -162,8 +162,9 @@ Instead, you can take advantage of the `at` and `match` options to match all of 
 Transforms.moveNodes(editor, {
   // This will again be expanded to a range of the entire node at `[2]`.
   at: [2],
-  // Nodes with a path of 1 longer are the children.
+  // Matches nodes with a longer path, which are the children.
   match: (node, path) => path.length === 2,
+  to: [5],
 })
 ```
 

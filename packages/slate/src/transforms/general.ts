@@ -44,6 +44,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
       case 'insert_text': {
         const { path, offset, text } = op
+        if (text.length === 0) break
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset)
@@ -167,6 +168,7 @@ export const GeneralTransforms: GeneralTransforms = {
 
       case 'remove_text': {
         const { path, offset, text } = op
+        if (text.length === 0) break
         const node = Node.leaf(editor, path)
         const before = node.text.slice(0, offset)
         const after = node.text.slice(offset + text.length)
@@ -182,7 +184,7 @@ export const GeneralTransforms: GeneralTransforms = {
       }
 
       case 'set_node': {
-        const { path, newProperties } = op
+        const { path, properties, newProperties } = op
 
         if (path.length === 0) {
           throw new Error(`Cannot set properties on the root node!`)
@@ -201,6 +203,13 @@ export const GeneralTransforms: GeneralTransforms = {
             delete node[key]
           } else {
             node[key] = value
+          }
+        }
+
+        // properties that were previously defined, but are now missing, must be deleted
+        for (const key in properties) {
+          if (!newProperties.hasOwnProperty(key)) {
+            delete node[key]
           }
         }
 
