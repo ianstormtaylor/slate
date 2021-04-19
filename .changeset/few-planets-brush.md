@@ -1,5 +1,5 @@
 ---
-'slate-react': minor
+'slate-react': patch
 ---
 
-Added renderPlaceholder prop to Editable component
+Added a `renderPlaceholder` prop to the `<Editable>` component for customizing how placeholders are rendered.

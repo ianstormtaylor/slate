@@ -1,11 +1,6 @@
 import React, { useState, useMemo } from 'react'
 import { createEditor, Descendant } from 'slate'
-import {
-  Slate,
-  Editable,
-  withReact,
-  defaultPlaceholderStyle,
-} from 'slate-react'
+import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 const PlainTextExample = () => {
@@ -15,8 +10,8 @@ const PlainTextExample = () => {
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable
         placeholder="Type something"
-        renderPlaceholder={({ children, ...attrs }) => (
-          <div {...attrs} style={defaultPlaceholderStyle}>
+        renderPlaceholder={({ children, attributes }) => (
+          <div {...attributes}>
             <p>{children}</p>
             <pre>
               Use the renderPlaceholder prop to customize rendering of the

@@ -115,7 +115,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
-    renderPlaceholder = defaultRenderPlaceholder,
+    renderPlaceholder = DefaultPlaceholder,
     style = {},
     as: Component = 'div',
     ...attributes
@@ -1057,32 +1057,24 @@ export const Editable = (props: EditableProps) => {
  * The props that get passed to renderPlaceholder
  */
 export type RenderPlaceholderProps = {
-  contentEditable: boolean
-  children?: React.ReactNode
-  ref: React.RefObject<any>
+  children: any
+  attributes: {
+    'data-slate-placeholder': boolean
+    dir?: 'rtl'
+    contentEditable: boolean
+    ref: React.RefObject<any>
+    style: React.CSSProperties
+  }
 }
 
 /**
- * Default placeholder style object.
- */
-export const defaultPlaceholderStyle: React.CSSProperties = {
-  position: 'absolute',
-  pointerEvents: 'none',
-  width: '100%',
-  maxWidth: '100%',
-  display: 'block',
-  opacity: '0.333',
-  userSelect: 'none',
-  textDecoration: 'none',
-}
-
-/**
- * The default placeholder render method
+ * The default placeholder element
  */
 
-export const defaultRenderPlaceholder = (props: RenderPlaceholderProps) => (
-  <span style={defaultPlaceholderStyle} {...props} />
-)
+export const DefaultPlaceholder = ({
+  attributes,
+  children,
+}: RenderPlaceholderProps) => <span {...attributes}>{children}</span>
 
 /**
  * A default memoized decorate function.

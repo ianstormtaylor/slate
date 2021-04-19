@@ -49,10 +49,14 @@ const Leaf = (props: {
   )
 
   if (leaf[PLACEHOLDER_SYMBOL]) {
-    const placeholderProps = {
-      ref: placeholderRef,
-      contentEditable: false,
+    const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
+      attributes: {
+        'data-slate-placeholder': true,
+        style: defaultPlaceholderStyle,
+        contentEditable: false,
+        ref: placeholderRef,
+      },
     }
 
     children = (
@@ -80,6 +84,7 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
+    next.renderPlaceholder === prev.renderPlaceholder &&
     next.text === prev.text &&
     next.leaf.text === prev.leaf.text &&
     Text.matches(next.leaf, prev.leaf) &&
@@ -93,3 +98,17 @@ export const DefaultLeaf = (props: RenderLeafProps) => {
 }
 
 export default MemoizedLeaf
+
+/**
+ * Default placeholder style attributes to maintain functionality
+ */
+const defaultPlaceholderStyle: React.CSSProperties = {
+  position: 'absolute',
+  pointerEvents: 'none',
+  width: '100%',
+  maxWidth: '100%',
+  display: 'block',
+  opacity: '0.333',
+  userSelect: 'none',
+  textDecoration: 'none',
+}

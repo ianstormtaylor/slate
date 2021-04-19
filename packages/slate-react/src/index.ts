@@ -4,8 +4,7 @@ export {
   RenderLeafProps,
   Editable,
   RenderPlaceholderProps,
-  defaultRenderPlaceholder,
-  defaultPlaceholderStyle,
+  DefaultPlaceholder,
 } from './components/editable'
 export { DefaultElement } from './components/element'
 export { DefaultLeaf } from './components/leaf'
