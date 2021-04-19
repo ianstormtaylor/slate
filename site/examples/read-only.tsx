@@ -17,7 +17,8 @@ const initialValue: Element[] = [
     type: 'paragraph',
     children: [
       {
-        text: 'This is editable plain text, just like a <textarea>!',
+        text:
+          'This example shows what happens when the Editor is set to readOnly, it is not editable',
       },
     ],
   },
