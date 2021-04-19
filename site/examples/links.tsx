@@ -2,7 +2,6 @@ import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { Slate, Editable, withReact, useSlate } from 'slate-react'
 import {
-  Node,
   Transforms,
   Editor,
   Range,
@@ -26,6 +25,7 @@ const LinkExample = () => {
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <LinkButton />
+        <RemoveLinkButton />
       </Toolbar>
       <Editable
         renderElement={props => <Element {...props} />}
@@ -135,7 +135,24 @@ const LinkButton = () => {
   )
 }
 
-const initialValue: SlateElement[] = [
+const RemoveLinkButton = () => {
+  const editor = useSlate()
+
+  return (
+    <Button
+      active={isLinkActive(editor)}
+      onMouseDown={event => {
+        if (isLinkActive(editor)) {
+          unwrapLink(editor)
+        }
+      }}
+    >
+      <Icon>link_off</Icon>
+    </Button>
+  )
+}
+
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

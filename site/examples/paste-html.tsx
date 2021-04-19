@@ -1,12 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import {
-  Node,
-  Transforms,
-  createEditor,
-  Element as SlateElement,
-  Descendant,
-} from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 import {
@@ -217,7 +211,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const initialValue: SlateElement[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

@@ -1,61 +1,29 @@
-// import { Descendant, Element, Text, CustomTypes, BaseText } from 'slate'
-
-// export type HeadingElement = {
-//   type: 'heading'
-//   level: number
-//   children: Descendant[]
-// }
-
-// export type ListItemElement = {
-//   type: 'list-item'
-//   depth: number
-//   children: Descendant[]
-// }
-
-// export type CustomText = {
-//   placeholder: string
-//   bold: boolean
-//   italic: boolean
-//   text: string
-// }
-
-// export type BoldCustomText = {
-//   bold: boolean
-//   text: string
-// }
-
-// declare module 'slate' {
-//   interface CustomTypes {
-//     Element: HeadingElement | ListItemElement
-//     Text: CustomText
-//   }
-// }
-
 import {
-  BaseText,
   BaseEditor,
   BaseSelection,
   BasePoint,
   BaseRange,
-  BaseElement,
+  Descendant,
 } from 'slate'
-// import { Prettify } from './prettify'
 
 export type HeadingElement = {
   type: 'heading'
   level: number
-} & BaseElement
+  children: Descendant[]
+}
 
 export type ListItemElement = {
   type: 'list-item'
   depth: number
-} & BaseElement
+  children: Descendant[]
+}
 
 export type CustomText = {
-  placeholder: string
-  bold: boolean
-  italic: boolean
-} & BaseText
+  placeholder?: string
+  bold?: boolean
+  italic?: boolean
+  text: string
+}
 
 export type CustomElement = HeadingElement | ListItemElement
 

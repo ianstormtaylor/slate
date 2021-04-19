@@ -1,0 +1,17 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@1.5.0/schema.json",
+  "changelog": [
+    "@changesets/changelog-github",
+    { "repo": "ianstormtaylor/slate" }
+  ],
+  "commit": false,
+  "linked": [["slate", "slate-history", "slate-hyperscript", "slate-react"]],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "useCalculatedVersionForSnapshots": true,
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  }
+}

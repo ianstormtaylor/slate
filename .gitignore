@@ -2,6 +2,7 @@
 .next/
 .vscode/
 .idea/
+*.tsbuildinfo
 build/
 dist/
 lib/
@@ -9,3 +10,8 @@ node_modules/
 packages/*/yarn.lock
 site/out/
 tmp/
+cypress/screenshots
+cypress/videos
+cypress/fixtures
+cypress/plugins
+.DS_Store

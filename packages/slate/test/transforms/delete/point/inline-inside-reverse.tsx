@@ -27,11 +27,10 @@ export const output = (
     <block>
       one
       <inline>two</inline>
-      <text />
-      <inline>
+      <text>
         <cursor />
-        three
-      </inline>
+      </text>
+      <inline>three</inline>
       four
     </block>
   </editor>

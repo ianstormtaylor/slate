@@ -1,10 +1,10 @@
 # Operations
 
-Operations are the granular, low-level actions that occur while invoking commands and transforms. A single high-level command could result in many low-level operations being applied to the editor.
+Operations are the granular, low-level actions that occur while invoking transforms. A single transform could result in many low-level operations being applied to the editor.
 
-Unlike commands, operations aren't extendable. Slate's core defines all of the possible operations that can occur on a richtext document. For example:
+Slate's core defines all of the possible operations that can occur on a richtext document. For example:
 
-```js
+```javascript
 editor.apply({
   type: 'insert_text',
   path: [0, 0],
@@ -31,6 +31,6 @@ editor.apply({
 })
 ```
 
-Under the covers Slate converts complex commands into the low-level operations and applies them to the editor automatically, so you rarely have to think about them.
+Under the covers Slate converts complex transforms into the low-level operations and applies them to the editor automatically. So you rarely have to think about operations unless you're implementing collaborative editing.
 
 > 🤖 Slate's editing behaviors being defined as operations is what makes things like collaborative editing possible, because each change is easily define-able, apply-able, compose-able and even undo-able!

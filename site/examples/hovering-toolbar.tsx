@@ -5,7 +5,6 @@ import {
   Transforms,
   Text,
   createEditor,
-  Node,
   Element,
   Descendant,
 } from 'slate'
@@ -33,7 +32,7 @@ const HoveringMenuExample = () => {
             case 'formatItalic':
               return toggleFormat(editor, 'italic')
             case 'formatUnderline':
-              return toggleFormat(editor, 'underline')
+              return toggleFormat(editor, 'underlined')
           }
         }}
       />
@@ -148,7 +147,7 @@ const FormatButton = ({ format, icon }) => {
   )
 }
 
-const initialValue: Element[] = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [

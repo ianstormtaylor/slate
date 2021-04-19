@@ -381,8 +381,7 @@ export const NodeTransforms: NodeTransforms = {
       const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
-        match: n =>
-          levels.includes(n) && Element.isElement(n) && n.children.length === 1,
+        match: n => levels.includes(n) && hasSingleChildNest(editor, n),
       })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
@@ -593,17 +592,21 @@ export const NodeTransforms: NodeTransforms = {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
         const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
+        const endAtEndOfNode = Editor.isEnd(editor, end, end.path)
         Transforms.splitNodes(editor, {
           at: end,
           match,
           mode: splitMode,
           voids,
+          always: !endAtEndOfNode,
         })
+        const startAtStartOfNode = Editor.isStart(editor, start, start.path)
         Transforms.splitNodes(editor, {
           at: start,
           match,
           mode: splitMode,
           voids,
+          always: !startAtStartOfNode,
         })
         at = rangeRef.unref()!
 
@@ -632,7 +635,8 @@ export const NodeTransforms: NodeTransforms = {
           }
 
           if (props[k] !== node[k]) {
-            properties[k] = node[k]
+            // Omit new properties from the old property list rather than set them to undefined
+            if (node.hasOwnProperty(k)) properties[k] = node[k]
             newProperties[k] = props[k]
           }
         }
@@ -961,6 +965,23 @@ export const NodeTransforms: NodeTransforms = {
       }
     })
   },
+}
+
+const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
+  if (Element.isElement(node)) {
+    const element = node as Element
+    if (Editor.isVoid(editor, node)) {
+      return true
+    } else if (element.children.length === 1) {
+      return hasSingleChildNest(editor, element.children[0])
+    } else {
+      return false
+    }
+  } else if (Editor.isEditor(node)) {
+    return false
+  } else {
+    return true
+  }
 }
 
 /**

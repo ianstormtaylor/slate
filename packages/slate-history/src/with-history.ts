@@ -5,6 +5,11 @@ import { HistoryEditor } from './history-editor'
 /**
  * The `withHistory` plugin keeps track of the operation history of a Slate
  * editor as operations are applied to it, using undo and redo stacks.
+ *
+ * If you are using TypeScript, you must extend Slate's CustomTypes to use
+ * this plugin.
+ *
+ * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
 export const withHistory = <T extends Editor>(editor: T) => {
@@ -44,16 +49,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
           const inverseOps = batch.map(Operation.inverse).reverse()
 
           for (const op of inverseOps) {
-            // If the final operation is deselecting the editor, skip it. This is
-            if (
-              op === inverseOps[inverseOps.length - 1] &&
-              op.type === 'set_selection' &&
-              op.newProperties == null
-            ) {
-              continue
-            } else {
-              e.apply(op)
-            }
+            e.apply(op)
           }
         })
       })
@@ -150,7 +146,10 @@ const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
  */
 
 const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection' && op.newProperties == null) {
+  if (
+    op.type === 'set_selection' &&
+    (op.properties == null || op.newProperties == null)
+  ) {
     return false
   }
 
