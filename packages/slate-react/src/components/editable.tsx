@@ -115,7 +115,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
-    renderPlaceholder = DefaultPlaceholder,
+    renderPlaceholder = props => <DefaultPlaceholder {...props} />,
     style = {},
     as: Component = 'div',
     ...attributes

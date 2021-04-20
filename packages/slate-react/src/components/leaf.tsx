@@ -62,7 +62,16 @@ const Leaf = (props: {
       children: leaf.placeholder,
       attributes: {
         'data-slate-placeholder': true,
-        style: defaultPlaceholderStyle,
+        style: {
+          position: 'absolute',
+          pointerEvents: 'none',
+          width: '100%',
+          maxWidth: '100%',
+          display: 'block',
+          opacity: '0.333',
+          userSelect: 'none',
+          textDecoration: 'none',
+        },
         contentEditable: false,
         ref: placeholderRef,
       },
@@ -107,17 +116,3 @@ export const DefaultLeaf = (props: RenderLeafProps) => {
 }
 
 export default MemoizedLeaf
-
-/**
- * Default placeholder style attributes to maintain functionality
- */
-const defaultPlaceholderStyle: React.CSSProperties = {
-  position: 'absolute',
-  pointerEvents: 'none',
-  width: '100%',
-  maxWidth: '100%',
-  display: 'block',
-  opacity: '0.333',
-  userSelect: 'none',
-  textDecoration: 'none',
-}
