@@ -361,7 +361,7 @@ Check if a value is a void `Element` object.
 
 #### `normalizeNode(entry: NodeEntry)`
 
-Normalize a Node according to the schema.
+[Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
 ### Override callback method
 
