@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React, { useEffect, useRef, useMemo, useCallback } from 'react'
 import {
   Editor,
@@ -20,6 +21,8 @@ import {
   IS_FIREFOX,
   IS_SAFARI,
   IS_EDGE_LEGACY,
+  IS_QQ_BROWSER,
+  IS_APPLE,
   IS_CHROME_LEGACY,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -129,6 +132,8 @@ export const Editable = (props: EditableProps) => {
     () => ({
       isComposing: false,
       isUpdatingSelection: false,
+      node: {} as Node,
+      isVoid: false,
       latestElement: null as DOMElement | null,
     }),
     []
@@ -382,8 +387,22 @@ export const Editable = (props: EditableProps) => {
 
             const window = ReactEditor.getWindow(editor)
             if (data instanceof window.DataTransfer) {
+              if (type === 'insertFromDrop' && state.node && state.isVoid) {
+                const path = ReactEditor.findPath(editor, state.node)
+                Transforms.delete(editor, { at: path })
+                Transforms.insertNodes(editor, state.node)
+                return
+              }
               ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
+              if (IS_QQ_BROWSER) {
+                event.stopPropagation()
+                return
+              }
+
+              if (type === 'insertFromComposition' && IS_APPLE) {
+                return
+              }
               Editor.insertText(editor, data)
             }
 
@@ -535,6 +554,13 @@ export const Editable = (props: EditableProps) => {
               // COMPAT: Certain browsers don't support the `beforeinput` event, so we
               // fall back to React's leaky polyfill instead just for it. It
               // only works for the `insertText` input type.
+              const text = (event as any).data as string
+              if (IS_QQ_BROWSER) {
+                event.preventDefault()
+                Editor.insertText(editor, text)
+                return
+              }
+
               if (
                 !HAS_BEFORE_INPUT_SUPPORT &&
                 !readOnly &&
@@ -543,7 +569,6 @@ export const Editable = (props: EditableProps) => {
               ) {
                 event.preventDefault()
                 if (!state.isComposing) {
-                  const text = (event as any).data as string
                   Editor.insertText(editor, text)
                 }
               }
@@ -747,11 +772,20 @@ export const Editable = (props: EditableProps) => {
                 !isEventHandled(event, attributes.onDragStart)
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
-                const path = ReactEditor.findPath(editor, node)
-                const voidMatch = Editor.void(editor, { at: path })
+                const text = Node.string(node)
+                event.dataTransfer.setData('text', text)
 
-                // If starting a drag on a void node, make sure it is selected
+                const path = ReactEditor.findPath(editor, node)
+                const isVoid = Editor.isVoid(editor, node)
+
+                state.node = node
+                state.isVoid = isVoid
+
+                const voidMatch = Editor.void(editor, {
+                  at: path,
+                }) // If starting a drag on a void node, make sure it is selected
                 // so that it shows up in the selection's fragment.
+
                 if (voidMatch) {
                   const range = Editor.range(editor, path)
                   Transforms.select(editor, range)

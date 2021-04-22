@@ -576,6 +576,7 @@ export const Node: NodeInterface = {
    */
 
   string(node: Node): string {
+    if (!node) return ''
     if (Text.isText(node)) {
       return node.text
     } else {
