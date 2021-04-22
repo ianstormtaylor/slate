@@ -35,8 +35,7 @@ interface Editor {
   - [Check methods](editor.md#check-methods)
   - [Normalization methods](editor.md#normalization-methods)
 - [Instance methods](editor.md#instance-methods)
-  - [Schema-specific methods to override](editor.md#schema-specific-methods-to-override)
-  - [Core actions](editor.md#core-actions)
+  - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
 
 ## Instantiation methods
 
@@ -348,7 +347,7 @@ const withImages = editor => {
 
 ### Override element type methods
 
-Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes#blocks-vs-inlines) or [voids](../../concepts/02-nodes#voids).
+Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes.md#blocks-vs-inlines) or [voids](../../concepts/02-nodes.md#voids).
 
 #### `isInline(element: Element)`
 
