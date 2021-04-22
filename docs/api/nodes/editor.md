@@ -348,7 +348,7 @@ const withImages = editor => {
 
 ### Override element type methods
 
-Use these methods that Slate can identify certain elements as [inlines](../concepts/02-nodes#blocks-vs-inlines) or [voids](../concepts/02-nodes#voids).
+Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes#blocks-vs-inlines) or [voids](../../concepts/02-nodes#voids).
 
 #### `isInline(element: Element)`
 
