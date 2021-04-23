@@ -34,9 +34,9 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  DOMStaticRange,
   isPlainTextOnlyPaste,
 } from '../utils/dom'
+
 import {
   EDITOR_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -98,6 +98,7 @@ export type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
@@ -114,6 +115,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
+    renderPlaceholder = props => <DefaultPlaceholder {...props} />,
     style = {},
     as: Component = 'div',
     ...attributes
@@ -225,6 +227,7 @@ export const Editable = (props: EditableProps) => {
         scrollMode: 'if-needed',
         boundary: el,
       })
+      // @ts-ignore
       delete leafEl.getBoundingClientRect
     } else {
       domSelection.removeAllRanges()
@@ -1046,6 +1049,7 @@ export const Editable = (props: EditableProps) => {
             decorations,
             node: editor,
             renderElement,
+            renderPlaceholder,
             renderLeaf,
             selection: editor.selection,
           })}
@@ -1054,6 +1058,29 @@ export const Editable = (props: EditableProps) => {
     </ReadOnlyContext.Provider>
   )
 }
+
+/**
+ * The props that get passed to renderPlaceholder
+ */
+export type RenderPlaceholderProps = {
+  children: any
+  attributes: {
+    'data-slate-placeholder': boolean
+    dir?: 'rtl'
+    contentEditable: boolean
+    ref: React.RefObject<any>
+    style: React.CSSProperties
+  }
+}
+
+/**
+ * The default placeholder element
+ */
+
+export const DefaultPlaceholder = ({
+  attributes,
+  children,
+}: RenderPlaceholderProps) => <span {...attributes}>{children}</span>
 
 /**
  * A default memoized decorate function.

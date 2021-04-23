@@ -26,6 +26,7 @@ import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
+import CustomPlaceholder from '../../examples/custom-placeholder'
 
 // node
 import { getAllExamples } from '../api'
@@ -50,6 +51,7 @@ const EXAMPLES = [
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
+  ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
 ]
 
 const Header = props => (
