@@ -133,6 +133,7 @@ export const Editable = (props: EditableProps) => {
       isComposing: false,
       isUpdatingSelection: false,
       dragNode: {} as Node,
+      dragSelection: null as any | Selection,
       dragNodeIsVoid: false,
       latestElement: null as DOMElement | null,
     }),
@@ -387,16 +388,13 @@ export const Editable = (props: EditableProps) => {
 
             const window = ReactEditor.getWindow(editor)
             if (data instanceof window.DataTransfer) {
-              if (
-                type === 'insertFromDrop' &&
-                state.dragNode &&
-                state.dragNodeIsVoid
-              ) {
+              if (type === 'insertFromDrop') {
                 const path = ReactEditor.findPath(editor, state.dragNode)
-                Transforms.delete(editor, { at: path })
+                Transforms.delete(editor, { at: state.dragSelection })
                 Transforms.insertNodes(editor, state.dragNode)
                 return
               }
+
               ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
               if (IS_QQ_BROWSER) {
@@ -784,6 +782,10 @@ export const Editable = (props: EditableProps) => {
 
                 state.dragNode = node
                 state.dragNodeIsVoid = isVoid
+                const { selection } = editor
+                if (selection) {
+                  state.dragSelection = selection
+                }
 
                 const voidMatch = Editor.void(editor, {
                   at: path,
@@ -821,6 +823,9 @@ export const Editable = (props: EditableProps) => {
                   const data = event.dataTransfer
                   Transforms.select(editor, range)
                   ReactEditor.insertData(editor, data)
+                  setTimeout(() => {
+                    Transforms.delete(editor, { at: state.dragSelection })
+                  }, 50)
                 }
               }
             },
