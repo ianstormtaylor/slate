@@ -35,8 +35,7 @@ interface Editor {
   - [Check methods](editor.md#check-methods)
   - [Normalization methods](editor.md#normalization-methods)
 - [Instance methods](editor.md#instance-methods)
-  - [Schema-specific methods to override](editor.md#schema-specific-methods-to-override)
-  - [Core actions](editor.md#core-actions)
+  - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
 
 ## Instantiation methods
 
@@ -330,9 +329,7 @@ Options: `{force?: boolean}`
 
 Call a function, deferring normalization until after it completes.
 
-## Instance methods
-
-### Schema-specific methods to override
+## Schema-specific instance methods to override
 
 Replace these methods to modify the original behavior of the editor when building [Plugins](https://github.com/ianstormtaylor/slate/tree/a02787539a460fb70730085e26df13cca959fabd/concepts/07-plugins/README.md). When modifying behavior, call the original method when appropriate. For example, a plugin that marks image nodes as "void":
 
@@ -348,6 +345,10 @@ const withImages = editor => {
 }
 ```
 
+### Override element type methods
+
+Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes.md#blocks-vs-inlines) or [voids](../../concepts/02-nodes.md#voids).
+
 #### `isInline(element: Element)`
 
 Check if a value is an inline `Element` object.
@@ -356,15 +357,19 @@ Check if a value is an inline `Element` object.
 
 Check if a value is a void `Element` object.
 
+### Override normalize method
+
 #### `normalizeNode(entry: NodeEntry)`
 
-Normalize a Node according to the schema.
+[Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
+
+### Override callback method
 
 #### `onChange()`
 
 Called when there is a change in the editor.
 
-### Core actions
+### Override mark methods
 
 #### `addMark(key: string, value: any)`
 
@@ -374,6 +379,10 @@ Add a custom property to the leaf text nodes in the current selection. If the se
 
 Remove a custom property from the leaf text nodes in the current selection.
 
+### Override delete methods
+
+When a user presses backspace or delete, it invokes the method based on the selection. For example, if the selection is expanded over some text and the user presses the backspace key, `deleteFragment` will be called but if the selecttion is collapsed, `deleteBackward` will be called.
+
 #### `deleteBackward(options?: {unit?: 'character' | 'word' | 'line' | 'block'})`
 
 Delete content in the editor backward from the current selection.
@@ -382,13 +391,15 @@ Delete content in the editor backward from the current selection.
 
 Delete content in the editor forward from the current selection.
 
-#### `insertFragment(fragment: Node[])`
-
-Insert a fragment at the current selection. If the selection is currently expanded, delete it first.
-
 #### `deleteFragment()`
 
 Delete the content of the current selection.
+
+### Override insert methods
+
+#### `insertFragment(fragment: Node[])`
+
+Insert a fragment at the current selection. If the selection is currently expanded, delete it first.
 
 #### `insertBreak()`
 
@@ -401,6 +412,8 @@ Insert a node at the current selection. If the selection is currently expanded, 
 #### `insertText(text: string)`
 
 Insert text at the current selection. If the selection is currently expanded, delete it first.
+
+### Override operation handling method
 
 #### `apply(operation: Operation)`
 
