@@ -132,9 +132,6 @@ export const Editable = (props: EditableProps) => {
     () => ({
       isComposing: false,
       isUpdatingSelection: false,
-      dragNode: {} as Node,
-      dragSelection: null as any | Selection,
-      dragNodeIsVoid: false,
       latestElement: null as DOMElement | null,
     }),
     []
@@ -388,13 +385,6 @@ export const Editable = (props: EditableProps) => {
 
             const window = ReactEditor.getWindow(editor)
             if (data instanceof window.DataTransfer) {
-              if (type === 'insertFromDrop') {
-                const path = ReactEditor.findPath(editor, state.dragNode)
-                Transforms.delete(editor, { at: state.dragSelection })
-                Transforms.insertNodes(editor, state.dragNode)
-                return
-              }
-
               ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
               if (IS_QQ_BROWSER) {
@@ -779,12 +769,13 @@ export const Editable = (props: EditableProps) => {
 
                 const path = ReactEditor.findPath(editor, node)
                 const isVoid = Editor.isVoid(editor, node)
-
-                state.dragNode = node
-                state.dragNodeIsVoid = isVoid
-                const { selection } = editor
-                if (selection) {
-                  state.dragSelection = selection
+                if (isVoid) {
+                  const string = JSON.stringify(node)
+                  const encoded = window.btoa(encodeURIComponent(string))
+                  event.dataTransfer.setData(
+                    'application/x-slate-nodes',
+                    encoded
+                  )
                 }
 
                 const voidMatch = Editor.void(editor, {
@@ -813,20 +804,16 @@ export const Editable = (props: EditableProps) => {
                 // Chromium browsers don't properly fire them for files being
                 // dropped into a `contenteditable`. (2019/11/26)
                 // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
-                if (
-                  !HAS_BEFORE_INPUT_SUPPORT ||
-                  !state.dragNodeIsVoid ||
-                  (!IS_SAFARI && event.dataTransfer.files.length > 0)
-                ) {
-                  event.preventDefault()
-                  const range = ReactEditor.findEventRange(editor, event)
-                  const data = event.dataTransfer
-                  Transforms.select(editor, range)
-                  ReactEditor.insertData(editor, data)
-                  setTimeout(() => {
-                    Transforms.delete(editor, { at: state.dragSelection })
-                  }, 50)
-                }
+                // if (
+                //   !HAS_BEFORE_INPUT_SUPPORT ||
+                //   (!IS_SAFARI && event.dataTransfer.files.length > 0)
+                // ) {
+                event.preventDefault()
+                const range = ReactEditor.findEventRange(editor, event)
+                const data = event.dataTransfer
+                Transforms.select(editor, range)
+                ReactEditor.insertData(editor, data)
+                // }
               }
             },
             [readOnly, attributes.onDrop]

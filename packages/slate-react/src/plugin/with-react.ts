@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import ReactDOM from 'react-dom'
 import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
 
@@ -183,6 +184,13 @@ export const withReact = <T extends Editor>(editor: T) => {
 
   e.insertData = (data: DataTransfer) => {
     const fragment = data.getData('application/x-slate-fragment')
+    const slateNodes = data.getData('application/x-slate-nodes')
+    if (slateNodes) {
+      const decoded = decodeURIComponent(window.atob(slateNodes))
+      const parsed = JSON.parse(decoded) as Node[]
+      Transforms.insertNodes(e, parsed)
+      return
+    }
 
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))
