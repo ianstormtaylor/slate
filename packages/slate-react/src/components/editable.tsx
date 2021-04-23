@@ -132,8 +132,8 @@ export const Editable = (props: EditableProps) => {
     () => ({
       isComposing: false,
       isUpdatingSelection: false,
-      node: {} as Node,
-      isVoid: false,
+      dragNode: {} as Node,
+      dragNodeIsVoid: false,
       latestElement: null as DOMElement | null,
     }),
     []
@@ -387,10 +387,14 @@ export const Editable = (props: EditableProps) => {
 
             const window = ReactEditor.getWindow(editor)
             if (data instanceof window.DataTransfer) {
-              if (type === 'insertFromDrop' && state.node && state.isVoid) {
-                const path = ReactEditor.findPath(editor, state.node)
+              if (
+                type === 'insertFromDrop' &&
+                state.dragNode &&
+                state.dragNodeIsVoid
+              ) {
+                const path = ReactEditor.findPath(editor, state.dragNode)
                 Transforms.delete(editor, { at: path })
-                Transforms.insertNodes(editor, state.node)
+                Transforms.insertNodes(editor, state.dragNode)
                 return
               }
               ReactEditor.insertData(editor, data as DataTransfer)
@@ -778,8 +782,8 @@ export const Editable = (props: EditableProps) => {
                 const path = ReactEditor.findPath(editor, node)
                 const isVoid = Editor.isVoid(editor, node)
 
-                state.node = node
-                state.isVoid = isVoid
+                state.dragNode = node
+                state.dragNodeIsVoid = isVoid
 
                 const voidMatch = Editor.void(editor, {
                   at: path,
@@ -809,6 +813,7 @@ export const Editable = (props: EditableProps) => {
                 // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
                 if (
                   !HAS_BEFORE_INPUT_SUPPORT ||
+                  !state.dragNodeIsVoid ||
                   (!IS_SAFARI && event.dataTransfer.files.length > 0)
                 ) {
                   event.preventDefault()
