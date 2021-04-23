@@ -6,16 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import {
-  Descendant,
-  Editor,
-  Element,
-  Node,
-  NodeEntry,
-  Range,
-  Text,
-  Transforms,
-} from 'slate'
+import { Descendant, Editor, Node, Range, Transforms } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -25,11 +16,7 @@ import { useSlate } from '../../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
 import {
   DOMElement,
-  DOMNode,
-  DOMRange,
-  DOMStaticRange,
   getDefaultView,
-  isDOMNode,
   isPlainTextOnlyPaste,
 } from '../../utils/dom'
 import {
@@ -49,12 +36,9 @@ import useChildren from '../../hooks/use-children'
 import {
   defaultDecorate,
   hasEditableTarget,
-  hasTarget,
   isEventHandled,
   isTargetInsideVoid,
 } from '../default-editable'
-
-const HAS_BEFORE_INPUT_SUPPORT = true
 
 export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
   return (

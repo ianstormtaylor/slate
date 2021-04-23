@@ -9,14 +9,6 @@ import {
 
 const debug = (...message: any[]) => {}
 
-/**
- * Unicode String for a ZERO_WIDTH_SPACE
- *
- * @type {String}
- */
-
-const ZERO_WIDTH_SPACE = String.fromCharCode(65279)
-
 function restoreDOM(editor: ReactEditor) {
   try {
     const onRestoreDOM = EDITOR_TO_RESTORE_DOM.get(editor)
@@ -58,10 +50,6 @@ function renderSync(editor: ReactEditor, fn: () => void) {
  *
  * Optionally, if an `isLastNode` argument is passed in, it will also remove
  * a trailing newline.
- *
- * @param {String} prevText
- * @param {Number} prevOffset
- * @param {Boolean} isLastNode
  */
 
 function fixTextAndOffset(
@@ -71,14 +59,6 @@ function fixTextAndOffset(
 ) {
   let nextOffset = prevOffset
   let nextText = prevText
-  let index = 0
-
-  while (index !== -1) {
-    index = nextText.indexOf(ZERO_WIDTH_SPACE, index)
-    if (index === -1) break
-    if (nextOffset > index) nextOffset--
-    nextText = `${nextText.slice(0, index)}${nextText.slice(index + 1)}`
-  }
 
   // remove the last newline if we are in the last node of a block
   const lastChar = nextText.charAt(nextText.length - 1)
@@ -102,16 +82,13 @@ function fixTextAndOffset(
  * But is an analysis mainly for `backspace` and `enter` as we handle
  * compositions as a single operation.
  *
- * @param {} editor
+ * @param editor
  */
 
 export class AndroidInputManager {
   /**
    * A MutationObserver that flushes to the method `flush`
-   *
-   * @type {MutationObserver}
    */
-
   private readonly observer: MutationObserver
 
   private rootEl?: HTMLElement = undefined
@@ -320,7 +297,7 @@ export class AndroidInputManager {
   /**
    * Handle MutationObserver flush
    *
-   * @param {MutationRecord[]} mutations
+   * @param mutations
    */
 
   flush = (mutations: MutationRecord[]) => {
@@ -332,7 +309,7 @@ export class AndroidInputManager {
   /**
    * Handle a `requestAnimationFrame` long batch of mutations.
    *
-   * @param {Array} mutations
+   * @param mutations
    */
 
   private flushAction = (mutations: MutationRecord[]) => {
@@ -365,7 +342,7 @@ export class AndroidInputManager {
    * Saves the changes to `last.diff` which can be applied later using
    * `applyDiff()`
    *
-   * @param {DOMNode} domNode
+   * @param domNode
    */
 
   private resolveDOMNode = (domNode: DOMNode) => {

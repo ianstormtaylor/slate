@@ -2,9 +2,9 @@
  * Returns the number of characters that are the same at the beginning of the
  * String.
  *
- * @param {String} prev  the previous text
- * @param {String} next  the next text
- * @returns {Number | null} the offset of the start of the difference; null if there is no difference
+ * @param prev  the previous text
+ * @param next  the next text
+ * @returns the offset of the start of the difference; null if there is no difference
  */
 function getDiffStart(prev: string, next: string): number | null {
   const length = Math.min(prev.length, next.length)
@@ -22,10 +22,10 @@ function getDiffStart(prev: string, next: string): number | null {
  * up to `max`. Max prevents double-counting characters when there are
  * multiple duplicate characters around the diff area.
  *
- * @param {String} prev  the previous text
- * @param {String} next  the next text
- * @param {Number} max  the max length to test.
- * @returns {Number} number of characters that are the same at the end of the string
+ * @param prev  the previous text
+ * @param next  the next text
+ * @param max  the max length to test.
+ * @returns number of characters that are the same at the end of the string
  */
 function getDiffEnd(prev: string, next: string, max: number): number | null {
   const prevLength = prev.length
@@ -55,9 +55,9 @@ type TextRange = {
  *
  * Returns null if they are identical.
  *
- * @param {String} prev  the previous text
- * @param {String} next  the next text
- * @returns {TextRange | null} the difference text range; null if there are no differences.
+ * @param prev  the previous text
+ * @param next  the next text
+ * @returns the difference text range; null if there are no differences.
  */
 function getDiffOffsets(prev: string, next: string): TextRange | null {
   if (prev === next) return null
@@ -72,9 +72,9 @@ function getDiffOffsets(prev: string, next: string): TextRange | null {
 /**
  * Takes a text string and returns a slice from the string at the given text range
  *
- * @param {String} text  the text
- * @param {Object} offsets  the text range
- * @returns {String} the text slice at text range
+ * @param text  the text
+ * @param offsets  the text range
+ * @returns the text slice at text range
  */
 function sliceText(text: string, offsets: TextRange): string {
   return text.slice(offsets.start, text.length - offsets.end)
@@ -85,9 +85,9 @@ function sliceText(text: string, offsets: TextRange): string {
  * change in a way that can be used as operations like inserting, removing or
  * replacing text.
  *
- * @param {String | undefined} prev the previous text
- * @param {String | undefined} next the next text
- * @returns {Diff | null} the text difference
+ * @param prev the previous text
+ * @param next the next text
+ * @returns the text difference
  */
 export function diffText(prev?: string, next?: string): Diff | null {
   if (prev === undefined || next === undefined) return null
