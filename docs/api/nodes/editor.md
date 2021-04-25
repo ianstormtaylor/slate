@@ -345,7 +345,7 @@ const withImages = editor => {
 }
 ```
 
-### Override element type methods
+### Element type methods
 
 Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes.md#blocks-vs-inlines) or [voids](../../concepts/02-nodes.md#voids).
 
@@ -357,13 +357,13 @@ Check if a value is an inline `Element` object.
 
 Check if a value is a void `Element` object.
 
-### Override normalize method
+### Normalize method
 
 #### `normalizeNode(entry: NodeEntry)`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
-### Override callback method
+### Callback method
 
 #### `onChange()`
 
@@ -379,7 +379,7 @@ Add a custom property to the leaf text nodes in the current selection. If the se
 
 Remove a custom property from the leaf text nodes in the current selection.
 
-### Override delete methods
+### Delete methods
 
 When a user presses backspace or delete, it invokes the method based on the selection. For example, if the selection is expanded over some text and the user presses the backspace key, `deleteFragment` will be called but if the selecttion is collapsed, `deleteBackward` will be called.
 
@@ -395,7 +395,7 @@ Delete content in the editor forward from the current selection.
 
 Delete the content of the current selection.
 
-### Override insert methods
+### Insert methods
 
 #### `insertFragment(fragment: Node[])`
 
@@ -413,7 +413,7 @@ Insert a node at the current selection. If the selection is currently expanded, 
 
 Insert text at the current selection. If the selection is currently expanded, delete it first.
 
-### Override operation handling method
+### Operation handling method
 
 #### `apply(operation: Operation)`
 
