@@ -2,4 +2,4 @@
 'slate-react': patch
 ---
 
-Fixes error thrown when Editor is rendered inside iframe
+Fixes error that occurs when Editor is rendered inside iframe
