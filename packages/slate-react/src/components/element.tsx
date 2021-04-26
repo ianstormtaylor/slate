@@ -15,7 +15,11 @@ import {
   KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
-import { RenderElementProps, RenderLeafProps } from './editable'
+import {
+  RenderElementProps,
+  RenderLeafProps,
+  RenderPlaceholderProps,
+} from './editable'
 
 /**
  * Element.
@@ -25,6 +29,7 @@ const Element = (props: {
   decorations: Range[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {
@@ -32,6 +37,7 @@ const Element = (props: {
     decorations,
     element,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
+    renderPlaceholder,
     renderLeaf,
     selection,
   } = props
@@ -44,6 +50,7 @@ const Element = (props: {
     decorations,
     node: element,
     renderElement,
+    renderPlaceholder,
     renderLeaf,
     selection,
   })
@@ -98,7 +105,13 @@ const Element = (props: {
           position: 'absolute',
         }}
       >
-        <Text decorations={[]} isLast={false} parent={element} text={text} />
+        <Text
+          renderPlaceholder={renderPlaceholder}
+          decorations={[]}
+          isLast={false}
+          parent={element}
+          text={text}
+        />
       </Tag>
     )
 
