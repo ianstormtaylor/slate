@@ -106,7 +106,9 @@ export const createEditor = (): Editor => {
           }
 
           editor.marks = marks
-          editor.onChange()
+          if (!FLUSHING.get(editor)) {
+            editor.onChange()
+          }
         }
       }
     },
@@ -296,7 +298,9 @@ export const createEditor = (): Editor => {
           const marks = { ...(Editor.marks(editor) || {}) }
           delete marks[key]
           editor.marks = marks
-          editor.onChange()
+          if (!FLUSHING.get(editor)) {
+            editor.onChange()
+          }
         }
       }
     },
