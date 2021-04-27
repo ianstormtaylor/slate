@@ -1,17 +1,17 @@
 import ReactDOM from 'react-dom'
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { createEditor } from 'slate'
+import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
 
 const ShadowDOM = () => {
-  const container = useRef(null)
+  const container = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (container.current.shadowRoot) return
+    if (container.current!.shadowRoot) return
 
     // Create a shadow DOM
-    const outerShadowRoot = container.current.attachShadow({ mode: 'open' })
+    const outerShadowRoot = container.current!.attachShadow({ mode: 'open' })
     const host = document.createElement('div')
     outerShadowRoot.appendChild(host)
 
@@ -28,7 +28,7 @@ const ShadowDOM = () => {
 }
 
 const ShadowEditor = () => {
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -38,8 +38,9 @@ const ShadowEditor = () => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [{ text: 'This Editor is rendered within a nested Shadow DOM.' }],
   },
 ]
