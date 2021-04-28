@@ -166,6 +166,8 @@ export const withReact = <T extends Editor>(editor: T) => {
       attach = span
     }
 
+    if (!attach) return
+
     const fragment = e.getFragment()
     const string = JSON.stringify(fragment)
     const encoded = window.btoa(encodeURIComponent(string))
