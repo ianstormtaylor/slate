@@ -769,6 +769,7 @@ export const Editable = (props: EditableProps) => {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const text = Node.string(node)
                 event.dataTransfer.setData('text', text)
+                event.dataTransfer.setData('type', 'drag')
 
                 const path = ReactEditor.findPath(editor, node)
                 const isVoid = Editor.isVoid(editor, node)
