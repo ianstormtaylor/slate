@@ -24,6 +24,13 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, node } = op
       const parent = Node.parent(editor, path)
       const index = path[path.length - 1]
+
+      if (index > parent.children.length) {
+        throw new Error(
+          `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
+        )
+      }
+
       parent.children.splice(index, 0, node)
 
       if (selection) {
