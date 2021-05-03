@@ -267,12 +267,31 @@ export const Editable = (props: EditableProps) => {
         const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
 
-        // These two types occur while a user is composing text and can't be
-        // cancelled. Let them through and wait for the composition to end.
-        if (
-          type === 'insertCompositionText' ||
-          type === 'deleteCompositionText'
-        ) {
+        // `insertCompositionText` and 'deleteCompositionText' occur
+        // while a user is composing text and can't be cancelled.
+        // Let them through and wait for the composition to end.
+        if (type === 'insertCompositionText') {
+          if (selection && Range.isCollapsed(selection)) {
+            const inline = Editor.above(editor, {
+              match: n => Editor.isInline(editor, n),
+              mode: 'highest',
+            })
+
+            if (inline) {
+              const [, inlinePath] = inline
+
+              if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                const point = Editor.after(editor, inlinePath)
+                Transforms.setSelection(editor, {
+                  anchor: point,
+                  focus: point,
+                })
+              }
+            }
+          }
+          return
+        }
+        if (type === 'deleteCompositionText') {
           return
         }
 
