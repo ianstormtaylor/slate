@@ -1,5 +1,21 @@
 # slate-react
 
+## 0.62.1
+
+### Patch Changes
+
+- [#4118](https://github.com/ianstormtaylor/slate/pull/4118) [`6a137633`](https://github.com/ianstormtaylor/slate/commit/6a1376332bbd2567336c444c57c1e64fdf706feb) Thanks [@kamilkazmierczak](https://github.com/kamilkazmierczak)! - Improved detection of legacy browsers that don't have proper `beforeinput` support.
+
+* [#4190](https://github.com/ianstormtaylor/slate/pull/4190) [`ea2eefef`](https://github.com/ianstormtaylor/slate/commit/ea2eefefb84365eb969e91151afc861e0dbefefd) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Added a `renderPlaceholder` prop to the `<Editable>` component for customizing how placeholders are rendered.
+
+- [#4157](https://github.com/ianstormtaylor/slate/pull/4157) [`de5cc7e5`](https://github.com/ianstormtaylor/slate/commit/de5cc7e5ed97fdca9e3766a8d947ab6391e6ccb2) Thanks [@githoniel](https://github.com/githoniel)! - Fixed a bug when syncing the selection for IME-based editing.
+
+* [#4158](https://github.com/ianstormtaylor/slate/pull/4158) [`ea6dc089`](https://github.com/ianstormtaylor/slate/commit/ea6dc08913d9dd671eeb05796dca522a4a35904e) Thanks [@githoniel](https://github.com/githoniel)! - Fixed a bug that resulted in doubly-input characters when using an IME.
+
+- [#4211](https://github.com/ianstormtaylor/slate/pull/4211) [`1c32b97d`](https://github.com/ianstormtaylor/slate/commit/1c32b97d23138d301e9ecb567263e3001cc4dbfa) Thanks [@clauderic](https://github.com/clauderic)! - Collapse expanded selection before handling `moveWordBackward` (`alt + left`) and `moveWordForward` (`alt + right`) hotkeys.
+
+* [#4219](https://github.com/ianstormtaylor/slate/pull/4219) [`737aaa9c`](https://github.com/ianstormtaylor/slate/commit/737aaa9cde2d4a2d6d64b83256aa5d9d1b5ce720) Thanks [@juliankrispel](https://github.com/juliankrispel)! - Fixes error that occurs when Editor is rendered inside iframe
+
 ## 0.62.0
 
 ### Minor Changes
