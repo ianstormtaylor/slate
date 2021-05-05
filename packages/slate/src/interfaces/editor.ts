@@ -16,6 +16,7 @@ import {
   RangeRef,
   Span,
   Text,
+  Transforms,
 } from '..'
 import {
   DIRTY_PATHS,
@@ -988,6 +989,27 @@ export const Editor: EditorInterface = {
     }
 
     Editor.withoutNormalizing(editor, () => {
+      /*
+        Fix dirty elements with no children.
+        editor.normalizeNode() does fix this, but some normalization fixes also require it to work.
+        Running an initial pass avoids the catch-22 race condition.
+      */
+      for (const dirtyPath of getDirtyPaths(editor)) {
+        if (Node.has(editor, dirtyPath)) {
+          const [node, _] = Editor.node(editor, dirtyPath)
+
+          // Add a text child to elements with no children.
+          // This is safe to do in any order, by definition it can't cause other paths to change.
+          if (Element.isElement(node) && node.children.length === 0) {
+            const child = { text: '' }
+            Transforms.insertNodes(editor, child, {
+              at: dirtyPath.concat(0),
+              voids: true,
+            })
+          }
+        }
+      }
+
       const max = getDirtyPaths(editor).length * 42 // HACK: better way?
       let m = 0
 
