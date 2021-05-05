@@ -429,32 +429,36 @@ export class AndroidInputManager {
 
           const fix = fixTextAndOffset(domText, offset)
 
-          let range = ReactEditor.toSlateRange(this.editor, domRange)
-          range = {
-            ...range,
-            anchor: {
-              ...range.anchor,
-              offset: fix.offset,
-            },
-            focus: {
-              ...range.focus,
-              offset: fix.offset,
-            },
+          let range = ReactEditor.toSlateRange(this.editor, domRange, {
+            exactMatch: true,
+          })
+          if (range !== null) {
+            range = {
+              ...range,
+              anchor: {
+                ...range.anchor,
+                offset: fix.offset,
+              },
+              focus: {
+                ...range.focus,
+                offset: fix.offset,
+              },
+            }
+
+            /**
+             * We must call `restoreDOM` even though this is applying a `diff` which
+             * should not require it. But if you type `it me. no.` on a blank line
+             * with a block following it, the next line will merge with the this
+             * line. A mysterious `keydown` with `input` of backspace appears in the
+             * event stream which the user not React caused.
+             *
+             * `focus` is required as well because otherwise we lose focus on hitting
+             * `enter` in such a scenario.
+             */
+
+            Transforms.select(this.editor, range)
+            ReactEditor.focus(this.editor)
           }
-
-          /**
-           * We must call `restoreDOM` even though this is applying a `diff` which
-           * should not require it. But if you type `it me. no.` on a blank line
-           * with a block following it, the next line will merge with the this
-           * line. A mysterious `keydown` with `input` of backspace appears in the
-           * event stream which the user not React caused.
-           *
-           * `focus` is required as well because otherwise we lose focus on hitting
-           * `enter` in such a scenario.
-           */
-
-          Transforms.select(this.editor, range)
-          ReactEditor.focus(this.editor)
 
           this.clearAction()
           restoreDOM(this.editor)
@@ -505,44 +509,48 @@ export class AndroidInputManager {
         domSelection.focusNode!.textContent!,
         domSelection.focusOffset
       )
-      let range = ReactEditor.toSlateRange(this.editor, domSelection)
-      range = {
-        focus: {
-          path: range.focus.path,
-          offset: focusOffset,
-        },
-        anchor: {
-          path: range.anchor.path,
-          offset: anchorOffset,
-        },
-      }
-
-      debug('onSelect:save-data', {
-        anchorNode: domSelection.anchorNode,
-        anchorOffset: domSelection.anchorOffset,
-        focusNode: domSelection.focusNode,
-        focusOffset: domSelection.focusOffset,
-        range,
+      let range = ReactEditor.toSlateRange(this.editor, domSelection, {
+        exactMatch: true,
       })
+      if (range !== null) {
+        range = {
+          focus: {
+            path: range.focus.path,
+            offset: focusOffset,
+          },
+          anchor: {
+            path: range.anchor.path,
+            offset: anchorOffset,
+          },
+        }
 
-      // If the `domSelection` has moved into a new node, then reconcile with
-      // `applyDiff`
-      if (
-        domSelection.isCollapsed &&
-        this.lastDomNode !== domSelection.anchorNode &&
-        this.lastDiff !== undefined
-      ) {
-        debug('onSelect:applyDiff', this.lastDiff)
-        this.applyDiff()
-        Transforms.select(this.editor, range)
+        debug('onSelect:save-data', {
+          anchorNode: domSelection.anchorNode,
+          anchorOffset: domSelection.anchorOffset,
+          focusNode: domSelection.focusNode,
+          focusOffset: domSelection.focusOffset,
+          range,
+        })
 
-        this.clearAction()
-        flushController(this.editor)
-        restoreDOM(this.editor)
+        // If the `domSelection` has moved into a new node, then reconcile with
+        // `applyDiff`
+        if (
+          domSelection.isCollapsed &&
+          this.lastDomNode !== domSelection.anchorNode &&
+          this.lastDiff !== undefined
+        ) {
+          debug('onSelect:applyDiff', this.lastDiff)
+          this.applyDiff()
+          Transforms.select(this.editor, range)
+
+          this.clearAction()
+          flushController(this.editor)
+          restoreDOM(this.editor)
+        }
+
+        this.lastRange = range
+        this.lastDomNode = domSelection.anchorNode
       }
-
-      this.lastRange = range
-      this.lastDomNode = domSelection.anchorNode
     })
   }
 }

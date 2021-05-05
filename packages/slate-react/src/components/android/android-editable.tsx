@@ -10,7 +10,7 @@ import { Descendant, Editor, Node, Range, Transforms } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
-import { ReactEditor } from '../..'
+import { DefaultPlaceholder, ReactEditor } from '../..'
 import { ReadOnlyContext } from '../../hooks/use-read-only'
 import { useSlate } from '../../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
@@ -38,7 +38,8 @@ import {
   hasEditableTarget,
   isEventHandled,
   isTargetInsideVoid,
-} from '../default-editable'
+} from '../editable'
+import { IS_FIREFOX } from '../../utils/environment'
 
 export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
   return (
@@ -61,6 +62,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     readOnly = false,
     renderElement,
     renderLeaf,
+    renderPlaceholder = props => <DefaultPlaceholder {...props} />,
     style = {},
     as: Component = 'div',
     ...attributes
@@ -109,7 +111,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // Whenever the editor updates, make sure the DOM selection state is in sync.
   useIsomorphicLayoutEffect(() => {
     const { selection } = editor
-    const domSelection = window.getSelection()
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    const domSelection = root.getSelection()
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
@@ -133,12 +136,23 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     }
 
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (
-      hasDomSelection &&
-      hasDomSelectionInEditor &&
-      selection &&
-      Range.equals(ReactEditor.toSlateRange(editor, domSelection), selection)
-    ) {
+    if (hasDomSelection && hasDomSelectionInEditor && selection) {
+      const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
+        exactMatch: true,
+      })
+      if (slateRange && Range.equals(slateRange, selection)) {
+        return
+      }
+    }
+
+    // when <Editable/> is being controlled through external value
+    // then its children might just change - DOM responds to it on its own
+    // but Slate's value is not being updated through any operation
+    // and thus it doesn't transform selection on its own
+    if (selection && !ReactEditor.hasRange(editor, selection)) {
+      editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
+        exactMatch: false,
+      })
       return
     }
 
@@ -146,42 +160,47 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     const el = ReactEditor.toDOMNode(editor, editor)
     state.isUpdatingSelection = true
 
-    try {
-      const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
-      if (newDomRange) {
-        if (Range.isBackward(selection!)) {
-          domSelection.setBaseAndExtent(
-            newDomRange.endContainer,
-            newDomRange.endOffset,
-            newDomRange.startContainer,
-            newDomRange.startOffset
-          )
-        } else {
-          domSelection.setBaseAndExtent(
-            newDomRange.startContainer,
-            newDomRange.startOffset,
-            newDomRange.endContainer,
-            newDomRange.endOffset
-          )
-        }
-        const leafEl = newDomRange.startContainer.parentElement!
-        scrollIntoView(leafEl, {
-          scrollMode: 'if-needed',
-          boundary: el,
-        })
+    if (newDomRange) {
+      if (Range.isBackward(selection!)) {
+        domSelection.setBaseAndExtent(
+          newDomRange.endContainer,
+          newDomRange.endOffset,
+          newDomRange.startContainer,
+          newDomRange.startOffset
+        )
       } else {
-        domSelection.removeAllRanges()
+        domSelection.setBaseAndExtent(
+          newDomRange.startContainer,
+          newDomRange.startOffset,
+          newDomRange.endContainer,
+          newDomRange.endOffset
+        )
+      }
+      const leafEl = newDomRange.startContainer.parentElement!
+      leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
+        newDomRange
+      )
+      scrollIntoView(leafEl, {
+        scrollMode: 'if-needed',
+        boundary: el,
+      })
+      // @ts-ignore
+      delete leafEl.getBoundingClientRect
+    } else {
+      domSelection.removeAllRanges()
+    }
+
+    setTimeout(() => {
+      // COMPAT: In Firefox, it's not enough to create a range, you also need
+      // to focus the contenteditable element too. (2016/11/16)
+      if (newDomRange && IS_FIREFOX) {
+        el.focus()
       }
 
-      setTimeout(() => {
-        state.isUpdatingSelection = false
-      })
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err)
       state.isUpdatingSelection = false
-    }
+    })
   })
 
   useLayoutEffect(() => {
@@ -219,9 +238,10 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
         inputManager.onSelect()
 
-        const { activeElement } = window.document
+        const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = window.getSelection()
+        const domSelection = root.getSelection()
 
         if (activeElement === el) {
           state.latestElement = activeElement
@@ -245,12 +265,10 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           isTargetInsideVoid(editor, focusNode)
 
         if (anchorNodeSelectable && focusNodeSelectable) {
-          try {
-            const range = ReactEditor.toSlateRange(editor, domSelection)
-            Transforms.select(editor, range)
-          } catch (e) {
-            // expected if the value hasn't been updated yet
-          }
+          const range = ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+          })
+          Transforms.select(editor, range)
         } else {
           Transforms.deselect(editor)
         }
@@ -424,6 +442,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           decorations,
           node: editor,
           renderElement,
+          renderPlaceholder,
           renderLeaf,
           selection: editor.selection,
         })}
