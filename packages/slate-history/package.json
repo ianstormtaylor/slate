@@ -14,7 +14,7 @@
     "dist/"
   ],
   "dependencies": {
-    "immer": "^7.0.0",
+    "immer": "^8.0.1",
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
