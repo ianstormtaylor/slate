@@ -17,7 +17,7 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
-  IS_FIREFOX,
+  IS_FIREFOX_LEGACY,
   IS_SAFARI,
   IS_EDGE_LEGACY,
   IS_CHROME_LEGACY,
