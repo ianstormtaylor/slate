@@ -1,4 +1,9 @@
 // Components
+// Environment-dependent Editable
+import { Editable as DefaultEditable } from './components/editable'
+import { AndroidEditableNoError as AndroidEditable } from './components/android/android-editable'
+import { IS_ANDROID } from './utils/environment'
+
 export {
   RenderElementProps,
   RenderLeafProps,
@@ -20,9 +25,4 @@ export { useSlate } from './hooks/use-slate'
 // Plugin
 export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
-
-// Environment-dependent Editable
-import { Editable as DefaultEditable } from './components/editable'
-import { AndroidEditable as AndroidEditable } from './components/android/android-editable'
-import { IS_ANDROID } from "./utils/environment";
-export const Editable = !IS_ANDROID ? DefaultEditable : AndroidEditable;
+export const Editable = !IS_ANDROID ? DefaultEditable : AndroidEditable
