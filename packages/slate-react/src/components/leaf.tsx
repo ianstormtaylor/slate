@@ -61,6 +61,7 @@ const Leaf = (props: {
     const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
       attributes: {
+        id: 'slate-placeholder',
         'data-slate-placeholder': true,
         style: {
           position: 'absolute',
