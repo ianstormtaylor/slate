@@ -1670,8 +1670,11 @@ export const Editor: EditorInterface = {
   withoutNormalizing(editor: Editor, fn: () => void): void {
     const value = Editor.isNormalizing(editor)
     NORMALIZING.set(editor, false)
-    fn()
-    NORMALIZING.set(editor, value)
+    try {
+      fn()
+    } finally {
+      NORMALIZING.set(editor, value)
+    }
     Editor.normalize(editor)
   },
 }

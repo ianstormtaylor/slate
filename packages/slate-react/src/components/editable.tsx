@@ -19,6 +19,7 @@ import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   IS_FIREFOX,
+  IS_FIREFOX_LEGACY,
   IS_SAFARI,
   IS_EDGE_LEGACY,
   IS_QQ_BROWSER,
@@ -133,6 +134,7 @@ export const Editable = (props: EditableProps) => {
   const state = useMemo(
     () => ({
       isComposing: false,
+      isDraggingInternally: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
     }),
@@ -434,7 +436,12 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
+      if (
+        !readOnly &&
+        !state.isComposing &&
+        !state.isUpdatingSelection &&
+        !state.isDraggingInternally
+      ) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -673,7 +680,11 @@ export const Editable = (props: EditableProps) => {
                 // aren't correct and never fire the "insertFromComposition"
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && event.data) {
+                if (
+                  !(IS_FIREFOX || IS_QQ_BROWSER) &&
+                  !IS_FIREFOX_LEGACY &&
+                  event.data
+                ) {
                   Editor.insertText(editor, event.data)
                 }
               }
@@ -781,16 +792,19 @@ export const Editable = (props: EditableProps) => {
                     encoded
                   )
                 }
+                const voidMatch =
+                  Editor.isVoid(editor, node) ||
+                  Editor.void(editor, { at: path, voids: true })
 
-                const voidMatch = Editor.void(editor, {
-                  at: path,
-                }) // If starting a drag on a void node, make sure it is selected
+                // If starting a drag on a void node, make sure it is selected
                 // so that it shows up in the selection's fragment.
 
                 if (voidMatch) {
                   const range = Editor.range(editor, path)
                   Transforms.select(editor, range)
                 }
+
+                state.isDraggingInternally = true
 
                 ReactEditor.setFragmentData(editor, event.dataTransfer)
               }
@@ -800,27 +814,57 @@ export const Editable = (props: EditableProps) => {
           onDrop={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
               if (
-                hasTarget(editor, event.target) &&
                 !readOnly &&
+                hasTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onDrop)
               ) {
-                // COMPAT: Certain browsers don't fire `beforeinput` events at all, and
-                // Chromium browsers don't properly fire them for files being
-                // dropped into a `contenteditable`. (2019/11/26)
-                // https://bugs.chromium.org/p/chromium/issues/detail?id=1028668
-                // if (
-                //   !HAS_BEFORE_INPUT_SUPPORT ||
-                //   (!IS_SAFARI && event.dataTransfer.files.length > 0)
-                // ) {
                 event.preventDefault()
+
+                // Keep a reference to the dragged range before updating selection
+                const draggedRange = editor.selection
+
+                // Find the range where the drop happened
                 const range = ReactEditor.findEventRange(editor, event)
                 const data = event.dataTransfer
+
                 Transforms.select(editor, range)
+
+                if (state.isDraggingInternally) {
+                  if (draggedRange) {
+                    Transforms.delete(editor, {
+                      at: draggedRange,
+                    })
+                  }
+
+                  state.isDraggingInternally = false
+                }
+
                 ReactEditor.insertData(editor, data)
-                // }
+
+                // When dragging from another source into the editor, it's possible
+                // that the current editor does not have focus.
+                if (!ReactEditor.isFocused(editor)) {
+                  ReactEditor.focus(editor)
+                }
               }
             },
             [readOnly, attributes.onDrop]
+          )}
+          onDragEnd={useCallback(
+            (event: React.DragEvent<HTMLDivElement>) => {
+              // When dropping on a different droppable element than the current editor,
+              // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
+              // Note: `onDragEnd` is only called when `onDrop` is not called
+              if (
+                !readOnly &&
+                state.isDraggingInternally &&
+                hasTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onDragEnd)
+              ) {
+                state.isDraggingInternally = false
+              }
+            },
+            [readOnly, attributes.onDragEnd]
           )}
           onFocus={useCallback(
             (event: React.FocusEvent<HTMLDivElement>) => {
