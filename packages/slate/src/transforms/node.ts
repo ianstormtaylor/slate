@@ -940,8 +940,14 @@ export const NodeTransforms: NodeTransforms = {
         if (matches.length > 0) {
           const [first] = matches
           const last = matches[matches.length - 1]
-          const [, firstPath] = first
-          const [, lastPath] = last
+          const [firstNode, firstPath] = first
+          const [lastNode, lastPath] = last
+
+          if (firstNode === lastNode && Editor.isEditor(firstNode)) {
+            // if the only matching node is an editor, no nodes matched
+            continue
+          }
+
           const commonPath = Path.equals(firstPath, lastPath)
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
