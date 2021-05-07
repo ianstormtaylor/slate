@@ -36,15 +36,15 @@ export const Text: TextInterface = {
   ): boolean {
     const { loose = false } = options
 
-    function omit(obj: Record<any, any>, key: string) {
-      const { [key]: _, ...rest } = obj
+    function omitText(obj: Record<any, any>) {
+      const { text, ...rest } = obj
 
       return rest
     }
 
     return isEqual(
-      loose ? omit(text, 'text') : text,
-      loose ? omit(another, 'text') : another
+      loose ? omitText(text) : text,
+      loose ? omitText(another) : another
     )
   },
 
