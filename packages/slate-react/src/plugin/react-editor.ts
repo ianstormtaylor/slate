@@ -463,6 +463,15 @@ export const ReactEditor = {
       let leafNode = parentNode.closest('[data-slate-leaf]')
       let domNode: DOMElement | null = null
 
+      // The parent of TEXT_NODE must have `date-slate-string`.
+      if (
+        !voidNode &&
+        nearestNode.nodeType === 3 &&
+        !parentNode.hasAttribute('data-slate-string')
+      ) {
+        parentNode.removeChild(nearestNode)
+      }
+
       // Calculate how far into the text node the `nearestNode` is, so that we
       // can determine what the offset relative to the text node is.
       if (leafNode) {
