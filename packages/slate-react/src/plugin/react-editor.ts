@@ -23,6 +23,7 @@ import {
   isDOMSelection,
   normalizeDOMPoint,
   hasShadowRoot,
+  isDOMText,
 } from '../utils/dom'
 import { IS_CHROME } from '../utils/environment'
 
@@ -466,7 +467,7 @@ export const ReactEditor = {
       // The parent of TEXT_NODE must have `date-slate-string`.
       if (
         !voidNode &&
-        nearestNode.nodeType === 3 &&
+        isDOMText(nearestNode) &&
         !parentNode.hasAttribute('data-slate-string')
       ) {
         parentNode.removeChild(nearestNode)
