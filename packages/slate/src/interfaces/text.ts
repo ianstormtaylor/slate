@@ -1,5 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import isEqual from 'lodash/isEqual'
+import isEqual from 'fast-deep-equal'
 import { Range } from '..'
 import { ExtendedType } from './custom-types'
 
