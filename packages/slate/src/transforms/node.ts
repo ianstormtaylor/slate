@@ -940,11 +940,11 @@ export const NodeTransforms: NodeTransforms = {
         if (matches.length > 0) {
           const [first] = matches
           const last = matches[matches.length - 1]
-          const [firstNode, firstPath] = first
-          const [lastNode, lastPath] = last
+          const [, firstPath] = first
+          const [, lastPath] = last
 
-          if (firstNode === lastNode && Editor.isEditor(firstNode)) {
-            // if the only matching node is an editor, no nodes matched
+          if (firstPath.length === 0 && lastPath.length === 0) {
+            // if there's no matching parent - usually means the node is an editor - don't do anything
             continue
           }
 
