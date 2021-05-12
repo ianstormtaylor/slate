@@ -1,6 +1,5 @@
 import isPlainObject from 'is-plain-object'
-import isEqual from 'lodash/isEqual'
-import omit from 'lodash/omit'
+import isEqual from 'fast-deep-equal'
 import { Range } from '..'
 import { ExtendedType } from './custom-types'
 
@@ -37,9 +36,15 @@ export const Text: TextInterface = {
   ): boolean {
     const { loose = false } = options
 
+    function omitText(obj: Record<any, any>) {
+      const { text, ...rest } = obj
+
+      return rest
+    }
+
     return isEqual(
-      loose ? omit(text, 'text') : text,
-      loose ? omit(another, 'text') : another
+      loose ? omitText(text) : text,
+      loose ? omitText(another) : another
     )
   },
 
