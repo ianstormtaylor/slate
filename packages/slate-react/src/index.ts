@@ -26,3 +26,4 @@ export { useSlate } from './hooks/use-slate'
 export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
 export const Editable = !IS_ANDROID ? DefaultEditable : AndroidEditable
+export { DefaultEditable, AndroidEditable }
