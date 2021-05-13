@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { Descendant, Editor, Node, Range, Transforms } from 'slate'
+import { Descendant, Editor, Element, Node, Range, Transforms } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -14,8 +14,11 @@ import { DefaultPlaceholder, ReactEditor } from '../..'
 import { ReadOnlyContext } from '../../hooks/use-read-only'
 import { useSlate } from '../../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
+import { DecorateContext } from '../../hooks/use-decorate'
 import {
   DOMElement,
+  isDOMElement,
+  isDOMNode,
   getDefaultView,
   isPlainTextOnlyPaste,
 } from '../../utils/dom'
@@ -265,6 +268,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // fire for any change to the selection inside the editor. (2019/11/04)
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
+    const window = ReactEditor.getWindow(editor)
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
@@ -306,126 +310,194 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <Component
-        key={contentKey}
-        role={readOnly ? undefined : 'textbox'}
-        {...attributes}
-        spellCheck={attributes.spellCheck}
-        autoCorrect={attributes.autoCorrect}
-        autoCapitalize={attributes.autoCapitalize}
-        data-slate-editor
-        data-slate-node="value"
-        contentEditable={readOnly ? undefined : true}
-        suppressContentEditableWarning
-        ref={ref}
-        style={{
-          // Prevent the default outline styles.
-          outline: 'none',
-          // Preserve adjacent whitespace and new lines.
-          whiteSpace: 'pre-wrap',
-          // Allow words to break if they are too long.
-          wordWrap: 'break-word',
-          // Allow for passed-in styles to override anything.
-          ...style,
-        }}
-        onCompositionEnd={useCallback(
-          (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionEnd)
-            ) {
-              state.isComposing = false
+      <DecorateContext.Provider value={decorate}>
+        <Component
+          key={contentKey}
+          role={readOnly ? undefined : 'textbox'}
+          {...attributes}
+          spellCheck={attributes.spellCheck}
+          autoCorrect={attributes.autoCorrect}
+          autoCapitalize={attributes.autoCapitalize}
+          data-slate-editor
+          data-slate-node="value"
+          contentEditable={readOnly ? undefined : true}
+          suppressContentEditableWarning
+          ref={ref}
+          style={{
+            // Allow positioning relative to the editable element.
+            position: 'relative',
+            // Prevent the default outline styles.
+            outline: 'none',
+            // Preserve adjacent whitespace and new lines.
+            whiteSpace: 'pre-wrap',
+            // Allow words to break if they are too long.
+            wordWrap: 'break-word',
+            // Allow for passed-in styles to override anything.
+            ...style,
+          }}
+          onCompositionEnd={useCallback(
+            (event: React.CompositionEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCompositionEnd)
+              ) {
+                state.isComposing = false
 
-              inputManager.onCompositionEnd()
-            }
-          },
-          [attributes.onCompositionEnd]
-        )}
-        onCompositionStart={useCallback(
-          (event: React.CompositionEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCompositionStart)
-            ) {
-              state.isComposing = true
-
-              inputManager.onCompositionStart()
-            }
-          },
-          [attributes.onCompositionStart]
-        )}
-        onCopy={useCallback(
-          (event: React.ClipboardEvent<HTMLDivElement>) => {
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCopy)
-            ) {
-              event.preventDefault()
-              ReactEditor.setFragmentData(editor, event.clipboardData)
-            }
-          },
-          [attributes.onCopy]
-        )}
-        onCut={useCallback(
-          (event: React.ClipboardEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onCut)
-            ) {
-              event.preventDefault()
-              ReactEditor.setFragmentData(editor, event.clipboardData)
-              const { selection } = editor
-
-              if (selection && Range.isExpanded(selection)) {
-                Editor.deleteFragment(editor)
+                inputManager.onCompositionEnd()
               }
-            }
-          },
-          [readOnly, attributes.onCut]
-        )}
-        onFocus={useCallback(
-          (event: React.FocusEvent<HTMLDivElement>) => {
-            if (
-              !readOnly &&
-              !state.isUpdatingSelection &&
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onFocus)
-            ) {
-              const el = ReactEditor.toDOMNode(editor, editor)
-              state.latestElement = window.document.activeElement
+            },
+            [attributes.onCompositionEnd]
+          )}
+          onCompositionStart={useCallback(
+            (event: React.CompositionEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCompositionStart)
+              ) {
+                state.isComposing = true
 
-              IS_FOCUSED.set(editor, true)
-            }
-          },
-          [readOnly, attributes.onFocus]
-        )}
-        )}
-        onPaste={useCallback(
-          (event: React.ClipboardEvent<HTMLDivElement>) => {
-            // This unfortunately needs to be handled with paste events instead.
-            if (
-              hasEditableTarget(editor, event.target) &&
-              !isEventHandled(event, attributes.onPaste) &&
-              isPlainTextOnlyPaste(event.nativeEvent) &&
-              !readOnly
-            ) {
-              event.preventDefault()
-              ReactEditor.insertData(editor, event.clipboardData)
-            }
-          },
-          [readOnly, attributes.onPaste]
-        )}
-      >
-        {useChildren({
-          decorations,
-          node: editor,
-          renderElement,
-          renderPlaceholder,
-          renderLeaf,
-          selection: editor.selection,
-        })}
-      </Component>
+                inputManager.onCompositionStart()
+              }
+            },
+            [attributes.onCompositionStart]
+          )}
+          onCopy={useCallback(
+            (event: React.ClipboardEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCopy)
+              ) {
+                event.preventDefault()
+                ReactEditor.setFragmentData(editor, event.clipboardData)
+              }
+            },
+            [attributes.onCopy]
+          )}
+          onCut={useCallback(
+            (event: React.ClipboardEvent<HTMLDivElement>) => {
+              if (
+                !readOnly &&
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCut)
+              ) {
+                event.preventDefault()
+                ReactEditor.setFragmentData(editor, event.clipboardData)
+                const { selection } = editor
+
+                if (selection) {
+                  if (Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                  } else {
+                    const node = Node.parent(editor, selection.anchor.path)
+                    if (Editor.isVoid(editor, node)) {
+                      Transforms.delete(editor)
+                    }
+                  }
+                }
+              }
+            },
+            [readOnly, attributes.onCut]
+          )}
+          onFocus={useCallback(
+            (event: React.FocusEvent<HTMLDivElement>) => {
+              if (
+                !readOnly &&
+                !state.isUpdatingSelection &&
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onFocus)
+              ) {
+                const root = ReactEditor.findDocumentOrShadowRoot(editor)
+                state.latestElement = root.activeElement
+
+                IS_FOCUSED.set(editor, true)
+              }
+            },
+            [readOnly, attributes.onFocus]
+          )}
+          onBlur={useCallback(
+            (event: React.FocusEvent<HTMLDivElement>) => {
+              if (
+                readOnly ||
+                state.isUpdatingSelection ||
+                !hasEditableTarget(editor, event.target) ||
+                isEventHandled(event, attributes.onBlur)
+              ) {
+                return
+              }
+
+              // COMPAT: If the current `activeElement` is still the previous
+              // one, this is due to the window being blurred when the tab
+              // itself becomes unfocused, so we want to abort early to allow to
+              // editor to stay focused when the tab becomes focused again.
+              const root = ReactEditor.findDocumentOrShadowRoot(editor)
+              if (state.latestElement === root.activeElement) {
+                return
+              }
+
+              const { relatedTarget } = event
+              const el = ReactEditor.toDOMNode(editor, editor)
+
+              // COMPAT: The event should be ignored if the focus is returning
+              // to the editor from an embedded editable element (eg. an <input>
+              // element inside a void node).
+              if (relatedTarget === el) {
+                return
+              }
+
+              // COMPAT: The event should be ignored if the focus is moving from
+              // the editor to inside a void node's spacer element.
+              if (
+                isDOMElement(relatedTarget) &&
+                relatedTarget.hasAttribute('data-slate-spacer')
+              ) {
+                return
+              }
+
+              // COMPAT: The event should be ignored if the focus is moving to a
+              // non- editable section of an element that isn't a void node (eg.
+              // a list item of the check list example).
+              if (
+                relatedTarget != null &&
+                isDOMNode(relatedTarget) &&
+                ReactEditor.hasDOMNode(editor, relatedTarget)
+              ) {
+                const node = ReactEditor.toSlateNode(editor, relatedTarget)
+
+                if (Element.isElement(node) && !editor.isVoid(node)) {
+                  return
+                }
+              }
+
+              IS_FOCUSED.delete(editor)
+            },
+            [readOnly, attributes.onBlur]
+          )}
+          onPaste={useCallback(
+            (event: React.ClipboardEvent<HTMLDivElement>) => {
+              // This unfortunately needs to be handled with paste events instead.
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onPaste) &&
+                isPlainTextOnlyPaste(event.nativeEvent) &&
+                !readOnly
+              ) {
+                event.preventDefault()
+                ReactEditor.insertData(editor, event.clipboardData)
+              }
+            },
+            [readOnly, attributes.onPaste]
+          )}
+        >
+          {useChildren({
+            decorations,
+            node: editor,
+            renderElement,
+            renderPlaceholder,
+            renderLeaf,
+            selection: editor.selection,
+          })}
+        </Component>
+      </DecorateContext.Provider>
     </ReadOnlyContext.Provider>
   )
 }
