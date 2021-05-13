@@ -25,16 +25,17 @@ import {
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
 } from '../../utils/weak-maps'
-import { AndroidInputManager } from './android-input-manager'
 import { EditableProps } from '../editable'
-import { ErrorBoundary } from './ErrorBoundary'
 import useChildren from '../../hooks/use-children'
 import {
   defaultDecorate,
   hasEditableTarget,
   isEventHandled,
+  isDOMEventHandled,
   isTargetInsideVoid,
 } from '../editable'
+
+import { useAndroidInputManager } from './use-android-input-manager'
 
 export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
   return (
@@ -64,7 +65,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   } = props
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
-  const inputManager = useMemo(() => new AndroidInputManager(editor), [editor])
+  const inputManager = useAndroidInputManager(ref)
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -72,32 +73,22 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
-      isComposing: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
     }),
     []
   )
 
-  useEffect(() => {
-    return () => {
-      inputManager.onWillUnmount()
-    }
-  }, [])
-
-  const prevValue = useRef<Descendant[]>([])
-
-  // To-do: updating refs during render phase will eventually be unusafe
-  // in future versions of React https://github.com/facebook/react/pull/18545
-  if (prevValue.current !== editor.children) {
-    inputManager.onRender()
-    prevValue.current = editor.children
-  }
+  const [contentKey, setContentKey] = useState(0)
+  const onRestoreDOM = useCallback(() => {
+    setContentKey(prev => prev + 1)
+  }, [contentKey])
 
   // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
     // Update element-related weak maps with the DOM element ref.
     let window
+
     if (ref.current && (window = getDefaultView(ref.current))) {
       EDITOR_TO_WINDOW.set(editor, window)
       EDITOR_TO_ELEMENT.set(editor, ref.current)
@@ -109,95 +100,97 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       EDITOR_TO_RESTORE_DOM.delete(editor)
     }
 
-    // Let the input manager know that the editor has re-rendered
-    inputManager.onDidUpdate()
+    try {
+      // Make sure the DOM selection state is in sync.
+      const { selection } = editor
+      const root = ReactEditor.findDocumentOrShadowRoot(editor)
+      const domSelection = root.getSelection()
 
-    // Make sure the DOM selection state is in sync.
-    const { selection } = editor
-    const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root.getSelection()
-
-    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
-      return
-    }
-
-    const hasDomSelection = domSelection.type !== 'None'
-
-    // If the DOM selection is properly unset, we're done.
-    if (!selection && !hasDomSelection) {
-      return
-    }
-
-    // verify that the dom selection is in the editor
-    const editorElement = EDITOR_TO_ELEMENT.get(editor)!
-    let hasDomSelectionInEditor = false
-    if (
-      editorElement.contains(domSelection.anchorNode) &&
-      editorElement.contains(domSelection.focusNode)
-    ) {
-      hasDomSelectionInEditor = true
-    }
-
-    // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (hasDomSelection && hasDomSelectionInEditor && selection) {
-      const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: true,
-      })
-      if (slateRange && Range.equals(slateRange, selection)) {
+      if (!domSelection || !ReactEditor.isFocused(editor)) {
         return
       }
-    }
 
-    // when <Editable/> is being controlled through external value
-    // then its children might just change - DOM responds to it on its own
-    // but Slate's value is not being updated through any operation
-    // and thus it doesn't transform selection on its own
-    if (selection && !ReactEditor.hasRange(editor, selection)) {
-      editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: false,
-      })
-      return
-    }
+      const hasDomSelection = domSelection.type !== 'None'
 
-    // Otherwise the DOM selection is out of sync, so update it.
-    const el = ReactEditor.toDOMNode(editor, editor)
-    state.isUpdatingSelection = true
-
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-
-    if (newDomRange) {
-      if (Range.isBackward(selection!)) {
-        domSelection.setBaseAndExtent(
-          newDomRange.endContainer,
-          newDomRange.endOffset,
-          newDomRange.startContainer,
-          newDomRange.startOffset
-        )
-      } else {
-        domSelection.setBaseAndExtent(
-          newDomRange.startContainer,
-          newDomRange.startOffset,
-          newDomRange.endContainer,
-          newDomRange.endOffset
-        )
+      // If the DOM selection is properly unset, we're done.
+      if (!selection && !hasDomSelection) {
+        return
       }
-      const leafEl = newDomRange.startContainer.parentElement!
-      leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
-        newDomRange
-      )
-      scrollIntoView(leafEl, {
-        scrollMode: 'if-needed',
-        boundary: el,
-      })
-      // @ts-ignore
-      delete leafEl.getBoundingClientRect
-    } else {
-      domSelection.removeAllRanges()
-    }
 
-    setTimeout(() => {
+      // verify that the dom selection is in the editor
+      const editorElement = EDITOR_TO_ELEMENT.get(editor)!
+      let hasDomSelectionInEditor = false
+      if (
+        editorElement.contains(domSelection.anchorNode) &&
+        editorElement.contains(domSelection.focusNode)
+      ) {
+        hasDomSelectionInEditor = true
+      }
+
+      // If the DOM selection is in the editor and the editor selection is already correct, we're done.
+      if (hasDomSelection && hasDomSelectionInEditor && selection) {
+        const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: true,
+        })
+        if (slateRange && Range.equals(slateRange, selection)) {
+          return
+        }
+      }
+
+      // when <Editable/> is being controlled through external value
+      // then its children might just change - DOM responds to it on its own
+      // but Slate's value is not being updated through any operation
+      // and thus it doesn't transform selection on its own
+      if (selection && !ReactEditor.hasRange(editor, selection)) {
+        editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: false,
+        })
+        return
+      }
+
+      // Otherwise the DOM selection is out of sync, so update it.
+      const el = ReactEditor.toDOMNode(editor, editor)
+      state.isUpdatingSelection = true
+
+      const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+
+      if (newDomRange) {
+        if (Range.isBackward(selection!)) {
+          domSelection.setBaseAndExtent(
+            newDomRange.endContainer,
+            newDomRange.endOffset,
+            newDomRange.startContainer,
+            newDomRange.startOffset
+          )
+        } else {
+          domSelection.setBaseAndExtent(
+            newDomRange.startContainer,
+            newDomRange.startOffset,
+            newDomRange.endContainer,
+            newDomRange.endOffset
+          )
+        }
+        const leafEl = newDomRange.startContainer.parentElement!
+        leafEl.getBoundingClientRect = newDomRange.getBoundingClientRect.bind(
+          newDomRange
+        )
+        scrollIntoView(leafEl, {
+          scrollMode: 'if-needed',
+          boundary: el,
+        })
+        // @ts-ignore
+        delete leafEl.getBoundingClientRect
+      } else {
+        domSelection.removeAllRanges()
+      }
+
+      setTimeout(() => {
+        state.isUpdatingSelection = false
+      })
+    } catch {
+      // Failed to update selection, likely due to reconciliation error
       state.isUpdatingSelection = false
-    })
+    }
   })
 
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
@@ -208,6 +201,34 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     }
   }, [autoFocus])
 
+  // Listen on the native `beforeinput` event to get real "Level 2" events. This
+  // is required because React's `beforeinput` is fake and never really attaches
+  // to the real event sadly. (2019/11/01)
+  // https://github.com/facebook/react/issues/11211
+  const onDOMBeforeInput = useCallback(
+    (event: InputEvent) => {
+      if (
+        !readOnly &&
+        hasEditableTarget(editor, event.target) &&
+        !isDOMEventHandled(event, propsOnDOMBeforeInput)
+      ) {
+        // no-op, parity with `editable.tsx`
+      }
+    },
+    [readOnly, propsOnDOMBeforeInput]
+  )
+
+  // Attach a native DOM event handler for `beforeinput` events, because React's
+  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
+  // real `beforeinput` events sadly... (2019/11/04)
+  useIsomorphicLayoutEffect(() => {
+    const node = ref.current
+
+    node?.addEventListener('beforeinput', onDOMBeforeInput)
+
+    return () => node?.removeEventListener('beforeinput', onDOMBeforeInput)
+  }, [contentKey, propsOnDOMBeforeInput])
+
   // Listen on the native `selectionchange` event to be able to update any time
   // the selection changes. This is required because React's `onSelect` is leaky
   // and non-standard so it doesn't fire until after a selection has been
@@ -215,9 +236,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!readOnly && !state.isComposing && !state.isUpdatingSelection) {
-        inputManager.onSelect()
-
+      if (!readOnly && !state.isUpdatingSelection) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -291,12 +310,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     })
   }
 
-  const [contentKey, setContentKey] = useState(0)
-
-  const onRestoreDOM = useCallback(() => {
-    setContentKey(prev => prev + 1)
-  }, [contentKey])
-
   return (
     <ReadOnlyContext.Provider value={readOnly}>
       <DecorateContext.Provider value={decorate}>
@@ -324,32 +337,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
             // Allow for passed-in styles to override anything.
             ...style,
           }}
-          onCompositionEnd={useCallback(
-            (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionEnd)
-              ) {
-                state.isComposing = false
-
-                inputManager.onCompositionEnd()
-              }
-            },
-            [attributes.onCompositionEnd]
-          )}
-          onCompositionStart={useCallback(
-            (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionStart)
-              ) {
-                state.isComposing = true
-
-                inputManager.onCompositionStart()
-              }
-            },
-            [attributes.onCompositionStart]
-          )}
           onCopy={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
               if (
