@@ -1,11 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Descendant, Editor, Element, Node, Range, Transforms } from 'slate'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
@@ -86,21 +79,40 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     []
   )
 
-  // Update element-related weak maps with the DOM element ref.
+  useEffect(() => {
+    return () => {
+      inputManager.onWillUnmount()
+    }
+  }, [])
+
+  const prevValue = useRef<Descendant[]>([])
+
+  // To-do: updating refs during render phase will eventually be unusafe
+  // in future versions of React https://github.com/facebook/react/pull/18545
+  if (prevValue.current !== editor.children) {
+    inputManager.onRender()
+    prevValue.current = editor.children
+  }
+
+  // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
+    // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
       EDITOR_TO_WINDOW.set(editor, window)
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
       ELEMENT_TO_NODE.set(ref.current, editor)
+      EDITOR_TO_RESTORE_DOM.set(editor, onRestoreDOM)
     } else {
       NODE_TO_ELEMENT.delete(editor)
+      EDITOR_TO_RESTORE_DOM.delete(editor)
     }
-  })
 
-  // Whenever the editor updates, make sure the DOM selection state is in sync.
-  useIsomorphicLayoutEffect(() => {
+    // Let the input manager know that the editor has re-rendered
+    inputManager.onDidUpdate()
+
+    // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
@@ -186,23 +198,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     setTimeout(() => {
       state.isUpdatingSelection = false
     })
-  })
-
-  useLayoutEffect(() => {
-    inputManager.onDidMount()
-    return () => {
-      inputManager.onWillUnmount()
-    }
-  }, [])
-
-  const prevValue = useRef<Descendant[]>([])
-  if (prevValue.current !== editor.children) {
-    inputManager.onRender()
-    prevValue.current = editor.children
-  }
-
-  useLayoutEffect(() => {
-    inputManager.onDidUpdate()
   })
 
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
@@ -301,12 +296,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const onRestoreDOM = useCallback(() => {
     setContentKey(prev => prev + 1)
   }, [contentKey])
-  EDITOR_TO_RESTORE_DOM.set(editor, onRestoreDOM)
-  useEffect(() => {
-    return () => {
-      EDITOR_TO_RESTORE_DOM.delete(editor)
-    }
-  }, [])
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>

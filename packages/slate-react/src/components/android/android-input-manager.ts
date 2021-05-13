@@ -106,10 +106,6 @@ export class AndroidInputManager {
     this.observer = new MutationObserver(this.flush)
   }
 
-  onDidMount = () => {
-    this.connect()
-  }
-
   onDidUpdate = () => {
     this.connect()
   }

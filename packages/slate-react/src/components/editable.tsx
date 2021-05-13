@@ -138,8 +138,9 @@ export const Editable = (props: EditableProps) => {
     []
   )
 
-  // Update element-related weak maps with the DOM element ref.
+  // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
+    // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
       EDITOR_TO_WINDOW.set(editor, window)
@@ -149,10 +150,8 @@ export const Editable = (props: EditableProps) => {
     } else {
       NODE_TO_ELEMENT.delete(editor)
     }
-  })
 
-  // Whenever the editor updates, make sure the DOM selection state is in sync.
-  useIsomorphicLayoutEffect(() => {
+    // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()

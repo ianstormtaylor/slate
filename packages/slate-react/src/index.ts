@@ -4,12 +4,15 @@ import { Editable as DefaultEditable } from './components/editable'
 import { AndroidEditableNoError as AndroidEditable } from './components/android/android-editable'
 import { IS_ANDROID } from './utils/environment'
 
+export const Editable = IS_ANDROID ? AndroidEditable : DefaultEditable
 export {
+  Editable as DefaultEditable,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,
 } from './components/editable'
+export { AndroidEditableNoError as AndroidEditable } from './components/android/android-editable'
 export { DefaultElement } from './components/element'
 export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
@@ -25,5 +28,3 @@ export { useSlate } from './hooks/use-slate'
 // Plugin
 export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
-export const Editable = !IS_ANDROID ? DefaultEditable : AndroidEditable
-export { DefaultEditable, AndroidEditable }
