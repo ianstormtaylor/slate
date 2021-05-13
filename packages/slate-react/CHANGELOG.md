@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.63.0
+
+### Patch Changes
+
+- [#4238](https://github.com/ianstormtaylor/slate/pull/4238) [`c14e1fbc`](https://github.com/ianstormtaylor/slate/commit/c14e1fbc77c51f7928ba8ab089c76f3e3438fb97) Thanks [@clauderic](https://github.com/clauderic)! - Fix duplicated content and other bugs related to drag and drop handling
+
+* [#4237](https://github.com/ianstormtaylor/slate/pull/4237) [`623960a7`](https://github.com/ianstormtaylor/slate/commit/623960a7d14103b8cebe667019b4de5f8ad1fd61) Thanks [@dylans](https://github.com/dylans)! - Fixed text insertion logic to prevent crashing in newer Firefox versions.
+
 ## 0.62.1
 
 ### Patch Changes

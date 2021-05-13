@@ -17,7 +17,7 @@
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
-    "slate": "^0.62.0"
+    "slate": "^0.63.0"
   },
   "peerDependencies": {
     "slate": ">=0.55.0"
