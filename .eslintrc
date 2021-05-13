@@ -151,6 +151,15 @@
       }
     ],
     "use-isnan": "error",
+    "valid-jsdoc": [
+      "error",
+      {
+        "prefer": {
+          "return": "returns"
+        },
+        "requireReturn": false
+      }
+    ],
     "valid-typeof": "error",
     "yield-star-spacing": [
       "error",
