@@ -39,7 +39,6 @@ import {
   isEventHandled,
   isTargetInsideVoid,
 } from '../editable'
-import { IS_FIREFOX } from '../../utils/environment'
 
 export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
   return (
@@ -89,17 +88,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
       EDITOR_TO_WINDOW.set(editor, window)
-      EDITOR_TO_ELEMENT.set(editor, ref.current)
-      NODE_TO_ELEMENT.set(editor, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, editor)
-    } else {
-      NODE_TO_ELEMENT.delete(editor)
-    }
-  })
-
-  // Update element-related weak maps with the DOM element ref.
-  useIsomorphicLayoutEffect(() => {
-    if (ref.current) {
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
       ELEMENT_TO_NODE.set(ref.current, editor)
@@ -193,12 +181,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     }
 
     setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need
-      // to focus the contenteditable element too. (2016/11/16)
-      if (newDomRange && IS_FIREFOX) {
-        el.focus()
-      }
-
       state.isUpdatingSelection = false
     })
   })
@@ -418,9 +400,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           },
           [readOnly, attributes.onFocus]
         )}
-        onKeyDown={useCallback(
-          (event: React.KeyboardEvent<HTMLDivElement>) => {},
-          [readOnly, attributes.onKeyDown]
         )}
         onPaste={useCallback(
           (event: React.ClipboardEvent<HTMLDivElement>) => {
