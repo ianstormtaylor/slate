@@ -1,7 +1,7 @@
 // Components
 // Environment-dependent Editable
 import { Editable as DefaultEditable } from './components/editable'
-import { AndroidEditableNoError as AndroidEditable } from './components/android/android-editable'
+import { AndroidEditable } from './components/android/android-editable'
 import { IS_ANDROID } from './utils/environment'
 
 export const Editable = IS_ANDROID ? AndroidEditable : DefaultEditable
@@ -12,7 +12,7 @@ export {
   RenderPlaceholderProps,
   DefaultPlaceholder,
 } from './components/editable'
-export { AndroidEditableNoError as AndroidEditable } from './components/android/android-editable'
+export { AndroidEditable } from './components/android/android-editable'
 export { DefaultElement } from './components/element'
 export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'

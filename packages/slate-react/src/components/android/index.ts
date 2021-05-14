@@ -1,1 +1,1 @@
-export { AndroidEditable, AndroidEditableNoError } from './android-editable'
+export { AndroidEditable } from './android-editable'

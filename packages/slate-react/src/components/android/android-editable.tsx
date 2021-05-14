@@ -37,14 +37,6 @@ import {
 
 import { useAndroidInputManager } from './use-android-input-manager'
 
-export const AndroidEditableNoError = (props: EditableProps): JSX.Element => {
-  return (
-    <ErrorBoundary>
-      <AndroidEditable {...props} />
-    </ErrorBoundary>
-  )
-}
-
 /**
  * Editable.
  */
