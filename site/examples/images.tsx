@@ -1,13 +1,13 @@
-import React, { useMemo, useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Transforms, createEditor, Descendant } from 'slate'
 import {
-  Editable,
   Slate,
-  useFocused,
-  useSelected,
+  Editable,
   useSlateStatic,
+  useSelected,
+  useFocused,
   withReact,
 } from 'slate-react'
 import { withHistory } from 'slate-history'

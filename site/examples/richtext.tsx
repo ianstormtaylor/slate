@@ -1,12 +1,12 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, Slate, useSlate, withReact } from 'slate-react'
+import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import {
+  Editor,
+  Transforms,
   createEditor,
   Descendant,
-  Editor,
   Element as SlateElement,
-  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
 
@@ -28,7 +28,7 @@ const RichTextExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={setValue}>
+    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
