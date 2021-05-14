@@ -27,8 +27,19 @@ const debug = (...message: any[]) => {}
  * https://github.com/facebook/draft-js/blob/master/src/component/handlers/composition/DOMObserver.js
  * https://github.com/ProseMirror/prosemirror-view/blob/master/src/domobserver.js
  *
- * But is an analysis mainly for `backspace` and `enter` as we handle
- * compositions as a single operation.
+ * The input manager attempts to map observed mutations on the document to a
+ * set of operations in order to reconcile Slate's internal value with the DOM.
+ *
+ * Mutations are processed synchronously as they come in. Only mutations that occur
+ * during a user input loop are processed, as other mutations can occur within the
+ * document that were not initiated by user input.
+ *
+ * The mutation reconciliation process attempts to match mutations to the following
+ * patterns:
+ *
+ * - Text updates
+ * - Deletions
+ * - Line breaks
  *
  * @param editor
  */
@@ -111,6 +122,9 @@ export class AndroidInputManager {
     const { selection } = this.editor
 
     Editor.insertBreak(this.editor)
+
+    // To-do: Need a more granular solution to restoring only a specific portion
+    // of the document. Restoring the entire document is expensive.
     restoreDOM(this.editor)
 
     if (selection) {
@@ -122,7 +136,7 @@ export class AndroidInputManager {
         ) {
           Transforms.move(this.editor)
         }
-      }, 150)
+      }, 100)
     }
   }
 

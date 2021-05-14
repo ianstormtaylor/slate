@@ -57,8 +57,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   } = props
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
-
-  useAndroidInputManager(ref)
+  const inputManager = useAndroidInputManager(ref)
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -205,7 +204,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
-        // no-op, parity with `editable.tsx`
+        inputManager.onUserInput()
       }
     },
     [readOnly, propsOnDOMBeforeInput]
@@ -231,41 +230,49 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!readOnly && !state.isUpdatingSelection) {
-        const root = ReactEditor.findDocumentOrShadowRoot(editor)
-        const { activeElement } = root
-        const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = root.getSelection()
+      try {
+        if (
+          !readOnly &&
+          !state.isUpdatingSelection &&
+          !inputManager.isReconciling.current
+        ) {
+          const root = ReactEditor.findDocumentOrShadowRoot(editor)
+          const { activeElement } = root
+          const el = ReactEditor.toDOMNode(editor, editor)
+          const domSelection = root.getSelection()
 
-        if (activeElement === el) {
-          state.latestElement = activeElement
-          IS_FOCUSED.set(editor, true)
-        } else {
-          IS_FOCUSED.delete(editor)
+          if (activeElement === el) {
+            state.latestElement = activeElement
+            IS_FOCUSED.set(editor, true)
+          } else {
+            IS_FOCUSED.delete(editor)
+          }
+
+          if (!domSelection) {
+            return Transforms.deselect(editor)
+          }
+
+          const { anchorNode, focusNode } = domSelection
+
+          const anchorNodeSelectable =
+            hasEditableTarget(editor, anchorNode) ||
+            isTargetInsideVoid(editor, anchorNode)
+
+          const focusNodeSelectable =
+            hasEditableTarget(editor, focusNode) ||
+            isTargetInsideVoid(editor, focusNode)
+
+          if (anchorNodeSelectable && focusNodeSelectable) {
+            const range = ReactEditor.toSlateRange(editor, domSelection, {
+              exactMatch: false,
+            })
+            Transforms.select(editor, range)
+          } else {
+            Transforms.deselect(editor)
+          }
         }
-
-        if (!domSelection) {
-          return Transforms.deselect(editor)
-        }
-
-        const { anchorNode, focusNode } = domSelection
-
-        const anchorNodeSelectable =
-          hasEditableTarget(editor, anchorNode) ||
-          isTargetInsideVoid(editor, anchorNode)
-
-        const focusNodeSelectable =
-          hasEditableTarget(editor, focusNode) ||
-          isTargetInsideVoid(editor, focusNode)
-
-        if (anchorNodeSelectable && focusNodeSelectable) {
-          const range = ReactEditor.toSlateRange(editor, domSelection, {
-            exactMatch: false,
-          })
-          Transforms.select(editor, range)
-        } else {
-          Transforms.deselect(editor)
-        }
+      } catch {
+        // Failed to update selection, likely due to reconciliation error
       }
     }, 100),
     [readOnly]
@@ -286,7 +293,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
         onDOMSelectionChange
       )
     }
-  }, [onDOMSelectionChange])
+  })
 
   const decorations = decorate([editor, []])
 
@@ -449,7 +456,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               if (
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onPaste) &&
-                isPlainTextOnlyPaste(event.nativeEvent) &&
                 !readOnly
               ) {
                 event.preventDefault()
