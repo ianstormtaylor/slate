@@ -23,6 +23,7 @@ import {
   isDOMSelection,
   normalizeDOMPoint,
   hasShadowRoot,
+  isDOMText,
 } from '../utils/dom'
 import { IS_CHROME } from '../utils/environment'
 
@@ -462,6 +463,15 @@ export const ReactEditor = {
       const voidNode = parentNode.closest('[data-slate-void="true"]')
       let leafNode = parentNode.closest('[data-slate-leaf]')
       let domNode: DOMElement | null = null
+
+      // The parent of TEXT_NODE must have `date-slate-string`.
+      if (
+        !voidNode &&
+        isDOMText(nearestNode) &&
+        !parentNode.hasAttribute('data-slate-string')
+      ) {
+        parentNode.removeChild(nearestNode)
+      }
 
       // Calculate how far into the text node the `nearestNode` is, so that we
       // can determine what the offset relative to the text node is.
