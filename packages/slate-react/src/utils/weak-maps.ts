@@ -37,6 +37,8 @@ export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 
 export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
 
+export const EDITOR_TO_RESTORE_DOM = new WeakMap<Editor, () => void>()
+
 /**
  * Symbols.
  */
