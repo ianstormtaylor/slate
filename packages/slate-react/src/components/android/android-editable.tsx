@@ -57,7 +57,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   } = props
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
-  const inputManager = useAndroidInputManager(ref)
+
+  useAndroidInputManager(ref)
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -216,8 +217,10 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   useIsomorphicLayoutEffect(() => {
     const node = ref.current
 
+    // @ts-ignore The `beforeinput` event isn't recognized.
     node?.addEventListener('beforeinput', onDOMBeforeInput)
 
+    // @ts-ignore The `beforeinput` event isn't recognized.
     return () => node?.removeEventListener('beforeinput', onDOMBeforeInput)
   }, [contentKey, propsOnDOMBeforeInput])
 
