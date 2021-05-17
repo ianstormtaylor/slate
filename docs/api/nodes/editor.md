@@ -369,15 +369,21 @@ Check if a value is a void `Element` object.
 
 Called when there is a change in the editor.
 
-### Override mark methods
+### Mark methods
 
 #### `addMark(key: string, value: any)`
 
-Add a custom property to the leaf text nodes in the current selection. If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
+Add a custom property to the leaf text nodes in the currentk selection. If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
 
 #### `removeMark(key: string)`
 
 Remove a custom property from the leaf text nodes in the current selection.
+
+### getFragment method
+
+#### `getFragment(): Descendant`
+
+Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection.
 
 ### Delete methods
 
