@@ -31,6 +31,7 @@ import { IS_CHROME } from '../utils/environment'
  */
 
 export interface ReactEditor extends BaseEditor {
+  isRemote: boolean
   insertData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean

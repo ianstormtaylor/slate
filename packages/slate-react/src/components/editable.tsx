@@ -673,7 +673,9 @@ export const Editable = (props: EditableProps) => {
                 state.isComposing = false
 
                 // https://github.com/ianstormtaylor/slate/issues/4060
-                document.execCommand('undo')
+                if (event.data) {
+                  document.execCommand('undo')
+                }
 
                 // COMPAT: In Chrome, `beforeinput` events for compositions
                 // aren't correct and never fire the "insertFromComposition"
@@ -684,6 +686,7 @@ export const Editable = (props: EditableProps) => {
                   !IS_FIREFOX_LEGACY &&
                   event.data
                 ) {
+                  editor.isRemote = false
                   Editor.insertText(editor, event.data)
                 }
               }
