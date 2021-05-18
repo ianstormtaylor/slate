@@ -10,7 +10,6 @@ import {
   Path,
 } from 'slate'
 import getDirection from 'direction'
-import { HistoryEditor } from 'slate-history'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -874,9 +873,10 @@ export const Editable = (props: EditableProps) => {
                 // hotkeys ourselves. (2019/11/06)
                 if (Hotkeys.isRedo(nativeEvent)) {
                   event.preventDefault()
+                  const maybeHistoryEditor: any = editor
 
-                  if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.redo()
+                  if (typeof maybeHistoryEditor.redo === 'function') {
+                    maybeHistoryEditor.redo()
                   }
 
                   return
@@ -884,9 +884,10 @@ export const Editable = (props: EditableProps) => {
 
                 if (Hotkeys.isUndo(nativeEvent)) {
                   event.preventDefault()
+                  const maybeHistoryEditor: any = editor
 
-                  if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.undo()
+                  if (typeof maybeHistoryEditor.undo === 'function') {
+                    maybeHistoryEditor.undo()
                   }
 
                   return
