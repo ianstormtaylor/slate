@@ -449,9 +449,9 @@ export const ReactEditor = {
   toSlatePoint<T extends boolean>(
     editor: ReactEditor,
     domPoint: DOMPoint,
-    extractMatch: T
+    exactMatch: T
   ): T extends true ? Point | null : Point {
-    const [nearestNode, nearestOffset] = extractMatch
+    const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
       : normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
@@ -525,7 +525,7 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
-      if (extractMatch) {
+      if (exactMatch) {
         return null as T extends true ? Point | null : Point
       }
       throw new Error(
