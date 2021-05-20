@@ -17,11 +17,10 @@ import scrollIntoView from 'scroll-into-view-if-needed'
 import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
+  HAS_BEFORE_INPUT_SUPPORT,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_SAFARI,
-  IS_EDGE_LEGACY,
-  IS_CHROME_LEGACY,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -47,15 +46,6 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
-
-// COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
-// Chrome Legacy doesn't support `beforeinput` correctly
-const HAS_BEFORE_INPUT_SUPPORT =
-  !IS_CHROME_LEGACY &&
-  !IS_EDGE_LEGACY &&
-  globalThis.InputEvent &&
-  // @ts-ignore The `getTargetRanges` property isn't recognized.
-  typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
 
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
