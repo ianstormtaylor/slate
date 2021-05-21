@@ -29,6 +29,8 @@ Transforms.move(editor, {
 })
 ```
 
+[Selection Transforms API Reference](api/transforms#selection-transforms)
+
 ## Text Transforms
 
 Text transforms act on the text content of the editor. For example, here's how you'd insert a string of text as a specific point:
