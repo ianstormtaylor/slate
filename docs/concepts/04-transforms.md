@@ -4,7 +4,7 @@ Slate's data structure is immutable, so you can't modify or delete nodes directl
 
 Slate's transform functions are designed to be very flexible, to make it possible to represent all kinds of changes you might need to make to your editor. However, that flexibility can be hard to understand at first.
 
-> 🤖 Check out the [Transforms](/api/transforms.md) reference for a full list of Slate's transforms.
+> 🤖 Check out the [Transforms](../api/transforms.md) reference for a full list of Slate's transforms.
 
 ## Selection Transforms
 
