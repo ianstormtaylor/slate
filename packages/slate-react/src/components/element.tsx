@@ -32,6 +32,7 @@ const Element = (props: {
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
+  decorate: (entry: NodeEntry) => Range[]
 }) => {
   const {
     decorations,
@@ -40,6 +41,7 @@ const Element = (props: {
     renderPlaceholder,
     renderLeaf,
     selection,
+    decorate,
   } = props
   const ref = useRef<HTMLElement>(null)
   const editor = useSlateStatic()
@@ -53,6 +55,7 @@ const Element = (props: {
     renderPlaceholder,
     renderLeaf,
     selection,
+    decorate,
   })
 
   // Attributes that the developer must mix into the element in their

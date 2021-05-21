@@ -5,7 +5,6 @@ import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
-import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   RenderElementProps,
@@ -24,6 +23,7 @@ const useChildren = (props: {
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
+  decorate: (entry: NodeEntry) => Range[]
 }) => {
   const {
     decorations,
@@ -32,8 +32,8 @@ const useChildren = (props: {
     renderPlaceholder,
     renderLeaf,
     selection,
+    decorate,
   } = props
-  const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []
@@ -41,7 +41,6 @@ const useChildren = (props: {
     Element.isElement(node) &&
     !editor.isInline(node) &&
     Editor.hasInlines(editor, node)
-
   for (let i = 0; i < node.children.length; i++) {
     const p = path.concat(i)
     const n = node.children[i] as Descendant
@@ -68,6 +67,7 @@ const useChildren = (props: {
           renderPlaceholder={renderPlaceholder}
           renderLeaf={renderLeaf}
           selection={sel}
+          decorate={decorate}
         />
       )
     } else {

@@ -26,7 +26,6 @@ import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { DecorateContext } from '../hooks/use-decorate'
 import {
   DOMElement,
   DOMNode,
@@ -176,7 +175,6 @@ export const Editable = (props: EditableProps) => {
         return
       }
     }
-
     // when <Editable/> is being controlled through external value
     // then its children might just change - DOM responds to it on its own
     // but Slate's value is not being updated through any operation
@@ -495,606 +493,603 @@ export const Editable = (props: EditableProps) => {
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <DecorateContext.Provider value={decorate}>
-        <Component
-          // COMPAT: The Grammarly Chrome extension works by changing the DOM
-          // out from under `contenteditable` elements, which leads to weird
-          // behaviors so we have to disable it like editor. (2017/04/24)
-          data-gramm={false}
-          role={readOnly ? undefined : 'textbox'}
-          {...attributes}
-          // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
-          // have to use hacks to make these replacement-based features work.
-          spellCheck={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck}
-          autoCorrect={
-            !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCorrect
-          }
-          autoCapitalize={
-            !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCapitalize
-          }
-          data-slate-editor
-          data-slate-node="value"
-          contentEditable={readOnly ? undefined : true}
-          suppressContentEditableWarning
-          ref={ref}
-          style={{
-            // Allow positioning relative to the editable element.
-            position: 'relative',
-            // Prevent the default outline styles.
-            outline: 'none',
-            // Preserve adjacent whitespace and new lines.
-            whiteSpace: 'pre-wrap',
-            // Allow words to break if they are too long.
-            wordWrap: 'break-word',
-            // Allow for passed-in styles to override anything.
-            ...style,
-          }}
-          onBeforeInput={useCallback(
-            (event: React.FormEvent<HTMLDivElement>) => {
-              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-              // fall back to React's leaky polyfill instead just for it. It
-              // only works for the `insertText` input type.
-              if (
-                !HAS_BEFORE_INPUT_SUPPORT &&
-                !readOnly &&
-                !isEventHandled(event, attributes.onBeforeInput) &&
-                hasEditableTarget(editor, event.target)
-              ) {
-                event.preventDefault()
-                if (!state.isComposing) {
-                  const text = (event as any).data as string
-                  Editor.insertText(editor, text)
-                }
+      <Component
+        // COMPAT: The Grammarly Chrome extension works by changing the DOM
+        // out from under `contenteditable` elements, which leads to weird
+        // behaviors so we have to disable it like editor. (2017/04/24)
+        data-gramm={false}
+        role={readOnly ? undefined : 'textbox'}
+        {...attributes}
+        // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
+        // have to use hacks to make these replacement-based features work.
+        spellCheck={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck}
+        autoCorrect={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCorrect}
+        autoCapitalize={
+          !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCapitalize
+        }
+        data-slate-editor
+        data-slate-node="value"
+        contentEditable={readOnly ? undefined : true}
+        suppressContentEditableWarning
+        ref={ref}
+        style={{
+          // Allow positioning relative to the editable element.
+          position: 'relative',
+          // Prevent the default outline styles.
+          outline: 'none',
+          // Preserve adjacent whitespace and new lines.
+          whiteSpace: 'pre-wrap',
+          // Allow words to break if they are too long.
+          wordWrap: 'break-word',
+          // Allow for passed-in styles to override anything.
+          ...style,
+        }}
+        onBeforeInput={useCallback(
+          (event: React.FormEvent<HTMLDivElement>) => {
+            // COMPAT: Certain browsers don't support the `beforeinput` event, so we
+            // fall back to React's leaky polyfill instead just for it. It
+            // only works for the `insertText` input type.
+            if (
+              !HAS_BEFORE_INPUT_SUPPORT &&
+              !readOnly &&
+              !isEventHandled(event, attributes.onBeforeInput) &&
+              hasEditableTarget(editor, event.target)
+            ) {
+              event.preventDefault()
+              if (!state.isComposing) {
+                const text = (event as any).data as string
+                Editor.insertText(editor, text)
               }
-            },
-            [readOnly]
-          )}
-          onBlur={useCallback(
-            (event: React.FocusEvent<HTMLDivElement>) => {
-              if (
-                readOnly ||
-                state.isUpdatingSelection ||
-                !hasEditableTarget(editor, event.target) ||
-                isEventHandled(event, attributes.onBlur)
-              ) {
+            }
+          },
+          [readOnly]
+        )}
+        onBlur={useCallback(
+          (event: React.FocusEvent<HTMLDivElement>) => {
+            if (
+              readOnly ||
+              state.isUpdatingSelection ||
+              !hasEditableTarget(editor, event.target) ||
+              isEventHandled(event, attributes.onBlur)
+            ) {
+              return
+            }
+
+            const window = ReactEditor.getWindow(editor)
+
+            // COMPAT: If the current `activeElement` is still the previous
+            // one, this is due to the window being blurred when the tab
+            // itself becomes unfocused, so we want to abort early to allow to
+            // editor to stay focused when the tab becomes focused again.
+            const root = ReactEditor.findDocumentOrShadowRoot(editor)
+            if (state.latestElement === root.activeElement) {
+              return
+            }
+
+            const { relatedTarget } = event
+            const el = ReactEditor.toDOMNode(editor, editor)
+
+            // COMPAT: The event should be ignored if the focus is returning
+            // to the editor from an embedded editable element (eg. an <input>
+            // element inside a void node).
+            if (relatedTarget === el) {
+              return
+            }
+
+            // COMPAT: The event should be ignored if the focus is moving from
+            // the editor to inside a void node's spacer element.
+            if (
+              isDOMElement(relatedTarget) &&
+              relatedTarget.hasAttribute('data-slate-spacer')
+            ) {
+              return
+            }
+
+            // COMPAT: The event should be ignored if the focus is moving to a
+            // non- editable section of an element that isn't a void node (eg.
+            // a list item of the check list example).
+            if (
+              relatedTarget != null &&
+              isDOMNode(relatedTarget) &&
+              ReactEditor.hasDOMNode(editor, relatedTarget)
+            ) {
+              const node = ReactEditor.toSlateNode(editor, relatedTarget)
+
+              if (Element.isElement(node) && !editor.isVoid(node)) {
                 return
               }
+            }
 
-              const window = ReactEditor.getWindow(editor)
+            IS_FOCUSED.delete(editor)
+          },
+          [readOnly, attributes.onBlur]
+        )}
+        onClick={useCallback(
+          (event: React.MouseEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onClick) &&
+              isDOMNode(event.target)
+            ) {
+              const node = ReactEditor.toSlateNode(editor, event.target)
+              const path = ReactEditor.findPath(editor, node)
+              const start = Editor.start(editor, path)
+              const end = Editor.end(editor, path)
 
-              // COMPAT: If the current `activeElement` is still the previous
-              // one, this is due to the window being blurred when the tab
-              // itself becomes unfocused, so we want to abort early to allow to
-              // editor to stay focused when the tab becomes focused again.
-              const root = ReactEditor.findDocumentOrShadowRoot(editor)
-              if (state.latestElement === root.activeElement) {
-                return
-              }
+              const startVoid = Editor.void(editor, { at: start })
+              const endVoid = Editor.void(editor, { at: end })
 
-              const { relatedTarget } = event
-              const el = ReactEditor.toDOMNode(editor, editor)
-
-              // COMPAT: The event should be ignored if the focus is returning
-              // to the editor from an embedded editable element (eg. an <input>
-              // element inside a void node).
-              if (relatedTarget === el) {
-                return
-              }
-
-              // COMPAT: The event should be ignored if the focus is moving from
-              // the editor to inside a void node's spacer element.
               if (
-                isDOMElement(relatedTarget) &&
-                relatedTarget.hasAttribute('data-slate-spacer')
+                startVoid &&
+                endVoid &&
+                Path.equals(startVoid[1], endVoid[1])
               ) {
-                return
-              }
-
-              // COMPAT: The event should be ignored if the focus is moving to a
-              // non- editable section of an element that isn't a void node (eg.
-              // a list item of the check list example).
-              if (
-                relatedTarget != null &&
-                isDOMNode(relatedTarget) &&
-                ReactEditor.hasDOMNode(editor, relatedTarget)
-              ) {
-                const node = ReactEditor.toSlateNode(editor, relatedTarget)
-
-                if (Element.isElement(node) && !editor.isVoid(node)) {
-                  return
-                }
-              }
-
-              IS_FOCUSED.delete(editor)
-            },
-            [readOnly, attributes.onBlur]
-          )}
-          onClick={useCallback(
-            (event: React.MouseEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onClick) &&
-                isDOMNode(event.target)
-              ) {
-                const node = ReactEditor.toSlateNode(editor, event.target)
-                const path = ReactEditor.findPath(editor, node)
-                const start = Editor.start(editor, path)
-                const end = Editor.end(editor, path)
-
-                const startVoid = Editor.void(editor, { at: start })
-                const endVoid = Editor.void(editor, { at: end })
-
-                if (
-                  startVoid &&
-                  endVoid &&
-                  Path.equals(startVoid[1], endVoid[1])
-                ) {
-                  const range = Editor.range(editor, start)
-                  Transforms.select(editor, range)
-                }
-              }
-            },
-            [readOnly, attributes.onClick]
-          )}
-          onCompositionEnd={useCallback(
-            (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionEnd)
-              ) {
-                state.isComposing = false
-
-                // COMPAT: In Chrome, `beforeinput` events for compositions
-                // aren't correct and never fire the "insertFromComposition"
-                // type that we need. So instead, insert whenever a composition
-                // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && !IS_FIREFOX_LEGACY && event.data) {
-                  Editor.insertText(editor, event.data)
-                }
-              }
-            },
-            [attributes.onCompositionEnd]
-          )}
-          onCompositionUpdate={useCallback(
-            (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionUpdate)
-              ) {
-                state.isComposing = true
-              }
-            },
-            [attributes.onCompositionUpdate]
-          )}
-          onCompositionStart={useCallback(
-            (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionStart)
-              ) {
-                const { selection } = editor
-                if (selection && Range.isExpanded(selection)) {
-                  Editor.deleteFragment(editor)
-                }
-              }
-            },
-            [attributes.onCompositionStart]
-          )}
-          onCopy={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCopy)
-              ) {
-                event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
-              }
-            },
-            [attributes.onCopy]
-          )}
-          onCut={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCut)
-              ) {
-                event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
-                const { selection } = editor
-
-                if (selection) {
-                  if (Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    const node = Node.parent(editor, selection.anchor.path)
-                    if (Editor.isVoid(editor, node)) {
-                      Transforms.delete(editor)
-                    }
-                  }
-                }
-              }
-            },
-            [readOnly, attributes.onCut]
-          )}
-          onDragOver={useCallback(
-            (event: React.DragEvent<HTMLDivElement>) => {
-              if (
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onDragOver)
-              ) {
-                // Only when the target is void, call `preventDefault` to signal
-                // that drops are allowed. Editable content is droppable by
-                // default, and calling `preventDefault` hides the cursor.
-                const node = ReactEditor.toSlateNode(editor, event.target)
-
-                if (Editor.isVoid(editor, node)) {
-                  event.preventDefault()
-                }
-              }
-            },
-            [attributes.onDragOver]
-          )}
-          onDragStart={useCallback(
-            (event: React.DragEvent<HTMLDivElement>) => {
-              if (
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onDragStart)
-              ) {
-                const node = ReactEditor.toSlateNode(editor, event.target)
-                const path = ReactEditor.findPath(editor, node)
-                const voidMatch =
-                  Editor.isVoid(editor, node) ||
-                  Editor.void(editor, { at: path, voids: true })
-
-                // If starting a drag on a void node, make sure it is selected
-                // so that it shows up in the selection's fragment.
-                if (voidMatch) {
-                  const range = Editor.range(editor, path)
-                  Transforms.select(editor, range)
-                }
-
-                state.isDraggingInternally = true
-
-                ReactEditor.setFragmentData(editor, event.dataTransfer)
-              }
-            },
-            [attributes.onDragStart]
-          )}
-          onDrop={useCallback(
-            (event: React.DragEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onDrop)
-              ) {
-                event.preventDefault()
-
-                // Keep a reference to the dragged range before updating selection
-                const draggedRange = editor.selection
-
-                // Find the range where the drop happened
-                const range = ReactEditor.findEventRange(editor, event)
-                const data = event.dataTransfer
-
+                const range = Editor.range(editor, start)
                 Transforms.select(editor, range)
+              }
+            }
+          },
+          [readOnly, attributes.onClick]
+        )}
+        onCompositionEnd={useCallback(
+          (event: React.CompositionEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCompositionEnd)
+            ) {
+              state.isComposing = false
 
-                if (state.isDraggingInternally) {
-                  if (draggedRange) {
-                    Transforms.delete(editor, {
-                      at: draggedRange,
-                    })
+              // COMPAT: In Chrome, `beforeinput` events for compositions
+              // aren't correct and never fire the "insertFromComposition"
+              // type that we need. So instead, insert whenever a composition
+              // ends since it will already have been committed to the DOM.
+              if (!IS_SAFARI && !IS_FIREFOX_LEGACY && event.data) {
+                Editor.insertText(editor, event.data)
+              }
+            }
+          },
+          [attributes.onCompositionEnd]
+        )}
+        onCompositionUpdate={useCallback(
+          (event: React.CompositionEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCompositionUpdate)
+            ) {
+              state.isComposing = true
+            }
+          },
+          [attributes.onCompositionUpdate]
+        )}
+        onCompositionStart={useCallback(
+          (event: React.CompositionEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCompositionStart)
+            ) {
+              const { selection } = editor
+              if (selection && Range.isExpanded(selection)) {
+                Editor.deleteFragment(editor)
+              }
+            }
+          },
+          [attributes.onCompositionStart]
+        )}
+        onCopy={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCopy)
+            ) {
+              event.preventDefault()
+              ReactEditor.setFragmentData(editor, event.clipboardData)
+            }
+          },
+          [attributes.onCopy]
+        )}
+        onCut={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCut)
+            ) {
+              event.preventDefault()
+              ReactEditor.setFragmentData(editor, event.clipboardData)
+              const { selection } = editor
+
+              if (selection) {
+                if (Range.isExpanded(selection)) {
+                  Editor.deleteFragment(editor)
+                } else {
+                  const node = Node.parent(editor, selection.anchor.path)
+                  if (Editor.isVoid(editor, node)) {
+                    Transforms.delete(editor)
                   }
-
-                  state.isDraggingInternally = false
-                }
-
-                ReactEditor.insertData(editor, data)
-
-                // When dragging from another source into the editor, it's possible
-                // that the current editor does not have focus.
-                if (!ReactEditor.isFocused(editor)) {
-                  ReactEditor.focus(editor)
                 }
               }
-            },
-            [readOnly, attributes.onDrop]
-          )}
-          onDragEnd={useCallback(
-            (event: React.DragEvent<HTMLDivElement>) => {
-              // When dropping on a different droppable element than the current editor,
-              // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
-              // Note: `onDragEnd` is only called when `onDrop` is not called
-              if (
-                !readOnly &&
-                state.isDraggingInternally &&
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onDragEnd)
-              ) {
+            }
+          },
+          [readOnly, attributes.onCut]
+        )}
+        onDragOver={useCallback(
+          (event: React.DragEvent<HTMLDivElement>) => {
+            if (
+              hasTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onDragOver)
+            ) {
+              // Only when the target is void, call `preventDefault` to signal
+              // that drops are allowed. Editable content is droppable by
+              // default, and calling `preventDefault` hides the cursor.
+              const node = ReactEditor.toSlateNode(editor, event.target)
+
+              if (Editor.isVoid(editor, node)) {
+                event.preventDefault()
+              }
+            }
+          },
+          [attributes.onDragOver]
+        )}
+        onDragStart={useCallback(
+          (event: React.DragEvent<HTMLDivElement>) => {
+            if (
+              hasTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onDragStart)
+            ) {
+              const node = ReactEditor.toSlateNode(editor, event.target)
+              const path = ReactEditor.findPath(editor, node)
+              const voidMatch =
+                Editor.isVoid(editor, node) ||
+                Editor.void(editor, { at: path, voids: true })
+
+              // If starting a drag on a void node, make sure it is selected
+              // so that it shows up in the selection's fragment.
+              if (voidMatch) {
+                const range = Editor.range(editor, path)
+                Transforms.select(editor, range)
+              }
+
+              state.isDraggingInternally = true
+
+              ReactEditor.setFragmentData(editor, event.dataTransfer)
+            }
+          },
+          [attributes.onDragStart]
+        )}
+        onDrop={useCallback(
+          (event: React.DragEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onDrop)
+            ) {
+              event.preventDefault()
+
+              // Keep a reference to the dragged range before updating selection
+              const draggedRange = editor.selection
+
+              // Find the range where the drop happened
+              const range = ReactEditor.findEventRange(editor, event)
+              const data = event.dataTransfer
+
+              Transforms.select(editor, range)
+
+              if (state.isDraggingInternally) {
+                if (draggedRange) {
+                  Transforms.delete(editor, {
+                    at: draggedRange,
+                  })
+                }
+
                 state.isDraggingInternally = false
               }
-            },
-            [readOnly, attributes.onDragEnd]
-          )}
-          onFocus={useCallback(
-            (event: React.FocusEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onFocus)
-              ) {
-                const el = ReactEditor.toDOMNode(editor, editor)
-                const root = ReactEditor.findDocumentOrShadowRoot(editor)
-                state.latestElement = root.activeElement
 
-                // COMPAT: If the editor has nested editable elements, the focus
-                // can go to them. In Firefox, this must be prevented because it
-                // results in issues with keyboard navigation. (2017/03/30)
-                if (IS_FIREFOX && event.target !== el) {
-                  el.focus()
-                  return
-                }
+              ReactEditor.insertData(editor, data)
 
-                IS_FOCUSED.set(editor, true)
+              // When dragging from another source into the editor, it's possible
+              // that the current editor does not have focus.
+              if (!ReactEditor.isFocused(editor)) {
+                ReactEditor.focus(editor)
               }
-            },
-            [readOnly, attributes.onFocus]
-          )}
-          onKeyDown={useCallback(
-            (event: React.KeyboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onKeyDown)
-              ) {
-                const { nativeEvent } = event
-                const { selection } = editor
+            }
+          },
+          [readOnly, attributes.onDrop]
+        )}
+        onDragEnd={useCallback(
+          (event: React.DragEvent<HTMLDivElement>) => {
+            // When dropping on a different droppable element than the current editor,
+            // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
+            // Note: `onDragEnd` is only called when `onDrop` is not called
+            if (
+              !readOnly &&
+              state.isDraggingInternally &&
+              hasTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onDragEnd)
+            ) {
+              state.isDraggingInternally = false
+            }
+          },
+          [readOnly, attributes.onDragEnd]
+        )}
+        onFocus={useCallback(
+          (event: React.FocusEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              !state.isUpdatingSelection &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onFocus)
+            ) {
+              const el = ReactEditor.toDOMNode(editor, editor)
+              const root = ReactEditor.findDocumentOrShadowRoot(editor)
+              state.latestElement = root.activeElement
 
-                const element =
-                  editor.children[
-                    selection !== null ? selection.focus.path[0] : 0
-                  ]
-                const isRTL = getDirection(Node.string(element)) === 'rtl'
-
-                // COMPAT: Since we prevent the default behavior on
-                // `beforeinput` events, the browser doesn't think there's ever
-                // any history stack to undo or redo, so we have to manage these
-                // hotkeys ourselves. (2019/11/06)
-                if (Hotkeys.isRedo(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.redo()
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isUndo(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (HistoryEditor.isHistoryEditor(editor)) {
-                    editor.undo()
-                  }
-
-                  return
-                }
-
-                // COMPAT: Certain browsers don't handle the selection updates
-                // properly. In Chrome, the selection isn't properly extended.
-                // And in Firefox, the selection isn't properly collapsed.
-                // (2017/10/17)
-                if (Hotkeys.isMoveLineBackward(nativeEvent)) {
-                  event.preventDefault()
-                  Transforms.move(editor, { unit: 'line', reverse: true })
-                  return
-                }
-
-                if (Hotkeys.isMoveLineForward(nativeEvent)) {
-                  event.preventDefault()
-                  Transforms.move(editor, { unit: 'line' })
-                  return
-                }
-
-                if (Hotkeys.isExtendLineBackward(nativeEvent)) {
-                  event.preventDefault()
-                  Transforms.move(editor, {
-                    unit: 'line',
-                    edge: 'focus',
-                    reverse: true,
-                  })
-                  return
-                }
-
-                if (Hotkeys.isExtendLineForward(nativeEvent)) {
-                  event.preventDefault()
-                  Transforms.move(editor, { unit: 'line', edge: 'focus' })
-                  return
-                }
-
-                // COMPAT: If a void node is selected, or a zero-width text node
-                // adjacent to an inline is selected, we need to handle these
-                // hotkeys manually because browsers won't be able to skip over
-                // the void node with the zero-width space not being an empty
-                // string.
-                if (Hotkeys.isMoveBackward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && Range.isCollapsed(selection)) {
-                    Transforms.move(editor, { reverse: !isRTL })
-                  } else {
-                    Transforms.collapse(editor, { edge: 'start' })
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isMoveForward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && Range.isCollapsed(selection)) {
-                    Transforms.move(editor, { reverse: isRTL })
-                  } else {
-                    Transforms.collapse(editor, { edge: 'end' })
-                  }
-
-                  return
-                }
-
-                if (Hotkeys.isMoveWordBackward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && Range.isExpanded(selection)) {
-                    Transforms.collapse(editor, { edge: 'focus' })
-                  }
-
-                  Transforms.move(editor, { unit: 'word', reverse: !isRTL })
-                  return
-                }
-
-                if (Hotkeys.isMoveWordForward(nativeEvent)) {
-                  event.preventDefault()
-
-                  if (selection && Range.isExpanded(selection)) {
-                    Transforms.collapse(editor, { edge: 'focus' })
-                  }
-
-                  Transforms.move(editor, { unit: 'word', reverse: isRTL })
-                  return
-                }
-
-                // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-                // fall back to guessing at the input intention for hotkeys.
-                // COMPAT: In iOS, some of these hotkeys are handled in the
-                if (!HAS_BEFORE_INPUT_SUPPORT) {
-                  // We don't have a core behavior for these, but they change the
-                  // DOM if we don't prevent them, so we have to.
-                  if (
-                    Hotkeys.isBold(nativeEvent) ||
-                    Hotkeys.isItalic(nativeEvent) ||
-                    Hotkeys.isTransposeCharacter(nativeEvent)
-                  ) {
-                    event.preventDefault()
-                    return
-                  }
-
-                  if (Hotkeys.isSplitBlock(nativeEvent)) {
-                    event.preventDefault()
-                    Editor.insertBreak(editor)
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteBackward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'backward' })
-                    } else {
-                      Editor.deleteBackward(editor)
-                    }
-
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteForward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'forward' })
-                    } else {
-                      Editor.deleteForward(editor)
-                    }
-
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'backward' })
-                    } else {
-                      Editor.deleteBackward(editor, { unit: 'line' })
-                    }
-
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteLineForward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'forward' })
-                    } else {
-                      Editor.deleteForward(editor, { unit: 'line' })
-                    }
-
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'backward' })
-                    } else {
-                      Editor.deleteBackward(editor, { unit: 'word' })
-                    }
-
-                    return
-                  }
-
-                  if (Hotkeys.isDeleteWordForward(nativeEvent)) {
-                    event.preventDefault()
-
-                    if (selection && Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor, { direction: 'forward' })
-                    } else {
-                      Editor.deleteForward(editor, { unit: 'word' })
-                    }
-
-                    return
-                  }
-                }
+              // COMPAT: If the editor has nested editable elements, the focus
+              // can go to them. In Firefox, this must be prevented because it
+              // results in issues with keyboard navigation. (2017/03/30)
+              if (IS_FIREFOX && event.target !== el) {
+                el.focus()
+                return
               }
-            },
-            [readOnly, attributes.onKeyDown]
-          )}
-          onPaste={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onPaste)
-              ) {
-                // COMPAT: Certain browsers don't support the `beforeinput` event, so we
-                // fall back to React's `onPaste` here instead.
-                // COMPAT: Firefox, Chrome and Safari don't emit `beforeinput` events
-                // when "paste without formatting" is used, so fallback. (2020/02/20)
+
+              IS_FOCUSED.set(editor, true)
+            }
+          },
+          [readOnly, attributes.onFocus]
+        )}
+        onKeyDown={useCallback(
+          (event: React.KeyboardEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onKeyDown)
+            ) {
+              const { nativeEvent } = event
+              const { selection } = editor
+
+              const element =
+                editor.children[
+                  selection !== null ? selection.focus.path[0] : 0
+                ]
+              const isRTL = getDirection(Node.string(element)) === 'rtl'
+
+              // COMPAT: Since we prevent the default behavior on
+              // `beforeinput` events, the browser doesn't think there's ever
+              // any history stack to undo or redo, so we have to manage these
+              // hotkeys ourselves. (2019/11/06)
+              if (Hotkeys.isRedo(nativeEvent)) {
+                event.preventDefault()
+
+                if (HistoryEditor.isHistoryEditor(editor)) {
+                  editor.redo()
+                }
+
+                return
+              }
+
+              if (Hotkeys.isUndo(nativeEvent)) {
+                event.preventDefault()
+
+                if (HistoryEditor.isHistoryEditor(editor)) {
+                  editor.undo()
+                }
+
+                return
+              }
+
+              // COMPAT: Certain browsers don't handle the selection updates
+              // properly. In Chrome, the selection isn't properly extended.
+              // And in Firefox, the selection isn't properly collapsed.
+              // (2017/10/17)
+              if (Hotkeys.isMoveLineBackward(nativeEvent)) {
+                event.preventDefault()
+                Transforms.move(editor, { unit: 'line', reverse: true })
+                return
+              }
+
+              if (Hotkeys.isMoveLineForward(nativeEvent)) {
+                event.preventDefault()
+                Transforms.move(editor, { unit: 'line' })
+                return
+              }
+
+              if (Hotkeys.isExtendLineBackward(nativeEvent)) {
+                event.preventDefault()
+                Transforms.move(editor, {
+                  unit: 'line',
+                  edge: 'focus',
+                  reverse: true,
+                })
+                return
+              }
+
+              if (Hotkeys.isExtendLineForward(nativeEvent)) {
+                event.preventDefault()
+                Transforms.move(editor, { unit: 'line', edge: 'focus' })
+                return
+              }
+
+              // COMPAT: If a void node is selected, or a zero-width text node
+              // adjacent to an inline is selected, we need to handle these
+              // hotkeys manually because browsers won't be able to skip over
+              // the void node with the zero-width space not being an empty
+              // string.
+              if (Hotkeys.isMoveBackward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isCollapsed(selection)) {
+                  Transforms.move(editor, { reverse: !isRTL })
+                } else {
+                  Transforms.collapse(editor, { edge: 'start' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isMoveForward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isCollapsed(selection)) {
+                  Transforms.move(editor, { reverse: isRTL })
+                } else {
+                  Transforms.collapse(editor, { edge: 'end' })
+                }
+
+                return
+              }
+
+              if (Hotkeys.isMoveWordBackward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  Transforms.collapse(editor, { edge: 'focus' })
+                }
+
+                Transforms.move(editor, { unit: 'word', reverse: !isRTL })
+                return
+              }
+
+              if (Hotkeys.isMoveWordForward(nativeEvent)) {
+                event.preventDefault()
+
+                if (selection && Range.isExpanded(selection)) {
+                  Transforms.collapse(editor, { edge: 'focus' })
+                }
+
+                Transforms.move(editor, { unit: 'word', reverse: isRTL })
+                return
+              }
+
+              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
+              // fall back to guessing at the input intention for hotkeys.
+              // COMPAT: In iOS, some of these hotkeys are handled in the
+              if (!HAS_BEFORE_INPUT_SUPPORT) {
+                // We don't have a core behavior for these, but they change the
+                // DOM if we don't prevent them, so we have to.
                 if (
-                  !HAS_BEFORE_INPUT_SUPPORT ||
-                  isPlainTextOnlyPaste(event.nativeEvent)
+                  Hotkeys.isBold(nativeEvent) ||
+                  Hotkeys.isItalic(nativeEvent) ||
+                  Hotkeys.isTransposeCharacter(nativeEvent)
                 ) {
                   event.preventDefault()
-                  ReactEditor.insertData(editor, event.clipboardData)
+                  return
+                }
+
+                if (Hotkeys.isSplitBlock(nativeEvent)) {
+                  event.preventDefault()
+                  Editor.insertBreak(editor)
+                  return
+                }
+
+                if (Hotkeys.isDeleteBackward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'backward' })
+                  } else {
+                    Editor.deleteBackward(editor)
+                  }
+
+                  return
+                }
+
+                if (Hotkeys.isDeleteForward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'forward' })
+                  } else {
+                    Editor.deleteForward(editor)
+                  }
+
+                  return
+                }
+
+                if (Hotkeys.isDeleteLineBackward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'backward' })
+                  } else {
+                    Editor.deleteBackward(editor, { unit: 'line' })
+                  }
+
+                  return
+                }
+
+                if (Hotkeys.isDeleteLineForward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'forward' })
+                  } else {
+                    Editor.deleteForward(editor, { unit: 'line' })
+                  }
+
+                  return
+                }
+
+                if (Hotkeys.isDeleteWordBackward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'backward' })
+                  } else {
+                    Editor.deleteBackward(editor, { unit: 'word' })
+                  }
+
+                  return
+                }
+
+                if (Hotkeys.isDeleteWordForward(nativeEvent)) {
+                  event.preventDefault()
+
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor, { direction: 'forward' })
+                  } else {
+                    Editor.deleteForward(editor, { unit: 'word' })
+                  }
+
+                  return
                 }
               }
-            },
-            [readOnly, attributes.onPaste]
-          )}
-        >
-          {useChildren({
-            decorations,
-            node: editor,
-            renderElement,
-            renderPlaceholder,
-            renderLeaf,
-            selection: editor.selection,
-          })}
-        </Component>
-      </DecorateContext.Provider>
+            }
+          },
+          [readOnly, attributes.onKeyDown]
+        )}
+        onPaste={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onPaste)
+            ) {
+              // COMPAT: Certain browsers don't support the `beforeinput` event, so we
+              // fall back to React's `onPaste` here instead.
+              // COMPAT: Firefox, Chrome and Safari don't emit `beforeinput` events
+              // when "paste without formatting" is used, so fallback. (2020/02/20)
+              if (
+                !HAS_BEFORE_INPUT_SUPPORT ||
+                isPlainTextOnlyPaste(event.nativeEvent)
+              ) {
+                event.preventDefault()
+                ReactEditor.insertData(editor, event.clipboardData)
+              }
+            }
+          },
+          [readOnly, attributes.onPaste]
+        )}
+      >
+        {useChildren({
+          decorations,
+          node: editor,
+          renderElement,
+          renderPlaceholder,
+          renderLeaf,
+          selection: editor.selection,
+          decorate,
+        })}
+      </Component>
     </ReadOnlyContext.Provider>
   )
 }
