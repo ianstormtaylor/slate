@@ -29,7 +29,7 @@ Transforms.move(editor, {
 })
 ```
 
-[Selection Transforms API Reference](../api/transforms.md#selection-transforms)
+> 🤖 For more info, check out the [Selection Transforms API Reference](../api/transforms.md#selection-transforms)
 
 ## Text Transforms
 
@@ -52,7 +52,7 @@ Transforms.delete(editor, {
 })
 ```
 
-[Text Transforms API Reference](../api/transforms.md#text-transforms)
+> 🤖 For more info, check out the [Text Transforms API Reference](../api/transforms.md#text-transforms)
 
 ## Node Transforms
 
@@ -79,7 +79,7 @@ Transforms.moveNodes(editor, {
 })
 ```
 
-[Node Transforms API Reference](../api/transforms.md#node-transforms)
+> 🤖 For more info, check out the [Node Transforms API Reference](../api/transforms.md#node-transforms)
 
 ## The `at` Option
 
