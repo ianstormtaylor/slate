@@ -86,6 +86,8 @@ editor.normalizeNode = entry => {
 
 Whenever you override behaviors, be sure to call the existing functions as a fallback mechanism for the default behavior. Unless you really do want to completely remove the default behaviors \(which is rarely a good idea\).
 
+> 🤖 For more info, check out the [Editor Instance Methods to Override API Reference](../api/nodes/editor.md#schema-specific-instance-methods-to-override)
+
 ## Helper Functions
 
 The `Editor` interface, like all Slate interfaces, exposes helper functions that are useful when implementing certain behaviors. There are many, many editor-related helpers. For example:
@@ -111,3 +113,5 @@ for (const point of Editor.positions(editor)) {
   // ...
 }
 ```
+
+> 🤖 For more info, check out the [Editor Static Methods API Reference](../api/nodes/editor.md#static-methods)
