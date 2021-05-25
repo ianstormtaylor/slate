@@ -29,6 +29,8 @@ Transforms.move(editor, {
 })
 ```
 
+> 🤖 For more info, check out the [Selection Transforms API Reference](../api/transforms.md#selection-transforms)
+
 ## Text Transforms
 
 Text transforms act on the text content of the editor. For example, here's how you'd insert a string of text as a specific point:
@@ -49,6 +51,8 @@ Transforms.delete(editor, {
   },
 })
 ```
+
+> 🤖 For more info, check out the [Text Transforms API Reference](../api/transforms.md#text-transforms)
 
 ## Node Transforms
 
@@ -74,6 +78,8 @@ Transforms.moveNodes(editor, {
   to: [0, 1],
 })
 ```
+
+> 🤖 For more info, check out the [Node Transforms API Reference](../api/transforms.md#node-transforms)
 
 ## The `at` Option
 
