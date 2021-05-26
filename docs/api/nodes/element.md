@@ -8,14 +8,14 @@ interface Element {
 }
 ```
 
-- [Configuration](element.md#configuration)
+- [Behavior Types](element.md#element-behavior-types)
   - [Block vs. Inline](element.md#block-vs-inline)
   - [Void vs Not Void](element.md#void-vs-not-void)
 - [Static methods](element.md#static-methods)
   - [Retrieval methods](element.md#retrieval-methods)
   - [Check methods](element.md#check-methods)
 
-## Configuration
+## Element Behavior Types
 
 Element nodes behave differently depending on the [Slate editor's configuration](./editor.md#schema-specific-instance-methods-to-override). An element can be:
 
