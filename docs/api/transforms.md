@@ -22,9 +22,9 @@ interface NodeOptions {
 }
 ```
 
-The `at` option is very versatile and can be used to implement more complex transforms easily. [Learn more about the `at` option](../concepts/04-transforms.md#the-at-option)
+- The `at` option is versatile and can be used to implement more complex transforms. [Learn more about the `at` option](../concepts/04-transforms.md#the-at-option)
 
-When combined with `at`, `match` can be very powerful. [Learn more about the `match` option](../concepts/04-transforms.md#the-match-option)
+- When combined with `at`, `match` can be powerful. [Learn more about the `match` option](../concepts/04-transforms.md#the-match-option)
 
 ## Static methods
 
