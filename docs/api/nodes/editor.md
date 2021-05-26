@@ -8,6 +8,7 @@ interface Editor {
   selection: Range | null
   operations: Operation[]
   marks: Record<string, any> | null
+
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
