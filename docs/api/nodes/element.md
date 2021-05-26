@@ -34,16 +34,16 @@ In a not "void" element, Slate handles the rendering of its `children` (e.g. in 
 
 ### Retrieval methods
 
-#### `Element.matches(element: Element, props: Partial<Element>): boolean`
+#### `Element.matches(element: Element, props: Partial<Element>) => boolean`
 
 Check if an element matches a set of `props`. Note: This checks custom properties, but it does not ensure that any children are equivalent.
 
 ### Check methods
 
-#### `Element.isElement(value: any): value is Element`
+#### `Element.isElement(value: any) => value is Element`
 
 Check if a `value` implements the `Element` interface.
 
-#### `Element.isElementList(value: any): value is Element[]`
+#### `Element.isElementList(value: any) => value is Element[]`
 
 Check if a `value` is an array of `Element` objects.
