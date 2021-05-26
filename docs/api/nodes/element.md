@@ -24,11 +24,11 @@ Element nodes behave differently depending on the [Slate editor's configuration]
 
 ### Block vs. Inline
 
-A "block" element can only be siblings with other "block" elements. AN "inline" node can be siblings with `Text` nodes or other "inline" elements.
+A "block" element can only be siblings with other "block" elements. An "inline" node can be siblings with `Text` nodes or other "inline" elements.
 
 ### Void vs Not Void
 
-In a not "void" element, Slate handles the rendering of its `children` (e.g. in a paragraph where the `Text` and `Inline` children are rendered by Slate). In a "void" element, the `children` are rendered by the `Element`s render code.
+In a not "void" element, Slate handles the rendering of its `children` (e.g. in a paragraph where the `Text` and `Inline` children are rendered by Slate). In a "void" element, the `children` are rendered by the `Element`'s render code.
 
 ## Static methods
 
