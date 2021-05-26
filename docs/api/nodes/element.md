@@ -2,24 +2,33 @@
 
 `Element` objects are a type of node in a Slate document that contain other `Element` nodes or `Text` nodes.
 
-Element nodes behave differently depending on the [Slate editor's configuration](./editor.md#schema-specific-instance-methods-to-override). An element can be:
-
-- "block" or "inline" as defined by `editor.isInline`
-- either "void" or "not void" as defined by `editor.isVoid`
-
-A "block" element can only be siblings with other "block" elements. AN "inline" node can be siblings with `Text` nodes or other "inline" elements.
-
-In a not "void" element, Slate handles the rendering of its `children` (e.g. in a paragraph where the `Text` and `Inline` children are rendered by Slate). In a "void" element, the `children` are rendered by the `Element`s render code.
-
 ```typescript
 interface Element {
   children: Node[]
 }
 ```
 
+- [Configuration](element.md#configuration)
+  - [Block vs. Inline](element.md#block-vs-inline)
+  - [Void vs Not Void](element.md#void-vs-not-void)
 - [Static methods](element.md#static-methods)
   - [Retrieval methods](element.md#retrieval-methods)
   - [Check methods](element.md#check-methods)
+
+## Configuration
+
+Element nodes behave differently depending on the [Slate editor's configuration](./editor.md#schema-specific-instance-methods-to-override). An element can be:
+
+- "block" or "inline" as defined by `editor.isInline`
+- either "void" or "not void" as defined by `editor.isVoid`
+
+### Block vs. Inline
+
+A "block" element can only be siblings with other "block" elements. AN "inline" node can be siblings with `Text` nodes or other "inline" elements.
+
+### Void vs Not Void
+
+In a not "void" element, Slate handles the rendering of its `children` (e.g. in a paragraph where the `Text` and `Inline` children are rendered by Slate). In a "void" element, the `children` are rendered by the `Element`s render code.
 
 ## Static methods
 
