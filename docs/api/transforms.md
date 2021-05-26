@@ -68,9 +68,8 @@ Wrap nodes at the specified location in the `element` container. If no location 
 
 Options supported: `NodeOptions & {split?: boolean}`.
 
-For `options.mode`, `'all'` is also supported.
-
-The `options.split` option indicates that it's okay to split a node in order to wrap the location. For example, if `ipsum` was selected in a `Text` node with `lorem ipsum dolar`, `split: true` would wrap the word `ipsum` only, resulting in splitting the `Text` node. If `split: false`, the entire `Text` node `lorem ipsum dolar` would be wrapped.
+- `options.mode`: `'all'` is also supported.
+- `options.split` indicates that it's okay to split a node in order to wrap the location. For example, if `ipsum` was selected in a `Text` node with `lorem ipsum dolar`, `split: true` would wrap the word `ipsum` only, resulting in splitting the `Text` node. If `split: false`, the entire `Text` node `lorem ipsum dolar` would be wrapped.
 
 #### `Transforms.unwrapNodes(editor: Editor, options?)`
 
