@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  setup:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -27,11 +27,6 @@ jobs:
       - name: Prepare release
         run: yarn prerelease
 
-  latest:
-    needs: setup
-    runs-on: ubuntu-latest
-
-    steps:
       # https://github.com/changesets/action
       - name: Create release pull request or Publish to npm
         uses: changesets/action@master
@@ -42,11 +37,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
-  dev:
-    needs: latest
-    runs-on: ubuntu-latest
-
-    steps:
       # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @dev channel
         run: |
