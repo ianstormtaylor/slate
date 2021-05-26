@@ -507,10 +507,10 @@ export const Editable = (props: EditableProps) => {
           // have to use hacks to make these replacement-based features work.
           spellCheck={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck}
           autoCorrect={
-            !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCorrect
+            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCorrect
           }
           autoCapitalize={
-            !HAS_BEFORE_INPUT_SUPPORT ? false : attributes.autoCapitalize
+            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCapitalize
           }
           data-slate-editor
           data-slate-node="value"
