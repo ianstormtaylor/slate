@@ -355,39 +355,39 @@ const withImages = editor => {
 
 Use these methods so that Slate can identify certain elements as [inlines](../../concepts/02-nodes.md#blocks-vs-inlines) or [voids](../../concepts/02-nodes.md#voids).
 
-#### `isInline(element: Element)`
+#### `isInline(element: Element) => boolean`
 
 Check if a value is an inline `Element` object.
 
-#### `isVoid(element: Element)`
+#### `isVoid(element: Element) => boolean`
 
 Check if a value is a void `Element` object.
 
 ### Normalize method
 
-#### `normalizeNode(entry: NodeEntry)`
+#### `normalizeNode(entry: NodeEntry) => void`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
 ### Callback method
 
-#### `onChange()`
+#### `onChange() => void`
 
 Called when there is a change in the editor.
 
 ### Mark methods
 
-#### `addMark(key: string, value: any)`
+#### `addMark(key: string, value: any) => void`
 
 Add a custom property to the leaf text nodes in the currentk selection. If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
 
-#### `removeMark(key: string)`
+#### `removeMark(key: string) => void`
 
 Remove a custom property from the leaf text nodes in the current selection.
 
 ### getFragment method
 
-#### `getFragment(): Descendant`
+#### `getFragment() => Descendant`
 
 Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection.
 
@@ -395,38 +395,38 @@ Returns the fragment at the current selection. Used when cutting or copying, as 
 
 When a user presses backspace or delete, it invokes the method based on the selection. For example, if the selection is expanded over some text and the user presses the backspace key, `deleteFragment` will be called but if the selecttion is collapsed, `deleteBackward` will be called.
 
-#### `deleteBackward(options?: {unit?: 'character' | 'word' | 'line' | 'block'})`
+#### `deleteBackward(options?: {unit?: 'character' | 'word' | 'line' | 'block'}) => void`
 
 Delete content in the editor backward from the current selection.
 
-#### `deleteForward(options?: {unit?: 'character' | 'word' | 'line' | 'block'})`
+#### `deleteForward(options?: {unit?: 'character' | 'word' | 'line' | 'block'}) => void`
 
 Delete content in the editor forward from the current selection.
 
-#### `deleteFragment()`
+#### `deleteFragment() => void`
 
 Delete the content of the current selection.
 
 ### Insert methods
 
-#### `insertFragment(fragment: Node[])`
+#### `insertFragment(fragment: Node[]) => void`
 
 Insert a fragment at the current selection. If the selection is currently expanded, delete it first.
 
-#### `insertBreak()`
+#### `insertBreak() => void`
 
 Insert a block break at the current selection. If the selection is currently expanded, delete it first.
 
-#### `insertNode(node: Node)`
+#### `insertNode(node: Node) => void`
 
 Insert a node at the current selection. If the selection is currently expanded, delete it first.
 
-#### `insertText(text: string)`
+#### `insertText(text: string) => void`
 
 Insert text at the current selection. If the selection is currently expanded, delete it first.
 
 ### Operation handling method
 
-#### `apply(operation: Operation)`
+#### `apply(operation: Operation) => void`
 
 Apply an operation in the editor.
