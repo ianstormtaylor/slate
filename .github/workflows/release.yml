@@ -6,14 +6,9 @@ on:
       - main
 
 jobs:
-  release:
-    name: ${{ matrix.channel }}
+  setup:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        channel:
-          - dev
-          - latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -32,9 +27,13 @@ jobs:
       - name: Prepare release
         run: yarn prerelease
 
+  latest:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
       # https://github.com/changesets/action
-      - name: Create release pull request
-        if: matrix.channel == 'latest'
+      - name: Create release pull request or Publish to npm
         uses: changesets/action@master
         with:
           publish: yarn changeset publish
@@ -43,12 +42,17 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+  dev:
+    needs: latest
+    runs-on: ubuntu-latest
+
+    steps:
       # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @dev channel
-        if: matrix.channel == 'dev'
         run: |
           yarn changeset version --snapshot
           yarn changeset publish --tag dev
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
