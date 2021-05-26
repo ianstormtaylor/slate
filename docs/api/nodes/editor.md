@@ -49,7 +49,7 @@ Creates a new, empty `Editor` object.
 
 ### Retrieval methods
 
-#### `Editor.above<T extends Ancestor>(editor: Editor, options?): NodeEntry | undefined`
+#### `Editor.above<T extends Ancestor>(editor: Editor, options?): NodeEntry<T> | undefined`
 
 Get the ancestor above a location in the document.
 
@@ -93,11 +93,15 @@ Get the leaf text node at a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-#### `Editor.levels<T extends Node>(editor: Editor, options?): Generator<NodeEntry, void, undefined>`
+#### `Editor.levels<T extends Node>(editor: Editor, options?): Generator<NodeEntry<T>, void, undefined>`
 
 Iterate through all of the levels at a location.
 
 Options: `{at?: Location, match?: NodeMatch, reverse?: boolean, voids?: boolean}`
+
+#### `Editor.marks(editor: Editor): Omit<Text, 'text'> | null`
+
+Get the marks that would be added to text at the current selection.
 
 #### `Editor.next<T extends Descendant>(editor: Editor, options?): NodeEntry<T> | undefined`
 
@@ -106,6 +110,8 @@ Get the matching node in the branch of the document after a location.
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
 #### `Editor.node(editor: Editor, at: Location, options?): NodeEntry`
+
+#### `Editor.nodes<T extends Node>(editor: Editor, options?): Generator<NodeEntry<T>, void, undefined>`
 
 Get the node at a location.
 
@@ -171,7 +177,7 @@ Note: By default void nodes are treated as a single point and iteration will not
 
 Options: `{at?: Location, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', reverse?: boolean, voids?: boolean}`
 
-#### `Editor.previous(editor: Editor, options?): NodeEntry<T> | undefined`
+#### `Editor.previous<T extends Node>(editor: Editor, options?): NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document before a location.
 
