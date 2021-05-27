@@ -2,4 +2,4 @@
 'slate-react': patch
 ---
 
-FIX warnings related to autoCorrect and autoCapitalize
+Fix React warnings related to `autoCorrect` and `autoCapitalize` attributes being passed as a boolean instead of a string.
