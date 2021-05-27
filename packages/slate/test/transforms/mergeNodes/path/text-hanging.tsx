@@ -8,12 +8,11 @@ export const input = (
     <block>
       <cursor />
       <text />
-      <text />
     </block>
   </editor>
 )
 export const run = editor => {
-  Transforms.mergeNodes(editor, { at: [1], match: Text.isText })
+  Transforms.mergeNodes(editor, { at: [1, 1], match: Text.isText })
 }
 export const output = (
   <editor>
