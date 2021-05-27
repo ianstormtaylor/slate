@@ -1191,14 +1191,21 @@ export const isEventHandled = <
   EventType extends React.SyntheticEvent<unknown, unknown>
 >(
   event: EventType,
-  handler?: (event: EventType) => void
+  handler?: (event: EventType) => void | boolean
 ) => {
   if (!handler) {
     return false
   }
+  // The custom event handler may return a boolean to specify whether the event
+  // shall be treated as being handled or not.
+  const shouldTreatEventAsHandled = handler(event)
 
-  handler(event)
-  return event.isDefaultPrevented() || event.isPropagationStopped()
+  return (
+    (shouldTreatEventAsHandled === true ||
+      event.isDefaultPrevented() ||
+      event.isPropagationStopped()) &&
+    shouldTreatEventAsHandled !== false
+  )
 }
 
 /**
