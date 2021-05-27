@@ -10,10 +10,12 @@ jobs:
     name: ${{ matrix.channel }}
     runs-on: ubuntu-latest
     strategy:
+      max-parallel: 1
       matrix:
         channel:
-          - dev
           - latest
+          - dev
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -33,7 +35,7 @@ jobs:
         run: yarn prerelease
 
       # https://github.com/changesets/action
-      - name: Create release pull request
+      - name: Create release pull request or Publish to npm
         if: matrix.channel == 'latest'
         uses: changesets/action@master
         with:
@@ -52,3 +54,4 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
