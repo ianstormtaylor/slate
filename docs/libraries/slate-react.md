@@ -18,6 +18,44 @@ React components for rendering Slate editors
 
 The main Slate editor.
 
+#### Event Handling
+
+By default, the `Editable` component comes with a set of event handlers that realize typical rich-text editing behavior (e.g., among others `Editable` implements its own `onCopy`, `onPaste`, `onDrop`, and `onKeyDown`). In some cases you may want to extend or overwrite Slate's default behavior, which can be done by passing your own event handler to the `Editable` component.
+
+Your custom event handler can control whether or not Slate will execute its own event handler after yours depending on the return value of your event handler as described below.
+
+```javascript
+const onClick = useCallback(event => {
+  // Implement custom event logic...
+
+  // When no value is returned, Slate will execute its own event handler if neither
+  // isDefaultPrevented or isPropagationStopped was set on the event
+}, []);
+
+const onDrop = useCallback(event => {
+  // Implement custom event logic...
+
+  // No matter the state of the event, treat it as being handled by returning true here
+  // -> Slate will skip its own event handler
+  return true;
+}, []);
+
+const onDragStart = useCallback(event => {
+  // Implement custom event logic...
+
+  // No matter the status of the event, treat event as *not* being handled by returning false
+  // -> Slate will exectue its own event handler afterward
+  return false;
+}, []);
+
+<Editable
+    onClick={onClick}
+    onDrop={onDrop}
+    onDragStart={onDragStart
+    {/*...*/}
+/>
+```
+
 ### `DefaultElement(props: RenderElementProps)`
 
 The default element renderer.
