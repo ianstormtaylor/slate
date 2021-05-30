@@ -1200,12 +1200,11 @@ export const isEventHandled = <
   // shall be treated as being handled or not.
   const shouldTreatEventAsHandled = handler(event)
 
-  return (
-    (shouldTreatEventAsHandled === true ||
-      event.isDefaultPrevented() ||
-      event.isPropagationStopped()) &&
-    shouldTreatEventAsHandled !== false
-  )
+  if (shouldTreatEventAsHandled != null) {
+    return shouldTreatEventAsHandled
+  }
+  
+  return event.isDefaultPrevented() || event.isPropagationStopped()
 }
 
 /**
