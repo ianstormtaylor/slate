@@ -50,7 +50,7 @@ const App = () => {
     },
   ];
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState<Descendant[]>([])
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   return (
     <Slate
       editor={editor}
