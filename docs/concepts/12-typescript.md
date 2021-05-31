@@ -2,7 +2,7 @@
 
 Slate supports typing of one Slate document model \(ie. one set of custom `Editor`, `Element` and `Text` types\). If you need to support more than one document model, see the section Multiple Document Models.
 
-**Warning:** You must define `CustomTypes` when using TypeScript or Slate will display typing errors.
+**Warning:** You must define `CustomTypes`, annotate `useState`, and annotate the editor's initial state when using TypeScript or Slate will display typing errors.
 
 ## Migrating from 0.47.x
 
@@ -21,14 +21,45 @@ import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
-type CustomText = { text: string; bold: boolean; italic: boolean }
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string; bold?: boolean; italic?: boolean }
 
 declare module 'slate' {
   interface CustomTypes {
     Editor: BaseEditor & ReactEditor & HistoryEditor
-    Element: { type: 'paragraph'; children: CustomText[] }
+    Element: CustomElement
     Text: CustomText
   }
+}
+```
+
+## Annotations in the Editor
+
+To avoid typing errors annotate `useState` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
+
+```typescript jsx
+import React, { useMemo, useState } from 'react'
+import { createEditor, Descendant } from 'slate'
+import { Slate, Editable, withReact } from 'slate-react'
+
+const App = () => {
+  const initialValue: CustomElement[] = [
+    {
+      type: 'paragraph',
+      children: [{ text: 'A line of text in a paragraph.' }],
+    },
+  ];
+  const editor = useMemo(() => withReact(createEditor()), [])
+  const [value, setValue] = useState<Descendant[]>([])
+  return (
+    <Slate
+      editor={editor}
+      value={value}
+      onChange={setValue}
+    >
+      <Editable />
+    </Slate>
+  )
 }
 ```
 
@@ -59,7 +90,7 @@ export type HeadingElement = {
 
 export type CustomElement = ParagraphElement | HeadingElement
 
-export type FormattedText = { text: string; bold: boolean; italic: boolean }
+export type FormattedText = { text: string; bold?: boolean; italic?: boolean }
 
 export type CustomText = FormattedText
 
