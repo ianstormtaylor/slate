@@ -27,7 +27,7 @@
     "internal:release:next": "yarn prerelease && yarn changeset publish --tag next",
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
-    "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/index.js",
+    "test": "mocha --require ./config/babel/register.cjs ./packages/*/test/**/*.{js,ts}",
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
     "test:integration": "run-p -r serve cypress:run",
