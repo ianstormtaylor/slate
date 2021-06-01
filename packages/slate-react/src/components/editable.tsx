@@ -18,6 +18,7 @@ import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   HAS_BEFORE_INPUT_SUPPORT,
+  IS_CHROME,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_SAFARI,
@@ -1056,6 +1057,33 @@ export const Editable = (props: EditableProps) => {
                     }
 
                     return
+                  }
+                } else {
+                  if (IS_CHROME) {
+                    // COMPAT: Chrome supports `beforeinput` event but does not fire
+                    // an event when deleting backwards in a selected void inline node
+                    if (
+                      selection &&
+                      (Hotkeys.isDeleteBackward(nativeEvent) ||
+                        Hotkeys.isDeleteForward(nativeEvent)) &&
+                      Range.isCollapsed(selection)
+                    ) {
+                      const currentNode = Node.parent(
+                        editor,
+                        selection.anchor.path
+                      )
+
+                      if (
+                        Element.isElement(currentNode) &&
+                        Editor.isVoid(editor, currentNode) &&
+                        Editor.isInline(editor, currentNode)
+                      ) {
+                        event.preventDefault()
+                        Transforms.delete(editor, { unit: 'block' })
+
+                        return
+                      }
+                    }
                   }
                 }
               }
