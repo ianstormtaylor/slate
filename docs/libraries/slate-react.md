@@ -26,36 +26,42 @@ In some cases you may want to extend or override Slate's default behavior, which
 
 Your custom event handler can control whether or not Slate should execute its own event handling for a given event after your handler runs depending on the return value of your event handler as described below.
 
-```javascript
-const onClick = event => {
-  // Implement custom event logic...
+```jsx
+import {Editable} from 'slate-react';
 
-  // When no value is returned, Slate will execute its own event handler when neither
-  // isDefaultPrevented nor isPropagationStopped was set on the event
-};
+function MyEditor() {
+  const onClick = event => {
+    // Implement custom event logic...
 
-const onDrop = event => {
-  // Implement custom event logic...
+    // When no value is returned, Slate will execute its own event handler when
+    // neither isDefaultPrevented nor isPropagationStopped was set on the event
+  };
 
-  // No matter the state of the event, treat it as being handled by returning true here
-  // -> Slate will skip its own event handler
-  return true;
-};
+  const onDrop = event => {
+    // Implement custom event logic...
 
-const onDragStart = event => {
-  // Implement custom event logic...
+    // No matter the state of the event, treat it as being handled by returning
+    // true here, Slate will skip its own event handler
+    return true;
+  };
 
-  // No matter the status of the event, treat event as *not* being handled by returning false
-  // -> Slate will exectue its own event handler afterward
-  return false;
-};
+  const onDragStart = event => {
+    // Implement custom event logic...
 
-<Editable
-    onClick={onClick}
-    onDrop={onDrop}
-    onDragStart={onDragStart
-    {/*...*/}
-/>
+    // No matter the status of the event, treat event as *not* being handled by
+    // returning false, Slate will exectue its own event handler afterward
+    return false;
+  };
+
+  return (
+    <Editable
+      onClick={onClick}
+      onDrop={onDrop}
+      onDragStart={onDragStart}
+      {/*...*/}
+    />
+  )
+}
 ```
 
 ### `DefaultElement(props: RenderElementProps)`
