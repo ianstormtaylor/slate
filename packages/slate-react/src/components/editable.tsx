@@ -1203,7 +1203,7 @@ export const isEventHandled = <
   if (shouldTreatEventAsHandled != null) {
     return shouldTreatEventAsHandled
   }
-  
+
   return event.isDefaultPrevented() || event.isPropagationStopped()
 }
 
@@ -1213,12 +1213,19 @@ export const isEventHandled = <
 
 export const isDOMEventHandled = <E extends Event>(
   event: E,
-  handler?: (event: E) => void
+  handler?: (event: E) => void | boolean
 ) => {
   if (!handler) {
     return false
   }
 
-  handler(event)
+  // The custom event handler may return a boolean to specify whether the event
+  // shall be treated as being handled or not.
+  const shouldTreatEventAsHandled = handler(event)
+
+  if (shouldTreatEventAsHandled != null) {
+    return shouldTreatEventAsHandled
+  }
+
   return event.defaultPrevented
 }
