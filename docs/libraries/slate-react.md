@@ -20,9 +20,11 @@ The main Slate editor.
 
 #### Event Handling
 
-By default, the `Editable` component comes with a set of event handlers that realize typical rich-text editing behavior (e.g., among others `Editable` implements its own `onCopy`, `onPaste`, `onDrop`, and `onKeyDown`). In some cases you may want to extend or overwrite Slate's default behavior, which can be done by passing your own event handler to the `Editable` component.
+By default, the `Editable` component comes with a set of event handlers that handle typical rich-text editing behaviors (for example, it implements its own `onCopy`, `onPaste`, `onDrop`, and `onKeyDown` handlers). 
 
-Your custom event handler can control whether or not Slate will execute its own event handler after yours depending on the return value of your event handler as described below.
+In some cases you may want to extend or override Slate's default behavior, which can be done by passing your own event handler(s) to the `Editable` component.
+
+Your custom event handler can control whether or not Slate should execute its own event handling for a given event after your handler runs depending on the return value of your event handler as described below.
 
 ```javascript
 const onClick = useCallback(event => {
