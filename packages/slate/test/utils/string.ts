@@ -2,11 +2,11 @@ import assert from 'assert'
 import { getCharacterDistance } from '../../src/utils/string'
 
 const regularCases = [
-  // ['a', 1],
-  // ['0', 1],
-  // [' ', 1],
-  // ['🙂', 2],
-  // ['⬅️', 2],
+  ['a', 1],
+  ['0', 1],
+  [' ', 1],
+  ['🙂', 2],
+  ['⬅️', 2],
   ['🏴', 2],
 ] as const
 
