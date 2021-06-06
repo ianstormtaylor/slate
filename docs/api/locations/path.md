@@ -53,7 +53,7 @@ Given a path, get the path to the previous sibling node. The method will throw a
 
 #### `Path.relative(path: Path, ancestor: Path): Path`
 
-Get a path relative to an ancestor.
+Given two paths, one that is an ancestor to the other, returns the relative path from the `ancestor` argument to the `path` argument. If the `ancestor` path is not actually an ancestor or equal to the `path` argument, throws an error.
 
 ### Check methods
 
