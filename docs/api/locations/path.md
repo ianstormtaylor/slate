@@ -33,7 +33,7 @@ Note: Two paths of unequal length can still receive a `0` result if one is direc
 
 #### `Path.levels(path: Path, options?): Path[]`
 
-Get a list of paths at every level down to a path. Note: this is the same as `Path.ancestors`, but including the path itself.
+Get a list of paths at every level down to a path. Note: this is the same as `Path.ancestors`, but includes the path itself.
 
 The paths are sorted from shallowest to deepest. However, if the `reverse: true` option is passed, they are reversed.
 
@@ -45,7 +45,7 @@ Given a path, gets the path to the next sibling node. The method does not ensure
 
 #### `Path.parent(path: Path): Path`
 
-Given a path, return a new path referring to the parent node above it.
+Given a path, return a new path referring to the parent node above it. If the `path` argument is equal to `[]`, throws an error.
 
 #### `Path.previous(path: Path): Path`
 
