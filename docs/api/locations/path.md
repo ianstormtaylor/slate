@@ -41,7 +41,7 @@ Options: `{reverse?: boolean}`
 
 #### `Path.next(path: Path): Path`
 
-Given a path, get the path to the next sibling node.
+Given a path, gets the path to the next sibling node. The method does not ensure that the returned `Path` is valid in the document.
 
 #### `Path.parent(path: Path): Path`
 
@@ -49,7 +49,7 @@ Given a path, return a new path referring to the parent node above it.
 
 #### `Path.previous(path: Path): Path`
 
-Given a path, get the path to the previous sibling node.
+Given a path, get the path to the previous sibling node. The method will throw an error if there are no previous siblings (e.g. if the Path is currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal and will throw an error).
 
 #### `Path.relative(path: Path, ancestor: Path): Path`
 
