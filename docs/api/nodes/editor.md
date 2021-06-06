@@ -118,13 +118,15 @@ Options: `depth?: number, edge?: 'start' | 'end'`
 
 #### `Editor.nodes<T extends Node>(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
 
-Iterate through all of the nodes in the Editor.
+At any given `Location` or `Span` in the editor provided by `at` (default is the current selection), the method returns a Generator of `NodeEntry` objects that represent the nodes that include `at`. At the top of the hierarchy is the `Editor` object itself.
 
 Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
 
+`options.match`: Provide a value to the `match?` option to limit the `NodeEntry` objects that are returned.
+
 `options.mode`:
 
-- `'all'` (default): all matching nodes
+- `'all'` (default): Return all matching nodes
 - `'highest'`: in a hierarchy of nodes, only return the highest level matching nodes
 - `'lowest'`: in a hierarchy of nodes, only return the lowest level matching nodes
 
