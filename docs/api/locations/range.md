@@ -26,19 +26,19 @@ Options: `{reverse?: boolean}`
 
 #### `Range.end(range: Range) => Point`
 
-Get the end point of a `range`.
+Get the end point of a `range` according to the order in which it appears in the document.
 
 #### `Range.intersection(range: Range, another: Range) => Range | null`
 
-Get the intersection of one `range` with `another`.
+Get the intersection of one `range` with `another`. If the two ranges do not overlap, return `null`.
 
 #### `Range.points(range: Range) => Generator<PointEntry>`
 
-Iterate through all the point entries in a `range`.
+Iterate through the two point entries in a `Range`. First it will yield a `PointEntry` representing the `anchor`, then it will yield a `PointEntry` representing the `focus`.
 
 #### `Range.start(range: Range) => Point`
 
-Get the start point of a `range`
+Get the start point of a `range` according to the order in which it appears in the document.
 
 ### Check methods
 
