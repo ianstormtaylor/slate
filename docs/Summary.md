@@ -35,6 +35,7 @@
   - [Editor](api/nodes/editor.md)
   - [Element](api/nodes/element.md)
   - [Node](api/nodes/node.md)
+  - [NodeEntry](api/nodes/node-entry.md)
   - [Text](api/nodes/text.md)
 - [Location Types](api/locations/README.md)
   - [Location](api/locations/location.md)
