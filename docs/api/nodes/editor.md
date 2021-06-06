@@ -112,13 +112,11 @@ Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest'
 
 #### `Editor.node(editor: Editor, at: Location, options?) => NodeEntry`
 
-#### `Editor.nodes<T extends Node>(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
-
 Get the node at a location.
 
 Options: `depth?: number, edge?: 'start' | 'end'`
 
-#### `Editor.nodes(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
+#### `Editor.nodes<T extends Node>(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
 
 Iterate through all of the nodes in the Editor.
 
