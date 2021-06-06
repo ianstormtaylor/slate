@@ -40,6 +40,7 @@
   - [Location](api/locations/location.md)
   - [Path](api/locations/path.md)
   - [Point](api/locations/point.md)
+  - [PointEntry](api/locations/point-entry.md)
   - [PointRef](api/locations/point-ref.md)
   - [Range](api/locations/range.md)
   - [RangeRef](api/locations/range-ref.md)
