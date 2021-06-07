@@ -56,10 +56,10 @@ Get the matching ancestor above a location in the document.
 
 Options:
 
-- `at?: Location`: Where to start at which is `editor.selection` by default.
-- `match?: NodeMatch`: Narrow the match
-- `mode?: 'highest' | 'lowest'`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
-- `voids?: boolean`: If `false` (default), ignore void objects. If `true`, include `void` objects.
+- `at?: Location = editor.selection`: Where to start at which is `editor.selection` by default.
+- `match?: NodeMatch = () => true`: Narrow the match
+- `mode?: 'highest' | 'lowest' = 'lowest'`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
+- `voids?: boolean = false`: When `false` ignore void objects.
 
 #### `Editor.after(editor: Editor, at: Location, options?) => Point | undefined`
 
