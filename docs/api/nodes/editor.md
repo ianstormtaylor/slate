@@ -186,10 +186,10 @@ Options:
 - `at?: Location = editor.selection`: The `Location` in which to iterate the positions of.
 - `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
   - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
-  - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: This does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
-  - `word`: Moves to the position immediately after the next `word`
+  - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: The character offsets for Unicode characters does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
+  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`.
   - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
-- `reverse?: boolean = false`: When `true` iterate backwards.
+- `reverse?: boolean = false`: When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
 - `voids?: boolean = false`: When `true` include void Nodes.
 
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
