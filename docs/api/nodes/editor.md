@@ -175,13 +175,22 @@ Get the set of currently tracked point refs of the editor.
 
 #### `Editor.positions(editor: Editor, options?) => Generator<Point, void, undefined>`
 
-Iterate through all of the positions in the document where a `Point` can be placed.
+Iterate through all of the positions in the document where a `Point` can be placed. The first `Point` returns is always the starting point followed by the next `Point` as determined by the `unit` option.
 
-By default it will move forward by individual offsets at a time, but you can pass the `unit: 'character'` option to moved forward one character, word, or line at at time.
+Read `options.unit` to see how this method iterates through positions.
 
 Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless you pass in true for the voids option, then iteration will occur.
 
-Options: `{at?: Location, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', reverse?: boolean, voids?: boolean}`
+`options:`
+
+- `at?: Location = editor.selection`: The `Location` in which to iterate the postions of.
+- `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
+  - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
+  - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: This does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
+  - `word`: Moves to the position immediately after the next `word`
+  - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
+- `reverse?: boolean = false`: When `true` iterate backwards.
+- `voids?: boolean = false`: When `true` include void Nodes.
 
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
