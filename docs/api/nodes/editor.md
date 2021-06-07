@@ -52,9 +52,14 @@ Creates a new, empty `Editor` object.
 
 #### `Editor.above<T extends Ancestor>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
-Get the ancestor above a location in the document.
+Get the matching ancestor above a location in the document.
 
-Options: `{at?: Location, match?: NodeMatch, mode?: 'highest' | 'lowest', voids?: boolean}`
+Options:
+
+- `at?: Location`: Where to start at which is `editor.selection` by default.
+- `match?: NodeMatch`: Narrow the match
+- `mode?: 'highest' | 'lowest'`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
+- `voids?: boolean`: If `false` (default), ignore void objects. If `true`, include `void` objects.
 
 #### `Editor.after(editor: Editor, at: Location, options?) => Point | undefined`
 
@@ -112,21 +117,21 @@ Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest'
 
 #### `Editor.node(editor: Editor, at: Location, options?) => NodeEntry`
 
-#### `Editor.nodes<T extends Node>(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
-
 Get the node at a location.
 
 Options: `depth?: number, edge?: 'start' | 'end'`
 
-#### `Editor.nodes(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
+#### `Editor.nodes<T extends Node>(editor: Editor, options?) => Generator<NodeEntry<T>, void, undefined>`
 
-Iterate through all of the nodes in the Editor.
+At any given `Location` or `Span` in the editor provided by `at` (default is the current selection), the method returns a Generator of `NodeEntry` objects that represent the nodes that include `at`. At the top of the hierarchy is the `Editor` object itself.
 
 Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
 
+`options.match`: Provide a value to the `match?` option to limit the `NodeEntry` objects that are returned.
+
 `options.mode`:
 
-- `'all'` (default): all matching nodes
+- `'all'` (default): Return all matching nodes
 - `'highest'`: in a hierarchy of nodes, only return the highest level matching nodes
 - `'lowest'`: in a hierarchy of nodes, only return the lowest level matching nodes
 
