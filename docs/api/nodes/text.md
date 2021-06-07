@@ -43,3 +43,7 @@ Options: `{loose?: boolean}`
 #### `Text.isText(value: any) => value is Text`
 
 Check if a `value` implements the `Text` interface.
+
+#### `Text.isTextList(value: any): value is Text[]`
+
+Check if `value` is an `Array` of only `Text` objects.
