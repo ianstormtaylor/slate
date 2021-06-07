@@ -183,7 +183,7 @@ Note: By default void nodes are treated as a single point and iteration will not
 
 Options:
 
-- `at?: Location = editor.selection`: The `Location` in which to iterate the postions of.
+- `at?: Location = editor.selection`: The `Location` in which to iterate the positions of.
 - `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
   - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
   - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: This does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
