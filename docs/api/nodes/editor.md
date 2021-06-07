@@ -52,18 +52,21 @@ Creates a new, empty `Editor` object.
 
 #### `Editor.above<T extends Ancestor>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
+```ts
+function Editor.above<T extends Ancestor>(
+  editor: Editor,
+  options?: {
+    at?: Location
+    match?: NodeMatch<T>
+    mode?: 'highest' | 'lowest'
+    voids?: boolean
+  }
+) => NodeEntry<T> | undefined
+```
+
 Get the matching ancestor above a location in the document.
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'highest' | 'lowest', voids?: boolean}`
-
-```ts
-type Options = {
-  at?: Location
-  match?: NodeMatch<T>
-  mode?: 'highest' | 'lowest'
-  voids?: boolean
-}
-```
 
 - `mode?`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
 - `voids?`: If `false` (default), ignore void objects. If `true`, include `void` objects.
