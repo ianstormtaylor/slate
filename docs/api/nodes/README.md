@@ -10,6 +10,7 @@ type Ancestor = Editor | Element
 ```
 
 - [Node](./node.md)
+- [NodeEntry](./node-entry.md)
 - [Editor](./editor.md)
 - [Element](./element.md)
 - [Text](./text.md)

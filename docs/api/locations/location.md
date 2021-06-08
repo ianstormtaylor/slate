@@ -13,6 +13,6 @@ type Location = Path | Point | Range
 
 ### Check methods
 
-#### `Location.isLocation(value: any): value is Location`
+#### `Location.isLocation(value: any) => value is Location`
 
 Check if a value implements the `Location` interface.

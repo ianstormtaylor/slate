@@ -253,6 +253,7 @@ export interface EditorInterface {
   ) => RangeRef
   rangeRefs: (editor: Editor) => Set<RangeRef>
   removeMark: (editor: Editor, key: string) => void
+  setNormalizing: (editor: Editor, isNormalizing: boolean) => void
   start: (editor: Editor, at: Location) => Point
   string: (
     editor: Editor,
@@ -1548,6 +1549,16 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Manually set if the editor should currently be normalizing.
+   *
+   * Note: Using this incorrectly can leave the editor in an invalid state.
+   *
+   */
+  setNormalizing(editor: Editor, isNormalizing: boolean): void {
+    NORMALIZING.set(editor, isNormalizing)
+  },
+
+  /**
    * Get the start point of a location.
    */
 
@@ -1667,11 +1678,11 @@ export const Editor: EditorInterface = {
 
   withoutNormalizing(editor: Editor, fn: () => void): void {
     const value = Editor.isNormalizing(editor)
-    NORMALIZING.set(editor, false)
+    Editor.setNormalizing(editor, false)
     try {
       fn()
     } finally {
-      NORMALIZING.set(editor, value)
+      Editor.setNormalizing(editor, value)
     }
     Editor.normalize(editor)
   },

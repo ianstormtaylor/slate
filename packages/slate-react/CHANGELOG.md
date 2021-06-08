@@ -1,5 +1,67 @@
 # slate-react
 
+## 0.65.0
+
+### Minor Changes
+
+- [#4299](https://github.com/ianstormtaylor/slate/pull/4299) [`2c17e2b7`](https://github.com/ianstormtaylor/slate/commit/2c17e2b7f9dbfa4a821b05668bd00f465da175ad) Thanks [@georgberecz](https://github.com/georgberecz)! - Allow custom event handlers on Editable component to return boolean flag to specify whether the event can be treated as being handled.
+
+  By default, the `Editable` component comes with a set of event handlers that handle typical rich-text editing behaviors (for example, it implements its own `onCopy`, `onPaste`, `onDrop`, and `onKeyDown` handlers).
+
+  In some cases you may want to extend or override Slate's default behavior, which can be done by passing your own event handler(s) to the `Editable` component.
+
+  Your custom event handler can control whether or not Slate should execute its own event handling for a given event after your handler runs depending on the return value of your event handler as described below.
+
+  ```jsx
+  import {Editable} from 'slate-react';
+
+  function MyEditor() {
+    const onClick = event => {
+      // Implement custom event logic...
+
+      // When no value is returned, Slate will execute its own event handler when
+      // neither isDefaultPrevented nor isPropagationStopped was set on the event
+    };
+
+    const onDrop = event => {
+      // Implement custom event logic...
+
+      // No matter the state of the event, treat it as being handled by returning
+      // true here, Slate will skip its own event handler
+      return true;
+    };
+
+    const onDragStart = event => {
+      // Implement custom event logic...
+
+      // No matter the status of the event, treat event as *not* being handled by
+      // returning false, Slate will exectue its own event handler afterward
+      return false;
+    };
+
+    return (
+      <Editable
+        onClick={onClick}
+        onDrop={onDrop}
+        onDragStart={onDragStart}
+        {/*...*/}
+      />
+    )
+  }
+  ```
+
+### Patch Changes
+
+- [#4266](https://github.com/ianstormtaylor/slate/pull/4266) [`411e5a19`](https://github.com/ianstormtaylor/slate/commit/411e5a193bd639fb743c2253a5f5e43a5949b100) Thanks [@TheSpyder](https://github.com/TheSpyder)! - Removed accidental bundling of `slate-history` inside `slate-react`
+
+* [#4307](https://github.com/ianstormtaylor/slate/pull/4307) [`a7e3a181`](https://github.com/ianstormtaylor/slate/commit/a7e3a18187d1c29744d78875542abd035220ebdc) Thanks [@clauderic](https://github.com/clauderic)! - Fix deletion of selected inline void nodes in Chrome. Chrome does not fire a `beforeinput` event when deleting backwards within an inline void node, so we need to add special logic to handle this edge-case for Chrome only.
+
+- [#4272](https://github.com/ianstormtaylor/slate/pull/4272) [`294d5120`](https://github.com/ianstormtaylor/slate/commit/294d5120aed89f4e1c7a818e0d1339f4fa1cbaf5) Thanks [@clauderic](https://github.com/clauderic)! - Fix errors accessing `globalThis` in browsers that do not implement it
+
+* [#4295](https://github.com/ianstormtaylor/slate/pull/4295) [`dfc03960`](https://github.com/ianstormtaylor/slate/commit/dfc039601f7b4d74592dfe39c31b67c0f0619bca) Thanks [@dubzzz](https://github.com/dubzzz)! - Fix React warnings related to `autoCorrect` and `autoCapitalize` attributes being passed as a boolean instead of a string.
+
+- [#4271](https://github.com/ianstormtaylor/slate/pull/4271) [`ff267767`](https://github.com/ianstormtaylor/slate/commit/ff267767f61577fdbd68119a1c978e9856e3bb31) Thanks [@omerg](https://github.com/omerg)! - Fixed typo: Renamed `toSlatePoint` argument `extractMatch` to `exactMatch`
+
 ## 0.64.0
 
 ### Minor Changes
