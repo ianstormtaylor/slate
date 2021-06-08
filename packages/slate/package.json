@@ -14,8 +14,6 @@
     "dist/"
   ],
   "dependencies": {
-    "@types/esrever": "^0.2.0",
-    "esrever": "^0.2.0",
     "fast-deep-equal": "^3.1.3",
     "immer": "^8.0.1",
     "is-plain-object": "^3.0.0",
