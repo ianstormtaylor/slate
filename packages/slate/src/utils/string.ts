@@ -10,151 +10,137 @@ const CHAMELEON = /['\u2018\u2019]/
  * Get the distance to the end of the first character in a string of text.
  */
 
+enum CodepointType {
+  // ZWJ sequences consist of multiple emojis separated by ZWJ character.  They
+  // are used to combine multiple emojis into one emoji.
+  // https://en.wikipedia.org/wiki/Zero-width_joiner
+  ZeroWidthJoiner,
+  // Kecap sequences consit of a digit, an asterisk or a number sign followed by
+  // the Combining Enclosing Keycap character. They are used to create emoji
+  // with a keycap appearance.  https://emojipedia.org/emoji-keycap-sequence
+  Keycap,
+  // Modifiers are used in ZWJ sequences to apply a skin tone to an emoji.
+  // https://en.wikipedia.org/wiki/Emoticons_(Unicode_block)#Emoji_modifiers
+  Modifier,
+  // Variation selectors are used to specify if a character should be displayed
+  // as text or as an emoji.
+  VariationSelector,
+  // Flag sequences consist of a pair of regional indicators.
+  // https://en.wikipedia.org/wiki/Regional_indicator_symbol
+  RegionalIndicator,
+  // Tag sequences consist of a Black Flag emoji followed by a series of Tag
+  // codepoints, then the Cancel Tag codepoint.
+  // https://en.wikipedia.org/wiki/Tags_(Unicode_block)
+  Tag,
+  Character,
+}
+
 export const getCharacterDistance = (str: string, isRTL = false): number => {
+  const codepoints = isRTL ? codepointsIteratorRTL(str) : str
   const isLTR = !isRTL
 
-  let dist = 0
-  // prev types:
-  // NSEQ: non sequenceable codepoint.
-  // MOD: modifier
-  // ZWJ: zero width joiner
-  // VAR: variation selector
-  // BMP: sequenceable codepoint from basic multilingual plane
-  // RI: regional indicator
-  // KC: keycap
-  // TAG: tag
-  let prev:
-    | 'NSEQ'
-    | 'MOD'
-    | 'ZWJ'
-    | 'VAR'
-    | 'BMP'
-    | 'RI'
-    | 'KC'
-    | 'TAG'
-    | null = null
+  const [isKeycapStart, isKeycapEnd, isTagStart, isTagEnd] = isLTR
+    ? [isKeycap, isCombiningEnclosingKeycap, isBlackFlag, isCancelTag]
+    : [isCombiningEnclosingKeycap, isKeycap, isCancelTag, isBlackFlag]
 
-  const codepoints = isLTR ? str : codepointsIteratorRTL(str)
+  let distance = 0
+  let previousType: CodepointType | null = null
 
   for (const codepoint of codepoints) {
     const code = codepoint.codePointAt(0)
     if (!code) break
 
-    // Check if codepoint is part of a sequence.
+    if (
+      isLTR &&
+      previousType === CodepointType.VariationSelector &&
+      !isZWJ(code) &&
+      !isKeycapEnd(code)
+    ) {
+      break
+    }
+
     if (isZWJ(code)) {
-      dist += codepoint.length
-      prev = 'ZWJ'
+      distance += codepoint.length
+      previousType = CodepointType.ZeroWidthJoiner
 
       continue
     }
 
-    const [isKeycapStart, isKeycapEnd] = isLTR
-      ? [isKeycap, isCombiningEnclosingKeycap]
-      : [isCombiningEnclosingKeycap, isKeycap]
     if (isKeycapStart(code)) {
-      if (prev === 'KC') {
-        break
-      }
+      if (previousType === CodepointType.Keycap) break
 
-      dist += codepoint.length
-      prev = 'KC'
+      distance += codepoint.length
+      previousType = CodepointType.Keycap
+
       continue
     }
     if (isKeycapEnd(code)) {
-      dist += codepoint.length
+      distance += codepoint.length
       break
     }
 
     if (isVariationSelector(code)) {
-      dist += codepoint.length
+      if (isRTL && previousType === CodepointType.Character) break
 
-      if (isLTR && prev === 'BMP') {
-        break
-      }
+      distance += codepoint.length
 
-      prev = 'VAR'
+      previousType = CodepointType.VariationSelector
 
-      continue
-    }
-
-    if (isBMPEmoji(code)) {
-      if (isLTR && prev && prev !== 'ZWJ' && prev !== 'VAR') {
-        break
-      }
-
-      dist += codepoint.length
-
-      if (isRTL && prev === 'VAR') {
-        break
-      }
-
-      prev = 'BMP'
       continue
     }
 
     if (isModifier(code)) {
-      dist += codepoint.length
-      prev = 'MOD'
+      distance += codepoint.length
+      previousType = CodepointType.Modifier
 
       continue
     }
 
-    const [isTagStart, isTagEnd] = isLTR
-      ? [isBlackFlag, isCancelTag]
-      : [isCancelTag, isBlackFlag]
     if (isTagStart(code)) {
-      if (prev === 'TAG') break
+      if (previousType === CodepointType.Tag) break
 
-      dist += codepoint.length
-      prev = 'TAG'
+      distance += codepoint.length
+      previousType = CodepointType.Tag
       continue
     }
-    if (isTagEnd(code)) {
-      dist += codepoint.length
+    if (previousType === CodepointType.Tag) {
+      if (isTagEnd(code)) {
+        distance += codepoint.length
+        break
+      }
+      if (isTag(code)) {
+        distance += codepoint.length
+        continue
+      }
+
       break
-    }
-    if (prev === 'TAG' && isTag(code)) {
-      dist += codepoint.length
-      continue
     }
 
     if (isRegionalIndicator(code)) {
-      dist += codepoint.length
-
-      if (prev === 'RI') {
+      if (previousType && previousType !== CodepointType.RegionalIndicator) {
         break
       }
 
-      prev = 'RI'
+      distance += codepoint.length
+
+      if (previousType === CodepointType.RegionalIndicator) break
+
+      previousType = CodepointType.RegionalIndicator
 
       continue
     }
 
-    if (!isBMP(code)) {
-      // If previous code point is not sequenceable, it means we are not in a
-      // sequence.
-      if (prev === 'NSEQ') {
-        break
-      }
+    // If previous and curent codepoints are regular characters. it means we are
+    // not in a sequence.
+    if (previousType === CodepointType.Character) break
 
-      dist += codepoint.length
-      prev = 'NSEQ'
+    distance += codepoint.length
+    previousType = CodepointType.Character
 
-      continue
-    }
-
-    // Modifier 'groups up' with what ever character is before that (even whitespace), need to
-    // look ahead.
-    if (isLTR && prev === 'MOD') {
-      dist += codepoint.length
-      break
-    }
-
-    // If while loop ever gets here, we're done (e.g latin chars).
-    break
+    continue
   }
 
-  return dist || 1
+  return distance || 1
 }
 
 /**
@@ -283,42 +269,6 @@ const isCombiningEnclosingKeycap = (code: number): boolean => {
 }
 
 /**
- * Is `code` one of the BMP codes used in emoji sequences.
- *
- * https://emojipedia.org/emoji-zwj-sequences/
- */
-
-const isBMPEmoji = (code: number): boolean => {
-  // This requires tiny bit of maintanance, better ideas?
-  // Fortunately it only happens if new Unicode Standard
-  // is released. Fails gracefully if upkeep lags behind,
-  // same way Slate previously behaved with all emojis.
-  return (
-    code === 0x2764 || // heart (❤)
-    code === 0x2642 || // male (♂)
-    code === 0x2640 || // female (♀)
-    code === 0x2620 || // scull (☠)
-    code === 0x2695 || // medical (⚕)
-    code === 0x2708 || // plane (✈️)
-    code === 0x25ef || // large circle (◯)
-    code === 0x2b06 || // up arrow (⬆)
-    code === 0x2197 || // up-right arrow (↗)
-    code === 0x27a1 || // right arrow (➡)
-    code === 0x2198 || // down-right arrow (↘)
-    code === 0x2b07 || // down arrow (⬇)
-    code === 0x2199 || // down-left arrow (↙)
-    code === 0x2b05 || // left arrow (⬅)
-    code === 0x2196 || // up-left arrow (↖)
-    code === 0x2195 || // up-down arrow (↕)
-    code === 0x2194 || // left-right arrow (↔)
-    code === 0x21a9 || // right arrow curving left (↩)
-    code === 0x21aa || // left arrow curving right (↪)
-    code === 0x2934 || // right arrow curving up (⤴)
-    code === 0x2935 // right arrow curving down (⤵)
-  )
-}
-
-/**
  * Is `code` a Regional Indicator.
  *
  * https://en.wikipedia.org/wiki/Regional_indicator_symbol
@@ -326,16 +276,6 @@ const isBMPEmoji = (code: number): boolean => {
 
 const isRegionalIndicator = (code: number): boolean => {
   return code >= 0x1f1e6 && code <= 0x1f1ff
-}
-
-/**
- * Is `code` from basic multilingual plane.
- *
- * https://codepoints.net/basic_multilingual_plane
- */
-
-const isBMP = (code: number): boolean => {
-  return code <= 0xffff
 }
 
 /**
