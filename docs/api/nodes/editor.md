@@ -56,10 +56,10 @@ Get the matching ancestor above a location in the document.
 
 Options:
 
-- `at?: Location`: Where to start at which is `editor.selection` by default.
-- `match?: NodeMatch`: Narrow the match
-- `mode?: 'highest' | 'lowest'`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
-- `voids?: boolean`: If `false` (default), ignore void objects. If `true`, include `void` objects.
+- `at?: Location = editor.selection`: Where to start at which is `editor.selection` by default.
+- `match?: NodeMatch = () => true`: Narrow the match
+- `mode?: 'highest' | 'lowest' = 'lowest'`: If `lowest` (default), returns the lowest matching ancestor. If `highest`, returns the highest matching ancestor.
+- `voids?: boolean = false`: When `false` ignore void objects.
 
 #### `Editor.after(editor: Editor, at: Location, options?) => Point | undefined`
 
@@ -175,13 +175,22 @@ Get the set of currently tracked point refs of the editor.
 
 #### `Editor.positions(editor: Editor, options?) => Generator<Point, void, undefined>`
 
-Iterate through all of the positions in the document where a `Point` can be placed.
+Iterate through all of the positions in the document where a `Point` can be placed. The first `Point` returns is always the starting point followed by the next `Point` as determined by the `unit` option.
 
-By default it will move forward by individual offsets at a time, but you can pass the `unit: 'character'` option to moved forward one character, word, or line at at time.
+Read `options.unit` to see how this method iterates through positions.
 
 Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless you pass in true for the voids option, then iteration will occur.
 
-Options: `{at?: Location, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', reverse?: boolean, voids?: boolean}`
+Options:
+
+- `at?: Location = editor.selection`: The `Location` in which to iterate the positions of.
+- `unit?: 'offset' | 'character' | 'word' | 'line' | 'block' = 'offset'`:
+  - `offset`: Moves to the next offset `Point`. It will include the `Point` at the end of a `Text` object and then move onto the first `Point` (at the 0th offset) of the next `Text` object. This may be counter-intuitive because the end of a `Text` and the beginning of the next `Text` might be thought of as the same position.
+  - `character`: Moves to the next `character` but is not always the next `index` in the string. This is because Unicode encodings may require multiple bytes to create one character. Unlike `offset`, `character` will not count the end of a `Text` and the beginning of the next `Text` as separate positions to return. Warning: The character offsets for Unicode characters does not appear to be reliable in some cases like a Smiley Emoji will be identified as 2 characters.
+  - `word`: Moves to the position immediately after the next `word`. In `reverse` mode, moves to the position immediately before the previous `word`.
+  - `line` | `block`: Starts at the beginning position and then the position at the end of the block. Then starts at the beginning of the next block and then the end of the next block.
+- `reverse?: boolean = false`: When `true` returns the positions in reverse order. In the case of the `unit` being `word`, the actual returned positions are different (i.e. we will get the start of a word in reverse instead of the end).
+- `voids?: boolean = false`: When `true` include void Nodes.
 
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
