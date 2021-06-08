@@ -1,7 +1,7 @@
 import assert from 'assert'
-import { getCharacterDistance } from '../../src/utils/string'
+import { getCharacterDistance, getWordDistance } from '../../src/utils/string'
 
-const regularCases = [
+const codepoints = [
   ['a', 1],
   ['0', 1],
   [' ', 1],
@@ -10,13 +10,13 @@ const regularCases = [
   ['🏴', 2],
 ] as const
 
-const sequences = [
+const zwjSequences = [
   ['👁‍🗨', 5],
   ['👨‍👩‍👧‍👧', 11],
   ['👨🏿‍🦳', 7],
 ] as const
 
-const regionalIndicators = [
+const regionalIndicatorSequences = [
   '🇧🇪',
   '🇧🇫',
   '🇧🇬',
@@ -29,7 +29,7 @@ const regionalIndicators = [
   '🇧🇴',
 ]
 
-const keycaps = [
+const keycapSequences = [
   '#️⃣',
   '*️⃣',
   '0️⃣',
@@ -44,40 +44,78 @@ const keycaps = [
   '9️⃣',
 ]
 
-const tags = [
+const tagSequences = [
   ['🏴󠁧󠁢󠁥󠁮󠁧󠁿', 14],
   ['🏴󠁧󠁢󠁳󠁣󠁴󠁿', 14],
   ['🏴󠁧󠁢󠁷󠁬󠁳󠁿', 14],
 ] as const
 
-describe('getCharacterDistance', () => {
-  regularCases.forEach(([str, length]) => {
-    it(`regular case ${str}`, () => {
-      assert.strictEqual(getCharacterDistance(str + str), length)
+const dirs = ['ltr', 'rtl']
+
+dirs.forEach(dir => {
+  const isRTL = dir === 'rtl'
+
+  describe(`getCharacterDistance - ${dir}`, () => {
+    codepoints.forEach(([str, dist]) => {
+      it(str, () => {
+        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      })
+    })
+
+    zwjSequences.forEach(([str, dist]) => {
+      it(str, () => {
+        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      })
+    })
+
+    regionalIndicatorSequences.forEach(str => {
+      it(str, () => {
+        assert.strictEqual(getCharacterDistance(str + str, isRTL), 4)
+      })
+    })
+
+    keycapSequences.forEach(str => {
+      it(str, () => {
+        assert.strictEqual(getCharacterDistance(str + str, isRTL), 3)
+      })
+    })
+
+    tagSequences.forEach(([str, dist]) => {
+      it(str, () => {
+        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      })
     })
   })
+})
 
-  regionalIndicators.forEach(str => {
-    it(`regional indicator ${str}`, () => {
-      assert.strictEqual(getCharacterDistance(str + str), 4)
+const ltrCases = [
+  ['hello foobarbaz', 5],
+  ['🏴󠁧󠁢󠁥󠁮󠁧󠁿🏴󠁧󠁢󠁳󠁣󠁴󠁿 🏴󠁧󠁢󠁷󠁬󠁳󠁿', 28],
+  ["Don't do this", 5],
+  ["I'm ok", 3],
+] as const
+
+const rtlCases = [
+  ['hello foobarbaz', 9],
+  ['🏴󠁧󠁢󠁥󠁮󠁧󠁿🏴󠁧󠁢󠁳󠁣󠁴󠁿 🏴󠁧󠁢󠁷󠁬󠁳󠁿', 14],
+  ["Don't", 5],
+  ["Don't do this", 4],
+  ["I'm", 3],
+  ['Tags 🏴󠁧󠁢󠁥󠁮󠁧󠁿🏴󠁧󠁢󠁳󠁣󠁴󠁿', 28],
+] as const
+
+describe(`getWordDistance - ltr`, () => {
+  ltrCases.forEach(([str, dist]) => {
+    it(str, () => {
+      assert.strictEqual(getWordDistance(str), dist)
     })
   })
+})
 
-  keycaps.forEach(str => {
-    it(`keycap ${str}`, () => {
-      assert.strictEqual(getCharacterDistance(str + str), 3)
-    })
-  })
-
-  tags.forEach(([str, length]) => {
-    it(`tag ${str}`, () => {
-      assert.strictEqual(getCharacterDistance(str + str), length)
-    })
-  })
-
-  sequences.forEach(([str, length]) => {
-    it(`sequence ${str}`, () => {
-      assert.strictEqual(getCharacterDistance(str + str), length)
+describe(`getWordDistance - rtl`, () => {
+  rtlCases.forEach(([str, dist]) => {
+    it(str, () => {
+      assert.strictEqual(getWordDistance(str, true), dist)
     })
   })
 })

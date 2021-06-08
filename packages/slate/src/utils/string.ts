@@ -10,8 +10,10 @@ const CHAMELEON = /['\u2018\u2019]/
  * Get the distance to the end of the first character in a string of text.
  */
 
-export const getCharacterDistance = (text: string): number => {
-  let offset = 0
+export const getCharacterDistance = (text: string, isRTL = false): number => {
+  const isLTR = !isRTL
+
+  let dist = 0
   // prev types:
   // NSEQ: non sequenceable codepoint.
   // MOD: modifier
@@ -32,36 +34,43 @@ export const getCharacterDistance = (text: string): number => {
     | 'TAG'
     | null = null
 
-  while (true) {
-    const code = text.codePointAt(offset)
+  const codepoints = Array.from(text)
+  for (let i = 0; i < codepoints.length; i++) {
+    const j = isRTL ? codepoints.length - 1 - i : i
+    const codepoint = codepoints[j]
+
+    const code = codepoint.codePointAt(0)
     if (!code) break
 
-    // Check if code point is part of a sequence.
+    // Check if codepoint is part of a sequence.
     if (isZWJ(code)) {
-      offset += 1
+      dist += codepoint.length
       prev = 'ZWJ'
 
       continue
     }
 
-    if (isKeycap(code)) {
+    const [isKeycapStart, isKeycapEnd] = isLTR
+      ? [isKeycap, isCombiningEnclosingKeycap]
+      : [isCombiningEnclosingKeycap, isKeycap]
+    if (isKeycapStart(code)) {
       if (prev === 'KC') {
         break
       }
 
-      offset += 1
+      dist += codepoint.length
       prev = 'KC'
       continue
     }
-    if (isCombiningEnclosingKeycap(code)) {
-      offset += 1
+    if (isKeycapEnd(code)) {
+      dist += codepoint.length
       break
     }
 
     if (isVariationSelector(code)) {
-      offset += 1
+      dist += codepoint.length
 
-      if (prev === 'BMP') {
+      if (isLTR && prev === 'BMP') {
         break
       }
 
@@ -71,41 +80,48 @@ export const getCharacterDistance = (text: string): number => {
     }
 
     if (isBMPEmoji(code)) {
-      if (prev && prev !== 'ZWJ' && prev !== 'VAR') {
+      if (isLTR && prev && prev !== 'ZWJ' && prev !== 'VAR') {
         break
       }
 
-      offset += 1
-      prev = 'BMP'
+      dist += codepoint.length
 
+      if (isRTL && prev === 'VAR') {
+        break
+      }
+
+      prev = 'BMP'
       continue
     }
 
     if (isModifier(code)) {
-      offset += 2
+      dist += codepoint.length
       prev = 'MOD'
 
       continue
     }
 
-    if (isBlackFlag(code)) {
-      if (prev === 'TAG') {
-        break
-      }
-      offset += 2
+    const [isTagStart, isTagEnd] = isLTR
+      ? [isBlackFlag, isCancelTag]
+      : [isCancelTag, isBlackFlag]
+    if (isTagStart(code)) {
+      if (prev === 'TAG') break
+
+      dist += codepoint.length
       prev = 'TAG'
       continue
     }
+    if (isTagEnd(code)) {
+      dist += codepoint.length
+      break
+    }
     if (prev === 'TAG' && isTag(code)) {
-      offset += 2
-
-      if (isCancelTag(code)) break
-
+      dist += codepoint.length
       continue
     }
 
     if (isRegionalIndicator(code)) {
-      offset += 2
+      dist += codepoint.length
 
       if (prev === 'RI') {
         break
@@ -123,7 +139,7 @@ export const getCharacterDistance = (text: string): number => {
         break
       }
 
-      offset += 2
+      dist += codepoint.length
       prev = 'NSEQ'
 
       continue
@@ -131,8 +147,8 @@ export const getCharacterDistance = (text: string): number => {
 
     // Modifier 'groups up' with what ever character is before that (even whitespace), need to
     // look ahead.
-    if (prev === 'MOD') {
-      offset += 1
+    if (isLTR && prev === 'MOD') {
+      dist += codepoint.length
       break
     }
 
@@ -140,37 +156,52 @@ export const getCharacterDistance = (text: string): number => {
     break
   }
 
-  return offset || 1
+  return dist || 1
 }
 
 /**
  * Get the distance to the end of the first word in a string of text.
  */
 
-export const getWordDistance = (text: string): number => {
-  let length = 0
-  let i = 0
+export const getWordDistance = (text: string, isRTL = false): number => {
+  let dist = 0
   let started = false
-  let char
 
-  while ((char = text.charAt(i))) {
-    const l = getCharacterDistance(char)
-    char = text.slice(i, i + l)
-    const rest = text.slice(i + l)
+  while (text.length > 0) {
+    const charDist = getCharacterDistance(text, isRTL)
+    const [char, remaining] = split(text, charDist, isRTL)
 
-    if (isWordCharacter(char, rest)) {
+    if (isWordCharacter(char, remaining, isRTL)) {
       started = true
-      length += l
+      dist += charDist
     } else if (!started) {
-      length += l
+      dist += charDist
     } else {
       break
     }
 
-    i += l
+    text = remaining
   }
 
-  return length
+  return dist
+}
+
+/**
+ * Split a string at a given distance starting from the end when `isRTL` is set
+ * to `true`.
+ */
+
+export const split = (
+  str: string,
+  dist: number,
+  isRTL = false
+): [string, string] => {
+  if (isRTL) {
+    const at = str.length - dist
+    return [str.slice(at, str.length), str.slice(0, at)]
+  }
+
+  return [str.slice(0, dist), str.slice(dist)]
 }
 
 /**
@@ -178,7 +209,11 @@ export const getWordDistance = (text: string): number => {
  * because sometimes you must read subsequent characters to truly determine it.
  */
 
-const isWordCharacter = (char: string, remaining: string): boolean => {
+const isWordCharacter = (
+  char: string,
+  remaining: string,
+  isRTL = false
+): boolean => {
   if (SPACE.test(char)) {
     return false
   }
@@ -186,12 +221,10 @@ const isWordCharacter = (char: string, remaining: string): boolean => {
   // Chameleons count as word characters as long as they're in a word, so
   // recurse to see if the next one is a word character or not.
   if (CHAMELEON.test(char)) {
-    let next = remaining.charAt(0)
-    const length = getCharacterDistance(next)
-    next = remaining.slice(0, length)
-    const rest = remaining.slice(length)
+    const charDist = getCharacterDistance(remaining, isRTL)
+    const [nextChar, nextRemaining] = split(remaining, charDist, isRTL)
 
-    if (isWordCharacter(next, rest)) {
+    if (isWordCharacter(nextChar, nextRemaining, isRTL)) {
       return true
     }
   }
