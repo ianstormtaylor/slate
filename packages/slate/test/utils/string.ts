@@ -1,5 +1,9 @@
 import assert from 'assert'
-import { getCharacterDistance, getWordDistance } from '../../src/utils/string'
+import {
+  getCharacterDistance,
+  getWordDistance,
+  codepointsIteratorRTL,
+} from '../../src/utils/string'
 
 const codepoints = [
   ['a', 1],
@@ -116,6 +120,25 @@ describe(`getWordDistance - rtl`, () => {
   rtlCases.forEach(([str, dist]) => {
     it(str, () => {
       assert.strictEqual(getWordDistance(str, true), dist)
+    })
+  })
+})
+
+const cases = [
+  ...[...codepoints, ...zwjSequences, ...tagSequences, ...rtlCases].map(
+    ([str]) => str
+  ),
+  ...keycapSequences,
+  ...regionalIndicatorSequences,
+]
+
+describe('codepointsIteratorRTL', () => {
+  cases.forEach(str => {
+    it(str, () => {
+      const arr1 = [...codepointsIteratorRTL(str)]
+      const arr2 = Array.from(str).reverse()
+
+      assert.deepStrictEqual(arr1, arr2)
     })
   })
 })

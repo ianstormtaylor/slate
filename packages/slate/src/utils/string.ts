@@ -10,7 +10,7 @@ const CHAMELEON = /['\u2018\u2019]/
  * Get the distance to the end of the first character in a string of text.
  */
 
-export const getCharacterDistance = (text: string, isRTL = false): number => {
+export const getCharacterDistance = (str: string, isRTL = false): number => {
   const isLTR = !isRTL
 
   let dist = 0
@@ -34,11 +34,9 @@ export const getCharacterDistance = (text: string, isRTL = false): number => {
     | 'TAG'
     | null = null
 
-  const codepoints = Array.from(text)
-  for (let i = 0; i < codepoints.length; i++) {
-    const j = isRTL ? codepoints.length - 1 - i : i
-    const codepoint = codepoints[j]
+  const codepoints = isLTR ? str : codepointsIteratorRTL(str)
 
+  for (const codepoint of codepoints) {
     const code = codepoint.codePointAt(0)
     if (!code) break
 
@@ -374,4 +372,48 @@ const isTag = (code: number): boolean => {
 
 const isCancelTag = (code: number): boolean => {
   return code === 0xe007f
+}
+
+/**
+ * Iterate on codepoints from right to left.
+ */
+
+export const codepointsIteratorRTL = function*(str: string) {
+  const end = str.length - 1
+
+  for (let i = 0; i < str.length; i++) {
+    const char1 = str.charAt(end - i)
+
+    if (isLowSurrogate(char1.charCodeAt(0))) {
+      const char2 = str.charAt(end - i - 1)
+      if (isHighSurrogate(char2.charCodeAt(0))) {
+        yield char2 + char1
+
+        i++
+        continue
+      }
+    }
+
+    yield char1
+  }
+}
+
+/**
+ * Is `charCode` a high surrogate.
+ *
+ * https://en.wikipedia.org/wiki/Universal_Character_Set_characters#Surrogates
+ */
+
+const isHighSurrogate = (charCode: number) => {
+  return charCode >= 0xd800 && charCode <= 0xdbff
+}
+
+/**
+ * Is `charCode` a low surrogate.
+ *
+ * https://en.wikipedia.org/wiki/Universal_Character_Set_characters#Surrogates
+ */
+
+const isLowSurrogate = (charCode: number) => {
+  return charCode >= 0xdc00 && charCode <= 0xdfff
 }
