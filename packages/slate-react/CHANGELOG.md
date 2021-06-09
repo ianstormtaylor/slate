@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.65.2
+
+### Patch Changes
+
+- [#4331](https://github.com/ianstormtaylor/slate/pull/4331) [`a3bc97af`](https://github.com/ianstormtaylor/slate/commit/a3bc97af3e3bc88ccf9ab7eadb1a56c0bc92f436) Thanks [@golota60](https://github.com/golota60)! - Fix deletion of selected inline void nodes in Safari when presssing `backspace` or `delete`. This is a bug that [was originally fixed only for Google Chrome](https://github.com/ianstormtaylor/slate/issues/3456), but the fix also needs to be applied in Safari.
+
 ## 0.65.1
 
 ### Patch Changes
