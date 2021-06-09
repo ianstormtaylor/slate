@@ -1,5 +1,14 @@
 # slate-react
 
+## 0.65.1
+
+### Patch Changes
+
+- [#4324](https://github.com/ianstormtaylor/slate/pull/4324) [`61171a23`](https://github.com/ianstormtaylor/slate/commit/61171a23821b882116deabceec15f7e2649d271c) Thanks [@clauderic](https://github.com/clauderic)! - Fix backward typing bug in Safari by ensuring the selection is always removed on blur.
+  Safari doesn't always remove the selection, even if the contenteditable element no longer has focus.
+  In this scenario, we need to forcefully remove the selection on blur.
+  Refer to https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
+
 ## 0.65.0
 
 ### Minor Changes
