@@ -179,6 +179,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     data.setData('text/html', div.innerHTML)
     data.setData('text/plain', getPlainText(div))
     document.body.removeChild(div)
+    return data
   }
 
   e.insertData = (data: DataTransfer) => {
