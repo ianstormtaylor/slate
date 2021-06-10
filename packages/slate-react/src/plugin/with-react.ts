@@ -96,7 +96,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     }
   }
 
-  e.setFragmentData = (data: DataTransfer) => {
+  e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 
     if (!selection) {
