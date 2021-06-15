@@ -36,7 +36,7 @@ const Leaf = (props: {
       '[data-slate-editor="true"]'
     )
 
-    if (!placeholderEl || !editorEl) {
+    if (!placeholderEl || !editorEl || editorEl.style.minHeight) {
       return
     }
 
