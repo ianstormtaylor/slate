@@ -1109,8 +1109,8 @@ export const Editable = (props: EditableProps) => {
                     return
                   }
                 } else {
-                  if (IS_CHROME) {
-                    // COMPAT: Chrome supports `beforeinput` event but does not fire
+                  if (IS_CHROME || IS_SAFARI) {
+                    // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
                     // an event when deleting backwards in a selected void inline node
                     if (
                       selection &&
