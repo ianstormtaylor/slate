@@ -4,6 +4,10 @@
   "workspaces": [
     "packages/*"
   ],
+   "repository": {
+    "type": "git",
+    "url": "https://github.com/ianstormtaylor/slate.git"
+  },
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
