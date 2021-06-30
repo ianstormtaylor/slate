@@ -115,12 +115,12 @@ export class AndroidInputManager {
           at,
           select: true,
         })
+        this.editor.marks = null
       } else {
         Transforms.insertText(this.editor, text, {
           at,
         })
       }
-      this.editor.marks = null
     })
   }
 
