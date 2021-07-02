@@ -1,9 +1,13 @@
 const escape = require('shell-quote').quote
 
 /**
- * Need this to fix a bug where we can't commit `pages/examples/[example].tsx`
+ * Need this to fix a bug where we can't commit `pages/examples/[example].tsx`.
  *
  * <https://github.com/okonet/lint-staged/issues/676#issuecomment-574764713>
+ *
+ * NOTE:
+ * We can remove this entire file if/when we upgrade to Prettier 2+ where this
+ * is no longer necessary according to the `lint-staged` issue.
  */
 
 module.exports = {
