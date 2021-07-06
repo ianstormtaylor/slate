@@ -131,11 +131,7 @@ const Element = (props: {
     }
   })
 
-  return (
-    <SelectedContext.Provider value={!!selection}>
-      {renderElement({ attributes, children, element })}
-    </SelectedContext.Provider>
-  )
+  return renderElement({ attributes, children, element })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
