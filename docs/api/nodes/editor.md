@@ -65,11 +65,15 @@ Options:
 
 Get the point after a location.
 
+If there is no point after the location (e.g. we are at the bottom of the document) returns `undefined`.
+
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
 #### `Editor.before(editor: Editor, at: Location, options?) => Point | undefined`
 
 Get the point before a location.
+
+If there is no point before the location (e.g. we are at the top of the document) returns `undefined`.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
