@@ -272,7 +272,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
         node.text = before
         newNode = {
           ...(properties as Partial<Text>),
-          text: after,
+          text: after || '\0',
         }
       } else {
         const before = node.children.slice(0, position)
