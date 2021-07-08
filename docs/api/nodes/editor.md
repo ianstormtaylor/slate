@@ -113,6 +113,8 @@ Get the marks that would be added to text at the current selection.
 
 Get the matching node in the branch of the document after a location.
 
+Note: If you are looking for the next Point, and not the next Node, you are probably looking for the method `Editor.after`
+
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
 #### `Editor.node(editor: Editor, at: Location, options?) => NodeEntry`
@@ -195,6 +197,8 @@ Options:
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document before a location.
+
+Note: If you are looking for the previous Point, and not the previous Node, you are probably looking for the method `Editor.before`
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
