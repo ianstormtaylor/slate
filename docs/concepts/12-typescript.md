@@ -1,4 +1,4 @@
-# TypeScript
+# Using TypeScript
 
 Slate supports typing of one Slate document model \(ie. one set of custom `Editor`, `Element` and `Text` types\). If you need to support more than one document model, see the section Multiple Document Models.
 
