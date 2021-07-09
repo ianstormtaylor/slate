@@ -22,7 +22,7 @@ import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
-type CustomText = { text: string; bold?: boolean; italic?: boolean }
+type CustomText = { text: string; bold?: true }
 
 declare module 'slate' {
   interface CustomTypes {
@@ -35,7 +35,7 @@ declare module 'slate' {
 
 ## Annotations in the Editor
 
-To avoid typing errors annotate `useState` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
+Annotate `useState` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
 
 ```typescript jsx
 import React, { useMemo, useState } from 'react'
@@ -43,20 +43,16 @@ import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const App = () => {
-  const initialValue: CustomElement[] = [
+  const initialValue: Descendant[] = [
     {
       type: 'paragraph',
       children: [{ text: 'A line of text in a paragraph.' }],
     },
-  ];
+  ]
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState<Descendant[]>(initialValue)
   return (
-    <Slate
-      editor={editor}
-      value={value}
-      onChange={setValue}
-    >
+    <Slate editor={editor} value={value} onChange={setValue}>
       <Editable />
     </Slate>
   )
@@ -90,7 +86,7 @@ export type HeadingElement = {
 
 export type CustomElement = ParagraphElement | HeadingElement
 
-export type FormattedText = { text: string; bold?: boolean; italic?: boolean }
+export type FormattedText = { text: string; bold?: true }
 
 export type CustomText = FormattedText
 
@@ -113,15 +109,15 @@ Slate needs to support a feature called type discrimination which is available w
 
 Slate also needs a way to allow developers to get their custom types into Slate. This is done through declaration merging which is a feature of an `interface`.
 
-Slate combines a union type and an interface to deliver this feature.
+Slate combines a union type and an interface in order to use both features.
 
 For more information see [Proposal: Add Custom TypeScript Types to Slate](https://github.com/ianstormtaylor/slate/issues/3725)
 
 ## Multiple Document Models
 
-At the moment, Slate supports types for a single document model at a time. For example, it cannot support a full Rich Text Editor for editing documents while also having a different Editor for editing comments.
+At the moment, Slate supports types for a single document model at a time. For example, it cannot support two different Rich Text Editor with different document schemas.
 
-Slate's TypeScript support was designed this way because some improved typing support was better than none. The goal is to support typing for multiple editor definitions in the future but this will depend on community input.
+Slate's TypeScript support was designed this way because typing for one document schema was better than none. The goal is to eventually support typing for multiple editor definitions and there is currently an in progress PR built by the creator of Slate.
 
 One workaround for supporting multiple document models is to create each editor in a separate package and then import them. This hasn't been tested but should work.
 
@@ -133,7 +129,7 @@ Currently there is also support for extending other types but these haven't been
 - `Range`
 - `Point`
 
-Feel free to extend these types but extending these types should be considered experimental.
+Feel free to extend these types but extending these types should be considered experimental. Please report bugs on GitHub issues.
 
 ## TypeScript Examples
 
