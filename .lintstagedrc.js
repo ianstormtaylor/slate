@@ -11,10 +11,9 @@ const escape = require('shell-quote').quote
  */
 
 module.exports = {
-  '*.{ts,tsx,js,json,css,md}': filenames => [
-    ...filenames.map(filename => `prettier --check "${escape([filename])}"`),
+  '*.{ts,tsx,js,jsx,json,css,md}': filenames => [
+    ...filenames.map(filename => `prettier --write "${escape([filename])}"`),
     ...filenames.map(filename => `git add "${filename}"`),
   ],
-  '*.{ts,tsx,js,md}': ['eslint'],
-  '*.{ts,tsx,css,md}': ['stylelint'],
+  '*.{ts,tsx,js,jsx,json,css,md}': ['eslint --fix'],
 }
