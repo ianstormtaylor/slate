@@ -221,7 +221,6 @@ export const Editable = (props: EditableProps) => {
       )
       scrollIntoView(leafEl, {
         scrollMode: 'if-needed',
-        boundary: el,
       })
       // @ts-ignore
       delete leafEl.getBoundingClientRect

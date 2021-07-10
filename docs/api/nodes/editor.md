@@ -65,11 +65,15 @@ Options:
 
 Get the point after a location.
 
+If there is no point after the location (e.g. we are at the bottom of the document) returns `undefined`.
+
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
 #### `Editor.before(editor: Editor, at: Location, options?) => Point | undefined`
 
 Get the point before a location.
+
+If there is no point before the location (e.g. we are at the top of the document) returns `undefined`.
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
@@ -112,6 +116,8 @@ Get the marks that would be added to text at the current selection.
 #### `Editor.next<T extends Descendant>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document after a location.
+
+Note: If you are looking for the next Point, and not the next Node, you are probably looking for the method `Editor.after`
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
@@ -195,6 +201,8 @@ Options:
 #### `Editor.previous<T extends Node>(editor: Editor, options?) => NodeEntry<T> | undefined`
 
 Get the matching node in the branch of the document before a location.
+
+Note: If you are looking for the previous Point, and not the previous Node, you are probably looking for the method `Editor.before`
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
