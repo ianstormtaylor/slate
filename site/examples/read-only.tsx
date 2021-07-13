@@ -1,9 +1,9 @@
 import React, { useState, useMemo } from 'react'
-import { createEditor, Node } from 'slate'
+import { createEditor, Descendant, Element } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -12,10 +12,14 @@ const ReadOnlyExample = () => {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
-      { text: 'This is editable plain text, just like a <textarea>!' },
+      {
+        text:
+          'This example shows what happens when the Editor is set to readOnly, it is not editable',
+      },
     ],
   },
 ]

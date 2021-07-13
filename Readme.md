@@ -103,16 +103,16 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/plaintext.tsx) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/richtext.tsx) — showing the features you'd expect from a basic editor.
-- [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/markdown-preview.tsx) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/links.tsx) — showing how wrap text in inline nodes with associated data.
-- [**Images**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/images.tsx) — showing how to use void (text-less) nodes to add images.
-- [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/hovering-toolbar.tsx) — showing how a hovering toolbar can be implemented.
-- [**Tables**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/tables.tsx) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/paste-html.tsx) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Mentions**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/mentions.tsx) — showing how to use inline void nodes for simple @-mentions.
-- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/master/site/examples/)
+- [**Plain text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/plaintext.tsx) — showing the most basic case: a glorified `<textarea>`.
+- [**Rich text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/richtext.tsx) — showing the features you'd expect from a basic editor.
+- [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/markdown-preview.tsx) — showing how to add key handlers for Markdown-like shortcuts.
+- [**Links**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/links.tsx) — showing how wrap text in inline nodes with associated data.
+- [**Images**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/images.tsx) — showing how to use void (text-less) nodes to add images.
+- [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/hovering-toolbar.tsx) — showing how a hovering toolbar can be implemented.
+- [**Tables**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/tables.tsx) — showing how to nest blocks to render more advanced components.
+- [**Paste HTML**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/paste-html.tsx) — showing how to use an HTML serializer to handle pasted HTML.
+- [**Mentions**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/mentions.tsx) — showing how to use inline void nodes for simple @-mentions.
+- [**See all the examples...**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/)
 
 If you have an idea for an example that shows a common use case, pull request it!
 
@@ -131,7 +131,9 @@ If even that's not enough, you can always [read the source itself](./packages/sl
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://github.com/loveloki/slate-docs-cn): `v0.57.1`
+- [中文](https://doodlewind.github.io/slate-doc-cn/) (`v0.47`)
+- [中文](https://github.com/loveloki/slate-docs-cn) (`v0.57`)
+- [中文](https://rain120.github.io/athena/zh/slate/Introduction.html) (`v0.59`)
 
 If you're maintaining a translation, feel free to pull request it here!
 
@@ -141,17 +143,17 @@ If you're maintaining a translation, feel free to pull request it here!
 
 Slate's codebase is monorepo managed with [Lerna](https://lerna.js.org/). It consists of a handful of packages—although you won't always use all of them. They are:
 
-| **Package**                                         | **Version**                                                                                                                         | **Size**                                                                                                                                                                                        | **Description**                                  |
-| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
-| [`slate`](./packages/slate)                         | [![](https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6)](./slate/package.json)                         | [![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=size)](https://unpkg.com/slate/dist/slate.min.js)                                                 | Slate's core data model logic.                   |
-| [`slate-history`](./packages/slate-history)         | [![](https://img.shields.io/npm/v/slate-history.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-history/package.json)         | [![](http://img.badgesize.io/https://unpkg.com/slate-history/dist/slate-history.min.js?compression=gzip&label=size)](https://unpkg.com/slate-history/dist/slate-history.min.js)                 | A plugin that adds undo/redo history to Slate.   |
-| [`slate-hyperscript`](./packages/slate-hyperscript) | [![](https://img.shields.io/npm/v/slate-hyperscript.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-hyperscript/package.json) | [![](http://img.badgesize.io/https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js?compression=gzip&label=size)](https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js) | A hyperscript tool to write JSX Slate documents! |
-| [`slate-react`](./packages/slate-react)             | [![](https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=version&colorB=007ec6)](./slate-react/package.json)             | [![](http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=size)](https://unpkg.com/slate-react/dist/slate-react.min.js)                         | React components for rendering Slate editors.    |
+| **Package**                                         |                                                                                                                           **Version** |                                                                                                                                                                                       **Size** | **Description**                                  |
+| :-------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------: | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------- |
+| [`slate`](./packages/slate)                         |                         [![](https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=&colorB=007ec6)](./packages/slate/package.json) |                                                 [![](http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&label=%20)](https://unpkg.com/slate/dist/slate.min.js) | Slate's core data model logic.                   |
+| [`slate-history`](./packages/slate-history)         |         [![](https://img.shields.io/npm/v/slate-history.svg?maxAge=3600&label=&colorB=007ec6)](./packages/slate-history/package.json) |                 [![](http://img.badgesize.io/https://unpkg.com/slate-history/dist/slate-history.min.js?compression=gzip&label=%20)](https://unpkg.com/slate-history/dist/slate-history.min.js) | A plugin that adds undo/redo history to Slate.   |
+| [`slate-hyperscript`](./packages/slate-hyperscript) | [![](https://img.shields.io/npm/v/slate-hyperscript.svg?maxAge=3600&label=&colorB=007ec6)](./packages/slate-hyperscript/package.json) | [![](http://img.badgesize.io/https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js?compression=gzip&label=%20)](https://unpkg.com/slate-hyperscript/dist/slate-hyperscript.min.js) | A hyperscript tool to write JSX Slate documents! |
+| [`slate-react`](./packages/slate-react)             |             [![](https://img.shields.io/npm/v/slate-react.svg?maxAge=3600&label=&colorB=007ec6)](./packages/slate-react/package.json) |                         [![](http://img.badgesize.io/https://unpkg.com/slate-react/dist/slate-react.min.js?compression=gzip&label=%20)](https://unpkg.com/slate-react/dist/slate-react.min.js) | React components for rendering Slate editors.    |
 
 <br />
 
 ### Contributing!
 
-All contributions are super welcome! Check out the [Contributing instructions](./Contributing.md) for more info!
+All contributions are super welcome! Check out the [Contributing instructions](https://docs.slatejs.org/general/contributing) for more info!
 
 Slate is [MIT-licensed](./License.md).

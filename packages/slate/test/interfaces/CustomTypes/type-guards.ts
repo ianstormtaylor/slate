@@ -1,8 +1,8 @@
 import { Element, Text } from 'slate'
-import { BoldCustomText, CustomText, HeadingElement } from './custom-types'
+import { CustomText, HeadingElement } from './custom-types'
 
-export const isBoldText = (text: Text): text is BoldCustomText =>
-  !!(text as BoldCustomText).bold
+export const isBoldText = (text: Text): text is CustomText =>
+  !!(text as CustomText).bold
 
 export const isCustomText = (text: Text): text is CustomText =>
   !!(text as CustomText).placeholder

@@ -101,7 +101,12 @@ export const TextTransforms: TextTransforms = {
       }
 
       if (!hanging) {
-        at = Editor.unhangRange(editor, at, { voids })
+        const [, end] = Range.edges(at)
+        const endOfDoc = Editor.end(editor, [])
+
+        if (!Point.equals(end, endOfDoc)) {
+          at = Editor.unhangRange(editor, at, { voids })
+        }
       }
 
       let [start, end] = Range.edges(at)
@@ -177,7 +182,8 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        if (text.length > 0)
+          editor.apply({ type: 'remove_text', path, offset, text })
       }
 
       for (const pathRef of pathRefs) {
@@ -191,7 +197,8 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        editor.apply({ type: 'remove_text', path, offset, text })
+        if (text.length > 0)
+          editor.apply({ type: 'remove_text', path, offset, text })
       }
 
       if (
@@ -207,7 +214,9 @@ export const TextTransforms: TextTransforms = {
         })
       }
 
-      const point = endRef.unref() || startRef.unref()
+      const point = reverse
+        ? startRef.unref() || endRef.unref()
+        : endRef.unref() || startRef.unref()
 
       if (options.at == null && point) {
         Transforms.select(editor, point)
@@ -476,7 +485,8 @@ export const TextTransforms: TextTransforms = {
       }
 
       const { path, offset } = at
-      editor.apply({ type: 'insert_text', path, offset, text })
+      if (text.length > 0)
+        editor.apply({ type: 'insert_text', path, offset, text })
     })
   },
 }

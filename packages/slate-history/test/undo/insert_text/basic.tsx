@@ -1,5 +1,6 @@
 /** @jsx jsx */
 import { jsx } from '../..'
+import { cloneDeep } from 'lodash'
 
 export const run = editor => {
   editor.insertText('text')
@@ -12,4 +13,4 @@ export const input = (
     </block>
   </editor>
 )
-export const output = input
+export const output = cloneDeep(input)

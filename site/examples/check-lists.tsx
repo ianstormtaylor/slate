@@ -8,7 +8,6 @@ import {
   ReactEditor,
 } from 'slate-react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,

@@ -1,15 +1,16 @@
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,
   Point,
   createEditor,
   Element as SlateElement,
+  Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {
   '*': 'list-item',
@@ -25,7 +26,7 @@ const SHORTCUTS = {
 }
 
 const MarkdownShortcutsExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
@@ -71,7 +72,10 @@ const withShortcuts = editor => {
         })
 
         if (type === 'list-item') {
-          const list = { type: 'bulleted-list', children: [] }
+          const list: BulletedListElement = {
+            type: 'bulleted-list',
+            children: [],
+          }
           Transforms.wrapNodes(editor, list, {
             match: n =>
               !Editor.isEditor(n) &&
@@ -156,7 +160,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
