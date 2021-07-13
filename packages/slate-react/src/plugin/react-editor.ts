@@ -223,9 +223,12 @@ export const ReactEditor = {
 
     return (
       targetEl.closest(`[data-slate-editor]`) === editorEl &&
-      (!editable ||
-        targetEl.isContentEditable ||
-        !!targetEl.getAttribute('data-slate-zero-width'))
+      (!editable || targetEl.isContentEditable
+        ? true
+        : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable only on HTMLElement, and other node will be undefined
+            // this is the core logic that let you can got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
+            targetEl.closest('[contenteditable="false"]') === editorEl) ||
+          !!targetEl.getAttribute('data-slate-zero-width'))
     )
   },
 

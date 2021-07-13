@@ -513,7 +513,12 @@ export const Editable = (props: EditableProps) => {
           }
           data-slate-editor
           data-slate-node="value"
-          contentEditable={readOnly ? undefined : true}
+          // explicitly set this
+          contentEditable={!readOnly}
+          // in some cases, if use a decoration which range are relate with selection to decorate a text node,
+          // then you will select the whole text node when you select part of text
+          // and this magic zIndex="-1" will fix it
+          zindex={-1}
           suppressContentEditableWarning
           ref={ref}
           style={{
