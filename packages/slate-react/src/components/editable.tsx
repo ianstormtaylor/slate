@@ -414,7 +414,6 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !readOnly &&
         !state.isComposing &&
         !state.isUpdatingSelection &&
         !state.isDraggingInternally
