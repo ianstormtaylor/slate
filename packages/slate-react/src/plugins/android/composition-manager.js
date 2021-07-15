@@ -544,6 +544,17 @@ function CompositionManager(editor) {
       const domSelection = getWindow(event.target).getSelection()
       let range = editor.findRange(domSelection)
 
+      if (!range) {
+        // Sometimes on Android, especially when you first click into the editor,
+        // findRange will return null. If we don't return now, then we will
+        // encounter a worse error a few lines down. But the long term
+        // consequences of doing this are not entirely clear. The cursor does
+        // wild things on Android, maybe a result of doing this, but at least
+        // the cursor does something when we have this in there.
+        console.error("Selection was not found.");
+        return;     
+      }
+
       const anchorFix = fixTextAndOffset(
         domSelection.anchorNode.textContent,
         domSelection.anchorOffset
