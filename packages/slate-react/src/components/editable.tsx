@@ -468,6 +468,7 @@ export const Editable = (props: EditableProps) => {
     window.document.addEventListener('selectionchange', onDOMSelectionChange)
 
     return () => {
+      onDOMSelectionChange.cancel();
       window.document.removeEventListener(
         'selectionchange',
         onDOMSelectionChange
