@@ -32,7 +32,7 @@
     "test:inspect": "yarn test --inspect-brk",
     "test:integration": "run-p -r serve cypress:run",
     "watch": "yarn build:rollup --watch",
-    "cypress:run": "cypress run",
+    "cypress:run": "cypress run --browser chrome",
     "cypress:open": "cypress open"
   },
   "devDependencies": {
