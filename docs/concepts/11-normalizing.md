@@ -114,9 +114,17 @@ And now when `normalizeNode` runs, no changes are made, so the document is valid
 
 > 🤖 For the most part you don't need to think about these internals. You can just know that anytime `normalizeNode` is called and you spot an invalid state, you can fix that single invalid state and trust that `normalizeNode` will be called again until the node becomes valid.
 
+## Empty Children Early Constraint Execution
+
+One special normalization executes before all other normalizations and this can be important to keep in mind when writing your normalizers.
+
+Before any of the other normalizations can execute, Slate iterates through all `Element` nodes and makes sure they have at least one child. If it does not, an empty `Text` descendant is created.
+
+This can trip you up when you have custom handling when an `Element` has no children. For example, if a table element has no rows, you may wish to remove the table; however, this will never happen because a `Text` node would automatically be created before that normalization could run.
+
 ## Incorrect Fixes
 
-The one pitfall to avoid however is creating an infinite normalization loop. This can happen if you check for a specific invalid structure, but then **don't** actually fix that structure with the change you make to the node. This results in an infinite loop because the node continues to be flagged as invalid, but it is never fixed properly.
+One pitfall to avoid is creating an infinite normalization loop. This can happen if you check for a specific invalid structure, but then **don't** actually fix that structure with the change you make to the node. This results in an infinite loop because the node continues to be flagged as invalid, but it is never fixed properly.
 
 For example, consider a normalization that ensured `link` elements have a valid `url` property:
 

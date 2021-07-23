@@ -14,7 +14,7 @@
   <a href="http://slatejs.org"><strong>Demo</strong></a> ·
   <a href="#examples"><strong>Examples</strong></a> ·
   <a href="http://docs.slatejs.org"><strong>Documentation</strong></a> ·
-  <a href="./Contributing.md"><strong>Contributing!</strong></a>
+  <a href="#contributing"><strong>Contributing!</strong></a>
 </p>
 <br/>
 
