@@ -13,7 +13,7 @@ describe('Check-lists example', () => {
       .eq(1)
       .should('have.css', 'text-decoration-line', 'line-through')
 
-    // uncheck the checkbox and then test if text is not crossed.
+    // Unchecking the checkboxes should un-cross the corresponding text.
     cy.get('div[data-slate-node="element"]')
       .eq(3)
       .should('contain', 'Criss-cross!')
