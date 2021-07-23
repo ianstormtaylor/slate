@@ -2,7 +2,9 @@ describe('Check-lists example', () => {
   it('checks the bullet when clicked', () => {
     cy.visit('examples/check-lists')
 
-    cy.get('div[data-slate-node="element"]').should('have.length', 6)
+    const slateNodeElement = 'div[data-slate-node="element"]'
+
+    cy.get(slateNodeElement).should('have.length', 6)
 
     cy.get('div[data-slate-node="element"]')
       .eq(3)
