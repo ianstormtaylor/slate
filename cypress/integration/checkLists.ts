@@ -1,4 +1,4 @@
-describe('On check-lists example', () => {
+describe('Check-lists example', () => {
   it('checks the bullet when clicked', () => {
     cy.visit('examples/check-lists')
 
