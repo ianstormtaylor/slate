@@ -1,12 +1,14 @@
 describe('Check-lists example', () => {
-  it('checks the bullet when clicked', () => {
+  beforeEach(() => {
     cy.visit('examples/check-lists')
+  })
 
+  it('checks the bullet when clicked', () => {
     const slateNodeElement = 'div[data-slate-node="element"]'
 
     cy.get(slateNodeElement).should('have.length', 6)
 
-    cy.get('div[data-slate-node="element"]')
+    cy.get(slateNodeElement)
       .eq(3)
       .should('contain', 'Criss-cross!')
       .find('span')
@@ -14,14 +16,14 @@ describe('Check-lists example', () => {
       .should('have.css', 'text-decoration-line', 'line-through')
 
     // Unchecking the checkboxes should un-cross the corresponding text.
-    cy.get('div[data-slate-node="element"]')
+    cy.get(slateNodeElement)
       .eq(3)
       .should('contain', 'Criss-cross!')
       .find('span')
       .eq(0)
       .find('input')
       .uncheck()
-      .get('div[data-slate-node="element"]')
+      .get(slateNodeElement)
       .eq(3)
       .should('contain', 'Criss-cross!')
       .find('span')
