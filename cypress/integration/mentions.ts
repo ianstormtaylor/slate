@@ -1,5 +1,5 @@
 describe('mentions example', () => {
-  before(() => cy.visit('examples/mentions'))
+  beforeEach(() => cy.visit('examples/mentions'))
 
   it('renders mention element', () => {
     cy.findByRole('textbox')

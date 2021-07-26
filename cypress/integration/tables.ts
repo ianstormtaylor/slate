@@ -1,7 +1,9 @@
 describe('table example', () => {
-  it('table tag rendered', () => {
+  beforeEach(() => {
     cy.visit('examples/tables')
+  })
 
+  it('table tag rendered', () => {
     cy.findByRole('textbox')
       .get('table')
       .should('exist')

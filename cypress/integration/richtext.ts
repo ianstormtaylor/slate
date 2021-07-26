@@ -1,5 +1,5 @@
 describe('On richtext example', () => {
-  before(() => cy.visit('examples/richtext'))
+  beforeEach(() => cy.visit('examples/richtext'))
 
   it('renders rich text', () => {
     cy.findByRole('textbox')
