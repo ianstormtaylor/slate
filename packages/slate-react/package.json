@@ -24,6 +24,8 @@
     "tiny-invariant": "1.0.6"
   },
   "devDependencies": {
+    "jsdom": "^16.6.0",
+    "react-test-renderer": ">=16.8.0",
     "slate": "^0.63.0",
     "slate-hyperscript": "^0.62.0"
   },
