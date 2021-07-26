@@ -17,7 +17,7 @@ describe('mentions example', () => {
       .should('exist')
   })
 
-  it('insert on enter from list', () => {
+  it('inserts on enter from list', () => {
     cy.findByRole('textbox')
       .type('{movetoend}')
       .type(' @Ja')
