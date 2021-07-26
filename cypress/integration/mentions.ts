@@ -3,9 +3,9 @@ describe('mentions example', () => {
 
   it('renders mention element', () => {
     cy.findByRole('textbox')
-      .get('[data-cy=mention-R2-D2')
+      .dataCy('mention-R2-D2')
       .should('exist')
-      .get('[data-cy=mention-Mace-Windu]')
+      .dataCy('mention-Mace-Windu')
       .should('exist')
   })
 
@@ -13,7 +13,7 @@ describe('mentions example', () => {
     cy.findByRole('textbox')
       .type('{movetoend}')
       .type(' @ma')
-      .get('[data-cy=mentions-portal]')
+      .dataCy('mentions-portal')
       .should('exist')
   })
 
@@ -22,7 +22,7 @@ describe('mentions example', () => {
       .type('{movetoend}')
       .type(' @Ja')
       .type('{enter}')
-      .get('[data-cy=mention-Jabba]')
+      .dataCy('mention-Jabba')
       .should('exist')
   })
 })
