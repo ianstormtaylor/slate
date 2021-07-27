@@ -202,7 +202,7 @@ function factory(pkg, options = {}) {
 
 export default [
   ...factory(Core),
-  ...factory(History),
-  ...factory(Hyperscript),
+  ...factory(History), 
+  // ...factory(Hyperscript), // 注释掉不需要的两个包
   ...factory(React),
 ]
