@@ -6,8 +6,8 @@ A `Span` is a low-level way to refer to a range using `Element` as the end point
 type Span = [Path, Path]
 ```
 
-- [Static methods](range.md#static-methods)
-  - [Check methods](range.md#check-methods)
+- [Static methods](span.md#static-methods)
+  - [Check methods](span.md#check-methods)
 
 ## Static Methods
 
