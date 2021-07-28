@@ -1,6 +1,5 @@
 describe('On richtext example', () => {
   beforeEach(() => cy.visit('examples/richtext'))
-  // afterEach(() => cy.reload())
 
   it('renders rich text', () => {
     cy.findByRole('textbox')

@@ -1,6 +1,5 @@
 describe('search highlighting', () => {
-  before(() => cy.visit('examples/search-highlighting'))
-  afterEach(() => cy.reload())
+  beforeEach(() => cy.visit('examples/search-highlighting'))
 
   it('highlights the searched text', () => {
     const searchField = 'input[type="search"]'
