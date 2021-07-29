@@ -1,4 +1,4 @@
-describe('On links example', () => {
+describe('Links example', () => {
   beforeEach(() => {
     cy.visit('examples/links')
   })

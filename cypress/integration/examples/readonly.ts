@@ -4,7 +4,9 @@ describe('readonly editor', () => {
   })
 
   it('should not be editable', () => {
-    cy.get('[data-slate-editor="true"]')
+    const slateEditor = '[data-slate-editor="true"]'
+
+    cy.get(slateEditor)
       .should('not.have.attr', 'contentEditable', 'true')
       .should('not.have.attr', 'role', 'textbox')
       .click()
