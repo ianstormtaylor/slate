@@ -9,7 +9,7 @@ describe('On markdown-shortcuts example', () => {
       .should('contain.text', 'A wise quote.')
   })
 
-  it('add list items', () => {
+  it('can add list items', () => {
     cy.findByRole('textbox')
       .find('ul')
       .should('not.exist')
