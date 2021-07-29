@@ -31,7 +31,7 @@ describe('On markdown-shortcuts example', () => {
       .should('contain.text', '3rd Item')
   })
 
-  it('add a h1 item', () => {
+  it('can add a h1 item', () => {
     cy.findByRole('textbox')
       .find('h1')
       .should('not.exist')
