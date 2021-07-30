@@ -2,4 +2,4 @@
 'slate': patch
 ---
 
-Add isElementType utilit to Element interface
+Add isElementType utility to Element interface
