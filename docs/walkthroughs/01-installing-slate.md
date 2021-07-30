@@ -66,7 +66,7 @@ declare module 'slate' {
 }
 ```
 
-```typescript jsx
+```typescript
 // Also you must annotate `useState<Descendant[]>` and the editor's initial value.
 const App = () => {
   const initialValue: CustomElement = []
