@@ -12,13 +12,14 @@ export interface BaseElement {
 }
 
 export type Element = ExtendedType<'Element', BaseElement>
+type DefaultElementType = Element & { type: string }
 
 export interface ElementInterface {
   isAncestor: (value: any) => value is Ancestor
   isElement: (value: any) => value is Element
   isElementList: (value: any) => value is Element[]
   isElementProps: (props: any) => props is Partial<Element>
-  isElementType: <T extends Element = Element & { type: string }>(
+  isElementType: <T extends Element>(
     value: any,
     elementVal: string,
     elementKey?: string
@@ -71,7 +72,7 @@ export const Element: ElementInterface = {
    * Check if a value implements the `Element` interface and has type key
    */
 
-  isElementType: <T extends Element = Element & { type: string }>(
+  isElementType: <T extends Element = DefaultElementType>(
     value: any,
     elementVal: string,
     elementKey: string = 'type'
