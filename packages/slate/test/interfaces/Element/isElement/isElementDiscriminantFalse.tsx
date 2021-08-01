@@ -1,11 +1,11 @@
 import { Element } from 'slate'
 
 export const input = {
-  type: 'paragraph',
+  source: 'heading-large',
   children: [{ text: '' }],
 }
 export const test = value => {
-  return Element.isElementType(value, 'heading-large')
+  return Element.isElementType(value, 'paragraph', 'source')
 }
 
-export const output = true
+export const output = false
