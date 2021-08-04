@@ -65,18 +65,16 @@ const Child = (props: {
         selection={sel}
       />
     )
-  } else {
-    return (
-      <TextComponent
-        decorations={ds}
-        isLast={isLast}
-        parent={parent}
-        renderPlaceholder={renderPlaceholder}
-        renderLeaf={renderLeaf}
-        text={child}
-      />
-    )
-  }
+  return (
+    <TextComponent
+      decorations={ds}
+      isLast={isLast}
+      parent={parent}
+      renderPlaceholder={renderPlaceholder}
+      renderLeaf={renderLeaf}
+      text={child}
+    />
+  )
 }
 
 const useChildren = (props: {
