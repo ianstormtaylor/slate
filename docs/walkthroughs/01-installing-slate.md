@@ -47,10 +47,10 @@ const App = () => {
 
 Of course we haven't rendered anything, so you won't see any changes.
 
-> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` as per the documentation on [TypeScript](../concepts/11-typescript/README.md). The example below also includes the custom types required for the rest of this example.
+> If you are using TypeScript, you will also need to extend the `Editor` with `ReactEditor` and add annotations as per the documentation on [TypeScript](../concepts/12-typescript.md). The example below also includes the custom types required for the rest of this example.
 
 ```typescript
-// TypeScript Users only add this code
+// TypeScript users only add this code
 import { BaseEditor } from 'slate'
 import { ReactEditor } from 'slate-react'
 
@@ -59,10 +59,23 @@ type CustomText = { text: string }
 
 declare module 'slate' {
   interface CustomTypes {
-    Editor: BaseEditor & ReactEditor & HistoryEditor
+    Editor: BaseEditor & ReactEditor
     Element: CustomElement
     Text: CustomText
   }
+}
+```
+
+```typescript jsx
+// Also you must annotate `useState<Descendant[]>` and the editor's initial value.
+const App = () => {
+  const initialValue: CustomElement = []
+  const [value, setValue] = useState<Descendant[]>(initialValue)
+  return (
+    <Slate value={value} onChange={setValue}>
+      ...
+    </Slate>
+  )
 }
 ```
 

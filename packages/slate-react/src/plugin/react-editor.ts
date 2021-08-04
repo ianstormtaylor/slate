@@ -106,6 +106,10 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 
+    // The below exception will always be thrown for iframes because the document inside an iframe
+    // does not inherit it's prototype from the parent document, therefore we return early
+    if (el.ownerDocument !== document) return el.ownerDocument
+
     if (!(root instanceof Document || root instanceof ShadowRoot))
       throw new Error(
         `Unable to find DocumentOrShadowRoot for editor element: ${el}`
@@ -432,7 +436,9 @@ export const ReactEditor = {
     }
 
     // Resolve a Slate range from the DOM range.
-    const range = ReactEditor.toSlateRange(editor, domRange)
+    const range = ReactEditor.toSlateRange(editor, domRange, {
+      exactMatch: false,
+    })
     return range
   },
 
@@ -440,8 +446,14 @@ export const ReactEditor = {
    * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
    */
 
-  toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point {
-    const [nearestNode, nearestOffset] = normalizeDOMPoint(domPoint)
+  toSlatePoint<T extends boolean>(
+    editor: ReactEditor,
+    domPoint: DOMPoint,
+    exactMatch: T
+  ): T extends true ? Point | null : Point {
+    const [nearestNode, nearestOffset] = exactMatch
+      ? domPoint
+      : normalizeDOMPoint(domPoint)
     const parentNode = nearestNode.parentNode as DOMElement
     let textNode: DOMElement | null = null
     let offset = 0
@@ -513,6 +525,9 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
+      if (exactMatch) {
+        return null as T extends true ? Point | null : Point
+      }
       throw new Error(
         `Cannot resolve a Slate point from DOM point: ${domPoint}`
       )
@@ -523,17 +538,21 @@ export const ReactEditor = {
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = ReactEditor.toSlateNode(editor, textNode!)
     const path = ReactEditor.findPath(editor, slateNode)
-    return { path, offset }
+    return { path, offset } as T extends true ? Point | null : Point
   },
 
   /**
    * Find a Slate range from a DOM range or selection.
    */
 
-  toSlateRange(
+  toSlateRange<T extends boolean>(
     editor: ReactEditor,
-    domRange: DOMRange | DOMStaticRange | DOMSelection
-  ): Range {
+    domRange: DOMRange | DOMStaticRange | DOMSelection,
+    options: {
+      exactMatch: T
+    }
+  ): T extends true ? Range | null : Range {
+    const { exactMatch } = options
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
@@ -580,12 +599,25 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset])
+    const anchor = ReactEditor.toSlatePoint(
+      editor,
+      [anchorNode, anchorOffset],
+      exactMatch
+    )
+    if (!anchor) {
+      return null as T extends true ? Range | null : Range
+    }
+
     const focus = isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset])
+      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], exactMatch)
+    if (!focus) {
+      return null as T extends true ? Range | null : Range
+    }
 
-    return { anchor, focus }
+    return ({ anchor, focus } as unknown) as T extends true
+      ? Range | null
+      : Range
   },
 
   hasRange(editor: ReactEditor, range: Range): boolean {

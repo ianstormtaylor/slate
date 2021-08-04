@@ -106,7 +106,9 @@ export const createEditor = (): Editor => {
           }
 
           editor.marks = marks
-          editor.onChange()
+          if (!FLUSHING.get(editor)) {
+            editor.onChange()
+          }
         }
       }
     },
@@ -224,8 +226,10 @@ export const createEditor = (): Editor => {
       let n = 0
 
       for (let i = 0; i < node.children.length; i++, n++) {
+        const currentNode = Node.get(editor, path)
+        if (Text.isText(currentNode)) continue
         const child = node.children[i] as Descendant
-        const prev = node.children[i - 1] as Descendant
+        const prev = currentNode.children[n - 1] as Descendant
         const isLast = i === node.children.length - 1
         const isInlineOrText =
           Text.isText(child) ||
@@ -294,7 +298,9 @@ export const createEditor = (): Editor => {
           const marks = { ...(Editor.marks(editor) || {}) }
           delete marks[key]
           editor.marks = marks
-          editor.onChange()
+          if (!FLUSHING.get(editor)) {
+            editor.onChange()
+          }
         }
       }
     },

@@ -8,6 +8,7 @@ import ErrorBoundary from 'react-error-boundary'
 import { Icon } from '../../components'
 
 import CheckLists from '../../examples/check-lists'
+import CodeHighlighting from '../../examples/code-highlighting'
 import EditableVoids from '../../examples/editable-voids'
 import Embeds from '../../examples/embeds'
 import ForcedLayout from '../../examples/forced-layout'
@@ -26,6 +27,7 @@ import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
+import CustomPlaceholder from '../../examples/custom-placeholder'
 
 // node
 import { getAllExamples } from '../api'
@@ -34,6 +36,7 @@ const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
   ['Editable Voids', EditableVoids, 'editable-voids'],
   ['Embeds', Embeds, 'embeds'],
+  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
   ['Forced Layout', ForcedLayout, 'forced-layout'],
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
   ['Huge Document', HugeDocument, 'huge-document'],
@@ -50,6 +53,7 @@ const EXAMPLES = [
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
+  ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
 ]
 
 const Header = props => (

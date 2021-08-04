@@ -16,22 +16,34 @@ interface Text {
 
 ### Retrieval methods
 
-#### `Text.matches(text: Text, props: Partial<Text>): boolean`
+#### `Text.matches(text: Text, props: Partial<Text>) => boolean`
 
-Check if a `text` matches a set of `props`.
+Check if `text` matches a set of `props`.
 
-#### `Text.decorations(node: Text, decorations: Range[]): Text[]`
+The way the check works is that it makes sure that (a) all the `props` exist in the `text`, and (b) if it exists, that it exactly matches the properties in the `text`.
+
+If a `props.text` property is passed in, it will be ignored.
+
+If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
+
+#### `Text.decorations(node: Text, decorations: Range[]) => Text[]`
 
 Get the leaves for a text node, given `decorations`.
 
 ### Check methods
 
-#### `Text.equals(text: Text, another: Text, options?): boolean`
+#### `Text.equals(text: Text, another: Text, options?) => boolean`
 
 Check if two text nodes are equal.
 
 Options: `{loose?: boolean}`
 
-#### `Text.isText(value: any): value is Text`
+- `loose?`: When `true`, it checks if the properties of the `Text` object are equal except for the `text` property (i.e. the `String` value of the `Text`). When `false` (default), checks all properties including `text`.
+
+#### `Text.isText(value: any) => value is Text`
 
 Check if a `value` implements the `Text` interface.
+
+#### `Text.isTextList(value: any): value is Text[]`
+
+Check if `value` is an `Array` of only `Text` objects.

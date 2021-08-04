@@ -14,11 +14,11 @@
     "dist/"
   ],
   "dependencies": {
-    "immer": "^7.0.0",
+    "immer": "^8.0.1",
     "is-plain-object": "^3.0.0"
   },
   "devDependencies": {
-    "slate": "^0.62.0",
+    "slate": "^0.63.0",
     "slate-hyperscript": "^0.62.0"
   },
   "peerDependencies": {
