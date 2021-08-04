@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Node, Transforms, createEditor } from 'slate'
+import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
   Editable,
@@ -14,9 +14,10 @@ import { withHistory } from 'slate-history'
 import { css } from 'emotion'
 
 import { Button, Icon, Toolbar } from '../components'
+import { ImageElement } from './custom-types'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
@@ -72,7 +73,7 @@ const withImages = editor => {
 
 const insertImage = (editor, url) => {
   const text = { text: '' }
-  const image = { type: 'image', url, children: [text] }
+  const image: ImageElement = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image)
 }
 
@@ -81,13 +82,13 @@ const Element = props => {
 
   switch (element.type) {
     case 'image':
-      return <ImageElement {...props} />
+      return <Image {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
 }
 
-const ImageElement = ({ attributes, children, element }) => {
+const Image = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -115,7 +116,10 @@ const InsertImageButton = () => {
       onMouseDown={event => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
-        if (!url) return
+        if (url && !isImageUrl(url)) {
+          alert('URL is not an image')
+          return
+        }
         insertImage(editor, url)
       }}
     >
@@ -131,7 +135,7 @@ const isImageUrl = url => {
   return imageExtensions.includes(ext)
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
     type: 'paragraph',
     children: [
@@ -151,7 +155,7 @@ const initialValue = [
     children: [
       {
         text:
-          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
+          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
       },
     ],
   },

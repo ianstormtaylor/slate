@@ -8,7 +8,6 @@ import {
   ReactEditor,
 } from 'slate-react'
 import {
-  Node,
   Editor,
   Transforms,
   Range,
@@ -177,7 +176,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
         className={css`
           flex: 1;
           opacity: ${checked ? 0.666 : 1};
-          text-decoration: ${checked ? 'none' : 'line-through'};
+          text-decoration: ${!checked ? 'none' : 'line-through'};
 
           &:focus {
             outline: none;

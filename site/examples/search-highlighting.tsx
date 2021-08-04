@@ -1,7 +1,7 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, Node, createEditor } from 'slate'
+import { Text, Descendant, createEditor } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
@@ -14,7 +14,7 @@ function clicked(event) {
   c = event.target.value
 }
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState<Node[]>(initialValue)
+  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -105,6 +105,7 @@ function Leaf({ attributes, children, leaf }) {
   return (
     <span
       {...attributes}
+      {...(leaf.highlight && { 'data-cy': 'search-highlighted' })}
       className={css`
         font-weight: ${leaf.bold && 'bold'};
         background-color: ${leaf.highlight && c};
@@ -115,8 +116,9 @@ function Leaf({ attributes, children, leaf }) {
   )
 }
 
-const initialValue = [
+const initialValue: Descendant[] = [
   {
+    type: 'paragraph',
     children: [
       {
         text:
@@ -127,6 +129,7 @@ const initialValue = [
     ],
   },
   {
+    type: 'paragraph',
     children: [
       { text: 'Try it out for yourself by typing in the search box above!' },
     ],
