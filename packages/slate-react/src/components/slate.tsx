@@ -23,16 +23,8 @@ export const Slate = (props: {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
   const context: [ReactEditor] = useMemo(() => {
-    invariant(
-      Node.isNodeList(value),
-      `[Slate] value is invalid! Expected a list of elements but got: ${JSON.stringify(
-        value
-      )}`
-    )
-    invariant(
-      Editor.isEditor(editor),
-      `[Slate] editor is invalid! you passed: ${JSON.stringify(editor)}`
-    )
+    invariant(Node.isNodeList(value), `[Slate] value is invalid.`)
+    invariant(Editor.isEditor(editor), `[Slate] editor is invalid.`)
 
     editor.children = value
     Object.assign(editor, rest)
