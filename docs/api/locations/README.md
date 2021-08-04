@@ -11,3 +11,4 @@ type Location = Path | Point | Range
 - [Point](./point.md)
 - [PointEntry](./pointe-entry.md)
 - [Range](./range.md)
+- [Span](./span.md)

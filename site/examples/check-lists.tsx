@@ -177,7 +177,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
           flex: 1;
           opacity: ${checked ? 0.666 : 1};
           text-decoration: ${checked ? 'line-through' : 'none'};
-
+          
           &:focus {
             outline: none;
           }
