@@ -65,6 +65,7 @@ const Child = (props: {
         selection={sel}
       />
     )
+  }
   return (
     <TextComponent
       decorations={ds}
