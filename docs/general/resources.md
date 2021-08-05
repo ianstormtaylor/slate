@@ -17,7 +17,6 @@ These extensions and plugins add additional features and capabilities to Slate:
 - [`slate-yjs`](https://github.com/BitPhinix/slate-yjs/) Collaborative editing utilities for Slate leveraging Yjs
 - [`slate-collaborative`](https://github.com/cudr/slate-collaborative) Collaborative editing utilities for Slate leveraging Automerge
 
-
 ## Products
 
 These products use Slate, and can give you an idea of what's possible:
