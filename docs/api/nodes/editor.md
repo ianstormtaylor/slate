@@ -360,7 +360,7 @@ Call a function, deferring normalization until after it completes.
 
 ## Schema-specific instance methods to override
 
-Replace these methods to modify the original behavior of the editor when building [Plugins](https://github.com/ianstormtaylor/slate/tree/a02787539a460fb70730085e26df13cca959fabd/concepts/07-plugins/README.md). When modifying behavior, call the original method when appropriate. For example, a plugin that marks image nodes as "void":
+Replace these methods to modify the original behavior of the editor when building [Plugins](../../concepts/08-plugins.md). When modifying behavior, call the original method when appropriate. For example, a plugin that marks image nodes as "void":
 
 ```javascript
 const withImages = editor => {
