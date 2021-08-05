@@ -106,6 +106,7 @@
     "slate-hyperscript": "*",
     "slate-react": "*",
     "source-map-loader": "^0.2.4",
+    "typescript": "3.9.7"
   },
   "simple-git-hooks": {
     "pre-commit": "yarn lint-staged"
