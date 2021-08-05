@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo, useCallback } from 'react'
+import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import {
   Editor,
   Element,
@@ -112,6 +112,8 @@ export const Editable = (props: EditableProps) => {
     ...attributes
   } = props
   const editor = useSlate()
+  // Rerender editor when composition status changed
+  const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
   // Update internal state on each render.
@@ -370,6 +372,7 @@ export const Editable = (props: EditableProps) => {
               // then we will abort because we're still composing and the selection
               // won't be updated properly.
               // https://www.w3.org/TR/input-events-2/
+              state.isComposing && setIsComposing(false)
               state.isComposing = false
             }
 
@@ -481,7 +484,8 @@ export const Editable = (props: EditableProps) => {
     placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === ''
+    Node.string(editor) === '' &&
+    !isComposing
   ) {
     const start = Editor.start(editor, [])
     decorations.push({
@@ -648,6 +652,7 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionEnd)
               ) {
+                state.isComposing && setIsComposing(false)
                 state.isComposing = false
 
                 // COMPAT: In Chrome, `beforeinput` events for compositions
@@ -667,6 +672,7 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionUpdate)
               ) {
+                !state.isComposing && setIsComposing(true)
                 state.isComposing = true
               }
             },
