@@ -942,6 +942,12 @@ export const NodeTransforms: NodeTransforms = {
           const last = matches[matches.length - 1]
           const [, firstPath] = first
           const [, lastPath] = last
+
+          if (firstPath.length === 0 && lastPath.length === 0) {
+            // if there's no matching parent - usually means the node is an editor - don't do anything
+            continue
+          }
+
           const commonPath = Path.equals(firstPath, lastPath)
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
