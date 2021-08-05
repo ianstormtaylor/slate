@@ -2,4 +2,4 @@
 "slate": patch
 ---
 
-Do not remove empty node in merge operation if it is first children in it's parent.
+Do not remove empty node in merge operation if it is first children in its parent.
