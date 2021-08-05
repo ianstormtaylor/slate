@@ -24,7 +24,7 @@ const ShadowDOM = () => {
     ReactDOM.render(<ShadowEditor />, reactRoot)
   })
 
-  return <div ref={container} />
+  return <div ref={container} data-cy="outer-shadow-root" />
 }
 
 const ShadowEditor = () => {
