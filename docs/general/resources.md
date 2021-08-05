@@ -7,6 +7,7 @@ A few resources that are helpful for building with Slate.
 These libraries are helpful when developing with Slate:
 
 - [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like cmd vs. ctrl keys for you automatically.
+- [`slate-angular`](https://github.com/worktile/slate-angular) is an angular-based view layer, which is a useful supplement to the slate and helps you build a rich text editor using angular.
 
 ## Products
 

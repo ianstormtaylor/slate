@@ -93,7 +93,9 @@ const isImageElement = element => {
 }
 ```
 
-You can define these as one-off functions easily. But you might also bundle them up into namespaces, just like the core interfaces do, and use them instead. For example:
+You can define these as one-off functions easily. But you might also bundle them up into namespaces, just like the core interfaces do, and use them instead.
+
+For example:
 
 ```javascript
 import { Element } from 'slate'

@@ -7,12 +7,12 @@ import {
   createEditor,
   Element,
   Descendant,
+  Range,
 } from 'slate'
 import { css } from 'emotion'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
-import { Range } from 'slate'
 
 const HoveringMenuExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
