@@ -1413,11 +1413,11 @@ __metadata:
   linkType: hard
 
 "@babel/runtime@npm:^7.14.6":
-  version: 7.15.3
-  resolution: "@babel/runtime@npm:7.15.3"
+  version: 7.14.8
+  resolution: "@babel/runtime@npm:7.14.8"
   dependencies:
     regenerator-runtime: ^0.13.4
-  checksum: 2f0b8d2d4e36035ab1d84af0ec26aafa098536870f27c8e07de0a0e398f7a394fdea68a88165535ffb52ded6a68912bdc3450bdf91f229eb132e1c89470789f5
+  checksum: d2dd0ce51ddab78ac93928b04042425145d0dc8cc2b70150d47934f8703f55702eb0b2894f9bd47f66794ad04d8bb03a6a847d0138fbb7aa0b970b5ccd5cc8b7
   languageName: node
   linkType: hard
 
@@ -3057,8 +3057,8 @@ __metadata:
   linkType: hard
 
 "@testing-library/dom@npm:^8.1.0":
-  version: 8.1.1
-  resolution: "@testing-library/dom@npm:8.1.1"
+  version: 8.1.0
+  resolution: "@testing-library/dom@npm:8.1.0"
   dependencies:
     "@babel/code-frame": ^7.10.4
     "@babel/runtime": ^7.12.5
@@ -3068,7 +3068,7 @@ __metadata:
     dom-accessibility-api: ^0.5.6
     lz-string: ^1.4.4
     pretty-format: ^27.0.2
-  checksum: 5eea2b2902d7b88f4e8f9c1641d1f2cef04418cabc1da671bbf73b61402e030d915533dcd87145fadb8b01720ad32d0113aa4f295312c39c7fa0789ddb68f46c
+  checksum: 8d3778b59c08dba4f1ba62823c0dad0990d2fcbd0396fcf0b8a2c4ce7420f8c5adbcae708f8f58a75ead749bd06d9ef4285187763abb18ac464ed47c2f8e332b
   languageName: node
   linkType: hard
 
@@ -5061,9 +5061,9 @@ __metadata:
   linkType: hard
 
 "colorette@npm:^1.2.2":
-  version: 1.3.0
-  resolution: "colorette@npm:1.3.0"
-  checksum: bda403dfba4d032bee4169f2a6436a83ae3da488a53bcb3be92dc44ace056518245cc614b12429d7529493d6b090a119b2523b0d55e8cd6b81ad939a3003c008
+  version: 1.2.2
+  resolution: "colorette@npm:1.2.2"
+  checksum: 69fec14ddaedd0f5b00e4bae40dc4bc61f7050ebdc82983a595d6fd64e650b9dc3c033fff378775683138e992e0ddd8717ac7c7cec4d089679dcfbe3cd921b04
   languageName: node
   linkType: hard
 
