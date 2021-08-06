@@ -6,37 +6,52 @@ A few resources that are helpful for building with Slate.
 
 These libraries are helpful when developing with Slate:
 
-- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like <kbd>cmd</kbd> vs. <kbd>ctrl</kbd> keys for you automatically.
+- [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like cmd vs. ctrl keys for you automatically.
+
+## Extensions and Plugins
+
+These extensions and plugins add additional features and capabilities to Slate:
+
+- [Plate](https://github.com/udecode/plate) Rich text editor plugin system for Slate & React
+- [`slate-angular`](https://github.com/worktile/slate-angular) Angular-based view layer, which is a useful supplement to Slate for building a rich text editor using Angular.
+- [`slate-yjs`](https://github.com/BitPhinix/slate-yjs/) Collaborative editing utilities for Slate leveraging Yjs
+- [`slate-collaborative`](https://github.com/cudr/slate-collaborative) Collaborative editing utilities for Slate leveraging Automerge
 
 ## Products
 
 These products use Slate, and can give you an idea of what's possible:
 
-- [Archbee](https://archbee.io)
+- [Archbee](https://archbee.io/)
 - [Cake](https://www.cake.co/)
-- [Chatterbug](https://chatterbug.com)
+- [Chatterbug](https://chatterbug.com/)
+- [Clause](https://clause.io/)
 - [GitBook](https://www.gitbook.com/)
+- [Discord](https://discord.com/)
 - [Grafana](https://grafana.com/)
-- [Guilded](https://www.guilded.gg)
+- [GraphCMS](https://graphcms.com/)
+- [Guilded](https://www.guilded.gg/)
 - [Guru](https://www.getguru.com/)
-- [Netlify CMS](https://www.netlifycms.org)
-- [Outline](https://www.getoutline.com/)
+- [Kitemaker](https://kitemaker.co/)
+- [Living Spec](https://livingspec.com/)
+- [Netlify CMS](https://www.netlifycms.org/)
 - [Prezly](https://www.prezly.com/)
-- [Sanity.io](https://www.sanity.io)
-- [Slite](https://slite.com)
+- [Sanity.io](https://www.sanity.io/)
+- [Slite](https://slite.com/)
 - [Taskade](https://www.taskade.com/)
+- [TRPG Engine](https://trpg.moonrailgun.com/)
 - [Yuque](https://www.yuque.com/)
-- [Thoughts](https://thoughts.teambition.com)
+- [Thoughts](https://thoughts.teambition.com/)
 
 ## Editors
 
 These pre-packaged editors are built on top of Slate, and can be helpful to see how you might structure your code:
 
+- [Accord Project Markdown Editor](https://github.com/accordproject/web-components) is a WYSIWYG editor for [CommonMark](https://commonmark.org/).
 - [Canner Editor](https://github.com/Canner/canner-slate-editor) is a rich text editor.
 - [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com).
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
 - [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
 - [ORY Editor](https://editor.ory.am/) is a self-contained, inline WYSIWYG editor library.
-- [Outline Editor](https://github.com/outline/rich-markdown-editor) is the editor that powers the [Outline](https://www.getoutline.com/) wiki.
+- [React Force Slate Editor](https://github.com/nareshbhatia/react-force/tree/master/packages/slate-editor) is a light-weight medium-style editor with no editor chrome.
 
-(Or, if you have their exact use case, can be a drop-in editor for you.)
+\(Or, if you have their exact use case, can be a drop-in editor for you.\)

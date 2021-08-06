@@ -44,7 +44,6 @@ const App = () => {
     <Slate
       editor={editor}
       value={value}
-      selection={selection}
       onChange={value => {
         setValue(value)
 

@@ -1,4 +1,4 @@
-# Using Commands
+# Executing Commands
 
 Up until now, everything we've learned has been about how to write one-off logic for your specific Slate editor. But one of the most powerful things about Slate is that it lets you model your specific rich text "domain" however you'd like, and write less one-off code.
 
