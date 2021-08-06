@@ -17,6 +17,7 @@ import useChildren from '../hooks/use-children'
 import Hotkeys from '../utils/hotkeys'
 import {
   HAS_BEFORE_INPUT_SUPPORT,
+  IS_IOS,
   IS_CHROME,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
@@ -659,7 +660,7 @@ export const Editable = (props: EditableProps) => {
                 // aren't correct and never fire the "insertFromComposition"
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && !IS_FIREFOX_LEGACY && event.data) {
+                if (!IS_SAFARI && !IS_FIREFOX_LEGACY && !IS_IOS && event.data) {
                   Editor.insertText(editor, event.data)
                 }
               }
