@@ -57,14 +57,16 @@ const Child = (props: {
 
   if (Element.isElement(child)) {
     return (
-      <ElementComponent
-        decorations={ds}
-        element={child}
-        renderElement={renderElement}
-        renderPlaceholder={renderPlaceholder}
-        renderLeaf={renderLeaf}
-        selection={sel}
-      />
+      <SelectedContext.Provider value={!!sel}>
+        <ElementComponent
+          decorations={ds}
+          element={child}
+          renderElement={renderElement}
+          renderPlaceholder={renderPlaceholder}
+          renderLeaf={renderLeaf}
+          selection={sel}
+        />
+      </SelectedContext.Provider>
     )
   }
   return (

@@ -5,7 +5,6 @@ import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 import Text from './text'
 import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
-import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
