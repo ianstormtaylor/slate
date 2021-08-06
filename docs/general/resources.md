@@ -12,7 +12,7 @@ These libraries are helpful when developing with Slate:
 
 These extensions and plugins add additional features and capabilities to Slate:
 
-- [Plate](https://github.com/@udecode/plate) Rich text editor plugin system for Slate & React
+- [Plate](https://github.com/udecode/plate) Rich text editor plugin system for Slate & React
 - [`slate-angular`](https://github.com/worktile/slate-angular) Angular-based view layer, which is a useful supplement to Slate for building a rich text editor using Angular.
 - [`slate-yjs`](https://github.com/BitPhinix/slate-yjs/) Collaborative editing utilities for Slate leveraging Yjs
 - [`slate-collaborative`](https://github.com/cudr/slate-collaborative) Collaborative editing utilities for Slate leveraging Automerge
