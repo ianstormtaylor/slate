@@ -75,6 +75,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return (
     <span
       {...attributes}
+      {...(leaf.highlight && { 'data-cy': 'search-highlighted' })}
       className={css`
         font-weight: ${leaf.bold && 'bold'};
         background-color: ${leaf.highlight && '#ffeeba'};

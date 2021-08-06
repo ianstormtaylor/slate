@@ -1,6 +1,7 @@
 /** @jsx jsx */
 import { Editor } from 'slate'
 import { jsx } from '../..'
+import { cloneDeep } from 'lodash'
 
 export const run = editor => {
   editor.insertBreak()
@@ -16,4 +17,4 @@ export const input = (
     </block>
   </editor>
 )
-export const output = input
+export const output = cloneDeep(input)

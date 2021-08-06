@@ -116,7 +116,10 @@ const InsertImageButton = () => {
       onMouseDown={event => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
-        if (!url) return
+        if (url && !isImageUrl(url)) {
+          alert('URL is not an image')
+          return
+        }
         insertImage(editor, url)
       }}
     >
@@ -152,7 +155,7 @@ const initialValue: Descendant[] = [
     children: [
       {
         text:
-          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your keyboard and paste it anywhere in the editor!',
+          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
       },
     ],
   },

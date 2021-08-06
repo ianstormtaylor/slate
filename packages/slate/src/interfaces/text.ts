@@ -1,4 +1,5 @@
 import isPlainObject from 'is-plain-object'
+import isEqual from 'fast-deep-equal'
 import { Range } from '..'
 import { ExtendedType } from './custom-types'
 
@@ -35,27 +36,16 @@ export const Text: TextInterface = {
   ): boolean {
     const { loose = false } = options
 
-    for (const key in text) {
-      if (loose && key === 'text') {
-        continue
-      }
+    function omitText(obj: Record<any, any>) {
+      const { text, ...rest } = obj
 
-      if (text[key] !== another[key]) {
-        return false
-      }
+      return rest
     }
 
-    for (const key in another) {
-      if (loose && key === 'text') {
-        continue
-      }
-
-      if (text[key] !== another[key]) {
-        return false
-      }
-    }
-
-    return true
+    return isEqual(
+      loose ? omitText(text) : text,
+      loose ? omitText(another) : another
+    )
   },
 
   /**
@@ -95,7 +85,7 @@ export const Text: TextInterface = {
         continue
       }
 
-      if (text[key] !== props[key]) {
+      if (!text.hasOwnProperty(key) || text[key] !== props[key]) {
         return false
       }
     }

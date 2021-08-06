@@ -381,8 +381,7 @@ export const NodeTransforms: NodeTransforms = {
       const emptyAncestor = Editor.above(editor, {
         at: path,
         mode: 'highest',
-        match: n =>
-          levels.includes(n) && Element.isElement(n) && n.children.length === 1,
+        match: n => levels.includes(n) && hasSingleChildNest(editor, n),
       })
 
       const emptyRef = emptyAncestor && Editor.pathRef(editor, emptyAncestor[1])
@@ -423,9 +422,12 @@ export const NodeTransforms: NodeTransforms = {
       // of merging the two. This is a common rich text editor behavior to
       // prevent losing formatting when deleting entire nodes when you have a
       // hanging selection.
+      // if prevNode is first child in parent,don't remove it.
       if (
         (Element.isElement(prevNode) && Editor.isEmpty(editor, prevNode)) ||
-        (Text.isText(prevNode) && prevNode.text === '')
+        (Text.isText(prevNode) &&
+          prevNode.text === '' &&
+          prevPath[prevPath.length - 1] !== 0)
       ) {
         Transforms.removeNodes(editor, { at: prevPath, voids })
       } else {
@@ -593,17 +595,21 @@ export const NodeTransforms: NodeTransforms = {
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
         const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
+        const endAtEndOfNode = Editor.isEnd(editor, end, end.path)
         Transforms.splitNodes(editor, {
           at: end,
           match,
           mode: splitMode,
           voids,
+          always: !endAtEndOfNode,
         })
+        const startAtStartOfNode = Editor.isStart(editor, start, start.path)
         Transforms.splitNodes(editor, {
           at: start,
           match,
           mode: splitMode,
           voids,
+          always: !startAtStartOfNode,
         })
         at = rangeRef.unref()!
 
@@ -632,7 +638,8 @@ export const NodeTransforms: NodeTransforms = {
           }
 
           if (props[k] !== node[k]) {
-            properties[k] = node[k]
+            // Omit new properties from the old property list rather than set them to undefined
+            if (node.hasOwnProperty(k)) properties[k] = node[k]
             newProperties[k] = props[k]
           }
         }
@@ -938,6 +945,12 @@ export const NodeTransforms: NodeTransforms = {
           const last = matches[matches.length - 1]
           const [, firstPath] = first
           const [, lastPath] = last
+
+          if (firstPath.length === 0 && lastPath.length === 0) {
+            // if there's no matching parent - usually means the node is an editor - don't do anything
+            continue
+          }
+
           const commonPath = Path.equals(firstPath, lastPath)
             ? Path.parent(firstPath)
             : Path.common(firstPath, lastPath)
@@ -961,6 +974,23 @@ export const NodeTransforms: NodeTransforms = {
       }
     })
   },
+}
+
+const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
+  if (Element.isElement(node)) {
+    const element = node as Element
+    if (Editor.isVoid(editor, node)) {
+      return true
+    } else if (element.children.length === 1) {
+      return hasSingleChildNest(editor, element.children[0])
+    } else {
+      return false
+    }
+  } else if (Editor.isEditor(node)) {
+    return false
+  } else {
+    return true
+  }
 }
 
 /**

@@ -1,4 +1,4 @@
-# Locations: Paths, Points, Ranges and Selections
+# Locations
 
 Locations are how you refer to specific places in the document when inserting, deleting, or doing anything else with a Slate editor. There are a few different kinds of location interfaces, each for different use cases.
 
@@ -6,13 +6,13 @@ Locations are how you refer to specific places in the document when inserting, d
 
 Paths are the lowest-level way to refer to a location. Each path is a simple array of numbers that refers to a node in the document tree by its indexes in each of its ancestor nodes down the tree:
 
-```ts
+```typescript
 type Path = number[]
 ```
 
 For example, in this document:
 
-```js
+```javascript
 const editor = {
   children: [
     {
@@ -33,17 +33,16 @@ The leaf text node would have a path of: `[0, 0]`.
 
 Points are slightly more specific than paths, and contain an `offset` into a specific text node. Their interface is:
 
-```ts
+```typescript
 interface Point {
   path: Path
   offset: number
-  [key: string]: unknown
 }
 ```
 
 For example, with that same document, if you wanted to refer to the very first place you could put your cursor it would be:
 
-```js
+```javascript
 const start = {
   path: [0, 0],
   offset: 0,
@@ -52,26 +51,25 @@ const start = {
 
 Or, if you wanted to refer to the end of the sentence:
 
-```js
+```javascript
 const end = {
   path: [0, 0],
   offset: 15,
 }
 ```
 
-It can be helpful to think of points as being "cursors" (or "carets") of a selection.
+It can be helpful to think of points as being "cursors" \(or "carets"\) of a selection.
 
 > 🤖 Points _always_ refer to text nodes! Since they are the only ones with strings that can have cursors.
 
 ## `Range`
 
-Ranges are a way to refer not just to a single point in the document, but to a wider span of content between two points. (An example of a range is when you make a selection.) Their interface is:
+Ranges are a way to refer not just to a single point in the document, but to a wider span of content between two points. \(An example of a range is when you make a selection.\) Their interface is:
 
-```ts
+```typescript
 interface Range {
   anchor: Point
   focus: Point
-  [key: string]: unknown
 }
 ```
 
@@ -81,12 +79,11 @@ An anchor and focus are established by a user interaction. The anchor point isn'
 
 Here's how Mozilla Developer Network explains it:
 
-> A user may make a selection from left to right (in document order) or right to left (reverse of document order). The anchor is where the user began the selection and the focus is where the user ends the selection. If you make a selection with a desktop mouse, the anchor is placed where you pressed the mouse button and the focus is placed where you released the mouse button. Anchor and focus should not be confused with the start and end positions of a selection, since anchor can be placed before the focus or vice versa, depending on the direction you made your selection.
-> — [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
+> A user may make a selection from left to right \(in document order\) or right to left \(reverse of document order\). The anchor is where the user began the selection and the focus is where the user ends the selection. If you make a selection with a desktop mouse, the anchor is placed where you pressed the mouse button and the focus is placed where you released the mouse button. Anchor and focus should not be confused with the start and end positions of a selection, since anchor can be placed before the focus or vice versa, depending on the direction you made your selection. — [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection)
 
 One important distinction is that the anchor and focus points of ranges **always reference the leaf-level text nodes** in a document and never reference elements. This behavior is different than the DOM, but it simplifies working with ranges as there are fewer edge cases for you to handle.
 
-> 🤖 For more info, check out the [`Range` reference](../reference/slate/range.md).
+> 🤖 For more info, check out the [Range API reference](../api/locations/range.md).
 
 ## Selection
 
@@ -94,7 +91,7 @@ Ranges are used in many places in Slate's API when you need to refer to a span o
 
 The selection is a special range that is a property of the top-level `Editor`. For example, say someone has the whole sentence currently selected:
 
-```js
+```javascript
 const editor = {
   selection: {
     anchor: { path: [0, 0], offset: 0 },

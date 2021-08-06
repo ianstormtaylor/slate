@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
-import { RenderLeafProps } from './editable'
+import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 
+// auto-incrementing key for String component, force it refresh to
+// prevent inconsistent rendering by React with IME input
+let keyForString = 0
 /**
  * Individual leaves in a text node with unique formatting.
  */
@@ -12,6 +15,7 @@ const Leaf = (props: {
   isLast: boolean
   leaf: Text
   parent: Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: Text
 }) => {
@@ -20,33 +24,62 @@ const Leaf = (props: {
     isLast,
     text,
     parent,
+    renderPlaceholder,
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
+  const placeholderRef = useRef<HTMLSpanElement | null>(null)
+
+  useEffect(() => {
+    const placeholderEl = placeholderRef?.current
+    const editorEl = document.querySelector<HTMLDivElement>(
+      '[data-slate-editor="true"]'
+    )
+
+    if (!placeholderEl || !editorEl) {
+      return
+    }
+
+    editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
+
+    return () => {
+      editorEl.style.minHeight = 'auto'
+    }
+  }, [placeholderRef, leaf])
+
   let children = (
-    <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
+    <String
+      key={keyForString++}
+      isLast={isLast}
+      leaf={leaf}
+      parent={parent}
+      text={text}
+    />
   )
 
   if (leaf[PLACEHOLDER_SYMBOL]) {
+    const placeholderProps: RenderPlaceholderProps = {
+      children: leaf.placeholder,
+      attributes: {
+        'data-slate-placeholder': true,
+        style: {
+          position: 'absolute',
+          pointerEvents: 'none',
+          width: '100%',
+          maxWidth: '100%',
+          display: 'block',
+          opacity: '0.333',
+          userSelect: 'none',
+          textDecoration: 'none',
+        },
+        contentEditable: false,
+        ref: placeholderRef,
+      },
+    }
+
     children = (
       <React.Fragment>
-        <span
-          contentEditable={false}
-          style={{
-            pointerEvents: 'none',
-            display: 'inline-block',
-            width: '0',
-            maxWidth: '100%',
-            whiteSpace: 'nowrap',
-            opacity: '0.333',
-            userSelect: 'none',
-            fontStyle: 'normal',
-            fontWeight: 'normal',
-            textDecoration: 'none',
-          }}
-        >
-          {leaf.placeholder}
-        </span>
+        {renderPlaceholder(placeholderProps)}
         {children}
       </React.Fragment>
     )
@@ -69,8 +102,10 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
+    next.renderPlaceholder === prev.renderPlaceholder &&
     next.text === prev.text &&
-    Text.matches(next.leaf, prev.leaf)
+    Text.equals(next.leaf, prev.leaf) &&
+    next.leaf[PLACEHOLDER_SYMBOL] === prev.leaf[PLACEHOLDER_SYMBOL]
   )
 })
 
