@@ -16,20 +16,26 @@ describe('code highlighting', () => {
       .should('have.css', 'color', 'rgb(153, 0, 85)')
   })
 
-  it('highlights javascript syntax', () => {
-    const JSCode = 'const slateVar = 30;{enter}'
-    cy.get('select').select('JavaScript') // Select the 'JavaScript' option
+  it(
+    'highlights javascript syntax',
+    {
+      defaultCommandTimeout: 10000, // test was not passing within 4s default
+    },
+    () => {
+      const JSCode = 'const slateVar = 30;{enter}'
+      cy.get('select').select('JavaScript') // Select the 'JavaScript' option
 
-    cy.get(slateEditor)
-      .type('{movetostart}')
-      .type(JSCode) // Type JavaScript code
+      cy.get(slateEditor)
+        .type('{movetostart}')
+        .type(JSCode) // Type JavaScript code
 
-    cy.get(slateEditor)
-      .find('span')
-      .eq(0)
-      .find(leafNode)
-      .eq(0)
-      .should('contain', 'const')
-      .should('have.css', 'color', 'rgb(0, 119, 170)')
-  })
+      cy.get(slateEditor)
+        .find('span')
+        .eq(0)
+        .find(leafNode)
+        .eq(0)
+        .should('contain', 'const')
+        .should('have.css', 'color', 'rgb(0, 119, 170)')
+    }
+  )
 })
