@@ -1,88 +1,120 @@
-import { Node, Path, Range } from '..'
+import { ExtendedType, Node, Path, Range } from '..'
 import isPlainObject from 'is-plain-object'
 
-export type InsertNodeOperation = {
+export type BaseInsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
-  [key: string]: unknown
 }
 
-export type InsertTextOperation = {
+export type InsertNodeOperation = ExtendedType<
+  'InsertNodeOperation',
+  BaseInsertNodeOperation
+>
+
+export type BaseInsertTextOperation = {
   type: 'insert_text'
   path: Path
   offset: number
   text: string
-  [key: string]: unknown
 }
 
-export type MergeNodeOperation = {
+export type InsertTextOperation = ExtendedType<
+  'InsertTextOperation',
+  BaseInsertTextOperation
+>
+
+export type BaseMergeNodeOperation = {
   type: 'merge_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
-  [key: string]: unknown
 }
 
-export type MoveNodeOperation = {
+export type MergeNodeOperation = ExtendedType<
+  'MergeNodeOperation',
+  BaseMergeNodeOperation
+>
+
+export type BaseMoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
-  [key: string]: unknown
 }
 
-export type RemoveNodeOperation = {
+export type MoveNodeOperation = ExtendedType<
+  'MoveNodeOperation',
+  BaseMoveNodeOperation
+>
+
+export type BaseRemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
-  [key: string]: unknown
 }
 
-export type RemoveTextOperation = {
+export type RemoveNodeOperation = ExtendedType<
+  'RemoveNodeOperation',
+  BaseRemoveNodeOperation
+>
+
+export type BaseRemoveTextOperation = {
   type: 'remove_text'
   path: Path
   offset: number
   text: string
-  [key: string]: unknown
 }
 
-export type SetNodeOperation = {
+export type RemoveTextOperation = ExtendedType<
+  'RemoveTextOperation',
+  BaseRemoveTextOperation
+>
+
+export type BaseSetNodeOperation = {
   type: 'set_node'
   path: Path
   properties: Partial<Node>
   newProperties: Partial<Node>
-  [key: string]: unknown
 }
 
-export type SetSelectionOperation =
+export type SetNodeOperation = ExtendedType<
+  'SetNodeOperation',
+  BaseSetNodeOperation
+>
+
+export type BaseSetSelectionOperation =
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: null
       newProperties: Range
     }
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: Partial<Range>
       newProperties: Partial<Range>
     }
   | {
       type: 'set_selection'
-      [key: string]: unknown
       properties: Range
       newProperties: null
     }
 
-export type SplitNodeOperation = {
+export type SetSelectionOperation = ExtendedType<
+  'SetSelectionOperation',
+  BaseSetSelectionOperation
+>
+
+export type BaseSplitNodeOperation = {
   type: 'split_node'
   path: Path
   position: number
-  target: number | null
   properties: Partial<Node>
-  [key: string]: unknown
 }
+
+export type SplitNodeOperation = ExtendedType<
+  'SplitNodeOperation',
+  BaseSplitNodeOperation
+>
 
 export type NodeOperation =
   | InsertNodeOperation
@@ -105,7 +137,16 @@ export type TextOperation = InsertTextOperation | RemoveTextOperation
 
 export type Operation = NodeOperation | SelectionOperation | TextOperation
 
-export const Operation = {
+export interface OperationInterface {
+  isNodeOperation: (value: any) => value is NodeOperation
+  isOperation: (value: any) => value is Operation
+  isOperationList: (value: any) => value is Operation[]
+  isSelectionOperation: (value: any) => value is SelectionOperation
+  isTextOperation: (value: any) => value is TextOperation
+  inverse: (op: Operation) => Operation
+}
+
+export const Operation: OperationInterface = {
   /**
    * Check of a value is a `NodeOperation` object.
    */
@@ -135,7 +176,6 @@ export const Operation = {
       case 'merge_node':
         return (
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           Path.isPath(value.path) &&
           isPlainObject(value.properties)
         )
@@ -166,7 +206,6 @@ export const Operation = {
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          (typeof value.target === 'number' || value.target === null) &&
           isPlainObject(value.properties)
         )
       default:
@@ -180,8 +219,7 @@ export const Operation = {
 
   isOperationList(value: any): value is Operation[] {
     return (
-      Array.isArray(value) &&
-      (value.length === 0 || Operation.isOperation(value[0]))
+      Array.isArray(value) && value.every(val => Operation.isOperation(val))
     )
   },
 
@@ -228,9 +266,18 @@ export const Operation = {
           return op
         }
 
-        // We need to get the original path here, but sometimes the `newPath`
-        // is a younger sibling of (or ends before) the original, and this
-        // accounts for it.
+        // If the move happens completely within a single parent the path and
+        // newPath are stable with respect to each other.
+        if (Path.isSibling(path, newPath)) {
+          return { ...op, path: newPath, newPath: path }
+        }
+
+        // If the move does not happen within a single parent it is possible
+        // for the move to impact the true path to the location where the node
+        // was removed from and where it was inserted. We have to adjust for this
+        // and find the original path. We can accomplish this (only in non-sibling)
+        // moves by looking at the impact of the move operation on the node
+        // after the original move path.
         const inversePath = Path.transform(path, op)!
         const inverseNewPath = Path.transform(Path.next(path), op)!
         return { ...op, path: inversePath, newPath: inverseNewPath }

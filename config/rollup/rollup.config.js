@@ -59,16 +59,6 @@ function configure(pkg, env, target) {
       // https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
       namedExports: {
         esrever: ['reverse'],
-
-        immutable: [
-          'List',
-          'Map',
-          'Record',
-          'OrderedSet',
-          'Set',
-          'Stack',
-          'is',
-        ],
         'react-dom': ['findDOMNode'],
         'react-dom/server': ['renderToStaticMarkup'],
       },
@@ -180,7 +170,7 @@ function configure(pkg, env, target) {
           file: `packages/${pkg.name}/${pkg.module}`,
           format: 'es',
           sourcemap: true,
-        }
+        },
       ],
       // We need to explicitly state which modules are external, meaning that
       // they are present at runtime. In the case of non-UMD configs, this means

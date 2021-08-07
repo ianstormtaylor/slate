@@ -1,0 +1,57 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    name: ${{ matrix.channel }}
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 1
+      matrix:
+        channel:
+          - latest
+          - dev
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Prepare release
+        run: yarn prerelease
+
+      # https://github.com/changesets/action
+      - name: Create release pull request or Publish to npm
+        if: matrix.channel == 'latest'
+        uses: changesets/action@master
+        with:
+          publish: yarn changeset publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
+      - name: Release to @dev channel
+        if: matrix.channel == 'dev'
+        run: |
+          yarn changeset version --snapshot
+          yarn changeset publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

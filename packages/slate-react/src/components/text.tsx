@@ -2,14 +2,15 @@ import React, { useRef } from 'react'
 import { Range, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
-import { ReactEditor, useEditor } from '..'
-import { RenderLeafProps } from './editable'
+import { ReactEditor, useSlateStatic } from '..'
+import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   KEY_TO_ELEMENT,
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
 } from '../utils/weak-maps'
+import { isDecoratorRangeListEqual } from '../utils/range-list'
 
 /**
  * Text.
@@ -19,11 +20,19 @@ const Text = (props: {
   decorations: Range[]
   isLast: boolean
   parent: Element
+  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
 }) => {
-  const { decorations, isLast, parent, renderLeaf, text } = props
-  const editor = useEditor()
+  const {
+    decorations,
+    isLast,
+    parent,
+    renderPlaceholder,
+    renderLeaf,
+    text,
+  } = props
+  const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement>(null)
   const leaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
@@ -36,6 +45,7 @@ const Text = (props: {
       <Leaf
         isLast={isLast && i === leaves.length - 1}
         key={`${key.id}-${i}`}
+        renderPlaceholder={renderPlaceholder}
         leaf={leaf}
         text={text}
         parent={parent}
@@ -68,7 +78,8 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
-    next.text === prev.text
+    next.text === prev.text &&
+    isDecoratorRangeListEqual(next.decorations, prev.decorations)
   )
 })
 
