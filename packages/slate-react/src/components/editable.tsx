@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
 import {
-  Ancestor,
   Editor,
   Element,
   NodeEntry,
