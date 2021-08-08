@@ -47,7 +47,7 @@ The `type` and `url` properties are your custom API. Slate sees that they exist,
 <a href={element.url}>{element.children}</a>
 ```
 
-When getting started with Slate, it's important to understand all of the interfaces it defines. There is a handful of them that are discussed in each of the guides.
+When getting started with Slate, it's important to understand all of the interfaces it defines. There are a handful of interfaces that are discussed in each of the guides.
 
 ## Helper Functions
 
