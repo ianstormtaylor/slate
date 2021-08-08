@@ -24,7 +24,7 @@ interface Element {
 }
 ```
 
-This is a very permissive interface. All it requires is that the `children` property is defined containing the element's child nodes.
+This is a very permissive interface. All it requires is that the `children` property gets defined containing the element's child nodes.
 
 But you can extend elements \(or any other interface\) with your custom properties that are specific to your domain. For example, you might have "paragraph" and "link" elements:
 
