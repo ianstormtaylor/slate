@@ -41,7 +41,7 @@ const link = {
 }
 ```
 
-The `type` and `url` properties there are your custom API. Slate sees that they exist, but it doesn't ever use them for anything. However, when it goes to render a link element you'll receive an object with the custom properties attached so that you can render it as:
+The `type` and `url` properties are your custom API. Slate sees that they exist, but doesn't use them. However, when Slate renders a link element, you'll receive an object with the custom properties attached so that you can render it as:
 
 ```jsx
 <a href={element.url}>{element.children}</a>
