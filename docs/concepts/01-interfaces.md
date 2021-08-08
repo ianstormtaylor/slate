@@ -79,7 +79,7 @@ if (Range.isCollapsed(range)) {
 }
 ```
 
-There are lots of helper functions available for all of the common use cases when working with different interfaces. When getting started it pays to read through them all because you can often simplify complex logic into just a handful of lines of code with them.
+There are many helper functions available for all common use cases when working with different interfaces. When getting started it helps to read through all of them so you can often simplify complex logic into just a handful of lines of code.
 
 ## Custom Helpers
 
