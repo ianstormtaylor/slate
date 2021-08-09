@@ -237,40 +237,43 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           !inputManager.isReconciling.current
         ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
-          if (root !== undefined) {
-            const { activeElement } = root
-            const el = ReactEditor.toDOMNode(editor, editor)
-            const domSelection = root.getSelection()
 
-            if (activeElement === el) {
-              state.latestElement = activeElement
-              IS_FOCUSED.set(editor, true)
-            } else {
-              IS_FOCUSED.delete(editor)
-            }
+          if (root === undefined) {
+            return
+          }
 
-            if (!domSelection) {
-              return Transforms.deselect(editor)
-            }
+          const { activeElement } = root
+          const el = ReactEditor.toDOMNode(editor, editor)
+          const domSelection = root.getSelection()
 
-            const { anchorNode, focusNode } = domSelection
+          if (activeElement === el) {
+            state.latestElement = activeElement
+            IS_FOCUSED.set(editor, true)
+          } else {
+            IS_FOCUSED.delete(editor)
+          }
 
-            const anchorNodeSelectable =
-              hasEditableTarget(editor, anchorNode) ||
-              isTargetInsideVoid(editor, anchorNode)
+          if (!domSelection) {
+            return Transforms.deselect(editor)
+          }
 
-            const focusNodeSelectable =
-              hasEditableTarget(editor, focusNode) ||
-              isTargetInsideVoid(editor, focusNode)
+          const { anchorNode, focusNode } = domSelection
 
-            if (anchorNodeSelectable && focusNodeSelectable) {
-              const range = ReactEditor.toSlateRange(editor, domSelection, {
-                exactMatch: false,
-              })
-              Transforms.select(editor, range)
-            } else {
-              Transforms.deselect(editor)
-            }
+          const anchorNodeSelectable =
+            hasEditableTarget(editor, anchorNode) ||
+            isTargetInsideVoid(editor, anchorNode)
+
+          const focusNodeSelectable =
+            hasEditableTarget(editor, focusNode) ||
+            isTargetInsideVoid(editor, focusNode)
+
+          if (anchorNodeSelectable && focusNodeSelectable) {
+            const range = ReactEditor.toSlateRange(editor, domSelection, {
+              exactMatch: false,
+            })
+            Transforms.select(editor, range)
+          } else {
+            Transforms.deselect(editor)
           }
         }
       } catch {
