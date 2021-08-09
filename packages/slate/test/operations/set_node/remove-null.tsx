@@ -10,6 +10,7 @@ export const input = (
   </editor>
 )
 
+// this is supported for backwards compatibility only; newProperties should omit removed values.
 export const operations = [
   {
     type: 'set_node',
