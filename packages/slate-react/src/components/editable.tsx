@@ -144,7 +144,7 @@ export const Editable = (props: EditableProps) => {
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root.getSelection()
+    const domSelection = root ? root.getSelection() : null
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
@@ -420,38 +420,41 @@ export const Editable = (props: EditableProps) => {
         !state.isDraggingInternally
       ) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
-        const { activeElement } = root
-        const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = root.getSelection()
 
-        if (activeElement === el) {
-          state.latestElement = activeElement
-          IS_FOCUSED.set(editor, true)
-        } else {
-          IS_FOCUSED.delete(editor)
-        }
+        if (root !== undefined) {
+          const { activeElement } = root
+          const el = ReactEditor.toDOMNode(editor, editor)
+          const domSelection = root.getSelection()
 
-        if (!domSelection) {
-          return Transforms.deselect(editor)
-        }
+          if (activeElement === el) {
+            state.latestElement = activeElement
+            IS_FOCUSED.set(editor, true)
+          } else {
+            IS_FOCUSED.delete(editor)
+          }
 
-        const { anchorNode, focusNode } = domSelection
+          if (!domSelection) {
+            return Transforms.deselect(editor)
+          }
 
-        const anchorNodeSelectable =
-          hasEditableTarget(editor, anchorNode) ||
-          isTargetInsideVoid(editor, anchorNode)
+          const { anchorNode, focusNode } = domSelection
 
-        const focusNodeSelectable =
-          hasEditableTarget(editor, focusNode) ||
-          isTargetInsideVoid(editor, focusNode)
+          const anchorNodeSelectable =
+            hasEditableTarget(editor, anchorNode) ||
+            isTargetInsideVoid(editor, anchorNode)
 
-        if (anchorNodeSelectable && focusNodeSelectable) {
-          const range = ReactEditor.toSlateRange(editor, domSelection, {
-            exactMatch: false,
-          })
-          Transforms.select(editor, range)
-        } else {
-          Transforms.deselect(editor)
+          const focusNodeSelectable =
+            hasEditableTarget(editor, focusNode) ||
+            isTargetInsideVoid(editor, focusNode)
+
+          if (anchorNodeSelectable && focusNodeSelectable) {
+            const range = ReactEditor.toSlateRange(editor, domSelection, {
+              exactMatch: false,
+            })
+            Transforms.select(editor, range)
+          } else {
+            Transforms.deselect(editor)
+          }
         }
       }
     }, 100),
@@ -564,7 +567,10 @@ export const Editable = (props: EditableProps) => {
               // itself becomes unfocused, so we want to abort early to allow to
               // editor to stay focused when the tab becomes focused again.
               const root = ReactEditor.findDocumentOrShadowRoot(editor)
-              if (state.latestElement === root.activeElement) {
+              if (
+                root !== undefined &&
+                state.latestElement === root.activeElement
+              ) {
                 return
               }
 
@@ -606,7 +612,7 @@ export const Editable = (props: EditableProps) => {
               // editable element no longer has focus. Refer to:
               // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
               if (IS_SAFARI) {
-                const domSelection = root.getSelection()
+                const domSelection = root ? root.getSelection() : null
                 domSelection?.removeAllRanges()
               }
 
@@ -832,7 +838,10 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const el = ReactEditor.toDOMNode(editor, editor)
                 const root = ReactEditor.findDocumentOrShadowRoot(editor)
-                state.latestElement = root.activeElement
+
+                if (root !== undefined) {
+                  state.latestElement = root.activeElement
+                }
 
                 // COMPAT: If the editor has nested editable elements, the focus
                 // can go to them. In Firefox, this must be prevented because it
