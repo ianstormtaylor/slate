@@ -177,7 +177,7 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root ? root.getSelection() : null
+    const domSelection = root?.getSelection() ?? null
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()

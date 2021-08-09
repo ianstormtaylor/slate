@@ -144,7 +144,7 @@ export const Editable = (props: EditableProps) => {
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root ? root.getSelection() : null
+    const domSelection = root?.getSelection() ?? null
 
     if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
       return
@@ -614,7 +614,7 @@ export const Editable = (props: EditableProps) => {
               // editable element no longer has focus. Refer to:
               // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
               if (IS_SAFARI) {
-                const domSelection = root ? root.getSelection() : null
+                const domSelection = root?.getSelection() ?? null
                 domSelection?.removeAllRanges()
               }
 

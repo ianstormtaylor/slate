@@ -96,7 +96,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       // Make sure the DOM selection state is in sync.
       const { selection } = editor
       const root = ReactEditor.findDocumentOrShadowRoot(editor)
-      const domSelection = root ? root.getSelection() : null
+      const domSelection = root?.getSelection() ?? null
 
       if (!domSelection || !ReactEditor.isFocused(editor)) {
         return
