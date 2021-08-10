@@ -82,7 +82,7 @@ const link = {
 }
 ```
 
-Or maybe you want to give all of your nodes ID an property:
+Or maybe you want to give all of your nodes an ID property:
 
 ```javascript
 const paragraph = {

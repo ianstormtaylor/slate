@@ -45,6 +45,7 @@
   - [PointRef](api/locations/point-ref.md)
   - [Range](api/locations/range.md)
   - [RangeRef](api/locations/range-ref.md)
+  - [Span](api/locations/span.md)
 - [Operation](api/operation.md)
 
 ## Libraries

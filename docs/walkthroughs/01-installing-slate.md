@@ -18,7 +18,7 @@ Once you've installed Slate, you'll need to import it.
 
 ```jsx
 // Import React dependencies.
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -66,7 +66,7 @@ declare module 'slate' {
 }
 ```
 
-```typescript jsx
+```typescript
 // Also you must annotate `useState<Descendant[]>` and the editor's initial value.
 const App = () => {
   const initialValue: CustomElement = []

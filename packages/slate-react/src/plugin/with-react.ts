@@ -97,7 +97,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     }
   }
 
-  e.setFragmentData = (data: DataTransfer) => {
+  e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 
     if (!selection) {
@@ -182,6 +182,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     data.setData('text/html', div.innerHTML)
     data.setData('text/plain', getPlainText(div))
     document.body.removeChild(div)
+    return data
   }
 
   e.insertData = (data: DataTransfer) => {

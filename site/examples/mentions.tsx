@@ -120,6 +120,7 @@ const MentionExample = () => {
               borderRadius: '4px',
               boxShadow: '0 1px 5px rgba(0,0,0,.2)',
             }}
+            data-cy="mentions-portal"
           >
             {chars.map((char, i) => (
               <div
@@ -181,6 +182,7 @@ const Mention = ({ attributes, children, element }) => {
     <span
       {...attributes}
       contentEditable={false}
+      data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={{
         padding: '3px 3px 2px',
         margin: '0 1px',
