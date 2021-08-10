@@ -18,8 +18,11 @@ export const output = (
   <editor>
     <block>
       one
-      <inline>tw</inline>
-      <cursor />
+      <inline>
+        tw
+        <cursor />
+      </inline>
+      <text />
     </block>
   </editor>
 )

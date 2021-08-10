@@ -12,7 +12,11 @@ export interface PathRef {
   unref(): Path | null
 }
 
-export const PathRef = {
+export interface PathRefInterface {
+  transform: (ref: PathRef, op: Operation) => void
+}
+
+export const PathRef: PathRefInterface = {
   /**
    * Transform the path ref's current value by an operation.
    */

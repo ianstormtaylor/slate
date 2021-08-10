@@ -12,7 +12,11 @@ export interface PointRef {
   unref(): Point | null
 }
 
-export const PointRef = {
+export interface PointRefInterface {
+  transform: (ref: PointRef, op: Operation) => void
+}
+
+export const PointRef: PointRefInterface = {
   /**
    * Transform the point ref's current value by an operation.
    */

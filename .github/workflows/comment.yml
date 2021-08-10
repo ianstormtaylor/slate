@@ -1,0 +1,75 @@
+# https://github.com/marketplace/actions/automatic-rebase  (https://github.com/cirrus-actions/rebase)
+name: Comment
+
+on:
+  issue_comment:
+    types:
+      - created
+
+jobs:
+  rebase:
+    name: rebase
+    runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request &&
+      startsWith(github.event.comment.body, '/rebase')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Rebase PR
+        uses: cirrus-actions/rebase@1.3.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release_next:
+    name: release:next
+    runs-on: ubuntu-latest
+    if: |
+      github.event.issue.pull_request &&
+      github.event.sender.login == 'ianstormtaylor' &&
+      startsWith(github.event.comment.body, '/release:next')
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Checkout pull request
+        run: hub pr checkout ${{ github.event.issue.number }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 12.x
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Prepare release
+        run: yarn prerelease
+
+      # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
+      - name: Release to @pr channel
+        run: |
+          yarn changeset version --snapshot
+          yarn changeset publish --tag pr
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Get released version
+        id: version
+        run: echo ::set-output name=version::$(node -p "require('./packages/slate/package.json').version")
+
+      - name: Create comment
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            A new release has been made for this pull request. You can install it with `yarn add slate@${{ steps.version.outputs.version }}`.
