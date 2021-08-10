@@ -363,6 +363,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               ) {
                 event.preventDefault()
                 ReactEditor.setFragmentData(editor, event.clipboardData)
+                slateClipboard.setData(event.clipboardData)
                 const { selection } = editor
 
                 if (selection) {
