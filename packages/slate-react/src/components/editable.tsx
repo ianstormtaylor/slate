@@ -48,6 +48,10 @@ import {
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
+const Children = (props: Parameters<typeof useChildren>[0]) => (
+  <React.Fragment>{useChildren(props)}</React.Fragment>
+)
+
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
@@ -1120,14 +1124,14 @@ export const Editable = (props: EditableProps) => {
             [readOnly, attributes.onPaste]
           )}
         >
-          {useChildren({
-            decorations,
-            node: editor,
-            renderElement,
-            renderPlaceholder,
-            renderLeaf,
-            selection: editor.selection,
-          })}
+          <Children
+            decorations={decorations}
+            node={editor}
+            renderElement={renderElement}
+            renderPlaceholder={renderPlaceholder}
+            renderLeaf={renderLeaf}
+            selection={editor.selection}
+          />
         </Component>
       </DecorateContext.Provider>
     </ReadOnlyContext.Provider>
