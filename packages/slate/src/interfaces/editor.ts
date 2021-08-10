@@ -997,16 +997,18 @@ export const Editor: EditorInterface = {
       */
       for (const dirtyPath of getDirtyPaths(editor)) {
         if (Node.has(editor, dirtyPath)) {
-          const [node, _] = Editor.node(editor, dirtyPath)
+          const entry = Editor.node(editor, dirtyPath)
+          const [node, _] = entry
 
-          // Add a text child to elements with no children.
-          // This is safe to do in any order, by definition it can't cause other paths to change.
+          /*
+            The default normalizer inserts an empty text node in this scenario, but it can be customised.
+            So there is some risk here.
+
+            As long as the normalizer only inserts child nodes for this case it is safe to do in any order;
+            by definition adding children to an empty node can't cause other paths to change.
+          */
           if (Element.isElement(node) && node.children.length === 0) {
-            const child = { text: '' }
-            Transforms.insertNodes(editor, child, {
-              at: dirtyPath.concat(0),
-              voids: true,
-            })
+            editor.normalizeNode(entry)
           }
         }
       }
