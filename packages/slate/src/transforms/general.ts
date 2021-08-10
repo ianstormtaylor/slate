@@ -125,7 +125,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
     case 'remove_node': {
       const { path } = op
+      const index = path[path.length - 1]
+      const parent = Node.parent(editor, path)
+      parent.children.splice(index, 1)
 
+      // Transform all of the points in the value, but if the point was in the
+      // node that was removed we need to update the range or remove it.
       if (selection) {
         for (const [point, key] of Range.points(selection)) {
           const result = Point.transform(point, op)
@@ -137,30 +142,30 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
             let next: NodeEntry<Text> | undefined
 
             for (const [n, p] of Node.texts(editor)) {
-              const comparison = Path.compare(p, path)
-              if (comparison === -1) {
+              if (Path.compare(p, path) === -1) {
                 prev = [n, p]
-              } else if (comparison === 1) {
+              } else {
                 next = [n, p]
                 break
               }
             }
 
-            let prevMoreInCommon = false
+            let preferNext = false
             if (prev && next) {
-              prevMoreInCommon =
-                Path.common(prev[1], path).length >
-                Path.common(next[1], path).length
+              if (Path.equals(next[1], path)) {
+                preferNext = !Path.hasPrevious(next[1])
+              } else {
+                preferNext =
+                  Path.common(prev[1], path).length <
+                  Path.common(next[1], path).length
+              }
             }
 
-            if (prev && prevMoreInCommon) {
+            if (prev && !preferNext) {
               point.path = prev[1]
               point.offset = prev[0].text.length
             } else if (next) {
-              const transformed = Path.transform(next[1], op)
-              Path.isPath(transformed)
-
-              point.path = transformed
+              point.path = next[1]
               point.offset = 0
             } else {
               selection = null
@@ -168,10 +173,6 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
           }
         }
       }
-
-      const index = path[path.length - 1]
-      const parent = Node.parent(editor, path)
-      parent.children.splice(index, 1)
 
       break
     }
