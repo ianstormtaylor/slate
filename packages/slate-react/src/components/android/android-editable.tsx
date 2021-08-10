@@ -96,7 +96,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       // Make sure the DOM selection state is in sync.
       const { selection } = editor
       const root = ReactEditor.findDocumentOrShadowRoot(editor)
-      const domSelection = root?.getSelection() ?? null
+      const domSelection = root.getSelection()
 
       if (!domSelection || !ReactEditor.isFocused(editor)) {
         return
@@ -237,11 +237,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           !inputManager.isReconciling.current
         ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
-
-          if (root === undefined) {
-            return
-          }
-
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
           const domSelection = root.getSelection()
@@ -390,10 +385,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onFocus)
               ) {
                 const root = ReactEditor.findDocumentOrShadowRoot(editor)
-
-                if (root !== undefined) {
-                  state.latestElement = root.activeElement
-                }
+                state.latestElement = root.activeElement
 
                 IS_FOCUSED.set(editor, true)
               }
@@ -416,10 +408,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               // itself becomes unfocused, so we want to abort early to allow to
               // editor to stay focused when the tab becomes focused again.
               const root = ReactEditor.findDocumentOrShadowRoot(editor)
-              if (
-                root !== undefined &&
-                state.latestElement === root.activeElement
-              ) {
+              if (state.latestElement === root.activeElement) {
                 return
               }
 

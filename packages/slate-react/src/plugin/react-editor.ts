@@ -102,9 +102,7 @@ export const ReactEditor = {
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
 
-  findDocumentOrShadowRoot(
-    editor: ReactEditor
-  ): Document | ShadowRoot | undefined {
+  findDocumentOrShadowRoot(editor: ReactEditor): Document | ShadowRoot {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 
@@ -113,7 +111,7 @@ export const ReactEditor = {
     if (el.ownerDocument !== document) return el.ownerDocument
 
     if (!(root instanceof Document || root instanceof ShadowRoot))
-      return undefined
+      return ReactEditor.getWindow(editor).document
 
     // COMPAT: Only Chrome implements the DocumentOrShadowRoot mixin for
     // ShadowRoot; other browsers still implement it on the Document
@@ -150,7 +148,7 @@ export const ReactEditor = {
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, false)
 
-    if (root !== undefined && root.activeElement === el) {
+    if (root.activeElement === el) {
       el.blur()
     }
   },
@@ -164,7 +162,7 @@ export const ReactEditor = {
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     IS_FOCUSED.set(editor, true)
 
-    if (root !== undefined && root.activeElement !== el) {
+    if (root.activeElement !== el) {
       el.focus({ preventScroll: true })
     }
   },
@@ -177,7 +175,7 @@ export const ReactEditor = {
     const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root?.getSelection() ?? null
+    const domSelection = root.getSelection()
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()
