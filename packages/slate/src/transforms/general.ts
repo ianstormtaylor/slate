@@ -150,8 +150,16 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
               }
             }
 
-            const preferNext =
-              prev && next && Path.common(prev[1], path).length === 0
+            let preferNext = false
+            if (prev && next) {
+              if (Path.equals(next[1], path)) {
+                preferNext = !Path.hasPrevious(next[1])
+              } else {
+                preferNext =
+                  Path.common(prev[1], path).length <
+                  Path.common(next[1], path).length
+              }
+            }
 
             if (prev && !preferNext) {
               point.path = prev[1]
