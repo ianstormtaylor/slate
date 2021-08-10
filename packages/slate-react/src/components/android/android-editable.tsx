@@ -36,6 +36,7 @@ import {
 } from '../editable'
 
 import { useAndroidInputManager } from './use-android-input-manager'
+import useClipboard from './use-clipboard'
 
 /**
  * Editable.
@@ -58,6 +59,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
   const inputManager = useAndroidInputManager(ref)
+  const slateClipboard = useClipboard()
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -347,6 +349,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               ) {
                 event.preventDefault()
                 ReactEditor.setFragmentData(editor, event.clipboardData)
+                slateClipboard.setData(event.clipboardData)
               }
             },
             [attributes.onCopy]
@@ -459,7 +462,10 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !readOnly
               ) {
                 event.preventDefault()
-                ReactEditor.insertData(editor, event.clipboardData)
+                const clipboardData = slateClipboard.getData(
+                  event.clipboardData
+                )
+                ReactEditor.insertData(editor, clipboardData)
               }
             },
             [readOnly, attributes.onPaste]
