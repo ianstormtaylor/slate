@@ -1,5 +1,27 @@
 # slate-react
 
+## 0.65.3
+
+### Patch Changes
+
+- [#4175](https://github.com/ianstormtaylor/slate/pull/4175) [`bde6e804`](https://github.com/ianstormtaylor/slate/commit/bde6e80476ee0ba7a14c8c7625b51de9e58bb170) Thanks [@gyh9457](https://github.com/gyh9457)! - Fixed a bug in the memoization logic for the leaves of text nodes.
+
+* [#4394](https://github.com/ianstormtaylor/slate/pull/4394) [`01889807`](https://github.com/ianstormtaylor/slate/commit/0188980796b7a4b23ef2ee9e7e468532c1f5c8c4) Thanks [@jaked](https://github.com/jaked)! - fix bug where decorate is not called on immediate children of editor
+
+- [#4049](https://github.com/ianstormtaylor/slate/pull/4049) [`6c844227`](https://github.com/ianstormtaylor/slate/commit/6c8442272105ec78b88d38efecb7aab9bb4e41de) Thanks [@ulion](https://github.com/ulion)! - Fix ios chrome ime double input issue.
+
+* [#4427](https://github.com/ianstormtaylor/slate/pull/4427) [`3f69a9f3`](https://github.com/ianstormtaylor/slate/commit/3f69a9f3951b5beca77b065aaa5eba0737e68a8e) Thanks [@ben10code](https://github.com/ben10code)! - Fix crash when unmounting an editor rendered within a React portal. The issue was arising at unmount time, because `getRootNode` returned the dettached portal node and it is not an instance of `Document` or `ShadowRoot`. As a fix, `getDocumentOrShadowRoot` has been refactored to return a root node instead of throwing. In sum, this patch fixes a regression bug introduced by https://github.com/ianstormtaylor/slate/pull/3749/
+
+- [#4369](https://github.com/ianstormtaylor/slate/pull/4369) [`c217dbb5`](https://github.com/ianstormtaylor/slate/commit/c217dbb5b9190753298bbc117a49af940a3a0d53) Thanks [@thesunny](https://github.com/thesunny)! - Scroll when inserting new text will now scroll parent scrollables
+
+* [#4333](https://github.com/ianstormtaylor/slate/pull/4333) [`e0776c5c`](https://github.com/ianstormtaylor/slate/commit/e0776c5c923f1fb33a130599e558e6dffdde40f4) Thanks [@dylans](https://github.com/dylans)! - Allow setFragmentData to work without copy/paste or DnD data structure
+
+- [#4421](https://github.com/ianstormtaylor/slate/pull/4421) [`237edc6e`](https://github.com/ianstormtaylor/slate/commit/237edc6ea616c9171611e632e146872a245bdb0e) Thanks [@jaked](https://github.com/jaked)! - fix decorate bug (#4277) without adding extra layers of render tree
+
+* [#4347](https://github.com/ianstormtaylor/slate/pull/4347) [`46c8871c`](https://github.com/ianstormtaylor/slate/commit/46c8871c9cafd3017b2c9afff9b36f0527c2205f) Thanks [@aiwenar](https://github.com/aiwenar)! - Re-render leaf when new properties were added to it
+
+- [#4352](https://github.com/ianstormtaylor/slate/pull/4352) [`4b373dc2`](https://github.com/ianstormtaylor/slate/commit/4b373dc29055a6fb3e2cdb26dd4cd023787603a5) Thanks [@hueyhe](https://github.com/hueyhe)! - Do not display placeholder when composing
+
 ## 0.65.2
 
 ### Patch Changes
