@@ -274,7 +274,7 @@ export const Editable = (props: EditableProps) => {
           type === 'insertText' &&
           selection &&
           Range.isCollapsed(selection) &&
-          // Only do it for single character a-z or space for now.
+          // Only use native character insertion for single characters a-z or space for now.
           // Long-press events (hold a + press 4 = ä) to choose a special character otherwise
           // causes duplicate inserts.
           event.data &&
