@@ -281,7 +281,7 @@ export const Editable = (props: EditableProps) => {
           event.data.length === 1 &&
           /[a-z ]/i.test(event.data) &&
           // Chrome seems to have issues correctly editing the start of nodes.
-          // I see this when there is an inline element, like a link, and you select
+          // When there is an inline element, e.g. a link, and you select
           // right after it (the start of the next node).
           selection.anchor.offset !== 0
         ) {
