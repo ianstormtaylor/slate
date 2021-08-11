@@ -847,7 +847,7 @@ export const NodeTransforms: NodeTransforms = {
       const pathRefs = Array.from(
         matches,
         ([, p]) => Editor.pathRef(editor, p)
-        // unwrapNode will call liftNode which does not support splitting the mode when nested.
+        // unwrapNode will call liftNode which does not support splitting the node when nested.
         // If we do not reverse the order and call it from top to the bottom, it will remove all blocks
         // that wrap target node. So we reverse the order.
       ).reverse()
