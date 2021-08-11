@@ -150,7 +150,18 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
               }
             }
 
-            if (prev) {
+            let preferNext = false
+            if (prev && next) {
+              if (Path.equals(next[1], path)) {
+                preferNext = !Path.hasPrevious(next[1])
+              } else {
+                preferNext =
+                  Path.common(prev[1], path).length <
+                  Path.common(next[1], path).length
+              }
+            }
+
+            if (prev && !preferNext) {
               point.path = prev[1]
               point.offset = prev[0].text.length
             } else if (next) {
