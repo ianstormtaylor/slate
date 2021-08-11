@@ -293,7 +293,7 @@ export const Editable = (props: EditableProps) => {
             native = false
           }
 
-          // and because of the selection moving in `insertText` (create-editor.tx).
+          // and because of the selection moving in `insertText` (create-editor.ts).
           const { anchor } = selection
           const inline = Editor.above(editor, {
             at: anchor,
