@@ -287,7 +287,7 @@ export const Editable = (props: EditableProps) => {
         ) {
           native = true
 
-          // Skip native if there are marks, as that means
+          // Skip native if there are marks, as
           // `insertText` will insert a node, not just text.
           if (editor.marks) {
             native = false
