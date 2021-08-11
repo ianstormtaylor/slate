@@ -18,7 +18,23 @@ export interface ElementInterface {
   isElement: (value: any) => value is Element
   isElementList: (value: any) => value is Element[]
   isElementProps: (props: any) => props is Partial<Element>
+  isElementType: <T extends Element>(
+    value: any,
+    elementVal: string,
+    elementKey?: string
+  ) => value is T
   matches: (element: Element, props: Partial<Element>) => boolean
+}
+
+/**
+ * Shared the function with isElementType utility
+ */
+const isElement = (value: any): value is Element => {
+  return (
+    isPlainObject(value) &&
+    Node.isNodeList(value.children) &&
+    !Editor.isEditor(value)
+  )
 }
 
 export const Element: ElementInterface = {
@@ -34,14 +50,7 @@ export const Element: ElementInterface = {
    * Check if a value implements the `Element` interface.
    */
 
-  isElement(value: any): value is Element {
-    return (
-      isPlainObject(value) &&
-      Node.isNodeList(value.children) &&
-      !Editor.isEditor(value)
-    )
-  },
-
+  isElement,
   /**
    * Check if a value is an array of `Element` objects.
    */
@@ -56,6 +65,19 @@ export const Element: ElementInterface = {
 
   isElementProps(props: any): props is Partial<Element> {
     return (props as Partial<Element>).children !== undefined
+  },
+
+  /**
+   * Check if a value implements the `Element` interface and has elementKey with selected value.
+   * Default it check to `type` key value
+   */
+
+  isElementType: <T extends Element>(
+    value: any,
+    elementVal: string,
+    elementKey: string = 'type'
+  ): value is T => {
+    return isElement(value) && value[elementKey] === elementVal
   },
 
   /**

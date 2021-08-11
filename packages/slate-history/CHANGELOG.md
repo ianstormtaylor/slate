@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.65.3
+
+### Patch Changes
+
+- [#4430](https://github.com/ianstormtaylor/slate/pull/4430) [`748bf750`](https://github.com/ianstormtaylor/slate/commit/748bf7500557507a999796749cef28b0d1eb79d9) Thanks [@TheSpyder](https://github.com/TheSpyder)! - Removed unnecessary (and outdated) dependency on `immer`
+
 ## 0.62.0
 
 ### Minor Changes

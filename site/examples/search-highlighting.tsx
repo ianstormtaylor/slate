@@ -48,8 +48,8 @@ const SearchHighlightingExample = () => {
           <Icon
             className={css`
               position: absolute;
-              top: 0.5em;
-              left: 0.5em;
+              top: 0.3em;
+              left: 0.4em;
               color: #ccc;
             `}
           >
@@ -60,7 +60,7 @@ const SearchHighlightingExample = () => {
             placeholder="Search the text..."
             onChange={e => setSearch(e.target.value)}
             className={css`
-              padding-left: 2em;
+              padding-left: 2.5em;
               width: 100%;
             `}
           />

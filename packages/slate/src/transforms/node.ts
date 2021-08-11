@@ -632,19 +632,23 @@ export const NodeTransforms: NodeTransforms = {
           continue
         }
 
+        let hasChanges = false
+
         for (const k in props) {
           if (k === 'children' || k === 'text') {
             continue
           }
 
           if (props[k] !== node[k]) {
-            // Omit new properties from the old property list rather than set them to undefined
+            hasChanges = true
+            // Omit new properties from the old properties list
             if (node.hasOwnProperty(k)) properties[k] = node[k]
-            newProperties[k] = props[k]
+            // Omit properties that have been removed from the new properties list
+            if (props[k] != null) newProperties[k] = props[k]
           }
         }
 
-        if (Object.keys(newProperties).length !== 0) {
+        if (hasChanges) {
           editor.apply({
             type: 'set_node',
             path,

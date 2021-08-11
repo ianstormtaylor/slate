@@ -17,7 +17,7 @@ export function useAndroidInputManager(node: RefObject<HTMLElement>) {
   const editor = useSlateStatic()
   const [inputManager] = useState(() => new AndroidInputManager(editor))
   const { receivedUserInput, onUserInput } = useTrackUserInput()
-  const timeoutId = useRef<NodeJS.Timeout | null>(null)
+  const timeoutId = useRef<ReturnType<typeof setTimeout> | null>(null)
   const isReconciling = useRef(false)
   const flush = useCallback((mutations: MutationRecord[]) => {
     if (!receivedUserInput.current) {
