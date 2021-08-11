@@ -604,7 +604,7 @@ export const Editable = (props: EditableProps) => {
           onInput={useCallback((event: React.SyntheticEvent) => {
             // Flush native operations, as native events will have propogated
             // and we can correctly compare DOM text values in components
-            // to stop rendering, so that browsers functions like autocorrect
+            // to stop rendering, so that browser functions like autocorrect
             // and spellcheck work as expected.
             flushNativeEvents(editor)
           }, [])}
