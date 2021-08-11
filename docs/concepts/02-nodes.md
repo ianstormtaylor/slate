@@ -72,7 +72,7 @@ const quote = {
 }
 ```
 
-It's important to note that you can use _any_ custom properties you want. The `type` property in that example isn't something Slate knows or cares about. If you were defining your own "link" nodes, you might have a `URL property:
+It's important to note that you can use _any_ custom properties you want. The `type` property in that example isn't something Slate knows or cares about. If you were defining your own "link" nodes, you might have a `url` property:
 
 ```javascript
 const link = {
@@ -104,13 +104,13 @@ But in certain cases, like for links, you might want to make them "inline" flowi
 
 > 🤖 This is a concept borrowed from the DOM's behavior, see [Block Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements) and [Inline Elements](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements).
 
-You can define which nodes are treated as inline nodes by overriding the `editor.isInline` function. \(By default it always returns `false`.\) Note that inline nodes cannot be the first or last child of a parent block, nor can they be next to another inline node in the children's array. Slate will automatically space these with `{ text: '' }` children by default with [`normalizeNode`](11-normalizing.md#built-in-constraints).
+You can define which nodes are treated as inline nodes by overriding the `editor.isInline` function. \(By default it always returns `false`.\) Note that inline nodes cannot be the first or last child of a parent block, nor can they be next to another inline node in the `children` array. Slate will automatically space these with `{ text: '' }` children by default with [`normalizeNode`](11-normalizing.md#built-in-constraints).
 
 Elements can either contain block elements or inline elements intermingled with text nodes as children. But elements **cannot** contain some children that are blocks and some that are inlined.
 
 ## Voids
 
-Similar to blocks and inlines, there is another element-specific behavior you can define depending on your use case: their "void" -ness.
+Similar to blocks and inlines, there is another element-specific behavior you can define depending on your use case: their "void"-ness.
 
 Elements default to being non-void, meaning that their children are fully editable as text. But in some cases, like for images, you want to ensure that Slate doesn't treat their content as editable text, but instead as a black box.
 
