@@ -24,6 +24,7 @@ describe('code highlighting', () => {
     () => {
       const JSCode = 'const slateVar = 30;{enter}'
       cy.get('select').select('JavaScript') // Select the 'JavaScript' option
+      cy.get('select').should('have.value', 'js') // Confirm value to avoid race conditin
 
       cy.get(slateEditor)
         .type('{movetostart}')
@@ -34,8 +35,7 @@ describe('code highlighting', () => {
         .eq(0)
         .find(leafNode)
         .eq(0)
-        // test is failing in CI, but is not actually due to breaking behavior
-        //.should('contain', 'const')
+        .should('contain', 'const')
         .should('have.css', 'color', 'rgb(0, 119, 170)')
     }
   )
