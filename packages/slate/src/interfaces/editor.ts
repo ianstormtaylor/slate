@@ -24,7 +24,11 @@ import {
   POINT_REFS,
   RANGE_REFS,
 } from '../utils/weak-maps'
-import { getWordDistance, getCharacterDistance, split } from '../utils/string'
+import {
+  getWordDistance,
+  getCharacterDistance,
+  splitByCharacterDistance,
+} from '../utils/string'
 import { Descendant } from './node'
 import { Element } from './element'
 
@@ -1378,7 +1382,13 @@ export const Editor: EditorInterface = {
           if (distance === 0) {
             if (blockText === '') break
             distance = calcDistance(blockText, unit, reverse)
-            blockText = split(blockText, distance, reverse)[1]
+            // Split the string at the previously found distance and use the
+            // remaining string for the next iteration.
+            blockText = splitByCharacterDistance(
+              blockText,
+              distance,
+              reverse
+            )[1]
           }
 
           // Advance `leafText` by the current `distance`.

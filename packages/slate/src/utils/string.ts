@@ -167,7 +167,7 @@ export const getWordDistance = (text: string, isRTL = false): number => {
 
   while (text.length > 0) {
     const charDist = getCharacterDistance(text, isRTL)
-    const [char, remaining] = split(text, charDist, isRTL)
+    const [char, remaining] = splitByCharacterDistance(text, charDist, isRTL)
 
     if (isWordCharacter(char, remaining, isRTL)) {
       started = true
@@ -185,14 +185,14 @@ export const getWordDistance = (text: string, isRTL = false): number => {
 }
 
 /**
- * Split a string at a given distance starting from the end when `isRTL` is set
- * to `true`.
+ * Split a string in two parts at a given distance starting from the end when
+ * `isRTL` is set to `true`.
  */
 
-export const split = (
+export const splitByCharacterDistance = (
   str: string,
   dist: number,
-  isRTL = false
+  isRTL?: boolean
 ): [string, string] => {
   if (isRTL) {
     const at = str.length - dist
@@ -220,7 +220,11 @@ const isWordCharacter = (
   // recurse to see if the next one is a word character or not.
   if (CHAMELEON.test(char)) {
     const charDist = getCharacterDistance(remaining, isRTL)
-    const [nextChar, nextRemaining] = split(remaining, charDist, isRTL)
+    const [nextChar, nextRemaining] = splitByCharacterDistance(
+      remaining,
+      charDist,
+      isRTL
+    )
 
     if (isWordCharacter(nextChar, nextRemaining, isRTL)) {
       return true
