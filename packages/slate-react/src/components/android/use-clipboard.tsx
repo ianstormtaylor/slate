@@ -21,8 +21,8 @@ const useClipboard = () => {
            */
           return clipboardDataRef.current
         }
+        clipboardDataRef.current = null
       }
-      clipboardDataRef.current = null
       return nativeDataTransfer
     },
     []
