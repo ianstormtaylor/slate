@@ -22,12 +22,15 @@ export const Slate = (props: {
   const [key, setKey] = useState(0)
   const context: [ReactEditor] = useMemo(() => {
     if (!Node.isNodeList(value)) {
-      throw new Error(`[Slate] value is invalid! Expected a list of elements` + 
-        `but got: ${JSON.stringify(value)}`)
+      throw new Error(
+        `[Slate] value is invalid! Expected a list of elements` +
+          `but got: ${JSON.stringify(value)}`
+      )
     }
     if (!Editor.isEditor(editor)) {
-      throw new Error(`[Slate] editor is invalid! you passed:` +
-      `${JSON.stringify(editor)}`)
+      throw new Error(
+        `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
+      )
     }
     editor.children = value
     Object.assign(editor, rest)
