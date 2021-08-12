@@ -1419,7 +1419,7 @@ export const Editor: EditorInterface = {
 
     // Helper:
     // Return the distance in offsets for a step of size `unit` on given string.
-    function calcDistance(text: string, unit: string, reverse: boolean) {
+    function calcDistance(text: string, unit: string, reverse?: boolean) {
       if (unit === 'character') {
         return getCharacterDistance(text, reverse)
       } else if (unit === 'word') {
