@@ -22,7 +22,7 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
   // BMP: sequenceable codepoint from basic multilingual plane
   // RI: regional indicator
   // KC: keycap
-  // Tag: tag
+  // TAG: tag
   let prev:
     | 'NSEQ'
     | 'MOD'
