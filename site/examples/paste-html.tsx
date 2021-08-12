@@ -58,9 +58,13 @@ export const deserialize = el => {
   ) {
     parent = el.childNodes[0]
   }
-  const children = Array.from(parent.childNodes)
+  let children = Array.from(parent.childNodes)
     .map(deserialize)
     .flat()
+
+  if (children.length === 0) {
+    children = [{ text: '' }]
+  }
 
   if (el.nodeName === 'BODY') {
     return jsx('fragment', {}, children)
