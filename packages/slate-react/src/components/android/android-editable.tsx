@@ -13,6 +13,7 @@ import {
   isDOMElement,
   isDOMNode,
   getDefaultView,
+  getClipboardData,
   isPlainTextOnlyPaste,
 } from '../../utils/dom'
 import {
@@ -36,7 +37,6 @@ import {
 } from '../editable'
 
 import { useAndroidInputManager } from './use-android-input-manager'
-import useClipboard from './use-clipboard'
 
 /**
  * Editable.
@@ -59,7 +59,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const editor = useSlate()
   const ref = useRef<HTMLDivElement>(null)
   const inputManager = useAndroidInputManager(ref)
-  const slateClipboard = useClipboard()
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -455,7 +454,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
               // This unfortunately needs to be handled with paste events instead.
-              event.clipboardData = slateClipboard.getData(event.clipboardData)
+              event.clipboardData = getClipboardData(event.clipboardData)
               if (
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onPaste) &&
