@@ -457,16 +457,14 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
               // This unfortunately needs to be handled with paste events instead.
+              event.clipboardData = slateClipboard.getData(event.clipboardData)
               if (
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onPaste) &&
                 !readOnly
               ) {
                 event.preventDefault()
-                const clipboardData = slateClipboard.getData(
-                  event.clipboardData
-                )
-                ReactEditor.insertData(editor, clipboardData)
+                ReactEditor.insertData(editor, event.clipboardData)
               }
             },
             [readOnly, attributes.onPaste]
