@@ -1,7 +1,7 @@
-describe('On richtext example', () => {
-  it('inserts text when typed', () => {
-    cy.visit('examples/richtext')
+describe('plaintext example', () => {
+  beforeEach(() => cy.visit('examples/plaintext'))
 
+  it('inserts text when typed', () => {
     cy.findByRole('textbox')
       .type('{movetostart}')
       .type('Hello World')

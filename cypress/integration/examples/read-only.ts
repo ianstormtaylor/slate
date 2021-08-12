@@ -1,7 +1,12 @@
 describe('readonly editor', () => {
-  it('should not be editable', () => {
+  beforeEach(() => {
     cy.visit('examples/read-only')
-      .get('[data-slate-editor="true"]')
+  })
+
+  it('should not be editable', () => {
+    const slateEditor = '[data-slate-editor="true"]'
+
+    cy.get(slateEditor)
       .should('not.have.attr', 'contentEditable', 'true')
       .should('not.have.attr', 'role', 'textbox')
       .click()
