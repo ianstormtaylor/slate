@@ -12,6 +12,7 @@ import {
   RenderLeafProps,
   RenderPlaceholderProps,
 } from '../components/editable'
+import { SelectedContext } from './use-selected'
 
 /**
  * Children.
@@ -60,15 +61,17 @@ const useChildren = (props: {
 
     if (Element.isElement(n)) {
       children.push(
-        <ElementComponent
-          decorations={ds}
-          element={n}
-          key={key.id}
-          renderElement={renderElement}
-          renderPlaceholder={renderPlaceholder}
-          renderLeaf={renderLeaf}
-          selection={sel}
-        />
+        <SelectedContext.Provider value={!!sel}>
+          <ElementComponent
+            decorations={ds}
+            element={n}
+            key={key.id}
+            renderElement={renderElement}
+            renderPlaceholder={renderPlaceholder}
+            renderLeaf={renderLeaf}
+            selection={sel}
+          />
+        </SelectedContext.Provider>
       )
     } else {
       children.push(

@@ -5,7 +5,6 @@ import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
 import Text from './text'
 import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
-import { SelectedContext } from '../hooks/use-selected'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
@@ -131,11 +130,7 @@ const Element = (props: {
     }
   })
 
-  return (
-    <SelectedContext.Provider value={!!selection}>
-      {renderElement({ attributes, children, element })}
-    </SelectedContext.Provider>
-  )
+  return renderElement({ attributes, children, element })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
