@@ -32,6 +32,7 @@ const withLayout = editor => {
       }
 
       for (const [child, childPath] of Node.children(editor, path)) {
+        let type: string;
         const slateIndex = childPath[0];
 
         switch (slateIndex) {
