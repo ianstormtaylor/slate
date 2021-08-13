@@ -13235,8 +13235,8 @@ resolve@^2.0.0-next.3:
     react-dom: ">=16.8.0"
     react-test-renderer: ">=16.8.0"
     scroll-into-view-if-needed: ^2.2.20
-    slate: "workspace:*"
-    slate-hyperscript: "workspace:*"
+    slate: ^0.65.3
+    slate-hyperscript: ^0.62.0
     source-map-loader: ^0.2.4
     tiny-invariant: 1.0.6
   peerDependencies:
@@ -13254,7 +13254,7 @@ resolve@^2.0.0-next.3:
     immer: ^8.0.1
     is-plain-object: ^3.0.0
     lodash: ^4.17.21
-    slate-hyperscript: "workspace:*"
+    slate-hyperscript: ^0.62.0
     source-map-loader: ^0.2.4
     tiny-warning: ^1.0.3
   languageName: unknown

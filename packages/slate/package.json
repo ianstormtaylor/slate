@@ -21,7 +21,7 @@
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
     "lodash": "^4.17.21",
-    "slate-hyperscript": "workspace:*",
+    "slate-hyperscript": "^0.62.0",
     "source-map-loader": "^0.2.4"
   },
   "keywords": [
