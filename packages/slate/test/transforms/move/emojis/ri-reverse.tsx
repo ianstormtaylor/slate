@@ -3,7 +3,7 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.delete(editor, { unit: 'character', reverse: true })
+  Transforms.move(editor, { reverse: true })
 }
 export const input = (
   <editor>
@@ -24,6 +24,7 @@ export const output = (
       <inline>
         word
         <cursor />
+        🇫🇷
       </inline>
       <text />
     </block>
