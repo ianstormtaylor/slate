@@ -21,6 +21,7 @@ import {
   IS_CHROME,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
+  IS_QQBROWSER,
   IS_SAFARI,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -714,7 +715,13 @@ export const Editable = (props: EditableProps) => {
                 // aren't correct and never fire the "insertFromComposition"
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && !IS_FIREFOX_LEGACY && !IS_IOS && event.data) {
+                if (
+                  !IS_SAFARI &&
+                  !IS_FIREFOX_LEGACY &&
+                  !IS_IOS &&
+                  !IS_QQBROWSER &&
+                  event.data
+                ) {
                   Editor.insertText(editor, event.data)
                 }
               }
