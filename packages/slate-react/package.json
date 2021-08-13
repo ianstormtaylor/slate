@@ -31,8 +31,8 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",
-    "slate": "^0.65.3",
-    "slate-hyperscript": "^0.62.0",
+    "slate": "workspace:*",
+    "slate-hyperscript": "workspace:*",
     "source-map-loader": "^0.2.4"
   },
   "peerDependencies": {
