@@ -13123,7 +13123,7 @@ resolve@^2.0.0-next.3:
     slate-hyperscript: ^0.62.0
     source-map-loader: ^0.2.4
   peerDependencies:
-    slate: ">=0.55.0"
+    slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
@@ -13136,7 +13136,7 @@ resolve@^2.0.0-next.3:
     slate: ^0.65.3
     source-map-loader: ^0.2.4
   peerDependencies:
-    slate: ">=0.55.0"
+    slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
@@ -13242,7 +13242,7 @@ resolve@^2.0.0-next.3:
   peerDependencies:
     react: ">=16.8.0"
     react-dom: ">=16.8.0"
-    slate: ">=0.55.0"
+    slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
