@@ -1,5 +1,5 @@
 import { ReactEditor } from '../../plugin/react-editor'
-import { Editor, Range, Transforms } from 'slate'
+import { Editor, Range, Transforms, Text } from 'slate'
 
 import { DOMNode } from '../../utils/dom'
 
@@ -102,13 +102,25 @@ export class AndroidInputManager {
   private insertText = (insertedText: TextInsertion[]) => {
     debug('insertText')
 
-    const { selection } = this.editor
+    const { selection, marks } = this.editor
 
     // Insert the batched text diffs
     insertedText.forEach(insertion => {
-      Transforms.insertText(this.editor, insertion.text.insertText, {
-        at: normalizeTextInsertionRange(this.editor, selection, insertion),
-      })
+      const text = insertion.text.insertText
+      const at = normalizeTextInsertionRange(this.editor, selection, insertion)
+      if (marks) {
+        const node = { text, ...marks }
+        Transforms.insertNodes(this.editor, node, {
+          match: Text.isText,
+          at,
+          select: true,
+        })
+        this.editor.marks = null
+      } else {
+        Transforms.insertText(this.editor, text, {
+          at,
+        })
+      }
     })
   }
 
