@@ -13,6 +13,7 @@ import {
   isDOMElement,
   isDOMNode,
   getDefaultView,
+  getClipboardData,
   isPlainTextOnlyPaste,
 } from '../../utils/dom'
 import {
@@ -453,6 +454,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
               // This unfortunately needs to be handled with paste events instead.
+              event.clipboardData = getClipboardData(event.clipboardData)
               if (
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onPaste) &&

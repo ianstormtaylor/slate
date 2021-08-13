@@ -233,3 +233,20 @@ export const getPlainText = (domNode: DOMNode) => {
 
   return text
 }
+
+const catchSlateFragment = /data-slate-fragment="(.+?)"/m
+export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
+  if (!dataTransfer.getData('application/x-slate-fragment')) {
+    const htmlData = dataTransfer.getData('text/html')
+    const [, fragment] = htmlData.match(catchSlateFragment) || []
+    if (fragment) {
+      const clipboardData = new DataTransfer()
+      dataTransfer.types.forEach(type => {
+        clipboardData.setData(type, dataTransfer.getData(type))
+      })
+      clipboardData.setData('application/x-slate-fragment', fragment)
+      return clipboardData
+    }
+  }
+  return dataTransfer
+}
