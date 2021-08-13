@@ -9,7 +9,11 @@ import {
   NATIVE_OPERATIONS,
   flushNativeEvents,
 } from '../utils/native'
-import { isDOMText, getPlainText } from '../utils/dom'
+import {
+  isDOMText,
+  getPlainText,
+  getSlateFragmentAttribute,
+} from '../utils/dom'
 import { findCurrentLineRange } from '../utils/lines'
 
 /**
@@ -213,7 +217,12 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.insertData = (data: DataTransfer) => {
-    const fragment = data.getData('application/x-slate-fragment')
+    /**
+     * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
+     */
+    const fragment =
+      data.getData('application/x-slate-fragment') ||
+      getSlateFragmentAttribute(data)
 
     if (fragment) {
       const decoded = decodeURIComponent(window.atob(fragment))

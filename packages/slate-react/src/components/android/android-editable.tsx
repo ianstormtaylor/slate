@@ -453,8 +453,9 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           )}
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
-              // This unfortunately needs to be handled with paste events instead.
+              // this will make application/x-slate-fragment exist when onPaste attributes is passed
               event.clipboardData = getClipboardData(event.clipboardData)
+              // This unfortunately needs to be handled with paste events instead.
               if (
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onPaste) &&
