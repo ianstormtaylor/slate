@@ -912,6 +912,7 @@ export const Editable = (props: EditableProps) => {
             (event: React.KeyboardEvent<HTMLDivElement>) => {
               if (
                 !readOnly &&
+                !state.isComposing &&
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onKeyDown)
               ) {
