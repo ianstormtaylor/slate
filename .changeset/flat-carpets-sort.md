@@ -2,4 +2,4 @@
 'slate-react': patch
 ---
 
-double ime support for qq browser
+double ime fix for qq browser
