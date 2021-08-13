@@ -131,6 +131,7 @@ export const Editable = (props: EditableProps) => {
   const state = useMemo(
     () => ({
       isComposing: false,
+      hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
@@ -717,6 +718,23 @@ export const Editable = (props: EditableProps) => {
                 if (!IS_SAFARI && !IS_FIREFOX_LEGACY && !IS_IOS && event.data) {
                   Editor.insertText(editor, event.data)
                 }
+
+                if (editor.selection && Range.isCollapsed(editor.selection)) {
+                  const leafPath = editor.selection.anchor.path
+                  const currentTextNode = Node.leaf(editor, leafPath)
+                  if (state.hasInsertPrefixInCompositon) {
+                    state.hasInsertPrefixInCompositon = false
+                    Editor.withoutNormalizing(editor, () => {
+                      // remove prefix added in onCompositionStart
+                      const text = currentTextNode.text.replace(/^\uFEFF/, '')
+                      Transforms.delete(editor, {
+                        distance: currentTextNode.text.length,
+                        reverse: true,
+                      })
+                      Transforms.insertText(editor, text)
+                    })
+                  }
+                }
               }
             },
             [attributes.onCompositionEnd]
@@ -739,9 +757,42 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionStart)
               ) {
-                const { selection } = editor
-                if (selection && Range.isExpanded(selection)) {
-                  Editor.deleteFragment(editor)
+                const { selection, marks } = editor
+                if (selection) {
+                  if (Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                  } else {
+                    const inline = Editor.above(editor, {
+                      match: n => Editor.isInline(editor, n),
+                      mode: 'highest',
+                    })
+                    if (inline) {
+                      const [, inlinePath] = inline
+                      if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                        const point = Editor.after(editor, inlinePath)!
+                        Transforms.setSelection(editor, {
+                          anchor: point,
+                          focus: point,
+                        })
+                      }
+                    }
+                    // insert new node in advance to ensure composition text will insert
+                    // along with final input text
+                    // and add prefix text to avoid this node removed by normalize
+                    if (marks) {
+                      state.hasInsertPrefixInCompositon = true
+                      Transforms.insertNodes(
+                        editor,
+                        {
+                          text: '\uFEFF',
+                          ...marks,
+                        },
+                        {
+                          select: true,
+                        }
+                      )
+                    }
+                  }
                 }
               }
             },
