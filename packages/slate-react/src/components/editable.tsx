@@ -725,7 +725,7 @@ export const Editable = (props: EditableProps) => {
                   if (state.hasInsertPrefixInCompositon) {
                     state.hasInsertPrefixInCompositon = false
                     Editor.withoutNormalizing(editor, () => {
-                      // remove prefix added in onCompositionStart
+                      // remove Unicode BOM prefix added in `onCompositionStart`
                       const text = currentTextNode.text.replace(/^\uFEFF/, '')
                       Transforms.delete(editor, {
                         distance: currentTextNode.text.length,
@@ -761,37 +761,37 @@ export const Editable = (props: EditableProps) => {
                 if (selection) {
                   if (Range.isExpanded(selection)) {
                     Editor.deleteFragment(editor)
-                  } else {
-                    const inline = Editor.above(editor, {
-                      match: n => Editor.isInline(editor, n),
-                      mode: 'highest',
-                    })
-                    if (inline) {
-                      const [, inlinePath] = inline
-                      if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-                        const point = Editor.after(editor, inlinePath)!
-                        Transforms.setSelection(editor, {
-                          anchor: point,
-                          focus: point,
-                        })
+                    return
+                  }
+                  const inline = Editor.above(editor, {
+                    match: n => Editor.isInline(editor, n),
+                    mode: 'highest',
+                  })
+                  if (inline) {
+                    const [, inlinePath] = inline
+                    if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                      const point = Editor.after(editor, inlinePath)!
+                      Transforms.setSelection(editor, {
+                        anchor: point,
+                        focus: point,
+                      })
+                    }
+                  }
+                  // insert new node in advance to ensure composition text will insert
+                  // along with final input text
+                  // add Unicode BOM prefix to avoid normalize removing this node
+                  if (marks) {
+                    state.hasInsertPrefixInCompositon = true
+                    Transforms.insertNodes(
+                      editor,
+                      {
+                        text: '\uFEFF',
+                        ...marks,
+                      },
+                      {
+                        select: true,
                       }
-                    }
-                    // insert new node in advance to ensure composition text will insert
-                    // along with final input text
-                    // and add prefix text to avoid this node removed by normalize
-                    if (marks) {
-                      state.hasInsertPrefixInCompositon = true
-                      Transforms.insertNodes(
-                        editor,
-                        {
-                          text: '\uFEFF',
-                          ...marks,
-                        },
-                        {
-                          select: true,
-                        }
-                      )
-                    }
+                    )
                   }
                 }
               }
