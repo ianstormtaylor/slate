@@ -1,7 +1,5 @@
 import React, { useMemo, useState, useCallback, useEffect } from 'react'
 import { Editor, Node, Element, Descendant } from 'slate'
-import invariant from 'tiny-invariant'
-
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
@@ -23,17 +21,17 @@ export const Slate = (props: {
   const { editor, children, onChange, value, ...rest } = props
   const [key, setKey] = useState(0)
   const context: [ReactEditor] = useMemo(() => {
-    invariant(
-      Node.isNodeList(value),
-      `[Slate] value is invalid! Expected a list of elements but got: ${JSON.stringify(
-        value
-      )}`
-    )
-    invariant(
-      Editor.isEditor(editor),
-      `[Slate] editor is invalid! you passed: ${JSON.stringify(editor)}`
-    )
-
+    if (!Node.isNodeList(value)) {
+      throw new Error(
+        `[Slate] value is invalid! Expected a list of elements` +
+          `but got: ${JSON.stringify(value)}`
+      )
+    }
+    if (!Editor.isEditor(editor)) {
+      throw new Error(
+        `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
+      )
+    }
     editor.children = value
     Object.assign(editor, rest)
     return [editor]

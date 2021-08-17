@@ -1,5 +1,4 @@
 import isPlainObject from 'is-plain-object'
-import { reverse as reverseText } from 'esrever'
 
 import {
   Ancestor,
@@ -25,7 +24,11 @@ import {
   POINT_REFS,
   RANGE_REFS,
 } from '../utils/weak-maps'
-import { getWordDistance, getCharacterDistance } from '../utils/string'
+import {
+  getWordDistance,
+  getCharacterDistance,
+  splitByCharacterDistance,
+} from '../utils/string'
 import { Descendant } from './node'
 import { Element } from './element'
 
@@ -1340,7 +1343,6 @@ export const Editor: EditorInterface = {
             : Editor.start(editor, path)
 
           blockText = Editor.string(editor, { anchor: s, focus: e }, { voids })
-          blockText = reverse ? reverseText(blockText) : blockText
           isNewBlock = true
         }
       }
@@ -1381,8 +1383,14 @@ export const Editor: EditorInterface = {
           // otherwise advance blockText forward by the new `distance`.
           if (distance === 0) {
             if (blockText === '') break
-            distance = calcDistance(blockText, unit)
-            blockText = blockText.slice(distance)
+            distance = calcDistance(blockText, unit, reverse)
+            // Split the string at the previously found distance and use the
+            // remaining string for the next iteration.
+            blockText = splitByCharacterDistance(
+              blockText,
+              distance,
+              reverse
+            )[1]
           }
 
           // Advance `leafText` by the current `distance`.
@@ -1413,11 +1421,11 @@ export const Editor: EditorInterface = {
 
     // Helper:
     // Return the distance in offsets for a step of size `unit` on given string.
-    function calcDistance(text: string, unit: string) {
+    function calcDistance(text: string, unit: string, reverse?: boolean) {
       if (unit === 'character') {
-        return getCharacterDistance(text)
+        return getCharacterDistance(text, reverse)
       } else if (unit === 'word') {
-        return getWordDistance(text)
+        return getWordDistance(text, reverse)
       } else if (unit === 'line' || unit === 'block') {
         return text.length
       }

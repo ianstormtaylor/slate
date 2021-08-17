@@ -58,7 +58,6 @@ function configure(pkg, env, target) {
       // we have to manually specify named exports here for them to work.
       // https://github.com/rollup/rollup-plugin-commonjs#custom-named-exports
       namedExports: {
-        esrever: ['reverse'],
         'react-dom': ['findDOMNode'],
         'react-dom/server': ['renderToStaticMarkup'],
       },

@@ -39,6 +39,10 @@ export const IS_FIREFOX_LEGACY =
     navigator.userAgent
   )
 
+// qq browser
+export const IS_QQBROWSER =
+  typeof navigator !== 'undefined' && /.*QQBrowser/.test(navigator.userAgent)
+
 // Check if DOM is available as React does internally.
 // https://github.com/facebook/react/blob/master/packages/shared/ExecutionEnvironment.js
 export const CAN_USE_DOM = !!(

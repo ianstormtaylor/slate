@@ -233,3 +233,34 @@ export const getPlainText = (domNode: DOMNode) => {
 
   return text
 }
+
+/**
+ * Get x-slate-fragment attribute from data-slate-fragment
+ */
+const catchSlateFragment = /data-slate-fragment="(.+?)"/m
+export const getSlateFragmentAttribute = (
+  dataTransfer: DataTransfer
+): string | void => {
+  const htmlData = dataTransfer.getData('text/html')
+  const [, fragment] = htmlData.match(catchSlateFragment) || []
+  return fragment
+}
+
+/**
+ * Get the x-slate-fragment attribute that exist in text/html data
+ * and append it to the DataTransfer object
+ */
+export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
+  if (!dataTransfer.getData('application/x-slate-fragment')) {
+    const fragment = getSlateFragmentAttribute(dataTransfer)
+    if (fragment) {
+      const clipboardData = new DataTransfer()
+      dataTransfer.types.forEach(type => {
+        clipboardData.setData(type, dataTransfer.getData(type))
+      })
+      clipboardData.setData('application/x-slate-fragment', fragment)
+      return clipboardData
+    }
+  }
+  return dataTransfer
+}

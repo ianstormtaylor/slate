@@ -21,6 +21,7 @@ import {
   IS_CHROME,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
+  IS_QQBROWSER,
   IS_SAFARI,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -131,6 +132,7 @@ export const Editable = (props: EditableProps) => {
   const state = useMemo(
     () => ({
       isComposing: false,
+      hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
@@ -714,8 +716,31 @@ export const Editable = (props: EditableProps) => {
                 // aren't correct and never fire the "insertFromComposition"
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
-                if (!IS_SAFARI && !IS_FIREFOX_LEGACY && !IS_IOS && event.data) {
+                if (
+                  !IS_SAFARI &&
+                  !IS_FIREFOX_LEGACY &&
+                  !IS_IOS &&
+                  !IS_QQBROWSER &&
+                  event.data
+                ) {
                   Editor.insertText(editor, event.data)
+                }
+
+                if (editor.selection && Range.isCollapsed(editor.selection)) {
+                  const leafPath = editor.selection.anchor.path
+                  const currentTextNode = Node.leaf(editor, leafPath)
+                  if (state.hasInsertPrefixInCompositon) {
+                    state.hasInsertPrefixInCompositon = false
+                    Editor.withoutNormalizing(editor, () => {
+                      // remove Unicode BOM prefix added in `onCompositionStart`
+                      const text = currentTextNode.text.replace(/^\uFEFF/, '')
+                      Transforms.delete(editor, {
+                        distance: currentTextNode.text.length,
+                        reverse: true,
+                      })
+                      Transforms.insertText(editor, text)
+                    })
+                  }
                 }
               }
             },
@@ -739,9 +764,42 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionStart)
               ) {
-                const { selection } = editor
-                if (selection && Range.isExpanded(selection)) {
-                  Editor.deleteFragment(editor)
+                const { selection, marks } = editor
+                if (selection) {
+                  if (Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                    return
+                  }
+                  const inline = Editor.above(editor, {
+                    match: n => Editor.isInline(editor, n),
+                    mode: 'highest',
+                  })
+                  if (inline) {
+                    const [, inlinePath] = inline
+                    if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                      const point = Editor.after(editor, inlinePath)!
+                      Transforms.setSelection(editor, {
+                        anchor: point,
+                        focus: point,
+                      })
+                    }
+                  }
+                  // insert new node in advance to ensure composition text will insert
+                  // along with final input text
+                  // add Unicode BOM prefix to avoid normalize removing this node
+                  if (marks) {
+                    state.hasInsertPrefixInCompositon = true
+                    Transforms.insertNodes(
+                      editor,
+                      {
+                        text: '\uFEFF',
+                        ...marks,
+                      },
+                      {
+                        select: true,
+                      }
+                    )
+                  }
                 }
               }
             },
@@ -912,6 +970,7 @@ export const Editable = (props: EditableProps) => {
             (event: React.KeyboardEvent<HTMLDivElement>) => {
               if (
                 !readOnly &&
+                !state.isComposing &&
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onKeyDown)
               ) {
