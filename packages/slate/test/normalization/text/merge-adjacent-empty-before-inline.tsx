@@ -5,7 +5,7 @@ export const input = (
   <editor>
     <block>
       <text>not empty</text>
-      <text a/>
+      <text a />
       <inline>inline</inline>
       <text />
     </block>
