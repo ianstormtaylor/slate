@@ -9,7 +9,7 @@ describe('slate-react', () => {
   describe('Editable', () => {
     describe('decorate', () => {
       // stub out some DOM stuff to avoid crashes
-      before(() => {
+      beforeEach(() => {
         const jsdom = new JSDOM()
         global.window = jsdom.window
         global.document = jsdom.window.document
