@@ -32,26 +32,25 @@ const withLayout = editor => {
       }
 
       for (const [child, childPath] of Node.children(editor, path)) {
-        let type: string;
-        const slateIndex = childPath[0];
-
-        switch (slateIndex) {
-          case 0:
-            type = 'title';
-            enforceType(type);
-            break;
-          case 1:
-            type = 'paragraph';
-            enforceType(type);
-          default:
-            break;
-        }
-
-        function enforceType(type) {
+        let type: string
+        const slateIndex = childPath[0]
+        const enforceType = type => {
           if (SlateElement.isElement(child) && child.type !== type) {
             const newProperties: Partial<SlateElement> = { type }
             Transforms.setNodes(editor, newProperties, { at: childPath })
           }
+        }
+
+        switch (slateIndex) {
+          case 0:
+            type = 'title'
+            enforceType(type)
+            break
+          case 1:
+            type = 'paragraph'
+            enforceType(type)
+          default:
+            break
         }
       }
     }
