@@ -31,7 +31,7 @@ export const output = (
       <text />
       <inline>
         <text />
-        <inline key>
+        <inline key={true}>
           <cursor />
           word
         </inline>

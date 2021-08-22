@@ -18,7 +18,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block key>
+    <block key={true}>
       <text />
     </block>
   </editor>

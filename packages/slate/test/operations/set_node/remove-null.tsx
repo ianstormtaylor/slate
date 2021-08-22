@@ -5,7 +5,7 @@ import { Transforms, Editor } from 'slate'
 export const input = (
   <editor>
     <element>
-      <text key />
+      <text key={true} />
     </element>
   </editor>
 )

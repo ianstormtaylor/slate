@@ -16,7 +16,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text key>
+      <text key={true}>
         <cursor />
         word
       </text>

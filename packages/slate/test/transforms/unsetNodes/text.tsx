@@ -8,7 +8,7 @@ export const run = editor => {
 export const input = (
   <editor>
     <block>
-      <text key>
+      <text key={true}>
         <cursor />
         word
       </text>

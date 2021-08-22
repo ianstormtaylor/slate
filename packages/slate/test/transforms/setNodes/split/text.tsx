@@ -22,7 +22,7 @@ export const output = (
   <editor>
     <block>
       <text>w</text>
-      <text key>
+      <text key={true}>
         <anchor />
         or
         <focus />

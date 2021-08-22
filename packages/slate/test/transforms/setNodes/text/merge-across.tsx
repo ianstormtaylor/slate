@@ -16,7 +16,7 @@ export const input = (
         One
         <anchor />
       </text>
-      <text key>Two</text>
+      <text key={true}>Two</text>
       <text>
         <focus />
         Three
@@ -31,7 +31,7 @@ export const output = (
         One
         <anchor />
       </text>
-      <text key>
+      <text key={true}>
         Two
         <focus />
       </text>

@@ -22,7 +22,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <block key>
+      <block key={true}>
         <cursor />
         word
       </block>

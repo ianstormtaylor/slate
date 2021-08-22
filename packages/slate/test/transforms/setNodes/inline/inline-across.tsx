@@ -33,7 +33,7 @@ export const output = (
   <editor>
     <block>
       <text />
-      <inline key>
+      <inline key={true}>
         <anchor />
         word
       </inline>
@@ -41,7 +41,7 @@ export const output = (
     </block>
     <block>
       <text />
-      <inline key>
+      <inline key={true}>
         another
         <focus />
       </inline>

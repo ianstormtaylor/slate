@@ -12,7 +12,7 @@ export const run = editor => {
 export const input = (
   <editor>
     <block>
-      <text key>
+      <text key={true}>
         w<anchor />
         or
         <focus />d
@@ -23,13 +23,13 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text key>w</text>
+      <text key={true}>w</text>
       <text>
         <anchor />
         or
         <focus />
       </text>
-      <text key>d</text>
+      <text key={true}>d</text>
     </block>
   </editor>
 )

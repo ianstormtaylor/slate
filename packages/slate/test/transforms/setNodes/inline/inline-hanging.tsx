@@ -25,7 +25,7 @@ export const output = (
   <editor>
     <block>
       <text />
-      <inline key>
+      <inline key={true}>
         <anchor />
         word
       </inline>

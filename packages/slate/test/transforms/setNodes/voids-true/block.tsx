@@ -13,7 +13,7 @@ export const run = editor => {
 export const output = (
   <editor>
     <block void>
-      <text key>word</text>
+      <text key={true}>word</text>
     </block>
   </editor>
 )

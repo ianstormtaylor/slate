@@ -25,7 +25,7 @@ export const run = (editor: Editor) => {
 }
 export const input = (
   <editor>
-    <block key>word</block>
+    <block key={true}>word</block>
   </editor>
 )
 export const output = (

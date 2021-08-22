@@ -20,13 +20,13 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text key>
+      <text key={true}>
         <anchor />
         word
       </text>
     </block>
     <block>
-      <text key>
+      <text key={true}>
         a<focus />
         nother
       </text>
