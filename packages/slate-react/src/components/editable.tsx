@@ -511,6 +511,11 @@ export const Editable = (props: EditableProps) => {
     [readOnly]
   )
 
+  const scheduleOnDOMSelectionChange = useCallback(
+    () => setTimeout(onDOMSelectionChange),
+    [onDOMSelectionChange]
+  )
+
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
   // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
@@ -518,15 +523,18 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
-    window.document.addEventListener('selectionchange', onDOMSelectionChange)
+    window.document.addEventListener(
+      'selectionchange',
+      scheduleOnDOMSelectionChange
+    )
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        onDOMSelectionChange
+        scheduleOnDOMSelectionChange
       )
     }
-  }, [onDOMSelectionChange])
+  }, [scheduleOnDOMSelectionChange])
 
   const decorations = decorate([editor, []])
 
