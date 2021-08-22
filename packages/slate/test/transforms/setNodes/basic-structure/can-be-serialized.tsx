@@ -4,7 +4,7 @@ import { Editor, Transforms, Operation } from 'slate'
 import { jsx } from '../../..'
 
 export const run = (editor: Editor) => {
-  Transforms.setNodes(editor, { key: true }, { at: [0] })
+  Transforms.setNodes(editor, { someKey: true }, { at: [0] })
   const [op] = editor.operations
   const roundTrip: Operation = JSON.parse(JSON.stringify(op))
   assert.deepStrictEqual(op, roundTrip)
@@ -18,7 +18,7 @@ export const input = (
 )
 export const output = (
   <editor>
-    <block key={true}>
+    <block someKey>
       <text />
     </block>
   </editor>

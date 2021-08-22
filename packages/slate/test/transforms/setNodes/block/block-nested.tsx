@@ -5,7 +5,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Transforms.setNodes(
     editor,
-    { key: true },
+    { someKey: true },
     { match: n => Editor.isBlock(editor, n) }
   )
 }
@@ -22,7 +22,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <block key={true}>
+      <block someKey>
         <cursor />
         word
       </block>

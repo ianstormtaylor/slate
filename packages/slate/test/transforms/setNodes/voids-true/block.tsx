@@ -8,12 +8,12 @@ export const input = (
   </editor>
 )
 export const run = editor => {
-  Transforms.setNodes(editor, { key: true }, { at: [0, 0], voids: true })
+  Transforms.setNodes(editor, { someKey: true }, { at: [0, 0], voids: true })
 }
 export const output = (
   <editor>
     <block void>
-      <text key={true}>word</text>
+      <text someKey>word</text>
     </block>
   </editor>
 )

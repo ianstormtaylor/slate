@@ -5,7 +5,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Transforms.setNodes(
     editor,
-    { key: true },
+    { someKey: true },
     { match: Text.isText, split: true }
   )
 }
@@ -16,7 +16,7 @@ export const input = (
         One
         <anchor />
       </text>
-      <text key={true}>Two</text>
+      <text someKey>Two</text>
       <text>
         <focus />
         Three
@@ -31,7 +31,7 @@ export const output = (
         One
         <anchor />
       </text>
-      <text key={true}>
+      <text someKey>
         Two
         <focus />
       </text>
