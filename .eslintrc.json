@@ -142,6 +142,12 @@
         "import/no-extraneous-dependencies": "off",
         "import/no-unresolved": "off"
       }
+    },
+    {
+      "files": "**/*.{ts,tsx}",
+      "rules": {
+        "import/named": "off"
+      }
     }
   ]
 }
