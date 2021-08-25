@@ -6,11 +6,11 @@ import {
   ELEMENT_TO_NODE,
   IS_FOCUSED,
   IS_READ_ONLY,
-  KEY_TO_ELEMENT,
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
   EDITOR_TO_WINDOW,
+  EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -241,9 +241,10 @@ export const ReactEditor = {
    */
 
   toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
+    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
-      : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
+      : KEY_TO_ELEMENT?.get(ReactEditor.findKey(editor, node))
 
     if (!domNode) {
       throw new Error(
