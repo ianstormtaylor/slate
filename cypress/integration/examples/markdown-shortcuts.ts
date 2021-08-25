@@ -14,9 +14,14 @@ describe('On markdown-shortcuts example', () => {
       .find('ul')
       .should('not.exist')
 
-    cy.findByRole('textbox').type(
-      '{movetostart}- 1st Item{enter}2nd Item{enter}3rd Item{enter}{backspace}'
-    )
+    cy.findByRole('textbox')
+      // need wait(0) here otherwise the page is not loaded yet correctly
+      .wait(0)
+      .type(
+        '{movetostart}* 1st Item{enter}2nd Item{enter}3rd Item{enter}{backspace}'
+      )
+
+    cy.get('ul > li')
 
     cy.get('ul > li').should('have.length', 3)
 
