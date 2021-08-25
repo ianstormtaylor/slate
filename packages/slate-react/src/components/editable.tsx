@@ -624,52 +624,19 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                // Check if user clicks thrice
-                if (event.detail === 3) {
-                  // Check the closest element block above the selection
-                  const elem = Editor.above(editor, {
-                    at: path,
-                    match: n => Editor.isBlock(editor, n),
-                  })
-                  if (elem) {
-                    // Get all the children of the element above
-                    const children = Node.children(editor, elem[1])
-                    const childrenPath = []
-                    // Loop through the generator of element children and create a list of their respective paths.
-                    for (const [, childPath] of children) {
-                      childrenPath.push(childPath)
-                    }
-                    // Triple-click selection is equal to click and drag from the begining to the end of a block.
-                    // Its anchor will be the first child and focus being the last child of the block.
-                    const anchorPath = childrenPath[0]
-                    const focusPath = childrenPath[childrenPath.length - 1]
-                    // In a triple-click selection, the anchor offset will always be 0 and focus offset will be the end point of the last child of the block.
-                    const { offset: focusOffset } = Editor.end(
-                      editor,
-                      focusPath
-                    )
-                    const range = Editor.range(
-                      editor,
-                      { path: anchorPath, offset: 0 },
-                      { path: focusPath, offset: focusOffset }
-                    )
-                    Transforms.select(editor, range)
-                  }
-                } else {
-                  const start = Editor.start(editor, path)
-                  const end = Editor.end(editor, path)
+                const start = Editor.start(editor, path)
+                const end = Editor.end(editor, path)
 
-                  const startVoid = Editor.void(editor, { at: start })
-                  const endVoid = Editor.void(editor, { at: end })
+                const startVoid = Editor.void(editor, { at: start })
+                const endVoid = Editor.void(editor, { at: end })
 
-                  if (
-                    startVoid &&
-                    endVoid &&
-                    Path.equals(startVoid[1], endVoid[1])
-                  ) {
-                    const range = Editor.range(editor, start)
-                    Transforms.select(editor, range)
-                  }
+                if (
+                  startVoid &&
+                  endVoid &&
+                  Path.equals(startVoid[1], endVoid[1])
+                ) {
+                  const range = Editor.range(editor, start)
+                  Transforms.select(editor, range)
                 }
               }
             },
