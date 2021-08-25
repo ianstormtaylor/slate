@@ -14,9 +14,14 @@ describe('On markdown-shortcuts example', () => {
       .find('ul')
       .should('not.exist')
 
-    cy.findByRole('textbox').type(
-      '{movetostart}- 1st Item{enter}2nd Item{enter}3rd Item{enter}{backspace}'
-    )
+    cy.findByRole('textbox')
+      // need wait() here otherwise the slate component is not fully mounted yet sometimes
+      .wait(1000)
+      .type(
+        '{movetostart}* 1st Item{enter}2nd Item{enter}3rd Item{enter}{backspace}'
+      )
+
+    cy.get('ul > li')
 
     cy.get('ul > li').should('have.length', 3)
 

@@ -1,7 +1,7 @@
 describe('forced layout example', () => {
   const elements = [
-    { tag: 'h2', count: 1 },
-    { tag: 'p', count: 1 },
+    { tag: '#__next h2', count: 1 },
+    { tag: '#__next p', count: 1 },
   ]
 
   beforeEach(() => {

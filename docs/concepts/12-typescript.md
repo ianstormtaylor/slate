@@ -37,7 +37,7 @@ declare module 'slate' {
 
 Annotate `useState` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
 
-```typescript jsx
+```tsx
 import React, { useMemo, useState } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'

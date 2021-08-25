@@ -7,6 +7,15 @@ In this guide, we'll show you how to add custom formatting options, like **bold*
 So we start with our app from earlier:
 
 ```jsx
+const renderElement = (props) => {
+  switch (props.element.type) {
+    case 'code':
+      return <CodeElement {...props} />
+    default:
+      return <DefaultElement {...props} />
+  }
+})
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -15,15 +24,6 @@ const App = () => {
       children: [{ text: 'A line of text in a paragraph.' }],
     },
   ])
-
-  const renderElement = useCallback(props => {
-    switch (props.element.type) {
-      case 'code':
-        return <CodeElement {...props} />
-      default:
-        return <DefaultElement {...props} />
-    }
-  }, [])
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
