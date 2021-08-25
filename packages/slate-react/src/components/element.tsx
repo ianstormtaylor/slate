@@ -11,7 +11,7 @@ import {
   ELEMENT_TO_NODE,
   NODE_TO_PARENT,
   NODE_TO_INDEX,
-  KEY_TO_ELEMENT,
+  EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
 import {
@@ -120,12 +120,13 @@ const Element = (props: {
 
   // Update element-related weak maps with the DOM element ref.
   useIsomorphicLayoutEffect(() => {
+    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
     if (ref.current) {
-      KEY_TO_ELEMENT.set(key, ref.current)
+      KEY_TO_ELEMENT?.set(key, ref.current)
       NODE_TO_ELEMENT.set(element, ref.current)
       ELEMENT_TO_NODE.set(ref.current, element)
     } else {
-      KEY_TO_ELEMENT.delete(key)
+      KEY_TO_ELEMENT?.delete(key)
       NODE_TO_ELEMENT.delete(element)
     }
   })
