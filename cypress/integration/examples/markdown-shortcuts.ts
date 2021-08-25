@@ -15,8 +15,8 @@ describe('On markdown-shortcuts example', () => {
       .should('not.exist')
 
     cy.findByRole('textbox')
-      // need wait(0) here otherwise the page is not loaded yet correctly
-      .wait(0)
+      // need wait() here otherwise the slate component is not fully mounted yet sometimes
+      .wait(1000)
       .type(
         '{movetostart}* 1st Item{enter}2nd Item{enter}3rd Item{enter}{backspace}'
       )
