@@ -1,6 +1,5 @@
 *.log
 .next/
-.vscode/
 .idea/
 *.tsbuildinfo
 build/
@@ -20,6 +19,7 @@ cypress/plugins
 .yarn/*
 !.yarn/releases
 !.yarn/plugins
-!.yarn/sdks
+!/.yarn/sdks/
+!/.yarn/sdks/**/lib/
 !.yarn/versions
 .pnp.*
