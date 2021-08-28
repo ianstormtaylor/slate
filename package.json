@@ -31,7 +31,7 @@
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
     "test:integration": "run-p -r serve cypress:run",
-    "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/*/test/**/*.{js,ts}",
+    "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
     "watch": "yarn build:rollup --watch",
     "cypress:run": "cypress run",
