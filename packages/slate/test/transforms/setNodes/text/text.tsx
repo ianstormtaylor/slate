@@ -3,7 +3,7 @@ import { Transforms, Text } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.setNodes(editor, { key: true }, { match: Text.isText })
+  Transforms.setNodes(editor, { someKey: true }, { match: Text.isText })
 }
 export const input = (
   <editor>
@@ -16,7 +16,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text key>
+      <text someKey>
         <cursor />
         word
       </text>
