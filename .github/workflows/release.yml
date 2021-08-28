@@ -40,6 +40,7 @@ jobs:
         if: matrix.channel == 'latest'
         uses: changesets/action@master
         with:
+          version: yarn changeset version
           publish: yarn changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
