@@ -65,6 +65,7 @@ const useChildren = (props: {
           <ElementComponent
             decorations={ds}
             element={n}
+            path={p}
             key={key.id}
             renderElement={renderElement}
             renderPlaceholder={renderPlaceholder}

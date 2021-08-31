@@ -1,6 +1,6 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, Node, Range, Path, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
@@ -15,6 +15,7 @@ import {
 } from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
 import {
+  RenderChildrenProps,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
@@ -27,6 +28,7 @@ import {
 const Element = (props: {
   decorations: Range[]
   element: SlateElement
+  path: Path
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
@@ -35,6 +37,7 @@ const Element = (props: {
   const {
     decorations,
     element,
+    path,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderPlaceholder,
     renderLeaf,
@@ -53,6 +56,19 @@ const Element = (props: {
     renderLeaf,
     selection,
   })
+
+  const renderChildren = (props?: RenderChildrenProps) =>
+    useChildren({
+      decorations:
+        props && props.decorations
+          ? [...decorations, ...props.decorations]
+          : decorations,
+      node: element,
+      renderElement,
+      renderPlaceholder,
+      renderLeaf,
+      selection,
+    })
 
   // Attributes that the developer must mix into the element in their
   // custom node renderer component.
@@ -131,7 +147,7 @@ const Element = (props: {
     }
   })
 
-  return renderElement({ attributes, children, element })
+  return renderElement({ attributes, children, element, path, renderChildren })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {

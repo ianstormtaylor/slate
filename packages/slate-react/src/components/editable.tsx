@@ -55,11 +55,21 @@ const Children = (props: Parameters<typeof useChildren>[0]) => (
 )
 
 /**
+ * `RenderChildrenProps` are passed to the `renderChildren` callback.
+ */
+
+export interface RenderChildrenProps {
+  decorations?: Range[]
+}
+
+/**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
 export interface RenderElementProps {
   children: any
+  renderChildren: (props?: RenderChildrenProps) => React.ReactNode
+  path: Path
   element: Element
   attributes: {
     'data-slate-node': 'element'
