@@ -5,7 +5,7 @@ module.exports = {
   webpack: config => {
     config.module.rules.push({
       test: /\.js$/,
-      use: ['source-map-loader'],
+      loader: require.resolve('source-map-loader'),
       enforce: 'pre',
       exclude: [/node_modules\/@next/, /node_modules\/next/],
     })
