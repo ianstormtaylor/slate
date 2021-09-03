@@ -1,9 +1,10 @@
 import React, { useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, Node, Path, Range, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
+import { useDecorate } from '../hooks/use-decorate'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -27,6 +28,7 @@ import {
 const Element = (props: {
   decorations: Range[]
   element: SlateElement
+  path: Path
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
@@ -35,18 +37,23 @@ const Element = (props: {
   const {
     decorations,
     element,
+    path,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderPlaceholder,
     renderLeaf,
     selection,
   } = props
   const ref = useRef<HTMLElement>(null)
+  const decorate = useDecorate()
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
+  const ds = decorate([element, path])
+  ds.splice(ds.length, 0, ...decorations)
+
   let children: React.ReactNode = useChildren({
-    decorations,
+    decorations: ds,
     node: element,
     renderElement,
     renderPlaceholder,
@@ -92,7 +99,7 @@ const Element = (props: {
     }
 
     const Tag = isInline ? 'span' : 'div'
-    const [[text]] = Node.texts(element)
+    const [[text, path]] = Node.texts(element)
 
     children = readOnly ? null : (
       <Tag
@@ -110,6 +117,7 @@ const Element = (props: {
           isLast={false}
           parent={element}
           text={text}
+          path={path}
         />
       </Tag>
     )
