@@ -228,7 +228,9 @@ export const NodeTransforms: NodeTransforms = {
         const path = parentPath.concat(index)
         index++
         editor.apply({ type: 'insert_node', path, node })
+        at = Path.next(at)
       }
+      at = Path.previous(at)
 
       if (select) {
         const point = Editor.end(editor, at)
