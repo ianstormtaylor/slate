@@ -4,7 +4,11 @@ import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
 
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
-import { EDITOR_TO_ON_CHANGE, NODE_TO_KEY } from '../utils/weak-maps'
+import {
+  EDITOR_TO_KEY_TO_ELEMENT,
+  EDITOR_TO_ON_CHANGE,
+  NODE_TO_KEY,
+} from '../utils/weak-maps'
 import {
   AS_NATIVE,
   NATIVE_OPERATIONS,
@@ -29,6 +33,10 @@ import { findCurrentLineRange } from '../utils/lines'
 export const withReact = <T extends Editor>(editor: T) => {
   const e = editor as T & ReactEditor
   const { apply, onChange, deleteBackward } = e
+
+  // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
+  // avoid collisions between editors in the DOM that share the same value.
+  EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
 
   e.deleteBackward = unit => {
     if (unit !== 'line') {

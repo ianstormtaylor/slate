@@ -1,7 +1,7 @@
 describe('huge document example', () => {
   const elements = [
-    { tag: 'h1', count: 100 },
-    { tag: 'p', count: 700 },
+    { tag: '#__next h1', count: 100 },
+    { tag: '#__next p', count: 700 },
   ]
 
   beforeEach(() => {

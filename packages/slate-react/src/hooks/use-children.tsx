@@ -61,7 +61,7 @@ const useChildren = (props: {
 
     if (Element.isElement(n)) {
       children.push(
-        <SelectedContext.Provider value={!!sel}>
+        <SelectedContext.Provider key={`provider-${key.id}`} value={!!sel}>
           <ElementComponent
             decorations={ds}
             element={n}

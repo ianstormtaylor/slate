@@ -4,7 +4,7 @@ import { Transforms, Text, Editor } from 'slate'
 import { jsx } from '../..'
 
 export const run = (editor: Editor) => {
-  Transforms.unsetNodes(editor, 'key', { at: [0] })
+  Transforms.unsetNodes(editor, 'someKey', { at: [0] })
 
   // unsetNodes uses null to remove properties, but that should not
   // flow through to the operation
@@ -14,7 +14,7 @@ export const run = (editor: Editor) => {
     assert.deepStrictEqual(setNode, {
       type: 'set_node',
       path: [0],
-      properties: { key: true },
+      properties: { someKey: true },
       newProperties: {},
     })
   } else {
@@ -25,7 +25,7 @@ export const run = (editor: Editor) => {
 }
 export const input = (
   <editor>
-    <block key>word</block>
+    <block someKey>word</block>
   </editor>
 )
 export const output = (

@@ -5,7 +5,7 @@ import { jsx } from '../../..'
 export const run = editor => {
   Transforms.setNodes(
     editor,
-    { key: true },
+    { someKey: true },
     { match: n => Editor.isInline(editor, n) }
   )
 }
@@ -25,7 +25,7 @@ export const output = (
   <editor>
     <block>
       <text />
-      <inline void key>
+      <inline void someKey>
         <cursor />
         word
       </inline>

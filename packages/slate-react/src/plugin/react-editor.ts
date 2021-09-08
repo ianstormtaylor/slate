@@ -6,11 +6,11 @@ import {
   ELEMENT_TO_NODE,
   IS_FOCUSED,
   IS_READ_ONLY,
-  KEY_TO_ELEMENT,
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
   EDITOR_TO_WINDOW,
+  EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -242,9 +242,10 @@ export const ReactEditor = {
    */
 
   toDOMNode(editor: ReactEditor, node: Node): HTMLElement {
+    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
     const domNode = Editor.isEditor(node)
       ? EDITOR_TO_ELEMENT.get(editor)
-      : KEY_TO_ELEMENT.get(ReactEditor.findKey(editor, node))
+      : KEY_TO_ELEMENT?.get(ReactEditor.findKey(editor, node))
 
     if (!domNode) {
       throw new Error(
@@ -560,6 +561,44 @@ export const ReactEditor = {
         anchorOffset = domRange.anchorOffset
         focusNode = domRange.focusNode
         focusOffset = domRange.focusOffset
+        // When triple clicking a block, Chrome will return a selection object whose
+        // focus node is the next element sibling and focusOffset is 0.
+        // This will highlight the corresponding toolbar button for the sibling
+        // block even though users just want to target the previous block.
+        // (2021/08/24)
+        // Within the context of Slate and Chrome, if anchor and focus nodes don't have
+        //  the same nodeValue and focusOffset is 0, then it's definitely a triple click
+        // behaviour.
+        if (
+          IS_CHROME &&
+          anchorNode?.nodeValue !== focusNode?.nodeValue &&
+          domRange.focusOffset === 0
+        ) {
+          // If an anchorNode is an element node when triple clicked, then the focusNode
+          //  should also be the same as anchorNode when triple clicked.
+          if (anchorNode!.nodeType === 1) {
+            focusNode = anchorNode
+          } else {
+            // Otherwise, anchorNode is a text node and we need to
+            // - climb up the DOM tree to get the farthest element node that receives
+            // triple click. It should have atribute 'data-slate-node' = "element"
+            // - get the last child of that element node
+            // - climb down the DOM tree to get the text node of the last child
+            // - this is also the end of the selection aka the focusNode
+            const anchorElement = anchorNode!.parentNode as HTMLElement
+            const tripleClickedBlock = anchorElement.closest(
+              '[data-slate-node="element"]'
+            )
+            const focusElement = tripleClickedBlock!.lastElementChild
+            // Get the element node that holds the focus text node
+            const innermostFocusElement = focusElement!.querySelector(
+              '[data-slate-string]'
+            )
+            const lastTextNode = innermostFocusElement!.childNodes[0]
+            focusNode = lastTextNode
+          }
+        }
+
         // COMPAT: There's a bug in chrome that always returns `true` for
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)

@@ -19,7 +19,10 @@
     "tiny-warning": "^1.0.3"
   },
   "devDependencies": {
-    "lodash": "^4.17.21"
+    "@babel/runtime": "^7.7.4",
+    "lodash": "^4.17.21",
+    "slate-hyperscript": "^0.62.0",
+    "source-map-loader": "^0.2.4"
   },
   "keywords": [
     "canvas",

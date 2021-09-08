@@ -302,6 +302,7 @@ export const TextTransforms: TextTransforms = {
       const [, blockPath] = blockMatch
       const isBlockStart = Editor.isStart(editor, at, blockPath)
       const isBlockEnd = Editor.isEnd(editor, at, blockPath)
+      const isBlockEmpty = isBlockStart && isBlockEnd
       const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
       const mergeEnd = !isBlockEnd
       const [, firstPath] = Node.first({ children: fragment }, [])
@@ -309,6 +310,15 @@ export const TextTransforms: TextTransforms = {
 
       const matches: NodeEntry[] = []
       const matcher = ([n, p]: NodeEntry) => {
+        const isRoot = p.length === 0
+        if (isRoot) {
+          return false
+        }
+
+        if (isBlockEmpty) {
+          return true
+        }
+
         if (
           mergeStart &&
           Path.isAncestor(p, firstPath) &&
@@ -336,7 +346,7 @@ export const TextTransforms: TextTransforms = {
         { children: fragment },
         { pass: matcher }
       )) {
-        if (entry[1].length > 0 && matcher(entry)) {
+        if (matcher(entry)) {
           matches.push(entry)
         }
       }
@@ -380,6 +390,8 @@ export const TextTransforms: TextTransforms = {
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
 
+      const blockPathRef = Editor.pathRef(editor, blockPath)
+
       Transforms.splitNodes(editor, {
         at,
         match: n =>
@@ -403,6 +415,10 @@ export const TextTransforms: TextTransforms = {
         mode: 'highest',
         voids,
       })
+
+      if (isBlockEmpty && middles.length) {
+        Transforms.delete(editor, { at: blockPathRef.unref()!, voids })
+      }
 
       Transforms.insertNodes(editor, middles, {
         at: middleRef.current!,
