@@ -590,11 +590,15 @@ export const ReactEditor = {
             )
             const focusElement = tripleClickedBlock!.lastElementChild
             // Get the element node that holds the focus text node
+            // Not every Slate element node contains a child node with `data-slate-string`,
+            // such as void nodes, so the result below could be null.
             const innermostFocusElement = focusElement!.querySelector(
               '[data-slate-string]'
             )
-            const lastTextNode = innermostFocusElement!.childNodes[0]
-            focusNode = lastTextNode
+            if (innermostFocusElement) {
+              const lastTextNode = innermostFocusElement.childNodes[0]
+              focusNode = lastTextNode
+            }
           }
         }
 
