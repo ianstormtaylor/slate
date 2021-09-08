@@ -1,4 +1,4 @@
-import isPlainObject from 'is-plain-object'
+import { isPlainObject } from 'is-plain-object'
 
 /*
   Custom deep equal comparison for Slate nodes.
