@@ -565,13 +565,17 @@ export const ReactEditor = {
         // This will highlight the corresponding toolbar button for the sibling
         // block even though users just want to target the previous block.
         // (2021/08/24)
-        // Within the context of Slate and Chrome, if anchor and focus nodes don't have
-        //  the same nodeValue and focusOffset is 0, then it's definitely a triple click
-        // behaviour.
+        // Signs of a triple click in Chrome
+        // - anchor node will be a text node but focus node won't
+        // - both anchorOffset and focusOffset are 0
+        // - focusNode value will be null since Chrome tries to extend to just the
+        // beginning of the next block
         if (
           IS_CHROME &&
-          anchorNode?.nodeValue !== focusNode?.nodeValue &&
-          domRange.focusOffset === 0
+          anchorNode?.nodeType !== focusNode?.nodeType &&
+          domRange.anchorOffset === 0 &&
+          domRange.focusOffset === 0 &&
+          focusNode?.nodeValue == null
         ) {
           // If an anchorNode is an element node when triple clicked, then the focusNode
           //  should also be the same as anchorNode when triple clicked.
@@ -590,11 +594,15 @@ export const ReactEditor = {
             )
             const focusElement = tripleClickedBlock!.lastElementChild
             // Get the element node that holds the focus text node
+            // Not every Slate element node contains a child node with `data-slate-string`,
+            // such as void nodes, so the result below could be null.
             const innermostFocusElement = focusElement!.querySelector(
               '[data-slate-string]'
             )
-            const lastTextNode = innermostFocusElement!.childNodes[0]
-            focusNode = lastTextNode
+            if (innermostFocusElement) {
+              const lastTextNode = innermostFocusElement.childNodes[0]
+              focusNode = lastTextNode
+            }
           }
         }
 
