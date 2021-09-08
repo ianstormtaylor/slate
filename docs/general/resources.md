@@ -25,6 +25,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Cake](https://www.cake.co/)
 - [Chatterbug](https://chatterbug.com/)
 - [Clause](https://clause.io/)
+- [CoCalc](https://cocalc.com/)
 - [GitBook](https://www.gitbook.com/)
 - [Discord](https://discord.com/)
 - [Grafana](https://grafana.com/)
@@ -49,6 +50,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 - [Accord Project Markdown Editor](https://github.com/accordproject/web-components) is a WYSIWYG editor for [CommonMark](https://commonmark.org/).
 - [Canner Editor](https://github.com/Canner/canner-slate-editor) is a rich text editor.
 - [Chatterslate](https://github.com/chatterbugapp/chatterslate) helps teach language grammar and more at [Chatterbug](https://chatterbug.com).
+- [CoCalc](https://github.com/sagemathinc/cocalc/) Collaborative Calculation editor in the Cloud
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline support.
 - [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
 - [React Force Slate Editor](https://github.com/nareshbhatia/react-force/tree/master/packages/slate-editor) is a light-weight medium-style editor with no editor chrome.

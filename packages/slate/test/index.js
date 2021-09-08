@@ -37,6 +37,14 @@ describe('slate', () => {
     assert.deepEqual(editor.children, output.children)
     assert.deepEqual(editor.selection, output.selection)
   })
+  fixtures(__dirname, 'utils/deep-equal', ({ module }) => {
+    let { input, test, output } = module
+    if (Editor.isEditor(input)) {
+      input = withTest(input)
+    }
+    const result = test(input)
+    assert.deepEqual(result, output)
+  })
 })
 const withTest = editor => {
   const { isInline, isVoid } = editor

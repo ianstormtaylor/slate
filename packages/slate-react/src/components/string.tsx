@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
@@ -55,11 +55,21 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
-
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
+
+  const ref = useRef<HTMLSpanElement>(null)
+  const forceUpdateFlag = useRef(false)
+
+  if (ref.current && ref.current.textContent !== text) {
+    forceUpdateFlag.current = !forceUpdateFlag.current
+  }
+
+  // This component may have skipped rendering due to native operations being
+  // applied. If an undo is performed React will see the old and new shadow DOM
+  // match and not apply an update. Forces each render to actually reconcile.
   return (
-    <span data-slate-string>
+    <span data-slate-string ref={ref} key={forceUpdateFlag.current ? 'A' : 'B'}>
       {text}
       {isTrailing ? '\n' : null}
     </span>

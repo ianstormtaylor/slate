@@ -10,7 +10,7 @@ export const input = (
     <block>
       <text />
       <inline>
-        word📛
+        word🇫🇷
         <cursor />
       </inline>
       <text />

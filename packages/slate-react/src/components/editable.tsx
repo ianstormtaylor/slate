@@ -24,7 +24,7 @@ import {
   IS_FIREFOX_LEGACY,
   IS_SAFARI,
   IS_EDGE_LEGACY,
-  IS_QQ_BROWSER,
+  IS_QQBROWSER,
   IS_APPLE,
   IS_CHROME_LEGACY,
 } from '../utils/environment'
@@ -52,6 +52,7 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
+import { asNative, flushNativeEvents } from '../utils/native'
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -135,6 +136,7 @@ export const Editable = (props: EditableProps) => {
   const state = useMemo(
     () => ({
       isComposing: false,
+      hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
@@ -272,7 +274,49 @@ export const Editable = (props: EditableProps) => {
           return
         }
 
-        event.preventDefault()
+        let native = false
+        if (
+          type === 'insertText' &&
+          selection &&
+          Range.isCollapsed(selection) &&
+          // Only use native character insertion for single characters a-z or space for now.
+          // Long-press events (hold a + press 4 = ä) to choose a special character otherwise
+          // causes duplicate inserts.
+          event.data &&
+          event.data.length === 1 &&
+          /[a-z ]/i.test(event.data) &&
+          // Chrome seems to have issues correctly editing the start of nodes.
+          // When there is an inline element, e.g. a link, and you select
+          // right after it (the start of the next node).
+          selection.anchor.offset !== 0
+        ) {
+          native = true
+
+          // Skip native if there are marks, as
+          // `insertText` will insert a node, not just text.
+          if (editor.marks) {
+            native = false
+          }
+
+          // and because of the selection moving in `insertText` (create-editor.ts).
+          const { anchor } = selection
+          const inline = Editor.above(editor, {
+            at: anchor,
+            match: n => Editor.isInline(editor, n),
+            mode: 'highest',
+          })
+          if (inline) {
+            const [, inlinePath] = inline
+
+            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+              native = false
+            }
+          }
+        }
+
+        if (!native) {
+          event.preventDefault()
+        }
 
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
@@ -384,7 +428,7 @@ export const Editable = (props: EditableProps) => {
             if (data instanceof window.DataTransfer) {
               ReactEditor.insertData(editor, data as DataTransfer)
             } else if (typeof data === 'string') {
-              if (IS_QQ_BROWSER) {
+              if (IS_QQBROWSER) {
                 event.stopPropagation()
                 return
               }
@@ -392,7 +436,14 @@ export const Editable = (props: EditableProps) => {
               if (type === 'insertFromComposition' && IS_APPLE) {
                 return
               }
-              Editor.insertText(editor, data)
+
+              // Only insertText operations use the native functionality, for now.
+              // Potentially expand to single character deletes, as well.
+              if (native) {
+                asNative(editor, () => Editor.insertText(editor, data))
+              } else {
+                Editor.insertText(editor, data)
+              }
             }
 
             break
@@ -473,6 +524,11 @@ export const Editable = (props: EditableProps) => {
     [readOnly]
   )
 
+  const scheduleOnDOMSelectionChange = useCallback(
+    () => setTimeout(onDOMSelectionChange),
+    [onDOMSelectionChange]
+  )
+
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
   // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
@@ -480,15 +536,18 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
-    window.document.addEventListener('selectionchange', onDOMSelectionChange)
+    window.document.addEventListener(
+      'selectionchange',
+      scheduleOnDOMSelectionChange
+    )
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        onDOMSelectionChange
+        scheduleOnDOMSelectionChange
       )
     }
-  }, [onDOMSelectionChange])
+  }, [scheduleOnDOMSelectionChange])
 
   const decorations = decorate([editor, []])
 
@@ -550,7 +609,7 @@ export const Editable = (props: EditableProps) => {
               // fall back to React's leaky polyfill instead just for it. It
               // only works for the `insertText` input type.
               const text = (event as any).data as string
-              if (IS_QQ_BROWSER) {
+              if (IS_QQBROWSER) {
                 event.preventDefault()
                 Editor.insertText(editor, text)
                 return
@@ -570,6 +629,13 @@ export const Editable = (props: EditableProps) => {
             },
             [readOnly]
           )}
+          onInput={useCallback((event: React.SyntheticEvent) => {
+            // Flush native operations, as native events will have propogated
+            // and we can correctly compare DOM text values in components
+            // to stop rendering, so that browser functions like autocorrect
+            // and spellcheck work as expected.
+            flushNativeEvents(editor)
+          }, [])}
           onBlur={useCallback(
             (event: React.FocusEvent<HTMLDivElement>) => {
               if (
@@ -683,13 +749,30 @@ export const Editable = (props: EditableProps) => {
                 // type that we need. So instead, insert whenever a composition
                 // ends since it will already have been committed to the DOM.
                 if (
-                  !(IS_FIREFOX || IS_QQ_BROWSER) &&
+                  !(IS_FIREFOX || IS_QQBROWSER) &&
                   !IS_FIREFOX_LEGACY &&
                   !IS_IOS &&
                   event.data
                 ) {
                   editor.isRemote = false
                   Editor.insertText(editor, event.data)
+                }
+
+                if (editor.selection && Range.isCollapsed(editor.selection)) {
+                  const leafPath = editor.selection.anchor.path
+                  const currentTextNode = Node.leaf(editor, leafPath)
+                  if (state.hasInsertPrefixInCompositon) {
+                    state.hasInsertPrefixInCompositon = false
+                    Editor.withoutNormalizing(editor, () => {
+                      // remove Unicode BOM prefix added in `onCompositionStart`
+                      const text = currentTextNode.text.replace(/^\uFEFF/, '')
+                      Transforms.delete(editor, {
+                        distance: currentTextNode.text.length,
+                        reverse: true,
+                      })
+                      Transforms.insertText(editor, text)
+                    })
+                  }
                 }
               }
             },
@@ -713,9 +796,42 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionStart)
               ) {
-                const { selection } = editor
-                if (selection && Range.isExpanded(selection)) {
-                  Editor.deleteFragment(editor)
+                const { selection, marks } = editor
+                if (selection) {
+                  if (Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                    return
+                  }
+                  const inline = Editor.above(editor, {
+                    match: n => Editor.isInline(editor, n),
+                    mode: 'highest',
+                  })
+                  if (inline) {
+                    const [, inlinePath] = inline
+                    if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+                      const point = Editor.after(editor, inlinePath)!
+                      Transforms.setSelection(editor, {
+                        anchor: point,
+                        focus: point,
+                      })
+                    }
+                  }
+                  // insert new node in advance to ensure composition text will insert
+                  // along with final input text
+                  // add Unicode BOM prefix to avoid normalize removing this node
+                  if (marks) {
+                    state.hasInsertPrefixInCompositon = true
+                    Transforms.insertNodes(
+                      editor,
+                      {
+                        text: '\uFEFF',
+                        ...marks,
+                      },
+                      {
+                        select: true,
+                      }
+                    )
+                  }
                 }
               }
             },
@@ -900,6 +1016,7 @@ export const Editable = (props: EditableProps) => {
             (event: React.KeyboardEvent<HTMLDivElement>) => {
               if (
                 !readOnly &&
+                !state.isComposing &&
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onKeyDown)
               ) {

@@ -24,6 +24,7 @@ describe('code highlighting', () => {
     () => {
       const JSCode = 'const slateVar = 30;{enter}'
       cy.get('select').select('JavaScript') // Select the 'JavaScript' option
+      cy.get('select').should('have.value', 'js') // Confirm value to avoid race condition
 
       cy.get(slateEditor)
         .type('{movetostart}')
