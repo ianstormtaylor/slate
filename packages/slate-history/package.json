@@ -14,7 +14,7 @@
     "dist/"
   ],
   "dependencies": {
-    "is-plain-object": "^3.0.0"
+    "is-plain-object": "^5.0.0"
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
