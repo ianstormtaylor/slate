@@ -344,16 +344,20 @@ export const Path: PathInterface = {
    */
 
   transform(
-    path: Path,
+    path: Path | null,
     operation: Operation,
     options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Path | null {
-    return produce(p => {
+    return produce(path, p => {
       const { affinity = 'forward' } = options
 
       // PERF: Exit early if the operation is guaranteed not to have an effect.
-      if (path.length === 0) {
+      if (!path || path?.length === 0) {
         return
+      }
+
+      if (p === null) {
+        return null
       }
 
       switch (operation.type) {
@@ -463,6 +467,6 @@ export const Path: PathInterface = {
           break
         }
       }
-    }, path)
+    })
   },
 }

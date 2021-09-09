@@ -207,38 +207,40 @@ export const Range: RangeInterface = {
    */
 
   transform(
-    range: Range,
+    range: Range | null,
     op: Operation,
     options: {
       affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
     } = {}
   ): Range | null {
-    const { affinity = 'inward' } = options
-    let affinityAnchor: 'forward' | 'backward' | null
-    let affinityFocus: 'forward' | 'backward' | null
-
-    if (affinity === 'inward') {
-      if (Range.isForward(range)) {
-        affinityAnchor = 'forward'
-        affinityFocus = 'backward'
-      } else {
-        affinityAnchor = 'backward'
-        affinityFocus = 'forward'
+    return produce(range, r => {
+      if (r === null) {
+        return null
       }
-    } else if (affinity === 'outward') {
-      if (Range.isForward(range)) {
-        affinityAnchor = 'backward'
-        affinityFocus = 'forward'
-      } else {
-        affinityAnchor = 'forward'
-        affinityFocus = 'backward'
-      }
-    } else {
-      affinityAnchor = affinity
-      affinityFocus = affinity
-    }
+      const { affinity = 'inward' } = options
+      let affinityAnchor: 'forward' | 'backward' | null
+      let affinityFocus: 'forward' | 'backward' | null
 
-    return produce(r => {
+      if (affinity === 'inward') {
+        if (Range.isForward(r)) {
+          affinityAnchor = 'forward'
+          affinityFocus = 'backward'
+        } else {
+          affinityAnchor = 'backward'
+          affinityFocus = 'forward'
+        }
+      } else if (affinity === 'outward') {
+        if (Range.isForward(r)) {
+          affinityAnchor = 'backward'
+          affinityFocus = 'forward'
+        } else {
+          affinityAnchor = 'forward'
+          affinityFocus = 'backward'
+        }
+      } else {
+        affinityAnchor = affinity
+        affinityFocus = affinity
+      }
       const anchor = Point.transform(r.anchor, op, { affinity: affinityAnchor })
       const focus = Point.transform(r.focus, op, { affinity: affinityFocus })
 
@@ -248,6 +250,6 @@ export const Range: RangeInterface = {
 
       r.anchor = anchor
       r.focus = focus
-    }, range)
+    })
   },
 }

@@ -91,11 +91,15 @@ export const Point: PointInterface = {
    */
 
   transform(
-    point: Point,
+    point: Point | null,
     op: Operation,
     options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Point | null {
-    return produce(p => {
+    return produce(point, p => {
+      if (p === null) {
+        return null
+      }
+
       const { affinity = 'forward' } = options
       const { path, offset } = p
 
@@ -162,7 +166,7 @@ export const Point: PointInterface = {
           break
         }
       }
-    }, point)
+    })
   },
 }
 
