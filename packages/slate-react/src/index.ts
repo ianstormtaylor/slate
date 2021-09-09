@@ -7,7 +7,9 @@ import { IS_ANDROID } from './utils/environment'
 export const Editable = IS_ANDROID ? AndroidEditable : DefaultEditable
 export {
   Editable as DefaultEditable,
+  RenderChildrenProps,
   RenderElementProps,
+  RenderTextProps,
   RenderLeafProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,

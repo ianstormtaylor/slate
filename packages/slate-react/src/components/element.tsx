@@ -6,6 +6,7 @@ import Text from './text'
 import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+import { useDecorate } from '../hooks/use-decorate'
 import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -19,7 +20,28 @@ import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
+  RenderTextProps,
 } from './editable'
+
+const handler = {}
+for (const method of ['getOwnPropertyDescriptor', 'get', 'has', 'ownKeys']) {
+  handler[method] = (target: any, ...args: any[]) =>
+    Reflect[method](target.force(), ...args)
+}
+
+function lazy<T>(thunk: () => T) {
+  let evaluated = false
+  let value: any = undefined
+  const force = () => {
+    if (!evaluated) {
+      value = thunk()
+      evaluated = true
+    }
+    return value
+  }
+
+  return new Proxy({ force }, handler)
+}
 
 /**
  * Element.
@@ -30,6 +52,7 @@ const Element = (props: {
   element: SlateElement
   path: Path
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
@@ -39,6 +62,7 @@ const Element = (props: {
     element,
     path,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
+    renderText,
     renderPlaceholder,
     renderLeaf,
     selection,
@@ -48,14 +72,19 @@ const Element = (props: {
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
-  let children: React.ReactNode = useChildren({
-    decorations,
-    node: element,
-    renderElement,
-    renderPlaceholder,
-    renderLeaf,
-    selection,
-  })
+
+  // we must trigger a re-render in the parent Element when decorate
+  // changes, in order to update the lazily-computed `children`.
+  // if not, the component returned by `renderElement` is re-rendered
+  // (because on the first render, `children` is forced in its context,
+  // calling `useDecorate`) but it receives the same `children` from the
+  // parent, which has already been forced.
+  // TODO(jaked) this is fragile
+  // it would be better for each component to compute its own decorations
+  // instead of computing them in the parent, as in #4488
+  const _ = useDecorate()
+
+  let children
 
   const renderChildren = (props?: RenderChildrenProps) =>
     useChildren({
@@ -65,6 +94,7 @@ const Element = (props: {
           : decorations,
       node: element,
       renderElement,
+      renderText,
       renderPlaceholder,
       renderLeaf,
       selection,
@@ -108,7 +138,7 @@ const Element = (props: {
     }
 
     const Tag = isInline ? 'span' : 'div'
-    const [[text]] = Node.texts(element)
+    const [[text, path]] = Node.texts(element)
 
     children = readOnly ? null : (
       <Tag
@@ -121,17 +151,21 @@ const Element = (props: {
         }}
       >
         <Text
+          renderText={renderText}
           renderPlaceholder={renderPlaceholder}
           decorations={[]}
           isLast={false}
           parent={element}
           text={text}
+          path={path}
         />
       </Tag>
     )
 
     NODE_TO_INDEX.set(text, 0)
     NODE_TO_PARENT.set(text, element)
+  } else {
+    children = lazy(renderChildren)
   }
 
   // Update element-related weak maps with the DOM element ref.

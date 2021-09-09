@@ -23,6 +23,8 @@ import PasteHtml from '../../examples/paste-html'
 import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
+import RichTextWithCodeHighlighting from '../../examples/richtext-with-code-highlighting'
+import RichTextWithCodeHighlightingRenderChildren from '../../examples/richtext-with-code-highlighting-renderChildren'
 import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
 import Tables from '../../examples/tables'
@@ -49,6 +51,16 @@ const EXAMPLES = [
   ['Plain Text', PlainText, 'plaintext'],
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'richtext'],
+  [
+    'Rich Text with Code Highlighting',
+    RichTextWithCodeHighlighting,
+    'richtext-with-code-highlighting',
+  ],
+  [
+    'Rich Text with Code Highlighting (renderChildren)',
+    RichTextWithCodeHighlightingRenderChildren,
+    'richtext-with-code-highlighting-renderChildren',
+  ],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Tables', Tables, 'tables'],

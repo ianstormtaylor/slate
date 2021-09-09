@@ -1,9 +1,14 @@
 import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
+import { Element, Path, Range, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { ReactEditor, useSlateStatic } from '..'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import {
+  RenderChildrenProps,
+  RenderLeafProps,
+  RenderPlaceholderProps,
+  RenderTextProps,
+} from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
@@ -21,37 +26,50 @@ const Text = (props: {
   isLast: boolean
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
+  path: Path
 }) => {
   const {
     decorations,
     isLast,
     parent,
     renderPlaceholder,
+    renderText = (p: RenderTextProps) => <DefaultText {...p} />,
     renderLeaf,
     text,
+    path,
   } = props
   const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement>(null)
-  const leaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
-  const children = []
 
-  for (let i = 0; i < leaves.length; i++) {
-    const leaf = leaves[i]
+  const renderChildren = (props?: RenderChildrenProps) => {
+    const ds =
+      props && props.decorations
+        ? [...decorations, ...props.decorations]
+        : decorations
+    const leaves = SlateText.decorations(text, ds)
+    const children = []
 
-    children.push(
-      <Leaf
-        isLast={isLast && i === leaves.length - 1}
-        key={`${key.id}-${i}`}
-        renderPlaceholder={renderPlaceholder}
-        leaf={leaf}
-        text={text}
-        parent={parent}
-        renderLeaf={renderLeaf}
-      />
-    )
+    for (let i = 0; i < leaves.length; i++) {
+      const leaf = leaves[i]
+
+      children.push(
+        <Leaf
+          isLast={isLast && i === leaves.length - 1}
+          key={`${key.id}-${i}`}
+          renderPlaceholder={renderPlaceholder}
+          leaf={leaf}
+          text={text}
+          parent={parent}
+          renderLeaf={renderLeaf}
+        />
+      )
+    }
+
+    return children
   }
 
   // Update element-related weak maps with the DOM element ref.
@@ -67,11 +85,20 @@ const Text = (props: {
     }
   })
 
-  return (
-    <span data-slate-node="text" ref={ref}>
-      {children}
-    </span>
-  )
+  const attributes: {
+    'data-slate-node': 'text'
+    ref: any
+  } = {
+    'data-slate-node': 'text',
+    ref,
+  }
+
+  return renderText({ attributes, text, path, renderChildren })
+}
+
+const DefaultText = (props: RenderTextProps) => {
+  const { attributes, renderChildren } = props
+  return <span {...attributes}>{renderChildren()}</span>
 }
 
 const MemoizedText = React.memo(Text, (prev, next) => {

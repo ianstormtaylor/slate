@@ -81,6 +81,20 @@ export interface RenderElementProps {
 }
 
 /**
+ * `RenderTextProps` are passed to the `renderText` handler.
+ */
+
+export interface RenderTextProps {
+  renderChildren: (props?: RenderChildrenProps) => React.ReactNode
+  path: Path
+  text: Text
+  attributes: {
+    'data-slate-node': 'text'
+    ref: any
+  }
+}
+
+/**
  * `RenderLeafProps` are passed to the `renderLeaf` handler.
  */
 
@@ -105,6 +119,7 @@ export type EditableProps = {
   role?: string
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
@@ -123,6 +138,7 @@ export const Editable = (props: EditableProps) => {
     placeholder,
     readOnly = false,
     renderElement,
+    renderText,
     renderLeaf,
     renderPlaceholder = props => <DefaultPlaceholder {...props} />,
     scrollSelectionIntoView = defaultScrollSelectionIntoView,
@@ -1262,6 +1278,7 @@ export const Editable = (props: EditableProps) => {
             node={editor}
             renderElement={renderElement}
             renderPlaceholder={renderPlaceholder}
+            renderText={renderText}
             renderLeaf={renderLeaf}
             selection={editor.selection}
           />

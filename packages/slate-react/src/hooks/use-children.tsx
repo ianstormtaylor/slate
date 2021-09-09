@@ -9,6 +9,7 @@ import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   RenderElementProps,
+  RenderTextProps,
   RenderLeafProps,
   RenderPlaceholderProps,
 } from '../components/editable'
@@ -22,6 +23,7 @@ const useChildren = (props: {
   decorations: Range[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
@@ -31,6 +33,7 @@ const useChildren = (props: {
     node,
     renderElement,
     renderPlaceholder,
+    renderText,
     renderLeaf,
     selection,
   } = props
@@ -69,6 +72,7 @@ const useChildren = (props: {
             key={key.id}
             renderElement={renderElement}
             renderPlaceholder={renderPlaceholder}
+            renderText={renderText}
             renderLeaf={renderLeaf}
             selection={sel}
           />
@@ -82,8 +86,10 @@ const useChildren = (props: {
           isLast={isLeafBlock && i === node.children.length - 1}
           parent={node}
           renderPlaceholder={renderPlaceholder}
+          renderText={renderText}
           renderLeaf={renderLeaf}
           text={n}
+          path={p}
         />
       )
     }
