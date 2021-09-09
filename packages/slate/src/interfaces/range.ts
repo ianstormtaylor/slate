@@ -238,7 +238,7 @@ export const Range: RangeInterface = {
       affinityFocus = affinity
     }
 
-    return produce(range, r => {
+    return produce(r => {
       const anchor = Point.transform(r.anchor, op, { affinity: affinityAnchor })
       const focus = Point.transform(r.focus, op, { affinity: affinityFocus })
 
@@ -248,6 +248,6 @@ export const Range: RangeInterface = {
 
       r.anchor = anchor
       r.focus = focus
-    })
+    }, range)
   },
 }

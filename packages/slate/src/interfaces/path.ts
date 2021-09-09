@@ -348,7 +348,7 @@ export const Path: PathInterface = {
     operation: Operation,
     options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Path | null {
-    return produce(path, p => {
+    return produce(p => {
       const { affinity = 'forward' } = options
 
       // PERF: Exit early if the operation is guaranteed not to have an effect.
@@ -463,6 +463,6 @@ export const Path: PathInterface = {
           break
         }
       }
-    })
+    }, path)
   },
 }
