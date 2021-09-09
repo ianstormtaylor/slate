@@ -8591,10 +8591,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"immer@npm:^8.0.1":
-  version: 8.0.4
-  resolution: "immer@npm:8.0.4"
-  checksum: 9d3b28df1ac5bf6918c611e71c15bdb136588c21a3431100448f21325fef9b055cc9a44fe8b023f0c5ecbc66a2ba38f403c9a67d581f613b49d0e4ff15564f79
+"immer@npm:^9.0.6":
+  version: 9.0.6
+  resolution: "immer@npm:9.0.6"
+  checksum: 75da22f3b32f3f14604eb389b4f50e84a14f2e42f306f0cbe4d2969aed54ec7fda9a7e9ca42ebae2ba73ec9bb6ec1001fafbac535accaf03860054ab0f7e8388
   languageName: node
   linkType: hard
 
@@ -14452,7 +14452,7 @@ resolve@^2.0.0-next.3:
   resolution: "slate@workspace:packages/slate"
   dependencies:
     "@babel/runtime": ^7.7.4
-    immer: ^8.0.1
+    immer: ^9.0.6
     is-plain-object: ^3.0.0
     lodash: ^4.17.21
     slate-hyperscript: ^0.62.0

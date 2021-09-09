@@ -14,7 +14,7 @@
     "dist/"
   ],
   "dependencies": {
-    "immer": "^8.0.1",
+    "immer": "^9.0.6",
     "is-plain-object": "^3.0.0",
     "tiny-warning": "^1.0.3"
   },
