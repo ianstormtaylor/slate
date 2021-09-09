@@ -84,7 +84,7 @@ const App = () => {
       value={value}
       onChange={value => {
         setValue(value)
-        const isAstChange = editor.operations.some(op => 'set_selection' !== op.type);
+        const isAstChange = editor.operations.some(op => 'set_selection' !== op.type)
         if (isAstChange) {
           // Save the value to Local Storage.
           const content = JSON.stringify(value)
