@@ -15,7 +15,7 @@
   ],
   "dependencies": {
     "immer": "^9.0.6",
-    "is-plain-object": "^3.0.0",
+    "is-plain-object": "^5.0.0",
     "tiny-warning": "^1.0.3"
   },
   "devDependencies": {

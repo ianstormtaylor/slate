@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import isPlainObject from 'is-plain-object'
+import { isPlainObject } from 'is-plain-object'
 import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
 
 /**
