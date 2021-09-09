@@ -142,7 +142,7 @@ const App = () => {
       value={value}
       onChange={value => {
         setValue(value)
-        const isAstChange = editor.operations.some(op => 'set_selection' !== op.type);
+        const isAstChange = editor.operations.some(op => 'set_selection' !== op.type)
         if (isAstChange) {
           // Serialize the value and save the string value to Local Storage.
           localStorage.setItem('content', serialize(value))
