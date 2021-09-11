@@ -1,11 +1,5 @@
 # slate-hyperscript
 
-## 0.66.0
-
-### Patch Changes
-
-- [#4500](https://github.com/ianstormtaylor/slate/pull/4500) [`50bb3d7e`](https://github.com/ianstormtaylor/slate/commit/50bb3d7e32d640957018831526235ca656963f1d) Thanks [@tubbo](https://github.com/tubbo)! - Upgrade `is-plain-object` to v5.0.0
-
 ## 0.62.0
 
 ### Minor Changes
