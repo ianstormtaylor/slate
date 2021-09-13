@@ -581,15 +581,12 @@ export const ReactEditor = {
         ) {
           // If an anchorNode is an element node when triple clicked, then the focusNode
           //  should also be the same as anchorNode when triple clicked.
-          // if (anchorNode!.nodeType === 1) {
-          //   focusNode = anchorNode
-          // } else {
-          //   // Otherwise, anchorNode is a text node and we need to
-          //   // - climb up the DOM tree to get the farthest element node that receives
-          //   // triple click. It should have atribute 'data-slate-node' = "element"
-          //   // - get the last child of that element node
-          //   // - climb down the DOM tree to get the text node of the last child
-          //   // - this is also the end of the selection aka the focusNode
+          // Otherwise, anchorNode is a text node and we need to
+          // - climb up the DOM tree to get the farthest element node that receives
+          //   triple click. It should have atribute 'data-slate-node' = "element"
+          // - get the last child of that element node
+          // - climb down the DOM tree to get the text node of the last child
+          // - this is also the end of the selection aka the focusNode
           const anchorElement = anchorNode.parentNode as HTMLElement
           const selectedBlock = anchorElement.closest(
             '[data-slate-node="element"]'
