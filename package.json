@@ -8,6 +8,7 @@
     "build": "yarn build:rollup && yarn build:next",
     "build:next": "cd ./site && next build && next export",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js",
+    "changeset:version": "yarn changeset version && yarn install && git add .",
     "clean": "rimraf './packages/*/{dist,lib,node_modules}' './site/{.next,out}'",
     "fix": "yarn fix:prettier && yarn fix:eslint",
     "fix:eslint": "yarn lint:eslint --fix",
