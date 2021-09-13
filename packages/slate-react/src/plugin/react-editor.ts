@@ -572,36 +572,49 @@ export const ReactEditor = {
         // beginning of the next block
         if (
           IS_CHROME &&
-          anchorNode?.nodeType !== focusNode?.nodeType &&
+          anchorNode &&
+          focusNode &&
+          anchorNode.nodeType !== focusNode.nodeType &&
           domRange.anchorOffset === 0 &&
           domRange.focusOffset === 0 &&
-          focusNode?.nodeValue == null
+          focusNode.nodeValue == null
         ) {
           // If an anchorNode is an element node when triple clicked, then the focusNode
           //  should also be the same as anchorNode when triple clicked.
-          if (anchorNode!.nodeType === 1) {
-            focusNode = anchorNode
-          } else {
-            // Otherwise, anchorNode is a text node and we need to
-            // - climb up the DOM tree to get the farthest element node that receives
-            // triple click. It should have atribute 'data-slate-node' = "element"
-            // - get the last child of that element node
-            // - climb down the DOM tree to get the text node of the last child
-            // - this is also the end of the selection aka the focusNode
-            const anchorElement = anchorNode!.parentNode as HTMLElement
-            const tripleClickedBlock = anchorElement.closest(
-              '[data-slate-node="element"]'
-            )
-            const focusElement = tripleClickedBlock!.lastElementChild
-            // Get the element node that holds the focus text node
-            // Not every Slate element node contains a child node with `data-slate-string`,
-            // such as void nodes, so the result below could be null.
-            const innermostFocusElement = focusElement!.querySelector(
-              '[data-slate-string]'
-            )
-            if (innermostFocusElement) {
-              const lastTextNode = innermostFocusElement.childNodes[0]
-              focusNode = lastTextNode
+          // Otherwise, anchorNode is a text node and we need to
+          // - climb up the DOM tree to get the farthest element node that receives
+          //   triple click. It should have atribute 'data-slate-node' = "element"
+          // - get the last child of that element node
+          // - climb down the DOM tree to get the text node of the last child
+          // - this is also the end of the selection aka the focusNode
+          const anchorElement = anchorNode.parentNode as HTMLElement
+          const selectedBlock = anchorElement.closest(
+            '[data-slate-node="element"]'
+          )
+          if (selectedBlock) {
+            // The Slate Text nodes are leaf-level and contains document's text.
+            // However, when represented in the DOM, they are actually Element nodes
+            // and different from the DOM's Text nodes
+            const { childElementCount: slateTextNodeCount } = selectedBlock
+            if (slateTextNodeCount === 1) {
+              focusNode = anchorNode as Text
+              focusOffset = focusNode.length
+            } else if (slateTextNodeCount > 1) {
+              // A element with attribute data-slate-node="element" can have multiple
+              // children with attribute data-slate-node="text". But these children only have
+              // one child at each level.
+              // <span data-slate-node="text">
+              //   <span data-slate-leaf="">
+              //     <span data-slate-string=""></span>
+              //   </span>
+              // </span>
+              const focusElement = selectedBlock.lastElementChild as HTMLElement
+              const nodeIterator = document.createNodeIterator(
+                focusElement,
+                NodeFilter.SHOW_TEXT
+              )
+              focusNode = nodeIterator.nextNode() as Text
+              focusOffset = focusNode.length
             }
           }
         }
