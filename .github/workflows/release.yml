@@ -41,7 +41,7 @@ jobs:
         uses: changesets/action@master
         with:
           # defined in package.json#scripts
-          version: changeset:version
+          version: changesetversion
           publish: yarn changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
