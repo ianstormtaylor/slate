@@ -46,7 +46,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-          ENABLE_IMMUTABLE_INSTALLS: false
+          YARN_ENABLE_IMMUTABLE_INSTALLS: false
 
       # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @dev channel
