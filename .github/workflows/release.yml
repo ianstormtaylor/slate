@@ -40,12 +40,13 @@ jobs:
         if: matrix.channel == 'latest'
         uses: changesets/action@master
         with:
-          version: yarn changeset version
+          version: yarn changeset version && yarn install && git add .
           publish: yarn changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          ENABLE_IMMUTABLE_INSTALLS: false
 
       # https://github.com/atlassian/changesets/blob/master/docs/snapshot-releases.md
       - name: Release to @dev channel
