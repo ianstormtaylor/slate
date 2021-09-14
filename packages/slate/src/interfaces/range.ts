@@ -222,12 +222,16 @@ export const Range: RangeInterface = {
       let affinityFocus: 'forward' | 'backward' | null
 
       if (affinity === 'inward') {
+        // If the range is collapsed, make sure to use the same affinity to
+        // avoid the two points passing each other and expanding in the opposite
+        // direction
+        const isCollapsed = Range.isCollapsed(r)
         if (Range.isForward(r)) {
           affinityAnchor = 'forward'
-          affinityFocus = 'backward'
+          affinityFocus = isCollapsed ? affinityAnchor : 'backward'
         } else {
           affinityAnchor = 'backward'
-          affinityFocus = 'forward'
+          affinityFocus = isCollapsed ? affinityAnchor : 'forward'
         }
       } else if (affinity === 'outward') {
         if (Range.isForward(r)) {
