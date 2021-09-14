@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.66.1
+
+### Patch Changes
+
+- [#4514](https://github.com/ianstormtaylor/slate/pull/4514) [`8b5dbc3d`](https://github.com/ianstormtaylor/slate/commit/8b5dbc3dc7716b51b74a3b7a3dbe2609642f2f6c) Thanks [@dylans](https://github.com/dylans)! - fix(react-editor): reset focus offset when triple clicking
+
 ## 0.66.0
 
 ### Minor Changes
