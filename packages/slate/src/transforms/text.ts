@@ -105,7 +105,7 @@ export const TextTransforms: TextTransforms = {
         const endOfDoc = Editor.end(editor, [])
 
         if (!Point.equals(end, endOfDoc)) {
-          at = Editor.unhangRange(editor, at, { voids })
+          at = Editor.unhangRange(editor, at)
         }
       }
 

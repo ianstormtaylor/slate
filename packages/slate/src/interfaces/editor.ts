@@ -15,7 +15,6 @@ import {
   RangeRef,
   Span,
   Text,
-  Transforms,
 } from '..'
 import {
   DIRTY_PATHS,
@@ -266,13 +265,7 @@ export interface EditorInterface {
       voids?: boolean
     }
   ) => string
-  unhangRange: (
-    editor: Editor,
-    range: Range,
-    options?: {
-      voids?: boolean
-    }
-  ) => Range
+  unhangRange: (editor: Editor, range: Range) => Range
   void: (
     editor: Editor,
     options?: {
@@ -1622,22 +1615,14 @@ export const Editor: EditorInterface = {
    * Convert a range into a non-hanging one.
    */
 
-  unhangRange(
-    editor: Editor,
-    range: Range,
-    options: {
-      voids?: boolean
-    } = {}
-  ): Range {
-    const { voids = false } = options
+  unhangRange(editor: Editor, range: Range): Range {
     let [start, end] = Range.edges(range)
-    const endAtVoid = Boolean(Editor.void(editor, { at: end.path }))
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
     if (
       start.offset !== 0 ||
       end.offset !== 0 ||
-      (voids && endAtVoid) ||
+      Boolean(Editor.void(editor, { at: end.path })) ||
       Range.isCollapsed(range)
     ) {
       return range
@@ -1650,15 +1635,13 @@ export const Editor: EditorInterface = {
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }
-    // If the end is in a void and we're not traversing voids, no need to skip
-    // as the end point will implicitly be skipped
-    let skip = voids || !endAtVoid
+    let skip = true
 
     for (const [node, path] of Editor.nodes(editor, {
       at: before,
       match: Text.isText,
       reverse: true,
-      voids,
+      voids: true,
     })) {
       if (skip) {
         skip = false
