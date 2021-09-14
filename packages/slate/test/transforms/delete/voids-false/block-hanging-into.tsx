@@ -23,6 +23,7 @@ export const output = (
     <block>
       <cursor />
     </block>
+    <block void>two</block>
     <block>three</block>
   </editor>
 )

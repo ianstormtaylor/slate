@@ -1631,9 +1631,15 @@ export const Editor: EditorInterface = {
   ): Range {
     const { voids = false } = options
     let [start, end] = Range.edges(range)
+    const endAtVoid = Boolean(Editor.void(editor, { at: end.path }))
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (
+      start.offset !== 0 ||
+      end.offset !== 0 ||
+      (voids && endAtVoid) ||
+      Range.isCollapsed(range)
+    ) {
       return range
     }
 
@@ -1644,7 +1650,9 @@ export const Editor: EditorInterface = {
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, [])
     const before = { anchor: first, focus: end }
-    let skip = true
+    // If the end is in a void and we're not traversing voids, no need to skip
+    // as the end point will implicitly be skipped
+    let skip = voids || !endAtVoid
 
     for (const [node, path] of Editor.nodes(editor, {
       at: before,
@@ -1657,7 +1665,16 @@ export const Editor: EditorInterface = {
         continue
       }
 
-      if (node.text !== '' || Path.isBefore(path, blockPath)) {
+      // Consider the end non-hanging if:
+      // - We hit a text node with content
+      // - We've crossed block boundaries
+      // - We're in a void element, since they only have one point to represent
+      //   them
+      if (
+        node.text !== '' ||
+        Path.isBefore(path, blockPath) ||
+        Editor.void(editor, { at: path })
+      ) {
         end = { path, offset: node.text.length }
         break
       }
