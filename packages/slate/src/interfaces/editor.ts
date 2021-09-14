@@ -1620,7 +1620,6 @@ export const Editor: EditorInterface = {
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
     if (
-      start.offset !== 0 ||
       end.offset !== 0 ||
       Boolean(Editor.void(editor, { at: end.path })) ||
       Range.isCollapsed(range)
