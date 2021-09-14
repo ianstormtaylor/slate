@@ -3,7 +3,7 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.delete(editor)
+  Transforms.delete(editor, { hanging: true })
 }
 export const input = (
   <editor>
