@@ -1,4 +1,4 @@
-import isPlainObject from 'is-plain-object'
+import { isPlainObject } from 'is-plain-object'
 import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
 
 /**

@@ -115,6 +115,15 @@ Options: `{edge?: 'anchor' | 'focus' | 'start' | 'end'}`
 
 Set the selection to a new value specified by `target`. When a selection already exists, this method is just a proxy for `setSelection` and will update the existing value.
 
+For example, to set the selection to the entire contents of the editor:
+
+```javascript
+Transforms.select(editor, {
+  anchor: Editor.start(editor, []),
+  focus: Editor.end(editor, []),
+})
+```
+
 #### `Transforms.deselect(editor: Editor)`
 
 Unset the selection.
