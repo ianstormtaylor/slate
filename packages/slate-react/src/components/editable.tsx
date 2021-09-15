@@ -308,10 +308,6 @@ export const Editable = (props: EditableProps) => {
           }
         }
 
-        if (!native) {
-          event.preventDefault()
-        }
-
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
         // and those commands determine that for themselves.
@@ -425,7 +421,9 @@ export const Editable = (props: EditableProps) => {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
-                asNative(editor, () => Editor.insertText(editor, data))
+                asNative(editor, () => Editor.insertText(editor, data), {
+                  onFlushed: () => (native = false),
+                })
               } else {
                 Editor.insertText(editor, data)
               }
@@ -433,6 +431,10 @@ export const Editable = (props: EditableProps) => {
 
             break
           }
+        }
+
+        if (!native) {
+          event.preventDefault()
         }
       }
     },
