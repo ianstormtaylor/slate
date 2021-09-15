@@ -41,11 +41,7 @@ jobs:
         uses: changesets/action@master
         with:
           # defined in package.json#scripts
-<<<<<<< HEAD
-          version: changesetversion
-=======
           version: yarn changesetversion
->>>>>>> 06434500... more work to fix automated changeset workflow
           publish: yarn changeset publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

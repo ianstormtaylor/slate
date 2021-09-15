@@ -1,5 +1,15 @@
 # slate
 
+## 0.66.1
+
+### Patch Changes
+
+- [#4518](https://github.com/ianstormtaylor/slate/pull/4518) [`6ec399d4`](https://github.com/ianstormtaylor/slate/commit/6ec399d4db60f1a8d59268c333b43a26dc518b79) Thanks [@TheSpyder](https://github.com/TheSpyder)! - Fixed flaw in deep-equal algorithm when dealing with nested mark objects
+
+* [#4511](https://github.com/ianstormtaylor/slate/pull/4511) [`2af6868d`](https://github.com/ianstormtaylor/slate/commit/2af6868d41b8d797eebdcba5edb18638fe62fd45) Thanks [@dylans](https://github.com/dylans)! - update release process for yarn 3
+
+- [#4516](https://github.com/ianstormtaylor/slate/pull/4516) [`59ca7a8f`](https://github.com/ianstormtaylor/slate/commit/59ca7a8f518c7735c89148ff1d9a8ae9dcf4297f) Thanks [@dylans](https://github.com/dylans)! - another attempt to get the automated changeset workflow working again
+
 ## 0.66.0
 
 ### Minor Changes
