@@ -594,9 +594,12 @@ export const NodeTransforms: NodeTransforms = {
       }
 
       if (split && Range.isRange(at)) {
-        if (Range.isCollapsed(at)) {
-          // If the range is collapsed and 'split' is true, there's nothing to
-          // style that won't get normalized away
+        if (
+          Range.isCollapsed(at) &&
+          Editor.leaf(editor, at.anchor)[0].text.length > 0
+        ) {
+          // If the range is collapsed in a non-empty node and 'split' is true in a non, there's nothing to
+          // set that won't get normalized away
           return
         }
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
