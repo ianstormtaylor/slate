@@ -598,7 +598,7 @@ export const NodeTransforms: NodeTransforms = {
           Range.isCollapsed(at) &&
           Editor.leaf(editor, at.anchor)[0].text.length > 0
         ) {
-          // If the range is collapsed in a non-empty node and 'split' is true in a non, there's nothing to
+          // If the range is collapsed in a non-empty node and 'split' is true, there's nothing to
           // set that won't get normalized away
           return
         }
