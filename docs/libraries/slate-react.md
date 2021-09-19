@@ -49,7 +49,7 @@ function MyEditor() {
     // Implement custom event logic...
 
     // No matter the status of the event, treat event as *not* being handled by
-    // returning false, Slate will exectue its own event handler afterward
+    // returning false, Slate will execute its own event handler afterward
     return false;
   };
 
