@@ -38,6 +38,7 @@ export const Slate = (props: {
   })
 
   const onContextChange = useCallback(() => {
+    onChange(editor.children)
     setContext([editor])
   }, [onChange])
 
