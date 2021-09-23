@@ -1,5 +1,11 @@
 # slate
 
+## 0.66.2
+
+### Patch Changes
+
+- [#4523](https://github.com/ianstormtaylor/slate/pull/4523) [`0da12c17`](https://github.com/ianstormtaylor/slate/commit/0da12c17dc0484f065af2a270d352593a65c1577) Thanks [@steve-codaio](https://github.com/steve-codaio)! - Fix setNodes when called with 'split' and a collapsed range
+
 ## 0.66.1
 
 ### Patch Changes
