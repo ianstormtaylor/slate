@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.66.2
+
+### Patch Changes
+
+- [#4529](https://github.com/ianstormtaylor/slate/pull/4529) [`bd80a0b8`](https://github.com/ianstormtaylor/slate/commit/bd80a0b8dc108a05addb6e599b7f6272acc8aa57) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix erroneous text after native insert
+
 ## 0.66.1
 
 ### Patch Changes
