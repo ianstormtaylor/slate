@@ -594,6 +594,14 @@ export const NodeTransforms: NodeTransforms = {
       }
 
       if (split && Range.isRange(at)) {
+        if (
+          Range.isCollapsed(at) &&
+          Editor.leaf(editor, at.anchor)[0].text.length > 0
+        ) {
+          // If the range is collapsed in a non-empty node and 'split' is true, there's nothing to
+          // set that won't get normalized away
+          return
+        }
         const rangeRef = Editor.rangeRef(editor, at, { affinity: 'inward' })
         const [start, end] = Range.edges(at)
         const splitMode = mode === 'lowest' ? 'lowest' : 'highest'
