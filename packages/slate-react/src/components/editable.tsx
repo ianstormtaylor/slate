@@ -1215,7 +1215,7 @@ export const Editable = (props: EditableProps) => {
                         Editor.isInline(editor, currentNode)
                       ) {
                         event.preventDefault()
-                        Transforms.delete(editor, { unit: 'block' })
+                        Editor.deleteBackward(editor, { unit: 'block' })
 
                         return
                       }
