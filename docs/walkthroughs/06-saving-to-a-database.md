@@ -28,7 +28,7 @@ That will render a basic Slate editor on your page, and when you type things wil
 
 What we need to do is save the changes you make somewhere. For this example, we'll just be using [Local Storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage), but it will give you an idea for where you'd need to add your own database hooks.
 
-So, in our `onChange` handler, we need to save the `value`:
+So, in our `onChange` handler, we need to save the `value` if anything besides the selection was changed:
 
 ```jsx
 const App = () => {
@@ -47,9 +47,14 @@ const App = () => {
       onChange={value => {
         setValue(value)
 
-        // Save the value to Local Storage.
-        const content = JSON.stringify(value)
-        localStorage.setItem('content', content)
+        const isAstChange = editor.operations.some(
+          op => 'set_selection' !== op.type
+        )
+        if (isAstChange) {
+          // Save the value to Local Storage.
+          const content = JSON.stringify(value)
+          localStorage.setItem('content', content)
+        }
       }}
     >
       <Editable />
@@ -81,8 +86,14 @@ const App = () => {
       value={value}
       onChange={value => {
         setValue(value)
-        const content = JSON.stringify(value)
-        localStorage.setItem('content', content)
+        const isAstChange = editor.operations.some(
+          op => 'set_selection' !== op.type
+        )
+        if (isAstChange) {
+          // Save the value to Local Storage.
+          const content = JSON.stringify(value)
+          localStorage.setItem('content', content)
+        }
       }}
     >
       <Editable />
@@ -135,8 +146,13 @@ const App = () => {
       value={value}
       onChange={value => {
         setValue(value)
-        // Serialize the value and save the string value to Local Storage.
-        localStorage.setItem('content', serialize(value))
+        const isAstChange = editor.operations.some(
+          op => 'set_selection' !== op.type
+        )
+        if (isAstChange) {
+          // Serialize the value and save the string value to Local Storage.
+          localStorage.setItem('content', serialize(value))
+        }
       }}
     >
       <Editable />
