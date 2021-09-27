@@ -515,7 +515,7 @@ export const ReactEditor = {
           // COMPAT: In Firefox, `range.cloneContents()` returns an extra trailing '\n'
           // when the document ends with a new-line character. This results in the offset
           // length being off by one, so we need to subtract one to account for this.
-          (IS_FIREFOX && domNode.textContent?.endsWith('\n')))
+          (IS_FIREFOX && domNode.textContent?.endsWith('\n\n')))
       ) {
         offset--
       }
