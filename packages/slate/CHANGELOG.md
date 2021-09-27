@@ -1,5 +1,11 @@
 # slate
 
+## 0.66.5
+
+### Patch Changes
+
+- [#4552](https://github.com/ianstormtaylor/slate/pull/4552) [`37d60c58`](https://github.com/ianstormtaylor/slate/commit/37d60c58b8d4fb844f31888b518be6c2a01fb110) Thanks [@clauderic](https://github.com/clauderic)! - Only apply Firefox `toSlatePoint()` offset fix when the cloned contents end in `\n\n` instead of just `\n`.
+
 ## 0.66.2
 
 ### Patch Changes
