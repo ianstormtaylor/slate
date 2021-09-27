@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.66.4
+
+### Patch Changes
+
+- [#4304](https://github.com/ianstormtaylor/slate/pull/4304) [`7ba486aa`](https://github.com/ianstormtaylor/slate/commit/7ba486aa397411a3e83ab636b0982167d95319c0) Thanks [@davidruisinger](https://github.com/davidruisinger)! - Fixed a bug where text was typed backwards within nested editor
+
 ## 0.66.3
 
 ### Patch Changes
