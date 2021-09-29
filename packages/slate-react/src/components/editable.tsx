@@ -186,7 +186,7 @@ export const Editable = (props: EditableProps) => {
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: true,
+        exactMatch: false,
       })
       if (slateRange && Range.equals(slateRange, selection)) {
         return
@@ -314,6 +314,10 @@ export const Editable = (props: EditableProps) => {
           }
         }
 
+        if (!native) {
+          event.preventDefault()
+        }
+
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
         // and those commands determine that for themselves.
@@ -437,7 +441,7 @@ export const Editable = (props: EditableProps) => {
               // Potentially expand to single character deletes, as well.
               if (native) {
                 asNative(editor, () => Editor.insertText(editor, data), {
-                  onFlushed: () => (native = false),
+                  onFlushed: () => event.preventDefault(),
                 })
               } else {
                 Editor.insertText(editor, data)
@@ -446,10 +450,6 @@ export const Editable = (props: EditableProps) => {
 
             break
           }
-        }
-
-        if (!native) {
-          event.preventDefault()
         }
       }
     },
@@ -1253,7 +1253,7 @@ export const Editable = (props: EditableProps) => {
                         Editor.isInline(editor, currentNode)
                       ) {
                         event.preventDefault()
-                        Transforms.delete(editor, { unit: 'block' })
+                        Editor.deleteBackward(editor, { unit: 'block' })
 
                         return
                       }

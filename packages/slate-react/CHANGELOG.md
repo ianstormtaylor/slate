@@ -1,5 +1,21 @@
 # slate-react
 
+## 0.66.4
+
+### Patch Changes
+
+- [#4304](https://github.com/ianstormtaylor/slate/pull/4304) [`7ba486aa`](https://github.com/ianstormtaylor/slate/commit/7ba486aa397411a3e83ab636b0982167d95319c0) Thanks [@davidruisinger](https://github.com/davidruisinger)! - Fixed a bug where text was typed backwards within nested editor
+
+## 0.66.3
+
+### Patch Changes
+
+- [#4547](https://github.com/ianstormtaylor/slate/pull/4547) [`677da0ca`](https://github.com/ianstormtaylor/slate/commit/677da0ca87ffefb36676200fee5cf5cf0136b22e) Thanks [@clauderic](https://github.com/clauderic)! - Fixed a bug that caused the editor to be unable to resolve a Slate point from a DOM point when selecting an entire document that ended in a new line in Firefox.
+
+* [#4526](https://github.com/ianstormtaylor/slate/pull/4526) [`bc85497d`](https://github.com/ianstormtaylor/slate/commit/bc85497d58dc2eddb0918eed4c7d25d040fa653f) Thanks [@VictorBaron](https://github.com/VictorBaron)! - Fix - delete selected inline void in chrome
+
+- [#4549](https://github.com/ianstormtaylor/slate/pull/4549) [`f9c41a56`](https://github.com/ianstormtaylor/slate/commit/f9c41a569cab2000bd14df5f516c80089b3bf0ac) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix deletion of expanded range (#4546)
+
 ## 0.66.2
 
 ### Patch Changes
