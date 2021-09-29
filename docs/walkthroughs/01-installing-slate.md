@@ -69,7 +69,7 @@ declare module 'slate' {
 ```typescript
 // Also you must annotate `useState<Descendant[]>` and the editor's initial value.
 const App = () => {
-  const initialValue: CustomElement = []
+  const initialValue: CustomElement[] = []
   const [value, setValue] = useState<Descendant[]>(initialValue)
   return (
     <Slate value={value} onChange={setValue}>
