@@ -5,7 +5,6 @@ import {
   Range,
   Text,
   Editor,
-  createEditor as makeEditor,
 } from 'slate'
 import {
   AnchorToken,
