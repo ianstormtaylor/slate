@@ -87,6 +87,12 @@ yarn lint
 
 This will catch TypeScript, Prettier, and Eslint errors.
 
+```text
+yarn fix
+```
+
+This will fix Prettier and Eslint errors.
+
 ## Running integration tests
 
 To run integrations with [cypress](https://github.com/cypress-io/cypress), first run `yarn start` to run the examples website, then run `yarn cypress:open` in a separate session to open the cypress GUI.
