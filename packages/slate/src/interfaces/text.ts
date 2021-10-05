@@ -1,4 +1,4 @@
-import isPlainObject from 'is-plain-object'
+import { isPlainObject } from 'is-plain-object'
 import { Range } from '..'
 import { ExtendedType } from './custom-types'
 import { isDeepEqual } from '../utils/deep-equal'

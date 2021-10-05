@@ -24,7 +24,7 @@ import {
   normalizeDOMPoint,
   hasShadowRoot,
 } from '../utils/dom'
-import { IS_CHROME } from '../utils/environment'
+import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
@@ -463,6 +463,7 @@ export const ReactEditor = {
         const range = window.document.createRange()
         range.setStart(textNode, 0)
         range.setEnd(nearestNode, nearestOffset)
+
         const contents = range.cloneContents()
         const removals = [
           ...Array.prototype.slice.call(
@@ -502,15 +503,19 @@ export const ReactEditor = {
         }
       }
 
-      // COMPAT: If the parent node is a Slate zero-width space, editor is
-      // because the text node should have no characters. However, during IME
-      // composition the ASCII characters will be prepended to the zero-width
-      // space, so subtract 1 from the offset to account for the zero-width
-      // space character.
       if (
         domNode &&
         offset === domNode.textContent!.length &&
-        parentNode.hasAttribute('data-slate-zero-width')
+        // COMPAT: If the parent node is a Slate zero-width space, editor is
+        // because the text node should have no characters. However, during IME
+        // composition the ASCII characters will be prepended to the zero-width
+        // space, so subtract 1 from the offset to account for the zero-width
+        // space character.
+        (parentNode.hasAttribute('data-slate-zero-width') ||
+          // COMPAT: In Firefox, `range.cloneContents()` returns an extra trailing '\n'
+          // when the document ends with a new-line character. This results in the offset
+          // length being off by one, so we need to subtract one to account for this.
+          (IS_FIREFOX && domNode.textContent?.endsWith('\n\n')))
       ) {
         offset--
       }
@@ -565,36 +570,57 @@ export const ReactEditor = {
         // This will highlight the corresponding toolbar button for the sibling
         // block even though users just want to target the previous block.
         // (2021/08/24)
-        // Within the context of Slate and Chrome, if anchor and focus nodes don't have
-        //  the same nodeValue and focusOffset is 0, then it's definitely a triple click
-        // behaviour.
+        // Signs of a triple click in Chrome
+        // - anchor node will be a text node but focus node won't
+        // - both anchorOffset and focusOffset are 0
+        // - focusNode value will be null since Chrome tries to extend to just the
+        // beginning of the next block
         if (
           IS_CHROME &&
-          anchorNode?.nodeValue !== focusNode?.nodeValue &&
-          domRange.focusOffset === 0
+          anchorNode &&
+          focusNode &&
+          anchorNode.nodeType !== focusNode.nodeType &&
+          domRange.anchorOffset === 0 &&
+          domRange.focusOffset === 0 &&
+          focusNode.nodeValue == null
         ) {
           // If an anchorNode is an element node when triple clicked, then the focusNode
           //  should also be the same as anchorNode when triple clicked.
-          if (anchorNode!.nodeType === 1) {
-            focusNode = anchorNode
-          } else {
-            // Otherwise, anchorNode is a text node and we need to
-            // - climb up the DOM tree to get the farthest element node that receives
-            // triple click. It should have atribute 'data-slate-node' = "element"
-            // - get the last child of that element node
-            // - climb down the DOM tree to get the text node of the last child
-            // - this is also the end of the selection aka the focusNode
-            const anchorElement = anchorNode!.parentNode as HTMLElement
-            const tripleClickedBlock = anchorElement.closest(
-              '[data-slate-node="element"]'
-            )
-            const focusElement = tripleClickedBlock!.lastElementChild
-            // Get the element node that holds the focus text node
-            const innermostFocusElement = focusElement!.querySelector(
-              '[data-slate-string]'
-            )
-            const lastTextNode = innermostFocusElement!.childNodes[0]
-            focusNode = lastTextNode
+          // Otherwise, anchorNode is a text node and we need to
+          // - climb up the DOM tree to get the farthest element node that receives
+          //   triple click. It should have atribute 'data-slate-node' = "element"
+          // - get the last child of that element node
+          // - climb down the DOM tree to get the text node of the last child
+          // - this is also the end of the selection aka the focusNode
+          const anchorElement = anchorNode.parentNode as HTMLElement
+          const selectedBlock = anchorElement.closest(
+            '[data-slate-node="element"]'
+          )
+          if (selectedBlock) {
+            // The Slate Text nodes are leaf-level and contains document's text.
+            // However, when represented in the DOM, they are actually Element nodes
+            // and different from the DOM's Text nodes
+            const { childElementCount: slateTextNodeCount } = selectedBlock
+            if (slateTextNodeCount === 1) {
+              focusNode = anchorNode as Text
+              focusOffset = focusNode.length
+            } else if (slateTextNodeCount > 1) {
+              // A element with attribute data-slate-node="element" can have multiple
+              // children with attribute data-slate-node="text". But these children only have
+              // one child at each level.
+              // <span data-slate-node="text">
+              //   <span data-slate-leaf="">
+              //     <span data-slate-string=""></span>
+              //   </span>
+              // </span>
+              const focusElement = selectedBlock.lastElementChild as HTMLElement
+              const nodeIterator = document.createNodeIterator(
+                focusElement,
+                NodeFilter.SHOW_TEXT
+              )
+              focusNode = nodeIterator.nextNode() as Text
+              focusOffset = focusNode.length
+            }
           }
         }
 

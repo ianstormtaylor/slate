@@ -1,5 +1,69 @@
 # slate-react
 
+## 0.66.4
+
+### Patch Changes
+
+- [#4304](https://github.com/ianstormtaylor/slate/pull/4304) [`7ba486aa`](https://github.com/ianstormtaylor/slate/commit/7ba486aa397411a3e83ab636b0982167d95319c0) Thanks [@davidruisinger](https://github.com/davidruisinger)! - Fixed a bug where text was typed backwards within nested editor
+
+## 0.66.3
+
+### Patch Changes
+
+- [#4547](https://github.com/ianstormtaylor/slate/pull/4547) [`677da0ca`](https://github.com/ianstormtaylor/slate/commit/677da0ca87ffefb36676200fee5cf5cf0136b22e) Thanks [@clauderic](https://github.com/clauderic)! - Fixed a bug that caused the editor to be unable to resolve a Slate point from a DOM point when selecting an entire document that ended in a new line in Firefox.
+
+* [#4526](https://github.com/ianstormtaylor/slate/pull/4526) [`bc85497d`](https://github.com/ianstormtaylor/slate/commit/bc85497d58dc2eddb0918eed4c7d25d040fa653f) Thanks [@VictorBaron](https://github.com/VictorBaron)! - Fix - delete selected inline void in chrome
+
+- [#4549](https://github.com/ianstormtaylor/slate/pull/4549) [`f9c41a56`](https://github.com/ianstormtaylor/slate/commit/f9c41a569cab2000bd14df5f516c80089b3bf0ac) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix deletion of expanded range (#4546)
+
+## 0.66.2
+
+### Patch Changes
+
+- [#4529](https://github.com/ianstormtaylor/slate/pull/4529) [`bd80a0b8`](https://github.com/ianstormtaylor/slate/commit/bd80a0b8dc108a05addb6e599b7f6272acc8aa57) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix erroneous text after native insert
+
+## 0.66.1
+
+### Patch Changes
+
+- [#4514](https://github.com/ianstormtaylor/slate/pull/4514) [`8b5dbc3d`](https://github.com/ianstormtaylor/slate/commit/8b5dbc3dc7716b51b74a3b7a3dbe2609642f2f6c) Thanks [@dylans](https://github.com/dylans)! - fix(react-editor): reset focus offset when triple clicking
+
+## 0.66.0
+
+### Minor Changes
+
+- [#3888](https://github.com/ianstormtaylor/slate/pull/3888) [`25afbd43`](https://github.com/ianstormtaylor/slate/commit/25afbd43001cdee852af6386d2b701d943b788da) Thanks [@bkrausz](https://github.com/bkrausz)! - Use native character insertion to fix browser/OS text features
+
+### Patch Changes
+
+- [#4475](https://github.com/ianstormtaylor/slate/pull/4475) [`c1433f56`](https://github.com/ianstormtaylor/slate/commit/c1433f56cfe13feb826264989bb4f68a0eefab62) Thanks [@skogsmaskin](https://github.com/skogsmaskin)! - [slate-react]: fix selection bugs when multiple editors share value
+
+* [#4132](https://github.com/ianstormtaylor/slate/pull/4132) [`48b71294`](https://github.com/ianstormtaylor/slate/commit/48b7129447347c9cf7a0535026287896ef59779b) Thanks [@ulion](https://github.com/ulion)! - Make onDomSelectionChange trigger after onClick.
+
+- [#4493](https://github.com/ianstormtaylor/slate/pull/4493) [`3dd74dd5`](https://github.com/ianstormtaylor/slate/commit/3dd74dd58daa907bfa1fb44bc5655ae2fc8ddb35) Thanks [@dylans](https://github.com/dylans)! - Update error message for useSlate
+
+* [#4450](https://github.com/ianstormtaylor/slate/pull/4450) [`220f2d2c`](https://github.com/ianstormtaylor/slate/commit/220f2d2ce6dffcc1a0f2ea1e8725601b8ea1949b) Thanks [@neko-neko](https://github.com/neko-neko)! - Changed so that the onKeyDown event do not fired while IME converting.
+
+- [#4452](https://github.com/ianstormtaylor/slate/pull/4452) [`935b3a79`](https://github.com/ianstormtaylor/slate/commit/935b3a79d6ec7d7e8f20804b2703e984e9c396e0) Thanks [@dylans](https://github.com/dylans)! - double ime fix for qq browser
+
+* [#4500](https://github.com/ianstormtaylor/slate/pull/4500) [`50bb3d7e`](https://github.com/ianstormtaylor/slate/commit/50bb3d7e32d640957018831526235ca656963f1d) Thanks [@tubbo](https://github.com/tubbo)! - Upgrade `is-plain-object` to v5.0.0
+
+- [#4480](https://github.com/ianstormtaylor/slate/pull/4480) [`e51566ad`](https://github.com/ianstormtaylor/slate/commit/e51566ada84cfa107c445cc6f3908e78c18656b6) Thanks [@imdbsd](https://github.com/imdbsd)! - Add key for Children SelectedContext.Provider
+
+* [#4454](https://github.com/ianstormtaylor/slate/pull/4454) [`d06706c9`](https://github.com/ianstormtaylor/slate/commit/d06706c9e15bbbdd7cdd9a1bbb38c87d37c85ea1) Thanks [@imdbsd](https://github.com/imdbsd)! - Fix to read fragment from data-slate-fragment when application/x-slate-fragment is missing
+
+- [#4460](https://github.com/ianstormtaylor/slate/pull/4460) [`ace397f9`](https://github.com/ianstormtaylor/slate/commit/ace397f96602d93ab9216e3d3434f55eef981e4d) Thanks [@dylans](https://github.com/dylans)! - fix double character insertion regression due to unnecessary memo
+
+* [#4451](https://github.com/ianstormtaylor/slate/pull/4451) [`8e4120ae`](https://github.com/ianstormtaylor/slate/commit/8e4120ae315151705152e62944737ca4f62ad446) Thanks [@githoniel](https://github.com/githoniel)! - fix IME double input with editor mark
+
+- [#4503](https://github.com/ianstormtaylor/slate/pull/4503) [`2065c5bd`](https://github.com/ianstormtaylor/slate/commit/2065c5bdfd0de9f7d5ea049b23cd22b71bb80225) Thanks [@bytrangle](https://github.com/bytrangle)! - Fix incorrect selection when triple clicking blocks in Editable component
+
+* [#4433](https://github.com/ianstormtaylor/slate/pull/4433) [`a1f925bd`](https://github.com/ianstormtaylor/slate/commit/a1f925bddfb8e4507977b3449972d4521d05b148) Thanks [@imdbsd](https://github.com/imdbsd)! - Fix copy-paste a slate fragment on android editable
+
+- [#4365](https://github.com/ianstormtaylor/slate/pull/4365) [`906e5af1`](https://github.com/ianstormtaylor/slate/commit/906e5af1b1af07454da0a93490fca70b58fd9986) Thanks [@samarsault](https://github.com/samarsault)! - fix a bug where element selections were not captured by useSelected
+
+* [#4342](https://github.com/ianstormtaylor/slate/pull/4342) [`834ce348`](https://github.com/ianstormtaylor/slate/commit/834ce3483dc407a6293ba29cac8f192c13f57b01) Thanks [@imdbsd](https://github.com/imdbsd)! - Fix editor mark is not inserted on android
+
 ## 0.65.3
 
 ### Patch Changes

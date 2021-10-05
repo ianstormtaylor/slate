@@ -182,7 +182,7 @@ export const Editable = (props: EditableProps) => {
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: true,
+        exactMatch: false,
       })
       if (slateRange && Range.equals(slateRange, selection)) {
         return
@@ -427,7 +427,9 @@ export const Editable = (props: EditableProps) => {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
-                asNative(editor, () => Editor.insertText(editor, data))
+                asNative(editor, () => Editor.insertText(editor, data), {
+                  onFlushed: () => event.preventDefault(),
+                })
               } else {
                 Editor.insertText(editor, data)
               }
@@ -1213,7 +1215,7 @@ export const Editable = (props: EditableProps) => {
                         Editor.isInline(editor, currentNode)
                       ) {
                         event.preventDefault()
-                        Transforms.delete(editor, { unit: 'block' })
+                        Editor.deleteBackward(editor, { unit: 'block' })
 
                         return
                       }
