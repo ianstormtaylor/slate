@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.66.6
+
+### Patch Changes
+
+- [#4556](https://github.com/ianstormtaylor/slate/pull/4556) [`b1084918`](https://github.com/ianstormtaylor/slate/commit/b10849182086699d4bb18209a37ea6247f712bd0) Thanks [@jaked](https://github.com/jaked)! - fix forced update in TextString in case of double render
+
 ## 0.66.4
 
 ### Patch Changes
