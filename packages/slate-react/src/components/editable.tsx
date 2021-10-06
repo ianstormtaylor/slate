@@ -505,8 +505,6 @@ export const Editable = (props: EditableProps) => {
             exactMatch: false,
           })
           Transforms.select(editor, range)
-        } else {
-          Transforms.deselect(editor)
         }
       }
     }, 100),
