@@ -14,8 +14,8 @@ This sub-library tracks changes to the Slate value state over time, and enables 
 
 The `withHistory` plugin keeps track of the operation history of a Slate editor as operations are applied to it, using undo and redo stacks.
 
-When used with `withReact`, `withHistory` should be applied second. For example:
+When used with `withReact`, `withHistory` should be applied inside. For example:
 
 ```javascript
-const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+const editor = useMemo(() => withReact(withHistory(createEditor())), [])
 ```
