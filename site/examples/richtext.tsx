@@ -66,9 +66,9 @@ const toggleBlock = (editor, format) => {
 
   Transforms.unwrapNodes(editor, {
     match: n =>
-      LIST_TYPES.includes(
-        !Editor.isEditor(n) && SlateElement.isElement(n) && n.type
-      ),
+      !Editor.isEditor(n) &&
+      SlateElement.isElement(n) &&
+      LIST_TYPES.includes(n.type),
     split: true,
   })
   const newProperties: Partial<SlateElement> = {
