@@ -20,9 +20,8 @@ export const output = (
   <editor>
     <block>
       one
-      <inline>two</inline>
-      four
-      <cursor />
+      <inline>twofour
+      <cursor /></inline>
       three
     </block>
   </editor>
