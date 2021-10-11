@@ -124,6 +124,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       if (hasDomSelection && hasDomSelectionInEditor && selection) {
         const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
           exactMatch: true,
+          suppressThrow: true,
         })
         if (slateRange && Range.equals(slateRange, selection)) {
           return
@@ -137,6 +138,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       if (selection && !ReactEditor.hasRange(editor, selection)) {
         editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
           exactMatch: false,
+          suppressThrow: false,
         })
         return
       }
@@ -266,6 +268,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           if (anchorNodeSelectable && focusNodeSelectable) {
             const range = ReactEditor.toSlateRange(editor, domSelection, {
               exactMatch: false,
+              suppressThrow: false,
             })
             Transforms.select(editor, range)
           } else {
