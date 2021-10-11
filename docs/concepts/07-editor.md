@@ -8,14 +8,12 @@ interface Editor {
   children: Node[]
   selection: Range | null
   operations: Operation[]
-  marks: Record<string, any> | null
-
+  marks: Omit<Text, 'text'> | null
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
-
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void
@@ -49,7 +47,7 @@ For example, if you want to define link elements that are inline nodes:
 ```javascript
 const { isInline } = editor
 
-editor.isInline = (element) => {
+editor.isInline = element => {
   return element.type === 'link' ? true : isInline(element)
 }
 ```
@@ -59,7 +57,7 @@ Or maybe you want to override the `insertText` behavior to "linkify" URLs:
 ```javascript
 const { insertText } = editor
 
-editor.insertText = (text) => {
+editor.insertText = text => {
   if (isUrl(text)) {
     // ...
     return
@@ -74,7 +72,7 @@ Or you can even define custom "normalizations" that take place to ensure that li
 ```javascript
 const { normalizeNode } = editor
 
-editor.normalizeNode = (entry) => {
+editor.normalizeNode = entry => {
   const [node, path] = entry
 
   if (Element.isElement(node) && node.type === 'link') {
