@@ -324,7 +324,7 @@ const [selection, setSelection] = useState(null)
 
 ### BREAKING
 
-**A complete overhaul.** The Slate codebase has had a complete overhaul and many pieces of its core architecture have been reconsidered from the ground up. There are lots of changes. We recommend re-reading the [Walkthroughs](https://docs.slatejs.org/walkthroughs) and [Concepts](https://docs.slatejs.org/concepts) documentation and the [Examples](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/site/examples/README.md) to get a sense for everything that has changed. As well as the [Migration](https://docs.slatejs.org/concepts/XX-migrating) writeup for what the major changes are.
+**A complete overhaul.** The Slate codebase has had a complete overhaul and many pieces of its core architecture have been reconsidered from the ground up. There are lots of changes. We recommend re-reading the [Walkthroughs](https://docs.slatejs.org/walkthroughs) and [Concepts](https://docs.slatejs.org/concepts) documentation and the [Examples](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/site/examples/README.md) to get a sense for everything that has changed. As well as the [Migration](https://docs.slatejs.org/concepts/xx-migrating) writeup for what the major changes are.
 
 > ⚠ **Warning:** Changes past this point refer to the older Slate architecture, based on Immutable.js and without TypeScript. Many things are different in the older architecture and may not apply to the newer one.
 
