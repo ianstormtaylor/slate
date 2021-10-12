@@ -293,6 +293,21 @@ export const Editable = (props: EditableProps) => {
           if (editor.marks) {
             native = false
           }
+
+          // and because of the selection moving in `insertText` (create-editor.ts).
+          const { anchor } = selection
+          const inline = Editor.above(editor, {
+            at: anchor,
+            match: n => Editor.isInline(editor, n),
+            mode: 'highest',
+          })
+          if (inline) {
+            const [, inlinePath] = inline
+
+            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+              native = false
+            }
+          }
         }
 
         if (!native) {
