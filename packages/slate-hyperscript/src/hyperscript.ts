@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Element } from 'slate'
+import { Element, createEditor as makeEditor } from 'slate'
 import {
   createAnchor,
   createCursor,
@@ -18,7 +18,7 @@ import {
 const DEFAULT_CREATORS = {
   anchor: createAnchor,
   cursor: createCursor,
-  editor: createEditor,
+  editor: createEditor(makeEditor),
   element: createElement,
   focus: createFocus,
   fragment: createFragment,
