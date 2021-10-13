@@ -180,6 +180,12 @@ React-specific plugins for Slate editors
 
 Adds React and DOM specific behaviors to the editor.
 
+When used with `withHistory`, `withReact` should be applied outside. For example:
+
+```javascript
+const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+```
+
 ## Utils
 
 Private convenience modules

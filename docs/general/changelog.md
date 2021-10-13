@@ -4,10 +4,10 @@ This is a list of changes to Slate with each new release. Until `1.0` is release
 
 > ⚠️ Until [https://github.com/atlassian/changesets/issues/264](https://github.com/atlassian/changesets/issues/264) is solved, each package will maintain its own individual changelog, which you can find here:
 >
-> - [slate](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/packages/slate/CHANGELOG.md)
-> - [slate-history](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/packages/slate-history/CHANGELOG.md)
-> - [slate-hyperscript](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/packages/slate-hyperscript/CHANGELOG.md)
-> - [slate-react](https://github.com/ianstormtaylor/slate/tree/71ff94c8d866a3ad9582ec4b84258d99d508fd70/packages/slate-react/CHANGELOG.md)
+> - [slate](https://github.com/ianstormtaylor/slate/blob/main/packages/slate/CHANGELOG.md)
+> - [slate-history](https://github.com/ianstormtaylor/slate/blob/main/packages/slate-history/CHANGELOG.md)
+> - [slate-hyperscript](https://github.com/ianstormtaylor/slate/blob/main/packages/slate-hyperscript/CHANGELOG.md)
+> - [slate-react](https://github.com/ianstormtaylor/slate/blob/main/packages/slate-react/CHANGELOG.md)
 
 ## `0.61` — March 29, 2021
 

@@ -93,6 +93,7 @@ const Image = ({ attributes, children, element }) => {
   const focused = useFocused()
   return (
     <div {...attributes}>
+      {children}
       <div contentEditable={false}>
         <img
           src={element.url}
@@ -104,7 +105,6 @@ const Image = ({ attributes, children, element }) => {
           `}
         />
       </div>
-      {children}
     </div>
   )
 }

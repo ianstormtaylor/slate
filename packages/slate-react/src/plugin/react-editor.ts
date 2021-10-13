@@ -566,65 +566,6 @@ export const ReactEditor = {
         anchorOffset = domRange.anchorOffset
         focusNode = domRange.focusNode
         focusOffset = domRange.focusOffset
-        // When triple clicking a block, Chrome will return a selection object whose
-        // focus node is the next element sibling and focusOffset is 0.
-        // This will highlight the corresponding toolbar button for the sibling
-        // block even though users just want to target the previous block.
-        // (2021/08/24)
-        // Signs of a triple click in Chrome
-        // - anchor node will be a text node but focus node won't
-        // - both anchorOffset and focusOffset are 0
-        // - focusNode value will be null since Chrome tries to extend to just the
-        // beginning of the next block
-        if (
-          IS_CHROME &&
-          anchorNode &&
-          focusNode &&
-          anchorNode.nodeType !== focusNode.nodeType &&
-          domRange.anchorOffset === 0 &&
-          domRange.focusOffset === 0 &&
-          focusNode.nodeValue == null
-        ) {
-          // If an anchorNode is an element node when triple clicked, then the focusNode
-          //  should also be the same as anchorNode when triple clicked.
-          // Otherwise, anchorNode is a text node and we need to
-          // - climb up the DOM tree to get the farthest element node that receives
-          //   triple click. It should have atribute 'data-slate-node' = "element"
-          // - get the last child of that element node
-          // - climb down the DOM tree to get the text node of the last child
-          // - this is also the end of the selection aka the focusNode
-          const anchorElement = anchorNode.parentNode as HTMLElement
-          const selectedBlock = anchorElement.closest(
-            '[data-slate-node="element"]'
-          )
-          if (selectedBlock) {
-            // The Slate Text nodes are leaf-level and contains document's text.
-            // However, when represented in the DOM, they are actually Element nodes
-            // and different from the DOM's Text nodes
-            const { childElementCount: slateTextNodeCount } = selectedBlock
-            if (slateTextNodeCount === 1) {
-              focusNode = anchorNode as Text
-              focusOffset = focusNode.length
-            } else if (slateTextNodeCount > 1) {
-              // A element with attribute data-slate-node="element" can have multiple
-              // children with attribute data-slate-node="text". But these children only have
-              // one child at each level.
-              // <span data-slate-node="text">
-              //   <span data-slate-leaf="">
-              //     <span data-slate-string=""></span>
-              //   </span>
-              // </span>
-              const focusElement = selectedBlock.lastElementChild as HTMLElement
-              const nodeIterator = document.createNodeIterator(
-                focusElement,
-                NodeFilter.SHOW_TEXT
-              )
-              focusNode = nodeIterator.nextNode() as Text
-              focusOffset = focusNode.length
-            }
-          }
-        }
-
         // COMPAT: There's a bug in chrome that always returns `true` for
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)
@@ -672,9 +613,21 @@ export const ReactEditor = {
       return null as T extends true ? Range | null : Range
     }
 
-    return ({ anchor, focus } as unknown) as T extends true
-      ? Range | null
-      : Range
+    let range: Range = { anchor: anchor as Point, focus: focus as Point }
+    // if the selection is a hanging range that ends in a void
+    // and the DOM focus is an Element
+    // (meaning that the selection ends before the element)
+    // unhang the range to avoid mistakenly including the void
+    if (
+      Range.isExpanded(range) &&
+      Range.isForward(range) &&
+      isDOMElement(focusNode) &&
+      Editor.void(editor, { at: range.focus, mode: 'highest' })
+    ) {
+      range = Editor.unhangRange(editor, range, { voids: true })
+    }
+
+    return (range as unknown) as T extends true ? Range | null : Range
   },
 
   hasRange(editor: ReactEditor, range: Range): boolean {

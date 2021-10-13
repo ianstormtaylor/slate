@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.66.7
+
+### Patch Changes
+
+- [#4588](https://github.com/ianstormtaylor/slate/pull/4588) [`ae65ae5f`](https://github.com/ianstormtaylor/slate/commit/ae65ae5f717c877eee0e3f839b76fc18d8b44999) Thanks [@jaked](https://github.com/jaked)! - revert #4455 / #4512; fix triple-click by unhanging range with void
+
 ## 0.66.6
 
 ### Patch Changes
