@@ -430,6 +430,7 @@ export const ReactEditor = {
     // Resolve a Slate range from the DOM range.
     const range = ReactEditor.toSlateRange(editor, domRange, {
       exactMatch: false,
+      suppressThrow: false,
     })
     return range
   },
@@ -441,8 +442,12 @@ export const ReactEditor = {
   toSlatePoint<T extends boolean>(
     editor: ReactEditor,
     domPoint: DOMPoint,
-    exactMatch: T
+    options: {
+      exactMatch: T
+      suppressThrow: T
+    }
   ): T extends true ? Point | null : Point {
+    const { exactMatch, suppressThrow } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
       : normalizeDOMPoint(domPoint)
@@ -522,7 +527,7 @@ export const ReactEditor = {
     }
 
     if (!textNode) {
-      if (exactMatch) {
+      if (suppressThrow) {
         return null as T extends true ? Point | null : Point
       }
       throw new Error(
@@ -547,9 +552,10 @@ export const ReactEditor = {
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options: {
       exactMatch: T
+      suppressThrow: T
     }
   ): T extends true ? Range | null : Range {
-    const { exactMatch } = options
+    const { exactMatch, suppressThrow } = options
     const el = isDOMSelection(domRange)
       ? domRange.anchorNode
       : domRange.startContainer
@@ -599,7 +605,7 @@ export const ReactEditor = {
     const anchor = ReactEditor.toSlatePoint(
       editor,
       [anchorNode, anchorOffset],
-      exactMatch
+      { exactMatch, suppressThrow }
     )
     if (!anchor) {
       return null as T extends true ? Range | null : Range
@@ -607,7 +613,10 @@ export const ReactEditor = {
 
     const focus = isCollapsed
       ? anchor
-      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], exactMatch)
+      : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], {
+          exactMatch,
+          suppressThrow,
+        })
     if (!focus) {
       return null as T extends true ? Range | null : Range
     }

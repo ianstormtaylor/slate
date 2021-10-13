@@ -183,6 +183,10 @@ export const Editable = (props: EditableProps) => {
     if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
+
+        // domSelection is not necessarily a valid Slate range
+        // (e.g. when clicking on contentEditable:false element)
+        suppressThrow: true,
       })
       if (slateRange && Range.equals(slateRange, selection)) {
         return
@@ -196,6 +200,7 @@ export const Editable = (props: EditableProps) => {
     if (selection && !ReactEditor.hasRange(editor, selection)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
+        suppressThrow: false,
       })
       return
     }
@@ -323,6 +328,7 @@ export const Editable = (props: EditableProps) => {
           if (targetRange) {
             const range = ReactEditor.toSlateRange(editor, targetRange, {
               exactMatch: false,
+              suppressThrow: false,
             })
 
             if (!selection || !Range.equals(selection, range)) {
@@ -503,6 +509,7 @@ export const Editable = (props: EditableProps) => {
         if (anchorNodeSelectable && focusNodeSelectable) {
           const range = ReactEditor.toSlateRange(editor, domSelection, {
             exactMatch: false,
+            suppressThrow: false,
           })
           Transforms.select(editor, range)
         }
