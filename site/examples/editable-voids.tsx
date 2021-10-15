@@ -11,7 +11,7 @@ import { EditableVoidElement } from './custom-types'
 const EditableVoidsExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
-    () => withEditableVoids(withHistory(withReact(createEditor()))),
+    () => withReact(withEditableVoids(withHistory(createEditor()))),
     []
   )
 

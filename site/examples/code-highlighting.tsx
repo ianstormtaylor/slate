@@ -13,7 +13,7 @@ const CodeHighlightingExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const [language, setLanguage] = useState('html')
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
 
   // decorate function depends on the language selected
   const decorate = useCallback(
@@ -99,7 +99,7 @@ const Leaf = ({ attributes, children, leaf }) => {
         ${leaf.comment &&
           css`
             color: slategray;
-          `} 
+          `}
 
         ${(leaf.operator || leaf.url) &&
           css`

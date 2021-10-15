@@ -5,7 +5,7 @@ import { withHistory } from 'slate-history'
 
 const PlainTextExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable

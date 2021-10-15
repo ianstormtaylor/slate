@@ -15,7 +15,7 @@ const TablesExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
-    () => withTables(withHistory(withReact(createEditor()))),
+    () => withReact(withTables(withHistory(createEditor()))),
     []
   )
   return (

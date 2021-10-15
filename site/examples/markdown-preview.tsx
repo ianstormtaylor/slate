@@ -11,7 +11,7 @@ import { css } from 'emotion'
 const MarkdownPreviewExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
   const decorate = useCallback(([node, path]) => {
     const ranges = []
 

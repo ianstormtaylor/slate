@@ -21,7 +21,7 @@ const MentionExample = () => {
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withMentions(withReact(withHistory(createEditor()))),
+    () => withReact(withMentions(withHistory(createEditor()))),
     []
   )
 
