@@ -17,7 +17,7 @@ import { Button, Icon, Toolbar } from '../components'
 const LinkExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
-    () => withLinks(withHistory(withReact(createEditor()))),
+    () => withLinks(withReact(withHistory(createEditor()))),
     []
   )
 
