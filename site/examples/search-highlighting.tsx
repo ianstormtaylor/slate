@@ -9,7 +9,7 @@ import { Icon, Toolbar } from '../components'
 const SearchHighlightingExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
-  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []

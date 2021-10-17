@@ -21,7 +21,7 @@ const IFrameExample = () => {
     []
   )
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 

@@ -15,7 +15,7 @@ import {
 
 const EmbedsExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
-  const editor = useMemo(() => withReact(withEmbeds(createEditor())), [])
+  const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable

@@ -29,7 +29,7 @@ const MarkdownShortcutsExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withReact(withShortcuts(withHistory(createEditor()))),
+    () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
   return (
