@@ -49,7 +49,7 @@ import {
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
 
-type DeferredOperation = () => void;
+type DeferredOperation = () => void
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -435,8 +435,9 @@ export const Editable = (props: EditableProps) => {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
-                deferredOperations.current.push(() => Editor.insertText(editor, data)
-                })
+                deferredOperations.current.push(() =>
+                  Editor.insertText(editor, data)
+                )
               } else {
                 Editor.insertText(editor, data)
               }
@@ -624,11 +625,7 @@ export const Editable = (props: EditableProps) => {
             // to stop rendering, so that browser functions like autocorrect
             // and spellcheck work as expected.
             for (const op of deferredOperations.current) {
-              switch (op.type) {
-                case 'insertText':
-                  Editor.insertText(editor, op.text)
-                  break
-              }
+              op()
             }
             deferredOperations.current = []
           }, [])}
