@@ -69,7 +69,7 @@ const CheckListsExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withReact(withChecklists(withHistory(createEditor()))),
+    () => withChecklists(withHistory(withReact(createEditor()))),
     []
   )
 

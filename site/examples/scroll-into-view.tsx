@@ -50,7 +50,7 @@ const ScrollIntoViewExample = () => {
 
 const PlainTextEditor = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
-  const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
       <Editable placeholder="Enter some plain text..." />

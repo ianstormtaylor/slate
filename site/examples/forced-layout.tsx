@@ -65,7 +65,7 @@ const ForcedLayoutExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
-    () => withReact(withLayout(withHistory(createEditor()))),
+    () => withLayout(withHistory(withReact(createEditor()))),
     []
   )
   return (

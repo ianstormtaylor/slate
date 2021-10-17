@@ -19,7 +19,7 @@ import { ImageElement } from './custom-types'
 const ImagesExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
-    () => withImages(withReact(withHistory(createEditor()))),
+    () => withImages(withHistory(withReact(createEditor()))),
     []
   )
 
