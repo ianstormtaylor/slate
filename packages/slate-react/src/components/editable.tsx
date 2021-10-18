@@ -48,7 +48,8 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
-import { asNative, flushNativeEvents } from '../utils/native'
+
+type DeferredOperation = () => void
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -124,6 +125,7 @@ export const Editable = (props: EditableProps) => {
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const deferredOperations = useRef<DeferredOperation[]>([])
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -433,9 +435,9 @@ export const Editable = (props: EditableProps) => {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
-                asNative(editor, () => Editor.insertText(editor, data), {
-                  onFlushed: () => event.preventDefault(),
-                })
+                deferredOperations.current.push(() =>
+                  Editor.insertText(editor, data)
+                )
               } else {
                 Editor.insertText(editor, data)
               }
@@ -622,7 +624,10 @@ export const Editable = (props: EditableProps) => {
             // and we can correctly compare DOM text values in components
             // to stop rendering, so that browser functions like autocorrect
             // and spellcheck work as expected.
-            flushNativeEvents(editor)
+            for (const op of deferredOperations.current) {
+              op()
+            }
+            deferredOperations.current = []
           }, [])}
           onBlur={useCallback(
             (event: React.FocusEvent<HTMLDivElement>) => {
