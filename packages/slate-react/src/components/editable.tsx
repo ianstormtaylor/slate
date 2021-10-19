@@ -288,7 +288,7 @@ export const Editable = (props: EditableProps) => {
           event.data &&
           event.data.length === 1 &&
           /[a-z ]/i.test(event.data) &&
-          // Chrome seems to have issues correctly editing the start of nodes.
+          // Chrome has issues correctly editing the start of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
           // When there is an inline element, e.g. a link, and you select
           // right after it (the start of the next node).
           selection.anchor.offset !== 0
@@ -301,7 +301,8 @@ export const Editable = (props: EditableProps) => {
             native = false
           }
 
-          // and because of the selection moving in `insertText` (create-editor.ts).
+          // Chrome also has issues correctly editing the end of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
+          // Therefore we don't allow native events to insert text at the end of nodes.
           const { anchor } = selection
           const inline = Editor.above(editor, {
             at: anchor,

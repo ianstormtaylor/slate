@@ -162,27 +162,6 @@ export const createEditor = (): Editor => {
       const { selection, marks } = editor
 
       if (selection) {
-        // If the cursor is at the end of an inline, move it outside of
-        // the inline before inserting
-        if (Range.isCollapsed(selection)) {
-          const inline = Editor.above(editor, {
-            match: n => Editor.isInline(editor, n),
-            mode: 'highest',
-          })
-
-          if (inline) {
-            const [, inlinePath] = inline
-
-            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-              const point = Editor.after(editor, inlinePath)!
-              Transforms.setSelection(editor, {
-                anchor: point,
-                focus: point,
-              })
-            }
-          }
-        }
-
         if (marks) {
           const node = { text, ...marks }
           Transforms.insertNodes(editor, node)
