@@ -19,8 +19,8 @@ export const Slate = (props: {
   onChange: (value: Descendant[]) => void
 }) => {
   const { editor, children, onChange, value, ...rest } = props
-  const [key, setKey] = useState(0)
-  const context: [ReactEditor] = useMemo(() => {
+
+  const [context, setContext] = React.useState<[ReactEditor]>(() => {
     if (!Node.isNodeList(value)) {
       throw new Error(
         `[Slate] value is invalid! Expected a list of elements` +
@@ -35,12 +35,12 @@ export const Slate = (props: {
     editor.children = value
     Object.assign(editor, rest)
     return [editor]
-  }, [key, value, ...Object.values(rest)])
+  })
 
   const onContextChange = useCallback(() => {
     onChange(editor.children)
-    setKey(key + 1)
-  }, [key, onChange])
+    setContext([editor])
+  }, [onChange])
 
   EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
 

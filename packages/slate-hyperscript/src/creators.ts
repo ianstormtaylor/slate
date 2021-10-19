@@ -1,12 +1,4 @@
-import {
-  Element,
-  Descendant,
-  Node,
-  Range,
-  Text,
-  Editor,
-  createEditor as makeEditor,
-} from 'slate'
+import { Element, Descendant, Node, Range, Text, Editor } from 'slate'
 import {
   AnchorToken,
   FocusToken,
@@ -217,11 +209,11 @@ export function createText(
  * Create a top-level `Editor` object.
  */
 
-export function createEditor(
+export const createEditor = (makeEditor: () => Editor) => (
   tagName: string,
   attributes: { [key: string]: any },
   children: any[]
-): Editor {
+): Editor => {
   const otherChildren: any[] = []
   let selectionChild: Range | undefined
 

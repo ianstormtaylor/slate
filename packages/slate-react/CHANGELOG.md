@@ -1,5 +1,25 @@
 # slate-react
 
+## 0.67.0
+
+### Minor Changes
+
+- [#4540](https://github.com/ianstormtaylor/slate/pull/4540) [`11ef83b4`](https://github.com/ianstormtaylor/slate/commit/11ef83b47fca84d1f908b5c9eeefada516fe9fed) Thanks [@bryanph](https://github.com/bryanph)! - The Slate Provider's "value" prop is now only used as initial state for editor.children as was intended before. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the "value" prop to do this for you.
+
+### Patch Changes
+
+- [#4577](https://github.com/ianstormtaylor/slate/pull/4577) [`4b2e4000`](https://github.com/ianstormtaylor/slate/commit/4b2e4000d6253bd86fab237b6f2c70e9f8d30f09) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed a bug that removed the selection when hovering over a non-selectable DOM element
+
+* [#4605](https://github.com/ianstormtaylor/slate/pull/4605) [`87ab2efa`](https://github.com/ianstormtaylor/slate/commit/87ab2efa41a5b7a1324b3fc97117a1cdd3b41d66) Thanks [@jaked](https://github.com/jaked)! - defer native events within Editable to avoid bugs with Editor
+
+- [#4584](https://github.com/ianstormtaylor/slate/pull/4584) [`f40e515d`](https://github.com/ianstormtaylor/slate/commit/f40e515dc7f956b7fd859688c0170f2c1763fecf) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed bug: setting selection from `contentEditable:false` element causes crash
+
+## 0.66.7
+
+### Patch Changes
+
+- [#4588](https://github.com/ianstormtaylor/slate/pull/4588) [`ae65ae5f`](https://github.com/ianstormtaylor/slate/commit/ae65ae5f717c877eee0e3f839b76fc18d8b44999) Thanks [@jaked](https://github.com/jaked)! - revert #4455 / #4512; fix triple-click by unhanging range with void
+
 ## 0.66.6
 
 ### Patch Changes
