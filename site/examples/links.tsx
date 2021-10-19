@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
-import { Slate, Editable, withReact, useSlate } from 'slate-react'
+import { css } from 'emotion'
+import { Slate, Editable, withReact, useSlate, useSelected } from 'slate-react'
 import {
   Transforms,
   Editor,
@@ -105,14 +106,30 @@ const wrapLink = (editor, url) => {
   }
 }
 
-const Element = ({ attributes, children, element }) => {
+const LinkComponent = ({ attributes, children, element }) => {
+  const selected = useSelected()
+  return (
+    <a
+      {...attributes}
+      href={element.url}
+      className={
+        selected
+          ? css`
+              box-shadow: 0 0 0 3px #ddd;
+            `
+          : ''
+      }
+    >
+      {children}
+    </a>
+  )
+}
+
+const Element = props => {
+  const { attributes, children, element } = props
   switch (element.type) {
     case 'link':
-      return (
-        <a {...attributes} href={element.url}>
-          {children}
-        </a>
-      )
+      return <LinkComponent {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
