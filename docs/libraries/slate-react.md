@@ -138,7 +138,15 @@ Check if a DOM node is within the editor.
 
 ### `insertData(editor: ReactEditor, data: DataTransfer)`
 
-Insert data from a `DataTransfer` into the editor.
+Insert data from a `DataTransfer` into the editor. This is a proxy method to call in this order `insertFragmentData(editor: ReactEditor, data: DataTransfer)` and then `insertTextData(editor: ReactEditor, data: DataTransfer)`.
+
+### `insertFragmentData(editor: ReactEditor, data: DataTransfer)`
+
+Insert fragment data from a `DataTransfer` into the editor.
+
+### `insertTextData(editor: ReactEditor, data: DataTransfer)`
+
+Insert text data from a `DataTransfer` into the editor.
 
 ### `setFragmentData(editor: ReactEditor, data: DataTransfer)`
 
