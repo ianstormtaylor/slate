@@ -200,10 +200,14 @@ const Mention = ({ attributes, children, element }) => {
     >
       @{element.character}
       {children}
-      <button onClick={() => {
-        // Remove myself from the Slate document
-        Transforms.removeNodes(editor, { at: path })
-      }}>X</button>
+      <button
+        onClick={() => {
+          // Remove myself from the Slate document
+          Transforms.removeNodes(editor, { at: path })
+        }}
+      >
+        X
+      </button>
     </span>
   )
 }
