@@ -8,7 +8,6 @@ import {
   withReact,
   useSelected,
   useFocused,
-  useEditor,
 } from 'slate-react'
 
 import { Portal } from '../components'
@@ -177,9 +176,6 @@ const Element = props => {
 }
 
 const Mention = ({ attributes, children, element }) => {
-  const editor = useEditor()
-  const path = ReactEditor.findPath(editor, element)
-
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -200,14 +196,6 @@ const Mention = ({ attributes, children, element }) => {
     >
       @{element.character}
       {children}
-      <button
-        onClick={() => {
-          // Remove myself from the Slate document
-          Transforms.removeNodes(editor, { at: path })
-        }}
-      >
-        X
-      </button>
     </span>
   )
 }
