@@ -195,6 +195,11 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.insertData = (data: DataTransfer) => {
+    e.insertFragmentData(data)
+    e.insertTextData(data)
+  }
+
+  e.insertFragmentData = (data: DataTransfer) => {
     /**
      * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
      */
@@ -208,7 +213,9 @@ export const withReact = <T extends Editor>(editor: T) => {
       e.insertFragment(parsed)
       return
     }
+  }
 
+  e.insertTextData = (data: DataTransfer) => {
     const text = data.getData('text/plain')
 
     if (text) {
