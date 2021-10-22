@@ -6,6 +6,6 @@ describe('Inlines example', () => {
   it('contains link', () => {
     cy.findByRole('textbox')
       .find('a')
-      .should('contain.text', 'hyperlinks')
+      .should('contain.text', 'hyperlink')
   })
 })
