@@ -32,6 +32,8 @@ import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
 
 export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
+  insertFragmentData: (data: DataTransfer) => void
+  insertTextData: (data: DataTransfer) => void
   setFragmentData: (data: DataTransfer) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
