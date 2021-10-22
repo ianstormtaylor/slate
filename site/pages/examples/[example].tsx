@@ -15,7 +15,7 @@ import ForcedLayout from '../../examples/forced-layout'
 import HoveringToolbar from '../../examples/hovering-toolbar'
 import HugeDocument from '../../examples/huge-document'
 import Images from '../../examples/images'
-import Links from '../../examples/links'
+import Inlines from '../../examples/inlines'
 import MarkdownPreview from '../../examples/markdown-preview'
 import MarkdownShortcuts from '../../examples/markdown-shortcuts'
 import Mentions from '../../examples/mentions'
@@ -41,7 +41,7 @@ const EXAMPLES = [
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
   ['Huge Document', HugeDocument, 'huge-document'],
   ['Images', Images, 'images'],
-  ['Links', Links, 'links'],
+  ['Inlines', Inlines, 'inlines'],
   ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
   ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
