@@ -1,6 +1,6 @@
-describe('Links example', () => {
+describe('Inlines example', () => {
   beforeEach(() => {
-    cy.visit('examples/links')
+    cy.visit('examples/inlines')
   })
 
   it('contains link', () => {
