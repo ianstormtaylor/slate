@@ -884,6 +884,7 @@ export const Editable = (props: EditableProps) => {
           onDragStart={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
               if (
+                !readOnly &&
                 hasTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onDragStart)
               ) {
