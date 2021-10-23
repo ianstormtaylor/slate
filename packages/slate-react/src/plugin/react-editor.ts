@@ -231,6 +231,22 @@ export const ReactEditor = {
   },
 
   /**
+   * Insert fragment data from a `DataTransfer` into the editor.
+   */
+
+  insertFragmentData(editor: ReactEditor, data: DataTransfer): void {
+    editor.insertFragmentData(data)
+  },
+
+  /**
+   * Insert text data from a `DataTransfer` into the editor.
+   */
+
+  insertTextData(editor: ReactEditor, data: DataTransfer): void {
+    editor.insertTextData(data)
+  },
+
+  /**
    * Sets data from the currently selected fragment on a `DataTransfer`.
    */
 
