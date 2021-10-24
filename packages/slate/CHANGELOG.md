@@ -1,5 +1,11 @@
 # slate
 
+## 0.67.1
+
+### Patch Changes
+
+- [#4578](https://github.com/ianstormtaylor/slate/pull/4578) [`67badb7d`](https://github.com/ianstormtaylor/slate/commit/67badb7dd03c6d36d31b90689247553c0386d771) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Allow typing at the end of inline elements
+
 ## 0.66.5
 
 ### Patch Changes
