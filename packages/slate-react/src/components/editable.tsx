@@ -478,7 +478,6 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !readOnly &&
         !state.isComposing &&
         !state.isUpdatingSelection &&
         !state.isDraggingInternally
@@ -585,7 +584,12 @@ export const Editable = (props: EditableProps) => {
           }
           data-slate-editor
           data-slate-node="value"
-          contentEditable={readOnly ? undefined : true}
+          // explicitly set this
+          contentEditable={!readOnly}
+          // in some cases, a decoration needs access to the range / selection to decorate a text node,
+          // then you will select the whole text node when you select part the of text
+          // this magic zIndex="-1" will fix it
+          zindex={-1}
           suppressContentEditableWarning
           ref={ref}
           style={{
