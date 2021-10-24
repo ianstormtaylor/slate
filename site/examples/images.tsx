@@ -9,6 +9,7 @@ import {
   useSelected,
   useFocused,
   withReact,
+  ReactEditor,
 } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
@@ -89,12 +90,20 @@ const Element = props => {
 }
 
 const Image = ({ attributes, children, element }) => {
+  const editor = useSlateStatic()
+  const path = ReactEditor.findPath(editor, element)
+
   const selected = useSelected()
   const focused = useFocused()
   return (
     <div {...attributes}>
       {children}
-      <div contentEditable={false}>
+      <div
+        contentEditable={false}
+        className={css`
+          position: relative;
+        `}
+      >
         <img
           src={element.url}
           className={css`
@@ -104,6 +113,19 @@ const Image = ({ attributes, children, element }) => {
             box-shadow: ${selected && focused ? '0 0 0 3px #B4D5FF' : 'none'};
           `}
         />
+        <Button
+          active
+          onClick={() => Transforms.removeNodes(editor, { at: path })}
+          className={css`
+            display: ${selected && focused ? 'inline' : 'none'};
+            position: absolute;
+            top: 0.5em;
+            left: 0.5em;
+            background-color: white;
+          `}
+        >
+          <Icon>delete</Icon>
+        </Button>
       </div>
     </div>
   )
@@ -158,6 +180,20 @@ const initialValue: Descendant[] = [
           'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
       },
     ],
+  },
+  {
+    type: 'paragraph',
+    children: [
+      {
+        text:
+          'You can delete images with the cross in the top left. Try deleting this sheep:',
+      },
+    ],
+  },
+  {
+    type: 'image',
+    url: 'https://source.unsplash.com/zOwZKwZOZq8',
+    children: [{ text: '' }],
   },
 ]
 
