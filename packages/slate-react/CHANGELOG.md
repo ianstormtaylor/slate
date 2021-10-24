@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.67.1
+
+### Patch Changes
+
+- [#4616](https://github.com/ianstormtaylor/slate/pull/4616) [`77d9f60a`](https://github.com/ianstormtaylor/slate/commit/77d9f60ab5e497aadf2d0c9564b1e79525984734) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed crash on self-deleting void node
+
+* [#4617](https://github.com/ianstormtaylor/slate/pull/4617) [`b186d3ea`](https://github.com/ianstormtaylor/slate/commit/b186d3ea12ce59c024a56fcbad4604c919757d36) Thanks [@imdbsd](https://github.com/imdbsd)! - Fix crash on drag and drop image on readOnly editable
+
+- [#4614](https://github.com/ianstormtaylor/slate/pull/4614) [`72160fac`](https://github.com/ianstormtaylor/slate/commit/72160fac08fde98d223c9dd2b4263897d23454f6) Thanks [@echarles](https://github.com/echarles)! - Add insertFragmentData and insertTextData to the ReactEditor API
+
 ## 0.67.0
 
 ### Minor Changes
