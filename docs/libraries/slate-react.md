@@ -142,11 +142,11 @@ Insert data from a `DataTransfer` into the editor. This is a proxy method to cal
 
 ### `insertFragmentData(editor: ReactEditor, data: DataTransfer)`
 
-Insert fragment data from a `DataTransfer` into the editor.
+Insert fragment data from a `DataTransfer` into the editor. Returns true if some content has been effectively inserted.
 
 ### `insertTextData(editor: ReactEditor, data: DataTransfer)`
 
-Insert text data from a `DataTransfer` into the editor.
+Insert text data from a `DataTransfer` into the editor. Returns true if some content has been effectively inserted.
 
 ### `setFragmentData(editor: ReactEditor, data: DataTransfer)`
 
