@@ -7,6 +7,6 @@ describe('images example', () => {
     cy.findByRole('textbox')
       .find('img')
       .should('exist')
-      .should('have.length', 1)
+      .should('have.length', 2)
   })
 })
