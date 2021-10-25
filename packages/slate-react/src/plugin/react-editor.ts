@@ -32,8 +32,8 @@ import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
 
 export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
-  insertFragmentData: (data: DataTransfer) => void
-  insertTextData: (data: DataTransfer) => void
+  insertFragmentData: (data: DataTransfer) => boolean
+  insertTextData: (data: DataTransfer) => boolean
   setFragmentData: (data: DataTransfer) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
@@ -237,16 +237,16 @@ export const ReactEditor = {
    * Insert fragment data from a `DataTransfer` into the editor.
    */
 
-  insertFragmentData(editor: ReactEditor, data: DataTransfer): void {
-    editor.insertFragmentData(data)
+  insertFragmentData(editor: ReactEditor, data: DataTransfer): boolean {
+    return editor.insertFragmentData(data)
   },
 
   /**
    * Insert text data from a `DataTransfer` into the editor.
    */
 
-  insertTextData(editor: ReactEditor, data: DataTransfer): void {
-    editor.insertTextData(data)
+  insertTextData(editor: ReactEditor, data: DataTransfer): boolean {
+    return editor.insertTextData(data)
   },
 
   /**
