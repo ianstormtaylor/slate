@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.68.0
+
+### Minor Changes
+
+- [#4620](https://github.com/ianstormtaylor/slate/pull/4620) [`0b59ad54`](https://github.com/ianstormtaylor/slate/commit/0b59ad5414f682b510453696b6f45d5a46cb66bb) Thanks [@NicklasAndersson](https://github.com/NicklasAndersson)! - Support selection in readOnly=true editors.
+
 ## 0.67.1
 
 ### Patch Changes
