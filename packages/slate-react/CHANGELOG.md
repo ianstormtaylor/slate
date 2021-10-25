@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.68.1
+
+### Patch Changes
+
+- [#4627](https://github.com/ianstormtaylor/slate/pull/4627) [`ec01e75f`](https://github.com/ianstormtaylor/slate/commit/ec01e75fff29b3e7b710b59a6ba8106d9aa9ca5e) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed issues where cursor jumps to wrong location
+
 ## 0.68.0
 
 ### Minor Changes
