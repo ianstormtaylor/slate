@@ -1,5 +1,41 @@
 # slate-react
 
+## 0.68.1
+
+### Patch Changes
+
+- [#4627](https://github.com/ianstormtaylor/slate/pull/4627) [`ec01e75f`](https://github.com/ianstormtaylor/slate/commit/ec01e75fff29b3e7b710b59a6ba8106d9aa9ca5e) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed issues where cursor jumps to wrong location
+
+## 0.68.0
+
+### Minor Changes
+
+- [#4620](https://github.com/ianstormtaylor/slate/pull/4620) [`0b59ad54`](https://github.com/ianstormtaylor/slate/commit/0b59ad5414f682b510453696b6f45d5a46cb66bb) Thanks [@NicklasAndersson](https://github.com/NicklasAndersson)! - Support selection in readOnly=true editors.
+
+## 0.67.1
+
+### Patch Changes
+
+- [#4616](https://github.com/ianstormtaylor/slate/pull/4616) [`77d9f60a`](https://github.com/ianstormtaylor/slate/commit/77d9f60ab5e497aadf2d0c9564b1e79525984734) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed crash on self-deleting void node
+
+* [#4617](https://github.com/ianstormtaylor/slate/pull/4617) [`b186d3ea`](https://github.com/ianstormtaylor/slate/commit/b186d3ea12ce59c024a56fcbad4604c919757d36) Thanks [@imdbsd](https://github.com/imdbsd)! - Fix crash on drag and drop image on readOnly editable
+
+- [#4614](https://github.com/ianstormtaylor/slate/pull/4614) [`72160fac`](https://github.com/ianstormtaylor/slate/commit/72160fac08fde98d223c9dd2b4263897d23454f6) Thanks [@echarles](https://github.com/echarles)! - Add insertFragmentData and insertTextData to the ReactEditor API
+
+## 0.67.0
+
+### Minor Changes
+
+- [#4540](https://github.com/ianstormtaylor/slate/pull/4540) [`11ef83b4`](https://github.com/ianstormtaylor/slate/commit/11ef83b47fca84d1f908b5c9eeefada516fe9fed) Thanks [@bryanph](https://github.com/bryanph)! - The Slate Provider's "value" prop is now only used as initial state for editor.children as was intended before. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the "value" prop to do this for you.
+
+### Patch Changes
+
+- [#4577](https://github.com/ianstormtaylor/slate/pull/4577) [`4b2e4000`](https://github.com/ianstormtaylor/slate/commit/4b2e4000d6253bd86fab237b6f2c70e9f8d30f09) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed a bug that removed the selection when hovering over a non-selectable DOM element
+
+* [#4605](https://github.com/ianstormtaylor/slate/pull/4605) [`87ab2efa`](https://github.com/ianstormtaylor/slate/commit/87ab2efa41a5b7a1324b3fc97117a1cdd3b41d66) Thanks [@jaked](https://github.com/jaked)! - defer native events within Editable to avoid bugs with Editor
+
+- [#4584](https://github.com/ianstormtaylor/slate/pull/4584) [`f40e515d`](https://github.com/ianstormtaylor/slate/commit/f40e515dc7f956b7fd859688c0170f2c1763fecf) Thanks [@jameshfisher](https://github.com/jameshfisher)! - Fixed bug: setting selection from `contentEditable:false` element causes crash
+
 ## 0.66.7
 
 ### Patch Changes

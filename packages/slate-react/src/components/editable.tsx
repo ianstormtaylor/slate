@@ -52,7 +52,8 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
 } from '../utils/weak-maps'
-import { asNative, flushNativeEvents } from '../utils/native'
+
+type DeferredOperation = () => void
 
 const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
@@ -128,6 +129,7 @@ export const Editable = (props: EditableProps) => {
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const deferredOperations = useRef<DeferredOperation[]>([])
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
@@ -186,7 +188,7 @@ export const Editable = (props: EditableProps) => {
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
     if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: false,
+        exactMatch: true,
 
         // domSelection is not necessarily a valid Slate range
         // (e.g. when clicking on contentEditable:false element)
@@ -290,7 +292,7 @@ export const Editable = (props: EditableProps) => {
           event.data &&
           event.data.length === 1 &&
           /[a-z ]/i.test(event.data) &&
-          // Chrome seems to have issues correctly editing the start of nodes.
+          // Chrome has issues correctly editing the start of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
           // When there is an inline element, e.g. a link, and you select
           // right after it (the start of the next node).
           selection.anchor.offset !== 0
@@ -303,7 +305,8 @@ export const Editable = (props: EditableProps) => {
             native = false
           }
 
-          // and because of the selection moving in `insertText` (create-editor.ts).
+          // Chrome also has issues correctly editing the end of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
+          // Therefore we don't allow native events to insert text at the end of nodes.
           const { anchor } = selection
           const inline = Editor.above(editor, {
             at: anchor,
@@ -446,9 +449,9 @@ export const Editable = (props: EditableProps) => {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
               if (native) {
-                asNative(editor, () => Editor.insertText(editor, data), {
-                  onFlushed: () => event.preventDefault(),
-                })
+                deferredOperations.current.push(() =>
+                  Editor.insertText(editor, data)
+                )
               } else {
                 Editor.insertText(editor, data)
               }
@@ -488,7 +491,6 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !readOnly &&
         !state.isComposing &&
         !state.isUpdatingSelection &&
         !state.isDraggingInternally
@@ -595,7 +597,12 @@ export const Editable = (props: EditableProps) => {
           }
           data-slate-editor
           data-slate-node="value"
-          contentEditable={readOnly ? undefined : true}
+          // explicitly set this
+          contentEditable={!readOnly}
+          // in some cases, a decoration needs access to the range / selection to decorate a text node,
+          // then you will select the whole text node when you select part the of text
+          // this magic zIndex="-1" will fix it
+          zindex={-1}
           suppressContentEditableWarning
           ref={ref}
           style={{
@@ -641,7 +648,10 @@ export const Editable = (props: EditableProps) => {
             // and we can correctly compare DOM text values in components
             // to stop rendering, so that browser functions like autocorrect
             // and spellcheck work as expected.
-            flushNativeEvents(editor)
+            for (const op of deferredOperations.current) {
+              op()
+            }
+            deferredOperations.current = []
           }, [])}
           onBlur={useCallback(
             (event: React.FocusEvent<HTMLDivElement>) => {
@@ -719,19 +729,29 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                const start = Editor.start(editor, path)
-                const end = Editor.end(editor, path)
 
-                const startVoid = Editor.void(editor, { at: start })
-                const endVoid = Editor.void(editor, { at: end })
+                // At this time, the Slate document may be arbitrarily different,
+                // because onClick handlers can change the document before we get here.
+                // Therefore we must check that this path actually exists,
+                // and that it still refers to the same node.
+                if (Editor.hasPath(editor, path)) {
+                  const lookupNode = Node.get(editor, path)
+                  if (lookupNode === node) {
+                    const start = Editor.start(editor, path)
+                    const end = Editor.end(editor, path)
 
-                if (
-                  startVoid &&
-                  endVoid &&
-                  Path.equals(startVoid[1], endVoid[1])
-                ) {
-                  const range = Editor.range(editor, start)
-                  Transforms.select(editor, range)
+                    const startVoid = Editor.void(editor, { at: start })
+                    const endVoid = Editor.void(editor, { at: end })
+
+                    if (
+                      startVoid &&
+                      endVoid &&
+                      Path.equals(startVoid[1], endVoid[1])
+                    ) {
+                      const range = Editor.range(editor, start)
+                      Transforms.select(editor, range)
+                    }
+                  }
                 }
               }
             },
@@ -902,6 +922,7 @@ export const Editable = (props: EditableProps) => {
           onDragStart={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
               if (
+                !readOnly &&
                 hasTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onDragStart)
               ) {

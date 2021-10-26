@@ -6,7 +6,7 @@ This directory contains a set of examples that give you an idea for how you migh
 - [**Rich text**](./richtext.tsx) — showing the features you'd expect from a basic editor.
 - [**Forced Layout**](./forced-layout.tsx) - showing how to use constraints to enforce a document structure.
 - [**Markdown Shortcuts**](./markdown-shortcuts.tsx) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](./links.tsx) — showing how wrap text in inline nodes with associated data.
+- [**Inlines**](./inlines.tsx) — showing how wrap text in inline nodes with associated data.
 - [**Images**](./images.tsx) — showing how to use void (text-less) nodes to add images.
 - [**Hovering toolbar**](./hovering-toolbar.tsx) — showing how a hovering toolbar can be implemented.
 - [**Tables**](./tables.tsx) — showing how to nest blocks to render more advanced components.

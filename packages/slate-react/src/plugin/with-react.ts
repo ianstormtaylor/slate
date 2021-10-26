@@ -10,11 +10,6 @@ import {
   NODE_TO_KEY,
 } from '../utils/weak-maps'
 import {
-  AS_NATIVE,
-  NATIVE_OPERATIONS,
-  flushNativeEvents,
-} from '../utils/native'
-import {
   isDOMText,
   getPlainText,
   getSlateFragmentAttribute,
@@ -67,31 +62,6 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.apply = (op: Operation) => {
-    // if we're NOT an insert_text and there's a queue
-    // of native events, bail out and flush the queue.
-    // otherwise transforms as part of this cycle will
-    // be incorrect.
-    //
-    // This is needed as overriden operations (e.g. `insertText`)
-    // can call additional transforms, which will need accurate
-    // content, and will be called _before_ `onInput` is fired.
-    if (op.type !== 'insert_text') {
-      AS_NATIVE.set(editor, false)
-      flushNativeEvents(editor)
-    }
-
-    // If we're in native mode, queue the operation
-    // and it will be applied later.
-    if (AS_NATIVE.get(editor)) {
-      const nativeOps = NATIVE_OPERATIONS.get(editor)
-      if (nativeOps) {
-        nativeOps.push(op)
-      } else {
-        NATIVE_OPERATIONS.set(editor, [op])
-      }
-      return
-    }
-
     const matches: [Path, Key][] = []
 
     switch (op.type) {
@@ -228,6 +198,11 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.insertData = (data: DataTransfer) => {
+    e.insertFragmentData(data)
+    e.insertTextData(data)
+  }
+
+  e.insertFragmentData = (data: DataTransfer) => {
     /**
      * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
      */
@@ -248,7 +223,9 @@ export const withReact = <T extends Editor>(editor: T) => {
       e.insertFragment(parsed)
       return
     }
+  }
 
+  e.insertTextData = (data: DataTransfer) => {
     const text = data.getData('text/plain')
 
     if (text) {
