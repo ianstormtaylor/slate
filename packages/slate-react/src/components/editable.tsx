@@ -941,7 +941,11 @@ export const Editable = (props: EditableProps) => {
                 Transforms.select(editor, range)
 
                 if (state.isDraggingInternally) {
-                  if (draggedRange) {
+                  if (
+                    draggedRange &&
+                    !Range.equals(draggedRange, range) &&
+                    !Editor.void(editor, { at: range, voids: true })
+                  ) {
                     Transforms.delete(editor, {
                       at: draggedRange,
                     })
