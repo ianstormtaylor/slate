@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.69.0
+
+### Minor Changes
+
+- [#4625](https://github.com/ianstormtaylor/slate/pull/4625) [`e54f2a0e`](https://github.com/ianstormtaylor/slate/commit/e54f2a0ea01ddc94f3ad14e812602b0ed824aeb3) Thanks [@echarles](https://github.com/echarles)! - insertTextData and insertFragmentData return a boolean (true if some content has been effectively inserted)
+
 ## 0.68.1
 
 ### Patch Changes
