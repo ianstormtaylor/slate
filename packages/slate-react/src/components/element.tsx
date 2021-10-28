@@ -30,7 +30,8 @@ const Element = (props: {
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  selection: Range | null
+  selection: Range | null,
+  [key: string]: unknown
 }) => {
   const {
     decorations,
@@ -39,6 +40,7 @@ const Element = (props: {
     renderPlaceholder,
     renderLeaf,
     selection,
+    ...rest
   } = props
   const ref = useRef<HTMLElement>(null)
   const editor = useSlateStatic()
@@ -131,7 +133,7 @@ const Element = (props: {
     }
   })
 
-  return renderElement({ attributes, children, element })
+  return renderElement({ attributes, children, element, ...rest })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
@@ -152,11 +154,11 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
  */
 
 export const DefaultElement = (props: RenderElementProps) => {
-  const { attributes, children, element } = props
+  const { attributes, children, element, ...rest } = props
   const editor = useSlateStatic()
   const Tag = editor.isInline(element) ? 'span' : 'div'
   return (
-    <Tag {...attributes} style={{ position: 'relative' }}>
+    <Tag {...attributes} style={{ position: 'relative' }} {...rest}>
       {children}
     </Tag>
   )

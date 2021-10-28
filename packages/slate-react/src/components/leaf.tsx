@@ -14,7 +14,8 @@ const Leaf = (props: {
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  text: Text
+  text: Text,
+  [key: string]: unknown
 }) => {
   const {
     leaf,
@@ -23,6 +24,7 @@ const Leaf = (props: {
     parent,
     renderPlaceholder,
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
+    ...rest
   } = props
 
   const placeholderRef = useRef<HTMLSpanElement | null>(null)
@@ -85,7 +87,7 @@ const Leaf = (props: {
     'data-slate-leaf': true,
   }
 
-  return renderLeaf({ attributes, children, leaf, text })
+  return renderLeaf({ attributes, children, leaf, text, ...rest })
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
@@ -101,8 +103,8 @@ const MemoizedLeaf = React.memo(Leaf, (prev, next) => {
 })
 
 export const DefaultLeaf = (props: RenderLeafProps) => {
-  const { attributes, children } = props
-  return <span {...attributes}>{children}</span>
+  const { attributes, children, text, leaf, ...rest } = props
+  return <span {...attributes} {...rest}>{children}</span>
 }
 
 export default MemoizedLeaf

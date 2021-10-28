@@ -69,6 +69,7 @@ export interface RenderElementProps {
     dir?: 'rtl'
     ref: any
   }
+  [key: string]: unknown
 }
 
 /**
@@ -82,6 +83,7 @@ export interface RenderLeafProps {
   attributes: {
     'data-slate-leaf': true
   }
+  [key: string]: unknown
 }
 
 /**
