@@ -1,6 +1,5 @@
 ---
-"slate-react": patch
-"slate": patch
+'slate-react': patch
 ---
 
 Fixes drop actions in editors rendered in iFrames.
