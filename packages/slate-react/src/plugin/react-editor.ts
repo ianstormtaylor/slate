@@ -429,7 +429,7 @@ export const ReactEditor = {
 
     // Else resolve a range from the caret position where the drop occured.
     let domRange
-    const { document } = window
+    const { document } = ReactEditor.getWindow(editor)
 
     // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
     if (document.caretRangeFromPoint) {
