@@ -67,7 +67,7 @@ export interface NodeTransforms {
   ) => void
   setNodes: <T extends Node>(
     editor: Editor,
-    props: Partial<Node>,
+    props: Partial<T>,
     options?: {
       at?: Location
       match?: NodeMatch<T>
