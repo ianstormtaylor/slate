@@ -33,8 +33,8 @@ import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
 export interface ReactEditor extends BaseEditor {
   isRemote: boolean
   insertData: (data: DataTransfer) => void
-  insertFragmentData: (data: DataTransfer) => void
-  insertTextData: (data: DataTransfer) => void
+  insertFragmentData: (data: DataTransfer) => boolean
+  insertTextData: (data: DataTransfer) => boolean
   setFragmentData: (data: DataTransfer) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
@@ -238,16 +238,16 @@ export const ReactEditor = {
    * Insert fragment data from a `DataTransfer` into the editor.
    */
 
-  insertFragmentData(editor: ReactEditor, data: DataTransfer): void {
-    editor.insertFragmentData(data)
+  insertFragmentData(editor: ReactEditor, data: DataTransfer): boolean {
+    return editor.insertFragmentData(data)
   },
 
   /**
    * Insert text data from a `DataTransfer` into the editor.
    */
 
-  insertTextData(editor: ReactEditor, data: DataTransfer): void {
-    editor.insertTextData(data)
+  insertTextData(editor: ReactEditor, data: DataTransfer): boolean {
+    return editor.insertTextData(data)
   },
 
   /**
@@ -430,7 +430,7 @@ export const ReactEditor = {
 
     // Else resolve a range from the caret position where the drop occured.
     let domRange
-    const { document } = window
+    const { document } = ReactEditor.getWindow(editor)
 
     // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
     if (document.caretRangeFromPoint) {

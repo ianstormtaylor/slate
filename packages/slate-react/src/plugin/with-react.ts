@@ -198,11 +198,12 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   e.insertData = (data: DataTransfer) => {
-    e.insertFragmentData(data)
-    e.insertTextData(data)
+    if (!e.insertFragmentData(data)) {
+      e.insertTextData(data)
+    }
   }
 
-  e.insertFragmentData = (data: DataTransfer) => {
+  e.insertFragmentData = (data: DataTransfer): boolean => {
     /**
      * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
      */
@@ -221,11 +222,12 @@ export const withReact = <T extends Editor>(editor: T) => {
       const decoded = decodeURIComponent(window.atob(fragment))
       const parsed = JSON.parse(decoded) as Node[]
       e.insertFragment(parsed)
-      return
+      return true
     }
+    return false
   }
 
-  e.insertTextData = (data: DataTransfer) => {
+  e.insertTextData = (data: DataTransfer): boolean => {
     const text = data.getData('text/plain')
 
     if (text) {
@@ -240,7 +242,9 @@ export const withReact = <T extends Editor>(editor: T) => {
         e.insertText(line)
         split = true
       }
+      return true
     }
+    return false
   }
 
   e.onChange = () => {
