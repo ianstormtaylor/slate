@@ -234,7 +234,11 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       try {
-        if (!state.isUpdatingSelection && !inputManager.isReconciling.current) {
+        if (
+          !state.isUpdatingSelection &&
+          !readOnly &&
+          !inputManager.isReconciling.current
+        ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
