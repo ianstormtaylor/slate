@@ -37,7 +37,9 @@ const withLayout = editor => {
         const enforceType = type => {
           if (SlateElement.isElement(child) && child.type !== type) {
             const newProperties: Partial<SlateElement> = { type }
-            Transforms.setNodes(editor, newProperties, { at: childPath })
+            Transforms.setNodes<SlateElement>(editor, newProperties, {
+              at: childPath,
+            })
           }
         }
 
