@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.70.0
+
+### Patch Changes
+
+- [#4636](https://github.com/ianstormtaylor/slate/pull/4636) [`9e8d5e2b`](https://github.com/ianstormtaylor/slate/commit/9e8d5e2b9bbff1ec7161e292635a074ba3538774) Thanks [@cmmartin](https://github.com/cmmartin)! - Fixes drop actions in editors rendered in iFrames.
+
 ## 0.69.0
 
 ### Minor Changes
