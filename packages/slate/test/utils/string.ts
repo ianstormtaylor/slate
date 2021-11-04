@@ -10,13 +10,26 @@ const codepoints = [
   ['0', 1],
   [' ', 1],
   ['🙂', 2],
+  ['☺️', 2],
+  ['☺️', 2],
   ['⬅️', 2],
   ['🏴', 2],
+  ['☺️a', 2, 1],
+  ['🏁🇨🇳', 2, 4],
+  ['🎌🇩🇪', 2, 4],
+  ['🚩🇺🇸', 2, 4],
+  ['🇨🇳🎌', 4, 2],
+  ['🏴🏳️', 2, 3],
+  ['🇷🇺🚩', 4, 2],
 ] as const
 
 const zwjSequences = [
   ['👁‍🗨', 5],
   ['👨‍👩‍👧‍👧', 11],
+  ['👩‍❤️‍👨', 8],
+  ['🙋🏽‍♂️', 7],
+  ['🙋‍♂️', 5],
+  ['🕵️‍♀️', 6],
   ['👨🏿‍🦳', 7],
 ] as const
 
@@ -60,7 +73,9 @@ dirs.forEach(dir => {
   const isRTL = dir === 'rtl'
 
   describe(`getCharacterDistance - ${dir}`, () => {
-    codepoints.forEach(([str, dist]) => {
+    codepoints.forEach(([str, ltrDist, rtlDist]) => {
+      const dist = isRTL && rtlDist != null ? rtlDist : ltrDist
+
       it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
       })
