@@ -567,10 +567,6 @@ export const Editable = (props: EditableProps) => {
     <ReadOnlyContext.Provider value={readOnly}>
       <DecorateContext.Provider value={decorate}>
         <Component
-          // COMPAT: The Grammarly Chrome extension works by changing the DOM
-          // out from under `contenteditable` elements, which leads to weird
-          // behaviors so we have to disable it like editor. (2017/04/24)
-          data-gramm={false}
           role={readOnly ? undefined : 'textbox'}
           {...attributes}
           // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
