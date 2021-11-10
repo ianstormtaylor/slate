@@ -1326,6 +1326,9 @@ const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
+  if (editor.selection?.anchor?.path[0] !== editor.selection?.focus?.path[0]) {
+    return
+  }
   const leafEl = domRange.startContainer.parentElement!
   leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
   scrollIntoView(leafEl, {
