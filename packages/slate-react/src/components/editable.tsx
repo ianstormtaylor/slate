@@ -1326,15 +1326,19 @@ const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
-  if (editor.selection?.anchor?.path[0] !== editor.selection?.focus?.path[0]) {
-    return
+  // This was affecting the selecting multi blocks and dragging behaviour so, enabled only
+  // if the selection is collapsed.
+  if (
+    !editor.selection ||
+    (editor.selection && Range.isCollapsed(editor.selection))
+  ) {
+    const leafEl = domRange.startContainer.parentElement!
+    leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
+    scrollIntoView(leafEl, {
+      scrollMode: 'if-needed',
+    })
+    delete leafEl.getBoundingClientRect
   }
-  const leafEl = domRange.startContainer.parentElement!
-  leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
-  scrollIntoView(leafEl, {
-    scrollMode: 'if-needed',
-  })
-  delete leafEl.getBoundingClientRect
 }
 
 /**
