@@ -429,9 +429,11 @@ export const Editable = (props: EditableProps) => {
               state.isComposing = false
             }
 
-            const window = ReactEditor.getWindow(editor)
-            if (data instanceof window.DataTransfer) {
-              ReactEditor.insertData(editor, data as DataTransfer)
+            // use a weak comparison instead of 'instanceof' to allow
+            // programmatic access of paste events coming from external windows
+            // like cypress where cy.window does not work realibly
+            if (data?.constructor.name === 'DataTransfer') {
+              ReactEditor.insertData(editor, data)
             } else if (typeof data === 'string') {
               // Only insertText operations use the native functionality, for now.
               // Potentially expand to single character deletes, as well.
