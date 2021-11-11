@@ -4,6 +4,40 @@ Slate's data structure is immutable, so you can't modify or delete nodes directl
 
 Slate's transform functions are designed to be very flexible, to make it possible to represent all kinds of changes you might need to make to your editor. However, that flexibility can be hard to understand at first.
 
+Typically, you'll apply a single operation to zero or Nodes. For example, here's how you flatten the syntax tree,
+by applying `unwrapNodes` to every parent of block children:
+
+```js
+Transforms.unwrapNodes(editor, {
+  at: [], // Path of Editor
+  match: node =>
+    !Editor.isEditor(node) &&
+    node.children?.every(child => Editor.isBlock(editor, child)),
+  mode: 'all', // also the Editor's children
+})
+```
+
+Non-standard operations (or debugging/tracing which Nodes will be affected by a set of NodeOptions) may require using
+`Editor.nodes` to create a JavaScript Iterator of NodeEntries and a for..of loop to act.
+Here's code to replace all image elements with their alt text:
+
+```js
+const imageElmnts = Editor.nodes(editor, {
+  at: [], // Path of Editor
+  match: (node, path) => 'image' === node.type,
+  // mode is defaults to "all", so this also searches the Editor's children
+})
+for (const nodeEntry of imageElmnts) {
+  const altText =
+    nodeEntry[0].alt ||
+    nodeEntry[0].title ||
+    /\/([^/]+)$/.exec(nodeEntry[0].url)?.[1] ||
+    '☹︎'
+  Transforms.select(editor, nodeEntry[1])
+  Editor.insertFragment(editor, [{ text: altText }])
+}
+```
+
 > 🤖 Check out the [Transforms](../api/transforms.md) reference for a full list of Slate's transforms.
 
 ## Selection Transforms
@@ -195,3 +229,4 @@ Transform.setNodes(
 ```
 
 When performing transforms, if you're ever looping over nodes and transforming them one at a time, consider seeing if `match` can solve your use case, and offload the complexity of managing loops to Slate instead.
+The `match` function can examine the children of a node, in `node.children`, or use `Node.parent` to examine its parent.

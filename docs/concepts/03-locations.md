@@ -29,6 +29,9 @@ const editor = {
 
 The leaf text node would have a path of: `[0, 0]`.
 
+The Editor itself has a path of `[]`. For example, to select the whole contents of the editor, call
+`Transforms.select(editor, [])`
+
 ## `Point`
 
 Points are slightly more specific than paths, and contain an `offset` into a specific text node. Their interface is:
