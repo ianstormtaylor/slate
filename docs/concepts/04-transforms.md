@@ -4,8 +4,8 @@ Slate's data structure is immutable, so you can't modify or delete nodes directl
 
 Slate's transform functions are designed to be very flexible, to make it possible to represent all kinds of changes you might need to make to your editor. However, that flexibility can be hard to understand at first.
 
-Typically, you'll apply a single operation to zero or Nodes. For example, here's how you flatten the syntax tree,
-by applying `unwrapNodes` to every parent of block children:
+Typically, you'll apply a single operation to zero or more Nodes. For example, here's how you flatten the syntax tree,
+by applying `unwrapNodes` to every parent of block Elements:
 
 ```js
 Transforms.unwrapNodes(editor, {
@@ -25,7 +25,7 @@ Here's code to replace all image elements with their alt text:
 const imageElmnts = Editor.nodes(editor, {
   at: [], // Path of Editor
   match: (node, path) => 'image' === node.type,
-  // mode is defaults to "all", so this also searches the Editor's children
+  // mode defaults to "all", so this also searches the Editor's children
 })
 for (const nodeEntry of imageElmnts) {
   const altText =
