@@ -51,7 +51,7 @@ Of course we haven't rendered anything, so you won't see any changes.
 
 ```typescript
 // TypeScript users only add this code
-import { BaseEditor } from 'slate'
+import { BaseEditor, Descendant } from 'slate'
 import { ReactEditor } from 'slate-react'
 
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
