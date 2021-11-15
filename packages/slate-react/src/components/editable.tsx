@@ -1326,8 +1326,8 @@ const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
-  // This was affecting the selecting multi blocks and dragging behaviour so, enabled only
-  // if the selection is collapsed.
+  // This was affecting the selection of multiple blocks and dragging behavior,
+  // so enabled only if the selection is collapsed.
   if (
     !editor.selection ||
     (editor.selection && Range.isCollapsed(editor.selection))
