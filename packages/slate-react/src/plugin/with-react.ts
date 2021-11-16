@@ -168,7 +168,7 @@ export const withReact = <T extends Editor>(editor: T) => {
     // in the HTML, and can be used for intra-Slate pasting. If it's a text
     // node, wrap it in a `<span>` so we have something to set an attribute on.
     if (isDOMText(attach)) {
-      const span = document.createElement('span')
+      const span = attach.ownerDocument.createElement('span')
       // COMPAT: In Chrome and Safari, if we don't add the `white-space` style
       // then leading and trailing spaces will be ignored. (2017/09/21)
       span.style.whiteSpace = 'pre'
@@ -184,13 +184,13 @@ export const withReact = <T extends Editor>(editor: T) => {
     data.setData('application/x-slate-fragment', encoded)
 
     // Add the content to a <div> so that we can get its inner HTML.
-    const div = document.createElement('div')
+    const div = contents.ownerDocument.createElement('div')
     div.appendChild(contents)
     div.setAttribute('hidden', 'true')
-    document.body.appendChild(div)
+    contents.ownerDocument.body.appendChild(div)
     data.setData('text/html', div.innerHTML)
     data.setData('text/plain', getPlainText(div))
-    document.body.removeChild(div)
+    contents.ownerDocument.body.removeChild(div)
     return data
   }
 
