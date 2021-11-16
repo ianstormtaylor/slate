@@ -19,7 +19,7 @@ Transforms.unwrapNodes(editor, {
 
 Non-standard operations (or debugging/tracing which Nodes will be affected by a set of NodeOptions) may require using
 `Editor.nodes` to create a JavaScript Iterator of NodeEntries and a for..of loop to act.
-Here's code to replace all image elements with their alt text:
+For example, to replace all image elements with their alt text:
 
 ```js
 const imageElmnts = Editor.nodes(editor, {
