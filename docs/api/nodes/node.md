@@ -1,4 +1,4 @@
-# Node
+# Node API
 
 - [Static methods](node.md#static-methods)
   - [Retrieval methods](node.md#retrieval-methods)

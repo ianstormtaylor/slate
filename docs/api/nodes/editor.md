@@ -1,6 +1,6 @@
-# Editor
+# Editor API
 
-The `Editor` object stores all the state of a slate editor. It can be extended by plugins to add helpers and implement new behaviors.
+The `Editor` object stores all the state of a Slate editor. It can be extended by [plugins](../../concepts/08-plugins.md) to add helpers and implement new behaviors. It's a type of `Node` and its path is `[]`.
 
 ```typescript
 interface Editor {
