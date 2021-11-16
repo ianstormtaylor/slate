@@ -138,3 +138,4 @@ const text = {
 ```
 
 Text nodes too can contain any custom properties you want, and that's how you implement custom formatting like **bold**, _italic_, `code`, etc.
+These custom properties are sometimes called [marks](../api/nodes/editor#mark-methods).

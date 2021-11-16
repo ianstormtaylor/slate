@@ -1,4 +1,4 @@
-# PointRef
+# PointRef API
 
 `PointRef` objects keep a specific point in a document synced over time as new operations are applied to the editor. You can access their property `current` at any time for the up-to-date `Point` value.
 
