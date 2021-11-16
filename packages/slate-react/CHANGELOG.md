@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.70.1
+
+### Patch Changes
+
+- [#4654](https://github.com/ianstormtaylor/slate/pull/4654) [`2c7750ca`](https://github.com/ianstormtaylor/slate/commit/2c7750cac5949a935a570a9590a82187673b9a44) Thanks [@anho](https://github.com/anho)! - weak guard on DataTransfer to not rely on current window
+
+* [#4652](https://github.com/ianstormtaylor/slate/pull/4652) [`95389ed7`](https://github.com/ianstormtaylor/slate/commit/95389ed7b03487aa066af277afcccba440c32f24) Thanks [@karthikcodes6](https://github.com/karthikcodes6)! - Disabled the auto scroll behaviour when the editor has any active selection
+
+- [#4650](https://github.com/ianstormtaylor/slate/pull/4650) [`b6643132`](https://github.com/ianstormtaylor/slate/commit/b6643132f1f3b64f019a601ee2f44a521c122ad3) Thanks [@e1himself](https://github.com/e1himself)! - Do not disable Grammarly extension in Slate editors
+
 ## 0.70.0
 
 ### Patch Changes
