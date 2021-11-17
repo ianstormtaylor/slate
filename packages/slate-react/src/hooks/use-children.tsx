@@ -5,7 +5,6 @@ import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
-import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   RenderElementProps,
@@ -19,7 +18,6 @@ import { SelectedContext } from './use-selected'
  */
 
 const useChildren = (props: {
-  decorations: Range[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
@@ -27,14 +25,12 @@ const useChildren = (props: {
   selection: Range | null
 }) => {
   const {
-    decorations,
     node,
     renderElement,
     renderPlaceholder,
     renderLeaf,
     selection,
   } = props
-  const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []
@@ -49,10 +45,10 @@ const useChildren = (props: {
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
-    const ds = decorate([n, p])
+    const ds: Range[] = []
 
-    for (const dec of decorations) {
-      const d = Range.intersection(dec, range)
+    for (const dec of editor.decorations) {
+      const d = Range.intersection(dec.rangeRef.current as Range, range)
 
       if (d) {
         ds.push(d)
@@ -63,7 +59,6 @@ const useChildren = (props: {
       children.push(
         <SelectedContext.Provider key={`provider-${key.id}`} value={!!sel}>
           <ElementComponent
-            decorations={ds}
             element={n}
             key={key.id}
             renderElement={renderElement}

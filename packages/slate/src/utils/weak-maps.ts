@@ -1,6 +1,7 @@
-import { Editor, Path, PathRef, PointRef, RangeRef } from '..'
+import { Editor, Range, Path, PathRef, PointRef, RangeRef } from '..'
 
 export const DIRTY_PATHS: WeakMap<Editor, Path[]> = new WeakMap()
+export const DECORATIONS: WeakMap<Editor, Range[]> = new WeakMap()
 export const FLUSHING: WeakMap<Editor, boolean> = new WeakMap()
 export const NORMALIZING: WeakMap<Editor, boolean> = new WeakMap()
 export const PATH_REFS: WeakMap<Editor, Set<PathRef>> = new WeakMap()

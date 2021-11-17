@@ -13,7 +13,8 @@ import {
   Text,
   Transforms,
 } from './'
-import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
+import { DIRTY_PATHS, FLUSHING, DECORATIONS } from './utils/weak-maps'
+
 
 /**
  * Create a new Slate `Editor` object.
@@ -28,11 +29,40 @@ export const createEditor = (): Editor => {
     isInline: () => false,
     isVoid: () => false,
     onChange: () => {},
+    addDecoration: (key: string, range: Range) => {
+      editor.decorations.push({
+        key,
+        rangeRef: Editor.rangeRef(editor, range)
+      })
+    },
+    removeDecorations: (key: string, range: Range) => {
+      editor.decorations = editor.decorations.filter(
+        (decoration) => {
+          const decorationRange = decoration.rangeRef.current
+          if (!decorationRange) {
+            return false
+          }
+          if (
+            decoration.key === key &&
+            Range.includes(range, decorationRange)
+          ) {
+            decoration.rangeRef.unref()
+            return false
+          }
 
+          return true
+        }
+      )
+    },
+    decorations: [],
     apply: (op: Operation) => {
       for (const ref of Editor.pathRefs(editor)) {
         PathRef.transform(ref, op)
       }
+
+      // for (const decoration of editor.decorations) {
+      //   RangeRef.transform(decoration.rangeRef, op)
+      // }
 
       for (const ref of Editor.pointRefs(editor)) {
         PointRef.transform(ref, op)
@@ -42,33 +72,9 @@ export const createEditor = (): Editor => {
         RangeRef.transform(ref, op)
       }
 
-      const set = new Set()
-      const dirtyPaths: Path[] = []
-
-      const add = (path: Path | null) => {
-        if (path) {
-          const key = path.join(',')
-
-          if (!set.has(key)) {
-            set.add(key)
-            dirtyPaths.push(path)
-          }
-        }
-      }
-
-      const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
-      const newDirtyPaths = getDirtyPaths(op)
-
-      for (const path of oldDirtyPaths) {
-        const newPath = Path.transform(path, op)
-        add(newPath)
-      }
-
-      for (const path of newDirtyPaths) {
-        add(path)
-      }
-
+      const dirtyPaths = getDirtyPaths(editor, op)
       DIRTY_PATHS.set(editor, dirtyPaths)
+
       Transforms.transform(editor, op)
       editor.operations.push(op)
       Editor.normalize(editor)
@@ -288,11 +294,44 @@ export const createEditor = (): Editor => {
   return editor
 }
 
+
+/**
+ * Get the old and new dirty paths combined for an op
+ */
+const getDirtyPaths = (editor: Editor, op: Operation) => {
+  const set = new Set()
+  const dirtyPaths: Path[] = []
+
+  const add = (path: Path | null) => {
+    if (path) {
+      const key = path.join(',')
+
+      if (!set.has(key)) {
+        set.add(key)
+        dirtyPaths.push(path)
+      }
+    }
+  }
+
+  const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
+  const newDirtyPaths = getDirtyPathsForOp(op)
+
+  for (const path of oldDirtyPaths) {
+    const newPath = Path.transform(path, op)
+    add(newPath)
+  }
+
+  for (const path of newDirtyPaths) {
+    add(path)
+  }
+
+  return dirtyPaths
+}
+
 /**
  * Get the "dirty" paths generated from an operation.
  */
-
-const getDirtyPaths = (op: Operation): Path[] => {
+const getDirtyPathsForOp = (op: Operation): Path[] => {
   switch (op.type) {
     case 'insert_text':
     case 'remove_text':

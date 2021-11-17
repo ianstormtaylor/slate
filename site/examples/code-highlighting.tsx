@@ -5,45 +5,48 @@ import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor, Element as SlateElement, Descendant } from 'slate'
+import { Node, Editor, Operation, Text, createEditor, Element as SlateElement, Descendant, NodeEntry } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from 'emotion'
+
+export const withDecorating = <T extends Editor>(editor: T) => {
+  const e = editor as T
+  const { apply } = e
+
+  e.apply = (op: Operation) => {
+    apply(op)
+
+    if (op.type !== 'insert_text' && op.type !== 'remove_text') return
+
+    const { path } = op
+    const node = Node.get(editor, path)
+
+    if (!Text.isText(node)) {
+      return
+    }
+
+    setDecorationsForTextNode(editor, [node, path])
+  }
+
+  return editor
+}
 
 const CodeHighlightingExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
   const [language, setLanguage] = useState('html')
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(() => {
+    const editor = withDecorating(withHistory(withReact(createEditor())))
+    editor.children = initialValue
 
-  // decorate function depends on the language selected
-  const decorate = useCallback(
-    ([node, path]) => {
-      const ranges = []
-      if (!Text.isText(node)) {
-        return ranges
-      }
-      const tokens = Prism.tokenize(node.text, Prism.languages[language])
-      let start = 0
+    // set all decorations for the intitial value
+    const texts = Array.from(Node.texts(editor))
+    for (const text of texts) {
+      setDecorationsForTextNode(editor, text)
+    }
 
-      for (const token of tokens) {
-        const length = getLength(token)
-        const end = start + length
-
-        if (typeof token !== 'string') {
-          ranges.push({
-            [token.type]: true,
-            anchor: { path, offset: start },
-            focus: { path, offset: end },
-          })
-        }
-
-        start = end
-      }
-
-      return ranges
-    },
-    [language]
-  )
+    return editor
+  }, [])
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -69,7 +72,6 @@ const CodeHighlightingExample = () => {
         </h3>
       </div>
       <Editable
-        decorate={decorate}
         renderLeaf={renderLeaf}
         placeholder="Write some code..."
       />
@@ -87,6 +89,39 @@ const getLength = token => {
   }
 }
 
+const setDecorationsForTextNode = (editor: Editor, [node, path]: NodeEntry<Text>) => {
+  const ranges = []
+  const tokens = Prism.tokenize(node.text, Prism.languages['html'])
+  let start = 0
+
+  for (const token of tokens) {
+    const length = getLength(token)
+    const end = start + length
+
+    if (typeof token !== 'string') {
+      ranges.push({
+        [token.type]: true,
+        anchor: { path, offset: start },
+        focus: { path, offset: end },
+      })
+    }
+
+    start = end
+  }
+
+  // remove all decorations for this text node
+  editor.removeDecorations('prism_token', {
+    anchor: { path: path, offset: 0 },
+    focus: { path: path, offset: node.text.length }
+  })
+
+  // and now add the new ones
+  for (const range of ranges) {
+    editor.addDecoration('prism_token', range)
+  }
+}
+
+
 // different token types, styles found on Prismjs website
 const Leaf = ({ attributes, children, leaf }) => {
   return (
@@ -99,7 +134,7 @@ const Leaf = ({ attributes, children, leaf }) => {
         ${leaf.comment &&
           css`
             color: slategray;
-          `} 
+          `}
 
         ${(leaf.operator || leaf.url) &&
           css`

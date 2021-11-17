@@ -7,7 +7,6 @@ import { DefaultPlaceholder, ReactEditor } from '../..'
 import { ReadOnlyContext } from '../../hooks/use-read-only'
 import { useSlate } from '../../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
-import { DecorateContext } from '../../hooks/use-decorate'
 import {
   DOMElement,
   isDOMElement,
@@ -29,7 +28,6 @@ import {
 import { EditableProps } from '../editable'
 import useChildren from '../../hooks/use-children'
 import {
-  defaultDecorate,
   hasEditableTarget,
   isEventHandled,
   isDOMEventHandled,
@@ -45,7 +43,6 @@ import { useAndroidInputManager } from './use-android-input-manager'
 export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const {
     autoFocus,
-    decorate = defaultDecorate,
     onDOMBeforeInput: propsOnDOMBeforeInput,
     placeholder,
     readOnly = false,
@@ -295,188 +292,168 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     }
   })
 
-  const decorations = decorate([editor, []])
-
-  if (
-    placeholder &&
-    editor.children.length === 1 &&
-    Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === ''
-  ) {
-    const start = Editor.start(editor, [])
-    decorations.push({
-      [PLACEHOLDER_SYMBOL]: true,
-      placeholder,
-      anchor: start,
-      focus: start,
-    })
-  }
-
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <DecorateContext.Provider value={decorate}>
-        <Component
-          key={contentKey}
-          role={readOnly ? undefined : 'textbox'}
-          {...attributes}
-          spellCheck={attributes.spellCheck}
-          autoCorrect={attributes.autoCorrect}
-          autoCapitalize={attributes.autoCapitalize}
-          data-slate-editor
-          data-slate-node="value"
-          contentEditable={readOnly ? undefined : true}
-          suppressContentEditableWarning
-          ref={ref}
-          style={{
-            // Allow positioning relative to the editable element.
-            position: 'relative',
-            // Prevent the default outline styles.
-            outline: 'none',
-            // Preserve adjacent whitespace and new lines.
-            whiteSpace: 'pre-wrap',
-            // Allow words to break if they are too long.
-            wordWrap: 'break-word',
-            // Allow for passed-in styles to override anything.
-            ...style,
-          }}
-          onCopy={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCopy)
-              ) {
-                event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
-              }
-            },
-            [attributes.onCopy]
-          )}
-          onCut={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCut)
-              ) {
-                event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
-                const { selection } = editor
+      <Component
+        key={contentKey}
+        role={readOnly ? undefined : 'textbox'}
+        {...attributes}
+        spellCheck={attributes.spellCheck}
+        autoCorrect={attributes.autoCorrect}
+        autoCapitalize={attributes.autoCapitalize}
+        data-slate-editor
+        data-slate-node="value"
+        contentEditable={readOnly ? undefined : true}
+        suppressContentEditableWarning
+        ref={ref}
+        style={{
+          // Allow positioning relative to the editable element.
+          position: 'relative',
+          // Prevent the default outline styles.
+          outline: 'none',
+          // Preserve adjacent whitespace and new lines.
+          whiteSpace: 'pre-wrap',
+          // Allow words to break if they are too long.
+          wordWrap: 'break-word',
+          // Allow for passed-in styles to override anything.
+          ...style,
+        }}
+        onCopy={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCopy)
+            ) {
+              event.preventDefault()
+              ReactEditor.setFragmentData(editor, event.clipboardData)
+            }
+          },
+          [attributes.onCopy]
+        )}
+        onCut={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onCut)
+            ) {
+              event.preventDefault()
+              ReactEditor.setFragmentData(editor, event.clipboardData)
+              const { selection } = editor
 
-                if (selection) {
-                  if (Range.isExpanded(selection)) {
-                    Editor.deleteFragment(editor)
-                  } else {
-                    const node = Node.parent(editor, selection.anchor.path)
-                    if (Editor.isVoid(editor, node)) {
-                      Transforms.delete(editor)
-                    }
+              if (selection) {
+                if (Range.isExpanded(selection)) {
+                  Editor.deleteFragment(editor)
+                } else {
+                  const node = Node.parent(editor, selection.anchor.path)
+                  if (Editor.isVoid(editor, node)) {
+                    Transforms.delete(editor)
                   }
                 }
               }
-            },
-            [readOnly, attributes.onCut]
-          )}
-          onFocus={useCallback(
-            (event: React.FocusEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                !state.isUpdatingSelection &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onFocus)
-              ) {
-                const root = ReactEditor.findDocumentOrShadowRoot(editor)
-                state.latestElement = root.activeElement
-
-                IS_FOCUSED.set(editor, true)
-              }
-            },
-            [readOnly, attributes.onFocus]
-          )}
-          onBlur={useCallback(
-            (event: React.FocusEvent<HTMLDivElement>) => {
-              if (
-                readOnly ||
-                state.isUpdatingSelection ||
-                !hasEditableTarget(editor, event.target) ||
-                isEventHandled(event, attributes.onBlur)
-              ) {
-                return
-              }
-
-              // COMPAT: If the current `activeElement` is still the previous
-              // one, this is due to the window being blurred when the tab
-              // itself becomes unfocused, so we want to abort early to allow to
-              // editor to stay focused when the tab becomes focused again.
+            }
+          },
+          [readOnly, attributes.onCut]
+        )}
+        onFocus={useCallback(
+          (event: React.FocusEvent<HTMLDivElement>) => {
+            if (
+              !readOnly &&
+              !state.isUpdatingSelection &&
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onFocus)
+            ) {
               const root = ReactEditor.findDocumentOrShadowRoot(editor)
-              if (state.latestElement === root.activeElement) {
+              state.latestElement = root.activeElement
+
+              IS_FOCUSED.set(editor, true)
+            }
+          },
+          [readOnly, attributes.onFocus]
+        )}
+        onBlur={useCallback(
+          (event: React.FocusEvent<HTMLDivElement>) => {
+            if (
+              readOnly ||
+              state.isUpdatingSelection ||
+              !hasEditableTarget(editor, event.target) ||
+              isEventHandled(event, attributes.onBlur)
+            ) {
+              return
+            }
+
+            // COMPAT: If the current `activeElement` is still the previous
+            // one, this is due to the window being blurred when the tab
+            // itself becomes unfocused, so we want to abort early to allow to
+            // editor to stay focused when the tab becomes focused again.
+            const root = ReactEditor.findDocumentOrShadowRoot(editor)
+            if (state.latestElement === root.activeElement) {
+              return
+            }
+
+            const { relatedTarget } = event
+            const el = ReactEditor.toDOMNode(editor, editor)
+
+            // COMPAT: The event should be ignored if the focus is returning
+            // to the editor from an embedded editable element (eg. an <input>
+            // element inside a void node).
+            if (relatedTarget === el) {
+              return
+            }
+
+            // COMPAT: The event should be ignored if the focus is moving from
+            // the editor to inside a void node's spacer element.
+            if (
+              isDOMElement(relatedTarget) &&
+              relatedTarget.hasAttribute('data-slate-spacer')
+            ) {
+              return
+            }
+
+            // COMPAT: The event should be ignored if the focus is moving to a
+            // non- editable section of an element that isn't a void node (eg.
+            // a list item of the check list example).
+            if (
+              relatedTarget != null &&
+              isDOMNode(relatedTarget) &&
+              ReactEditor.hasDOMNode(editor, relatedTarget)
+            ) {
+              const node = ReactEditor.toSlateNode(editor, relatedTarget)
+
+              if (Element.isElement(node) && !editor.isVoid(node)) {
                 return
               }
+            }
 
-              const { relatedTarget } = event
-              const el = ReactEditor.toDOMNode(editor, editor)
-
-              // COMPAT: The event should be ignored if the focus is returning
-              // to the editor from an embedded editable element (eg. an <input>
-              // element inside a void node).
-              if (relatedTarget === el) {
-                return
-              }
-
-              // COMPAT: The event should be ignored if the focus is moving from
-              // the editor to inside a void node's spacer element.
-              if (
-                isDOMElement(relatedTarget) &&
-                relatedTarget.hasAttribute('data-slate-spacer')
-              ) {
-                return
-              }
-
-              // COMPAT: The event should be ignored if the focus is moving to a
-              // non- editable section of an element that isn't a void node (eg.
-              // a list item of the check list example).
-              if (
-                relatedTarget != null &&
-                isDOMNode(relatedTarget) &&
-                ReactEditor.hasDOMNode(editor, relatedTarget)
-              ) {
-                const node = ReactEditor.toSlateNode(editor, relatedTarget)
-
-                if (Element.isElement(node) && !editor.isVoid(node)) {
-                  return
-                }
-              }
-
-              IS_FOCUSED.delete(editor)
-            },
-            [readOnly, attributes.onBlur]
-          )}
-          onPaste={useCallback(
-            (event: React.ClipboardEvent<HTMLDivElement>) => {
-              // this will make application/x-slate-fragment exist when onPaste attributes is passed
-              event.clipboardData = getClipboardData(event.clipboardData)
-              // This unfortunately needs to be handled with paste events instead.
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onPaste) &&
-                !readOnly
-              ) {
-                event.preventDefault()
-                ReactEditor.insertData(editor, event.clipboardData)
-              }
-            },
-            [readOnly, attributes.onPaste]
-          )}
-        >
-          {useChildren({
-            decorations,
-            node: editor,
-            renderElement,
-            renderPlaceholder,
-            renderLeaf,
-            selection: editor.selection,
-          })}
-        </Component>
-      </DecorateContext.Provider>
+            IS_FOCUSED.delete(editor)
+          },
+          [readOnly, attributes.onBlur]
+        )}
+        onPaste={useCallback(
+          (event: React.ClipboardEvent<HTMLDivElement>) => {
+            // this will make application/x-slate-fragment exist when onPaste attributes is passed
+            event.clipboardData = getClipboardData(event.clipboardData)
+            // This unfortunately needs to be handled with paste events instead.
+            if (
+              hasEditableTarget(editor, event.target) &&
+              !isEventHandled(event, attributes.onPaste) &&
+              !readOnly
+            ) {
+              event.preventDefault()
+              ReactEditor.insertData(editor, event.clipboardData)
+            }
+          },
+          [readOnly, attributes.onPaste]
+        )}
+      >
+        {useChildren({
+          node: editor,
+          renderElement,
+          renderPlaceholder,
+          renderLeaf,
+          selection: editor.selection,
+        })}
+      </Component>
     </ReadOnlyContext.Provider>
   )
 }

@@ -41,11 +41,17 @@ export type Selection = ExtendedType<'Selection', BaseSelection>
  * by plugins that wish to add their own helpers and implement new behaviors.
  */
 
+type Decoration = {
+  key: string,
+  rangeRef: RangeRef
+}
+
 export interface BaseEditor {
   children: Descendant[]
   selection: Selection
   operations: Operation[]
   marks: Omit<Text, 'text'> | null
+  decorations: Decoration[]
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -65,6 +71,11 @@ export interface BaseEditor {
   insertNode: (node: Node) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
+
+  // add a decoration
+  addDecoration: (key: string, range: Range) => void,
+  // remove all decorations matching ${range} with key ${key}
+  removeDecorations: (key: string, range: Range) => void
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>

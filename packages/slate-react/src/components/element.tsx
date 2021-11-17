@@ -25,7 +25,6 @@ import {
  */
 
 const Element = (props: {
-  decorations: Range[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
@@ -33,7 +32,6 @@ const Element = (props: {
   selection: Range | null
 }) => {
   const {
-    decorations,
     element,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderPlaceholder,
@@ -46,7 +44,6 @@ const Element = (props: {
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
   let children: React.ReactNode = useChildren({
-    decorations,
     node: element,
     renderElement,
     renderPlaceholder,
@@ -139,7 +136,6 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
