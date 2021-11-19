@@ -1,14 +1,17 @@
 import assert from 'assert'
 import {
+  codepointsIteratorRTL,
   getCharacterDistance,
   getWordDistance,
-  codepointsIteratorRTL,
 } from '../../src/utils/string'
 
 const codepoints = [
   ['a', 1],
   ['0', 1],
   [' ', 1],
+  ['# ', 1],
+  ['* ', 1],
+  ['2 ', 1],
   ['🙂', 2],
   ['☺️', 2],
   ['☺️', 2],
