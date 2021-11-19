@@ -70,6 +70,34 @@ const tagSequences = [
   ['🏴󠁧󠁢󠁷󠁬󠁳󠁿', 14],
 ] as const
 
+// https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html#samples
+// In some strings, explicit Unicode code points are used to prevent accidental normalization.
+const sampleStrings = {
+  '2': ['a\u0308'],
+  '3': [' ‍', 'ن'],
+  '4': ['ن‍', ' '],
+  '5': ['ᄀᄀ'],
+  '6': ['가\u11a8', 'ᄀ'],
+  '7': ['각ᆨ', 'ᄀ'],
+  '8': ['🇦🇧', '🇨', 'b'],
+  '9': ['a', '🇦🇧', '🇨', 'b'],
+  '10': ['a', '🇦🇧‍', '🇨', 'b'],
+  '11': ['a', '🇦‍', '🇧🇨', 'b'],
+  '12': ['a', '🇦🇧', '🇨🇩', 'b'],
+  '13': ['a‍'],
+  '14': ['a\u0308', 'b'],
+  '15': ['aः', 'b'],
+  '16': ['a', '؀b'],
+  '17': ['👶🏿', '👶'],
+  '18': ['a🏿', '👶'],
+  '19': ['a🏿', '👶‍🛑'],
+  '20': ['👶🏿̈‍👶🏿'],
+  '21': ['🛑‍🛑'],
+  '22': ['a‍', '🛑'],
+  '23': ['✁‍✁'],
+  '24': ['a‍', '✁'],
+}
+
 const dirs = ['ltr', 'rtl']
 
 dirs.forEach(dir => {
@@ -106,6 +134,20 @@ dirs.forEach(dir => {
       it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
       })
+    })
+
+    Object.entries(sampleStrings).forEach(([label, strs]) => {
+      for (let i = 0; i < strs.length; i++) {
+        let str = ''
+        if (isRTL) {
+          str = strs.slice(0, i + 1).join('')
+        } else {
+          str = strs.slice(i).join('')
+        }
+        it(`Sample string ${label}, boundary ${isRTL ? i : i + 1}`, () => {
+          assert.strictEqual(getCharacterDistance(str, isRTL), strs[i].length)
+        })
+      }
     })
   })
 })
