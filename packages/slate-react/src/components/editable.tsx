@@ -305,7 +305,7 @@ export const Editable = (props: EditableProps) => {
   )
 
   const scheduleOnDOMSelectionChange = useMemo(
-    () => debounce(onDOMSelectionChange, 0, { leading: false }),
+    () => debounce(onDOMSelectionChange, 0),
     [onDOMSelectionChange]
   )
 
