@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.70.2
+
+### Patch Changes
+
+- [#4669](https://github.com/ianstormtaylor/slate/pull/4669) [`807716d7`](https://github.com/ianstormtaylor/slate/commit/807716d7dfb0fa5791cdcdfeaf4ac027a003127b) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Flush scheduleOnDOMSelectionChange on beforeinput
+
+* [#4661](https://github.com/ianstormtaylor/slate/pull/4661) [`0f194a86`](https://github.com/ianstormtaylor/slate/commit/0f194a86a08d5de07e58e20fb95c9dc760e9d52d) Thanks [@leoc4e](https://github.com/leoc4e)! - use ownerDocument to create element
+
 ## 0.70.1
 
 ### Patch Changes
