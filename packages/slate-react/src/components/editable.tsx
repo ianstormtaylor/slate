@@ -10,6 +10,7 @@ import {
   Path,
 } from 'slate'
 import getDirection from 'direction'
+import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -253,6 +254,61 @@ export const Editable = (props: EditableProps) => {
     }
   }, [autoFocus])
 
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React's `onSelect` is leaky
+  // and non-standard so it doesn't fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
+  const onDOMSelectionChange = useCallback(
+    throttle(() => {
+      if (
+        !state.isComposing &&
+        !state.isUpdatingSelection &&
+        !state.isDraggingInternally
+      ) {
+        const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        const { activeElement } = root
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const domSelection = root.getSelection()
+
+        if (activeElement === el) {
+          state.latestElement = activeElement
+          IS_FOCUSED.set(editor, true)
+        } else {
+          IS_FOCUSED.delete(editor)
+        }
+
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideVoid(editor, focusNode)
+
+        if (anchorNodeSelectable && focusNodeSelectable) {
+          const range = ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+            suppressThrow: false,
+          })
+          Transforms.select(editor, range)
+        }
+      }
+    }, 100),
+    [readOnly]
+  )
+
+  const scheduleOnDOMSelectionChange = useMemo(
+    () => debounce(onDOMSelectionChange, 0),
+    [onDOMSelectionChange]
+  )
+
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
   // to the real event sadly. (2019/11/01)
@@ -264,6 +320,11 @@ export const Editable = (props: EditableProps) => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
+        // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
+        // triggering a `beforeinput` expecting the change to be applied to the immediately before
+        // set selection.
+        scheduleOnDOMSelectionChange.flush()
+
         const { selection } = editor
         const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
@@ -471,61 +532,6 @@ export const Editable = (props: EditableProps) => {
       }
     }
   }, [onDOMBeforeInput])
-
-  // Listen on the native `selectionchange` event to be able to update any time
-  // the selection changes. This is required because React's `onSelect` is leaky
-  // and non-standard so it doesn't fire until after a selection has been
-  // released. This causes issues in situations where another change happens
-  // while a selection is being dragged.
-  const onDOMSelectionChange = useCallback(
-    throttle(() => {
-      if (
-        !state.isComposing &&
-        !state.isUpdatingSelection &&
-        !state.isDraggingInternally
-      ) {
-        const root = ReactEditor.findDocumentOrShadowRoot(editor)
-        const { activeElement } = root
-        const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = root.getSelection()
-
-        if (activeElement === el) {
-          state.latestElement = activeElement
-          IS_FOCUSED.set(editor, true)
-        } else {
-          IS_FOCUSED.delete(editor)
-        }
-
-        if (!domSelection) {
-          return Transforms.deselect(editor)
-        }
-
-        const { anchorNode, focusNode } = domSelection
-
-        const anchorNodeSelectable =
-          hasEditableTarget(editor, anchorNode) ||
-          isTargetInsideVoid(editor, anchorNode)
-
-        const focusNodeSelectable =
-          hasEditableTarget(editor, focusNode) ||
-          isTargetInsideVoid(editor, focusNode)
-
-        if (anchorNodeSelectable && focusNodeSelectable) {
-          const range = ReactEditor.toSlateRange(editor, domSelection, {
-            exactMatch: false,
-            suppressThrow: false,
-          })
-          Transforms.select(editor, range)
-        }
-      }
-    }, 100),
-    [readOnly]
-  )
-
-  const scheduleOnDOMSelectionChange = useCallback(
-    () => setTimeout(onDOMSelectionChange),
-    [onDOMSelectionChange]
-  )
 
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
