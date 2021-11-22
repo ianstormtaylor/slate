@@ -70,32 +70,33 @@ const tagSequences = [
   ['🏴󠁧󠁢󠁷󠁬󠁳󠁿', 14],
 ] as const
 
-// https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html#samples
+// Sample strings from https://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.html#samples
 // In some strings, explicit Unicode code points are used to prevent accidental normalization.
+// Zero-width joiners (U+200D), which are hard to tell, are also made explicit.
 const sampleStrings = {
   '2': ['a\u0308'],
-  '3': [' ‍', 'ن'],
-  '4': ['ن‍', ' '],
+  '3': [' \u200d', 'ن'],
+  '4': ['ن\u200d', ' '],
   '5': ['ᄀᄀ'],
   '6': ['가\u11a8', 'ᄀ'],
   '7': ['각ᆨ', 'ᄀ'],
   '8': ['🇦🇧', '🇨', 'b'],
   '9': ['a', '🇦🇧', '🇨', 'b'],
-  '10': ['a', '🇦🇧‍', '🇨', 'b'],
-  '11': ['a', '🇦‍', '🇧🇨', 'b'],
+  '10': ['a', '🇦🇧\u200d', '🇨', 'b'],
+  '11': ['a', '🇦\u200d', '🇧🇨', 'b'],
   '12': ['a', '🇦🇧', '🇨🇩', 'b'],
-  '13': ['a‍'],
+  '13': ['a\u200d'],
   '14': ['a\u0308', 'b'],
   '15': ['aः', 'b'],
   '16': ['a', '؀b'],
   '17': ['👶🏿', '👶'],
   '18': ['a🏿', '👶'],
-  '19': ['a🏿', '👶‍🛑'],
-  '20': ['👶🏿̈‍👶🏿'],
-  '21': ['🛑‍🛑'],
-  '22': ['a‍', '🛑'],
-  '23': ['✁‍✁'],
-  '24': ['a‍', '✁'],
+  '19': ['a🏿', '👶\u200d🛑'],
+  '20': ['👶🏿̈\u200d👶🏿'],
+  '21': ['🛑\u200d🛑'],
+  '22': ['a\u200d', '🛑'],
+  '23': ['✁\u200d✁'],
+  '24': ['a\u200d', '✁'],
 }
 
 const dirs = ['ltr', 'rtl']
