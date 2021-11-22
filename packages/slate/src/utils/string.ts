@@ -16,51 +16,54 @@ export const getCharacterDistance = (str: string, isRTL = false): number => {
   const isLTR = !isRTL
   const codepoints = isRTL ? codepointsIteratorRTL(str) : str
 
-  let leftType: CodepointType = CodepointType.None
-  let rightType: CodepointType = CodepointType.None
+  let left: CodepointType = CodepointType.None
+  let right: CodepointType = CodepointType.None
   let distance = 0
-  // Defer evaluation of these properties on RTL scanning.
-  let emojiZWJToTheLeft: boolean | null = isLTR ? false : null
-  let oddNumberOfRIsToTheLeft: boolean | null = isLTR ? false : null
+  // Evaluation of these conditions are deferred.
+  let gb11: boolean | null = null // Is GB11 applicable?
+  let gb12Or13: boolean | null = null // Is GB12 or GB13 applicable?
 
   for (const char of codepoints) {
     const code = char.codePointAt(0)
     if (!code) break
 
     const type = getCodepointType(char, code)
-    ;[leftType, rightType] = isLTR ? [rightType, type] : [type, leftType]
+    ;[left, right] = isLTR ? [right, type] : [type, left]
 
-    if (intersects(rightType, CodepointType.ExtPict)) {
+    if (
+      intersects(left, CodepointType.ZWJ) &&
+      intersects(right, CodepointType.ExtPict)
+    ) {
       if (isLTR) {
-        emojiZWJToTheLeft = endsWithEmojiZWJ(str.substring(0, distance))
+        gb11 = endsWithEmojiZWJ(str.substring(0, distance))
       } else {
-        emojiZWJToTheLeft = endsWithEmojiZWJ(
-          str.substring(0, str.length - distance)
-        )
+        gb11 = endsWithEmojiZWJ(str.substring(0, str.length - distance))
       }
-    }
-
-    if (intersects(leftType, CodepointType.RI)) {
-      if (oddNumberOfRIsToTheLeft !== null) {
-        oddNumberOfRIsToTheLeft = !oddNumberOfRIsToTheLeft
-      } else {
-        // RTL
-        oddNumberOfRIsToTheLeft = endsWithOddNumberOfRIs(
-          str.substring(0, str.length - distance)
-        )
-      }
+      if (!gb11) break
     }
 
     if (
-      leftType !== CodepointType.None &&
-      rightType !== CodepointType.None &&
-      isBoundaryPair(
-        leftType,
-        rightType,
-        // Values after ?? does not matter.
-        emojiZWJToTheLeft ?? false,
-        oddNumberOfRIsToTheLeft ?? false
-      )
+      intersects(left, CodepointType.RI) &&
+      intersects(right, CodepointType.RI)
+    ) {
+      if (gb12Or13 !== null) {
+        gb12Or13 = !gb12Or13
+      } else {
+        if (isLTR) {
+          gb12Or13 = true
+        } else {
+          gb12Or13 = endsWithOddNumberOfRIs(
+            str.substring(0, str.length - distance)
+          )
+        }
+      }
+      if (!gb12Or13) break
+    }
+
+    if (
+      left !== CodepointType.None &&
+      right !== CodepointType.None &&
+      isBoundaryPair(left, right)
     ) {
       break
     }
@@ -269,54 +272,33 @@ function intersects(x: CodepointType, y: CodepointType) {
   return (x & y) !== 0
 }
 
-// Labels in parentheses are used in [3].
 const NonBoundaryPairs: [CodepointType, CodepointType][] = [
-  // GB6 (6.0)
+  // GB6
   [
     CodepointType.L,
     CodepointType.L | CodepointType.V | CodepointType.LV | CodepointType.LVT,
   ],
-  // GB7 (7.0)
+  // GB7
   [CodepointType.LV | CodepointType.V, CodepointType.V | CodepointType.T],
-  // GB8 (8.0)
+  // GB8
   [CodepointType.LVT | CodepointType.T, CodepointType.T],
-  // GB9 (9.0)
+  // GB9
   [CodepointType.Any, CodepointType.Extend | CodepointType.ZWJ],
-  // GB9a (9.1)
+  // GB9a
   [CodepointType.Any, CodepointType.SpacingMark],
-  // GB9b (9.2)
+  // GB9b
   [CodepointType.Prepend, CodepointType.Any],
-]
-
-const NonBoundaryPairsEmojiZWJToTheLeft: [CodepointType, CodepointType][] = [
-  // GB11 (11.0)
+  // GB11
   [CodepointType.ZWJ, CodepointType.ExtPict],
-]
-
-const NonBoundaryPairsOddNumberOfRIsToTheLeft: [
-  CodepointType,
-  CodepointType
-][] = [
-  // GB12 (12.0) and GB13 (13.0)
+  // GB12 and GB13
   [CodepointType.RI, CodepointType.RI],
 ]
 
-// Any pair of regional indicator symbols is treated as non-boundary,
-// so it must be handled by caller-side.
-function isBoundaryPair(
-  left: CodepointType,
-  right: CodepointType,
-  emojiZWJToTheLeft: boolean,
-  oddNumberOfRIsToTheLeft: boolean
-) {
-  const rules = [
-    ...NonBoundaryPairs,
-    ...(emojiZWJToTheLeft ? NonBoundaryPairsEmojiZWJToTheLeft : []),
-    ...(oddNumberOfRIsToTheLeft ? NonBoundaryPairsOddNumberOfRIsToTheLeft : []),
-  ]
+function isBoundaryPair(left: CodepointType, right: CodepointType) {
   return (
-    rules.findIndex(r => intersects(left, r[0]) && intersects(right, r[1])) ===
-    -1
+    NonBoundaryPairs.findIndex(
+      r => intersects(left, r[0]) && intersects(right, r[1])
+    ) === -1
   )
 }
 
