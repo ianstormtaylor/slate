@@ -24,6 +24,7 @@ import {
   IS_FIREFOX_LEGACY,
   IS_QQBROWSER,
   IS_SAFARI,
+  CAN_USE_DOM,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -579,12 +580,23 @@ export const Editable = (props: EditableProps) => {
           {...attributes}
           // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
           // have to use hacks to make these replacement-based features work.
-          spellCheck={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck}
+          // For SSR situations HAS_BEFORE_INPUT_SUPPORT is false and results in prop
+          // mismatch warning app moves to browser. Pass-through consumer props when
+          // not CAN_USE_DOM (SSR) and default to falsy value
+          spellCheck={
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.spellCheck
+              : false
+          }
           autoCorrect={
-            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCorrect
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.autoCorrect
+              : 'false'
           }
           autoCapitalize={
-            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCapitalize
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.autoCapitalize
+              : 'false'
           }
           data-slate-editor
           data-slate-node="value"
