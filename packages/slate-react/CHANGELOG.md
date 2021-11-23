@@ -1,5 +1,18 @@
 # slate-react
 
+## 0.71.0
+
+### Minor Changes
+
+- [#4682](https://github.com/ianstormtaylor/slate/pull/4682) [`e5380655`](https://github.com/ianstormtaylor/slate/commit/e53806557217b08bce6217b7d871cd5ae7dad31c) Thanks [@matthewkeil](https://github.com/matthewkeil)! - Support SSR for autoCorrect, spellCheck and autoCapitalize.
+  Fixes prop mismatch between server and client.
+  Removes the need to add
+  <Editable
+    spellCheck={false}
+    autoCorrect="false"
+    autoCapitalize="false"
+  />
+
 ## 0.70.2
 
 ### Patch Changes
