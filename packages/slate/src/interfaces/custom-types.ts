@@ -9,6 +9,7 @@ type ExtendableTypes =
   | 'Selection'
   | 'Range'
   | 'Point'
+  | 'Operation'
   | 'InsertNodeOperation'
   | 'InsertTextOperation'
   | 'MergeNodeOperation'
