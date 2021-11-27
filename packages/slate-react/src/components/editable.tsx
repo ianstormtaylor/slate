@@ -250,10 +250,20 @@ export const Editable = (props: EditableProps) => {
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
   useEffect(() => {
-    if (ref.current && autoFocus) {
-      ref.current.focus()
-    }
-  }, [autoFocus])
+      if (ref.current && autoFocus) {
+        if(window.getSelection && document.createRange) {
+          const range = document.createRange();
+          node.focus();
+          range.setStart(ref.current, ref.current.childNodes.length);
+          range.setEnd(ref.current, ref.current.childNodes.length);
+          const sel = window.getSelection();
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        else
+          ref.current.focus();
+      }
+    }, [autoFocus])
 
   // Listen on the native `selectionchange` event to be able to update any time
   // the selection changes. This is required because React's `onSelect` is leaky
