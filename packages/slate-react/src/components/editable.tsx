@@ -253,7 +253,7 @@ export const Editable = (props: EditableProps) => {
       if (ref.current && autoFocus) {
         if(window.getSelection && document.createRange) {
           const range = document.createRange();
-          node.focus();
+          ref.current.focus();
           range.setStart(ref.current, ref.current.childNodes.length);
           range.setEnd(ref.current, ref.current.childNodes.length);
           const sel = window.getSelection();
