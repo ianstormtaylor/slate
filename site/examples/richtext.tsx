@@ -74,7 +74,7 @@ const toggleBlock = (editor, format) => {
   const newProperties: Partial<SlateElement> = {
     type: isActive ? 'paragraph' : isList ? 'list-item' : format,
   }
-  Transforms.setNodes(editor, newProperties)
+  Transforms.setNodes<SlateElement>(editor, newProperties)
 
   if (!isActive && isList) {
     const block = { type: format, children: [] }

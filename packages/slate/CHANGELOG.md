@@ -1,5 +1,25 @@
 # slate
 
+## 0.71.0
+
+### Minor Changes
+
+- [#4672](https://github.com/ianstormtaylor/slate/pull/4672) [`2523dc4f`](https://github.com/ianstormtaylor/slate/commit/2523dc4f6e7fee81baf77a67da4c3adaab921f15) Thanks [@VictorBaron](https://github.com/VictorBaron)! - Fix - deep-equals was always returning true when array props were equals.
+
+### Patch Changes
+
+- [#4671](https://github.com/ianstormtaylor/slate/pull/4671) [`e3afda94`](https://github.com/ianstormtaylor/slate/commit/e3afda946685795237f748e76c7bb051c09cb7fa) Thanks [@unageek](https://github.com/unageek)! - Fixed the issue where the cursor jumps more than one character unexpectedly
+
+## 0.70.0
+
+### Minor Changes
+
+- [#4565](https://github.com/ianstormtaylor/slate/pull/4565) [`5818aca5`](https://github.com/ianstormtaylor/slate/commit/5818aca5038f38465a5769fe944f184be0255341) Thanks [@oliger](https://github.com/oliger)! - Fix issue with unicode 1.1 smileys followed by a variation selector.
+
+### Patch Changes
+
+- [#4638](https://github.com/ianstormtaylor/slate/pull/4638) [`e0f41514`](https://github.com/ianstormtaylor/slate/commit/e0f41514a1e0e866297904be16eff82702e8afd8) Thanks [@e1himself](https://github.com/e1himself)! - Improve typescript type of `props` argument of `Transforms.setNodes()`
+
 ## 0.67.1
 
 ### Patch Changes

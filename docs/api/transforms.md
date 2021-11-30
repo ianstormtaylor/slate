@@ -1,4 +1,4 @@
-# Transforms
+# Transforms API
 
 Transforms are helper functions operating on the document. They can be used in defining your own commands.
 
@@ -11,20 +11,24 @@ Transforms are helper functions operating on the document. They can be used in d
 
 ## Node options
 
-All transforms support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify the place in the document that the transform is applied to.
+All transforms support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify which Nodes in the document that the transform is applied to.
 
 ```typescript
 interface NodeOptions {
   at?: Location
-  match?: (node: Node) => boolean
+  match?: (node: Node, path: Location) => boolean
   mode?: 'highest' | 'lowest'
   voids?: boolean
 }
 ```
 
-- The `at` option is versatile and can be used to implement more complex transforms. [Learn more about the `at` option](../concepts/04-transforms.md#the-at-option)
+- The `at` option selects a [Location](../concepts/03-locations.md) in the editor. It defaults to the user's current selection. [Learn more about the `at` option](../concepts/04-transforms.md#the-at-option)
 
-- When combined with `at`, `match` can be powerful. [Learn more about the `match` option](../concepts/04-transforms.md#the-match-option)
+- The `match` option filters the set of Nodes with a custom function. [Learn more about the `match` option](../concepts/04-transforms.md#the-match-option)
+
+- The `mode` option also filters the set of nodes.
+
+- When `voids` is false, [void Elements](./nodes/editor#schema-specific-instance-methods-to-override) are filtered out.
 
 ## Static methods
 

@@ -1,5 +1,42 @@
 # slate-react
 
+## 0.71.0
+
+### Minor Changes
+
+- [#4682](https://github.com/ianstormtaylor/slate/pull/4682) [`e5380655`](https://github.com/ianstormtaylor/slate/commit/e53806557217b08bce6217b7d871cd5ae7dad31c) Thanks [@matthewkeil](https://github.com/matthewkeil)! - Support SSR for autoCorrect, spellCheck and autoCapitalize.
+  Fixes prop mismatch between server and client.
+  Removes the need to add
+  <Editable
+    spellCheck={false}
+    autoCorrect="false"
+    autoCapitalize="false"
+  />
+
+## 0.70.2
+
+### Patch Changes
+
+- [#4669](https://github.com/ianstormtaylor/slate/pull/4669) [`807716d7`](https://github.com/ianstormtaylor/slate/commit/807716d7dfb0fa5791cdcdfeaf4ac027a003127b) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Flush scheduleOnDOMSelectionChange on beforeinput
+
+* [#4661](https://github.com/ianstormtaylor/slate/pull/4661) [`0f194a86`](https://github.com/ianstormtaylor/slate/commit/0f194a86a08d5de07e58e20fb95c9dc760e9d52d) Thanks [@leoc4e](https://github.com/leoc4e)! - use ownerDocument to create element
+
+## 0.70.1
+
+### Patch Changes
+
+- [#4654](https://github.com/ianstormtaylor/slate/pull/4654) [`2c7750ca`](https://github.com/ianstormtaylor/slate/commit/2c7750cac5949a935a570a9590a82187673b9a44) Thanks [@anho](https://github.com/anho)! - weak guard on DataTransfer to not rely on current window
+
+* [#4652](https://github.com/ianstormtaylor/slate/pull/4652) [`95389ed7`](https://github.com/ianstormtaylor/slate/commit/95389ed7b03487aa066af277afcccba440c32f24) Thanks [@karthikcodes6](https://github.com/karthikcodes6)! - Disabled the auto scroll behaviour when the editor has any active selection
+
+- [#4650](https://github.com/ianstormtaylor/slate/pull/4650) [`b6643132`](https://github.com/ianstormtaylor/slate/commit/b6643132f1f3b64f019a601ee2f44a521c122ad3) Thanks [@e1himself](https://github.com/e1himself)! - Do not disable Grammarly extension in Slate editors
+
+## 0.70.0
+
+### Patch Changes
+
+- [#4636](https://github.com/ianstormtaylor/slate/pull/4636) [`9e8d5e2b`](https://github.com/ianstormtaylor/slate/commit/9e8d5e2b9bbff1ec7161e292635a074ba3538774) Thanks [@cmmartin](https://github.com/cmmartin)! - Fixes drop actions in editors rendered in iFrames.
+
 ## 0.69.0
 
 ### Minor Changes

@@ -1,4 +1,4 @@
-# PointEntry
+# PointEntry API
 
 `PointEntry` objects are returned when iterating over `Point` objects that belong to a range.
 

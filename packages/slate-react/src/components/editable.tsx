@@ -11,6 +11,7 @@ import {
   Path,
 } from 'slate'
 import getDirection from 'direction'
+import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
@@ -27,6 +28,7 @@ import {
   IS_QQBROWSER,
   IS_APPLE,
   IS_CHROME_LEGACY,
+  CAN_USE_DOM,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -257,6 +259,61 @@ export const Editable = (props: EditableProps) => {
     }
   }, [autoFocus])
 
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React's `onSelect` is leaky
+  // and non-standard so it doesn't fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
+  const onDOMSelectionChange = useCallback(
+    throttle(() => {
+      if (
+        !state.isComposing &&
+        !state.isUpdatingSelection &&
+        !state.isDraggingInternally
+      ) {
+        const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        const { activeElement } = root
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const domSelection = root.getSelection()
+
+        if (activeElement === el) {
+          state.latestElement = activeElement
+          IS_FOCUSED.set(editor, true)
+        } else {
+          IS_FOCUSED.delete(editor)
+        }
+
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideVoid(editor, focusNode)
+
+        if (anchorNodeSelectable && focusNodeSelectable) {
+          const range = ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+            suppressThrow: false,
+          })
+          Transforms.select(editor, range)
+        }
+      }
+    }, 100),
+    [readOnly]
+  )
+
+  const scheduleOnDOMSelectionChange = useMemo(
+    () => debounce(onDOMSelectionChange, 0),
+    [onDOMSelectionChange]
+  )
+
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
   // to the real event sadly. (2019/11/01)
@@ -268,6 +325,11 @@ export const Editable = (props: EditableProps) => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
+        // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
+        // triggering a `beforeinput` expecting the change to be applied to the immediately before
+        // set selection.
+        scheduleOnDOMSelectionChange.flush()
+
         const { selection } = editor
         const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
@@ -433,9 +495,11 @@ export const Editable = (props: EditableProps) => {
               state.isComposing = false
             }
 
-            const window = ReactEditor.getWindow(editor)
-            if (data instanceof window.DataTransfer) {
-              ReactEditor.insertData(editor, data as DataTransfer)
+            // use a weak comparison instead of 'instanceof' to allow
+            // programmatic access of paste events coming from external windows
+            // like cypress where cy.window does not work realibly
+            if (data?.constructor.name === 'DataTransfer') {
+              ReactEditor.insertData(editor, data)
             } else if (typeof data === 'string') {
               if (IS_QQBROWSER) {
                 event.stopPropagation()
@@ -581,20 +645,27 @@ export const Editable = (props: EditableProps) => {
     <ReadOnlyContext.Provider value={readOnly}>
       <DecorateContext.Provider value={decorate}>
         <Component
-          // COMPAT: The Grammarly Chrome extension works by changing the DOM
-          // out from under `contenteditable` elements, which leads to weird
-          // behaviors so we have to disable it like editor. (2017/04/24)
-          data-gramm={false}
           role={readOnly ? undefined : 'textbox'}
           {...attributes}
           // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
           // have to use hacks to make these replacement-based features work.
-          spellCheck={!HAS_BEFORE_INPUT_SUPPORT ? false : attributes.spellCheck}
+          // For SSR situations HAS_BEFORE_INPUT_SUPPORT is false and results in prop
+          // mismatch warning app moves to browser. Pass-through consumer props when
+          // not CAN_USE_DOM (SSR) and default to falsy value
+          spellCheck={
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.spellCheck
+              : false
+          }
           autoCorrect={
-            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCorrect
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.autoCorrect
+              : 'false'
           }
           autoCapitalize={
-            !HAS_BEFORE_INPUT_SUPPORT ? 'false' : attributes.autoCapitalize
+            HAS_BEFORE_INPUT_SUPPORT || !CAN_USE_DOM
+              ? attributes.autoCapitalize
+              : 'false'
           }
           data-slate-editor
           data-slate-node="value"
@@ -1369,12 +1440,19 @@ const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
-  const leafEl = domRange.startContainer.parentElement!
-  leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
-  scrollIntoView(leafEl, {
-    scrollMode: 'if-needed',
-  })
-  delete leafEl.getBoundingClientRect
+  // This was affecting the selection of multiple blocks and dragging behavior,
+  // so enabled only if the selection has been collapsed.
+  if (
+    !editor.selection ||
+    (editor.selection && Range.isCollapsed(editor.selection))
+  ) {
+    const leafEl = domRange.startContainer.parentElement!
+    leafEl.getBoundingClientRect = domRange.getBoundingClientRect.bind(domRange)
+    scrollIntoView(leafEl, {
+      scrollMode: 'if-needed',
+    })
+    delete leafEl.getBoundingClientRect
+  }
 }
 
 /**

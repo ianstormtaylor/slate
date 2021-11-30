@@ -1,6 +1,6 @@
-# Span
+# Span API
 
-A `Span` is a low-level way to refer to a range using `Element` as the end points instead of a `Point` which requires the use of leaf text nodes.
+A `Span` is a low-level way to refer to a `Range` using `Element` as the end points instead of a `Point` which requires the use of leaf text nodes.
 
 ```typescript
 type Span = [Path, Path]
