@@ -24,6 +24,7 @@ import {
   IS_FIREFOX_LEGACY,
   IS_QQBROWSER,
   IS_SAFARI,
+  IS_UC_MOBILE,
   CAN_USE_DOM,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -490,8 +491,8 @@ export const Editable = (props: EditableProps) => {
                 // https://www.w3.org/TR/input-events-2/
                 state.isComposing && setIsComposing(false)
                 state.isComposing = false
-              } else if (state.isComposing) {
-                // other browser we should do nothing to avoid
+              } else if (state.isComposing && !IS_UC_MOBILE) {
+                // browsers except UC mobile do nothing to avoid duplicated insertion
                 return
               }
             }
@@ -777,6 +778,7 @@ export const Editable = (props: EditableProps) => {
                   !IS_FIREFOX_LEGACY &&
                   !IS_IOS &&
                   !IS_QQBROWSER &&
+                  !IS_UC_MOBILE &&
                   event.data
                 ) {
                   Editor.insertText(editor, event.data)
