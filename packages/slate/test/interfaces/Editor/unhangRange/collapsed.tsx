@@ -4,7 +4,10 @@ import { jsx } from '../../..'
 
 export const input = (
   <editor>
-    <block>one<cursor/></block>
+    <block>
+      one
+      <cursor />
+    </block>
   </editor>
 )
 export const test = editor => {

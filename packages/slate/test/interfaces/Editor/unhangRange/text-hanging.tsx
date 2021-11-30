@@ -9,9 +9,7 @@ export const input = (
         before
         <anchor />
       </text>
-      <text>
-        selected
-      </text>
+      <text>selected</text>
       <text>
         <focus />
         after
