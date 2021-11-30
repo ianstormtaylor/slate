@@ -1,4 +1,4 @@
-# Range
+# Range API
 
 `Range` objects are a set of points that refer to a specific span of a Slate document. They can define a span inside a single node or they can span across multiple nodes. The editor's `selection` is stored as a range.
 

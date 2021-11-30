@@ -1,6 +1,6 @@
-# Element
+# Element API
 
-`Element` objects are a type of node in a Slate document that contain other `Element` nodes or `Text` nodes.
+`Element` objects are a type of `Node` in a Slate document that contain other `Element` nodes or `Text` nodes.
 
 ```typescript
 interface Element {

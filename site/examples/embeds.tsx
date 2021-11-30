@@ -73,7 +73,9 @@ const VideoElement = ({ attributes, children, element }) => {
             const newProperties: Partial<SlateElement> = {
               url: val,
             }
-            Transforms.setNodes(editor, newProperties, { at: path })
+            Transforms.setNodes<SlateElement>(editor, newProperties, {
+              at: path,
+            })
           }}
         />
       </div>

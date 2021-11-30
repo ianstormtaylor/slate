@@ -1,4 +1,4 @@
-# Node Types
+# Node Types APIs
 
 The `Node` union type represents all of the different types of nodes that occur in a Slate document tree.
 
