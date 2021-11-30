@@ -482,13 +482,18 @@ export const Editable = (props: EditableProps) => {
           case 'insertReplacementText':
           case 'insertText': {
             if (type === 'insertFromComposition') {
-              // COMPAT: in Safari, `compositionend` is dispatched after the
-              // `beforeinput` for "insertFromComposition". But if we wait for it
-              // then we will abort because we're still composing and the selection
-              // won't be updated properly.
-              // https://www.w3.org/TR/input-events-2/
-              state.isComposing && setIsComposing(false)
-              state.isComposing = false
+              if (IS_SAFARI) {
+                // COMPAT: in Safari, `compositionend` is dispatched after the
+                // `beforeinput` for "insertFromComposition". But if we wait for it
+                // then we will abort because we're still composing and the selection
+                // won't be updated properly.
+                // https://www.w3.org/TR/input-events-2/
+                state.isComposing && setIsComposing(false)
+                state.isComposing = false
+              } else if (state.isComposing) {
+                // other browser we should do nothing to avoid
+                return
+              }
             }
 
             // use a weak comparison instead of 'instanceof' to allow
