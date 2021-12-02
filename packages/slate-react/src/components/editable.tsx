@@ -936,7 +936,7 @@ export const Editable = (props: EditableProps) => {
                 ReactEditor.setFragmentData(editor, event.dataTransfer)
               }
             },
-            [attributes.onDragStart]
+            [readOnly, attributes.onDragStart]
           )}
           onDrop={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
