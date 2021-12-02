@@ -54,11 +54,8 @@ export function useRestoreDom(
 
   useMutationObserver(node, handleDOMMutation, MUTATION_OBSERVER_CONFIG)
 
-  useEffect(() => {
-    // Clear mutated nodes on every render
-    mutatedNodes.current.clear()
-  })
-
+  // Clear mutated nodes on every render
+  mutatedNodes.current.clear()
   const restore = useCallback(() => {
     const mutated = Array.from(mutatedNodes.current.values())
 
@@ -74,9 +71,10 @@ export function useRestoreDom(
     )
 
     nodesToRestore.forEach(n => {
-      // Force node to re-render
       NODE_TO_RESTORE_DOM.get(n)?.()
     })
+
+    mutatedNodes.current.clear()
   }, [])
 
   return restore

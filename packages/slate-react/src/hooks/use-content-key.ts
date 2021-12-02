@@ -4,18 +4,21 @@ import { NODE_TO_RESTORE_DOM } from '../utils/weak-maps'
 
 export function useContentKey(node: SlateNode) {
   const contentKeyRef = useRef<number>(0)
-  const updateTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+  const updateAnimationFrameRef = useRef<number | null>(null)
 
   const [, setForceRerenderCounter] = useState(0)
 
   useEffect(() => {
     NODE_TO_RESTORE_DOM.set(node, () => {
-      // Only force a re-render if the component isn't re-rendered this tick in order
-      // to avoid rendering it twice.
-      updateTimeoutRef.current = setTimeout(() => {
+      // Update is already queued and node hasn't re-render yet
+      if (updateAnimationFrameRef.current) {
+        return
+      }
+
+      updateAnimationFrameRef.current = requestAnimationFrame(() => {
         setForceRerenderCounter(state => state + 1)
-        updateTimeoutRef.current = undefined
-      }, 0)
+        updateAnimationFrameRef.current = null
+      })
 
       contentKeyRef.current++
     })
@@ -25,12 +28,11 @@ export function useContentKey(node: SlateNode) {
     }
   }, [node])
 
-  useEffect(() => {
-    if (updateTimeoutRef.current) {
-      clearTimeout(updateTimeoutRef.current)
-      updateTimeoutRef.current = undefined
-    }
-  })
+  // Node was restored => clear scheduled update
+  if (updateAnimationFrameRef.current) {
+    cancelAnimationFrame(updateAnimationFrameRef.current)
+    updateAnimationFrameRef.current = null
+  }
 
   return contentKeyRef.current
 }
