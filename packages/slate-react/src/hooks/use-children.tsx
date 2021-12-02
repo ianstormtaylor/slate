@@ -1,5 +1,5 @@
 import React from 'react'
-import { Editor, Range, Element, NodeEntry, Ancestor, Descendant } from 'slate'
+import { Editor, Range, Element, Ancestor, Descendant } from 'slate'
 
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'

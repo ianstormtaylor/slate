@@ -1,6 +1,6 @@
-import React, { useRef } from 'react'
+import React, { Fragment, useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, NodeEntry, Element as SlateElement } from 'slate'
+import { Editor, Node, Range, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
@@ -19,6 +19,8 @@ import {
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
+import { useContentKey } from '../hooks/use-content-key'
+import { IS_ANDROID } from '../utils/environment'
 
 /**
  * Element.
@@ -131,7 +133,14 @@ const Element = (props: {
     }
   })
 
-  return renderElement({ attributes, children, element })
+  const content = renderElement({ attributes, children, element })
+
+  if (IS_ANDROID) {
+    const contentKey = useContentKey(element)
+    return <Fragment key={contentKey}>{content}</Fragment>
+  }
+
+  return content
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {
