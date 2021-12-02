@@ -4,7 +4,7 @@ import {
   BasePoint,
   BaseRange,
   Descendant,
-  Operation
+  Operation,
 } from 'slate'
 
 export type HeadingElement = {
@@ -27,10 +27,9 @@ export type CustomText = {
 }
 
 export type CustomOperation = {
-  type: 'custom_op',
+  type: 'custom_op'
   value: string
 }
-
 
 export type ExtendedOperation = Operation | CustomOperation
 
