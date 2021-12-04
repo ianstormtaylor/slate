@@ -4,6 +4,7 @@ import {
   BasePoint,
   BaseRange,
   Descendant,
+  Operation,
 } from 'slate'
 
 export type HeadingElement = {
@@ -25,6 +26,13 @@ export type CustomText = {
   text: string
 }
 
+export type CustomOperation = {
+  type: 'custom_op'
+  value: string
+}
+
+export type ExtendedOperation = Operation | CustomOperation
+
 export type CustomElement = HeadingElement | ListItemElement
 
 declare module 'slate' {
@@ -36,5 +44,6 @@ declare module 'slate' {
     Point: BasePoint
     Range: BaseRange
     Selection: BaseSelection
+    Operation: ExtendedOperation
   }
 }
