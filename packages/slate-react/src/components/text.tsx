@@ -11,6 +11,8 @@ import {
   EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
+import { useContentKey } from '../hooks/use-content-key'
+import { IS_ANDROID } from '../utils/environment'
 
 /**
  * Text.
@@ -67,8 +69,10 @@ const Text = (props: {
     }
   })
 
+  const contentKey = IS_ANDROID ? useContentKey(text) : undefined
+
   return (
-    <span data-slate-node="text" ref={ref}>
+    <span data-slate-node="text" ref={ref} key={contentKey}>
       {children}
     </span>
   )

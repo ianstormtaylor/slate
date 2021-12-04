@@ -16,7 +16,6 @@ import {
   isReplaceExpandedSelection,
   isTextInsertion,
 } from './mutation-detection'
-import { restoreDOM } from './restore-dom'
 
 // Replace with `const debug = console.log` to debug
 const debug = (...message: any[]) => {}
@@ -42,11 +41,13 @@ const debug = (...message: any[]) => {}
  * - Line breaks
  *
  * @param editor
+ * @param restoreDOM
  */
 
 export class AndroidInputManager {
-  constructor(private editor: ReactEditor) {
+  constructor(private editor: ReactEditor, private restoreDOM: () => void) {
     this.editor = editor
+    this.restoreDOM = restoreDOM
   }
 
   /**
@@ -65,7 +66,7 @@ export class AndroidInputManager {
       console.error(err)
 
       // Failed to reconcile mutations, restore DOM to its previous state
-      restoreDOM(this.editor)
+      this.restoreDOM()
     }
   }
 
@@ -135,9 +136,7 @@ export class AndroidInputManager {
 
     Editor.insertBreak(this.editor)
 
-    // To-do: Need a more granular solution to restoring only a specific portion
-    // of the document. Restoring the entire document is expensive.
-    restoreDOM(this.editor)
+    this.restoreDOM()
 
     if (selection) {
       // Compat: Move selection to the newly inserted block if it has not moved
@@ -167,7 +166,7 @@ export class AndroidInputManager {
       Editor.insertText(this.editor, text)
     }
 
-    restoreDOM(this.editor)
+    this.restoreDOM()
   }
 
   /**
@@ -180,7 +179,7 @@ export class AndroidInputManager {
     Editor.deleteBackward(this.editor)
     ReactEditor.focus(this.editor)
 
-    restoreDOM(this.editor)
+    this.restoreDOM()
   }
 
   /**
@@ -194,7 +193,7 @@ export class AndroidInputManager {
         const path = ReactEditor.findPath(this.editor, slateNode)
 
         Transforms.delete(this.editor, { at: path })
-        restoreDOM(this.editor)
+        this.restoreDOM()
       }
     }
   }
