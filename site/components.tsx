@@ -1,6 +1,6 @@
 import React, { Ref, PropsWithChildren } from 'react'
 import ReactDOM from 'react-dom'
-import { css, cx } from @emotion/css';
+import { css, cx } from '@emotion/css';
 
 interface BaseProps {
   className: string
