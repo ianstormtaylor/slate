@@ -1,15 +1,15 @@
 import { isPlainObject } from 'is-plain-object'
 import { Operation, Range } from 'slate'
 
-/**
- * `History` objects hold all of the operations that are applied to a value, so
- * they can be undone or redone as necessary.
- */
-
 interface Batch {
   operations: Operation[]
   selectionBefore: Range | null
 }
+
+/**
+ * `History` objects hold all of the operations that are applied to a value, so
+ * they can be undone or redone as necessary.
+ */
 
 export interface History {
   redos: Batch[]

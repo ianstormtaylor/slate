@@ -68,7 +68,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
-    const overwrite = shouldOverwrite(op, lastOp)
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
 
@@ -83,15 +82,11 @@ export const withHistory = <T extends Editor>(editor: T) => {
         } else if (operations.length !== 0) {
           merge = true
         } else {
-          merge = shouldMerge(op, lastOp) || overwrite
+          merge = shouldMerge(op, lastOp)
         }
       }
 
       if (lastBatch && merge) {
-        if (overwrite) {
-          lastBatch.operations.pop()
-        }
-
         lastBatch.operations.push(op)
       } else {
         const batch = {
@@ -105,9 +100,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
         undos.shift()
       }
 
-      if (shouldClear(op)) {
-        history.redos = []
-      }
+      history.redos = []
     }
 
     apply(op)
@@ -121,10 +114,6 @@ export const withHistory = <T extends Editor>(editor: T) => {
  */
 
 const shouldMerge = (op: Operation, prev: Operation | undefined): boolean => {
-  if (op.type === 'set_selection') {
-    return true
-  }
-
   if (
     prev &&
     op.type === 'insert_text' &&
@@ -161,28 +150,9 @@ const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
 }
 
 /**
- * Check whether an operation should overwrite the previous one.
- */
-
-const shouldOverwrite = (
-  op: Operation,
-  prev: Operation | undefined
-): boolean => {
-  if (prev && op.type === 'set_selection' && prev.type === 'set_selection') {
-    return true
-  }
-
-  return false
-}
-
-/**
  * Check whether an operation should clear the redos stack.
  */
 
 const shouldClear = (op: Operation): boolean => {
-  if (op.type === 'set_selection') {
-    return false
-  }
-
   return true
 }
