@@ -25,6 +25,7 @@ import {
   IS_QQBROWSER,
   IS_SAFARI,
   IS_UC_MOBILE,
+  IS_WECHATBROWSER,
   CAN_USE_DOM,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -483,18 +484,13 @@ export const Editable = (props: EditableProps) => {
           case 'insertReplacementText':
           case 'insertText': {
             if (type === 'insertFromComposition') {
-              if (IS_SAFARI) {
-                // COMPAT: in Safari, `compositionend` is dispatched after the
-                // `beforeinput` for "insertFromComposition". But if we wait for it
-                // then we will abort because we're still composing and the selection
-                // won't be updated properly.
-                // https://www.w3.org/TR/input-events-2/
-                state.isComposing && setIsComposing(false)
-                state.isComposing = false
-              } else if (state.isComposing && !IS_UC_MOBILE) {
-                // browsers except UC mobile do nothing to avoid duplicated insertion
-                return
-              }
+              // COMPAT: in Safari, `compositionend` is dispatched after the
+              // `beforeinput` for "insertFromComposition". But if we wait for it
+              // then we will abort because we're still composing and the selection
+              // won't be updated properly.
+              // https://www.w3.org/TR/input-events-2/
+              state.isComposing && setIsComposing(false)
+              state.isComposing = false
             }
 
             // use a weak comparison instead of 'instanceof' to allow
@@ -778,6 +774,7 @@ export const Editable = (props: EditableProps) => {
                   !IS_FIREFOX_LEGACY &&
                   !IS_IOS &&
                   !IS_QQBROWSER &&
+                  !IS_WECHATBROWSER &&
                   !IS_UC_MOBILE &&
                   event.data
                 ) {
