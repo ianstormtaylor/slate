@@ -1,5 +1,28 @@
 # slate
 
+## 0.72.0
+
+### Patch Changes
+
+- [#4708](https://github.com/ianstormtaylor/slate/pull/4708) [`2fc7ad92`](https://github.com/ianstormtaylor/slate/commit/2fc7ad924cfbb75de59f685eeabb0375769201b9) Thanks [@bryanph](https://github.com/bryanph)! - Allow `Operation` type to be extended
+
+  For example:
+
+  ```
+  import type { BaseOperation } from 'slate'
+
+  type CustomOperation =
+   | BaseOperation
+   | YourCustomOperation
+   | AnotherCustomOperation
+
+  declare module 'slate' {
+    interface CustomTypes {
+      Operation: CustomOperation;
+    }
+  }
+  ```
+
 ## 0.71.0
 
 ### Minor Changes
