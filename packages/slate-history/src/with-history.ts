@@ -152,4 +152,3 @@ const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
 
   return true
 }
-
