@@ -153,10 +153,3 @@ const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
   return true
 }
 
-/**
- * Check whether an operation should clear the redos stack.
- */
-
-const shouldClear = (op: Operation): boolean => {
-  return true
-}
