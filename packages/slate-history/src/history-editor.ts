@@ -9,6 +9,7 @@ export const HISTORY = new WeakMap<Editor, History>()
 export const SAVING = new WeakMap<Editor, boolean | undefined>()
 export const MERGING = new WeakMap<Editor, boolean | undefined>()
 
+
 /**
  * `HistoryEditor` contains helpers for history-enabled editors.
  */
