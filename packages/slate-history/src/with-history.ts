@@ -52,7 +52,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
             e.apply(op)
           }
           if (batch.selectionBefore) {
-              Transforms.setSelection(e, batch.selectionBefore)
+            Transforms.setSelection(e, batch.selectionBefore)
           }
         })
       })
@@ -66,7 +66,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const { operations, history } = e
     const { undos } = history
     const lastBatch = undos[undos.length - 1]
-    const lastOp = lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const lastOp =
+      lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
     const overwrite = shouldOverwrite(op, lastOp)
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
@@ -94,8 +95,8 @@ export const withHistory = <T extends Editor>(editor: T) => {
         lastBatch.operations.push(op)
       } else {
         const batch = {
-            operations: [op],
-            selectionBefore: e.selection
+          operations: [op],
+          selectionBefore: e.selection,
         }
         undos.push(batch)
       }

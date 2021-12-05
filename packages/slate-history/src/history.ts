@@ -7,8 +7,8 @@ import { Operation, Range } from 'slate'
  */
 
 interface Batch {
-    operations: Operation[];
-    selectionBefore: Range | null
+  operations: Operation[]
+  selectionBefore: Range | null
 }
 
 export interface History {
