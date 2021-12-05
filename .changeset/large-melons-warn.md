@@ -2,4 +2,4 @@
 'slate-react': minor
 ---
 
-Fix CJK IME(like Chinese, Japanese) double input
+Fix CJK IME (e.g. Chinese or Japanese) double input
