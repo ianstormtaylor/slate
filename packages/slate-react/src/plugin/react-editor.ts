@@ -36,7 +36,7 @@ export interface ReactEditor extends BaseEditor {
   insertTextData: (data: DataTransfer) => boolean
   setFragmentData: (
     data: DataTransfer,
-    originEvent: 'drag' | 'copy' | 'cut'
+    originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
@@ -259,7 +259,7 @@ export const ReactEditor = {
   setFragmentData(
     editor: ReactEditor,
     data: DataTransfer,
-    originEvent: 'drag' | 'copy' | 'cut'
+    originEvent?: 'drag' | 'copy' | 'cut'
   ): void {
     editor.setFragmentData(data, originEvent)
   },
