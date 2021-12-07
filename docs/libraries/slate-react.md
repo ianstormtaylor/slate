@@ -148,7 +148,7 @@ Insert fragment data from a `DataTransfer` into the editor. Returns true if some
 
 Insert text data from a `DataTransfer` into the editor. Returns true if some content has been effectively inserted.
 
-### `setFragmentData(editor: ReactEditor, data: DataTransfer)`
+### `setFragmentData(editor: ReactEditor, data: DataTransfer, originEvent: 'drag' | 'copy' | 'cut')`
 
 Sets data from the currently selected fragment on a `DataTransfer`.
 
