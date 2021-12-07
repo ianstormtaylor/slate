@@ -34,7 +34,10 @@ export interface ReactEditor extends BaseEditor {
   insertData: (data: DataTransfer) => void
   insertFragmentData: (data: DataTransfer) => boolean
   insertTextData: (data: DataTransfer) => boolean
-  setFragmentData: (data: DataTransfer, originEvent: 'drag' | 'copy' | 'cut') => void
+  setFragmentData: (
+    data: DataTransfer,
+    originEvent: 'drag' | 'copy' | 'cut'
+  ) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
@@ -253,7 +256,11 @@ export const ReactEditor = {
    * Sets data from the currently selected fragment on a `DataTransfer`.
    */
 
-  setFragmentData(editor: ReactEditor, data: DataTransfer, originEvent: 'drag' | 'copy' | 'cut'): void {
+  setFragmentData(
+    editor: ReactEditor,
+    data: DataTransfer,
+    originEvent: 'drag' | 'copy' | 'cut'
+  ): void {
     editor.setFragmentData(data, originEvent)
   },
 
