@@ -1,5 +1,17 @@
 # slate-react
 
+## 0.72.0
+
+### Minor Changes
+
+- [#4702](https://github.com/ianstormtaylor/slate/pull/4702) [`8bc6a464`](https://github.com/ianstormtaylor/slate/commit/8bc6a464600d6820d85f55fdaf71e9ea01702eb5) Thanks [@ttitoo](https://github.com/ttitoo)! - Fix CJK IME (e.g. Chinese or Japanese) double input
+
+### Patch Changes
+
+- [#4706](https://github.com/ianstormtaylor/slate/pull/4706) [`6d194077`](https://github.com/ianstormtaylor/slate/commit/6d194077763ec0a9d5642be5cafef20e65dbce8e) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Update android restoreDOM to use partial dom restoring
+
+* [#4707](https://github.com/ianstormtaylor/slate/pull/4707) [`c020ca23`](https://github.com/ianstormtaylor/slate/commit/c020ca23b6f5d2307eb62630566ec711def89fcf) Thanks [@ahoisl](https://github.com/ahoisl)! - fix: add 'readonly' dependency for onDragStart callback
+
 ## 0.71.0
 
 ### Minor Changes
