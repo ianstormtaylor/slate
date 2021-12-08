@@ -37,6 +37,14 @@ interface Editor {
   - [Normalization methods](editor.md#normalization-methods)
 - [Instance methods](editor.md#instance-methods)
   - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
+  - [Element Type Methods](editor.md/#element-type-methods)
+  - [Normalize Method](editor.md/#normalize-method)
+  - [Callback Method](editor.md/#callback-method)
+  - [Mark Methods](editor.md/#mark-methods)
+  - [getFragment Method](editor.md/#getfragment-method)
+  - [Delete Methods](editor.md/#delete-methods)
+  - [Insert Methods](editor.md/#insert-methods)
+  - [Operation Handling Method](editor.md/#operation-handling-method)
 
 ## Instantiation methods
 
@@ -358,7 +366,9 @@ Options: `{force?: boolean}`
 
 Call a function, deferring normalization until after it completes.
 
-## Schema-specific instance methods to override
+## Instance Methods
+
+### Schema-specific instance methods to override
 
 Replace these methods to modify the original behavior of the editor when building [Plugins](../../concepts/08-plugins.md). When modifying behavior, call the original method when appropriate. For example, a plugin that marks image nodes as "void":
 
