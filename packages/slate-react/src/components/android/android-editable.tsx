@@ -340,7 +340,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onCopy)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'copy')
               }
             },
             [attributes.onCopy]
@@ -353,7 +353,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onCut)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'cut')
                 const { selection } = editor
 
                 if (selection) {

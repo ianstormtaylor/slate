@@ -867,7 +867,7 @@ export const Editable = (props: EditableProps) => {
                 !isEventHandled(event, attributes.onCopy)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'copy')
               }
             },
             [attributes.onCopy]
@@ -880,7 +880,7 @@ export const Editable = (props: EditableProps) => {
                 !isEventHandled(event, attributes.onCut)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'cut')
                 const { selection } = editor
 
                 if (selection) {
@@ -937,7 +937,7 @@ export const Editable = (props: EditableProps) => {
 
                 state.isDraggingInternally = true
 
-                ReactEditor.setFragmentData(editor, event.dataTransfer)
+                ReactEditor.setFragmentData(editor, event.dataTransfer, 'drag')
               }
             },
             [readOnly, attributes.onDragStart]
