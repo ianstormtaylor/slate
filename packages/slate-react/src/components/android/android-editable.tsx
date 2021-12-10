@@ -14,11 +14,9 @@ import {
   isDOMNode,
   getDefaultView,
   getClipboardData,
-  isPlainTextOnlyPaste,
 } from '../../utils/dom'
 import {
   EDITOR_TO_ELEMENT,
-  EDITOR_TO_RESTORE_DOM,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
   IS_FOCUSED,
@@ -37,6 +35,7 @@ import {
 } from '../editable'
 
 import { useAndroidInputManager } from './use-android-input-manager'
+import { useContentKey } from '../../hooks/use-content-key'
 
 /**
  * Editable.
@@ -72,10 +71,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     []
   )
 
-  const [contentKey, setContentKey] = useState(0)
-  const onRestoreDOM = useCallback(() => {
-    setContentKey(prev => prev + 1)
-  }, [contentKey])
+  const contentKey = useContentKey(editor)
 
   // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
@@ -87,10 +83,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       EDITOR_TO_ELEMENT.set(editor, ref.current)
       NODE_TO_ELEMENT.set(editor, ref.current)
       ELEMENT_TO_NODE.set(ref.current, editor)
-      EDITOR_TO_RESTORE_DOM.set(editor, onRestoreDOM)
     } else {
       NODE_TO_ELEMENT.delete(editor)
-      EDITOR_TO_RESTORE_DOM.delete(editor)
     }
 
     try {
@@ -350,7 +344,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onCopy)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'copy')
               }
             },
             [attributes.onCopy]
@@ -363,7 +357,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onCut)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'cut')
                 const { selection } = editor
 
                 if (selection) {

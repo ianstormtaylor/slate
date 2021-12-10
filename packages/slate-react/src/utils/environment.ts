@@ -43,6 +43,14 @@ export const IS_FIREFOX_LEGACY =
 export const IS_QQBROWSER =
   typeof navigator !== 'undefined' && /.*QQBrowser/.test(navigator.userAgent)
 
+// UC mobile browser
+export const IS_UC_MOBILE =
+  typeof navigator !== 'undefined' && /.*UCBrowser/.test(navigator.userAgent)
+
+// Wechat browser
+export const IS_WECHATBROWSER =
+  typeof navigator !== 'undefined' && /.*Wechat/.test(navigator.userAgent)
+
 // Check if DOM is available as React does internally.
 // https://github.com/facebook/react/blob/master/packages/shared/ExecutionEnvironment.js
 export const CAN_USE_DOM = !!(

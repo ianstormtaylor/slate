@@ -28,6 +28,8 @@ import {
   IS_QQBROWSER,
   IS_APPLE,
   IS_CHROME_LEGACY,
+  IS_UC_MOBILE,
+  IS_WECHATBROWSER,
   CAN_USE_DOM,
 } from '../utils/environment'
 import { ReactEditor } from '..'
@@ -851,6 +853,9 @@ export const Editable = (props: EditableProps) => {
                   !(IS_FIREFOX || IS_QQBROWSER) &&
                   !IS_FIREFOX_LEGACY &&
                   !IS_IOS &&
+                  !IS_QQBROWSER &&
+                  !IS_WECHATBROWSER &&
+                  !IS_UC_MOBILE &&
                   event.data
                 ) {
                   editor.isRemote = false
@@ -943,7 +948,7 @@ export const Editable = (props: EditableProps) => {
                 !isEventHandled(event, attributes.onCopy)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'copy')
               }
             },
             [attributes.onCopy]
@@ -956,7 +961,7 @@ export const Editable = (props: EditableProps) => {
                 !isEventHandled(event, attributes.onCut)
               ) {
                 event.preventDefault()
-                ReactEditor.setFragmentData(editor, event.clipboardData)
+                ReactEditor.setFragmentData(editor, event.clipboardData, 'cut')
                 const { selection } = editor
 
                 if (selection) {
@@ -1027,10 +1032,10 @@ export const Editable = (props: EditableProps) => {
 
                 state.isDraggingInternally = true
 
-                ReactEditor.setFragmentData(editor, event.dataTransfer)
+                ReactEditor.setFragmentData(editor, event.dataTransfer, 'drag')
               }
             },
-            [attributes.onDragStart]
+            [readOnly, attributes.onDragStart]
           )}
           onDrop={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
