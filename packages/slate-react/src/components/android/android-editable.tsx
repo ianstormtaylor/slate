@@ -31,7 +31,7 @@ import {
   hasEditableTarget,
   isEventHandled,
   isDOMEventHandled,
-  isTargetInsideVoid,
+  isTargetInsideNonReadonlyVoid,
 } from '../editable'
 
 import { useAndroidInputManager } from './use-android-input-manager'
@@ -249,11 +249,11 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
 
           const anchorNodeSelectable =
             hasEditableTarget(editor, anchorNode) ||
-            isTargetInsideVoid(editor, anchorNode)
+            isTargetInsideNonReadonlyVoid(editor, anchorNode)
 
           const focusNodeSelectable =
             hasEditableTarget(editor, focusNode) ||
-            isTargetInsideVoid(editor, focusNode)
+            isTargetInsideNonReadonlyVoid(editor, focusNode)
 
           if (anchorNodeSelectable && focusNodeSelectable) {
             const range = ReactEditor.toSlateRange(editor, domSelection, {
