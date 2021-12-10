@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.72.1
+
+### Patch Changes
+
+- [#4720](https://github.com/ianstormtaylor/slate/pull/4720) [`1217021a`](https://github.com/ianstormtaylor/slate/commit/1217021a9a42563c9ee951ab670255c209863452) Thanks [@bryanph](https://github.com/bryanph)! - Add origin event type to setFragmentData to be able to distinguish copy, cut and drag
+
+* [#4727](https://github.com/ianstormtaylor/slate/pull/4727) [`0334851c`](https://github.com/ianstormtaylor/slate/commit/0334851cb1da3fd194278e48985166eb658eaf24) Thanks [@ahoisl](https://github.com/ahoisl)! - Fix "Cannot resolve from DOM point" error on onDomSelectionChange for readonly void elements
+
 ## 0.72.0
 
 ### Minor Changes
