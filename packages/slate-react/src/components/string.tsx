@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useLayoutEffect } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
@@ -55,24 +55,36 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
-const TextString = (props: { text: string; isTrailing?: boolean }) => {
+ const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
 
   const ref = useRef<HTMLSpanElement>(null)
-  const forceUpdateCount = useRef(0)
 
-  if (ref.current && ref.current.textContent !== text) {
-    forceUpdateCount.current += 1
-  }
+  // This is the actual text rendering boundary where we interface with the DOM
+  // The text is not rendered as part of the virtual DOM, as since we handle basic character insertions natively,
+  // updating the DOM is not a one way dataflow anymore. What we need here is not reconciliation and diffing
+  // with previous version of the virtual DOM, but rather diffing with the actual DOM element, and replace the DOM <span> content
+  // exactly if and only if its current content does not match our current virtual DOM.
+  // Otherwise the DOM TextNode would always be replaced by React as the user types, which interferes with native text features,
+  // eg makes native spellcheck opt out from checking the text node.
 
-  // This component may have skipped rendering due to native operations being
-  // applied. If an undo is performed React will see the old and new shadow DOM
-  // match and not apply an update. Forces each render to actually reconcile.
+  // useLayoutEffect: updating our span before browser paint
+  useLayoutEffect(() => {
+    // making sure we're not outputing "null" in the extreme case the text is nullish at runtime
+    const textWithTrailing = text != null
+      ? text + (isTrailing ? '\n' : "")
+      : (isTrailing ? '\n' : null);
+
+    if (ref.current && ref.current.textContent !== textWithTrailing) {
+      ref.current.textContent = textWithTrailing;
+    }
+  // intentionally not specifying dependencies, so that this effect runs on every render
+  // as this effectively replaces "specifying the text in the virtual DOM under the <span> below" on each render
+  });
+
+  // the span is intentionally same on every render in virtual DOM, actual rendering happens in the layout effect above
   return (
-    <span data-slate-string ref={ref} key={forceUpdateCount.current}>
-      {text}
-      {isTrailing ? '\n' : null}
-    </span>
+    <span data-slate-string ref={ref} />
   )
 }
 
