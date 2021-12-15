@@ -1,5 +1,6 @@
 import { Ancestor, Editor, Node } from 'slate'
 import { Key } from './key'
+import { TextInsertion } from '../components/android/diff-text'
 
 /**
  * Two weak maps that allow us rebuild a path given a node. They are populated
@@ -32,6 +33,17 @@ export const IS_READ_ONLY: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_FOCUSED: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
+export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
+export const IS_ON_COMPOSITION_END: WeakMap<Editor, boolean> = new WeakMap()
+
+/**
+ * Weak maps for saving text on composition stage.
+ */
+
+export const EDITOR_ON_COMPOSITION_TEXT: WeakMap<
+  Editor,
+  TextInsertion[]
+> = new WeakMap()
 
 /**
  * Weak map for associating the context `onChange` context with the plugin.
