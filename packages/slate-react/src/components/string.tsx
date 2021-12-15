@@ -55,7 +55,7 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
- const TextString = (props: { text: string; isTrailing?: boolean }) => {
+const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
 
   const ref = useRef<HTMLSpanElement>(null)
@@ -70,22 +70,23 @@ const String = (props: {
 
   // useLayoutEffect: updating our span before browser paint
   useLayoutEffect(() => {
+    let textWithTrailing: string | null = text + (isTrailing ? '\n' : '')
+
     // making sure we're not outputing "null" in the extreme case the text is nullish at runtime
-    const textWithTrailing = text != null
-      ? text + (isTrailing ? '\n' : "")
-      : (isTrailing ? '\n' : null);
+    if (text == null) {
+      textWithTrailing = isTrailing ? '\n' : null
+    }
 
     if (ref.current && ref.current.textContent !== textWithTrailing) {
-      ref.current.textContent = textWithTrailing;
+      ref.current.textContent = textWithTrailing
     }
-  // intentionally not specifying dependencies, so that this effect runs on every render
-  // as this effectively replaces "specifying the text in the virtual DOM under the <span> below" on each render
-  });
+
+    // intentionally not specifying dependencies, so that this effect runs on every render
+    // as this effectively replaces "specifying the text in the virtual DOM under the <span> below" on each render
+  })
 
   // the span is intentionally same on every render in virtual DOM, actual rendering happens in the layout effect above
-  return (
-    <span data-slate-string ref={ref} />
-  )
+  return <span data-slate-string ref={ref} />
 }
 
 /**
