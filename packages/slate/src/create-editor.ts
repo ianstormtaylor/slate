@@ -57,13 +57,17 @@ export const createEditor = (): Editor => {
       }
 
       const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
-      const newDirtyPaths = getDirtyPaths(op)
-
+      const canTransformPath = Path.operationCanTransformPath(op)
       for (const path of oldDirtyPaths) {
-        const newPath = Path.transform(path, op)
-        add(newPath)
+        if (canTransformPath) {
+          const newPath = Path.transform(path, op)
+          add(newPath)
+        } else {
+          add(path)
+        }
       }
 
+      const newDirtyPaths = getDirtyPaths(op)
       for (const path of newDirtyPaths) {
         add(path)
       }

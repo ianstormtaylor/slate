@@ -34,6 +34,7 @@ export interface PathInterface {
     }
   ) => Path[]
   next: (path: Path) => Path
+  operationCanTransformPath: (operation: Operation) => boolean
   parent: (path: Path) => Path
   previous: (path: Path) => Path
   relative: (path: Path, ancestor: Path) => Path
@@ -289,6 +290,26 @@ export const Path: PathInterface = {
 
     const last = path[path.length - 1]
     return path.slice(0, -1).concat(last + 1)
+  },
+
+  /**
+   * Returns whether this operation can affect paths or not. Used as an
+   * optimization when updating dirty paths during normalization
+   *
+   * NOTE: This *must* be kept in sync with the implementation of 'transform'
+   * below
+   */
+  operationCanTransformPath(operation: Operation): boolean {
+    switch (operation.type) {
+      case 'insert_node':
+      case 'remove_node':
+      case 'merge_node':
+      case 'split_node':
+      case 'move_node':
+        return true
+      default:
+        return false
+    }
   },
 
   /**
