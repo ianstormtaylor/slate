@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Descendant, Editor, Element, Node, Range, Transforms } from 'slate'
+import { Editor, Element, Node, Range, Transforms, Path, Text } from 'slate'
 import throttle from 'lodash/throttle'
+import debounce from 'lodash/debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'
 
 import { DefaultPlaceholder, ReactEditor } from '../..'
@@ -23,8 +24,13 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
+  IS_COMPOSING,
+  IS_ON_COMPOSITION_END,
+  EDITOR_ON_COMPOSITION_TEXT,
 } from '../../utils/weak-maps'
-import { EditableProps } from '../editable'
+import { normalizeTextInsertionRange } from './diff-text'
+
+import { EditableProps, hasTarget } from '../editable'
 import useChildren from '../../hooks/use-children'
 import {
   defaultDecorate,
@@ -41,6 +47,10 @@ import { useContentKey } from '../../hooks/use-content-key'
  * Editable.
  */
 
+// https://github.com/facebook/draft-js/blob/main/src/component/handlers/composition/DraftEditorCompositionHandler.js#L41
+// When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
+const RESOLVE_DELAY = 20
+
 export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const {
     autoFocus,
@@ -56,6 +66,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     ...attributes
   } = props
   const editor = useSlate()
+  // Rerender editor when composition status changed
+  const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
   const inputManager = useAndroidInputManager(ref)
 
@@ -65,6 +77,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
+      isComposing: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
     }),
@@ -93,7 +106,11 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
       const root = ReactEditor.findDocumentOrShadowRoot(editor)
       const domSelection = root.getSelection()
 
-      if (!domSelection || !ReactEditor.isFocused(editor)) {
+      if (
+        state.isComposing ||
+        !domSelection ||
+        !ReactEditor.isFocused(editor)
+      ) {
         return
       }
 
@@ -190,36 +207,6 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     }
   }, [autoFocus])
 
-  // Listen on the native `beforeinput` event to get real "Level 2" events. This
-  // is required because React's `beforeinput` is fake and never really attaches
-  // to the real event sadly. (2019/11/01)
-  // https://github.com/facebook/react/issues/11211
-  const onDOMBeforeInput = useCallback(
-    (event: InputEvent) => {
-      if (
-        !readOnly &&
-        hasEditableTarget(editor, event.target) &&
-        !isDOMEventHandled(event, propsOnDOMBeforeInput)
-      ) {
-        inputManager.onUserInput()
-      }
-    },
-    [readOnly, propsOnDOMBeforeInput]
-  )
-
-  // Attach a native DOM event handler for `beforeinput` events, because React's
-  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
-  // real `beforeinput` events sadly... (2019/11/04)
-  useIsomorphicLayoutEffect(() => {
-    const node = ref.current
-
-    // @ts-ignore The `beforeinput` event isn't recognized.
-    node?.addEventListener('beforeinput', onDOMBeforeInput)
-
-    // @ts-ignore The `beforeinput` event isn't recognized.
-    return () => node?.removeEventListener('beforeinput', onDOMBeforeInput)
-  }, [contentKey, propsOnDOMBeforeInput])
-
   // Listen on the native `selectionchange` event to be able to update any time
   // the selection changes. This is required because React's `onSelect` is leaky
   // and non-standard so it doesn't fire until after a selection has been
@@ -228,7 +215,11 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       try {
-        if (!state.isUpdatingSelection && !inputManager.isReconciling.current) {
+        if (
+          !state.isComposing &&
+          !state.isUpdatingSelection &&
+          !inputManager.isReconciling.current
+        ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
@@ -272,6 +263,46 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     [readOnly]
   )
 
+  const scheduleOnDOMSelectionChange = useMemo(
+    () => debounce(onDOMSelectionChange, 0),
+    [onDOMSelectionChange]
+  )
+
+  // Listen on the native `beforeinput` event to get real "Level 2" events. This
+  // is required because React's `beforeinput` is fake and never really attaches
+  // to the real event sadly. (2019/11/01)
+  // https://github.com/facebook/react/issues/11211
+  const onDOMBeforeInput = useCallback(
+    (event: InputEvent) => {
+      if (
+        !readOnly &&
+        hasEditableTarget(editor, event.target) &&
+        !isDOMEventHandled(event, propsOnDOMBeforeInput)
+      ) {
+        // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
+        // triggering a `beforeinput` expecting the change to be applied to the immediately before
+        // set selection.
+        scheduleOnDOMSelectionChange.flush()
+
+        inputManager.onUserInput()
+      }
+    },
+    [readOnly, propsOnDOMBeforeInput]
+  )
+
+  // Attach a native DOM event handler for `beforeinput` events, because React's
+  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
+  // real `beforeinput` events sadly... (2019/11/04)
+  useIsomorphicLayoutEffect(() => {
+    const node = ref.current
+
+    // @ts-ignore The `beforeinput` event isn't recognized.
+    node?.addEventListener('beforeinput', onDOMBeforeInput)
+
+    // @ts-ignore The `beforeinput` event isn't recognized.
+    return () => node?.removeEventListener('beforeinput', onDOMBeforeInput)
+  }, [contentKey, propsOnDOMBeforeInput])
+
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
   // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
@@ -279,15 +310,18 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
-    window.document.addEventListener('selectionchange', onDOMSelectionChange)
+    window.document.addEventListener(
+      'selectionchange',
+      scheduleOnDOMSelectionChange
+    )
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        onDOMSelectionChange
+        scheduleOnDOMSelectionChange
       )
     }
-  })
+  }, [scheduleOnDOMSelectionChange])
 
   const decorations = decorate([editor, []])
 
@@ -295,7 +329,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
     placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === ''
+    Node.string(editor) === '' &&
+    !isComposing
   ) {
     const start = Editor.start(editor, [])
     decorations.push({
@@ -443,6 +478,123 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               IS_FOCUSED.delete(editor)
             },
             [readOnly, attributes.onBlur]
+          )}
+          onClick={useCallback(
+            (event: React.MouseEvent<HTMLDivElement>) => {
+              if (
+                !readOnly &&
+                hasTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onClick) &&
+                isDOMNode(event.target)
+              ) {
+                const node = ReactEditor.toSlateNode(editor, event.target)
+                const path = ReactEditor.findPath(editor, node)
+
+                // At this time, the Slate document may be arbitrarily different,
+                // because onClick handlers can change the document before we get here.
+                // Therefore we must check that this path actually exists,
+                // and that it still refers to the same node.
+                if (Editor.hasPath(editor, path)) {
+                  const lookupNode = Node.get(editor, path)
+                  if (lookupNode === node) {
+                    const start = Editor.start(editor, path)
+                    const end = Editor.end(editor, path)
+
+                    const startVoid = Editor.void(editor, { at: start })
+                    const endVoid = Editor.void(editor, { at: end })
+
+                    if (
+                      startVoid &&
+                      endVoid &&
+                      Path.equals(startVoid[1], endVoid[1])
+                    ) {
+                      const range = Editor.range(editor, start)
+                      Transforms.select(editor, range)
+                    }
+                  }
+                }
+              }
+            },
+            [readOnly, attributes.onClick]
+          )}
+          onCompositionEnd={useCallback(
+            (event: React.CompositionEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCompositionEnd)
+              ) {
+                scheduleOnDOMSelectionChange.flush()
+                setTimeout(() => {
+                  state.isComposing && setIsComposing(false)
+                  state.isComposing = false
+
+                  IS_COMPOSING.set(editor, false)
+                  IS_ON_COMPOSITION_END.set(editor, true)
+
+                  const insertedText =
+                    EDITOR_ON_COMPOSITION_TEXT.get(editor) || []
+
+                  // `insertedText` is set in `MutationObserver` constructor.
+                  // If open phone keyboard association function, `CompositionEvent` will be triggered.
+                  if (!insertedText.length) {
+                    return
+                  }
+
+                  EDITOR_ON_COMPOSITION_TEXT.set(editor, [])
+
+                  const { selection, marks } = editor
+
+                  insertedText.forEach(insertion => {
+                    const text = insertion.text.insertText
+                    const at = normalizeTextInsertionRange(
+                      editor,
+                      selection,
+                      insertion
+                    )
+                    if (marks) {
+                      const node = { text, ...marks }
+                      Transforms.insertNodes(editor, node, {
+                        match: Text.isText,
+                        at,
+                        select: true,
+                      })
+                      editor.marks = null
+                    } else {
+                      Transforms.insertText(editor, text, {
+                        at,
+                      })
+                    }
+                  })
+                }, RESOLVE_DELAY)
+              }
+            },
+            [attributes.onCompositionEnd]
+          )}
+          onCompositionUpdate={useCallback(
+            (event: React.CompositionEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCompositionUpdate)
+              ) {
+                !state.isComposing && setIsComposing(true)
+                state.isComposing = true
+                IS_COMPOSING.set(editor, true)
+              }
+            },
+            [attributes.onCompositionUpdate]
+          )}
+          onCompositionStart={useCallback(
+            (event: React.CompositionEvent<HTMLDivElement>) => {
+              if (
+                hasEditableTarget(editor, event.target) &&
+                !isEventHandled(event, attributes.onCompositionStart)
+              ) {
+                !state.isComposing && setIsComposing(true)
+                state.isComposing = true
+                IS_COMPOSING.set(editor, true)
+              }
+            },
+            [attributes.onCompositionStart]
           )}
           onPaste={useCallback(
             (event: React.ClipboardEvent<HTMLDivElement>) => {
