@@ -230,3 +230,8 @@ Transform.setNodes(
 
 When performing transforms, if you're ever looping over nodes and transforming them one at a time, consider seeing if `match` can solve your use case, and offload the complexity of managing loops to Slate instead.
 The `match` function can examine the children of a node, in `node.children`, or use `Node.parent` to examine its parent.
+
+## Transforms and Normalization
+
+Sequences of Transforms may need to be wrapped in [`Editor.withoutNormalizing`](../api/nodes/editor.md#editorwithoutnormalizingeditor-editor-fn---void--void) if the node tree should _not_ be normalized between Transforms.
+See [Normalization - Implications for Other Code](./11-normalizing.md#implications-for-other-code);
