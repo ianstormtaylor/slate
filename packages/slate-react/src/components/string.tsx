@@ -71,7 +71,7 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
   // useLayoutEffect: updating our span before browser paint
   useLayoutEffect(() => {
     // null coalescing text to make sure we're not outputing "null" as a string in the extreme case it is nullish at runtime
-    const textWithTrailing = (text ?? '') + (isTrailing ? '\n' : '')
+    const textWithTrailing = `${text ?? ''}${isTrailing ? '\n' : ''}`
 
     if (ref.current && ref.current.textContent !== textWithTrailing) {
       ref.current.textContent = textWithTrailing
