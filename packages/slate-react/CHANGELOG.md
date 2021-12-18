@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.72.2
+
+### Patch Changes
+
+- [#4734](https://github.com/ianstormtaylor/slate/pull/4734) [`3c07a870`](https://github.com/ianstormtaylor/slate/commit/3c07a8706ef152fe35c5363a2316aa291c12c2f0) Thanks [@YasinChan](https://github.com/YasinChan)! - [AndroidEditor] Solve input association problems and add click events.
+
 ## 0.72.1
 
 ### Patch Changes

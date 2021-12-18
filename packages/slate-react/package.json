@@ -1,7 +1,7 @@
 {
   "name": "slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.72.1",
+  "version": "0.72.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -31,7 +31,7 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",
-    "slate": "^0.72.0",
+    "slate": "^0.72.2",
     "slate-hyperscript": "^0.67.0",
     "source-map-loader": "^0.2.4"
   },
