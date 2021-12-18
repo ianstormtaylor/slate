@@ -276,19 +276,19 @@ Insert a block break at the current selection.
 
 #### `Editor.insertFragment(editor: Editor, fragment: Node[]) => void`
 
-Insert a fragment at the current selection.
+Inserts a fragment _at the current selection_.
 
-If the selection is currently expanded, it will be deleted first.
+If the selection is currently expanded, it will be deleted first. To atomically insert nodes (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
 
 #### `Editor.insertNode(editor: Editor, node: Node) => void`
 
-Insert a node at the current selection.
+Inserts a node _at the current selection_.
 
-If the selection is currently expanded, it will be deleted first.
+If the selection is currently expanded, it will be deleted first. To atomically insert a node (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
 
 #### `Editor.insertText(editor: Editor, text: string) => void`
 
-Insert text at the current selection.
+Inserts text _at the current selection_.
 
 If the selection is currently expanded, it will be deleted first.
 

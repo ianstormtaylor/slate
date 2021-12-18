@@ -44,9 +44,19 @@ Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
-Insert `nodes` at the specified location in the document. If no location is specified, insert at the current selection. If there is no selection, insert at the end of the document.
+Atomically inserts `nodes` at the specified location in the document. If no location is specified, inserts at the current selection. If there is no selection, inserts at the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
+
+For example, to insert at the very end, without replacing the current selection and regardless of block nesting, use
+
+```javascript
+Transforms.insertNodes(
+  editor,
+  { type: targetType, children: [{ text: '' }] },
+  { at: [editor.children.length] }
+)
+```
 
 #### `Transforms.removeNodes(editor: Editor, options?)`
 
