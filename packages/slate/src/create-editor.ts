@@ -13,7 +13,7 @@ import {
   Text,
   Transforms,
 } from './'
-import { DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
+import { DIRTY_PATHS, DIRTY_PATH_KEYS, FLUSHING } from './utils/weak-maps'
 
 /**
  * Create a new Slate `Editor` object.
@@ -42,33 +42,41 @@ export const createEditor = (): Editor => {
         RangeRef.transform(ref, op)
       }
 
-      const set = new Set()
-      const dirtyPaths: Path[] = []
+      const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
+      const oldDirtyPathKeys = DIRTY_PATH_KEYS.get(editor) || new Set()
+      let dirtyPaths: Path[]
+      let dirtyPathKeys: Set<string>
 
       const add = (path: Path | null) => {
         if (path) {
           const key = path.join(',')
 
-          if (!set.has(key)) {
-            set.add(key)
+          if (!dirtyPathKeys.has(key)) {
+            dirtyPathKeys.add(key)
             dirtyPaths.push(path)
           }
         }
       }
 
-      const oldDirtyPaths = DIRTY_PATHS.get(editor) || []
-      const newDirtyPaths = getDirtyPaths(op)
-
-      for (const path of oldDirtyPaths) {
-        const newPath = Path.transform(path, op)
-        add(newPath)
+      if (Path.operationCanTransformPath(op)) {
+        dirtyPaths = []
+        dirtyPathKeys = new Set()
+        for (const path of oldDirtyPaths) {
+          const newPath = Path.transform(path, op)
+          add(newPath)
+        }
+      } else {
+        dirtyPaths = oldDirtyPaths
+        dirtyPathKeys = oldDirtyPathKeys
       }
 
+      const newDirtyPaths = getDirtyPaths(op)
       for (const path of newDirtyPaths) {
         add(path)
       }
 
       DIRTY_PATHS.set(editor, dirtyPaths)
+      DIRTY_PATH_KEYS.set(editor, dirtyPathKeys)
       Transforms.transform(editor, op)
       editor.operations.push(op)
       Editor.normalize(editor)
