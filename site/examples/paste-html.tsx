@@ -226,7 +226,7 @@ const initialValue: Descendant[] = [
       { text: "'text/plain'", code: true },
       {
         text:
-          " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintaing its formatting. To do this, your editor needs to handle ",
+          " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintain its formatting. To do this, your editor needs to handle ",
       },
       { text: "'text/html'", code: true },
       { text: ' data. ' },

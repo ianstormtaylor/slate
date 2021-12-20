@@ -1,6 +1,7 @@
 # PointRef API
 
 `PointRef` objects keep a specific point in a document synced over time as new operations are applied to the editor. You can access their property `current` at any time for the up-to-date `Point` value.
+When you no longer need to track this location, call `unref()` to free the resources.
 
 ```typescript
 interface PointRef {
@@ -28,4 +29,4 @@ It also returns the current value.
 #### `PointRef.transform(ref: PointRef, op: Operation)`
 
 Transform the point refs current value by an `op`.
-Rarely needed, as the PointRef is updated when the editor is updated.
+The editor calls this as needed, so normally you won't need to.
