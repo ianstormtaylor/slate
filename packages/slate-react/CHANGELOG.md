@@ -1,5 +1,12 @@
 # slate-react
 
+## 0.72.2
+
+### Patch Changes
+
+- [#4734](https://github.com/ianstormtaylor/slate/pull/4734) [`3c07a870`](https://github.com/ianstormtaylor/slate/commit/3c07a8706ef152fe35c5363a2316aa291c12c2f0) Thanks [@YasinChan](https://github.com/YasinChan)! - [AndroidEditor] Solve input association problems and add click events.
+- [#4733](https://github.com/ianstormtaylor/slate/pull/4733) [`ccafb69`](https://github.com/ianstormtaylor/slate/commit/ccafb6982f56364becc8ca39ed6c1953a5febac3) Thanks [@Schipy](https://github.com/Schipy)! - Optimize TextString rendering to support browser/OS text features, e.g. fix native spellcheck.
+
 ## 0.72.1
 
 ### Patch Changes
