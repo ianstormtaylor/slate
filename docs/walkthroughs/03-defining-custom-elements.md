@@ -177,6 +177,7 @@ Now, if you press ``Ctrl-``` the block your cursor is in should turn into a code
 But we forgot one thing. When you hit ``Ctrl-``` again, it should change the code block back into a paragraph. To do that, we'll need to add a bit of logic to change the type we set based on whether any of the currently selected blocks are already a code block:
 
 ```jsx
+import { Editor, Transforms, Element } from 'slate'
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   const [value, setValue] = useState([
@@ -204,7 +205,7 @@ const App = () => {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
             const [match] = Editor.nodes(editor, {
-              match: n => n.type === 'code',
+              match: n => Element.isElement(n) && n.type === 'code',
             })
             // Toggle the block type depending on whether there's already a match.
             Transforms.setNodes(
