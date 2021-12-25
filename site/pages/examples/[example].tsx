@@ -19,6 +19,7 @@ import Inlines from '../../examples/inlines'
 import MarkdownPreview from '../../examples/markdown-preview'
 import MarkdownShortcuts from '../../examples/markdown-shortcuts'
 import Mentions from '../../examples/mentions'
+import MentionsWithSpace from '../../examples/mentions-with-space'
 import PasteHtml from '../../examples/paste-html'
 import PlainText from '../../examples/plaintext'
 import ReadOnly from '../../examples/read-only'
@@ -45,6 +46,7 @@ const EXAMPLES = [
   ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
   ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
   ['Mentions', Mentions, 'mentions'],
+  ['Mentions with Space', MentionsWithSpace, 'mentions-with-space'],
   ['Paste HTML', PasteHtml, 'paste-html'],
   ['Plain Text', PlainText, 'plaintext'],
   ['Read-only', ReadOnly, 'read-only'],
