@@ -88,7 +88,7 @@ const MentionExample = () => {
             })
           const textRange = end && Editor.range(editor, end, start)
           const text = textRange && Editor.string(editor, textRange)
-          const match = text?.match(/@([\w+\s]+)$/)
+          const match = text?.match(/@([\w\s]+)$/) // change the regex according to your use case
 
           if (match) {
             const [targetText, matchText] = match
