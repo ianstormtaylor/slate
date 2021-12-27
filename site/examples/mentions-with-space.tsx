@@ -88,9 +88,13 @@ const MentionExample = () => {
             })
           const textRange = end && Editor.range(editor, end, start)
           const text = textRange && Editor.string(editor, textRange)
-          const match = text?.match(/@([\w\s]+)$/) // change the regex according to your use case
+          const match = text?.match(/@(\w+\s?\w*)$/) // change the regex according to your use case
+          const after = Editor.after(editor, start)
+          const afterRange = Editor.range(editor, start, after)
+          const afterText = Editor.string(editor, afterRange)
+          const afterMatch = afterText.match(/^(\s|$)/)
 
-          if (match) {
+          if (match && afterMatch) {
             const [targetText, matchText] = match
             const entity = Editor.before(editor, start, {
               unit: 'offset',
@@ -100,7 +104,7 @@ const MentionExample = () => {
 
             if (targetRange) {
               setTarget(targetRange)
-              setSearch(matchText)
+              setSearch(matchText.trim())
               setIndex(0)
               return
             }
