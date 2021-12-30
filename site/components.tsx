@@ -1,6 +1,6 @@
 import React, { Ref, PropsWithChildren } from 'react'
 import ReactDOM from 'react-dom'
-import { cx, css } from 'emotion'
+import { css, cx } from '@emotion/css';
 
 interface BaseProps {
   className: string
@@ -21,7 +21,7 @@ export const Button = React.forwardRef(
         reversed: boolean
       } & BaseProps
     >,
-    ref: Ref<OrNull<HTMLSpanElement>>
+    ref: any
   ) => (
     <span
       {...props}
@@ -54,10 +54,10 @@ export const EditorValue = React.forwardRef(
         value: any
       } & BaseProps
     >,
-    ref: Ref<OrNull<null>>
+    ref: any
   ) => {
     const textLines = value.document.nodes
-      .map(node => node.text)
+      .map((node: { text: any; }) => node.text)
       .toArray()
       .join('\n')
     return (
@@ -103,7 +103,7 @@ export const EditorValue = React.forwardRef(
 export const Icon = React.forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<OrNull<HTMLSpanElement>>
+    ref: Ref<OrNull<HTMLSpanElement>> | any
   ) => (
     <span
       {...props}
@@ -123,7 +123,7 @@ export const Icon = React.forwardRef(
 export const Instruction = React.forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<OrNull<HTMLDivElement>>
+    ref: Ref<OrNull<HTMLDivElement>>| any
   ) => (
     <div
       {...props}
@@ -145,7 +145,7 @@ export const Instruction = React.forwardRef(
 export const Menu = React.forwardRef(
   (
     { className, ...props }: PropsWithChildren<BaseProps>,
-    ref: Ref<OrNull<HTMLDivElement>>
+    ref: Ref<OrNull<HTMLDivElement>>| any
   ) => (
     <div
       {...props}
@@ -156,7 +156,6 @@ export const Menu = React.forwardRef(
           & > * {
             display: inline-block;
           }
-
           & > * + * {
             margin-left: 15px;
           }
@@ -166,7 +165,7 @@ export const Menu = React.forwardRef(
   )
 )
 
-export const Portal = ({ children }) => {
+export const Portal = ({ children }:any) => {
   return typeof document === 'object'
     ? ReactDOM.createPortal(children, document.body)
     : null
