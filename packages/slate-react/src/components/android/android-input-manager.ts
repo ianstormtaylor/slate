@@ -134,9 +134,7 @@ export class AndroidInputManager {
         })
         this.editor.marks = null
       } else {
-        Transforms.insertText(this.editor, text, {
-          at,
-        })
+        Editor.insertText(this.editor, text)
       }
     })
   }
