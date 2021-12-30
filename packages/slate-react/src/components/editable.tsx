@@ -793,7 +793,7 @@ export const Editable = (props: EditableProps) => {
                         distance: currentTextNode.text.length,
                         reverse: true,
                       })
-                      Transforms.insertText(editor, text)
+                      Editor.insertText(editor, text)
                     })
                   }
                 }
