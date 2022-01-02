@@ -104,15 +104,17 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const IFrame = ({ children, ...props }) => {
-  const [contentRef, setContentRef] = useState(null)
-  const mountNode =
-    contentRef &&
-    contentRef.contentWindow &&
-    contentRef.contentWindow.document.body
+const IFrame = ({ children, onLoad = null, ...props }) => {
+  const [iframeBody, setIframeBody] = useState(null)
+
+  const handleLoad = e => {
+    onLoad && onLoad(e)
+    !e.defaultPrevented && setIframeBody(e.target.contentDocument.body)
+  }
+
   return (
-    <iframe {...props} ref={setContentRef}>
-      {mountNode && createPortal(React.Children.only(children), mountNode)}
+    <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
+      {iframeBody && createPortal(children, iframeBody)}
     </iframe>
   )
 }
