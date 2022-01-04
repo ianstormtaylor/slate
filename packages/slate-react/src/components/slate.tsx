@@ -58,7 +58,7 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => {
-      window.setTimeout(() => {
+      setTimeout(() => {
         setIsFocused(ReactEditor.isFocused(editor))
       }, 0)
     }
@@ -68,7 +68,7 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => {
-      window.setTimeout(() => {
+      setTimeout(() => {
         setIsFocused(ReactEditor.isFocused(editor))
       }, 0)
     }
