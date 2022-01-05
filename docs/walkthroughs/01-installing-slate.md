@@ -110,7 +110,9 @@ const App = () => {
 }
 ```
 
-You can think of the `<Slate>` component as providing a "controlled" context to every component underneath it.
+You can think of the `<Slate>` component as providing a context to every component underneath it.
+
+> As of v0.67 the Slate Provider's "value" prop is now only used as initial state for editor.children. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the "value" prop to do this for you. See [here](https://github.com/ianstormtaylor/slate/pull/4540) for a more in-depth discussion.
 
 This is a slightly different mental model than things like `<input>` or `<textarea>`, because richtext documents are more complex. You'll often want to include toolbars, or live previews, or other complex components next to your editable content.
 
