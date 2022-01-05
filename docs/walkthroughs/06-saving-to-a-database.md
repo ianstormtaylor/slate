@@ -168,10 +168,11 @@ You can emulate this strategy for any format you like. You can serialize to HTML
 > 🤖 Note that even though you _can_ serialize your content however you like, there are tradeoffs. The serialization process has a cost itself, and certain formats may be harder to work with than others. In general we recommend writing your own format only if your use case has a specific need for it. Otherwise, you're often better leaving the data in the format Slate uses.
 
 If you want to update the editor's content in response to events from outside of slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `setValue(newValue)` in the example above). Alternatively, you can use slate's internal operations to transform the value, for example:
+
 ```javascript
   /**
   * resetNodes resets the value of the editor.
-  * It should be noted that passing the `at` parameter may cause a "Cannot resolve a DOM point from Slate point" error. 
+  * It should be noted that passing the `at` parameter may cause a "Cannot resolve a DOM point from Slate point" error.
   */
   resetNodes<T extends Node>(
     editor: Editor,
@@ -190,8 +191,8 @@ If you want to update the editor's content in response to events from outside of
       nodes.forEach((node, i) => editor.apply({ type: 'insert_node', path: [i], node: node }))
     }
 
-    const point = options.at && Point.isPoint(options.at) 
-      ? options.at 
+    const point = options.at && Point.isPoint(options.at)
+      ? options.at
       : Editor.end(editor, [])
 
     if (point) {
