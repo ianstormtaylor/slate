@@ -47,8 +47,16 @@ const initialValue: Descendant[] = [
     children: [
       {
         text:
-          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected.',
+          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
       },
+      // The following is an example of an inline at the end of a block.
+      // This is an edge case that can cause issues.
+      {
+        type: 'link',
+        url: 'https://twitter.com/JustMissEmma/status/1448679899531726852',
+        children: [{ text: 'Finally, here is our favorite dog video.' }],
+      },
+      { text: '' },
     ],
   },
 ]
@@ -96,6 +104,7 @@ const InlinesExample = () => {
       </Toolbar>
       <Editable
         renderElement={props => <Element {...props} />}
+        renderLeaf={props => <Text {...props} />}
         placeholder="Enter some text..."
         onKeyDown={onKeyDown}
       />
@@ -289,6 +298,29 @@ const Element = props => {
     default:
       return <p {...attributes}>{children}</p>
   }
+}
+
+const Text = props => {
+  const { attributes, children, leaf } = props
+  return (
+    <span
+      // The following is a workaround for a Chromium bug where,
+      // if you have an inline at the end of a block,
+      // clicking the end of a block puts the cursor inside the inline
+      // instead of inside the final {text: ''} node
+      // https://github.com/ianstormtaylor/slate/issues/4704#issuecomment-1006696364
+      className={
+        leaf.text === ''
+          ? css`
+              padding-left: 0.1px;
+            `
+          : null
+      }
+      {...attributes}
+    >
+      {children}
+    </span>
+  )
 }
 
 const AddLinkButton = () => {
