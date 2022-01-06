@@ -104,14 +104,11 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const IFrame = ({ children, onLoad = null, ...props }) => {
+const IFrame = ({ children, ...props }) => {
   const [iframeBody, setIframeBody] = useState(null)
-
   const handleLoad = e => {
-    onLoad && onLoad(e)
-    !e.defaultPrevented && setIframeBody(e.target.contentDocument.body)
+    setIframeBody(e.target.contentDocument.body)
   }
-
   return (
     <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
       {iframeBody && createPortal(children, iframeBody)}
