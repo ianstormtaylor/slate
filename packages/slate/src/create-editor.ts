@@ -227,6 +227,14 @@ export const createEditor = (): Editor => {
         // other inline nodes, or parent blocks that only contain inlines and
         // text.
         if (isInlineOrText !== shouldHaveInlines) {
+          // eslint-disable-next-line no-console
+          console.warn(
+            `Removing ${
+              isInlineOrText ? 'inline' : 'block'
+            } node at path ${path.concat(n)} because parent expects ${
+              shouldHaveInlines ? 'inline' : 'block'
+            } children`
+          )
           Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
           n--
         } else if (Element.isElement(child)) {
