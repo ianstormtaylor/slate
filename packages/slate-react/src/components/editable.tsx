@@ -217,17 +217,29 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
 
     if (newDomRange) {
+      let startOffset = newDomRange.startOffset
+      // COMPAT: Firefox will not trig clipboard events when selecting void nodes.
+      // Make sure that the range has 0-1 (not 1-1) offset so something is actually selected.
+      // This obviously works fine in other browsers. Related to the zero-value (\uFEFF)?
+      if (
+        IS_FIREFOX &&
+        newDomRange[
+          Range.isBackward(selection!) ? 'endContainer' : 'startContainer'
+        ].textContent === '\uFEFF'
+      ) {
+        startOffset = 0
+      }
       if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
           newDomRange.endOffset,
           newDomRange.startContainer,
-          newDomRange.startOffset
+          startOffset
         )
       } else {
         domSelection.setBaseAndExtent(
           newDomRange.startContainer,
-          newDomRange.startOffset,
+          startOffset,
           newDomRange.endContainer,
           newDomRange.endOffset
         )
