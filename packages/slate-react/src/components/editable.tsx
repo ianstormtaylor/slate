@@ -8,6 +8,7 @@ import {
   Text,
   Transforms,
   Path,
+  BaseElement,
 } from 'slate'
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
@@ -1094,6 +1095,35 @@ export const Editable = (props: EditableProps) => {
                 if (Hotkeys.isMoveLineForward(nativeEvent)) {
                   event.preventDefault()
                   Transforms.move(editor, { unit: 'line' })
+                  return
+                }
+
+                // Make sure we move consistently over void nodes when extending the selection with arrow up/down.
+                if (
+                  selection &&
+                  (Hotkeys.isExtendUp(nativeEvent) ||
+                    Hotkeys.isExtendDown(nativeEvent)) &&
+                  editor.isVoid(element as BaseElement)
+                ) {
+                  event.preventDefault()
+                  const reverse = Hotkeys.isExtendUp(nativeEvent)
+                  Transforms.move(editor, {
+                    unit: 'line',
+                    edge: 'focus',
+                    reverse,
+                  })
+                  return
+                }
+
+                // Make sure we move consistently over void nodes on arrow up/down.
+                if (
+                  (Hotkeys.isMoveUp(nativeEvent) ||
+                    Hotkeys.isMoveDown(nativeEvent)) &&
+                  editor.isVoid(element as BaseElement)
+                ) {
+                  event.preventDefault()
+                  const reverse = Hotkeys.isMoveDown(nativeEvent)
+                  Transforms.move(editor, { unit: 'line', reverse })
                   return
                 }
 
