@@ -18,7 +18,7 @@ Once you've installed Slate, you'll need to import it.
 
 ```jsx
 // Import React dependencies.
-import React, { useMemo, useState } from 'react'
+import React, { useState } from 'react'
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -35,12 +35,12 @@ const App = () => {
 }
 ```
 
-The next step is to create a new `Editor` object. We want the editor to be stable across renders, so we use the `useMemo` hook:
+The next step is to create a new `Editor` object. We want the editor to be stable across renders, so we use the `useState` hook [without a setter](https://github.com/ianstormtaylor/slate/pull/3925#issuecomment-781179930):
 
 ```jsx
 const App = () => {
   // Create a Slate editor object that won't change across renders.
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   return null
 }
 ```
@@ -83,7 +83,7 @@ Next we want to create state for `value`:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   // Keep track of state for the value of the editor.
   const [value, setValue] = useState([])
@@ -97,7 +97,7 @@ The provider component keeps track of your Slate editor, its plugins, its value,
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   const [value, setValue] = useState([])
   // Render the Slate context.
   return (
@@ -120,7 +120,7 @@ Okay, so the next step is to render the `<Editable>` component itself:
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
@@ -143,7 +143,7 @@ The value is just plain JSON. Here's one containing a single paragraph block wit
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   // Add the initial value when setting up our state.
   const [value, setValue] = useState([
     {
