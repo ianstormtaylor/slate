@@ -520,6 +520,10 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 !isEventHandled(event, attributes.onCompositionEnd)
               ) {
                 scheduleOnDOMSelectionChange.flush()
+                setTimeout(() => {
+                  state.isComposing && setIsComposing(false)
+                  state.isComposing = false
+                }, RESOLVE_DELAY)
               }
             },
             [attributes.onCompositionEnd]
