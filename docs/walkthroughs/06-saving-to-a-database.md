@@ -166,3 +166,37 @@ That works! Now you're working with plain text.
 You can emulate this strategy for any format you like. You can serialize to HTML, to Markdown, or even to your own custom JSON format that is tailored to your use case.
 
 > 🤖 Note that even though you _can_ serialize your content however you like, there are tradeoffs. The serialization process has a cost itself, and certain formats may be harder to work with than others. In general we recommend writing your own format only if your use case has a specific need for it. Otherwise, you're often better leaving the data in the format Slate uses.
+
+If you want to update the editor's content in response to events from outside of slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `setValue(newValue)` in the example above). Alternatively, you can use slate's internal operations to transform the value, for example:
+
+```javascript
+  /**
+  * resetNodes resets the value of the editor.
+  * It should be noted that passing the `at` parameter may cause a "Cannot resolve a DOM point from Slate point" error.
+  */
+  resetNodes<T extends Node>(
+    editor: Editor,
+    options: {
+      nodes?: Node | Node[],
+      at?: Location
+    } = {}
+  ): void {
+    const children = [...editor.children]
+
+    children.forEach((node) => editor.apply({ type: 'remove_node', path: [0], node }))
+
+    if (options.nodes) {
+      const nodes = Node.isNode(options.nodes) ? [options.nodes] : options.nodes
+
+      nodes.forEach((node, i) => editor.apply({ type: 'insert_node', path: [i], node: node }))
+    }
+
+    const point = options.at && Point.isPoint(options.at)
+      ? options.at
+      : Editor.end(editor, [])
+
+    if (point) {
+      Transforms.select(editor, point)
+    }
+  }
+```
