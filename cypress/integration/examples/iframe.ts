@@ -12,6 +12,7 @@ const getIframeBody = () => {
       .its('body')
       // automatically retries until body is loaded
       .should('not.be.undefined')
+      .should('not.be.null')
       .then(cy.wrap)
   )
 }
