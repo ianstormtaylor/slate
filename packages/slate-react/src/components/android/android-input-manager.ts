@@ -1,16 +1,9 @@
+import { Editor, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
-import { Editor, Range, Transforms, Text } from 'slate'
-import {
-  IS_COMPOSING,
-  IS_ON_COMPOSITION_END,
-  EDITOR_ON_COMPOSITION_TEXT,
-} from '../../utils/weak-maps'
-
 import { DOMNode } from '../../utils/dom'
-
 import {
-  normalizeTextInsertionRange,
   combineInsertedText,
+  normalizeTextInsertionRange,
   TextInsertion,
 } from './diff-text'
 import {
@@ -110,17 +103,6 @@ export class AndroidInputManager {
 
     const { selection, marks } = this.editor
 
-    // If it is in composing or after `onCompositionend`, set `EDITOR_ON_COMPOSITION_TEXT` and return.
-    // Text will be inserted on compositionend event.
-    if (
-      IS_COMPOSING.get(this.editor) ||
-      IS_ON_COMPOSITION_END.get(this.editor)
-    ) {
-      EDITOR_ON_COMPOSITION_TEXT.set(this.editor, insertedText)
-      IS_ON_COMPOSITION_END.set(this.editor, false)
-      return
-    }
-
     // Insert the batched text diffs
     insertedText.forEach(insertion => {
       const text = insertion.text.insertText
@@ -134,6 +116,7 @@ export class AndroidInputManager {
         })
         this.editor.marks = null
       } else {
+        Transforms.setSelection(this.editor, at)
         Editor.insertText(this.editor, text)
       }
     })
