@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import isUrl from 'is-url'
 import { isKeyHotkey } from 'is-hotkey'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import { Editable, withReact, useSlate, useSelected } from 'slate-react'
 import * as SlateReact from 'slate-react'
 import {
