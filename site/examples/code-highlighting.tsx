@@ -7,7 +7,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Text, createEditor, Element as SlateElement, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 
 const CodeHighlightingExample = () => {
   const [value, setValue] = useState<Descendant[]>(initialValue)
@@ -99,7 +99,7 @@ const Leaf = ({ attributes, children, leaf }) => {
         ${leaf.comment &&
           css`
             color: slategray;
-          `} 
+          `}
 
         ${(leaf.operator || leaf.url) &&
           css`

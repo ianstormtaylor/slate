@@ -16,7 +16,7 @@ import {
   Descendant,
   Element as SlateElement,
 } from 'slate'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
 
 const initialValue: Descendant[] = [

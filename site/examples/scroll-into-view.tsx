@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import range from 'lodash/range'
 
 /**

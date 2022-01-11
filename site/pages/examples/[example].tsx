@@ -1,5 +1,5 @@
 import React, { useState, PropsWithChildren, Ref } from 'react'
-import { cx, css } from 'emotion'
+import { cx, css } from '@emotion/css'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'

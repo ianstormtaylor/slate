@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import { Transforms, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import {
   Slate,
   Editable,
