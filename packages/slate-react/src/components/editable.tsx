@@ -251,7 +251,7 @@ export const Editable = (props: EditableProps) => {
   // needs to be manually focused.
   useEffect(() => {
       if (ref.current && autoFocus) {
-        if(window.getSelection && document.createRange) {
+        if (window.getSelection && document.createRange) {
           const range = document.createRange();
           ref.current.focus();
           range.setStart(ref.current, ref.current.childNodes.length);
