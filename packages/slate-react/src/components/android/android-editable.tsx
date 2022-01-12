@@ -24,7 +24,11 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
+  IS_COMPOSING,
+  IS_ON_COMPOSITION_END,
+  EDITOR_ON_COMPOSITION_TEXT,
 } from '../../utils/weak-maps'
+import { normalizeTextInsertionRange } from './diff-text'
 
 import { EditableProps, hasTarget } from '../editable'
 import useChildren from '../../hooks/use-children'
@@ -523,6 +527,43 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                 setTimeout(() => {
                   state.isComposing && setIsComposing(false)
                   state.isComposing = false
+
+                  IS_COMPOSING.set(editor, false)
+                  IS_ON_COMPOSITION_END.set(editor, true)
+
+                  const insertedText =
+                    EDITOR_ON_COMPOSITION_TEXT.get(editor) || []
+
+                  // `insertedText` is set in `MutationObserver` constructor.
+                  // If open phone keyboard association function, `CompositionEvent` will be triggered.
+                  if (!insertedText.length) {
+                    return
+                  }
+
+                  EDITOR_ON_COMPOSITION_TEXT.set(editor, [])
+
+                  const { selection, marks } = editor
+
+                  insertedText.forEach(insertion => {
+                    const text = insertion.text.insertText
+                    const at = normalizeTextInsertionRange(
+                      editor,
+                      selection,
+                      insertion
+                    )
+                    if (marks) {
+                      const node = { text, ...marks }
+                      Transforms.insertNodes(editor, node, {
+                        match: Text.isText,
+                        at,
+                        select: true,
+                      })
+                      editor.marks = null
+                    } else {
+                      Transforms.setSelection(editor, at)
+                      Editor.insertText(editor, text)
+                    }
+                  })
                 }, RESOLVE_DELAY)
               }
             },
@@ -536,6 +577,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               ) {
                 !state.isComposing && setIsComposing(true)
                 state.isComposing = true
+                IS_COMPOSING.set(editor, true)
               }
             },
             [attributes.onCompositionUpdate]
@@ -548,6 +590,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
               ) {
                 !state.isComposing && setIsComposing(true)
                 state.isComposing = true
+                IS_COMPOSING.set(editor, true)
               }
             },
             [attributes.onCompositionStart]
