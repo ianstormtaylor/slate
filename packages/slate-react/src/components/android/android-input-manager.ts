@@ -134,6 +134,7 @@ export class AndroidInputManager {
         })
         this.editor.marks = null
       } else {
+        Transforms.setSelection(this.editor, at)
         Editor.insertText(this.editor, text)
       }
     })

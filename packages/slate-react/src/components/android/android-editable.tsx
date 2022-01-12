@@ -560,6 +560,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                       })
                       editor.marks = null
                     } else {
+                      Transforms.setSelection(editor, at)
                       Editor.insertText(editor, text)
                     }
                   })
