@@ -542,7 +542,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
 
                   EDITOR_ON_COMPOSITION_TEXT.set(editor, [])
 
-                  const { selection, marks } = editor
+                  const { selection } = editor
 
                   insertedText.forEach(insertion => {
                     const text = insertion.text.insertText
@@ -551,18 +551,8 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
                       selection,
                       insertion
                     )
-                    if (marks) {
-                      const node = { text, ...marks }
-                      Transforms.insertNodes(editor, node, {
-                        match: Text.isText,
-                        at,
-                        select: true,
-                      })
-                      editor.marks = null
-                    } else {
-                      Transforms.setSelection(editor, at)
-                      Editor.insertText(editor, text)
-                    }
+                    Transforms.setSelection(editor, at)
+                    Editor.insertText(editor, text)
                   })
                 }, RESOLVE_DELAY)
               }
