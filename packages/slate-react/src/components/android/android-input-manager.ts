@@ -108,7 +108,7 @@ export class AndroidInputManager {
   private insertText = (insertedText: TextInsertion[]) => {
     debug('insertText')
 
-    const { selection, marks } = this.editor
+    const { selection } = this.editor
 
     // If it is in composing or after `onCompositionend`, set `EDITOR_ON_COMPOSITION_TEXT` and return.
     // Text will be inserted on compositionend event.
@@ -125,18 +125,8 @@ export class AndroidInputManager {
     insertedText.forEach(insertion => {
       const text = insertion.text.insertText
       const at = normalizeTextInsertionRange(this.editor, selection, insertion)
-      if (marks) {
-        const node = { text, ...marks }
-        Transforms.insertNodes(this.editor, node, {
-          match: Text.isText,
-          at,
-          select: true,
-        })
-        this.editor.marks = null
-      } else {
-        Transforms.setSelection(this.editor, at)
-        Editor.insertText(this.editor, text)
-      }
+      Transforms.setSelection(this.editor, at)
+      Editor.insertText(this.editor, text)
     })
   }
 
