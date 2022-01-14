@@ -1,11 +1,11 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
-import { Editor, Node, Element, Descendant } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
-import { FocusedContext } from '../hooks/use-focused'
-import { EditorContext } from '../hooks/use-slate-static'
-import { SlateContext } from '../hooks/use-slate'
-import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+import React, { useMemo, useState, useCallback, useEffect } from "react";
+import { Editor, Node, Element, Descendant } from "slate";
+import { ReactEditor } from "../plugin/react-editor";
+import { FocusedContext } from "../hooks/use-focused";
+import { EditorContext } from "../hooks/use-slate-static";
+import { SlateContext } from "../hooks/use-slate";
+import { EDITOR_TO_ON_CHANGE } from "../utils/weak-maps";
+import { useIsomorphicLayoutEffect } from "../hooks/use-isomorphic-layout-effect";
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
@@ -13,68 +13,62 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
  */
 
 export const Slate = (props: {
-  editor: ReactEditor
-  value: Descendant[]
-  children: React.ReactNode
-  onChange: (value: Descendant[]) => void
+  editor: ReactEditor;
+  value: Descendant[];
+  children: React.ReactNode;
+  onChange: (value: Descendant[]) => void;
 }) => {
-  const { editor, children, onChange, value, ...rest } = props
+  const { editor, children, onChange, value, ...rest } = props;
 
   const [context, setContext] = React.useState<[ReactEditor]>(() => {
     if (!Node.isNodeList(value)) {
       throw new Error(
         `[Slate] value is invalid! Expected a list of elements` +
           `but got: ${JSON.stringify(value)}`
-      )
+      );
     }
     if (!Editor.isEditor(editor)) {
       throw new Error(
         `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
-      )
+      );
     }
-    editor.children = value
-    Object.assign(editor, rest)
-    return [editor]
-  })
+    editor.children = value;
+    Object.assign(editor, rest);
+    return [editor];
+  });
 
   const onContextChange = useCallback(() => {
-    onChange(editor.children)
-    setContext([editor])
-  }, [onChange])
+    onChange(editor.children);
+    setContext([editor]);
+  }, [onChange]);
 
-  EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+  EDITOR_TO_ON_CHANGE.set(editor, onContextChange);
 
   useEffect(() => {
     return () => {
-      EDITOR_TO_ON_CHANGE.set(editor, () => {})
-    }
-  }, [])
+      EDITOR_TO_ON_CHANGE.set(editor, () => {});
+    };
+  }, []);
 
-  const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
+  const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor));
 
   useEffect(() => {
-    setIsFocused(ReactEditor.isFocused(editor))
-  })
+    setIsFocused(ReactEditor.isFocused(editor));
+  });
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => {
       setTimeout(() => {
-        setIsFocused(ReactEditor.isFocused(editor))
-      }, 0)
-    }
-    document.addEventListener('focus', fn, true)
-    return () => document.removeEventListener('focus', fn, true)
-  }, [])
-
-  useIsomorphicLayoutEffect(() => {
-    const fn = () => {
-      setTimeout(() => {
-        setIsFocused(ReactEditor.isFocused(editor))
-      }, 0)
-    }
-    document.addEventListener('blur', fn, true)
-    return () => document.removeEventListener('blur', fn, true)
-  }, [])
+        setIsFocused(ReactEditor.isFocused(editor));
+      }, 0);
+    };
+    document.addEventListener("focus", fn, true);
+    document.addEventListener("blur", fn, true);
+    return () => {
+      document.removeEventListener("focus", fn, true);
+      document.removeEventListener("blur", fn, true);
+    };
+  }, []);
 
   return (
     <SlateContext.Provider value={context}>
@@ -84,5 +78,5 @@ export const Slate = (props: {
         </FocusedContext.Provider>
       </EditorContext.Provider>
     </SlateContext.Provider>
-  )
-}
+  );
+};
