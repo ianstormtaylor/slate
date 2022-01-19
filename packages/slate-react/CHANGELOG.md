@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.72.5
+
+### Patch Changes
+
+- [#4749](https://github.com/ianstormtaylor/slate/pull/4749) [`a3dfb151`](https://github.com/ianstormtaylor/slate/commit/a3dfb151d432ec67f10847997fc71b009bcf5c00) Thanks [@Jabher](https://github.com/Jabher)! - Fix "cannot resolve DOM point" error when switching between multiple errors
+
 ## 0.72.4
 
 ### Patch Changes
