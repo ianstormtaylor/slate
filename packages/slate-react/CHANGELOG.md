@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.72.6
+
+### Patch Changes
+
+- [#4796](https://github.com/ianstormtaylor/slate/pull/4796) [`5d8a1606`](https://github.com/ianstormtaylor/slate/commit/5d8a16066949981ead34466af26bcb8e4ffa994b) Thanks [@hueyhe](https://github.com/hueyhe)! - Fix text not rendered on server-side rendering
+
 ## 0.72.5
 
 ### Patch Changes
