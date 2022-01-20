@@ -1,7 +1,8 @@
-import React, { useRef, useLayoutEffect } from 'react'
+import React, { useRef } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 /**
  * Leaf content strings.
@@ -69,7 +70,7 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
   // eg makes native spellcheck opt out from checking the text node.
 
   // useLayoutEffect: updating our span before browser paint
-  useLayoutEffect(() => {
+  useIsomorphicLayoutEffect(() => {
     // null coalescing text to make sure we're not outputing "null" as a string in the extreme case it is nullish at runtime
     const textWithTrailing = `${text ?? ''}${isTrailing ? '\n' : ''}`
 
