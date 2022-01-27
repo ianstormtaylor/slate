@@ -106,7 +106,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Plain text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/plaintext.tsx) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/richtext.tsx) — showing the features you'd expect from a basic editor.
 - [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/markdown-preview.tsx) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/links.tsx) — showing how wrap text in inline nodes with associated data.
+- [**Inlines**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/inlines.tsx) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/images.tsx) — showing how to use void (text-less) nodes to add images.
 - [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/hovering-toolbar.tsx) — showing how a hovering toolbar can be implemented.
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/tables.tsx) — showing how to nest blocks to render more advanced components.
