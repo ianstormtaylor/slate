@@ -491,33 +491,36 @@ export const ReactEditor = {
       // Calculate how far into the text node the `nearestNode` is, so that we
       // can determine what the offset relative to the text node is.
       if (leafNode) {
-        textNode = leafNode.closest('[data-slate-node="text"]')!
-        const window = ReactEditor.getWindow(editor)
-        const range = window.document.createRange()
-        range.setStart(textNode, 0)
-        range.setEnd(nearestNode, nearestOffset)
+        textNode = leafNode.closest('[data-slate-node="text"]')
 
-        const contents = range.cloneContents()
-        const removals = [
-          ...Array.prototype.slice.call(
-            contents.querySelectorAll('[data-slate-zero-width]')
-          ),
-          ...Array.prototype.slice.call(
-            contents.querySelectorAll('[contenteditable=false]')
-          ),
-        ]
+        if (textNode) {
+          const window = ReactEditor.getWindow(editor)
+          const range = window.document.createRange()
+          range.setStart(textNode, 0)
+          range.setEnd(nearestNode, nearestOffset)
 
-        removals.forEach(el => {
-          el!.parentNode!.removeChild(el)
-        })
+          const contents = range.cloneContents()
+          const removals = [
+            ...Array.prototype.slice.call(
+              contents.querySelectorAll('[data-slate-zero-width]')
+            ),
+            ...Array.prototype.slice.call(
+              contents.querySelectorAll('[contenteditable=false]')
+            ),
+          ]
 
-        // COMPAT: Edge has a bug where Range.prototype.toString() will
-        // convert \n into \r\n. The bug causes a loop when slate-react
-        // attempts to reposition its cursor to match the native position. Use
-        // textContent.length instead.
-        // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
-        offset = contents.textContent!.length
-        domNode = textNode
+          removals.forEach(el => {
+            el!.parentNode!.removeChild(el)
+          })
+
+          // COMPAT: Edge has a bug where Range.prototype.toString() will
+          // convert \n into \r\n. The bug causes a loop when slate-react
+          // attempts to reposition its cursor to match the native position. Use
+          // textContent.length instead.
+          // https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/10291116/
+          offset = contents.textContent!.length
+          domNode = textNode
+        }
       } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
         // ancestor, so find it by going down from the nearest void parent.
