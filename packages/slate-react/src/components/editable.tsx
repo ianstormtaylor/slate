@@ -330,6 +330,7 @@ export const Editable = (props: EditableProps) => {
         // triggering a `beforeinput` expecting the change to be applied to the immediately before
         // set selection.
         scheduleOnDOMSelectionChange.flush()
+        onDOMSelectionChange.flush()
 
         const { selection } = editor
         const { inputType: type } = event
