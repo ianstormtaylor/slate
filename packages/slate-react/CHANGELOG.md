@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.72.7
+
+### Patch Changes
+
+- [#4813](https://github.com/ianstormtaylor/slate/pull/4813) [`a5fd62dd`](https://github.com/ianstormtaylor/slate/commit/a5fd62ddd646553841a54616f7a5528e310bfd22) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't throw in toSlatePoint while using supressThrow if leaf has no text node
+
+* [#4798](https://github.com/ianstormtaylor/slate/pull/4798) [`3796c514`](https://github.com/ianstormtaylor/slate/commit/3796c514d6da0db8656486151147d92e73a2350a) Thanks [@hueyhe](https://github.com/hueyhe)! - Fix text not rendered on ssr
+
+- [#4809](https://github.com/ianstormtaylor/slate/pull/4809) [`e9987529`](https://github.com/ianstormtaylor/slate/commit/e9987529895d3ef2740f8f466a9ef9ce4c3e37c2) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Flush onDOMSelectionChange on onDOMBeforeInput
+
 ## 0.72.6
 
 ### Patch Changes
