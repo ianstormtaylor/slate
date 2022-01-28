@@ -4,9 +4,14 @@ import { jsx } from '../../..'
 
 export const input = (
   <editor>
-    <block><text>Block before</text></block>
     <block>
-      <text><anchor />Some text before </text>
+      <text>Block before</text>
+    </block>
+    <block>
+      <text>
+        <anchor />
+        Some text before{' '}
+      </text>
       <inline void>
         <focus />
       </inline>
@@ -20,7 +25,6 @@ export const input = (
 
 export const test = editor => {
   const range = Editor.unhangRange(editor, editor.selection)
-  console.log(range)
   return range
 }
 
@@ -28,4 +32,3 @@ export const output = {
   anchor: { path: [1, 0], offset: 0 },
   focus: { path: [1, 1, 0], offset: 0 },
 }
-
