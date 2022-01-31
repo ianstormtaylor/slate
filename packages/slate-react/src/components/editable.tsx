@@ -215,7 +215,6 @@ export const Editable = (props: EditableProps) => {
     state.isUpdatingSelection = true
 
     const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-    
     if (newDomRange) {
       if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
