@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.72.8
+
+### Patch Changes
+
+- [#4816](https://github.com/ianstormtaylor/slate/pull/4816) [`6d62abc1`](https://github.com/ianstormtaylor/slate/commit/6d62abc1039cf93ce90bd9332a505471df8118ba) Thanks [@dylans](https://github.com/dylans)! - - Revert #4749, DOM & Slate selection are mismatching
+
 ## 0.72.7
 
 ### Patch Changes
