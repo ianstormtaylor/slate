@@ -1,6 +1,6 @@
 ---
-"slate-react": patch
-"slate": patch
+'slate-react': patch
+'slate': patch
 ---
 
-* Revert #4749, DOM & Slate selection are mismatching
+- Revert #4749, DOM & Slate selection are mismatching
