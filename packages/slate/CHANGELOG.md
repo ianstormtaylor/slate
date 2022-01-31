@@ -1,5 +1,11 @@
 # slate
 
+## 0.72.8
+
+### Patch Changes
+
+- [#4804](https://github.com/ianstormtaylor/slate/pull/4804) [`03861afc`](https://github.com/ianstormtaylor/slate/commit/03861afc62c3b27339d20151ca8a3e52f51ff973) Thanks [@suilang](https://github.com/suilang)! - update insertText logic when selection is not collapsed
+
 ## 0.72.3
 
 ### Patch Changes
