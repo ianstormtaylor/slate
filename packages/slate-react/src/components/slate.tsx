@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useCallback, useEffect } from 'react'
+import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
 import { Editor, Node, Element, Descendant } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
@@ -19,6 +19,7 @@ export const Slate = (props: {
   onChange: (value: Descendant[]) => void
 }) => {
   const { editor, children, onChange, value, ...rest } = props
+  const unmountRef = useRef(false)
 
   const [context, setContext] = React.useState<[ReactEditor]>(() => {
     if (!Node.isNodeList(value)) {
@@ -47,6 +48,7 @@ export const Slate = (props: {
   useEffect(() => {
     return () => {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
+      unmountRef.current = true
     }
   }, [])
 
@@ -59,6 +61,9 @@ export const Slate = (props: {
   useIsomorphicLayoutEffect(() => {
     const fn = () => {
       setTimeout(() => {
+        if (unmountRef.current) {
+          return
+        }
         setIsFocused(ReactEditor.isFocused(editor))
       }, 0)
     }
