@@ -970,8 +970,6 @@ export const Editable = (props: EditableProps) => {
                       at: draggedRange,
                     })
                   }
-
-                  state.isDraggingInternally = false
                 }
 
                 ReactEditor.insertData(editor, data)
@@ -982,22 +980,26 @@ export const Editable = (props: EditableProps) => {
                   ReactEditor.focus(editor)
                 }
               }
+
+              state.isDraggingInternally = false
             },
             [readOnly, attributes.onDrop]
           )}
           onDragEnd={useCallback(
             (event: React.DragEvent<HTMLDivElement>) => {
-              // When dropping on a different droppable element than the current editor,
-              // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
-              // Note: `onDragEnd` is only called when `onDrop` is not called
               if (
                 !readOnly &&
                 state.isDraggingInternally &&
-                hasTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onDragEnd)
+                attributes.onDragEnd &&
+                hasTarget(editor, event.target)
               ) {
-                state.isDraggingInternally = false
+                attributes.onDragEnd(event)
               }
+
+              // When dropping on a different droppable element than the current editor,
+              // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
+              // Note: `onDragEnd` is only called when `onDrop` is not called
+              state.isDraggingInternally = false
             },
             [readOnly, attributes.onDragEnd]
           )}
