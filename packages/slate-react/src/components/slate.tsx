@@ -4,6 +4,10 @@ import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
 import { SlateContext } from '../hooks/use-slate'
+import {
+  getSelectorContext,
+  SlateSelectorContext,
+} from '../hooks/use-slate-selector'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
@@ -38,9 +42,15 @@ export const Slate = (props: {
     return [editor]
   })
 
+  const {
+    selectorContext,
+    onChange: handleSelectorChange,
+  } = getSelectorContext(editor)
+
   const onContextChange = useCallback(() => {
     onChange(editor.children)
     setContext([editor])
+    handleSelectorChange(editor)
   }, [onChange])
 
   EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
@@ -76,12 +86,14 @@ export const Slate = (props: {
   }, [])
 
   return (
-    <SlateContext.Provider value={context}>
-      <EditorContext.Provider value={editor}>
-        <FocusedContext.Provider value={isFocused}>
-          {children}
-        </FocusedContext.Provider>
-      </EditorContext.Provider>
-    </SlateContext.Provider>
+    <SlateSelectorContext.Provider value={selectorContext}>
+      <SlateContext.Provider value={context}>
+        <EditorContext.Provider value={editor}>
+          <FocusedContext.Provider value={isFocused}>
+            {children}
+          </FocusedContext.Provider>
+        </EditorContext.Provider>
+      </SlateContext.Provider>
+    </SlateSelectorContext.Provider>
   )
 }
