@@ -13,6 +13,8 @@ Slate editors come with a few built-in constraints out of the box. These constra
 3. **Block nodes can only contain other blocks, or inline and text nodes.** For example, a `paragraph` block cannot have another `paragraph` block element _and_ a `link` inline element as children at the same time. The type of children allowed is determined by the first child, and any other non-conforming children are removed. This ensures that common richtext behaviors like "splitting a block in two" function consistently.
 4. **Inline nodes cannot be the first or last child of a parent block, nor can it be next to another inline node in the children array.** If this is the case, an empty text node will be added to correct this to be in compliance with the constraint.
 5. **The top-level editor node can only contain block nodes.** If any of the top-level children are inline or text nodes they will be removed. This ensures that there are always block nodes in the editor so that behaviors like "splitting a block in two" work as expected.
+6. **Nodes must be JSON-serializable.** For example, avoid using `undefined` in your data model. This ensures that [operations](./05-operations.md) are also JSON-serializable, a property which is assumed by collaboration libraries.
+7. **Property values must not be `null`.** Instead, you should use an optional property, e.g. `foo?: string` instead of `foo: string | null`. This limitation is due to `null` being used in [operations](./05-operations.md) to represent the absence of a property.
 
 These default constraints are all mandated because they make working with Slate documents _much_ more predictable.
 
