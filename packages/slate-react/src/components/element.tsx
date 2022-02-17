@@ -96,7 +96,7 @@ const Element = (props: {
     const Tag = isInline ? 'span' : 'div'
     const [[text]] = Node.texts(element)
 
-    children = readOnly ? null : (
+    children = (
       <Tag
         data-slate-spacer
         style={{
