@@ -110,7 +110,11 @@ export const Point: PointInterface = {
         }
 
         case 'insert_text': {
-          if (Path.equals(op.path, path) && op.offset <= offset) {
+          if (
+            Path.equals(op.path, path) &&
+            (op.offset < offset ||
+              (op.offset === offset && affinity === 'forward'))
+          ) {
             p.offset += op.text.length
           }
 
