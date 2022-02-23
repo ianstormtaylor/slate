@@ -302,7 +302,16 @@ If the selection is currently collapsed, the removal will be stored on `editor.m
 
 Convert a range into a non-hanging one.
 
-Options: `{voids?: boolean}`
+A "hanging" range is one created by the browser's "triple-click" selection behavior. When triple-clicking a block, the browser selects from the start of that block to the start of the _next_ block. The range thus "hangs over" into the next block. If `unhangRange` is given such a range, it moves the end backwards until it's in a non-empty text node that precedes the hanging block.
+
+Note that `unhangRange` is designed for the specific purpose of fixing triple-clicked blocks, and therefore currently has a number of caveats:
+
+- It does not modify the start of the range; only the end. For example, it does not "unhang" a selection that starts at the end of a previous block.
+- It only does anything if the start block is fully selected. For example, it does not handle ranges created by double-clicking the end of a paragraph (which browsers treat by selecting from the end of that paragraph to the start of the next).
+
+Options:
+
+- `voids?: boolean = false`: Allow placing the end of the selection in a void node.
 
 ### Check methods
 
