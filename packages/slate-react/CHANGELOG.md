@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.73.0
+
+### Patch Changes
+
+- [#4840](https://github.com/ianstormtaylor/slate/pull/4840) [`100448d5`](https://github.com/ianstormtaylor/slate/commit/100448d55c018351d5a5ffbe18efa207e668f1fb) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Render void spacer in readonly mode
+
 ## 0.72.9
 
 ### Patch Changes
