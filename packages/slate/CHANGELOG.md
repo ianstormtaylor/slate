@@ -1,5 +1,11 @@
 # slate
 
+## 0.73.0
+
+### Minor Changes
+
+- [#4848](https://github.com/ianstormtaylor/slate/pull/4848) [`482b090e`](https://github.com/ianstormtaylor/slate/commit/482b090e6f6f4c5fbc85e6dd2ea65387156ae8b5) Thanks [@rockettomatooo](https://github.com/rockettomatooo)! - fix point transform for insert_text operations to account for affinity
+
 ## 0.72.8
 
 ### Patch Changes
