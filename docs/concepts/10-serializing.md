@@ -177,7 +177,7 @@ const deserialize = (el, markAttributes = {}) => {
       nodeAttributes.bold = true;
   }
   
-  const children = Array.from(el.childNodes).map(node => deserialize(el, nodeAttributes))
+  const children = Array.from(el.childNodes).map(node => deserialize(el, nodeAttributes)).flat()
 
   if (children.length === 0) {
     children.push(jsx('text', nodeAttributes, ''))
