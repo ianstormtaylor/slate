@@ -162,17 +162,25 @@ For example, here's a `deserialize` function for HTML:
 ```javascript
 import { jsx } from 'slate-hyperscript'
 
-const deserialize = el => {
-  if (el.nodeType === 3) {
-    return el.textContent
-  } else if (el.nodeType !== 1) {
+const deserialize = (el, markAttributes = {}) => {
+  if (el.nodeType === Node.TEXT_NODE) {
+    return jsx('text', markAttributes, el.textContent)
+  } else if (el.nodeType !== Node.ELEMENT_NODE) {
     return null
   }
-
-  let children = Array.from(el.childNodes).map(deserialize)
+  
+  const nodeAttributes = { ...markAttributes };
+  
+  // define attibutes for text nodes
+  switch (el.nodeName) {
+    case 'strong':
+      nodeAttributes.bold = true;
+  }
+  
+  const children = Array.from(el.childNodes).map(node => deserialize(el, nodeAttributes))
 
   if (children.length === 0) {
-    children = [{ text: '' }]
+    children.push(jsx('text', nodeAttributes, ''))
   }
 
   switch (el.nodeName) {
@@ -191,7 +199,7 @@ const deserialize = el => {
         children
       )
     default:
-      return el.textContent
+      return children
   }
 }
 ```
