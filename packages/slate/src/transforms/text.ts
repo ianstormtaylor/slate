@@ -487,8 +487,7 @@ export const TextTransforms: TextTransforms = {
           if (!voids && Editor.void(editor, { at: end })) {
             return
           }
-          const start = Range.start(at)
-          const pointRef = Editor.pointRef(editor, start)
+          const pointRef = Editor.pointRef(editor, end)
           Transforms.delete(editor, { at, voids })
           at = pointRef.unref()!
           Transforms.setSelection(editor, { anchor: at, focus: at })
