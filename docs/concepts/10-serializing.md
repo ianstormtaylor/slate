@@ -168,16 +168,18 @@ const deserialize = (el, markAttributes = {}) => {
   } else if (el.nodeType !== Node.ELEMENT_NODE) {
     return null
   }
-  
-  const nodeAttributes = { ...markAttributes };
-  
+
+  const nodeAttributes = { ...markAttributes }
+
   // define attibutes for text nodes
   switch (el.nodeName) {
     case 'strong':
-      nodeAttributes.bold = true;
+      nodeAttributes.bold = true
   }
-  
-  const children = Array.from(el.childNodes).map(node => deserialize(el, nodeAttributes)).flat()
+
+  const children = Array.from(el.childNodes)
+    .map(node => deserialize(el, nodeAttributes))
+    .flat()
 
   if (children.length === 0) {
     children.push(jsx('text', nodeAttributes, ''))
