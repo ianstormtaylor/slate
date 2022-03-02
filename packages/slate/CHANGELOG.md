@@ -1,5 +1,11 @@
 # slate
 
+## 0.73.1
+
+### Patch Changes
+
+- [#4858](https://github.com/ianstormtaylor/slate/pull/4858) [`33be22f3`](https://github.com/ianstormtaylor/slate/commit/33be22f3e3a0321ded199b13c0d97ae577c6b941) Thanks [@TheSpyder](https://github.com/TheSpyder)! - Reverted #4804 as it triggered an exception when inserting text with multi-block selection
+
 ## 0.73.0
 
 ### Minor Changes
