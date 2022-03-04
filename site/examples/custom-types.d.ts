@@ -10,10 +10,15 @@ import {
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
-export type BlockQuoteElement = { type: 'block-quote'; children: Descendant[] }
+export type BlockQuoteElement = {
+  type: 'block-quote'
+  align?: string
+  children: Descendant[]
+}
 
 export type BulletedListElement = {
   type: 'bulleted-list'
+  align?: string
   children: Descendant[]
 }
 
@@ -28,9 +33,17 @@ export type EditableVoidElement = {
   children: EmptyText[]
 }
 
-export type HeadingElement = { type: 'heading'; children: Descendant[] }
+export type HeadingElement = {
+  type: 'heading'
+  align?: string
+  children: Descendant[]
+}
 
-export type HeadingTwoElement = { type: 'heading-two'; children: Descendant[] }
+export type HeadingTwoElement = {
+  type: 'heading-two'
+  align?: string
+  children: Descendant[]
+}
 
 export type ImageElement = {
   type: 'image'
@@ -50,7 +63,11 @@ export type MentionElement = {
   children: CustomText[]
 }
 
-export type ParagraphElement = { type: 'paragraph'; children: Descendant[] }
+export type ParagraphElement = {
+  type: 'paragraph'
+  align?: string
+  children: Descendant[]
+}
 
 export type TableElement = { type: 'table'; children: TableRow[] }
 
