@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.74.0
+
+### Minor Changes
+
+- [#4841](https://github.com/ianstormtaylor/slate/pull/4841) [`47f2403e`](https://github.com/ianstormtaylor/slate/commit/47f2403e3a46d84b8d8f99c6e2bf41f2699e30df) Thanks [@Fibs7000](https://github.com/Fibs7000)! - Added redux-style useSlateSelector to improve and prevent unneccessary rerendering with the useSlate hook
+
 ## 0.73.0
 
 ### Patch Changes
