@@ -1,11 +1,10 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
+import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
 import {
   Editor,
   Transforms,
   Text,
   createEditor,
-  Element,
   Descendant,
   Range,
 } from 'slate'
@@ -76,6 +75,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 const HoveringToolbar = () => {
   const ref = useRef<HTMLDivElement | null>()
   const editor = useSlate()
+  const inFocus = useFocused()
 
   useEffect(() => {
     const el = ref.current
@@ -87,7 +87,7 @@ const HoveringToolbar = () => {
 
     if (
       !selection ||
-      !ReactEditor.isFocused(editor) ||
+      !inFocus ||
       Range.isCollapsed(selection) ||
       Editor.string(editor, selection) === ''
     ) {
@@ -122,6 +122,10 @@ const HoveringToolbar = () => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}
+        onMouseDown={e => {
+          // prevent toolbar from taking focus away from editor
+          e.preventDefault()
+        }}
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
@@ -137,10 +141,7 @@ const FormatButton = ({ format, icon }) => {
     <Button
       reversed
       active={isFormatActive(editor, format)}
-      onMouseDown={event => {
-        event.preventDefault()
-        toggleFormat(editor, format)
-      }}
+      onClick={() => toggleFormat(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>
