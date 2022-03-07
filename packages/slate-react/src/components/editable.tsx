@@ -484,11 +484,10 @@ export const Editable = (props: EditableProps) => {
           case 'insertReplacementText':
           case 'insertText': {
             const { selection } = editor
-                if (selection) {
-                    if (Range.isExpanded(selection)) {
-                        Editor.deleteFragment(editor)
-                    }
-                }
+            if (selection) {
+              if (Range.isExpanded(selection)) {
+                Editor.deleteFragment(editor)
+              }
             }
 
             if (type === 'insertFromComposition') {
@@ -1049,7 +1048,7 @@ export const Editable = (props: EditableProps) => {
 
                 const element =
                   editor.children[
-                    selection !== null ? selection.focus.path[0] : 0
+                  selection !== null ? selection.focus.path[0] : 0
                   ]
                 const isRTL = getDirection(Node.string(element)) === 'rtl'
 
