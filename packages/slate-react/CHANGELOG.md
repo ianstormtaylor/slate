@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.74.1
+
+### Patch Changes
+
+- [#4868](https://github.com/ianstormtaylor/slate/pull/4868) [`7499d4b4`](https://github.com/ianstormtaylor/slate/commit/7499d4b4c01a089906a96f30f6c04256204ca65e) Thanks [@sennpang](https://github.com/sennpang)! - fixed cursor when triple clicking on text and type over it, fixes #4862
+
 ## 0.74.0
 
 ### Minor Changes
