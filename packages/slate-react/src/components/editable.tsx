@@ -1048,7 +1048,7 @@ export const Editable = (props: EditableProps) => {
 
                 const element =
                   editor.children[
-                  selection !== null ? selection.focus.path[0] : 0
+                    selection !== null ? selection.focus.path[0] : 0
                   ]
                 const isRTL = getDirection(Node.string(element)) === 'rtl'
 
