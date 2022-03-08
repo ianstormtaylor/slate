@@ -29,7 +29,7 @@
     "@types/jsdom": "^16.2.14",
     "@types/react": "^16.9.13",
     "@types/react-dom": "^16.9.4",
-    "@types/react-test-renderer": "^17.0.1",
+    "@types/react-test-renderer": "^16.8.0",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",

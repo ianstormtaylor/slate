@@ -3670,23 +3670,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-test-renderer@npm:^17.0.1":
-  version: 17.0.1
-  resolution: "@types/react-test-renderer@npm:17.0.1"
+"@types/react-test-renderer@npm:^16.8.0":
+  version: 16.9.5
+  resolution: "@types/react-test-renderer@npm:16.9.5"
   dependencies:
-    "@types/react": "*"
-  checksum: ecaae8df36cd8cfeb89080d52534856acc3789bad9a6e369ff5119426377c827b4e5b5daa638507f2c1c2fd6c994bf45de288a698143178cd4049c2cd8b77b35
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:*":
-  version: 17.0.39
-  resolution: "@types/react@npm:17.0.39"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: bf04d3c2894559012710d595553e12b422d3b91cd8f4f7e122d8cb044ba9c2ba17f6e8a4e09581359cc5509ddc59cd8c8fabd6774f3505a40a45393f074d6e6e
+    "@types/react": ^16
+  checksum: 5ba383f05342c9bdd3bdd431591586b76d01d673f7446bf0a035f990cdb8a84c8944994089bf179855b39324f516ed1461e23c7f27e2522210a7acaba60a5172
   languageName: node
   linkType: hard
 
@@ -14619,7 +14608,7 @@ resolve@^2.0.0-next.3:
     "@types/lodash": ^4.14.149
     "@types/react": ^16.9.13
     "@types/react-dom": ^16.9.4
-    "@types/react-test-renderer": ^17.0.1
+    "@types/react-test-renderer": ^16.8.0
     direction: ^1.0.3
     is-hotkey: ^0.1.6
     is-plain-object: ^5.0.0
