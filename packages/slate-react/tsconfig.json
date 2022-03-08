@@ -3,7 +3,7 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./lib"
+    "outDir": "./lib",
   },
   "references": [{ "path": "../slate" }]
 }
