@@ -472,6 +472,9 @@ export const Editable = (props: EditableProps) => {
           }
 
           case 'insertLineBreak':
+            Editor.insertSoftBreak(editor)
+            break
+
           case 'insertParagraph': {
             Editor.insertBreak(editor)
             break
@@ -1173,6 +1176,12 @@ export const Editable = (props: EditableProps) => {
                     Hotkeys.isTransposeCharacter(nativeEvent)
                   ) {
                     event.preventDefault()
+                    return
+                  }
+
+                  if (Hotkeys.isSoftBreak(nativeEvent)) {
+                    event.preventDefault()
+                    Editor.insertSoftBreak(editor)
                     return
                   }
 

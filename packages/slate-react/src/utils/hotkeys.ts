@@ -17,7 +17,8 @@ const HOTKEYS = {
   extendBackward: 'shift+left',
   extendForward: 'shift+right',
   italic: 'mod+i',
-  splitBlock: 'shift?+enter',
+  insertSoftBreak: 'shift+enter',
+  splitBlock: 'enter',
   undo: 'mod+z',
 }
 
@@ -89,6 +90,7 @@ export default {
   isMoveWordBackward: create('moveWordBackward'),
   isMoveWordForward: create('moveWordForward'),
   isRedo: create('redo'),
+  isSoftBreak: create('insertSoftBreak'),
   isSplitBlock: create('splitBlock'),
   isTransposeCharacter: create('transposeCharacter'),
   isUndo: create('undo'),

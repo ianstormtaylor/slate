@@ -460,6 +460,10 @@ Insert a fragment at the current selection. If the selection is currently expand
 
 Insert a block break at the current selection. If the selection is currently expanded, delete it first.
 
+#### `insertSoftBreak() => void`
+
+Insert a soft break at the current selection. If the selection is currently expanded, delete it first.
+
 #### `insertNode(node: Node) => void`
 
 Insert a node at the current selection. If the selection is currently expanded, delete it first.

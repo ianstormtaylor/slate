@@ -158,6 +158,10 @@ export const createEditor = (): Editor => {
       Transforms.splitNodes(editor, { always: true })
     },
 
+    insertSoftBreak: () => {
+      Transforms.splitNodes(editor, { always: true })
+    },
+
     insertFragment: (fragment: Node[]) => {
       Transforms.insertFragment(editor, fragment)
     },

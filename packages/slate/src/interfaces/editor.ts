@@ -62,6 +62,7 @@ export interface BaseEditor {
   deleteFragment: (direction?: 'forward' | 'backward') => void
   getFragment: () => Descendant[]
   insertBreak: () => void
+  insertSoftBreak: () => void
   insertFragment: (fragment: Node[]) => void
   insertNode: (node: Node) => void
   insertText: (text: string) => void
@@ -126,6 +127,7 @@ export interface EditorInterface {
   hasPath: (editor: Editor, path: Path) => boolean
   hasTexts: (editor: Editor, element: Element) => boolean
   insertBreak: (editor: Editor) => void
+  insertSoftBreak: (editor: Editor) => void
   insertFragment: (editor: Editor, fragment: Node[]) => void
   insertNode: (editor: Editor, node: Node) => void
   insertText: (editor: Editor, text: string) => void
@@ -528,6 +530,16 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Insert a soft break at the current selection.
+   *
+   * If the selection is currently expanded, it will be deleted first.
+   */
+
+  insertSoftBreak(editor: Editor): void {
+    editor.insertSoftBreak()
+  },
+
+  /**
    * Insert a fragment at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
@@ -582,6 +594,7 @@ export const Editor: EditorInterface = {
       typeof value.deleteForward === 'function' &&
       typeof value.deleteFragment === 'function' &&
       typeof value.insertBreak === 'function' &&
+      typeof value.insertSoftBreak === 'function' &&
       typeof value.insertFragment === 'function' &&
       typeof value.insertNode === 'function' &&
       typeof value.insertText === 'function' &&
