@@ -28,6 +28,7 @@ jobs:
           node-version: 16.x
           cache: yarn
           registry-url: https://registry.npmjs.org
+          key: node16
 
       - name: Install dependencies
         run: yarn
