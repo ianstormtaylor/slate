@@ -25,9 +25,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 16.x
           cache: yarn
           registry-url: https://registry.npmjs.org
+          key: node16
 
       - name: Install dependencies
         run: yarn
