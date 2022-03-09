@@ -49,15 +49,8 @@ const useChildren = (props: {
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
-    const ds = decorate([n, p])
 
-    for (const dec of decorations) {
-      const d = Range.intersection(dec, range)
-
-      if (d) {
-        ds.push(d)
-      }
-    }
+    const ds = decorations.filter(dec => Range.intersection(dec, range))
 
     if (Element.isElement(n)) {
       children.push(

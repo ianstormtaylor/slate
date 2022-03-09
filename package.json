@@ -110,6 +110,7 @@
     "slate-hyperscript": "workspace:*",
     "slate-react": "workspace:*",
     "source-map-loader": "^0.2.4",
+    "ts-jest": "^27.1.3",
     "typescript": "3.9.7"
   },
   "simple-git-hooks": {

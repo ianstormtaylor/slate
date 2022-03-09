@@ -5,7 +5,7 @@ declare module 'slate' {
   interface CustomTypes {
     Editor: ReactEditor
     Text: BaseText & {
-      placeholder: string
+      placeholder?: string
     }
     Range: BaseRange & {
       placeholder?: string

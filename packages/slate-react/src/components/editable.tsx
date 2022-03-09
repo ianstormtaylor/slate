@@ -563,7 +563,9 @@ export const Editable = (props: EditableProps) => {
     }
   }, [scheduleOnDOMSelectionChange])
 
-  const decorations = decorate([editor, []])
+  const decorations = [...Node.nodes(editor)].flatMap(([n, p]) =>
+    decorate([n, p])
+  )
 
   if (
     placeholder &&
