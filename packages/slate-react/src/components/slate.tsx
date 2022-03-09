@@ -69,15 +69,13 @@ export const Slate = (props: {
   })
 
   useIsomorphicLayoutEffect(() => {
-    const fn = () => {
-      setTimeout(() => {
-        if (unmountRef.current) {
-          return
-        }
-        setIsFocused(ReactEditor.isFocused(editor))
-      }, 0)
-    }
+    const fn = () => setIsFocused(ReactEditor.isFocused(editor))
     document.addEventListener('focus', fn, true)
+    return () => document.removeEventListener('focus', fn, true)
+  }, [])
+
+  useIsomorphicLayoutEffect(() => {
+    const fn = () => setIsFocused(ReactEditor.isFocused(editor))
     document.addEventListener('blur', fn, true)
     return () => {
       document.removeEventListener('focus', fn, true)
