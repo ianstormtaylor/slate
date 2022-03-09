@@ -25,6 +25,7 @@ jobs:
         with:
           node-version: 16
           cache: yarn
+          key: node16
 
       - name: Run ${{ matrix.command }}
         run: yarn && yarn build && yarn ${{ matrix.command }}
