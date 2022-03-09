@@ -1,4 +1,5 @@
 {
   "extends": "../../../config/typescript/tsconfig.json",
+  "target": "ES2019",
   "references": [{ "path": "../" }]
 }
