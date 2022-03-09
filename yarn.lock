@@ -3578,7 +3578,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^12.12.14, @types/node@npm:^12.7.1":
+"@types/node@npm:^12.7.1":
   version: 12.20.19
   resolution: "@types/node@npm:12.20.19"
   checksum: 00b623beed4d4b17ad8d60bd2e99a0acab1b95e1d2242d1e2c313abd05a639ecb902c33c5970436d2fd13d5d772747dec6ec73d7f40ad799fe09a35009566699
@@ -3589,6 +3589,13 @@ __metadata:
   version: 14.17.9
   resolution: "@types/node@npm:14.17.9"
   checksum: e59b92e4346ed0db61e042d439f9658d1d3e8ad1d14825b714804cafae8ce22220ff6c8d907c4e4c6384aac748de07283fa321ef13cb8bdeb460eb789d634244
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.11.26":
+  version: 16.11.26
+  resolution: "@types/node@npm:16.11.26"
+  checksum: 57757caaba3f0d95de82198cb276a1002c49b710108c932a1d02d7c91ff2fa57cfe2dd19fde60853b6dd90b0964b3cf35557981d2628e20aed6a909057aedfe6
   languageName: node
   linkType: hard
 
@@ -14377,7 +14384,7 @@ resolve@^2.0.0-next.3:
     "@types/jest": 27.0.1
     "@types/lodash": ^4.14.149
     "@types/mocha": ^5.2.7
-    "@types/node": ^12.12.14
+    "@types/node": ^16.11.26
     "@types/react": ^16.9.13
     "@types/react-dom": ^16.9.4
     "@typescript-eslint/eslint-plugin": ^2.9.0
