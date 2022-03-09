@@ -5,6 +5,7 @@
 ### Patch Changes
 
 - [#4876](https://github.com/ianstormtaylor/slate/pull/4876) [`1b205c08`](https://github.com/ianstormtaylor/slate/commit/1b205c087bef2f2360679c46801804d6d30a8139) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix decorations not getting applied for children unless parent changes
+- [#4874](https://github.com/ianstormtaylor/slate/pull/4874) [`4d28948`](https://github.com/ianstormtaylor/slate/commit/4d28948b901b1724493dd0a782e3001149546533) Thanks [@bryanph](https://github.com/bryanph)! - Revert #4755
 
 ## 0.74.1
 
