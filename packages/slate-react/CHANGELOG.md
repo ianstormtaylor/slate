@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.74.2
+
+### Patch Changes
+
+- [#4876](https://github.com/ianstormtaylor/slate/pull/4876) [`1b205c08`](https://github.com/ianstormtaylor/slate/commit/1b205c087bef2f2360679c46801804d6d30a8139) Thanks [@nemanja-tosic](https://github.com/nemanja-tosic)! - Fix decorations not getting applied for children unless parent changes
+
 ## 0.74.1
 
 ### Patch Changes
