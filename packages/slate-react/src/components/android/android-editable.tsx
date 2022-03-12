@@ -30,7 +30,7 @@ import {
 } from '../../utils/weak-maps'
 import { normalizeTextInsertionRange } from './diff-text'
 
-import { EditableProps, hasTarget } from '../editable'
+import { EditableProps, hasTarget, isTargetInsideReadonlyVoid } from '../editable'
 import useChildren from '../../hooks/use-children'
 import {
   defaultDecorate,
@@ -239,12 +239,12 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
           const { anchorNode, focusNode } = domSelection
 
           const anchorNodeSelectable =
-            hasEditableTarget(editor, anchorNode) ||
-            isTargetInsideNonReadonlyVoid(editor, anchorNode)
+            hasEditableTarget(editor, anchorNode) &&
+            !isTargetInsideReadonlyVoid(editor, anchorNode)
 
           const focusNodeSelectable =
-            hasEditableTarget(editor, focusNode) ||
-            isTargetInsideNonReadonlyVoid(editor, focusNode)
+            hasEditableTarget(editor, focusNode) &&
+            !isTargetInsideReadonlyVoid(editor, focusNode)
 
           if (anchorNodeSelectable && focusNodeSelectable) {
             const range = ReactEditor.toSlateRange(editor, domSelection, {

@@ -287,12 +287,12 @@ export const Editable = (props: EditableProps) => {
         const { anchorNode, focusNode } = domSelection
 
         const anchorNodeSelectable =
-          hasEditableTarget(editor, anchorNode) ||
-          isTargetInsideNonReadonlyVoid(editor, anchorNode)
+          hasEditableTarget(editor, anchorNode) &&
+          !isTargetInsideReadonlyVoid(editor, anchorNode)
 
         const focusNodeSelectable =
-          hasEditableTarget(editor, focusNode) ||
-          isTargetInsideNonReadonlyVoid(editor, focusNode)
+          hasEditableTarget(editor, focusNode) &&
+          !isTargetInsideReadonlyVoid(editor, focusNode)
 
         if (anchorNodeSelectable && focusNodeSelectable) {
           const range = ReactEditor.toSlateRange(editor, domSelection, {
@@ -1419,19 +1419,17 @@ export const hasEditableTarget = (
 }
 
 /**
- * Check if the target is inside void and in an non-readonly editor.
+ * Check if the target is inside void and in an readonly editor.
  */
-
-export const isTargetInsideNonReadonlyVoid = (
+export const isTargetInsideReadonlyVoid = (
   editor: ReactEditor,
   target: EventTarget | null
 ): boolean => {
-  if (IS_READ_ONLY.get(editor)) return false
-
   const slateNode =
     hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
-  return Editor.isVoid(editor, slateNode)
+  return IS_READ_ONLY.get(editor) && Editor.isVoid(editor, slateNode)
 }
+
 
 /**
  * Check if an event is overrided by a handler.
