@@ -11,7 +11,7 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
-import { NodeMatch } from '../interfaces/editor'
+import { NodeMatch, PropsCompare } from '../interfaces/editor'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -75,6 +75,7 @@ export interface NodeTransforms {
       hanging?: boolean
       split?: boolean
       voids?: boolean
+      compare?: PropsCompare
     }
   ) => void
   splitNodes: <T extends Node>(
@@ -568,10 +569,11 @@ export const NodeTransforms: NodeTransforms = {
       hanging?: boolean
       split?: boolean
       voids?: boolean
+      compare?: PropsCompare
     } = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.selection } = options
+      let { match, at = editor.selection, compare } = options
       const {
         hanging = false,
         mode = 'lowest',
@@ -628,6 +630,10 @@ export const NodeTransforms: NodeTransforms = {
         }
       }
 
+      if (!compare) {
+        compare = (prop, nodeProp) => prop !== nodeProp
+      }
+
       for (const [node, path] of Editor.nodes(editor, {
         at,
         match,
@@ -649,7 +655,7 @@ export const NodeTransforms: NodeTransforms = {
             continue
           }
 
-          if (props[k] !== node[k]) {
+          if (compare(props[k], node[k])) {
             hasChanges = true
             // Omit new properties from the old properties list
             if (node.hasOwnProperty(k)) properties[k] = node[k]
