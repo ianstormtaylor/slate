@@ -1427,7 +1427,7 @@ export const isTargetInsideReadonlyVoid = (
 ): boolean => {
   const slateNode =
     hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
-  return IS_READ_ONLY.get(editor) && Editor.isVoid(editor, slateNode)
+  return IS_READ_ONLY.get(editor) === true && Editor.isVoid(editor, slateNode)
 }
 
 
