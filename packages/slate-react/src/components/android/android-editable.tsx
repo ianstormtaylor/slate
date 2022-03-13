@@ -30,14 +30,14 @@ import {
 } from '../../utils/weak-maps'
 import { normalizeTextInsertionRange } from './diff-text'
 
-import { EditableProps, hasTarget, isTargetInsideReadonlyVoid } from '../editable'
+import { EditableProps, hasTarget } from '../editable'
 import useChildren from '../../hooks/use-children'
 import {
   defaultDecorate,
   hasEditableTarget,
   isEventHandled,
   isDOMEventHandled,
-  isTargetInsideNonReadonlyVoid,
+  isTargetInsideReadonlyVoid,
 } from '../editable'
 
 import { useAndroidInputManager } from './use-android-input-manager'
