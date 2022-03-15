@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
-- [#4891](https://github.com/ianstormtaylor/slate/pull/4891) [`b5714a1d`](https://github.com/ianstormtaylor/slate/commit/b5714a1d6816c5090992c7c2f66429a5675de484) Thanks [@dylans](https://github.com/dylans)! - feat: add custom compare node props #4889
+- [#4889](https://github.com/ianstormtaylor/slate/pull/4889) [`970523f`](https://github.com/ianstormtaylor/slate/commit/970523f881bf1918f91cb9de87c961dfb965e8a1)`](https://github.com/ianstormtaylor/slate/commit/970523f881bf1918f91cb9de87c961dfb965e8a1) Thanks [@zhugexinxin](https://github.com/zhugexinxin)! - feat: add custom compare node props
 
 ## 0.73.1
 
