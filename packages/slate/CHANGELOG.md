@@ -1,5 +1,11 @@
 # slate
 
+## 0.75.0
+
+### Patch Changes
+
+- [#4891](https://github.com/ianstormtaylor/slate/pull/4891) [`b5714a1d`](https://github.com/ianstormtaylor/slate/commit/b5714a1d6816c5090992c7c2f66429a5675de484) Thanks [@dylans](https://github.com/dylans)! - feat: add custom compare node props #4889
+
 ## 0.73.1
 
 ### Patch Changes
