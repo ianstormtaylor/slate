@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.75.0
+
+### Minor Changes
+
+- [#4883](https://github.com/ianstormtaylor/slate/pull/4883) [`3b3b0e32`](https://github.com/ianstormtaylor/slate/commit/3b3b0e32df4df9fb4cf1d82c0c09b7242c708169) Thanks [@always-maap](https://github.com/always-maap)! - Fix chrome and edge three digit version check
+
 ## 0.74.2
 
 ### Patch Changes
