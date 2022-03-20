@@ -484,7 +484,16 @@ export const ReactEditor = {
     let offset = 0
 
     if (parentNode) {
-      const voidNode = parentNode.closest('[data-slate-void="true"]')
+      const editorEl = ReactEditor.toDOMNode(editor, editor)
+      const potentialVoidNode = parentNode.closest('[data-slate-void="true"]')
+      // Need to ensure that the closest void node is actually a void node
+      // within this editor, and not a void node within some parent editor. This can happen
+      // if this editor is within a void node of another editor ("nested editors", like in
+      // the "Editable Voids" example on the docs site).
+      const voidNode =
+        potentialVoidNode && editorEl.contains(potentialVoidNode)
+          ? potentialVoidNode
+          : null
       let leafNode = parentNode.closest('[data-slate-leaf]')
       let domNode: DOMElement | null = null
 
