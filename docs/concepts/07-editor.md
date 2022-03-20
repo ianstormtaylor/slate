@@ -21,6 +21,7 @@ interface Editor {
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteFragment: () => void
   insertBreak: () => void
+  insertSoftBreak: () => void
   insertFragment: (fragment: Node[]) => void
   insertNode: (node: Node) => void
   insertText: (text: string) => void

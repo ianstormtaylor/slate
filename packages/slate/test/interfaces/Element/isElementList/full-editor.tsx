@@ -12,6 +12,7 @@ export const input = [
     deleteForward() {},
     deleteFragment() {},
     insertBreak() {},
+    insertSoftBreak() {},
     insertFragment() {},
     insertNode() {},
     insertText() {},
