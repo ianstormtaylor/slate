@@ -60,42 +60,35 @@ export const withReact = <T extends Editor>(editor: T) => {
     }
   }
 
+  // This attempts to reset the NODE_TO_KEY entry to the correct value
+  // as apply() changes the object reference and hence invalidates the NODE_TO_KEY entry
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
     switch (op.type) {
       case 'insert_text':
       case 'remove_text':
-      case 'set_node': {
-        for (const [node, path] of Editor.levels(e, { at: op.path })) {
-          const key = ReactEditor.findKey(e, node)
-          matches.push([path, key])
-        }
-
+      case 'set_node':
+      case 'split_node': {
+        matches.push(...getMatches(e, op.path))
         break
       }
 
       case 'insert_node':
-      case 'remove_node':
-      case 'merge_node':
-      case 'split_node': {
-        for (const [node, path] of Editor.levels(e, {
-          at: Path.parent(op.path),
-        })) {
-          const key = ReactEditor.findKey(e, node)
-          matches.push([path, key])
-        }
+      case 'remove_node': {
+        matches.push(...getMatches(e, Path.parent(op.path)))
+        break
+      }
 
+      case 'merge_node': {
+        const prevPath = Path.previous(op.path)
+        matches.push(...getMatches(e, prevPath))
         break
       }
 
       case 'move_node': {
-        for (const [node, path] of Editor.levels(e, {
-          at: Path.common(Path.parent(op.path), Path.parent(op.newPath)),
-        })) {
-          const key = ReactEditor.findKey(e, node)
-          matches.push([path, key])
-        }
+        const commonPath = Path.common(Path.parent(op.path), Path.parent(op.newPath))
+        matches.push(...getMatches(e, commonPath))
         break
       }
     }
@@ -254,4 +247,13 @@ export const withReact = <T extends Editor>(editor: T) => {
   }
 
   return e
+}
+
+const getMatches = (e: Editor, path: Path) => {
+  const matches: [Path, Key][] = []
+  for (const [n, p] of Editor.levels(e, { at: path })) {
+    const key = ReactEditor.findKey(e, n)
+    matches.push([p, key])
+  }
+  return matches
 }
