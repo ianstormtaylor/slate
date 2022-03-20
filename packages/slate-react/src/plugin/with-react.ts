@@ -87,7 +87,10 @@ export const withReact = <T extends Editor>(editor: T) => {
       }
 
       case 'move_node': {
-        const commonPath = Path.common(Path.parent(op.path), Path.parent(op.newPath))
+        const commonPath = Path.common(
+          Path.parent(op.path),
+          Path.parent(op.newPath)
+        )
         matches.push(...getMatches(e, commonPath))
         break
       }
