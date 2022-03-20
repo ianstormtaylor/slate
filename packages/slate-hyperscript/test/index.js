@@ -8,7 +8,7 @@ describe('slate-hyperscript', () => {
     let actual = {}
 
     if (Array.isArray(output)) {
-      actual = output
+      actual = input
     } else {
       for (const key in output) {
         actual[key] = input[key]
