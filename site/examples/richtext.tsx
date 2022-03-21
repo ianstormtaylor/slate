@@ -22,11 +22,20 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
 
-const RichTextExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+const RichTextExample = ({
+  editor: editorProp,
+  initialValue: initialValueProp = initialValue,
+}: {
+  editor?: Editor
+  initialValue?: Descendant[]
+}) => {
+  const [value, setValue] = useState<Descendant[]>(initialValueProp)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const editor = useMemo(
+    () => withHistory(withReact(editorProp ?? createEditor())),
+    []
+  )
 
   return (
     <Slate editor={editor} value={value} onChange={value => setValue(value)}>
@@ -49,6 +58,7 @@ const RichTextExample = () => {
         renderElement={renderElement}
         renderLeaf={renderLeaf}
         placeholder="Enter some rich text…"
+        data-testid="slate-content-editable"
         spellCheck
         autoFocus
         onKeyDown={event => {
@@ -222,6 +232,8 @@ const MarkButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
+      data-testid={format}
+      data-active={isMarkActive(editor, format)}
       active={isMarkActive(editor, format)}
       onMouseDown={event => {
         event.preventDefault()

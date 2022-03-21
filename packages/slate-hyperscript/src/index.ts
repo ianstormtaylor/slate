@@ -3,7 +3,16 @@ import {
   HyperscriptCreators,
   HyperscriptShorthands,
 } from './hyperscript'
-import { createEditor } from './creators'
+import {
+  createEditor,
+  createText,
+  createAnchor,
+  createCursor,
+  createElement,
+  createFocus,
+  createFragment,
+  createSelection,
+} from './creators'
 
 /**
  * The default hyperscript factory that ships with Slate, without custom tags.
@@ -15,6 +24,13 @@ export {
   jsx,
   createHyperscript,
   createEditor,
+  createText,
+  createAnchor,
+  createCursor,
+  createElement,
+  createFocus,
+  createFragment,
+  createSelection,
   HyperscriptCreators,
   HyperscriptShorthands,
 }
