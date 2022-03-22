@@ -471,10 +471,10 @@ export const ReactEditor = {
     editor: ReactEditor,
     domPoint: DOMPoint,
     options: {
-      exactMatch: T
-      suppressThrow: T
+      exactMatch: boolean
+      suppressThrow: boolean
     }
-  ): T extends true ? Point | null : Point {
+  ): Point | null {
     const { exactMatch, suppressThrow } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
@@ -642,16 +642,15 @@ export const ReactEditor = {
       )
     }
 
-    const anchor = ReactEditor.toSlatePoint(
-      editor,
-      [anchorNode, anchorOffset],
-      { exactMatch, suppressThrow }
-    )
+    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset], {
+      exactMatch,
+      suppressThrow,
+    })
     if (!anchor) {
       return null as T extends true ? Range | null : Range
     }
 
-    const focus = isCollapsed
+    let focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], {
           exactMatch,
@@ -659,6 +658,46 @@ export const ReactEditor = {
         })
     if (!focus) {
       return null as T extends true ? Range | null : Range
+    }
+
+    /**
+     * suppose we have this document:
+     *
+     * { type: 'paragraph',
+     *   children: [
+     *     { text: 'foo ' },
+     *     { text: 'bar' },
+     *     { text: ' baz' }
+     *   ]
+     * }
+     *
+     * a double click on "bar" on chrome will create this range:
+     *
+     * anchor -> [0,1] offset 0
+     * focus  -> [0,1] offset 3
+     *
+     * while on firefox will create this range:
+     *
+     * anchor -> [0,0] offset 4
+     * focus  -> [0,2] offset 0
+     *
+     * let's try to fix it...
+     */
+
+    if (IS_FIREFOX && !isCollapsed && anchorNode !== focusNode) {
+      const isEnd = Editor.isEnd(editor, anchor, anchor.path)
+      const isStart = Editor.isStart(editor, focus, focus.path)
+
+      if (isEnd) {
+        const after = Editor.after(editor, anchor as Point)
+        // Editor.after() might return undefined
+        anchor = after || anchor
+      }
+
+      if (isStart) {
+        const before = Editor.before(editor, focus as Point)
+        focus = before || focus
+      }
     }
 
     let range: Range = { anchor: anchor as Point, focus: focus as Point }
