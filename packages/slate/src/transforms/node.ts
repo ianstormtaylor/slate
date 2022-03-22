@@ -11,7 +11,7 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
-import { NodeMatch, PropsCompare } from '../interfaces/editor'
+import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -76,7 +76,7 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
       compare?: PropsCompare
-      merge?: Function | null
+      merge?: PropsMerge
     }
   ) => void
   splitNodes: <T extends Node>(
@@ -571,7 +571,7 @@ export const NodeTransforms: NodeTransforms = {
       split?: boolean
       voids?: boolean
       compare?: PropsCompare
-      merge?: Function | null
+      merge?: PropsMerge
     } = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {

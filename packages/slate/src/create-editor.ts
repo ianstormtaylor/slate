@@ -97,7 +97,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    addMark: (key: string, value: any, merge: Function | null = null) => {
+    addMark: (key: string, value: any, merge) => {
       const { selection } = editor
 
       if (selection) {

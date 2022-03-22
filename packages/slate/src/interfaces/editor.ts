@@ -55,7 +55,7 @@ export interface BaseEditor {
   onChange: () => void
 
   // Overrideable core actions.
-  addMark: (key: string, value: any, merge: Function | null) => void
+  addMark: (key: string, value: any, merge?: PropsMerge) => void
   apply: (operation: Operation) => void
   deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
@@ -81,7 +81,7 @@ export interface EditorInterface {
       voids?: boolean
     }
   ) => NodeEntry<T> | undefined
-  addMark: (editor: Editor, key: string, value: any, merge?: Function) => void
+  addMark: (editor: Editor, key: string, value: any, merge?: PropsMerge) => void
   after: (
     editor: Editor,
     at: Location,
@@ -336,12 +336,7 @@ export const Editor: EditorInterface = {
    * `editor.marks` property instead, and applied when text is inserted next.
    */
 
-  addMark(
-    editor: Editor,
-    key: string,
-    value: any,
-    merge: Function | null = null
-  ): void {
+  addMark(editor: Editor, key: string, value: any, merge?: PropsMerge): void {
     editor.addMark(key, value, merge)
   },
 
@@ -1741,3 +1736,4 @@ export type NodeMatch<T extends Node> =
   | ((node: Node, path: Path) => boolean)
 
 export type PropsCompare = (prop: Partial<Node>, node: Partial<Node>) => boolean
+export type PropsMerge = (prop: Partial<Node>, node: Partial<Node>) => object
