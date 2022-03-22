@@ -336,7 +336,12 @@ export const Editor: EditorInterface = {
    * `editor.marks` property instead, and applied when text is inserted next.
    */
 
-  addMark(editor: Editor, key: string, value: any, merge: Function | null = null): void {
+  addMark(
+    editor: Editor,
+    key: string,
+    value: any,
+    merge: Function | null = null
+  ): void {
     editor.addMark(key, value, merge)
   },
 
