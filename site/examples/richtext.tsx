@@ -213,7 +213,13 @@ const BlockButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
+      data-testid={format}
       active={isBlockActive(
+        editor,
+        format,
+        TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+      )}
+      data-active={isBlockActive(
         editor,
         format,
         TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'

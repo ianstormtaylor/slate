@@ -16,5 +16,5 @@
     "jsx": "react"
   },
   "exclude": ["node_modules"],
-  "include": ["**/*.ts", "**/*.tsx", "./hyperscript.d.ts"]
+  "include": ["**/*.ts", "**/*.tsx", "./hyperscript.d.ts", "./setupTests.ts"]
 }

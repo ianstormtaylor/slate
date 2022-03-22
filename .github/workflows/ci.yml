@@ -13,6 +13,7 @@ jobs:
         command:
           - 'test'
           - 'test:integration'
+          - 'test:examples'
           - 'lint:eslint'
           - 'lint:prettier'
           - 'lint:typescript'

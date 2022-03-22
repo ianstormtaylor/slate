@@ -50,6 +50,8 @@ The slate repository is a monorepo that is managed with [lerna](https://github.c
 
 To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
+> 🚨 Make sure you are running on Node 16+ otherwise you will run into issues while developing.
+
 ```text
 yarn install
 yarn build
@@ -115,7 +117,7 @@ yarn release:latest
 
 And follow the prompts Lerna gives you.
 
-Note that this will automatically run the prelease script first that will build, test and lint before attempting to publish.
+Note that this will automatically run the prerelease script first that will build, test and lint before attempting to publish.
 
 ### Publishing `@next` Release
 

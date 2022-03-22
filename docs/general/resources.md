@@ -7,6 +7,7 @@ A few resources that are helpful for building with Slate.
 These libraries are helpful when developing with Slate:
 
 - [`is-hotkey`](https://github.com/ianstormtaylor/is-hotkey) is a simple way to check whether an `onKeyDown` handler should fire for a given hotkey, handling cross-platform concerns like cmd vs. ctrl keys for you automatically.
+- [`slate-test-utils`](https://github.com/mwood23/slate-test-utils) is a toolkit to write user centric integration tests with ease for Slate React.
 
 ## Extensions and Plugins
 
