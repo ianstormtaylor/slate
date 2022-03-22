@@ -3,7 +3,7 @@ const config = {
   preset: 'ts-jest',
   globals: {
     'ts-jest': {
-      tsconfig: '<rootDir>/test/tsconfig.json',
+      tsconfig: '<rootDir>/tsconfig.json',
     },
   },
   testEnvironment: 'jsdom',
