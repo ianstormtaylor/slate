@@ -97,7 +97,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    addMark: (key: string, value: any) => {
+    addMark: (key: string, value: any, merge: Function | null = null) => {
       const { selection } = editor
 
       if (selection) {
@@ -105,7 +105,7 @@ export const createEditor = (): Editor => {
           Transforms.setNodes(
             editor,
             { [key]: value },
-            { match: Text.isText, split: true }
+            { match: Text.isText, split: true, merge }
           )
         } else {
           const marks = {
