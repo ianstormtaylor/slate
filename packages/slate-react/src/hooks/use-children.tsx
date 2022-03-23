@@ -50,7 +50,11 @@ const useChildren = (props: {
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
 
-    const ds = decorations.filter(dec => Range.intersection(dec, range))
+    const ds = decorations.reduce<Range[]>((acc, dec) => {
+      const intersection = Range.intersection(dec, range)
+      if (intersection) acc.push(intersection)
+      return acc
+    }, [])
 
     if (Element.isElement(n)) {
       children.push(
