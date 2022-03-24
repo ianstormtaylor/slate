@@ -5,7 +5,6 @@ import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
-import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   RenderElementProps,
@@ -34,7 +33,6 @@ const useChildren = (props: {
     renderLeaf,
     selection,
   } = props
-  const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []

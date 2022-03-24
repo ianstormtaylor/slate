@@ -113,11 +113,21 @@ describe('slate-react', () => {
           },
         ]
 
-        // initial render does not return
-        const decorate = jest.fn<Range[], [NodeEntry]>(() => [])
+        const decorate = jest.fn<Range[], [NodeEntry]>(([node]) => {
+          if (node !== value[0]) {
+            return []
+          }
+          return [
+            {
+              anchor: { path: [0, 1, 0], offset: 1 },
+              focus: { path: [0, 2, 0], offset: 2 },
+              highlight: true,
+            },
+          ]
+        })
+
         const renderLeaf = jest.fn<JSX.Element, [RenderLeafProps]>(DefaultLeaf)
         const onChange = jest.fn<void, []>()
-
         let el: ReactTestRenderer
 
         act(() => {
@@ -129,37 +139,15 @@ describe('slate-react', () => {
           )
         })
 
-        // 3 leaves (foo,bar,baz)
-        expect(renderLeaf).toHaveBeenCalledTimes(3)
-        renderLeaf.mockClear()
-
-        // return a decoration spanning foo_b[ar_ba]z
-        decorate.mockImplementation(([node]) => {
-          if (node !== value[0]) {
-            return []
-          }
-
-          return [
-            {
-              anchor: { path: [0, 1, 0], offset: 1 },
-              focus: { path: [0, 2, 0], offset: 2 },
-              highlight: true,
-            },
-          ]
-        })
-
-        act(() => {
-          el.update(
-            <Slate editor={editor} value={value} onChange={onChange}>
-              <DefaultEditable decorate={decorate} renderLeaf={renderLeaf} />
-            </Slate>
-          )
-        })
-
-        // 4 rerenders, for b,ar,ba,z
-        expect(renderLeaf).toHaveBeenCalledTimes(4)
+        // 4 renders, for foo,b,ar,ba,z
+        expect(renderLeaf).toHaveBeenCalledTimes(5)
         expect(renderLeaf.mock.calls).toEqual(
           expect.arrayContaining([
+            [
+              expect.objectContaining({
+                leaf: { highlight: false, text: 'foo' },
+              }),
+            ],
             [
               expect.objectContaining({
                 leaf: { highlight: false, text: 'b' },
