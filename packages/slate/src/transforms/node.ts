@@ -11,7 +11,7 @@ import {
   NodeEntry,
   Ancestor,
 } from '..'
-import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
+import { NodeMatch, PropsCompare } from '../interfaces/editor'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -76,7 +76,6 @@ export interface NodeTransforms {
       split?: boolean
       voids?: boolean
       compare?: PropsCompare
-      merge?: PropsMerge
     }
   ) => void
   splitNodes: <T extends Node>(
@@ -571,11 +570,10 @@ export const NodeTransforms: NodeTransforms = {
       split?: boolean
       voids?: boolean
       compare?: PropsCompare
-      merge?: PropsMerge
     } = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
-      let { match, at = editor.selection, compare, merge } = options
+      let { match, at = editor.selection, compare } = options
       const {
         hanging = false,
         mode = 'lowest',
@@ -662,11 +660,7 @@ export const NodeTransforms: NodeTransforms = {
             // Omit new properties from the old properties list
             if (node.hasOwnProperty(k)) properties[k] = node[k]
             // Omit properties that have been removed from the new properties list
-            if (merge) {
-              if (props[k] != null) newProperties[k] = merge(node[k], props[k])
-            } else {
-              if (props[k] != null) newProperties[k] = props[k]
-            }
+            if (props[k] != null) newProperties[k] = props[k]
           }
         }
 
