@@ -1,5 +1,23 @@
 # slate-react
 
+## 0.76.0
+
+### Minor Changes
+
+- [#4873](https://github.com/ianstormtaylor/slate/pull/4873) [`20acca4b`](https://github.com/ianstormtaylor/slate/commit/20acca4bc8f31bd1aa6fbca2c49aaae5f31cadfe) Thanks [@bryanph](https://github.com/bryanph)! - A different behavior for inserting a soft break with shift+enter is quite common in rich text editors. Right now you have to do this in onKeyDown which is not so nice. This adds a separate insertSoftBreak method on the editor instance that gets called when a soft break is inserted. This maintains the current default behavior for backwards compatibility (it just splits the block). But at least you can easily overwrite it now.
+
+  If you rely on overwriting editor.insertBreak for extra behavior for soft breaks this might be a breaking change for you and you should overwrite editor.insertSoftBreak instead.
+
+### Patch Changes
+
+- [#4901](https://github.com/ianstormtaylor/slate/pull/4901) [`5ef346fe`](https://github.com/ianstormtaylor/slate/commit/5ef346feb9e6430b3b6af66f196e5445a9ee3ff2) Thanks [@bryanph](https://github.com/bryanph)! - Fixes a bug where nodes remounted on split_node and merge_node
+
+* [#4885](https://github.com/ianstormtaylor/slate/pull/4885) [`07669dca`](https://github.com/ianstormtaylor/slate/commit/07669dca4b0641506ca857bd781c460dae7606a9) Thanks [@ryanmitts](https://github.com/ryanmitts)! - toSlatePoint should not consider a selection within a void node if the void node isn't in the editor itself.
+
+  Prior to this fix, a nested Slate editor inside a void node in a parent editor would not allow you to start typing text in a blank editor state correctly. After the first character insertion, the selection would jump back to the start of the nested editor.
+
+- [#4910](https://github.com/ianstormtaylor/slate/pull/4910) [`2a8d86f1`](https://github.com/ianstormtaylor/slate/commit/2a8d86f1a40bcc806422e6fe3658ddd810ce73a5) Thanks [@jasonphillips](https://github.com/jasonphillips)! - Fix decorations applied across nested elements
+
 ## 0.75.0
 
 ### Minor Changes
