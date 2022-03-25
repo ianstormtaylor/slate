@@ -733,13 +733,24 @@ export const Editable = (props: EditableProps) => {
           onClick={useCallback(
             (event: React.MouseEvent<HTMLDivElement>) => {
               if (
-                !readOnly &&
                 hasTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onClick) &&
                 isDOMNode(event.target)
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
+
+                if (event.detail === 3 && readOnly) {
+                  const start = Editor.start(editor, [path[0]])
+                  const end = Editor.end(editor, [path[0]])
+                  const range = Editor.range(editor, start, end)
+                  Transforms.select(editor, range)
+                  return
+                }
+
+                if (readOnly) {
+                  return
+                }
 
                 // At this time, the Slate document may be arbitrarily different,
                 // because onClick handlers can change the document before we get here.
@@ -750,7 +761,6 @@ export const Editable = (props: EditableProps) => {
                   if (lookupNode === node) {
                     const start = Editor.start(editor, path)
                     const end = Editor.end(editor, path)
-
                     const startVoid = Editor.void(editor, { at: start })
                     const endVoid = Editor.void(editor, { at: end })
 
