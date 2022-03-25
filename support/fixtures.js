@@ -18,36 +18,40 @@ export const fixtures = (...args) => {
   d(dir, () => {
     for (const file of files) {
       const p = resolve(path, file)
+
       const stat = fs.statSync(p)
 
       if (stat.isDirectory()) {
         fixtures(path, file, fn)
       }
-      if (
-        stat.isFile() &&
-        (file.endsWith('.js') ||
-          file.endsWith('.tsx') ||
-          file.endsWith('.ts')) &&
-        !file.endsWith('custom-types.ts') &&
-        !file.endsWith('type-guards.ts') &&
-        !file.startsWith('.') &&
-        // Ignoring `index.js` files allows us to use the fixtures directly
-        // from the top-level directory itself, instead of only children.
-        file !== 'index.js'
-      ) {
-        const name = basename(file, extname(file))
 
-        // This needs to be a non-arrow function to use `this.skip()`.
-        it(`${name} `, function() {
-          const module = require(p)
+      if (file.includes('nested-uneven')) {
+        if (
+          stat.isFile() &&
+          (file.endsWith('.js') ||
+            file.endsWith('.tsx') ||
+            file.endsWith('.ts')) &&
+          !file.endsWith('custom-types.ts') &&
+          !file.endsWith('type-guards.ts') &&
+          !file.startsWith('.') &&
+          // Ignoring `index.js` files allows us to use the fixtures directly
+          // from the top-level directory itself, instead of only children.
+          file !== 'index.js'
+        ) {
+          const name = basename(file, extname(file))
 
-          if (module.skip) {
-            this.skip()
-            return
-          }
+          // This needs to be a non-arrow function to use `this.skip()`.
+          it(`${name} `, function() {
+            const module = require(p)
 
-          fn({ name, path, module })
-        })
+            if (module.skip) {
+              this.skip()
+              return
+            }
+
+            fn({ name, path, module })
+          })
+        }
       }
     }
   })
