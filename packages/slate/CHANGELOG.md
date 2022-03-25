@@ -1,5 +1,17 @@
 # slate
 
+## 0.76.0
+
+### Minor Changes
+
+- [#4873](https://github.com/ianstormtaylor/slate/pull/4873) [`20acca4b`](https://github.com/ianstormtaylor/slate/commit/20acca4bc8f31bd1aa6fbca2c49aaae5f31cadfe) Thanks [@bryanph](https://github.com/bryanph)! - A different behavior for inserting a soft break with shift+enter is quite common in rich text editors. Right now you have to do this in onKeyDown which is not so nice. This adds a separate insertSoftBreak method on the editor instance that gets called when a soft break is inserted. This maintains the current default behavior for backwards compatibility (it just splits the block). But at least you can easily overwrite it now.
+
+  If you rely on overwriting editor.insertBreak for extra behavior for soft breaks this might be a breaking change for you and you should overwrite editor.insertSoftBreak instead.
+
+### Patch Changes
+
+- [#4912](https://github.com/ianstormtaylor/slate/pull/4912) [`43ca2b56`](https://github.com/ianstormtaylor/slate/commit/43ca2b56c8bd8bcc30dd38808dd191f804d53ae4) Thanks [@zhugexinxin](https://github.com/zhugexinxin)! - feat: add merge to setNodes and test
+
 ## 0.75.0
 
 ### Patch Changes
