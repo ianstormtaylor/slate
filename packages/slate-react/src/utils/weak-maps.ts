@@ -1,4 +1,4 @@
-import { Ancestor, Editor, Node } from 'slate'
+import { Ancestor, Editor, Node, RangeRef } from 'slate'
 import { Key } from './key'
 import { TextInsertion } from '../components/android/diff-text'
 
@@ -35,6 +35,8 @@ export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_ON_COMPOSITION_END: WeakMap<Editor, boolean> = new WeakMap()
+
+export const EDITOR_TO_USER_SELECTION: WeakMap<Editor, RangeRef> = new WeakMap()
 
 /**
  * Weak maps for saving text on composition stage.
