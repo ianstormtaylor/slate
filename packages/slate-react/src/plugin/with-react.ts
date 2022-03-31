@@ -7,6 +7,7 @@ import {
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
   NODE_TO_KEY,
+  EDITOR_TO_USER_SELECTION,
 } from '../utils/weak-maps'
 import {
   isDOMText,
@@ -71,6 +72,13 @@ export const withReact = <T extends Editor>(editor: T) => {
       case 'set_node':
       case 'split_node': {
         matches.push(...getMatches(e, op.path))
+        break
+      }
+
+      case 'set_selection': {
+        // Selection was manually set, don't restore the user selection after the change.
+        EDITOR_TO_USER_SELECTION.get(editor)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(editor)
         break
       }
 
