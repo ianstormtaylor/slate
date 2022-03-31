@@ -9,6 +9,7 @@ import {
   SlateSelectorContext,
 } from '../hooks/use-slate-selector'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
+import { IS_REACT_ABOVE_VERSION_17 } from '../utils/environment'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 /**
@@ -70,16 +71,20 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    document.addEventListener('focus', fn, true)
-    return () => document.removeEventListener('focus', fn, true)
-  }, [])
-
-  useIsomorphicLayoutEffect(() => {
-    const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    document.addEventListener('blur', fn, true)
-    return () => {
-      document.removeEventListener('focus', fn, true)
-      document.removeEventListener('blur', fn, true)
+    if (IS_REACT_ABOVE_VERSION_17) {
+      document.addEventListener('focusin', fn)
+      document.addEventListener('focusout', fn)
+      return () => {
+        document.removeEventListener('focusin', fn)
+        document.removeEventListener('focusout', fn)
+      }
+    } else {
+      document.addEventListener('focus', fn, true)
+      document.addEventListener('blur', fn, true)
+      return () => {
+        document.removeEventListener('focus', fn, true)
+        document.removeEventListener('blur', fn, true)
+      }
     }
   }, [])
 
