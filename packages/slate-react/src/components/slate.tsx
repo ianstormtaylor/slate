@@ -9,7 +9,7 @@ import {
   SlateSelectorContext,
 } from '../hooks/use-slate-selector'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
-import { IS_REACT_ABOVE_VERSION_17 } from '../utils/environment'
+import { IS_REACT_VERSION_17_OR_ABOVE } from '../utils/environment'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 /**
@@ -71,7 +71,7 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    if (IS_REACT_ABOVE_VERSION_17) {
+    if (IS_REACT_VERSION_17_OR_ABOVE) {
       document.addEventListener('focusin', fn)
       document.addEventListener('focusout', fn)
       return () => {
