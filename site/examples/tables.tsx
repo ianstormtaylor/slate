@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
   Editor,
@@ -11,7 +11,6 @@ import {
 import { withHistory } from 'slate-history'
 
 const TablesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -19,7 +18,7 @@ const TablesExample = () => {
     []
   )
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
     </Slate>
   )

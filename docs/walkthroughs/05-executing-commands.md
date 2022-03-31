@@ -11,14 +11,15 @@ Let's see how this works.
 We'll start with our app from earlier:
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -34,7 +35,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -117,14 +118,15 @@ const CustomEditor = {
   },
 }
 
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -140,7 +142,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -173,14 +175,15 @@ const App = () => {
 Now our commands are clearly defined and you can invoke them from anywhere we have access to our `editor` object. For example, from hypothetical toolbar buttons:
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -197,7 +200,7 @@ const App = () => {
 
   return (
     // Add a toolbar with buttons that call the same methods.
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <div>
         <button
           onMouseDown={event => {

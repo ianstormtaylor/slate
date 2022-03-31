@@ -15,7 +15,6 @@ const HOTKEYS = {
 }
 
 const IFrameExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(
     ({ attributes, children }) => <p {...attributes}>{children}</p>,
     []
@@ -26,7 +25,7 @@ const IFrameExample = () => {
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />

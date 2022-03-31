@@ -15,7 +15,6 @@ import { MentionElement } from './custom-types'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
@@ -73,9 +72,8 @@ const MentionExample = () => {
   return (
     <Slate
       editor={editor}
-      value={value}
-      onChange={value => {
-        setValue(value)
+      value={initialValue}
+      onChange={() => {
         const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {

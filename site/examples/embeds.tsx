@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import {
   Transforms,
   createEditor,
@@ -14,10 +14,9 @@ import {
 } from 'slate-react'
 
 const EmbedsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."

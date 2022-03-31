@@ -7,26 +7,27 @@ In this guide, we'll show you how to add custom formatting options, like **bold*
 So we start with our app from earlier:
 
 ```jsx
-const renderElement = (props) => {
+const renderElement = props => {
   switch (props.element.type) {
     case 'code':
       return <CodeElement {...props} />
     default:
       return <DefaultElement {...props} />
   }
-})
+}
+
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
 
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -52,14 +53,15 @@ const App = () => {
 And now, we'll edit the `onKeyDown` handler to make it so that when you press `control-B`, it will add a `bold` format to the currently selected text:
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -71,7 +73,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={value}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -137,14 +139,15 @@ Pretty familiar, right?
 And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor.
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   const renderElement = useCallback(props => {
     switch (props.element.type) {
@@ -161,7 +164,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         // Pass in the `renderLeaf` function.

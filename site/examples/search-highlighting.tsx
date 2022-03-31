@@ -7,7 +7,6 @@ import { withHistory } from 'slate-history'
 import { Icon, Toolbar } from '../components'
 
 const SearchHighlightingExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [search, setSearch] = useState<string | undefined>()
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
@@ -38,7 +37,7 @@ const SearchHighlightingExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Toolbar>
         <div
           className={css`
