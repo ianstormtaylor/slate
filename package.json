@@ -36,7 +36,8 @@
     "test:jest": "jest --config jest.config.js",
     "watch": "yarn build:rollup --watch",
     "cypress:run": "cypress run",
-    "cypress:open": "cypress open"
+    "cypress:open": "cypress open",
+    "cypress:open-ct": "cypress open-ct"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -54,6 +55,8 @@
     "@babel/runtime": "^7.7.4",
     "@changesets/changelog-github": "^0.3.0",
     "@changesets/cli": "^2.14.1",
+    "@cypress/react": "^5.12.4",
+    "@cypress/webpack-dev-server": "^1.8.4",
     "@emotion/css": "^11.7.1",
     "@testing-library/cypress": "^8.0.0",
     "@types/jest": "27.0.1",
@@ -68,7 +71,7 @@
     "babel-jest": "27.0.6",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
-    "cypress": "^8.3.0",
+    "cypress": "^9.5.3",
     "eslint": "^6.7.1",
     "eslint-config-prettier": "^6.7.0",
     "eslint-plugin-import": "^2.18.2",
