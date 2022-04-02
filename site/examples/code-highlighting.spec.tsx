@@ -1,9 +1,12 @@
+import { mount } from '@cypress/react'
+import Editor from './code-highlighting'
+
 describe('code highlighting', () => {
   const slateEditor = '[data-slate-node="element"]'
   const leafNode = 'span[data-slate-leaf="true"]'
 
   beforeEach(() => {
-    cy.visit('examples/code-highlighting')
+    mount(<Editor />)
   })
 
   it('highlights HTML tags', () => {

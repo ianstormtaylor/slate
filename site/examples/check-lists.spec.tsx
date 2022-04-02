@@ -1,9 +1,9 @@
+import { mount } from '@cypress/react'
+import Editor from './check-lists'
 describe('Check-lists example', () => {
-  beforeEach(() => {
-    cy.visit('examples/check-lists')
-  })
-
   it('checks the bullet when clicked', () => {
+    mount(<Editor />)
+
     const slateNodeElement = 'div[data-slate-node="element"]'
 
     cy.get(slateNodeElement).should('have.length', 6)
