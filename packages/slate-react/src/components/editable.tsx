@@ -8,6 +8,7 @@ import {
   Text,
   Transforms,
   Path,
+  RangeRef,
 } from 'slate'
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
@@ -51,6 +52,7 @@ import {
   IS_FOCUSED,
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
+  EDITOR_TO_USER_SELECTION,
 } from '../utils/weak-maps'
 
 type DeferredOperation = () => void
@@ -399,7 +401,14 @@ export const Editable = (props: EditableProps) => {
             })
 
             if (!selection || !Range.equals(selection, range)) {
+              const selectionRef =
+                editor.selection && Editor.rangeRef(editor, editor.selection)
+
               Transforms.select(editor, range)
+
+              if (selectionRef) {
+                EDITOR_TO_USER_SELECTION.set(editor, selectionRef)
+              }
             }
           }
         }
@@ -522,6 +531,17 @@ export const Editable = (props: EditableProps) => {
 
             break
           }
+        }
+
+        // Restore the actual user section if nothing manually set it.
+        const toRestore = EDITOR_TO_USER_SELECTION.get(editor)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(editor)
+
+        if (
+          toRestore &&
+          (!editor.selection || !Range.equals(editor.selection, toRestore))
+        ) {
+          Transforms.select(editor, toRestore)
         }
       }
     },
@@ -1393,23 +1413,6 @@ const defaultScrollSelectionIntoView = (
     })
     delete leafEl.getBoundingClientRect
   }
-}
-
-/**
- * Check if two DOM range objects are equal.
- */
-
-export const isRangeEqual = (a: DOMRange, b: DOMRange) => {
-  return (
-    (a.startContainer === b.startContainer &&
-      a.startOffset === b.startOffset &&
-      a.endContainer === b.endContainer &&
-      a.endOffset === b.endOffset) ||
-    (a.startContainer === b.endContainer &&
-      a.startOffset === b.endOffset &&
-      a.endContainer === b.startContainer &&
-      a.endOffset === b.startOffset)
-  )
 }
 
 /**
