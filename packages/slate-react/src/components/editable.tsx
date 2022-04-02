@@ -759,8 +759,8 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-
-                if (event.detail === 3 && readOnly) {
+                const TRIPLE_CLICK = 3
+                if (event.detail === TRIPLE_CLICK && readOnly) {
                   const start = Editor.start(editor, [path[0]])
                   const end = Editor.end(editor, [path[0]])
                   const range = Editor.range(editor, start, end)
