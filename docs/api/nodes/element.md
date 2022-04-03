@@ -35,11 +35,11 @@ In a not "void" element, Slate handles the rendering of its `children` (e.g. in 
 
 Void Elements must
 
-- must always have one empty child text node (so selection works)
-- must render using the `attributes` and `children`, so their outermost HTML element **can't** be an HTML void element.
-- must set `contentEditable={false}` for Firefox
+- always have one empty child text node (for selection)
+- render using `attributes` and `children` (so, their outermost HTML element **can't** be an HTML void element)
+- set `contentEditable={false}` (for Firefox)
 
-The rendering code will typically resemble this `thematic-break` (horizontal rule) element:
+Typical rendering code will resemble this `thematic-break` (horizontal rule) element:
 
 ```javascript
 return (
