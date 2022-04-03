@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
 import {
   Editor,
@@ -14,11 +14,10 @@ import { withHistory } from 'slate-history'
 import { Button, Icon, Menu, Portal } from '../components'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}

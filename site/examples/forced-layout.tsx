@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import {
   Transforms,
@@ -64,14 +64,13 @@ const withLayout = editor => {
 }
 
 const ForcedLayoutExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),
     []
   )
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         placeholder="Enter a title…"

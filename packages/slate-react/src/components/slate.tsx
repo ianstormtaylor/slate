@@ -20,7 +20,7 @@ export const Slate = (props: {
   editor: ReactEditor
   value: Descendant[]
   children: React.ReactNode
-  onChange: (value: Descendant[]) => void
+  onChange?: (value: Descendant[]) => void
 }) => {
   const { editor, children, onChange, value, ...rest } = props
   const unmountRef = useRef(false)
@@ -48,7 +48,10 @@ export const Slate = (props: {
   } = getSelectorContext(editor)
 
   const onContextChange = useCallback(() => {
-    onChange(editor.children)
+    if (onChange) {
+      onChange(editor.children)
+    }
+
     setContext([editor])
     handleSelectorChange(editor)
   }, [onChange])

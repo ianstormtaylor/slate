@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Transforms, createEditor, Descendant } from 'slate'
@@ -18,14 +18,13 @@ import { Button, Icon, Toolbar } from '../components'
 import { ImageElement } from './custom-types'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Toolbar>
         <InsertImageButton />
       </Toolbar>

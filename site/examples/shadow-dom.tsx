@@ -1,5 +1,5 @@
 import ReactDOM from 'react-dom'
-import React, { useState, useMemo, useRef, useEffect } from 'react'
+import React, { useMemo, useRef, useEffect } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
@@ -28,11 +28,10 @@ const ShadowDOM = () => {
 }
 
 const ShadowEditor = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable placeholder="Enter some plain text..." />
     </Slate>
   )

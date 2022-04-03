@@ -7,17 +7,18 @@ In this guide, we'll show you how to add logic to save your Slate content to a d
 Let's start with a basic editor:
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable />
     </Slate>
   )
@@ -31,22 +32,21 @@ What we need to do is save the changes you make somewhere. For this example, we'
 So, in our `onChange` handler, we need to save the `value` if anything besides the selection was changed:
 
 ```jsx
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState([
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ])
 
   return (
     <Slate
       editor={editor}
-      value={value}
+      value={initialValue}
       onChange={value => {
-        setValue(value)
-
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
         )
@@ -71,21 +71,21 @@ But... if you refresh the page, everything is still reset. That's because we nee
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   // Update the initial content to be pulled from Local Storage if it exists.
-  const [value, setValue] = useState(
+  const initialValue = useMemo(
     JSON.parse(localStorage.getItem('content')) || [
       {
         type: 'paragraph',
         children: [{ text: 'A line of text in a paragraph.' }],
       },
-    ]
+    ],
+    []
   )
 
   return (
     <Slate
       editor={editor}
-      value={value}
+      value={initialValue}
       onChange={value => {
-        setValue(value)
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
         )
@@ -136,16 +136,16 @@ const deserialize = string => {
 const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   // Use our deserializing function to read the data from Local Storage.
-  const [value, setValue] = useState(
-    deserialize(localStorage.getItem('content')) || ''
+  const initialValue = useMemo(
+    deserialize(localStorage.getItem('content')) || '',
+    []
   )
 
   return (
     <Slate
       editor={editor}
-      value={value}
+      value={initialValue}
       onChange={value => {
-        setValue(value)
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
         )
@@ -167,7 +167,7 @@ You can emulate this strategy for any format you like. You can serialize to HTML
 
 > 🤖 Note that even though you _can_ serialize your content however you like, there are tradeoffs. The serialization process has a cost itself, and certain formats may be harder to work with than others. In general we recommend writing your own format only if your use case has a specific need for it. Otherwise, you're often better leaving the data in the format Slate uses.
 
-If you want to update the editor's content in response to events from outside of slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `setValue(newValue)` in the example above). Alternatively, you can use slate's internal operations to transform the value, for example:
+If you want to update the editor's content in response to events from outside of slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `editor.onChange()` in the example above). Alternatively, you can use slate's internal operations to transform the value, for example:
 
 ```javascript
   /**

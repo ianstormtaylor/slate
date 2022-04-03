@@ -1,12 +1,11 @@
-import React, { useState, useMemo } from 'react'
-import { createEditor, Descendant, Element } from 'slate'
+import React, { useMemo } from 'react'
+import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const ReadOnlyExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <Editable readOnly placeholder="Enter some plain text..." />
     </Slate>
   )

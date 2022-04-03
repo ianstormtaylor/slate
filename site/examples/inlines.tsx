@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import isUrl from 'is-url'
 import { isKeyHotkey } from 'is-hotkey'
 import { css } from '@emotion/css'
@@ -61,7 +61,6 @@ const initialValue: Descendant[] = [
   },
 ]
 const InlinesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withInlines(withHistory(withReact(createEditor()))),
     []
@@ -92,11 +91,7 @@ const InlinesExample = () => {
   }
 
   return (
-    <SlateReact.Slate
-      editor={editor}
-      value={value}
-      onChange={value => setValue(value)}
-    >
+    <SlateReact.Slate editor={editor} value={initialValue}>
       <Toolbar>
         <AddLinkButton />
         <RemoveLinkButton />

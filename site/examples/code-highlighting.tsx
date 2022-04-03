@@ -10,7 +10,6 @@ import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 
 const CodeHighlightingExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [language, setLanguage] = useState('html')
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -46,7 +45,7 @@ const CodeHighlightingExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} value={initialValue}>
       <div
         contentEditable={false}
         style={{ position: 'relative', top: '5px', right: '5px' }}
