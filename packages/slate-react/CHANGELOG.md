@@ -1,5 +1,19 @@
 # slate-react
 
+## 0.76.1
+
+### Patch Changes
+
+- [#4923](https://github.com/ianstormtaylor/slate/pull/4923) [`08d5a12c`](https://github.com/ianstormtaylor/slate/commit/08d5a12c9131c715ba75d3cc6f87108f8e6a8f59) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Call keyDown handler while composing
+
+* [#4920](https://github.com/ianstormtaylor/slate/pull/4920) [`f6b7ca1f`](https://github.com/ianstormtaylor/slate/commit/f6b7ca1f97bcc9e6136ab6ba6c7e9bcb1c4fd9bb) Thanks [@adri1wald](https://github.com/adri1wald)! - fix useFocused hook in react >= 17
+
+- [#4914](https://github.com/ianstormtaylor/slate/pull/4914) [`aff67312`](https://github.com/ianstormtaylor/slate/commit/aff67312cbfa7e45df5cf6abcaec9f4f7d5f1a89) Thanks [@sennpang](https://github.com/sennpang)! - Fixed Triple click selection and copy&paste in read-only mode
+
+* [#4919](https://github.com/ianstormtaylor/slate/pull/4919) [`7de7cdcf`](https://github.com/ianstormtaylor/slate/commit/7de7cdcf5625d44dbb2dc9faf52675374e51499f) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Restore user selection after applying beforeinput with target range
+
+- [#4922](https://github.com/ianstormtaylor/slate/pull/4922) [`9892cf0f`](https://github.com/ianstormtaylor/slate/commit/9892cf0ffbd741cc2880d1f0bd0d7c1b36145bbd) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Make Slate component onChange optional
+
 ## 0.76.0
 
 ### Minor Changes

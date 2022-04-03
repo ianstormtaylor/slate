@@ -1,5 +1,11 @@
 # slate
 
+## 0.76.1
+
+### Patch Changes
+
+- [#4914](https://github.com/ianstormtaylor/slate/pull/4914) [`aff67312`](https://github.com/ianstormtaylor/slate/commit/aff67312cbfa7e45df5cf6abcaec9f4f7d5f1a89) Thanks [@sennpang](https://github.com/sennpang)! - Fixed Triple click selection and copy&paste in read-only mode
+
 ## 0.76.0
 
 ### Minor Changes
