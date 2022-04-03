@@ -35,7 +35,7 @@ declare module 'slate' {
 
 ## Annotations in the Editor
 
-Annotate `useState` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
+Annotate `initialValue` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
 
 ```tsx
 import React, { useMemo, useState } from 'react'
@@ -49,10 +49,11 @@ const App = () => {
       children: [{ text: 'A line of text in a paragraph.' }],
     },
   ]
+
   const editor = useMemo(() => withReact(createEditor()), [])
-  const [value, setValue] = useState<Descendant[]>(initialValue)
+
   return (
-    <Slate editor={editor} value={value} onChange={setValue}>
+    <Slate editor={editor} value={initialValue}>
       <Editable />
     </Slate>
   )

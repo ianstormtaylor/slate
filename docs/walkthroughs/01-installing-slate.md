@@ -95,7 +95,6 @@ const initialValue = []
 
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
-  const [value, setValue] = useState([])
   return (
     // Add the editable component inside the context.
     <Slate editor={editor} value={initialValue}>
@@ -122,7 +121,6 @@ const initialValue = [
 
 const App = () => {
   const [editor] = useState(() => withReact(createEditor())
-  const [value, setValue] = useState()
 
   return (
     <Slate editor={editor} value={initialValue}>

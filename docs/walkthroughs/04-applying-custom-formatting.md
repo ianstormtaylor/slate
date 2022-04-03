@@ -73,7 +73,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={value}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
