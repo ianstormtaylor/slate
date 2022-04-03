@@ -116,7 +116,7 @@ Elements default to being non-void, meaning that their children are fully editab
 
 > 🤖 This is a concept borrowed from the HTML spec, see [Void Elements](https://www.w3.org/TR/2011/WD-html-markup-20110405/syntax.html#void-element).
 
-You can define which elements are treated as void by overriding the `editor.isVoid` function. \(By default it always returns `false`.\)
+You can define which elements are treated as void by overriding the `editor.isVoid` function. \(By default it always returns `false`.\) See [Rendering Void Elements](../api/nodes/element.md#rendering-void-elements) for implementation details.
 
 ## `Text`
 
@@ -138,4 +138,4 @@ const text = {
 ```
 
 Text nodes too can contain any custom properties you want, and that's how you implement custom formatting like **bold**, _italic_, `code`, etc.
-These custom properties are sometimes called [marks](../api/nodes/editor#mark-methods).
+These custom properties are sometimes called [marks](../api/nodes/editor.md#mark-methods).

@@ -11,6 +11,7 @@ interface Element {
 - [Behavior Types](element.md#element-behavior-types)
   - [Block vs. Inline](element.md#block-vs-inline)
   - [Void vs Not Void](element.md#void-vs-not-void)
+    - [Rendering Void Elements](element.md#rendering-void-elements)
 - [Static methods](element.md#static-methods)
   - [Retrieval methods](element.md#retrieval-methods)
   - [Check methods](element.md#check-methods)
@@ -29,6 +30,25 @@ A "block" element can only be siblings with other "block" elements. An "inline" 
 ### Void vs Not Void
 
 In a not "void" element, Slate handles the rendering of its `children` (e.g. in a paragraph where the `Text` and `Inline` children are rendered by Slate). In a "void" element, the `children` are rendered by the `Element`'s render code.
+
+#### Rendering Void Elements
+
+Void Elements must
+
+- must always have one empty child text node (so selection works)
+- must render using the `attributes` and `children`, so their outermost HTML element **can't** be an HTML void element.
+- must set `contentEditable={false}` for Firefox
+
+The rendering code will typically resemble this `thematic-break` (horizontal rule) element:
+
+```javascript
+return (
+  <div {...attributes} contentEditable={false}>
+    {children}
+    <hr />
+  </div>
+)
+```
 
 ## Static methods
 
