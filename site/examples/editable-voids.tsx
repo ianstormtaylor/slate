@@ -9,14 +9,13 @@ import { Button, Icon, Toolbar } from '../components'
 import { EditableVoidElement } from './custom-types'
 
 const EditableVoidsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={setValue}>
+    <Slate editor={editor} value={initialValue}>
       <Toolbar>
         <InsertEditableVoidButton />
       </Toolbar>
