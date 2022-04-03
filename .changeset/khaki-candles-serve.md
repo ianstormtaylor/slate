@@ -1,5 +1,5 @@
 ---
-"slate-react": patch
+'slate-react': patch
 "slate": patch
 ---
 
