@@ -1,3 +1,8 @@
+import React from 'react'
+
+export const IS_REACT_VERSION_17_OR_ABOVE =
+  parseInt(React.version.split('.')[0], 10) >= 17
+
 export const IS_IOS =
   typeof navigator !== 'undefined' &&
   typeof window !== 'undefined' &&
