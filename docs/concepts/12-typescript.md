@@ -35,21 +35,21 @@ declare module 'slate' {
 
 ## Annotations in the Editor
 
-Annotate `initialValue` w/ `<Descendant[]>` and the editor's initial value w/ your custom Element type.
+Annotate the editor's initial value w/ `Descendant[]`.
 
 ```tsx
 import React, { useMemo, useState } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
-const App = () => {
-  const initialValue: Descendant[] = [
-    {
-      type: 'paragraph',
-      children: [{ text: 'A line of text in a paragraph.' }],
-    },
-  ]
+const initialValue: Descendant[] = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
 
+const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
 
   return (
