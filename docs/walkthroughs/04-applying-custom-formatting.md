@@ -33,7 +33,6 @@ const App = () => {
         onKeyDown={event => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
-            const { selection } = editor
             const [match] = Editor.nodes(editor, {
               match: n => n.type === 'code',
             })
