@@ -1,8 +1,11 @@
+import { mount } from '@cypress/react'
+import Editor from './embeds'
+
 describe('embeds example', () => {
   const slateEditor = 'div[data-slate-editor="true"]'
 
   beforeEach(() => {
-    cy.visit('examples/embeds')
+    mount(<Editor />)
   })
 
   it('contains embeded', () => {

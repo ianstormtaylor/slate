@@ -1,6 +1,10 @@
-describe('paste html example', () => {
-  beforeEach(() => cy.visit('examples/paste-html'))
+import { mount } from '@cypress/react'
+import Editor from './paste-html'
 
+describe('paste html example', () => {
+  beforeEach(() => mount(<Editor />))
+
+  const slateEditor = 'div[data-slate-editor="true"]'
   const createHtmlPasteEvent = (htmlContent: string) =>
     Object.assign(new Event('paste', { bubbles: true, cancelable: true }), {
       clipboardData: {
@@ -11,7 +15,7 @@ describe('paste html example', () => {
 
   const cyNewPasteHtml = (htmlContent: string) =>
     cy
-      .findByRole('textbox')
+      .get(slateEditor)
       .type('{selectall}')
       .trigger('paste', createHtmlPasteEvent(htmlContent))
 

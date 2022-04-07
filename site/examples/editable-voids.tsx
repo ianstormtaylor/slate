@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Descendant } from 'slate'
-import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
-
-import RichTextEditor from './richtext'
+import React, { useMemo, useState } from 'react'
+import { createEditor, Descendant, Transforms } from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, Slate, useSlateStatic, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from '../components'
 import { EditableVoidElement } from './custom-types'
+import RichTextEditor from './richtext'
+
 
 const EditableVoidsExample = () => {
   const editor = useMemo(
@@ -120,6 +120,7 @@ const InsertEditableVoidButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
+      data-testid="add-editable-void-button"
       onMouseDown={event => {
         event.preventDefault()
         insertEditableVoid(editor)

@@ -1,11 +1,14 @@
+import { mount } from '@cypress/react'
+import Editor from './forced-layout'
+
 describe('forced layout example', () => {
   const elements = [
-    { tag: '#__next h2', count: 1 },
-    { tag: '#__next p', count: 1 },
+    { tag: 'h2', count: 1 },
+    { tag: 'p', count: 1 },
   ]
 
   beforeEach(() => {
-    cy.visit('examples/forced-layout')
+    mount(<Editor />)
   })
 
   it('checks for the elements', () => {
@@ -16,12 +19,14 @@ describe('forced layout example', () => {
 
   it('checks if elements persist even after everything is deleted', () => {
     // clear the textbox
-    cy.get('div[role="textbox"]')
+    cy.get('[role="textbox"]')
       .type(`{selectall}`)
-      .clear()
+      .clear().then(() => {
+        elements.forEach(({ tag, count }) => {
+          cy.get(tag).should('have.length', count)
+        })
+      })
 
-    elements.forEach(({ tag, count }) => {
-      cy.get(tag).should('have.length', count)
-    })
+
   })
 })

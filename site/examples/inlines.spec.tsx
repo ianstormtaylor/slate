@@ -1,10 +1,13 @@
+import { mount } from '@cypress/react'
+import Editor from './inlines'
+
 describe('Inlines example', () => {
   beforeEach(() => {
-    cy.visit('examples/inlines')
+    mount(<Editor />)
   })
 
   it('contains link', () => {
-    cy.findByRole('textbox')
+    cy.get('div[role="textbox"]')
       .find('a')
       .should('contain.text', 'hyperlink')
   })

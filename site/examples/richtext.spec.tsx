@@ -1,8 +1,12 @@
-describe('On richtext example', () => {
-  beforeEach(() => cy.visit('examples/richtext'))
+import { mount } from '@cypress/react'
+import Editor from './richtext'
 
+describe('On richtext example', () => {
+  beforeEach(() => mount(<Editor />))
+
+  const slateEditor = 'div[data-slate-editor="true"]'
   it('renders rich text', () => {
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .get('strong')
       .should('contain.text', 'rich')
       .get('blockquote')
@@ -10,7 +14,7 @@ describe('On richtext example', () => {
   })
 
   it('inserts text when typed', () => {
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .type('{movetostart}')
       .type('Hello World')
       .should('contain.text', 'Hello World')

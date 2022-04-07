@@ -1,10 +1,13 @@
+import { mount } from '@cypress/react'
+import Editor from './tables'
+
 describe('table example', () => {
   beforeEach(() => {
-    cy.visit('examples/tables')
+    mount(<Editor />)
   })
 
   it('table tag rendered', () => {
-    cy.findByRole('textbox')
+    cy.get('[data-slate-editor="true"]')
       .get('table')
       .should('exist')
   })

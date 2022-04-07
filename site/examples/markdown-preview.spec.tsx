@@ -1,9 +1,12 @@
+import { mount } from '@cypress/react'
+import Editor from './markdown-preview'
+
 describe('markdown preview', () => {
   const slateEditor = 'div[data-slate-editor="true"]'
   const markdown = 'span[data-slate-string="true"]'
 
   beforeEach(() => {
-    cy.visit('examples/markdown-preview')
+    mount(<Editor />)
   })
 
   it('checks for markdown', () => {

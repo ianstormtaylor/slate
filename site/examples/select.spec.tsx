@@ -1,3 +1,6 @@
+import { mount } from '@cypress/react'
+import Editor from './richtext'
+
 describe('selection', () => {
   // Currently, testing color property always yields rgb() value, even when stored
   // as hex.
@@ -30,6 +33,7 @@ describe('selection', () => {
 
     expect(tempColor).to.equal(targetColor)
   }
+
   Cypress.Commands.overwrite(
     'should',
     (originalFn, subject, expectation, ...args) => {
@@ -46,7 +50,8 @@ describe('selection', () => {
     }
   )
   const slateEditor = '[data-slate-node="element"]'
-  beforeEach(() => cy.visit('examples/richtext'))
+  beforeEach(() => mount(<Editor />))
+
   it('select the correct block when triple clicking', () => {
     // triple clicking the second block (paragraph) shouldn't highlight the
     // quote button

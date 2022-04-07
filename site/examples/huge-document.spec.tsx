@@ -1,11 +1,14 @@
+import { mount } from '@cypress/react'
+import Editor from './huge-document'
+
 describe('huge document example', () => {
   const elements = [
-    { tag: '#__next h1', count: 100 },
-    { tag: '#__next p', count: 700 },
+    { tag: 'h1', count: 100 },
+    { tag: 'p', count: 700 },
   ]
 
   beforeEach(() => {
-    cy.visit('examples/huge-document')
+    mount(<Editor />)
   })
 
   it('contains image', () => {

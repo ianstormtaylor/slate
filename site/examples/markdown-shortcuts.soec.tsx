@@ -1,20 +1,24 @@
+import { mount } from '@cypress/react'
+import Editor from './markdown-shortcuts'
+
 describe('On markdown-shortcuts example', () => {
+  const slateEditor = 'div[data-slate-editor="true"]'
   beforeEach(() => {
-    cy.visit('examples/markdown-shortcuts')
+    mount(<Editor />)
   })
 
   it('contains quote', () => {
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .find('blockquote')
       .should('contain.text', 'A wise quote.')
   })
 
   it('can add list items', () => {
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .find('ul')
       .should('not.exist')
 
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       // need wait() here otherwise the slate component is not fully mounted yet sometimes
       .wait(1000)
       .type(
@@ -37,15 +41,15 @@ describe('On markdown-shortcuts example', () => {
   })
 
   it('can add a h1 item', () => {
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .find('h1')
       .should('not.exist')
 
-    cy.findByRole('textbox').type('{enter}{leftarrow}# Heading')
+    cy.get(slateEditor).type('{enter}{leftarrow}# Heading')
 
     cy.get('h1').should('have.length', 1)
 
-    cy.findByRole('textbox')
+    cy.get(slateEditor)
       .find('h1')
       .should('contain.text', 'Heading')
   })

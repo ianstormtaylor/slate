@@ -1,4 +1,8 @@
+import { mount } from '@cypress/react'
+import Editor from './editable-voids'
+
 describe('editable voids', () => {
+
   const elements = [
     { tag: 'h4', count: 3 },
     { tag: 'input[type="text"]', count: 1 },
@@ -6,7 +10,7 @@ describe('editable voids', () => {
   ]
 
   beforeEach(() => {
-    cy.visit('examples/editable-voids')
+    mount(<Editor />)
   })
 
   it('checks for the elements', () => {
@@ -17,12 +21,13 @@ describe('editable voids', () => {
 
   it('should double the elements', () => {
     // click the `+` sign to duplicate the editable void
-    cy.get('span.material-icons')
-      .eq(1)
-      .click()
+    cy.get('[data-testid="add-editable-void-button"]')
+      .click().then(() => {
+        elements.forEach(({ tag, count }) => {
+          cy.get(tag).should('have.length', count * 2)
+        })
+      })
 
-    elements.forEach(({ tag, count }) => {
-      cy.get(tag).should('have.length', count * 2)
-    })
+
   })
 })

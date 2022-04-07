@@ -1,18 +1,21 @@
+import { mount } from '@cypress/react'
+import Editor from './hovering-toolbar'
+
 describe('hovering toolbar example', () => {
   beforeEach(() => {
-    cy.visit('examples/hovering-toolbar')
+    mount(<Editor />)
   })
 
+  let hoveringToolbar = '[data-testid="hovering-toolbar"]'
+
   it('hovering toolbar appears', () => {
-    cy.get('div')
-      .eq(12)
-      .should('not.exist')
+    cy.get(hoveringToolbar)
+      .should('not.be.visible')
 
     cy.get('span[data-slate-string="true"]')
       .eq(0)
       .type(`{selectall}`)
-      .get('div')
-      .eq(12)
+      .get(hoveringToolbar)
       .should('exist')
       .should('have.css', 'opacity', '1')
       .find('span.material-icons')
@@ -22,8 +25,7 @@ describe('hovering toolbar example', () => {
     cy.get('span[data-slate-string="true"]')
       .eq(0)
       .type(`{selectall}`)
-      .get('div')
-      .eq(12)
+      .get(hoveringToolbar)
       .should('exist')
       .get('span[data-slate-string="true"]')
       .eq(0)
@@ -31,8 +33,7 @@ describe('hovering toolbar example', () => {
       .get('div')
       .eq(0)
       .click({ force: true })
-      .get('div')
-      .eq(12)
+      .get(hoveringToolbar)
       .should('have.css', 'opacity', '0')
   })
 })

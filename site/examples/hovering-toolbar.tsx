@@ -1,17 +1,9 @@
-import React, { useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
-import {
-  Editor,
-  Transforms,
-  Text,
-  createEditor,
-  Descendant,
-  Range,
-} from 'slate'
-import { css } from '@emotion/css'
+import React, { useEffect, useMemo, useRef } from 'react'
+import { createEditor, Descendant, Editor, Range, Text, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
-
+import { Editable, Slate, useFocused, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Menu, Portal } from '../components'
+
 
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
@@ -108,6 +100,7 @@ const HoveringToolbar = () => {
   return (
     <Portal>
       <Menu
+        data-testid="hovering-toolbar"
         ref={ref}
         className={css`
           padding: 8px 7px 6px;

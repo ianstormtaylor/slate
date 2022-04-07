@@ -1,39 +1,28 @@
-import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
-import {
-  Editor,
-  Element,
-  NodeEntry,
-  Node,
-  Range,
-  Text,
-  Transforms,
-  Path,
-  RangeRef,
-} from 'slate'
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
+import { default as React, default as React, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
-
-import useChildren from '../hooks/use-children'
-import Hotkeys from '../utils/hotkeys'
 import {
-  HAS_BEFORE_INPUT_SUPPORT,
-  IS_IOS,
-  IS_CHROME,
-  IS_FIREFOX,
-  IS_FIREFOX_LEGACY,
-  IS_QQBROWSER,
-  IS_SAFARI,
-  IS_UC_MOBILE,
-  IS_WECHATBROWSER,
-  CAN_USE_DOM,
-} from '../utils/environment'
+  Editor,
+  Element,
+
+  Node, NodeEntry,
+
+
+
+
+  Path, Range,
+  Text,
+  Transforms
+} from 'slate'
 import { ReactEditor } from '..'
+import useChildren from '../hooks/use-children'
+import { DecorateContext } from '../hooks/use-decorate'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { DecorateContext } from '../hooks/use-decorate'
+import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
   DOMNode,
@@ -41,20 +30,48 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  isPlainTextOnlyPaste,
+  isPlainTextOnlyPaste
 } from '../utils/dom'
+import {
+  CAN_USE_DOM, HAS_BEFORE_INPUT_SUPPORT,
 
+  IS_CHROME,
+  IS_FIREFOX,
+  IS_FIREFOX_LEGACY, IS_IOS,
+
+
+
+  IS_QQBROWSER,
+  IS_SAFARI,
+  IS_UC_MOBILE,
+  IS_WECHATBROWSER
+} from '../utils/environment'
+import Hotkeys from '../utils/hotkeys'
 import {
   EDITOR_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-  IS_READ_ONLY,
+
+
+
+
+
+
+
+
+
+
+
+
+
+  EDITOR_TO_USER_SELECTION, EDITOR_TO_WINDOW, ELEMENT_TO_NODE,
+
+
+  IS_FOCUSED, IS_READ_ONLY,
   NODE_TO_ELEMENT,
-  IS_FOCUSED,
-  PLACEHOLDER_SYMBOL,
-  EDITOR_TO_WINDOW,
-  EDITOR_TO_USER_SELECTION,
+
+  PLACEHOLDER_SYMBOL
 } from '../utils/weak-maps'
-import { TRIPLE_CLICK } from '../utils/constants'
+
+
 
 type DeferredOperation = () => void
 
@@ -1083,7 +1100,7 @@ export const Editable = (props: EditableProps) => {
 
                 const element =
                   editor.children[
-                    selection !== null ? selection.focus.path[0] : 0
+                  selection !== null ? selection.focus.path[0] : 0
                   ]
                 const isRTL = getDirection(Node.string(element)) === 'rtl'
 

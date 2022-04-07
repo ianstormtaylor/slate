@@ -1,10 +1,13 @@
+import { mount } from '@cypress/react'
+import Editor from './images'
+
 describe('images example', () => {
   beforeEach(() => {
-    cy.visit('examples/images')
+    mount(<Editor />)
   })
 
   it('contains image', () => {
-    cy.findByRole('textbox')
+    cy.get('div[role="textbox"]')
       .find('img')
       .should('exist')
       .should('have.length', 2)

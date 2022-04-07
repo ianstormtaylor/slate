@@ -1,5 +1,8 @@
+import { mount } from '@cypress/react'
+import Editor from './custom-placeholder'
+
 describe('placeholder example', () => {
-  beforeEach(() => cy.visit('examples/custom-placeholder'))
+  beforeEach(() => mount(<Editor />))
 
   it('renders custom placeholder', () => {
     const placeholderElement = cy.get('[data-slate-placeholder=true]')
