@@ -1,18 +1,22 @@
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
-import { default as React, default as React, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  default as React,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
   Editor,
   Element,
-
-  Node, NodeEntry,
-
-
-
-
-  Path, Range,
+  Node,
+  NodeEntry,
+  Path,
+  Range,
   Text,
   Transforms
 } from 'slate'
@@ -33,14 +37,12 @@ import {
   isPlainTextOnlyPaste
 } from '../utils/dom'
 import {
-  CAN_USE_DOM, HAS_BEFORE_INPUT_SUPPORT,
-
+  CAN_USE_DOM,
+  HAS_BEFORE_INPUT_SUPPORT,
   IS_CHROME,
   IS_FIREFOX,
-  IS_FIREFOX_LEGACY, IS_IOS,
-
-
-
+  IS_FIREFOX_LEGACY,
+  IS_IOS,
   IS_QQBROWSER,
   IS_SAFARI,
   IS_UC_MOBILE,
@@ -49,29 +51,14 @@ import {
 import Hotkeys from '../utils/hotkeys'
 import {
   EDITOR_TO_ELEMENT,
-
-
-
-
-
-
-
-
-
-
-
-
-
-  EDITOR_TO_USER_SELECTION, EDITOR_TO_WINDOW, ELEMENT_TO_NODE,
-
-
-  IS_FOCUSED, IS_READ_ONLY,
+  EDITOR_TO_USER_SELECTION,
+  EDITOR_TO_WINDOW,
+  ELEMENT_TO_NODE,
+  IS_FOCUSED,
+  IS_READ_ONLY,
   NODE_TO_ELEMENT,
-
   PLACEHOLDER_SYMBOL
 } from '../utils/weak-maps'
-
-
 
 type DeferredOperation = () => void
 
