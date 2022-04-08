@@ -1,21 +1,14 @@
 import React from 'react'
+import { act, create, ReactTestRenderer } from 'react-test-renderer'
+import { createEditor, Element, NodeEntry, Range, Transforms } from 'slate'
 import {
-  createEditor,
-  NodeEntry,
-  Node,
-  Range,
-  Element,
-  Transforms,
-} from 'slate'
-import { create, act, ReactTestRenderer } from 'react-test-renderer'
-import {
-  Slate,
-  withReact,
   DefaultEditable,
-  RenderElementProps,
-  RenderLeafProps,
   DefaultElement,
   DefaultLeaf,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  withReact
 } from '../src'
 
 const createNodeMock = () => ({
@@ -36,7 +29,7 @@ describe('slate-react', () => {
 
         act(() => {
           el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
+            <Slate editor={editor} value={value} onChange={() => { }}>
               <DefaultEditable decorate={decorate} />
             </Slate>,
             { createNodeMock }
@@ -190,7 +183,7 @@ describe('slate-react', () => {
 
         act(() => {
           el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
+            <Slate editor={editor} value={value} onChange={() => { }}>
               <DefaultEditable
                 renderElement={({ element, children }) => {
                   React.useEffect(() => mounts(element), [])
@@ -224,7 +217,7 @@ describe('slate-react', () => {
 
         act(() => {
           el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
+            <Slate editor={editor} value={value} onChange={() => { }}>
               <DefaultEditable
                 renderElement={({ element, children }) => {
                   React.useEffect(() => mounts(element), [])
