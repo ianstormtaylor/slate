@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './search-highlighting'
 
 describe('search highlighting', () => {

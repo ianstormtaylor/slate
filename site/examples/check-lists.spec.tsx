@@ -1,5 +1,7 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './check-lists'
+
 describe('Check-lists example', () => {
   it('checks the bullet when clicked', () => {
     mount(<Editor />)

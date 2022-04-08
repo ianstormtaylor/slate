@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './forced-layout'
 
 describe('forced layout example', () => {
@@ -21,12 +22,11 @@ describe('forced layout example', () => {
     // clear the textbox
     cy.get('[role="textbox"]')
       .type(`{selectall}`)
-      .clear().then(() => {
+      .clear()
+      .then(() => {
         elements.forEach(({ tag, count }) => {
           cy.get(tag).should('have.length', count)
         })
       })
-
-
   })
 })

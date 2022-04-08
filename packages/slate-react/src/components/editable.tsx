@@ -7,7 +7,7 @@ import {
   useEffect,
   useMemo,
   useRef,
-  useState
+  useState,
 } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
@@ -18,7 +18,7 @@ import {
   Path,
   Range,
   Text,
-  Transforms
+  Transforms,
 } from 'slate'
 import { ReactEditor } from '..'
 import useChildren from '../hooks/use-children'
@@ -34,7 +34,7 @@ import {
   getDefaultView,
   isDOMElement,
   isDOMNode,
-  isPlainTextOnlyPaste
+  isPlainTextOnlyPaste,
 } from '../utils/dom'
 import {
   CAN_USE_DOM,
@@ -46,7 +46,7 @@ import {
   IS_QQBROWSER,
   IS_SAFARI,
   IS_UC_MOBILE,
-  IS_WECHATBROWSER
+  IS_WECHATBROWSER,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -57,7 +57,7 @@ import {
   IS_FOCUSED,
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
-  PLACEHOLDER_SYMBOL
+  PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 
 type DeferredOperation = () => void
@@ -1087,7 +1087,7 @@ export const Editable = (props: EditableProps) => {
 
                 const element =
                   editor.children[
-                  selection !== null ? selection.focus.path[0] : 0
+                    selection !== null ? selection.focus.path[0] : 0
                   ]
                 const isRTL = getDirection(Node.string(element)) === 'rtl'
 

@@ -7,7 +7,6 @@ import { Button, Icon, Toolbar } from '../components'
 import { EditableVoidElement } from './custom-types'
 import RichTextEditor from './richtext'
 
-
 const EditableVoidsExample = () => {
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),

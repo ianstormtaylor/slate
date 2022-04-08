@@ -1,10 +1,16 @@
 import { css } from '@emotion/css'
 import React, { useEffect, useMemo, useRef } from 'react'
-import { createEditor, Descendant, Editor, Range, Text, Transforms } from 'slate'
+import {
+  createEditor,
+  Descendant,
+  Editor,
+  Range,
+  Text,
+  Transforms,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, useFocused, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Menu, Portal } from '../components'
-
 
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])

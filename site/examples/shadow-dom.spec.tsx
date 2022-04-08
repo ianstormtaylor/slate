@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './shadow-dom'
 
 describe('shadow-dom example', () => {
@@ -8,7 +9,6 @@ describe('shadow-dom example', () => {
     const outerShadow = cy.get('[data-cy=outer-shadow-root]').shadow()
     const innerShadow = outerShadow.find('> div').shadow()
 
-    innerShadow.find('[role="textbox"]')
-      .should('exist')
+    innerShadow.find('[role="textbox"]').should('exist')
   })
 })

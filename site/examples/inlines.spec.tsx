@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './inlines'
 
 describe('Inlines example', () => {

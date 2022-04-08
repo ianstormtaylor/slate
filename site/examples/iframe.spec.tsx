@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './iframe'
 
 // Taken from https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
@@ -26,7 +27,8 @@ describe('iframe editor', () => {
   })
 
   it.only('should be editable', () => {
-    getIframeBody().find('[role="textbox"]')
+    getIframeBody()
+      .find('[role="textbox"]')
       .type('{movetostart}')
       .type('Hello World')
       .should('contain.text', 'Hello World')

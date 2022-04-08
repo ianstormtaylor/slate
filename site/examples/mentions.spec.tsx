@@ -1,4 +1,5 @@
 import { mount } from '@cypress/react'
+import React from 'react'
 import Editor from './mentions'
 
 describe('mentions example', () => {
@@ -7,9 +8,9 @@ describe('mentions example', () => {
 
   it('renders mention element', () => {
     cy.get(slateEditor)
-      .get("[data-cy=mention-R2-D2]")
+      .get('[data-cy=mention-R2-D2]')
       .should('exist')
-      .get("[data-cy=mention-Mace-Windu]")
+      .get('[data-cy=mention-Mace-Windu]')
       .should('exist')
   })
 
@@ -17,7 +18,7 @@ describe('mentions example', () => {
     cy.get(slateEditor)
       .type('{movetoend}')
       .type(' @ma')
-      .get("[data-cy=mentions-portal]")
+      .get('[data-cy=mentions-portal]')
       .should('exist')
   })
 
@@ -26,7 +27,7 @@ describe('mentions example', () => {
       .type('{movetoend}')
       .type(' @Ja')
       .type('{enter}')
-      .get("[data-cy=mention-Jabba]")
+      .get('[data-cy=mention-Jabba]')
       .should('exist')
   })
 })
