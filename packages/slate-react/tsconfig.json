@@ -3,7 +3,8 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./lib"
+    "outDir": "./lib",
+    "types": ["cypress"]
   },
   "references": [{ "path": "../slate" }]
 }

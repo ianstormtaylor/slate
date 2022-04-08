@@ -29,11 +29,10 @@
     "serve": "cd ./site && next",
     "start": "npm-run-all --parallel --print-label watch serve",
     "watch": "yarn build:rollup --watch",
-    "test": "yarn run test:unit && yarn run test:examples:run && yarn run test:jest",
-    "test:examples:run": "cd ./site && yarn cypress run-ct",
-    "test:examples:open": "cd ./site && yarn cypress open-ct",
-    "test:unit": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
-    "test:jest": "jest --config jest.config.js"
+    "test": "yarn run test:unit && yarn run test:ui",
+    "test:ui": "yarn cypress run-ct",
+    "test:ui:open": "yarn cypress open-ct",
+    "test:unit": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -55,7 +54,6 @@
     "@cypress/webpack-dev-server": "^1.3.0",
     "@emotion/css": "^11.7.1",
     "@testing-library/cypress": "^8.0.0",
-    "@types/jest": "27.0.1",
     "@types/lodash": "^4.14.149",
     "@types/mocha": "^5.2.7",
     "@types/node": "^16.11.26",
@@ -64,7 +62,6 @@
     "@typescript-eslint/eslint-plugin": "^2.9.0",
     "@typescript-eslint/parser": "^2.9.0",
     "babel-eslint": "^10.0.3",
-    "babel-jest": "27.0.6",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
     "cypress": "^9.5.3",
@@ -78,7 +75,6 @@
     "image-extensions": "^1.1.0",
     "is-hotkey": "^0.1.6",
     "is-url": "^1.2.2",
-    "jest": "27.0.6",
     "lerna": "^3.19.0",
     "lint-staged": ">=10",
     "lodash": "^4.17.4",
@@ -110,7 +106,6 @@
     "slate-hyperscript": "workspace:*",
     "slate-react": "workspace:*",
     "source-map-loader": "^0.2.4",
-    "ts-jest": "^27.1.3",
     "typescript": "3.9.7",
     "webpack-dev-server": "^3.11.2"
   },
