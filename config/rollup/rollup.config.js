@@ -13,7 +13,6 @@ import Hyperscript from '../../packages/slate-hyperscript/package.json'
 import React from '../../packages/slate-react/package.json'
 import Core from '../../packages/slate/package.json'
 
-
 /**
  * Return a Rollup configuration for a `pkg` with `env` and `target`.
  */
@@ -87,15 +86,15 @@ function configure(pkg, env, target) {
           isUmd
             ? { modules: false }
             : {
-              exclude: [
-                '@babel/plugin-transform-regenerator',
-                '@babel/transform-async-to-generator',
-              ],
-              modules: false,
-              targets: {
-                esmodules: isModule,
+                exclude: [
+                  '@babel/plugin-transform-regenerator',
+                  '@babel/transform-async-to-generator',
+                ],
+                modules: false,
+                targets: {
+                  esmodules: isModule,
+                },
               },
-            },
         ],
         '@babel/preset-react',
       ],
@@ -105,9 +104,9 @@ function configure(pkg, env, target) {
           isUmd
             ? {}
             : {
-              regenerator: false,
-              useESModules: isModule,
-            },
+                regenerator: false,
+                useESModules: isModule,
+              },
         ],
         '@babel/plugin-proposal-class-properties',
       ],
