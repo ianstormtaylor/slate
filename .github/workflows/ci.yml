@@ -12,7 +12,6 @@ jobs:
       matrix:
         command:
           - 'test'
-          - 'test:integration'
           - 'lint:eslint'
           - 'lint:prettier'
           - 'lint:typescript'
