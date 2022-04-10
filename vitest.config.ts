@@ -5,7 +5,6 @@ export default defineConfig({
     include: [
       './packages/{slate,slate-history,slate-hyperscript,slate-react}/test/**/*.test.{js,ts,tsx}',
     ],
-    global: true,
     environment: 'jsdom',
   },
 })
