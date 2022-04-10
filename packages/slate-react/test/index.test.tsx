@@ -17,6 +17,7 @@ import {
   DefaultElement,
   DefaultLeaf,
 } from '../src'
+import { vi } from 'vitest'
 
 const createNodeMock = () => ({
   ownerDocument: global.document,
@@ -30,7 +31,7 @@ describe('slate-react', () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: '' }] }]
 
-        const decorate = jest.fn<Range[], [NodeEntry]>(entry => [])
+        const decorate = vi.fn<Range[], [NodeEntry]>(entry => [])
 
         let el: ReactTestRenderer
 
@@ -55,13 +56,13 @@ describe('slate-react', () => {
         ]
 
         // initial render does not return
-        const decorate = jest.fn<Range[], [NodeEntry]>(() => [])
+        const decorate = vi.fn<Range[], [NodeEntry]>(() => [])
 
-        const renderElement = jest.fn<JSX.Element, [RenderElementProps]>(
+        const renderElement = vi.fn<JSX.Element, [RenderElementProps]>(
           DefaultElement
         )
 
-        const onChange = jest.fn<void, []>()
+        const onChange = vi.fn<void, []>()
 
         let el: ReactTestRenderer
 
@@ -120,7 +121,7 @@ describe('slate-react', () => {
           },
         ]
 
-        const decorate = jest.fn<Range[], [NodeEntry]>(([node]) => {
+        const decorate = vi.fn<Range[], [NodeEntry]>(([node]) => {
           if (node !== value[0]) {
             return []
           }
@@ -133,8 +134,8 @@ describe('slate-react', () => {
           ]
         })
 
-        const renderLeaf = jest.fn<JSX.Element, [RenderLeafProps]>(DefaultLeaf)
-        const onChange = jest.fn<void, []>()
+        const renderLeaf = vi.fn<JSX.Element, [RenderLeafProps]>(DefaultLeaf)
+        const onChange = vi.fn<void, []>()
         let el: ReactTestRenderer
 
         act(() => {
@@ -184,7 +185,7 @@ describe('slate-react', () => {
       it('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: 'test' }] }]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = vi.fn<void, [Element]>()
 
         let el: ReactTestRenderer
 
@@ -218,7 +219,7 @@ describe('slate-react', () => {
           { type: 'block', children: [{ text: 'te' }] },
           { type: 'block', children: [{ text: 'st' }] },
         ]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = vi.fn<void, [Element]>()
 
         let el: ReactTestRenderer
 
