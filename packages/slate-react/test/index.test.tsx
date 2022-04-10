@@ -17,7 +17,7 @@ import {
   DefaultElement,
   DefaultLeaf,
 } from '../src'
-import { vi } from 'vitest'
+import { vi, test, describe, expect } from 'vitest'
 
 const createNodeMock = () => ({
   ownerDocument: global.document,
@@ -27,7 +27,7 @@ const createNodeMock = () => ({
 describe('slate-react', () => {
   describe('Editable', () => {
     describe('decorate', () => {
-      it('should be called on all nodes in document', () => {
+      test('should be called on all nodes in document', () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: '' }] }]
 
@@ -47,7 +47,7 @@ describe('slate-react', () => {
         expect(decorate).toHaveBeenCalledTimes(3)
       })
 
-      it('should rerender the part of the tree that received an updated decoration', () => {
+      test('should rerender the part of the tree that received an updated decoration', () => {
         const editor = withReact(createEditor())
 
         const value = [
@@ -107,7 +107,7 @@ describe('slate-react', () => {
         expect(renderElement).toHaveBeenCalledTimes(3)
       })
 
-      it('should pass the intersecting part of decorations to nested elements', () => {
+      test('should pass the intersecting part of decorations to nested elements', () => {
         const editor = withReact(createEditor())
 
         const value = [
@@ -182,7 +182,7 @@ describe('slate-react', () => {
     })
 
     describe('NODE_TO_KEY logic', () => {
-      it('should not unmount the node that gets split on a split_node operation', async () => {
+      test('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: 'test' }] }]
         const mounts = vi.fn<void, [Element]>()
@@ -213,7 +213,7 @@ describe('slate-react', () => {
         expect(mounts).toHaveBeenCalledTimes(2)
       })
 
-      it('should not unmount the node that gets merged into on a merge_node operation', async () => {
+      test('should not unmount the node that gets merged into on a merge_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [
           { type: 'block', children: [{ text: 'te' }] },
