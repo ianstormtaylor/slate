@@ -26,7 +26,7 @@ export const IS_SAFARI =
 // "modern" Edge was released at 79.x
 export const IS_EDGE_LEGACY =
   typeof navigator !== 'undefined' &&
-  /Edge?\/(?:[0-6][0-9]|[0-7][0-8])(\.)/i.test(navigator.userAgent)
+  /Edge?\/(?:[0-6][0-9]|[0-7][0-8])(?:\.)/i.test(navigator.userAgent)
 
 export const IS_CHROME =
   typeof navigator !== 'undefined' && /Chrome/i.test(navigator.userAgent)
@@ -35,12 +35,12 @@ export const IS_CHROME =
 // and older, Chrome 76+ can use `beforeInput` though.
 export const IS_CHROME_LEGACY =
   typeof navigator !== 'undefined' &&
-  /Chrome?\/(?:[0-7][0-5]|[0-6][0-9])(\.)/i.test(navigator.userAgent)
+  /Chrome?\/(?:[0-7][0-5]|[0-6][0-9])(?:\.)/i.test(navigator.userAgent)
 
 // Firefox did not support `beforeInput` until `v87`.
 export const IS_FIREFOX_LEGACY =
   typeof navigator !== 'undefined' &&
-  /^(?!.*Seamonkey)(?=.*Firefox\/(?:[0-7][0-9]|[0-8][0-6])).*/i.test(
+  /^(?!.*Seamonkey)(?=.*Firefox\/(?:[0-7][0-9]|[0-8][0-6])(?:\.)).*/i.test(
     navigator.userAgent
   )
 
