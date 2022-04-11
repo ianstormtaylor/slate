@@ -1,9 +1,9 @@
-import assert from 'assert'
 import {
   codepointsIteratorRTL,
   getCharacterDistance,
   getWordDistance,
 } from '../../src/utils/string'
+import { describe, test, expect } from 'vitest'
 
 const codepoints = [
   ['a', 1],
@@ -108,32 +108,32 @@ dirs.forEach(dir => {
     codepoints.forEach(([str, ltrDist, rtlDist]) => {
       const dist = isRTL && rtlDist != null ? rtlDist : ltrDist
 
-      it(str, () => {
-        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      test(str, () => {
+        expect(getCharacterDistance(str + str, isRTL)).toEqual(dist)
       })
     })
 
     zwjSequences.forEach(([str, dist]) => {
-      it(str, () => {
-        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      test(str, () => {
+        expect(getCharacterDistance(str + str, isRTL)).toEqual(dist)
       })
     })
 
     regionalIndicatorSequences.forEach(str => {
-      it(str, () => {
-        assert.strictEqual(getCharacterDistance(str + str, isRTL), 4)
+      test(str, () => {
+        expect(getCharacterDistance(str + str, isRTL)).toEqual(4)
       })
     })
 
     keycapSequences.forEach(str => {
-      it(str, () => {
-        assert.strictEqual(getCharacterDistance(str + str, isRTL), 3)
+      test(str, () => {
+        expect(getCharacterDistance(str + str, isRTL)).toEqual(3)
       })
     })
 
     tagSequences.forEach(([str, dist]) => {
-      it(str, () => {
-        assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
+      test(str, () => {
+        expect(getCharacterDistance(str + str, isRTL)).toEqual(dist)
       })
     })
 
@@ -145,8 +145,8 @@ dirs.forEach(dir => {
         } else {
           str = strs.slice(i).join('')
         }
-        it(`Sample string ${label}, boundary ${isRTL ? i : i + 1}`, () => {
-          assert.strictEqual(getCharacterDistance(str, isRTL), strs[i].length)
+        test(`Sample string ${label}, boundary ${isRTL ? i : i + 1}`, () => {
+          expect(getCharacterDistance(str, isRTL)).toEqual(strs[i].length)
         })
       }
     })
@@ -171,16 +171,16 @@ const rtlCases = [
 
 describe(`getWordDistance - ltr`, () => {
   ltrCases.forEach(([str, dist]) => {
-    it(str, () => {
-      assert.strictEqual(getWordDistance(str), dist)
+    test(str, () => {
+      expect(getWordDistance(str)).toEqual(dist)
     })
   })
 })
 
 describe(`getWordDistance - rtl`, () => {
   rtlCases.forEach(([str, dist]) => {
-    it(str, () => {
-      assert.strictEqual(getWordDistance(str, true), dist)
+    test(str, () => {
+      expect(getWordDistance(str, true)).toEqual(dist)
     })
   })
 })
@@ -195,11 +195,11 @@ const cases = [
 
 describe('codepointsIteratorRTL', () => {
   cases.forEach(str => {
-    it(str, () => {
+    test(str, () => {
       const arr1 = [...codepointsIteratorRTL(str)]
       const arr2 = Array.from(str).reverse()
 
-      assert.deepStrictEqual(arr1, arr2)
+      expect(arr1).toEqual(arr2)
     })
   })
 })
