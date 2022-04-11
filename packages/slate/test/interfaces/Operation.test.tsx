@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Operation } from 'slate'
+import { Operation } from '../../src/interfaces/operation'
 
 describe.concurrent('Operation', () => {
   test('inverse-moveNode-backward-in-parent', () => {

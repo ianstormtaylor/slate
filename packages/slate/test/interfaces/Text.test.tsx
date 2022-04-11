@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Text } from 'slate'
+import { Text } from '../../src/interfaces/text'
 
 describe.concurrent('Text', () => {
   test('decorations-adjacent', () => {

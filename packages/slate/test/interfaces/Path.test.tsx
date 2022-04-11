@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Path } from 'slate'
+import { Path } from '../../src/interfaces/path'
 
 describe.concurrent('Path', () => {
   test('ancestors-reverse', () => {

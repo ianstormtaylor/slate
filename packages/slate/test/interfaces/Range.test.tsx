@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Range } from 'slate'
+import { Range } from '../../src/interfaces/range'
 
 describe.concurrent('Range', () => {
   test('edges-collapsed', () => {

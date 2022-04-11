@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Element } from 'slate'
+import { Element } from '../../src/interfaces/element'
 
 describe.concurrent('Element', () => {
   test('isElement-boolean', () => {

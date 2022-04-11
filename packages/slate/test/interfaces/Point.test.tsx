@@ -1,5 +1,5 @@
 import { test, expect, describe } from 'vitest'
-import { Point } from 'slate'
+import { Point } from '../../src/interfaces/point'
 
 describe.concurrent('Point', () => {
   test('compare-path-after-offset-after', () => {

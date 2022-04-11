@@ -1,6 +1,6 @@
 /** @jsx jsx  */
 import { test, expect, describe } from 'vitest'
-import { Node } from 'slate'
+import { Node } from '../../src/interfaces/node'
 import { jsx } from '../jsx'
 import { cloneDeep } from 'lodash'
 import { withTest } from '../with-test'
