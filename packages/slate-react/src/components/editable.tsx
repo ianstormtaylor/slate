@@ -765,6 +765,7 @@ export const Editable = (props: EditableProps) => {
                   const end = Editor.end(editor, [path[0]])
                   const range = Editor.range(editor, start, end)
                   setTimeout(() => {
+                    if (!ref.current) return
                     Transforms.select(editor, range)
                     Editor.unhangRange(editor, range)
                   }, 100)
