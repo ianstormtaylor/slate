@@ -171,14 +171,14 @@ const deserialize = (el, markAttributes = {}) => {
 
   const nodeAttributes = { ...markAttributes }
 
-  // define attibutes for text nodes
+  // define attributes for text nodes
   switch (el.nodeName) {
     case 'strong':
       nodeAttributes.bold = true
   }
 
   const children = Array.from(el.childNodes)
-    .map(node => deserialize(el, nodeAttributes))
+    .map(node => deserialize(node, nodeAttributes))
     .flat()
 
   if (children.length === 0) {
