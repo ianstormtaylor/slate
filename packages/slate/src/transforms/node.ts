@@ -12,6 +12,7 @@ import {
   Ancestor,
 } from '..'
 import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
+import { PointRef } from '../interfaces/point-ref'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -728,82 +729,85 @@ export const NodeTransforms: NodeTransforms = {
       const beforeRef = Editor.pointRef(editor, at, {
         affinity: 'backward',
       })
-      const [highest] = Editor.nodes(editor, { at, match, mode, voids })
+      let afterRef: PointRef | undefined
+      try {
+        const [highest] = Editor.nodes(editor, { at, match, mode, voids })
 
-      if (!highest) {
-        return
-      }
+        if (!highest) {
+          return
+        }
 
-      const voidMatch = Editor.void(editor, { at, mode: 'highest' })
-      const nudge = 0
+        const voidMatch = Editor.void(editor, { at, mode: 'highest' })
+        const nudge = 0
 
-      if (!voids && voidMatch) {
-        const [voidNode, voidPath] = voidMatch
+        if (!voids && voidMatch) {
+          const [voidNode, voidPath] = voidMatch
 
-        if (Element.isElement(voidNode) && editor.isInline(voidNode)) {
-          let after = Editor.after(editor, voidPath)
+          if (Element.isElement(voidNode) && editor.isInline(voidNode)) {
+            let after = Editor.after(editor, voidPath)
 
-          if (!after) {
-            const text = { text: '' }
-            const afterPath = Path.next(voidPath)
-            Transforms.insertNodes(editor, text, { at: afterPath, voids })
-            after = Editor.point(editor, afterPath)!
+            if (!after) {
+              const text = { text: '' }
+              const afterPath = Path.next(voidPath)
+              Transforms.insertNodes(editor, text, { at: afterPath, voids })
+              after = Editor.point(editor, afterPath)!
+            }
+
+            at = after
+            always = true
           }
 
-          at = after
+          const siblingHeight = at.path.length - voidPath.length
+          height = siblingHeight + 1
           always = true
         }
 
-        const siblingHeight = at.path.length - voidPath.length
-        height = siblingHeight + 1
-        always = true
-      }
+        afterRef = Editor.pointRef(editor, at)
+        const depth = at.path.length - height
+        const [, highestPath] = highest
+        const lowestPath = at.path.slice(0, depth)
+        let position = height === 0 ? at.offset : at.path[depth] + nudge
 
-      const afterRef = Editor.pointRef(editor, at)
-      const depth = at.path.length - height
-      const [, highestPath] = highest
-      const lowestPath = at.path.slice(0, depth)
-      let position = height === 0 ? at.offset : at.path[depth] + nudge
+        for (const [node, path] of Editor.levels(editor, {
+          at: lowestPath,
+          reverse: true,
+          voids,
+        })) {
+          let split = false
 
-      for (const [node, path] of Editor.levels(editor, {
-        at: lowestPath,
-        reverse: true,
-        voids,
-      })) {
-        let split = false
+          if (
+            path.length < highestPath.length ||
+            path.length === 0 ||
+            (!voids && Editor.isVoid(editor, node))
+          ) {
+            break
+          }
 
-        if (
-          path.length < highestPath.length ||
-          path.length === 0 ||
-          (!voids && Editor.isVoid(editor, node))
-        ) {
-          break
+          const point = beforeRef.current!
+          const isEnd = Editor.isEnd(editor, point, path)
+
+          if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
+            split = true
+            const properties = Node.extractProps(node)
+            editor.apply({
+              type: 'split_node',
+              path,
+              position,
+              properties,
+            })
+          }
+
+          position = path[path.length - 1] + (split || isEnd ? 1 : 0)
         }
 
-        const point = beforeRef.current!
-        const isEnd = Editor.isEnd(editor, point, path)
-
-        if (always || !beforeRef || !Editor.isEdge(editor, point, path)) {
-          split = true
-          const properties = Node.extractProps(node)
-          editor.apply({
-            type: 'split_node',
-            path,
-            position,
-            properties,
-          })
+        if (options.at == null) {
+          const point = afterRef.current || Editor.end(editor, [])
+          Transforms.select(editor, point)
         }
-
-        position = path[path.length - 1] + (split || isEnd ? 1 : 0)
+      } finally {
+        beforeRef.unref()
+        afterRef?.unref()
       }
-
-      if (options.at == null) {
-        const point = afterRef.current || Editor.end(editor, [])
-        Transforms.select(editor, point)
-      }
-
-      beforeRef.unref()
-      afterRef.unref()
     })
   },
 
