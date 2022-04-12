@@ -144,6 +144,7 @@ export const Editable = (props: EditableProps) => {
       hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
+      isTripleClick: false,
       latestElement: null as DOMElement | null,
     }),
     []
@@ -760,12 +761,15 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
+
+                state.isTripleClick = false
                 if (event.detail >= TRIPLE_CLICK && path.length) {
+                  state.isTripleClick = true
                   const start = Editor.start(editor, [path[0]])
                   const end = Editor.end(editor, [path[0]])
                   const range = Editor.range(editor, start, end)
                   setTimeout(() => {
-                    if (!ref.current) return
+                    if (!ref.current || !state.isTripleClick) return
                     Transforms.select(editor, range)
                     Editor.unhangRange(editor, range)
                   }, 100)
