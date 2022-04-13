@@ -760,7 +760,19 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                if (event.detail === TRIPLE_CLICK) {
+
+                // At this time, the Slate document may be arbitrarily different,
+                // because onClick handlers can change the document before we get here.
+                // Therefore we must check that this path actually exists,
+                // and that it still refers to the same node.
+                if (
+                  !Editor.hasPath(editor, path) ||
+                  Node.get(editor, path) !== node
+                ) {
+                  return
+                }
+
+                if (event.detail === TRIPLE_CLICK && path.length >= 1) {
                   const start = Editor.start(editor, [path[0]])
                   const end = Editor.end(editor, [path[0]])
                   const range = Editor.range(editor, start, end)
@@ -772,27 +784,18 @@ export const Editable = (props: EditableProps) => {
                   return
                 }
 
-                // At this time, the Slate document may be arbitrarily different,
-                // because onClick handlers can change the document before we get here.
-                // Therefore we must check that this path actually exists,
-                // and that it still refers to the same node.
-                if (Editor.hasPath(editor, path)) {
-                  const lookupNode = Node.get(editor, path)
-                  if (lookupNode === node) {
-                    const start = Editor.start(editor, path)
-                    const end = Editor.end(editor, path)
-                    const startVoid = Editor.void(editor, { at: start })
-                    const endVoid = Editor.void(editor, { at: end })
+                const start = Editor.start(editor, path)
+                const end = Editor.end(editor, path)
+                const startVoid = Editor.void(editor, { at: start })
+                const endVoid = Editor.void(editor, { at: end })
 
-                    if (
-                      startVoid &&
-                      endVoid &&
-                      Path.equals(startVoid[1], endVoid[1])
-                    ) {
-                      const range = Editor.range(editor, start)
-                      Transforms.select(editor, range)
-                    }
-                  }
+                if (
+                  startVoid &&
+                  endVoid &&
+                  Path.equals(startVoid[1], endVoid[1])
+                ) {
+                  const range = Editor.range(editor, start)
+                  Transforms.select(editor, range)
                 }
               }
             },
