@@ -1,5 +1,11 @@
 # slate
 
+## 0.77.0
+
+### Patch Changes
+
+- [#4939](https://github.com/ianstormtaylor/slate/pull/4939) [`c39c8082`](https://github.com/ianstormtaylor/slate/commit/c39c8082a97dec8fc9ba64568d817ba87e348b48) Thanks [@ahoisl](https://github.com/ahoisl)! - Fix pointRef leaks caused by not unref'ing
+
 ## 0.76.1
 
 ### Patch Changes
