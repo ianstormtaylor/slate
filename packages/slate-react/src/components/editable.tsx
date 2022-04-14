@@ -785,7 +785,6 @@ export const Editable = (props: EditableProps) => {
                   const start = Editor.start(editor, [path[0]])
                   const end = Editor.end(editor, [path[0]])
                   const range = Editor.range(editor, start, end)
-                  if (!ref.current) return
                   Transforms.select(editor, range)
                   return
                 }
