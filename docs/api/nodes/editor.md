@@ -35,6 +35,7 @@ interface Editor {
   - [Manipulation methods](editor.md#manipulation-methods)
   - [Check methods](editor.md#check-methods)
   - [Normalization methods](editor.md#normalization-methods)
+  - [Ref methods](editor.md#ref-methods)
 - [Instance methods](editor.md#instance-methods)
   - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
   - [Element Type Methods](editor.md/#element-type-methods)
@@ -161,31 +162,11 @@ Get the path of a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-#### `Editor.pathRef(editor: Editor, path: Path, options?) => PathRef`
-
-Create a mutable ref for a `Path` object, which will stay in sync as new operations are applied to the editor.
-
-Options: `{affinity?: 'backward' | 'forward' | null}`
-
-#### `Editor.pathRefs(editor: Editor) => Set<PathRef>`
-
-Get the set of currently tracked path refs of the editor.
-
 #### `Editor.point(editor: Editor, at: Location, options?) => Point`
 
 Get the start or end point of a location.
 
 Options: `{edge?: 'start' | 'end'}`
-
-#### `Editor.pointRef(editor: Editor, point: Point, options?) => PointRef`
-
-Create a mutable ref for a `Point` object, which will stay in sync as new operations are applied to the editor.
-
-Options: `{affinity?: 'backward' | 'forward' | null}`
-
-#### `Editor.pointRefs(editor: Editor) => Set<PointRef>`
-
-Get the set of currently tracked point refs of the editor.
 
 #### `Editor.positions(editor: Editor, options?) => Generator<Point, void, undefined>`
 
@@ -217,16 +198,6 @@ Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest'
 #### `Editor.range(editor: Editor, at: Location, to?: Location) => Range`
 
 Get a range of a location.
-
-#### `Editor.rangeRef(editor: Editor, range: Range, options?) => RangeRef`
-
-Create a mutable ref for a `Range` object, which will stay in sync as new operations are applied to the editor.
-
-Options: `{affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null}`
-
-#### `Editor.rangeRefs(editor: Editor) => Set<RangeRef>`
-
-Get the set of currently tracked range refs of the editor.
 
 #### `Editor.start(editor: Editor, at: Location) => Point`
 
@@ -375,6 +346,38 @@ Options: `{force?: boolean}`
 
 Call a function, deferring normalization until after it completes.
 See [Normalization - Implications for Other Code](./11-normalizing.md#implications-for-other-code);
+
+### Ref Methods
+
+#### `Editor.pathRef(editor: Editor, path: Path, options?) => PathRef`
+
+Create a mutable ref for a `Path` object, which will stay in sync as new operations are applied to the editor.
+
+Options: `{affinity?: 'backward' | 'forward' | null}`
+
+#### `Editor.pathRefs(editor: Editor) => Set<PathRef>`
+
+Get the set of currently tracked path refs of the editor.
+
+#### `Editor.pointRef(editor: Editor, point: Point, options?) => PointRef`
+
+Create a mutable ref for a `Point` object, which will stay in sync as new operations are applied to the editor.
+
+Options: `{affinity?: 'backward' | 'forward' | null}`
+
+#### `Editor.pointRefs(editor: Editor) => Set<PointRef>`
+
+Get the set of currently tracked point refs of the editor.
+
+#### `Editor.rangeRef(editor: Editor, range: Range, options?) => RangeRef`
+
+Create a mutable ref for a `Range` object, which will stay in sync as new operations are applied to the editor.
+
+Options: `{affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null}`
+
+#### `Editor.rangeRefs(editor: Editor) => Set<RangeRef>`
+
+Get the set of currently tracked range refs of the editor.
 
 ## Instance Methods
 

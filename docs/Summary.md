@@ -40,6 +40,7 @@
 - [Location Types](api/locations/README.md)
   - [Location](api/locations/location.md)
   - [Path](api/locations/path.md)
+  - [PathRef](api/locations/path-ref.md)
   - [Point](api/locations/point.md)
   - [PointEntry](api/locations/point-entry.md)
   - [PointRef](api/locations/point-ref.md)

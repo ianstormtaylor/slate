@@ -1,7 +1,6 @@
 # PathRef API
 
-`PathRef` objects keep a specific path in a document synced over time as new operations are applied to the editor. You can access their property `current` at any time for the up-to-date `Path` value.
-When you no longer need to track this location, call `unref()` to free the resources.
+`PathRef` objects keep a specific path in a document synced over time as new operations are applied to the editor. It is created using the `Editor.pathRef` method. You can access their property `current` at any time for the up-to-date `Path` value. When you no longer need to track this location, call `unref()` to free the resources. The `affinity` refers to the direction the `PathRef` will go when a user inserts content at the current position of the `Path`.
 
 ```typescript
 interface PathRef {
