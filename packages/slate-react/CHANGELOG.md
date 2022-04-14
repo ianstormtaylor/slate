@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.77.0
+
+### Minor Changes
+
+- [#4926](https://github.com/ianstormtaylor/slate/pull/4926) [`076ab9a6`](https://github.com/ianstormtaylor/slate/commit/076ab9a67a5d7bf54062e551e6c29b1464da7e99) Thanks [@Auralytical](https://github.com/Auralytical)! - Fix firefox three digit version check
+
+### Patch Changes
+
+- [#4944](https://github.com/ianstormtaylor/slate/pull/4944) [`486c385b`](https://github.com/ianstormtaylor/slate/commit/486c385bc52ae76890f67ee9e8965955a6de3f61) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix crash when tripple clicking editor root
+
 ## 0.76.1
 
 ### Patch Changes

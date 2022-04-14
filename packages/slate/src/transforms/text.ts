@@ -214,9 +214,9 @@ export const TextTransforms: TextTransforms = {
         })
       }
 
-      const point = reverse
-        ? startRef.unref() || endRef.unref()
-        : endRef.unref() || startRef.unref()
+      const startUnref = startRef.unref()
+      const endUnref = endRef.unref()
+      const point = reverse ? startUnref || endUnref : endUnref || startUnref
 
       if (options.at == null && point) {
         Transforms.select(editor, point)
