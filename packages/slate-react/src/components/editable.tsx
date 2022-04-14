@@ -303,7 +303,13 @@ export const Editable = (props: EditableProps) => {
             exactMatch: false,
             suppressThrow: false,
           })
-          Transforms.select(editor, range)
+
+          if (state.isTripleClick) {
+            state.isTripleClick = false
+            Editor.unhangRange(editor, range)
+          } else {
+            Transforms.select(editor, range)
+          }
         }
       }
     }, 100),
