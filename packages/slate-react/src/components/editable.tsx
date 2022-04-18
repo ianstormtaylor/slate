@@ -368,19 +368,20 @@ export const Editable = (props: EditableProps) => {
             native = false
           }
 
-          // Chrome also has issues correctly editing the end of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
-          // Therefore we don't allow native events to insert text at the end of nodes.
+          // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
+          // Therefore we don't allow native events to insert text at the end of anchor nodes.
           const { anchor } = selection
-          const inline = Editor.above(editor, {
-            at: anchor,
-            match: n => Editor.isInline(editor, n),
-            mode: 'highest',
-          })
-          if (inline) {
-            const [, inlinePath] = inline
+          if (Editor.isEnd(editor, anchor, anchor.path)) {
+            const [node] = ReactEditor.toDOMPoint(editor, selection.anchor)
+            const anchorNode = node.parentElement?.closest('a')
 
-            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-              native = false
+            if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
+              const node = ReactEditor.toSlateNode(editor, anchorNode)
+              const path = ReactEditor.findPath(editor, node)
+
+              if (Editor.isEnd(editor, anchor, path)) {
+                native = false
+              }
             }
           }
         }
