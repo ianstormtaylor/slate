@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.77.1
+
+### Patch Changes
+
+- [#4948](https://github.com/ianstormtaylor/slate/pull/4948) [`9957c214`](https://github.com/ianstormtaylor/slate/commit/9957c214357dbbd5492ec4761fd6e1c7b14310f5) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Prevent native insert at the end of anchor elements
+
 ## 0.77.0
 
 ### Minor Changes
