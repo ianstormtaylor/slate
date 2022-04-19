@@ -1341,6 +1341,9 @@ export const Editor: EditorInterface = {
         // then we will iterate over their content.
         if (!voids && editor.isVoid(node)) {
           yield Editor.start(editor, path)
+          // It's possible the start of the range we're iterating over is in a void, in which case
+          // we want to make sure we don't incorrectly yield the start of a subsequent text node for unit !== 'offset'
+          isNewBlock = false
           continue
         }
 
