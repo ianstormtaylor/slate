@@ -42,6 +42,7 @@ import {
   isDOMElement,
   isDOMNode,
   isPlainTextOnlyPaste,
+  DOMText,
 } from '../utils/dom'
 
 import {
@@ -371,17 +372,20 @@ export const Editable = (props: EditableProps) => {
           // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
           // Therefore we don't allow native events to insert text at the end of anchor nodes.
           const { anchor } = selection
-          if (Editor.isEnd(editor, anchor, anchor.path)) {
-            const [node] = ReactEditor.toDOMPoint(editor, selection.anchor)
-            const anchorNode = node.parentElement?.closest('a')
 
-            if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
-              const node = ReactEditor.toSlateNode(editor, anchorNode)
-              const path = ReactEditor.findPath(editor, node)
+          const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
+          const anchorNode = node.parentElement?.closest('a')
 
-              if (Editor.isEnd(editor, anchor, path)) {
-                native = false
-              }
+          if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
+            const { document } = ReactEditor.getWindow(editor)
+
+            // Find the last text node inside the anchor.
+            const lastText = document
+              .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
+              .lastChild() as DOMText | null
+
+            if (lastText === node && lastText.textContent?.length === offset) {
+              native = false
             }
           }
         }
