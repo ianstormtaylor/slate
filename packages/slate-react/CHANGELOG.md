@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.77.2
+
+### Patch Changes
+
+- [#4951](https://github.com/ianstormtaylor/slate/pull/4951) [`5b51e87d`](https://github.com/ianstormtaylor/slate/commit/5b51e87d511e3a8c05a679903650cb256f3bf044) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix double insert in anchor element decorations
+
 ## 0.77.1
 
 ### Patch Changes
