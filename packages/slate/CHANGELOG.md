@@ -1,5 +1,11 @@
 # slate
 
+## 0.77.2
+
+### Patch Changes
+
+- [#4952](https://github.com/ianstormtaylor/slate/pull/4952) [`9ce0a08c`](https://github.com/ianstormtaylor/slate/commit/9ce0a08c2a8b2b72df14141a06ca08825a66d472) Thanks [@steve-codaio](https://github.com/steve-codaio)! - Fix positions iteration when starting inside an inline void node
+
 ## 0.77.0
 
 ### Patch Changes
