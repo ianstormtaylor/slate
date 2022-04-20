@@ -390,10 +390,6 @@ export const Editable = (props: EditableProps) => {
           }
         }
 
-        if (!native) {
-          event.preventDefault()
-        }
-
         // COMPAT: For the deleting forward/backward input types we don't want
         // to change the selection because it is the range that will be deleted,
         // and those commands determine that for themselves.
@@ -407,6 +403,8 @@ export const Editable = (props: EditableProps) => {
             })
 
             if (!selection || !Range.equals(selection, range)) {
+              native = false
+
               const selectionRef =
                 editor.selection && Editor.rangeRef(editor, editor.selection)
 
@@ -417,6 +415,10 @@ export const Editable = (props: EditableProps) => {
               }
             }
           }
+        }
+
+        if (!native) {
+          event.preventDefault()
         }
 
         // COMPAT: If the selection is expanded, even if the command seems like
