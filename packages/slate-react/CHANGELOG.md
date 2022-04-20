@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.77.3
+
+### Patch Changes
+
+- [#4957](https://github.com/ianstormtaylor/slate/pull/4957) [`c1e3fbaa`](https://github.com/ianstormtaylor/slate/commit/c1e3fbaab969f2e78303f9ba00f26b88c575cdd1) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't treat events with non-selection target range as native
+
 ## 0.77.2
 
 ### Patch Changes
