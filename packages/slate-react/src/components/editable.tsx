@@ -780,9 +780,17 @@ export const Editable = (props: EditableProps) => {
                 }
 
                 if (event.detail === TRIPLE_CLICK && path.length >= 1) {
-                  const start = Editor.start(editor, [path[0]])
-                  const end = Editor.end(editor, [path[0]])
-                  const range = Editor.range(editor, start, end)
+                  let blockPath = path
+                  if (!Editor.isBlock(editor, node)) {
+                    const block = Editor.above(editor, {
+                      match: n => Editor.isBlock(editor, n),
+                      at: path,
+                    })
+
+                    blockPath = block?.[1] ?? path.slice(0, 1)
+                  }
+
+                  const range = Editor.range(editor, blockPath)
                   Transforms.select(editor, range)
                   return
                 }
