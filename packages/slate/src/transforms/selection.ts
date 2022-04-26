@@ -1,29 +1,30 @@
 import { Editor, Location, Point, Range, Transforms } from '..'
+import { SelectionEdge, MoveUnit } from '../interfaces/types'
+
+export interface SelectionCollapseOptions {
+  edge?: SelectionEdge
+}
+
+export interface SelectionMoveOptions {
+  distance?: number
+  unit?: MoveUnit
+  reverse?: boolean
+  edge?: SelectionEdge
+}
+
+export interface SelectionSetPointOptions {
+  edge?: SelectionEdge
+}
 
 export interface SelectionTransforms {
-  collapse: (
-    editor: Editor,
-    options?: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) => void
+  collapse: (editor: Editor, options?: SelectionCollapseOptions) => void
   deselect: (editor: Editor) => void
-  move: (
-    editor: Editor,
-    options?: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
-  ) => void
+  move: (editor: Editor, options?: SelectionMoveOptions) => void
   select: (editor: Editor, target: Location) => void
   setPoint: (
     editor: Editor,
     props: Partial<Point>,
-    options?: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    }
+    options?: SelectionSetPointOptions
   ) => void
   setSelection: (editor: Editor, props: Partial<Range>) => void
 }
@@ -33,12 +34,7 @@ export const SelectionTransforms: SelectionTransforms = {
    * Collapse the selection.
    */
 
-  collapse(
-    editor: Editor,
-    options: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    } = {}
-  ): void {
+  collapse(editor: Editor, options: SelectionCollapseOptions = {}): void {
     const { edge = 'anchor' } = options
     const { selection } = editor
 
@@ -77,15 +73,7 @@ export const SelectionTransforms: SelectionTransforms = {
    * Move the selection's point forward or backward.
    */
 
-  move(
-    editor: Editor,
-    options: {
-      distance?: number
-      unit?: 'offset' | 'character' | 'word' | 'line'
-      reverse?: boolean
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    } = {}
-  ): void {
+  move(editor: Editor, options: SelectionMoveOptions = {}): void {
     const { selection } = editor
     const { distance = 1, unit = 'character', reverse = false } = options
     let { edge = null } = options
@@ -164,9 +152,7 @@ export const SelectionTransforms: SelectionTransforms = {
   setPoint(
     editor: Editor,
     props: Partial<Point>,
-    options: {
-      edge?: 'anchor' | 'focus' | 'start' | 'end'
-    } = {}
+    options: SelectionSetPointOptions = {}
   ): void {
     const { selection } = editor
     let { edge = 'both' } = options

@@ -10,42 +10,68 @@ import { Element, ElementEntry } from './element'
 export type BaseNode = Editor | Element | Text
 export type Node = Editor | Element | Text
 
+export interface NodeAncestorsOptions {
+  reverse?: boolean
+}
+
+export interface NodeChildrenOptions {
+  reverse?: boolean
+}
+
+export interface NodeDescendantsOptions {
+  from?: Path
+  to?: Path
+  reverse?: boolean
+  pass?: (node: NodeEntry) => boolean
+}
+
+export interface NodeElementsOptions {
+  from?: Path
+  to?: Path
+  reverse?: boolean
+  pass?: (node: NodeEntry) => boolean
+}
+
+export interface NodeLevelsOptions {
+  reverse?: boolean
+}
+
+export interface NodeNodesOptions {
+  from?: Path
+  to?: Path
+  reverse?: boolean
+  pass?: (entry: NodeEntry) => boolean
+}
+
+export interface NodeTextsOptions {
+  from?: Path
+  to?: Path
+  reverse?: boolean
+  pass?: (node: NodeEntry) => boolean
+}
+
 export interface NodeInterface {
   ancestor: (root: Node, path: Path) => Ancestor
   ancestors: (
     root: Node,
     path: Path,
-    options?: {
-      reverse?: boolean
-    }
+    options?: NodeAncestorsOptions
   ) => Generator<NodeEntry<Ancestor>, void, undefined>
   child: (root: Node, index: number) => Descendant
   children: (
     root: Node,
     path: Path,
-    options?: {
-      reverse?: boolean
-    }
+    options?: NodeChildrenOptions
   ) => Generator<NodeEntry<Descendant>, void, undefined>
   common: (root: Node, path: Path, another: Path) => NodeEntry
   descendant: (root: Node, path: Path) => Descendant
   descendants: (
     root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
+    options?: NodeDescendantsOptions
   ) => Generator<NodeEntry<Descendant>, void, undefined>
   elements: (
     root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
+    options?: NodeElementsOptions
   ) => Generator<ElementEntry, void, undefined>
   extractProps: (node: Node) => NodeProps
   first: (root: Node, path: Path) => NodeEntry
@@ -59,30 +85,18 @@ export interface NodeInterface {
   levels: (
     root: Node,
     path: Path,
-    options?: {
-      reverse?: boolean
-    }
+    options?: NodeLevelsOptions
   ) => Generator<NodeEntry, void, undefined>
   matches: (node: Node, props: Partial<Node>) => boolean
   nodes: (
     root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
-    }
+    options?: NodeNodesOptions
   ) => Generator<NodeEntry, void, undefined>
   parent: (root: Node, path: Path) => Ancestor
   string: (node: Node) => string
   texts: (
     root: Node,
-    options?: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    }
+    options?: NodeTextsOptions
   ) => Generator<NodeEntry<Text>, void, undefined>
 }
 
@@ -115,9 +129,7 @@ export const Node: NodeInterface = {
   *ancestors(
     root: Node,
     path: Path,
-    options: {
-      reverse?: boolean
-    } = {}
+    options: NodeAncestorsOptions = {}
   ): Generator<NodeEntry<Ancestor>, void, undefined> {
     for (const p of Path.ancestors(path, options)) {
       const n = Node.ancestor(root, p)
@@ -157,9 +169,7 @@ export const Node: NodeInterface = {
   *children(
     root: Node,
     path: Path,
-    options: {
-      reverse?: boolean
-    } = {}
+    options: NodeChildrenOptions = {}
   ): Generator<NodeEntry<Descendant>, void, undefined> {
     const { reverse = false } = options
     const ancestor = Node.ancestor(root, path)
@@ -206,12 +216,7 @@ export const Node: NodeInterface = {
 
   *descendants(
     root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    } = {}
+    options: NodeDescendantsOptions = {}
   ): Generator<NodeEntry<Descendant>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (path.length !== 0) {
@@ -230,12 +235,7 @@ export const Node: NodeInterface = {
 
   *elements(
     root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    } = {}
+    options: NodeElementsOptions = {}
   ): Generator<ElementEntry, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Element.isElement(node)) {
@@ -445,9 +445,7 @@ export const Node: NodeInterface = {
   *levels(
     root: Node,
     path: Path,
-    options: {
-      reverse?: boolean
-    } = {}
+    options: NodeLevelsOptions = {}
   ): Generator<NodeEntry, void, undefined> {
     for (const p of Path.levels(path, options)) {
       const n = Node.get(root, p)
@@ -478,12 +476,7 @@ export const Node: NodeInterface = {
 
   *nodes(
     root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (entry: NodeEntry) => boolean
-    } = {}
+    options: NodeNodesOptions = {}
   ): Generator<NodeEntry, void, undefined> {
     const { pass, reverse = false } = options
     const { from = [], to } = options
@@ -589,12 +582,7 @@ export const Node: NodeInterface = {
 
   *texts(
     root: Node,
-    options: {
-      from?: Path
-      to?: Path
-      reverse?: boolean
-      pass?: (node: NodeEntry) => boolean
-    } = {}
+    options: NodeTextsOptions = {}
   ): Generator<NodeEntry<Text>, void, undefined> {
     for (const [node, path] of Node.nodes(root, options)) {
       if (Text.isText(node)) {
