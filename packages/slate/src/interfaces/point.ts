@@ -1,6 +1,7 @@
 import { isPlainObject } from 'is-plain-object'
 import { produce } from 'immer'
 import { ExtendedType, Operation, Path } from '..'
+import { TextDirection } from './types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -16,6 +17,10 @@ export interface BasePoint {
 
 export type Point = ExtendedType<'Point', BasePoint>
 
+export interface PointTransformOptions {
+  affinity?: TextDirection | null
+}
+
 export interface PointInterface {
   compare: (point: Point, another: Point) => -1 | 0 | 1
   isAfter: (point: Point, another: Point) => boolean
@@ -25,7 +30,7 @@ export interface PointInterface {
   transform: (
     point: Point,
     op: Operation,
-    options?: { affinity?: 'forward' | 'backward' | null }
+    options?: PointTransformOptions
   ) => Point | null
 }
 
@@ -93,7 +98,7 @@ export const Point: PointInterface = {
   transform(
     point: Point | null,
     op: Operation,
-    options: { affinity?: 'forward' | 'backward' | null } = {}
+    options: PointTransformOptions = {}
   ): Point | null {
     return produce(point, p => {
       if (p === null) {
