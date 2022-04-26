@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.77.4
+
+### Patch Changes
+
+- [#4965](https://github.com/ianstormtaylor/slate/pull/4965) [`a4536e2a`](https://github.com/ianstormtaylor/slate/commit/a4536e2aa2703d4c4460a54f87997ce76a722689) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix tripple click handling in nested blocks
+
 ## 0.77.3
 
 ### Patch Changes
