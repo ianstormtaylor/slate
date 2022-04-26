@@ -10,35 +10,39 @@ import {
   Range,
   Transforms,
 } from '..'
+import { TextUnit } from '../interfaces/types'
+
+export interface TextDeleteOptions {
+  at?: Location
+  distance?: number
+  unit?: TextUnit
+  reverse?: boolean
+  hanging?: boolean
+  voids?: boolean
+}
+
+export interface TextInsertFragmentOptions {
+  at?: Location
+  hanging?: boolean
+  voids?: boolean
+}
+
+export interface TextInsertTextOptions {
+  at?: Location
+  voids?: boolean
+}
 
 export interface TextTransforms {
-  delete: (
-    editor: Editor,
-    options?: {
-      at?: Location
-      distance?: number
-      unit?: 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
-      hanging?: boolean
-      voids?: boolean
-    }
-  ) => void
+  delete: (editor: Editor, options?: TextDeleteOptions) => void
   insertFragment: (
     editor: Editor,
     fragment: Node[],
-    options?: {
-      at?: Location
-      hanging?: boolean
-      voids?: boolean
-    }
+    options?: TextInsertFragmentOptions
   ) => void
   insertText: (
     editor: Editor,
     text: string,
-    options?: {
-      at?: Location
-      voids?: boolean
-    }
+    options?: TextInsertTextOptions
   ) => void
 }
 
@@ -47,17 +51,7 @@ export const TextTransforms: TextTransforms = {
    * Delete content in the editor.
    */
 
-  delete(
-    editor: Editor,
-    options: {
-      at?: Location
-      distance?: number
-      unit?: 'character' | 'word' | 'line' | 'block'
-      reverse?: boolean
-      hanging?: boolean
-      voids?: boolean
-    } = {}
-  ): void {
+  delete(editor: Editor, options: TextDeleteOptions = {}): void {
     Editor.withoutNormalizing(editor, () => {
       const {
         reverse = false,
@@ -231,11 +225,7 @@ export const TextTransforms: TextTransforms = {
   insertFragment(
     editor: Editor,
     fragment: Node[],
-    options: {
-      at?: Location
-      hanging?: boolean
-      voids?: boolean
-    } = {}
+    options: TextInsertFragmentOptions = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { hanging = false, voids = false } = options
@@ -462,10 +452,7 @@ export const TextTransforms: TextTransforms = {
   insertText(
     editor: Editor,
     text: string,
-    options: {
-      at?: Location
-      voids?: boolean
-    } = {}
+    options: TextInsertTextOptions = {}
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { voids = false } = options

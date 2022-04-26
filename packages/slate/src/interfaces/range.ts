@@ -1,6 +1,7 @@
 import { produce } from 'immer'
 import { isPlainObject } from 'is-plain-object'
 import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
+import { RangeDirection } from './types'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -15,13 +16,16 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
+export interface RangeEdgesOptions {
+  reverse?: boolean
+}
+
+export interface RangeTransformOptions {
+  affinity?: RangeDirection | null
+}
+
 export interface RangeInterface {
-  edges: (
-    range: Range,
-    options?: {
-      reverse?: boolean
-    }
-  ) => [Point, Point]
+  edges: (range: Range, options?: RangeEdgesOptions) => [Point, Point]
   end: (range: Range) => Point
   equals: (range: Range, another: Range) => boolean
   includes: (range: Range, target: Path | Point | Range) => boolean
@@ -36,9 +40,7 @@ export interface RangeInterface {
   transform: (
     range: Range,
     op: Operation,
-    options?: {
-      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
-    }
+    options?: RangeTransformOptions
   ) => Range | null
 }
 
@@ -48,12 +50,7 @@ export const Range: RangeInterface = {
    * in the document.
    */
 
-  edges(
-    range: Range,
-    options: {
-      reverse?: boolean
-    } = {}
-  ): [Point, Point] {
+  edges(range: Range, options: RangeEdgesOptions = {}): [Point, Point] {
     const { reverse = false } = options
     const { anchor, focus } = range
     return Range.isBackward(range) === reverse
@@ -209,9 +206,7 @@ export const Range: RangeInterface = {
   transform(
     range: Range | null,
     op: Operation,
-    options: {
-      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
-    } = {}
+    options: RangeTransformOptions = {}
   ): Range | null {
     return produce(range, r => {
       if (r === null) {
