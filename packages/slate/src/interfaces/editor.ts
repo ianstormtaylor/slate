@@ -15,6 +15,7 @@ import {
   RangeRef,
   Span,
   Text,
+  Transforms,
 } from '..'
 import {
   DIRTY_PATHS,
@@ -31,21 +32,10 @@ import {
 } from '../utils/string'
 import { Descendant } from './node'
 import { Element } from './element'
-import {
-  LeafEdge,
-  SelectionMode,
-  TextDirection,
-  TextUnit,
-  TextUnitAdjustment,
-  RangeDirection,
-  MaximizeMode,
-} from './types'
 
 export type BaseSelection = Range | null
 
 export type Selection = ExtendedType<'Selection', BaseSelection>
-
-export type EditorMarks = Omit<Text, 'text'>
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -56,7 +46,7 @@ export interface BaseEditor {
   children: Descendant[]
   selection: Selection
   operations: Operation[]
-  marks: EditorMarks | null
+  marks: Omit<Text, 'text'> | null
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
@@ -67,9 +57,9 @@ export interface BaseEditor {
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void
-  deleteBackward: (unit: TextUnit) => void
-  deleteForward: (unit: TextUnit) => void
-  deleteFragment: (direction?: TextDirection) => void
+  deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => void
+  deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
+  deleteFragment: (direction?: 'forward' | 'backward') => void
   getFragment: () => Descendant[]
   insertBreak: () => void
   insertSoftBreak: () => void
@@ -81,151 +71,52 @@ export interface BaseEditor {
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
 
-export interface EditorAboveOptions<T extends Ancestor> {
-  at?: Location
-  match?: NodeMatch<T>
-  mode?: MaximizeMode
-  voids?: boolean
-}
-
-export interface EditorAfterOptions {
-  distance?: number
-  unit?: TextUnitAdjustment
-  voids?: boolean
-}
-
-export interface EditorBeforeOptions {
-  distance?: number
-  unit?: TextUnitAdjustment
-  voids?: boolean
-}
-
-export interface EditorDirectedDeletionOptions {
-  unit?: TextUnit
-}
-
-export interface EditorFragmentDeletionOptions {
-  direction?: TextDirection
-}
-
-export interface EditorLeafOptions {
-  depth?: number
-  edge?: LeafEdge
-}
-
-export interface EditorLevelsOptions<T extends Node> {
-  at?: Location
-  match?: NodeMatch<T>
-  reverse?: boolean
-  voids?: boolean
-}
-
-export interface EditorNextOptions<T extends Descendant> {
-  at?: Location
-  match?: NodeMatch<T>
-  mode?: SelectionMode
-  voids?: boolean
-}
-
-export interface EditorNodeOptions {
-  depth?: number
-  edge?: LeafEdge
-}
-
-export interface EditorNodesOptions<T extends Node> {
-  at?: Location | Span
-  match?: NodeMatch<T>
-  mode?: SelectionMode
-  universal?: boolean
-  reverse?: boolean
-  voids?: boolean
-}
-
-export interface EditorNormalizeOptions {
-  force?: boolean
-}
-
-export interface EditorParentOptions {
-  depth?: number
-  edge?: LeafEdge
-}
-
-export interface EditorPathOptions {
-  depth?: number
-  edge?: LeafEdge
-}
-
-export interface EditorPathRefOptions {
-  affinity?: TextDirection | null
-}
-
-export interface EditorPointOptions {
-  edge?: LeafEdge
-}
-
-export interface EditorPointRefOptions {
-  affinity?: TextDirection | null
-}
-
-export interface EditorPositionsOptions {
-  at?: Location
-  unit?: TextUnitAdjustment
-  reverse?: boolean
-  voids?: boolean
-}
-
-export interface EditorPreviousOptions<T extends Node> {
-  at?: Location
-  match?: NodeMatch<T>
-  mode?: SelectionMode
-  voids?: boolean
-}
-
-export interface EditorRangeRefOptions {
-  affinity?: RangeDirection | null
-}
-
-export interface EditorStringOptions {
-  voids?: boolean
-}
-
-export interface EditorUnhangRangeOptions {
-  voids?: boolean
-}
-
-export interface EditorVoidOptions {
-  at?: Location
-  mode?: MaximizeMode
-  voids?: boolean
-}
-
 export interface EditorInterface {
   above: <T extends Ancestor>(
     editor: Editor,
-    options?: EditorAboveOptions<T>
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
   ) => NodeEntry<T> | undefined
   addMark: (editor: Editor, key: string, value: any) => void
   after: (
     editor: Editor,
     at: Location,
-    options?: EditorAfterOptions
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    }
   ) => Point | undefined
   before: (
     editor: Editor,
     at: Location,
-    options?: EditorBeforeOptions
+    options?: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    }
   ) => Point | undefined
   deleteBackward: (
     editor: Editor,
-    options?: EditorDirectedDeletionOptions
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
   ) => void
   deleteForward: (
     editor: Editor,
-    options?: EditorDirectedDeletionOptions
+    options?: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    }
   ) => void
   deleteFragment: (
     editor: Editor,
-    options?: EditorFragmentDeletionOptions
+    options?: {
+      direction?: 'forward' | 'backward'
+    }
   ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
   end: (editor: Editor, at: Location) => Point
@@ -253,55 +144,119 @@ export interface EditorInterface {
   leaf: (
     editor: Editor,
     at: Location,
-    options?: EditorLeafOptions
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
   ) => NodeEntry<Text>
   levels: <T extends Node>(
     editor: Editor,
-    options?: EditorLevelsOptions<T>
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      reverse?: boolean
+      voids?: boolean
+    }
   ) => Generator<NodeEntry<T>, void, undefined>
   marks: (editor: Editor) => Omit<Text, 'text'> | null
   next: <T extends Descendant>(
     editor: Editor,
-    options?: EditorNextOptions<T>
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
   ) => NodeEntry<T> | undefined
-  node: (editor: Editor, at: Location, options?: EditorNodeOptions) => NodeEntry
+  node: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => NodeEntry
   nodes: <T extends Node>(
     editor: Editor,
-    options?: EditorNodesOptions<T>
+    options?: {
+      at?: Location | Span
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
+      reverse?: boolean
+      voids?: boolean
+    }
   ) => Generator<NodeEntry<T>, void, undefined>
-  normalize: (editor: Editor, options?: EditorNormalizeOptions) => void
+  normalize: (
+    editor: Editor,
+    options?: {
+      force?: boolean
+    }
+  ) => void
   parent: (
     editor: Editor,
     at: Location,
-    options?: EditorParentOptions
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
   ) => NodeEntry<Ancestor>
-  path: (editor: Editor, at: Location, options?: EditorPathOptions) => Path
+  path: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      depth?: number
+      edge?: 'start' | 'end'
+    }
+  ) => Path
   pathRef: (
     editor: Editor,
     path: Path,
-    options?: EditorPathRefOptions
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
   ) => PathRef
   pathRefs: (editor: Editor) => Set<PathRef>
-  point: (editor: Editor, at: Location, options?: EditorPointOptions) => Point
+  point: (
+    editor: Editor,
+    at: Location,
+    options?: {
+      edge?: 'start' | 'end'
+    }
+  ) => Point
   pointRef: (
     editor: Editor,
     point: Point,
-    options?: EditorPointRefOptions
+    options?: {
+      affinity?: 'backward' | 'forward' | null
+    }
   ) => PointRef
   pointRefs: (editor: Editor) => Set<PointRef>
   positions: (
     editor: Editor,
-    options?: EditorPositionsOptions
+    options?: {
+      at?: Location
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+      voids?: boolean
+    }
   ) => Generator<Point, void, undefined>
   previous: <T extends Node>(
     editor: Editor,
-    options?: EditorPreviousOptions<T>
+    options?: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    }
   ) => NodeEntry<T> | undefined
   range: (editor: Editor, at: Location, to?: Location) => Range
   rangeRef: (
     editor: Editor,
     range: Range,
-    options?: EditorRangeRefOptions
+    options?: {
+      affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
+    }
   ) => RangeRef
   rangeRefs: (editor: Editor) => Set<RangeRef>
   removeMark: (editor: Editor, key: string) => void
@@ -310,16 +265,24 @@ export interface EditorInterface {
   string: (
     editor: Editor,
     at: Location,
-    options?: EditorStringOptions
+    options?: {
+      voids?: boolean
+    }
   ) => string
   unhangRange: (
     editor: Editor,
     range: Range,
-    options?: EditorUnhangRangeOptions
+    options?: {
+      voids?: boolean
+    }
   ) => Range
   void: (
     editor: Editor,
-    options?: EditorVoidOptions
+    options?: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    }
   ) => NodeEntry<Element> | undefined
   withoutNormalizing: (editor: Editor, fn: () => void) => void
 }
@@ -333,7 +296,12 @@ export const Editor: EditorInterface = {
 
   above<T extends Ancestor>(
     editor: Editor,
-    options: EditorAboveOptions<T> = {}
+    options: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
   ): NodeEntry<T> | undefined {
     const {
       voids = false,
@@ -379,7 +347,11 @@ export const Editor: EditorInterface = {
   after(
     editor: Editor,
     at: Location,
-    options: EditorAfterOptions = {}
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    } = {}
   ): Point | undefined {
     const anchor = Editor.point(editor, at, { edge: 'end' })
     const focus = Editor.end(editor, [])
@@ -413,7 +385,11 @@ export const Editor: EditorInterface = {
   before(
     editor: Editor,
     at: Location,
-    options: EditorBeforeOptions = {}
+    options: {
+      distance?: number
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      voids?: boolean
+    } = {}
   ): Point | undefined {
     const anchor = Editor.start(editor, [])
     const focus = Editor.point(editor, at, { edge: 'start' })
@@ -447,7 +423,9 @@ export const Editor: EditorInterface = {
 
   deleteBackward(
     editor: Editor,
-    options: EditorDirectedDeletionOptions = {}
+    options: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    } = {}
   ): void {
     const { unit = 'character' } = options
     editor.deleteBackward(unit)
@@ -459,7 +437,9 @@ export const Editor: EditorInterface = {
 
   deleteForward(
     editor: Editor,
-    options: EditorDirectedDeletionOptions = {}
+    options: {
+      unit?: 'character' | 'word' | 'line' | 'block'
+    } = {}
   ): void {
     const { unit = 'character' } = options
     editor.deleteForward(unit)
@@ -471,7 +451,9 @@ export const Editor: EditorInterface = {
 
   deleteFragment(
     editor: Editor,
-    options: EditorFragmentDeletionOptions = {}
+    options: {
+      direction?: 'forward' | 'backward'
+    } = {}
   ): void {
     const { direction = 'forward' } = options
     editor.deleteFragment(direction)
@@ -717,7 +699,10 @@ export const Editor: EditorInterface = {
   leaf(
     editor: Editor,
     at: Location,
-    options: EditorLeafOptions = {}
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    } = {}
   ): NodeEntry<Text> {
     const path = Editor.path(editor, at, options)
     const node = Node.leaf(editor, path)
@@ -730,7 +715,12 @@ export const Editor: EditorInterface = {
 
   *levels<T extends Node>(
     editor: Editor,
-    options: EditorLevelsOptions<T> = {}
+    options: {
+      at?: Location
+      match?: NodeMatch<T>
+      reverse?: boolean
+      voids?: boolean
+    } = {}
   ): Generator<NodeEntry<T>, void, undefined> {
     const { at = editor.selection, reverse = false, voids = false } = options
     let { match } = options
@@ -822,7 +812,12 @@ export const Editor: EditorInterface = {
 
   next<T extends Descendant>(
     editor: Editor,
-    options: EditorNextOptions<T> = {}
+    options: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
   ): NodeEntry<T> | undefined {
     const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
@@ -863,7 +858,10 @@ export const Editor: EditorInterface = {
   node(
     editor: Editor,
     at: Location,
-    options: EditorNodeOptions = {}
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    } = {}
   ): NodeEntry {
     const path = Editor.path(editor, at, options)
     const node = Node.get(editor, path)
@@ -876,7 +874,14 @@ export const Editor: EditorInterface = {
 
   *nodes<T extends Node>(
     editor: Editor,
-    options: EditorNodesOptions<T> = {}
+    options: {
+      at?: Location | Span
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      universal?: boolean
+      reverse?: boolean
+      voids?: boolean
+    } = {}
   ): Generator<NodeEntry<T>, void, undefined> {
     const {
       at = editor.selection,
@@ -977,7 +982,12 @@ export const Editor: EditorInterface = {
    * Normalize any dirty objects in the editor.
    */
 
-  normalize(editor: Editor, options: EditorNormalizeOptions = {}): void {
+  normalize(
+    editor: Editor,
+    options: {
+      force?: boolean
+    } = {}
+  ): void {
     const { force = false } = options
     const getDirtyPaths = (editor: Editor) => {
       return DIRTY_PATHS.get(editor) || []
@@ -1062,7 +1072,10 @@ export const Editor: EditorInterface = {
   parent(
     editor: Editor,
     at: Location,
-    options: EditorParentOptions = {}
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    } = {}
   ): NodeEntry<Ancestor> {
     const path = Editor.path(editor, at, options)
     const parentPath = Path.parent(path)
@@ -1074,7 +1087,14 @@ export const Editor: EditorInterface = {
    * Get the path of a location.
    */
 
-  path(editor: Editor, at: Location, options: EditorPathOptions = {}): Path {
+  path(
+    editor: Editor,
+    at: Location,
+    options: {
+      depth?: number
+      edge?: 'start' | 'end'
+    } = {}
+  ): Path {
     const { depth, edge } = options
 
     if (Path.isPath(at)) {
@@ -1120,7 +1140,9 @@ export const Editor: EditorInterface = {
   pathRef(
     editor: Editor,
     path: Path,
-    options: EditorPathRefOptions = {}
+    options: {
+      affinity?: 'backward' | 'forward' | null
+    } = {}
   ): PathRef {
     const { affinity = 'forward' } = options
     const ref: PathRef = {
@@ -1159,7 +1181,13 @@ export const Editor: EditorInterface = {
    * Get the start or end point of a location.
    */
 
-  point(editor: Editor, at: Location, options: EditorPointOptions = {}): Point {
+  point(
+    editor: Editor,
+    at: Location,
+    options: {
+      edge?: 'start' | 'end'
+    } = {}
+  ): Point {
     const { edge = 'start' } = options
 
     if (Path.isPath(at)) {
@@ -1200,7 +1228,9 @@ export const Editor: EditorInterface = {
   pointRef(
     editor: Editor,
     point: Point,
-    options: EditorPointRefOptions = {}
+    options: {
+      affinity?: 'backward' | 'forward' | null
+    } = {}
   ): PointRef {
     const { affinity = 'forward' } = options
     const ref: PointRef = {
@@ -1250,7 +1280,12 @@ export const Editor: EditorInterface = {
 
   *positions(
     editor: Editor,
-    options: EditorPositionsOptions = {}
+    options: {
+      at?: Location
+      unit?: 'offset' | 'character' | 'word' | 'line' | 'block'
+      reverse?: boolean
+      voids?: boolean
+    } = {}
   ): Generator<Point, void, undefined> {
     const {
       at = editor.selection,
@@ -1434,7 +1469,12 @@ export const Editor: EditorInterface = {
 
   previous<T extends Node>(
     editor: Editor,
-    options: EditorPreviousOptions<T> = {}
+    options: {
+      at?: Location
+      match?: NodeMatch<T>
+      mode?: 'all' | 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
   ): NodeEntry<T> | undefined {
     const { mode = 'lowest', voids = false } = options
     let { match, at = editor.selection } = options
@@ -1501,7 +1541,9 @@ export const Editor: EditorInterface = {
   rangeRef(
     editor: Editor,
     range: Range,
-    options: EditorRangeRefOptions = {}
+    options: {
+      affinity?: 'backward' | 'forward' | 'outward' | 'inward' | null
+    } = {}
   ): RangeRef {
     const { affinity = 'forward' } = options
     const ref: RangeRef = {
@@ -1576,7 +1618,9 @@ export const Editor: EditorInterface = {
   string(
     editor: Editor,
     at: Location,
-    options: EditorStringOptions = {}
+    options: {
+      voids?: boolean
+    } = {}
   ): string {
     const { voids = false } = options
     const range = Editor.range(editor, at)
@@ -1611,7 +1655,9 @@ export const Editor: EditorInterface = {
   unhangRange(
     editor: Editor,
     range: Range,
-    options: EditorUnhangRangeOptions = {}
+    options: {
+      voids?: boolean
+    } = {}
   ): Range {
     const { voids = false } = options
     let [start, end] = Range.edges(range)
@@ -1656,7 +1702,11 @@ export const Editor: EditorInterface = {
 
   void(
     editor: Editor,
-    options: EditorVoidOptions = {}
+    options: {
+      at?: Location
+      mode?: 'highest' | 'lowest'
+      voids?: boolean
+    } = {}
   ): NodeEntry<Element> | undefined {
     return Editor.above(editor, {
       ...options,
