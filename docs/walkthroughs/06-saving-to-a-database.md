@@ -72,12 +72,13 @@ const App = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   // Update the initial content to be pulled from Local Storage if it exists.
   const initialValue = useMemo(
-    () => JSON.parse(localStorage.getItem('content')) || [
-      {
-        type: 'paragraph',
-        children: [{ text: 'A line of text in a paragraph.' }],
-      },
-    ],
+    () =>
+      JSON.parse(localStorage.getItem('content')) || [
+        {
+          type: 'paragraph',
+          children: [{ text: 'A line of text in a paragraph.' }],
+        },
+      ],
     []
   )
 
