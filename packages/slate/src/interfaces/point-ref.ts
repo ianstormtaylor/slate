@@ -1,5 +1,4 @@
 import { Operation, Point } from '..'
-import { TextDirection } from './types'
 
 /**
  * `PointRef` objects keep a specific point in a document synced over time as new
@@ -9,7 +8,7 @@ import { TextDirection } from './types'
 
 export interface PointRef {
   current: Point | null
-  affinity: TextDirection | null
+  affinity: 'forward' | 'backward' | null
   unref(): Point | null
 }
 

@@ -14,7 +14,6 @@ import {
   Transforms,
 } from './'
 import { DIRTY_PATHS, DIRTY_PATH_KEYS, FLUSHING } from './utils/weak-maps'
-import { TextUnit } from './interfaces/types'
 
 /**
  * Create a new Slate `Editor` object.
@@ -122,7 +121,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteBackward: (unit: TextUnit) => {
+    deleteBackward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {
@@ -130,7 +129,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteForward: (unit: TextUnit) => {
+    deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {

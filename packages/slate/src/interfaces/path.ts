@@ -1,6 +1,5 @@
 import { produce } from 'immer'
 import { Operation } from '..'
-import { TextDirection } from './types'
 
 /**
  * `Path` arrays are a list of indexes that describe a node's exact position in
@@ -10,20 +9,8 @@ import { TextDirection } from './types'
 
 export type Path = number[]
 
-export interface PathAncestorsOptions {
-  reverse?: boolean
-}
-
-export interface PathLevelsOptions {
-  reverse?: boolean
-}
-
-export interface PathTransformOptions {
-  affinity?: TextDirection | null
-}
-
 export interface PathInterface {
-  ancestors: (path: Path, options?: PathAncestorsOptions) => Path[]
+  ancestors: (path: Path, options?: { reverse?: boolean }) => Path[]
   common: (path: Path, another: Path) => Path
   compare: (path: Path, another: Path) => -1 | 0 | 1
   endsAfter: (path: Path, another: Path) => boolean
@@ -40,7 +27,12 @@ export interface PathInterface {
   isParent: (path: Path, another: Path) => boolean
   isPath: (value: any) => value is Path
   isSibling: (path: Path, another: Path) => boolean
-  levels: (path: Path, options?: PathLevelsOptions) => Path[]
+  levels: (
+    path: Path,
+    options?: {
+      reverse?: boolean
+    }
+  ) => Path[]
   next: (path: Path) => Path
   operationCanTransformPath: (operation: Operation) => boolean
   parent: (path: Path) => Path
@@ -49,7 +41,7 @@ export interface PathInterface {
   transform: (
     path: Path,
     operation: Operation,
-    options?: PathTransformOptions
+    options?: { affinity?: 'forward' | 'backward' | null }
   ) => Path | null
 }
 
@@ -61,7 +53,7 @@ export const Path: PathInterface = {
    * `reverse: true` option is passed, they are reversed.
    */
 
-  ancestors(path: Path, options: PathAncestorsOptions = {}): Path[] {
+  ancestors(path: Path, options: { reverse?: boolean } = {}): Path[] {
     const { reverse = false } = options
     let paths = Path.levels(path, options)
 
@@ -265,7 +257,12 @@ export const Path: PathInterface = {
    * true` option is passed, they are reversed.
    */
 
-  levels(path: Path, options: PathLevelsOptions = {}): Path[] {
+  levels(
+    path: Path,
+    options: {
+      reverse?: boolean
+    } = {}
+  ): Path[] {
     const { reverse = false } = options
     const list: Path[] = []
 
@@ -370,7 +367,7 @@ export const Path: PathInterface = {
   transform(
     path: Path | null,
     operation: Operation,
-    options: PathTransformOptions = {}
+    options: { affinity?: 'forward' | 'backward' | null } = {}
   ): Path | null {
     return produce(path, p => {
       const { affinity = 'forward' } = options
