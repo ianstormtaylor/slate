@@ -1,5 +1,11 @@
 # slate
 
+## 0.78.0
+
+### Minor Changes
+
+- [#4974](https://github.com/ianstormtaylor/slate/pull/4974) [`3b7a1bf7`](https://github.com/ianstormtaylor/slate/commit/3b7a1bf72d0c3951416c771f7f149bfbda411111) Thanks [@dylans](https://github.com/dylans)! - Added types for options and common string literals, thanks @JoshuaKGoldberg
+
 ## 0.77.2
 
 ### Patch Changes

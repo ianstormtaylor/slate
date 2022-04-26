@@ -33,7 +33,7 @@
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",
-    "slate": "^0.77.2",
+    "slate": "^0.78.0",
     "slate-hyperscript": "^0.77.0",
     "source-map-loader": "^0.2.4"
   },
