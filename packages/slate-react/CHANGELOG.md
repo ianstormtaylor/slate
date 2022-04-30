@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.78.1
+
+### Patch Changes
+
+- [#4979](https://github.com/ianstormtaylor/slate/pull/4979) [`6afa9f6a`](https://github.com/ianstormtaylor/slate/commit/6afa9f6a719092368b92dc3342e21e44d457d77e) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Unset isComposing on keydown with isCompsing false
+
 ## 0.77.4
 
 ### Patch Changes
