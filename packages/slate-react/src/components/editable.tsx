@@ -1090,15 +1090,25 @@ export const Editable = (props: EditableProps) => {
           )}
           onKeyDown={useCallback(
             (event: React.KeyboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onKeyDown) &&
-                !state.isComposing
-              ) {
+              if (!readOnly && hasEditableTarget(editor, event.target)) {
                 const { nativeEvent } = event
-                const { selection } = editor
 
+                // COMPAT: The composition end event isn't fired reliably in all browsers,
+                // so we sometimes might end up stuck in a composition state even though we
+                // aren't composing any more.
+                if (state.isComposing && nativeEvent.isComposing === false) {
+                  state.isComposing = false
+                  setIsComposing(false)
+                }
+
+                if (
+                  isEventHandled(event, attributes.onKeyDown) ||
+                  state.isComposing
+                ) {
+                  return
+                }
+
+                const { selection } = editor
                 const element =
                   editor.children[
                     selection !== null ? selection.focus.path[0] : 0
