@@ -1,7 +1,6 @@
 import { ReactEditor } from '../../plugin/react-editor'
 import { Editor, Range, Transforms, Text } from 'slate'
 import {
-  IS_COMPOSING,
   IS_ON_COMPOSITION_END,
   EDITOR_ON_COMPOSITION_TEXT,
 } from '../../utils/weak-maps'
@@ -113,7 +112,7 @@ export class AndroidInputManager {
     // If it is in composing or after `onCompositionend`, set `EDITOR_ON_COMPOSITION_TEXT` and return.
     // Text will be inserted on compositionend event.
     if (
-      IS_COMPOSING.get(this.editor) ||
+      ReactEditor.isComposing(this.editor) ||
       IS_ON_COMPOSITION_END.get(this.editor)
     ) {
       EDITOR_ON_COMPOSITION_TEXT.set(this.editor, insertedText)
