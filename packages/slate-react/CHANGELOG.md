@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.79.0
+
+### Minor Changes
+
+- [#4981](https://github.com/ianstormtaylor/slate/pull/4981) [`cb8a5515`](https://github.com/ianstormtaylor/slate/commit/cb8a551508c023346fd3aa0af1a5a80ffd6a37cd) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Add `ReactEditor.isComposing(editor)` to get the current `isComposing` state
+
 ## 0.78.1
 
 ### Patch Changes
