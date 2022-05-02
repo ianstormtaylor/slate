@@ -104,6 +104,10 @@ Get the current editor object from the React context. A version of useSlate that
 
 A React and DOM-specific version of the `Editor` interface. All about translating between the DOM and Slate.
 
+### `isComposing(editor: ReactEditor)`
+
+Check if the user is currently composing inside the editor.
+
 ### `findKey(editor: ReactEditor, node: Node)`
 
 Find a key for a Slate node.

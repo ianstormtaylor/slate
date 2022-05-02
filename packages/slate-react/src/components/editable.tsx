@@ -54,6 +54,7 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_WINDOW,
   EDITOR_TO_USER_SELECTION,
+  IS_COMPOSING,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
 
@@ -141,7 +142,6 @@ export const Editable = (props: EditableProps) => {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
-      isComposing: false,
       hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
@@ -168,7 +168,11 @@ export const Editable = (props: EditableProps) => {
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
 
-    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
+    if (
+      ReactEditor.isComposing(editor) ||
+      !domSelection ||
+      !ReactEditor.isFocused(editor)
+    ) {
       return
     }
 
@@ -268,7 +272,7 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !state.isComposing &&
+        !ReactEditor.isComposing(editor) &&
         !state.isUpdatingSelection &&
         !state.isDraggingInternally
       ) {
@@ -516,8 +520,10 @@ export const Editable = (props: EditableProps) => {
               // then we will abort because we're still composing and the selection
               // won't be updated properly.
               // https://www.w3.org/TR/input-events-2/
-              state.isComposing && setIsComposing(false)
-              state.isComposing = false
+              if (ReactEditor.isComposing(editor)) {
+                setIsComposing(false)
+                IS_COMPOSING.set(editor, false)
+              }
             }
 
             // use a weak comparison instead of 'instanceof' to allow
@@ -674,7 +680,7 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target)
               ) {
                 event.preventDefault()
-                if (!state.isComposing) {
+                if (!ReactEditor.isComposing(editor)) {
                   const text = (event as any).data as string
                   Editor.insertText(editor, text)
                 }
@@ -822,8 +828,10 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionEnd)
               ) {
-                state.isComposing && setIsComposing(false)
-                state.isComposing = false
+                if (ReactEditor.isComposing(editor)) {
+                  setIsComposing(false)
+                  IS_COMPOSING.set(editor, false)
+                }
 
                 // COMPAT: In Chrome, `beforeinput` events for compositions
                 // aren't correct and never fire the "insertFromComposition"
@@ -867,8 +875,10 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionUpdate)
               ) {
-                !state.isComposing && setIsComposing(true)
-                state.isComposing = true
+                if (!ReactEditor.isComposing(editor)) {
+                  setIsComposing(true)
+                  IS_COMPOSING.set(editor, true)
+                }
               }
             },
             [attributes.onCompositionUpdate]
@@ -1096,14 +1106,17 @@ export const Editable = (props: EditableProps) => {
                 // COMPAT: The composition end event isn't fired reliably in all browsers,
                 // so we sometimes might end up stuck in a composition state even though we
                 // aren't composing any more.
-                if (state.isComposing && nativeEvent.isComposing === false) {
-                  state.isComposing = false
+                if (
+                  ReactEditor.isComposing(editor) &&
+                  nativeEvent.isComposing === false
+                ) {
+                  IS_COMPOSING.set(editor, false)
                   setIsComposing(false)
                 }
 
                 if (
                   isEventHandled(event, attributes.onKeyDown) ||
-                  state.isComposing
+                  ReactEditor.isComposing(editor)
                 ) {
                   return
                 }
