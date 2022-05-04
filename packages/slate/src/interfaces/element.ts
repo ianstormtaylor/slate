@@ -11,6 +11,8 @@ export interface BaseElement {
   children: Descendant[]
 }
 
+const IS_ELEMENT_CACHE = new WeakMap<object, boolean>()
+
 export type Element = ExtendedType<'Element', BaseElement>
 
 export interface ElementInterface {
@@ -30,11 +32,18 @@ export interface ElementInterface {
  * Shared the function with isElementType utility
  */
 const isElement = (value: any): value is Element => {
-  return (
-    isPlainObject(value) &&
-    Node.isNodeList(value.children) &&
-    !Editor.isEditor(value)
-  )
+  if (!isPlainObject(value)) {
+    return false
+  }
+
+  const cachedIsElement = IS_ELEMENT_CACHE.get(value)
+  if (cachedIsElement !== undefined) {
+    return cachedIsElement
+  }
+
+  const isElement = Node.isNodeList(value.children) && !Editor.isEditor(value)
+  IS_ELEMENT_CACHE.set(value, isElement)
+  return isElement
 }
 
 export const Element: ElementInterface = {
