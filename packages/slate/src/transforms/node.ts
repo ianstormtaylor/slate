@@ -13,6 +13,7 @@ import {
 } from '..'
 import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
 import { PointRef } from '../interfaces/point-ref'
+import { RangeMode, MaximizeMode } from '../interfaces/types'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
@@ -21,7 +22,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       select?: boolean
       voids?: boolean
@@ -32,7 +33,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       voids?: boolean
     }
   ) => void
@@ -41,7 +42,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       voids?: boolean
     }
@@ -51,7 +52,7 @@ export interface NodeTransforms {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       to: Path
       voids?: boolean
     }
@@ -61,7 +62,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       voids?: boolean
     }
@@ -72,7 +73,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       hanging?: boolean
       split?: boolean
       voids?: boolean
@@ -85,7 +86,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       always?: boolean
       height?: number
       voids?: boolean
@@ -97,7 +98,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     }
@@ -107,7 +108,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     }
@@ -118,7 +119,7 @@ export interface NodeTransforms {
     options?: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     }
@@ -136,7 +137,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       select?: boolean
       voids?: boolean
@@ -255,7 +256,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       voids?: boolean
     } = {}
   ): void {
@@ -319,7 +320,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       voids?: boolean
     } = {}
@@ -459,7 +460,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       to: Path
       voids?: boolean
     }
@@ -520,7 +521,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       hanging?: boolean
       voids?: boolean
     } = {}
@@ -567,7 +568,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       hanging?: boolean
       split?: boolean
       voids?: boolean
@@ -692,7 +693,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'highest' | 'lowest'
+      mode?: RangeMode
       always?: boolean
       height?: number
       voids?: boolean
@@ -821,7 +822,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     } = {}
@@ -849,7 +850,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     } = {}
@@ -915,7 +916,7 @@ export const NodeTransforms: NodeTransforms = {
     options: {
       at?: Location
       match?: NodeMatch<T>
-      mode?: 'all' | 'highest' | 'lowest'
+      mode?: MaximizeMode
       split?: boolean
       voids?: boolean
     } = {}

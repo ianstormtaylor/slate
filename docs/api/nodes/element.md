@@ -60,6 +60,10 @@ Check if an element matches a set of `props`. Note: This checks custom propertie
 
 ### Check methods
 
+#### `Element.isAncestor(value: any) => value is Ancestor`
+
+Check if a value implements the 'Ancestor' interface.
+
 #### `Element.isElement(value: any) => value is Element`
 
 Check if a `value` implements the `Element` interface.
@@ -67,3 +71,8 @@ Check if a `value` implements the `Element` interface.
 #### `Element.isElementList(value: any) => value is Element[]`
 
 Check if a `value` is an array of `Element` objects.
+
+#### `Element.isElementType<T Extends Element>(value: any, elementVal: string, ElementKey: string = 'type'): value is T`
+
+Check if a value implements the `Element` interface and has elementKey with selected value.
+Default it check to `type` key value

@@ -1,5 +1,51 @@
 # slate-react
 
+## 0.79.0
+
+### Minor Changes
+
+- [#4981](https://github.com/ianstormtaylor/slate/pull/4981) [`cb8a5515`](https://github.com/ianstormtaylor/slate/commit/cb8a551508c023346fd3aa0af1a5a80ffd6a37cd) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Add `ReactEditor.isComposing(editor)` to get the current `isComposing` state
+
+## 0.78.1
+
+### Patch Changes
+
+- [#4979](https://github.com/ianstormtaylor/slate/pull/4979) [`6afa9f6a`](https://github.com/ianstormtaylor/slate/commit/6afa9f6a719092368b92dc3342e21e44d457d77e) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Unset isComposing on keydown with isCompsing false
+
+## 0.77.4
+
+### Patch Changes
+
+- [#4965](https://github.com/ianstormtaylor/slate/pull/4965) [`a4536e2a`](https://github.com/ianstormtaylor/slate/commit/a4536e2aa2703d4c4460a54f87997ce76a722689) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix triple click handling in nested blocks
+
+## 0.77.3
+
+### Patch Changes
+
+- [#4957](https://github.com/ianstormtaylor/slate/pull/4957) [`c1e3fbaa`](https://github.com/ianstormtaylor/slate/commit/c1e3fbaab969f2e78303f9ba00f26b88c575cdd1) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't treat events with non-selection target range as native
+
+## 0.77.2
+
+### Patch Changes
+
+- [#4951](https://github.com/ianstormtaylor/slate/pull/4951) [`5b51e87d`](https://github.com/ianstormtaylor/slate/commit/5b51e87d511e3a8c05a679903650cb256f3bf044) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix double insert in anchor element decorations
+
+## 0.77.1
+
+### Patch Changes
+
+- [#4948](https://github.com/ianstormtaylor/slate/pull/4948) [`9957c214`](https://github.com/ianstormtaylor/slate/commit/9957c214357dbbd5492ec4761fd6e1c7b14310f5) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Prevent native insert at the end of anchor elements
+
+## 0.77.0
+
+### Minor Changes
+
+- [#4926](https://github.com/ianstormtaylor/slate/pull/4926) [`076ab9a6`](https://github.com/ianstormtaylor/slate/commit/076ab9a67a5d7bf54062e551e6c29b1464da7e99) Thanks [@Auralytical](https://github.com/Auralytical)! - Fix firefox three digit version check
+
+### Patch Changes
+
+- [#4944](https://github.com/ianstormtaylor/slate/pull/4944) [`486c385b`](https://github.com/ianstormtaylor/slate/commit/486c385bc52ae76890f67ee9e8965955a6de3f61) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix crash when tripple clicking editor root
+
 ## 0.76.1
 
 ### Patch Changes

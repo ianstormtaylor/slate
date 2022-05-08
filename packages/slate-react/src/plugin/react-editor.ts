@@ -11,6 +11,7 @@ import {
   NODE_TO_PARENT,
   EDITOR_TO_WINDOW,
   EDITOR_TO_KEY_TO_ELEMENT,
+  IS_COMPOSING,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -42,6 +43,14 @@ export interface ReactEditor extends BaseEditor {
 }
 
 export const ReactEditor = {
+  /**
+   * Check if the user is currently composing inside the editor.
+   */
+
+  isComposing(editor: ReactEditor): boolean {
+    return !!IS_COMPOSING.get(editor)
+  },
+
   /**
    * Return the host window of the current editor.
    */

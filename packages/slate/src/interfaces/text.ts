@@ -15,8 +15,12 @@ export interface BaseText {
 
 export type Text = ExtendedType<'Text', BaseText>
 
+export interface TextEqualsOptions {
+  loose?: boolean
+}
+
 export interface TextInterface {
-  equals: (text: Text, another: Text, options?: { loose?: boolean }) => boolean
+  equals: (text: Text, another: Text, options?: TextEqualsOptions) => boolean
   isText: (value: any) => value is Text
   isTextList: (value: any) => value is Text[]
   isTextProps: (props: any) => props is Partial<Text>
@@ -31,11 +35,7 @@ export const Text: TextInterface = {
    * When loose is set, the text is not compared. This is
    * used to check whether sibling text nodes can be merged.
    */
-  equals(
-    text: Text,
-    another: Text,
-    options: { loose?: boolean } = {}
-  ): boolean {
+  equals(text: Text, another: Text, options: TextEqualsOptions = {}): boolean {
     const { loose = false } = options
 
     function omitText(obj: Record<any, any>) {

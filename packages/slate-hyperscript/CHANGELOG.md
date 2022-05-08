@@ -1,5 +1,11 @@
 # slate-hyperscript
 
+## 0.77.0
+
+### Patch Changes
+
+- [#4932](https://github.com/ianstormtaylor/slate/pull/4932) [`1ff6e690`](https://github.com/ianstormtaylor/slate/commit/1ff6e6909353a2e8088dcc8c2bacad15381652a4) Thanks [@e1himself](https://github.com/e1himself)! - Export `createText` creator from `slate-hyperscript` package
+
 ## 0.67.0
 
 ### Patch Changes

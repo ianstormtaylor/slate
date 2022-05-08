@@ -35,6 +35,7 @@ import {
   isDOMElement,
   isDOMNode,
   isPlainTextOnlyPaste,
+  DOMText,
 } from '../utils/dom'
 import {
   CAN_USE_DOM,
@@ -58,6 +59,7 @@ import {
   IS_READ_ONLY,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
+  IS_COMPOSING,
 } from '../utils/weak-maps'
 
 type DeferredOperation = () => void
@@ -144,7 +146,6 @@ export const Editable = (props: EditableProps) => {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
-      isComposing: false,
       hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
@@ -171,7 +172,11 @@ export const Editable = (props: EditableProps) => {
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
 
-    if (state.isComposing || !domSelection || !ReactEditor.isFocused(editor)) {
+    if (
+      ReactEditor.isComposing(editor) ||
+      !domSelection ||
+      !ReactEditor.isFocused(editor)
+    ) {
       return
     }
 
@@ -271,7 +276,7 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !state.isComposing &&
+        !ReactEditor.isComposing(editor) &&
         !state.isUpdatingSelection &&
         !state.isDraggingInternally
       ) {
@@ -372,25 +377,25 @@ export const Editable = (props: EditableProps) => {
             native = false
           }
 
-          // Chrome also has issues correctly editing the end of nodes: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
-          // Therefore we don't allow native events to insert text at the end of nodes.
+          // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
+          // Therefore we don't allow native events to insert text at the end of anchor nodes.
           const { anchor } = selection
-          const inline = Editor.above(editor, {
-            at: anchor,
-            match: n => Editor.isInline(editor, n),
-            mode: 'highest',
-          })
-          if (inline) {
-            const [, inlinePath] = inline
 
-            if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
+          const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
+          const anchorNode = node.parentElement?.closest('a')
+
+          if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
+            const { document } = ReactEditor.getWindow(editor)
+
+            // Find the last text node inside the anchor.
+            const lastText = document
+              .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
+              .lastChild() as DOMText | null
+
+            if (lastText === node && lastText.textContent?.length === offset) {
               native = false
             }
           }
-        }
-
-        if (!native) {
-          event.preventDefault()
         }
 
         // COMPAT: For the deleting forward/backward input types we don't want
@@ -406,6 +411,8 @@ export const Editable = (props: EditableProps) => {
             })
 
             if (!selection || !Range.equals(selection, range)) {
+              native = false
+
               const selectionRef =
                 editor.selection && Editor.rangeRef(editor, editor.selection)
 
@@ -416,6 +423,10 @@ export const Editable = (props: EditableProps) => {
               }
             }
           }
+        }
+
+        if (!native) {
+          event.preventDefault()
         }
 
         // COMPAT: If the selection is expanded, even if the command seems like
@@ -513,8 +524,10 @@ export const Editable = (props: EditableProps) => {
               // then we will abort because we're still composing and the selection
               // won't be updated properly.
               // https://www.w3.org/TR/input-events-2/
-              state.isComposing && setIsComposing(false)
-              state.isComposing = false
+              if (ReactEditor.isComposing(editor)) {
+                setIsComposing(false)
+                IS_COMPOSING.set(editor, false)
+              }
             }
 
             // use a weak comparison instead of 'instanceof' to allow
@@ -671,7 +684,7 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target)
               ) {
                 event.preventDefault()
-                if (!state.isComposing) {
+                if (!ReactEditor.isComposing(editor)) {
                   const text = (event as any).data as string
                   Editor.insertText(editor, text)
                 }
@@ -764,10 +777,30 @@ export const Editable = (props: EditableProps) => {
               ) {
                 const node = ReactEditor.toSlateNode(editor, event.target)
                 const path = ReactEditor.findPath(editor, node)
-                if (event.detail === TRIPLE_CLICK) {
-                  const start = Editor.start(editor, [path[0]])
-                  const end = Editor.end(editor, [path[0]])
-                  const range = Editor.range(editor, start, end)
+
+                // At this time, the Slate document may be arbitrarily different,
+                // because onClick handlers can change the document before we get here.
+                // Therefore we must check that this path actually exists,
+                // and that it still refers to the same node.
+                if (
+                  !Editor.hasPath(editor, path) ||
+                  Node.get(editor, path) !== node
+                ) {
+                  return
+                }
+
+                if (event.detail === TRIPLE_CLICK && path.length >= 1) {
+                  let blockPath = path
+                  if (!Editor.isBlock(editor, node)) {
+                    const block = Editor.above(editor, {
+                      match: n => Editor.isBlock(editor, n),
+                      at: path,
+                    })
+
+                    blockPath = block?.[1] ?? path.slice(0, 1)
+                  }
+
+                  const range = Editor.range(editor, blockPath)
                   Transforms.select(editor, range)
                   return
                 }
@@ -776,27 +809,18 @@ export const Editable = (props: EditableProps) => {
                   return
                 }
 
-                // At this time, the Slate document may be arbitrarily different,
-                // because onClick handlers can change the document before we get here.
-                // Therefore we must check that this path actually exists,
-                // and that it still refers to the same node.
-                if (Editor.hasPath(editor, path)) {
-                  const lookupNode = Node.get(editor, path)
-                  if (lookupNode === node) {
-                    const start = Editor.start(editor, path)
-                    const end = Editor.end(editor, path)
-                    const startVoid = Editor.void(editor, { at: start })
-                    const endVoid = Editor.void(editor, { at: end })
+                const start = Editor.start(editor, path)
+                const end = Editor.end(editor, path)
+                const startVoid = Editor.void(editor, { at: start })
+                const endVoid = Editor.void(editor, { at: end })
 
-                    if (
-                      startVoid &&
-                      endVoid &&
-                      Path.equals(startVoid[1], endVoid[1])
-                    ) {
-                      const range = Editor.range(editor, start)
-                      Transforms.select(editor, range)
-                    }
-                  }
+                if (
+                  startVoid &&
+                  endVoid &&
+                  Path.equals(startVoid[1], endVoid[1])
+                ) {
+                  const range = Editor.range(editor, start)
+                  Transforms.select(editor, range)
                 }
               }
             },
@@ -808,8 +832,10 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionEnd)
               ) {
-                state.isComposing && setIsComposing(false)
-                state.isComposing = false
+                if (ReactEditor.isComposing(editor)) {
+                  setIsComposing(false)
+                  IS_COMPOSING.set(editor, false)
+                }
 
                 // COMPAT: In Chrome, `beforeinput` events for compositions
                 // aren't correct and never fire the "insertFromComposition"
@@ -853,8 +879,10 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionUpdate)
               ) {
-                !state.isComposing && setIsComposing(true)
-                state.isComposing = true
+                if (!ReactEditor.isComposing(editor)) {
+                  setIsComposing(true)
+                  IS_COMPOSING.set(editor, true)
+                }
               }
             },
             [attributes.onCompositionUpdate]
@@ -1076,15 +1104,28 @@ export const Editable = (props: EditableProps) => {
           )}
           onKeyDown={useCallback(
             (event: React.KeyboardEvent<HTMLDivElement>) => {
-              if (
-                !readOnly &&
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onKeyDown) &&
-                !state.isComposing
-              ) {
+              if (!readOnly && hasEditableTarget(editor, event.target)) {
                 const { nativeEvent } = event
-                const { selection } = editor
 
+                // COMPAT: The composition end event isn't fired reliably in all browsers,
+                // so we sometimes might end up stuck in a composition state even though we
+                // aren't composing any more.
+                if (
+                  ReactEditor.isComposing(editor) &&
+                  nativeEvent.isComposing === false
+                ) {
+                  IS_COMPOSING.set(editor, false)
+                  setIsComposing(false)
+                }
+
+                if (
+                  isEventHandled(event, attributes.onKeyDown) ||
+                  ReactEditor.isComposing(editor)
+                ) {
+                  return
+                }
+
+                const { selection } = editor
                 const element =
                   editor.children[
                     selection !== null ? selection.focus.path[0] : 0

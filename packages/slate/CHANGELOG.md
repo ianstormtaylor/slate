@@ -1,5 +1,23 @@
 # slate
 
+## 0.78.0
+
+### Minor Changes
+
+- [#4974](https://github.com/ianstormtaylor/slate/pull/4974) [`3b7a1bf7`](https://github.com/ianstormtaylor/slate/commit/3b7a1bf72d0c3951416c771f7f149bfbda411111) Thanks [@dylans](https://github.com/dylans)! - Added types for options and common string literals, thanks @JoshuaKGoldberg
+
+## 0.77.2
+
+### Patch Changes
+
+- [#4952](https://github.com/ianstormtaylor/slate/pull/4952) [`9ce0a08c`](https://github.com/ianstormtaylor/slate/commit/9ce0a08c2a8b2b72df14141a06ca08825a66d472) Thanks [@steve-codaio](https://github.com/steve-codaio)! - Fix positions iteration when starting inside an inline void node
+
+## 0.77.0
+
+### Patch Changes
+
+- [#4939](https://github.com/ianstormtaylor/slate/pull/4939) [`c39c8082`](https://github.com/ianstormtaylor/slate/commit/c39c8082a97dec8fc9ba64568d817ba87e348b48) Thanks [@ahoisl](https://github.com/ahoisl)! - Fix pointRef leaks caused by not unref'ing
+
 ## 0.76.1
 
 ### Patch Changes
