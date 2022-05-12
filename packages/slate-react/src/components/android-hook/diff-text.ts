@@ -1,6 +1,6 @@
 import { Editor, Path, Range, Text } from 'slate'
 
-import { ReactEditor } from '../../'
+import { ReactEditor } from '../..'
 import { DOMNode } from '../../utils/dom'
 
 export type Diff = {
@@ -156,6 +156,21 @@ export function getTextInsertion<T extends Editor>(
   }
 
   return undefined
+}
+
+export function mergeTextInsertions(
+  current: TextInsertion[],
+  next: TextInsertion[]
+) {
+  const merged: TextInsertion[] = next.slice(0)
+
+  current.forEach(insertion => {
+    if (!merged.some(({ path }) => Path.equals(path, insertion.path))) {
+      merged.push(insertion)
+    }
+  })
+
+  return merged
 }
 
 export function normalizeTextInsertionRange(

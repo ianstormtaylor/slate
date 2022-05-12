@@ -104,12 +104,19 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
  * Leaf strings without text, render as zero-width strings.
  */
 
-const ZeroWidthString = (props: { length?: number; isLineBreak?: boolean }) => {
-  const { length = 0, isLineBreak = false } = props
+export const ZeroWidthString = (props: {
+  length?: number
+  isLineBreak?: boolean
+  isDeletePlaceholder?: boolean
+}) => {
+  const { length = 0, isLineBreak = false, isDeletePlaceholder = false } = props
   return (
     <span
       data-slate-zero-width={isLineBreak ? 'n' : 'z'}
       data-slate-length={length}
+      {...(isDeletePlaceholder
+        ? { 'data-slate-delete-placeholder': true }
+        : {})}
     >
       {'\uFEFF'}
       {isLineBreak ? <br /> : null}

@@ -600,11 +600,15 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    if (!isPlainObject(value)) return false
     const cachedIsEditor = IS_EDITOR_CACHE.get(value)
     if (cachedIsEditor !== undefined) {
       return cachedIsEditor
     }
+
+    if (!isPlainObject(value)) {
+      return false
+    }
+
     const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
@@ -625,7 +629,9 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
+
     IS_EDITOR_CACHE.set(value, isEditor)
+
     return isEditor
   },
 

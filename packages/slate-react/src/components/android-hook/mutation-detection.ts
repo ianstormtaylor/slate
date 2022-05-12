@@ -1,6 +1,6 @@
 import { Editor, Node, Path, Range } from 'slate'
 
-import { DOMNode } from '../../utils/dom'
+import { DOMNode, isDOMElement, isDOMText } from '../../utils/dom'
 import { ReactEditor } from '../..'
 import { TextInsertion, getTextInsertion } from './diff-text'
 
@@ -69,37 +69,61 @@ export function gatherMutationData(
   return { addedNodes, removedNodes, insertedText, characterDataMutations }
 }
 
-/**
- * In general, when a line break occurs, there will be more `addedNodes` than `removedNodes`.
- *
- * This isn't always the case however. In some cases, there will be more `removedNodes` than
- * `addedNodes`.
- *
- * To account for these edge cases, the most reliable strategy to detect line break mutations
- * is to check whether a new block was inserted of the same type as the current block.
- */
-export const isLineBreak: MutationDetection = (editor, { addedNodes }) => {
-  const { selection } = editor
-  const parentNode = selection
-    ? Node.parent(editor, selection.anchor.path)
-    : null
-  const parentDOMNode = parentNode
-    ? ReactEditor.toDOMNode(editor, parentNode)
-    : null
+export const isLineBreak: MutationDetection = (
+  editor,
+  { addedNodes, removedNodes }
+) => {
+  const window = ReactEditor.getWindow(editor)
 
-  if (!parentDOMNode) {
+  const removesNodes = removedNodes.some(
+    node => !window.document.contains(node)
+  )
+  if (removesNodes) {
     return false
   }
 
-  return addedNodes.some(
-    addedNode =>
-      addedNode instanceof HTMLElement &&
-      addedNode.tagName === parentDOMNode?.tagName
-  )
+  return addedNodes.some(node => {
+    // Inserted a plain line break
+    if (isDOMText(node) && node.textContent === '\n') {
+      return true
+    }
+
+    // Inserted a cloned slate node
+    return (
+      isDOMElement(node) &&
+      (node.hasAttribute('data-slate-node') ||
+        node.hasAttribute('data-slate-string') ||
+        node.hasAttribute('data-slate-string'))
+    )
+  })
+}
+
+// Swift key first element in the line does some weird stuff
+export const isUnwrapNode: MutationDetection = (
+  _,
+  { removedNodes, addedNodes, characterDataMutations }
+) => {
+  if (characterDataMutations.length > 0 || removedNodes.length === 0) {
+    return false
+  }
+
+  return removedNodes.every(node => {
+    if (!isDOMElement(node)) {
+      return !addedNodes.some(added => added === node || added.contains(node))
+    }
+
+    for (const child of node.children) {
+      if (!removedNodes.includes(child) && !addedNodes.includes(child)) {
+        return false
+      }
+    }
+
+    return true
+  })
 }
 
 /**
- * So long as we check for line break mutations before deletion mutations,
+ * So long as we check for all other kinds of mutations before deletion mutations,
  * we can safely assume that a set of mutations was a deletion if there are
  * removed nodes.
  */
@@ -123,7 +147,10 @@ export const isReplaceExpandedSelection: MutationDetection = (
 /**
  * Plain text insertion
  */
-export const isTextInsertion: MutationDetection = (_, { insertedText }) => {
+export const isTextInsertion: MutationDetection = (
+  _,
+  { insertedText, addedNodes }
+) => {
   return insertedText.length > 0
 }
 
@@ -134,6 +161,8 @@ export const isRemoveLeafNodes: MutationDetection = (
   _,
   { addedNodes, characterDataMutations, removedNodes }
 ) => {
+  console.log(addedNodes, removedNodes, characterDataMutations)
+
   return (
     removedNodes.length > 0 &&
     addedNodes.length === 0 &&

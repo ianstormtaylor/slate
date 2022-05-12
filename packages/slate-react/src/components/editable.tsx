@@ -57,6 +57,7 @@ import {
   IS_COMPOSING,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
+import { useAndroidInputManager } from './android-hook/use-android-input-manager'
 
 type DeferredOperation = () => void
 
@@ -152,6 +153,8 @@ export const Editable = (props: EditableProps) => {
 
   // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
+    // TODO: Don't restore selection if we have pending changes (might not be required though since we always flush before render)
+
     // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
@@ -169,10 +172,12 @@ export const Editable = (props: EditableProps) => {
     const domSelection = root.getSelection()
 
     if (
-      ReactEditor.isComposing(editor) ||
       !domSelection ||
-      !ReactEditor.isFocused(editor)
+      !ReactEditor.isFocused(editor) ||
+      androidInputManager?.hasPendingChanges()
     ) {
+      console.log('pending changes')
+
       return
     }
 
@@ -180,6 +185,8 @@ export const Editable = (props: EditableProps) => {
 
     // If the DOM selection is properly unset, we're done.
     if (!selection && !hasDomSelection) {
+      console.log('no selection')
+
       return
     }
 
@@ -212,9 +219,11 @@ export const Editable = (props: EditableProps) => {
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
     if (selection && !ReactEditor.hasRange(editor, selection)) {
+      console.log('selection not in editor')
+
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
-        suppressThrow: false,
+        suppressThrow: true,
       })
       return
     }
@@ -222,8 +231,20 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     state.isUpdatingSelection = true
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    let newDomRange: DOMRange | null = null
+
+    try {
+      newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    } catch (e) {
+      console.log(e)
+      // suppress
+      return
+    }
+
     if (newDomRange) {
+      console.log(newDomRange)
+
+      // TODO: GBoard requires this to be called inside setTimeout to win over native on backspace line
       if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
@@ -272,9 +293,9 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
-        !ReactEditor.isComposing(editor) &&
         !state.isUpdatingSelection &&
-        !state.isDraggingInternally
+        !state.isDraggingInternally &&
+        !androidInputManager?.handleDOMSelectionChange()
       ) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
@@ -305,9 +326,16 @@ export const Editable = (props: EditableProps) => {
         if (anchorNodeSelectable && focusNodeSelectable) {
           const range = ReactEditor.toSlateRange(editor, domSelection, {
             exactMatch: false,
-            suppressThrow: false,
+            suppressThrow: true,
           })
-          Transforms.select(editor, range)
+
+          if (range) {
+            if (!IS_COMPOSING.has(editor)) {
+              Transforms.select(editor, range)
+            } else {
+              editor.selection = range
+            }
+          }
         }
       }
     }, 100),
@@ -318,6 +346,12 @@ export const Editable = (props: EditableProps) => {
     () => debounce(onDOMSelectionChange, 0),
     [onDOMSelectionChange]
   )
+
+  const androidInputManager = useAndroidInputManager({
+    node: ref,
+    onDOMSelectionChange,
+    scheduleOnDOMSelectionChange,
+  })
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
@@ -330,6 +364,10 @@ export const Editable = (props: EditableProps) => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
+        if (androidInputManager?.handleDOMBeforeInput(event)) {
+          return
+        }
+
         // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
         // triggering a `beforeinput` expecting the change to be applied to the immediately before
         // set selection.
@@ -824,13 +862,17 @@ export const Editable = (props: EditableProps) => {
           )}
           onCompositionEnd={useCallback(
             (event: React.CompositionEvent<HTMLDivElement>) => {
-              if (
-                hasEditableTarget(editor, event.target) &&
-                !isEventHandled(event, attributes.onCompositionEnd)
-              ) {
+              if (hasEditableTarget(editor, event.target)) {
                 if (ReactEditor.isComposing(editor)) {
                   setIsComposing(false)
                   IS_COMPOSING.set(editor, false)
+                }
+
+                if (
+                  isEventHandled(event, attributes.onCompositionEnd) ||
+                  androidInputManager?.handleCompositionEnd(event)
+                ) {
+                  return
                 }
 
                 // COMPAT: In Chrome, `beforeinput` events for compositions
@@ -889,6 +931,10 @@ export const Editable = (props: EditableProps) => {
                 hasEditableTarget(editor, event.target) &&
                 !isEventHandled(event, attributes.onCompositionStart)
               ) {
+                if (androidInputManager?.handleCompositionStart(event)) {
+                  return
+                }
+
                 const { selection, marks } = editor
                 if (selection) {
                   if (Range.isExpanded(selection)) {

@@ -1,6 +1,5 @@
 import ReactDOM from 'react-dom'
 import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
-
 import { ReactEditor } from './react-editor'
 import { Key } from '../utils/key'
 import {
@@ -65,6 +64,8 @@ export const withReact = <T extends Editor>(editor: T) => {
   // as apply() changes the object reference and hence invalidates the NODE_TO_KEY entry
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
+
+    console.trace(op)
 
     switch (op.type) {
       case 'insert_text':
