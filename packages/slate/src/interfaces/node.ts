@@ -122,8 +122,8 @@ export const Node: NodeInterface = {
   /**
    * Return a generator of all the ancestor nodes above a specific path.
    *
-   * By default the order is bottom-up, from lowest to highest ancestor in
-   * the tree, but you can pass the `reverse: true` option to go top-down.
+   * By default the order is top-down, from highest to lowest ancestor in
+   * the tree, but you can pass the `reverse: true` option to go bottom-up.
    */
 
   *ancestors(
@@ -438,7 +438,7 @@ export const Node: NodeInterface = {
   /**
    * Return a generator of the in a branch of the tree, from a specific path.
    *
-   * By default the order is top-down, from lowest to highest node in the tree,
+   * By default the order is top-down, from highest to lowest node in the tree,
    * but you can pass the `reverse: true` option to go bottom-up.
    */
 
