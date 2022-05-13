@@ -65,8 +65,6 @@ export const withReact = <T extends Editor>(editor: T) => {
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
-    console.trace(op)
-
     switch (op.type) {
       case 'insert_text':
       case 'remove_text':

@@ -25,7 +25,7 @@ import {
   normalizeDOMPoint,
   hasShadowRoot,
 } from '../utils/dom'
-import { IS_CHROME, IS_FIREFOX } from '../utils/environment'
+import { IS_CHROME, IS_FIREFOX, IS_ANDROID } from '../utils/environment'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
@@ -528,6 +528,16 @@ export const ReactEditor = {
           ]
 
           removals.forEach(el => {
+            if (
+              IS_ANDROID &&
+              !exactMatch &&
+              el.matches('[data-slate-zero-width]') &&
+              el.textContent.length > 1
+            ) {
+              el.textContent = el.textContent.replaceAll('\uFEFF', '')
+              return
+            }
+
             el!.parentNode!.removeChild(el)
           })
 

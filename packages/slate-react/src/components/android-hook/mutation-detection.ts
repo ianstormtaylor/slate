@@ -15,11 +15,12 @@ type MutationDetection = (editor: Editor, mutationData: MutationData) => boolean
 
 export function gatherMutationData(
   editor: Editor,
-  mutations: MutationRecord[]
+  mutations: MutationRecord[],
+  pendingInsertions: TextInsertion[] = []
 ): MutationData {
   const addedNodes: DOMNode[] = []
   const removedNodes: DOMNode[] = []
-  const insertedText: TextInsertion[] = []
+  let insertedText: TextInsertion[] = pendingInsertions.slice(0)
   const characterDataMutations: MutationRecord[] = []
 
   mutations.forEach(mutation => {
@@ -47,16 +48,16 @@ export function gatherMutationData(
           return
         }
 
+        const node = ReactEditor.toSlateNode(editor, parentNode)
+        const textPath = ReactEditor.findPath(editor, node)
+
+        // Filter out existing diffs for the current text node
+        insertedText = insertedText.filter(
+          ({ path }) => !Path.equals(path, textPath)
+        )
+
         const textInsertion = getTextInsertion(editor, parentNode)
-
         if (!textInsertion) {
-          return
-        }
-
-        // If we've already detected a diff at that path, we can return early
-        if (
-          insertedText.some(({ path }) => Path.equals(path, textInsertion.path))
-        ) {
           return
         }
 
@@ -93,32 +94,8 @@ export const isLineBreak: MutationDetection = (
       isDOMElement(node) &&
       (node.hasAttribute('data-slate-node') ||
         node.hasAttribute('data-slate-string') ||
-        node.hasAttribute('data-slate-string'))
+        node.hasAttribute('data-slate-leaf'))
     )
-  })
-}
-
-// Swift key first element in the line does some weird stuff
-export const isUnwrapNode: MutationDetection = (
-  _,
-  { removedNodes, addedNodes, characterDataMutations }
-) => {
-  if (characterDataMutations.length > 0 || removedNodes.length === 0) {
-    return false
-  }
-
-  return removedNodes.every(node => {
-    if (!isDOMElement(node)) {
-      return !addedNodes.some(added => added === node || added.contains(node))
-    }
-
-    for (const child of node.children) {
-      if (!removedNodes.includes(child) && !addedNodes.includes(child)) {
-        return false
-      }
-    }
-
-    return true
   })
 }
 
@@ -136,22 +113,17 @@ export const isDeletion: MutationDetection = (_, { removedNodes }) => {
  * the contents of the selection need to be replaced with the diff
  */
 export const isReplaceExpandedSelection: MutationDetection = (
-  { selection },
+  editor,
   { removedNodes }
 ) => {
-  return selection
-    ? Range.isExpanded(selection) && removedNodes.length > 0
-    : false
-}
+  const { selection } = editor
 
-/**
- * Plain text insertion
- */
-export const isTextInsertion: MutationDetection = (
-  _,
-  { insertedText, addedNodes }
-) => {
-  return insertedText.length > 0
+  console.log(selection && Editor.unhangRange(editor, selection))
+
+  return selection
+    ? Range.isExpanded(Editor.unhangRange(editor, selection)) &&
+        removedNodes.length > 0
+    : false
 }
 
 /**
@@ -161,8 +133,6 @@ export const isRemoveLeafNodes: MutationDetection = (
   _,
   { addedNodes, characterDataMutations, removedNodes }
 ) => {
-  console.log(addedNodes, removedNodes, characterDataMutations)
-
   return (
     removedNodes.length > 0 &&
     addedNodes.length === 0 &&

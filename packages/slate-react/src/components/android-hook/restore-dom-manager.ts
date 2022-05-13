@@ -2,7 +2,7 @@ import { ReactEditor } from '../../plugin/react-editor'
 import { isDOMElement } from '../../utils/dom'
 import { MutableRefObject } from 'react'
 
-export const UndoManager = (
+export const createRestoreDomManager = (
   editor: ReactEditor,
   receivedUserInput: MutableRefObject<boolean>
 ) => {
@@ -104,11 +104,9 @@ export const UndoManager = (
     // caused by the user and those caused by us restoring the dom.
     receivedUserInput.current = false
 
-    console.log('Undo mutations')
-
     bufferedMutations.reverse().forEach(mutation => {
       if (mutation.type === 'characterData' && mutation.oldValue !== null) {
-        ;(mutation.target as Text).data
+        // ;(mutation.target as Text).textContent = mutation.oldValue
         return
       }
 

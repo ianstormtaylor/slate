@@ -142,6 +142,12 @@ export function getTextInsertion<T extends Editor>(
     nextText = nextText.slice(0, nextText.length - 1)
   }
 
+  // When writing into an empty leaf, we'll pick up the by the zero width space
+  // added zero_width_space.
+  if (nextText.startsWith('\uFEFF')) {
+    nextText = nextText.slice(1)
+  }
+
   // If the text is no different, there is no diff.
   if (nextText !== prevText) {
     const textDiff = diffText(prevText, nextText)

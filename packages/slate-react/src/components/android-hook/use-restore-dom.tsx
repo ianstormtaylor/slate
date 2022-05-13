@@ -1,7 +1,7 @@
 import { MutableRefObject, RefObject, useRef, useState } from 'react'
 import { useSlateStatic } from '../..'
 import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
-import { UndoManager } from './undo-manager'
+import { createRestoreDomManager } from './restore-dom-manager'
 import { useMutationObserver } from './use-mutation-observer'
 
 const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
@@ -17,7 +17,9 @@ export function useRestoreDom(
   receivedUserInput: MutableRefObject<boolean>
 ) {
   const editor = useSlateStatic()
-  const [undoManager] = useState(() => UndoManager(editor, receivedUserInput))
+  const [undoManager] = useState(() =>
+    createRestoreDomManager(editor, receivedUserInput)
+  )
 
   useMutationObserver(
     node,

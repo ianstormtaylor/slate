@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Range, Transforms, Path } from 'slate'
+import { Editor, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import { DOMNode } from '../../utils/dom'
 import {
@@ -10,7 +10,6 @@ import {
   combineInsertedText,
   normalizeTextInsertionRange,
   TextInsertion,
-  mergeTextInsertions,
 } from './diff-text'
 import {
   gatherMutationData,
@@ -18,10 +17,7 @@ import {
   isLineBreak,
   isRemoveLeafNodes,
   isReplaceExpandedSelection,
-  isTextInsertion,
-  isUnwrapNode,
 } from './mutation-detection'
-import uniqWith from 'lodash/uniqWith'
 
 //
 
@@ -100,7 +96,12 @@ export function createAndroidInputManager({
    */
 
   const reconcileMutations = (mutations: MutationRecord[]) => {
-    const mutationData = gatherMutationData(editor, mutations)
+    const mutationData = gatherMutationData(
+      editor,
+      mutations,
+      EDITOR_TO_PENDING_INSERTIONS.get(editor)
+    )
+
     const { insertedText, removedNodes } = mutationData
 
     debug('reconcileMutations', mutations, mutationData)
@@ -112,18 +113,9 @@ export function createAndroidInputManager({
       insertBreak()
     } else if (isRemoveLeafNodes(editor, mutationData)) {
       removeLeafNodes(removedNodes)
-    } else if (isUnwrapNode(editor, mutationData)) {
-      debug('unwrap node')
-      flush()
-      restoreDom()
-
-      // TODO: force re-render in another way or just restore the selection directly
-      if (editor.selection) {
-        Editor.addMark(editor, 'test', true)
-      }
     } else if (isDeletion(editor, mutationData)) {
       deleteBackward()
-    } else if (isTextInsertion(editor, mutationData)) {
+    } else {
       insertText(insertedText)
     }
   }
@@ -133,14 +125,9 @@ export function createAndroidInputManager({
    */
 
   const insertText = (insertedText: TextInsertion[]) => {
-    debug('insertText')
+    debug('insertText', insertedText)
 
-    const combinedInsertions: TextInsertion[] = uniqWith(
-      [...insertedText, ...(EDITOR_TO_PENDING_INSERTIONS.get(editor) ?? [])],
-      (a, b) => Path.equals(a.path, b.path)
-    )
-
-    EDITOR_TO_PENDING_INSERTIONS.set(editor, combinedInsertions)
+    EDITOR_TO_PENDING_INSERTIONS.set(editor, insertedText)
 
     if (!ReactEditor.isComposing(editor)) {
       flush()
@@ -164,7 +151,7 @@ export function createAndroidInputManager({
       return
     }
 
-    debug('pendingChanges', pendingChanges)
+    debug('apply changes', pendingChanges, editor.selection)
 
     const { selection } = editor
     pendingChanges.forEach(insertion => {
@@ -174,10 +161,22 @@ export function createAndroidInputManager({
       Editor.insertText(editor, text)
     })
 
-    scheduleOnDOMSelectionChange.flush()
-    onDOMSelectionChange.flush()
+    if (pendingChanges) {
+      scheduleOnDOMSelectionChange()
+      scheduleOnDOMSelectionChange.flush()
+      onDOMSelectionChange.flush()
+    }
 
-    debug('selection after', editor.selection)
+    /*
+    debug(
+      editor.selection,
+      window
+        .getSelection()
+        ?.getRangeAt(0)
+        .cloneRange()
+    )*/
+
+    restoreDom()
   }
 
   /**
@@ -185,21 +184,8 @@ export function createAndroidInputManager({
    */
 
   const insertBreak = () => {
-    debug('insertBreak')
-
-    const { selection } = editor
     Editor.insertBreak(editor)
-
     restoreDom()
-
-    if (selection) {
-      // Compat: Move selection to the newly inserted block if it has not moved
-      setTimeout(() => {
-        if (editor.selection && Range.equals(selection, editor.selection)) {
-          Transforms.move(editor)
-        }
-      }, 100)
-    }
   }
 
   /**
@@ -228,13 +214,25 @@ export function createAndroidInputManager({
    */
 
   const deleteBackward = () => {
-    debug('deleteBackward')
+    debug('deleteBackward', editor.selection)
 
-    // TODO: Handle text replacement affecting the selection
-    Editor.withoutNormalizing(editor, () => {
-      Editor.deleteBackward(editor)
-      ReactEditor.focus(editor)
-    })
+    // COMPAT: GBoard likes to select from the end of the previous line to the start
+    // of the current line when deleting backwards at the start of a line.
+    const target =
+      editor.selection && Editor.unhangRange(editor, editor.selection)
+
+    if (
+      target &&
+      (!editor.selection || !Range.equals(editor.selection, target))
+    ) {
+      Transforms.select(editor, target)
+    }
+
+    Editor.deleteBackward(editor)
+    ReactEditor.focus(editor)
+
+    scheduleOnDOMSelectionChange.cancel()
+    onDOMSelectionChange.cancel()
 
     restoreDom()
   }
@@ -290,8 +288,24 @@ export function createAndroidInputManager({
   const handleDOMBeforeInput = (_event: InputEvent) => {
     onUserInput()
 
+    // TODO: Restore dom selection
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
+
+    // Set current selection to target range to ensure we are applying the next action
+    // to the correct target range (mostly relevant for delete expanded selection)
+    const [targetRange] = (event as any).getTargetRanges()
+    if (targetRange) {
+      const range = ReactEditor.toSlateRange(editor, targetRange, {
+        exactMatch: false,
+        suppressThrow: true,
+      })
+
+      if (range) {
+        debug('beforeInputSelection', range)
+        editor.selection = range
+      }
+    }
 
     return true
   }
@@ -301,10 +315,9 @@ export function createAndroidInputManager({
   }
 
   const handleDOMSelectionChange = () => {
+    // Delay selection change until pending changes are flushed
     if (hasPendingChanges()) {
-      // Delay selection change until pending changes are flushed
       scheduleOnDOMSelectionChange()
-
       return true
     }
   }

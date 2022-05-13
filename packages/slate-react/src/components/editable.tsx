@@ -28,6 +28,7 @@ import {
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
   CAN_USE_DOM,
+  IS_ANDROID,
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
@@ -139,6 +140,7 @@ export const Editable = (props: EditableProps) => {
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
+  ;(window as any).editor = editor
 
   // Keep track of some state for the event handler logic.
   const state = useMemo(
@@ -153,8 +155,6 @@ export const Editable = (props: EditableProps) => {
 
   // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
-    // TODO: Don't restore selection if we have pending changes (might not be required though since we always flush before render)
-
     // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
@@ -176,8 +176,6 @@ export const Editable = (props: EditableProps) => {
       !ReactEditor.isFocused(editor) ||
       androidInputManager?.hasPendingChanges()
     ) {
-      console.log('pending changes')
-
       return
     }
 
@@ -185,8 +183,6 @@ export const Editable = (props: EditableProps) => {
 
     // If the DOM selection is properly unset, we're done.
     if (!selection && !hasDomSelection) {
-      console.log('no selection')
-
       return
     }
 
@@ -219,8 +215,6 @@ export const Editable = (props: EditableProps) => {
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
     if (selection && !ReactEditor.hasRange(editor, selection)) {
-      console.log('selection not in editor')
-
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: true,
@@ -228,23 +222,15 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
+    const newDomRange: DOMRange | null =
+      selection && ReactEditor.toDOMRange(editor, selection)
+
     // Otherwise the DOM selection is out of sync, so update it.
-    state.isUpdatingSelection = true
+    state.isUpdatingSelection = newDomRange
 
-    let newDomRange: DOMRange | null = null
-
-    try {
-      newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
-    } catch (e) {
-      console.log(e)
-      // suppress
-      return
-    }
+    console.log('set dom selection', newDomRange)
 
     if (newDomRange) {
-      console.log(newDomRange)
-
-      // TODO: GBoard requires this to be called inside setTimeout to win over native on backspace line
       if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
@@ -266,6 +252,34 @@ export const Editable = (props: EditableProps) => {
     }
 
     setTimeout(() => {
+      // COMPAT: Since we flush mutation synchronously, sometimes the keyboard (especially GBoard) will move the
+      // selection to a undesired place after our dom mutation and we have to force it back at the end of the 'tick'.
+      /* if (
+        editor.selection &&
+        selection &&
+        newDomRange &&
+        IS_ANDROID &&
+        Range.equals(editor.selection, selection)
+      ) {
+        if (Range.isBackward(selection!)) {
+          domSelection.setBaseAndExtent(
+            newDomRange.endContainer,
+            newDomRange.endOffset,
+            newDomRange.startContainer,
+            newDomRange.startOffset
+          )
+        } else {
+          domSelection.setBaseAndExtent(
+            newDomRange.startContainer,
+            newDomRange.startOffset,
+            newDomRange.endContainer,
+            newDomRange.endOffset
+          )
+        }
+      } */
+
+      console.log('done updating selection')
+
       // COMPAT: In Firefox, it's not enough to create a range, you also need
       // to focus the contenteditable element too. (2016/11/16)
       if (newDomRange && IS_FIREFOX) {
@@ -330,6 +344,8 @@ export const Editable = (props: EditableProps) => {
           })
 
           if (range) {
+            console.log('user select', range)
+
             if (!IS_COMPOSING.has(editor)) {
               Transforms.select(editor, range)
             } else {
@@ -625,6 +641,20 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
+
+    window.document.addEventListener('selectionchange', () => {
+      if (state.isUpdatingSelection && window.getSelection()) {
+        window
+          .getSelection()
+          ?.setBaseAndExtent(
+            state.isUpdatingSelection.endContainer,
+            state.isUpdatingSelection.endOffset,
+            state.isUpdatingSelection.startContainer,
+            state.isUpdatingSelection.startOffset
+          )
+      }
+    })
+
     window.document.addEventListener(
       'selectionchange',
       scheduleOnDOMSelectionChange
