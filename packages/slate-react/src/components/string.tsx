@@ -3,6 +3,7 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+import { IS_ANDROID } from '../utils/environment'
 
 /**
  * Leaf content strings.
@@ -109,17 +110,14 @@ export const ZeroWidthString = (props: {
   isLineBreak?: boolean
   isDeletePlaceholder?: boolean
 }) => {
-  const { length = 0, isLineBreak = false, isDeletePlaceholder = false } = props
+  const { length = 0, isLineBreak = false } = props
   return (
     <span
       data-slate-zero-width={isLineBreak ? 'n' : 'z'}
       data-slate-length={length}
-      {...(isDeletePlaceholder
-        ? { 'data-slate-delete-placeholder': true }
-        : {})}
     >
-      {'\uFEFF'}
-      {isLineBreak ? <br /> : null}
+      {!IS_ANDROID && '\uFEFF'}
+      {isLineBreak || IS_ANDROID ? <br /> : null}
     </span>
   )
 }

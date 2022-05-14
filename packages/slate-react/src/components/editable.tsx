@@ -222,11 +222,11 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
+    // Otherwise the DOM selection is out of sync, so update it.
+    state.isUpdatingSelection = true
+
     const newDomRange: DOMRange | null =
       selection && ReactEditor.toDOMRange(editor, selection)
-
-    // Otherwise the DOM selection is out of sync, so update it.
-    state.isUpdatingSelection = newDomRange
 
     console.log('set dom selection', newDomRange)
 
@@ -344,7 +344,14 @@ export const Editable = (props: EditableProps) => {
           })
 
           if (range) {
-            console.log('user select', range)
+            console.log(
+              'user select',
+              range,
+              window
+                .getSelection()
+                ?.getRangeAt(0)
+                .cloneRange()
+            )
 
             if (!IS_COMPOSING.has(editor)) {
               Transforms.select(editor, range)
@@ -641,19 +648,6 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
-
-    window.document.addEventListener('selectionchange', () => {
-      if (state.isUpdatingSelection && window.getSelection()) {
-        window
-          .getSelection()
-          ?.setBaseAndExtent(
-            state.isUpdatingSelection.endContainer,
-            state.isUpdatingSelection.endOffset,
-            state.isUpdatingSelection.startContainer,
-            state.isUpdatingSelection.startOffset
-          )
-      }
-    })
 
     window.document.addEventListener(
       'selectionchange',

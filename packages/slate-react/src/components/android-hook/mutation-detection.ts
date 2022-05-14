@@ -1,8 +1,7 @@
-import { Editor, Node, Path, Range } from 'slate'
-
-import { DOMNode, isDOMElement, isDOMText } from '../../utils/dom'
+import { Editor, Path, Range } from 'slate'
 import { ReactEditor } from '../..'
-import { TextInsertion, getTextInsertion } from './diff-text'
+import { DOMNode, isDOMElement, isDOMText } from '../../utils/dom'
+import { getTextInsertion, TextInsertion } from './diff-text'
 
 interface MutationData {
   addedNodes: DOMNode[]
@@ -104,8 +103,11 @@ export const isLineBreak: MutationDetection = (
  * we can safely assume that a set of mutations was a deletion if there are
  * removed nodes.
  */
-export const isDeletion: MutationDetection = (_, { removedNodes }) => {
-  return removedNodes.length > 0
+export const isDeletion: MutationDetection = (
+  _,
+  { removedNodes, insertedText }
+) => {
+  return removedNodes.length > 0 && insertedText.length === 0
 }
 
 /**
@@ -117,9 +119,6 @@ export const isReplaceExpandedSelection: MutationDetection = (
   { removedNodes }
 ) => {
   const { selection } = editor
-
-  console.log(selection && Editor.unhangRange(editor, selection))
-
   return selection
     ? Range.isExpanded(Editor.unhangRange(editor, selection)) &&
         removedNodes.length > 0

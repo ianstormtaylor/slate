@@ -167,15 +167,6 @@ export function createAndroidInputManager({
       onDOMSelectionChange.flush()
     }
 
-    /*
-    debug(
-      editor.selection,
-      window
-        .getSelection()
-        ?.getRangeAt(0)
-        .cloneRange()
-    )*/
-
     restoreDom()
   }
 
@@ -184,6 +175,7 @@ export function createAndroidInputManager({
    */
 
   const insertBreak = () => {
+    flush()
     Editor.insertBreak(editor)
     restoreDom()
   }
@@ -287,6 +279,8 @@ export function createAndroidInputManager({
 
   const handleDOMBeforeInput = (_event: InputEvent) => {
     onUserInput()
+
+    console.log('beforeInputSelection')
 
     // TODO: Restore dom selection
     scheduleOnDOMSelectionChange.flush()

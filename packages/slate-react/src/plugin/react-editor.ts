@@ -528,13 +528,14 @@ export const ReactEditor = {
           ]
 
           removals.forEach(el => {
+            // COMPAT: While composing at the start of a text node, some keyboards put
+            // the text content inside the zero width space.
             if (
               IS_ANDROID &&
               !exactMatch &&
               el.matches('[data-slate-zero-width]') &&
-              el.textContent.length > 1
+              el.textContent.length > 0
             ) {
-              el.textContent = el.textContent.replaceAll('\uFEFF', '')
               return
             }
 
@@ -568,6 +569,7 @@ export const ReactEditor = {
       }
 
       if (
+        !IS_ANDROID &&
         domNode &&
         offset === domNode.textContent!.length &&
         // COMPAT: If the parent node is a Slate zero-width space, editor is
