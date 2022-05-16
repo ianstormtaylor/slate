@@ -1,9 +1,10 @@
-import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
+import React, { useRef, useMemo } from 'react'
+import { Range, Path, Element, Text as SlateText } from 'slate'
 
 import Leaf from './leaf'
 import { ReactEditor, useSlateStatic } from '..'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import { useDecorate } from '../hooks/use-decorate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
@@ -18,14 +19,17 @@ import { IS_ANDROID } from '../utils/environment'
  * Text.
  */
 
-const Text = (props: {
+export interface TextProps {
   decorations: Range[]
   isLast: boolean
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
-}) => {
+  path: Path
+}
+
+const Text = (props: TextProps) => {
   const {
     decorations,
     isLast,
@@ -78,14 +82,28 @@ const Text = (props: {
   )
 }
 
-const MemoizedText = React.memo(Text, (prev, next) => {
-  return (
+const MemoizedTextWithDecorations = (props: TextProps) => {
+  const decorate = useDecorate()
+  const ownDecorations = useMemo(() => decorate([props.text, props.path]), [
+    props.text,
+    props.path,
+    decorate,
+  ])
+  const decorations = useMemo(() => [...props.decorations, ...ownDecorations], [
+    props.decorations,
+    ownDecorations,
+  ])
+  return <MemoizedText {...props} decorations={decorations} />
+}
+
+const MemoizedText = React.memo(
+  Text,
+  (prev, next) =>
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
     isDecoratorRangeListEqual(next.decorations, prev.decorations)
-  )
-})
+)
 
-export default MemoizedText
+export default MemoizedTextWithDecorations

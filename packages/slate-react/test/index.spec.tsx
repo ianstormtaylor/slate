@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  createEditor,
-  NodeEntry,
-  Node,
-  Range,
-  Element,
-  Transforms,
-} from 'slate'
+import { createEditor, NodeEntry, Range, Element, Transforms } from 'slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import {
   Slate,
@@ -46,20 +39,19 @@ describe('slate-react', () => {
         expect(decorate).toHaveBeenCalledTimes(3)
       })
 
-      it('should rerender the part of the tree that received an updated decoration', () => {
+      it('should rerender the nodes of the tree that received an updated decoration', () => {
         const editor = withReact(createEditor())
 
         const value = [
-          { type: 'block', children: [{ text: '' }] },
-          { type: 'block', children: [{ text: '' }] },
+          { type: 'block', children: [{ text: 'foo' }] },
+          { type: 'block', children: [{ text: 'bar' }] },
         ]
 
-        // initial render does not return
-        const decorate = jest.fn<Range[], [NodeEntry]>(() => [])
-
+        let decorate = jest.fn<Range[], [NodeEntry]>(() => [])
         const renderElement = jest.fn<JSX.Element, [RenderElementProps]>(
           DefaultElement
         )
+        const renderLeaf = jest.fn<JSX.Element, [RenderLeafProps]>(DefaultLeaf)
 
         const onChange = jest.fn<void, []>()
 
@@ -71,6 +63,7 @@ describe('slate-react', () => {
               <DefaultEditable
                 decorate={decorate}
                 renderElement={renderElement}
+                renderLeaf={renderLeaf}
               />
             </Slate>,
             { createNodeMock }
@@ -78,8 +71,12 @@ describe('slate-react', () => {
         })
 
         expect(renderElement).toHaveBeenCalledTimes(2)
+        expect(renderLeaf).toHaveBeenCalledTimes(2)
 
-        decorate.mockImplementation(([node]) => {
+        renderElement.mockClear()
+        renderLeaf.mockClear()
+
+        decorate = jest.fn<Range[], [NodeEntry]>(([node, p]) => {
           if (node !== value[0].children[0]) {
             return []
           }
@@ -87,7 +84,8 @@ describe('slate-react', () => {
           return [
             {
               anchor: { path: [0, 0], offset: 0 },
-              focus: { path: [0, 0], offset: 0 },
+              focus: { path: [0, 0], offset: 3 },
+              highlight: true,
             },
           ]
         })
@@ -98,12 +96,14 @@ describe('slate-react', () => {
               <DefaultEditable
                 decorate={decorate}
                 renderElement={renderElement}
+                renderLeaf={renderLeaf}
               />
             </Slate>
           )
         })
 
-        expect(renderElement).toHaveBeenCalledTimes(3)
+        expect(renderElement).toHaveBeenCalledTimes(0)
+        expect(renderLeaf).toHaveBeenCalledTimes(1)
       })
 
       it('should pass the intersecting part of decorations to nested elements', () => {

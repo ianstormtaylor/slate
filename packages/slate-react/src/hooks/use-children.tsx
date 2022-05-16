@@ -48,11 +48,15 @@ const useChildren = (props: {
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
 
-    const ds = decorations.reduce<Range[]>((acc, dec) => {
-      const intersection = Range.intersection(dec, range)
-      if (intersection) acc.push(intersection)
-      return acc
-    }, [])
+    const ds: Range[] = []
+
+    for (const dec of decorations) {
+      const d = Range.intersection(dec, range)
+
+      if (d) {
+        ds.push(d)
+      }
+    }
 
     if (Element.isElement(n)) {
       children.push(
@@ -60,6 +64,7 @@ const useChildren = (props: {
           <ElementComponent
             decorations={ds}
             element={n}
+            path={p}
             key={key.id}
             renderElement={renderElement}
             renderPlaceholder={renderPlaceholder}
@@ -78,6 +83,7 @@ const useChildren = (props: {
           renderPlaceholder={renderPlaceholder}
           renderLeaf={renderLeaf}
           text={n}
+          path={p}
         />
       )
     }

@@ -1,9 +1,10 @@
-import React, { Fragment, useRef } from 'react'
+import React, { Fragment, useRef, useMemo } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
+import { Editor, Path, Node, Range, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
+import { useDecorate } from '../hooks/use-decorate'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
@@ -26,17 +27,21 @@ import { IS_ANDROID } from '../utils/environment'
  * Element.
  */
 
-const Element = (props: {
+export interface ElementProps {
   decorations: Range[]
+  path: Path
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
-}) => {
+}
+
+const Element = (props: ElementProps) => {
   const {
     decorations,
     element,
+    path,
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderPlaceholder,
     renderLeaf,
@@ -112,6 +117,7 @@ const Element = (props: {
           isLast={false}
           parent={element}
           text={text}
+          path={path.concat[0]}
         />
       </Tag>
     )
@@ -143,8 +149,23 @@ const Element = (props: {
   return content
 }
 
-const MemoizedElement = React.memo(Element, (prev, next) => {
-  return (
+const MemoizedElementWithDecorations = (props: ElementProps) => {
+  const decorate = useDecorate()
+  const ownDecorations = useMemo(() => decorate([props.element, props.path]), [
+    props.element,
+    props.path,
+    decorate,
+  ])
+  const decorations = useMemo(() => [...props.decorations, ...ownDecorations], [
+    props.decorations,
+    ownDecorations,
+  ])
+  return <MemoizedElement {...props} decorations={decorations} />
+}
+
+const MemoizedElement = React.memo(
+  Element,
+  (prev, next) =>
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
@@ -153,8 +174,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
       (!!prev.selection &&
         !!next.selection &&
         Range.equals(prev.selection, next.selection)))
-  )
-})
+)
 
 /**
  * The default element renderer.
@@ -171,4 +191,4 @@ export const DefaultElement = (props: RenderElementProps) => {
   )
 }
 
-export default MemoizedElement
+export default MemoizedElementWithDecorations
