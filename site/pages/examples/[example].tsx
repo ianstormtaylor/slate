@@ -265,6 +265,7 @@ const ExamplePage = ({ example }: { example: string }) => {
       onError={(error, stacktrace) => {
         setError(error)
         setStacktrace(stacktrace)
+        console.error(error)
       }}
     >
       <div>

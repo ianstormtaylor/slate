@@ -11,8 +11,9 @@ export type Diff = {
 }
 
 export interface TextInsertion {
-  text: Diff
-  path: Path
+  range: Range
+  insertText: string
+  removeText: string
 }
 
 type TextRange = {
@@ -121,7 +122,7 @@ export function diffText(prev?: string, next?: string): Diff | null {
 }
 
 export function combineInsertedText(insertedText: TextInsertion[]): string {
-  return insertedText.reduce((acc, { text }) => `${acc}${text.insertText}`, '')
+  return insertedText.reduce((acc, { insertText }) => `${acc}${insertText}`, '')
 }
 
 export function getTextInsertion<T extends Editor>(
@@ -149,8 +150,12 @@ export function getTextInsertion<T extends Editor>(
       const textPath = ReactEditor.findPath(editor, node)
 
       return {
-        text: textDiff,
-        path: textPath,
+        range: {
+          anchor: { path: textPath, offset: textDiff.start },
+          focus: { path: textPath, offset: textDiff.end },
+        },
+        insertText: textDiff.insertText,
+        removeText: textDiff.removeText,
       }
     }
   }
@@ -158,36 +163,15 @@ export function getTextInsertion<T extends Editor>(
   return undefined
 }
 
-export function mergeTextInsertions(
-  current: TextInsertion[],
-  next: TextInsertion[]
-) {
-  const merged: TextInsertion[] = next.slice(0)
-
-  current.forEach(insertion => {
-    if (!merged.some(({ path }) => Path.equals(path, insertion.path))) {
-      merged.push(insertion)
-    }
-  })
-
-  return merged
-}
-
 export function normalizeTextInsertionRange(
   editor: Editor,
   range: Range | null,
-  { path, text }: TextInsertion
+  { range: insertionRange, insertText, removeText }: TextInsertion
 ) {
-  const insertionRange = {
-    anchor: { path, offset: text.start },
-    focus: { path, offset: text.end },
-  }
-
   if (!range || !Range.isCollapsed(range)) {
     return insertionRange
   }
 
-  const { insertText, removeText } = text
   const isSingleCharacterInsertion =
     insertText.length === 1 || removeText.length === 1
 
@@ -210,7 +194,10 @@ export function normalizeTextInsertionRange(
    *
    * hello[o]|o
    */
-  if (isSingleCharacterInsertion && Path.equals(range.anchor.path, path)) {
+  if (
+    isSingleCharacterInsertion &&
+    Path.equals(range.anchor.path, range.anchor.path)
+  ) {
     const [text] = Array.from(
       Editor.nodes(editor, { at: range, match: Text.isText })
     )
@@ -229,8 +216,8 @@ export function normalizeTextInsertionRange(
       if (removeText.length === 1 && removeText === characterBeforeAnchor) {
         // Assume text should be removed right before the anchor
         return {
-          anchor: { path, offset: anchor.offset - 1 },
-          focus: { path, offset: anchor.offset },
+          anchor: { path: range.anchor.path, offset: anchor.offset - 1 },
+          focus: { path: range.anchor.path, offset: anchor.offset },
         }
       }
     }

@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Range, Transforms } from 'slate'
+import { Editor, Range, Transforms, Path } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import { DOMNode } from '../../utils/dom'
 import {
@@ -155,8 +155,18 @@ export function createAndroidInputManager({
 
     const { selection } = editor
     pendingChanges.forEach(insertion => {
-      const text = insertion.text.insertText
+      const text = insertion.insertText
       const at = normalizeTextInsertionRange(editor, selection, insertion)
+
+      // Skip applying the pending text change if the text under the selection changed
+      // compared to the version the user is currently seeing.
+      if (
+        !Path.equals(at.anchor.path, at.focus.path) ||
+        Editor.string(editor, at) !== insertion.removeText
+      ) {
+        return
+      }
+
       Transforms.setSelection(editor, at)
       Editor.insertText(editor, text)
     })
@@ -206,18 +216,18 @@ export function createAndroidInputManager({
    */
 
   const deleteBackward = () => {
-    debug('deleteBackward', editor.selection)
-
     // COMPAT: GBoard likes to select from the end of the previous line to the start
     // of the current line when deleting backwards at the start of a line.
-    const target =
-      editor.selection && Editor.unhangRange(editor, editor.selection)
+    const isCollapsed =
+      editor.selection &&
+      Range.isCollapsed(Editor.unhangRange(editor, editor.selection))
 
     if (
-      target &&
-      (!editor.selection || !Range.equals(editor.selection, target))
+      editor.selection &&
+      isCollapsed &&
+      !Range.isCollapsed(editor.selection)
     ) {
-      Transforms.select(editor, target)
+      Transforms.select(editor, Range.end(editor.selection))
     }
 
     Editor.deleteBackward(editor)

@@ -343,7 +343,7 @@ export const Editable = (props: EditableProps) => {
             suppressThrow: true,
           })
 
-          if (range) {
+          if (range && Editor.hasRange(editor, range)) {
             console.log(
               'user select',
               range,

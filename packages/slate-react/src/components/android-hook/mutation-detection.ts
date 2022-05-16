@@ -52,7 +52,11 @@ export function gatherMutationData(
 
         // Filter out existing diffs for the current text node
         insertedText = insertedText.filter(
-          ({ path }) => !Path.equals(path, textPath)
+          ({
+            range: {
+              anchor: { path },
+            },
+          }) => !Path.equals(path, textPath)
         )
 
         const textInsertion = getTextInsertion(editor, parentNode)
