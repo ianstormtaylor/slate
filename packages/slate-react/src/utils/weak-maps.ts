@@ -46,6 +46,11 @@ export const EDITOR_TO_PENDING_INSERTIONS: WeakMap<
   TextInsertion[]
 > = new WeakMap()
 
+export const EDITOR_TO_MUTATION_OBSERVERS: WeakMap<
+  Editor,
+  Set<MutationObserver>
+> = new WeakMap()
+
 /**
  * Weak map for associating the context `onChange` context with the plugin.
  */

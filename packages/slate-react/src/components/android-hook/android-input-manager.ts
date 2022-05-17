@@ -1,5 +1,6 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Range, Transforms, Path } from 'slate'
+import { RefObject } from 'react'
+import { Editor, Path, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import { DOMNode } from '../../utils/dom'
 import {
@@ -54,20 +55,20 @@ const debug = console.log
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
-  restoreDom: () => void
   onUserInput: () => void
 
   scheduleOnDOMSelectionChange: DebouncedFunc<() => void>
   onDOMSelectionChange: DebouncedFunc<() => void>
+  receivedUserInput: RefObject<boolean>
 }
 
 export function createAndroidInputManager({
   editor,
-  restoreDom,
   onUserInput,
 
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
+  receivedUserInput,
 }: CreateAndroidInputManagerOptions) {
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
 
@@ -83,9 +84,6 @@ export function createAndroidInputManager({
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err)
-
-      // Failed to reconcile mutations, restore DOM to its previous state
-      restoreDom()
     }
   }
 
@@ -96,6 +94,10 @@ export function createAndroidInputManager({
    */
 
   const reconcileMutations = (mutations: MutationRecord[]) => {
+    if (!receivedUserInput.current) {
+      return
+    }
+
     const mutationData = gatherMutationData(
       editor,
       mutations,
@@ -154,7 +156,7 @@ export function createAndroidInputManager({
     debug('apply changes', pendingChanges, editor.selection)
 
     const { selection } = editor
-    pendingChanges.forEach(insertion => {
+    pendingChanges?.forEach(insertion => {
       const text = insertion.insertText
       const at = normalizeTextInsertionRange(editor, selection, insertion)
 
@@ -171,13 +173,12 @@ export function createAndroidInputManager({
       Editor.insertText(editor, text)
     })
 
-    if (pendingChanges) {
+    if (pendingChanges?.length) {
       scheduleOnDOMSelectionChange()
-      scheduleOnDOMSelectionChange.flush()
-      onDOMSelectionChange.flush()
     }
 
-    restoreDom()
+    scheduleOnDOMSelectionChange.flush()
+    onDOMSelectionChange.flush()
   }
 
   /**
@@ -187,7 +188,6 @@ export function createAndroidInputManager({
   const insertBreak = () => {
     flush()
     Editor.insertBreak(editor)
-    restoreDom()
   }
 
   /**
@@ -207,8 +207,6 @@ export function createAndroidInputManager({
       // Delete expanded selection
       Editor.deleteFragment(editor)
     })
-
-    restoreDom()
   }
 
   /**
@@ -230,13 +228,13 @@ export function createAndroidInputManager({
       Transforms.select(editor, Range.end(editor.selection))
     }
 
+    debug('deleteBackward', editor.selection)
+
     Editor.deleteBackward(editor)
     ReactEditor.focus(editor)
 
     scheduleOnDOMSelectionChange.cancel()
     onDOMSelectionChange.cancel()
-
-    restoreDom()
   }
 
   /**
@@ -252,7 +250,6 @@ export function createAndroidInputManager({
           const path = ReactEditor.findPath(editor, slateNode)
 
           Transforms.delete(editor, { at: path })
-          restoreDom()
         }
       }
     })
@@ -290,7 +287,7 @@ export function createAndroidInputManager({
   const handleDOMBeforeInput = (_event: InputEvent) => {
     onUserInput()
 
-    console.log('beforeInputSelection')
+    debug('beforeInputSelection', ReactEditor.isComposing(editor))
 
     // TODO: Restore dom selection
     scheduleOnDOMSelectionChange.flush()

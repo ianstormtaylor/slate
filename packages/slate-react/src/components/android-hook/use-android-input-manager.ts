@@ -1,13 +1,13 @@
 import { RefObject, useLayoutEffect, useState } from 'react'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
-import { useRestoreDom } from '../android-hook/use-restore-dom'
 import { useTrackUserInput } from '../android-hook/use-track-user-input'
 import {
   createAndroidInputManager,
   CreateAndroidInputManagerOptions,
 } from './android-input-manager'
 import { useMutationObserver } from './use-mutation-observer'
+import { useRestoreDom } from './use-restore-dom'
 
 const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
   childList: true,
@@ -20,7 +20,7 @@ type UseAndroidInputManagerOptions = {
   node: RefObject<HTMLElement>
 } & Omit<
   CreateAndroidInputManagerOptions,
-  'editor' | 'restoreDom' | 'onUserInput'
+  'editor' | 'onUserInput' | 'receivedUserInput'
 >
 
 export function useAndroidInputManager({
@@ -34,10 +34,13 @@ export function useAndroidInputManager({
   const editor = useSlateStatic()
 
   const { receivedUserInput, onUserInput } = useTrackUserInput()
-  const restoreDom = useRestoreDom(node, receivedUserInput)
-
   const [inputManager] = useState(() =>
-    createAndroidInputManager({ editor, restoreDom, onUserInput, ...options })
+    createAndroidInputManager({
+      receivedUserInput,
+      editor,
+      onUserInput,
+      ...options,
+    })
   )
 
   useLayoutEffect(() => () => {
@@ -45,12 +48,15 @@ export function useAndroidInputManager({
   })
 
   useMutationObserver(
+    editor,
     node,
     inputManager.handleMutations,
     MUTATION_OBSERVER_CONFIG
   )
 
   inputManager.flush()
+
+  useRestoreDom(node, receivedUserInput)
 
   return inputManager
 }

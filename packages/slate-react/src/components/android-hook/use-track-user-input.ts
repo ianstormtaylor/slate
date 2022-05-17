@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef } from 'react'
-
+import { useCallback, useEffect, useRef, useLayoutEffect } from 'react'
 import { ReactEditor } from '../..'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 
@@ -12,7 +11,6 @@ export function useTrackUserInput() {
       const window = ReactEditor.getWindow(editor)
 
       receivedUserInput.current = true
-
       if (animationFrameRef.current) {
         window.cancelAnimationFrame(animationFrameRef.current)
       }
@@ -23,13 +21,6 @@ export function useTrackUserInput() {
       })
     }
   }, [])
-
-  useEffect(() => {
-    // Reset user input tracking on every render
-    if (receivedUserInput.current) {
-      receivedUserInput.current = false
-    }
-  })
 
   return {
     receivedUserInput,

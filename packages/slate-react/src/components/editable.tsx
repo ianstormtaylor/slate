@@ -153,6 +153,92 @@ export const Editable = (props: EditableProps) => {
     []
   )
 
+  // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
+  // needs to be manually focused.
+  useEffect(() => {
+    if (ref.current && autoFocus) {
+      ref.current.focus()
+    }
+  }, [autoFocus])
+
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React's `onSelect` is leaky
+  // and non-standard so it doesn't fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
+  const onDOMSelectionChange = useCallback(
+    throttle(() => {
+      if (
+        !state.isUpdatingSelection &&
+        !state.isDraggingInternally &&
+        !androidInputManager?.handleDOMSelectionChange()
+      ) {
+        const root = ReactEditor.findDocumentOrShadowRoot(editor)
+        const { activeElement } = root
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const domSelection = root.getSelection()
+
+        if (activeElement === el) {
+          state.latestElement = activeElement
+          IS_FOCUSED.set(editor, true)
+        } else {
+          IS_FOCUSED.delete(editor)
+        }
+
+        if (!domSelection) {
+          return Transforms.deselect(editor)
+        }
+
+        const { anchorNode, focusNode } = domSelection
+
+        const anchorNodeSelectable =
+          hasEditableTarget(editor, anchorNode) ||
+          isTargetInsideNonReadonlyVoid(editor, anchorNode)
+
+        const focusNodeSelectable =
+          hasEditableTarget(editor, focusNode) ||
+          isTargetInsideNonReadonlyVoid(editor, focusNode)
+
+        if (anchorNodeSelectable && focusNodeSelectable) {
+          const range = ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+            suppressThrow: true,
+          })
+
+          if (range && Editor.hasRange(editor, range)) {
+            console.log(
+              'user select',
+              range,
+              window
+                .getSelection()
+                ?.getRangeAt(0)
+                .cloneRange()
+            )
+
+            if (!IS_COMPOSING.has(editor)) {
+              Transforms.select(editor, range)
+            } else {
+              editor.selection = range
+            }
+          }
+        }
+      }
+    }, 100),
+    [readOnly]
+  )
+
+  const scheduleOnDOMSelectionChange = useMemo(
+    () => debounce(onDOMSelectionChange, 0),
+    [onDOMSelectionChange]
+  )
+
+  const androidInputManager = useAndroidInputManager({
+    node: ref,
+    onDOMSelectionChange,
+    scheduleOnDOMSelectionChange,
+  })
+
+  // Has to be after androidInputManager so restoreDOM is run beforehand
   // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
     // Update element-related weak maps with the DOM element ref.
@@ -289,91 +375,6 @@ export const Editable = (props: EditableProps) => {
 
       state.isUpdatingSelection = false
     })
-  })
-
-  // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
-  // needs to be manually focused.
-  useEffect(() => {
-    if (ref.current && autoFocus) {
-      ref.current.focus()
-    }
-  }, [autoFocus])
-
-  // Listen on the native `selectionchange` event to be able to update any time
-  // the selection changes. This is required because React's `onSelect` is leaky
-  // and non-standard so it doesn't fire until after a selection has been
-  // released. This causes issues in situations where another change happens
-  // while a selection is being dragged.
-  const onDOMSelectionChange = useCallback(
-    throttle(() => {
-      if (
-        !state.isUpdatingSelection &&
-        !state.isDraggingInternally &&
-        !androidInputManager?.handleDOMSelectionChange()
-      ) {
-        const root = ReactEditor.findDocumentOrShadowRoot(editor)
-        const { activeElement } = root
-        const el = ReactEditor.toDOMNode(editor, editor)
-        const domSelection = root.getSelection()
-
-        if (activeElement === el) {
-          state.latestElement = activeElement
-          IS_FOCUSED.set(editor, true)
-        } else {
-          IS_FOCUSED.delete(editor)
-        }
-
-        if (!domSelection) {
-          return Transforms.deselect(editor)
-        }
-
-        const { anchorNode, focusNode } = domSelection
-
-        const anchorNodeSelectable =
-          hasEditableTarget(editor, anchorNode) ||
-          isTargetInsideNonReadonlyVoid(editor, anchorNode)
-
-        const focusNodeSelectable =
-          hasEditableTarget(editor, focusNode) ||
-          isTargetInsideNonReadonlyVoid(editor, focusNode)
-
-        if (anchorNodeSelectable && focusNodeSelectable) {
-          const range = ReactEditor.toSlateRange(editor, domSelection, {
-            exactMatch: false,
-            suppressThrow: true,
-          })
-
-          if (range && Editor.hasRange(editor, range)) {
-            console.log(
-              'user select',
-              range,
-              window
-                .getSelection()
-                ?.getRangeAt(0)
-                .cloneRange()
-            )
-
-            if (!IS_COMPOSING.has(editor)) {
-              Transforms.select(editor, range)
-            } else {
-              editor.selection = range
-            }
-          }
-        }
-      }
-    }, 100),
-    [readOnly]
-  )
-
-  const scheduleOnDOMSelectionChange = useMemo(
-    () => debounce(onDOMSelectionChange, 0),
-    [onDOMSelectionChange]
-  )
-
-  const androidInputManager = useAndroidInputManager({
-    node: ref,
-    onDOMSelectionChange,
-    scheduleOnDOMSelectionChange,
   })
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
