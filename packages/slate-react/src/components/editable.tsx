@@ -206,7 +206,7 @@ export const Editable = (props: EditableProps) => {
         try {
           const domRange = ReactEditor.toDOMRange(editor, selection)
           scrollSelectionIntoView(editor, domRange)
-        } catch { }
+        } catch {}
 
         return
       }
