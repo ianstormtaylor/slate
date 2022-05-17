@@ -203,6 +203,11 @@ export const Editable = (props: EditableProps) => {
         suppressThrow: true,
       })
       if (slateRange && Range.equals(slateRange, selection)) {
+        try {
+          const domRange = ReactEditor.toDOMRange(editor, selection)
+          scrollSelectionIntoView(editor, domRange)
+        } catch { }
+
         return
       }
     }
