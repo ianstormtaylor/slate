@@ -57,7 +57,7 @@ export const Path: PathInterface = {
   /**
    * Get a list of ancestor paths for a given path.
    *
-   * The paths are sorted from deepest to shallowest ancestor. However, if the
+   * The paths are sorted from shallowest to deepest ancestor. However, if the
    * `reverse: true` option is passed, they are reversed.
    */
 
