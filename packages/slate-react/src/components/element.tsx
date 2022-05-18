@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react'
+import React, { Fragment, useCallback, useRef, useMemo } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
+import { Editor, Path, Node, Range, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
+import { useDecorations } from '../hooks/use-decorations'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
 import {
   NODE_TO_ELEMENT,
@@ -23,14 +24,16 @@ import {
  * Element.
  */
 
-const Element = (props: {
+export interface ElementProps {
   decorations: Range[]
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
-}) => {
+}
+
+const Element = (props: ElementProps) => {
   const {
     decorations,
     element,
@@ -40,6 +43,7 @@ const Element = (props: {
     selection,
   } = props
   const editor = useSlateStatic()
+  const ds = useDecorations(element)
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
@@ -59,7 +63,7 @@ const Element = (props: {
     [editor, key, element]
   )
   let children: React.ReactNode = useChildren({
-    decorations,
+    decorations: [...ds, ...decorations],
     node: element,
     renderElement,
     renderPlaceholder,
@@ -134,8 +138,9 @@ const Element = (props: {
   return renderElement({ attributes, children, element })
 }
 
-const MemoizedElement = React.memo(Element, (prev, next) => {
-  return (
+const MemoizedElement = React.memo(
+  Element,
+  (prev, next) =>
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
@@ -144,8 +149,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
       (!!prev.selection &&
         !!next.selection &&
         Range.equals(prev.selection, next.selection)))
-  )
-})
+)
 
 /**
  * The default element renderer.

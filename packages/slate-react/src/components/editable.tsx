@@ -22,11 +22,11 @@ import {
 } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
 import useChildren from '../hooks/use-children'
-import { DecorateContext } from '../hooks/use-decorate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { TRIPLE_CLICK } from '../utils/constants'
+import { DecorateContext, getDecorateContext } from '../hooks/use-decorations'
 import {
   DOMElement,
   DOMNode,
@@ -426,6 +426,17 @@ export const Editable = (props: EditableProps) => {
       }
     }
   })
+
+  const initialDecorate = useRef(true)
+  const { decorateContext, onDecorateChange } = getDecorateContext(decorate)
+  useIsomorphicLayoutEffect(() => {
+    // don't force extra update on very first render
+    if (initialDecorate.current) {
+      initialDecorate.current = false
+      return
+    }
+    onDecorateChange(decorate)
+  }, [decorate])
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
   // is required because React's `beforeinput` is fake and never really attaches
@@ -847,7 +858,7 @@ export const Editable = (props: EditableProps) => {
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
-      <DecorateContext.Provider value={decorate}>
+      <DecorateContext.Provider value={decorateContext}>
         <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
           <Component
             role={readOnly ? undefined : 'textbox'}
