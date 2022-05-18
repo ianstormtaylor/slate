@@ -117,15 +117,17 @@ export const Range: RangeInterface = {
    */
 
   intersection(range: Range, another: Range): Range | null {
-    const { anchor, focus, ...rest } = range
     const [s1, e1] = Range.edges(range)
     const [s2, e2] = Range.edges(another)
     const start = Point.isBefore(s1, s2) ? s2 : s1
-    const end = Point.isBefore(e1, e2) ? e1 : e2
+    const end = Point.isAfter(e1, e2) ? e2 : e1
 
     if (Point.isBefore(end, start)) {
       return null
+    } else if (start === s1 && end === e1) {
+      return range
     } else {
+      const { anchor, focus, ...rest } = range
       return { anchor: start, focus: end, ...rest }
     }
   },
