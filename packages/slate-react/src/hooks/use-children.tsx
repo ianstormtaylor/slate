@@ -46,7 +46,7 @@ const useChildren = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
-    const sel = selection && Range.intersection(range, selection)
+    const sel = selection && Range.intersection(selection, range)
     const ds = []
 
     for (const dec of decorations) {

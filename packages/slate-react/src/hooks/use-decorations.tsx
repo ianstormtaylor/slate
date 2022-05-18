@@ -1,20 +1,9 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useReducer,
-  useRef,
-} from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef } from 'react'
 import { Node, NodeEntry, BaseRange } from 'slate'
+import { useSyncExternalStoreWithSelector } from 'use-sync-external-store/shim/with-selector'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
-import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
-
-function isError(error: any): error is Error {
-  return error instanceof Error
-}
 
 type DecorationsList = (BaseRange & { placeholder?: string | undefined })[]
 type DecorateFn = (entry: NodeEntry) => DecorationsList
@@ -29,11 +18,7 @@ export const DecorateContext = createContext<{
   addEventListener: (callback: DecorateChangeHandler) => () => void
 }>({} as any)
 
-/**
- * use redux style selectors to prevent rerendering on every decorate change
- */
 export function useDecorations(node: Node) {
-  const [iteration, forceRender] = useReducer(s => s + 1, 0)
   const editor = useSlateStatic()
   const context = useContext(DecorateContext)
 
@@ -44,71 +29,18 @@ export function useDecorations(node: Node) {
   }
   const { getDecorate, addEventListener } = context
 
-  const latestSubscriptionCallbackError = useRef<Error | undefined>()
-  const latestNode = useRef<Node>(node)
-  const latestDecorationState = useRef<DecorationsList>([])
-  let decorationState: DecorationsList
-
-  try {
-    if (
-      iteration === 0 ||
-      node !== latestNode.current ||
-      latestSubscriptionCallbackError.current
-    ) {
-      const path = ReactEditor.findPath(editor, node)
-      decorationState = getDecorate()([node, path])
-    } else {
-      decorationState = latestDecorationState.current
-    }
-  } catch (err) {
-    if (latestSubscriptionCallbackError.current && isError(err)) {
-      err.message += `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`
-    }
-
-    throw err
+  const getDecorations = (decorate: DecorateFn) => {
+    const path = ReactEditor.findPath(editor, node)
+    return decorate([node, path])
   }
-  useIsomorphicLayoutEffect(() => {
-    latestNode.current = node
-    latestDecorationState.current = decorationState
-    latestSubscriptionCallbackError.current = undefined
-  })
 
-  useIsomorphicLayoutEffect(
-    () => {
-      function checkForUpdates() {
-        try {
-          const path = ReactEditor.findPath(editor, latestNode.current)
-          const newDecorationState = getDecorate()([latestNode.current, path])
-
-          if (
-            isDecoratorRangeListEqual(
-              newDecorationState,
-              latestDecorationState.current
-            )
-          ) {
-            return
-          }
-
-          latestDecorationState.current = newDecorationState
-        } catch (err) {
-          // we ignore all errors here, since when the component
-          // is re-rendered, the selectors are called again, and
-          // will throw again, if neither props nor store state
-          // changed
-          latestSubscriptionCallbackError.current = err
-        }
-
-        forceRender()
-      }
-
-      const unsubscribe = addEventListener(checkForUpdates)
-      return () => unsubscribe()
-    },
-    // don't rerender on equalityFn change since we want to be able to define it inline
-    [addEventListener, getDecorate]
+  return useSyncExternalStoreWithSelector(
+    addEventListener,
+    getDecorate,
+    null,
+    getDecorations,
+    isDecoratorRangeListEqual
   )
-
-  return decorationState
 }
 
 /**
