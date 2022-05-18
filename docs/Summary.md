@@ -48,6 +48,7 @@
   - [RangeRef](api/locations/range-ref.md)
   - [Span](api/locations/span.md)
 - [Operation](api/operation.md)
+- [Scrubber](api/scrubber.md)
 
 ## Libraries
 
