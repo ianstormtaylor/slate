@@ -51,10 +51,15 @@ export const createRestoreDomManager = (
       ? target
       : target.parentElement) as HTMLElement | null
 
-    if (
-      !targetElement ||
-      !ReactEditor.hasDOMNode(editor, targetElement, { editable: true })
-    ) {
+    if (!targetElement) {
+      return false
+    }
+
+    if (targetElement === ReactEditor.toDOMNode(editor, editor)) {
+      return true
+    }
+
+    if (!ReactEditor.hasDOMNode(editor, targetElement, { editable: true })) {
       return false
     }
 

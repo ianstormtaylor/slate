@@ -6,8 +6,12 @@ import { getTextInsertion, TextInsertion } from './diff-text'
 interface MutationData {
   addedNodes: DOMNode[]
   removedNodes: DOMNode[]
-  insertedText: TextInsertion[]
   characterDataMutations: MutationRecord[]
+
+  // New pending insertions
+  pendingInsertions: TextInsertion[]
+  // Inserted text in this batch
+  insertedText: TextInsertion[]
 }
 
 type MutationDetection = (editor: Editor, mutationData: MutationData) => boolean
@@ -19,7 +23,10 @@ export function gatherMutationData(
 ): MutationData {
   const addedNodes: DOMNode[] = []
   const removedNodes: DOMNode[] = []
-  let insertedText: TextInsertion[] = pendingInsertions.slice(0)
+
+  let newPendingInsertions: TextInsertion[] = pendingInsertions.slice(0)
+  let insertedText: TextInsertion[] = []
+
   const characterDataMutations: MutationRecord[] = []
 
   mutations.forEach(mutation => {
@@ -51,6 +58,13 @@ export function gatherMutationData(
         const textPath = ReactEditor.findPath(editor, node)
 
         // Filter out existing diffs for the current text node
+        newPendingInsertions = newPendingInsertions.filter(
+          ({
+            range: {
+              anchor: { path },
+            },
+          }) => !Path.equals(path, textPath)
+        )
         insertedText = insertedText.filter(
           ({
             range: {
@@ -65,12 +79,19 @@ export function gatherMutationData(
         }
 
         // Add the text diff to the array of detected text insertions that need to be reconciled
+        newPendingInsertions.push(textInsertion)
         insertedText.push(textInsertion)
       }
     }
   })
 
-  return { addedNodes, removedNodes, insertedText, characterDataMutations }
+  return {
+    addedNodes,
+    removedNodes,
+    pendingInsertions: newPendingInsertions,
+    characterDataMutations,
+    insertedText,
+  }
 }
 
 export const isLineBreak: MutationDetection = (

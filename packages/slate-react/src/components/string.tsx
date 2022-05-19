@@ -116,8 +116,8 @@ export const ZeroWidthString = (props: {
       data-slate-zero-width={isLineBreak ? 'n' : 'z'}
       data-slate-length={length}
     >
-      {!IS_ANDROID && '\uFEFF'}
-      {isLineBreak || IS_ANDROID ? <br /> : null}
+      {(!IS_ANDROID || !isLineBreak) && '\uFEFF'}
+      {isLineBreak ? <br /> : null}
     </span>
   )
 }

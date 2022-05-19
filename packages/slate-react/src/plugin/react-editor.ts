@@ -569,9 +569,13 @@ export const ReactEditor = {
       }
 
       if (
-        !IS_ANDROID &&
         domNode &&
         offset === domNode.textContent!.length &&
+        // COMPAT: Android IMEs might remove the zero width space while composing,
+        // and we don't add it for line-breaks.
+        IS_ANDROID &&
+        domNode.getAttribute('data-slate-zero-width') === 'z' &&
+        domNode.textContent?.startsWith('\uFEFF') &&
         // COMPAT: If the parent node is a Slate zero-width space, editor is
         // because the text node should have no characters. However, during IME
         // composition the ASCII characters will be prepended to the zero-width

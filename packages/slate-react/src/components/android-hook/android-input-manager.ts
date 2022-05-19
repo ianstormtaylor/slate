@@ -104,7 +104,7 @@ export function createAndroidInputManager({
       EDITOR_TO_PENDING_INSERTIONS.get(editor)
     )
 
-    const { insertedText, removedNodes } = mutationData
+    const { pendingInsertions, insertedText, removedNodes } = mutationData
 
     debug('reconcileMutations', mutations, mutationData)
 
@@ -118,7 +118,7 @@ export function createAndroidInputManager({
     } else if (isDeletion(editor, mutationData)) {
       deleteBackward()
     } else {
-      insertText(insertedText)
+      insertText(pendingInsertions)
     }
   }
 
@@ -214,6 +214,8 @@ export function createAndroidInputManager({
    */
 
   const deleteBackward = () => {
+    flush()
+
     // COMPAT: GBoard likes to select from the end of the previous line to the start
     // of the current line when deleting backwards at the start of a line.
     const isCollapsed =
