@@ -314,7 +314,8 @@ export const ReactEditor = {
     const texts = Array.from(el.querySelectorAll(selector))
     let start = 0
 
-    for (const text of texts) {
+    for (let i = 0; i < texts.length; i++) {
+      const text = texts[i]
       const domNode = text.childNodes[0] as HTMLElement
 
       if (domNode == null || domNode.textContent == null) {
@@ -325,6 +326,19 @@ export const ReactEditor = {
       const attr = text.getAttribute('data-slate-length')
       const trueLength = attr == null ? length : parseInt(attr, 10)
       const end = start + trueLength
+
+      const nextText = texts[i + 1]
+      if (
+        IS_ANDROID &&
+        point.offset === end &&
+        nextText?.hasAttribute('data-slate-mark-placeholder')
+      ) {
+        domPoint = [
+          nextText,
+          nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
+        ]
+        break
+      }
 
       if (point.offset <= end) {
         const offset = Math.min(length, Math.max(0, point.offset - start))
@@ -533,9 +547,14 @@ export const ReactEditor = {
             if (
               IS_ANDROID &&
               !exactMatch &&
-              el.matches('[data-slate-zero-width]') &&
-              el.textContent.length > 0
+              el.hasAttribute('data-slate-zero-width') &&
+              el.textContent.length > 0 &&
+              el.textContext !== '\uFEFF'
             ) {
+              if (el.textContent.startsWith('\uFEFF')) {
+                el.textContent = el.textContent.slice(1)
+              }
+
               return
             }
 

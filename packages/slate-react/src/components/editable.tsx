@@ -56,6 +56,8 @@ import {
   EDITOR_TO_WINDOW,
   EDITOR_TO_USER_SELECTION,
   IS_COMPOSING,
+  MARK_PLACEHOLDER_SYMBOL,
+  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
 import { useAndroidInputManager } from './android-hook/use-android-input-manager'
@@ -291,8 +293,23 @@ export const Editable = (props: EditableProps) => {
         // (e.g. when clicking on contentEditable:false element)
         suppressThrow: true,
       })
+
       if (slateRange && Range.equals(slateRange, selection)) {
-        return
+        const hasMarkPlaceholder = !!EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(
+          editor
+        )
+
+        if (!IS_ANDROID || !hasMarkPlaceholder) {
+          return
+        }
+
+        // Ensure selection is inside the mark placeholder
+        const { anchorNode } = domSelection
+        if (
+          anchorNode?.parentElement?.hasAttribute('data-slate-mark-placeholder')
+        ) {
+          return
+        }
       }
     }
 
@@ -314,7 +331,7 @@ export const Editable = (props: EditableProps) => {
     const newDomRange: DOMRange | null =
       selection && ReactEditor.toDOMRange(editor, selection)
 
-    console.log('set dom selection', newDomRange)
+    console.log('set dom selection', newDomRange?.cloneRange())
 
     if (newDomRange) {
       if (Range.isBackward(selection!)) {
@@ -338,32 +355,6 @@ export const Editable = (props: EditableProps) => {
     }
 
     setTimeout(() => {
-      // COMPAT: Since we flush mutation synchronously, sometimes the keyboard (especially GBoard) will move the
-      // selection to a undesired place after our dom mutation and we have to force it back at the end of the 'tick'.
-      /* if (
-        editor.selection &&
-        selection &&
-        newDomRange &&
-        IS_ANDROID &&
-        Range.equals(editor.selection, selection)
-      ) {
-        if (Range.isBackward(selection!)) {
-          domSelection.setBaseAndExtent(
-            newDomRange.endContainer,
-            newDomRange.endOffset,
-            newDomRange.startContainer,
-            newDomRange.startOffset
-          )
-        } else {
-          domSelection.setBaseAndExtent(
-            newDomRange.startContainer,
-            newDomRange.startOffset,
-            newDomRange.endContainer,
-            newDomRange.endOffset
-          )
-        }
-      } */
-
       console.log('done updating selection')
 
       // COMPAT: In Firefox, it's not enough to create a range, you also need
@@ -681,6 +672,32 @@ export const Editable = (props: EditableProps) => {
       anchor: start,
       focus: start,
     })
+  }
+
+  const marks = Editor.marks(editor)
+  if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
+    EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks)
+
+    const { anchor } = editor.selection
+    const leaf = Node.get(editor, anchor.path) as Text
+
+    if (!Text.equals(leaf, marks as Text, { loose: true })) {
+      const { text, ...rest } = leaf
+      const unset = Object.fromEntries(
+        Object.keys(rest).map(key => [key, null])
+      )
+
+      decorations.push({
+        [MARK_PLACEHOLDER_SYMBOL]: true,
+        ...unset,
+        ...marks,
+
+        anchor,
+        focus: anchor,
+      })
+    }
+  } else {
+    EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, null)
   }
 
   return (

@@ -49,7 +49,6 @@ export function gatherMutationData(
 
         // Changes to text nodes should consider the parent element
         const { parentNode } = mutation.target
-
         if (!parentNode) {
           return
         }

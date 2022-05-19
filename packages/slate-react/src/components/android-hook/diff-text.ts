@@ -1,7 +1,8 @@
 import { Editor, Path, Range, Text } from 'slate'
 
 import { ReactEditor } from '../..'
-import { DOMNode } from '../../utils/dom'
+import { DOMNode, DOMElement } from '../../utils/dom'
+import { EDITOR_TO_MARK_PLACEHOLDER_MARKS } from '../../utils/weak-maps'
 
 export type Diff = {
   start: number
@@ -14,6 +15,7 @@ export interface TextInsertion {
   range: Range
   insertText: string
   removeText: string
+  marks: Partial<Text> | null
 }
 
 type TextRange = {
@@ -127,9 +129,10 @@ export function combineInsertedText(insertedText: TextInsertion[]): string {
 
 export function getTextInsertion<T extends Editor>(
   editor: T,
-  domNode: DOMNode
+  targetNode: DOMNode
 ): TextInsertion | undefined {
-  const node = ReactEditor.toSlateNode(editor, domNode)
+  const node = ReactEditor.toSlateNode(editor, targetNode)
+  const domNode = ReactEditor.toDOMNode(editor, node)
 
   if (!Text.isText(node)) {
     return undefined
@@ -148,8 +151,16 @@ export function getTextInsertion<T extends Editor>(
     const textDiff = diffText(prevText, nextText)
     if (textDiff !== null) {
       const textPath = ReactEditor.findPath(editor, node)
+      let { text, ...marks } = node
+
+      if (
+        (targetNode as DOMElement).hasAttribute('data-slate-mark-placeholder')
+      ) {
+        marks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor) ?? marks
+      }
 
       return {
+        marks,
         range: {
           anchor: { path: textPath, offset: textDiff.start },
           focus: { path: textPath, offset: textDiff.end },

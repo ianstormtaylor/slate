@@ -170,6 +170,10 @@ export function createAndroidInputManager({
       }
 
       Transforms.setSelection(editor, at)
+      if (insertion.marks) {
+        editor.marks = insertion.marks
+      }
+
       Editor.insertText(editor, text)
     })
 
@@ -291,7 +295,6 @@ export function createAndroidInputManager({
 
     debug('beforeInputSelection', ReactEditor.isComposing(editor))
 
-    // TODO: Restore dom selection
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
 

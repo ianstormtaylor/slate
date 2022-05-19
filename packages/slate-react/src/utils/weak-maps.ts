@@ -1,4 +1,4 @@
-import { Ancestor, Editor, Node, RangeRef } from 'slate'
+import { Ancestor, Editor, Node, RangeRef, Text } from 'slate'
 import { Key } from './key'
 import { TextInsertion } from '../components/android-hook/diff-text'
 
@@ -56,9 +56,16 @@ export const EDITOR_TO_MUTATION_OBSERVERS: WeakMap<
  */
 
 export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
+export const EDITOR_TO_MARK_PLACEHOLDER_MARKS = new WeakMap<
+  Editor,
+  Partial<Text> | null
+>()
 
 /**
  * Symbols.
  */
 
 export const PLACEHOLDER_SYMBOL = (Symbol('placeholder') as unknown) as string
+export const MARK_PLACEHOLDER_SYMBOL = (Symbol(
+  'mark-placeholder'
+) as unknown) as string

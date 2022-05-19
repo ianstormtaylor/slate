@@ -40,7 +40,6 @@ export const Text: TextInterface = {
 
     function omitText(obj: Record<any, any>) {
       const { text, ...rest } = obj
-
       return rest
     }
 
