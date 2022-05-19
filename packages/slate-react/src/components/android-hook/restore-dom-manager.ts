@@ -59,7 +59,11 @@ export const createRestoreDomManager = (
       return true
     }
 
-    if (!ReactEditor.hasDOMNode(editor, targetElement, { editable: true })) {
+    if (
+      !ReactEditor.hasDOMNode(editor, targetElement, { editable: true }) &&
+      !targetElement.hasAttribute('data-slate-zero-width') &&
+      !targetElement.hasAttribute('data-slate-string')
+    ) {
       return false
     }
 
