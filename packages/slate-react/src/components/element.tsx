@@ -1,6 +1,6 @@
 import React, { Fragment, useRef } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
+import { Editor, Node, Range, Element as SlateElement } from 'slate-latest'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'

@@ -1,4 +1,4 @@
-import { Element, Descendant, Node, Range, Text, Editor } from 'slate'
+import { Element, Descendant, Node, Range, Text, Editor } from 'slate-latest'
 import {
   AnchorToken,
   FocusToken,

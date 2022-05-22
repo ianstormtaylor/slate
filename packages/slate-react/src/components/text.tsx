@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
+import { Range, Element, Text as SlateText } from 'slate-latest'
 
 import Leaf from './leaf'
 import { ReactEditor, useSlateStatic } from '..'

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Editor, Element, Node, Range, Transforms, Path, Text } from 'slate'
+import { Editor, Element, Node, Range, Transforms, Path, Text } from 'slate-latest'
 import throttle from 'lodash/throttle'
 import debounce from 'lodash/debounce'
 import scrollIntoView from 'scroll-into-view-if-needed'

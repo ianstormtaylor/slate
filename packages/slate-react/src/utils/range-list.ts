@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import { Range } from 'slate-latest'
 import { PLACEHOLDER_SYMBOL } from './weak-maps'
 
 export const shallowCompare = (obj1: {}, obj2: {}) =>

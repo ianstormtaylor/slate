@@ -1,5 +1,5 @@
 import { ReactEditor } from '../../plugin/react-editor'
-import { Editor, Range, Transforms, Text } from 'slate'
+import { Editor, Range, Transforms, Text } from 'slate-latest'
 import {
   IS_ON_COMPOSITION_END,
   EDITOR_ON_COMPOSITION_TEXT,

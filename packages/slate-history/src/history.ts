@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Operation } from 'slate'
+import { Operation } from 'slate-latest'
 
 /**
  * `History` objects hold all of the operations that are applied to a value, so

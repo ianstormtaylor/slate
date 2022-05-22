@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef } from 'react'
-import { Node as SlateNode, Path } from 'slate'
+import { Node as SlateNode, Path } from 'slate-latest'
 import { ReactEditor, useSlateStatic } from '../..'
 import { DOMNode, isDOMElement } from '../../utils/dom'
 import { ELEMENT_TO_NODE, NODE_TO_RESTORE_DOM } from '../../utils/weak-maps'

@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Element, createEditor as makeEditor } from 'slate'
+import { Element, createEditor as makeEditor } from 'slate-latest'
 import {
   createAnchor,
   createCursor,

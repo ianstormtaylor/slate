@@ -1,4 +1,4 @@
-import { Ancestor, Editor, Node, RangeRef } from 'slate'
+import { Ancestor, Editor, Node, RangeRef } from 'slate-latest'
 import { Key } from './key'
 import { TextInsertion } from '../components/android/diff-text'
 

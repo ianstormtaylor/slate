@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react'
-import { Element, Text } from 'slate'
+import { Element, Text } from 'slate-latest'
 import String from './string'
 import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'

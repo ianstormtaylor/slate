@@ -1,5 +1,5 @@
 import { createContext, useContext } from 'react'
-import { Range, NodeEntry } from 'slate'
+import { Range, NodeEntry } from 'slate-latest'
 
 /**
  * A React context for sharing the `decorate` prop of the editable.

@@ -5,7 +5,7 @@
     "packages/*"
   ],
   "scripts": {
-    "build": "yarn build:rollup && yarn build:next",
+    "build": "yarn build:rollup",
     "build:next": "cd ./site && next build && next export",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js",
     "changesetversion": "yarn changeset version && yarn install && git add .",
@@ -105,10 +105,10 @@
     "rollup-plugin-typescript2": "^0.27.2",
     "shell-quote": "^1.7.2",
     "simple-git-hooks": ">=2.0.3",
-    "slate": "workspace:*",
-    "slate-history": "workspace:*",
-    "slate-hyperscript": "workspace:*",
-    "slate-react": "workspace:*",
+    "slate-history-latest": "workspace:*",
+    "slate-hyperscript-latest": "workspace:*",
+    "slate-latest": "workspace:*",
+    "slate-react-latest": "workspace:*",
     "source-map-loader": "^0.2.4",
     "ts-jest": "^27.1.3",
     "typescript": "3.9.7"
