@@ -1,26 +1,25 @@
 import { DebouncedFunc } from 'lodash'
 import { RefObject } from 'react'
-import { Editor, Path, Range, Transforms } from 'slate'
+import { Editor, Node, Path, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
-import { DOMNode } from '../../utils/dom'
-import {
-  EDITOR_TO_PENDING_INSERTIONS,
-  IS_COMPOSING,
-} from '../../utils/weak-maps'
-import {
-  combineInsertedText,
-  normalizeTextInsertionRange,
-  TextInsertion,
-} from './diff-text'
-import {
-  gatherMutationData,
-  isDeletion,
-  isLineBreak,
-  isRemoveLeafNodes,
-  isReplaceExpandedSelection,
-} from './mutation-detection'
+import { EDITOR_TO_USER_SELECTION, IS_COMPOSING } from '../../utils/weak-maps'
+import { Diff, mergeDiffs } from './diff-text'
 
-//
+type TextDiff = { path: Path; diff: Diff }
+
+type ReplaceExpandedAction = {
+  at: Range
+  text: string
+  type: 'replace_expanded'
+}
+type LineBreakAction = { at: Range; type: 'line_break' }
+type DeleteAction = {
+  at: Range
+  type: 'delete'
+  direction: 'forward' | 'backward'
+}
+
+type Action = ReplaceExpandedAction | LineBreakAction | DeleteAction
 
 // https://github.com/facebook/draft-js/blob/main/src/component/handlers/composition/DraftEditorCompositionHandler.js#L41
 // When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
@@ -28,30 +27,6 @@ const RESOLVE_DELAY = 25
 
 // Replace with `const debug = console.log` to debug
 const debug = console.log
-
-/**
- * Based loosely on:
- *
- * https://github.com/facebook/draft-js/blob/master/src/component/handlers/composition/DOMObserver.js
- * https://github.com/ProseMirror/prosemirror-view/blob/master/src/domobserver.js
- *
- * The input manager attempts to map observed mutations on the document to a
- * set of operations in order to reconcile Slate's internal value with the DOM.
- *
- * Mutations are processed synchronously as they come in. Only mutations that occur
- * during a user input loop are processed, as other mutations can occur within the
- * document that were not initiated by user input.
- *
- * The mutation reconciliation process attempts to match mutations to the following
- * patterns:
- *
- * - Text updates
- * - Deletions
- * - Line breaks
- *
- * @param editor
- * @param restoreDOM
- */
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
@@ -68,9 +43,12 @@ export function createAndroidInputManager({
 
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
-  receivedUserInput,
 }: CreateAndroidInputManagerOptions) {
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
+
+  let pendingDiffs: TextDiff[] = []
+  let currentAction: Action | null = null
 
   /**
    * Handle MutationObserver flush
@@ -78,187 +56,64 @@ export function createAndroidInputManager({
    * @param mutations
    */
 
-  const handleMutations = (mutations: MutationRecord[]) => {
-    try {
-      reconcileMutations(mutations)
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error(err)
+  const selectPendingSelection = () => {
+    const pendingSelection = EDITOR_TO_USER_SELECTION.get(editor)?.unref()
+    EDITOR_TO_USER_SELECTION.delete(editor)
+    if (pendingSelection) {
+      Transforms.select(editor, pendingSelection)
     }
   }
 
-  /**
-   * Reconcile a batch of mutations
-   *
-   * @param mutations
-   */
-
-  const reconcileMutations = (mutations: MutationRecord[]) => {
-    if (!receivedUserInput.current) {
-      return
+  const performAction = (action: Action) => {
+    const range = Editor.range(editor, action.at)
+    if (!editor.selection || !Range.equals(editor.selection, range)) {
+      Transforms.select(editor, range)
     }
 
-    const mutationData = gatherMutationData(
-      editor,
-      mutations,
-      EDITOR_TO_PENDING_INSERTIONS.get(editor)
-    )
-
-    const { pendingInsertions, insertedText, removedNodes } = mutationData
-
-    debug('reconcileMutations', mutations, mutationData)
-
-    if (isReplaceExpandedSelection(editor, mutationData)) {
-      const text = combineInsertedText(insertedText)
-      replaceExpandedSelection(text)
-    } else if (isLineBreak(editor, mutationData)) {
-      insertBreak()
-    } else if (isRemoveLeafNodes(editor, mutationData)) {
-      removeLeafNodes(removedNodes)
-    } else if (isDeletion(editor, mutationData)) {
-      deleteBackward()
-    } else {
-      insertText(pendingInsertions)
-    }
-  }
-
-  /**
-   * Apply text diff
-   */
-
-  const insertText = (insertedText: TextInsertion[]) => {
-    debug('insertText', insertedText)
-
-    EDITOR_TO_PENDING_INSERTIONS.set(editor, insertedText)
-
-    if (!ReactEditor.isComposing(editor)) {
-      flush()
+    switch (action.type) {
+      case 'line_break': {
+        Editor.insertBreak(editor)
+        break
+      }
+      case 'replace_expanded': {
+        Editor.insertText(editor, action.text)
+        break
+      }
+      case 'delete': {
+        if (editor.selection && Range.isExpanded(editor.selection)) {
+          Editor.deleteFragment(editor, { direction: action.direction })
+        } else if (action.direction === 'forward') {
+          Editor.deleteForward(editor)
+        } else {
+          Editor.deleteBackward(editor)
+        }
+        break
+      }
     }
   }
 
   const flush = () => {
-    // TODO: Apply selection with op if we just manually mutated it.
-    debug('flushPendingChanges', editor.selection)
-
-    if (compositionEndTimeoutId) {
-      clearTimeout(compositionEndTimeoutId)
-      IS_COMPOSING.set(editor, false)
-    }
-
-    const pendingChanges = EDITOR_TO_PENDING_INSERTIONS.get(editor)
-    EDITOR_TO_PENDING_INSERTIONS.set(editor, [])
-    if (!pendingChanges?.length) {
-      scheduleOnDOMSelectionChange.flush()
-      onDOMSelectionChange.flush()
-      return
-    }
-
-    debug('apply changes', pendingChanges, editor.selection)
-
-    const { selection } = editor
-    pendingChanges?.forEach(insertion => {
-      const text = insertion.insertText
-      const at = normalizeTextInsertionRange(editor, selection, insertion)
-
-      // Skip applying the pending text change if the text under the selection changed
-      // compared to the version the user is currently seeing.
-      if (
-        !Path.equals(at.anchor.path, at.focus.path) ||
-        Editor.string(editor, at) !== insertion.removeText
-      ) {
-        return
-      }
-
-      Transforms.setSelection(editor, at)
-      if (insertion.marks) {
-        editor.marks = insertion.marks
-      }
-
-      Editor.insertText(editor, text)
-    })
-
-    if (pendingChanges?.length) {
-      scheduleOnDOMSelectionChange()
-    }
-
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
-  }
 
-  /**
-   * Handle line breaks
-   */
+    selectPendingSelection()
 
-  const insertBreak = () => {
-    flush()
-    Editor.insertBreak(editor)
-  }
-
-  /**
-   * Handle expanded selection being deleted or replaced by text
-   */
-
-  const replaceExpandedSelection = (text: string) => {
-    debug('replaceExpandedSelection')
-
-    // TODO: Handle text replacement affecting the selection
+    // TODO: Perform text diffs fist to ensure we can correctly normalize the selection
     Editor.withoutNormalizing(editor, () => {
-      if (text.length) {
-        // Selection was replaced by text, insert the entire text diff
-        Editor.insertText(editor, text)
-      }
-
-      // Delete expanded selection
-      Editor.deleteFragment(editor)
+      pendingDiffs.forEach(diff => {
+        Transforms.select(editor, {
+          anchor: { path: diff.path, offset: diff.diff.start },
+          focus: { path: diff.path, offset: diff.diff.end },
+        })
+        Editor.insertText(editor, diff.diff.insertText)
+      })
     })
-  }
+    pendingDiffs = []
 
-  /**
-   * Handle `backspace` that merges blocks
-   */
-
-  const deleteBackward = () => {
-    flush()
-
-    // COMPAT: GBoard likes to select from the end of the previous line to the start
-    // of the current line when deleting backwards at the start of a line.
-    const isCollapsed =
-      editor.selection &&
-      Range.isCollapsed(Editor.unhangRange(editor, editor.selection))
-
-    if (
-      editor.selection &&
-      isCollapsed &&
-      !Range.isCollapsed(editor.selection)
-    ) {
-      Transforms.select(editor, Range.end(editor.selection))
+    if (currentAction) {
+      performAction(currentAction)
+      currentAction = null
     }
-
-    debug('deleteBackward', editor.selection)
-
-    Editor.deleteBackward(editor)
-    ReactEditor.focus(editor)
-
-    scheduleOnDOMSelectionChange.cancel()
-    onDOMSelectionChange.cancel()
-  }
-
-  /**
-   * Handle mutations that remove specific leaves
-   */
-  const removeLeafNodes = (nodes: DOMNode[]) => {
-    // TODO: Handle text replacement affecting the selection
-    Editor.withoutNormalizing(editor, () => {
-      for (const node of nodes) {
-        const slateNode = ReactEditor.toSlateNode(editor, node)
-
-        if (slateNode) {
-          const path = ReactEditor.findPath(editor, slateNode)
-
-          Transforms.delete(editor, { at: path })
-        }
-      }
-    })
   }
 
   const handleCompositionEnd = (
@@ -270,6 +125,9 @@ export function createAndroidInputManager({
 
     const handleCompositionEnd = () => {
       IS_COMPOSING.set(editor, false)
+
+      console.log('handleCompositionEnd')
+
       flush()
     }
 
@@ -290,41 +148,259 @@ export function createAndroidInputManager({
     return true
   }
 
-  const handleDOMBeforeInput = (_event: InputEvent) => {
+  const pushAction = (action: Action | TextDiff) => {
+    if (currentAction) {
+      throw new Error('Pushed new action while current action is pending')
+    }
+
+    console.log('action', action)
+
+    if (!('type' in action)) {
+      const idx = pendingDiffs.findIndex(change =>
+        Path.equals(change.path, action.path)
+      )
+      if (idx < 0) {
+        pendingDiffs.push(action)
+        return
+      }
+
+      const target = Node.get(editor, action.path) as Text
+      pendingDiffs[idx] = {
+        path: pendingDiffs[idx].path,
+        diff: mergeDiffs(target.text, pendingDiffs[idx].diff, action.diff),
+      }
+
+      console.log('pendingDiffs', pendingDiffs)
+
+      return
+    }
+
+    currentAction = action
+  }
+
+  const handleDOMBeforeInput = (event: InputEvent) => {
     onUserInput()
 
-    debug('beforeInputSelection', ReactEditor.isComposing(editor))
+    // Ensure we don't flush while performing an action
+    if (flushTimeoutId) {
+      clearTimeout(flushTimeoutId)
+      flushTimeoutId = null
+    }
 
+    // Ensure out current (pending) selection is up-to-date
+    scheduleOnDOMSelectionChange()
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
 
-    // Set current selection to target range to ensure we are applying the next action
-    // to the correct target range (mostly relevant for delete expanded selection)
-    const [targetRange] = (event as any).getTargetRanges()
-    if (targetRange) {
-      const range = ReactEditor.toSlateRange(editor, targetRange, {
+    const { inputType: type } = event
+    let targetRange =
+      EDITOR_TO_USER_SELECTION.get(editor)?.current ?? editor.selection
+    const data = (event as any).dataTransfer || event.data || undefined
+
+    // COMPAT: For the deleting forward/backward input types we don't want
+    // to change the selection because it is the range that will be deleted,
+    // and those commands determine that for themselves.
+    const [nativeTargetRange] = (event as any).getTargetRanges()
+
+    if (nativeTargetRange) {
+      const range = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
-        suppressThrow: true,
+        suppressThrow: false,
       })
 
       if (range) {
-        debug('beforeInputSelection', range)
-        editor.selection = range
+        targetRange = range
       }
     }
+
+    if (!targetRange) {
+      throw new Error('Before input without target range')
+    }
+
+    console.log({
+      targetRange,
+      selection: window
+        .getSelection()
+        ?.getRangeAt(0)
+        .cloneRange(),
+      target: (event as any).getTargetRanges(),
+      data,
+    })
+
+    if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
+      targetRange = Editor.unhangRange(editor, targetRange)
+    }
+
+    if (
+      targetRange &&
+      Range.isExpanded(targetRange) &&
+      type.startsWith('delete')
+    ) {
+      if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
+        const [start, end] = Range.edges(targetRange)
+        pushAction({
+          path: targetRange.anchor.path,
+          diff: {
+            insertText: '',
+            end: end.offset,
+            start: start.offset,
+          },
+        })
+
+        return true
+      }
+
+      const direction = type.endsWith('Backward') ? 'backward' : 'forward'
+      pushAction({ type: 'delete', at: targetRange, direction })
+      return true
+    }
+
+    switch (type) {
+      case 'deleteByComposition':
+      case 'deleteByCut':
+      case 'deleteByDrag':
+      case 'deleteContent':
+      case 'deleteContentForward': {
+        pushAction({
+          type: 'delete',
+          at: targetRange,
+          direction: 'forward',
+        })
+        break
+      }
+
+      case 'deleteContentBackward': {
+        if (targetRange.anchor.offset > 0) {
+          pushAction({
+            path: targetRange.anchor.path,
+            diff: {
+              insertText: '',
+              end: targetRange.anchor.offset,
+              start: targetRange.anchor.offset - 1,
+            },
+          })
+          break
+        }
+
+        pushAction({
+          type: 'delete',
+          at: targetRange,
+          direction: 'backward',
+        })
+        break
+      }
+
+      case 'deleteEntireSoftLine': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteHardLineBackward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteSoftLineBackward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteHardLineForward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteSoftLineForward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteWordBackward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'deleteWordForward': {
+        throw new Error('Not implemented')
+      }
+
+      case 'insertLineBreak':
+        // TODO: Other editor action
+        pushAction({ type: 'line_break', at: targetRange })
+        break
+
+      case 'insertParagraph': {
+        pushAction({ type: 'line_break', at: targetRange })
+        break
+      }
+
+      case 'insertCompositionText':
+      case 'deleteCompositionText':
+      case 'insertFromComposition':
+      case 'insertFromDrop':
+      case 'insertFromPaste':
+      case 'insertFromYank':
+      case 'insertReplacementText':
+      case 'insertText': {
+        // TODO: Non-string data action, line break
+
+        const unhanged = Editor.unhangRange(editor, targetRange)
+        if (!Path.equals(unhanged.anchor.path, unhanged.focus.path)) {
+          pushAction({
+            type: 'replace_expanded',
+            at: targetRange,
+            text: data ?? '',
+          })
+          break
+        }
+
+        // TODO: Handle
+        const [start, end] = Range.edges(targetRange)
+        pushAction({
+          path: start.path,
+          diff: {
+            start: start.offset,
+            end: end.offset,
+            insertText: data ?? '',
+          },
+        })
+
+        break
+      }
+    }
+
+    debug('beforeInputSelection', editor.selection, type)
 
     return true
   }
 
   const hasPendingChanges = () => {
-    return !!EDITOR_TO_PENDING_INSERTIONS.get(editor)?.length
+    return !!pendingDiffs.length
   }
 
-  const handleDOMSelectionChange = () => {
-    // Delay selection change until pending changes are flushed
-    if (hasPendingChanges()) {
-      scheduleOnDOMSelectionChange()
-      return true
+  const handleUserSelect = (range: Range | null) => {
+    const previousSelection =
+      EDITOR_TO_USER_SELECTION.get(editor)?.unref() ?? editor.selection
+    EDITOR_TO_USER_SELECTION.set(
+      editor,
+      range ? Editor.rangeRef(editor, range) : null
+    )
+
+    if (flushTimeoutId) {
+      clearTimeout(flushTimeoutId)
+      flushTimeoutId = null
+    }
+
+    if (
+      range &&
+      previousSelection &&
+      !Path.equals(previousSelection.anchor.path, range.anchor.path) &&
+      !hasPendingChanges()
+    ) {
+      if (!flushTimeoutId) {
+        flushTimeoutId = setTimeout(flush)
+      }
+    }
+  }
+
+  const flushAction = () => {
+    // Beforeinput events don't necessarily cause dom mutations (e.g. when deleting before a non-contenteditable element)
+    if (currentAction) {
+      flush()
     }
   }
 
@@ -332,12 +408,11 @@ export function createAndroidInputManager({
     flush,
     hasPendingChanges,
 
-    handleMutations,
-
+    handleUserSelect,
     handleCompositionEnd,
     handleCompositionStart,
-    handleDOMSelectionChange,
-
     handleDOMBeforeInput,
+
+    handleInput: flushAction,
   }
 }

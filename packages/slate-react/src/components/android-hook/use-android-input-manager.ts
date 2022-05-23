@@ -47,13 +47,6 @@ export function useAndroidInputManager({
     console.log('----------')
   })
 
-  useMutationObserver(
-    editor,
-    node,
-    inputManager.handleMutations,
-    MUTATION_OBSERVER_CONFIG
-  )
-
   inputManager.flush()
 
   useRestoreDom(node, receivedUserInput)

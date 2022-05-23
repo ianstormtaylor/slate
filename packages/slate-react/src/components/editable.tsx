@@ -170,11 +170,7 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (
-        !state.isUpdatingSelection &&
-        !state.isDraggingInternally &&
-        !androidInputManager?.handleDOMSelectionChange()
-      ) {
+      if (!state.isUpdatingSelection && !state.isDraggingInternally) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -207,20 +203,11 @@ export const Editable = (props: EditableProps) => {
             suppressThrow: true,
           })
 
-          if (range && Editor.hasRange(editor, range)) {
-            console.log(
-              'user select',
-              range,
-              window
-                .getSelection()
-                ?.getRangeAt(0)
-                .cloneRange()
-            )
-
+          if (range) {
             if (!IS_COMPOSING.has(editor)) {
               Transforms.select(editor, range)
             } else {
-              editor.selection = range
+              androidInputManager?.handleUserSelect(range)
             }
           }
         }
@@ -374,15 +361,15 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/11211
   const onDOMBeforeInput = useCallback(
     (event: InputEvent) => {
+      if (androidInputManager?.handleDOMBeforeInput(event)) {
+        return
+      }
+
       if (
         !readOnly &&
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
-        if (androidInputManager?.handleDOMBeforeInput(event)) {
-          return
-        }
-
         // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
         // triggering a `beforeinput` expecting the change to be applied to the immediately before
         // set selection.
@@ -769,6 +756,10 @@ export const Editable = (props: EditableProps) => {
             [readOnly]
           )}
           onInput={useCallback((event: React.SyntheticEvent) => {
+            if (androidInputManager?.handleInput()) {
+              return
+            }
+
             // Flush native operations, as native events will have propogated
             // and we can correctly compare DOM text values in components
             // to stop rendering, so that browser functions like autocorrect

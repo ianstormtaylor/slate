@@ -7,7 +7,6 @@ import {
   EDITOR_TO_ON_CHANGE,
   NODE_TO_KEY,
   EDITOR_TO_USER_SELECTION,
-  EDITOR_TO_PENDING_INSERTIONS,
 } from '../utils/weak-maps'
 import {
   isDOMText,
@@ -15,8 +14,6 @@ import {
   getSlateFragmentAttribute,
 } from '../utils/dom'
 import { findCurrentLineRange } from '../utils/lines'
-import { TextInsertion } from '../components/android-hook/diff-text'
-
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
  *
@@ -103,20 +100,6 @@ export const withReact = <T extends Editor>(editor: T) => {
         matches.push(...getMatches(e, commonPath))
         break
       }
-    }
-
-    // "Transform" pending text insertions
-    const pendingInsertions = EDITOR_TO_PENDING_INSERTIONS.get(e)
-    if (pendingInsertions?.length) {
-      EDITOR_TO_PENDING_INSERTIONS.set(
-        e,
-        pendingInsertions
-          .map(({ range, ...rest }) => ({
-            range: Range.transform(range, op),
-            ...rest,
-          }))
-          .filter(({ range }) => range) as TextInsertion[]
-      )
     }
 
     apply(op)
