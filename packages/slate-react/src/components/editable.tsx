@@ -170,7 +170,11 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!state.isUpdatingSelection && !state.isDraggingInternally) {
+      if (
+        !state.isUpdatingSelection &&
+        !state.isDraggingInternally &&
+        !androidInputManager?.handleDOMSelectionChange()
+      ) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -205,6 +209,8 @@ export const Editable = (props: EditableProps) => {
 
           if (range) {
             if (!IS_COMPOSING.has(editor)) {
+              console.log('selecting range', range)
+
               Transforms.select(editor, range)
             } else {
               androidInputManager?.handleUserSelect(range)
@@ -249,10 +255,12 @@ export const Editable = (props: EditableProps) => {
     if (
       !domSelection ||
       !ReactEditor.isFocused(editor) ||
-      androidInputManager?.hasPendingChanges()
+      androidInputManager?.hasPendingAction()
     ) {
       return
     }
+
+    console.log('restore selection')
 
     const hasDomSelection = domSelection.type !== 'None'
 

@@ -34,6 +34,11 @@ export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 
+export const EDITOR_TO_PENDING_SELECTION: WeakMap<
+  Editor,
+  Range | null
+> = new WeakMap()
+
 export const EDITOR_TO_USER_SELECTION: WeakMap<
   Editor,
   RangeRef | null

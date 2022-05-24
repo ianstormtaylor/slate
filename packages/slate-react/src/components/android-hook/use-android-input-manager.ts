@@ -8,6 +8,7 @@ import {
 } from './android-input-manager'
 import { useMutationObserver } from './use-mutation-observer'
 import { useRestoreDom } from './use-restore-dom'
+import { useIsMounted } from './use-is-mounted'
 
 const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
   childList: true,
@@ -32,6 +33,7 @@ export function useAndroidInputManager({
   }
 
   const editor = useSlateStatic()
+  const isMounted = useIsMounted()
 
   const { receivedUserInput, onUserInput } = useTrackUserInput()
   const [inputManager] = useState(() =>
@@ -43,13 +45,21 @@ export function useAndroidInputManager({
     })
   )
 
+  useMutationObserver(
+    editor,
+    node,
+    inputManager.handleInput,
+    MUTATION_OBSERVER_CONFIG
+  )
+
   useLayoutEffect(() => () => {
     console.log('----------')
   })
 
-  inputManager.flush()
+  if (isMounted) {
+    inputManager.flush()
+  }
 
   useRestoreDom(node, receivedUserInput)
-
   return inputManager
 }

@@ -74,9 +74,10 @@ export const withReact = <T extends Editor>(editor: T) => {
       }
 
       case 'set_selection': {
+        // console.trace(op)
         // Selection was manually set, don't restore the user selection after the change.
-        EDITOR_TO_USER_SELECTION.get(editor)?.unref()
-        EDITOR_TO_USER_SELECTION.delete(editor)
+        // EDITOR_TO_USER_SELECTION.get(editor)?.unref()
+        // EDITOR_TO_USER_SELECTION.delete(editor)
         break
       }
 
