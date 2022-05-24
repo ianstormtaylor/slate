@@ -1,5 +1,6 @@
 import { Ancestor, Editor, Node, RangeRef, Text, Range } from 'slate'
 import { Key } from './key'
+import { TextDiff } from '../components/android-hook/diff-text'
 
 /**
  * Two weak maps that allow us rebuild a path given a node. They are populated
@@ -37,6 +38,10 @@ export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 export const EDITOR_TO_PENDING_SELECTION: WeakMap<
   Editor,
   Range | null
+> = new WeakMap()
+export const EDITOR_TO_PENDING_CHANGES: WeakMap<
+  Editor,
+  TextDiff[]
 > = new WeakMap()
 
 export const EDITOR_TO_USER_SELECTION: WeakMap<

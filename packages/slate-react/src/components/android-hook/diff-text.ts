@@ -1,4 +1,4 @@
-import { Editor, Point, Node, Text, Range, Path } from 'slate'
+import { Editor, Point, Node, Text, Range, Path, Operation } from 'slate'
 
 export type StringDiff = {
   start: number
@@ -6,7 +6,7 @@ export type StringDiff = {
   insertText: string
 }
 
-type TextDiff = { path: Path; diff: StringDiff }
+export type TextDiff = { path: Path; diff: StringDiff }
 
 function applyStringDiff(text: string, ...diffs: StringDiff[]) {
   return diffs.reduce(

@@ -610,6 +610,21 @@ export const ReactEditor = {
       }
     }
 
+    if (!textNode && !exactMatch) {
+      const node = parentNode.hasAttribute('data-slate-node')
+        ? parentNode
+        : parentNode.closest('[data-slate-node]')
+
+      if (node && ReactEditor.hasDOMNode(editor, node, { editable: true })) {
+        const slateNode = ReactEditor.toSlateNode(editor, node)
+        const start = Editor.start(
+          editor,
+          ReactEditor.findPath(editor, slateNode)
+        )
+        return start as T extends true ? Point | null : Point
+      }
+    }
+
     if (!textNode) {
       if (suppressThrow) {
         return null as T extends true ? Point | null : Point

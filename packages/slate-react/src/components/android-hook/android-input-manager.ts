@@ -1,19 +1,18 @@
 import { DebouncedFunc } from 'lodash'
 import { RefObject } from 'react'
-import { Editor, Node, Path, Range, Text, Transforms, Point } from 'slate'
+import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
+  EDITOR_TO_PENDING_CHANGES,
   EDITOR_TO_PENDING_SELECTION,
   IS_COMPOSING,
 } from '../../utils/weak-maps'
 import {
-  StringDiff,
   mergeStringDiffs,
   normalizeRange,
   targetRange,
+  TextDiff,
 } from './diff-text'
-
-type TextDiff = { path: Path; diff: StringDiff }
 
 type ReplaceExpandedAction = {
   at: Range
@@ -32,6 +31,9 @@ type Action = ReplaceExpandedAction | LineBreakAction | DeleteAction
 // https://github.com/facebook/draft-js/blob/main/src/component/handlers/composition/DraftEditorCompositionHandler.js#L41
 // When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
 const RESOLVE_DELAY = 25
+
+// Time with node user interaction before the current user action is considered as done.
+const FLUSH_DELAY = 100
 
 // Replace with `const debug = console.log` to debug
 const debug = console.log
@@ -55,7 +57,6 @@ export function createAndroidInputManager({
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
 
-  let pendingDiffs: TextDiff[] = []
   let currentAction: Action | null = null
 
   const applyPendingSelection = () => {
@@ -108,18 +109,17 @@ export function createAndroidInputManager({
   }
 
   const flush = () => {
-    debug('flush', currentAction, pendingDiffs)
-
     const selectionRef =
       editor.selection && Editor.rangeRef(editor, editor.selection)
 
-    const textDiffs = pendingDiffs
-    pendingDiffs = []
+    const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
+    EDITOR_TO_PENDING_CHANGES.set(editor, [])
+    debug('flush', currentAction, pendingChanges)
 
     Editor.withoutNormalizing(editor, () => {
-      textDiffs.forEach(textDiff => {
+      pendingChanges.forEach(textDiff => {
         const range = targetRange(editor, textDiff)
-        console.log(
+        debug(
           'apply text diff targetRange',
           Editor.hasRange(editor, range),
           range
@@ -145,25 +145,17 @@ export function createAndroidInputManager({
       Transforms.select(editor, selection)
     }
 
+    if (currentAction) {
+      performAction()
+      return
+    }
+
     // COMPAT: The selectionChange event is fired after the action is performed,
     // so we have to manually schedule it to ensure we don't 'throw away' the selection
     // while rendering if we have pending changes.
-    //
-    // Also we can't use the `beforeInputSelection` if we have text diffs since it was
-    // applied on a out-of-date dom state.
-    if (textDiffs.length && !currentAction) {
-      console.log('scheduleOnDOMSelectionChange')
-
+    if (pendingChanges.length) {
+      debug('scheduleOnDOMSelectionChange pending changes')
       scheduleOnDOMSelectionChange()
-    }
-
-    if (currentAction) {
-      EDITOR_TO_PENDING_SELECTION.delete(editor)
-      scheduleOnDOMSelectionChange.cancel()
-      onDOMSelectionChange.cancel()
-
-      performAction()
-      return
     }
 
     scheduleOnDOMSelectionChange.flush()
@@ -199,13 +191,20 @@ export function createAndroidInputManager({
   }
 
   const pushAction = (action: Action | TextDiff) => {
-    console.log('pushAction', action)
+    debug('pushAction', action)
+
+    EDITOR_TO_PENDING_SELECTION.delete(editor)
+    scheduleOnDOMSelectionChange.cancel()
+    onDOMSelectionChange.cancel()
 
     if (currentAction) {
       throw new Error('Pushed new action while current action is pending')
     }
 
     if (!('type' in action)) {
+      const pendingDiffs = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
+      EDITOR_TO_PENDING_CHANGES.set(editor, pendingDiffs)
+
       const idx = pendingDiffs.findIndex(change =>
         Path.equals(change.path, action.path)
       )
@@ -239,18 +238,9 @@ export function createAndroidInputManager({
       flushTimeoutId = null
     }
 
-    // Ensure out current (pending) selection is up-to-date
-    scheduleOnDOMSelectionChange()
-    scheduleOnDOMSelectionChange.flush()
-    onDOMSelectionChange.flush()
-
     const { inputType: type } = event
-    let targetRange =
-      EDITOR_TO_PENDING_SELECTION.get(editor) ?? editor.selection
+    let targetRange: Range | null = null
     const data = (event as any).dataTransfer || event.data || undefined
-
-    // TODO:
-    EDITOR_TO_PENDING_SELECTION.delete(editor)
 
     // COMPAT: For the deleting forward/backward input types we don't want
     // to change the selection because it is the range that will be deleted,
@@ -263,9 +253,38 @@ export function createAndroidInputManager({
         suppressThrow: true,
       })
 
+      debug('before input target range', range)
+
       if (range) {
         targetRange = range
       }
+    }
+
+    // COMPAT: SelectionChange event is fired after the action is performed, so we
+    // have to manually get the selection here to ensure it's up-to-date.
+    const window = ReactEditor.getWindow(editor)
+    const domSelection = window.getSelection()
+    if (!targetRange && !hasPendingAction() && domSelection) {
+      const range = ReactEditor.toSlateRange(editor, domSelection, {
+        exactMatch: false,
+        suppressThrow: true,
+      })
+
+      debug(
+        'before input dom selection',
+        range,
+        domSelection.getRangeAt(0).cloneRange()
+      )
+
+      if (range) {
+        targetRange = range
+      }
+    }
+
+    if (!targetRange) {
+      debug('before input fallback', editor.selection)
+
+      targetRange = editor.selection
     }
 
     if (!targetRange) {
@@ -424,7 +443,7 @@ export function createAndroidInputManager({
   }
 
   const hasPendingChanges = () => {
-    return !!pendingDiffs.length
+    return !!EDITOR_TO_PENDING_CHANGES.get(editor)?.length
   }
 
   const hasPendingAction = () => {
@@ -439,10 +458,8 @@ export function createAndroidInputManager({
   }
 
   const handleUserSelect = (range: Range | null) => {
-    const previousSelection =
-      EDITOR_TO_PENDING_SELECTION.get(editor) ?? editor.selection
+    debug('userSelect', range)
 
-    console.log('handleUserSelect', range)
     EDITOR_TO_PENDING_SELECTION.set(editor, range)
 
     if (flushTimeoutId) {
@@ -450,16 +467,8 @@ export function createAndroidInputManager({
       flushTimeoutId = null
     }
 
-    if (
-      range &&
-      previousSelection &&
-      !Path.equals(previousSelection.anchor.path, range.anchor.path) &&
-      !hasPendingAction() &&
-      !hasPendingChanges()
-    ) {
-      if (!flushTimeoutId) {
-        flushTimeoutId = setTimeout(flush)
-      }
+    if (!hasPendingAction() && !hasPendingChanges()) {
+      flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
 
