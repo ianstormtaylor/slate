@@ -33,7 +33,7 @@ type Action = ReplaceExpandedAction | LineBreakAction | DeleteAction
 const RESOLVE_DELAY = 25
 
 // Time with node user interaction before the current user action is considered as done.
-const FLUSH_DELAY = 100
+const FLUSH_DELAY = 200
 
 // Replace with `const debug = console.log` to debug
 const debug = console.log
@@ -67,7 +67,7 @@ export function createAndroidInputManager({
       const { selection } = editor
       const normalized = normalizeRange(editor, pendingSelection)
 
-      if (!selection || !Range.equals(normalized, selection)) {
+      if (normalized && (!selection || !Range.equals(normalized, selection))) {
         Transforms.select(editor, normalized)
       }
     }
@@ -118,13 +118,7 @@ export function createAndroidInputManager({
 
     Editor.withoutNormalizing(editor, () => {
       pendingChanges.forEach(textDiff => {
-        const range = targetRange(editor, textDiff)
-        debug(
-          'apply text diff targetRange',
-          Editor.hasRange(editor, range),
-          range
-        )
-
+        const range = targetRange(textDiff)
         if (!editor.selection || !Range.equals(editor.selection, range)) {
           Transforms.select(editor, range)
         }
@@ -160,6 +154,7 @@ export function createAndroidInputManager({
 
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
+
     applyPendingSelection()
   }
 
@@ -171,8 +166,10 @@ export function createAndroidInputManager({
     }
 
     compositionEndTimeoutId = setTimeout(() => {
+      debug('composition end')
+
       IS_COMPOSING.set(editor, false)
-      flush()
+      // flush()
     }, RESOLVE_DELAY)
     return true
   }
@@ -458,7 +455,14 @@ export function createAndroidInputManager({
   }
 
   const handleUserSelect = (range: Range | null) => {
-    debug('userSelect', range)
+    console.trace(
+      'userSelect',
+      range,
+      window
+        .getSelection()
+        ?.getRangeAt(0)
+        .cloneRange()
+    )
 
     EDITOR_TO_PENDING_SELECTION.set(editor, range)
 
@@ -468,7 +472,7 @@ export function createAndroidInputManager({
     }
 
     if (!hasPendingAction() && !hasPendingChanges()) {
-      flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
+      flushTimeoutId = setTimeout(flush, FLUSH_DELAY) as any
     }
   }
 

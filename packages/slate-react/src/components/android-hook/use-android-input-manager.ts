@@ -1,21 +1,14 @@
 import { RefObject, useLayoutEffect, useState } from 'react'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
+import { EDITOR_TO_FLUSH_PENDING_CHANGES } from '../../utils/weak-maps'
 import { useTrackUserInput } from '../android-hook/use-track-user-input'
 import {
   createAndroidInputManager,
   CreateAndroidInputManagerOptions,
 } from './android-input-manager'
-import { useMutationObserver } from './use-mutation-observer'
-import { useRestoreDom } from './use-restore-dom'
 import { useIsMounted } from './use-is-mounted'
-
-const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
-  childList: true,
-  characterData: true,
-  characterDataOldValue: true,
-  subtree: true,
-}
+import { useRestoreDom } from './use-restore-dom'
 
 type UseAndroidInputManagerOptions = {
   node: RefObject<HTMLElement>
@@ -45,16 +38,7 @@ export function useAndroidInputManager({
     })
   )
 
-  useMutationObserver(
-    editor,
-    node,
-    inputManager.handleInput,
-    MUTATION_OBSERVER_CONFIG
-  )
-
-  useLayoutEffect(() => () => {
-    console.log('----------')
-  })
+  EDITOR_TO_FLUSH_PENDING_CHANGES.set(editor, inputManager.flush)
 
   if (isMounted) {
     inputManager.flush()

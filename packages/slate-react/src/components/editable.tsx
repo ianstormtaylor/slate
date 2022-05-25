@@ -208,9 +208,7 @@ export const Editable = (props: EditableProps) => {
           })
 
           if (range) {
-            if (!IS_COMPOSING.has(editor)) {
-              console.log('selecting range', range)
-
+            if (!ReactEditor.isComposing(editor)) {
               Transforms.select(editor, range)
             } else {
               androidInputManager?.handleUserSelect(range)

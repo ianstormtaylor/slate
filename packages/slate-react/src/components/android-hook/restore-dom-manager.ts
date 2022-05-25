@@ -1,11 +1,11 @@
-import { MutableRefObject } from 'react'
+import { MutableRefObject, RefObject } from 'react'
 import { ReactEditor } from '../../plugin/react-editor'
 import { isDOMElement } from '../../utils/dom'
 import { EDITOR_TO_MUTATION_OBSERVERS } from '../../utils/weak-maps'
 
 export const createRestoreDomManager = (
   editor: ReactEditor,
-  receivedUserInput: MutableRefObject<boolean>
+  receivedUserInput: RefObject<boolean>
 ) => {
   let bufferedMutations: MutationRecord[] = []
 
@@ -81,6 +81,10 @@ export const createRestoreDomManager = (
   }
 
   function restoreDOM() {
+    if (bufferedMutations.every(mutation => mutation.type !== 'childList')) {
+      return
+    }
+
     bufferedMutations.reverse().forEach(mutation => {
       if (mutation.type === 'characterData') {
         mutation.target.textContent = mutation.oldValue

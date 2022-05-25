@@ -58,6 +58,11 @@ export const EDITOR_TO_MARK_PLACEHOLDER_MARKS = new WeakMap<
   Partial<Text> | null
 >()
 
+export const EDITOR_TO_FLUSH_PENDING_CHANGES: WeakMap<
+  Editor,
+  () => void
+> = new WeakMap()
+
 export const EDITOR_TO_MUTATION_OBSERVERS: WeakMap<
   Editor,
   Set<MutationObserver>

@@ -1,19 +1,24 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Path, Operation, Transforms, Range } from 'slate'
-import { ReactEditor } from './react-editor'
-import { Key } from '../utils/key'
+import { Editor, Node, Operation, Path, Range, Transforms } from 'slate'
 import {
-  EDITOR_TO_KEY_TO_ELEMENT,
-  EDITOR_TO_ON_CHANGE,
-  NODE_TO_KEY,
-  EDITOR_TO_USER_SELECTION,
-} from '../utils/weak-maps'
+  TextDiff,
+  transformTextDiff,
+} from '../components/android-hook/diff-text'
 import {
-  isDOMText,
   getPlainText,
   getSlateFragmentAttribute,
+  isDOMText,
 } from '../utils/dom'
+import { Key } from '../utils/key'
 import { findCurrentLineRange } from '../utils/lines'
+import {
+  EDITOR_TO_FLUSH_PENDING_CHANGES,
+  EDITOR_TO_KEY_TO_ELEMENT,
+  EDITOR_TO_ON_CHANGE,
+  EDITOR_TO_PENDING_CHANGES,
+  NODE_TO_KEY,
+} from '../utils/weak-maps'
+import { ReactEditor } from './react-editor'
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
  *
@@ -25,11 +30,21 @@ import { findCurrentLineRange } from '../utils/lines'
 
 export const withReact = <T extends Editor>(editor: T) => {
   const e = editor as T & ReactEditor
-  const { apply, onChange, deleteBackward } = e
+  const { apply, onChange, deleteBackward, addMark, removeMark } = e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
+
+  e.addMark = (key, value) => {
+    EDITOR_TO_FLUSH_PENDING_CHANGES.get(e)?.()
+    addMark(key, value)
+  }
+
+  e.removeMark = key => {
+    EDITOR_TO_FLUSH_PENDING_CHANGES.get(e)?.()
+    removeMark(key)
+  }
 
   e.deleteBackward = unit => {
     if (unit !== 'line') {
@@ -64,20 +79,21 @@ export const withReact = <T extends Editor>(editor: T) => {
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
+    const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor)
+    if (pendingChanges?.length) {
+      const transformed = pendingChanges
+        .map(textDiff => transformTextDiff(textDiff, op))
+        .filter(Boolean) as TextDiff[]
+
+      EDITOR_TO_PENDING_CHANGES.set(editor, transformed)
+    }
+
     switch (op.type) {
       case 'insert_text':
       case 'remove_text':
       case 'set_node':
       case 'split_node': {
         matches.push(...getMatches(e, op.path))
-        break
-      }
-
-      case 'set_selection': {
-        // console.trace(op)
-        // Selection was manually set, don't restore the user selection after the change.
-        // EDITOR_TO_USER_SELECTION.get(editor)?.unref()
-        // EDITOR_TO_USER_SELECTION.delete(editor)
         break
       }
 
