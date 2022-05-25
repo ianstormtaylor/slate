@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.80.0
+
+### Patch Changes
+
+- [#5007](https://github.com/ianstormtaylor/slate/pull/5007) [`92c5730a`](https://github.com/ianstormtaylor/slate/commit/92c5730a96223a683b3c95651eb4c90a5caca21a) Thanks [@jasonphillips](https://github.com/jasonphillips)! - Revert #4876 & #4910 to restore original decorations behavior
+
 ## 0.79.0
 
 ### Minor Changes

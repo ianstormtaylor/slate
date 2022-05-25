@@ -18,7 +18,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
-    "slate": "^0.78.0",
+    "slate": "^0.80.0",
     "source-map-loader": "^0.2.4"
   },
   "peerDependencies": {
