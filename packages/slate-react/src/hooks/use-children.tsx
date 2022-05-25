@@ -5,6 +5,7 @@ import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '..'
 import { useSlateStatic } from './use-slate-static'
+import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   RenderElementProps,
@@ -33,6 +34,7 @@ const useChildren = (props: {
     renderLeaf,
     selection,
   } = props
+  const decorate = useDecorate()
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, node)
   const children = []
@@ -48,11 +50,7 @@ const useChildren = (props: {
     const range = Editor.range(editor, p)
     const sel = selection && Range.intersection(range, selection)
 
-    const ds = decorations.reduce<Range[]>((acc, dec) => {
-      const intersection = Range.intersection(dec, range)
-      if (intersection) acc.push(intersection)
-      return acc
-    }, [])
+    const ds = decorations.filter(dec => Range.intersection(dec, range))
 
     if (Element.isElement(n)) {
       children.push(
