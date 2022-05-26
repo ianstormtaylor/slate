@@ -40,17 +40,13 @@ const debug = console.log
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
-  onUserInput: () => void
 
   scheduleOnDOMSelectionChange: DebouncedFunc<() => void>
   onDOMSelectionChange: DebouncedFunc<() => void>
-  receivedUserInput: RefObject<boolean>
 }
 
 export function createAndroidInputManager({
   editor,
-  onUserInput,
-
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions) {
@@ -227,8 +223,6 @@ export function createAndroidInputManager({
   }
 
   const handleDOMBeforeInput = (event: InputEvent) => {
-    onUserInput()
-
     // Ensure we don't flush while performing an action
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
