@@ -1,5 +1,5 @@
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import { Editor, Node, Element, Descendant } from 'slate'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Editor, Node, Descendant, Scrubber } from 'slate'
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
@@ -30,12 +30,13 @@ export const Slate = (props: {
     if (!Node.isNodeList(value)) {
       throw new Error(
         `[Slate] value is invalid! Expected a list of elements` +
-          `but got: ${JSON.stringify(value)}`
+          `but got: ${Scrubber.stringify(value)}`
       )
     }
     if (!Editor.isEditor(editor)) {
       throw new Error(
-        `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
+        `[Slate] editor is invalid! you passed:` +
+          `${Scrubber.stringify(editor)}`
       )
     }
     editor.children = value
