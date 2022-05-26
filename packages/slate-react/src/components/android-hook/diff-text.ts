@@ -69,7 +69,7 @@ function normalizePoint(editor: Editor, point: Point): Point | null {
 
   while (offset > leaf.text.length) {
     const entry = Editor.next(editor, { at: path, match: Text.isText })
-    if (!entry || !Path.isDescendant(entry[1], path)) {
+    if (!entry || !Path.isDescendant(entry[1], parentBlock[1])) {
       return null
     }
 

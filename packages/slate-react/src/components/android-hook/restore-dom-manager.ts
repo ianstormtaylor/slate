@@ -3,10 +3,16 @@ import { ReactEditor } from '../../plugin/react-editor'
 import { isDOMElement } from '../../utils/dom'
 import { EDITOR_TO_MUTATION_OBSERVERS } from '../../utils/weak-maps'
 
+export type RestoreDOMManager = {
+  registerMutations: (mutations: MutationRecord[]) => void
+  restoreDOM: () => void
+  clear: () => void
+}
+
 export const createRestoreDomManager = (
   editor: ReactEditor,
   receivedUserInput: RefObject<boolean>
-) => {
+): RestoreDOMManager => {
   let bufferedMutations: MutationRecord[] = []
 
   const clear = () => {
@@ -110,5 +116,3 @@ export const createRestoreDomManager = (
     clear,
   }
 }
-
-export type RestoreDOMManager = ReturnType<typeof createRestoreDomManager>

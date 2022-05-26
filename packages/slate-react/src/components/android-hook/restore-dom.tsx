@@ -1,5 +1,6 @@
-import { Component, ContextType, RefObject } from 'react'
+import React, { Component, ComponentType, ContextType, RefObject } from 'react'
 import { EditorContext } from '../../hooks/use-slate-static'
+import { IS_ANDROID } from '../../utils/environment'
 import {
   createRestoreDomManager,
   RestoreDOMManager,
@@ -17,9 +18,8 @@ type RestoreDOMProps = {
   node: RefObject<HTMLDivElement>
 }
 
-// Sadly we have to use a class component here since we rely on `getSnapshotBeforeUpdate` which has no equivalent
-// in FCs.
-export class RestoreDOM extends Component<RestoreDOMProps, {}> {
+// Sadly we have to use a class component here since we rely on `getSnapshotBeforeUpdate` which has no FC equivalent.
+class RestoreDOMComponent extends Component<RestoreDOMProps> {
   static contextType = EditorContext
   context: ContextType<typeof EditorContext> = null
 
@@ -70,3 +70,7 @@ export class RestoreDOM extends Component<RestoreDOMProps, {}> {
     return this.props.children
   }
 }
+
+export const RestoreDOM: ComponentType<RestoreDOMProps> = IS_ANDROID
+  ? RestoreDOMComponent
+  : ({ children }) => <>{children}</>

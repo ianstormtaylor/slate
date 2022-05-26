@@ -1,11 +1,13 @@
-import { useCallback, useRef } from 'react'
+import { useCallback, useRef, useEffect } from 'react'
 import { ReactEditor } from '../..'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 
 export function useTrackUserInput() {
   const editor = useSlateStatic()
+
   const receivedUserInput = useRef<boolean>(false)
   const animationFrameRef = useRef<number | null>(null)
+
   const onUserInput = useCallback(() => {
     if (receivedUserInput.current === false) {
       const window = ReactEditor.getWindow(editor)
@@ -21,6 +23,15 @@ export function useTrackUserInput() {
       })
     }
   }, [])
+
+  useEffect(
+    () => () => {
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+      }
+    },
+    []
+  )
 
   return {
     receivedUserInput,

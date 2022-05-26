@@ -63,6 +63,8 @@ export function createAndroidInputManager({
       const { selection } = editor
       const normalized = normalizeRange(editor, pendingSelection)
 
+      console.log('apply pending selection', pendingSelection, normalized)
+
       if (normalized && (!selection || !Range.equals(normalized, selection))) {
         Transforms.select(editor, normalized)
       }
@@ -70,14 +72,18 @@ export function createAndroidInputManager({
   }
 
   const performAction = () => {
-    const action = currentAction
-    currentAction = null
-
-    if (!action) {
+    if (!currentAction) {
       return
     }
 
-    const range = Editor.range(editor, action.at)
+    const action = currentAction
+    currentAction = null
+
+    const range = normalizeRange(editor, Editor.range(editor, action.at))
+    if (!range) {
+      return
+    }
+
     if (!editor.selection || !Range.equals(editor.selection, range)) {
       Transforms.select(editor, range)
     }
@@ -106,10 +112,10 @@ export function createAndroidInputManager({
 
   const flush = () => {
     const selectionRef =
-      editor.selection && Editor.rangeRef(editor, editor.selection)
+      editor.selection &&
+      Editor.rangeRef(editor, editor.selection, { affinity: 'forward' })
 
     const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
-    EDITOR_TO_PENDING_CHANGES.set(editor, [])
     debug('flush', currentAction, pendingChanges)
 
     Editor.withoutNormalizing(editor, () => {
@@ -136,6 +142,7 @@ export function createAndroidInputManager({
     }
 
     if (currentAction) {
+      EDITOR_TO_PENDING_CHANGES.set(editor, [])
       performAction()
       return
     }
@@ -150,6 +157,8 @@ export function createAndroidInputManager({
 
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
+
+    EDITOR_TO_PENDING_CHANGES.set(editor, [])
 
     applyPendingSelection()
   }
@@ -433,12 +442,14 @@ export function createAndroidInputManager({
     return true
   }
 
-  const hasPendingChanges = () => {
-    return !!EDITOR_TO_PENDING_CHANGES.get(editor)?.length
-  }
-
   const hasPendingAction = () => {
     return currentAction !== null
+  }
+
+  const hasPendingChanges = () => {
+    return (
+      !!EDITOR_TO_PENDING_CHANGES.get(editor)?.length && !hasPendingAction()
+    )
   }
 
   const handleDOMSelectionChange = () => {
@@ -449,7 +460,7 @@ export function createAndroidInputManager({
   }
 
   const handleUserSelect = (range: Range | null) => {
-    console.trace(
+    debug(
       'userSelect',
       range,
       window
@@ -465,7 +476,7 @@ export function createAndroidInputManager({
       flushTimeoutId = null
     }
 
-    if (!hasPendingAction() && !hasPendingChanges()) {
+    if (!hasPendingChanges()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY) as any
     }
   }

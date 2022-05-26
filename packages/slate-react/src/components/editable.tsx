@@ -212,7 +212,10 @@ export const Editable = (props: EditableProps) => {
           })
 
           if (range) {
-            if (!ReactEditor.isComposing(editor)) {
+            if (
+              !ReactEditor.isComposing(editor) &&
+              !androidInputManager?.hasPendingChanges()
+            ) {
               Transforms.select(editor, range)
             } else {
               androidInputManager?.handleUserSelect(range)
@@ -673,10 +676,9 @@ export const Editable = (props: EditableProps) => {
     })
   }
 
-  const marks = Editor.marks(editor)
+  const { marks } = editor
+  EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
   if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
-    EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks)
-
     const { anchor } = editor.selection
     const leaf = Node.get(editor, anchor.path) as Text
 
@@ -694,9 +696,9 @@ export const Editable = (props: EditableProps) => {
         anchor,
         focus: anchor,
       })
+
+      EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks)
     }
-  } else {
-    EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, null)
   }
 
   return (
