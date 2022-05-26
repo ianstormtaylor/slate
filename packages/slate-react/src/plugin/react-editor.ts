@@ -617,11 +617,16 @@ export const ReactEditor = {
 
       if (node && ReactEditor.hasDOMNode(editor, node, { editable: true })) {
         const slateNode = ReactEditor.toSlateNode(editor, node)
-        const start = Editor.start(
+        let { path, offset } = Editor.start(
           editor,
           ReactEditor.findPath(editor, slateNode)
         )
-        return start as T extends true ? Point | null : Point
+
+        if (!node.querySelector('[data-slate-leaf]')) {
+          offset = nearestOffset
+        }
+
+        return { path, offset } as T extends true ? Point | null : Point
       }
     }
 
