@@ -174,7 +174,7 @@ export function createAndroidInputManager({
       debug('composition end')
 
       IS_COMPOSING.set(editor, false)
-      // flush()
+      flush()
     }, RESOLVE_DELAY)
     return true
   }
@@ -476,7 +476,12 @@ export function createAndroidInputManager({
       flushTimeoutId = null
     }
 
-    if (!hasPendingChanges()) {
+    const pathChanged =
+      range &&
+      (!editor.selection ||
+        !Path.equals(editor.selection.anchor.path, range?.anchor.path))
+
+    if (pathChanged || !hasPendingChanges()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY) as any
     }
   }
