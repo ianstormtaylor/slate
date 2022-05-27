@@ -1,5 +1,4 @@
 import { DebouncedFunc } from 'lodash'
-import { RefObject } from 'react'
 import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
@@ -52,6 +51,7 @@ export function createAndroidInputManager({
 }: CreateAndroidInputManagerOptions) {
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
 
   let currentAction: Action | null = null
 
@@ -111,6 +111,15 @@ export function createAndroidInputManager({
   }
 
   const flush = () => {
+    if (flushTimeoutId) {
+      clearTimeout(flushTimeoutId)
+      flushTimeoutId = null
+    }
+    if (actionTimeoutId) {
+      clearTimeout(actionTimeoutId)
+      actionTimeoutId = null
+    }
+
     const selectionRef =
       editor.selection &&
       Editor.rangeRef(editor, editor.selection, { affinity: 'forward' })
@@ -228,6 +237,10 @@ export function createAndroidInputManager({
       return
     }
 
+    // COMPAT: When deleting before a non-contenteditable element chrome only fires a beforeinput,
+    // (no input) and doesn't perform any dom mutations. Without a flush timeout we would never flush
+    // in this case.
+    actionTimeoutId = setTimeout(flush)
     currentAction = action
   }
 
