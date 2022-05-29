@@ -192,8 +192,7 @@ const Mention = ({ attributes, children, element }) => {
         boxShadow: selected && focused ? '0 0 0 2px #B4D5FF' : 'none',
       }}
     >
-      @{element.character}
-      {children}
+      {children}@{element.character}
     </span>
   )
 }
