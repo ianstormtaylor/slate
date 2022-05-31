@@ -63,11 +63,6 @@ export const EDITOR_TO_FLUSH_PENDING_CHANGES: WeakMap<
   () => void
 > = new WeakMap()
 
-export const EDITOR_TO_MUTATION_OBSERVERS: WeakMap<
-  Editor,
-  Set<MutationObserver>
-> = new WeakMap()
-
 /**
  * Weak map for associating the context `onChange` context with the plugin.
  */

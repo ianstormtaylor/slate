@@ -376,15 +376,15 @@ export const Editable = (props: EditableProps) => {
     (event: InputEvent) => {
       onUserInput()
 
-      if (androidInputManager?.handleDOMBeforeInput(event)) {
-        return
-      }
-
       if (
         !readOnly &&
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
+        if (androidInputManager?.handleDOMBeforeInput(event)) {
+          return
+        }
+
         // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
         // triggering a `beforeinput` expecting the change to be applied to the immediately before
         // set selection.

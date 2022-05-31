@@ -11,6 +11,7 @@ import {
   normalizeRange,
   targetRange,
   TextDiff,
+  verifyDiffState,
 } from './diff-text'
 
 type ReplaceExpandedAction = {
@@ -63,7 +64,7 @@ export function createAndroidInputManager({
       const { selection } = editor
       const normalized = normalizeRange(editor, pendingSelection)
 
-      console.log('apply pending selection', pendingSelection, normalized)
+      debug('apply pending selection', pendingSelection, normalized)
 
       if (normalized && (!selection || !Range.equals(normalized, selection))) {
         Transforms.select(editor, normalized)
@@ -127,19 +128,22 @@ export function createAndroidInputManager({
     const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
     debug('flush', currentAction, pendingChanges)
 
-    Editor.withoutNormalizing(editor, () => {
-      pendingChanges.forEach(textDiff => {
-        const range = targetRange(textDiff)
-        if (!editor.selection || !Range.equals(editor.selection, range)) {
-          Transforms.select(editor, range)
-        }
+    pendingChanges.forEach(textDiff => {
+      const range = targetRange(textDiff)
+      if (!editor.selection || !Range.equals(editor.selection, range)) {
+        Transforms.select(editor, range)
+      }
 
-        if (textDiff.diff.insertText) {
-          Editor.insertText(editor, textDiff.diff.insertText)
-        } else {
-          Editor.deleteFragment(editor)
-        }
-      })
+      if (textDiff.diff.insertText) {
+        Editor.insertText(editor, textDiff.diff.insertText)
+      } else {
+        Editor.deleteFragment(editor)
+      }
+
+      if (!verifyDiffState(editor, textDiff)) {
+        currentAction = null
+        EDITOR_TO_PENDING_SELECTION.delete(editor)
+      }
     })
 
     const selection = selectionRef?.unref()

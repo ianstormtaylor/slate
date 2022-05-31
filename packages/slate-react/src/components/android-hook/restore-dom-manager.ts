@@ -1,7 +1,6 @@
 import { RefObject } from 'react'
 import { ReactEditor } from '../../plugin/react-editor'
 import { isDOMElement } from '../../utils/dom'
-import { EDITOR_TO_MUTATION_OBSERVERS } from '../../utils/weak-maps'
 
 export type RestoreDOMManager = {
   registerMutations: (mutations: MutationRecord[]) => void
@@ -28,6 +27,8 @@ export const createRestoreDomManager = (
       if (isTracked(mutation, mutations)) {
         return true
       }
+
+      console.log('ignoring mutation', mutation)
 
       return false
     })
@@ -99,12 +100,6 @@ export const createRestoreDomManager = (
         mutation.target.removeChild(node)
       })
     })
-
-    // Flush mutation observer so they don't call their callbacks for the mutations
-    // restoring the dom
-    EDITOR_TO_MUTATION_OBSERVERS.get(editor)?.forEach(observer =>
-      observer.takeRecords()
-    )
 
     // Clear buffered mutations to ensure we don't undo them twice
     clear()

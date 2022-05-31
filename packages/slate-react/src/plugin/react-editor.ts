@@ -12,6 +12,7 @@ import {
   EDITOR_TO_WINDOW,
   EDITOR_TO_KEY_TO_ELEMENT,
   IS_COMPOSING,
+  EDITOR_TO_FLUSH_PENDING_CHANGES,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -645,6 +646,10 @@ export const ReactEditor = {
     const slateNode = ReactEditor.toSlateNode(editor, textNode!)
     const path = ReactEditor.findPath(editor, slateNode)
     return { path, offset } as T extends true ? Point | null : Point
+  },
+
+  flushPendingChanges(editor: Editor) {
+    EDITOR_TO_FLUSH_PENDING_CHANGES.get(editor)?.()
   },
 
   /**

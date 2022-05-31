@@ -11,6 +11,33 @@ export type TextDiff = {
   diff: StringDiff
 }
 
+export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
+  const { path, diff } = textDiff
+  if (!Editor.hasPath(editor, path)) {
+    return false
+  }
+
+  const node = Node.get(editor, path)
+  if (!Text.isText(node)) {
+    return false
+  }
+
+  if (diff.start !== node.text.length || diff.insertText.length === 0) {
+    return (
+      node.text.slice(diff.start, diff.start + diff.insertText.length) ===
+      diff.insertText
+    )
+  }
+
+  const nextPath = Path.next(path)
+  if (!Editor.hasPath(editor, nextPath)) {
+    return false
+  }
+
+  const nextNode = Node.get(editor, nextPath)
+  return Text.isText(nextNode) && nextNode.text.startsWith(diff.insertText)
+}
+
 function applyStringDiff(text: string, ...diffs: StringDiff[]) {
   return diffs.reduce(
     (text, diff) =>
