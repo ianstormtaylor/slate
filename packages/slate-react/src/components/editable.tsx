@@ -8,7 +8,6 @@ import {
   Text,
   Transforms,
   Path,
-  RangeRef,
 } from 'slate'
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
@@ -57,7 +56,6 @@ import {
   EDITOR_TO_USER_SELECTION,
   IS_COMPOSING,
   MARK_PLACEHOLDER_SYMBOL,
-  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
 import { useAndroidInputManager } from './android-hook/use-android-input-manager'
@@ -151,10 +149,10 @@ export const Editable = (props: EditableProps) => {
   // Keep track of some state for the event handler logic.
   const state = useMemo(
     () => ({
-      hasInsertPrefixInCompositon: false,
       isDraggingInternally: false,
       isUpdatingSelection: false,
       latestElement: null as DOMElement | null,
+      hasMarkPlaceholder: false,
     }),
     []
   )
@@ -295,11 +293,7 @@ export const Editable = (props: EditableProps) => {
       })
 
       if (slateRange && Range.equals(slateRange, selection)) {
-        const hasMarkPlaceholder = !!EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(
-          editor
-        )
-
-        if (!IS_ANDROID || !hasMarkPlaceholder) {
+        if (!state.hasMarkPlaceholder) {
           return
         }
 
@@ -677,12 +671,14 @@ export const Editable = (props: EditableProps) => {
   }
 
   const { marks } = editor
-  EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
+  state.hasMarkPlaceholder = false
   if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
     const { anchor } = editor.selection
     const leaf = Node.get(editor, anchor.path) as Text
 
     if (!Text.equals(leaf, marks as Text, { loose: true })) {
+      state.hasMarkPlaceholder = true
+
       const { text, ...rest } = leaf
       const unset = Object.fromEntries(
         Object.keys(rest).map(key => [key, null])
@@ -696,8 +692,6 @@ export const Editable = (props: EditableProps) => {
         anchor,
         focus: anchor,
       })
-
-      EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks)
     }
   }
 
@@ -938,23 +932,6 @@ export const Editable = (props: EditableProps) => {
                   ) {
                     Editor.insertText(editor, event.data)
                   }
-
-                  if (editor.selection && Range.isCollapsed(editor.selection)) {
-                    const leafPath = editor.selection.anchor.path
-                    const currentTextNode = Node.leaf(editor, leafPath)
-                    if (state.hasInsertPrefixInCompositon) {
-                      state.hasInsertPrefixInCompositon = false
-                      Editor.withoutNormalizing(editor, () => {
-                        // remove Unicode BOM prefix added in `onCompositionStart`
-                        const text = currentTextNode.text.replace(/^\uFEFF/, '')
-                        Transforms.delete(editor, {
-                          distance: currentTextNode.text.length,
-                          reverse: true,
-                        })
-                        Editor.insertText(editor, text)
-                      })
-                    }
-                  }
                 }
               },
               [attributes.onCompositionEnd]
@@ -983,7 +960,7 @@ export const Editable = (props: EditableProps) => {
                     return
                   }
 
-                  const { selection, marks } = editor
+                  const { selection } = editor
                   if (selection) {
                     if (Range.isExpanded(selection)) {
                       Editor.deleteFragment(editor)
@@ -1002,22 +979,6 @@ export const Editable = (props: EditableProps) => {
                           focus: point,
                         })
                       }
-                    }
-                    // insert new node in advance to ensure composition text will insert
-                    // along with final input text
-                    // add Unicode BOM prefix to avoid normalize removing this node
-                    if (marks) {
-                      state.hasInsertPrefixInCompositon = true
-                      Transforms.insertNodes(
-                        editor,
-                        {
-                          text: '\uFEFF',
-                          ...marks,
-                        },
-                        {
-                          select: true,
-                        }
-                      )
                     }
                   }
                 }

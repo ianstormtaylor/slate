@@ -1,8 +1,10 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Operation, Path, Range, Transforms } from 'slate'
+import { Editor, Node, Operation, Path, Range, Transforms, Point } from 'slate'
 import {
   TextDiff,
   transformTextDiff,
+  transformPendingRange,
+  transformPendingPoint,
 } from '../components/android-hook/diff-text'
 import {
   getPlainText,
@@ -15,8 +17,11 @@ import {
   EDITOR_TO_FLUSH_PENDING_CHANGES,
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
-  EDITOR_TO_PENDING_CHANGES,
+  EDITOR_TO_PENDING_DIFFS,
   NODE_TO_KEY,
+  EDITOR_TO_PENDING_SELECTION,
+  EDITOR_TO_PENDING_ACTION,
+  IS_APPLYING_DIFFS,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
 /**
@@ -79,13 +84,34 @@ export const withReact = <T extends Editor>(editor: T) => {
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
-    const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor)
+    const pendingChanges = EDITOR_TO_PENDING_DIFFS.get(editor)
     if (pendingChanges?.length) {
       const transformed = pendingChanges
         .map(textDiff => transformTextDiff(textDiff, op))
         .filter(Boolean) as TextDiff[]
 
-      EDITOR_TO_PENDING_CHANGES.set(editor, transformed)
+      EDITOR_TO_PENDING_DIFFS.set(editor, transformed)
+    }
+
+    if (IS_APPLYING_DIFFS.get(editor)) {
+      const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
+      if (pendingSelection) {
+        EDITOR_TO_PENDING_SELECTION.set(
+          editor,
+          transformPendingRange(editor, pendingSelection, op)
+        )
+      }
+      const pendingAction = EDITOR_TO_PENDING_ACTION.get(editor)
+      if (pendingAction) {
+        const at = Point.isPoint(pendingAction?.at)
+          ? transformPendingPoint(editor, pendingAction.at, op)
+          : transformPendingRange(editor, pendingAction.at, op)
+
+        EDITOR_TO_PENDING_ACTION.set(
+          editor,
+          at ? { ...pendingAction, at } : null
+        )
+      }
     }
 
     switch (op.type) {

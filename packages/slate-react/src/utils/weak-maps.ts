@@ -1,6 +1,7 @@
 import { Ancestor, Editor, Node, RangeRef, Text, Range } from 'slate'
 import { Key } from './key'
 import { TextDiff } from '../components/android-hook/diff-text'
+import { Action } from '../components/android-hook/android-input-manager'
 
 /**
  * Two weak maps that allow us rebuild a path given a node. They are populated
@@ -35,14 +36,7 @@ export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 
-export const EDITOR_TO_PENDING_SELECTION: WeakMap<
-  Editor,
-  Range | null
-> = new WeakMap()
-export const EDITOR_TO_PENDING_CHANGES: WeakMap<
-  Editor,
-  TextDiff[]
-> = new WeakMap()
+export const IS_APPLYING_DIFFS: WeakMap<Editor, boolean> = new WeakMap()
 
 export const EDITOR_TO_USER_SELECTION: WeakMap<
   Editor,
@@ -50,17 +44,27 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<
 > = new WeakMap()
 
 /**
- * Weak maps for saving text on composition stage.
+ * Weak maps for saving pending state on composition stage.
  */
-
-export const EDITOR_TO_MARK_PLACEHOLDER_MARKS = new WeakMap<
-  Editor,
-  Partial<Text> | null
->()
 
 export const EDITOR_TO_FLUSH_PENDING_CHANGES: WeakMap<
   Editor,
   () => void
+> = new WeakMap()
+
+export const EDITOR_TO_PENDING_DIFFS: WeakMap<
+  Editor,
+  TextDiff[]
+> = new WeakMap()
+
+export const EDITOR_TO_PENDING_ACTION: WeakMap<
+  Editor,
+  Action | null
+> = new WeakMap()
+
+export const EDITOR_TO_PENDING_SELECTION: WeakMap<
+  Editor,
+  Range | null
 > = new WeakMap()
 
 /**

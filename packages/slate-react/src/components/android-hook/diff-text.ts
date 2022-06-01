@@ -1,9 +1,10 @@
-import { Editor, Node, Path, Point, Range, Text, Operation } from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Text } from 'slate'
+import { EDITOR_TO_PENDING_DIFFS } from '../../utils/weak-maps'
 
 export type StringDiff = {
   start: number
   end: number
-  insertText: string
+  text: string
 }
 
 export type TextDiff = {
@@ -22,10 +23,9 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
     return false
   }
 
-  if (diff.start !== node.text.length || diff.insertText.length === 0) {
+  if (diff.start !== node.text.length || diff.text.length === 0) {
     return (
-      node.text.slice(diff.start, diff.start + diff.insertText.length) ===
-      diff.insertText
+      node.text.slice(diff.start, diff.start + diff.text.length) === diff.text
     )
   }
 
@@ -35,13 +35,13 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   }
 
   const nextNode = Node.get(editor, nextPath)
-  return Text.isText(nextNode) && nextNode.text.startsWith(diff.insertText)
+  return Text.isText(nextNode) && nextNode.text.startsWith(diff.text)
 }
 
 function applyStringDiff(text: string, ...diffs: StringDiff[]) {
   return diffs.reduce(
     (text, diff) =>
-      text.slice(0, diff.start) + diff.insertText + text.slice(diff.end),
+      text.slice(0, diff.start) + diff.text + text.slice(diff.end),
     text
   )
 }
@@ -54,22 +54,22 @@ export function mergeStringDiffs(
   const start = Math.min(a.start, b.start)
   const overlap = Math.max(
     0,
-    Math.min(a.start + a.insertText.length, b.end) - b.start
+    Math.min(a.start + a.text.length, b.end) - b.start
   )
 
   const applied = applyStringDiff(text, a, b)
   const sliceEnd = Math.max(
-    b.start + b.insertText.length,
+    b.start + b.text.length,
     a.start +
-      a.insertText.length +
-      (a.start + a.insertText.length > b.start ? b.insertText.length : 0) -
+      a.text.length +
+      (a.start + a.text.length > b.start ? b.text.length : 0) -
       overlap
   )
 
   return {
     start,
-    end: Math.max(a.end, b.end - a.insertText.length + (a.end - a.start)),
-    insertText: applied.slice(start, sliceEnd),
+    end: Math.max(a.end, b.end - a.text.length + (a.end - a.start)),
+    text: applied.slice(start, sliceEnd),
   }
 }
 
@@ -126,7 +126,89 @@ export function normalizeRange(editor: Editor, range: Range): Range | null {
   return { anchor, focus }
 }
 
-// TODO: Standardize behavior, decide how we want to handle changes
+export function transformPendingPoint(
+  editor: Editor,
+  point: Point,
+  op: Operation
+): Point | null {
+  const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+  const textDiff = pendingDiffs?.find(({ path }) =>
+    Path.equals(path, point.path)
+  )
+
+  if (!textDiff || point.offset <= textDiff.diff.start) {
+    return Point.transform(point, op)
+  }
+
+  const { diff } = textDiff
+  // Point references location inside the diff => transform the point based on the location
+  // the diff will be applied to and add the offset inside the diff.
+  if (point.offset <= diff.start + diff.text.length) {
+    const anchor = { path: point.path, offset: diff.start }
+    const transformed = Point.transform(anchor, op, {
+      affinity: 'backward',
+    })
+
+    if (!transformed) {
+      return null
+    }
+
+    return {
+      path: transformed.path,
+      offset: transformed.offset + point.offset - diff.start,
+    }
+  }
+
+  // Point references location after the diff
+  const anchor = {
+    path: point.path,
+    offset: point.offset - diff.text.length + diff.end - diff.start,
+  }
+  const transformed = Point.transform(anchor, op, {
+    affinity: 'backward',
+  })
+  if (!transformed) {
+    return null
+  }
+
+  // TODO: Fix condition?
+  if (
+    op.type === 'split_node' &&
+    Path.equals(op.path, point.path) &&
+    anchor.offset < op.position &&
+    diff.start < op.position
+  ) {
+    return transformed
+  }
+
+  return {
+    path: transformed.path,
+    offset: transformed.offset + diff.text.length + diff.end - diff.start,
+  }
+}
+
+export function transformPendingRange(
+  editor: Editor,
+  range: Range,
+  op: Operation
+): Range | null {
+  const anchor = transformPendingPoint(editor, range.anchor, op)
+  if (!anchor) {
+    return null
+  }
+
+  if (Range.isCollapsed(range)) {
+    return { anchor, focus: anchor }
+  }
+
+  const focus = transformPendingPoint(editor, range.focus, op)
+  if (!focus) {
+    return null
+  }
+
+  return { anchor, focus }
+}
+
 export function transformTextDiff(
   textDiff: TextDiff,
   op: Operation
@@ -144,13 +226,20 @@ export function transformTextDiff(
           diff: {
             start: op.text.length + diff.start,
             end: op.text.length + diff.end,
-            insertText: diff.insertText,
+            text: diff.text,
           },
           path,
         }
       }
 
-      return null
+      return {
+        diff: {
+          start: diff.start,
+          end: diff.end + op.text.length,
+          text: diff.text,
+        },
+        path,
+      }
     }
     case 'remove_text': {
       if (!Path.equals(op.path, path) || op.offset >= diff.end) {
@@ -162,33 +251,47 @@ export function transformTextDiff(
           diff: {
             start: diff.start - op.text.length,
             end: diff.end - op.text.length,
-            insertText: diff.insertText,
+            text: diff.text,
           },
           path,
         }
       }
 
-      return null
+      return {
+        diff: {
+          start: diff.start,
+          end: diff.end - op.text.length,
+          text: diff.text,
+        },
+        path,
+      }
     }
     case 'split_node': {
-      if (Path.equals(op.path, path) || op.position >= diff.end) {
+      if (!Path.equals(op.path, path) || op.position >= diff.end) {
         return {
           diff,
-          path: Path.transform(path, op)!,
+          path: Path.transform(path, op, { affinity: 'backward' })!,
         }
       }
 
       if (op.position > diff.start) {
-        return null
+        return {
+          diff: {
+            start: diff.start,
+            end: Math.min(op.position, diff.end),
+            text: diff.text,
+          },
+          path,
+        }
       }
 
       return {
         diff: {
           start: diff.start - op.position,
           end: diff.end - op.position,
-          insertText: diff.insertText,
+          text: diff.text,
         },
-        path: Path.transform(path, op)!,
+        path: Path.transform(path, op, { affinity: 'forward' })!,
       }
     }
     case 'merge_node': {
@@ -203,7 +306,7 @@ export function transformTextDiff(
         diff: {
           start: diff.start + op.position,
           end: diff.end + op.position,
-          insertText: diff.insertText,
+          text: diff.text,
         },
         path: Path.transform(path, op)!,
       }

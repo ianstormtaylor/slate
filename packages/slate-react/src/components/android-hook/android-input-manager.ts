@@ -1,32 +1,22 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
-  EDITOR_TO_PENDING_CHANGES,
+  EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_PENDING_SELECTION,
   IS_COMPOSING,
+  EDITOR_TO_PENDING_ACTION,
+  IS_APPLYING_DIFFS,
 } from '../../utils/weak-maps'
 import {
   mergeStringDiffs,
   normalizeRange,
+  StringDiff,
   targetRange,
-  TextDiff,
   verifyDiffState,
 } from './diff-text'
 
-type ReplaceExpandedAction = {
-  at: Range
-  text: string
-  type: 'replace_expanded'
-}
-type LineBreakAction = { at: Range | Point; type: 'line_break' }
-type DeleteAction = {
-  at: Range
-  type: 'delete'
-  direction: 'forward' | 'backward'
-}
-
-type Action = ReplaceExpandedAction | LineBreakAction | DeleteAction
+export type Action = { at: Point | Range; run: () => void }
 
 // https://github.com/facebook/draft-js/blob/main/src/component/handlers/composition/DraftEditorCompositionHandler.js#L41
 // When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
@@ -54,8 +44,6 @@ export function createAndroidInputManager({
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
 
-  let currentAction: Action | null = null
-
   const applyPendingSelection = () => {
     const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
     EDITOR_TO_PENDING_SELECTION.delete(editor)
@@ -73,12 +61,11 @@ export function createAndroidInputManager({
   }
 
   const performAction = () => {
-    if (!currentAction) {
+    const action = EDITOR_TO_PENDING_ACTION.get(editor)
+    EDITOR_TO_PENDING_ACTION.set(editor, null)
+    if (!action) {
       return
     }
-
-    const action = currentAction
-    currentAction = null
 
     const range = normalizeRange(editor, Editor.range(editor, action.at))
     if (!range) {
@@ -89,26 +76,7 @@ export function createAndroidInputManager({
       Transforms.select(editor, range)
     }
 
-    switch (action.type) {
-      case 'line_break': {
-        Editor.insertBreak(editor)
-        break
-      }
-      case 'replace_expanded': {
-        Editor.insertText(editor, action.text)
-        break
-      }
-      case 'delete': {
-        if (editor.selection && Range.isExpanded(editor.selection)) {
-          Editor.deleteFragment(editor, { direction: action.direction })
-        } else if (action.direction === 'forward') {
-          Editor.deleteForward(editor)
-        } else {
-          Editor.deleteBackward(editor)
-        }
-        break
-      }
-    }
+    action.run()
   }
 
   const flush = () => {
@@ -125,26 +93,29 @@ export function createAndroidInputManager({
       editor.selection &&
       Editor.rangeRef(editor, editor.selection, { affinity: 'forward' })
 
-    const pendingChanges = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
-    debug('flush', currentAction, pendingChanges)
+    const pendingChanges = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
+    debug('flush', EDITOR_TO_PENDING_ACTION.get(editor), pendingChanges)
 
+    const wasApplyingDiffs = !!IS_APPLYING_DIFFS.get(editor)
+    IS_APPLYING_DIFFS.set(editor, true)
     pendingChanges.forEach(textDiff => {
       const range = targetRange(textDiff)
       if (!editor.selection || !Range.equals(editor.selection, range)) {
         Transforms.select(editor, range)
       }
 
-      if (textDiff.diff.insertText) {
-        Editor.insertText(editor, textDiff.diff.insertText)
+      if (textDiff.diff.text) {
+        Editor.insertText(editor, textDiff.diff.text)
       } else {
         Editor.deleteFragment(editor)
       }
 
       if (!verifyDiffState(editor, textDiff)) {
-        currentAction = null
+        EDITOR_TO_PENDING_ACTION.delete(editor)
         EDITOR_TO_PENDING_SELECTION.delete(editor)
       }
     })
+    IS_APPLYING_DIFFS.set(editor, wasApplyingDiffs)
 
     const selection = selectionRef?.unref()
     if (
@@ -154,8 +125,8 @@ export function createAndroidInputManager({
       Transforms.select(editor, selection)
     }
 
-    if (currentAction) {
-      EDITOR_TO_PENDING_CHANGES.set(editor, [])
+    if (hasPendingAction()) {
+      EDITOR_TO_PENDING_DIFFS.set(editor, [])
       performAction()
       return
     }
@@ -171,7 +142,7 @@ export function createAndroidInputManager({
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
 
-    EDITOR_TO_PENDING_CHANGES.set(editor, [])
+    EDITOR_TO_PENDING_DIFFS.set(editor, [])
 
     applyPendingSelection()
   }
@@ -205,47 +176,40 @@ export function createAndroidInputManager({
     return true
   }
 
-  const pushAction = (action: Action | TextDiff) => {
-    debug('pushAction', action)
+  const storeDiff = (path: Path, diff: StringDiff) => {
+    const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
+    EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
+
+    const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
+    if (idx < 0) {
+      pendingDiffs.push({ path, diff })
+      return
+    }
+
+    const target = Node.leaf(editor, path)
+    pendingDiffs[idx] = {
+      path: pendingDiffs[idx].path,
+      diff: mergeStringDiffs(target.text, pendingDiffs[idx].diff, diff),
+    }
+  }
+
+  const scheduleAction = (at: Point | Range, run: () => void) => {
+    debug('scheduleAction', { at, run })
 
     EDITOR_TO_PENDING_SELECTION.delete(editor)
     scheduleOnDOMSelectionChange.cancel()
     onDOMSelectionChange.cancel()
 
-    if (currentAction) {
-      throw new Error('Pushed new action while current action is pending')
+    if (hasPendingAction()) {
+      throw new Error('Scheduled new action while current action is pending')
     }
 
-    if (!('type' in action)) {
-      const pendingDiffs = EDITOR_TO_PENDING_CHANGES.get(editor) ?? []
-      EDITOR_TO_PENDING_CHANGES.set(editor, pendingDiffs)
-
-      const idx = pendingDiffs.findIndex(change =>
-        Path.equals(change.path, action.path)
-      )
-      if (idx < 0) {
-        pendingDiffs.push(action)
-        return
-      }
-
-      const target = Node.get(editor, action.path) as Text
-      pendingDiffs[idx] = {
-        path: pendingDiffs[idx].path,
-        diff: mergeStringDiffs(
-          target.text,
-          pendingDiffs[idx].diff,
-          action.diff
-        ),
-      }
-
-      return
-    }
+    EDITOR_TO_PENDING_ACTION.set(editor, { at, run })
 
     // COMPAT: When deleting before a non-contenteditable element chrome only fires a beforeinput,
     // (no input) and doesn't perform any dom mutations. Without a flush timeout we would never flush
     // in this case.
     actionTimeoutId = setTimeout(flush)
-    currentAction = action
   }
 
   const handleDOMBeforeInput = (event: InputEvent) => {
@@ -300,7 +264,6 @@ export function createAndroidInputManager({
 
     if (!targetRange) {
       debug('before input fallback', editor.selection)
-
       targetRange = editor.selection
     }
 
@@ -319,96 +282,124 @@ export function createAndroidInputManager({
     ) {
       if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
         const [start, end] = Range.edges(targetRange)
-        pushAction({
-          path: targetRange.anchor.path,
-          diff: {
-            insertText: '',
-            end: end.offset,
-            start: start.offset,
-          },
+        storeDiff(targetRange.anchor.path, {
+          text: '',
+          end: end.offset,
+          start: start.offset,
         })
 
         return true
       }
 
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
-      pushAction({ type: 'delete', at: targetRange, direction })
+      scheduleAction(targetRange, () =>
+        Editor.deleteFragment(editor, { direction })
+      )
       return true
     }
 
     switch (type) {
       case 'deleteByComposition':
       case 'deleteByCut':
-      case 'deleteByDrag':
+      case 'deleteByDrag': {
+        scheduleAction(targetRange, () => Editor.deleteFragment(editor))
+        break
+      }
+
       case 'deleteContent':
       case 'deleteContentForward': {
-        pushAction({
-          type: 'delete',
-          at: targetRange,
-          direction: 'forward',
-        })
+        const { anchor } = targetRange
+        if (Range.isCollapsed(targetRange)) {
+          const targetNode = Node.leaf(editor, anchor.path)
+
+          if (anchor.offset < targetNode.text.length) {
+            storeDiff(anchor.path, {
+              text: '',
+              start: anchor.offset,
+              end: anchor.offset + 1,
+            })
+            break
+          }
+        }
+
+        scheduleAction(targetRange, () => Editor.deleteForward(editor))
         break
       }
 
       case 'deleteContentBackward': {
-        if (targetRange.anchor.offset > 0) {
-          pushAction({
-            path: targetRange.anchor.path,
-            diff: {
-              insertText: '',
-              end: targetRange.anchor.offset,
-              start: targetRange.anchor.offset - 1,
-            },
+        const { anchor } = targetRange
+        if (Range.isCollapsed(targetRange) && anchor.offset > 0) {
+          storeDiff(anchor.path, {
+            text: '',
+            start: anchor.offset - 1,
+            end: anchor.offset,
           })
           break
         }
 
-        pushAction({
-          type: 'delete',
-          at: targetRange,
-          direction: 'backward',
-        })
+        scheduleAction(targetRange, () => Editor.deleteBackward(editor))
         break
       }
 
       case 'deleteEntireSoftLine': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () => {
+          Editor.deleteBackward(editor, { unit: 'line' })
+          Editor.deleteForward(editor, { unit: 'line' })
+        })
+        break
       }
 
       case 'deleteHardLineBackward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteBackward(editor, { unit: 'block' })
+        )
+        break
       }
 
       case 'deleteSoftLineBackward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteBackward(editor, { unit: 'line' })
+        )
+        break
       }
 
       case 'deleteHardLineForward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteForward(editor, { unit: 'block' })
+        )
+        break
       }
 
       case 'deleteSoftLineForward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteForward(editor, { unit: 'line' })
+        )
+        break
       }
 
       case 'deleteWordBackward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteBackward(editor, { unit: 'word' })
+        )
+        break
       }
 
       case 'deleteWordForward': {
-        throw new Error('Not implemented')
+        scheduleAction(targetRange, () =>
+          Editor.deleteForward(editor, { unit: 'word' })
+        )
+        break
       }
 
-      case 'insertLineBreak':
-        // TODO: Other editor action
-        pushAction({ type: 'line_break', at: targetRange })
+      case 'insertLineBreak': {
+        scheduleAction(targetRange, () => Editor.insertSoftBreak(editor))
         break
+      }
 
       case 'insertParagraph': {
-        pushAction({ type: 'line_break', at: targetRange })
+        scheduleAction(targetRange, () => Editor.insertBreak(editor))
         break
       }
-
       case 'insertCompositionText':
       case 'deleteCompositionText':
       case 'insertFromComposition':
@@ -417,56 +408,45 @@ export function createAndroidInputManager({
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
-        // TODO: Non-string data action, line break
-        if (data && typeof data !== 'string') {
+        if (data?.constructor.name === 'DataTransfer') {
+          scheduleAction(targetRange, () =>
+            ReactEditor.insertData(editor, data)
+          )
           break
         }
 
-        // TODO: Apply after text diff
-        const insertLineBreak = data?.endsWith('\n')
-        if (insertLineBreak) {
-          pushAction({ type: 'line_break', at: Range.end(targetRange) })
-
+        if (typeof data === 'string' && data.includes('\n')) {
+          scheduleAction(Range.end(targetRange), () =>
+            Editor.insertSoftBreak(editor)
+          )
           break
         }
 
         const unhanged = Editor.unhangRange(editor, targetRange)
-        if (!Path.equals(unhanged.anchor.path, unhanged.focus.path)) {
-          pushAction({
-            type: 'replace_expanded',
-            at: targetRange,
+        if (Path.equals(unhanged.anchor.path, unhanged.focus.path)) {
+          const [start, end] = Range.edges(targetRange)
+          storeDiff(start.path, {
+            start: start.offset,
+            end: end.offset,
             text: data ?? '',
           })
-        } else {
-          // TODO: Handle
-          const [start, end] = Range.edges(targetRange)
-          pushAction({
-            path: start.path,
-            diff: {
-              start: start.offset,
-              end: end.offset,
-              insertText: data ?? '',
-            },
-          })
+          break
         }
 
+        scheduleAction(targetRange, () => Editor.insertText(editor, data ?? ''))
         break
       }
     }
-
-    debug('beforeInputSelection', targetRange, type)
 
     return true
   }
 
   const hasPendingAction = () => {
-    return currentAction !== null
+    return !!EDITOR_TO_PENDING_ACTION.get(editor)
   }
 
   const hasPendingChanges = () => {
-    return (
-      !!EDITOR_TO_PENDING_CHANGES.get(editor)?.length && !hasPendingAction()
-    )
+    return !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length && !hasPendingAction()
   }
 
   const handleDOMSelectionChange = () => {
@@ -504,8 +484,7 @@ export function createAndroidInputManager({
   }
 
   const flushAction = () => {
-    // Beforeinput events don't necessarily cause dom mutations (e.g. when deleting before a non-contenteditable element)
-    if (currentAction) {
+    if (hasPendingAction()) {
       flush()
     }
   }
