@@ -1,7 +1,7 @@
 import { RefObject, useState, useLayoutEffect } from 'react'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
-import { EDITOR_TO_FLUSH_PENDING_CHANGES } from '../../utils/weak-maps'
+import { EDITOR_TO_SCHEDULE_FLUSH } from '../../utils/weak-maps'
 import {
   createAndroidInputManager,
   CreateAndroidInputManagerOptions,
@@ -35,7 +35,7 @@ export function useAndroidInputManager({
     })
   )
 
-  EDITOR_TO_FLUSH_PENDING_CHANGES.set(editor, inputManager.flush)
+  EDITOR_TO_SCHEDULE_FLUSH.set(editor, inputManager.flush)
   if (isMounted) {
     inputManager.flush()
   }

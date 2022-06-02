@@ -34,7 +34,7 @@ const MarkdownShortcutsExample = () => {
 
   const handleDOMBeforeInput = useCallback((e: InputEvent) => {
     if (e.data === ' ') {
-      setTimeout(() => ReactEditor.flushPendingChanges(editor))
+      ReactEditor.scheduleFlushPendingChanges(editor)
     }
   }, [])
 

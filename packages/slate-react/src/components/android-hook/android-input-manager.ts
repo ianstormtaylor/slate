@@ -2,18 +2,21 @@ import { DebouncedFunc } from 'lodash'
 import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
+  EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_PENDING_SELECTION,
   IS_COMPOSING,
-  EDITOR_TO_PENDING_ACTION,
-  IS_APPLYING_DIFFS,
+  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
+  EDITOR_TO_USER_MARKS,
 } from '../../utils/weak-maps'
 import {
   mergeStringDiffs,
   normalizeRange,
   StringDiff,
   targetRange,
+  TextDiff,
   verifyDiffState,
+  normalizePoint,
 } from './diff-text'
 
 export type Action = { at: Point | Range; run: () => void }
@@ -40,6 +43,8 @@ export function createAndroidInputManager({
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions) {
+  let flushing = false
+
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
@@ -62,24 +67,33 @@ export function createAndroidInputManager({
 
   const performAction = () => {
     const action = EDITOR_TO_PENDING_ACTION.get(editor)
-    EDITOR_TO_PENDING_ACTION.set(editor, null)
+    EDITOR_TO_PENDING_ACTION.delete(editor)
     if (!action) {
       return
     }
 
-    const range = normalizeRange(editor, Editor.range(editor, action.at))
-    if (!range) {
+    const target = Point.isPoint(action.at)
+      ? normalizePoint(editor, action.at)
+      : normalizeRange(editor, action.at)
+
+    if (!target) {
       return
     }
 
-    if (!editor.selection || !Range.equals(editor.selection, range)) {
-      Transforms.select(editor, range)
+    const targetRange = Editor.range(editor, target)
+    if (!editor.selection || !Range.equals(editor.selection, targetRange)) {
+      Transforms.select(editor, target)
     }
 
     action.run()
   }
 
   const flush = () => {
+    // Flushing is mainly used so that onDOMSelectionChange calls handleUserSelect
+    // instead of Transforms.select() directly even after we have applied the pending diffs.
+    flushing = true
+    queueMicrotask(() => (flushing = false))
+
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
       flushTimeoutId = null
@@ -92,30 +106,56 @@ export function createAndroidInputManager({
     const selectionRef =
       editor.selection &&
       Editor.rangeRef(editor, editor.selection, { affinity: 'forward' })
+    EDITOR_TO_USER_MARKS.set(editor, editor.marks)
 
-    const pendingChanges = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
-    debug('flush', EDITOR_TO_PENDING_ACTION.get(editor), pendingChanges)
+    debug(
+      'flush',
+      EDITOR_TO_PENDING_ACTION.get(editor),
+      EDITOR_TO_PENDING_DIFFS.get(editor)
+    )
 
-    const wasApplyingDiffs = !!IS_APPLYING_DIFFS.get(editor)
-    IS_APPLYING_DIFFS.set(editor, true)
-    pendingChanges.forEach(textDiff => {
-      const range = targetRange(textDiff)
+    const hadPendingDiffs = !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
+
+    let diff: TextDiff | undefined
+    while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
+      const placeholderMarks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)
+      if (placeholderMarks !== undefined) {
+        EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
+        editor.marks = placeholderMarks
+      }
+
+      const range = targetRange(diff)
       if (!editor.selection || !Range.equals(editor.selection, range)) {
         Transforms.select(editor, range)
       }
 
-      if (textDiff.diff.text) {
-        Editor.insertText(editor, textDiff.diff.text)
+      if (diff.diff.text) {
+        Editor.insertText(editor, diff.diff.text)
       } else {
         Editor.deleteFragment(editor)
       }
 
-      if (!verifyDiffState(editor, textDiff)) {
+      // Remove diff only after we have applied it to account for it when transforming
+      // pending ranges.
+      EDITOR_TO_PENDING_DIFFS.set(
+        editor,
+        EDITOR_TO_PENDING_DIFFS.get(editor)?.filter(
+          ({ id }) => id !== diff!.id
+        )!
+      )
+
+      if (!verifyDiffState(editor, diff)) {
+        debug('invalid diff state')
         EDITOR_TO_PENDING_ACTION.delete(editor)
+        EDITOR_TO_USER_MARKS.delete(editor)
+
+        // Ensure we don't restore the pending user (dom) selection
+        // since the document and dom state do not match.
         EDITOR_TO_PENDING_SELECTION.delete(editor)
+        scheduleOnDOMSelectionChange.cancel()
+        onDOMSelectionChange.cancel()
       }
-    })
-    IS_APPLYING_DIFFS.set(editor, wasApplyingDiffs)
+    }
 
     const selection = selectionRef?.unref()
     if (
@@ -126,7 +166,6 @@ export function createAndroidInputManager({
     }
 
     if (hasPendingAction()) {
-      EDITOR_TO_PENDING_DIFFS.set(editor, [])
       performAction()
       return
     }
@@ -134,7 +173,7 @@ export function createAndroidInputManager({
     // COMPAT: The selectionChange event is fired after the action is performed,
     // so we have to manually schedule it to ensure we don't 'throw away' the selection
     // while rendering if we have pending changes.
-    if (pendingChanges.length) {
+    if (hadPendingDiffs) {
       debug('scheduleOnDOMSelectionChange pending changes')
       scheduleOnDOMSelectionChange()
     }
@@ -142,9 +181,13 @@ export function createAndroidInputManager({
     scheduleOnDOMSelectionChange.flush()
     onDOMSelectionChange.flush()
 
-    EDITOR_TO_PENDING_DIFFS.set(editor, [])
-
     applyPendingSelection()
+
+    const userMarks = EDITOR_TO_USER_MARKS.get(editor)
+    EDITOR_TO_USER_MARKS.delete(editor)
+    if (userMarks !== undefined) {
+      editor.marks = userMarks
+    }
   }
 
   const handleCompositionEnd = (
@@ -182,14 +225,20 @@ export function createAndroidInputManager({
 
     const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
     if (idx < 0) {
-      pendingDiffs.push({ path, diff })
+      pendingDiffs.push({ path, diff, id: Date.now() })
       return
     }
 
     const target = Node.leaf(editor, path)
+    const merged = mergeStringDiffs(target.text, pendingDiffs[idx].diff, diff)
+    if (!merged) {
+      pendingDiffs.splice(idx, 1)
+      return
+    }
+
     pendingDiffs[idx] = {
-      path: pendingDiffs[idx].path,
-      diff: mergeStringDiffs(target.text, pendingDiffs[idx].diff, diff),
+      ...pendingDiffs[idx],
+      diff: merged,
     }
   }
 
@@ -208,7 +257,7 @@ export function createAndroidInputManager({
 
     // COMPAT: When deleting before a non-contenteditable element chrome only fires a beforeinput,
     // (no input) and doesn't perform any dom mutations. Without a flush timeout we would never flush
-    // in this case.
+    // in this case and thus never actually perform the action.
     actionTimeoutId = setTimeout(flush)
   }
 
@@ -229,16 +278,10 @@ export function createAndroidInputManager({
     const [nativeTargetRange] = (event as any).getTargetRanges()
 
     if (nativeTargetRange && !hasPendingAction()) {
-      const range = ReactEditor.toSlateRange(editor, nativeTargetRange, {
+      targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
       })
-
-      debug('before input target range', range)
-
-      if (range) {
-        targetRange = range
-      }
     }
 
     // COMPAT: SelectionChange event is fired after the action is performed, so we
@@ -246,33 +289,24 @@ export function createAndroidInputManager({
     const window = ReactEditor.getWindow(editor)
     const domSelection = window.getSelection()
     if (!targetRange && !hasPendingAction() && domSelection) {
-      const range = ReactEditor.toSlateRange(editor, domSelection, {
+      targetRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: true,
       })
-
-      debug(
-        'before input dom selection',
-        range,
-        domSelection.getRangeAt(0).cloneRange()
-      )
-
-      if (range) {
-        targetRange = range
-      }
     }
 
+    targetRange = targetRange ?? editor.selection
     if (!targetRange) {
-      debug('before input fallback', editor.selection)
-      targetRange = editor.selection
-    }
-
-    if (!targetRange) {
-      throw new Error('Before input without target range')
+      return
     }
 
     if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
+      const end = Range.end(targetRange)
       targetRange = Editor.unhangRange(editor, targetRange)
+
+      if (Range.isCollapsed(targetRange)) {
+        targetRange = { anchor: end, focus: end }
+      }
     }
 
     if (
@@ -442,11 +476,14 @@ export function createAndroidInputManager({
   }
 
   const hasPendingAction = () => {
-    return !!EDITOR_TO_PENDING_ACTION.get(editor)
+    return !!EDITOR_TO_PENDING_ACTION.get(editor) || !!actionTimeoutId
   }
 
   const hasPendingChanges = () => {
-    return !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length && !hasPendingAction()
+    return (
+      (!!EDITOR_TO_PENDING_DIFFS.get(editor)?.length && !hasPendingAction()) ||
+      flushing
+    )
   }
 
   const handleDOMSelectionChange = () => {
@@ -479,7 +516,7 @@ export function createAndroidInputManager({
         !Path.equals(editor.selection.anchor.path, range?.anchor.path))
 
     if (pathChanged || !hasPendingChanges()) {
-      flushTimeoutId = setTimeout(flush, FLUSH_DELAY) as any
+      flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
 
@@ -489,8 +526,16 @@ export function createAndroidInputManager({
     }
   }
 
+  const scheduleFlush = () => {
+    if (!hasPendingAction()) {
+      actionTimeoutId = setTimeout(flush)
+    }
+  }
+
   return {
     flush,
+    scheduleFlush,
+
     hasPendingChanges,
     hasPendingAction,
 

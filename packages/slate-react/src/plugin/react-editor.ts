@@ -12,7 +12,7 @@ import {
   EDITOR_TO_WINDOW,
   EDITOR_TO_KEY_TO_ELEMENT,
   IS_COMPOSING,
-  EDITOR_TO_FLUSH_PENDING_CHANGES,
+  EDITOR_TO_SCHEDULE_FLUSH,
 } from '../utils/weak-maps'
 import {
   DOMElement,
@@ -330,7 +330,6 @@ export const ReactEditor = {
 
       const nextText = texts[i + 1]
       if (
-        IS_ANDROID &&
         point.offset === end &&
         nextText?.hasAttribute('data-slate-mark-placeholder')
       ) {
@@ -648,8 +647,8 @@ export const ReactEditor = {
     return { path, offset } as T extends true ? Point | null : Point
   },
 
-  flushPendingChanges(editor: Editor) {
-    EDITOR_TO_FLUSH_PENDING_CHANGES.get(editor)?.()
+  scheduleFlushPendingChanges(editor: Editor) {
+    EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
   },
 
   /**

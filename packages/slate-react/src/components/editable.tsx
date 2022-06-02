@@ -1,65 +1,64 @@
-import React, { useEffect, useRef, useMemo, useCallback, useState } from 'react'
-import {
-  Editor,
-  Element,
-  NodeEntry,
-  Node,
-  Range,
-  Text,
-  Transforms,
-  Path,
-} from 'slate'
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
-
-import useChildren from '../hooks/use-children'
-import Hotkeys from '../utils/hotkeys'
 import {
-  HAS_BEFORE_INPUT_SUPPORT,
-  IS_IOS,
-  IS_CHROME,
-  IS_FIREFOX,
-  IS_FIREFOX_LEGACY,
-  IS_QQBROWSER,
-  IS_SAFARI,
-  IS_UC_MOBILE,
-  IS_WECHATBROWSER,
-  CAN_USE_DOM,
-  IS_ANDROID,
-} from '../utils/environment'
+  Editor,
+  Element,
+  Node,
+  NodeEntry,
+  Path,
+  Range,
+  Text,
+  Transforms,
+} from 'slate'
 import { ReactEditor } from '..'
+import useChildren from '../hooks/use-children'
+import { DecorateContext } from '../hooks/use-decorate'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { DecorateContext } from '../hooks/use-decorate'
+import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
   DOMNode,
   DOMRange,
+  DOMText,
   getDefaultView,
   isDOMElement,
   isDOMNode,
   isPlainTextOnlyPaste,
-  DOMText,
 } from '../utils/dom'
-
+import {
+  CAN_USE_DOM,
+  HAS_BEFORE_INPUT_SUPPORT,
+  IS_CHROME,
+  IS_FIREFOX,
+  IS_FIREFOX_LEGACY,
+  IS_IOS,
+  IS_QQBROWSER,
+  IS_SAFARI,
+  IS_UC_MOBILE,
+  IS_WECHATBROWSER,
+} from '../utils/environment'
+import Hotkeys from '../utils/hotkeys'
 import {
   EDITOR_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-  IS_READ_ONLY,
-  NODE_TO_ELEMENT,
-  IS_FOCUSED,
-  PLACEHOLDER_SYMBOL,
-  EDITOR_TO_WINDOW,
+  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
   EDITOR_TO_USER_SELECTION,
+  EDITOR_TO_WINDOW,
+  ELEMENT_TO_NODE,
   IS_COMPOSING,
+  IS_FOCUSED,
+  IS_READ_ONLY,
   MARK_PLACEHOLDER_SYMBOL,
+  NODE_TO_ELEMENT,
+  PLACEHOLDER_SYMBOL,
+  EDITOR_TO_USER_MARKS,
 } from '../utils/weak-maps'
-import { TRIPLE_CLICK } from '../utils/constants'
-import { useAndroidInputManager } from './android-hook/use-android-input-manager'
 import { RestoreDOM } from './android-hook/restore-dom'
+import { useAndroidInputManager } from './android-hook/use-android-input-manager'
 import { useTrackUserInput } from './android-hook/use-track-user-input'
 
 type DeferredOperation = () => void
@@ -349,8 +348,6 @@ export const Editable = (props: EditableProps) => {
     }
 
     setTimeout(() => {
-      console.log('done updating selection')
-
       // COMPAT: In Firefox, it's not enough to create a range, you also need
       // to focus the contenteditable element too. (2016/11/16)
       if (newDomRange && IS_FIREFOX) {
@@ -671,29 +668,32 @@ export const Editable = (props: EditableProps) => {
   }
 
   const { marks } = editor
-  state.hasMarkPlaceholder = false
   if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
+    state.hasMarkPlaceholder = true
+
     const { anchor } = editor.selection
-    const leaf = Node.get(editor, anchor.path) as Text
+    const { text, ...rest } = Node.leaf(editor, anchor.path)
+    const unset = Object.fromEntries(
+      Object.keys(rest).map(mark => [mark, null])
+    )
 
-    if (!Text.equals(leaf, marks as Text, { loose: true })) {
-      state.hasMarkPlaceholder = true
+    decorations.push({
+      [MARK_PLACEHOLDER_SYMBOL]: true,
+      ...unset,
+      ...marks,
 
-      const { text, ...rest } = leaf
-      const unset = Object.fromEntries(
-        Object.keys(rest).map(key => [key, null])
-      )
-
-      decorations.push({
-        [MARK_PLACEHOLDER_SYMBOL]: true,
-        ...unset,
-        ...marks,
-
-        anchor,
-        focus: anchor,
-      })
-    }
+      anchor,
+      focus: anchor,
+    })
+  } else {
+    state.hasMarkPlaceholder = false
   }
+
+  // Update EDITOR_TO_MARK_PLACEHOLDER_MARKS in setTimeout useEffect to ensure we don't set it
+  // before we have a change to receive the composition end event.
+  useEffect(() => {
+    setTimeout(() => EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks))
+  })
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
@@ -930,7 +930,24 @@ export const Editable = (props: EditableProps) => {
                     !IS_UC_MOBILE &&
                     event.data
                   ) {
+                    const placeholderMarks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(
+                      editor
+                    )
+                    EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
+
+                    // Ensure we insert text with the marks the user was actually seeing
+                    if (placeholderMarks !== undefined) {
+                      EDITOR_TO_USER_MARKS.set(editor, editor.marks)
+                      editor.marks = placeholderMarks
+                    }
+
                     Editor.insertText(editor, event.data)
+
+                    const userMarks = EDITOR_TO_USER_MARKS.get(editor)
+                    EDITOR_TO_USER_MARKS.delete(editor)
+                    if (userMarks !== undefined) {
+                      editor.marks = userMarks
+                    }
                   }
                 }
               },
@@ -959,6 +976,8 @@ export const Editable = (props: EditableProps) => {
                   if (androidInputManager?.handleCompositionStart(event)) {
                     return
                   }
+
+                  setIsComposing(true)
 
                   const { selection } = editor
                   if (selection) {

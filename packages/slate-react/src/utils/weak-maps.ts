@@ -36,8 +36,6 @@ export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 
-export const IS_APPLYING_DIFFS: WeakMap<Editor, boolean> = new WeakMap()
-
 export const EDITOR_TO_USER_SELECTION: WeakMap<
   Editor,
   RangeRef | null
@@ -47,9 +45,19 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<
  * Weak maps for saving pending state on composition stage.
  */
 
-export const EDITOR_TO_FLUSH_PENDING_CHANGES: WeakMap<
+export const EDITOR_TO_SCHEDULE_FLUSH: WeakMap<
   Editor,
   () => void
+> = new WeakMap()
+
+export const EDITOR_TO_USER_MARKS: WeakMap<
+  Editor,
+  Partial<Text> | null
+> = new WeakMap()
+
+export const EDITOR_TO_MARK_PLACEHOLDER_MARKS: WeakMap<
+  Editor,
+  Partial<Text> | null
 > = new WeakMap()
 
 export const EDITOR_TO_PENDING_DIFFS: WeakMap<

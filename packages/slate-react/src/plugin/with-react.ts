@@ -14,14 +14,13 @@ import {
 import { Key } from '../utils/key'
 import { findCurrentLineRange } from '../utils/lines'
 import {
-  EDITOR_TO_FLUSH_PENDING_CHANGES,
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
   EDITOR_TO_PENDING_DIFFS,
   NODE_TO_KEY,
   EDITOR_TO_PENDING_SELECTION,
   EDITOR_TO_PENDING_ACTION,
-  IS_APPLYING_DIFFS,
+  EDITOR_TO_USER_MARKS,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
 /**
@@ -42,12 +41,12 @@ export const withReact = <T extends Editor>(editor: T) => {
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
 
   e.addMark = (key, value) => {
-    EDITOR_TO_FLUSH_PENDING_CHANGES.get(e)?.()
+    EDITOR_TO_USER_MARKS.delete(editor)
     addMark(key, value)
   }
 
   e.removeMark = key => {
-    EDITOR_TO_FLUSH_PENDING_CHANGES.get(e)?.()
+    EDITOR_TO_USER_MARKS.delete(editor)
     removeMark(key)
   }
 
@@ -93,25 +92,20 @@ export const withReact = <T extends Editor>(editor: T) => {
       EDITOR_TO_PENDING_DIFFS.set(editor, transformed)
     }
 
-    if (IS_APPLYING_DIFFS.get(editor)) {
-      const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
-      if (pendingSelection) {
-        EDITOR_TO_PENDING_SELECTION.set(
-          editor,
-          transformPendingRange(editor, pendingSelection, op)
-        )
-      }
-      const pendingAction = EDITOR_TO_PENDING_ACTION.get(editor)
-      if (pendingAction) {
-        const at = Point.isPoint(pendingAction?.at)
-          ? transformPendingPoint(editor, pendingAction.at, op)
-          : transformPendingRange(editor, pendingAction.at, op)
+    const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
+    if (pendingSelection) {
+      EDITOR_TO_PENDING_SELECTION.set(
+        editor,
+        transformPendingRange(editor, pendingSelection, op)
+      )
+    }
+    const pendingAction = EDITOR_TO_PENDING_ACTION.get(editor)
+    if (pendingAction) {
+      const at = Point.isPoint(pendingAction?.at)
+        ? transformPendingPoint(editor, pendingAction.at, op)
+        : transformPendingRange(editor, pendingAction.at, op)
 
-        EDITOR_TO_PENDING_ACTION.set(
-          editor,
-          at ? { ...pendingAction, at } : null
-        )
-      }
+      EDITOR_TO_PENDING_ACTION.set(editor, at ? { ...pendingAction, at } : null)
     }
 
     switch (op.type) {
@@ -143,6 +137,10 @@ export const withReact = <T extends Editor>(editor: T) => {
         matches.push(...getMatches(e, commonPath))
         break
       }
+    }
+
+    if (op.type === 'set_selection') {
+      console.trace(op)
     }
 
     apply(op)

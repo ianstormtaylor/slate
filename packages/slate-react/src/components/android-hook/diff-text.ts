@@ -8,6 +8,7 @@ export type StringDiff = {
 }
 
 export type TextDiff = {
+  id: number
   path: Path
   diff: StringDiff
 }
@@ -47,17 +48,17 @@ function applyStringDiff(text: string, ...diffs: StringDiff[]) {
 }
 
 export function mergeStringDiffs(
-  text: string,
+  targetText: string,
   a: StringDiff,
   b: StringDiff
-): StringDiff {
+): StringDiff | null {
   const start = Math.min(a.start, b.start)
   const overlap = Math.max(
     0,
     Math.min(a.start + a.text.length, b.end) - b.start
   )
 
-  const applied = applyStringDiff(text, a, b)
+  const applied = applyStringDiff(targetText, a, b)
   const sliceEnd = Math.max(
     b.start + b.text.length,
     a.start +
@@ -66,10 +67,17 @@ export function mergeStringDiffs(
       overlap
   )
 
+  const text = applied.slice(start, sliceEnd)
+  const end = Math.max(a.end, b.end - a.text.length + (a.end - a.start))
+
+  if (!text && end === start) {
+    return null
+  }
+
   return {
     start,
-    end: Math.max(a.end, b.end - a.text.length + (a.end - a.start)),
-    text: applied.slice(start, sliceEnd),
+    end,
+    text,
   }
 }
 
@@ -81,9 +89,16 @@ export function targetRange(textDiff: TextDiff): Range {
   }
 }
 
-function normalizePoint(editor: Editor, point: Point): Point | null {
+export function normalizePoint(editor: Editor, point: Point): Point | null {
   let { path, offset } = point
-  let leaf = Node.leaf(editor, path)
+  if (!Editor.hasPath(editor, path)) {
+    return null
+  }
+
+  let leaf = Node.get(editor, path)
+  if (!Text.isText(leaf)) {
+    return null
+  }
 
   const parentBlock = Editor.above(editor, {
     match: n => Editor.isBlock(editor, n),
@@ -137,7 +152,7 @@ export function transformPendingPoint(
   )
 
   if (!textDiff || point.offset <= textDiff.diff.start) {
-    return Point.transform(point, op)
+    return Point.transform(point, op, { affinity: 'backward' })
   }
 
   const { diff } = textDiff
@@ -183,7 +198,7 @@ export function transformPendingPoint(
 
   return {
     path: transformed.path,
-    offset: transformed.offset + diff.text.length + diff.end - diff.start,
+    offset: transformed.offset + diff.text.length - diff.end + diff.start,
   }
 }
 
@@ -213,7 +228,7 @@ export function transformTextDiff(
   textDiff: TextDiff,
   op: Operation
 ): TextDiff | null {
-  const { path, diff } = textDiff
+  const { path, diff, id } = textDiff
 
   switch (op.type) {
     case 'insert_text': {
@@ -228,6 +243,7 @@ export function transformTextDiff(
             end: op.text.length + diff.end,
             text: diff.text,
           },
+          id,
           path,
         }
       }
@@ -238,6 +254,7 @@ export function transformTextDiff(
           end: diff.end + op.text.length,
           text: diff.text,
         },
+        id,
         path,
       }
     }
@@ -253,6 +270,7 @@ export function transformTextDiff(
             end: diff.end - op.text.length,
             text: diff.text,
           },
+          id,
           path,
         }
       }
@@ -263,6 +281,7 @@ export function transformTextDiff(
           end: diff.end - op.text.length,
           text: diff.text,
         },
+        id,
         path,
       }
     }
@@ -270,6 +289,7 @@ export function transformTextDiff(
       if (!Path.equals(op.path, path) || op.position >= diff.end) {
         return {
           diff,
+          id,
           path: Path.transform(path, op, { affinity: 'backward' })!,
         }
       }
@@ -281,6 +301,7 @@ export function transformTextDiff(
             end: Math.min(op.position, diff.end),
             text: diff.text,
           },
+          id,
           path,
         }
       }
@@ -291,6 +312,7 @@ export function transformTextDiff(
           end: diff.end - op.position,
           text: diff.text,
         },
+        id,
         path: Path.transform(path, op, { affinity: 'forward' })!,
       }
     }
@@ -298,6 +320,7 @@ export function transformTextDiff(
       if (!Path.equals(op.path, path)) {
         return {
           diff,
+          id,
           path: Path.transform(path, op)!,
         }
       }
@@ -308,6 +331,7 @@ export function transformTextDiff(
           end: diff.end + op.position,
           text: diff.text,
         },
+        id,
         path: Path.transform(path, op)!,
       }
     }
@@ -321,5 +345,6 @@ export function transformTextDiff(
   return {
     diff,
     path: newPath,
+    id,
   }
 }
