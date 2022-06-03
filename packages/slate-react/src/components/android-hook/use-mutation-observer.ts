@@ -9,11 +9,22 @@ export function isTrackedMutation(
   batch: MutationRecord[]
 ): boolean {
   const { target } = mutation
-  const parentMutation = batch.find(
-    ({ addedNodes, removedNodes }) =>
-      Array.from(addedNodes).includes(target) ||
-      Array.from(removedNodes).includes(target)
-  )
+  const parentMutation = batch.find(({ addedNodes, removedNodes }) => {
+    const added = Array.from(addedNodes)
+    if (added.includes(target) || added.some(node => node.contains(target))) {
+      return true
+    }
+
+    const removed = Array.from(removedNodes)
+    if (
+      removed.includes(target) ||
+      removed.some(node => node.contains(target))
+    ) {
+      return true
+    }
+
+    return false
+  })
 
   // Target add/remove is tracked. Track the mutation if we track the parent mutation.
   if (parentMutation) {
