@@ -75,6 +75,8 @@ export const EDITOR_TO_PENDING_SELECTION: WeakMap<
   Range | null
 > = new WeakMap()
 
+export const EDITOR_TO_FORCE_RENDER: WeakMap<Editor, () => void> = new WeakMap()
+
 /**
  * Weak map for associating the context `onChange` context with the plugin.
  */

@@ -1,6 +1,6 @@
 import { RefObject } from 'react'
 import { ReactEditor } from '../../plugin/react-editor'
-import { isDOMElement } from '../../utils/dom'
+import { isTrackedMutation } from './use-mutation-observer'
 
 export type RestoreDOMManager = {
   registerMutations: (mutations: MutationRecord[]) => void
@@ -24,7 +24,7 @@ export const createRestoreDomManager = (
     }
 
     const trackedMutations = mutations.filter(mutation => {
-      if (isTracked(mutation, mutations)) {
+      if (isTrackedMutation(editor, mutation, mutations)) {
         return true
       }
 
@@ -34,55 +34,6 @@ export const createRestoreDomManager = (
     })
 
     bufferedMutations.push(...trackedMutations)
-  }
-
-  const isTracked = (
-    mutation: MutationRecord,
-    batch: MutationRecord[]
-  ): boolean => {
-    const { target } = mutation
-    const parentMutation = batch.find(
-      ({ addedNodes, removedNodes }) =>
-        Array.from(addedNodes).includes(target) ||
-        Array.from(removedNodes).includes(target)
-    )
-
-    // Target add/remove is tracked. Track the mutation if we track the parent mutation.
-    if (parentMutation) {
-      return isTracked(parentMutation, batch)
-    }
-
-    const targetElement = (isDOMElement(target)
-      ? target
-      : target.parentElement) as HTMLElement | null
-
-    if (!targetElement) {
-      return false
-    }
-
-    if (targetElement === ReactEditor.toDOMNode(editor, editor)) {
-      return true
-    }
-
-    if (
-      !ReactEditor.hasDOMNode(editor, targetElement, { editable: true }) &&
-      !targetElement.hasAttribute('data-slate-zero-width') &&
-      !targetElement.hasAttribute('data-slate-string')
-    ) {
-      return false
-    }
-
-    const voidParent = targetElement.closest('data-slate-void')
-
-    // Mutation isn't inside a void element
-    if (!voidParent) {
-      return true
-    }
-
-    const block = targetElement.closest('[data-slate-node="element"]')
-
-    // If mutation is inside a block inside a void element, track it.
-    return !!block && voidParent.contains(block)
   }
 
   function restoreDOM() {

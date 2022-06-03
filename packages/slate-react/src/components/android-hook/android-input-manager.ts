@@ -1,5 +1,5 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Transforms } from 'slate'
+import { Editor, Node, Path, Point, Range, Transforms, Text } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
   EDITOR_TO_PENDING_ACTION,
@@ -8,6 +8,7 @@ import {
   IS_COMPOSING,
   EDITOR_TO_MARK_PLACEHOLDER_MARKS,
   EDITOR_TO_USER_MARKS,
+  EDITOR_TO_FORCE_RENDER,
 } from '../../utils/weak-maps'
 import {
   mergeStringDiffs,
@@ -18,6 +19,7 @@ import {
   verifyDiffState,
   normalizePoint,
 } from './diff-text'
+import { isTrackedMutation } from './use-mutation-observer'
 
 export type Action = { at: Point | Range; run: () => void }
 
@@ -43,7 +45,7 @@ export function createAndroidInputManager({
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions) {
-  let flushing = false
+  let flushing: 'action' | boolean = false
 
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
@@ -89,10 +91,13 @@ export function createAndroidInputManager({
   }
 
   const flush = () => {
-    // Flushing is mainly used so that onDOMSelectionChange calls handleUserSelect
-    // instead of Transforms.select() directly even after we have applied the pending diffs.
-    flushing = true
-    queueMicrotask(() => (flushing = false))
+    if (!flushing) {
+      flushing = true
+      setTimeout(() => (flushing = false))
+    }
+    if (hasPendingAction()) {
+      flushing = 'action'
+    }
 
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -114,7 +119,7 @@ export function createAndroidInputManager({
       EDITOR_TO_PENDING_DIFFS.get(editor)
     )
 
-    const hadPendingDiffs = !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
+    let scheduleSelectionChange = !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
 
     let diff: TextDiff | undefined
     while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
@@ -146,8 +151,10 @@ export function createAndroidInputManager({
 
       if (!verifyDiffState(editor, diff)) {
         debug('invalid diff state')
+        scheduleSelectionChange = false
         EDITOR_TO_PENDING_ACTION.delete(editor)
         EDITOR_TO_USER_MARKS.delete(editor)
+        flushing = 'action'
 
         // Ensure we don't restore the pending user (dom) selection
         // since the document and dom state do not match.
@@ -173,7 +180,7 @@ export function createAndroidInputManager({
     // COMPAT: The selectionChange event is fired after the action is performed,
     // so we have to manually schedule it to ensure we don't 'throw away' the selection
     // while rendering if we have pending changes.
-    if (hadPendingDiffs) {
+    if (scheduleSelectionChange) {
       debug('scheduleOnDOMSelectionChange pending changes')
       scheduleOnDOMSelectionChange()
     }
@@ -301,11 +308,14 @@ export function createAndroidInputManager({
     }
 
     if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
-      const end = Range.end(targetRange)
-      targetRange = Editor.unhangRange(editor, targetRange)
+      const [start, end] = Range.edges(targetRange)
+      const leaf = Node.leaf(editor, start.path)
 
-      if (Range.isCollapsed(targetRange)) {
-        targetRange = { anchor: end, focus: end }
+      if (leaf.text.length === start.offset && end.offset === 0) {
+        const next = Editor.next(editor, { at: start.path, match: Text.isText })
+        if (next && Path.equals(next[1], end.path)) {
+          targetRange = { anchor: end, focus: end }
+        }
       }
     }
 
@@ -480,10 +490,11 @@ export function createAndroidInputManager({
   }
 
   const hasPendingChanges = () => {
-    return (
-      (!!EDITOR_TO_PENDING_DIFFS.get(editor)?.length && !hasPendingAction()) ||
-      flushing
-    )
+    return !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
+  }
+
+  const isFlushing = () => {
+    return flushing
   }
 
   const handleDOMSelectionChange = () => {
@@ -521,7 +532,7 @@ export function createAndroidInputManager({
   }
 
   const flushAction = () => {
-    if (hasPendingAction()) {
+    if (hasPendingAction() || !hasPendingChanges()) {
       flush()
     }
   }
@@ -529,6 +540,20 @@ export function createAndroidInputManager({
   const scheduleFlush = () => {
     if (!hasPendingAction()) {
       actionTimeoutId = setTimeout(flush)
+    }
+  }
+
+  const handleDomMutations = (mutations: MutationRecord[]) => {
+    if (hasPendingChanges()) {
+      return
+    }
+
+    if (
+      mutations.some(mutation => isTrackedMutation(editor, mutation, mutations))
+    ) {
+      // Cause a re-render to restore the dom state if we encounter tracked mutations without
+      // a corresponding pending action.
+      EDITOR_TO_FORCE_RENDER.get(editor)?.()
     }
   }
 
@@ -545,6 +570,8 @@ export function createAndroidInputManager({
     handleCompositionStart,
     handleDOMBeforeInput,
 
+    handleDomMutations,
     handleInput: flushAction,
+    isFlushing,
   }
 }

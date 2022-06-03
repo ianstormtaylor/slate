@@ -139,10 +139,6 @@ export const withReact = <T extends Editor>(editor: T) => {
       }
     }
 
-    if (op.type === 'set_selection') {
-      console.trace(op)
-    }
-
     apply(op)
 
     for (const [path, key] of matches) {

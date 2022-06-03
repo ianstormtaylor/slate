@@ -1,7 +1,14 @@
 import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useReducer,
+} from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
   Editor,
@@ -41,6 +48,7 @@ import {
   IS_SAFARI,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
+  IS_ANDROID,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -56,6 +64,7 @@ import {
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_USER_MARKS,
+  EDITOR_TO_FORCE_RENDER,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './android-hook/restore-dom'
 import { useAndroidInputManager } from './android-hook/use-android-input-manager'
@@ -141,6 +150,9 @@ export const Editable = (props: EditableProps) => {
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
+  const [, forceRender] = useReducer(s => s + 1, 0)
+  EDITOR_TO_FORCE_RENDER.set(editor, forceRender)
+
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
   ;(window as any).editor = editor
@@ -211,7 +223,8 @@ export const Editable = (props: EditableProps) => {
           if (range) {
             if (
               !ReactEditor.isComposing(editor) &&
-              !androidInputManager?.hasPendingChanges()
+              !androidInputManager?.hasPendingChanges() &&
+              !androidInputManager?.isFlushing()
             ) {
               Transforms.select(editor, range)
             } else {
@@ -262,92 +275,99 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    console.log('restore selection')
-
     const hasDomSelection = domSelection.type !== 'None'
 
-    // If the DOM selection is properly unset, we're done.
-    if (!selection && !hasDomSelection) {
-      return
-    }
+    const setDomSelection = () => {
+      // If the DOM selection is properly unset, we're done.
+      if (!selection && !hasDomSelection) {
+        return
+      }
 
-    // verify that the dom selection is in the editor
-    const editorElement = EDITOR_TO_ELEMENT.get(editor)!
-    let hasDomSelectionInEditor = false
-    if (
-      editorElement.contains(domSelection.anchorNode) &&
-      editorElement.contains(domSelection.focusNode)
-    ) {
-      hasDomSelectionInEditor = true
-    }
+      // verify that the dom selection is in the editor
+      const editorElement = EDITOR_TO_ELEMENT.get(editor)!
+      let hasDomSelectionInEditor = false
+      if (
+        editorElement.contains(domSelection.anchorNode) &&
+        editorElement.contains(domSelection.focusNode)
+      ) {
+        hasDomSelectionInEditor = true
+      }
 
-    // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (hasDomSelection && hasDomSelectionInEditor && selection) {
-      const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: true,
+      // If the DOM selection is in the editor and the editor selection is already correct, we're done.
+      if (hasDomSelection && hasDomSelectionInEditor && selection) {
+        const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: true,
 
-        // domSelection is not necessarily a valid Slate range
-        // (e.g. when clicking on contentEditable:false element)
-        suppressThrow: true,
-      })
+          // domSelection is not necessarily a valid Slate range
+          // (e.g. when clicking on contentEditable:false element)
+          suppressThrow: true,
+        })
 
-      if (slateRange && Range.equals(slateRange, selection)) {
-        if (!state.hasMarkPlaceholder) {
-          return
-        }
+        if (slateRange && Range.equals(slateRange, selection)) {
+          if (!state.hasMarkPlaceholder) {
+            return
+          }
 
-        // Ensure selection is inside the mark placeholder
-        const { anchorNode } = domSelection
-        if (
-          anchorNode?.parentElement?.hasAttribute('data-slate-mark-placeholder')
-        ) {
-          return
+          // Ensure selection is inside the mark placeholder
+          const { anchorNode } = domSelection
+          if (
+            anchorNode?.parentElement?.hasAttribute(
+              'data-slate-mark-placeholder'
+            )
+          ) {
+            return
+          }
         }
       }
-    }
 
-    // when <Editable/> is being controlled through external value
-    // then its children might just change - DOM responds to it on its own
-    // but Slate's value is not being updated through any operation
-    // and thus it doesn't transform selection on its own
-    if (selection && !ReactEditor.hasRange(editor, selection)) {
-      editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
-        exactMatch: false,
-        suppressThrow: true,
-      })
-      return
-    }
+      // when <Editable/> is being controlled through external value
+      // then its children might just change - DOM responds to it on its own
+      // but Slate's value is not being updated through any operation
+      // and thus it doesn't transform selection on its own
+      if (selection && !ReactEditor.hasRange(editor, selection)) {
+        editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
+          exactMatch: false,
+          suppressThrow: true,
+        })
+        return
+      }
 
-    // Otherwise the DOM selection is out of sync, so update it.
-    state.isUpdatingSelection = true
+      // Otherwise the DOM selection is out of sync, so update it.
+      state.isUpdatingSelection = true
 
-    const newDomRange: DOMRange | null =
-      selection && ReactEditor.toDOMRange(editor, selection)
+      const newDomRange: DOMRange | null =
+        selection && ReactEditor.toDOMRange(editor, selection)
 
-    console.log('set dom selection', newDomRange?.cloneRange())
-
-    if (newDomRange) {
-      if (Range.isBackward(selection!)) {
-        domSelection.setBaseAndExtent(
-          newDomRange.endContainer,
-          newDomRange.endOffset,
-          newDomRange.startContainer,
-          newDomRange.startOffset
-        )
+      if (newDomRange) {
+        if (Range.isBackward(selection!)) {
+          domSelection.setBaseAndExtent(
+            newDomRange.endContainer,
+            newDomRange.endOffset,
+            newDomRange.startContainer,
+            newDomRange.startOffset
+          )
+        } else {
+          domSelection.setBaseAndExtent(
+            newDomRange.startContainer,
+            newDomRange.startOffset,
+            newDomRange.endContainer,
+            newDomRange.endOffset
+          )
+        }
+        scrollSelectionIntoView(editor, newDomRange)
       } else {
-        domSelection.setBaseAndExtent(
-          newDomRange.startContainer,
-          newDomRange.startOffset,
-          newDomRange.endContainer,
-          newDomRange.endOffset
-        )
+        domSelection.removeAllRanges()
       }
-      scrollSelectionIntoView(editor, newDomRange)
-    } else {
-      domSelection.removeAllRanges()
+
+      return newDomRange
     }
 
-    setTimeout(() => {
+    const newDomRange = setDomSelection()
+    const ensureSelection = androidInputManager?.isFlushing() === 'action'
+
+    // TODO: Adjust for non-android, document why we need to force it 3 times in total.
+    let timeoutId: ReturnType<typeof setTimeout> | null = null
+    const animationFrameId = requestAnimationFrame(() => {
       // COMPAT: In Firefox, it's not enough to create a range, you also need
       // to focus the contenteditable element too. (2016/11/16)
       if (newDomRange && IS_FIREFOX) {
@@ -355,8 +375,32 @@ export const Editable = (props: EditableProps) => {
         el.focus()
       }
 
+      if (ensureSelection) {
+        try {
+          setDomSelection()
+
+          timeoutId = setTimeout(() => {
+            try {
+              domSelection?.removeAllRanges()
+              setDomSelection()
+            } catch (e) {
+              // Ignore, dom and state might be out of sync
+            }
+          })
+        } catch (e) {
+          // Ignore, dom and state might be out of sync
+        }
+      }
+
       state.isUpdatingSelection = false
     })
+
+    return () => {
+      cancelAnimationFrame(animationFrameId)
+      if (timeoutId) {
+        clearTimeout(timeoutId)
+      }
+    }
   })
 
   // Listen on the native `beforeinput` event to get real "Level 2" events. This
@@ -634,15 +678,17 @@ export const Editable = (props: EditableProps) => {
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
 
-    window.document.addEventListener(
-      'selectionchange',
-      scheduleOnDOMSelectionChange
-    )
+    const handleSelectionChange = () => {
+      console.log('user select event')
+      scheduleOnDOMSelectionChange()
+    }
+
+    window.document.addEventListener('selectionchange', handleSelectionChange)
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        scheduleOnDOMSelectionChange
+        handleSelectionChange
       )
     }
   }, [scheduleOnDOMSelectionChange])
