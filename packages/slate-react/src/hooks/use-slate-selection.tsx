@@ -1,6 +1,6 @@
 import { Range } from 'slate'
 
-import { useSlateSelector } from "./use-slate-selector"
+import { useSlateSelector } from './use-slate-selector'
 
 /**
  * Get the current slate selection.

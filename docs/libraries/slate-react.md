@@ -100,6 +100,10 @@ Get the current editor object from the React context. Re-renders the context whe
 
 Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
 
+### `useSlateSelection`
+
+Get the current editor selection from the React context. Only re-renders when the selection changes.
+
 ## ReactEditor
 
 A React and DOM-specific version of the `Editor` interface. All about translating between the DOM and Slate.
