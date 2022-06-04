@@ -58,6 +58,7 @@ import {
   IS_COMPOSING,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
+import { useSlateSelection } from '../hooks/use-slate-selection'
 
 type DeferredOperation = () => void
 
@@ -132,14 +133,7 @@ export const Editable = (props: EditableProps) => {
     ...attributes
   } = props
   const editor = useSlate()
-  const selection = useSlateSelector(
-    editor => editor.selection,
-    (a, b) => {
-      if (!a && !b) return true
-      if (!a || !b) return false
-      return Range.equals(a, b)
-    }
-  )
+  const selection = useSlateSelection()
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
