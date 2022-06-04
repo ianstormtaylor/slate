@@ -32,6 +32,7 @@ import {
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
+import { useSlateSelector } from '../hooks/use-slate-selector'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
 import {
@@ -131,6 +132,14 @@ export const Editable = (props: EditableProps) => {
     ...attributes
   } = props
   const editor = useSlate()
+  const selection = useSlateSelector(
+    editor => editor.selection,
+    (a, b) => {
+      if (!a && !b) return true
+      if (!a || !b) return false
+      return Range.equals(a, b)
+    }
+  )
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -164,7 +173,6 @@ export const Editable = (props: EditableProps) => {
     }
 
     // Make sure the DOM selection state is in sync.
-    const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
 
@@ -254,7 +262,7 @@ export const Editable = (props: EditableProps) => {
 
       state.isUpdatingSelection = false
     })
-  })
+  }, [selection])
 
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
