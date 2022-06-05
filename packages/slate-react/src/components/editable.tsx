@@ -31,7 +31,7 @@ import {
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
-import { useSlate } from '../hooks/use-slate'
+import { useSlate, useSlateWithV } from '../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
 import {
@@ -112,6 +112,21 @@ export type EditableProps = {
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
+
+const useV = (v: number) => {
+  const ref = useRef<number>();
+  ref.current = v
+  return ref.current
+}
+
+const usePrevV = (v: number) => {
+  const ref = useRef<number>();
+  useEffect(() => {
+    ref.current = v;
+  });
+  return ref.current;
+}
+
 /**
  * Editable.
  */
@@ -131,7 +146,11 @@ export const Editable = (props: EditableProps) => {
     as: Component = 'div',
     ...attributes
   } = props
-  const editor = useSlate()
+  // const editor = useSlate()
+  const { editor, v: passedV } = useSlateWithV()
+  const v = useV(passedV)
+  const prevV = usePrevV(passedV)
+
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -151,8 +170,12 @@ export const Editable = (props: EditableProps) => {
     []
   )
 
-  // Whenever the editor updates...
+  // Whenever the editor updates, sync the DOM selection with the slate selection
   useIsomorphicLayoutEffect(() => {
+    if (prevV === v) {
+      console.log('prevented isomporhic layout effect...', prevV, v)
+      return;
+    }
     // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
