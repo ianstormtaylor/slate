@@ -32,7 +32,6 @@ import {
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
-import { useSlateSelector } from '../hooks/use-slate-selector'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
 import {
@@ -133,7 +132,6 @@ export const Editable = (props: EditableProps) => {
     ...attributes
   } = props
   const editor = useSlate()
-  const selection = useSlateSelection()
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -181,7 +179,7 @@ export const Editable = (props: EditableProps) => {
     const hasDomSelection = domSelection.type !== 'None'
 
     // If the DOM selection is properly unset, we're done.
-    if (!selection && !hasDomSelection) {
+    if (!editor.selection && !hasDomSelection) {
       return
     }
 
@@ -196,7 +194,7 @@ export const Editable = (props: EditableProps) => {
     }
 
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (hasDomSelection && hasDomSelectionInEditor && selection) {
+    if (hasDomSelection && hasDomSelectionInEditor && editor.selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: true,
 
@@ -204,7 +202,7 @@ export const Editable = (props: EditableProps) => {
         // (e.g. when clicking on contentEditable:false element)
         suppressThrow: true,
       })
-      if (slateRange && Range.equals(slateRange, selection)) {
+      if (slateRange && Range.equals(slateRange, editor.selection)) {
         return
       }
     }
@@ -213,7 +211,7 @@ export const Editable = (props: EditableProps) => {
     // then its children might just change - DOM responds to it on its own
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
-    if (selection && !ReactEditor.hasRange(editor, selection)) {
+    if (editor.selection && !ReactEditor.hasRange(editor, editor.selection)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: false,
@@ -224,9 +222,9 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     state.isUpdatingSelection = true
 
-    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+    const newDomRange = editor.selection && ReactEditor.toDOMRange(editor, editor.selection)
     if (newDomRange) {
-      if (Range.isBackward(selection!)) {
+      if (Range.isBackward(editor.selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
           newDomRange.endOffset,
@@ -256,7 +254,7 @@ export const Editable = (props: EditableProps) => {
 
       state.isUpdatingSelection = false
     })
-  }, [selection])
+  })
 
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.

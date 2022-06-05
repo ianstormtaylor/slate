@@ -1,4 +1,4 @@
-import { Range } from 'slate'
+import { BaseSelection, Range } from 'slate'
 
 import { useSlateSelector } from './use-slate-selector'
 
@@ -9,10 +9,12 @@ import { useSlateSelector } from './use-slate-selector'
 export const useSlateSelection = () => {
   return useSlateSelector(
     editor => editor.selection,
-    (a, b) => {
-      if (!a && !b) return true
-      if (!a || !b) return false
-      return Range.equals(a, b)
-    }
+    isSelectionEqual
   )
+}
+
+const isSelectionEqual = (a: BaseSelection, b: BaseSelection) => {
+  if (!a && !b) return true
+  if (!a || !b) return false
+  return Range.equals(a, b)
 }
