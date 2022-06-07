@@ -51,11 +51,11 @@ Of course we haven't rendered anything, so you won't see any changes.
 
 ```typescript
 // TypeScript users only add this code
-import { BaseEditor, BaseElement, BaseText, Descendant } from 'slate'
+import { BaseEditor, Descendant } from 'slate'
 import { ReactEditor } from 'slate-react'
 
-type CustomElement = BaseElement & { type: 'paragraph'; children: CustomText[] }
-type CustomText = BaseText & { text: string }
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string }
 
 declare module 'slate' {
   interface CustomTypes {
