@@ -172,10 +172,10 @@ export const Editable = (props: EditableProps) => {
 
   // Whenever the editor updates, sync the DOM selection with the slate selection
   useIsomorphicLayoutEffect(() => {
-    if (prevV === v) {
-      console.log('prevented isomporhic layout effect...', prevV, v)
-      return;
-    }
+    // if (prevV === v) {
+    //   console.log('prevented isomporhic layout effect...', prevV, v)
+    //   return;
+    // }
     // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
