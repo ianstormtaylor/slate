@@ -18,7 +18,7 @@ Once you've installed Slate, you'll need to import it.
 
 ```jsx
 // Import React dependencies.
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 // Import the Slate editor factory.
 import { createEditor } from 'slate'
 
@@ -40,7 +40,7 @@ The next step is to create a new `Editor` object. We want the editor to be stabl
 ```jsx
 const App = () => {
   // Create a Slate editor object that won't change across renders.
-  const [editor] = useState(() => withReact(createEditor()))
+  const editor = useMemo(() => withReact(createEditor()), [])
   return null
 }
 ```
@@ -74,7 +74,7 @@ The provider component keeps track of your Slate editor, its plugins, its value,
 const initialValue = []
 
 const App = () => {
-  const [editor] = useState(() => withReact(createEditor()))
+  const editor = useMemo(() => withReact(createEditor()), [])
   // Render the Slate context.
   return <Slate editor={editor} value={initialValue} />
 }
@@ -94,7 +94,7 @@ Okay, so the next step is to render the `<Editable>` component itself:
 const initialValue = []
 
 const App = () => {
-  const [editor] = useState(() => withReact(createEditor()))
+  const editor = useMemo(() => withReact(createEditor()), [])
   return (
     // Add the editable component inside the context.
     <Slate editor={editor} value={initialValue}>
@@ -120,7 +120,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const [editor] = useState(() => withReact(createEditor()))
+  const editor = useMemo(() => withReact(createEditor()), [])
 
   return (
     <Slate editor={editor} value={initialValue}>
