@@ -15,12 +15,12 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
       <Editable
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (event.key === '&') {
             event.preventDefault()
             editor.insertText('and')
@@ -40,7 +40,7 @@ Element renderers are just simple React components, like so:
 
 ```jsx
 // Define a React component renderer for our code blocks.
-const CodeElement = props => {
+const CodeElement = (props) => {
   return (
     <pre {...props.attributes}>
       <code>{props.children}</code>
@@ -58,7 +58,7 @@ And see that `props.children` reference? Slate will automatically render all of 
 And here's a component for the "default" elements:
 
 ```jsx
-const DefaultElement = props => {
+const DefaultElement = (props) => {
   return <p {...props.attributes}>{props.children}</p>
 }
 ```
@@ -74,11 +74,11 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   // Define a rendering function based on the element passed to `props`. We use
   // `useCallback` here to memoize the function for subsequent renders.
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -92,7 +92,7 @@ const App = () => {
       <Editable
         // Pass in the `renderElement` function.
         renderElement={renderElement}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (event.key === '&') {
             event.preventDefault()
             editor.insertText('and')
@@ -103,7 +103,7 @@ const App = () => {
   )
 }
 
-const CodeElement = props => {
+const CodeElement = (props) => {
   return (
     <pre {...props.attributes}>
       <code>{props.children}</code>
@@ -111,7 +111,7 @@ const CodeElement = props => {
   )
 }
 
-const DefaultElement = props => {
+const DefaultElement = (props) => {
   return <p {...props.attributes}>{props.children}</p>
 }
 ```
@@ -130,9 +130,9 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -145,7 +145,7 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (event.key === '`' && event.ctrlKey) {
             // Prevent the "`" from being inserted by default.
             event.preventDefault()
@@ -153,7 +153,7 @@ const App = () => {
             Transforms.setNodes(
               editor,
               { type: 'code' },
-              { match: n => Editor.isBlock(editor, n) }
+              { match: (n) => Editor.isBlock(editor, n) }
             )
           }
         }}
@@ -162,7 +162,7 @@ const App = () => {
   )
 }
 
-const CodeElement = props => {
+const CodeElement = (props) => {
   return (
     <pre {...props.attributes}>
       <code>{props.children}</code>
@@ -170,7 +170,7 @@ const CodeElement = props => {
   )
 }
 
-const DefaultElement = props => {
+const DefaultElement = (props) => {
   return <p {...props.attributes}>{props.children}</p>
 }
 ```
@@ -188,9 +188,9 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -203,18 +203,18 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             // Determine whether any of the currently selected blocks are code blocks.
             const [match] = Editor.nodes(editor, {
-              match: n => n.type === 'code',
+              match: (n) => n.type === 'code',
             })
             // Toggle the block type depending on whether there's already a match.
             Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: n => Editor.isBlock(editor, n) }
+              { match: (n) => Editor.isBlock(editor, n) }
             )
           }
         }}

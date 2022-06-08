@@ -13,7 +13,7 @@ import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const MyEditor = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   const renderElement = useCallback(({ attributes, children, element }) => {
     switch (element.type) {
       case 'quote':
@@ -42,7 +42,7 @@ const MyEditor = () => {
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```javascript
-const renderElement = useCallback(props => {
+const renderElement = useCallback((props) => {
   switch (props.element.type) {
     case 'quote':
       return <QuoteElement {...props} />
@@ -115,7 +115,7 @@ A common use case for this is rendering a toolbar with formatting buttons that a
 
 ```jsx
 const MyEditor = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   return (
     <Slate editor={editor}>
       <Toolbar />

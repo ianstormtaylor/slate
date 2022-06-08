@@ -17,7 +17,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
@@ -38,13 +38,13 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
       <Editable
         // Define a new handler which prints the key that was pressed.
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           console.log(event.key)
         }}
       />
@@ -68,12 +68,12 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
       <Editable
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()

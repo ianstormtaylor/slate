@@ -19,9 +19,9 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -30,7 +30,7 @@ const App = () => {
     }
   }, [])
 
-  const renderLeaf = useCallback(props => {
+  const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />
   }, [])
 
@@ -39,7 +39,7 @@ const App = () => {
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (!event.ctrlKey) {
             return
           }
@@ -48,12 +48,12 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: n => n.type === 'code',
+                match: (n) => n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: n => Editor.isBlock(editor, n) }
+                { match: (n) => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -63,7 +63,7 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { bold: true },
-                { match: n => Text.isText(n), split: true }
+                { match: (n) => Text.isText(n), split: true }
               )
               break
             }
@@ -84,7 +84,7 @@ We can instead implement these domain-specific concepts by creating custom helpe
 const CustomEditor = {
   isBoldMarkActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: n => n.bold === true,
+      match: (n) => n.bold === true,
       universal: true,
     })
 
@@ -93,7 +93,7 @@ const CustomEditor = {
 
   isCodeBlockActive(editor) {
     const [match] = Editor.nodes(editor, {
-      match: n => n.type === 'code',
+      match: (n) => n.type === 'code',
     })
 
     return !!match
@@ -104,7 +104,7 @@ const CustomEditor = {
     Transforms.setNodes(
       editor,
       { bold: isActive ? null : true },
-      { match: n => Text.isText(n), split: true }
+      { match: (n) => Text.isText(n), split: true }
     )
   },
 
@@ -113,7 +113,7 @@ const CustomEditor = {
     Transforms.setNodes(
       editor,
       { type: isActive ? null : 'code' },
-      { match: n => Editor.isBlock(editor, n) }
+      { match: (n) => Editor.isBlock(editor, n) }
     )
   },
 }
@@ -126,9 +126,9 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -137,7 +137,7 @@ const App = () => {
     }
   }, [])
 
-  const renderLeaf = useCallback(props => {
+  const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />
   }, [])
 
@@ -146,7 +146,7 @@ const App = () => {
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (!event.ctrlKey) {
             return
           }
@@ -183,9 +183,9 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback(props => {
+  const renderElement = useCallback((props) => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -194,7 +194,7 @@ const App = () => {
     }
   }, [])
 
-  const renderLeaf = useCallback(props => {
+  const renderLeaf = useCallback((props) => {
     return <Leaf {...props} />
   }, [])
 
@@ -203,7 +203,7 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <div>
         <button
-          onMouseDown={event => {
+          onMouseDown={(event) => {
             event.preventDefault()
             CustomEditor.toggleBoldMark(editor)
           }}
@@ -211,7 +211,7 @@ const App = () => {
           Bold
         </button>
         <button
-          onMouseDown={event => {
+          onMouseDown={(event) => {
             event.preventDefault()
             CustomEditor.toggleCodeBlock(editor)
           }}
@@ -223,7 +223,7 @@ const App = () => {
         editor={editor}
         renderElement={renderElement}
         renderLeaf={renderLeaf}
-        onKeyDown={event => {
+        onKeyDown={(event) => {
           if (!event.ctrlKey) {
             return
           }

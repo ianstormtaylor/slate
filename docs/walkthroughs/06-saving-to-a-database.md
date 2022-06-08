@@ -15,7 +15,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
@@ -40,15 +40,15 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate
       editor={editor}
       value={initialValue}
-      onChange={value => {
+      onChange={(value) => {
         const isAstChange = editor.operations.some(
-          op => 'set_selection' !== op.type
+          (op) => 'set_selection' !== op.type
         )
         if (isAstChange) {
           // Save the value to Local Storage.
@@ -69,7 +69,7 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   // Update the initial content to be pulled from Local Storage if it exists.
   const initialValue = useMemo(
     () =>
@@ -86,9 +86,9 @@ const App = () => {
     <Slate
       editor={editor}
       value={initialValue}
-      onChange={value => {
+      onChange={(value) => {
         const isAstChange = editor.operations.some(
-          op => 'set_selection' !== op.type
+          (op) => 'set_selection' !== op.type
         )
         if (isAstChange) {
           // Save the value to Local Storage.
@@ -114,20 +114,20 @@ But what if you want something other than JSON? Well, you'd need to serialize yo
 import { Node } from 'slate'
 
 // Define a serializing function that takes a value and returns a string.
-const serialize = value => {
+const serialize = (value) => {
   return (
     value
       // Return the string content of each paragraph in the value's children.
-      .map(n => Node.string(n))
+      .map((n) => Node.string(n))
       // Join them all with line breaks denoting paragraphs.
       .join('\n')
   )
 }
 
 // Define a deserializing function that takes a string and returns a value.
-const deserialize = string => {
+const deserialize = (string) => {
   // Return a value array of children derived by splitting the string.
-  return string.split('\n').map(line => {
+  return string.split('\n').map((line) => {
     return {
       children: [{ text: line }],
     }
@@ -135,7 +135,7 @@ const deserialize = string => {
 }
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   // Use our deserializing function to read the data from Local Storage.
   const initialValue = useMemo(
     deserialize(localStorage.getItem('content')) || '',
@@ -146,9 +146,9 @@ const App = () => {
     <Slate
       editor={editor}
       value={initialValue}
-      onChange={value => {
+      onChange={(value) => {
         const isAstChange = editor.operations.some(
-          op => 'set_selection' !== op.type
+          (op) => 'set_selection' !== op.type
         )
         if (isAstChange) {
           // Serialize the value and save the string value to Local Storage.
