@@ -42,7 +42,7 @@ const MyEditor = () => {
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
 ```javascript
-const renderElement = useCallback((props) => {
+const renderElement = useCallback(props => {
   switch (props.element.type) {
     case 'quote':
       return <QuoteElement {...props} />

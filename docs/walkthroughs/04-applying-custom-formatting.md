@@ -7,7 +7,7 @@ In this guide, we'll show you how to add custom formatting options, like **bold*
 So we start with our app from earlier:
 
 ```jsx
-const renderElement = (props) => {
+const renderElement = props => {
   switch (props.element.type) {
     case 'code':
       return <CodeElement {...props} />
@@ -30,16 +30,16 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (event.key === '`' && event.ctrlKey) {
             event.preventDefault()
             const [match] = Editor.nodes(editor, {
-              match: (n) => n.type === 'code',
+              match: n => n.type === 'code',
             })
             Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: (n) => Editor.isBlock(editor, n) }
+              { match: n => Editor.isBlock(editor, n) }
             )
           }
         }}
@@ -62,7 +62,7 @@ const initialValue = [
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback((props) => {
+  const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -75,7 +75,7 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <Editable
         renderElement={renderElement}
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (!event.ctrlKey) {
             return
           }
@@ -85,12 +85,12 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: (n) => n.type === 'code',
+                match: n => n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
                 { type: match ? 'paragraph' : 'code' },
-                { match: (n) => Editor.isBlock(editor, n) }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -103,7 +103,7 @@ const App = () => {
                 { bold: true },
                 // Apply it to text nodes, and split the text node up if the
                 // selection is overlapping only part of it.
-                { match: (n) => Text.isText(n), split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -121,7 +121,7 @@ For every format you add, Slate will break up the text content into "leaves", an
 
 ```jsx
 // Define a React component to render leaves with bold text.
-const Leaf = (props) => {
+const Leaf = props => {
   return (
     <span
       {...props.attributes}
@@ -148,7 +148,7 @@ const initialValue = [
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
-  const renderElement = useCallback((props) => {
+  const renderElement = useCallback(props => {
     switch (props.element.type) {
       case 'code':
         return <CodeElement {...props} />
@@ -158,7 +158,7 @@ const App = () => {
   }, [])
 
   // Define a leaf rendering function that is memoized with `useCallback`.
-  const renderLeaf = useCallback((props) => {
+  const renderLeaf = useCallback(props => {
     return <Leaf {...props} />
   }, [])
 
@@ -168,7 +168,7 @@ const App = () => {
         renderElement={renderElement}
         // Pass in the `renderLeaf` function.
         renderLeaf={renderLeaf}
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (!event.ctrlKey) {
             return
           }
@@ -177,12 +177,12 @@ const App = () => {
             case '`': {
               event.preventDefault()
               const [match] = Editor.nodes(editor, {
-                match: (n) => n.type === 'code',
+                match: n => n.type === 'code',
               })
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: (n) => Editor.isBlock(editor, n) }
+                { match: n => Editor.isBlock(editor, n) }
               )
               break
             }
@@ -192,7 +192,7 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { bold: true },
-                { match: (n) => Text.isText(n), split: true }
+                { match: n => Text.isText(n), split: true }
               )
               break
             }
@@ -203,7 +203,7 @@ const App = () => {
   )
 }
 
-const Leaf = (props) => {
+const Leaf = props => {
   return (
     <span
       {...props.attributes}

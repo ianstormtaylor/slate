@@ -44,7 +44,7 @@ const App = () => {
     <Slate editor={editor} value={initialValue}>
       <Editable
         // Define a new handler which prints the key that was pressed.
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           console.log(event.key)
         }}
       />
@@ -73,7 +73,7 @@ const App = () => {
   return (
     <Slate editor={editor} value={initialValue}>
       <Editable
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (event.key === '&') {
             // Prevent the ampersand character from being inserted.
             event.preventDefault()
