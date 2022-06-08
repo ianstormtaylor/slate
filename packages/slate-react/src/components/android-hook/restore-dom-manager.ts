@@ -23,15 +23,9 @@ export const createRestoreDomManager = (
       return
     }
 
-    const trackedMutations = mutations.filter(mutation => {
-      if (isTrackedMutation(editor, mutation, mutations)) {
-        return true
-      }
-
-      console.log('ignoring mutation', mutation)
-
-      return false
-    })
+    const trackedMutations = mutations.filter(mutation =>
+      isTrackedMutation(editor, mutation, mutations)
+    )
 
     bufferedMutations.push(...trackedMutations)
   }
@@ -43,11 +37,11 @@ export const createRestoreDomManager = (
         return
       }
 
-      Array.from(mutation.removedNodes).forEach(node => {
+      mutation.removedNodes.forEach(node => {
         mutation.target.insertBefore(node, mutation.nextSibling)
       })
 
-      Array.from(mutation.addedNodes).forEach(node => {
+      mutation.addedNodes.forEach(node => {
         mutation.target.removeChild(node)
       })
     })

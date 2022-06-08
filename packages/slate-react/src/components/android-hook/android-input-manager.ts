@@ -1,23 +1,24 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Transforms, Text } from 'slate'
+import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
+import { isDOMSelection } from '../../utils/dom'
 import {
+  EDITOR_TO_FORCE_RENDER,
+  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_PENDING_SELECTION,
-  IS_COMPOSING,
-  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
   EDITOR_TO_USER_MARKS,
-  EDITOR_TO_FORCE_RENDER,
+  IS_COMPOSING,
 } from '../../utils/weak-maps'
 import {
   mergeStringDiffs,
+  normalizePoint,
   normalizeRange,
   StringDiff,
   targetRange,
   TextDiff,
   verifyDiffState,
-  normalizePoint,
 } from './diff-text'
 import { isTrackedMutation } from './use-mutation-observer'
 
@@ -50,6 +51,7 @@ export function createAndroidInputManager({
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
+  let idCounter = 0
 
   const applyPendingSelection = () => {
     const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
@@ -124,6 +126,7 @@ export function createAndroidInputManager({
     let diff: TextDiff | undefined
     while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
       const placeholderMarks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)
+
       if (placeholderMarks !== undefined) {
         EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
         editor.marks = placeholderMarks
@@ -232,7 +235,7 @@ export function createAndroidInputManager({
 
     const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
     if (idx < 0) {
-      pendingDiffs.push({ path, diff, id: Date.now() })
+      pendingDiffs.push({ path, diff, id: idCounter++ })
       return
     }
 
@@ -249,7 +252,7 @@ export function createAndroidInputManager({
     }
   }
 
-  const scheduleAction = (at: Point | Range, run: () => void) => {
+  const scheduleAction = (at: Point | Range, run: () => void): void => {
     debug('scheduleAction', { at, run })
 
     EDITOR_TO_PENDING_SELECTION.delete(editor)
@@ -268,8 +271,7 @@ export function createAndroidInputManager({
     actionTimeoutId = setTimeout(flush)
   }
 
-  const handleDOMBeforeInput = (event: InputEvent) => {
-    // Ensure we don't flush while performing an action
+  const handleDOMBeforeInput = (event: InputEvent): void => {
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
       flushTimeoutId = null
@@ -279,12 +281,8 @@ export function createAndroidInputManager({
     let targetRange: Range | null = null
     const data = (event as any).dataTransfer || event.data || undefined
 
-    // COMPAT: For the deleting forward/backward input types we don't want
-    // to change the selection because it is the range that will be deleted,
-    // and those commands determine that for themselves.
-    const [nativeTargetRange] = (event as any).getTargetRanges()
-
-    if (nativeTargetRange && !hasPendingAction()) {
+    let [nativeTargetRange] = (event as any).getTargetRanges()
+    if (nativeTargetRange) {
       targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
@@ -295,7 +293,8 @@ export function createAndroidInputManager({
     // have to manually get the selection here to ensure it's up-to-date.
     const window = ReactEditor.getWindow(editor)
     const domSelection = window.getSelection()
-    if (!targetRange && !hasPendingAction() && domSelection) {
+    if (!targetRange && domSelection) {
+      nativeTargetRange = domSelection
       targetRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: true,
@@ -319,35 +318,27 @@ export function createAndroidInputManager({
       }
     }
 
-    if (
-      targetRange &&
-      Range.isExpanded(targetRange) &&
-      type.startsWith('delete')
-    ) {
+    if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
       if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
         const [start, end] = Range.edges(targetRange)
-        storeDiff(targetRange.anchor.path, {
+        return storeDiff(targetRange.anchor.path, {
           text: '',
           end: end.offset,
           start: start.offset,
         })
-
-        return true
       }
 
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
-      scheduleAction(targetRange, () =>
+      return scheduleAction(targetRange, () =>
         Editor.deleteFragment(editor, { direction })
       )
-      return true
     }
 
     switch (type) {
       case 'deleteByComposition':
       case 'deleteByCut':
       case 'deleteByDrag': {
-        scheduleAction(targetRange, () => Editor.deleteFragment(editor))
-        break
+        return scheduleAction(targetRange, () => Editor.deleteFragment(editor))
       }
 
       case 'deleteContent':
@@ -357,92 +348,91 @@ export function createAndroidInputManager({
           const targetNode = Node.leaf(editor, anchor.path)
 
           if (anchor.offset < targetNode.text.length) {
-            storeDiff(anchor.path, {
+            return storeDiff(anchor.path, {
               text: '',
               start: anchor.offset,
               end: anchor.offset + 1,
             })
-            break
           }
         }
 
-        scheduleAction(targetRange, () => Editor.deleteForward(editor))
-        break
+        return scheduleAction(targetRange, () => Editor.deleteForward(editor))
       }
 
       case 'deleteContentBackward': {
         const { anchor } = targetRange
-        if (Range.isCollapsed(targetRange) && anchor.offset > 0) {
-          storeDiff(anchor.path, {
+
+        // If we have a mismatch between the native and slate selection being collapsed
+        // we are most likely deleting a zero-width placeholder and thus should perform it
+        // as an action to ensure correct behavior (mostly happens with mark placeholders)
+        const nativeCollapsed = isDOMSelection(nativeTargetRange)
+          ? nativeTargetRange.isCollapsed
+          : !!nativeTargetRange?.collapsed
+
+        if (
+          nativeCollapsed &&
+          Range.isCollapsed(targetRange) &&
+          anchor.offset > 0
+        ) {
+          return storeDiff(anchor.path, {
             text: '',
             start: anchor.offset - 1,
             end: anchor.offset,
           })
-          break
         }
 
-        scheduleAction(targetRange, () => Editor.deleteBackward(editor))
-        break
+        return scheduleAction(targetRange, () => Editor.deleteBackward(editor))
       }
 
       case 'deleteEntireSoftLine': {
-        scheduleAction(targetRange, () => {
+        return scheduleAction(targetRange, () => {
           Editor.deleteBackward(editor, { unit: 'line' })
           Editor.deleteForward(editor, { unit: 'line' })
         })
-        break
       }
 
       case 'deleteHardLineBackward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteBackward(editor, { unit: 'block' })
         )
-        break
       }
 
       case 'deleteSoftLineBackward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteBackward(editor, { unit: 'line' })
         )
-        break
       }
 
       case 'deleteHardLineForward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteForward(editor, { unit: 'block' })
         )
-        break
       }
 
       case 'deleteSoftLineForward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteForward(editor, { unit: 'line' })
         )
-        break
       }
 
       case 'deleteWordBackward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteBackward(editor, { unit: 'word' })
         )
-        break
       }
 
       case 'deleteWordForward': {
-        scheduleAction(targetRange, () =>
+        return scheduleAction(targetRange, () =>
           Editor.deleteForward(editor, { unit: 'word' })
         )
-        break
       }
 
       case 'insertLineBreak': {
-        scheduleAction(targetRange, () => Editor.insertSoftBreak(editor))
-        break
+        return scheduleAction(targetRange, () => Editor.insertSoftBreak(editor))
       }
 
       case 'insertParagraph': {
-        scheduleAction(targetRange, () => Editor.insertBreak(editor))
-        break
+        return scheduleAction(targetRange, () => Editor.insertBreak(editor))
       }
       case 'insertCompositionText':
       case 'deleteCompositionText':
@@ -453,36 +443,39 @@ export function createAndroidInputManager({
       case 'insertReplacementText':
       case 'insertText': {
         if (data?.constructor.name === 'DataTransfer') {
-          scheduleAction(targetRange, () =>
+          return scheduleAction(targetRange, () =>
             ReactEditor.insertData(editor, data)
           )
-          break
         }
 
         if (typeof data === 'string' && data.includes('\n')) {
-          scheduleAction(Range.end(targetRange), () =>
+          return scheduleAction(Range.end(targetRange), () =>
             Editor.insertSoftBreak(editor)
           )
-          break
         }
 
-        const unhanged = Editor.unhangRange(editor, targetRange)
-        if (Path.equals(unhanged.anchor.path, unhanged.focus.path)) {
+        let text = data ?? ''
+
+        // COMPAT: If we are writing inside a placeholder, the ime inserts the text inside
+        // the placeholder itself and thus includes the zero-width space inside edit events.
+        if (EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)) {
+          text = text.replace('\uFEFF', '')
+        }
+
+        if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
           const [start, end] = Range.edges(targetRange)
-          storeDiff(start.path, {
+          return storeDiff(start.path, {
             start: start.offset,
             end: end.offset,
-            text: data ?? '',
+            text,
           })
-          break
         }
 
-        scheduleAction(targetRange, () => Editor.insertText(editor, data ?? ''))
-        break
+        return scheduleAction(targetRange, () =>
+          Editor.insertText(editor, text)
+        )
       }
     }
-
-    return true
   }
 
   const hasPendingAction = () => {
@@ -497,13 +490,6 @@ export function createAndroidInputManager({
     return flushing
   }
 
-  const handleDOMSelectionChange = () => {
-    if (hasPendingAction()) {
-      scheduleOnDOMSelectionChange()
-      return true
-    }
-  }
-
   const handleUserSelect = (range: Range | null) => {
     debug(
       'userSelect',
@@ -515,6 +501,10 @@ export function createAndroidInputManager({
     )
 
     EDITOR_TO_PENDING_SELECTION.set(editor, range)
+
+    if (EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)) {
+      // debugger
+    }
 
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -564,7 +554,6 @@ export function createAndroidInputManager({
     hasPendingChanges,
     hasPendingAction,
 
-    handleDOMSelectionChange,
     handleUserSelect,
     handleCompositionEnd,
     handleCompositionStart,

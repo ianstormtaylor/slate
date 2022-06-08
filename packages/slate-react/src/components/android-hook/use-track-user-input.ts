@@ -6,32 +6,24 @@ export function useTrackUserInput() {
   const editor = useSlateStatic()
 
   const receivedUserInput = useRef<boolean>(false)
-  const animationFrameRef = useRef<number | null>(null)
+  const animationFrameIdRef = useRef<number>(0)
 
   const onUserInput = useCallback(() => {
-    if (receivedUserInput.current === false) {
-      const window = ReactEditor.getWindow(editor)
-
-      receivedUserInput.current = true
-      if (animationFrameRef.current) {
-        window.cancelAnimationFrame(animationFrameRef.current)
-      }
-
-      animationFrameRef.current = window.requestAnimationFrame(() => {
-        receivedUserInput.current = false
-        animationFrameRef.current = null
-      })
+    if (receivedUserInput.current) {
+      return
     }
+
+    receivedUserInput.current = true
+
+    const window = ReactEditor.getWindow(editor)
+    window.cancelAnimationFrame(animationFrameIdRef.current)
+
+    animationFrameIdRef.current = window.requestAnimationFrame(() => {
+      receivedUserInput.current = false
+    })
   }, [])
 
-  useEffect(
-    () => () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
-      }
-    },
-    []
-  )
+  useEffect(() => () => cancelAnimationFrame(animationFrameIdRef.current), [])
 
   return {
     receivedUserInput,

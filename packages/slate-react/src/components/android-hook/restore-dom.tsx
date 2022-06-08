@@ -18,7 +18,8 @@ type RestoreDOMProps = {
   node: RefObject<HTMLDivElement>
 }
 
-// Sadly we have to use a class component here since we rely on `getSnapshotBeforeUpdate` which has no FC equivalent.
+// We have to use a class component here since we rely on `getSnapshotBeforeUpdate` which has no FC equivalent
+// to run code synchronously immediately before react commits the component update to the DOM.
 class RestoreDOMComponent extends Component<RestoreDOMProps> {
   static contextType = EditorContext
   context: ContextType<typeof EditorContext> = null

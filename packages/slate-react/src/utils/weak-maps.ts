@@ -1,7 +1,7 @@
-import { Ancestor, Editor, Node, RangeRef, Text, Range } from 'slate'
-import { Key } from './key'
-import { TextDiff } from '../components/android-hook/diff-text'
+import { Ancestor, Editor, Node, Range, RangeRef, Text } from 'slate'
 import { Action } from '../components/android-hook/android-input-manager'
+import { TextDiff } from '../components/android-hook/diff-text'
+import { Key } from './key'
 
 /**
  * Two weak maps that allow us rebuild a path given a node. They are populated
@@ -42,6 +42,12 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<
 > = new WeakMap()
 
 /**
+ * Weak map for associating the context `onChange` context with the plugin.
+ */
+
+export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
+
+/**
  * Weak maps for saving pending state on composition stage.
  */
 
@@ -50,15 +56,19 @@ export const EDITOR_TO_SCHEDULE_FLUSH: WeakMap<
   () => void
 > = new WeakMap()
 
+export const EDITOR_TO_MARK_PLACEHOLDER_MARKS: WeakMap<
+  Editor,
+  Partial<Text> | null
+> = new WeakMap()
+
 export const EDITOR_TO_USER_MARKS: WeakMap<
   Editor,
   Partial<Text> | null
 > = new WeakMap()
 
-export const EDITOR_TO_MARK_PLACEHOLDER_MARKS: WeakMap<
-  Editor,
-  Partial<Text> | null
-> = new WeakMap()
+/**
+ * Android input handling specific weak-maps
+ */
 
 export const EDITOR_TO_PENDING_DIFFS: WeakMap<
   Editor,
@@ -76,12 +86,6 @@ export const EDITOR_TO_PENDING_SELECTION: WeakMap<
 > = new WeakMap()
 
 export const EDITOR_TO_FORCE_RENDER: WeakMap<Editor, () => void> = new WeakMap()
-
-/**
- * Weak map for associating the context `onChange` context with the plugin.
- */
-
-export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
 
 /**
  * Symbols.

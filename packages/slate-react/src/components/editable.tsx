@@ -5,9 +5,9 @@ import React, {
   useCallback,
   useEffect,
   useMemo,
+  useReducer,
   useRef,
   useState,
-  useReducer,
 } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
@@ -48,12 +48,13 @@ import {
   IS_SAFARI,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
-  IS_ANDROID,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
   EDITOR_TO_ELEMENT,
+  EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_MARK_PLACEHOLDER_MARKS,
+  EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
   ELEMENT_TO_NODE,
@@ -63,8 +64,6 @@ import {
   MARK_PLACEHOLDER_SYMBOL,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
-  EDITOR_TO_USER_MARKS,
-  EDITOR_TO_FORCE_RENDER,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './android-hook/restore-dom'
 import { useAndroidInputManager } from './android-hook/use-android-input-manager'
@@ -183,11 +182,7 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (
-        !state.isUpdatingSelection &&
-        !state.isDraggingInternally &&
-        !androidInputManager?.handleDOMSelectionChange()
-      ) {
+      if (!state.isUpdatingSelection && !state.isDraggingInternally) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -275,9 +270,9 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    const hasDomSelection = domSelection.type !== 'None'
-
     const setDomSelection = () => {
+      const hasDomSelection = domSelection.type !== 'None'
+
       // If the DOM selection is properly unset, we're done.
       if (!selection && !hasDomSelection) {
         return
@@ -376,20 +371,21 @@ export const Editable = (props: EditableProps) => {
       }
 
       if (ensureSelection) {
-        try {
-          setDomSelection()
+        const forceSelectionChange = () => {
+          try {
+            domSelection?.removeAllRanges()
 
-          timeoutId = setTimeout(() => {
-            try {
-              domSelection?.removeAllRanges()
-              setDomSelection()
-            } catch (e) {
-              // Ignore, dom and state might be out of sync
-            }
-          })
-        } catch (e) {
-          // Ignore, dom and state might be out of sync
+            const el = ReactEditor.toDOMNode(editor, editor)
+            el.focus()
+
+            setDomSelection()
+          } catch (e) {
+            // Ignore, dom and state might be out of sync
+          }
         }
+
+        forceSelectionChange()
+        timeoutId = setTimeout(forceSelectionChange)
       }
 
       state.isUpdatingSelection = false
@@ -416,8 +412,8 @@ export const Editable = (props: EditableProps) => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
-        if (androidInputManager?.handleDOMBeforeInput(event)) {
-          return
+        if (androidInputManager) {
+          return androidInputManager.handleDOMBeforeInput(event)
         }
 
         // Some IMEs/Chrome extensions like e.g. Grammarly set the selection immediately before
@@ -714,29 +710,32 @@ export const Editable = (props: EditableProps) => {
   }
 
   const { marks } = editor
-  if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
-    state.hasMarkPlaceholder = true
+  state.hasMarkPlaceholder = false
 
+  if (editor.selection && Range.isCollapsed(editor.selection)) {
     const { anchor } = editor.selection
     const { text, ...rest } = Node.leaf(editor, anchor.path)
-    const unset = Object.fromEntries(
-      Object.keys(rest).map(mark => [mark, null])
-    )
 
-    decorations.push({
-      [MARK_PLACEHOLDER_SYMBOL]: true,
-      ...unset,
-      ...marks,
+    if (!Text.equals(rest as Text, marks as Text, { loose: true })) {
+      state.hasMarkPlaceholder = true
 
-      anchor,
-      focus: anchor,
-    })
-  } else {
-    state.hasMarkPlaceholder = false
+      const unset = Object.fromEntries(
+        Object.keys(rest).map(mark => [mark, null])
+      )
+
+      decorations.push({
+        [MARK_PLACEHOLDER_SYMBOL]: true,
+        ...unset,
+        ...marks,
+
+        anchor,
+        focus: anchor,
+      })
+    }
   }
 
   // Update EDITOR_TO_MARK_PLACEHOLDER_MARKS in setTimeout useEffect to ensure we don't set it
-  // before we have a change to receive the composition end event.
+  // before we receive the composition end event.
   useEffect(() => {
     setTimeout(() => EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks))
   })
