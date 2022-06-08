@@ -65,7 +65,9 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      let isCollapsed = false
       if (Range.isRange(at) && Range.isCollapsed(at)) {
+        isCollapsed = true
         at = at.anchor
       }
 
@@ -170,14 +172,18 @@ export const TextTransforms: TextTransforms = {
       const startRef = Editor.pointRef(editor, start)
       const endRef = Editor.pointRef(editor, end)
 
+      let removedText = ''
+
       if (!isSingleText && !startVoid) {
         const point = startRef.current!
         const [node] = Editor.leaf(editor, point)
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
       for (const pathRef of pathRefs) {
@@ -191,8 +197,10 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
       if (
@@ -206,6 +214,22 @@ export const TextTransforms: TextTransforms = {
           hanging: true,
           voids,
         })
+      }
+
+      // For Thai script, deleting N character(s) backward should delete
+      // N code point(s) instead of an entire grapheme cluster.
+      // Therefore, the remaining code points should be inserted back.
+      if (
+        isCollapsed &&
+        reverse &&
+        unit === 'character' &&
+        removedText.length > 1 &&
+        removedText.match(/[\u0E00-\u0E7F]+/)
+      ) {
+        Transforms.insertText(
+          editor,
+          removedText.slice(0, removedText.length - distance)
+        )
       }
 
       const startUnref = startRef.unref()
