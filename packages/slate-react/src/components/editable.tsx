@@ -723,7 +723,7 @@ export const Editable = (props: EditableProps) => {
   const { marks } = editor
   state.hasMarkPlaceholder = false
 
-  if (editor.selection && Range.isCollapsed(editor.selection)) {
+  if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
     const { anchor } = editor.selection
     const { text, ...rest } = Node.leaf(editor, anchor.path)
 
