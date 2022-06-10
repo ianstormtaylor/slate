@@ -19,6 +19,7 @@ import {
   targetRange,
   TextDiff,
   verifyDiffState,
+  normalizeStringDiff,
 } from './diff-text'
 import { isTrackedMutation } from './use-mutation-observer'
 
@@ -93,14 +94,6 @@ export function createAndroidInputManager({
   }
 
   const flush = () => {
-    if (!flushing) {
-      flushing = true
-      setTimeout(() => (flushing = false))
-    }
-    if (hasPendingAction()) {
-      flushing = 'action'
-    }
-
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
       flushTimeoutId = null
@@ -108,6 +101,18 @@ export function createAndroidInputManager({
     if (actionTimeoutId) {
       clearTimeout(actionTimeoutId)
       actionTimeoutId = null
+    }
+
+    if (!hasPendingDiffs() && !hasPendingAction()) {
+      return
+    }
+
+    if (!flushing) {
+      flushing = true
+      setTimeout(() => (flushing = false))
+    }
+    if (hasPendingAction()) {
+      flushing = 'action'
     }
 
     const selectionRef =
@@ -213,7 +218,6 @@ export function createAndroidInputManager({
       IS_COMPOSING.set(editor, false)
       flush()
     }, RESOLVE_DELAY)
-    return true
   }
 
   const handleCompositionStart = (
@@ -225,21 +229,22 @@ export function createAndroidInputManager({
       clearTimeout(compositionEndTimeoutId)
       compositionEndTimeoutId = null
     }
-
-    return true
   }
 
   const storeDiff = (path: Path, diff: StringDiff) => {
     const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
 
+    const target = Node.leaf(editor, path)
     const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
     if (idx < 0) {
-      pendingDiffs.push({ path, diff, id: idCounter++ })
+      const normalized = normalizeStringDiff(target.text, diff)
+      if (normalized) {
+        pendingDiffs.push({ path, diff, id: idCounter++ })
+      }
       return
     }
 
-    const target = Node.leaf(editor, path)
     const merged = mergeStringDiffs(target.text, pendingDiffs[idx].diff, diff)
     if (!merged) {
       pendingDiffs.splice(idx, 1)
@@ -482,7 +487,7 @@ export function createAndroidInputManager({
     return !!EDITOR_TO_PENDING_ACTION.get(editor) || !!actionTimeoutId
   }
 
-  const hasPendingChanges = () => {
+  const hasPendingDiffs = () => {
     return !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
   }
 
@@ -516,13 +521,13 @@ export function createAndroidInputManager({
       (!editor.selection ||
         !Path.equals(editor.selection.anchor.path, range?.anchor.path))
 
-    if (pathChanged || !hasPendingChanges()) {
+    if (pathChanged || !hasPendingDiffs()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
 
   const flushAction = () => {
-    if (hasPendingAction() || !hasPendingChanges()) {
+    if (hasPendingAction() || !hasPendingDiffs()) {
       flush()
     }
   }
@@ -534,7 +539,7 @@ export function createAndroidInputManager({
   }
 
   const handleDomMutations = (mutations: MutationRecord[]) => {
-    if (hasPendingChanges()) {
+    if (hasPendingDiffs() || hasPendingAction()) {
       return
     }
 
@@ -551,7 +556,7 @@ export function createAndroidInputManager({
     flush,
     scheduleFlush,
 
-    hasPendingChanges,
+    hasPendingDiffs,
     hasPendingAction,
 
     handleUserSelect,

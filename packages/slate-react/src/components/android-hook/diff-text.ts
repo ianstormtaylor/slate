@@ -47,6 +47,60 @@ function applyStringDiff(text: string, ...diffs: StringDiff[]) {
   )
 }
 
+function longestCommonPrefixLength(str: string, another: string) {
+  const length = Math.min(str.length, another.length)
+
+  for (let i = 0; i < length; i++) {
+    if (str.charAt(i) !== another.charAt(i)) {
+      return i
+    }
+  }
+
+  return length
+}
+
+function longestCommonSuffixLength(
+  str: string,
+  another: string,
+  max: number
+): number {
+  const length = Math.min(str.length, another.length, max)
+
+  for (let i = 0; i < length; i++) {
+    if (
+      str.charAt(str.length - i - 1) !== another.charAt(another.length - i - 1)
+    ) {
+      return i
+    }
+  }
+
+  return length
+}
+
+export function normalizeStringDiff(targetText: string, diff: StringDiff) {
+  const { start, end, text } = diff
+  const removedText = targetText.slice(start, end)
+
+  const prefixLength = longestCommonPrefixLength(removedText, text)
+  const max = Math.min(
+    removedText.length - prefixLength,
+    text.length - prefixLength
+  )
+  const suffixLength = longestCommonSuffixLength(removedText, text, max)
+
+  const normalized: StringDiff = {
+    start: start + prefixLength,
+    end: end - suffixLength,
+    text: text.slice(prefixLength, text.length - suffixLength),
+  }
+
+  if (normalized.start === normalized.end && normalized.text.length === 0) {
+    return null
+  }
+
+  return normalized
+}
+
 export function mergeStringDiffs(
   targetText: string,
   a: StringDiff,
@@ -69,16 +123,7 @@ export function mergeStringDiffs(
 
   const text = applied.slice(start, sliceEnd)
   const end = Math.max(a.end, b.end - a.text.length + (a.end - a.start))
-
-  if (!text && end === start) {
-    return null
-  }
-
-  return {
-    start,
-    end,
-    text,
-  }
+  return normalizeStringDiff(targetText, { start, end, text })
 }
 
 export function targetRange(textDiff: TextDiff): Range {

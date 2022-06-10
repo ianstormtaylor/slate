@@ -48,6 +48,7 @@ import {
   IS_SAFARI,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
+  IS_ANDROID,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -182,7 +183,10 @@ export const Editable = (props: EditableProps) => {
   // while a selection is being dragged.
   const onDOMSelectionChange = useCallback(
     throttle(() => {
-      if (!state.isUpdatingSelection && !state.isDraggingInternally) {
+      if (
+        (!state.isUpdatingSelection || androidInputManager?.isFlushing()) &&
+        !state.isDraggingInternally
+      ) {
         const root = ReactEditor.findDocumentOrShadowRoot(editor)
         const { activeElement } = root
         const el = ReactEditor.toDOMNode(editor, editor)
@@ -218,7 +222,7 @@ export const Editable = (props: EditableProps) => {
           if (range) {
             if (
               !ReactEditor.isComposing(editor) &&
-              !androidInputManager?.hasPendingChanges() &&
+              !androidInputManager?.hasPendingDiffs() &&
               !androidInputManager?.isFlushing()
             ) {
               Transforms.select(editor, range)
@@ -360,16 +364,22 @@ export const Editable = (props: EditableProps) => {
     const newDomRange = setDomSelection()
     const ensureSelection = androidInputManager?.isFlushing() === 'action'
 
-    // TODO: Adjust for non-android, document why we need to force it 3 times in total.
+    if (!IS_ANDROID || !ensureSelection) {
+      setTimeout(() => {
+        // COMPAT: In Firefox, it's not enough to create a range, you also need
+        // to focus the contenteditable element too. (2016/11/16)
+        if (newDomRange && IS_FIREFOX) {
+          const el = ReactEditor.toDOMNode(editor, editor)
+          el.focus()
+        }
+
+        state.isUpdatingSelection = false
+      })
+      return
+    }
+
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     const animationFrameId = requestAnimationFrame(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need
-      // to focus the contenteditable element too. (2016/11/16)
-      if (newDomRange && IS_FIREFOX) {
-        const el = ReactEditor.toDOMNode(editor, editor)
-        el.focus()
-      }
-
       if (ensureSelection) {
         const forceSelectionChange = () => {
           try {
@@ -385,10 +395,11 @@ export const Editable = (props: EditableProps) => {
         }
 
         forceSelectionChange()
-        timeoutId = setTimeout(forceSelectionChange)
+        timeoutId = setTimeout(() => {
+          forceSelectionChange()
+          state.isUpdatingSelection = false
+        })
       }
-
-      state.isUpdatingSelection = false
     })
 
     return () => {
@@ -955,9 +966,11 @@ export const Editable = (props: EditableProps) => {
                     IS_COMPOSING.set(editor, false)
                   }
 
+                  androidInputManager?.handleCompositionEnd(event)
+
                   if (
                     isEventHandled(event, attributes.onCompositionEnd) ||
-                    androidInputManager?.handleCompositionEnd(event)
+                    IS_ANDROID
                   ) {
                     return
                   }
@@ -1014,11 +1027,13 @@ export const Editable = (props: EditableProps) => {
             )}
             onCompositionStart={useCallback(
               (event: React.CompositionEvent<HTMLDivElement>) => {
-                if (
-                  hasEditableTarget(editor, event.target) &&
-                  !isEventHandled(event, attributes.onCompositionStart)
-                ) {
-                  if (androidInputManager?.handleCompositionStart(event)) {
+                if (hasEditableTarget(editor, event.target)) {
+                  androidInputManager?.handleCompositionStart(event)
+
+                  if (
+                    isEventHandled(event, attributes.onCompositionStart) ||
+                    IS_ANDROID
+                  ) {
                     return
                   }
 
