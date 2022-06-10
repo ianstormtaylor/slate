@@ -4,7 +4,7 @@ For most folks, you'll want to install Slate via `npm`, in which case you can fo
 
 But, if you'd rather install Slate by simply adding a `<script>` tag to your application, this guide will help you. To make the "bundled" use case simpler, each version of Slate ships with a bundled source file called `slate.js`.
 
-To get a copy of `slate.js`, download the version of slate you want from npm:
+To get a copy of `slate.js`, download the version of Slate you want from npm:
 
 ```text
 npm install slate@latest
