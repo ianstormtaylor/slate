@@ -1,4 +1,4 @@
-import { RefObject, useLayoutEffect, useState } from 'react'
+import { RefObject, useState } from 'react'
 import { useSlateStatic } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
 import { EDITOR_TO_SCHEDULE_FLUSH } from '../../utils/weak-maps'
@@ -32,8 +32,6 @@ export function useAndroidInputManager({
 
   const editor = useSlateStatic()
   const isMounted = useIsMounted()
-
-  useLayoutEffect(() => console.log('------'))
 
   const [inputManager] = useState(() =>
     createAndroidInputManager({

@@ -10,6 +10,7 @@ import {
   EDITOR_TO_PENDING_SELECTION,
   EDITOR_TO_USER_MARKS,
   IS_COMPOSING,
+  EDITOR_TO_PLACEHOLDER_ELEMENT,
 } from '../../utils/weak-maps'
 import {
   mergeStringDiffs,
@@ -33,7 +34,7 @@ const RESOLVE_DELAY = 25
 const FLUSH_DELAY = 200
 
 // Replace with `const debug = console.log` to debug
-const debug = console.log
+const debug = (..._: unknown[]) => {}
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
@@ -231,6 +232,20 @@ export function createAndroidInputManager({
     }
   }
 
+  const updatePlaceholderVisibility = () => {
+    const placeholderElement = EDITOR_TO_PLACEHOLDER_ELEMENT.get(editor)
+    if (!placeholderElement) {
+      return
+    }
+
+    if (hasPendingDiffs()) {
+      placeholderElement.style.visibility = 'hidden'
+      return
+    }
+
+    delete placeholderElement.style.visibility
+  }
+
   const storeDiff = (path: Path, diff: StringDiff) => {
     const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
@@ -242,12 +257,15 @@ export function createAndroidInputManager({
       if (normalized) {
         pendingDiffs.push({ path, diff, id: idCounter++ })
       }
+
+      updatePlaceholderVisibility()
       return
     }
 
     const merged = mergeStringDiffs(target.text, pendingDiffs[idx].diff, diff)
     if (!merged) {
       pendingDiffs.splice(idx, 1)
+      updatePlaceholderVisibility()
       return
     }
 

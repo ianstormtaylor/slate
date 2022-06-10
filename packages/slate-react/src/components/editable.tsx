@@ -40,6 +40,7 @@ import {
 import {
   CAN_USE_DOM,
   HAS_BEFORE_INPUT_SUPPORT,
+  IS_ANDROID,
   IS_CHROME,
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
@@ -48,7 +49,6 @@ import {
   IS_SAFARI,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
-  IS_ANDROID,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -274,7 +274,7 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
-    const setDomSelection = () => {
+    const setDomSelection = (forceChange?: boolean) => {
       const hasDomSelection = domSelection.type !== 'None'
 
       // If the DOM selection is properly unset, we're done.
@@ -293,7 +293,12 @@ export const Editable = (props: EditableProps) => {
       }
 
       // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-      if (hasDomSelection && hasDomSelectionInEditor && selection) {
+      if (
+        hasDomSelection &&
+        hasDomSelectionInEditor &&
+        selection &&
+        !forceChange
+      ) {
         const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
           exactMatch: true,
 
@@ -381,22 +386,28 @@ export const Editable = (props: EditableProps) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     const animationFrameId = requestAnimationFrame(() => {
       if (ensureSelection) {
-        const forceSelectionChange = () => {
+        const ensureSelection = (forceChange?: boolean) => {
           try {
-            domSelection?.removeAllRanges()
-
             const el = ReactEditor.toDOMNode(editor, editor)
             el.focus()
 
-            setDomSelection()
+            setDomSelection(forceChange)
           } catch (e) {
             // Ignore, dom and state might be out of sync
           }
         }
 
-        forceSelectionChange()
+        // Compat: Android IMEs try to force their selection by manually re-applying it even after we set it.
+        // This essentially would make setting the slate selection during an update meaningless, so we force it
+        // again here. We can't only do it in the setTimeout after the animation frame since that would cause a
+        // visible flicker.
+        ensureSelection()
+
         timeoutId = setTimeout(() => {
-          forceSelectionChange()
+          // COMPAT: While setting the selection in an animation frame visually correctly sets the selection,
+          // it doesn't update GBoards spellchecker state. We have to manually trigger a selection change after
+          // the animation frame to ensure it displays the correct state.
+          ensureSelection(true)
           state.isUpdatingSelection = false
         })
       }
@@ -685,17 +696,15 @@ export const Editable = (props: EditableProps) => {
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
 
-    const handleSelectionChange = () => {
-      console.log('user select event')
-      scheduleOnDOMSelectionChange()
-    }
-
-    window.document.addEventListener('selectionchange', handleSelectionChange)
+    window.document.addEventListener(
+      'selectionchange',
+      scheduleOnDOMSelectionChange
+    )
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
-        handleSelectionChange
+        scheduleOnDOMSelectionChange
       )
     }
   }, [scheduleOnDOMSelectionChange])
