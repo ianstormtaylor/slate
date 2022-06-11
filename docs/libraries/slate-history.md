@@ -17,5 +17,5 @@ The `withHistory` plugin keeps track of the operation history of a Slate editor 
 When used with `withReact`, `withHistory` should be applied inside. For example:
 
 ```javascript
-const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+const [editor] = useState(() => withReact(withHistory(createEditor())))
 ```
