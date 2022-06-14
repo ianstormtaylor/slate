@@ -1,4 +1,13 @@
-import { Editor, Node, Path, Point, Range, Transforms, BaseEditor } from 'slate'
+import {
+  BaseEditor,
+  Editor,
+  Node,
+  Path,
+  Point,
+  Range,
+  Scrubber,
+  Transforms,
+} from 'slate'
 
 import { Key } from '../utils/key'
 import {
@@ -108,7 +117,7 @@ export const ReactEditor = {
     }
 
     throw new Error(
-      `Unable to find the path for Slate node: ${JSON.stringify(node)}`
+      `Unable to find the path for Slate node: ${Scrubber.stringify(node)}`
     )
   },
 
@@ -285,7 +294,7 @@ export const ReactEditor = {
 
     if (!domNode) {
       throw new Error(
-        `Cannot resolve a DOM node from Slate node: ${JSON.stringify(node)}`
+        `Cannot resolve a DOM node from Slate node: ${Scrubber.stringify(node)}`
       )
     }
 
@@ -337,7 +346,9 @@ export const ReactEditor = {
 
     if (!domPoint) {
       throw new Error(
-        `Cannot resolve a DOM point from Slate point: ${JSON.stringify(point)}`
+        `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
+          point
+        )}`
       )
     }
 

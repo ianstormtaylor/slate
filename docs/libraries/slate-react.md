@@ -195,7 +195,7 @@ Adds React and DOM specific behaviors to the editor.
 When used with `withHistory`, `withReact` should be applied outside. For example:
 
 ```javascript
-const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+const [editor] = useState(() => withReact(withHistory(createEditor())))
 ```
 
 ## Utils

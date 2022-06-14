@@ -51,7 +51,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Plain text**](https://www.slatejs.org/examples/plaintext) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](https://www.slatejs.org/examples/richtext) — showing the features you'd expect from a basic editor.
 - [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://www.slatejs.org/examples/links) — showing how to wrap text in inline nodes with associated data.
+- [**Inlines**](https://www.slatejs.org/examples/inlines) — showing how to wrap text in inline nodes with associated data.
 - [**Images**](https://www.slatejs.org/examples/images) — showing how to use void \(text-less\) nodes to add images.
 - [**Hovering toolbar**](https://www.slatejs.org/examples/hovering-toolbar) — showing how a contextual hovering menu can be implemented.
 - [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.
