@@ -1,13 +1,13 @@
 import { RefObject, useState } from 'react'
-import { useSlateStatic } from '../../hooks/use-slate-static'
+import { useSlateStatic } from '../use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
 import { EDITOR_TO_SCHEDULE_FLUSH } from '../../utils/weak-maps'
 import {
   createAndroidInputManager,
   CreateAndroidInputManagerOptions,
 } from './android-input-manager'
-import { useIsMounted } from './use-is-mounted'
-import { useMutationObserver } from './use-mutation-observer'
+import { useIsMounted } from '../use-is-mounted'
+import { useMutationObserver } from '../use-mutation-observer'
 
 type UseAndroidInputManagerOptions = {
   node: RefObject<HTMLElement>

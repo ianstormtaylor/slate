@@ -5,7 +5,7 @@ import {
   transformTextDiff,
   transformPendingRange,
   transformPendingPoint,
-} from '../components/android-hook/diff-text'
+} from '../utils/diff-text'
 import {
   getPlainText,
   getSlateFragmentAttribute,

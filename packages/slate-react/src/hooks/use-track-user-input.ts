@@ -1,6 +1,6 @@
 import { useCallback, useRef, useEffect } from 'react'
-import { ReactEditor } from '../..'
-import { useSlateStatic } from '../../hooks/use-slate-static'
+import { ReactEditor } from '..'
+import { useSlateStatic } from './use-slate-static'
 
 export function useTrackUserInput() {
   const editor = useSlateStatic()

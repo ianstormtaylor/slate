@@ -66,9 +66,9 @@ import {
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
-import { RestoreDOM } from './android-hook/restore-dom'
-import { useAndroidInputManager } from './android-hook/use-android-input-manager'
-import { useTrackUserInput } from './android-hook/use-track-user-input'
+import { RestoreDOM } from './restore-dom/restore-dom'
+import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
+import { useTrackUserInput } from '../hooks/use-track-user-input'
 
 type DeferredOperation = () => void
 
@@ -155,7 +155,6 @@ export const Editable = (props: EditableProps) => {
 
   // Update internal state on each render.
   IS_READ_ONLY.set(editor, readOnly)
-  ;(window as any).editor = editor
 
   // Keep track of some state for the event handler logic.
   const state = useMemo(
@@ -184,6 +183,7 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useCallback(
     throttle(() => {
       if (
+        (IS_ANDROID || !ReactEditor.isComposing(editor)) &&
         (!state.isUpdatingSelection || androidInputManager?.isFlushing()) &&
         !state.isDraggingInternally
       ) {
@@ -386,7 +386,7 @@ export const Editable = (props: EditableProps) => {
     let timeoutId: ReturnType<typeof setTimeout> | null = null
     const animationFrameId = requestAnimationFrame(() => {
       if (ensureSelection) {
-        const ensureSelection = (forceChange?: boolean) => {
+        const ensureDomSelection = (forceChange?: boolean) => {
           try {
             const el = ReactEditor.toDOMNode(editor, editor)
             el.focus()
@@ -401,13 +401,13 @@ export const Editable = (props: EditableProps) => {
         // This essentially would make setting the slate selection during an update meaningless, so we force it
         // again here. We can't only do it in the setTimeout after the animation frame since that would cause a
         // visible flicker.
-        ensureSelection()
+        ensureDomSelection()
 
         timeoutId = setTimeout(() => {
           // COMPAT: While setting the selection in an animation frame visually correctly sets the selection,
           // it doesn't update GBoards spellchecker state. We have to manually trigger a selection change after
           // the animation frame to ensure it displays the correct state.
-          ensureSelection(true)
+          ensureDomSelection(true)
           state.isUpdatingSelection = false
         })
       }
@@ -434,6 +434,7 @@ export const Editable = (props: EditableProps) => {
         hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
+        // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
         if (androidInputManager) {
           return androidInputManager.handleDOMBeforeInput(event)
         }

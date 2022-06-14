@@ -1,6 +1,6 @@
 import { RefObject } from 'react'
 import { ReactEditor } from '../../plugin/react-editor'
-import { isTrackedMutation } from './use-mutation-observer'
+import { isTrackedMutation } from '../../utils/dom'
 
 export type RestoreDOMManager = {
   registerMutations: (mutations: MutationRecord[]) => void

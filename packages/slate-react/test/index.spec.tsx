@@ -1,17 +1,10 @@
 import React from 'react'
-import {
-  createEditor,
-  NodeEntry,
-  Node,
-  Range,
-  Element,
-  Transforms,
-} from 'slate'
+import { createEditor, NodeEntry, Range, Element, Transforms } from 'slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import {
   Slate,
   withReact,
-  DefaultEditable,
+  Editable,
   RenderElementProps,
   RenderLeafProps,
   DefaultElement,
@@ -37,7 +30,7 @@ describe('slate-react', () => {
         act(() => {
           el = create(
             <Slate editor={editor} value={value} onChange={() => {}}>
-              <DefaultEditable decorate={decorate} />
+              <Editable decorate={decorate} />
             </Slate>,
             { createNodeMock }
           )
@@ -68,10 +61,7 @@ describe('slate-react', () => {
         act(() => {
           el = create(
             <Slate editor={editor} value={value} onChange={onChange}>
-              <DefaultEditable
-                decorate={decorate}
-                renderElement={renderElement}
-              />
+              <Editable decorate={decorate} renderElement={renderElement} />
             </Slate>,
             { createNodeMock }
           )
@@ -95,10 +85,7 @@ describe('slate-react', () => {
         act(() => {
           el.update(
             <Slate editor={editor} value={value} onChange={onChange}>
-              <DefaultEditable
-                decorate={decorate}
-                renderElement={renderElement}
-              />
+              <Editable decorate={decorate} renderElement={renderElement} />
             </Slate>
           )
         })
@@ -140,7 +127,7 @@ describe('slate-react', () => {
         act(() => {
           el = create(
             <Slate editor={editor} value={value} onChange={onChange}>
-              <DefaultEditable decorate={decorate} renderLeaf={renderLeaf} />
+              <Editable decorate={decorate} renderLeaf={renderLeaf} />
             </Slate>,
             { createNodeMock }
           )
@@ -191,7 +178,7 @@ describe('slate-react', () => {
         act(() => {
           el = create(
             <Slate editor={editor} value={value} onChange={() => {}}>
-              <DefaultEditable
+              <Editable
                 renderElement={({ element, children }) => {
                   React.useEffect(() => mounts(element), [])
 
@@ -225,7 +212,7 @@ describe('slate-react', () => {
         act(() => {
           el = create(
             <Slate editor={editor} value={value} onChange={() => {}}>
-              <DefaultEditable
+              <Editable
                 renderElement={({ element, children }) => {
                   React.useEffect(() => mounts(element), [])
 

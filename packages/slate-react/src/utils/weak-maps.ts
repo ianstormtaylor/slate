@@ -1,6 +1,6 @@
 import { Ancestor, Editor, Node, Range, RangeRef, Text } from 'slate'
-import { Action } from '../components/android-hook/android-input-manager'
-import { TextDiff } from '../components/android-hook/diff-text'
+import { Action } from '../hooks/android-input-manager/android-input-manager'
+import { TextDiff } from './diff-text'
 import { Key } from './key'
 
 /**

@@ -1,7 +1,7 @@
 import { DebouncedFunc } from 'lodash'
 import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
-import { isDOMSelection } from '../../utils/dom'
+import { isDOMSelection, isTrackedMutation } from '../../utils/dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_MARK_PLACEHOLDER_MARKS,
@@ -21,8 +21,7 @@ import {
   TextDiff,
   verifyDiffState,
   normalizeStringDiff,
-} from './diff-text'
-import { isTrackedMutation } from './use-mutation-observer'
+} from '../../utils/diff-text'
 
 export type Action = { at: Point | Range; run: () => void }
 
