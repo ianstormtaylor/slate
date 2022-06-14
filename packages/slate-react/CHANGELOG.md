@@ -1,5 +1,24 @@
 # slate-react
 
+## 0.81.0
+
+### Minor Changes
+
+- [#4999](https://github.com/ianstormtaylor/slate/pull/4999) [`fe13a8f9`](https://github.com/ianstormtaylor/slate/commit/fe13a8f9e750569342ee004951e34233ab6614bf) Thanks [@alexandercampbell](https://github.com/alexandercampbell)! - Add new Slate.Scrubber interface to allow scrubbing end user data from exception
+  text. The default behavior remains unchanged.
+
+## 0.80.0
+
+### Patch Changes
+
+- [#5007](https://github.com/ianstormtaylor/slate/pull/5007) [`92c5730a`](https://github.com/ianstormtaylor/slate/commit/92c5730a96223a683b3c95651eb4c90a5caca21a) Thanks [@jasonphillips](https://github.com/jasonphillips)! - Revert #4876 & #4910 to restore original decorations behavior
+
+## 0.79.0
+
+### Minor Changes
+
+- [#4981](https://github.com/ianstormtaylor/slate/pull/4981) [`cb8a5515`](https://github.com/ianstormtaylor/slate/commit/cb8a551508c023346fd3aa0af1a5a80ffd6a37cd) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Add `ReactEditor.isComposing(editor)` to get the current `isComposing` state
+
 ## 0.78.1
 
 ### Patch Changes
