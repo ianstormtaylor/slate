@@ -1,5 +1,12 @@
 # slate
 
+## 0.81.1
+
+### Patch Changes
+
+- [#5015](https://github.com/ianstormtaylor/slate/pull/5015) [`9ae37287`](https://github.com/ianstormtaylor/slate/commit/9ae372875df1ee3ef6041f5d6bd2f57ee8291ea0) Thanks [@tithanayut](https://github.com/tithanayut)! - Fix deleteBackward behavior for Thai script where deleting N character(s) backward should delete
+  N code point(s) instead of an entire grapheme cluster
+
 ## 0.81.0
 
 ### Minor Changes
