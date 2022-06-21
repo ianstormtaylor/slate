@@ -1,6 +1,16 @@
 import { DebouncedFunc } from 'lodash'
 import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
+import {
+  mergeStringDiffs,
+  normalizePoint,
+  normalizeRange,
+  normalizeStringDiff,
+  StringDiff,
+  targetRange,
+  TextDiff,
+  verifyDiffState,
+} from '../../utils/diff-text'
 import { isDOMSelection, isTrackedMutation } from '../../utils/dom'
 import {
   EDITOR_TO_FORCE_RENDER,
@@ -8,20 +18,10 @@ import {
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_PENDING_SELECTION,
+  EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
   IS_COMPOSING,
-  EDITOR_TO_PLACEHOLDER_ELEMENT,
 } from '../../utils/weak-maps'
-import {
-  mergeStringDiffs,
-  normalizePoint,
-  normalizeRange,
-  StringDiff,
-  targetRange,
-  TextDiff,
-  verifyDiffState,
-  normalizeStringDiff,
-} from '../../utils/diff-text'
 
 export type Action = { at: Point | Range; run: () => void }
 
@@ -29,7 +29,7 @@ export type Action = { at: Point | Range; run: () => void }
 // When using keyboard English association function, conpositionEnd triggered too fast, resulting in after `insertText` still maintain association state.
 const RESOLVE_DELAY = 25
 
-// Time with node user interaction before the current user action is considered as done.
+// Time with no user interaction before the current user action is considered as done.
 const FLUSH_DELAY = 200
 
 // Replace with `const debug = console.log` to debug
@@ -42,17 +42,61 @@ export type CreateAndroidInputManagerOptions = {
   onDOMSelectionChange: DebouncedFunc<() => void>
 }
 
+export type AndroidInputManager = {
+  flush: () => void
+  scheduleFlush: () => void
+
+  hasPendingDiffs: () => boolean
+  hasPendingAction: () => boolean
+  isFlushing: () => boolean | 'action'
+
+  handleUserSelect: (range: Range | null) => void
+  handleCompositionEnd: (event: React.CompositionEvent<HTMLDivElement>) => void
+  handleCompositionStart: (
+    event: React.CompositionEvent<HTMLDivElement>
+  ) => void
+  handleDOMBeforeInput: (event: InputEvent) => void
+
+  handleDomMutations: (mutations: MutationRecord[]) => void
+  handleInput: () => void
+}
+
+export function forceSwiftKeyUpdate(editor: ReactEditor) {
+  const { document } = ReactEditor.getWindow(editor)
+  debug('force ime update')
+
+  const div = document.createElement('div')
+  div.setAttribute('contenteditable', 'true')
+  div.setAttribute('display', 'none')
+  div.setAttribute('position', 'absolute')
+  div.setAttribute('top', '0')
+  div.setAttribute('left', '0')
+  div.textContent = ' '
+
+  document.body.appendChild(div)
+  const range = document.createRange()
+  range.selectNodeContents(div)
+  const selection = window.getSelection()
+
+  selection?.removeAllRanges()
+  selection?.addRange(range)
+  div.parentElement?.removeChild(div)
+
+  ReactEditor.focus(editor)
+}
+
 export function createAndroidInputManager({
   editor,
   scheduleOnDOMSelectionChange,
   onDOMSelectionChange,
-}: CreateAndroidInputManagerOptions) {
+}: CreateAndroidInputManagerOptions): AndroidInputManager {
   let flushing: 'action' | boolean = false
 
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
   let idCounter = 0
+  let isInsertAfterMarkPlaceholder = false
 
   const applyPendingSelection = () => {
     const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
@@ -132,9 +176,10 @@ export function createAndroidInputManager({
     while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
       const placeholderMarks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)
 
-      if (placeholderMarks !== undefined) {
+      if (placeholderMarks) {
         EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
         editor.marks = placeholderMarks
+        isInsertAfterMarkPlaceholder = true
       }
 
       const range = targetRange(diff)
@@ -213,8 +258,6 @@ export function createAndroidInputManager({
     }
 
     compositionEndTimeoutId = setTimeout(() => {
-      debug('composition end')
-
       IS_COMPOSING.set(editor, false)
       flush()
     }, RESOLVE_DELAY)
@@ -223,6 +266,8 @@ export function createAndroidInputManager({
   const handleCompositionStart = (
     _event: React.CompositionEvent<HTMLDivElement>
   ) => {
+    debug('composition start')
+
     IS_COMPOSING.set(editor, true)
 
     if (compositionEndTimeoutId) {
@@ -246,6 +291,8 @@ export function createAndroidInputManager({
   }
 
   const storeDiff = (path: Path, diff: StringDiff) => {
+    debug('storeDiff', path, diff)
+
     const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
 
@@ -485,6 +532,18 @@ export function createAndroidInputManager({
         }
 
         if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
+          // COMPAT: Swiftkey has a weird bug where the target range of the 2nd word
+          // inserted after a mark placeholder is inserted with a anchor offset off by 1.
+          // So writing 'some text' will result in 'some ttext'. If we force a IME update
+          // after inserting the first word, swiftkey will insert with the correct offset
+          if (text.endsWith(' ') && isInsertAfterMarkPlaceholder) {
+            isInsertAfterMarkPlaceholder = false
+            forceSwiftKeyUpdate(editor)
+            return scheduleAction(targetRange, () =>
+              Editor.insertText(editor, text)
+            )
+          }
+
           const [start, end] = Range.edges(targetRange)
           return storeDiff(start.path, {
             start: start.offset,
@@ -513,20 +572,7 @@ export function createAndroidInputManager({
   }
 
   const handleUserSelect = (range: Range | null) => {
-    debug(
-      'userSelect',
-      range,
-      window
-        .getSelection()
-        ?.getRangeAt(0)
-        .cloneRange()
-    )
-
     EDITOR_TO_PENDING_SELECTION.set(editor, range)
-
-    if (EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(editor)) {
-      // debugger
-    }
 
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
@@ -538,13 +584,18 @@ export function createAndroidInputManager({
       (!editor.selection ||
         !Path.equals(editor.selection.anchor.path, range?.anchor.path))
 
+    if (pathChanged) {
+      isInsertAfterMarkPlaceholder = false
+    }
+
     if (pathChanged || !hasPendingDiffs()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
 
-  const flushAction = () => {
+  const handleInput = () => {
     if (hasPendingAction() || !hasPendingDiffs()) {
+      debug('flush input')
       flush()
     }
   }
@@ -575,6 +626,7 @@ export function createAndroidInputManager({
 
     hasPendingDiffs,
     hasPendingAction,
+    isFlushing,
 
     handleUserSelect,
     handleCompositionEnd,
@@ -582,7 +634,6 @@ export function createAndroidInputManager({
     handleDOMBeforeInput,
 
     handleDomMutations,
-    handleInput: flushAction,
-    isFlushing,
+    handleInput,
   }
 }

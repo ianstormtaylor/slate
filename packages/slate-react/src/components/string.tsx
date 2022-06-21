@@ -125,7 +125,7 @@ export const ZeroWidthString = (props: {
 
   return (
     <span {...attributes}>
-      {(!IS_ANDROID || !isLineBreak) && '\uFEFF'}
+      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
       {isLineBreak ? <br /> : null}
     </span>
   )

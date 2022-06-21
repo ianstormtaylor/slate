@@ -247,8 +247,6 @@ export const Editable = (props: EditableProps) => {
     scheduleOnDOMSelectionChange,
   })
 
-  // Has to be after androidInputManager so restoreDOM is run beforehand
-  // Whenever the editor updates...
   useIsomorphicLayoutEffect(() => {
     // Update element-related weak maps with the DOM element ref.
     let window
@@ -829,7 +827,8 @@ export const Editable = (props: EditableProps) => {
               [readOnly]
             )}
             onInput={useCallback((event: React.SyntheticEvent) => {
-              if (androidInputManager?.handleInput()) {
+              if (androidInputManager) {
+                androidInputManager.handleInput()
                 return
               }
 
@@ -1697,3 +1696,5 @@ export const isDOMEventHandled = <E extends Event>(
 
   return event.defaultPrevented
 }
+
+Editable.whyDidYouRender = true
