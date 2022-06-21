@@ -1,5 +1,5 @@
 import { useCallback, useRef, useEffect } from 'react'
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 import { useSlateStatic } from './use-slate-static'
 
 export function useTrackUserInput() {

@@ -20,7 +20,7 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 import useChildren from '../hooks/use-children'
 import { DecorateContext } from '../hooks/use-decorate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -1696,5 +1696,3 @@ export const isDOMEventHandled = <E extends Event>(
 
   return event.defaultPrevented
 }
-
-Editable.whyDidYouRender = true

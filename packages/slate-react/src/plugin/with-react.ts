@@ -1,10 +1,10 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Operation, Path, Range, Transforms, Point } from 'slate'
+import { Editor, Node, Operation, Path, Point, Range, Transforms } from 'slate'
 import {
   TextDiff,
-  transformTextDiff,
-  transformPendingRange,
   transformPendingPoint,
+  transformPendingRange,
+  transformTextDiff,
 } from '../utils/diff-text'
 import {
   getPlainText,
@@ -16,11 +16,12 @@ import { findCurrentLineRange } from '../utils/lines'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   EDITOR_TO_ON_CHANGE,
-  EDITOR_TO_PENDING_DIFFS,
-  NODE_TO_KEY,
-  EDITOR_TO_PENDING_SELECTION,
   EDITOR_TO_PENDING_ACTION,
+  EDITOR_TO_PENDING_DIFFS,
+  EDITOR_TO_PENDING_SELECTION,
   EDITOR_TO_USER_MARKS,
+  EDITOR_TO_USER_SELECTION,
+  NODE_TO_KEY,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
 /**
@@ -83,9 +84,9 @@ export const withReact = <T extends Editor>(editor: T) => {
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
-    const pendingChanges = EDITOR_TO_PENDING_DIFFS.get(editor)
-    if (pendingChanges?.length) {
-      const transformed = pendingChanges
+    const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+    if (pendingDiffs?.length) {
+      const transformed = pendingDiffs
         .map(textDiff => transformTextDiff(textDiff, op))
         .filter(Boolean) as TextDiff[]
 
@@ -114,6 +115,13 @@ export const withReact = <T extends Editor>(editor: T) => {
       case 'set_node':
       case 'split_node': {
         matches.push(...getMatches(e, op.path))
+        break
+      }
+
+      case 'set_selection': {
+        // Selection was manually set, don't restore the user selection after the change.
+        EDITOR_TO_USER_SELECTION.get(editor)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(editor)
         break
       }
 

@@ -337,6 +337,8 @@ export const ReactEditor = {
       const trueLength = attr == null ? length : parseInt(attr, 10)
       const end = start + trueLength
 
+      // Prefer putting the selection inside the mark placeholder to ensure
+      // composed text is displayed with the correct marks.
       const nextText = texts[i + 1]
       if (
         point.offset === end &&
@@ -621,7 +623,7 @@ export const ReactEditor = {
       }
     }
 
-    if (!textNode && !exactMatch) {
+    if (IS_ANDROID && !textNode && !exactMatch) {
       const node = parentNode.hasAttribute('data-slate-node')
         ? parentNode
         : parentNode.closest('[data-slate-node]')
@@ -658,6 +660,9 @@ export const ReactEditor = {
     return { path, offset } as T extends true ? Point | null : Point
   },
 
+  /**
+   * Android specific: Flush all pending diffs and cancel composition at the next possible time.
+   */
   scheduleFlushPendingChanges(editor: Editor) {
     EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
   },

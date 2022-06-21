@@ -12,7 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 
 export {
   DOMNode,

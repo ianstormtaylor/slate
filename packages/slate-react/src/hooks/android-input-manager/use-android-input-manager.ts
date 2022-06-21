@@ -46,7 +46,7 @@ export function useAndroidInputManager({
     MUTATION_OBSERVER_CONFIG
   )
 
-  EDITOR_TO_SCHEDULE_FLUSH.set(editor, inputManager.flush)
+  EDITOR_TO_SCHEDULE_FLUSH.set(editor, inputManager.scheduleFlush)
   if (isMounted) {
     inputManager.flush()
   }

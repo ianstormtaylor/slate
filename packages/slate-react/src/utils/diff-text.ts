@@ -13,6 +13,10 @@ export type TextDiff = {
   diff: StringDiff
 }
 
+/**
+ * Check whether a text diff was applied in a way we can perform the pending action on /
+ * recover the pending selection.
+ */
 export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   const { path, diff } = textDiff
   if (!Editor.hasPath(editor, path)) {
@@ -77,6 +81,9 @@ function longestCommonSuffixLength(
   return length
 }
 
+/**
+ * Remove redundant changes from the diff so that it spans the minimal possible range
+ */
 export function normalizeStringDiff(targetText: string, diff: StringDiff) {
   const { start, end, text } = diff
   const removedText = targetText.slice(start, end)
@@ -101,6 +108,10 @@ export function normalizeStringDiff(targetText: string, diff: StringDiff) {
   return normalized
 }
 
+/**
+ * Return a string diff that is equivalent to applying b after a spanning the range of
+ * both changes
+ */
 export function mergeStringDiffs(
   targetText: string,
   a: StringDiff,
@@ -126,6 +137,9 @@ export function mergeStringDiffs(
   return normalizeStringDiff(targetText, { start, end, text })
 }
 
+/**
+ * Get the slate range the text diff spans.
+ */
 export function targetRange(textDiff: TextDiff): Range {
   const { path, diff } = textDiff
   return {
@@ -134,6 +148,12 @@ export function targetRange(textDiff: TextDiff): Range {
   }
 }
 
+/**
+ * Normalize a 'pending point' a.k.a a point based on the dom state before applying
+ * the pending diffs. Since the pending diffs might have been inserted with different
+ * marks we have to 'walk' the offset from the starting position to ensure we still
+ * have a valid point inside the document
+ */
 export function normalizePoint(editor: Editor, point: Point): Point | null {
   let { path, offset } = point
   if (!Editor.hasPath(editor, path)) {
@@ -168,6 +188,9 @@ export function normalizePoint(editor: Editor, point: Point): Point | null {
   return { path, offset }
 }
 
+/**
+ * Normalize a 'pending selection' to ensure it's valid in the current document state.
+ */
 export function normalizeRange(editor: Editor, range: Range): Range | null {
   const anchor = normalizePoint(editor, range.anchor)
   if (!anchor) {
@@ -231,7 +254,6 @@ export function transformPendingPoint(
     return null
   }
 
-  // TODO: Fix condition?
   if (
     op.type === 'split_node' &&
     Path.equals(op.path, point.path) &&

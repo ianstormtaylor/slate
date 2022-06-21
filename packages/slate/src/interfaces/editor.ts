@@ -234,8 +234,6 @@ export interface EditorInterface {
   hasBlocks: (editor: Editor, element: Element) => boolean
   hasInlines: (editor: Editor, element: Element) => boolean
   hasPath: (editor: Editor, path: Path) => boolean
-  hasPoint: (editor: Editor, point: Point) => boolean
-  hasRange: (editor: Editor, range: Range) => boolean
   hasTexts: (editor: Editor, element: Element) => boolean
   insertBreak: (editor: Editor) => void
   insertSoftBreak: (editor: Editor) => void
@@ -631,9 +629,7 @@ export const Editor: EditorInterface = {
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
       Operation.isOperationList(value.operations)
-
     IS_EDITOR_CACHE.set(value, isEditor)
-
     return isEditor
   },
 
@@ -1118,19 +1114,6 @@ export const Editor: EditorInterface = {
 
   hasPath(editor: Editor, path: Path): boolean {
     return Node.has(editor, path)
-  },
-
-  hasPoint(editor: Editor, { path, offset }: Point): boolean {
-    if (!Node.has(editor, path) || offset < 0) {
-      return false
-    }
-
-    const leaf = Node.get(editor, path)
-    return Text.isText(leaf) && offset <= leaf.text.length
-  },
-
-  hasRange(editor: Editor, { anchor, focus }: Range): boolean {
-    return Editor.hasPoint(editor, anchor) && Editor.hasPoint(editor, focus)
   },
 
   /**
