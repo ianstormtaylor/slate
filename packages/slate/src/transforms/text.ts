@@ -451,16 +451,18 @@ export const TextTransforms: TextTransforms = {
       if (!options.at) {
         let path
 
-        if (ends.length > 0) {
-          path = Path.previous(endRef.current!)
-        } else if (middles.length > 0) {
-          path = Path.previous(middleRef.current!)
-        } else {
-          path = Path.previous(startRef.current!)
+        if (ends.length > 0 && endRef.current) {
+          path = Path.previous(endRef.current)
+        } else if (middles.length > 0 && middleRef.current) {
+          path = Path.previous(middleRef.current)
+        } else if (startRef.current) {
+          path = Path.previous(startRef.current)
         }
 
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        if (path) {
+          const end = Editor.end(editor, path)
+          Transforms.select(editor, end)
+        }
       }
 
       startRef.unref()
