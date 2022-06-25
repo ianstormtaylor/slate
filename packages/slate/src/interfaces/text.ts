@@ -106,15 +106,17 @@ export const Text: TextInterface = {
       const { anchor, focus, ...rest } = dec
       const [start, end] = Range.edges(dec)
       const next = []
-      let o = 0
+      let leafEnd = 0
+      const decorationBegin = start.offset;
+      const decorationEnd = end.offset;
 
       for (const leaf of leaves) {
         const { length } = leaf.text
-        const offset = o
-        o += length
+        const leafBegin = leafEnd
+        leafEnd += length
 
-        // If the range encompases the entire leaf, add the range.
-        if (start.offset <= offset && end.offset >= o) {
+        // If the range encompasses the entire leaf, add the range.
+        if (decorationBegin <= leafBegin && leafEnd <= decorationEnd) {
           Object.assign(leaf, rest)
           next.push(leaf)
           continue
@@ -122,11 +124,11 @@ export const Text: TextInterface = {
 
         // If the range expanded and match the leaf, or starts after, or ends before it, continue.
         if (
-          (start.offset !== end.offset &&
-            (start.offset === o || end.offset === offset)) ||
-          start.offset > o ||
-          end.offset < offset ||
-          (end.offset === offset && offset !== 0)
+          (decorationBegin !== decorationEnd &&
+            (decorationBegin === leafEnd || decorationEnd === leafBegin)) ||
+          decorationBegin > leafEnd ||
+          decorationEnd < leafBegin ||
+          (decorationEnd === leafBegin && leafBegin !== 0)
         ) {
           next.push(leaf)
           continue
@@ -139,14 +141,14 @@ export const Text: TextInterface = {
         let before
         let after
 
-        if (end.offset < o) {
-          const off = end.offset - offset
+        if (decorationEnd < leafEnd) {
+          const off = decorationEnd - leafBegin
           after = { ...middle, text: middle.text.slice(off) }
           middle = { ...middle, text: middle.text.slice(0, off) }
         }
 
-        if (start.offset > offset) {
-          const off = start.offset - offset
+        if (decorationBegin > leafBegin) {
+          const off = decorationBegin - leafBegin
           before = { ...middle, text: middle.text.slice(0, off) }
           middle = { ...middle, text: middle.text.slice(off) }
         }
