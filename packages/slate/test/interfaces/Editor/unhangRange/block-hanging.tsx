@@ -5,8 +5,9 @@ import { jsx } from '../../..'
 export const input = (
   <editor>
     <block>
+      wo
       <anchor />
-      word
+      rd
     </block>
     <block>
       <focus />
@@ -20,6 +21,6 @@ export const test = editor => {
 }
 
 export const output = {
-  anchor: { path: [0, 0], offset: 0 },
+  anchor: { path: [0, 0], offset: 2 },
   focus: { path: [0, 0], offset: 4 },
 }
