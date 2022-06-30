@@ -1614,7 +1614,7 @@ export const Editor: EditorInterface = {
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if ((end.offset !== 0 || Range.isCollapsed(range)) {
+    if (end.offset !== 0 || Range.isCollapsed(range)) {
       return range
     }
 
