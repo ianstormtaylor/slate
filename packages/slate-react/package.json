@@ -35,7 +35,7 @@
     "react-test-renderer": ">=16.8.0",
     "slate": "^0.81.0",
     "slate-hyperscript": "^0.77.0",
-    "source-map-loader": "^0.2.4"
+    "source-map-loader": "^4.0.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

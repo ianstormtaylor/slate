@@ -21,7 +21,7 @@
     "lodash": "^4.17.21",
     "slate": "^0.81.0",
     "slate-hyperscript": "^0.77.0",
-    "source-map-loader": "^0.2.4"
+    "source-map-loader": "^4.0.0"
   },
   "peerDependencies": {
     "slate": ">=0.65.3"
