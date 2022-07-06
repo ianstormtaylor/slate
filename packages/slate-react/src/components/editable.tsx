@@ -31,7 +31,7 @@ import {
 } from '../utils/environment'
 import { ReactEditor } from '..'
 import { ReadOnlyContext } from '../hooks/use-read-only'
-import { useSlate, useSlateWithV } from '../hooks/use-slate'
+import { useSlate } from '../hooks/use-slate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { DecorateContext } from '../hooks/use-decorate'
 import {
@@ -57,7 +57,6 @@ import {
   IS_COMPOSING,
 } from '../utils/weak-maps'
 import { TRIPLE_CLICK } from '../utils/constants'
-import { useSlateSelection } from '../hooks/use-slate-selection'
 
 type DeferredOperation = () => void
 
