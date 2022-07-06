@@ -11,6 +11,7 @@ export interface History {
   undos: Operation[][]
 }
 
+// eslint-disable-next-line no-redeclare
 export const History = {
   /**
    * Check if a value is a `History` object.

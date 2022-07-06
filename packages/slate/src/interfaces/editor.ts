@@ -326,6 +326,7 @@ export interface EditorInterface {
 
 const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
 
+// eslint-disable-next-line no-redeclare
 export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.

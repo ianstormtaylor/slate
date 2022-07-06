@@ -51,6 +51,7 @@ export interface ReactEditor extends BaseEditor {
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
+// eslint-disable-next-line no-redeclare
 export const ReactEditor = {
   /**
    * Check if the user is currently composing inside the editor.
