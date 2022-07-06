@@ -7,10 +7,7 @@ import { useSlateSelector } from './use-slate-selector'
  * Only triggers a rerender when the selection actually changes
  */
 export const useSlateSelection = () => {
-  return useSlateSelector(
-    editor => editor.selection,
-    isSelectionEqual
-  )
+  return useSlateSelector(editor => editor.selection, isSelectionEqual)
 }
 
 const isSelectionEqual = (a: BaseSelection, b: BaseSelection) => {

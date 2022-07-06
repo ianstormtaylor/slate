@@ -8,12 +8,12 @@ import { ReactEditor } from '../plugin/react-editor'
  */
 
 export interface SlateContextValue {
-  v: number,
+  v: number
   editor: ReactEditor
 }
 
 export const SlateContext = createContext<{
-  v: number,
+  v: number
   editor: ReactEditor
 } | null>(null)
 

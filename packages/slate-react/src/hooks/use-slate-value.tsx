@@ -7,7 +7,5 @@ import { useSlateSelector } from './use-slate-selector'
  * Only triggers a rerender when the editor.children actually changes
  */
 export const useSlateValue = () => {
-  return useSlateSelector(
-    editor => editor.children,
-  )
+  return useSlateSelector(editor => editor.children)
 }

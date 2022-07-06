@@ -56,7 +56,7 @@ export const Slate = (props: {
 
     setContext(prevContext => ({
       v: prevContext.v + 1,
-      editor
+      editor,
     }))
     handleSelectorChange(editor)
   }, [onChange])
