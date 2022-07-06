@@ -9,9 +9,9 @@ module.exports = {
       exclude: [/node_modules\/@next/, /node_modules\/next/],
       use: [
         {
-          loader: require.resolve('source-map-loader')
-        }
-      ]
+          loader: require.resolve('source-map-loader'),
+        },
+      ],
     })
     return config
   },
