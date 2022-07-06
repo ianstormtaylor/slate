@@ -112,21 +112,6 @@ export type EditableProps = {
   as?: React.ElementType
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
-
-const useV = (v: number) => {
-  const ref = useRef<number>();
-  ref.current = v
-  return ref.current
-}
-
-const usePrevV = (v: number) => {
-  const ref = useRef<number>();
-  useEffect(() => {
-    ref.current = v;
-  });
-  return ref.current;
-}
-
 /**
  * Editable.
  */
@@ -146,11 +131,7 @@ export const Editable = (props: EditableProps) => {
     as: Component = 'div',
     ...attributes
   } = props
-  // const editor = useSlate()
-  const { editor, v: passedV } = useSlateWithV()
-  const v = useV(passedV)
-  const prevV = usePrevV(passedV)
-
+  const editor = useSlate()
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
@@ -172,10 +153,6 @@ export const Editable = (props: EditableProps) => {
 
   // Whenever the editor updates, sync the DOM selection with the slate selection
   useIsomorphicLayoutEffect(() => {
-    // if (prevV === v) {
-    //   console.log('prevented isomporhic layout effect...', prevV, v)
-    //   return;
-    // }
     // Update element-related weak maps with the DOM element ref.
     let window
     if (ref.current && (window = getDefaultView(ref.current))) {
@@ -188,6 +165,7 @@ export const Editable = (props: EditableProps) => {
     }
 
     // Make sure the DOM selection state is in sync.
+    const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
 
@@ -202,7 +180,7 @@ export const Editable = (props: EditableProps) => {
     const hasDomSelection = domSelection.type !== 'None'
 
     // If the DOM selection is properly unset, we're done.
-    if (!editor.selection && !hasDomSelection) {
+    if (!selection && !hasDomSelection) {
       return
     }
 
@@ -217,7 +195,7 @@ export const Editable = (props: EditableProps) => {
     }
 
     // If the DOM selection is in the editor and the editor selection is already correct, we're done.
-    if (hasDomSelection && hasDomSelectionInEditor && editor.selection) {
+    if (hasDomSelection && hasDomSelectionInEditor && selection) {
       const slateRange = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: true,
 
@@ -225,7 +203,7 @@ export const Editable = (props: EditableProps) => {
         // (e.g. when clicking on contentEditable:false element)
         suppressThrow: true,
       })
-      if (slateRange && Range.equals(slateRange, editor.selection)) {
+      if (slateRange && Range.equals(slateRange, selection)) {
         return
       }
     }
@@ -234,7 +212,7 @@ export const Editable = (props: EditableProps) => {
     // then its children might just change - DOM responds to it on its own
     // but Slate's value is not being updated through any operation
     // and thus it doesn't transform selection on its own
-    if (editor.selection && !ReactEditor.hasRange(editor, editor.selection)) {
+    if (selection && !ReactEditor.hasRange(editor, selection)) {
       editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: false,
@@ -245,9 +223,9 @@ export const Editable = (props: EditableProps) => {
     // Otherwise the DOM selection is out of sync, so update it.
     state.isUpdatingSelection = true
 
-    const newDomRange = editor.selection && ReactEditor.toDOMRange(editor, editor.selection)
+    const newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
     if (newDomRange) {
-      if (Range.isBackward(editor.selection!)) {
+      if (Range.isBackward(selection!)) {
         domSelection.setBaseAndExtent(
           newDomRange.endContainer,
           newDomRange.endOffset,
