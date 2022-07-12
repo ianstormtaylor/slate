@@ -388,7 +388,7 @@ export const Editable = (props: EditableProps) => {
             ReactEditor.hasDOMNode(editor, anchorNode)
           ) {
             // Find the last text node inside the anchor.
-            const lastText = window.document
+            const lastText = window?.document
               .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
               .lastChild() as DOMText | null
 
@@ -402,7 +402,7 @@ export const Editable = (props: EditableProps) => {
           if (
             native &&
             node.parentElement &&
-            window.getComputedStyle(node.parentElement).whiteSpace === 'pre'
+            window?.getComputedStyle(node.parentElement)?.whiteSpace === 'pre'
           ) {
             const block = Editor.above(editor, {
               at: anchor.path,
