@@ -380,15 +380,36 @@ export const Editable = (props: EditableProps) => {
           const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
           const anchorNode = node.parentElement?.closest('a')
 
-          if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
-            const { document } = ReactEditor.getWindow(editor)
+          const window = ReactEditor.getWindow(editor)
 
+          if (
+            native &&
+            anchorNode &&
+            ReactEditor.hasDOMNode(editor, anchorNode)
+          ) {
             // Find the last text node inside the anchor.
-            const lastText = document
+            const lastText = window?.document
               .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
               .lastChild() as DOMText | null
 
             if (lastText === node && lastText.textContent?.length === offset) {
+              native = false
+            }
+          }
+
+          // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
+          // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+          if (
+            native &&
+            node.parentElement &&
+            window?.getComputedStyle(node.parentElement)?.whiteSpace === 'pre'
+          ) {
+            const block = Editor.above(editor, {
+              at: anchor.path,
+              match: n => Editor.isBlock(editor, n),
+            })
+
+            if (block && Node.string(block[0]).includes('\t')) {
               native = false
             }
           }
