@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.81.2
+
+### Patch Changes
+
+- [#5045](https://github.com/ianstormtaylor/slate/pull/5045) [`0b2e6c79`](https://github.com/ianstormtaylor/slate/commit/0b2e6c79c08fc4eba32be7a424da758ba74573c3) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't native insert inside blocks with whitespace="pre" containing tab chars to work around https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+
+* [#5046](https://github.com/ianstormtaylor/slate/pull/5046) [`f96b6597`](https://github.com/ianstormtaylor/slate/commit/f96b659755673375ef1b6a1cc925c73ce4934a03) Thanks [@BitPhinix](https://github.com/BitPhinix)! - fix macos accent menu when using arrow keys
+
 ## 0.81.0
 
 ### Minor Changes
