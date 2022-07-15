@@ -1,5 +1,11 @@
 # slate
 
+## 0.81.2
+
+### Patch Changes
+
+- [#5029](https://github.com/ianstormtaylor/slate/pull/5029) [`736662f8`](https://github.com/ianstormtaylor/slate/commit/736662f80838902f8560554fae704c13c5d8e227) Thanks [@hanagejet](https://github.com/hanagejet)! - fix: `Path.previous()` dose not working when path is `null`
+
 ## 0.81.1
 
 ### Patch Changes
