@@ -340,12 +340,12 @@ export const Editable = (props: EditableProps) => {
         const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
 
-        // These two types occur while a user is composing text and can't be
-        // cancelled. Let them through and wait for the composition to end.
-        if (
-          type === 'insertCompositionText' ||
-          type === 'deleteCompositionText'
-        ) {
+        const isCompositionChange =
+          type === 'insertCompositionText' || type === 'deleteCompositionText'
+
+        // COMPAT: use composition change events as a hint to where we should insert
+        // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
+        if (isCompositionChange && ReactEditor.isComposing(editor)) {
           return
         }
 
@@ -431,7 +431,9 @@ export const Editable = (props: EditableProps) => {
               native = false
 
               const selectionRef =
-                editor.selection && Editor.rangeRef(editor, editor.selection)
+                !isCompositionChange &&
+                editor.selection &&
+                Editor.rangeRef(editor, editor.selection)
 
               Transforms.select(editor, range)
 
@@ -440,6 +442,12 @@ export const Editable = (props: EditableProps) => {
               }
             }
           }
+        }
+
+        // Composition change types occur while a user is composing text and can't be
+        // cancelled. Let them through and wait for the composition to end.
+        if (isCompositionChange) {
+          return
         }
 
         if (!native) {
