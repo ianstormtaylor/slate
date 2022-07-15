@@ -397,15 +397,13 @@ export const TextTransforms: TextTransforms = {
 
       const middleRef = Editor.pathRef(
         editor,
-        isBlockEnd ? Path.next(blockPath) : blockPath
+        isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
       )
 
       const endRef = Editor.pathRef(
         editor,
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
-
-      const blockPathRef = Editor.pathRef(editor, blockPath)
 
       Transforms.splitNodes(editor, {
         at,
@@ -414,6 +412,10 @@ export const TextTransforms: TextTransforms = {
             ? Editor.isBlock(editor, n)
             : Text.isText(n) || Editor.isInline(editor, n),
         mode: hasBlocks ? 'lowest' : 'highest',
+        always:
+          hasBlocks &&
+          (!isBlockStart || starts.length > 0) &&
+          (!isBlockEnd || ends.length > 0),
         voids,
       })
 
@@ -431,8 +433,8 @@ export const TextTransforms: TextTransforms = {
         voids,
       })
 
-      if (isBlockEmpty && middles.length) {
-        Transforms.delete(editor, { at: blockPathRef.unref()!, voids })
+      if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
+        Transforms.delete(editor, { at: blockPath, voids })
       }
 
       Transforms.insertNodes(editor, middles, {
