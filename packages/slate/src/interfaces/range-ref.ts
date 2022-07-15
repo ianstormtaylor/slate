@@ -16,6 +16,7 @@ export interface RangeRefInterface {
   transform: (ref: RangeRef, op: Operation) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const RangeRef: RangeRefInterface = {
   /**
    * Transform the range ref's current value by an operation.

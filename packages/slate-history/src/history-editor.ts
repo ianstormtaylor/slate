@@ -19,6 +19,7 @@ export interface HistoryEditor extends BaseEditor {
   redo: () => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const HistoryEditor = {
   /**
    * Check if a value is a `HistoryEditor` object.

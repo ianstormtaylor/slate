@@ -28,6 +28,7 @@ export interface TextInterface {
   decorations: (node: Text, decorations: Range[]) => Text[]
 }
 
+// eslint-disable-next-line no-redeclare
 export const Text: TextInterface = {
   /**
    * Check if two text nodes are equal.

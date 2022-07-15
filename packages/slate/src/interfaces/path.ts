@@ -53,6 +53,7 @@ export interface PathInterface {
   ) => Path | null
 }
 
+// eslint-disable-next-line no-redeclare
 export const Path: PathInterface = {
   /**
    * Get a list of ancestor paths for a given path.
