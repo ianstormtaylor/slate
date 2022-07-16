@@ -1,5 +1,5 @@
 ---
-'slate-react': patch
+'slate-react': minor
 ---
 
 - Introduces a `useSlateSelection` hook that triggers whenever the selection changes.
