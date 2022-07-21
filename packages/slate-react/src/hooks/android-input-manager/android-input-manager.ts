@@ -329,7 +329,7 @@ export function createAndroidInputManager({
     onDOMSelectionChange.cancel()
 
     if (hasPendingAction()) {
-      throw new Error('Scheduled new action while current action is pending')
+      flush()
     }
 
     EDITOR_TO_PENDING_ACTION.set(editor, { at, run })
