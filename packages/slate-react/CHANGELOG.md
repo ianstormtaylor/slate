@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.81.3
+
+### Patch Changes
+
+- [#5054](https://github.com/ianstormtaylor/slate/pull/5054) [`1cc0797f`](https://github.com/ianstormtaylor/slate/commit/1cc0797f53f22e650198c83192ba5fc35c525a15) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix toSlatePoint in void nodes with nested editors if children are rendered as the last child
+
+* [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
 ## 0.81.2
 
 ### Patch Changes

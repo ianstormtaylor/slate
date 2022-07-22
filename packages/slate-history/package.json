@@ -1,7 +1,7 @@
 {
   "name": "slate-history",
   "description": "An operation-based history implementation for Slate editors.",
-  "version": "0.66.0",
+  "version": "0.81.3",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -19,8 +19,8 @@
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
     "lodash": "^4.17.21",
-    "slate": "^0.81.0",
-    "slate-hyperscript": "^0.77.0",
+    "slate": "^0.81.3",
+    "slate-hyperscript": "^0.81.3",
     "source-map-loader": "^4.0.0"
   },
   "peerDependencies": {

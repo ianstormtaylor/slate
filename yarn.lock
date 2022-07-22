@@ -14115,21 +14115,21 @@ resolve@^2.0.0-next.3:
     "@babel/runtime": ^7.7.4
     is-plain-object: ^5.0.0
     lodash: ^4.17.21
-    slate: ^0.81.0
-    slate-hyperscript: ^0.77.0
+    slate: ^0.81.3
+    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
   peerDependencies:
     slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
-"slate-hyperscript@^0.77.0, slate-hyperscript@workspace:*, slate-hyperscript@workspace:packages/slate-hyperscript":
+"slate-hyperscript@^0.81.3, slate-hyperscript@workspace:*, slate-hyperscript@workspace:packages/slate-hyperscript":
   version: 0.0.0-use.local
   resolution: "slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
     "@babel/runtime": ^7.7.4
     is-plain-object: ^5.0.0
-    slate: ^0.81.0
+    slate: ^0.81.3
     source-map-loader: ^4.0.0
   peerDependencies:
     slate: ">=0.65.3"
@@ -14236,8 +14236,8 @@ resolve@^2.0.0-next.3:
     react-dom: ">=16.8.0"
     react-test-renderer: ">=16.8.0"
     scroll-into-view-if-needed: ^2.2.20
-    slate: ^0.81.2
-    slate-hyperscript: ^0.77.0
+    slate: ^0.81.3
+    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-invariant: 1.0.6
   peerDependencies:
@@ -14247,7 +14247,7 @@ resolve@^2.0.0-next.3:
   languageName: unknown
   linkType: soft
 
-"slate@^0.81.0, slate@^0.81.2, slate@workspace:*, slate@workspace:packages/slate":
+"slate@^0.81.3, slate@workspace:*, slate@workspace:packages/slate":
   version: 0.0.0-use.local
   resolution: "slate@workspace:packages/slate"
   dependencies:
@@ -14255,7 +14255,7 @@ resolve@^2.0.0-next.3:
     immer: ^9.0.6
     is-plain-object: ^5.0.0
     lodash: ^4.17.21
-    slate-hyperscript: ^0.77.0
+    slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-warning: ^1.0.3
   languageName: unknown

@@ -1,5 +1,13 @@
 # slate
 
+## 0.81.3
+
+### Patch Changes
+
+- [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
+* [#5018](https://github.com/ianstormtaylor/slate/pull/5018) [`f13cd6b9`](https://github.com/ianstormtaylor/slate/commit/f13cd6b9180e18201b2a001b6f5d109218071319) Thanks [@ulion](https://github.com/ulion)! - Fix for insertFragment text/inline + block mixed fragments.
+
 ## 0.81.2
 
 ### Patch Changes
