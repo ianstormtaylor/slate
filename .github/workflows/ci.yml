@@ -1,8 +1,9 @@
 name: CI
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: [ main ]
+  pull_request:
 
 jobs:
   ci:
@@ -49,7 +50,7 @@ jobs:
         run: yarn && yarn build
 
       - name: Cypress tests
-        uses: replayio/action-cypress@v0.1.7
+        uses: replayio/action-cypress@no-record
         with:
           command: yarn test:integration --
           browser: "Replay Firefox"
