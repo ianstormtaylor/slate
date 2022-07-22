@@ -148,6 +148,7 @@ export function createAndroidInputManager({
     }
 
     if (!hasPendingDiffs() && !hasPendingAction()) {
+      applyPendingSelection()
       return
     }
 
@@ -287,7 +288,7 @@ export function createAndroidInputManager({
       return
     }
 
-    delete placeholderElement.style.visibility
+    placeholderElement.style.removeProperty('visibility')
   }
 
   const storeDiff = (path: Path, diff: StringDiff) => {
