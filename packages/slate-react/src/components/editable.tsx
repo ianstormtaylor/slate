@@ -150,7 +150,7 @@ export const Editable = (props: EditableProps) => {
     []
   )
 
-  // Whenever the editor updates...
+  // Whenever the editor updates, sync the DOM selection with the slate selection
   useIsomorphicLayoutEffect(() => {
     // Update element-related weak maps with the DOM element ref.
     let window
