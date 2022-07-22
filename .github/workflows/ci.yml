@@ -52,7 +52,7 @@ jobs:
         uses: replayio/action-cypress@no-record
         with:
           command: yarn test:integration --
-          browser: "Replay Firefox"
+          browser: "firefox"
           apiKey: ${{ secrets.CYPRESS_REPLAY_API_KEY }}
           public: true
           issue-number: ${{ github.event.pull_request.number }}
