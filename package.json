@@ -31,11 +31,12 @@
     "test": "yarn run test:mocha && yarn run test:jest",
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
-    "test:integration": "run-p -r serve cypress:run",
+    "test:integration": "run-p -r serve \"cypress:run {@}\"",
     "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
     "watch": "yarn build:rollup --watch",
-    "cypress:run": "cypress run",
+    "cypress:record": "RECORD_ALL_CONTENT=1 RECORD_REPLAY_METADATA_FILE=$(mktemp) cypress run --browser 'Replay Firefox'",
+    "cypress:run": "RECORD_REPLAY_VERBOSE=1 cypress run",
     "cypress:open": "cypress open"
   },
   "devDependencies": {
@@ -55,6 +56,7 @@
     "@changesets/changelog-github": "^0.3.0",
     "@changesets/cli": "^2.14.1",
     "@emotion/css": "^11.7.1",
+    "@replayio/cypress": "^0.2.7",
     "@testing-library/cypress": "^8.0.0",
     "@types/jest": "27.0.1",
     "@types/lodash": "^4.14.149",

@@ -1,4 +1,6 @@
 {
   "projectId": "slate-react",
-  "baseUrl": "http://localhost:3000"
+  "baseUrl": "http://localhost:3000",
+  "screenshotOnRunFailure": false,
+  "video": false
 }

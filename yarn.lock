@@ -3393,6 +3393,47 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@replayio/cypress@npm:^0.2.7":
+  version: 0.2.9
+  resolution: "@replayio/cypress@npm:0.2.9"
+  dependencies:
+    "@replayio/replay": ^0.8.1
+    uuid: ^8.3.2
+  bin:
+    replayio-cypress: bin/replayio-cypress.js
+  checksum: 9848a5ce6385a7eac30b94b3539391097076a389853898a7f92676ac87baa586b0d6238885b75a313d03f006a7b1711b5e598a015a696cdfd611fceda0094305
+  languageName: node
+  linkType: hard
+
+"@replayio/replay@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@replayio/replay@npm:0.8.1"
+  dependencies:
+    "@replayio/sourcemap-upload": ^1.0.2
+    commander: ^7.2.0
+    is-uuid: ^1.0.2
+    superstruct: ^0.15.4
+    text-table: ^0.2.0
+    ws: ^7.5.0
+  bin:
+    replay: bin/replay.js
+  checksum: eb1f947d881b4e4555d7bab524d857d1008f44340abf479d30646f55ed925de2863d77391ad89d37559a67c60f613af070e37ed6819587ba5c29d7561e81e422
+  languageName: node
+  linkType: hard
+
+"@replayio/sourcemap-upload@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "@replayio/sourcemap-upload@npm:1.0.2"
+  dependencies:
+    commander: ^7.2.0
+    debug: ^4.3.1
+    glob: ^7.1.6
+    node-fetch: ^2.6.1
+    string.prototype.matchall: ^4.0.5
+  checksum: b82009a88f34699862ddb5132dfad1a47d24173f4a2431d0edef838281f9a9d36700ffdcaf547f15649d96bdbc61bb2f961b7f667aa90bc3df6203e1e4ccd135
+  languageName: node
+  linkType: hard
+
 "@rollup/pluginutils@npm:^3.1.0":
   version: 3.1.0
   resolution: "@rollup/pluginutils@npm:3.1.0"
@@ -8061,6 +8102,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"glob@npm:^7.1.6":
+  version: 7.2.3
+  resolution: "glob@npm:7.2.3"
+  dependencies:
+    fs.realpath: ^1.0.0
+    inflight: ^1.0.4
+    inherits: 2
+    minimatch: ^3.1.1
+    once: ^1.3.0
+    path-is-absolute: ^1.0.0
+  checksum: 29452e97b38fa704dabb1d1045350fb2467cf0277e155aa9ff7077e90ad81d1ea9d53d3ee63bd37c05b09a065e90f16aec4a65f5b8de401d1dac40bc5605d133
+  languageName: node
+  linkType: hard
+
 "global-dirs@npm:^3.0.0":
   version: 3.0.0
   resolution: "global-dirs@npm:3.0.0"
@@ -9222,6 +9277,13 @@ __metadata:
   version: 0.2.1
   resolution: "is-utf8@npm:0.2.1"
   checksum: 167ccd2be869fc228cc62c1a28df4b78c6b5485d15a29027d3b5dceb09b383e86a3522008b56dcac14b592b22f0a224388718c2505027a994fd8471465de54b3
+  languageName: node
+  linkType: hard
+
+"is-uuid@npm:^1.0.2":
+  version: 1.0.2
+  resolution: "is-uuid@npm:1.0.2"
+  checksum: 53eb3544e4416ee2f170e204a319bf686768087d2de1f061f7261decd6b8e2cc16c83687fb081d3aac398c657c8e461ad43e3f664d3155b866db4016697624a3
   languageName: node
   linkType: hard
 
@@ -11039,6 +11101,15 @@ __metadata:
   dependencies:
     brace-expansion: ^1.1.7
   checksum: 66ac295f8a7b59788000ea3749938b0970344c841750abd96694f80269b926ebcafad3deeb3f1da2522978b119e6ae3a5869b63b13a7859a456b3408bd18a078
+  languageName: node
+  linkType: hard
+
+"minimatch@npm:^3.1.1":
+  version: 3.1.2
+  resolution: "minimatch@npm:3.1.2"
+  dependencies:
+    brace-expansion: ^1.1.7
+  checksum: c154e566406683e7bcb746e000b84d74465b3a832c45d59912b9b55cd50dee66e5c4b1e5566dba26154040e51672f9aa450a9aef0c97cfc7336b78b7afb9540a
   languageName: node
   linkType: hard
 
@@ -14156,6 +14227,7 @@ resolve@^2.0.0-next.3:
     "@changesets/changelog-github": ^0.3.0
     "@changesets/cli": ^2.14.1
     "@emotion/css": ^11.7.1
+    "@replayio/cypress": ^0.2.7
     "@testing-library/cypress": ^8.0.0
     "@types/jest": 27.0.1
     "@types/lodash": ^4.14.149
@@ -14976,6 +15048,13 @@ resolve@^2.0.0-next.3:
   version: 4.0.13
   resolution: "stylis@npm:4.0.13"
   checksum: 8ea7a87028b6383c6a982231c4b5b6150031ce028e0fdaf7b2ace82253d28a8af50cc5a9da8a421d3c7c4441592f393086e332795add672aa4a825f0fe3713a3
+  languageName: node
+  linkType: hard
+
+"superstruct@npm:^0.15.4":
+  version: 0.15.5
+  resolution: "superstruct@npm:0.15.5"
+  checksum: 6d1f5249fee789424b7178fa0a1ffb2ace629c5480c39505885bd8c0046a4ff8b267569a3442fa53b8c560a7ba6599cf3f8af94225aebeb2cf6023f7dd911050
   languageName: node
   linkType: hard
 
@@ -15829,6 +15908,15 @@ typescript@4.0.5:
   languageName: node
   linkType: hard
 
+"uuid@npm:^8.3.2":
+  version: 8.3.2
+  resolution: "uuid@npm:8.3.2"
+  bin:
+    uuid: dist/bin/uuid
+  checksum: 5575a8a75c13120e2f10e6ddc801b2c7ed7d8f3c8ac22c7ed0c7b2ba6383ec0abda88c905085d630e251719e0777045ae3236f04c812184b7c765f63a70e58df
+  languageName: node
+  linkType: hard
+
 "v8-compile-cache@npm:^2.0.3":
   version: 2.3.0
   resolution: "v8-compile-cache@npm:2.3.0"
@@ -16192,6 +16280,21 @@ typescript@4.0.5:
     utf-8-validate:
       optional: true
   checksum: 423dc0d859fa74020f5555140905b862470a60ea1567bb9ad55a087263d7718b9c94f69678be1cee9868925c570f1e6fc79d09f90c39057bc63fa2edbb2c547b
+  languageName: node
+  linkType: hard
+
+"ws@npm:^7.5.0":
+  version: 7.5.9
+  resolution: "ws@npm:7.5.9"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: c3c100a181b731f40b7f2fddf004aa023f79d64f489706a28bc23ff88e87f6a64b3c6651fbec3a84a53960b75159574d7a7385709847a62ddb7ad6af76f49138
   languageName: node
   linkType: hard
 

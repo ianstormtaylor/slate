@@ -12,7 +12,6 @@ jobs:
       matrix:
         command:
           - 'test'
-          - 'test:integration'
           - 'lint:eslint'
           - 'lint:prettier'
           - 'lint:typescript'
@@ -31,3 +30,30 @@ jobs:
         run: yarn && yarn build && yarn ${{ matrix.command }}
         env:
           CI: true
+
+  cy:    
+    name: Run Cypress
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v2
+
+      - name: Setup node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+          cache: yarn
+          key: node16
+
+      - name: Run
+        run: yarn && yarn build
+
+      - name: Cypress tests
+        uses: replayio/action-cypress@v0.1.7
+        with:
+          command: yarn test:integration --
+          browser: "Replay Firefox"
+          apiKey: ${{ secrets.CYPRESS_REPLAY_API_KEY }}
+          public: true
+          issue-number: ${{ github.event.pull_request.number }}
+          upload-all: true
