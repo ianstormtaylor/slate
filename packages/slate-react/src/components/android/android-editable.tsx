@@ -301,7 +301,7 @@ export const AndroidEditable = (props: EditableProps): JSX.Element => {
 
     // @ts-ignore The `beforeinput` event isn't recognized.
     return () => node?.removeEventListener('beforeinput', onDOMBeforeInput)
-  }, [contentKey, propsOnDOMBeforeInput])
+  }, [contentKey, onDOMBeforeInput])
 
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
