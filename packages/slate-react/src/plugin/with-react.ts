@@ -22,6 +22,8 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
+  EDITOR_TO_SCHEDULE_FLUSH,
+  EDITOR_TO_PENDING_INSERTION_MARKS,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
 /**
@@ -42,12 +44,34 @@ export const withReact = <T extends Editor>(editor: T) => {
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
 
   e.addMark = (key, value) => {
+    EDITOR_TO_SCHEDULE_FLUSH.get(e)?.()
+
+    if (
+      !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&
+      EDITOR_TO_PENDING_DIFFS.get(e)?.length
+    ) {
+      // Ensure the current pending diffs originating from changes before the addMark
+      // are applied with the current formatting
+      EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
+    }
+
     EDITOR_TO_USER_MARKS.delete(editor)
+
     addMark(key, value)
   }
 
   e.removeMark = key => {
+    if (
+      !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&
+      EDITOR_TO_PENDING_DIFFS.get(e)?.length
+    ) {
+      // Ensure the current pending diffs originating from changes before the addMark
+      // are applied with the current formatting
+      EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
+    }
+
     EDITOR_TO_USER_MARKS.delete(editor)
+
     removeMark(key)
   }
 

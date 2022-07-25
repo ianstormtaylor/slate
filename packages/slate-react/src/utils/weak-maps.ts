@@ -60,7 +60,7 @@ export const EDITOR_TO_SCHEDULE_FLUSH: WeakMap<
   () => void
 > = new WeakMap()
 
-export const EDITOR_TO_MARK_PLACEHOLDER_MARKS: WeakMap<
+export const EDITOR_TO_PENDING_INSERTION_MARKS: WeakMap<
   Editor,
   Partial<Text> | null
 > = new WeakMap()

@@ -54,7 +54,7 @@ import Hotkeys from '../utils/hotkeys'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
-  EDITOR_TO_MARK_PLACEHOLDER_MARKS,
+  EDITOR_TO_PENDING_INSERTION_MARKS,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
@@ -754,7 +754,7 @@ export const Editable = (props: EditableProps) => {
   // Update EDITOR_TO_MARK_PLACEHOLDER_MARKS in setTimeout useEffect to ensure we don't set it
   // before we receive the composition end event.
   useEffect(() => {
-    setTimeout(() => EDITOR_TO_MARK_PLACEHOLDER_MARKS.set(editor, marks))
+    setTimeout(() => EDITOR_TO_PENDING_INSERTION_MARKS.set(editor, marks))
   })
 
   return (
@@ -995,10 +995,10 @@ export const Editable = (props: EditableProps) => {
                     !IS_UC_MOBILE &&
                     event.data
                   ) {
-                    const placeholderMarks = EDITOR_TO_MARK_PLACEHOLDER_MARKS.get(
+                    const placeholderMarks = EDITOR_TO_PENDING_INSERTION_MARKS.get(
                       editor
                     )
-                    EDITOR_TO_MARK_PLACEHOLDER_MARKS.delete(editor)
+                    EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
 
                     // Ensure we insert text with the marks the user was actually seeing
                     if (placeholderMarks !== undefined) {
