@@ -215,6 +215,7 @@ export function createAndroidInputManager({
         EDITOR_TO_PENDING_SELECTION.delete(editor)
         scheduleOnDOMSelectionChange.cancel()
         onDOMSelectionChange.cancel()
+        selectionRef?.unref()
       }
     }
 
