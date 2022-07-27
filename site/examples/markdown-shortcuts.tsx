@@ -1,15 +1,16 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact, ReactEditor } from 'slate-react'
 import {
-  Editor,
-  Transforms,
-  Range,
-  Point,
   createEditor,
-  Element as SlateElement,
   Descendant,
+  Editor,
+  Element as SlateElement,
+  Node as SlateNode,
+  Point,
+  Range,
+  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
 import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {
@@ -33,9 +34,33 @@ const MarkdownShortcutsExample = () => {
   )
 
   const handleDOMBeforeInput = useCallback((e: InputEvent) => {
-    if (e.data === ' ') {
-      ReactEditor.androidScheduleFlush(editor)
-    }
+    queueMicrotask(() => {
+      const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+
+      const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
+        if (!diff.text.endsWith(' ')) {
+          return false
+        }
+
+        const { text } = SlateNode.leaf(editor, path)
+        const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+        if (!(beforeText in SHORTCUTS)) {
+          return
+        }
+
+        const blockEntry = Editor.above(editor, { at: path })
+        if (!blockEntry) {
+          return false
+        }
+
+        const [, blockPath] = blockEntry
+        return Editor.isStart(editor, Editor.start(editor, path), blockPath)
+      })
+
+      if (scheduleFlush) {
+        ReactEditor.androidScheduleFlush(editor)
+      }
+    })
   }, [])
 
   return (
