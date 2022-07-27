@@ -48,7 +48,10 @@ const MarkdownShortcutsExample = () => {
           return
         }
 
-        const blockEntry = Editor.above(editor, { at: path })
+        const blockEntry = Editor.above(editor, {
+          at: path,
+          match: n => Editor.isBlock(editor, n),
+        })
         if (!blockEntry) {
           return false
         }
