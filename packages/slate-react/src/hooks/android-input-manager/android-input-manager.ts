@@ -180,6 +180,9 @@ export function createAndroidInputManager({
       if (pendingMarks !== undefined) {
         EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
         editor.marks = pendingMarks
+      }
+
+      if (pendingMarks) {
         isInsertAfterMarkPlaceholder = true
       }
 

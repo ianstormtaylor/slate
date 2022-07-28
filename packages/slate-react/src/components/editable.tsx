@@ -754,7 +754,13 @@ export const Editable = (props: EditableProps) => {
   // Update EDITOR_TO_MARK_PLACEHOLDER_MARKS in setTimeout useEffect to ensure we don't set it
   // before we receive the composition end event.
   useEffect(() => {
-    setTimeout(() => EDITOR_TO_PENDING_INSERTION_MARKS.set(editor, marks))
+    setTimeout(() => {
+      if (marks) {
+        EDITOR_TO_PENDING_INSERTION_MARKS.set(editor, marks)
+      } else {
+        EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
+      }
+    })
   })
 
   return (
@@ -1606,6 +1612,7 @@ const defaultScrollSelectionIntoView = (
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
     })
+    // @ts-ignore
     delete leafEl.getBoundingClientRect
   }
 }
