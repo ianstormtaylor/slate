@@ -39,7 +39,7 @@ jobs:
       # https://github.com/changesets/action
       - name: Create release pull request or Publish to npm
         if: matrix.channel == 'latest'
-        uses: changesets/action@master
+        uses: changesets/action@v1
         with:
           # defined in package.json#scripts
           version: yarn changesetversion
