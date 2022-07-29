@@ -447,12 +447,12 @@ export const Editable = (props: EditableProps) => {
         const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
 
-        // These two types occur while a user is composing text and can't be
-        // cancelled. Let them through and wait for the composition to end.
-        if (
-          type === 'insertCompositionText' ||
-          type === 'deleteCompositionText'
-        ) {
+        const isCompositionChange =
+          type === 'insertCompositionText' || type === 'deleteCompositionText'
+
+        // COMPAT: use composition change events as a hint to where we should insert
+        // composition text if we aren't composing to work around https://github.com/ianstormtaylor/slate/issues/5038
+        if (isCompositionChange && ReactEditor.isComposing(editor)) {
           return
         }
 
@@ -487,15 +487,36 @@ export const Editable = (props: EditableProps) => {
           const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
           const anchorNode = node.parentElement?.closest('a')
 
-          if (anchorNode && ReactEditor.hasDOMNode(editor, anchorNode)) {
-            const { document } = ReactEditor.getWindow(editor)
+          const window = ReactEditor.getWindow(editor)
 
+          if (
+            native &&
+            anchorNode &&
+            ReactEditor.hasDOMNode(editor, anchorNode)
+          ) {
             // Find the last text node inside the anchor.
-            const lastText = document
+            const lastText = window?.document
               .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
               .lastChild() as DOMText | null
 
             if (lastText === node && lastText.textContent?.length === offset) {
+              native = false
+            }
+          }
+
+          // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
+          // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+          if (
+            native &&
+            node.parentElement &&
+            window?.getComputedStyle(node.parentElement)?.whiteSpace === 'pre'
+          ) {
+            const block = Editor.above(editor, {
+              at: anchor.path,
+              match: n => Editor.isBlock(editor, n),
+            })
+
+            if (block && Node.string(block[0]).includes('\t')) {
               native = false
             }
           }
@@ -517,7 +538,9 @@ export const Editable = (props: EditableProps) => {
               native = false
 
               const selectionRef =
-                editor.selection && Editor.rangeRef(editor, editor.selection)
+                !isCompositionChange &&
+                editor.selection &&
+                Editor.rangeRef(editor, editor.selection)
 
               Transforms.select(editor, range)
 
@@ -526,6 +549,12 @@ export const Editable = (props: EditableProps) => {
               }
             }
           }
+        }
+
+        // Composition change types occur while a user is composing text and can't be
+        // cancelled. Let them through and wait for the composition to end.
+        if (isCompositionChange) {
+          return
         }
 
         if (!native) {
@@ -1612,7 +1641,8 @@ const defaultScrollSelectionIntoView = (
     scrollIntoView(leafEl, {
       scrollMode: 'if-needed',
     })
-    // @ts-ignore
+
+    // @ts-expect-error an unorthodox delete D:
     delete leafEl.getBoundingClientRect
   }
 }

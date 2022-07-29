@@ -127,6 +127,7 @@ export interface NodeTransforms {
   ) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const NodeTransforms: NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.

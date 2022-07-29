@@ -313,6 +313,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
   return selection
 }
 
+// eslint-disable-next-line no-redeclare
 export const GeneralTransforms: GeneralTransforms = {
   /**
    * Transform the editor by an operation.

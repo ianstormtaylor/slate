@@ -53,6 +53,7 @@ export interface ReactEditor extends BaseEditor {
   hasRange: (editor: ReactEditor, range: Range) => boolean
 }
 
+// eslint-disable-next-line no-redeclare
 export const ReactEditor = {
   /**
    * Check if the user is currently composing inside the editor.
@@ -585,8 +586,16 @@ export const ReactEditor = {
         }
       } else if (voidNode) {
         // For void nodes, the element with the offset key will be a cousin, not an
-        // ancestor, so find it by going down from the nearest void parent.
-        leafNode = voidNode.querySelector('[data-slate-leaf]')!
+        // ancestor, so find it by going down from the nearest void parent and taking the
+        // first one that isn't inside a nested editor.
+        const leafNodes = voidNode.querySelectorAll('[data-slate-leaf]')
+        for (let index = 0; index < leafNodes.length; index++) {
+          const current = leafNodes[index]
+          if (ReactEditor.hasDOMNode(editor, current)) {
+            leafNode = current
+            break
+          }
+        }
 
         // COMPAT: In read-only editors the leaf is not rendered.
         if (!leafNode) {

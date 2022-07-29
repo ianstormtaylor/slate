@@ -15,6 +15,7 @@ export interface LocationInterface {
   isLocation: (value: any) => value is Location
 }
 
+// eslint-disable-next-line no-redeclare
 export const Location: LocationInterface = {
   /**
    * Check if a value implements the `Location` interface.
@@ -36,6 +37,7 @@ export interface SpanInterface {
   isSpan: (value: any) => value is Span
 }
 
+// eslint-disable-next-line no-redeclare
 export const Span: SpanInterface = {
   /**
    * Check if a value implements the `Span` interface.

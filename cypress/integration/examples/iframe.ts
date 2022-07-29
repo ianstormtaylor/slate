@@ -1,9 +1,13 @@
 // Taken from https://www.cypress.io/blog/2020/02/12/working-with-iframes-in-cypress/
 const getIframeDocument = () => {
-  return cy
-    .get('iframe')
-    .its('0.contentDocument')
-    .should('exist')
+  return (
+    cy
+      // adding the wait here because the IFrame component re-renders a bunch of times at startup which can mess up this test.
+      .wait(1000)
+      .get('iframe')
+      .its('0.contentDocument')
+      .should('exist')
+  )
 }
 
 const getIframeBody = () => {

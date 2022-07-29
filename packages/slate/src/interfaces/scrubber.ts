@@ -22,6 +22,7 @@ let _scrubber: Scrubber | undefined = undefined
  *    });
  *
  */
+// eslint-disable-next-line no-redeclare
 export const Scrubber: ScrubberInterface = {
   setScrubber(scrubber: Scrubber | undefined): void {
     _scrubber = scrubber
