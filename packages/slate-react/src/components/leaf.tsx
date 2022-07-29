@@ -1,8 +1,12 @@
 import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
 import String from './string'
-import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
+import {
+  PLACEHOLDER_SYMBOL,
+  EDITOR_TO_PLACEHOLDER_ELEMENT,
+} from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import { useSlateStatic } from '../hooks/use-slate-static'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -26,6 +30,7 @@ const Leaf = (props: {
   } = props
 
   const placeholderRef = useRef<HTMLSpanElement | null>(null)
+  const editor = useSlateStatic()
 
   useEffect(() => {
     const placeholderEl = placeholderRef?.current
@@ -38,9 +43,11 @@ const Leaf = (props: {
     }
 
     editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
+    EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
 
     return () => {
       editorEl.style.minHeight = 'auto'
+      EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
     }
   }, [placeholderRef, leaf])
 
