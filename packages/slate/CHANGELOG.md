@@ -1,5 +1,11 @@
 # slate
 
+## 0.82.0
+
+### Patch Changes
+
+- [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
 ## 0.81.3
 
 ### Patch Changes

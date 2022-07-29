@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.82.0
+
+### Minor Changes
+
+- [#5041](https://github.com/ianstormtaylor/slate/pull/5041) [`9bc0b613`](https://github.com/ianstormtaylor/slate/commit/9bc0b6132aa288a37ae9a85d0e59a9d5a75ebdd7) Thanks [@bryanph](https://github.com/bryanph)! - - Introduces a `useSlateSelection` hook that triggers whenever the selection changes.
+  - This also changes the implementation of SlateContext to use an incrementing value instead of an array replace to trigger updates
+  - Introduces a `useSlateWithV` hook that includes the version counter which can be used to prevent re-renders
+
+* [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
 ## 0.81.3
 
 ### Patch Changes
