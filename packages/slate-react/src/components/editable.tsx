@@ -1289,6 +1289,8 @@ export const Editable = (props: EditableProps) => {
             onKeyDown={useCallback(
               (event: React.KeyboardEvent<HTMLDivElement>) => {
                 if (!readOnly && hasEditableTarget(editor, event.target)) {
+                  androidInputManager?.handleKeyDown(event)
+
                   const { nativeEvent } = event
 
                   // COMPAT: The composition end event isn't fired reliably in all browsers,
