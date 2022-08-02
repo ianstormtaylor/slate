@@ -14,9 +14,9 @@ import {
 import { isDOMSelection, isTrackedMutation } from '../../utils/dom'
 import {
   EDITOR_TO_FORCE_RENDER,
-  EDITOR_TO_PENDING_INSERTION_MARKS,
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
+  EDITOR_TO_PENDING_INSERTION_MARKS,
   EDITOR_TO_PENDING_SELECTION,
   EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
@@ -56,6 +56,7 @@ export type AndroidInputManager = {
     event: React.CompositionEvent<HTMLDivElement>
   ) => void
   handleDOMBeforeInput: (event: InputEvent) => void
+  handleKeyDown: (event: React.KeyboardEvent<HTMLDivElement>) => void
 
   handleDomMutations: (mutations: MutationRecord[]) => void
   handleInput: () => void
@@ -91,7 +92,6 @@ export function createAndroidInputManager({
   onDOMSelectionChange,
 }: CreateAndroidInputManagerOptions): AndroidInputManager {
   let flushing: 'action' | boolean = false
-
   let compositionEndTimeoutId: ReturnType<typeof setTimeout> | null = null
   let flushTimeoutId: ReturnType<typeof setTimeout> | null = null
   let actionTimeoutId: ReturnType<typeof setTimeout> | null = null
@@ -281,18 +281,18 @@ export function createAndroidInputManager({
     }
   }
 
-  const updatePlaceholderVisibility = () => {
+  const updatePlaceholderVisibility = (forceHide = false) => {
     const placeholderElement = EDITOR_TO_PLACEHOLDER_ELEMENT.get(editor)
     if (!placeholderElement) {
       return
     }
 
-    if (hasPendingDiffs()) {
-      placeholderElement.style.visibility = 'hidden'
+    if (hasPendingDiffs() || forceHide) {
+      placeholderElement.style.display = 'none'
       return
     }
 
-    placeholderElement.style.removeProperty('visibility')
+    placeholderElement.style.removeProperty('display')
   }
 
   const storeDiff = (path: Path, diff: StringDiff) => {
@@ -605,6 +605,18 @@ export function createAndroidInputManager({
     }
   }
 
+  const handleKeyDown = (_: React.KeyboardEvent) => {
+    // COMPAT: Swiftkey closes the keyboard when typing inside a empty node
+    // directly next to a non-contenteditable element (= the placeholder).
+    // The only event fired soon enough for us to allow hiding the placeholder
+    // without swiftkey picking it up is the keydown event, so we have to hide it
+    // here. See https://github.com/ianstormtaylor/slate/pull/4988#issuecomment-1201050535
+    if (!hasPendingDiffs()) {
+      updatePlaceholderVisibility(true)
+      setTimeout(updatePlaceholderVisibility)
+    }
+  }
+
   const scheduleFlush = () => {
     if (!hasPendingAction()) {
       actionTimeoutId = setTimeout(flush)
@@ -637,6 +649,7 @@ export function createAndroidInputManager({
     handleCompositionEnd,
     handleCompositionStart,
     handleDOMBeforeInput,
+    handleKeyDown,
 
     handleDomMutations,
     handleInput,
