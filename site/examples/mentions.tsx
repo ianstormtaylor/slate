@@ -1,21 +1,29 @@
-import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
-import { Editor, Transforms, Range, createEditor, Descendant } from 'slate'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  createEditor,
+  Descendant,
+  Editor,
+  Point,
+  Range,
+  Transforms,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
-  Slate,
   Editable,
   ReactEditor,
-  withReact,
-  useSelected,
+  Slate,
   useFocused,
+  useSelected,
+  withReact,
 } from 'slate-react'
-
 import { Portal } from '../components'
 import { MentionElement } from './custom-types'
 
+const QUERY_REGEX = /@(?<query>[^\s]+)$/
+
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [target, setTarget] = useState<Range | undefined>()
+  const [target, setTarget] = useState<Point | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -28,78 +36,122 @@ const MentionExample = () => {
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
 
-  const onKeyDown = useCallback(
-    event => {
-      if (target) {
-        switch (event.key) {
-          case 'ArrowDown':
-            event.preventDefault()
-            const prevIndex = index >= chars.length - 1 ? 0 : index + 1
-            setIndex(prevIndex)
-            break
-          case 'ArrowUp':
-            event.preventDefault()
-            const nextIndex = index <= 0 ? chars.length - 1 : index - 1
-            setIndex(nextIndex)
-            break
-          case 'Tab':
-          case 'Enter':
-            event.preventDefault()
-            Transforms.select(editor, target)
-            insertMention(editor, chars[index])
-            setTarget(null)
-            break
-          case 'Escape':
-            event.preventDefault()
-            setTarget(null)
-            break
-        }
+  const pendingPick = useRef<string | undefined>()
+  const applyPick = useCallback((character?: string) => {
+    const char = character ?? pendingPick.current
+    pendingPick.current = undefined
+
+    if (!ReactEditor.androidPendingDiffs(editor)?.length) {
+      insertMention(editor, char)
+      return
+    }
+
+    ReactEditor.androidScheduleFlush(editor)
+    pendingPick.current = char
+  }, [])
+
+  const onKeyDown = useStableHandler((event: React.KeyboardEvent) => {
+    if (target) {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault()
+          const prevIndex = index >= chars.length - 1 ? 0 : index + 1
+          setIndex(prevIndex)
+          break
+        case 'ArrowUp':
+          event.preventDefault()
+          const nextIndex = index <= 0 ? chars.length - 1 : index - 1
+          setIndex(nextIndex)
+          break
+        case 'Tab':
+        case 'Enter':
+          event.preventDefault()
+          applyPick(chars[index])
+          setTarget(null)
+          break
+        case 'Escape':
+          event.preventDefault()
+          setTarget(null)
+          break
       }
-    },
-    [index, search, target]
-  )
+    }
+  })
 
   useEffect(() => {
     if (target && chars.length > 0) {
       const el = ref.current
-      const domRange = ReactEditor.toDOMRange(editor, target)
-      const rect = domRange.getBoundingClientRect()
-      el.style.top = `${rect.top + window.pageYOffset + 24}px`
-      el.style.left = `${rect.left + window.pageXOffset}px`
+      try {
+        const domRange = ReactEditor.toDOMRange(
+          editor,
+          Editor.range(editor, target)
+        )
+        const rect = domRange.getBoundingClientRect()
+        el.style.top = `${rect.top + window.pageYOffset + 24}px`
+        el.style.left = `${rect.left + window.pageXOffset}px`
+      } catch (e) {
+        // Ignore Error, DOM might be in an invalid state while composing on android
+      }
     }
   }, [chars.length, editor, index, search, target])
 
-  return (
-    <Slate
-      editor={editor}
-      value={initialValue}
-      onChange={() => {
-        const { selection } = editor
+  const handleDOMBeforeInput = useCallback(() => {
+    queueMicrotask(() => {
+      const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+      if (pendingDiffs?.length !== 1) {
+        setTarget(null)
+        return
+      }
 
-        if (selection && Range.isCollapsed(selection)) {
-          const [start] = Range.edges(selection)
-          const wordBefore = Editor.before(editor, start, { unit: 'word' })
-          const before = wordBefore && Editor.before(editor, wordBefore)
-          const beforeRange = before && Editor.range(editor, before, start)
-          const beforeText = beforeRange && Editor.string(editor, beforeRange)
-          const beforeMatch = beforeText && beforeText.match(/^@(\w+)$/)
-          const after = Editor.after(editor, start)
-          const afterRange = Editor.range(editor, start, after)
-          const afterText = Editor.string(editor, afterRange)
-          const afterMatch = afterText.match(/^(\s|$)/)
+      const [textDiff] = pendingDiffs
+      const searchText =
+        getTextBefore(editor, {
+          path: textDiff.path,
+          offset: textDiff.diff.start,
+        }) + textDiff.diff.text
 
-          if (beforeMatch && afterMatch) {
-            setTarget(beforeRange)
-            setSearch(beforeMatch[1])
-            setIndex(0)
-            return
-          }
+      const match = searchText.match(QUERY_REGEX)
+      if (match) {
+        const target = {
+          path: textDiff.path,
+          offset: match.index,
         }
 
-        setTarget(null)
-      }}
-    >
+        setSearch(match.groups.query)
+        setTarget(target)
+        return
+      }
+
+      setTarget(null)
+    })
+  }, [])
+
+  const handleChange = useCallback(() => {
+    const { selection } = editor
+
+    if (pendingPick.current !== undefined) {
+      applyPick()
+    }
+
+    if (selection && Range.isCollapsed(selection)) {
+      const start = Range.start(selection)
+      const searchText = getTextBefore(editor, start)
+
+      const match = searchText.match(QUERY_REGEX)
+      if (typeof match?.index === 'number') {
+        setTarget(start)
+        setSearch(match.groups.query)
+        setIndex(0)
+        return
+      }
+    }
+
+    setTarget(null)
+  }, [])
+
+  return (
+    <Slate editor={editor} value={initialValue} onChange={handleChange}>
       <Editable
+        onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
@@ -153,12 +205,45 @@ const withMentions = editor => {
   return editor
 }
 
-const insertMention = (editor, character) => {
+const useStableHandler = <TArgs extends unknown[], TReturn>(
+  handler: (...args: TArgs) => TReturn
+) => {
+  const ref = useRef(handler)
+  ref.current = handler
+  return useCallback((...args: TArgs) => ref.current(...args), [])
+}
+
+const getTextBefore = (editor: Editor, point: Point) => {
+  const nodeStart = Editor.start(editor, point.path)
+  const searchRange = Editor.range(editor, nodeStart, point)
+  return Editor.string(editor, searchRange)
+}
+
+const insertMention = (editor: Editor, character: string) => {
+  const { selection } = editor
+  if (!selection || !Range.isCollapsed(selection)) {
+    return
+  }
+
+  const start = Range.start(selection)
+  const searchText = getTextBefore(editor, start)
+  const match = searchText.match(QUERY_REGEX)
+  if (typeof match?.index !== 'number') {
+    return
+  }
+
+  const targetRange = {
+    anchor: { path: start.path, offset: match.index },
+    focus: { path: start.path, offset: match.index + match[0].length },
+  }
+
   const mention: MentionElement = {
     type: 'mention',
     character,
     children: [{ text: '' }],
   }
+
+  Transforms.select(editor, targetRange)
   Transforms.insertNodes(editor, mention)
   Transforms.move(editor)
 }

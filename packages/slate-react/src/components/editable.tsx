@@ -127,7 +127,7 @@ export type EditableProps = {
  * Editable.
  */
 
-export const Editable = (props: EditableProps) => {
+const EditableComponent = (props: EditableProps) => {
   const {
     autoFocus,
     decorate = defaultDecorate,
@@ -142,6 +142,7 @@ export const Editable = (props: EditableProps) => {
     as: Component = 'div',
     ...attributes
   } = props
+
   const editor = useSlate()
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
@@ -1733,3 +1734,5 @@ export const isDOMEventHandled = <E extends Event>(
 
   return event.defaultPrevented
 }
+
+export const Editable = React.memo(EditableComponent)

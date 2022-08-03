@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect } from 'react'
+import React, { useMemo, useRef, useEffect, useCallback } from 'react'
 import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
 import {
   Editor,
@@ -16,23 +16,29 @@ import { Button, Icon, Menu, Portal } from '../components'
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
+  const handleDOMBeforeInput = useCallback((event: InputEvent) => {
+    switch (event.inputType) {
+      case 'formatBold':
+        event.preventDefault()
+        return toggleFormat(editor, 'bold')
+      case 'formatItalic':
+        event.preventDefault()
+        return toggleFormat(editor, 'italic')
+      case 'formatUnderline':
+        event.preventDefault()
+        return toggleFormat(editor, 'underlined')
+    }
+  }, [])
+
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+
   return (
     <Slate editor={editor} value={initialValue}>
       <HoveringToolbar />
       <Editable
-        renderLeaf={props => <Leaf {...props} />}
+        renderLeaf={renderLeaf}
+        onDOMBeforeInput={handleDOMBeforeInput}
         placeholder="Enter some text..."
-        onDOMBeforeInput={(event: InputEvent) => {
-          event.preventDefault()
-          switch (event.inputType) {
-            case 'formatBold':
-              return toggleFormat(editor, 'bold')
-            case 'formatItalic':
-              return toggleFormat(editor, 'italic')
-            case 'formatUnderline':
-              return toggleFormat(editor, 'underlined')
-          }
-        }}
       />
     </Slate>
   )
