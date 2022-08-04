@@ -33,43 +33,9 @@ const MarkdownShortcutsExample = () => {
     []
   )
 
-  const handleDOMBeforeInput = useCallback((e: InputEvent) => {
-    queueMicrotask(() => {
-      const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
-
-      const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
-        if (!diff.text.endsWith(' ')) {
-          return false
-        }
-
-        const { text } = SlateNode.leaf(editor, path)
-        const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
-        if (!(beforeText in SHORTCUTS)) {
-          return
-        }
-
-        const blockEntry = Editor.above(editor, {
-          at: path,
-          match: n => Editor.isBlock(editor, n),
-        })
-        if (!blockEntry) {
-          return false
-        }
-
-        const [, blockPath] = blockEntry
-        return Editor.isStart(editor, Editor.start(editor, path), blockPath)
-      })
-
-      if (scheduleFlush) {
-        ReactEditor.androidScheduleFlush(editor)
-      }
-    })
-  }, [])
-
   return (
     <Slate editor={editor} value={initialValue}>
       <Editable
-        onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         placeholder="Write some markdown..."
         spellCheck
@@ -80,7 +46,34 @@ const MarkdownShortcutsExample = () => {
 }
 
 const withShortcuts = editor => {
-  const { deleteBackward, insertText } = editor
+  const { deleteBackward, insertText, shouldFlushPendingChanges } = editor
+
+  editor.shouldFlushPendingChanges = diffs => {
+    const forceFlush = diffs.some(({ diff, path }) => {
+      if (!diff.text.endsWith(' ')) {
+        return false
+      }
+
+      const { text } = SlateNode.leaf(editor, path)
+      const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+      if (!(beforeText in SHORTCUTS)) {
+        return
+      }
+
+      const blockEntry = Editor.above(editor, {
+        at: path,
+        match: n => Editor.isBlock(editor, n),
+      })
+      if (!blockEntry) {
+        return false
+      }
+
+      const [, blockPath] = blockEntry
+      return Editor.isStart(editor, Editor.start(editor, path), blockPath)
+    })
+
+    return forceFlush || shouldFlushPendingChanges(diffs)
+  }
 
   editor.insertText = text => {
     const { selection } = editor

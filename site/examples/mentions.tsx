@@ -23,31 +23,40 @@ const QUERY_REGEX = /@(?<query>[^\s]+)$/
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [target, setTarget] = useState<Point | undefined>()
+
+  const [target, setTarget] = useState<Point | null>(null)
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
+
   const renderElement = useCallback(props => <Element {...props} />, [])
-  const editor = useMemo(
-    () => withMentions(withReact(withHistory(createEditor()))),
-    []
-  )
+
+  const editor = useMemo(() => {
+    const withMentions = createWithMentions({
+      onSearchChange: search => {
+        if (!search) {
+          setTarget(null)
+          return
+        }
+
+        setTarget(search.target)
+        setSearch(search.text)
+        setIndex(0)
+      },
+    })
+
+    return withMentions(withReact(withHistory(createEditor())))
+  }, [])
 
   const chars = CHARACTERS.filter(c =>
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
 
-  const pendingPick = useRef<string | undefined>()
-  const applyPick = useCallback((character?: string) => {
-    const char = character ?? pendingPick.current
-    pendingPick.current = undefined
-
-    if (!ReactEditor.androidPendingDiffs(editor)?.length) {
-      insertMention(editor, char)
-      return
+  const applyPick = useCallback((character: string) => {
+    if (ReactEditor.pendingChanges(editor).length) {
+      ReactEditor.applyPendingChanges(editor)
     }
 
-    ReactEditor.androidScheduleFlush(editor)
-    pendingPick.current = char
+    insertMention(editor, character)
   }, [])
 
   const onKeyDown = useStableHandler((event: React.KeyboardEvent) => {
@@ -94,64 +103,9 @@ const MentionExample = () => {
     }
   }, [chars.length, editor, index, search, target])
 
-  const handleDOMBeforeInput = useCallback(() => {
-    queueMicrotask(() => {
-      const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
-      if (pendingDiffs?.length !== 1) {
-        setTarget(null)
-        return
-      }
-
-      const [textDiff] = pendingDiffs
-      const searchText =
-        getTextBefore(editor, {
-          path: textDiff.path,
-          offset: textDiff.diff.start,
-        }) + textDiff.diff.text
-
-      const match = searchText.match(QUERY_REGEX)
-      if (match) {
-        const target = {
-          path: textDiff.path,
-          offset: match.index,
-        }
-
-        setSearch(match.groups.query)
-        setTarget(target)
-        return
-      }
-
-      setTarget(null)
-    })
-  }, [])
-
-  const handleChange = useCallback(() => {
-    const { selection } = editor
-
-    if (pendingPick.current !== undefined) {
-      applyPick()
-    }
-
-    if (selection && Range.isCollapsed(selection)) {
-      const start = Range.start(selection)
-      const searchText = getTextBefore(editor, start)
-
-      const match = searchText.match(QUERY_REGEX)
-      if (typeof match?.index === 'number') {
-        setTarget(start)
-        setSearch(match.groups.query)
-        setIndex(0)
-        return
-      }
-    }
-
-    setTarget(null)
-  }, [])
-
   return (
-    <Slate editor={editor} value={initialValue} onChange={handleChange}>
+    <Slate editor={editor} value={initialValue}>
       <Editable
-        onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
@@ -191,8 +145,8 @@ const MentionExample = () => {
   )
 }
 
-const withMentions = editor => {
-  const { isInline, isVoid } = editor
+const createWithMentions = ({ onSearchChange }) => editor => {
+  const { isInline, isVoid, shouldFlushPendingChanges, onChange } = editor
 
   editor.isInline = element => {
     return element.type === 'mention' ? true : isInline(element)
@@ -200,6 +154,45 @@ const withMentions = editor => {
 
   editor.isVoid = element => {
     return element.type === 'mention' ? true : isVoid(element)
+  }
+
+  const updateSearch = (position: Point, suffix: string = '') => {
+    const searchText = getTextBefore(editor, position) + suffix
+
+    const match = searchText.match(QUERY_REGEX)
+    if (typeof match?.index === 'number') {
+      onSearchChange({ target: position, text: match.groups.query })
+      return
+    }
+
+    onSearchChange(null)
+  }
+
+  editor.onChange = () => {
+    const { selection } = editor
+    if (selection && Range.isCollapsed(selection)) {
+      updateSearch(selection.anchor)
+    } else {
+      onSearchChange(null)
+    }
+
+    onChange()
+  }
+
+  editor.shouldFlushPendingChanges = diffs => {
+    if (diffs.length === 1) {
+      const [textDiff] = diffs
+      const at = {
+        path: textDiff.path,
+        offset: textDiff.diff.start,
+      }
+
+      updateSearch(at, textDiff.diff.text)
+    } else {
+      onSearchChange(null)
+    }
+
+    return shouldFlushPendingChanges(diffs)
   }
 
   return editor

@@ -21,7 +21,7 @@ import {
   EDITOR_TO_WINDOW,
   EDITOR_TO_KEY_TO_ELEMENT,
   IS_COMPOSING,
-  EDITOR_TO_SCHEDULE_FLUSH,
+  EDITOR_TO_FLUSH_CHANGES,
   EDITOR_TO_PENDING_DIFFS,
 } from '../utils/weak-maps'
 import {
@@ -37,6 +37,7 @@ import {
   hasShadowRoot,
 } from '../utils/dom'
 import { IS_CHROME, IS_FIREFOX, IS_ANDROID } from '../utils/environment'
+import { TextDiff } from '../utils/diff-text'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
@@ -51,6 +52,8 @@ export interface ReactEditor extends BaseEditor {
     originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
+
+  shouldFlushPendingChanges: (changes: TextDiff[]) => boolean
 }
 
 // eslint-disable-next-line no-redeclare
@@ -773,16 +776,17 @@ export const ReactEditor = {
   },
 
   /**
-   * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
+   * Experimental and android specific for now:
+   * Flush all pending changes and cancel composition at the next possible time.
    */
-  androidScheduleFlush(editor: Editor) {
-    EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
+  applyPendingChanges(editor: Editor) {
+    EDITOR_TO_FLUSH_CHANGES.get(editor)?.()
   },
 
   /**
-   * Experimental and android specific: Get pending diffs
+   * Experimental and android specific: Get pending changes
    */
-  androidPendingDiffs(editor: Editor) {
-    return EDITOR_TO_PENDING_DIFFS.get(editor)
+  pendingChanges(editor: Editor) {
+    return EDITOR_TO_PENDING_DIFFS.get(editor) ?? []
   },
 }

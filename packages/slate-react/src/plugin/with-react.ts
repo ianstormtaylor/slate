@@ -22,7 +22,7 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
-  EDITOR_TO_SCHEDULE_FLUSH,
+  EDITOR_TO_FLUSH_CHANGES,
   EDITOR_TO_PENDING_INSERTION_MARKS,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
@@ -43,8 +43,10 @@ export const withReact = <T extends Editor>(editor: T) => {
   // avoid collisions between editors in the DOM that share the same value.
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
 
+  e.shouldFlushPendingChanges = () => false
+
   e.addMark = (key, value) => {
-    EDITOR_TO_SCHEDULE_FLUSH.get(e)?.()
+    EDITOR_TO_FLUSH_CHANGES.get(e)?.()
 
     if (
       !EDITOR_TO_PENDING_INSERTION_MARKS.get(e) &&

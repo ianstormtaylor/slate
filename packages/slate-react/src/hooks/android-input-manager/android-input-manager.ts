@@ -44,7 +44,6 @@ export type CreateAndroidInputManagerOptions = {
 
 export type AndroidInputManager = {
   flush: () => void
-  scheduleFlush: () => void
 
   hasPendingDiffs: () => boolean
   hasPendingAction: () => boolean
@@ -599,15 +598,13 @@ export function createAndroidInputManager({
   }
 
   const handleInput = () => {
-    if (hasPendingAction() || !hasPendingDiffs()) {
+    const forceFlush = editor.shouldFlushPendingChanges(
+      ReactEditor.pendingChanges(editor)
+    )
+
+    if (forceFlush || hasPendingAction() || !hasPendingDiffs()) {
       debug('flush input')
       flush()
-    }
-  }
-
-  const scheduleFlush = () => {
-    if (!hasPendingAction()) {
-      actionTimeoutId = setTimeout(flush)
     }
   }
 
@@ -627,7 +624,6 @@ export function createAndroidInputManager({
 
   return {
     flush,
-    scheduleFlush,
 
     hasPendingDiffs,
     hasPendingAction,

@@ -55,7 +55,7 @@ export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
  * Weak maps for saving pending state on composition stage.
  */
 
-export const EDITOR_TO_SCHEDULE_FLUSH: WeakMap<
+export const EDITOR_TO_FLUSH_CHANGES: WeakMap<
   Editor,
   () => void
 > = new WeakMap()
