@@ -1630,7 +1630,7 @@ export const Editor: EditorInterface = {
 
     for (const [node, path] of Editor.nodes(editor, {
       at: before,
-      match: Text.isText,
+      match: n => !Editor.isBlock(editor, n) && !Editor.isEditor(n),
       reverse: true,
       voids,
     })) {
@@ -1639,8 +1639,8 @@ export const Editor: EditorInterface = {
         continue
       }
 
-      if (node.text !== '' || Path.isBefore(path, blockPath)) {
-        end = { path, offset: node.text.length }
+      if (!Text.isText(node) || Path.isBefore(path, blockPath)) {
+        end = Editor.end(editor, path)
         break
       }
     }
