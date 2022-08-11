@@ -147,6 +147,7 @@ export interface OperationInterface {
   inverse: (op: Operation) => Operation
 }
 
+// eslint-disable-next-line no-redeclare
 export const Operation: OperationInterface = {
   /**
    * Check of a value is a `NodeOperation` object.

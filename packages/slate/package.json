@@ -1,7 +1,7 @@
 {
   "name": "slate-latest",
   "description": "A completely customizable framework for building rich text editors.",
-  "version": "0.78.1",
+  "version": "0.82.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -21,8 +21,8 @@
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
     "lodash": "^4.17.21",
-    "slate-hyperscript-latest": "^0.77.0",
-    "source-map-loader": "^0.2.4"
+    "slate-hyperscript-latest": "^0.81.3",
+    "source-map-loader": "^4.0.0"
   },
   "keywords": [
     "canvas",

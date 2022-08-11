@@ -19,7 +19,6 @@ import {
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
-import { useContentKey } from '../hooks/use-content-key'
 import { IS_ANDROID } from '../utils/environment'
 
 /**
@@ -133,14 +132,7 @@ const Element = (props: {
     }
   })
 
-  const content = renderElement({ attributes, children, element })
-
-  if (IS_ANDROID) {
-    const contentKey = useContentKey(element)
-    return <Fragment key={contentKey}>{content}</Fragment>
-  }
-
-  return content
+  return renderElement({ attributes, children, element })
 }
 
 const MemoizedElement = React.memo(Element, (prev, next) => {

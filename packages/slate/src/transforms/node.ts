@@ -1,15 +1,16 @@
 import {
+  Ancestor,
   Editor,
   Element,
   Location,
   Node,
+  NodeEntry,
   Path,
   Point,
   Range,
+  Scrubber,
   Text,
   Transforms,
-  NodeEntry,
-  Ancestor,
 } from '..'
 import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
 import { PointRef } from '../interfaces/point-ref'
@@ -126,6 +127,7 @@ export interface NodeTransforms {
   ) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const NodeTransforms: NodeTransforms = {
   /**
    * Insert nodes at a specific location in the Editor.
@@ -406,9 +408,9 @@ export const NodeTransforms: NodeTransforms = {
         properties = rest as Partial<Element>
       } else {
         throw new Error(
-          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${JSON.stringify(
+          `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
             node
-          )} ${JSON.stringify(prevNode)}`
+          )} ${Scrubber.stringify(prevNode)}`
         )
       }
 

@@ -38,7 +38,7 @@ declare module 'slate' {
 Annotate the editor's initial value w/ `Descendant[]`.
 
 ```tsx
-import React, { useMemo, useState } from 'react'
+import React, { useState, useState } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
@@ -50,7 +50,7 @@ const initialValue: Descendant[] = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>

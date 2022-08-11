@@ -1,5 +1,49 @@
 # slate
 
+## 0.82.0
+
+### Patch Changes
+
+- [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
+## 0.81.3
+
+### Patch Changes
+
+- [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
+* [#5018](https://github.com/ianstormtaylor/slate/pull/5018) [`f13cd6b9`](https://github.com/ianstormtaylor/slate/commit/f13cd6b9180e18201b2a001b6f5d109218071319) Thanks [@ulion](https://github.com/ulion)! - Fix for insertFragment text/inline + block mixed fragments.
+
+## 0.81.2
+
+### Patch Changes
+
+- [#5029](https://github.com/ianstormtaylor/slate/pull/5029) [`736662f8`](https://github.com/ianstormtaylor/slate/commit/736662f80838902f8560554fae704c13c5d8e227) Thanks [@hanagejet](https://github.com/hanagejet)! - fix: `Path.previous()` dose not working when path is `null`
+
+## 0.81.1
+
+### Patch Changes
+
+- [#5015](https://github.com/ianstormtaylor/slate/pull/5015) [`9ae37287`](https://github.com/ianstormtaylor/slate/commit/9ae372875df1ee3ef6041f5d6bd2f57ee8291ea0) Thanks [@tithanayut](https://github.com/tithanayut)! - Fix deleteBackward behavior for Thai script where deleting N character(s) backward should delete
+  N code point(s) instead of an entire grapheme cluster
+
+## 0.81.0
+
+### Minor Changes
+
+- [#4999](https://github.com/ianstormtaylor/slate/pull/4999) [`fe13a8f9`](https://github.com/ianstormtaylor/slate/commit/fe13a8f9e750569342ee004951e34233ab6614bf) Thanks [@alexandercampbell](https://github.com/alexandercampbell)! - Add new Slate.Scrubber interface to allow scrubbing end user data from exception
+  text. The default behavior remains unchanged.
+
+## 0.80.0
+
+### Minor Changes
+
+- [#4892](https://github.com/ianstormtaylor/slate/pull/4892) [`d2fc25c3`](https://github.com/ianstormtaylor/slate/commit/d2fc25c3c31453597f59cd2ac6ba087a1beb1fe3) Thanks [@suilang](https://github.com/suilang)! - update insertText logic when selection is not collapsed
+
+### Patch Changes
+
+- [#5008](https://github.com/ianstormtaylor/slate/pull/5008) [`e9ea2815`](https://github.com/ianstormtaylor/slate/commit/e9ea2815950fc6b78fb0a2ba0e5d95c8553ac023) Thanks [@steve-codaio](https://github.com/steve-codaio)! - Revert to previous position behavior around inline voids
+
 ## 0.78.0
 
 ### Minor Changes

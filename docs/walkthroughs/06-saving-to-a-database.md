@@ -15,7 +15,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
@@ -40,7 +40,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate
@@ -69,7 +69,7 @@ But... if you refresh the page, everything is still reset. That's because we nee
 
 ```jsx
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   // Update the initial content to be pulled from Local Storage if it exists.
   const initialValue = useMemo(
     () =>
@@ -135,7 +135,7 @@ const deserialize = string => {
 }
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   // Use our deserializing function to read the data from Local Storage.
   const initialValue = useMemo(
     deserialize(localStorage.getItem('content')) || '',
@@ -168,7 +168,7 @@ You can emulate this strategy for any format you like. You can serialize to HTML
 
 > 🤖 Note that even though you _can_ serialize your content however you like, there are tradeoffs. The serialization process has a cost itself, and certain formats may be harder to work with than others. In general we recommend writing your own format only if your use case has a specific need for it. Otherwise, you're often better leaving the data in the format Slate uses.
 
-If you want to update the editor's content in response to events from outside of slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `editor.onChange()` in the example above). Alternatively, you can use slate's internal operations to transform the value, for example:
+If you want to update the editor's content in response to events from outside of Slate, you need to change the children property directly. The simplest way is to replace the value of editor.children `editor.children = newValue` and trigger a re-rendering (e.g. by calling `editor.onChange()` in the example above). Alternatively, you can use Slate's internal operations to transform the value, for example:
 
 ```javascript
   /**

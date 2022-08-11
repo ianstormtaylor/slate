@@ -1,4 +1,4 @@
-import { Editor, Location, Point, Range, Transforms } from '..'
+import { Editor, Location, Point, Range, Scrubber, Transforms } from '..'
 import { SelectionEdge, MoveUnit } from '../interfaces/types'
 
 export interface SelectionCollapseOptions {
@@ -29,6 +29,7 @@ export interface SelectionTransforms {
   setSelection: (editor: Editor, props: Partial<Range>) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const SelectionTransforms: SelectionTransforms = {
   /**
    * Collapse the selection.
@@ -132,7 +133,7 @@ export const SelectionTransforms: SelectionTransforms = {
 
     if (!Range.isRange(target)) {
       throw new Error(
-        `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${JSON.stringify(
+        `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${Scrubber.stringify(
           target
         )}`
       )

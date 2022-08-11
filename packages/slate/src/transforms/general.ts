@@ -1,17 +1,18 @@
 import { createDraft, finishDraft, isDraft } from 'immer'
 import {
-  Node,
-  Editor,
-  Selection,
-  Range,
-  Point,
-  Text,
-  Element,
-  Operation,
-  Descendant,
-  NodeEntry,
-  Path,
   Ancestor,
+  Descendant,
+  Editor,
+  Element,
+  Node,
+  NodeEntry,
+  Operation,
+  Path,
+  Point,
+  Range,
+  Scrubber,
+  Selection,
+  Text,
 } from '..'
 
 export interface GeneralTransforms {
@@ -73,7 +74,9 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
         prev.children.push(...node.children)
       } else {
         throw new Error(
-          `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${node} ${prev}`
+          `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
+            node
+          )} ${Scrubber.stringify(prev)}`
         )
       }
 
@@ -236,7 +239,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
         if (selection == null) {
           if (!Range.isRange(newProperties)) {
             throw new Error(
-              `Cannot apply an incomplete "set_selection" operation properties ${JSON.stringify(
+              `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
                 newProperties
               )} when there is no current selection.`
             )
@@ -310,6 +313,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
   return selection
 }
 
+// eslint-disable-next-line no-redeclare
 export const GeneralTransforms: GeneralTransforms = {
   /**
    * Transform the editor by an operation.

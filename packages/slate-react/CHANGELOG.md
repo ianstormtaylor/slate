@@ -1,5 +1,44 @@
 # slate-react
 
+## 0.82.0
+
+### Minor Changes
+
+- [#5041](https://github.com/ianstormtaylor/slate/pull/5041) [`9bc0b613`](https://github.com/ianstormtaylor/slate/commit/9bc0b6132aa288a37ae9a85d0e59a9d5a75ebdd7) Thanks [@bryanph](https://github.com/bryanph)! - - Introduces a `useSlateSelection` hook that triggers whenever the selection changes.
+  - This also changes the implementation of SlateContext to use an incrementing value instead of an array replace to trigger updates
+  - Introduces a `useSlateWithV` hook that includes the version counter which can be used to prevent re-renders
+
+* [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
+## 0.81.3
+
+### Patch Changes
+
+- [#5054](https://github.com/ianstormtaylor/slate/pull/5054) [`1cc0797f`](https://github.com/ianstormtaylor/slate/commit/1cc0797f53f22e650198c83192ba5fc35c525a15) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix toSlatePoint in void nodes with nested editors if children are rendered as the last child
+
+* [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
+## 0.81.2
+
+### Patch Changes
+
+- [#5045](https://github.com/ianstormtaylor/slate/pull/5045) [`0b2e6c79`](https://github.com/ianstormtaylor/slate/commit/0b2e6c79c08fc4eba32be7a424da758ba74573c3) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Don't native insert inside blocks with whitespace="pre" containing tab chars to work around https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+
+* [#5046](https://github.com/ianstormtaylor/slate/pull/5046) [`f96b6597`](https://github.com/ianstormtaylor/slate/commit/f96b659755673375ef1b6a1cc925c73ce4934a03) Thanks [@BitPhinix](https://github.com/BitPhinix)! - fix macos accent menu when using arrow keys
+
+## 0.81.0
+
+### Minor Changes
+
+- [#4999](https://github.com/ianstormtaylor/slate/pull/4999) [`fe13a8f9`](https://github.com/ianstormtaylor/slate/commit/fe13a8f9e750569342ee004951e34233ab6614bf) Thanks [@alexandercampbell](https://github.com/alexandercampbell)! - Add new Slate.Scrubber interface to allow scrubbing end user data from exception
+  text. The default behavior remains unchanged.
+
+## 0.80.0
+
+### Patch Changes
+
+- [#5007](https://github.com/ianstormtaylor/slate/pull/5007) [`92c5730a`](https://github.com/ianstormtaylor/slate/commit/92c5730a96223a683b3c95651eb4c90a5caca21a) Thanks [@jasonphillips](https://github.com/jasonphillips)! - Revert #4876 & #4910 to restore original decorations behavior
+
 ## 0.79.0
 
 ### Minor Changes

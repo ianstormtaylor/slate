@@ -96,9 +96,17 @@ Get the current `selected` state of an element.
 
 Get the current editor object from the React context. Re-renders the context whenever changes occur in the editor.
 
+### `useSlateWithV`
+
+The same as `useSlate()` but includes a version counter which you can use to prevent re-renders.
+
 ### `useSlateStatic`
 
 Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
+
+### `useSlateSelection`
+
+Get the current editor selection from the React context. Only re-renders when the selection changes.
 
 ## ReactEditor
 
@@ -195,7 +203,7 @@ Adds React and DOM specific behaviors to the editor.
 When used with `withHistory`, `withReact` should be applied outside. For example:
 
 ```javascript
-const editor = useMemo(() => withReact(withHistory(createEditor())), [])
+const [editor] = useState(() => withReact(withHistory(createEditor())))
 ```
 
 ## Utils

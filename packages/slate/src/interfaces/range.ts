@@ -44,6 +44,7 @@ export interface RangeInterface {
   ) => Range | null
 }
 
+// eslint-disable-next-line no-redeclare
 export const Range: RangeInterface = {
   /**
    * Get the start and end points of a range, in the order in which they appear

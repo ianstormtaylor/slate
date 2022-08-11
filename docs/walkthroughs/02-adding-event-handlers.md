@@ -17,7 +17,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
@@ -38,7 +38,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>
@@ -68,7 +68,7 @@ const initialValue = [
 ]
 
 const App = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
 
   return (
     <Slate editor={editor} value={initialValue}>

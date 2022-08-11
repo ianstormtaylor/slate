@@ -46,6 +46,7 @@ export interface TextTransforms {
   ) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const TextTransforms: TextTransforms = {
   /**
    * Delete content in the editor.
@@ -65,7 +66,9 @@ export const TextTransforms: TextTransforms = {
         return
       }
 
+      let isCollapsed = false
       if (Range.isRange(at) && Range.isCollapsed(at)) {
+        isCollapsed = true
         at = at.anchor
       }
 
@@ -170,14 +173,18 @@ export const TextTransforms: TextTransforms = {
       const startRef = Editor.pointRef(editor, start)
       const endRef = Editor.pointRef(editor, end)
 
+      let removedText = ''
+
       if (!isSingleText && !startVoid) {
         const point = startRef.current!
         const [node] = Editor.leaf(editor, point)
         const { path } = point
         const { offset } = start
         const text = node.text.slice(offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
       for (const pathRef of pathRefs) {
@@ -191,8 +198,10 @@ export const TextTransforms: TextTransforms = {
         const { path } = point
         const offset = isSingleText ? start.offset : 0
         const text = node.text.slice(offset, end.offset)
-        if (text.length > 0)
+        if (text.length > 0) {
           editor.apply({ type: 'remove_text', path, offset, text })
+          removedText = text
+        }
       }
 
       if (
@@ -206,6 +215,22 @@ export const TextTransforms: TextTransforms = {
           hanging: true,
           voids,
         })
+      }
+
+      // For Thai script, deleting N character(s) backward should delete
+      // N code point(s) instead of an entire grapheme cluster.
+      // Therefore, the remaining code points should be inserted back.
+      if (
+        isCollapsed &&
+        reverse &&
+        unit === 'character' &&
+        removedText.length > 1 &&
+        removedText.match(/[\u0E00-\u0E7F]+/)
+      ) {
+        Transforms.insertText(
+          editor,
+          removedText.slice(0, removedText.length - distance)
+        )
       }
 
       const startUnref = startRef.unref()
@@ -372,15 +397,13 @@ export const TextTransforms: TextTransforms = {
 
       const middleRef = Editor.pathRef(
         editor,
-        isBlockEnd ? Path.next(blockPath) : blockPath
+        isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
       )
 
       const endRef = Editor.pathRef(
         editor,
         isInlineEnd ? Path.next(inlinePath) : inlinePath
       )
-
-      const blockPathRef = Editor.pathRef(editor, blockPath)
 
       Transforms.splitNodes(editor, {
         at,
@@ -389,6 +412,10 @@ export const TextTransforms: TextTransforms = {
             ? Editor.isBlock(editor, n)
             : Text.isText(n) || Editor.isInline(editor, n),
         mode: hasBlocks ? 'lowest' : 'highest',
+        always:
+          hasBlocks &&
+          (!isBlockStart || starts.length > 0) &&
+          (!isBlockEnd || ends.length > 0),
         voids,
       })
 
@@ -406,8 +433,8 @@ export const TextTransforms: TextTransforms = {
         voids,
       })
 
-      if (isBlockEmpty && middles.length) {
-        Transforms.delete(editor, { at: blockPathRef.unref()!, voids })
+      if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
+        Transforms.delete(editor, { at: blockPath, voids })
       }
 
       Transforms.insertNodes(editor, middles, {
@@ -427,16 +454,18 @@ export const TextTransforms: TextTransforms = {
       if (!options.at) {
         let path
 
-        if (ends.length > 0) {
-          path = Path.previous(endRef.current!)
-        } else if (middles.length > 0) {
-          path = Path.previous(middleRef.current!)
-        } else {
-          path = Path.previous(startRef.current!)
+        if (ends.length > 0 && endRef.current) {
+          path = Path.previous(endRef.current)
+        } else if (middles.length > 0 && middleRef.current) {
+          path = Path.previous(middleRef.current)
+        } else if (startRef.current) {
+          path = Path.previous(startRef.current)
         }
 
-        const end = Editor.end(editor, path)
-        Transforms.select(editor, end)
+        if (path) {
+          const end = Editor.end(editor, path)
+          Transforms.select(editor, end)
+        }
       }
 
       startRef.unref()

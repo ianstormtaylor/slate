@@ -12,6 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
+import { ReactEditor } from '../plugin/react-editor'
 
 export {
   DOMNode,
@@ -263,4 +264,45 @@ export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
     }
   }
   return dataTransfer
+}
+
+/**
+ * Check whether a mutation originates from a editable element inside the editor.
+ */
+
+export const isTrackedMutation = (
+  editor: ReactEditor,
+  mutation: MutationRecord,
+  batch: MutationRecord[]
+): boolean => {
+  const { target } = mutation
+  if (isDOMElement(target) && target.matches('[contentEditable="false"]')) {
+    return false
+  }
+
+  const { document } = ReactEditor.getWindow(editor)
+  if (document.contains(target)) {
+    return ReactEditor.hasDOMNode(editor, target, { editable: true })
+  }
+
+  const parentMutation = batch.find(({ addedNodes, removedNodes }) => {
+    for (const node of addedNodes) {
+      if (node === target || node.contains(target)) {
+        return true
+      }
+    }
+
+    for (const node of removedNodes) {
+      if (node === target || node.contains(target)) {
+        return true
+      }
+    }
+  })
+
+  if (!parentMutation || parentMutation === mutation) {
+    return false
+  }
+
+  // Target add/remove is tracked. Track the mutation if we track the parent mutation.
+  return isTrackedMutation(editor, parentMutation, batch)
 }

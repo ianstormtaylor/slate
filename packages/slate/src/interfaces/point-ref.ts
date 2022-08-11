@@ -17,6 +17,7 @@ export interface PointRefInterface {
   transform: (ref: PointRef, op: Operation) => void
 }
 
+// eslint-disable-next-line no-redeclare
 export const PointRef: PointRefInterface = {
   /**
    * Transform the point ref's current value by an operation.

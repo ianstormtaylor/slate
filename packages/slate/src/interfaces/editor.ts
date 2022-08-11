@@ -326,6 +326,7 @@ export interface EditorInterface {
 
 const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
 
+// eslint-disable-next-line no-redeclare
 export const Editor: EditorInterface = {
   /**
    * Get the ancestor above a location in the document.
@@ -600,11 +601,15 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    if (!isPlainObject(value)) return false
     const cachedIsEditor = IS_EDITOR_CACHE.get(value)
     if (cachedIsEditor !== undefined) {
       return cachedIsEditor
     }
+
+    if (!isPlainObject(value)) {
+      return false
+    }
+
     const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
@@ -1306,9 +1311,6 @@ export const Editor: EditorInterface = {
         // then we will iterate over their content.
         if (!voids && editor.isVoid(node)) {
           yield Editor.start(editor, path)
-          // It's possible the start of the range we're iterating over is in a void, in which case
-          // we want to make sure we don't incorrectly yield the start of a subsequent text node for unit !== 'offset'
-          isNewBlock = false
           continue
         }
 

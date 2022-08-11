@@ -34,6 +34,7 @@ export interface PointInterface {
   ) => Point | null
 }
 
+// eslint-disable-next-line no-redeclare
 export const Point: PointInterface = {
   /**
    * Compare a point to another, returning an integer indicating whether the

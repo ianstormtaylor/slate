@@ -1,9 +1,9 @@
-import React, { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import { Editor, Node, Element, Descendant } from 'slate-latest'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { Editor, Node, Descendant, Scrubber } from 'slate-latest'
 import { ReactEditor } from '../plugin/react-editor'
 import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
-import { SlateContext } from '../hooks/use-slate'
+import { SlateContext, SlateContextValue } from '../hooks/use-slate'
 import {
   getSelectorContext,
   SlateSelectorContext,
@@ -26,21 +26,22 @@ export const Slate = (props: {
   const { editor, children, onChange, value, ...rest } = props
   const unmountRef = useRef(false)
 
-  const [context, setContext] = React.useState<[ReactEditor]>(() => {
+  const [context, setContext] = React.useState<SlateContextValue>(() => {
     if (!Node.isNodeList(value)) {
       throw new Error(
         `[Slate] value is invalid! Expected a list of elements` +
-          `but got: ${JSON.stringify(value)}`
+          `but got: ${Scrubber.stringify(value)}`
       )
     }
     if (!Editor.isEditor(editor)) {
       throw new Error(
-        `[Slate] editor is invalid! you passed:` + `${JSON.stringify(editor)}`
+        `[Slate] editor is invalid! you passed:` +
+          `${Scrubber.stringify(editor)}`
       )
     }
     editor.children = value
     Object.assign(editor, rest)
-    return [editor]
+    return { v: 0, editor }
   })
 
   const {
@@ -53,7 +54,10 @@ export const Slate = (props: {
       onChange(editor.children)
     }
 
-    setContext([editor])
+    setContext(prevContext => ({
+      v: prevContext.v + 1,
+      editor,
+    }))
     handleSelectorChange(editor)
   }, [onChange])
 

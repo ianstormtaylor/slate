@@ -37,6 +37,7 @@ const isElement = (value: any): value is Element => {
   )
 }
 
+// eslint-disable-next-line no-redeclare
 export const Element: ElementInterface = {
   /**
    * Check if a value implements the 'Ancestor' interface.
