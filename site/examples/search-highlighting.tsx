@@ -65,7 +65,7 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable decorate={decorate} renderLeaf={Leaf} />
     </Slate>
   )
 }
