@@ -141,7 +141,7 @@ const InsertImageButton = () => {
           alert('URL is not an image')
           return
         }
-        insertImage(editor, url)
+        url && insertImage(editor, url)
       }}
     >
       <Icon>image</Icon>
