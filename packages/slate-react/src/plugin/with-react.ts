@@ -124,8 +124,9 @@ export const withReact = <T extends Editor>(editor: T) => {
         transformPendingRange(editor, pendingSelection, op)
       )
     }
+
     const pendingAction = EDITOR_TO_PENDING_ACTION.get(editor)
-    if (pendingAction) {
+    if (pendingAction?.at) {
       const at = Point.isPoint(pendingAction?.at)
         ? transformPendingPoint(editor, pendingAction.at, op)
         : transformPendingRange(editor, pendingAction.at, op)

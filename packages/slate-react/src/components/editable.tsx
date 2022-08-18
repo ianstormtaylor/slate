@@ -222,7 +222,7 @@ export const Editable = (props: EditableProps) => {
           if (range) {
             if (
               !ReactEditor.isComposing(editor) &&
-              !androidInputManager?.hasPendingDiffs() &&
+              !androidInputManager?.hasPendingChanges() &&
               !androidInputManager?.isFlushing()
             ) {
               Transforms.select(editor, range)
@@ -784,11 +784,17 @@ export const Editable = (props: EditableProps) => {
   // before we receive the composition end event.
   useEffect(() => {
     setTimeout(() => {
-      if (marks) {
-        EDITOR_TO_PENDING_INSERTION_MARKS.set(editor, marks)
-      } else {
-        EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
+      const { selection } = editor
+      if (selection) {
+        const { anchor } = selection
+        const { text, ...rest } = Node.leaf(editor, anchor.path)
+        if (!Text.equals(rest as Text, marks as Text, { loose: true })) {
+          EDITOR_TO_PENDING_INSERTION_MARKS.set(editor, marks)
+          return
+        }
       }
+
+      EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
     })
   })
 
@@ -1616,7 +1622,14 @@ export type RenderPlaceholderProps = {
 export const DefaultPlaceholder = ({
   attributes,
   children,
-}: RenderPlaceholderProps) => <span {...attributes}>{children}</span>
+}: RenderPlaceholderProps) => (
+  // COMPAT: Artificially add a line-break to the end on the placeholder element
+  // to prevent Android IMEs to pick up its content in autocorrect and to auto-capitalize the first letter
+  <span {...attributes}>
+    {children}
+    {IS_ANDROID && <br />}
+  </span>
+)
 
 /**
  * A default memoized decorate function.
