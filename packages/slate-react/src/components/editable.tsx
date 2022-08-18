@@ -1624,7 +1624,7 @@ export const DefaultPlaceholder = ({
   children,
 }: RenderPlaceholderProps) => (
   // COMPAT: Artificially add a line-break to the end on the placeholder element
-  // to prevent android IMEs to pick up it's content in autocorrect and to auto-capitalize the first letter
+  // to prevent Android IMEs to pick up its content in autocorrect and to auto-capitalize the first letter
   <span {...attributes}>
     {children}
     {IS_ANDROID && <br />}

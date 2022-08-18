@@ -563,10 +563,11 @@ export function createAndroidInputManager({
           }
 
           // COMPAT: Swiftkey has a weird bug where the target range of the 2nd word
-          // inserted after a mark placeholder is inserted with a anchor offset off by 1.
+          // inserted after a mark placeholder is inserted with an anchor offset off by 1.
           // So writing 'some text' will result in 'some ttext'. Luckily all 'normal' insert
           // text events are fired with the correct target ranges, only the final 'insertComposition'
-          // isn't, so we can just ignore it if we re 100% certain it's the incorrect insert.
+          // isn't, so we can adjust the target range start offset if we are confident this is the
+          // swiftkey insert causing the issue.
           if (text && insertPositionHint && type === 'insertCompositionText') {
             const hintPosition =
               insertPositionHint.start + insertPositionHint.text.search(/\S|$/)
