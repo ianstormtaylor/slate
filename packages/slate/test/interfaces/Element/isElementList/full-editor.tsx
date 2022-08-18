@@ -21,6 +21,7 @@ export const input = [
     normalizeNode() {},
     onChange() {},
     removeMark() {},
+    getDirtyPaths() {},
   },
 ]
 export const test = value => {

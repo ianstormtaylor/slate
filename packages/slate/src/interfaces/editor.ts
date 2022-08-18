@@ -77,6 +77,7 @@ export interface BaseEditor {
   insertNode: (node: Node) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
+  getDirtyPaths: (op: Operation) => Path[]
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -626,6 +627,7 @@ export const Editor: EditorInterface = {
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
+      typeof value.getDirtyPaths === 'function' &&
       (value.marks === null || isPlainObject(value.marks)) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
