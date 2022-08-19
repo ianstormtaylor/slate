@@ -64,7 +64,7 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
       EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
     }
 
-    EDITOR_TO_USER_MARKS.delete(editor)
+    EDITOR_TO_USER_MARKS.delete(e)
 
     addMark(key, value)
   }
@@ -79,7 +79,7 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
       EDITOR_TO_PENDING_INSERTION_MARKS.set(e, null)
     }
 
-    EDITOR_TO_USER_MARKS.delete(editor)
+    EDITOR_TO_USER_MARKS.delete(e)
 
     removeMark(key)
   }
@@ -89,24 +89,24 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
       return deleteBackward(unit)
     }
 
-    if (editor.selection && Range.isCollapsed(editor.selection)) {
-      const parentBlockEntry = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
-        at: editor.selection,
+    if (e.selection && Range.isCollapsed(e.selection)) {
+      const parentBlockEntry = Editor.above(e, {
+        match: n => Editor.isBlock(e, n),
+        at: e.selection,
       })
 
       if (parentBlockEntry) {
         const [, parentBlockPath] = parentBlockEntry
         const parentElementRange = Editor.range(
-          editor,
+          e,
           parentBlockPath,
-          editor.selection.anchor
+          e.selection.anchor
         )
 
         const currentLineRange = findCurrentLineRange(e, parentElementRange)
 
         if (!Range.isCollapsed(currentLineRange)) {
-          Transforms.delete(editor, { at: currentLineRange })
+          Transforms.delete(e, { at: currentLineRange })
         }
       }
     }
@@ -117,30 +117,30 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
   e.apply = (op: Operation) => {
     const matches: [Path, Key][] = []
 
-    const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+    const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(e)
     if (pendingDiffs?.length) {
       const transformed = pendingDiffs
         .map(textDiff => transformTextDiff(textDiff, op))
         .filter(Boolean) as TextDiff[]
 
-      EDITOR_TO_PENDING_DIFFS.set(editor, transformed)
+      EDITOR_TO_PENDING_DIFFS.set(e, transformed)
     }
 
-    const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(editor)
+    const pendingSelection = EDITOR_TO_PENDING_SELECTION.get(e)
     if (pendingSelection) {
       EDITOR_TO_PENDING_SELECTION.set(
-        editor,
-        transformPendingRange(editor, pendingSelection, op)
+        e,
+        transformPendingRange(e, pendingSelection, op)
       )
     }
 
-    const pendingAction = EDITOR_TO_PENDING_ACTION.get(editor)
+    const pendingAction = EDITOR_TO_PENDING_ACTION.get(e)
     if (pendingAction?.at) {
       const at = Point.isPoint(pendingAction?.at)
-        ? transformPendingPoint(editor, pendingAction.at, op)
-        : transformPendingRange(editor, pendingAction.at, op)
+        ? transformPendingPoint(e, pendingAction.at, op)
+        : transformPendingRange(e, pendingAction.at, op)
 
-      EDITOR_TO_PENDING_ACTION.set(editor, at ? { ...pendingAction, at } : null)
+      EDITOR_TO_PENDING_ACTION.set(e, at ? { ...pendingAction, at } : null)
     }
 
     switch (op.type) {
@@ -154,8 +154,8 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
 
       case 'set_selection': {
         // Selection was manually set, don't restore the user selection after the change.
-        EDITOR_TO_USER_SELECTION.get(editor)?.unref()
-        EDITOR_TO_USER_SELECTION.delete(editor)
+        EDITOR_TO_USER_SELECTION.get(e)?.unref()
+        EDITOR_TO_USER_SELECTION.delete(e)
         break
       }
 
