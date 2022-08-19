@@ -62,6 +62,7 @@ export interface BaseEditor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
+  normalizeSelection: (fn: (range: Range) => void) => void
   onChange: () => void
 
   // Overrideable core actions.
@@ -260,7 +261,7 @@ export interface EditorInterface {
     editor: Editor,
     options?: EditorLevelsOptions<T>
   ) => Generator<NodeEntry<T>, void, undefined>
-  marks: (editor: Editor) => Omit<Text, 'text'> | null
+  marks: (editor: Editor) => Omit<Text, 'text'>
   next: <T extends Descendant>(
     editor: Editor,
     options?: EditorNextOptions<T>
@@ -776,51 +777,53 @@ export const Editor: EditorInterface = {
    * Get the marks that would be added to text at the current selection.
    */
 
-  marks(editor: Editor): Omit<Text, 'text'> | null {
-    const { marks, selection } = editor
+  marks(editor: Editor): Omit<Text, 'text'> {
+    let result: Omit<Text, 'text'> = {}
+    editor.normalizeSelection(selection => {
+      const { marks } = editor
 
-    if (!selection) {
-      return null
-    }
-
-    if (marks) {
-      return marks
-    }
-
-    if (Range.isExpanded(selection)) {
-      const [match] = Editor.nodes(editor, { match: Text.isText })
-
-      if (match) {
-        const [node] = match as NodeEntry<Text>
-        const { text, ...rest } = node
-        return rest
-      } else {
-        return {}
+      if (marks) {
+        result = Object.assign(result, marks)
+        return
       }
-    }
 
-    const { anchor } = selection
-    const { path } = anchor
-    let [node] = Editor.leaf(editor, path)
+      if (Range.isExpanded(selection)) {
+        const [match] = Editor.nodes(editor, { match: Text.isText })
 
-    if (anchor.offset === 0) {
-      const prev = Editor.previous(editor, { at: path, match: Text.isText })
-      const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
-      })
-
-      if (prev && block) {
-        const [prevNode, prevPath] = prev
-        const [, blockPath] = block
-
-        if (Path.isAncestor(blockPath, prevPath)) {
-          node = prevNode as Text
+        if (match) {
+          const [node] = match as NodeEntry<Text>
+          const { text, ...rest } = node
+          result = Object.assign(result, rest)
+          return
+        } else {
+          return
         }
       }
-    }
 
-    const { text, ...rest } = node
-    return rest
+      const { anchor } = selection
+      const { path } = anchor
+      let [node] = Editor.leaf(editor, path)
+
+      if (anchor.offset === 0) {
+        const prev = Editor.previous(editor, { at: path, match: Text.isText })
+        const block = Editor.above(editor, {
+          match: n => Editor.isBlock(editor, n),
+        })
+
+        if (prev && block) {
+          const [prevNode, prevPath] = prev
+          const [, blockPath] = block
+
+          if (Path.isAncestor(blockPath, prevPath)) {
+            node = prevNode as Text
+          }
+        }
+      }
+
+      const { text, ...rest } = node
+      result = Object.assign(result, rest)
+    })
+    return result
   },
 
   /**
@@ -1676,7 +1679,10 @@ export const Editor: EditorInterface = {
     const value = Editor.isNormalizing(editor)
     Editor.setNormalizing(editor, false)
     try {
-      fn()
+      editor.normalizeSelection(selection => {
+        if (editor.selection !== selection) editor.selection = selection
+        fn()
+      })
     } finally {
       Editor.setNormalizing(editor, value)
     }
