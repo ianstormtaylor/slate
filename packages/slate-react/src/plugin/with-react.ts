@@ -1,5 +1,14 @@
 import ReactDOM from 'react-dom'
-import { Editor, Node, Operation, Path, Point, Range, Transforms } from 'slate'
+import {
+  BaseEditor,
+  Editor,
+  Node,
+  Operation,
+  Path,
+  Point,
+  Range,
+  Transforms,
+} from 'slate'
 import {
   TextDiff,
   transformPendingPoint,
@@ -35,7 +44,7 @@ import { ReactEditor } from './react-editor'
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-export const withReact = <T extends Editor>(editor: T) => {
+export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
   const e = editor as T & ReactEditor
   const { apply, onChange, deleteBackward, addMark, removeMark } = e
 
