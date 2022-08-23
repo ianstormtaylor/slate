@@ -59,6 +59,138 @@ This example is fairly simple. Whenever `normalizeNode` gets called on a paragra
 
 But what if the child has nested blocks?
 
+## Normalize Selection
+
+| cell1 | cell2 | cell3 |
+| ----- | ----- | ----- |
+| cell4 | cell5 | cell6 |
+| cell7 | cell8 | cell9 |
+
+`Selection` is usually continuous, however in `Grid` data structure(such as a table) `Selection` is expected to be expressed by cell matrix. Take the matrix above as an example, when `anchor` is located at `cell1` and `focus` is located at `cell5`, `cell1` `cell2` `cell3` `cell4` and `cell5` will all be selected. In practice we expect only `cell1` `cell2` `cell4` `cell5` to be selected in matrix form(exclude `cell3`), and the execution of node changes will only applied to these 4 cells.
+
+The following code shows how `Selection` can be normalized according to cell matrix when `normalizeSelection` function gets called on `table` element.
+
+```javascript
+// table plugin
+const TableEditor = {
+  // traverse cell
+  *cells(
+    editor: Editor,
+    opitons: TableGeneratorCellsOptions = {}
+  ): Generator<[Element, number, number]> {
+    const { at = editor.selection } = opitons
+    const [tableEntry] = Editor.nodes(editor, {
+      at,
+      match: n => Element.isElement(n) && n.type === 'table',
+    })
+    if (!tableEntry) return
+    const [table] = tableEntry
+    const { children } = table
+    const {
+      startRow = 0,
+      startCol = 0,
+      endRow = children.length - 1,
+      reverse = false,
+    } = opitons
+    let r = reverse ? Math.max(endRow, children.length - 1) : startRow
+    while (reverse ? r >= 0 : r <= endRow) {
+      const row = children[r]
+      if (!row) break
+      const { children: cells } = row
+      const { endCol = cells.length - 1 } = opitons
+      let c = reverse ? Math.max(endCol, cells.length - 1) : startCol
+      while (reverse ? c >= 0 : c <= endCol) {
+        const cell = cells[c]
+        yield [cell, r, c]
+        c = reverse ? c - 1 : c + 1
+      }
+      r = reverse ? r - 1 : r + 1
+    }
+  },
+  // get the start and end cells of the table
+  getSelection: (editor: Editor, at?: Location): TableSelection | undefined => {
+    const [tableEntry] = Editor.nodes(editor, {
+      at,
+      match: n => Element.isElement(n) && n.type === 'table',
+    })
+    if (!tableEntry) return
+    const [, path] = tableEntry
+    const { selection } = editor
+    if (!selection) return
+    const [start, end] = Range.edges(selection)
+    try {
+      const range = Editor.range(editor, path)
+      if (
+        !Range.includes(range, selection.anchor) ||
+        !Range.includes(range, selection.focus)
+      )
+        return
+    } catch (error) {
+      return
+    }
+    const [startEntry] = Editor.nodes<Element>(editor, {
+      at: start,
+      match: n => Element.isElement(n) && n.type === 'table-cell',
+    })
+    if (!startEntry) return
+    const [endEntry] = Range.isExpanded(selection)
+      ? Editor.nodes<Element>(editor, {
+          at: end,
+          match: n => Element.isElement(n) && n.type === 'table-cell',
+        })
+      : [startEntry]
+    if (!endEntry) return
+    const [, startPath] = startEntry
+    const [, endPath] = endEntry
+    return {
+      start: startPath.slice(startPath.length - 2) as CellPoint,
+      end: endPath.slice(endPath.length - 2) as CellPoint,
+    }
+  },
+}
+
+import { Transforms, Element, Node } from 'slate'
+
+const withTable = editor => {
+  const { normalizeSelection } = editor
+
+  editor.normalizeSelection = fn => {
+    // find table element
+    const [tableEntry] = Editor.nodes(editor, {
+      match: n => Element.isElement(n) && n.type === 'table',
+    })
+    if (tableEntry) {
+      const [, path] = tableEntry
+      const { selection } = editor
+      // get position(start and end) of selected cells
+      const sel = TableEditor.getSelection(editor, path)
+      if (!sel) return normalizeSelection(fn)
+      const { start, end } = sel
+      const cells = TableEditor.cells(editor, {
+        at: path,
+        startRow: start[0],
+        startCol: start[1],
+        endRow: end[0],
+        endCol: end[1],
+      })
+      // traverse cells
+      for (const [cell, row, col] of cells) {
+        if (!cell) break
+        // set selection by cell
+        const anchor = Editor.start(editor, path.concat([row, col]))
+        const focus = Editor.end(editor, path.concat([row, col]))
+        fn({ anchor, focus })
+      }
+      Transforms.select(editor, selection)
+    } else {
+      normalizeSelection(fn)
+    }
+  }
+
+  return editor
+}
+```
+
 ## Multi-pass Normalizing
 
 One thing to understand about `normalizeNode` constraints is that they are **multi-pass**.
