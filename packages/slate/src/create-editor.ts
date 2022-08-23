@@ -277,6 +277,11 @@ export const createEditor = (): Editor => {
       }
     },
 
+    normalizeSelection: fn => {
+      const { selection } = editor
+      fn(selection)
+    },
+
     removeMark: (key: string) => {
       const { selection } = editor
 

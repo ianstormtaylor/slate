@@ -62,7 +62,7 @@ export interface BaseEditor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  normalizeSelection: (fn: (range: Range) => void) => void
+  normalizeSelection: (fn: (selection: Selection) => void) => void
   onChange: () => void
 
   // Overrideable core actions.
@@ -626,6 +626,7 @@ export const Editor: EditorInterface = {
       typeof value.isInline === 'function' &&
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
+      typeof value.normalizeSelection === 'function' &&
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
       typeof value.getDirtyPaths === 'function' &&
@@ -781,7 +782,7 @@ export const Editor: EditorInterface = {
     let result: Omit<Text, 'text'> = {}
     editor.normalizeSelection(selection => {
       const { marks } = editor
-
+      if (!selection) return
       if (marks) {
         result = Object.assign(result, marks)
         return

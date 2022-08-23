@@ -19,6 +19,7 @@ export const input = [
     isInline() {},
     isVoid() {},
     normalizeNode() {},
+    normalizeSelection() {},
     onChange() {},
     removeMark() {},
     getDirtyPaths() {},
