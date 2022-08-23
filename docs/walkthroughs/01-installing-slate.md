@@ -40,7 +40,7 @@ The next step is to create a new `Editor` object. We want the editor to be stabl
 ```jsx
 const App = () => {
   // Create a Slate editor object that won't change across renders.
-  const editor = useState(() => withReact(createEditor()))
+  const [editor] = useState(() => withReact(createEditor()))
   return null
 }
 ```
