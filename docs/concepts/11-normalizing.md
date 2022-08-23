@@ -66,7 +66,7 @@ But what if the child has nested blocks?
 | cell4 | cell5 | cell6 |
 | cell7 | cell8 | cell9 |
 
-`Selection` is usually continuous, however in `Grid` data structure(such as a table) `Selection` is expected to be expressed by cell matrix. Take the matrix above as an example, when `anchor` is located at `cell1` and `focus` is located at `cell5`, `cell1` `cell2` `cell3` `cell4` and `cell5` will all be selected. In practice we expect only `cell1` `cell2` `cell4` `cell5` to be selected in matrix form(exclude `cell3`), and the execution of node changes will only applied to these 4 cells.
+`Selection` is usually continuous, however in `Grid` data structure(such as a table) `Selection` is expected to be expressed by cell matrix. Take the matrix above as an example, when `anchor` is located at `cell1` and `focus` is located at `cell5`, `cell1` `cell2` `cell3` `cell4` and `cell5` will all be selected. In practice we expect only `cell1` `cell2` `cell4` `cell5` to be selected in matrix form(exclude `cell3`), and the execution of node changes should only applied to these 4 cells.
 
 The following code shows how `Selection` can be normalized according to cell matrix when `normalizeSelection` function gets called on `table` element.
 
