@@ -13,6 +13,7 @@ interface Editor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
+  normalizeSelection: (fn: (selection: Selection) => void) => void
   onChange: () => void
   // Overrideable core actions.
   addMark: (key: string, value: any) => void

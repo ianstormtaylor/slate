@@ -13,6 +13,7 @@ interface Editor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
+  normalizeSelection: (fn: (selection: Selection) => void) => void
   onChange: () => void
 
   // Overrideable core actions.
@@ -412,6 +413,10 @@ Check if a value is a void `Element` object.
 ### Normalize method
 
 #### `normalizeNode(entry: NodeEntry) => void`
+
+[Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
+
+#### `normalizeSelection: (fn: (selection: Selection) => void) => void`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
