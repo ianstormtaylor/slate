@@ -1,5 +1,11 @@
 # slate
 
+## 0.82.1
+
+### Patch Changes
+
+- [#5069](https://github.com/ianstormtaylor/slate/pull/5069) [`46d113fe`](https://github.com/ianstormtaylor/slate/commit/46d113fe1e102c87772681fdd90a086e37a3200d) Thanks [@krenzke](https://github.com/krenzke)! - Expose getDirtyPaths method on Editor object to allow for customization
+
 ## 0.82.0
 
 ### Patch Changes
