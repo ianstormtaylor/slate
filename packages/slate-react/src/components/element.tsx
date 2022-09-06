@@ -1,11 +1,10 @@
-import React, { Fragment, useRef } from 'react'
+import React, { useCallback } from 'react'
 import getDirection from 'direction'
 import { Editor, Node, Range, Element as SlateElement } from 'slate'
 
 import Text from './text'
 import useChildren from '../hooks/use-children'
 import { ReactEditor, useSlateStatic, useReadOnly } from '..'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import {
   NODE_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -19,7 +18,6 @@ import {
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
-import { IS_ANDROID } from '../utils/environment'
 
 /**
  * Element.
@@ -41,11 +39,25 @@ const Element = (props: {
     renderLeaf,
     selection,
   } = props
-  const ref = useRef<HTMLElement>(null)
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
   const isInline = editor.isInline(element)
   const key = ReactEditor.findKey(editor, element)
+  const ref = useCallback(
+    (ref: HTMLElement | null) => {
+      // Update element-related weak maps with the DOM element ref.
+      const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
+      if (ref) {
+        KEY_TO_ELEMENT?.set(key, ref)
+        NODE_TO_ELEMENT.set(element, ref)
+        ELEMENT_TO_NODE.set(ref, element)
+      } else {
+        KEY_TO_ELEMENT?.delete(key)
+        NODE_TO_ELEMENT.delete(element)
+      }
+    },
+    [editor, key, element]
+  )
   let children: React.ReactNode = useChildren({
     decorations,
     node: element,
@@ -118,19 +130,6 @@ const Element = (props: {
     NODE_TO_INDEX.set(text, 0)
     NODE_TO_PARENT.set(text, element)
   }
-
-  // Update element-related weak maps with the DOM element ref.
-  useIsomorphicLayoutEffect(() => {
-    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
-    if (ref.current) {
-      KEY_TO_ELEMENT?.set(key, ref.current)
-      NODE_TO_ELEMENT.set(element, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, element)
-    } else {
-      KEY_TO_ELEMENT?.delete(key)
-      NODE_TO_ELEMENT.delete(element)
-    }
-  })
 
   return renderElement({ attributes, children, element })
 }
