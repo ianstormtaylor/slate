@@ -804,6 +804,7 @@ export const Editable = (props: EditableProps) => {
         <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
           <Component
             role={readOnly ? undefined : 'textbox'}
+            aria-multiline={readOnly ? undefined : true}
             {...attributes}
             // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
             // have to use hacks to make these replacement-based features work.
