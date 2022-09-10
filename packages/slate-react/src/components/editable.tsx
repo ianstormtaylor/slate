@@ -231,6 +231,11 @@ export const Editable = (props: EditableProps) => {
             }
           }
         }
+
+        // Deselect the editor if the dom selection is not selectable in readonly mode
+        if (readOnly && (!anchorNodeSelectable || !focusNodeSelectable)) {
+          Transforms.deselect(editor)
+        }
       }
     }, 100),
     [readOnly]
