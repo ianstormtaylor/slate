@@ -434,7 +434,7 @@ export const Editable = (props: EditableProps) => {
 
       if (
         !readOnly &&
-        hasEditableTarget(editor, event.target) &&
+        hasSelectableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
         // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
@@ -862,7 +862,7 @@ export const Editable = (props: EditableProps) => {
                   !HAS_BEFORE_INPUT_SUPPORT &&
                   !readOnly &&
                   !isEventHandled(event, attributes.onBeforeInput) &&
-                  hasEditableTarget(editor, event.target)
+                  hasSelectableTarget(editor, event.target)
                 ) {
                   event.preventDefault()
                   if (!ReactEditor.isComposing(editor)) {
@@ -1014,7 +1014,7 @@ export const Editable = (props: EditableProps) => {
             )}
             onCompositionEnd={useCallback(
               (event: React.CompositionEvent<HTMLDivElement>) => {
-                if (hasEditableTarget(editor, event.target)) {
+                if (hasSelectableTarget(editor, event.target)) {
                   if (ReactEditor.isComposing(editor)) {
                     setIsComposing(false)
                     IS_COMPOSING.set(editor, false)
@@ -1068,7 +1068,7 @@ export const Editable = (props: EditableProps) => {
             onCompositionUpdate={useCallback(
               (event: React.CompositionEvent<HTMLDivElement>) => {
                 if (
-                  hasEditableTarget(editor, event.target) &&
+                  hasSelectableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onCompositionUpdate)
                 ) {
                   if (!ReactEditor.isComposing(editor)) {
@@ -1081,7 +1081,7 @@ export const Editable = (props: EditableProps) => {
             )}
             onCompositionStart={useCallback(
               (event: React.CompositionEvent<HTMLDivElement>) => {
-                if (hasEditableTarget(editor, event.target)) {
+                if (hasSelectableTarget(editor, event.target)) {
                   androidInputManager?.handleCompositionStart(event)
 
                   if (
@@ -1121,7 +1121,7 @@ export const Editable = (props: EditableProps) => {
             onCopy={useCallback(
               (event: React.ClipboardEvent<HTMLDivElement>) => {
                 if (
-                  hasEditableTarget(editor, event.target) &&
+                  hasSelectableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onCopy)
                 ) {
                   event.preventDefault()
@@ -1138,7 +1138,7 @@ export const Editable = (props: EditableProps) => {
               (event: React.ClipboardEvent<HTMLDivElement>) => {
                 if (
                   !readOnly &&
-                  hasEditableTarget(editor, event.target) &&
+                  hasSelectableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onCut)
                 ) {
                   event.preventDefault()
@@ -1278,7 +1278,7 @@ export const Editable = (props: EditableProps) => {
                 if (
                   !readOnly &&
                   !state.isUpdatingSelection &&
-                  hasEditableTarget(editor, event.target) &&
+                  hasSelectableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onFocus)
                 ) {
                   const el = ReactEditor.toDOMNode(editor, editor)
@@ -1300,7 +1300,7 @@ export const Editable = (props: EditableProps) => {
             )}
             onKeyDown={useCallback(
               (event: React.KeyboardEvent<HTMLDivElement>) => {
-                if (!readOnly && hasEditableTarget(editor, event.target)) {
+                if (!readOnly && hasSelectableTarget(editor, event.target)) {
                   androidInputManager?.handleKeyDown(event)
 
                   const { nativeEvent } = event
@@ -1573,7 +1573,7 @@ export const Editable = (props: EditableProps) => {
               (event: React.ClipboardEvent<HTMLDivElement>) => {
                 if (
                   !readOnly &&
-                  hasEditableTarget(editor, event.target) &&
+                  hasSelectableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onPaste)
                 ) {
                   // COMPAT: Certain browsers don't support the `beforeinput` event, so we
@@ -1706,6 +1706,20 @@ export const isTargetInsideNonReadonlyVoid = (
   const slateNode =
     hasTarget(editor, target) && ReactEditor.toSlateNode(editor, target)
   return Editor.isVoid(editor, slateNode)
+}
+
+/**
+ * Check if the target can be selectable
+ */
+
+export const hasSelectableTarget = (
+  editor: ReactEditor,
+  target: EventTarget | null
+): boolean => {
+  return (
+    hasEditableTarget(editor, target) ||
+    isTargetInsideNonReadonlyVoid(editor, target)
+  )
 }
 
 /**
