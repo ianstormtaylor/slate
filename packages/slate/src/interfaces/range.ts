@@ -250,6 +250,8 @@ export const Range: RangeInterface = {
 
       r.anchor = anchor
       r.focus = focus
+      
+      return r
     })
   },
 }
