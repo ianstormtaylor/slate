@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.83.0
+
+### Minor Changes
+
+- [#5123](https://github.com/ianstormtaylor/slate/pull/5123) [`0eb37e79`](https://github.com/ianstormtaylor/slate/commit/0eb37e79150275d3535f1694d8972751a83d826f) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to delete block elements with backspace in Chrome and Safari
+
+### Patch Changes
+
+- [#5127](https://github.com/ianstormtaylor/slate/pull/5127) [`341041f0`](https://github.com/ianstormtaylor/slate/commit/341041f0b721926cca3f9dee98dc4589f2c96797) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Cleanup and fix insertion placeholder mark compare
+
 ## 0.82.2
 
 ### Patch Changes
