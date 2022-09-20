@@ -434,7 +434,7 @@ export const Editable = (props: EditableProps) => {
 
       if (
         !readOnly &&
-        hasSelectableTarget(editor, event.target) &&
+        hasEditableTarget(editor, event.target) &&
         !isDOMEventHandled(event, propsOnDOMBeforeInput)
       ) {
         // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
