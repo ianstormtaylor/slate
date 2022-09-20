@@ -1561,7 +1561,8 @@ export const Editable = (props: EditableProps) => {
                         if (
                           Element.isElement(currentNode) &&
                           Editor.isVoid(editor, currentNode) &&
-                          Editor.isInline(editor, currentNode)
+                          (Editor.isInline(editor, currentNode) ||
+                            Editor.isBlock(editor, currentNode))
                         ) {
                           event.preventDefault()
                           Editor.deleteBackward(editor, { unit: 'block' })
