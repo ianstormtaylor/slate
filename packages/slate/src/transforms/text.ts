@@ -187,14 +187,11 @@ export const TextTransforms: TextTransforms = {
         }
       }
 
-      const middlePaths = pathRefs
+      pathRefs
         .reverse()
         .map(r => r.unref())
-        .filter((r): r is Path => !!r)
-
-      for (const p of middlePaths) {
-        Transforms.removeNodes(editor, { at: p, voids })
-      }
+        .filter((r): r is Path => r !== null)
+        .forEach(p => Transforms.removeNodes(editor, { at: p, voids }))
 
       if (!endVoid) {
         const point = endRef.current!
