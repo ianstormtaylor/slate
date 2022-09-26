@@ -5,8 +5,13 @@ on:
     branches:
       - main
 
+permissions: {}
 jobs:
   release:
+    permissions:
+      contents: write # to create release (changesets/action)
+      pull-requests: write # to create pull request (changesets/action)
+
     name: ${{ matrix.channel }}
     runs-on: ubuntu-latest
     strategy:
