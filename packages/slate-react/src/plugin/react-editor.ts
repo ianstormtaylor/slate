@@ -35,6 +35,7 @@ import {
   isDOMSelection,
   normalizeDOMPoint,
   hasShadowRoot,
+  DOMText,
 } from '../utils/dom'
 import { IS_CHROME, IS_FIREFOX, IS_ANDROID } from '../utils/environment'
 
@@ -346,8 +347,15 @@ export const ReactEditor = {
         point.offset === end &&
         nextText?.hasAttribute('data-slate-mark-placeholder')
       ) {
+        const domText = nextText.childNodes[0]
+
         domPoint = [
-          nextText,
+          // COMPAT: If we don't explicity set the dom point to be on the actual
+          // dom text element, chrome will put the selection behind the actual dom
+          // text element, causing domRange.getBoundingClientRect() calls on a collapsed
+          // selection to return incorrect zero values (https://bugs.chromium.org/p/chromium/issues/detail?id=435438)
+          // which will cause issues when scrolling to it.
+          domText instanceof DOMText ? domText : nextText,
           nextText.textContent?.startsWith('\uFEFF') ? 1 : 0,
         ]
         break
