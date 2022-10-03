@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.83.1
+
+### Patch Changes
+
+- [#5143](https://github.com/ianstormtaylor/slate/pull/5143) [`347865ca`](https://github.com/ianstormtaylor/slate/commit/347865cafc1f2f3b0fc3d74d8758e082480df6ca) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix scrollIntoView when selection is collapsed inside mark placeholder
+
 ## 0.83.0
 
 ### Minor Changes
