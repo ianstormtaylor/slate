@@ -903,8 +903,6 @@ export const Editable = (props: EditableProps) => {
                 : {
                     // Allow positioning relative to the editable element.
                     position: 'relative',
-                    // Prevent the default outline styles.
-                    outline: 'none',
                     // Preserve adjacent whitespace and new lines.
                     whiteSpace: 'pre-wrap',
                     // Allow words to break if they are too long.
