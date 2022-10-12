@@ -648,13 +648,6 @@ export const Editable = (props: EditableProps) => {
           case 'insertFromYank':
           case 'insertReplacementText':
           case 'insertText': {
-            const { selection } = editor
-            if (selection) {
-              if (Range.isExpanded(selection)) {
-                Editor.deleteFragment(editor)
-              }
-            }
-
             if (type === 'insertFromComposition') {
               // COMPAT: in Safari, `compositionend` is dispatched after the
               // `beforeinput` for "insertFromComposition". But if we wait for it
