@@ -192,7 +192,6 @@ export const ReactEditor = {
    */
 
   deselect(editor: ReactEditor): void {
-    const el = ReactEditor.toDOMNode(editor, editor)
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
