@@ -7,6 +7,7 @@ import {
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
+import { ReactEditor } from '..'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -34,9 +35,7 @@ const Leaf = (props: {
 
   useEffect(() => {
     const placeholderEl = placeholderRef?.current
-    const editorEl = document.querySelector<HTMLDivElement>(
-      '[data-slate-editor="true"]'
-    )
+    const editorEl = ReactEditor.toDOMNode(editor, editor)
 
     if (!placeholderEl || !editorEl) {
       return
