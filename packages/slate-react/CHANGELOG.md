@@ -1,5 +1,12 @@
 # slate-react
 
+## 0.83.2
+
+### Patch Changes
+
+- [#5148](https://github.com/ianstormtaylor/slate/pull/5148) [`a2b6786d`](https://github.com/ianstormtaylor/slate/commit/a2b6786d19f8bd5f779c526742a4dc3da971f696) Thanks [@ksimons](https://github.com/ksimons)! - Ensure the min-height for placeholders is set on the correct editor
+- [#5155](https://github.com/ianstormtaylor/slate/pull/5154) [`1b14de5`](https://github.com/ianstormtaylor/slate/commit/1b14de5f8e5961ac36eced229abea9abb5be71f9) Thanks [@jameshfisher](https://github.com/jameshfisher) - Revert insertText breaking change that deletes fragment
+
 ## 0.83.1
 
 ### Patch Changes
