@@ -14053,10 +14053,17 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"shell-quote@npm:^1.6.1, shell-quote@npm:^1.7.2":
+"shell-quote@npm:^1.6.1":
   version: 1.7.2
   resolution: "shell-quote@npm:1.7.2"
   checksum: efad426fb25d8a54d06363f1f45774aa9e195f62f14fa696d542b44bfe418ab41206448b63af18d726c62e099e66d9a3f4f44858b9ea2ce4b794b41b802672d1
+  languageName: node
+  linkType: hard
+
+"shell-quote@npm:^1.7.2":
+  version: 1.7.4
+  resolution: "shell-quote@npm:1.7.4"
+  checksum: 2874ea9c1a7c3ebfc9ec5734a897e16533d0d06f2e4cddc22ba3d1cab5cdc07d0f825364c1b1e39abe61236f44d8e60e933c7ad7349ce44de4f5dddc7b4354e9
   languageName: node
   linkType: hard
 
