@@ -1,5 +1,11 @@
 # slate
 
+## 0.84.0
+
+### Minor Changes
+
+- [#5137](https://github.com/ianstormtaylor/slate/pull/5137) [`a2184d86`](https://github.com/ianstormtaylor/slate/commit/a2184d86571cfd0d89beb67863c444a988174937) Thanks [@mainhanu](https://github.com/mainhanu)! - transform.delete and transform.insertFragment performance optimize
+
 ## 0.82.1
 
 ### Patch Changes
