@@ -21,24 +21,24 @@ These extensions and plugins add additional features and capabilities to Slate:
 
 These products use Slate, and can give you an idea of what's possible:
 
-- [Archbee](https://archbee.io/)
-- [Cake](https://www.cake.co/)
-- [Chatterbug](https://chatterbug.com/)
-- [Clause](https://clause.io/)
-- [CoCalc](https://cocalc.com/)
-- [GitBook](https://www.gitbook.com/)
-- [Discord](https://discord.com/)
-- [Grafana](https://grafana.com/)
-- [GraphCMS](https://graphcms.com/)
-- [Guilded](https://www.guilded.gg/)
-- [Guru](https://www.getguru.com/)
-- [Kitemaker](https://kitemaker.co/)
-- [Living Spec](https://livingspec.com/)
-- [Netlify CMS](https://www.netlifycms.org/)
-- [Prezly](https://www.prezly.com/)
-- [Sanity.io](https://www.sanity.io/)
-- [Slite](https://slite.com/)
-- [Taskade](https://www.taskade.com/)
+- [Archbee](https://archbee.io/): Build better product docs with your team
+- [Chatterbug](https://chatterbug.com/): Learn languages from real people
+- [Clause](https://clause.io/): Smart agreements
+- [CoCalc](https://cocalc.com/): Collaborative calculation and data science
+- [GitBook](https://www.gitbook.com/): Plan, centralize and share knowledge
+- [Discord](https://discord.com/): Channels to collaborate & share
+- [Grafana](https://grafana.com/): Operational dashboards for your data
+- [GraphCMS](https://graphcms.com/): The federated content platform
+- [Guilded](https://www.guilded.gg/): Better chat, happier communities
+- [Guru](https://www.getguru.com/): Organize company information. Access it anywhere.
+- [Kitemaker](https://kitemaker.co/): Product development tool built to manage the work
+- [Living Spec](https://livingspec.com/): A modern way for product teams to work
+- [Netlify CMS](https://www.netlifycms.org/): Open source content management for your Git workflow
+- [Notes Together](https://notestogether.hominidsoftware.com/): Get routine info out of your head
+- [Prezly](https://www.prezly.com/): Turn your audience into fans
+- [Sanity.io](https://www.sanity.io/): Platform for structured content
+- [Slite](https://slite.com/): Where remote teams make decisions and share knowledge
+- [Taskade](https://www.taskade.com/): Get work done in one unified workspace
 - [TRPG Engine](https://trpg.moonrailgun.com/)
 - [Thoughts](https://thoughts.teambition.com/)
 
