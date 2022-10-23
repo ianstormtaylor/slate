@@ -1,5 +1,10 @@
 import { isPlainObject } from 'is-plain-object'
-import { Operation } from 'slate'
+import { Operation, Range } from 'slate'
+
+interface Batch {
+  operations: Operation[]
+  selectionBefore: Range | null
+}
 
 /**
  * `History` objects hold all of the operations that are applied to a value, so
@@ -7,8 +12,8 @@ import { Operation } from 'slate'
  */
 
 export interface History {
-  redos: Operation[][]
-  undos: Operation[][]
+  redos: Batch[]
+  undos: Batch[]
 }
 
 // eslint-disable-next-line no-redeclare
