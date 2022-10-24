@@ -23,24 +23,25 @@ These products use Slate, and can give you an idea of what's possible:
 
 - [Aline](https://www.aline.co/): Digital contracting for the modern enterprise
 - [Archbee](https://archbee.io/): Build better product docs with your team
-- [Campfire](https://www.campfirewriting.com/): The most versatile writing software
+- [Campfire](https://www.campfirewriting.com/): The most versatile writing software [for fiction]
 - [Chatterbug](https://chatterbug.com/): Learn languages from real people
 - [CoCalc](https://cocalc.com/): Collaborative calculation and data science
 - [Coda](https://coda.io/): Coda brings all your words, data, and teamwork into one powerful doc
 - [Dropdeck](https://www.dropdeck.com/): Magically create beautiful slides — faster than ever
 - [GitBook](https://www.gitbook.com/): Plan, centralize and share knowledge
-- [Discord](https://discord.com/): Channels to collaborate & share
+- [Discord](https://discord.com/): Text & voice channels to collaborate & share
 - [Grafana](https://grafana.com/): Operational dashboards for your data
-- [GraphCMS](https://graphcms.com/): The federated content platform
 - [Guilded](https://www.guilded.gg/): Better chat, happier communities
-- [Guru](https://www.getguru.com/): Organize company information. Access it anywhere.
-- [Kitemaker](https://kitemaker.co/): Product development tool built to manage the work
+- [Guru](https://www.getguru.com/): Organize company information. Access it anywhere. [wiki]
+- [Hygraph](https://hygraph.com/): The federated content platform
+- [Kitemaker](https://kitemaker.co/): Product development tool built to manage the work, not the workers
 - [Living Spec](https://livingspec.com/): A modern way for product teams to work
 - [Netlify CMS](https://www.netlifycms.org/): Open source content management for your Git workflow
 - [Notes Together](https://notestogether.hominidsoftware.com/): Get mundane details out of your head
 - [Prezly](https://www.prezly.com/): Turn your audience into fans
-- [Sana](https://www.sanalabs.com): Reimagining learning with AI
-- [Sanity.io](https://www.sanity.io/): Platform for structured content
+- [Quill Forms](https://demo.quillforms.com/): Open Source Typeform Alternative WordPress Plugin
+- [Sana](https://www.sanalabs.com): Reimagining learning with AI [LMS]
+- [Sanity.io](https://www.sanity.io/): Platform for structured content [data driven content]
 - [Slite](https://slite.com/): Where remote teams make decisions and share knowledge
 - [Taskade](https://www.taskade.com/): Get work done in one unified workspace
 - [TRPG Engine](https://trpg.moonrailgun.com/)
