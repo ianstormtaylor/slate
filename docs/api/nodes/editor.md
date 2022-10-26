@@ -126,7 +126,7 @@ Get the marks that would be added to text at the current selection.
 
 Get the matching node in the branch of the document after a location.
 
-Note: If you are looking for the next Point, and not the next Node, you are probably looking for the method `Editor.after`
+Note: To find the next Point, and not the next Node, use the `Editor.after` method
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
@@ -174,7 +174,7 @@ Iterate through all of the positions in the document where a `Point` can be plac
 
 Read `options.unit` to see how this method iterates through positions.
 
-Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless you pass in true for the voids option, then iteration will occur.
+Note: By default void nodes are treated as a single point and iteration will not happen inside their content unless the voids option is set, then iteration will occur.
 
 Options:
 
@@ -191,7 +191,7 @@ Options:
 
 Get the matching node in the branch of the document before a location.
 
-Note: If you are looking for the previous Point, and not the previous Node, you are probably looking for the method `Editor.before`
+Note: To find the previous Point, and not the previous Node, use the `Editor.before` method
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
@@ -207,7 +207,7 @@ Get the start point of a location.
 
 Get the text string content of a location.
 
-Note: by default the text of void nodes is considered to be an empty string, regardless of content, unless you pass in true for the voids option
+Note: by default the text of void nodes is considered to be an empty string, regardless of content, unless the voids option is set.
 
 Options: : `{voids?: boolean}`
 
@@ -439,7 +439,7 @@ Returns the fragment at the current selection. Used when cutting or copying, as 
 
 ### Delete methods
 
-When a user presses backspace or delete, it invokes the method based on the selection. For example, if the selection is expanded over some text and the user presses the backspace key, `deleteFragment` will be called but if the selecttion is collapsed, `deleteBackward` will be called.
+When a user presses backspace or delete, it invokes the method based on the selection. For example, if the selection is expanded over some text and the user presses the backspace key, `deleteFragment` will be called, but if the selection is collapsed, `deleteBackward` will be called.
 
 #### `deleteBackward(options?: {unit?: 'character' | 'word' | 'line' | 'block'}) => void`
 
