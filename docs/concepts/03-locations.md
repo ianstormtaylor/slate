@@ -90,7 +90,7 @@ One important distinction is that the anchor and focus points of ranges **always
 
 ## Selection
 
-Ranges are used in many places in Slate's API when you need to refer to a span of content between two points. One of the most common though is the user's current "selection".
+Ranges are used in many places in Slate's API when you need to refer to a span of content between two points. One of the most common, though, is the user's current "selection".
 
 The selection is a special range that is a property of the top-level `Editor`. For example, say someone has the whole sentence currently selected:
 
@@ -116,3 +116,26 @@ const editor = {
 > 🤖 The selection concept is also borrowed from the DOM, see [`Selection`, MDN](https://developer.mozilla.org/en-US/docs/Web/API/Selection), although in a greatly-simplified form because Slate doesn't allow for multiple ranges inside a single selection, which makes things a lot easier to work with.
 
 There isn't a special `Selection` interface. It's just an object that happens to respect the more general-purpose `Range` interface instead.
+
+For example, to find the lowest block that contains all of the current selection:
+
+```javascript
+function getCommonBlock(editor) {
+  const range = Editor.unhangRange(editor, editor.selection, { voids: true })
+
+  let [common, path] = SlateNode.common(
+    editor,
+    range.anchor.path,
+    range.focus.path
+  )
+
+  if (Editor.isBlock(editor, common) || Editor.isEditor(common)) {
+    return [common, path]
+  } else {
+    return Editor.above(editor, {
+      at: path,
+      match: n => Editor.isBlock(editor, n) || Editor.isEditor(n),
+    })
+  }
+}
+```
