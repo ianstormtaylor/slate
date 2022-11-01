@@ -31,7 +31,9 @@ Options: `{reverse?: boolean}`
 
 #### `Node.common(root: Node, path: Path, another: Path) => NodeEntry`
 
-Get an entry for the common ancestor node of two paths.
+Get an entry for the common ancestor node of two paths. It might be a Text node, an Element, or the Editor itself.
+
+For the common block ancestor, see [Editor Selection](https://docs.slatejs.org/concepts/03-locations#selection)
 
 #### `Node.descendant(root: Node, path: Path) => Descendant`
 
