@@ -12,6 +12,7 @@ interface Editor {
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
+  markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
 
@@ -221,7 +222,7 @@ Options: `{at?: Location, mode?: 'highest' | 'lowest', voids?: boolean}`
 
 #### `Editor.addMark(editor: Editor, key: string, value: any) => void`
 
-Add a custom property to the leaf text nodes in the current selection.
+Add a custom property to the leaf text nodes and any nodes that `editor.markableVoid()` allows in the current selection.
 
 If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
 
@@ -265,7 +266,7 @@ If the selection is currently expanded, it will be deleted first.
 
 #### `Editor.removeMark(editor: Editor, key: string) => void`
 
-Remove a custom property from all of the leaf text nodes in the current selection.
+Remove a custom property from all of the leaf text nodes within non-void nodes or void nodes that `editor.markableVoid()` allows in the current selection.
 
 If the selection is currently collapsed, the removal will be stored on `editor.marks` and applied to the text inserted next.
 
@@ -423,13 +424,17 @@ Called when there is a change in the editor.
 
 ### Mark methods
 
+#### `markableVoid: (element: Element) => boolean`
+
+Tells which void nodes accept Marks. Slate's default implementation returns `false`, but if some void elements support formatting, override this function to include them.
+
 #### `addMark(key: string, value: any) => void`
 
-Add a custom property to the leaf text nodes in the current selection. If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
+Add a custom property to the leaf text nodes within non-void nodes or void nodes that `editor.markableVoid()` allows in the current selection. If the selection is currently collapsed, the marks will be added to the `editor.marks` property instead, and applied when text is inserted next.
 
 #### `removeMark(key: string) => void`
 
-Remove a custom property from the leaf text nodes in the current selection.
+Remove a custom property from the leaf text nodes within non-void nodes or void nodes that `editor.markableVoid()` allows in the current selection.
 
 ### getFragment method
 

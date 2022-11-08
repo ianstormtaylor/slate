@@ -28,6 +28,7 @@ export const createEditor = (): Editor => {
     marks: null,
     isInline: () => false,
     isVoid: () => false,
+    markableVoid: () => false,
     onChange: () => {},
 
     apply: (op: Operation) => {
@@ -99,14 +100,35 @@ export const createEditor = (): Editor => {
     },
 
     addMark: (key: string, value: any) => {
-      const { selection } = editor
+      const { selection, markableVoid } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        const match = (node: Node, path: Path) => {
+          if (!Text.isText(node)) {
+            return false // marks can only be applied to text
+          }
+          const [parentNode, parentPath] = Editor.parent(editor, path)
+          return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
+        }
+        const expandedSelection = Range.isExpanded(selection)
+        let markAcceptingVoidSelected = false
+        if (!expandedSelection) {
+          const [selectedNode, selectedPath] = Editor.node(editor, selection)
+          if (selectedNode && match(selectedNode, selectedPath)) {
+            const [parentNode] = Editor.parent(editor, selectedPath)
+            markAcceptingVoidSelected =
+              parentNode && editor.markableVoid(parentNode)
+          }
+        }
+        if (expandedSelection || markAcceptingVoidSelected) {
           Transforms.setNodes(
             editor,
             { [key]: value },
-            { match: Text.isText, split: true }
+            {
+              match,
+              split: true,
+              voids: true,
+            }
           )
         } else {
           const marks = {
@@ -281,10 +303,28 @@ export const createEditor = (): Editor => {
       const { selection } = editor
 
       if (selection) {
-        if (Range.isExpanded(selection)) {
+        const match = (node: Node, path: Path) => {
+          if (!Text.isText(node)) {
+            return false // marks can only be applied to text
+          }
+          const [parentNode, parentPath] = Editor.parent(editor, path)
+          return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
+        }
+        const expandedSelection = Range.isExpanded(selection)
+        let markAcceptingVoidSelected = false
+        if (!expandedSelection) {
+          const [selectedNode, selectedPath] = Editor.node(editor, selection)
+          if (selectedNode && match(selectedNode, selectedPath)) {
+            const [parentNode] = Editor.parent(editor, selectedPath)
+            markAcceptingVoidSelected =
+              parentNode && editor.markableVoid(parentNode)
+          }
+        }
+        if (expandedSelection || markAcceptingVoidSelected) {
           Transforms.unsetNodes(editor, key, {
-            match: Text.isText,
+            match,
             split: true,
+            voids: true,
           })
         } else {
           const marks = { ...(Editor.marks(editor) || {}) }
