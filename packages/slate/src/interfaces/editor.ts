@@ -357,8 +357,18 @@ export const Editor: EditorInterface = {
       match,
       reverse,
     })) {
-      if (!Text.isText(n) && !Path.equals(path, p)) {
-        return [n, p]
+      if (Text.isText(n)) return
+      if (Range.isRange(at)) {
+        if (
+          Path.isAncestor(p, at.anchor.path) &&
+          Path.isAncestor(p, at.focus.path)
+        ) {
+          return [n, p]
+        }
+      } else {
+        if (!Path.equals(path, p)) {
+          return [n, p]
+        }
       }
     }
   },
