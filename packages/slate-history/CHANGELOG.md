@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.85.0
+
+### Minor Changes
+
+- [#4717](https://github.com/ianstormtaylor/slate/pull/4717) [`d73026ee`](https://github.com/ianstormtaylor/slate/commit/d73026eed2d190da6153e91a914717978b155d8e) Thanks [@bryanph](https://github.com/bryanph)! - Changes how selections are stored in the history resulting in more consistent results
+
 ## 0.81.3
 
 ### Patch Changes
