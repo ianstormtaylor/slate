@@ -816,16 +816,21 @@ export const Editor: EditorInterface = {
 
     if (anchor.offset === 0) {
       const prev = Editor.previous(editor, { at: path, match: Text.isText })
-      const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+      const markedVoid = Editor.above(editor, {
+        match: n => Editor.isVoid(editor, n) && editor.markableVoid(n),
       })
+      if (!markedVoid) {
+        const block = Editor.above(editor, {
+          match: n => Editor.isBlock(editor, n),
+        })
 
-      if (prev && block) {
-        const [prevNode, prevPath] = prev
-        const [, blockPath] = block
+        if (prev && block) {
+          const [prevNode, prevPath] = prev
+          const [, blockPath] = block
 
-        if (Path.isAncestor(blockPath, prevPath)) {
-          node = prevNode as Text
+          if (Path.isAncestor(blockPath, prevPath)) {
+            node = prevNode as Text
+          }
         }
       }
     }
