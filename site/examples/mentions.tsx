@@ -31,7 +31,7 @@ const MentionExample = () => {
 
   const onKeyDown = useCallback(
     event => {
-      if (target) {
+      if (target && chars.length > 0) {
         switch (event.key) {
           case 'ArrowDown':
             event.preventDefault()
