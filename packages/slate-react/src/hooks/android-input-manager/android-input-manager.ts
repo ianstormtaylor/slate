@@ -539,13 +539,19 @@ export function createAndroidInputManager({
           })
         }
 
-        if (typeof data === 'string' && data.includes('\n')) {
+        if (typeof data === 'string' && data === '\n') {
           return scheduleAction(() => Editor.insertSoftBreak(editor), {
             at: Range.end(targetRange),
           })
         }
 
         let text = data ?? ''
+
+        if (typeof data === 'string' && data.includes('\n')) {
+          return scheduleAction(() => Editor.insertText(editor, text), {
+            at: targetRange,
+          })
+        }
 
         // COMPAT: If we are writing inside a placeholder, the ime inserts the text inside
         // the placeholder itself and thus includes the zero-width space inside edit events.
