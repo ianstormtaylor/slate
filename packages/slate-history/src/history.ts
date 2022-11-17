@@ -27,8 +27,10 @@ export const History = {
       isPlainObject(value) &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
-      (value.redos.length === 0 || Operation.isOperationList(value.redos[0])) &&
-      (value.undos.length === 0 || Operation.isOperationList(value.undos[0]))
+      (value.redos.length === 0 ||
+        Operation.isOperationList(value.redos[0].operations)) &&
+      (value.undos.length === 0 ||
+        Operation.isOperationList(value.undos[0].operations))
     )
   },
 }
