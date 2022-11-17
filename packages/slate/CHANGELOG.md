@@ -1,5 +1,15 @@
 # slate
 
+## 0.86.0
+
+### Patch Changes
+
+- [#5189](https://github.com/ianstormtaylor/slate/pull/5189) [`fbc9838f`](https://github.com/ianstormtaylor/slate/commit/fbc9838fd72e78bfa9af49013981939773dcca11) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Add hanging option to unsetNodes so it matches setNodes
+
+* [#5193](https://github.com/ianstormtaylor/slate/pull/5193) [`6909a8f7`](https://github.com/ianstormtaylor/slate/commit/6909a8f7da0f70b1ef3b5c3a665e8d0d09e6fa99) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Stops Editor.unhangRange() from adjusting the range in some cases when it was not actually hanging
+
+- [#5186](https://github.com/ianstormtaylor/slate/pull/5186) [`e416d00b`](https://github.com/ianstormtaylor/slate/commit/e416d00b6c95d05a1e10f738bfbbddd6cb940ab6) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Report marks applied to a markableVoid if selection is collapsed
+
 ## 0.85.0
 
 ### Patch Changes

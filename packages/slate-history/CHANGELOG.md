@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.86.0
+
+### Patch Changes
+
+- [#5197](https://github.com/ianstormtaylor/slate/pull/5197) [`70b64dc8`](https://github.com/ianstormtaylor/slate/commit/70b64dc8f10199658ac09bfef141b56187498652) Thanks [@jacobcarpenter](https://github.com/jacobcarpenter)! - Fix isHistory check.
+
 ## 0.85.0
 
 ### Minor Changes
