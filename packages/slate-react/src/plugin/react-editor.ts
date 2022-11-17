@@ -33,6 +33,7 @@ import {
   DOMStaticRange,
   isDOMElement,
   isDOMSelection,
+  isDOMNode,
   normalizeDOMPoint,
   hasShadowRoot,
   DOMText,
@@ -52,6 +53,22 @@ export interface ReactEditor extends BaseEditor {
     originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
   hasRange: (editor: ReactEditor, range: Range) => boolean
+  hasTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+  hasEditableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+  hasSelectableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
+  isTargetInsideNonReadonlyVoid: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
 }
 
 // eslint-disable-next-line no-redeclare
@@ -777,6 +794,57 @@ export const ReactEditor = {
     return (
       Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
     )
+  },
+
+  /**
+   * Check if the target is in the editor.
+   */
+  hasTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): target is DOMNode {
+    return isDOMNode(target) && ReactEditor.hasDOMNode(editor, target)
+  },
+
+  /**
+   * Check if the target is editable and in the editor.
+   */
+  hasEditableTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): target is DOMNode {
+    return (
+      isDOMNode(target) &&
+      ReactEditor.hasDOMNode(editor, target, { editable: true })
+    )
+  },
+
+  /**
+   * Check if the target can be selectable
+   */
+  hasSelectableTarget(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): boolean {
+    return (
+      ReactEditor.hasEditableTarget(editor, target) ||
+      ReactEditor.isTargetInsideNonReadonlyVoid(editor, target)
+    )
+  },
+
+  /**
+   * Check if the target is inside void and in an non-readonly editor.
+   */
+  isTargetInsideNonReadonlyVoid(
+    editor: ReactEditor,
+    target: EventTarget | null
+  ): boolean {
+    if (IS_READ_ONLY.get(editor)) return false
+
+    const slateNode =
+      ReactEditor.hasTarget(editor, target) &&
+      ReactEditor.toSlateNode(editor, target)
+    return Editor.isVoid(editor, slateNode)
   },
 
   /**
