@@ -47,5 +47,3 @@ export const output = (
     </block>
   </editor>
 )
-// TODO this has to be skipped because the second void and the final empty text fail to be marked bold
-export const skip = true

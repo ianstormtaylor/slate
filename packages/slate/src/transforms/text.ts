@@ -265,7 +265,7 @@ export const TextTransforms: TextTransforms = {
         return
       } else if (Range.isRange(at)) {
         if (!hanging) {
-          at = Editor.unhangRange(editor, at)
+          at = Editor.unhangRange(editor, at, { voids })
         }
 
         if (Range.isCollapsed(at)) {

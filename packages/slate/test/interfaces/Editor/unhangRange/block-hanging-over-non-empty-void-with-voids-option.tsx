@@ -8,11 +8,11 @@ export const input = (
       <anchor />
       This is a first paragraph
     </block>
-    <block>
-      This is the second paragraph
-      {/* unhang should move focus to here because, without `voids` set, it should skip over void block below */}
+    <block>This is the second paragraph</block>
+    <block void>
+      This is the third paragraph
+      {/* unhang should move focus to here */}
     </block>
-    <block void>This void paragraph gets skipped over</block>
     <block>
       <focus />
     </block>
@@ -20,10 +20,10 @@ export const input = (
 )
 
 export const test = editor => {
-  return Editor.unhangRange(editor, editor.selection)
+  return Editor.unhangRange(editor, editor.selection, { voids: true })
 }
 
 export const output = {
   anchor: { path: [0, 0], offset: 0 },
-  focus: { path: [1, 0], offset: 28 },
+  focus: { path: [2, 0], offset: 27 },
 }
