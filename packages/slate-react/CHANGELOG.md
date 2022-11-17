@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.86.0
+
+### Minor Changes
+
+- [#5121](https://github.com/ianstormtaylor/slate/pull/5121) [`06942c6d`](https://github.com/ianstormtaylor/slate/commit/06942c6d7e4b8418a467f022750b010491dbdbe7) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to copy/paste void elements
+
 ## 0.83.2
 
 ### Patch Changes
