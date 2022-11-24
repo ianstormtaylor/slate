@@ -3,7 +3,7 @@ import { Editor, Range, Element, Ancestor, Descendant } from 'slate'
 
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
-import { ReactEditor } from '..'
+import { ReactEditor } from '../plugin/react-editor'
 import { useSlateStatic } from './use-slate-static'
 import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'

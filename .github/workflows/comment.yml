@@ -6,8 +6,16 @@ on:
     types:
       - created
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+  pull-requests: read # to get info about PR (cirrus-actions/rebase)
+
 jobs:
   rebase:
+    permissions:
+      contents: write # to push code to rebase (cirrus-actions/rebase)
+      pull-requests: read # to get info about PR (cirrus-actions/rebase)
+
     name: rebase
     runs-on: ubuntu-latest
     if: |
@@ -25,6 +33,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   release_next:
+    permissions:
+      contents: read # to fetch code (actions/checkout)
+      pull-requests: write # to create or update comment (peter-evans/create-or-update-comment)
+
     name: release:next
     runs-on: ubuntu-latest
     if: |

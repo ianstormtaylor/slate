@@ -215,7 +215,7 @@ Using `match` can make representing complex logic a lot simpler.
 For example, consider wanting to add a bold mark to any text nodes that aren't already italic:
 
 ```js
-Transform.setNodes(
+Transforms.setNodes(
   editor,
   { bold: true },
   {

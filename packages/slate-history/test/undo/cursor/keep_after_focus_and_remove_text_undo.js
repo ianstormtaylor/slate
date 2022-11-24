@@ -44,6 +44,6 @@ export const output = {
   ],
   selection: {
     anchor: { path: [0, 0], offset: 5 },
-    focus: { path: [0, 0], offset: 5 },
+    focus: { path: [0, 0], offset: 0 },
   },
 }

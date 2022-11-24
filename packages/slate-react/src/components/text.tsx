@@ -1,18 +1,15 @@
 import React, { useRef } from 'react'
-import { Range, Element, Text as SlateText } from 'slate'
-
-import Leaf from './leaf'
+import { Element, Range, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import {
-  NODE_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-  EDITOR_TO_KEY_TO_ELEMENT,
-} from '../utils/weak-maps'
 import { isDecoratorRangeListEqual } from '../utils/range-list'
-import { useContentKey } from '../hooks/use-content-key'
-import { IS_ANDROID } from '../utils/environment'
+import {
+  EDITOR_TO_KEY_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  NODE_TO_ELEMENT,
+} from '../utils/weak-maps'
+import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import Leaf from './leaf'
 
 /**
  * Text.
@@ -69,10 +66,8 @@ const Text = (props: {
     }
   })
 
-  const contentKey = IS_ANDROID ? useContentKey(text) : undefined
-
   return (
-    <span data-slate-node="text" ref={ref} key={contentKey}>
+    <span data-slate-node="text" ref={ref}>
       {children}
     </span>
   )

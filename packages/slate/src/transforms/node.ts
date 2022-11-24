@@ -100,6 +100,7 @@ export interface NodeTransforms {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     }
@@ -180,7 +181,7 @@ export const NodeTransforms: NodeTransforms = {
 
       if (Range.isRange(at)) {
         if (!hanging) {
-          at = Editor.unhangRange(editor, at)
+          at = Editor.unhangRange(editor, at, { voids })
         }
 
         if (Range.isCollapsed(at)) {
@@ -345,7 +346,7 @@ export const NodeTransforms: NodeTransforms = {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       if (Range.isRange(at)) {
@@ -543,7 +544,7 @@ export const NodeTransforms: NodeTransforms = {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       const depths = Editor.nodes(editor, { at, match, mode, voids })
@@ -598,7 +599,7 @@ export const NodeTransforms: NodeTransforms = {
       }
 
       if (!hanging && Range.isRange(at)) {
-        at = Editor.unhangRange(editor, at)
+        at = Editor.unhangRange(editor, at, { voids })
       }
 
       if (split && Range.isRange(at)) {
@@ -825,6 +826,7 @@ export const NodeTransforms: NodeTransforms = {
       at?: Location
       match?: NodeMatch<T>
       mode?: MaximizeMode
+      hanging?: boolean
       split?: boolean
       voids?: boolean
     } = {}

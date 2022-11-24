@@ -1,5 +1,62 @@
 # slate-react
 
+## 0.86.0
+
+### Minor Changes
+
+- [#5121](https://github.com/ianstormtaylor/slate/pull/5121) [`06942c6d`](https://github.com/ianstormtaylor/slate/commit/06942c6d7e4b8418a467f022750b010491dbdbe7) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to copy/paste void elements
+
+## 0.83.2
+
+### Patch Changes
+
+- [#5148](https://github.com/ianstormtaylor/slate/pull/5148) [`a2b6786d`](https://github.com/ianstormtaylor/slate/commit/a2b6786d19f8bd5f779c526742a4dc3da971f696) Thanks [@ksimons](https://github.com/ksimons)! - Ensure the min-height for placeholders is set on the correct editor
+- [#5155](https://github.com/ianstormtaylor/slate/pull/5154) [`1b14de5`](https://github.com/ianstormtaylor/slate/commit/1b14de5f8e5961ac36eced229abea9abb5be71f9) Thanks [@jameshfisher](https://github.com/jameshfisher) - Revert insertText breaking change that deletes fragment
+
+## 0.83.1
+
+### Patch Changes
+
+- [#5143](https://github.com/ianstormtaylor/slate/pull/5143) [`347865ca`](https://github.com/ianstormtaylor/slate/commit/347865cafc1f2f3b0fc3d74d8758e082480df6ca) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix scrollIntoView when selection is collapsed inside mark placeholder
+
+## 0.83.0
+
+### Minor Changes
+
+- [#5123](https://github.com/ianstormtaylor/slate/pull/5123) [`0eb37e79`](https://github.com/ianstormtaylor/slate/commit/0eb37e79150275d3535f1694d8972751a83d826f) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Make it possible to delete block elements with backspace in Chrome and Safari
+
+### Patch Changes
+
+- [#5127](https://github.com/ianstormtaylor/slate/pull/5127) [`341041f0`](https://github.com/ianstormtaylor/slate/commit/341041f0b721926cca3f9dee98dc4589f2c96797) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Cleanup and fix insertion placeholder mark compare
+
+## 0.82.2
+
+### Patch Changes
+
+- [#5120](https://github.com/ianstormtaylor/slate/pull/5120) [`9815bdab`](https://github.com/ianstormtaylor/slate/commit/9815bdabdd34221ed86f68b556cfa43d845e2db0) Thanks [@hueyhe](https://github.com/hueyhe)! - Fix editor selection out of sync in readonly mode
+
+* [#5100](https://github.com/ianstormtaylor/slate/pull/5100) [`8eb1972b`](https://github.com/ianstormtaylor/slate/commit/8eb1972b5b2f9489936b1759afb76574040af5a0) Thanks [@KittyGiraudel](https://github.com/KittyGiraudel)! - Add `aria-multiline` attribute to textbox editor
+
+- [#5105](https://github.com/ianstormtaylor/slate/pull/5105) [`55b95740`](https://github.com/ianstormtaylor/slate/commit/55b9574097f6008bda7ed8e3cb7aa9dd607d9f49) Thanks [@yume-chan](https://github.com/yume-chan)! - Change `Element` component to use callback-style ref to reliably track DOM node of rendered custom elements
+
+## 0.82.1
+
+### Patch Changes
+
+- [#5084](https://github.com/ianstormtaylor/slate/pull/5084) [`50de780b`](https://github.com/ianstormtaylor/slate/commit/50de780b1c32fa2c52ad88d42031748f9d3944e9) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Fix selection handling with slow flush in mark placeholders on android, fix auto-capitalize after placeholder
+
+* [#5091](https://github.com/ianstormtaylor/slate/pull/5091) [`e18879e7`](https://github.com/ianstormtaylor/slate/commit/e18879e728077b09580b29e9a6683aaa66629bc5) Thanks [@e1himself](https://github.com/e1himself)! - Fix `withReact()` function type definition
+
+## 0.82.0
+
+### Minor Changes
+
+- [#5041](https://github.com/ianstormtaylor/slate/pull/5041) [`9bc0b613`](https://github.com/ianstormtaylor/slate/commit/9bc0b6132aa288a37ae9a85d0e59a9d5a75ebdd7) Thanks [@bryanph](https://github.com/bryanph)! - - Introduces a `useSlateSelection` hook that triggers whenever the selection changes.
+  - This also changes the implementation of SlateContext to use an incrementing value instead of an array replace to trigger updates
+  - Introduces a `useSlateWithV` hook that includes the version counter which can be used to prevent re-renders
+
+* [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
 ## 0.81.3
 
 ### Patch Changes

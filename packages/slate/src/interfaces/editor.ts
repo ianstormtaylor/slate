@@ -61,6 +61,7 @@ export interface BaseEditor {
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
+  markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
 
@@ -77,6 +78,7 @@ export interface BaseEditor {
   insertNode: (node: Node) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
+  getDirtyPaths: (op: Operation) => Path[]
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -356,8 +358,18 @@ export const Editor: EditorInterface = {
       match,
       reverse,
     })) {
-      if (!Text.isText(n) && !Path.equals(path, p)) {
-        return [n, p]
+      if (Text.isText(n)) return
+      if (Range.isRange(at)) {
+        if (
+          Path.isAncestor(p, at.anchor.path) &&
+          Path.isAncestor(p, at.focus.path)
+        ) {
+          return [n, p]
+        }
+      } else {
+        if (!Path.equals(path, p)) {
+          return [n, p]
+        }
       }
     }
   },
@@ -601,11 +613,15 @@ export const Editor: EditorInterface = {
    */
 
   isEditor(value: any): value is Editor {
-    if (!isPlainObject(value)) return false
     const cachedIsEditor = IS_EDITOR_CACHE.get(value)
     if (cachedIsEditor !== undefined) {
       return cachedIsEditor
     }
+
+    if (!isPlainObject(value)) {
+      return false
+    }
+
     const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
@@ -622,6 +638,7 @@ export const Editor: EditorInterface = {
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
       typeof value.removeMark === 'function' &&
+      typeof value.getDirtyPaths === 'function' &&
       (value.marks === null || isPlainObject(value.marks)) &&
       (value.selection === null || Range.isRange(value.selection)) &&
       Node.isNodeList(value.children) &&
@@ -799,16 +816,21 @@ export const Editor: EditorInterface = {
 
     if (anchor.offset === 0) {
       const prev = Editor.previous(editor, { at: path, match: Text.isText })
-      const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+      const markedVoid = Editor.above(editor, {
+        match: n => Editor.isVoid(editor, n) && editor.markableVoid(n),
       })
+      if (!markedVoid) {
+        const block = Editor.above(editor, {
+          match: n => Editor.isBlock(editor, n),
+        })
 
-      if (prev && block) {
-        const [prevNode, prevPath] = prev
-        const [, blockPath] = block
+        if (prev && block) {
+          const [prevNode, prevPath] = prev
+          const [, blockPath] = block
 
-        if (Path.isAncestor(blockPath, prevPath)) {
-          node = prevNode as Text
+          if (Path.isAncestor(blockPath, prevPath)) {
+            node = prevNode as Text
+          }
         }
       }
     }
@@ -1615,13 +1637,19 @@ export const Editor: EditorInterface = {
     let [start, end] = Range.edges(range)
 
     // PERF: exit early if we can guarantee that the range isn't hanging.
-    if (start.offset !== 0 || end.offset !== 0 || Range.isCollapsed(range)) {
+    if (
+      start.offset !== 0 ||
+      end.offset !== 0 ||
+      Range.isCollapsed(range) ||
+      Path.hasPrevious(end.path)
+    ) {
       return range
     }
 
     const endBlock = Editor.above(editor, {
       at: end,
       match: n => Editor.isBlock(editor, n),
+      voids,
     })
     const blockPath = endBlock ? endBlock[1] : []
     const first = Editor.start(editor, start)

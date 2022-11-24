@@ -1,5 +1,41 @@
 # slate
 
+## 0.86.0
+
+### Patch Changes
+
+- [#5189](https://github.com/ianstormtaylor/slate/pull/5189) [`fbc9838f`](https://github.com/ianstormtaylor/slate/commit/fbc9838fd72e78bfa9af49013981939773dcca11) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Add hanging option to unsetNodes so it matches setNodes
+
+* [#5193](https://github.com/ianstormtaylor/slate/pull/5193) [`6909a8f7`](https://github.com/ianstormtaylor/slate/commit/6909a8f7da0f70b1ef3b5c3a665e8d0d09e6fa99) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Stops Editor.unhangRange() from adjusting the range in some cases when it was not actually hanging
+
+- [#5186](https://github.com/ianstormtaylor/slate/pull/5186) [`e416d00b`](https://github.com/ianstormtaylor/slate/commit/e416d00b6c95d05a1e10f738bfbbddd6cb940ab6) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Report marks applied to a markableVoid if selection is collapsed
+
+## 0.85.0
+
+### Patch Changes
+
+- [#5135](https://github.com/ianstormtaylor/slate/pull/5135) [`346f6572`](https://github.com/ianstormtaylor/slate/commit/346f6572fc8fdb6504bb18d8676f5bdeef7014eb) Thanks [@SmilinBrian](https://github.com/SmilinBrian)! - Allow void elements to receive marks via markableVoid()
+
+* [#5168](https://github.com/ianstormtaylor/slate/pull/5168) [`3c49ff28`](https://github.com/ianstormtaylor/slate/commit/3c49ff28b3d188f69d8361bd682b7e8d0a1c13b6) Thanks [@i-artist](https://github.com/i-artist)! - Fixed above method that failed to get parentEntry when selection was range
+
+## 0.84.0
+
+### Minor Changes
+
+- [#5137](https://github.com/ianstormtaylor/slate/pull/5137) [`a2184d86`](https://github.com/ianstormtaylor/slate/commit/a2184d86571cfd0d89beb67863c444a988174937) Thanks [@mainhanu](https://github.com/mainhanu)! - transform.delete and transform.insertFragment performance optimize
+
+## 0.82.1
+
+### Patch Changes
+
+- [#5069](https://github.com/ianstormtaylor/slate/pull/5069) [`46d113fe`](https://github.com/ianstormtaylor/slate/commit/46d113fe1e102c87772681fdd90a086e37a3200d) Thanks [@krenzke](https://github.com/krenzke)! - Expose getDirtyPaths method on Editor object to allow for customization
+
+## 0.82.0
+
+### Patch Changes
+
+- [#4988](https://github.com/ianstormtaylor/slate/pull/4988) [`fbab6331`](https://github.com/ianstormtaylor/slate/commit/fbab6331a5ecebd9e98c6c8c87d6f4b3b7c43bd0) Thanks [@BitPhinix](https://github.com/BitPhinix)! - Android input handling rewrite, replace composition insert prefixes with decoration based mark placeholders
+
 ## 0.81.3
 
 ### Patch Changes

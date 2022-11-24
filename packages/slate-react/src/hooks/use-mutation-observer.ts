@@ -1,5 +1,7 @@
 import { RefObject, useEffect, useState } from 'react'
-import { useIsomorphicLayoutEffect } from '../../hooks/use-isomorphic-layout-effect'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
+import { isDOMElement } from '../utils/dom'
+import { ReactEditor } from '../plugin/react-editor'
 
 export function useMutationObserver(
   node: RefObject<HTMLElement>,
@@ -9,8 +11,9 @@ export function useMutationObserver(
   const [mutationObserver] = useState(() => new MutationObserver(callback))
 
   useIsomorphicLayoutEffect(() => {
-    // Disconnect mutation observer during render phase
-    mutationObserver.disconnect()
+    // Discard mutations caused during render phase. This works due to react calling
+    // useLayoutEffect synchronously after the render phase before the next tick.
+    mutationObserver.takeRecords()
   })
 
   useEffect(() => {
@@ -18,10 +21,7 @@ export function useMutationObserver(
       throw new Error('Failed to attach MutationObserver, `node` is undefined')
     }
 
-    // Attach mutation observer after render phase has finished
     mutationObserver.observe(node.current, options)
-
-    // Clean up after effect
-    return mutationObserver.disconnect.bind(mutationObserver)
-  })
+    return () => mutationObserver.disconnect()
+  }, [])
 }

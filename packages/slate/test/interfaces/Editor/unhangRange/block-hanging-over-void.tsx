@@ -8,8 +8,11 @@ export const input = (
       <anchor />
       This is a first paragraph
     </block>
-    <block>This is the second paragraph</block>
-    <block void />
+    <block>
+      This is the second paragraph
+      {/* unhang should move focus to here because, without `voids` set, it should skip over void block below */}
+    </block>
+    <block void>This void paragraph gets skipped over</block>
     <block>
       <focus />
     </block>

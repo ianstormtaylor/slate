@@ -12,6 +12,7 @@ interface Editor {
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
+  markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
   onChange: () => void
   // Overrideable core actions.
@@ -67,6 +68,20 @@ editor.insertText = text => {
   }
 
   insertText(text)
+}
+```
+
+If you have void "mention" elements that can accept marks like bold or italic:
+
+```javascript
+const { isVoid, markableVoid } = editor
+
+editor.isVoid = element => {
+  return element.type === 'mention' ? true : isInline(element)
+}
+
+editor.markableVoid = element => {
+  return element.type === 'mention' || markableVoid(element)
 }
 ```
 

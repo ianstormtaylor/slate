@@ -3,6 +3,8 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
+import { IS_ANDROID } from '../utils/environment'
+import { MARK_PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
 
 /**
  * Leaf content strings.
@@ -18,6 +20,7 @@ const String = (props: {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
   const parentPath = Path.parent(path)
+  const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
 
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
@@ -34,14 +37,14 @@ const String = (props: {
     !editor.isInline(parent) &&
     Editor.string(editor, parentPath) === ''
   ) {
-    return <ZeroWidthString isLineBreak />
+    return <ZeroWidthString isLineBreak isMarkPlaceholder={isMarkPlaceholder} />
   }
 
   // COMPAT: If the text is empty, it's because it's on the edge of an inline
   // node, so we render a zero-width space so that the selection can be
   // inserted next to it still.
   if (leaf.text === '') {
-    return <ZeroWidthString />
+    return <ZeroWidthString isMarkPlaceholder={isMarkPlaceholder} />
   }
 
   // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
@@ -104,14 +107,25 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
  * Leaf strings without text, render as zero-width strings.
  */
 
-const ZeroWidthString = (props: { length?: number; isLineBreak?: boolean }) => {
-  const { length = 0, isLineBreak = false } = props
+export const ZeroWidthString = (props: {
+  length?: number
+  isLineBreak?: boolean
+  isMarkPlaceholder?: boolean
+}) => {
+  const { length = 0, isLineBreak = false, isMarkPlaceholder = false } = props
+
+  const attributes = {
+    'data-slate-zero-width': isLineBreak ? 'n' : 'z',
+    'data-slate-length': length,
+  }
+
+  if (isMarkPlaceholder) {
+    attributes['data-slate-mark-placeholder'] = true
+  }
+
   return (
-    <span
-      data-slate-zero-width={isLineBreak ? 'n' : 'z'}
-      data-slate-length={length}
-    >
-      {'\uFEFF'}
+    <span {...attributes}>
+      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
       {isLineBreak ? <br /> : null}
     </span>
   )
