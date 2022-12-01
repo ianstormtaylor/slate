@@ -76,6 +76,9 @@ const Children = (props: Parameters<typeof useChildren>[0]) => (
   <React.Fragment>{useChildren(props)}</React.Fragment>
 )
 
+// The number of Editable components currently mounted.
+let mountedCount = 0
+
 /**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
@@ -802,6 +805,36 @@ export const Editable = (props: EditableProps) => {
     })
   })
 
+  useEffect(() => {
+    mountedCount++
+
+    if (mountedCount === 1) {
+      // Set global default styles for editors.
+      const defaultStylesElement = document.createElement('style')
+      defaultStylesElement.setAttribute('data-slate-default-styles', 'true')
+      defaultStylesElement.innerHTML =
+        // :where is used to give these rules lower specificity so user stylesheets can override them.
+        `:where([data-slate-editor]) {` +
+        // Allow positioning relative to the editable element.
+        `position: relative;` +
+        // Prevent the default outline styles.
+        `outline: none;` +
+        // Preserve adjacent whitespace and new lines.
+        `white-space: pre-wrap;` +
+        // Allow words to break if they are too long.
+        `word-wrap: break-word;` +
+        `}`
+      document.head.appendChild(defaultStylesElement)
+    }
+
+    return () => {
+      mountedCount--
+
+      if (mountedCount <= 0)
+        document.querySelector('style[data-slate-default-styles]')?.remove()
+    }
+  }, [])
+
   return (
     <ReadOnlyContext.Provider value={readOnly}>
       <DecorateContext.Provider value={decorate}>
@@ -840,18 +873,7 @@ export const Editable = (props: EditableProps) => {
             zindex={-1}
             suppressContentEditableWarning
             ref={ref}
-            style={{
-              // Allow positioning relative to the editable element.
-              position: 'relative',
-              // Prevent the default outline styles.
-              outline: 'none',
-              // Preserve adjacent whitespace and new lines.
-              whiteSpace: 'pre-wrap',
-              // Allow words to break if they are too long.
-              wordWrap: 'break-word',
-              // Allow for passed-in styles to override anything.
-              ...style,
-            }}
+            style={style}
             onBeforeInput={useCallback(
               (event: React.FormEvent<HTMLDivElement>) => {
                 // COMPAT: Certain browsers don't support the `beforeinput` event, so we
