@@ -8,7 +8,15 @@ const createNodeMock = () => ({
   getRootNode: () => global.document,
 })
 
+class MockResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 describe('slate-react', () => {
+  window.ResizeObserver = MockResizeObserver as any
+
   describe('Editable', () => {
     describe('NODE_TO_KEY logic', () => {
       it('should not unmount the node that gets split on a split_node operation', async () => {

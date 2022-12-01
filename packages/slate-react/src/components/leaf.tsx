@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react'
+import React, { useRef, useEffect, useMemo } from 'react'
 import { Element, Text } from 'slate'
 import String from './string'
 import {
@@ -34,6 +34,19 @@ const Leaf = (props: {
   const placeholderRef = useRef<HTMLSpanElement | null>(null)
   const editor = useSlateStatic()
 
+  const placeholderResizeObserver = useMemo(
+    () =>
+      new ResizeObserver(([{ target }]) => {
+        const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
+        if (!styleElement) return
+
+        // Make the min-height the height of the placeholder.
+        const minHeight = `${target.clientHeight}px`
+        styleElement.innerHTML = `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+      }),
+    []
+  )
+
   useEffect(() => {
     const placeholderEl = placeholderRef?.current
     const editorEl = ReactEditor.toDOMNode(editor, editor)
@@ -42,17 +55,20 @@ const Leaf = (props: {
       return
     }
 
-    EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
-    const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
-    if (styleElement) {
-      styleElement.innerHTML =
-        `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+    if (placeholderEl !== EDITOR_TO_PLACEHOLDER_ELEMENT.get(editor)) {
+      EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
+      placeholderResizeObserver.disconnect()
+      placeholderResizeObserver.observe(placeholderEl)
     }
 
     return () => {
       EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
+      placeholderResizeObserver.disconnect()
       const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
-      if (styleElement) styleElement.innerHTML = ''
+      if (styleElement) {
+        // No min-height if there is no placeholder.
+        styleElement.innerHTML = ''
+      }
     }
   }, [placeholderRef, leaf])
 
