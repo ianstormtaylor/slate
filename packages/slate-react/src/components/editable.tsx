@@ -864,6 +864,7 @@ export const Editable = (props: EditableProps) => {
                 : 'false'
             }
             data-slate-editor
+            data-slate-editor-id={editor.id}
             data-slate-node="value"
             // explicitly set this
             contentEditable={!readOnly}
