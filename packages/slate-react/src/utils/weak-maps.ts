@@ -29,6 +29,10 @@ export const EDITOR_TO_KEY_TO_ELEMENT: WeakMap<
   Editor,
   WeakMap<Key, HTMLElement>
 > = new WeakMap()
+export const EDITOR_TO_STYLE_ELEMENT: WeakMap<
+  Editor,
+  HTMLStyleElement
+> = new WeakMap()
 
 /**
  * Weak maps for storing editor-related state.

@@ -4,6 +4,7 @@ import String from './string'
 import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_PLACEHOLDER_ELEMENT,
+  EDITOR_TO_STYLE_ELEMENT,
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
@@ -41,12 +42,17 @@ const Leaf = (props: {
       return
     }
 
-    editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
     EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
+    const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
+    if (styleElement) {
+      styleElement.innerHTML =
+        `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+    }
 
     return () => {
-      editorEl.style.minHeight = 'auto'
       EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
+      const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
+      if (styleElement) styleElement.innerHTML = ''
     }
   }, [placeholderRef, leaf])
 

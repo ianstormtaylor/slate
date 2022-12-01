@@ -55,6 +55,7 @@ import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_INSERTION_MARKS,
+  EDITOR_TO_STYLE_ELEMENT,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
@@ -832,6 +833,16 @@ export const Editable = (props: EditableProps) => {
 
       if (mountedCount <= 0)
         document.querySelector('style[data-slate-default-styles]')?.remove()
+    }
+  }, [])
+
+  useEffect(() => {
+    const styleElement = document.createElement('style')
+    document.head.appendChild(styleElement)
+    EDITOR_TO_STYLE_ELEMENT.set(editor, styleElement)
+    return () => {
+      styleElement.remove()
+      EDITOR_TO_STYLE_ELEMENT.delete(editor)
     }
   }, [])
 
