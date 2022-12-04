@@ -1,5 +1,11 @@
 # slate
 
+## 0.87.0
+
+### Minor Changes
+
+- [#5206](https://github.com/ianstormtaylor/slate/pull/5206) [`96b7fcdb`](https://github.com/ianstormtaylor/slate/commit/96b7fcdbf98a7c8908f5d9613d9898cb24a8ae47) Thanks [@kylemclean](https://github.com/kylemclean)! - Use stylesheet for default styles on Editable components
+
 ## 0.86.0
 
 ### Patch Changes
