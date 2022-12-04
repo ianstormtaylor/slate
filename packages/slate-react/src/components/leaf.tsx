@@ -4,10 +4,10 @@ import String from './string'
 import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_PLACEHOLDER_ELEMENT,
+  EDITOR_TO_STYLE_ELEMENT,
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
-import { ReactEditor } from '..'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -33,19 +33,54 @@ const Leaf = (props: {
   const placeholderRef = useRef<HTMLSpanElement | null>(null)
   const editor = useSlateStatic()
 
+  const placeholderResizeObserver = useRef<ResizeObserver | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (placeholderResizeObserver.current) {
+        placeholderResizeObserver.current.disconnect()
+      }
+    }
+  }, [])
+
   useEffect(() => {
     const placeholderEl = placeholderRef?.current
-    const editorEl = ReactEditor.toDOMNode(editor, editor)
 
-    if (!placeholderEl || !editorEl) {
-      return
+    if (placeholderEl) {
+      EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
+    } else {
+      EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
     }
 
-    editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
-    EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
+    if (placeholderResizeObserver.current) {
+      // Update existing observer.
+      placeholderResizeObserver.current.disconnect()
+      if (placeholderEl)
+        placeholderResizeObserver.current.observe(placeholderEl)
+    } else if (placeholderEl) {
+      // Create a new observer and observe the placeholder element.
+      placeholderResizeObserver.current = new ResizeObserver(([{ target }]) => {
+        const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
+        if (styleElement) {
+          // Make the min-height the height of the placeholder.
+          const minHeight = `${target.clientHeight}px`
+          styleElement.innerHTML = `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+        }
+      })
+
+      placeholderResizeObserver.current.observe(placeholderEl)
+    }
+
+    if (!placeholderEl) {
+      // No placeholder element, so no need for a resize observer.
+      const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
+      if (styleElement) {
+        // No min-height if there is no placeholder.
+        styleElement.innerHTML = ''
+      }
+    }
 
     return () => {
-      editorEl.style.minHeight = 'auto'
       EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
     }
   }, [placeholderRef, leaf])

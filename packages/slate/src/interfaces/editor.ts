@@ -57,6 +57,7 @@ export interface BaseEditor {
   selection: Selection
   operations: Operation[]
   marks: EditorMarks | null
+  readonly id: number
 
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean

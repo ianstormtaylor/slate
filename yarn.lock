@@ -3739,6 +3739,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/resize-observer-browser@npm:^0.1.7":
+  version: 0.1.7
+  resolution: "@types/resize-observer-browser@npm:0.1.7"
+  checksum: 0377eaac8bb7a17b983b49a156006032380b459bfebefc54a5aa2f7f8a9786d2b60723e8837c61ef733330b478f4f26293e9edbdc8006238e4f80c878c56c988
+  languageName: node
+  linkType: hard
+
 "@types/resolve@npm:0.0.8":
   version: 0.0.8
   resolution: "@types/resolve@npm:0.0.8"
@@ -14235,6 +14242,7 @@ resolve@^2.0.0-next.3:
     "@types/react": ^16.9.13
     "@types/react-dom": ^16.9.4
     "@types/react-test-renderer": ^16.8.0
+    "@types/resize-observer-browser": ^0.1.7
     direction: ^1.0.3
     is-hotkey: ^0.1.6
     is-plain-object: ^5.0.0
