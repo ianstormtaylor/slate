@@ -1311,7 +1311,7 @@ export const Editable = (props: EditableProps) => {
                 if (
                   !readOnly &&
                   !state.isUpdatingSelection &&
-                  ReactEditor.hasSelectableTarget(editor, event.target) &&
+                  ReactEditor.hasEditableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onFocus)
                 ) {
                   const el = ReactEditor.toDOMNode(editor, editor)
