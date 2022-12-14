@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.87.1
+
+### Patch Changes
+
+- [#5223](https://github.com/ianstormtaylor/slate/pull/5223) [`120437d6`](https://github.com/ianstormtaylor/slate/commit/120437d61237eeb8df4ed0db92af31698e910eda) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Fix issue preventing editing and copy/paste into editable voids
+
 ## 0.87.0
 
 ### Minor Changes
