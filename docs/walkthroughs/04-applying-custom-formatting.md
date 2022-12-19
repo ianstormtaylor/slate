@@ -133,7 +133,7 @@ const Leaf = props => {
 }
 ```
 
-Pretty familiar, right?
+Pretty familiar, right? Note that it is described with a `span` - This is because all leaves must be an [inline element](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements). You can learn more about leaves in the [Rendering section](../concepts/09-rendering.md#leaves).
 
 And now, let's tell Slate about that leaf. To do that, we'll pass in the `renderLeaf` prop to our editor.
 
