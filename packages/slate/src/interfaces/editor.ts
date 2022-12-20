@@ -359,7 +359,7 @@ export const Editor: EditorInterface = {
       match,
       reverse,
     })) {
-      if (Text.isText(n)) return
+      if (Text.isText(n)) continue
       if (Range.isRange(at)) {
         if (
           Path.isAncestor(p, at.anchor.path) &&
