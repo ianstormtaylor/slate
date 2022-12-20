@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.88.0
+
+### Minor Changes
+
+- [#5226](https://github.com/ianstormtaylor/slate/pull/5226) [`0141f683`](https://github.com/ianstormtaylor/slate/commit/0141f683659025c7e851c11274cf200da05fd31e) Thanks [@laufeyrut](https://github.com/laufeyrut)! - Check if getBoundingClientRect exist before trying to call bind on it. Makes unit testing experience agains Editable nicer
+
 ## 0.87.1
 
 ### Patch Changes
