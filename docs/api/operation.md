@@ -18,11 +18,11 @@ Check if a value is a list of `Operation` objects. Returns the value as an `Oper
 
 #### `isSelectionOperation(value: any) => boolean`
 
-Check of a value is a `SelectionOperation` object. Returns the value as a `SelectionOperation` if it is one.
+Check if a value is a `SelectionOperation` object. Returns the value as a `SelectionOperation` if it is one.
 
 #### `isTextOperation(value: any) => boolean`
 
-Check of a value is a `TextOperation` object. Returns the value as a `TextOperation` if it is one.
+Check if a value is a `TextOperation` object. Returns the value as a `TextOperation` if it is one.
 
 ### Static methods
 
