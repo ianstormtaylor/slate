@@ -1,5 +1,11 @@
 # slate
 
+## 0.88.1
+
+### Patch Changes
+
+- [#5235](https://github.com/ianstormtaylor/slate/pull/5235) [`36203b3f`](https://github.com/ianstormtaylor/slate/commit/36203b3f10fc1ee154923c7c75ce7912fec1e6f7) Thanks [@ppiotrowicz](https://github.com/ppiotrowicz)! - Fixed Editor.above method that always returned undefined with Point location
+
 ## 0.87.0
 
 ### Minor Changes
