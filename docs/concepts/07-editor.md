@@ -35,7 +35,7 @@ It is slightly more complex than the others, because it contains all of the top-
 The `children` property contains the document tree of nodes that make up the editor's content.
 
 The `selection` property contains the user's current selection, if any.
-Don't set it directly; use [Transforms.select](04-transforms#selection-transforms)
+Don't set it directly; use [Transforms.select](04-transforms.md#selection-transforms)
 
 The `operations` property contains all of the operations that have been applied since the last "change" was flushed. \(Since Slate batches operations up into ticks of the event loop.\)
 
