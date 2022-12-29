@@ -28,6 +28,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [CoCalc](https://cocalc.com/): Collaborative calculation and data science
 - [Coda](https://coda.io/): Coda brings all your words, data, and teamwork into one powerful doc
 - [Dropdeck](https://www.dropdeck.com/): Magically create beautiful slides — faster than ever
+- [Eraser](https://www.tryeraser.com/): The Whiteboard for Engineering Teams
 - [GitBook](https://www.gitbook.com/): Plan, centralize and share knowledge
 - [Discord](https://discord.com/): Text & voice channels to collaborate & share
 - [Grafana](https://grafana.com/): Operational dashboards for your data
