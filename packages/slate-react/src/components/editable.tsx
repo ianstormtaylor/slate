@@ -81,6 +81,16 @@ const Children = (props: Parameters<typeof useChildren>[0]) => (
 let mountedCount = 0
 
 /**
+ * `ElementType` represents the `type` string property on any `Element`.
+ */
+
+export type ElementType = Element extends infer E
+  ? E extends { type: string }
+    ? E['type']
+    : never
+  : never
+
+/**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
