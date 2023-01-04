@@ -1,6 +1,8 @@
 // Components
 export {
   Editable,
+  ElementRenderer,
+  ElementRenderers,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
