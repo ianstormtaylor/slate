@@ -106,9 +106,9 @@ export type TypedElement<T extends ElementType> = Element extends infer E
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
-export interface RenderElementProps<T extends ElementType | {} = {}> {
+export interface RenderElementProps<T extends ElementType = ElementType> {
   children: any
-  element: T extends ElementType ? TypedElement<T> : Element
+  element: ElementType extends T ? Element : TypedElement<T>
   attributes: {
     'data-slate-node': 'element'
     'data-slate-inline'?: true
@@ -131,7 +131,7 @@ export type ElementRenderer<T extends ElementType> = (
  */
 
 export type ElementRenderers = {
-  [T in ElementType]: ElementRenderer<T>
+  [T in ElementType]?: ElementRenderer<T>
 }
 
 /**
