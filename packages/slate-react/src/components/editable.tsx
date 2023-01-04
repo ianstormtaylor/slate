@@ -91,12 +91,24 @@ export type ElementType = Element extends infer E
   : never
 
 /**
+ * `TypedElement` represents the `Elemet` ith a `type` property of `T`.
+ */
+
+export type TypedElement<T extends ElementType> = Element extends infer E
+  ? E extends { type: string }
+    ? E['type'] extends T
+      ? E
+      : never
+    : never
+  : never
+
+/**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
-export interface RenderElementProps {
+export interface RenderElementProps<T extends ElementType | {} = {}> {
   children: any
-  element: Element
+  element: T extends ElementType ? TypedElement<T> : Element
   attributes: {
     'data-slate-node': 'element'
     'data-slate-inline'?: true
