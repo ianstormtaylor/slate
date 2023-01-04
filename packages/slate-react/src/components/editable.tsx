@@ -2,7 +2,6 @@ import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import React, {
-  FC,
   useCallback,
   useEffect,
   useMemo,
@@ -120,17 +119,19 @@ export interface RenderElementProps<T extends ElementType | {} = {}> {
 }
 
 /**
- * `ElementRenderer` renders elements of a matching `type` property.
+ * `ElementRenderer` renders an element
  */
 
-export type ElementRenderer<T extends ElementType> = FC<RenderElementProps<T>>
+export type ElementRenderer<T extends ElementType> = (
+  props: RenderElementProps<T>
+) => JSX.Element
 
 /**
  * `ElementRenderers` maps element types to render functions.
  */
 
 export type ElementRenderers = {
-  [T in ElementType]: FC<RenderElementProps<T>>
+  [T in ElementType]: ElementRenderer<T>
 }
 
 /**
@@ -157,7 +158,9 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderElement?:
+    | ((props: RenderElementProps) => JSX.Element)
+    | ElementRenderers
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
