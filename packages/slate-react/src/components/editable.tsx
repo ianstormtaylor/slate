@@ -170,7 +170,7 @@ export interface RenderLeafProps<T extends TextType = TextType> {
  */
 
 export type LeafRenderer<T extends TextType> = (
-  props: RenderElementProps<T>
+  props: RenderLeafProps<T>
 ) => JSX.Element
 
 /**
