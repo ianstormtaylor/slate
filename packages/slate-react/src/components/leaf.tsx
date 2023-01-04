@@ -6,7 +6,11 @@ import {
   EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_STYLE_ELEMENT,
 } from '../utils/weak-maps'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import {
+  LeafRenderers,
+  RenderLeafProps,
+  RenderPlaceholderProps,
+} from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
 
 /**
@@ -18,7 +22,7 @@ const Leaf = (props: {
   leaf: Text
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   text: Text
 }) => {
   const {
@@ -124,6 +128,18 @@ const Leaf = (props: {
     'data-slate-leaf': true
   } = {
     'data-slate-leaf': true,
+  }
+
+  if (typeof renderLeaf !== 'function') {
+    const leafType = Reflect.get(leaf, 'type')
+    if (typeof leafType === 'string' && leafType in renderLeaf) {
+      return renderLeaf[leafType]({ attributes, children, leaf, text })
+    }
+    return (
+      <DefaultLeaf attributes={attributes} leaf={leaf} text={text}>
+        {children}
+      </DefaultLeaf>
+    )
   }
 
   return renderLeaf({ attributes, children, leaf, text })

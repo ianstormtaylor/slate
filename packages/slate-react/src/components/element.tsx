@@ -15,6 +15,7 @@ import {
 import { isDecoratorRangeListEqual } from '../utils/range-list'
 import {
   ElementRenderers,
+  LeafRenderers,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
@@ -31,7 +32,7 @@ const Element = (props: {
     | ((props: RenderElementProps) => JSX.Element)
     | ElementRenderers
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   selection: Range | null
 }) => {
   const {

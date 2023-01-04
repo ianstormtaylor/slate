@@ -91,14 +91,12 @@ export type ElementType = Element extends infer E
   : never
 
 /**
- * `TypedElement` represents the `Elemet` ith a `type` property of `T`.
+ * `TypedElement` represents the `Element` with a `type` property of `T`.
  */
 
 export type TypedElement<T extends ElementType> = Element extends infer E
-  ? E extends { type: string }
-    ? E['type'] extends T
-      ? E
-      : never
+  ? E extends { type: T }
+    ? E
     : never
   : never
 
@@ -119,7 +117,7 @@ export interface RenderElementProps<T extends ElementType = ElementType> {
 }
 
 /**
- * `ElementRenderer` renders an element
+ * `ElementRenderer` renders an element.
  */
 
 export type ElementRenderer<T extends ElementType> = (
@@ -135,16 +133,52 @@ export type ElementRenderers = {
 }
 
 /**
+ * `TextType` represents the `type` string property on any `Text`.
+ */
+
+export type TextType = Text extends infer T
+  ? T extends { type: string }
+    ? T['type']
+    : never
+  : never
+
+/**
+ * `TypedText` represents the `Text` with a `type` property of `T`.
+ */
+
+export type TypedText<T extends TextType> = Text extends infer L
+  ? L extends { type: T }
+    ? T
+    : never
+  : never
+
+/**
  * `RenderLeafProps` are passed to the `renderLeaf` handler.
  */
 
-export interface RenderLeafProps {
+export interface RenderLeafProps<T extends TextType = TextType> {
   children: any
-  leaf: Text
-  text: Text
+  leaf: TextType extends T ? Text : TypedText<T>
+  text: TextType extends T ? Text : TypedText<T>
   attributes: {
     'data-slate-leaf': true
   }
+}
+
+/**
+ * `LeafRenderer` renders a leaf.
+ */
+
+export type LeafRenderer<T extends TextType> = (
+  props: RenderElementProps<T>
+) => JSX.Element
+
+/**
+ * `LeafRenderers` maps leaf types to render functions.
+ */
+
+export type LeafRenderers = {
+  [T in TextType]?: LeafRenderer<T>
 }
 
 /**
@@ -161,7 +195,7 @@ export type EditableProps = {
   renderElement?:
     | ((props: RenderElementProps) => JSX.Element)
     | ElementRenderers
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType

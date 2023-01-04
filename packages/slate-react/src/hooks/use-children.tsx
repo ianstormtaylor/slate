@@ -9,6 +9,7 @@ import { useDecorate } from './use-decorate'
 import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
 import {
   ElementRenderers,
+  LeafRenderers,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
@@ -26,7 +27,7 @@ const useChildren = (props: {
     | ((props: RenderElementProps) => JSX.Element)
     | ElementRenderers
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   selection: Range | null
 }) => {
   const {
