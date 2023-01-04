@@ -2,6 +2,7 @@ import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import React, {
+  FC,
   useCallback,
   useEffect,
   useMemo,
@@ -116,6 +117,20 @@ export interface RenderElementProps<T extends ElementType | {} = {}> {
     dir?: 'rtl'
     ref: any
   }
+}
+
+/**
+ * `ElementRenderer` renders elements of a matching `type` property.
+ */
+
+export type ElementRenderer<T extends ElementType> = FC<RenderElementProps<T>>
+
+/**
+ * `ElementRenderers` maps element types to render functions.
+ */
+
+export type ElementRenderers = {
+  [T in ElementType]: FC<RenderElementProps<T>>
 }
 
 /**
