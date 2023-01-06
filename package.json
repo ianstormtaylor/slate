@@ -31,12 +31,11 @@
     "test": "yarn run test:mocha && yarn run test:jest",
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
-    "test:integration": "run-p -r serve cypress:run",
+    "test:integration": "run-p -r serve playwright",
     "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
     "watch": "yarn build:rollup --watch",
-    "cypress:run": "cypress run",
-    "cypress:open": "cypress open"
+    "playwright": "playwright test"
   },
   "devDependencies": {
     "@babel/cli": "^7.7.4",
@@ -55,6 +54,7 @@
     "@changesets/changelog-github": "^0.3.0",
     "@changesets/cli": "^2.14.1",
     "@emotion/css": "^11.7.1",
+    "@playwright/test": "^1.29.1",
     "@testing-library/cypress": "^8.0.0",
     "@types/jest": "27.0.1",
     "@types/lodash": "^4.14.149",
@@ -68,7 +68,6 @@
     "babel-jest": "27.0.6",
     "babel-plugin-dev-expression": "^0.2.2",
     "babel-plugin-module-resolver": "^3.1.1",
-    "cypress": "^8.3.0",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^7.2.0",
     "eslint-plugin-import": "^2.18.2",
@@ -85,6 +84,7 @@
     "mocha": "^6.2.0",
     "next": "^12.2.0",
     "npm-run-all": "^4.1.2",
+    "playwright": "^1.29.1",
     "prettier": "^1.19.1",
     "prismjs": "^1.5.1",
     "react": "^16.12.0",
