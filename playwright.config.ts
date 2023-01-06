@@ -1,6 +1,6 @@
-import type { PlaywrightTestConfig } from '@playwright/test';
-import { devices } from '@playwright/test';
-import os from 'os';
+import { PlaywrightTestConfig } from '@playwright/test'
+import { devices } from '@playwright/test'
+import os from 'os'
 
 const projects = [
   {
@@ -23,7 +23,7 @@ const projects = [
       ...devices['Desktop Firefox'],
     },
   },
-];
+]
 
 if (os.type() === 'Darwin') {
   projects.push({
@@ -31,14 +31,14 @@ if (os.type() === 'Darwin') {
     use: {
       ...devices['Desktop Safari'],
     },
-  });
+  })
 }
 
 const retries = process.env.PLAYWRIGHT_RETRIES
   ? +process.env.PLAYWRIGHT_RETRIES
   : process.env.CI
   ? 5
-  : 2;
+  : 2
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -85,6 +85,6 @@ const config: PlaywrightTestConfig = {
 
   /* Folder for test artifacts such as screenshots, videos, traces, etc. */
   // outputDir: 'test-results/',
-};
+}
 
-export default config;
+export default config
