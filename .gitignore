@@ -9,10 +9,7 @@ node_modules/
 packages/*/yarn.lock
 site/out/
 tmp/
-cypress/screenshots
-cypress/videos
-cypress/fixtures
-cypress/plugins
+test-results/
 .DS_Store
 
 # Recommendation from https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored (not using Zero-installs)
