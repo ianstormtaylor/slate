@@ -13,14 +13,16 @@ test.describe('mentions example', () => {
 
   test('shows list of mentions', async ({ page }) => {
     await page.getByRole('textbox').click()
-    await page.getByRole('textbox').press('End')
+    await page.getByRole('textbox').selectText()
+    await page.getByRole('textbox').press('Backspace')
     await page.getByRole('textbox').type(' @ma')
     expect(await page.locator('[data-cy="mentions-portal"]').count()).toBe(1)
   })
 
   test('inserts on enter from list', async ({ page }) => {
     await page.getByRole('textbox').click()
-    await page.getByRole('textbox').press('End')
+    await page.getByRole('textbox').selectText()
+    await page.getByRole('textbox').press('Backspace')
     await page.getByRole('textbox').type(' @Ja')
     await page.getByRole('textbox').press('Enter')
     expect(await page.locator('[data-cy="mention-Jabba"]').count()).toBe(1)
