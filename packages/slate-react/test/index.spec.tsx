@@ -19,7 +19,7 @@ describe('slate-react', () => {
 
   describe('Editable', () => {
     describe('NODE_TO_KEY logic', () => {
-      it('should not unmount the node that gets split on a split_node operation', async () => {
+      test('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: 'test' }] }]
         const mounts = jest.fn<void, [Element]>()
@@ -50,7 +50,7 @@ describe('slate-react', () => {
         expect(mounts).toHaveBeenCalledTimes(2)
       })
 
-      it('should not unmount the node that gets merged into on a merge_node operation', async () => {
+      test('should not unmount the node that gets merged into on a merge_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [
           { type: 'block', children: [{ text: 'te' }] },

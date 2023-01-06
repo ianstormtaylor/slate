@@ -13,6 +13,7 @@ const projects = [
     name: 'chromium',
     use: {
       ...devices['Desktop Chrome'],
+      permissions: ['clipboard-read', 'clipboard-write'],
       launchOptions: {
         // headless: false,
         /**
