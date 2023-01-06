@@ -25,11 +25,17 @@ test.describe('code highlighting', () => {
     await expect(await page.locator('select').inputValue()).toBe('js') // Confirm value to avoid race condition
 
     await page.locator(slateEditor).click() // focus on the editor
-    await page.keyboard.press('Home')
+    const isMac = await page.evaluate(() => {
+      return /Mac|iPhone|iPod|iPad/i.test(navigator.platform)
+    })
+    if (isMac) {
+      await page.keyboard.press('Meta+A')
+    } else {
+      await page.keyboard.press('Control+A')
+    }
     await page.keyboard.type(JSCode) // Type JavaScript code
     await page.keyboard.press('Enter')
 
-    await page.pause()
     expect(
       await page
         .locator(slateEditor)
