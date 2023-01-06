@@ -1,5 +1,6 @@
 import type { PlaywrightTestConfig } from '@playwright/test';
 import { devices } from '@playwright/test';
+import os from 'os';
 
 const projects = [
   {
@@ -16,22 +17,22 @@ const projects = [
       },
     },
   },
-  // {
-  //   name: 'firefox',
-  //   use: {
-  //     ...devices['Desktop Firefox'],
-  //   },
-  // },
+  {
+    name: 'firefox',
+    use: {
+      ...devices['Desktop Firefox'],
+    },
+  },
 ];
 
-// if (os.type() === 'Darwin') {
-//   projects.push({
-//     name: 'webkit',
-//     use: {
-//       ...devices['Desktop Safari'],
-//     },
-//   });
-// }
+if (os.type() === 'Darwin') {
+  projects.push({
+    name: 'webkit',
+    use: {
+      ...devices['Desktop Safari'],
+    },
+  });
+}
 
 const retries = process.env.PLAYWRIGHT_RETRIES
   ? +process.env.PLAYWRIGHT_RETRIES
