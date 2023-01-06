@@ -108,31 +108,31 @@ dirs.forEach(dir => {
     codepoints.forEach(([str, ltrDist, rtlDist]) => {
       const dist = isRTL && rtlDist != null ? rtlDist : ltrDist
 
-      test(str, () => {
+      it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
       })
     })
 
     zwjSequences.forEach(([str, dist]) => {
-      test(str, () => {
+      it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
       })
     })
 
     regionalIndicatorSequences.forEach(str => {
-      test(str, () => {
+      it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), 4)
       })
     })
 
     keycapSequences.forEach(str => {
-      test(str, () => {
+      it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), 3)
       })
     })
 
     tagSequences.forEach(([str, dist]) => {
-      test(str, () => {
+      it(str, () => {
         assert.strictEqual(getCharacterDistance(str + str, isRTL), dist)
       })
     })
@@ -145,7 +145,7 @@ dirs.forEach(dir => {
         } else {
           str = strs.slice(i).join('')
         }
-        test(`Sample string ${label}, boundary ${isRTL ? i : i + 1}`, () => {
+        it(`Sample string ${label}, boundary ${isRTL ? i : i + 1}`, () => {
           assert.strictEqual(getCharacterDistance(str, isRTL), strs[i].length)
         })
       }
@@ -171,7 +171,7 @@ const rtlCases = [
 
 describe(`getWordDistance - ltr`, () => {
   ltrCases.forEach(([str, dist]) => {
-    test(str, () => {
+    it(str, () => {
       assert.strictEqual(getWordDistance(str), dist)
     })
   })
@@ -179,7 +179,7 @@ describe(`getWordDistance - ltr`, () => {
 
 describe(`getWordDistance - rtl`, () => {
   rtlCases.forEach(([str, dist]) => {
-    test(str, () => {
+    it(str, () => {
       assert.strictEqual(getWordDistance(str, true), dist)
     })
   })
@@ -195,7 +195,7 @@ const cases = [
 
 describe('codepointsIteratorRTL', () => {
   cases.forEach(str => {
-    test(str, () => {
+    it(str, () => {
       const arr1 = [...codepointsIteratorRTL(str)]
       const arr2 = Array.from(str).reverse()
 
