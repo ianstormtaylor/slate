@@ -108,12 +108,12 @@ export const TextTransforms: TextTransforms = {
 
       let [start, end] = Range.edges(at)
       const startBlock = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at: start,
         voids,
       })
       const endBlock = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at: end,
         voids,
       })
@@ -161,7 +161,7 @@ export const TextTransforms: TextTransforms = {
         }
 
         if (
-          (!voids && Editor.isVoid(editor, node)) ||
+          (!voids && Element.isElement(node) && Editor.isVoid(editor, node)) ||
           (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
         ) {
           matches.push(entry)
@@ -293,7 +293,7 @@ export const TextTransforms: TextTransforms = {
       // instead since it will need to be split otherwise.
       const inlineElementMatch = Editor.above(editor, {
         at,
-        match: n => Editor.isInline(editor, n),
+        match: n => Element.isElement(n) && Editor.isInline(editor, n),
         mode: 'highest',
         voids,
       })
@@ -311,7 +311,7 @@ export const TextTransforms: TextTransforms = {
       }
 
       const blockMatch = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         at,
         voids,
       })!
@@ -410,7 +410,7 @@ export const TextTransforms: TextTransforms = {
         at,
         match: n =>
           hasBlocks
-            ? Editor.isBlock(editor, n)
+            ? Element.isElement(n) && Editor.isBlock(editor, n)
             : Text.isText(n) || Editor.isInline(editor, n),
         mode: hasBlocks ? 'lowest' : 'highest',
         always:
@@ -440,7 +440,7 @@ export const TextTransforms: TextTransforms = {
 
       Transforms.insertNodes(editor, middles, {
         at: middleRef.current!,
-        match: n => Editor.isBlock(editor, n),
+        match: n => Element.isElement(n) && Editor.isBlock(editor, n),
         mode: 'lowest',
         voids,
       })

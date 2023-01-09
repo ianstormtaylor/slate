@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from 'slate'
+import { Editor, Element } from 'slate'
 import { jsx } from '../../../..'
 
 export const input = (
@@ -13,7 +13,7 @@ export const test = editor => {
   return Array.from(
     Editor.nodes(editor, {
       at: [],
-      match: n => Editor.isInline(editor, n),
+      match: n => Element.isElement(n) && Editor.isInline(editor, n),
     })
   )
 }
