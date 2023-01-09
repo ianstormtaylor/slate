@@ -45,7 +45,6 @@ import {
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_IOS,
-  IS_QQBROWSER,
   IS_SAFARI,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
@@ -1070,7 +1069,6 @@ export const Editable = (props: EditableProps) => {
                     !IS_SAFARI &&
                     !IS_FIREFOX_LEGACY &&
                     !IS_IOS &&
-                    !IS_QQBROWSER &&
                     !IS_WECHATBROWSER &&
                     !IS_UC_MOBILE &&
                     event.data
