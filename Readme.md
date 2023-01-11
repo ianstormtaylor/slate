@@ -26,8 +26,8 @@
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=size">
   </a>
-  <a href="https://slate-slack.herokuapp.com">
-    <img src="https://slate-slack.herokuapp.com/badge.svg">
+  <a href="https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw">
+    <img src="https://img.shields.io/badge/slack-slate--js-brightgreen.svg?logo=slack">
   </a>
   <a href="./packages/slate/package.json">
     <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6">

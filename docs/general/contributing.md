@@ -32,9 +32,9 @@ Here's a [JSFiddle template for Slate](https://jsfiddle.net/01pLxfzu/) to get yo
 
 ## Asking Questions
 
-We've also got a [Slate Slack team](https://slate-slack.herokuapp.com) where you can ask questions and get answers from other people using Slate:
+We've also got a [Slate Slack team](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw) where you can ask questions and get answers from other people using Slate:
 
-[![](../.gitbook/assets/slack.png)](https://slate-slack.herokuapp.com)
+[![](../.gitbook/assets/slack.png)](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw)
 
 Please use the Slack instead of asking questions in issues, since we want to reserve issues for keeping track of bugs and features. We close questions in issues so that maintaining the project isn't overwhelming.
 
