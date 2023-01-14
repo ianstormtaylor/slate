@@ -44,10 +44,6 @@ export const IS_FIREFOX_LEGACY =
     navigator.userAgent
   )
 
-// qq browser
-export const IS_QQBROWSER =
-  typeof navigator !== 'undefined' && /.*QQBrowser/.test(navigator.userAgent)
-
 // UC mobile browser
 export const IS_UC_MOBILE =
   typeof navigator !== 'undefined' && /.*UCBrowser/.test(navigator.userAgent)
