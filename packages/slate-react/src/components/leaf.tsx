@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
+import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
 import {
   PLACEHOLDER_SYMBOL,
@@ -60,6 +61,7 @@ const Leaf = (props: {
         placeholderResizeObserver.current.observe(placeholderEl)
     } else if (placeholderEl) {
       // Create a new observer and observe the placeholder element.
+      const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
       placeholderResizeObserver.current = new ResizeObserver(([{ target }]) => {
         const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
         if (styleElement) {
