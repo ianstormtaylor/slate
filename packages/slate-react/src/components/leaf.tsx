@@ -8,6 +8,7 @@ import {
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
+import { whereIfSupported } from '../utils/where-if-supported'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -63,8 +64,9 @@ const Leaf = (props: {
         const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
         if (styleElement) {
           // Make the min-height the height of the placeholder.
-          const minHeight = `${target.clientHeight}px`
-          styleElement.innerHTML = `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+          const selector = `[data-slate-editor-id="${editor.id}"]`
+          const styles = `min-height: ${target.clientHeight}px;`
+          styleElement.innerHTML = whereIfSupported(selector, styles)
         }
       })
 

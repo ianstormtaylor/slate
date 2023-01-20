@@ -66,6 +66,7 @@ import {
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
+import { whereIfSupported } from '../utils/where-if-supported'
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
@@ -812,9 +813,8 @@ export const Editable = (props: EditableProps) => {
       // Set global default styles for editors.
       const defaultStylesElement = document.createElement('style')
       defaultStylesElement.setAttribute('data-slate-default-styles', 'true')
-      defaultStylesElement.innerHTML =
-        // :where is used to give these rules lower specificity so user stylesheets can override them.
-        `:where([data-slate-editor]) {` +
+      const selector = '[data-slate-editor]'
+      const defaultStyles =
         // Allow positioning relative to the editable element.
         `position: relative;` +
         // Prevent the default outline styles.
@@ -822,8 +822,9 @@ export const Editable = (props: EditableProps) => {
         // Preserve adjacent whitespace and new lines.
         `white-space: pre-wrap;` +
         // Allow words to break if they are too long.
-        `word-wrap: break-word;` +
-        `}`
+        `word-wrap: break-word;`
+      defaultStylesElement.innerHTML = whereIfSupported(selector, defaultStyles)
+
       document.head.appendChild(defaultStylesElement)
     }
 
