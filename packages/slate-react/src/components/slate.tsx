@@ -61,9 +61,9 @@ export const Slate = (props: {
     handleSelectorChange(editor)
   }, [onChange])
 
-  EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
-
   useEffect(() => {
+    EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+
     return () => {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
       unmountRef.current = true
