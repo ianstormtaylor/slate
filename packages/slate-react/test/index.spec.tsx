@@ -27,9 +27,17 @@ describe('slate-react', () => {
 
   describe('Editable', () => {
     describe('decorate', () => {
-      it('should be called on all nodes in document', () => {
+      it('should be called once on all nodes in document', () => {
         const editor = withReact(createEditor())
-        const value = [{ type: 'block', children: [{ text: '' }] }]
+        const value = [
+          {
+            type: 'block',
+            children: [
+              { type: 'block', children: [{ text: '' }] },
+              { type: 'block', children: [{ text: '' }] },
+            ],
+          },
+        ]
 
         const decorate = jest.fn<Range[], [NodeEntry]>(() => [])
 
@@ -44,7 +52,7 @@ describe('slate-react', () => {
           )
         })
 
-        expect(decorate).toHaveBeenCalledTimes(3)
+        expect(decorate).toHaveBeenCalledTimes(6)
       })
 
       it('should rerender the nodes of the tree that received an updated decoration', () => {
