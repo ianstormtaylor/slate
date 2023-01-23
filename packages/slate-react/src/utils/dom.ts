@@ -256,15 +256,18 @@ export const getSlateFragmentAttribute = (
  * Get the x-slate-fragment attribute that exist in text/html data
  * and append it to the DataTransfer object
  */
-export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
-  if (!dataTransfer.getData('application/x-slate-fragment')) {
+export const getClipboardData = (
+  dataTransfer: DataTransfer,
+  clipboardFormatKey = 'x-slate-fragment'
+): DataTransfer => {
+  if (!dataTransfer.getData(`application/${clipboardFormatKey}`)) {
     const fragment = getSlateFragmentAttribute(dataTransfer)
     if (fragment) {
       const clipboardData = new DataTransfer()
       dataTransfer.types.forEach(type => {
         clipboardData.setData(type, dataTransfer.getData(type))
       })
-      clipboardData.setData('application/x-slate-fragment', fragment)
+      clipboardData.setData(`application/${clipboardFormatKey}`, fragment)
       return clipboardData
     }
   }
