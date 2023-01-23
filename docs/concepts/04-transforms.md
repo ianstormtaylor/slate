@@ -10,9 +10,9 @@ by applying `unwrapNodes` to every parent of block Elements:
 ```javascript
 Transforms.unwrapNodes(editor, {
   at: [], // Path of Editor
-  match: (node) =>
+  match: node =>
     !Editor.isEditor(node) &&
-    node.children?.every((child) => Editor.isBlock(editor, child)),
+    node.children?.every(child => Editor.isBlock(editor, child)),
   mode: 'all', // also the Editor's children
 })
 ```
