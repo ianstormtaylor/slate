@@ -8,6 +8,7 @@ import {
   Point,
   Range,
   Transforms,
+  Element,
 } from 'slate'
 import {
   TextDiff,
@@ -91,7 +92,7 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
 
     if (e.selection && Range.isCollapsed(e.selection)) {
       const parentBlockEntry = Editor.above(e, {
-        match: n => Editor.isBlock(e, n),
+        match: n => Element.isElement(n) && Editor.isBlock(e, n),
         at: e.selection,
       })
 

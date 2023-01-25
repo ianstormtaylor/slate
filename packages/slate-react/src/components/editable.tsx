@@ -521,7 +521,7 @@ export const Editable = (props: EditableProps) => {
           ) {
             const block = Editor.above(editor, {
               at: anchor.path,
-              match: n => Editor.isBlock(editor, n),
+              match: n => Element.isElement(n) && Editor.isBlock(editor, n),
             })
 
             if (block && Node.string(block[0]).includes('\t')) {
@@ -1009,9 +1009,12 @@ export const Editable = (props: EditableProps) => {
 
                   if (event.detail === TRIPLE_CLICK && path.length >= 1) {
                     let blockPath = path
-                    if (!Editor.isBlock(editor, node)) {
+                    if (
+                      !(Element.isElement(node) && Editor.isBlock(editor, node))
+                    ) {
                       const block = Editor.above(editor, {
-                        match: n => Editor.isBlock(editor, n),
+                        match: n =>
+                          Element.isElement(n) && Editor.isBlock(editor, n),
                         at: path,
                       })
 
@@ -1131,7 +1134,8 @@ export const Editable = (props: EditableProps) => {
                       return
                     }
                     const inline = Editor.above(editor, {
-                      match: n => Editor.isInline(editor, n),
+                      match: n =>
+                        Element.isElement(n) && Editor.isInline(editor, n),
                       mode: 'highest',
                     })
                     if (inline) {
@@ -1205,7 +1209,7 @@ export const Editable = (props: EditableProps) => {
                   // default, and calling `preventDefault` hides the cursor.
                   const node = ReactEditor.toSlateNode(editor, event.target)
 
-                  if (Editor.isVoid(editor, node)) {
+                  if (Element.isElement(node) && Editor.isVoid(editor, node)) {
                     event.preventDefault()
                   }
                 }
@@ -1222,7 +1226,7 @@ export const Editable = (props: EditableProps) => {
                   const node = ReactEditor.toSlateNode(editor, event.target)
                   const path = ReactEditor.findPath(editor, node)
                   const voidMatch =
-                    Editor.isVoid(editor, node) ||
+                    (Element.isElement(node) && Editor.isVoid(editor, node)) ||
                     Editor.void(editor, { at: path, voids: true })
 
                   // If starting a drag on a void node, make sure it is selected
