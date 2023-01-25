@@ -1,12 +1,4 @@
-import {
-  Text,
-  createEditor,
-  Node,
-  Element,
-  Editor,
-  Descendant,
-  BaseEditor,
-} from 'slate'
+import { Descendant, BaseEditor, Range } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
@@ -79,6 +71,12 @@ export type TitleElement = { type: 'title'; children: Descendant[] }
 
 export type VideoElement = { type: 'video'; url: string; children: EmptyText[] }
 
+export type CodeLineElement = {
+  type: 'code-line'
+  language: string
+  children: Descendant[]
+}
+
 type CustomElement =
   | BlockQuoteElement
   | BulletedListElement
@@ -97,6 +95,7 @@ type CustomElement =
   | TableCellElement
   | TitleElement
   | VideoElement
+  | CodeLineElement
 
 export type CustomText = {
   bold?: boolean
@@ -109,12 +108,19 @@ export type EmptyText = {
   text: string
 }
 
-export type CustomEditor = BaseEditor & ReactEditor & HistoryEditor
+export type CustomEditor = BaseEditor &
+  ReactEditor &
+  HistoryEditor & {
+    ranges?: Map<string, Range[]>
+    intervals?: Map<string, [number, number][]>
+    intervalsStarts?: Map<string, Set<number>>
+  }
 
 declare module 'slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
     Text: CustomText | EmptyText
+    Range: Range
   }
 }
