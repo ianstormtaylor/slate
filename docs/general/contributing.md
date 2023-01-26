@@ -77,7 +77,7 @@ yarn test
 
 If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:inspect`.
 
-If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
+If you only want to run a specific test or tests, you can run `yarn run test:mocha --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
 
 In addition to tests you should also run the linter:
 
