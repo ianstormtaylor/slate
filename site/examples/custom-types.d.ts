@@ -121,7 +121,7 @@ declare module 'slate' {
     Editor: CustomEditor
     Element: CustomElement
     Text: CustomText | EmptyText
-    Range: Range,
+    Range: Range
     Point: Point
   }
 }
