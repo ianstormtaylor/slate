@@ -7,7 +7,7 @@ Slate's transform functions are designed to be very flexible, to make it possibl
 Typically, you'll apply a single operation to zero or more Nodes. For example, here's how you flatten the syntax tree,
 by applying `unwrapNodes` to every parent of block Elements:
 
-```js
+```javascript
 Transforms.unwrapNodes(editor, {
   at: [], // Path of Editor
   match: node =>
@@ -21,7 +21,7 @@ Non-standard operations (or debugging/tracing which Nodes will be affected by a 
 `Editor.nodes` to create a JavaScript Iterator of NodeEntries and a for..of loop to act.
 For example, to replace all image elements with their alt text:
 
-```js
+```javascript
 const imageElmnts = Editor.nodes(editor, {
   at: [], // Path of Editor
   match: (node, path) => 'image' === node.type,
@@ -44,7 +44,7 @@ for (const nodeEntry of imageElmnts) {
 
 Selection-related transforms are some of the simpler ones. For example, here's how you set the selection to a new range:
 
-```js
+```javascript
 Transforms.select(editor, {
   anchor: { path: [0, 0], offset: 0 },
   focus: { path: [1, 0], offset: 2 },
@@ -55,7 +55,7 @@ But they can be more complex too.
 
 For example, it's common to need to move a cursor forwards or backwards by varying distances—by character, by word, by line. Here's how you'd move the cursor backwards by three words:
 
-```js
+```javascript
 Transforms.move(editor, {
   distance: 3,
   unit: 'word',
@@ -69,7 +69,7 @@ Transforms.move(editor, {
 
 Text transforms act on the text content of the editor. For example, here's how you'd insert a string of text as a specific point:
 
-```js
+```javascript
 Transforms.insertText(editor, 'some words', {
   at: { path: [0, 0], offset: 3 },
 })
@@ -77,7 +77,7 @@ Transforms.insertText(editor, 'some words', {
 
 Or you could delete all of the content in an entire range from the editor:
 
-```js
+```javascript
 Transforms.delete(editor, {
   at: {
     anchor: { path: [0, 0], offset: 0 },
@@ -92,7 +92,7 @@ Transforms.delete(editor, {
 
 Node transforms act on the individual element and text nodes that make up the editor's value. For example you could insert a new text node at a specific path:
 
-```js
+```javascript
 Transforms.insertNodes(
   editor,
   {
@@ -106,7 +106,7 @@ Transforms.insertNodes(
 
 Or you could move nodes from one path to another:
 
-```js
+```javascript
 Transforms.moveNodes(editor, {
   at: [0, 0],
   to: [0, 1],
@@ -121,13 +121,13 @@ Many transforms act on a specific location in the document. By default, they wil
 
 For example when inserting text, this would insert the string at the user's current cursor:
 
-```js
+```javascript
 Transforms.insertText(editor, 'some words')
 ```
 
 Whereas this would insert it at a specific point:
 
-```js
+```javascript
 Transforms.insertText(editor, 'some words', {
   at: { path: [0, 0], offset: 3 },
 })
@@ -139,7 +139,7 @@ For example, in the case of inserting text, if you specify a `Range` location, t
 
 So to replace a range of text with a new string you can do:
 
-```js
+```javascript
 Transforms.insertText(editor, 'some words', {
   at: {
     anchor: { path: [0, 0], offset: 0 },
@@ -152,7 +152,7 @@ Or, if you specify a `Path` location, it will expand to a range that covers the 
 
 So to replace the text of an entire node with a new string you can do:
 
-```js
+```javascript
 Transforms.insertText(editor, 'some words', {
   at: [0, 0],
 })
@@ -166,7 +166,7 @@ Many of the node-based transforms take a `match` function option, which restrict
 
 For example, consider a basic transform that moves a node from one path to another:
 
-```js
+```javascript
 Transforms.moveNodes(editor, {
   at: [2],
   to: [5],
@@ -177,7 +177,7 @@ Although it looks like it simply takes a path and moves it to another place. Und
 
 First, the `at` option is expanded to be a range representing all of the content inside the node at `[2]`. Which might look something like:
 
-```js
+```javascript
 at: {
   anchor: { path: [2, 0], offset: 0 },
   focus: { path: [2, 2], offset: 19 }
@@ -186,7 +186,7 @@ at: {
 
 Second, the `match` option is defaulted to a function that only matches the specific path, in this case `[2]`:
 
-```js
+```javascript
 match: (node, path) => Path.equals(path, [2])
 ```
 
@@ -198,7 +198,7 @@ You might consider looping over the node's children and moving them one at a tim
 
 Instead, you can take advantage of the `at` and `match` options to match all of the children:
 
-```js
+```javascript
 Transforms.moveNodes(editor, {
   // This will again be expanded to a range of the entire node at `[2]`.
   at: [2],
@@ -214,7 +214,7 @@ Using `match` can make representing complex logic a lot simpler.
 
 For example, consider wanting to add a bold mark to any text nodes that aren't already italic:
 
-```js
+```javascript
 Transforms.setNodes(
   editor,
   { bold: true },
