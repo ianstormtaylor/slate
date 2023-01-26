@@ -1,4 +1,4 @@
-import { BaseRange, BaseText } from 'slate'
+import { BasePoint, BaseRange, BaseText, Path } from "slate";
 import { ReactEditor } from './plugin/react-editor'
 
 declare module 'slate' {
@@ -9,6 +9,9 @@ declare module 'slate' {
     }
     Range: BaseRange & {
       placeholder?: string
+    }
+    Point: BasePoint & {
+      basePath?: Path
     }
   }
 }

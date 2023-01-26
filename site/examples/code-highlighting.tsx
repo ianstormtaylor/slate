@@ -9,7 +9,15 @@ import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
 import React, { useCallback, useState } from 'react'
-import { createEditor, Node, Editor, Range, Element, Transforms } from 'slate'
+import {
+  createEditor,
+  Node,
+  Editor,
+  Range,
+  Element,
+  Transforms,
+  Point,
+} from 'slate'
 import {
   withReact,
   Slate,
@@ -283,10 +291,18 @@ const ExtractRanges = () => {
           ranges.set(key.id, [])
         }
 
-        const anchor = { basePath: [index, 0], path: [], offset: startOffset }
-        const focus = { basePath: [index, 0], path: [], offset: endOffset }
+        const anchor: Point = {
+          basePath: [index, 0],
+          path: [],
+          offset: startOffset,
+        }
+        const focus: Point = {
+          basePath: [index, 0],
+          path: [],
+          offset: endOffset,
+        }
 
-        const range = { anchor, focus }
+        const range: Range = { anchor, focus }
 
         for (const type of types) {
           range[type] = true

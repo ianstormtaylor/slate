@@ -1,5 +1,5 @@
 import React from 'react'
-import { Editor, Range, Element, Ancestor, Descendant } from 'slate'
+import { Editor, Range, Element, Ancestor, Descendant, Point } from 'slate'
 
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
@@ -52,7 +52,7 @@ const useChildren = (props: {
     const ds = decorate([n, p])
 
     for (const dec of decorations) {
-      const d = Range.intersection(dec, range)
+      const d = Range.intersection(toAbsoluteRange(dec), range)
 
       if (d) {
         ds.push(d)
@@ -76,7 +76,7 @@ const useChildren = (props: {
     } else {
       children.push(
         <TextComponent
-          decorations={ds}
+          decorations={ds.map(toAbsoluteRange)}
           key={key.id}
           isLast={isLeafBlock && i === node.children.length - 1}
           parent={node}
@@ -92,6 +92,30 @@ const useChildren = (props: {
   }
 
   return children
+}
+
+const toAbsoluteRange = (range: Range): Range => {
+  const absAnchor = toAbsolutePoint(range.anchor)
+  const absFocus = toAbsolutePoint(range.focus)
+
+  if (absAnchor === range.anchor && absFocus === absFocus) {
+    return range
+  }
+
+  return {
+    ...range,
+    anchor: toAbsolutePoint(range.anchor),
+    focus: toAbsolutePoint(range.focus),
+  }
+}
+
+const toAbsolutePoint = (point: Point) => {
+  return point.basePath
+    ? {
+        path: [...point.basePath, ...point.path],
+        offset: point.offset,
+      }
+    : point
 }
 
 export default useChildren
