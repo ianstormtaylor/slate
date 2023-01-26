@@ -52,7 +52,7 @@ const useChildren = (props: {
     const ds = decorate([n, p])
 
     for (const dec of decorations) {
-      const d = Range.intersection(toAbsoluteRange(dec), range)
+      const d = Range.intersection(dec, range)
 
       if (d) {
         ds.push(d)
@@ -76,7 +76,7 @@ const useChildren = (props: {
     } else {
       children.push(
         <TextComponent
-          decorations={ds.map(toAbsoluteRange)}
+          decorations={ds}
           key={key.id}
           isLast={isLeafBlock && i === node.children.length - 1}
           parent={node}
@@ -92,26 +92,6 @@ const useChildren = (props: {
   }
 
   return children
-}
-
-const toAbsoluteRange = (range: Range): Range => {
-  if (!range.basePath) {
-    return range
-  }
-
-  const { basePath, ...rest } = range
-
-  return {
-    ...rest,
-    anchor: {
-      path: [...basePath, ...range.anchor.path],
-      offset: range.anchor.offset,
-    },
-    focus: {
-      path: [...basePath, ...range.focus.path],
-      offset: range.focus.offset,
-    },
-  }
 }
 
 export default useChildren
