@@ -535,9 +535,9 @@ export const ReactEditor = {
     domPoint: DOMPoint,
     options: {
       exactMatch: boolean
-      suppressThrow: boolean
+      suppressThrow: T
     }
-  ): Point | null {
+  ): T extends true ? Point | null : Point {
     const { exactMatch, suppressThrow } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
@@ -703,7 +703,7 @@ export const ReactEditor = {
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
     options: {
-      exactMatch: T
+      exactMatch: boolean
       suppressThrow: T
     }
   ): T extends true ? Range | null : Range {
@@ -797,18 +797,18 @@ export const ReactEditor = {
      */
 
     if (IS_FIREFOX && !isCollapsed && anchorNode !== focusNode) {
-      const isEnd = Editor.isEnd(editor, anchor, anchor.path)
-      const isStart = Editor.isStart(editor, focus, focus.path)
+      const isEnd = Editor.isEnd(editor, anchor!, anchor.path)
+      const isStart = Editor.isStart(editor, focus!, focus.path)
 
       if (isEnd) {
         const after = Editor.after(editor, anchor as Point)
         // Editor.after() might return undefined
-        anchor = after || anchor
+        anchor = (after || anchor!) as T extends true ? Point | null : Point
       }
 
       if (isStart) {
         const before = Editor.before(editor, focus as Point)
-        focus = before || focus
+        focus = (before || focus!) as T extends true ? Point | null : Point
       }
     }
 
