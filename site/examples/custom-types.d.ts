@@ -1,4 +1,4 @@
-import { Descendant, BaseEditor, Range, Point } from 'slate'
+import { Descendant, BaseEditor, BaseRange, BasePoint, Range } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
@@ -121,7 +121,9 @@ declare module 'slate' {
     Editor: CustomEditor
     Element: CustomElement
     Text: CustomText | EmptyText
-    Range: Range
-    Point: Point
+    Point: BasePoint & { basePath?: number[] }
+    Range: BaseRange & {
+      [key: string]: unknown
+    }
   }
 }

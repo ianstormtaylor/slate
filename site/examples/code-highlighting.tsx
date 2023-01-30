@@ -188,7 +188,7 @@ const ExtractRanges = () => {
 
   const ranges = new Map<string, Range[]>()
 
-  const intervals = editor.intervals.get(CodeLineType) || [] // work only with code line intervals
+  const intervals = editor.intervals.get(CodeLineType) || [] // get only code line intervals
   for (const interval of intervals) {
     const firstElement = editor.children[interval[0]] as CodeLineElement
     const language = firstElement.language
