@@ -75,18 +75,15 @@ const renderElement = (props: RenderElementProps) => {
         {...attributes}
         {...attrs}
         style={{ position: 'relative' }}
-        className={
-          element.type === CodeLineType &&
-          css(`
+        className={css(`
         font-family: monospace;
         font-size: 16px;
         line-height: 20px;
         margin-top: 0;
         background: rgba(0, 20, 60, .03);
         padding: 5px 13px;
-      `)
-        }
-        spellCheck={element.type !== CodeLineType}
+      `)}
+        spellCheck={false}
       >
         {selectVisible && (
           <LanguageSelect
