@@ -1,5 +1,6 @@
 import React, { useRef, useEffect } from 'react'
 import { Element, Text } from 'slate'
+import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
 import {
   PLACEHOLDER_SYMBOL,
@@ -8,6 +9,7 @@ import {
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
+import { whereIfSupported } from '../utils/where-if-supported'
 
 /**
  * Individual leaves in a text node with unique formatting.
@@ -59,12 +61,14 @@ const Leaf = (props: {
         placeholderResizeObserver.current.observe(placeholderEl)
     } else if (placeholderEl) {
       // Create a new observer and observe the placeholder element.
+      const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
       placeholderResizeObserver.current = new ResizeObserver(([{ target }]) => {
         const styleElement = EDITOR_TO_STYLE_ELEMENT.get(editor)
         if (styleElement) {
           // Make the min-height the height of the placeholder.
-          const minHeight = `${target.clientHeight}px`
-          styleElement.innerHTML = `:where([data-slate-editor-id="${editor.id}"]) { min-height: ${minHeight}; }`
+          const selector = `[data-slate-editor-id="${editor.id}"]`
+          const styles = `min-height: ${target.clientHeight}px;`
+          styleElement.innerHTML = whereIfSupported(selector, styles)
         }
       })
 

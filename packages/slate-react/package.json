@@ -14,6 +14,7 @@
     "dist/"
   ],
   "dependencies": {
+    "@juggle/resize-observer": "^3.4.0",
     "@types/is-hotkey": "^0.1.1",
     "@types/lodash": "^4.14.149",
     "direction": "^1.0.3",
