@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.89.0
+
+### Minor Changes
+
+- [#5275](https://github.com/ianstormtaylor/slate/pull/5275) [`5bc69d8d`](https://github.com/ianstormtaylor/slate/commit/5bc69d8d657c57eef06aeaa1fa198840d36939c7) Thanks [@12joan](https://github.com/12joan)! - Firefox: fix wrong text highlighting with double-click
+
+### Patch Changes
+
+- [#5265](https://github.com/ianstormtaylor/slate/pull/5265) [`3cf51f4d`](https://github.com/ianstormtaylor/slate/commit/3cf51f4d88e8e91faa6ab5d1f2c5f8c8e505ae89) Thanks [@kylemclean](https://github.com/kylemclean)! - Improve compatibility for browsers that do not support ResizeObserver or :where selector
+
 ## 0.88.2
 
 ### Patch Changes
