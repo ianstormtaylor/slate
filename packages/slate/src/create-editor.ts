@@ -16,8 +16,6 @@ import {
 import { DIRTY_PATHS, DIRTY_PATH_KEYS, FLUSHING } from './utils/weak-maps'
 import { TextUnit } from './interfaces/types'
 
-let nextEditorId = 0
-
 /**
  * Create a new Slate `Editor` object.
  */
@@ -28,7 +26,6 @@ export const createEditor = (): Editor => {
     operations: [],
     selection: null,
     marks: null,
-    id: nextEditorId++,
     isInline: () => false,
     isVoid: () => false,
     markableVoid: () => false,
