@@ -25,6 +25,7 @@ import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
+import Styling from '../../examples/styling'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
 import CustomPlaceholder from '../../examples/custom-placeholder'
@@ -51,6 +52,7 @@ const EXAMPLES = [
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
+  ['Styling', Styling, 'styling'],
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
   ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],

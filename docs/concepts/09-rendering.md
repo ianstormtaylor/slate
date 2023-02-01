@@ -136,3 +136,24 @@ const Toolbar = () => {
 ```
 
 Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will re-render whenever the editor changes, so that the active state of the buttons stays in sync.
+
+## Editor Styling
+
+Custom styles can be applied to the editor itself by using the `style` prop on the `<Editable>` component.
+
+```jsx
+const MyEditor = () => {
+  const [editor] = useState(() => withReact(createEditor()))
+  return (
+    <Slate editor={editor}>
+      <Editable style={{ minHeight: '200px', backgroundColor: 'lime' }} />
+    </Slate>
+  )
+}
+```
+
+It is also possible to apply custom styles with a stylesheet and `className`. However, Slate uses inline styles to provide some default styles for the editor. Because inline styles take precedence over stylesheets, styles you provide using stylesheets will not override the default styles. If you are trying to use a stylesheet and your rules are not taking effect, do one of the following:
+
+- Provide your styles using the `style` prop instead of a stylesheet, which overrides the default inline styles.
+- Pass the `disableDefaultStyles` prop to the `<Editable>` component.
+- Use `!important` in your stylesheet declarations to make them override the inline styles.

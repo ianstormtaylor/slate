@@ -14,4 +14,21 @@ test.describe('placeholder example', () => {
       'renderPlaceholder'
     )
   })
+
+  test('renders editor tall enough to fit placeholder', async ({ page }) => {
+    const slateEditor = page.locator('[data-slate-editor=true]')
+    const placeholderElement = page.locator('[data-slate-placeholder=true]')
+
+    const editorBoundingBox = await slateEditor.boundingBox()
+    const placeholderBoundingBox = await placeholderElement.boundingBox()
+
+    if (!editorBoundingBox)
+      throw new Error('Could not get bounding box for editor')
+    if (!placeholderBoundingBox)
+      throw new Error('Could not get bounding box for placeholder')
+
+    expect(editorBoundingBox.height).toBeGreaterThanOrEqual(
+      placeholderBoundingBox.height
+    )
+  })
 })
