@@ -2,4 +2,4 @@
 'slate-react': minor
 ---
 
-Reduce re-renders caused by decorations updates if only the path field is modified. It is possible by adding the `basePath` field to the `Point` type.
+If TextComponent decorations keep the same offsets and only paths are changed, prevent re-rendering because only decoration offsets matter when leaves are calculated.

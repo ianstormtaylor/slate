@@ -292,13 +292,11 @@ const ExtractRanges = () => {
           }
 
           const anchor: Point = {
-            basePath: [index, 0],
-            path: [],
+            path: [index, 0],
             offset: startOffset,
           }
           const focus: Point = {
-            basePath: [index, 0],
-            path: [],
+            path: [index, 0],
             offset: endOffset,
           }
 

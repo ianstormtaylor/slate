@@ -12,7 +12,7 @@ import {
   NODE_TO_INDEX,
   EDITOR_TO_KEY_TO_ELEMENT,
 } from '../utils/weak-maps'
-import { isDecoratorRangeListEqual } from '../utils/range-list'
+import { isElementDecorationsEqual } from '../utils/range-list'
 import {
   RenderElementProps,
   RenderLeafProps,
@@ -139,7 +139,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
+    isElementDecorationsEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&
