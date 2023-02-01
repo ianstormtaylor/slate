@@ -1,5 +1,11 @@
 # slate
 
+## 0.90.0
+
+### Patch Changes
+
+- [#5278](https://github.com/ianstormtaylor/slate/pull/5278) [`9c4097a2`](https://github.com/ianstormtaylor/slate/commit/9c4097a26fa92718e6f4fc1f984a70fb5af42ca2) Thanks [@kylemclean](https://github.com/kylemclean)! - Revert to using inline styles for default editor styles
+
 ## 0.88.1
 
 ### Patch Changes
