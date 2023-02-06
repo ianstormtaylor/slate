@@ -19,6 +19,8 @@ import React from '../../packages/slate-react/package.json'
  */
 
 function configure(pkg, env, target) {
+  pkg.name = pkg.name.split('/')[1] || pkg.name.split('/')[0]
+
   const isProd = env === 'production'
   const isUmd = target === 'umd'
   const isModule = target === 'module'

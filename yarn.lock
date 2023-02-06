@@ -3458,6 +3458,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@seewo-doc/slate-react@workspace:*, @seewo-doc/slate-react@workspace:packages/slate-react":
+  version: 0.0.0-use.local
+  resolution: "@seewo-doc/slate-react@workspace:packages/slate-react"
+  dependencies:
+    "@babel/runtime": ^7.7.4
+    "@types/is-hotkey": ^0.1.1
+    "@types/jest": ^27.4.1
+    "@types/jsdom": ^16.2.14
+    "@types/lodash": ^4.14.149
+    "@types/react": ^16.9.13
+    "@types/react-dom": ^16.9.4
+    "@types/react-test-renderer": ^16.8.0
+    "@types/resize-observer-browser": ^0.1.7
+    direction: ^1.0.3
+    is-hotkey: ^0.1.6
+    is-plain-object: ^5.0.0
+    lodash: ^4.17.4
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+    react-test-renderer: ">=16.8.0"
+    scroll-into-view-if-needed: ^2.2.20
+    slate: ^0.88.1
+    slate-hyperscript: ^0.81.3
+    source-map-loader: ^4.0.0
+    tiny-invariant: 1.0.6
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+    slate: ">=0.65.3"
+  languageName: unknown
+  linkType: soft
+
 "@sinonjs/commons@npm:^1.7.0":
   version: 1.8.3
   resolution: "@sinonjs/commons@npm:1.8.3"
@@ -14232,6 +14264,7 @@ resolve@^2.0.0-next.3:
     "@changesets/changelog-github": ^0.3.0
     "@changesets/cli": ^2.14.1
     "@emotion/css": ^11.7.1
+    "@seewo-doc/slate-react": "workspace:*"
     "@testing-library/cypress": ^8.0.0
     "@types/jest": 27.0.1
     "@types/lodash": ^4.14.149
@@ -14285,42 +14318,9 @@ resolve@^2.0.0-next.3:
     slate: "workspace:*"
     slate-history: "workspace:*"
     slate-hyperscript: "workspace:*"
-    slate-react: "workspace:*"
     source-map-loader: ^4.0.0
     ts-jest: ^27.1.3
     typescript: 4.0.5
-  languageName: unknown
-  linkType: soft
-
-"slate-react@workspace:*, slate-react@workspace:packages/slate-react":
-  version: 0.0.0-use.local
-  resolution: "slate-react@workspace:packages/slate-react"
-  dependencies:
-    "@babel/runtime": ^7.7.4
-    "@types/is-hotkey": ^0.1.1
-    "@types/jest": ^27.4.1
-    "@types/jsdom": ^16.2.14
-    "@types/lodash": ^4.14.149
-    "@types/react": ^16.9.13
-    "@types/react-dom": ^16.9.4
-    "@types/react-test-renderer": ^16.8.0
-    "@types/resize-observer-browser": ^0.1.7
-    direction: ^1.0.3
-    is-hotkey: ^0.1.6
-    is-plain-object: ^5.0.0
-    lodash: ^4.17.4
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-    react-test-renderer: ">=16.8.0"
-    scroll-into-view-if-needed: ^2.2.20
-    slate: ^0.88.1
-    slate-hyperscript: ^0.81.3
-    source-map-loader: ^4.0.0
-    tiny-invariant: 1.0.6
-  peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-    slate: ">=0.65.3"
   languageName: unknown
   linkType: soft
 
