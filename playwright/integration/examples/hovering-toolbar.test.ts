@@ -7,24 +7,18 @@ test.describe('hovering toolbar example', () => {
 
   test('hovering toolbar appears', async ({ page }) => {
     await page.pause()
-    await expect(page.locator('div').nth(12)).toHaveCSS('opacity', '0')
+    await expect(page.getByTestId('menu')).toHaveCSS('opacity', '0')
 
     await page
       .locator('span[data-slate-string="true"]')
       .nth(0)
       .selectText()
-    expect(
-      await page
-        .locator('div')
-        .nth(12)
-        .count()
-    ).toBe(1)
+    expect(await page.getByTestId('menu').count()).toBe(1)
 
-    await expect(page.locator('div').nth(12)).toHaveCSS('opacity', '1')
+    await expect(page.getByTestId('menu')).toHaveCSS('opacity', '1')
     expect(
       await page
-        .locator('div')
-        .nth(12)
+        .getByTestId('menu')
         .locator('span.material-icons')
         .count()
     ).toBe(3)
@@ -35,7 +29,7 @@ test.describe('hovering toolbar example', () => {
       .locator('span[data-slate-string="true"]')
       .nth(0)
       .selectText()
-    await expect(page.locator('div').nth(12)).toHaveCSS('opacity', '1')
+    await expect(page.getByTestId('menu')).toHaveCSS('opacity', '1')
     await page
       .locator('span[data-slate-string="true"]')
       .nth(0)
@@ -43,7 +37,7 @@ test.describe('hovering toolbar example', () => {
     await page
       .locator('div')
       .nth(0)
-      .click({ force: true })
-    await expect(page.locator('div').nth(12)).toHaveCSS('opacity', '0')
+      .click({ force: true, position: { x: 0, y: 0 } })
+    await expect(page.getByTestId('menu')).toHaveCSS('opacity', '0')
   })
 })
