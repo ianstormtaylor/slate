@@ -122,9 +122,8 @@ const useDecorate = (editor: Editor) => {
     }
 
     // find ranges for element by id
-    const element = editor.children[path[0]]
-    const id = ReactEditor.findKey(editor, element).id
-    const ranges = editor.ranges.get(id)
+    const element = editor.children[path[0]] as Element
+    const ranges = editor.ranges.get(element)
 
     return ranges ? ranges.slice() : []
   }, [])
@@ -188,7 +187,7 @@ const ExtractRanges = () => {
   const editor = useSlate()
 
   useMemo(() => {
-    const ranges = new Map<string, Range[]>()
+    const ranges = new Map<Element, Range[]>()
 
     const intervals = editor.intervals.get(CodeLineType) || [] // get only code line intervals
     for (const interval of intervals) {
@@ -286,9 +285,9 @@ const ExtractRanges = () => {
 
         // fill ranges map for decorate function
         if (types.size) {
-          const key = ReactEditor.findKey(editor, editor.children[index])
-          if (!ranges.has(key.id)) {
-            ranges.set(key.id, [])
+          const element = editor.children[index] as Element
+          if (!ranges.has(element)) {
+            ranges.set(element, [])
           }
 
           const anchor: Point = {
@@ -306,7 +305,7 @@ const ExtractRanges = () => {
             range[type] = true
           }
 
-          ranges.get(key.id)!.push(range)
+          ranges.get(element)!.push(range)
         }
 
         // move startOffset to end

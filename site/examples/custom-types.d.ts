@@ -1,4 +1,4 @@
-import { Descendant, BaseEditor, BaseRange, Range } from 'slate'
+import { Descendant, BaseEditor, BaseRange, Range, Element } from 'slate'
 import { ReactEditor } from 'slate-react'
 import { HistoryEditor } from 'slate-history'
 
@@ -111,7 +111,7 @@ export type EmptyText = {
 export type CustomEditor = BaseEditor &
   ReactEditor &
   HistoryEditor & {
-    ranges?: Map<string, Range[]>
+    ranges?: Map<Element, Range[]>
     intervals?: Map<string, [number, number][]>
     intervalsStarts?: Map<string, Set<number>>
   }
