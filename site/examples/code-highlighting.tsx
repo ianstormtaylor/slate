@@ -16,7 +16,7 @@ import {
   Range,
   Element,
   Transforms,
-  Point,
+  NodeEntry,
 } from 'slate'
 import {
   withReact,
@@ -31,50 +31,46 @@ import {
 import { withHistory } from 'slate-history'
 import isHotkey from 'is-hotkey'
 import { css } from '@emotion/css'
-
-import { ParagraphElement, CodeLineElement } from './custom-types'
+import { CodeBlockElement } from './custom-types'
+import { normalizeTokens } from '../utils/normalize-tokens'
 
 const ParagraphType = 'paragraph'
+const CodeBlockType = 'code-block'
 const CodeLineType = 'code-line'
+
+const CodeHighlightingExample = () => {
+  const [editor] = useState(() => withHistory(withReact(createEditor())))
+
+  const decorate = useDecorate(editor)
+  const onKeyDown = useOnKeydown(editor)
+
+  return (
+    <Slate editor={editor} value={initialValue}>
+      <SetNodeToDecorations />
+      <Editable
+        decorate={decorate}
+        renderElement={renderElement}
+        renderLeaf={renderLeaf}
+        onKeyDown={onKeyDown}
+      />
+      <style>{prismThemeCss}</style>
+    </Slate>
+  )
+}
 
 const renderElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
-  const Tag = editor.isInline(element) ? 'span' : 'div'
-  const attrs = {
-    'data-slate-element-type': element.type,
-  }
 
-  if (element.type === CodeLineType) {
-    const intervalsStarts =
-      editor.intervalsStarts.get(CodeLineType) || new Set()
-    const path = ReactEditor.findPath(editor, element)
-    const selectVisible = intervalsStarts.has(path[0])
-
+  if (element.type === CodeBlockType) {
     const setLanguage = (language: string) => {
-      const intervals = editor.intervals.get(CodeLineType) || []
-      const interval = intervals.find(
-        ([start, end]) => start <= path[0] && end >= path[0]
-      )
-      if (interval) {
-        Transforms.setNodes(
-          editor,
-          { language },
-          {
-            at: {
-              anchor: Editor.start(editor, [interval[0]]),
-              focus: Editor.end(editor, [interval[1]]),
-            },
-          }
-        )
-      }
+      const path = ReactEditor.findPath(editor, element)
+      Transforms.setNodes(editor, { language }, { at: path })
     }
 
     return (
-      <Tag
+      <div
         {...attributes}
-        {...attrs}
-        style={{ position: 'relative' }}
         className={css(`
         font-family: monospace;
         font-size: 16px;
@@ -83,21 +79,29 @@ const renderElement = (props: RenderElementProps) => {
         background: rgba(0, 20, 60, .03);
         padding: 5px 13px;
       `)}
+        style={{ position: 'relative' }}
         spellCheck={false}
       >
-        {selectVisible && (
-          <LanguageSelect
-            value={element.language}
-            onChange={e => setLanguage(e.target.value)}
-          />
-        )}
+        <LanguageSelect
+          value={element.language}
+          onChange={e => setLanguage(e.target.value)}
+        />
         {children}
-      </Tag>
+      </div>
     )
   }
 
+  if (element.type === CodeLineType) {
+    return (
+      <div {...attributes} style={{ position: 'relative' }}>
+        {children}
+      </div>
+    )
+  }
+
+  const Tag = editor.isInline(element) ? 'span' : 'div'
   return (
-    <Tag {...attributes} {...attrs} style={{ position: 'relative' }}>
+    <Tag {...attributes} style={{ position: 'relative' }}>
       {children}
     </Tag>
   )
@@ -115,61 +119,14 @@ const renderLeaf = (props: RenderLeafProps) => {
 }
 
 const useDecorate = (editor: Editor) => {
-  return useCallback(([_, path]) => {
-    if (path.length !== 1) {
-      // skip not top level elements
-      return []
+  return useCallback(([node, path]) => {
+    if (Element.isElement(node) && node.type === CodeLineType) {
+      const ranges = editor.nodeToDecorations.get(node) || []
+      return ranges
     }
 
-    // find ranges for element by id
-    const element = editor.children[path[0]] as Element
-    const ranges = editor.ranges.get(element)
-
-    return ranges ? ranges.slice() : []
+    return []
   }, [])
-}
-
-// set editor.intervals with intervals of a continuous stream of identical elements
-// set editor.intervalsStarts with set of these intervals start index (for optimization)
-const ExtractIntervals = () => {
-  const editor = useSlate()
-
-  useMemo(() => {
-    const intervals = new Map<string, [number, number][]>()
-    const intervalsStarts = new Map<string, Set<number>>()
-    let prev = null
-    // the loop has children.length + 1 iterations in order to close the last interval
-    for (let i = 0; i < editor.children.length + 1; i++) {
-      const element = editor.children[i] as Element
-
-      if (!prev || !element || prev.type !== element.type) {
-        if (prev) {
-          // update the end of an interval
-          intervals.get(prev.type).slice(-1)[0][1] = i - 1
-        }
-
-        if (element) {
-          if (!intervals.has(element.type)) {
-            intervals.set(element.type, [])
-          }
-          // push the start of an interval
-          intervals.get(element.type).push([i, 0])
-
-          if (!intervalsStarts.has(element.type)) {
-            intervalsStarts.set(element.type, new Set())
-          }
-          intervalsStarts.get(element.type).add(i)
-        }
-      }
-
-      prev = element
-    }
-
-    editor.intervals = intervals
-    editor.intervalsStarts = intervalsStarts
-  }, [editor.children])
-
-  return null
 }
 
 class PrismTokenNode {
@@ -182,138 +139,69 @@ class PrismTokenNode {
   }
 }
 
-// set editor.ranges with decorations to use them in decorate function then
-const ExtractRanges = () => {
+const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<
+  CodeBlockElement
+>) => {
+  const nodeToDecorations = new Map<Element, Range[]>()
+
+  const text = block.children.map(line => Node.string(line)).join('\n')
+  const language = block.language
+  const tokens = Prism.tokenize(text, Prism.languages[language])
+  const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
+  const blockChildren = block.children as Element[]
+
+  for (let index = 0; index < normalizedTokens.length; index++) {
+    const tokens = normalizedTokens[index]
+    const element = blockChildren[index]
+
+    if (!nodeToDecorations.has(element)) {
+      nodeToDecorations.set(element, [])
+    }
+
+    let start = 0
+    for (const token of tokens) {
+      const length = token.content.length
+      if (!length) {
+        continue
+      }
+
+      const end = start + length
+
+      const path = [...blockPath, index, 0]
+      const range = {
+        anchor: { path, offset: start },
+        focus: { path, offset: end },
+        token: true,
+        ...Object.fromEntries(token.types.map(type => [type, true])),
+      }
+
+      nodeToDecorations.get(element)!.push(range)
+
+      start = end
+    }
+  }
+
+  return nodeToDecorations
+}
+
+// precalculate editor.nodeToDecorations map to use it inside decorate function then
+const SetNodeToDecorations = () => {
   const editor = useSlate()
 
   useMemo(() => {
-    const ranges = new Map<Element, Range[]>()
+    const blockEntries = Array.from(
+      Editor.nodes(editor, {
+        at: [],
+        mode: 'highest',
+        match: n => Element.isElement(n) && n.type === CodeBlockType,
+      })
+    )
 
-    const intervals = editor.intervals.get(CodeLineType) || [] // get only code line intervals
-    for (const interval of intervals) {
-      const firstElement = editor.children[interval[0]] as CodeLineElement
-      const language = firstElement.language
+    const nodeToDecorations = mergeMaps(
+      ...blockEntries.map(getChildNodeToDecorations)
+    )
 
-      const text = editor.children
-        .slice(interval[0], interval[1] + 1)
-        .map(element => Node.string(element))
-        .join('\n')
-      const tokens = Prism.tokenize(text, Prism.languages[language])
-
-      const stack: PrismTokenNode[] = []
-
-      // fill initial stack with reversed tokens
-      for (let i = tokens.length - 1; i >= 0; i--) {
-        stack.push(new PrismTokenNode(tokens[i], null))
-      }
-
-      let startOffset = 0
-      let index = interval[0]
-      while (stack.length) {
-        const currentTokenNode = stack.pop()!
-        const token = currentTokenNode.token
-        const length = token.length
-
-        if (typeof token !== 'string' && Array.isArray(token.content)) {
-          // add reversed content (children) tokens to stack
-          for (let i = token.content.length - 1; i >= 0; i--) {
-            stack.push(new PrismTokenNode(token.content[i], currentTokenNode))
-          }
-          continue
-        }
-
-        // split string into lines to be sure that there are no multiline tokens
-        const str =
-          typeof token === 'string' ? token : (token.content as string)
-        if (str !== '\n') {
-          const lines = str.split(/(\n)/)
-          if (lines.length > 1) {
-            // if it is multiline token split it add it back to stack each line separately in reversed order
-            for (let i = lines.length - 1; i >= 0; i--) {
-              const line = lines[i]
-
-              stack.push(
-                new PrismTokenNode(
-                  typeof token === 'string'
-                    ? line
-                    : new Prism.Token(token.type, line, token.alias, line),
-                  currentTokenNode
-                )
-              )
-            }
-            continue
-          }
-        } else {
-          // if it is line break reset startOffset and increment index
-          index++
-          startOffset = 0
-          continue
-        }
-
-        // calculate endOffset
-        const endOffset = startOffset + length
-
-        // create types set based on token's and all ancestors' types
-        const types = new Set<string>(['token'])
-        let tokenNodeCursor = currentTokenNode
-        while (tokenNodeCursor) {
-          const { token } = tokenNodeCursor
-
-          if (typeof token !== 'string') {
-            const type = token.type
-            const aliasArray = Array.isArray(token.alias)
-              ? token.alias
-              : [token.alias]
-
-            const isTag = type === 'tag' || aliasArray.includes('tag')
-
-            if (types.has('script') && isTag) {
-              // skip "tag" type and following, if types already has "script" type
-              // matters for correct jsx, tsx attributes highlighting
-              break
-            }
-
-            types.add(type)
-
-            for (const alias of aliasArray) {
-              alias && types.add(alias)
-            }
-          }
-
-          tokenNodeCursor = tokenNodeCursor.parent
-        }
-
-        // fill ranges map for decorate function
-        if (types.size) {
-          const element = editor.children[index] as Element
-          if (!ranges.has(element)) {
-            ranges.set(element, [])
-          }
-
-          const anchor: Point = {
-            path: [index, 0],
-            offset: startOffset,
-          }
-          const focus: Point = {
-            path: [index, 0],
-            offset: endOffset,
-          }
-
-          const range: Range = { anchor, focus }
-
-          for (const type of types) {
-            range[type] = true
-          }
-
-          ranges.get(element)!.push(range)
-        }
-
-        // move startOffset to end
-        startOffset = endOffset
-      }
-    }
-
-    editor.ranges = ranges
+    editor.nodeToDecorations = nodeToDecorations
   }, [editor.children])
 
   return null
@@ -334,7 +222,16 @@ const useOnKeydown = (editor: Editor) => {
 
 const LanguageSelect = (props: JSX.IntrinsicElements['select']) => {
   return (
-    <select contentEditable={false} style={{ float: 'right' }} {...props}>
+    <select
+      contentEditable={false}
+      className={css`
+        position: absolute;
+        right: 5px;
+        top: 5px;
+        z-index: 1;
+      `}
+      {...props}
+    >
       <option value="css">CSS</option>
       <option value="html">HTML</option>
       <option value="java">Java</option>
@@ -350,41 +247,35 @@ const LanguageSelect = (props: JSX.IntrinsicElements['select']) => {
   )
 }
 
-const CodeHighlightingExample = () => {
-  const [editor] = useState(() => withHistory(withReact(createEditor())))
+const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
+  const map = new Map<K, V>()
 
-  const decorate = useDecorate(editor)
-  const onKeyDown = useOnKeydown(editor)
+  for (const m of maps) {
+    for (const item of m) {
+      map.set(...item)
+    }
+  }
 
-  return (
-    <Slate editor={editor} value={initialValue}>
-      <ExtractIntervals />
-      <ExtractRanges />
-      <Editable
-        decorate={decorate}
-        renderElement={renderElement}
-        renderLeaf={renderLeaf}
-        onKeyDown={onKeyDown}
-      />
-      <style>{prismThemeCss}</style>
-    </Slate>
-  )
+  return map
 }
 
-// Initial content lines stored in content property, because it is easier to test/change it
-type ToLine<TElement> = Omit<TElement & { content: string }, 'children'>
-type Line = ToLine<ParagraphElement> | ToLine<CodeLineElement>
+const toChildren = (content: string) => [{ text: content }]
+const toCodeLines = (content: string): Element[] =>
+  content
+    .split('\n')
+    .map(line => ({ type: CodeLineType, children: toChildren(line) }))
 
-const initialValueLines: Line[] = [
+const initialValue: Element[] = [
   {
     type: ParagraphType,
-    content:
-      "Here's one containing a single paragraph block with some text in it:",
+    children: toChildren(
+      "Here's one containing a single paragraph block with some text in it:"
+    ),
   },
   {
-    type: CodeLineType,
+    type: CodeBlockType,
     language: 'jsx',
-    content: `// Add the initial value.
+    children: toCodeLines(`// Add the initial value.
 const initialValue = [
   {
     type: 'paragraph',
@@ -400,17 +291,18 @@ const App = () => {
       <Editable />
     </Slate>
   )
-}`,
+}`),
   },
   {
     type: ParagraphType,
-    content:
-      'If you are using TypeScript, you will also need to extend the Editor with ReactEditor and add annotations as per the documentation on TypeScript. The example below also includes the custom types required for the rest of this example.',
+    children: toChildren(
+      'If you are using TypeScript, you will also need to extend the Editor with ReactEditor and add annotations as per the documentation on TypeScript. The example below also includes the custom types required for the rest of this example.'
+    ),
   },
   {
-    type: CodeLineType,
+    type: CodeBlockType,
     language: 'typescript',
-    content: `// TypeScript users only add this code
+    children: toCodeLines(`// TypeScript users only add this code
 import { BaseEditor, Descendant } from 'slate'
 import { ReactEditor } from 'slate-react'
 
@@ -423,24 +315,13 @@ declare module 'slate' {
     Element: CustomElement
     Text: CustomText
   }
-}`,
+}`),
   },
 ]
 
-const initialValue = []
-for (const line of initialValueLines) {
-  const { content, ...rest } = line
-
-  for (const line of content.split('\n')) {
-    initialValue.push({
-      ...rest,
-      children: [{ text: line }],
-    })
-  }
-}
-
 // Prismjs theme stored as a string instead of emotion css function.
 // It is useful for copy/pasting different themes. Also lets keeping simpler Leaf implementation
+// In the real project better to use just css file
 const prismThemeCss = `
 /**
  * prism.js default theme for JavaScript, CSS and HTML

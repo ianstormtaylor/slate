@@ -71,9 +71,14 @@ export type TitleElement = { type: 'title'; children: Descendant[] }
 
 export type VideoElement = { type: 'video'; url: string; children: EmptyText[] }
 
+export type CodeBlockElement = {
+  type: 'code-block'
+  language: string
+  children: Descendant[]
+}
+
 export type CodeLineElement = {
   type: 'code-line'
-  language: string
   children: Descendant[]
 }
 
@@ -95,6 +100,7 @@ type CustomElement =
   | TableCellElement
   | TitleElement
   | VideoElement
+  | CodeBlockElement
   | CodeLineElement
 
 export type CustomText = {
@@ -111,9 +117,7 @@ export type EmptyText = {
 export type CustomEditor = BaseEditor &
   ReactEditor &
   HistoryEditor & {
-    ranges?: Map<Element, Range[]>
-    intervals?: Map<string, [number, number][]>
-    intervalsStarts?: Map<string, Set<number>>
+    nodeToDecorations?: Map<Element, Range[]>
   }
 
 declare module 'slate' {
