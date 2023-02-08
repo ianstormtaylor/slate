@@ -37,13 +37,17 @@ async function setText(page: Page, text: string, language: string) {
   } else {
     await page.keyboard.press('Control+A')
   }
+  await page.keyboard.press('Backspace')
+
+  const codeBlockButton = await page.getByTestId('code-block-button')
+  await codeBlockButton.click({ force: true }) // convert elements to code block
   await page.keyboard.type(text)
 
-  const codeLine = await page
-    .locator('[data-slate-element-type="code-line"]')
+  const codeBlock = await page
+    .locator('[data-slate-element-type="code-block"]')
     .nth(0)
 
-  const select = await codeLine.locator('select').nth(0)
+  const select = await codeBlock.locator('select').nth(0)
 
   await select.selectOption({ value: language }) // Select the language option
   await expect(await select.inputValue()).toBe(language) // Confirm value to avoid race condition
@@ -114,18 +118,18 @@ function getTestCases() {
         ['"', 'rgb(0, 119, 170)'],
         [' ', 'rgb(153, 0, 85)'],
         ['renderIcon', 'rgb(102, 153, 0)'],
-        ['=', 'rgb(153, 153, 153)'],
-        ['{', 'rgb(153, 153, 153)'],
-        ['(', 'rgb(153, 153, 153)'],
-        [')', 'rgb(153, 153, 153)'],
-        [' ', 'rgb(0, 0, 0)'],
+        ['=', 'rgb(153, 0, 85)'],
+        ['{', 'rgb(153, 0, 85)'],
+        ['(', 'rgb(153, 0, 85)'],
+        [')', 'rgb(153, 0, 85)'],
+        [' ', 'rgb(153, 0, 85)'],
         ['=>', 'rgb(154, 110, 58)'],
-        [' ', 'rgb(0, 0, 0)'],
+        [' ', 'rgb(153, 0, 85)'],
         ['<', 'rgb(153, 0, 85)'],
         ['Icon', 'rgb(221, 74, 104)'],
         [' ', 'rgb(153, 0, 85)'],
         ['/>', 'rgb(153, 0, 85)'],
-        ['}', 'rgb(153, 153, 153)'],
+        ['}', 'rgb(153, 0, 85)'],
         [' ', 'rgb(153, 0, 85)'],
         ['/>', 'rgb(153, 0, 85)'],
       ],

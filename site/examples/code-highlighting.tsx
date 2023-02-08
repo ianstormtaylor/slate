@@ -33,6 +33,7 @@ import isHotkey from 'is-hotkey'
 import { css } from '@emotion/css'
 import { CodeBlockElement } from './custom-types'
 import { normalizeTokens } from '../utils/normalize-tokens'
+import { Button, Icon, Toolbar } from '../components'
 
 const ParagraphType = 'paragraph'
 const CodeBlockType = 'code-block'
@@ -46,6 +47,7 @@ const CodeHighlightingExample = () => {
 
   return (
     <Slate editor={editor} value={initialValue}>
+      <ExampleToolbar />
       <SetNodeToDecorations />
       <Editable
         decorate={decorate}
@@ -61,6 +63,8 @@ const CodeHighlightingExample = () => {
 const renderElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
+
+  attributes['data-slate-element-type'] = element.type // for elements selecting in integration test
 
   if (element.type === CodeBlockType) {
     const setLanguage = (language: string) => {
@@ -104,6 +108,46 @@ const renderElement = (props: RenderElementProps) => {
     <Tag {...attributes} style={{ position: 'relative' }}>
       {children}
     </Tag>
+  )
+}
+
+const ExampleToolbar = () => {
+  return (
+    <Toolbar>
+      <CodeBlockButton />
+    </Toolbar>
+  )
+}
+
+const CodeBlockButton = () => {
+  const editor = useSlateStatic()
+  const handleClick = () => {
+    Transforms.wrapNodes(
+      editor,
+      { type: CodeBlockType, language: 'html', children: [] },
+      {
+        match: n => Element.isElement(n) && n.type === ParagraphType,
+        split: true,
+      }
+    )
+    Transforms.setNodes(
+      editor,
+      { type: CodeLineType },
+      { match: n => Element.isElement(n) && n.type === ParagraphType }
+    )
+  }
+
+  return (
+    <Button
+      data-test-id="code-block-button"
+      active
+      onMouseDown={event => {
+        event.preventDefault()
+        handleClick()
+      }}
+    >
+      <Icon>code</Icon>
+    </Button>
   )
 }
 
@@ -316,6 +360,10 @@ declare module 'slate' {
     Text: CustomText
   }
 }`),
+  },
+  {
+    type: ParagraphType,
+    children: toChildren('There you have it!'),
   },
 ]
 
