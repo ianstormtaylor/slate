@@ -173,16 +173,6 @@ const useDecorate = (editor: Editor) => {
   }, [])
 }
 
-class PrismTokenNode {
-  token: string | Prism.Token
-  parent: null | PrismTokenNode
-
-  constructor(token: string | Prism.Token, parent: null | PrismTokenNode) {
-    this.token = token
-    this.parent = parent
-  }
-}
-
 const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<
   CodeBlockElement
 >) => {
