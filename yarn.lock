@@ -3729,6 +3729,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/prismjs@npm:^1.26.0":
+  version: 1.26.0
+  resolution: "@types/prismjs@npm:1.26.0"
+  checksum: cd5e7a6214c1f4213ec512a5fcf6d8fe37a56b813fc57ac95b5ff5ee074742bfdbd2f2730d9fd985205bf4586728e09baa97023f739e5aa1c9735a7c1ecbd11a
+  languageName: node
+  linkType: hard
+
 "@types/prop-types@npm:*":
   version: 15.7.4
   resolution: "@types/prop-types@npm:15.7.4"
@@ -12341,10 +12348,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prismjs@npm:^1.5.1":
-  version: 1.24.1
-  resolution: "prismjs@npm:1.24.1"
-  checksum: e5d14a4ba56773122039295bd760c72106acc964e04cb9831b9ae7e7a58f67ccac6c053e77e21f1018a3684f31d35bb065c0c81fd4ff00b73b1570c3ace4aef0
+"prismjs@npm:^1.29.0":
+  version: 1.29.0
+  resolution: "prismjs@npm:1.29.0"
+  checksum: 007a8869d4456ff8049dc59404e32d5666a07d99c3b0e30a18bd3b7676dfa07d1daae9d0f407f20983865fd8da56de91d09cb08e6aa61f5bc420a27c0beeaf93
   languageName: node
   linkType: hard
 
@@ -13851,6 +13858,7 @@ resolve@^2.0.0-next.3:
     "@types/lodash": ^4.14.149
     "@types/mocha": ^5.2.7
     "@types/node": ^16.11.26
+    "@types/prismjs": ^1.26.0
     "@types/react": ^16.9.13
     "@types/react-dom": ^16.9.4
     "@typescript-eslint/eslint-plugin": ^5.30.5
@@ -13877,7 +13885,7 @@ resolve@^2.0.0-next.3:
     npm-run-all: ^4.1.2
     playwright: ^1.29.1
     prettier: ^1.19.1
-    prismjs: ^1.5.1
+    prismjs: ^1.29.0
     react: ^16.12.0
     react-dom: ^16.12.0
     react-error-boundary: ^1.2.5

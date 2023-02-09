@@ -2,7 +2,7 @@ import React, { useRef } from 'react'
 import { Element, Range, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { isDecoratorRangeListEqual } from '../utils/range-list'
+import { isTextDecorationsEqual } from '../utils/range-list'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
@@ -79,7 +79,7 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
     next.text === prev.text &&
-    isDecoratorRangeListEqual(next.decorations, prev.decorations)
+    isTextDecorationsEqual(next.decorations, prev.decorations)
   )
 })
 
