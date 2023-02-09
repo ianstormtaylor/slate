@@ -45,7 +45,10 @@ import { ReactEditor } from './react-editor'
  * See https://docs.slatejs.org/concepts/11-typescript to learn how.
  */
 
-export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
+export const withReact = <T extends BaseEditor>(
+  editor: T,
+  clipboardFormatKey = 'x-slate-fragment'
+): T & ReactEditor => {
   const e = editor as T & ReactEditor
   const { apply, onChange, deleteBackward, addMark, removeMark } = e
 
@@ -263,7 +266,7 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
     const string = JSON.stringify(fragment)
     const encoded = window.btoa(encodeURIComponent(string))
     attach.setAttribute('data-slate-fragment', encoded)
-    data.setData('application/x-slate-fragment', encoded)
+    data.setData(`application/${clipboardFormatKey}`, encoded)
 
     // Add the content to a <div> so that we can get its inner HTML.
     const div = contents.ownerDocument.createElement('div')
@@ -287,7 +290,7 @@ export const withReact = <T extends BaseEditor>(editor: T): T & ReactEditor => {
      * Checking copied fragment from application/x-slate-fragment or data-slate-fragment
      */
     const fragment =
-      data.getData('application/x-slate-fragment') ||
+      data.getData(`application/${clipboardFormatKey}`) ||
       getSlateFragmentAttribute(data)
 
     if (fragment) {
