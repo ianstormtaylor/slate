@@ -8,7 +8,7 @@ test.describe('code highlighting', () => {
   for (const testCase of getTestCases()) {
     const { language, content, highlights } = testCase
 
-    test(`highlights ${language} tags`, async ({ page }) => {
+    test(`code highlighting ${language}`, async ({ page }) => {
       await setText(page, content, language)
 
       const tokens = await page
@@ -26,31 +26,13 @@ test.describe('code highlighting', () => {
   }
 })
 
-// it also tests if select works the right way
+// it also tests if select and code block button works the right way
 async function setText(page: Page, text: string, language: string) {
-  await page.locator('[data-slate-editor]').click() // focus on the editor
-  const isMac = await page.evaluate(() => {
-    return /Mac|iPhone|iPod|iPad/i.test(navigator.platform)
-  })
-  if (isMac) {
-    await page.keyboard.press('Meta+A')
-  } else {
-    await page.keyboard.press('Control+A')
-  }
-  await page.keyboard.press('Backspace')
+  await page.locator('[data-slate-editor]').fill('') // clear editor
+  await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
+  await page.getByTestId('language-select').selectOption({ value: language }) // select the language option
 
-  const codeBlockButton = await page.getByTestId('code-block-button')
-  await codeBlockButton.click({ force: true }) // convert elements to code block
-  await page.keyboard.type(text)
-
-  const codeBlock = await page
-    .locator('[data-slate-element-type="code-block"]')
-    .nth(0)
-
-  const select = await codeBlock.locator('select').nth(0)
-
-  await select.selectOption({ value: language }) // Select the language option
-  await expect(await select.inputValue()).toBe(language) // Confirm value to avoid race condition
+  await page.keyboard.type(text) // type text
 }
 
 function getTestCases() {

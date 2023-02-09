@@ -64,8 +64,6 @@ const renderElement = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
 
-  attributes['data-slate-element-type'] = element.type // for elements selecting in integration test
-
   if (element.type === CodeBlockType) {
     const setLanguage = (language: string) => {
       const path = ReactEditor.findPath(editor, element)
@@ -257,6 +255,7 @@ const useOnKeydown = (editor: Editor) => {
 const LanguageSelect = (props: JSX.IntrinsicElements['select']) => {
   return (
     <select
+      data-test-id="language-select"
       contentEditable={false}
       className={css`
         position: absolute;
