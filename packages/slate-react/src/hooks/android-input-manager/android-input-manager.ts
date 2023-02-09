@@ -381,7 +381,7 @@ export function createAndroidInputManager({
       const [start, end] = Range.edges(targetRange)
       const leaf = Node.leaf(editor, start.path)
 
-      if (leaf.text.length === start.offset && end.offset === 0) {
+      if ((!leaf || leaf.text.length === start.offset) && end.offset === 0) {
         const next = Editor.next(editor, { at: start.path, match: Text.isText })
         if (next && Path.equals(next[1], end.path)) {
           targetRange = { anchor: end, focus: end }
