@@ -44,6 +44,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Sana](https://www.sanalabs.com): Reimagining learning with AI [LMS]
 - [Sanity.io](https://www.sanity.io/): Platform for structured content [data driven content]
 - [Slite](https://slite.com/): Where remote teams make decisions and share knowledge
+- [Static CMS](https://www.staticcms.org/): Git-based CMS for Static Site Generators
 - [Taskade](https://www.taskade.com/): Get work done in one unified workspace
 - [TRPG Engine](https://trpg.moonrailgun.com/)
 - [Thoughts](https://thoughts.teambition.com/)
