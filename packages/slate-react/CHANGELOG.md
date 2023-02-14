@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.91.0
+
+### Minor Changes
+
+- [#5267](https://github.com/ianstormtaylor/slate/pull/5267) [`463edbd2`](https://github.com/ianstormtaylor/slate/commit/463edbd27ed78a4b4a3d38886da4d9e3e8b8efd5) Thanks [@ilya2204](https://github.com/ilya2204)! - Allow to change clipboard fragment format name
+
+* [#5271](https://github.com/ianstormtaylor/slate/pull/5271) [`9635b992`](https://github.com/ianstormtaylor/slate/commit/9635b992a0d91cecd45e3b6a883a860f14bcaaea) Thanks [@dsvgit](https://github.com/dsvgit)! - If TextComponent decorations keep the same offsets and only paths are changed, prevent re-rendering because only decoration offsets matter when leaves are calculated.
+
 ## 0.90.0
 
 ### Minor Changes
