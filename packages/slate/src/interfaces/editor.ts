@@ -79,12 +79,15 @@ export interface BaseEditor {
   insertText: (text: string) => void
   removeMark: (key: string) => void
   getDirtyPaths: (operation: Operation) => Path[]
-  getMaxNormalizeIterations: (
-    dirtyPaths: Path[],
-    options?: {
-      operation?: Operation
-    }
-  ) => number
+  shouldNormalize: ({
+    iteration,
+    dirtyPaths,
+    operation,
+  }: {
+    iteration: number
+    dirtyPaths: Path[]
+    operation?: Operation
+  }) => boolean
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -1073,31 +1076,9 @@ export const Editor: EditorInterface = {
 
       let iteration = 0
 
-      const shouldNormalizeNode = ({
-        iteration,
-        dirtyPaths,
-        operation,
-      }: {
-        iteration: number
-        dirtyPaths: Path[]
-        operation?: Operation
-      }) => {
-        const maxIterations = editor.getMaxNormalizeIterations(dirtyPaths, {
-          operation,
-        })
-
-        if (iteration > maxIterations) {
-          throw new Error(
-            `Could not completely normalize the editor after ${maxIterations} iterations! This is usually due to incorrect normalization logic that leaves a node in an invalid state.`
-          )
-        }
-
-        return true
-      }
-
       while (getDirtyPaths(editor).length !== 0) {
         if (
-          !shouldNormalizeNode({
+          !editor.shouldNormalize({
             iteration,
             dirtyPaths: getDirtyPaths(editor),
             operation,
