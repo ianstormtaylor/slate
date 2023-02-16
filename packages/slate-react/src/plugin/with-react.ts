@@ -2,13 +2,13 @@ import ReactDOM from 'react-dom'
 import {
   BaseEditor,
   Editor,
+  Element,
   Node,
   Operation,
   Path,
   Point,
   Range,
   Transforms,
-  Element,
 } from 'slate'
 import {
   TextDiff,
@@ -28,14 +28,15 @@ import {
   EDITOR_TO_ON_CHANGE,
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
+  EDITOR_TO_PENDING_INSERTION_MARKS,
   EDITOR_TO_PENDING_SELECTION,
+  EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
-  EDITOR_TO_SCHEDULE_FLUSH,
-  EDITOR_TO_PENDING_INSERTION_MARKS,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
+
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
  *
@@ -322,7 +323,7 @@ export const withReact = <T extends BaseEditor>(
     return false
   }
 
-  e.onChange = () => {
+  e.onChange = options => {
     // COMPAT: React doesn't batch `setState` hook calls, which means that the
     // children and selection can get out of sync for one render pass. So we
     // have to use this unstable API to ensure it batches them. (2019/12/03)
@@ -334,7 +335,7 @@ export const withReact = <T extends BaseEditor>(
         onContextChange()
       }
 
-      onChange()
+      onChange(options)
     })
   }
 
