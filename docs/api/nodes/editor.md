@@ -422,7 +422,6 @@ Override this method to prevent normalizing the editor.
 
 Options: `{ iteration: number; dirtyPaths: Path[]; operation?: Operation(entry: NodeEntry, { operation }`
 
-
 ### Callback method
 
 #### `onChange(options?: { operation?: Operation }) => void`
