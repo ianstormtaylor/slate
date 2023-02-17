@@ -36,8 +36,6 @@ export const EDITOR_TO_KEY_TO_ELEMENT: WeakMap<
 
 export const IS_READ_ONLY: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_FOCUSED: WeakMap<Editor, boolean> = new WeakMap()
-export const IS_DRAGGING: WeakMap<Editor, boolean> = new WeakMap()
-export const IS_CLICKING: WeakMap<Editor, boolean> = new WeakMap()
 export const IS_COMPOSING: WeakMap<Editor, boolean> = new WeakMap()
 
 export const EDITOR_TO_USER_SELECTION: WeakMap<
