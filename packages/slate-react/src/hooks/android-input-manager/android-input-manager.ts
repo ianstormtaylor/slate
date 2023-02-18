@@ -352,12 +352,25 @@ export function createAndroidInputManager({
       insertPositionHint = false
     }
 
+    let inVoidNode = false
     let [nativeTargetRange] = (event as any).getTargetRanges()
     if (nativeTargetRange) {
       targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
       })
+
+      if (
+        nativeTargetRange.collapsed &&
+        nativeTargetRange.startContainer.nodeType === globalThis.Node.TEXT_NODE
+      ) {
+        const closestElement = nativeTargetRange.startContainer.parentElement.closest(
+          '[data-slate-node=element]'
+        )
+        inVoidNode = closestElement?.attributes.hasOwnProperty(
+          'data-slate-void'
+        )
+      }
     }
 
     // COMPAT: SelectionChange event is fired after the action is performed, so we
@@ -515,12 +528,14 @@ export function createAndroidInputManager({
       }
 
       case 'insertLineBreak': {
+        if (inVoidNode) return
         return scheduleAction(() => Editor.insertSoftBreak(editor), {
           at: targetRange,
         })
       }
 
       case 'insertParagraph': {
+        if (inVoidNode) return
         return scheduleAction(() => Editor.insertBreak(editor), {
           at: targetRange,
         })
@@ -533,6 +548,7 @@ export function createAndroidInputManager({
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
+        if (inVoidNode) return
         if (data?.constructor.name === 'DataTransfer') {
           return scheduleAction(() => ReactEditor.insertData(editor, data), {
             at: targetRange,
