@@ -147,7 +147,7 @@ export const Editable = (props: EditableProps) => {
   const editor = useSlate()
   // Rerender editor when composition status changed
   const [isComposing, setIsComposing] = useState(false)
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement | null>(null)
   const deferredOperations = useRef<DeferredOperation[]>([])
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
@@ -698,6 +698,23 @@ export const Editable = (props: EditableProps) => {
     [readOnly, propsOnDOMBeforeInput]
   )
 
+  const callbackRef = useCallback(
+    node => {
+      if (node == null) {
+        EDITOR_TO_ELEMENT.delete(editor)
+        NODE_TO_ELEMENT.delete(editor)
+
+        if (HAS_BEFORE_INPUT_SUPPORT) {
+          // @ts-ignore The `beforeinput` event isn't recognized.
+          ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
+        }
+      }
+
+      ref.current = node
+    },
+    [ref, onDOMBeforeInput]
+  )
+
   // Attach a native DOM event handler for `beforeinput` events, because React's
   // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
   // real `beforeinput` events sadly... (2019/11/04)
@@ -845,7 +862,7 @@ export const Editable = (props: EditableProps) => {
             // this magic zIndex="-1" will fix it
             zindex={-1}
             suppressContentEditableWarning
-            ref={ref}
+            ref={callbackRef}
             style={{
               ...(disableDefaultStyles
                 ? {}

@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { Element, Range, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -32,7 +32,7 @@ const Text = (props: {
     text,
   } = props
   const editor = useSlateStatic()
-  const ref = useRef<HTMLSpanElement>(null)
+  const ref = useRef<HTMLSpanElement | null>(null)
   const leaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
   const children = []
@@ -54,20 +54,26 @@ const Text = (props: {
   }
 
   // Update element-related weak maps with the DOM element ref.
-  useIsomorphicLayoutEffect(() => {
-    const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
-    if (ref.current) {
-      KEY_TO_ELEMENT?.set(key, ref.current)
-      NODE_TO_ELEMENT.set(text, ref.current)
-      ELEMENT_TO_NODE.set(ref.current, text)
-    } else {
-      KEY_TO_ELEMENT?.delete(key)
-      NODE_TO_ELEMENT.delete(text)
-    }
-  })
-
+  const callbackRef = useCallback(
+    (span: HTMLSpanElement | null) => {
+      const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
+      if (span) {
+        KEY_TO_ELEMENT?.set(key, span)
+        NODE_TO_ELEMENT.set(text, span)
+        ELEMENT_TO_NODE.set(span, text)
+      } else {
+        KEY_TO_ELEMENT?.delete(key)
+        NODE_TO_ELEMENT.delete(text)
+        if (ref.current) {
+          ELEMENT_TO_NODE.delete(ref.current)
+        }
+      }
+      ref.current = span
+    },
+    [ref, editor, key, text]
+  )
   return (
-    <span data-slate-node="text" ref={ref}>
+    <span data-slate-node="text" ref={callbackRef}>
       {children}
     </span>
   )
