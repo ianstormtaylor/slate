@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.91.2
+
+### Patch Changes
+
+- [#5297](https://github.com/ianstormtaylor/slate/pull/5297) [`967d99eb`](https://github.com/ianstormtaylor/slate/commit/967d99eb36df798ac3163c7d15a01e64fee0668c) Thanks [@edhager](https://github.com/edhager)! - Fix memory leaks by adding clean-up code that looks for ref resets in Editable and Text.
+
 ## 0.91.1
 
 ### Patch Changes
