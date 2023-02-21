@@ -266,16 +266,20 @@ export const Editable = (props: EditableProps) => {
       NODE_TO_ELEMENT.delete(editor)
     }
 
+    if (
+      !ReactEditor.isFocused(editor) ||
+      androidInputManager?.hasPendingChanges() ||
+      androidInputManager?.isFlushing()
+    ) {
+      return
+    }
+
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
     const domSelection = root.getSelection()
 
-    if (
-      !domSelection ||
-      !ReactEditor.isFocused(editor) ||
-      androidInputManager?.hasPendingAction()
-    ) {
+    if (!domSelection) {
       return
     }
 
