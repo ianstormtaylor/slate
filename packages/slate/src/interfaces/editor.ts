@@ -21,6 +21,7 @@ import {
   getWordDistance,
   splitByCharacterDistance,
 } from '../utils/string'
+import { OmitFirstArg } from '../utils/types'
 import {
   DIRTY_PATH_KEYS,
   DIRTY_PATHS,
@@ -59,13 +60,13 @@ export interface BaseEditor {
   marks: EditorMarks | null
 
   // Schema-specific node behaviors.
-  isInline: (element: Element) => boolean
-  isVoid: (element: Element) => boolean
+
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
 
   // Overrideable core actions.
+
   addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void
   deleteBackward: (unit: TextUnit) => void
@@ -88,6 +89,52 @@ export interface BaseEditor {
     dirtyPaths: Path[]
     operation?: Operation
   }) => boolean
+
+  // Overrideable core queries.
+
+  above: OmitFirstArg<typeof Editor.above>
+  after: OmitFirstArg<typeof Editor.after>
+  before: OmitFirstArg<typeof Editor.before>
+  edges: OmitFirstArg<typeof Editor.edges>
+  end: OmitFirstArg<typeof Editor.end>
+  first: OmitFirstArg<typeof Editor.first>
+  fragment: OmitFirstArg<typeof Editor.fragment>
+  hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
+  hasInlines: OmitFirstArg<typeof Editor.hasInlines>
+  hasPath: OmitFirstArg<typeof Editor.hasPath>
+  hasTexts: OmitFirstArg<typeof Editor.hasTexts>
+  isBlock: OmitFirstArg<typeof Editor.isBlock>
+  isEditor: OmitFirstArg<typeof Editor.isEditor>
+  isEnd: OmitFirstArg<typeof Editor.isEnd>
+  isEdge: OmitFirstArg<typeof Editor.isEdge>
+  isEmpty: OmitFirstArg<typeof Editor.isEmpty>
+  isInline: OmitFirstArg<typeof Editor.isInline>
+  isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
+  isStart: OmitFirstArg<typeof Editor.isStart>
+  isVoid: OmitFirstArg<typeof Editor.isVoid>
+  last: OmitFirstArg<typeof Editor.last>
+  leaf: OmitFirstArg<typeof Editor.leaf>
+  levels: OmitFirstArg<typeof Editor.levels>
+  getMarks: OmitFirstArg<typeof Editor.marks>
+  next: OmitFirstArg<typeof Editor.next>
+  node: OmitFirstArg<typeof Editor.node>
+  nodes: OmitFirstArg<typeof Editor.nodes>
+  parent: OmitFirstArg<typeof Editor.parent>
+  path: OmitFirstArg<typeof Editor.path>
+  pathRef: OmitFirstArg<typeof Editor.pathRef>
+  pathRefs: OmitFirstArg<typeof Editor.pathRefs>
+  point: OmitFirstArg<typeof Editor.point>
+  pointRef: OmitFirstArg<typeof Editor.pointRef>
+  pointRefs: OmitFirstArg<typeof Editor.pointRefs>
+  positions: OmitFirstArg<typeof Editor.positions>
+  previous: OmitFirstArg<typeof Editor.previous>
+  range: OmitFirstArg<typeof Editor.range>
+  rangeRef: OmitFirstArg<typeof Editor.rangeRef>
+  rangeRefs: OmitFirstArg<typeof Editor.rangeRefs>
+  start: OmitFirstArg<typeof Editor.start>
+  string: OmitFirstArg<typeof Editor.string>
+  unhangRange: OmitFirstArg<typeof Editor.unhangRange>
+  void: OmitFirstArg<typeof Editor.void>
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -210,6 +257,8 @@ export interface EditorVoidOptions {
   mode?: MaximizeMode
   voids?: boolean
 }
+
+const a: A = a => {}
 
 export interface EditorInterface {
   above: <T extends Ancestor>(
