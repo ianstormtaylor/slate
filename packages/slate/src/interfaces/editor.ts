@@ -15,6 +15,7 @@ import {
   RangeRef,
   Span,
   Text,
+  Transforms,
 } from '..'
 import {
   getCharacterDistance,
@@ -54,32 +55,21 @@ export type EditorMarks = Omit<Text, 'text'>
  */
 
 export interface BaseEditor {
+  // Core state.
+
   children: Descendant[]
   selection: Selection
   operations: Operation[]
   marks: EditorMarks | null
 
-  // Schema-specific node behaviors.
+  // Overrideable core methods.
 
+  apply: (operation: Operation) => void
+  getDirtyPaths: (operation: Operation) => Path[]
+  getFragment: () => Descendant[]
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
-
-  // Overrideable core actions.
-
-  addMark: (key: string, value: any) => void
-  apply: (operation: Operation) => void
-  deleteBackward: (unit: TextUnit) => void
-  deleteForward: (unit: TextUnit) => void
-  deleteFragment: (direction?: TextDirection) => void
-  getFragment: () => Descendant[]
-  insertBreak: () => void
-  insertSoftBreak: () => void
-  insertFragment: (fragment: Node[]) => void
-  insertNode: (node: Node) => void
-  insertText: (text: string) => void
-  removeMark: (key: string) => void
-  getDirtyPaths: (operation: Operation) => Path[]
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -89,6 +79,39 @@ export interface BaseEditor {
     dirtyPaths: Path[]
     operation?: Operation
   }) => boolean
+
+  // Overrideable core transforms.
+
+  addMark: OmitFirstArg<typeof Editor.addMark>
+  collapse: OmitFirstArg<typeof Transforms.collapse>
+  deselect: OmitFirstArg<typeof Transforms.deselect>
+  delete: OmitFirstArg<typeof Transforms.delete>
+  insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
+  insertText: OmitFirstArg<typeof Transforms.insertText>
+  move: OmitFirstArg<typeof Transforms.move>
+  select: OmitFirstArg<typeof Transforms.select>
+  setPoint: OmitFirstArg<typeof Transforms.setPoint>
+  setSelection: OmitFirstArg<typeof Transforms.setSelection>
+  deleteBackward: OmitFirstArg<typeof Editor.deleteBackward>
+  deleteForward: OmitFirstArg<typeof Editor.deleteForward>
+  deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
+  insertBreak: OmitFirstArg<typeof Editor.insertBreak>
+  insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
+  insertNode: OmitFirstArg<typeof Editor.insertNode>
+  insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
+  liftNodes: OmitFirstArg<typeof Transforms.liftNodes>
+  mergeNodes: OmitFirstArg<typeof Transforms.mergeNodes>
+  moveNodes: OmitFirstArg<typeof Transforms.moveNodes>
+  normalize: OmitFirstArg<typeof Editor.normalize>
+  removeMark: OmitFirstArg<typeof Editor.removeMark>
+  removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
+  setNodes: OmitFirstArg<typeof Transforms.setNodes>
+  setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
+  splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
+  unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
+  unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
+  withoutNormalizing: OmitFirstArg<typeof Editor.withoutNormalizing>
+  wrapNodes: OmitFirstArg<typeof Transforms.wrapNodes>
 
   // Overrideable core queries.
 
@@ -257,8 +280,6 @@ export interface EditorVoidOptions {
   mode?: MaximizeMode
   voids?: boolean
 }
-
-const a: A = a => {}
 
 export interface EditorInterface {
   above: <T extends Ancestor>(
@@ -516,43 +537,27 @@ export const Editor: EditorInterface = {
   /**
    * Delete content in the editor backward from the current selection.
    */
-
-  deleteBackward(
-    editor: Editor,
-    options: EditorDirectedDeletionOptions = {}
-  ): void {
-    const { unit = 'character' } = options
-    editor.deleteBackward(unit)
+  deleteBackward(editor, options) {
+    editor.deleteBackward(options)
   },
 
   /**
    * Delete content in the editor forward from the current selection.
    */
-
-  deleteForward(
-    editor: Editor,
-    options: EditorDirectedDeletionOptions = {}
-  ): void {
-    const { unit = 'character' } = options
-    editor.deleteForward(unit)
+  deleteForward(editor, options) {
+    editor.deleteForward(options)
   },
 
   /**
    * Delete the content in the current selection.
    */
-
-  deleteFragment(
-    editor: Editor,
-    options: EditorFragmentDeletionOptions = {}
-  ): void {
-    const { direction = 'forward' } = options
-    editor.deleteFragment(direction)
+  deleteFragment(editor, options): void {
+    editor.deleteFragment(options)
   },
 
   /**
    * Get the start and end points of a location.
    */
-
   edges(editor: Editor, at: Location): [Point, Point] {
     return [Editor.start(editor, at), Editor.end(editor, at)]
   },
@@ -560,7 +565,6 @@ export const Editor: EditorInterface = {
   /**
    * Get the end point of a location.
    */
-
   end(editor: Editor, at: Location): Point {
     return Editor.point(editor, at, { edge: 'end' })
   },
@@ -1120,8 +1124,6 @@ export const Editor: EditorInterface = {
           }
         }
       }
-
-      const dirtyPaths = getDirtyPaths(editor)
 
       let iteration = 0
 

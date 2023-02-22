@@ -12,7 +12,6 @@ import {
   Text,
   Transforms,
 } from './'
-import { TextUnit } from './interfaces/types'
 import { DIRTY_PATH_KEYS, DIRTY_PATHS, FLUSHING } from './utils/weak-maps'
 
 /**
@@ -145,7 +144,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteBackward: (unit: TextUnit) => {
+    deleteBackward: ({ unit = 'character' } = {}) => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {
@@ -153,7 +152,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteForward: (unit: TextUnit) => {
+    deleteForward: ({ unit = 'character' } = {}) => {
       const { selection } = editor
 
       if (selection && Range.isCollapsed(selection)) {
@@ -161,7 +160,7 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteFragment: (direction?: 'forward' | 'backward') => {
+    deleteFragment: ({ direction = 'forward' } = {}) => {
       const { selection } = editor
 
       if (selection && Range.isExpanded(selection)) {
