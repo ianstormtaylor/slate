@@ -392,6 +392,11 @@ export function createAndroidInputManager({
     if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
       if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
         const [start, end] = Range.edges(targetRange)
+
+        const point = { path: targetRange.anchor.path, offset: start.offset }
+        const range = Editor.range(editor, point, point)
+        handleUserSelect(range)
+
         return storeDiff(targetRange.anchor.path, {
           text: '',
           end: end.offset,
