@@ -13936,7 +13936,7 @@ resolve@^2.0.0-next.3:
     react-dom: ">=16.8.0"
     react-test-renderer: ">=16.8.0"
     scroll-into-view-if-needed: ^2.2.20
-    slate: ^0.91.1
+    slate: ^0.91.3
     slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-invariant: 1.0.6
@@ -13947,7 +13947,7 @@ resolve@^2.0.0-next.3:
   languageName: unknown
   linkType: soft
 
-"slate@^0.91.1, slate@workspace:*, slate@workspace:packages/slate":
+"slate@^0.91.1, slate@^0.91.3, slate@workspace:*, slate@workspace:packages/slate":
   version: 0.0.0-use.local
   resolution: "slate@workspace:packages/slate"
   dependencies:

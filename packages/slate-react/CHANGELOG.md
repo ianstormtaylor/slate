@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.91.3
+
+### Patch Changes
+
+- [#5305](https://github.com/ianstormtaylor/slate/pull/5305) [`11adbf96`](https://github.com/ianstormtaylor/slate/commit/11adbf966c764ffde866be38ada2d32e00105e48) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Allow pasting plain text into editable voids
+
 ## 0.91.2
 
 ### Patch Changes
