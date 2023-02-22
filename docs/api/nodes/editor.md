@@ -14,7 +14,7 @@ interface Editor {
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  onChange: (options?: { operation?: Operation }) => void
 
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
@@ -40,7 +40,7 @@ interface Editor {
 - [Instance methods](editor.md#instance-methods)
   - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
   - [Element Type Methods](editor.md/#element-type-methods)
-  - [Normalize Method](editor.md/#normalize-method)
+  - [Normalize Methods](editor.md/#normalize-methods)
   - [Callback Method](editor.md/#callback-method)
   - [Mark Methods](editor.md/#mark-methods)
   - [getFragment Method](editor.md/#getfragment-method)
@@ -341,7 +341,7 @@ Check if a value is a void `Element` object.
 
 Normalize any dirty objects in the editor.
 
-Options: `{force?: boolean}`
+Options: `{force?: boolean; operation?: Operation}`
 
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 
@@ -410,15 +410,21 @@ Check if a value is an inline `Element` object.
 
 Check if a value is a void `Element` object.
 
-### Normalize method
+### Normalize methods
 
-#### `normalizeNode(entry: NodeEntry) => void`
+#### `normalizeNode(entry: NodeEntry, { operation }) => void`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
+#### `shouldNormalize: (options) => boolean`
+
+Override this method to prevent normalizing the editor.
+
+Options: `{ iteration: number; dirtyPaths: Path[]; operation?: Operation(entry: NodeEntry, { operation }`
+
 ### Callback method
 
-#### `onChange() => void`
+#### `onChange(options?: { operation?: Operation }) => void`
 
 Called when there is a change in the editor.
 

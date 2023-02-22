@@ -14,7 +14,7 @@ interface Editor {
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  onChange: (options?: { operation?: Operation }) => void
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void

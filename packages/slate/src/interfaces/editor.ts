@@ -17,28 +17,28 @@ import {
   Text,
 } from '..'
 import {
-  DIRTY_PATHS,
+  getCharacterDistance,
+  getWordDistance,
+  splitByCharacterDistance,
+} from '../utils/string'
+import {
   DIRTY_PATH_KEYS,
+  DIRTY_PATHS,
   NORMALIZING,
   PATH_REFS,
   POINT_REFS,
   RANGE_REFS,
 } from '../utils/weak-maps'
-import {
-  getWordDistance,
-  getCharacterDistance,
-  splitByCharacterDistance,
-} from '../utils/string'
-import { Descendant } from './node'
 import { Element } from './element'
+import { Descendant } from './node'
 import {
   LeafEdge,
+  MaximizeMode,
+  RangeDirection,
   SelectionMode,
   TextDirection,
   TextUnit,
   TextUnitAdjustment,
-  RangeDirection,
-  MaximizeMode,
 } from './types'
 
 export type BaseSelection = Range | null
@@ -62,8 +62,8 @@ export interface BaseEditor {
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
-  normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
+  onChange: (options?: { operation?: Operation }) => void
 
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
@@ -78,7 +78,16 @@ export interface BaseEditor {
   insertNode: (node: Node) => void
   insertText: (text: string) => void
   removeMark: (key: string) => void
-  getDirtyPaths: (op: Operation) => Path[]
+  getDirtyPaths: (operation: Operation) => Path[]
+  shouldNormalize: ({
+    iteration,
+    dirtyPaths,
+    operation,
+  }: {
+    iteration: number
+    dirtyPaths: Path[]
+    operation?: Operation
+  }) => boolean
 }
 
 export type Editor = ExtendedType<'Editor', BaseEditor>
@@ -145,6 +154,7 @@ export interface EditorNodesOptions<T extends Node> {
 
 export interface EditorNormalizeOptions {
   force?: boolean
+  operation?: Operation
 }
 
 export interface EditorParentOptions {
@@ -1007,7 +1017,7 @@ export const Editor: EditorInterface = {
    */
 
   normalize(editor: Editor, options: EditorNormalizeOptions = {}): void {
-    const { force = false } = options
+    const { force = false, operation } = options
     const getDirtyPaths = (editor: Editor) => {
       return DIRTY_PATHS.get(editor) || []
     }
@@ -1057,19 +1067,24 @@ export const Editor: EditorInterface = {
             by definition adding children to an empty node can't cause other paths to change.
           */
           if (Element.isElement(node) && node.children.length === 0) {
-            editor.normalizeNode(entry)
+            editor.normalizeNode(entry, { operation })
           }
         }
       }
 
-      const max = getDirtyPaths(editor).length * 42 // HACK: better way?
-      let m = 0
+      const dirtyPaths = getDirtyPaths(editor)
+
+      let iteration = 0
 
       while (getDirtyPaths(editor).length !== 0) {
-        if (m > max) {
-          throw new Error(`
-            Could not completely normalize the editor after ${max} iterations! This is usually due to incorrect normalization logic that leaves a node in an invalid state.
-          `)
+        if (
+          !editor.shouldNormalize({
+            iteration,
+            dirtyPaths: getDirtyPaths(editor),
+            operation,
+          })
+        ) {
+          return
         }
 
         const dirtyPath = popDirtyPath(editor)
@@ -1077,9 +1092,9 @@ export const Editor: EditorInterface = {
         // If the node doesn't exist in the tree, it does not need to be normalized.
         if (Node.has(editor, dirtyPath)) {
           const entry = Editor.node(editor, dirtyPath)
-          editor.normalizeNode(entry)
+          editor.normalizeNode(entry, { operation })
         }
-        m++
+        iteration++
       }
     })
   },
