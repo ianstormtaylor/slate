@@ -1610,7 +1610,7 @@ export const Editable = (props: EditableProps) => {
               (event: React.ClipboardEvent<HTMLDivElement>) => {
                 if (
                   !readOnly &&
-                  ReactEditor.hasSelectableTarget(editor, event.target) &&
+                  ReactEditor.hasEditableTarget(editor, event.target) &&
                   !isEventHandled(event, attributes.onPaste)
                 ) {
                   // COMPAT: Certain browsers don't support the `beforeinput` event, so we
