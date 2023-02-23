@@ -84,6 +84,7 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
     next.renderLeaf === prev.renderLeaf &&
+    next.renderPlaceholder === prev.renderPlaceholder &&
     next.text === prev.text &&
     isTextDecorationsEqual(next.decorations, prev.decorations)
   )
