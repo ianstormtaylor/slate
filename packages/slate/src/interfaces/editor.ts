@@ -85,6 +85,7 @@ export interface BaseEditor {
     operation,
   }: {
     iteration: number
+    initialDirtyPathsLength: number
     dirtyPaths: Path[]
     operation?: Operation
   }) => boolean
@@ -1072,15 +1073,15 @@ export const Editor: EditorInterface = {
         }
       }
 
-      const dirtyPaths = getDirtyPaths(editor)
-
+      const initialDirtyPathsLength = getDirtyPaths(editor).length
       let iteration = 0
 
       while (getDirtyPaths(editor).length !== 0) {
         if (
           !editor.shouldNormalize({
-            iteration,
             dirtyPaths: getDirtyPaths(editor),
+            iteration,
+            initialDirtyPathsLength,
             operation,
           })
         ) {

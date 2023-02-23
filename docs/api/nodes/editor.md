@@ -420,7 +420,7 @@ Check if a value is a void `Element` object.
 
 Override this method to prevent normalizing the editor.
 
-Options: `{ iteration: number; dirtyPaths: Path[]; operation?: Operation(entry: NodeEntry, { operation }`
+Options: `{ dirtyPaths: Path[]; initialDirtyPathsLength: number; iteration: number; operation?: Operation }`
 
 ### Callback method
 
