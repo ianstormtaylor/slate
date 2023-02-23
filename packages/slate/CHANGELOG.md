@@ -1,5 +1,11 @@
 # slate
 
+## 0.91.4
+
+### Patch Changes
+
+- [#5311](https://github.com/ianstormtaylor/slate/pull/5311) [`0ac72a62`](https://github.com/ianstormtaylor/slate/commit/0ac72a626c41a9e259dc945b408d09367eca4b3f) Thanks [@zbeyens](https://github.com/zbeyens)! - Fix #5295 regression. `editor.shouldNormalize` new option: `initialDirtyPathsLength: number`
+
 ## 0.91.3
 
 ### Patch Changes
