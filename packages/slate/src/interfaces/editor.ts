@@ -1073,13 +1073,14 @@ export const Editor: EditorInterface = {
         }
       }
 
-      const initialDirtyPathsLength = getDirtyPaths(editor).length
+      let dirtyPaths = getDirtyPaths(editor)
+      const initialDirtyPathsLength = dirtyPaths.length
       let iteration = 0
 
-      while (getDirtyPaths(editor).length !== 0) {
+      while (dirtyPaths.length !== 0) {
         if (
           !editor.shouldNormalize({
-            dirtyPaths: getDirtyPaths(editor),
+            dirtyPaths,
             iteration,
             initialDirtyPathsLength,
             operation,
@@ -1096,6 +1097,7 @@ export const Editor: EditorInterface = {
           editor.normalizeNode(entry, { operation })
         }
         iteration++
+        dirtyPaths = getDirtyPaths(editor)
       }
     })
   },
