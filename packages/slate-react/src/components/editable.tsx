@@ -704,9 +704,18 @@ export const Editable = (props: EditableProps) => {
         EDITOR_TO_ELEMENT.delete(editor)
         NODE_TO_ELEMENT.delete(editor)
 
-        if (HAS_BEFORE_INPUT_SUPPORT) {
+        if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
           // @ts-ignore The `beforeinput` event isn't recognized.
           ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
+        }
+      } else {
+        // Attach a native DOM event handler for `beforeinput` events, because React's
+        // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
+        // real `beforeinput` events sadly... (2019/11/04)
+        // https://github.com/facebook/react/issues/11211
+        if (HAS_BEFORE_INPUT_SUPPORT) {
+          // @ts-ignore The `beforeinput` event isn't recognized.
+          node.addEventListener('beforeinput', onDOMBeforeInput)
         }
       }
 
@@ -714,24 +723,6 @@ export const Editable = (props: EditableProps) => {
     },
     [ref, onDOMBeforeInput]
   )
-
-  // Attach a native DOM event handler for `beforeinput` events, because React's
-  // built-in `onBeforeInput` is actually a leaky polyfill that doesn't expose
-  // real `beforeinput` events sadly... (2019/11/04)
-  // https://github.com/facebook/react/issues/11211
-  useIsomorphicLayoutEffect(() => {
-    if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-      // @ts-ignore The `beforeinput` event isn't recognized.
-      ref.current.addEventListener('beforeinput', onDOMBeforeInput)
-    }
-
-    return () => {
-      if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
-        // @ts-ignore The `beforeinput` event isn't recognized.
-        ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
-      }
-    }
-  }, [onDOMBeforeInput])
 
   // Attach a native DOM event handler for `selectionchange`, because React's
   // built-in `onSelect` handler doesn't fire for all selection changes. It's a
