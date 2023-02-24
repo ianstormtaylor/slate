@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.91.5
+
+### Patch Changes
+
+- [#5313](https://github.com/ianstormtaylor/slate/pull/5313) [`3bf568ed`](https://github.com/ianstormtaylor/slate/commit/3bf568ede2a1df91ff4f88402e0cdd848848f2fb) Thanks [@edhager](https://github.com/edhager)! - Some code clean-up in Editable.
+
+* [#5306](https://github.com/ianstormtaylor/slate/pull/5306) [`213edbbf`](https://github.com/ianstormtaylor/slate/commit/213edbbf3abc407532aeda72e40d6f01d368c33c) Thanks [@clauderic](https://github.com/clauderic)! - Use memoization to avoid unnecessary `textContent` updates in `<TextString>` component.
+
 ## 0.91.4
 
 ### Patch Changes
