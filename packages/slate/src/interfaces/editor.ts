@@ -66,7 +66,6 @@ export interface BaseEditor {
 
   apply: (operation: Operation) => void
   getDirtyPaths: (operation: Operation) => Path[]
-  getFragment: () => Descendant[]
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
@@ -83,30 +82,36 @@ export interface BaseEditor {
   // Overrideable core transforms.
 
   addMark: OmitFirstArg<typeof Editor.addMark>
-  collapse: OmitFirstArg<typeof Transforms.collapse>
-  deselect: OmitFirstArg<typeof Transforms.deselect>
-  delete: OmitFirstArg<typeof Transforms.delete>
-  insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
-  insertText: OmitFirstArg<typeof Transforms.insertText>
-  move: OmitFirstArg<typeof Transforms.move>
-  select: OmitFirstArg<typeof Transforms.select>
-  setPoint: OmitFirstArg<typeof Transforms.setPoint>
-  setSelection: OmitFirstArg<typeof Transforms.setSelection>
-  deleteBackward: OmitFirstArg<typeof Editor.deleteBackward>
-  deleteForward: OmitFirstArg<typeof Editor.deleteForward>
-  deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
-  insertBreak: OmitFirstArg<typeof Editor.insertBreak>
-  insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
   insertNode: OmitFirstArg<typeof Editor.insertNode>
   insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
+
+  // slate (not used)
+
+  deselect: OmitFirstArg<typeof Transforms.deselect>
+
+  // slate-react
+
+  collapse: OmitFirstArg<typeof Transforms.collapse>
+  //
+
+  delete: OmitFirstArg<typeof Transforms.delete>
+  deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
+  insertBreak: OmitFirstArg<typeof Editor.insertBreak>
+  insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
+  insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
+  insertText: OmitFirstArg<typeof Transforms.insertText>
   liftNodes: OmitFirstArg<typeof Transforms.liftNodes>
   mergeNodes: OmitFirstArg<typeof Transforms.mergeNodes>
+  move: OmitFirstArg<typeof Transforms.move>
   moveNodes: OmitFirstArg<typeof Transforms.moveNodes>
   normalize: OmitFirstArg<typeof Editor.normalize>
   removeMark: OmitFirstArg<typeof Editor.removeMark>
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
+  select: OmitFirstArg<typeof Transforms.select>
   setNodes: OmitFirstArg<typeof Transforms.setNodes>
   setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
+  setPoint: OmitFirstArg<typeof Transforms.setPoint>
+  setSelection: OmitFirstArg<typeof Transforms.setSelection>
   splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
   unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
   unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
@@ -297,14 +302,6 @@ export interface EditorInterface {
     at: Location,
     options?: EditorBeforeOptions
   ) => Point | undefined
-  deleteBackward: (
-    editor: Editor,
-    options?: EditorDirectedDeletionOptions
-  ) => void
-  deleteForward: (
-    editor: Editor,
-    options?: EditorDirectedDeletionOptions
-  ) => void
   deleteFragment: (
     editor: Editor,
     options?: EditorFragmentDeletionOptions
@@ -535,20 +532,6 @@ export const Editor: EditorInterface = {
   },
 
   /**
-   * Delete content in the editor backward from the current selection.
-   */
-  deleteBackward(editor, options) {
-    editor.deleteBackward(options)
-  },
-
-  /**
-   * Delete content in the editor forward from the current selection.
-   */
-  deleteForward(editor, options) {
-    editor.deleteForward(options)
-  },
-
-  /**
    * Delete the content in the current selection.
    */
   deleteFragment(editor, options): void {
@@ -690,8 +673,6 @@ export const Editor: EditorInterface = {
     const isEditor =
       typeof value.addMark === 'function' &&
       typeof value.apply === 'function' &&
-      typeof value.deleteBackward === 'function' &&
-      typeof value.deleteForward === 'function' &&
       typeof value.deleteFragment === 'function' &&
       typeof value.insertBreak === 'function' &&
       typeof value.insertSoftBreak === 'function' &&

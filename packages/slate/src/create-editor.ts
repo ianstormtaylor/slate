@@ -144,37 +144,12 @@ export const createEditor = (): Editor => {
       }
     },
 
-    deleteBackward: ({ unit = 'character' } = {}) => {
-      const { selection } = editor
-
-      if (selection && Range.isCollapsed(selection)) {
-        Transforms.delete(editor, { unit, reverse: true })
-      }
-    },
-
-    deleteForward: ({ unit = 'character' } = {}) => {
-      const { selection } = editor
-
-      if (selection && Range.isCollapsed(selection)) {
-        Transforms.delete(editor, { unit })
-      }
-    },
-
     deleteFragment: ({ direction = 'forward' } = {}) => {
       const { selection } = editor
 
       if (selection && Range.isExpanded(selection)) {
         Transforms.delete(editor, { reverse: direction === 'backward' })
       }
-    },
-
-    getFragment: () => {
-      const { selection } = editor
-
-      if (selection) {
-        return Node.fragment(editor, selection)
-      }
-      return []
     },
 
     insertBreak: () => {

@@ -1,5 +1,5 @@
 import React, { useRef } from 'react'
-import { Editor, Text, Path, Element, Node } from 'slate'
+import { Editor, Element, Node, Path, Text } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'

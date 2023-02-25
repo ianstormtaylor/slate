@@ -14,7 +14,7 @@ import {
 } from '..'
 import { NodeMatch, PropsCompare, PropsMerge } from '../interfaces/editor'
 import { PointRef } from '../interfaces/point-ref'
-import { RangeMode, MaximizeMode } from '../interfaces/types'
+import { MaximizeMode, RangeMode } from '../interfaces/types'
 
 export interface NodeTransforms {
   insertNodes: <T extends Node>(
