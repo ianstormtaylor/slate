@@ -704,6 +704,9 @@ export const Editable = (props: EditableProps) => {
         EDITOR_TO_ELEMENT.delete(editor)
         NODE_TO_ELEMENT.delete(editor)
 
+        onDOMSelectionChange.cancel()
+        scheduleOnDOMSelectionChange.cancel()
+
         if (ref.current && HAS_BEFORE_INPUT_SUPPORT) {
           // @ts-ignore The `beforeinput` event isn't recognized.
           ref.current.removeEventListener('beforeinput', onDOMBeforeInput)
