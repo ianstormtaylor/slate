@@ -894,7 +894,11 @@ export const Editable = (props: EditableProps) => {
               },
               [readOnly]
             )}
-            onInput={useCallback((event: React.SyntheticEvent) => {
+            onInput={useCallback((event: React.FormEvent<HTMLDivElement>) => {
+              if (isEventHandled(event, attributes.onInput)) {
+                return
+              }
+
               if (androidInputManager) {
                 androidInputManager.handleInput()
                 return
