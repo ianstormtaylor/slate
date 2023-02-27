@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.91.6
+
+### Patch Changes
+
+- [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - The `RestoreDOM` manager that is used Android no longer restores the DOM to its previous state for text mutations. This allows the editor state to be reconciled during a composition without interrupting the composition, as programatically updating the `textContent` of a text node ends the current composition.
+
+* [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - Fixed consumer defined `onInput` event handler not being invoked when passed to the `<Editable>` component.
+
 ## 0.91.5
 
 ### Patch Changes
