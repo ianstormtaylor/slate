@@ -701,6 +701,9 @@ export const Editable = (props: EditableProps) => {
   const callbackRef = useCallback(
     node => {
       if (node == null) {
+        onDOMSelectionChange.cancel()
+        scheduleOnDOMSelectionChange.cancel()
+
         EDITOR_TO_ELEMENT.delete(editor)
         NODE_TO_ELEMENT.delete(editor)
 
@@ -721,7 +724,7 @@ export const Editable = (props: EditableProps) => {
 
       ref.current = node
     },
-    [ref, onDOMBeforeInput]
+    [ref, onDOMBeforeInput, onDOMSelectionChange, scheduleOnDOMSelectionChange]
   )
 
   // Attach a native DOM event handler for `selectionchange`, because React's
