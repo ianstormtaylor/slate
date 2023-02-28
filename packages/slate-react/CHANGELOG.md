@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.91.7
+
+### Patch Changes
+
+- [#5322](https://github.com/ianstormtaylor/slate/pull/5322) [`836f6600`](https://github.com/ianstormtaylor/slate/commit/836f660054c6fd4ced793cfa28349543b8db9890) Thanks [@edhager](https://github.com/edhager)! - Add checks to Editable selection change handler to avoid errors
+
 ## 0.91.6
 
 ### Patch Changes
