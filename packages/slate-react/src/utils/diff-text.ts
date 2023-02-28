@@ -52,7 +52,7 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   return Text.isText(nextNode) && nextNode.text.startsWith(diff.text)
 }
 
-function applyStringDiff(text: string, ...diffs: StringDiff[]) {
+export function applyStringDiff(text: string, ...diffs: StringDiff[]) {
   return diffs.reduce(
     (text, diff) =>
       text.slice(0, diff.start) + diff.text + text.slice(diff.end),
