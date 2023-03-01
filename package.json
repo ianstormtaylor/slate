@@ -88,8 +88,8 @@
     "playwright": "^1.29.1",
     "prettier": "^1.19.1",
     "prismjs": "^1.29.0",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
+    "react": "^18.2.0 ",
+    "react-dom": "^18.2.0 ",
     "react-error-boundary": "^1.2.5",
     "react-router-dom": "^5.1.2",
     "react-values": "^0.3.0",
@@ -122,6 +122,10 @@
       "prettier --write",
       "eslint --fix"
     ]
+  },
+  "resolutions": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "packageManager": "yarn@3.3.1"
 }

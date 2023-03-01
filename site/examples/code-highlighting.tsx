@@ -241,7 +241,7 @@ const SetNodeToDecorations = () => {
 
 const useOnKeydown = (editor: Editor) => {
   const onKeyDown: React.KeyboardEventHandler = useCallback(e => {
-    if (isHotkey('tab', e)) {
+    if (isHotkey('tab', e as any)) {
       // handle tab key, insert spaces
       e.preventDefault()
 
