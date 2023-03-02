@@ -68,11 +68,10 @@ export const CAN_USE_DOM = !!(
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
 export const HAS_BEFORE_INPUT_SUPPORT =
-  (!IS_CHROME_LEGACY &&
-    !IS_EDGE_LEGACY &&
-    // globalThis is undefined in older browsers
-    typeof globalThis !== 'undefined' &&
-    globalThis.InputEvent &&
-    // @ts-ignore The `getTargetRanges` property isn't recognized.
-    typeof globalThis.InputEvent.prototype.getTargetRanges === 'function') ||
-  !IS_ANDROID_CHROME_LEGACY
+  (!IS_CHROME_LEGACY || !IS_ANDROID_CHROME_LEGACY) &&
+  !IS_EDGE_LEGACY &&
+  // globalThis is undefined in older browsers
+  typeof globalThis !== 'undefined' &&
+  globalThis.InputEvent &&
+  // @ts-ignore The `getTargetRanges` property isn't recognized.
+  typeof globalThis.InputEvent.prototype.getTargetRanges === 'function'
