@@ -137,7 +137,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
-    renderPlaceholder = props => <DefaultPlaceholder {...props} />,
+    renderPlaceholder = renderDefaultPlaceholder,
     scrollSelectionIntoView = defaultScrollSelectionIntoView,
     style: userStyle = {},
     as: Component = 'div',
@@ -1670,6 +1670,10 @@ export const DefaultPlaceholder = ({
     {children}
     {IS_ANDROID && <br />}
   </span>
+)
+
+const renderDefaultPlaceholder = (props: RenderPlaceholderProps) => (
+  <DefaultPlaceholder {...props} />
 )
 
 /**
