@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.91.9
+
+### Patch Changes
+
+- [#5339](https://github.com/ianstormtaylor/slate/pull/5339) [`62f8ddd9`](https://github.com/ianstormtaylor/slate/commit/62f8ddd9713617bf474968a10b69c24b71074b41) Thanks [@12joan](https://github.com/12joan)! - Fixes #5335. To prevent performance issues, make sure to wrap custom `renderPlaceholder` values in `useCallback`.
+
 ## 0.91.8
 
 ### Patch Changes
