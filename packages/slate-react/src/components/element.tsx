@@ -139,6 +139,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
+    prev.renderPlaceholder === next.renderPlaceholder &&
     isElementDecorationsEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&

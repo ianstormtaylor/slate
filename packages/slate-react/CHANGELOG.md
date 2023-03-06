@@ -1,5 +1,41 @@
 # slate-react
 
+## 0.91.8
+
+### Patch Changes
+
+- [#5325](https://github.com/ianstormtaylor/slate/pull/5325) [`af3f828b`](https://github.com/ianstormtaylor/slate/commit/af3f828b1206409951708b823fb32965b67c798f) Thanks [@clauderic](https://github.com/clauderic)! - Fix edge-cases in the Android input manager when text leaf nodes are deleted, such as when deleting text leaf nodes adjacent to inline void nodes.
+
+* [#5327](https://github.com/ianstormtaylor/slate/pull/5327) [`4205e0f0`](https://github.com/ianstormtaylor/slate/commit/4205e0f002929f575f34ef8bb5d3bf9d2670d9d7) Thanks [@YasinChan](https://github.com/YasinChan)! - Fix the issue of composition API and beforeinput event triggering between Chrome versions 60-75 on the Android platform.
+
+## 0.91.7
+
+### Patch Changes
+
+- [#5322](https://github.com/ianstormtaylor/slate/pull/5322) [`836f6600`](https://github.com/ianstormtaylor/slate/commit/836f660054c6fd4ced793cfa28349543b8db9890) Thanks [@edhager](https://github.com/edhager)! - Add checks to Editable selection change handler to avoid errors
+
+## 0.91.6
+
+### Patch Changes
+
+- [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - The `RestoreDOM` manager that is used Android no longer restores the DOM to its previous state for text mutations. This allows the editor state to be reconciled during a composition without interrupting the composition, as programatically updating the `textContent` of a text node ends the current composition.
+
+* [#5315](https://github.com/ianstormtaylor/slate/pull/5315) [`5784a38b`](https://github.com/ianstormtaylor/slate/commit/5784a38b6bd0f7de50efc890a4d6ceb8fafe191b) Thanks [@clauderic](https://github.com/clauderic)! - Fixed consumer defined `onInput` event handler not being invoked when passed to the `<Editable>` component.
+
+## 0.91.5
+
+### Patch Changes
+
+- [#5313](https://github.com/ianstormtaylor/slate/pull/5313) [`3bf568ed`](https://github.com/ianstormtaylor/slate/commit/3bf568ede2a1df91ff4f88402e0cdd848848f2fb) Thanks [@edhager](https://github.com/edhager)! - Some code clean-up in Editable.
+
+* [#5306](https://github.com/ianstormtaylor/slate/pull/5306) [`213edbbf`](https://github.com/ianstormtaylor/slate/commit/213edbbf3abc407532aeda72e40d6f01d368c33c) Thanks [@clauderic](https://github.com/clauderic)! - Use memoization to avoid unnecessary `textContent` updates in `<TextString>` component.
+
+## 0.91.4
+
+### Patch Changes
+
+- [#5310](https://github.com/ianstormtaylor/slate/pull/5310) [`b94254d6`](https://github.com/ianstormtaylor/slate/commit/b94254d694c6ea6c88cacd661e7bd77165cd2607) Thanks [@etrepum](https://github.com/etrepum)! - Fix to ensure that the latest versions of onChange and renderPlaceholder are used
+
 ## 0.91.3
 
 ### Patch Changes

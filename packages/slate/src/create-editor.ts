@@ -388,8 +388,8 @@ export const createEditor = (): Editor => {
       }
     },
 
-    shouldNormalize: ({ iteration, dirtyPaths }) => {
-      const maxIterations = dirtyPaths.length * 42 // HACK: better way?
+    shouldNormalize: ({ iteration, initialDirtyPathsLength }) => {
+      const maxIterations = initialDirtyPathsLength * 42 // HACK: better way?
 
       if (iteration > maxIterations) {
         throw new Error(

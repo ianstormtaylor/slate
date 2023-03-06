@@ -68,7 +68,7 @@ export const Slate = (props: {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
       unmountRef.current = true
     }
-  }, [])
+  }, [onContextChange])
 
   const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
 

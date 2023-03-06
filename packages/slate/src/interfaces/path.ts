@@ -1,4 +1,11 @@
-import { Operation } from '..'
+import {
+  InsertNodeOperation,
+  MergeNodeOperation,
+  MoveNodeOperation,
+  RemoveNodeOperation,
+  SplitNodeOperation,
+  Operation,
+} from '..'
 import { TextDirection } from './types'
 
 /**
@@ -41,7 +48,14 @@ export interface PathInterface {
   isSibling: (path: Path, another: Path) => boolean
   levels: (path: Path, options?: PathLevelsOptions) => Path[]
   next: (path: Path) => Path
-  operationCanTransformPath: (operation: Operation) => boolean
+  operationCanTransformPath: (
+    operation: Operation
+  ) => operation is
+    | InsertNodeOperation
+    | RemoveNodeOperation
+    | MergeNodeOperation
+    | SplitNodeOperation
+    | MoveNodeOperation
   parent: (path: Path) => Path
   previous: (path: Path) => Path
   relative: (path: Path, ancestor: Path) => Path
@@ -302,7 +316,14 @@ export const Path: PathInterface = {
    * NOTE: This *must* be kept in sync with the implementation of 'transform'
    * below
    */
-  operationCanTransformPath(operation: Operation): boolean {
+  operationCanTransformPath(
+    operation: Operation
+  ): operation is
+    | InsertNodeOperation
+    | RemoveNodeOperation
+    | MergeNodeOperation
+    | SplitNodeOperation
+    | MoveNodeOperation {
     switch (operation.type) {
       case 'insert_node':
       case 'remove_node':
