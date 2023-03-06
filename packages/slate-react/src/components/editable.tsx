@@ -129,6 +129,10 @@ export type EditableProps = {
  */
 
 export const Editable = (props: EditableProps) => {
+  const defaultRenderPlaceholder = useCallback(
+    (props: RenderPlaceholderProps) => <DefaultPlaceholder {...props} />,
+    []
+  )
   const {
     autoFocus,
     decorate = defaultDecorate,
@@ -137,7 +141,7 @@ export const Editable = (props: EditableProps) => {
     readOnly = false,
     renderElement,
     renderLeaf,
-    renderPlaceholder = props => <DefaultPlaceholder {...props} />,
+    renderPlaceholder = defaultRenderPlaceholder,
     scrollSelectionIntoView = defaultScrollSelectionIntoView,
     style: userStyle = {},
     as: Component = 'div',
