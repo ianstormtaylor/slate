@@ -754,6 +754,17 @@ export const ReactEditor = {
       )
     }
 
+    // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
+    // inside a `contenteditable="false"` DOM node following the word, which
+    // will cause `toSlatePoint` to throw an error. (2023/03/07)
+    if (
+      'getAttribute' in focusNode &&
+      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false'
+    ) {
+      focusNode = anchorNode
+      focusOffset = anchorNode.textContent?.length || 0
+    }
+
     let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset], {
       exactMatch,
       suppressThrow,
