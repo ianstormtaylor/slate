@@ -704,7 +704,7 @@ export function createAndroidInputManager({
       insertPositionHint = false
     }
 
-    if (pathChanged || !hasPendingDiffs()) {
+    if (pathChanged || hasPendingDiffs()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }
