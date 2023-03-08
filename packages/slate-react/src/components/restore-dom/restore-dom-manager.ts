@@ -23,8 +23,11 @@ export const createRestoreDomManager = (
       return
     }
 
-    const trackedMutations = mutations.filter(mutation =>
-      isTrackedMutation(editor, mutation, mutations)
+    const trackedMutations = mutations.filter(
+      mutation =>
+        isTrackedMutation(editor, mutation, mutations) &&
+        mutation.type !== 'characterData' &&
+        (mutation.removedNodes.length || mutation.addedNodes.length)
     )
 
     bufferedMutations.push(...trackedMutations)
@@ -33,12 +36,6 @@ export const createRestoreDomManager = (
   function restoreDOM() {
     if (bufferedMutations.length > 0) {
       bufferedMutations.reverse().forEach(mutation => {
-        if (mutation.type === 'characterData') {
-          // We don't want to restore the DOM for characterData mutations
-          // because this interrupts the composition.
-          return
-        }
-
         mutation.removedNodes.forEach(node => {
           mutation.target.insertBefore(node, mutation.nextSibling)
         })
