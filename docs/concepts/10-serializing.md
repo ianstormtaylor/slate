@@ -173,7 +173,7 @@ const deserialize = (el, markAttributes = {}) => {
 
   // define attributes for text nodes
   switch (el.nodeName) {
-    case 'strong':
+    case 'STRONG':
       nodeAttributes.bold = true
   }
 
