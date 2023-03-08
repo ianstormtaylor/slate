@@ -8,10 +8,14 @@ import {
   withReact,
   useSelected,
   useFocused,
+  useReadOnly,
 } from 'slate-react'
 
 import { Portal } from '../components'
 import { MentionElement } from './custom-types'
+
+export const IS_ANDROID =
+  typeof navigator !== 'undefined' && /Android/.test(navigator.userAgent)
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
@@ -204,6 +208,7 @@ const Element = props => {
 const Mention = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
+  const readOnly = useReadOnly()
   const style: React.CSSProperties = {
     padding: '3px 3px 2px',
     margin: '0 1px',
@@ -221,14 +226,18 @@ const Mention = ({ attributes, children, element }) => {
   if (element.children[0].italic) {
     style.fontStyle = 'italic'
   }
+
   return (
     <span
       {...attributes}
-      contentEditable={false}
+      contentEditable={!readOnly && IS_ANDROID}
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      {children}@{element.character}
+      {children}
+      <span contentEditable="false" style={{ userSelect: 'none' }}>
+        @{element.character}
+      </span>
     </span>
   )
 }
