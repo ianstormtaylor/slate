@@ -124,10 +124,40 @@ export type EditableProps = {
   disableDefaultStyles?: boolean
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 
+const placeholderProps: RenderPlaceholderProps = {
+  attributes: {
+    'data-slate-placeholder': true,
+    style: {
+      position: 'absolute',
+      pointerEvents: 'none',
+      width: '100%',
+      maxWidth: '100%',
+      display: 'block',
+      opacity: '0.333',
+      userSelect: 'none',
+      textDecoration: 'none',
+    },
+    contentEditable: false,
+  },
+}
+
+function shouldShowPlaceholder(
+  editor: ReactEditor,
+  placeholder: string | undefined,
+  isComposing: boolean
+): boolean {
+  const placeholderExists = placeholder != null && placeholder.length > 0
+  return (
+    placeholderExists &&
+    editor.children.length === 1 &&
+    Array.from(Node.texts(editor)).length === 1 &&
+    Node.string(editor) === '' &&
+    !isComposing
+  )
+}
 /**
  * Editable.
  */
-
 export const Editable = (props: EditableProps) => {
   const defaultRenderPlaceholder = useCallback(
     (props: RenderPlaceholderProps) => <DefaultPlaceholder {...props} />,
@@ -153,6 +183,15 @@ export const Editable = (props: EditableProps) => {
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
   const deferredOperations = useRef<DeferredOperation[]>([])
+
+  const showPlaceholder = shouldShowPlaceholder(
+    editor,
+    placeholder,
+    isComposing
+  )
+  const [delayedShowPlaceholder, setDelayedShowPlaceholder] = useState(
+    showPlaceholder
+  )
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -754,21 +793,15 @@ export const Editable = (props: EditableProps) => {
 
   const decorations = decorate([editor, []])
 
-  if (
-    placeholder &&
-    editor.children.length === 1 &&
-    Array.from(Node.texts(editor)).length === 1 &&
-    Node.string(editor) === '' &&
-    !isComposing
-  ) {
-    const start = Editor.start(editor, [])
-    decorations.push({
-      [PLACEHOLDER_SYMBOL]: true,
-      placeholder,
-      anchor: start,
-      focus: start,
-    })
-  }
+  useEffect(() => {
+    if (androidInputManager && showPlaceholder !== delayedShowPlaceholder) {
+      if (showPlaceholder) {
+        setTimeout(() => setDelayedShowPlaceholder(true), 300)
+      } else {
+        setDelayedShowPlaceholder(false)
+      }
+    }
+  }, [showPlaceholder, delayedShowPlaceholder, androidInputManager])
 
   const { marks } = editor
   state.hasMarkPlaceholder = false
@@ -827,6 +860,9 @@ export const Editable = (props: EditableProps) => {
     <ReadOnlyContext.Provider value={readOnly}>
       <DecorateContext.Provider value={decorate}>
         <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
+          {showPlaceholder &&
+            (!androidInputManager || delayedShowPlaceholder) &&
+            renderPlaceholder({ ...placeholderProps, children: placeholder })}
           <Component
             role={readOnly ? undefined : 'textbox'}
             aria-multiline={readOnly ? undefined : true}
@@ -1650,12 +1686,12 @@ export const Editable = (props: EditableProps) => {
  * The props that get passed to renderPlaceholder
  */
 export type RenderPlaceholderProps = {
-  children: any
+  children?: any
   attributes: {
     'data-slate-placeholder': boolean
     dir?: 'rtl'
     contentEditable: boolean
-    ref: React.RefObject<any>
+    ref?: React.RefObject<any>
     style: React.CSSProperties
   }
 }
