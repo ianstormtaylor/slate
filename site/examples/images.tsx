@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import isHotkey from 'is-hotkey'
 import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
@@ -29,6 +30,12 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
+        onKeyDown={event => {
+          if (isHotkey('mod+a', event)) {
+            event.preventDefault()
+            Transforms.select(editor, [])
+          }
+        }}
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
