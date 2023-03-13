@@ -233,7 +233,8 @@ const Mention = ({ attributes, children, element }) => {
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      &#x200B;{children}@{element.character}&#x200B;
+      @{element.character}
+      {children}
     </span>
   )
 }
