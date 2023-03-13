@@ -29,7 +29,6 @@ import { useSlate } from '../hooks/use-slate'
 import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
-  DOMNode,
   DOMRange,
   DOMText,
   getDefaultView,
@@ -64,7 +63,6 @@ import {
   IS_READ_ONLY,
   MARK_PLACEHOLDER_SYMBOL,
   NODE_TO_ELEMENT,
-  PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
@@ -189,9 +187,17 @@ export const Editable = (props: EditableProps) => {
     placeholder,
     isComposing
   )
-  const [delayedShowPlaceholder, setDelayedShowPlaceholder] = useState(
-    showPlaceholder
+
+  // Create a state property that allows the android manager to quickly
+  // hide the placeholder
+  const [androidHidePlaceholder, setAndroidHidePlaceholder] = useState<boolean>(
+    !showPlaceholder
   )
+
+  // Sync up androidHidePlaceholder with showPlaceholder
+  useEffect(() => {
+    setAndroidHidePlaceholder(!showPlaceholder)
+  }, [showPlaceholder, setAndroidHidePlaceholder])
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -475,6 +481,8 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/11211
   const onDOMBeforeInput = useCallback(
     (event: InputEvent) => {
+      const { inputType: type } = event
+
       onUserInput()
 
       if (
@@ -484,6 +492,13 @@ export const Editable = (props: EditableProps) => {
       ) {
         // COMPAT: BeforeInput events aren't cancelable on android, so we have to handle them differently using the android input manager.
         if (androidInputManager) {
+          // If the placeholder is visible, hide it as quickly as possible
+          // to avoid seeing text and the placeholder at the same time
+          // if even for a spilt second
+          if (!androidHidePlaceholder && type.startsWith('insert')) {
+            setAndroidHidePlaceholder(true)
+          }
+
           return androidInputManager.handleDOMBeforeInput(event)
         }
 
@@ -494,7 +509,6 @@ export const Editable = (props: EditableProps) => {
         onDOMSelectionChange.flush()
 
         const { selection } = editor
-        const { inputType: type } = event
         const data = (event as any).dataTransfer || event.data || undefined
 
         const isCompositionChange =
@@ -738,7 +752,15 @@ export const Editable = (props: EditableProps) => {
         }
       }
     },
-    [readOnly, propsOnDOMBeforeInput]
+    [
+      readOnly,
+      propsOnDOMBeforeInput,
+      editor,
+      placeholder,
+      isComposing,
+      androidHidePlaceholder,
+      setAndroidHidePlaceholder,
+    ]
   )
 
   const callbackRef = useCallback(
@@ -792,16 +814,6 @@ export const Editable = (props: EditableProps) => {
   }, [scheduleOnDOMSelectionChange])
 
   const decorations = decorate([editor, []])
-
-  useEffect(() => {
-    if (androidInputManager && showPlaceholder !== delayedShowPlaceholder) {
-      if (showPlaceholder) {
-        setTimeout(() => setDelayedShowPlaceholder(true), 300)
-      } else {
-        setDelayedShowPlaceholder(false)
-      }
-    }
-  }, [showPlaceholder, delayedShowPlaceholder, androidInputManager])
 
   const { marks } = editor
   state.hasMarkPlaceholder = false
@@ -861,7 +873,7 @@ export const Editable = (props: EditableProps) => {
       <DecorateContext.Provider value={decorate}>
         <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
           {showPlaceholder &&
-            (!androidInputManager || delayedShowPlaceholder) &&
+            !androidHidePlaceholder &&
             renderPlaceholder({ ...placeholderProps, children: placeholder })}
           <Component
             role={readOnly ? undefined : 'textbox'}
@@ -941,7 +953,6 @@ export const Editable = (props: EditableProps) => {
               if (isEventHandled(event, attributes.onInput)) {
                 return
               }
-
               if (androidInputManager) {
                 androidInputManager.handleInput()
                 return
