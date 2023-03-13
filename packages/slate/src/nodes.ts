@@ -1,0 +1,107 @@
+import { Node, NodeEntry } from './interfaces/node'
+import { Editor, EditorNodesOptions } from './interfaces/editor'
+import { Span } from './interfaces/location'
+import { Element } from './interfaces/element'
+import { Path } from './interfaces/path'
+import { Text } from './interfaces/text'
+
+export function* nodes<T extends Node>(
+  editor: Editor,
+  options: EditorNodesOptions<T> = {}
+): Generator<NodeEntry<T>, void, undefined> {
+  const {
+    at = editor.selection,
+    mode = 'all',
+    universal = false,
+    reverse = false,
+    voids = false,
+  } = options
+  let { match } = options
+
+  if (!match) {
+    match = () => true
+  }
+
+  if (!at) {
+    return
+  }
+
+  let from
+  let to
+
+  if (Span.isSpan(at)) {
+    from = at[0]
+    to = at[1]
+  } else {
+    const first = Editor.path(editor, at, { edge: 'start' })
+    const last = Editor.path(editor, at, { edge: 'end' })
+    from = reverse ? last : first
+    to = reverse ? first : last
+  }
+
+  const nodeEntries = Node.nodes(editor, {
+    reverse,
+    from,
+    to,
+    pass: ([n]) =>
+      voids ? false : Element.isElement(n) && Editor.isVoid(editor, n),
+  })
+
+  const matches: NodeEntry<T>[] = []
+  let hit: NodeEntry<T> | undefined
+
+  for (const [node, path] of nodeEntries) {
+    const isLower = hit && Path.compare(path, hit[1]) === 0
+
+    // In highest mode any node lower than the last hit is not a match.
+    if (mode === 'highest' && isLower) {
+      continue
+    }
+
+    if (!match(node, path)) {
+      // If we've arrived at a leaf text node that is not lower than the last
+      // hit, then we've found a branch that doesn't include a match, which
+      // means the match is not universal.
+      if (universal && !isLower && Text.isText(node)) {
+        return
+      } else {
+        continue
+      }
+    }
+
+    // If there's a match and it's lower than the last, update the hit.
+    if (mode === 'lowest' && isLower) {
+      hit = [node, path]
+      continue
+    }
+
+    // In lowest mode we emit the last hit, once it's guaranteed lowest.
+    const emit: NodeEntry<T> | undefined =
+      mode === 'lowest' ? hit : [node, path]
+
+    if (emit) {
+      if (universal) {
+        matches.push(emit)
+      } else {
+        yield emit
+      }
+    }
+
+    hit = [node, path]
+  }
+
+  // Since lowest is always emitting one behind, catch up at the end.
+  if (mode === 'lowest' && hit) {
+    if (universal) {
+      matches.push(hit)
+    } else {
+      yield hit
+    }
+  }
+
+  // Universal defers to ensure that the match occurs in every branch, so we
+  // yield all of the matches after iterating.
+  if (universal) {
+    yield* matches
+  }
+}
