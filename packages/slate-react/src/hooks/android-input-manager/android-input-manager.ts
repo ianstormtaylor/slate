@@ -596,6 +596,13 @@ export function createAndroidInputManager({
           text = text.replace('\uFEFF', '')
         }
 
+        // Pastes from the Android clipboard will generate `insertText` events.
+        // If the copied text contains any newlines, Android will append an
+        // extra newline to the end of the copied text.
+        if (type === 'insertText' && /.*\n.*\n$/.test(text)) {
+          text = text.slice(0, -1)
+        }
+
         // If the text includes a newline, split it at newlines and paste each component
         // string, with soft breaks in between each.
         if (text.includes('\n')) {
