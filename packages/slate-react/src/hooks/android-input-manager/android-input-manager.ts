@@ -36,6 +36,10 @@ const FLUSH_DELAY = 200
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
 
+// Type guard to check if a value is a DataTransfer
+const isDataTransfer = (value: any): value is DataTransfer =>
+  value?.constructor.name === 'DataTransfer'
+
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
 
@@ -343,7 +347,8 @@ export function createAndroidInputManager({
 
     const { inputType: type } = event
     let targetRange: Range | null = null
-    const data = (event as any).dataTransfer || event.data || undefined
+    const data: DataTransfer | string | undefined =
+      (event as any).dataTransfer || event.data || undefined
 
     if (
       insertPositionHint !== false &&
@@ -577,8 +582,7 @@ export function createAndroidInputManager({
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
-        if (data?.constructor.name === 'DataTransfer') {
-          return scheduleAction(() => ReactEditor.insertData(editor, data), {
+        if (isDataTransfer(data)) {
             at: targetRange,
           })
         }
