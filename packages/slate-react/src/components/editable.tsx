@@ -1696,7 +1696,7 @@ export type RenderPlaceholderProps = {
     'data-slate-placeholder': boolean
     dir?: 'rtl'
     contentEditable: boolean
-    ref: React.RefObject<any>
+    ref: React.Ref<any>
     style: React.CSSProperties
   }
 }
