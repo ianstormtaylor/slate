@@ -36,6 +36,10 @@ const FLUSH_DELAY = 200
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
 
+// Type guard to check if a value is a DataTransfer
+const isDataTransfer = (value: any): value is DataTransfer =>
+  value?.constructor.name === 'DataTransfer'
+
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
 
@@ -343,7 +347,8 @@ export function createAndroidInputManager({
 
     const { inputType: type } = event
     let targetRange: Range | null = null
-    const data = (event as any).dataTransfer || event.data || undefined
+    const data: DataTransfer | string | undefined =
+      (event as any).dataTransfer || event.data || undefined
 
     if (
       insertPositionHint !== false &&
@@ -577,15 +582,9 @@ export function createAndroidInputManager({
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
-        if (data?.constructor.name === 'DataTransfer') {
+        if (isDataTransfer(data)) {
           return scheduleAction(() => ReactEditor.insertData(editor, data), {
             at: targetRange,
-          })
-        }
-
-        if (typeof data === 'string' && data.includes('\n')) {
-          return scheduleAction(() => Editor.insertSoftBreak(editor), {
-            at: Range.end(targetRange),
           })
         }
 
@@ -595,6 +594,34 @@ export function createAndroidInputManager({
         // the placeholder itself and thus includes the zero-width space inside edit events.
         if (EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)) {
           text = text.replace('\uFEFF', '')
+        }
+
+        // Pastes from the Android clipboard will generate `insertText` events.
+        // If the copied text contains any newlines, Android will append an
+        // extra newline to the end of the copied text.
+        if (type === 'insertText' && /.*\n.*\n$/.test(text)) {
+          text = text.slice(0, -1)
+        }
+
+        // If the text includes a newline, split it at newlines and paste each component
+        // string, with soft breaks in between each.
+        if (text.includes('\n')) {
+          return scheduleAction(
+            () => {
+              const parts = text.split('\n')
+              parts.forEach((line, i) => {
+                if (line) {
+                  Editor.insertText(editor, line)
+                }
+                if (i !== parts.length - 1) {
+                  Editor.insertSoftBreak(editor)
+                }
+              })
+            },
+            {
+              at: targetRange,
+            }
+          )
         }
 
         if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
