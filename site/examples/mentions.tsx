@@ -125,6 +125,11 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
+                onClick={() => {
+                  Transforms.select(editor, target)
+                  insertMention(editor, char)
+                  setTarget(null)
+                }}
                 style={{
                   padding: '1px 3px',
                   borderRadius: '3px',
@@ -228,7 +233,8 @@ const Mention = ({ attributes, children, element }) => {
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      {children}@{element.character}
+      @{element.character}
+      {children}
     </span>
   )
 }
