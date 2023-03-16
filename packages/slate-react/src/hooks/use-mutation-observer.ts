@@ -23,5 +23,5 @@ export function useMutationObserver(
 
     mutationObserver.observe(node.current, options)
     return () => mutationObserver.disconnect()
-  }, [])
+  }, [mutationObserver, node, options])
 }

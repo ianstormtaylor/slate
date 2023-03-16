@@ -21,7 +21,7 @@ export function useTrackUserInput() {
     animationFrameIdRef.current = window.requestAnimationFrame(() => {
       receivedUserInput.current = false
     })
-  }, [])
+  }, [editor])
 
   useEffect(() => () => cancelAnimationFrame(animationFrameIdRef.current), [])
 

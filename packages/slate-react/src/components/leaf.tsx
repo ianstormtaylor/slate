@@ -83,7 +83,7 @@ const Leaf = (props: {
     return () => {
       EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
     }
-  }, [placeholderRef, leaf])
+  }, [placeholderRef, leaf, editor])
 
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
