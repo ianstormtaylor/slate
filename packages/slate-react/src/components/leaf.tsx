@@ -1,4 +1,10 @@
-import React, { useRef, useCallback, MutableRefObject } from 'react'
+import React, {
+  useRef,
+  useCallback,
+  MutableRefObject,
+  useState,
+  useEffect,
+} from 'react'
 import { Element, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
@@ -21,6 +27,16 @@ function disconnectPlaceholderResizeObserver(
     }
   }
 }
+
+type TimerId = ReturnType<typeof setTimeout> | null
+
+function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = null
+  }
+}
+
 /**
  * Individual leaves in a text node with unique formatting.
  */
@@ -44,6 +60,8 @@ const Leaf = (props: {
   const editor = useSlateStatic()
   const placeholderResizeObserver = useRef<ResizeObserver | null>(null)
   const placeholderRef = useRef<HTMLElement | null>(null)
+  const [showPlaceholder, setShowPlaceholder] = useState(false)
+  const showPlaceholderTimeoutRef = useRef<TimerId>(null)
 
   const callbackPlaceholderRef = useCallback(
     (placeholderEl: HTMLElement | null) => {
@@ -85,7 +103,24 @@ const Leaf = (props: {
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  if (leaf[PLACEHOLDER_SYMBOL]) {
+  const leafIsPlaceholder = leaf[PLACEHOLDER_SYMBOL]
+  useEffect(() => {
+    if (leafIsPlaceholder) {
+      if (!showPlaceholderTimeoutRef.current) {
+        // Delay the placeholder so it will not render in a selection
+        showPlaceholderTimeoutRef.current = setTimeout(() => {
+          setShowPlaceholder(true)
+          showPlaceholderTimeoutRef.current = null
+        }, 30)
+      }
+    } else {
+      clearTimeoutRef(showPlaceholderTimeoutRef)
+      setShowPlaceholder(false)
+    }
+    return () => clearTimeoutRef(showPlaceholderTimeoutRef)
+  }, [leafIsPlaceholder, setShowPlaceholder])
+
+  if (leafIsPlaceholder) {
     const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
       attributes: {
@@ -95,7 +130,7 @@ const Leaf = (props: {
           pointerEvents: 'none',
           width: '100%',
           maxWidth: '100%',
-          display: 'block',
+          display: showPlaceholder ? 'block' : 'none',
           opacity: '0.333',
           userSelect: 'none',
           textDecoration: 'none',
