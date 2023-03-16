@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.91.11
+
+### Patch Changes
+
+- [#5362](https://github.com/ianstormtaylor/slate/pull/5362) [`43999356`](https://github.com/ianstormtaylor/slate/commit/439993569001f8c5dc9e68194c198d430a4ef4bc) Thanks [@jason0x43](https://github.com/jason0x43)! - Fix an issue where pastes in Safari wouldn't include application/x-slate-fragment data
+
+* [#5359](https://github.com/ianstormtaylor/slate/pull/5359) [`9825d29b`](https://github.com/ianstormtaylor/slate/commit/9825d29b87ffff96b4cdfd7339028cc1a92c6f68) Thanks [@jason0x43](https://github.com/jason0x43)! - Fix an issue on Android where content containing a newline wouldn't be pasted properly
+
 ## 0.91.10
 
 ### Patch Changes
