@@ -1,5 +1,21 @@
 # slate-react
 
+## 0.92.0
+
+### Minor Changes
+
+- [#5363](https://github.com/ianstormtaylor/slate/pull/5363) [`d42cd005`](https://github.com/ianstormtaylor/slate/commit/d42cd005db862165f5ac63fba4d35f36d92864f6) Thanks [@aciccarello](https://github.com/aciccarello)! - update dependencies on react hooks to be more senstive to changes
+
+  The code should now meet eslint react hook standards
+
+  This could result in more renders
+
+  closes #3886
+
+### Patch Changes
+
+- [#5369](https://github.com/ianstormtaylor/slate/pull/5369) [`556a4565`](https://github.com/ianstormtaylor/slate/commit/556a4565d2bb4a611d34bb30ecd9bac324664066) Thanks [@alex-vladut](https://github.com/alex-vladut)! - Allow copying from editable void input
+
 ## 0.91.11
 
 ### Patch Changes
