@@ -1157,7 +1157,8 @@ export const Editable = (props: EditableProps) => {
               (event: React.ClipboardEvent<HTMLDivElement>) => {
                 if (
                   ReactEditor.hasSelectableTarget(editor, event.target) &&
-                  !isEventHandled(event, attributes.onCopy)
+                  !isEventHandled(event, attributes.onCopy) &&
+                  !isDOMEventTargetInput(event)
                 ) {
                   event.preventDefault()
                   ReactEditor.setFragmentData(
@@ -1174,7 +1175,8 @@ export const Editable = (props: EditableProps) => {
                 if (
                   !readOnly &&
                   ReactEditor.hasSelectableTarget(editor, event.target) &&
-                  !isEventHandled(event, attributes.onCut)
+                  !isEventHandled(event, attributes.onCut) &&
+                  !isDOMEventTargetInput(event)
                 ) {
                   event.preventDefault()
                   ReactEditor.setFragmentData(
@@ -1734,6 +1736,21 @@ export const isEventHandled = <
   }
 
   return event.isDefaultPrevented() || event.isPropagationStopped()
+}
+
+/**
+ * Check if the event's target is an input element
+ */
+export const isDOMEventTargetInput = <
+  EventType extends React.SyntheticEvent<unknown, unknown>
+>(
+  event: EventType
+) => {
+  return (
+    isDOMNode(event.target) &&
+    (event.target instanceof HTMLInputElement ||
+      event.target instanceof HTMLTextAreaElement)
+  )
 }
 
 /**
