@@ -154,6 +154,9 @@ export const Editable = (props: EditableProps) => {
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
   const deferredOperations = useRef<DeferredOperation[]>([])
+  const [placeholderHeight, setPlaceholderHeight] = useState<
+    number | undefined
+  >()
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -780,13 +783,13 @@ export const Editable = (props: EditableProps) => {
 
   const decorations = decorate([editor, []])
 
-  if (
+  const showPlaceholder =
     placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === '' &&
     !isComposing
-  ) {
+  if (showPlaceholder) {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
@@ -795,6 +798,15 @@ export const Editable = (props: EditableProps) => {
       focus: start,
     })
   }
+
+  useIsomorphicLayoutEffect(() => {
+    const placeholderEl = EDITOR_TO_PLACEHOLDER_ELEMENT.get(editor)
+    if (placeholderEl && showPlaceholder) {
+      setPlaceholderHeight(placeholderEl.getBoundingClientRect()?.height)
+    } else {
+      setPlaceholderHeight(undefined)
+    }
+  }, [showPlaceholder])
 
   const { marks } = editor
   state.hasMarkPlaceholder = false
@@ -844,10 +856,6 @@ export const Editable = (props: EditableProps) => {
       EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
     })
   })
-
-  const placeholderHeight = EDITOR_TO_PLACEHOLDER_ELEMENT.get(
-    editor
-  )?.getBoundingClientRect()?.height
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
