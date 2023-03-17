@@ -5,7 +5,7 @@ import { FocusedContext } from '../hooks/use-focused'
 import { EditorContext } from '../hooks/use-slate-static'
 import { SlateContext, SlateContextValue } from '../hooks/use-slate'
 import {
-  getSelectorContext,
+  useSelectorContext,
   SlateSelectorContext,
 } from '../hooks/use-slate-selector'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
@@ -47,7 +47,7 @@ export const Slate = (props: {
   const {
     selectorContext,
     onChange: handleSelectorChange,
-  } = getSelectorContext(editor)
+  } = useSelectorContext(editor)
 
   const onContextChange = useCallback(() => {
     if (onChange) {
@@ -59,7 +59,7 @@ export const Slate = (props: {
       editor,
     }))
     handleSelectorChange(editor)
-  }, [onChange])
+  }, [editor, handleSelectorChange, onChange])
 
   useEffect(() => {
     EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
@@ -68,13 +68,13 @@ export const Slate = (props: {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
       unmountRef.current = true
     }
-  }, [onContextChange])
+  }, [editor, onContextChange])
 
   const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
 
   useEffect(() => {
     setIsFocused(ReactEditor.isFocused(editor))
-  })
+  }, [editor])
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))

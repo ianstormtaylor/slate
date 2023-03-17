@@ -4,7 +4,8 @@
     "plugin:import/typescript",
     "prettier",
     "prettier/@typescript-eslint",
-    "prettier/react"
+    "prettier/react",
+    "plugin:react-hooks/recommended"
   ],
   "plugins": ["@typescript-eslint", "import", "react", "prettier"],
   "parser": "@typescript-eslint/parser",
@@ -19,7 +20,7 @@
   "settings": {
     "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
     "react": {
-      "version": "detect"
+      "version": "16"
     }
   },
   "env": {

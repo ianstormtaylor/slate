@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { createEditor, Element, Transforms } from 'slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import { Slate, withReact, Editable } from '../src'
@@ -22,7 +22,7 @@ describe('slate-react', () => {
       test('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
         const value = [{ type: 'block', children: [{ text: 'test' }] }]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = jest.fn()
 
         let el: ReactTestRenderer
 
@@ -30,8 +30,8 @@ describe('slate-react', () => {
           el = create(
             <Slate editor={editor} value={value} onChange={() => {}}>
               <Editable
-                renderElement={({ element, children }) => {
-                  React.useEffect(() => mounts(element), [])
+                renderElement={({ children }) => {
+                  useEffect(() => mounts(), [])
 
                   return children
                 }}
@@ -56,7 +56,7 @@ describe('slate-react', () => {
           { type: 'block', children: [{ text: 'te' }] },
           { type: 'block', children: [{ text: 'st' }] },
         ]
-        const mounts = jest.fn<void, [Element]>()
+        const mounts = jest.fn()
 
         let el: ReactTestRenderer
 
@@ -64,8 +64,8 @@ describe('slate-react', () => {
           el = create(
             <Slate editor={editor} value={value} onChange={() => {}}>
               <Editable
-                renderElement={({ element, children }) => {
-                  React.useEffect(() => mounts(element), [])
+                renderElement={({ children }) => {
+                  useEffect(() => mounts(), [])
 
                   return children
                 }}

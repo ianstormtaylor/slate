@@ -112,17 +112,22 @@ export function useSlateSelector<T>(
 /**
  * Create selector context with editor updating on every editor change
  */
-export function getSelectorContext(editor: Editor) {
+export function useSelectorContext(editor: Editor) {
   const eventListeners = useRef<EditorChangeHandler[]>([]).current
   const slateRef = useRef<{
     editor: Editor
   }>({
     editor,
   }).current
-  const onChange = useCallback((editor: Editor) => {
-    slateRef.editor = editor
-    eventListeners.forEach((listener: EditorChangeHandler) => listener(editor))
-  }, [])
+  const onChange = useCallback(
+    (editor: Editor) => {
+      slateRef.editor = editor
+      eventListeners.forEach((listener: EditorChangeHandler) =>
+        listener(editor)
+      )
+    },
+    [eventListeners, slateRef]
+  )
 
   const selectorContext = useMemo(() => {
     return {

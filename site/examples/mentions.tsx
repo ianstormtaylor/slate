@@ -57,7 +57,7 @@ const MentionExample = () => {
         }
       }
     },
-    [index, search, target]
+    [chars, editor, index, target]
   )
 
   useEffect(() => {
