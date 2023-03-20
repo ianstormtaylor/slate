@@ -59,6 +59,7 @@ export interface BaseEditor {
   marks: EditorMarks | null
 
   // Schema-specific node behaviors.
+  isElementReadOnly: (element: Element) => boolean
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
@@ -114,6 +115,12 @@ export interface EditorBeforeOptions {
 
 export interface EditorDirectedDeletionOptions {
   unit?: TextUnit
+}
+
+export interface EditorElementReadOnlyOptions {
+  at?: Location
+  mode?: MaximizeMode
+  voids?: boolean
 }
 
 export interface EditorFragmentDeletionOptions {
@@ -241,6 +248,10 @@ export interface EditorInterface {
     options?: EditorFragmentDeletionOptions
   ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
+  elementReadOnly: (
+    editor: Editor,
+    options?: EditorElementReadOnlyOptions
+  ) => NodeEntry<Element> | undefined
   end: (editor: Editor, at: Location) => Point
   first: (editor: Editor, at: Location) => NodeEntry
   fragment: (editor: Editor, at: Location) => Descendant[]
@@ -257,6 +268,7 @@ export interface EditorInterface {
   isEditor: (value: any) => value is Editor
   isEnd: (editor: Editor, point: Point, at: Location) => boolean
   isEdge: (editor: Editor, point: Point, at: Location) => boolean
+  isElementReadOnly: (editor: Editor, element: Element) => boolean
   isEmpty: (editor: Editor, element: Element) => boolean
   isInline: (editor: Editor, value: Element) => boolean
   isNormalizing: (editor: Editor) => boolean
@@ -510,6 +522,20 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Match a read-only element in the current branch of the editor.
+   */
+
+  elementReadOnly(
+    editor: Editor,
+    options: EditorElementReadOnlyOptions = {}
+  ): NodeEntry<Element> | undefined {
+    return Editor.above(editor, {
+      ...options,
+      match: n => Element.isElement(n) && Editor.isElementReadOnly(editor, n),
+    })
+  },
+
+  /**
    * Get the end point of a location.
    */
 
@@ -646,6 +672,7 @@ export const Editor: EditorInterface = {
       typeof value.insertFragment === 'function' &&
       typeof value.insertNode === 'function' &&
       typeof value.insertText === 'function' &&
+      typeof value.isElementReadOnly === 'function' &&
       typeof value.isInline === 'function' &&
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
@@ -699,6 +726,14 @@ export const Editor: EditorInterface = {
 
   isInline(editor: Editor, value: Element): boolean {
     return editor.isInline(value)
+  },
+
+  /**
+   * Check if a value is a read-only `Element` object.
+   */
+
+  isElementReadOnly(editor: Editor, value: Element): boolean {
+    return editor.isElementReadOnly(value)
   },
 
   /**
@@ -952,7 +987,10 @@ export const Editor: EditorInterface = {
       from,
       to,
       pass: ([n]) =>
-        voids ? false : Element.isElement(n) && Editor.isVoid(editor, n),
+        voids
+          ? false
+          : Element.isElement(n) &&
+            (Editor.isVoid(editor, n) || Editor.isElementReadOnly(editor, n)),
     })
 
     const matches: NodeEntry<T>[] = []
@@ -1351,7 +1389,7 @@ export const Editor: EditorInterface = {
         // Void nodes are a special case, so by default we will always
         // yield their first point. If the `voids` option is set to true,
         // then we will iterate over their content.
-        if (!voids && editor.isVoid(node)) {
+        if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
           yield Editor.start(editor, path)
           continue
         }

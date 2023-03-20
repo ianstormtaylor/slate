@@ -16,6 +16,7 @@ export const input = {
   insertNode() {},
   insertText() {},
   isInline() {},
+  isElementReadOnly() {},
   isVoid() {},
   normalizeNode() {},
   onChange() {},

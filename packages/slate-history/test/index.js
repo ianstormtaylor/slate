@@ -30,7 +30,7 @@ export const jsx = createHyperscript({
 })
 
 const withTest = editor => {
-  const { isInline, isVoid } = editor
+  const { isInline, isVoid, isElementReadOnly } = editor
 
   editor.isInline = element => {
     return element.inline === true ? true : isInline(element)
@@ -38,6 +38,10 @@ const withTest = editor => {
 
   editor.isVoid = element => {
     return element.void === true ? true : isVoid(element)
+  }
+
+  editor.isElementReadOnly = element => {
+    return element.readOnly === true ? true : isElementReadOnly(element)
   }
 
   return editor
