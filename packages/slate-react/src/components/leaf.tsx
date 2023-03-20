@@ -87,7 +87,7 @@ const Leaf = (props: {
         placeholderRef.current = placeholderEl
       }
     },
-    [placeholderRef, editor]
+    [placeholderRef, leaf, editor]
   )
 
   let children = (

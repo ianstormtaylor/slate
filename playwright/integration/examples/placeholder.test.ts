@@ -19,6 +19,8 @@ test.describe('placeholder example', () => {
     const slateEditor = page.locator('[data-slate-editor=true]')
     const placeholderElement = page.locator('[data-slate-placeholder=true]')
 
+    await expect(placeholderElement).toBeVisible()
+
     const editorBoundingBox = await slateEditor.boundingBox()
     const placeholderBoundingBox = await placeholderElement.boundingBox()
 
