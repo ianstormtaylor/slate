@@ -47,6 +47,8 @@ export type LinkElement = { type: 'link'; url: string; children: Descendant[] }
 
 export type ButtonElement = { type: 'button'; children: Descendant[] }
 
+export type BadgeElement = { type: 'badge'; children: Descendant[] }
+
 export type ListItemElement = { type: 'list-item'; children: Descendant[] }
 
 export type MentionElement = {
@@ -92,6 +94,7 @@ type CustomElement =
   | ImageElement
   | LinkElement
   | ButtonElement
+  | BadgeElement
   | ListItemElement
   | MentionElement
   | ParagraphElement
