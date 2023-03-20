@@ -29,7 +29,6 @@ import { useSlate } from '../hooks/use-slate'
 import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
-  DOMNode,
   DOMRange,
   DOMText,
   getDefaultView,
@@ -154,6 +153,9 @@ export const Editable = (props: EditableProps) => {
   const [isComposing, setIsComposing] = useState(false)
   const ref = useRef<HTMLDivElement | null>(null)
   const deferredOperations = useRef<DeferredOperation[]>([])
+  const [placeholderHeight, setPlaceholderHeight] = useState<
+    number | undefined
+  >()
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -780,17 +782,30 @@ export const Editable = (props: EditableProps) => {
 
   const decorations = decorate([editor, []])
 
-  if (
+  const showPlaceholder =
     placeholder &&
     editor.children.length === 1 &&
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === '' &&
     !isComposing
-  ) {
+
+  const placeHolderResizeHandler = useCallback(
+    (placeholderEl: HTMLElement | null) => {
+      if (placeholderEl && showPlaceholder) {
+        setPlaceholderHeight(placeholderEl.getBoundingClientRect()?.height)
+      } else {
+        setPlaceholderHeight(undefined)
+      }
+    },
+    [showPlaceholder]
+  )
+
+  if (showPlaceholder) {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
       placeholder,
+      onPlaceholderResize: placeHolderResizeHandler,
       anchor: start,
       focus: start,
     })
@@ -844,10 +859,6 @@ export const Editable = (props: EditableProps) => {
       EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
     })
   })
-
-  const placeholderHeight = EDITOR_TO_PLACEHOLDER_ELEMENT.get(
-    editor
-  )?.getBoundingClientRect()?.height
 
   return (
     <ReadOnlyContext.Provider value={readOnly}>
@@ -1696,7 +1707,7 @@ export type RenderPlaceholderProps = {
     'data-slate-placeholder': boolean
     dir?: 'rtl'
     contentEditable: boolean
-    ref: React.RefObject<any>
+    ref: React.RefCallback<any>
     style: React.CSSProperties
   }
 }

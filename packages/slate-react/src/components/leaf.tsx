@@ -1,4 +1,10 @@
-import React, { useRef, useEffect } from 'react'
+import React, {
+  useRef,
+  useCallback,
+  MutableRefObject,
+  useState,
+  useEffect,
+} from 'react'
 import { Element, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
@@ -10,10 +16,30 @@ import {
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
 
+function disconnectPlaceholderResizeObserver(
+  placeholderResizeObserver: MutableRefObject<ResizeObserver | null>,
+  releaseObserver: boolean
+) {
+  if (placeholderResizeObserver.current) {
+    placeholderResizeObserver.current.disconnect()
+    if (releaseObserver) {
+      placeholderResizeObserver.current = null
+    }
+  }
+}
+
+type TimerId = ReturnType<typeof setTimeout> | null
+
+function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = null
+  }
+}
+
 /**
  * Individual leaves in a text node with unique formatting.
  */
-
 const Leaf = (props: {
   isLast: boolean
   leaf: Text
@@ -31,65 +57,61 @@ const Leaf = (props: {
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
-  const lastPlaceholderRef = useRef<HTMLSpanElement | null>(null)
-  const placeholderRef = useRef<HTMLSpanElement | null>(null)
   const editor = useSlateStatic()
-
   const placeholderResizeObserver = useRef<ResizeObserver | null>(null)
+  const placeholderRef = useRef<HTMLElement | null>(null)
+  const [showPlaceholder, setShowPlaceholder] = useState(false)
+  const showPlaceholderTimeoutRef = useRef<TimerId>(null)
 
-  useEffect(() => {
-    return () => {
-      if (placeholderResizeObserver.current) {
-        placeholderResizeObserver.current.disconnect()
-      }
-    }
-  }, [])
+  const callbackPlaceholderRef = useCallback(
+    (placeholderEl: HTMLElement | null) => {
+      disconnectPlaceholderResizeObserver(
+        placeholderResizeObserver,
+        placeholderEl == null
+      )
 
-  useEffect(() => {
-    const placeholderEl = placeholderRef?.current
+      if (placeholderEl == null) {
+        EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
+        leaf.onPlaceholderResize?.(null)
+      } else {
+        EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
 
-    if (placeholderEl) {
-      EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
-    } else {
-      EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
-    }
-
-    if (placeholderResizeObserver.current) {
-      // Update existing observer.
-      placeholderResizeObserver.current.disconnect()
-      if (placeholderEl)
+        if (!placeholderResizeObserver.current) {
+          // Create a new observer and observe the placeholder element.
+          const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
+          placeholderResizeObserver.current = new ResizeObserver(() => {
+            leaf.onPlaceholderResize?.(placeholderEl)
+          })
+        }
         placeholderResizeObserver.current.observe(placeholderEl)
-    } else if (placeholderEl) {
-      // Create a new observer and observe the placeholder element.
-      const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
-      placeholderResizeObserver.current = new ResizeObserver(() => {
-        // Force a re-render of the editor so its min-height can be updated
-        // to the new height of the placeholder.
-        const forceRender = EDITOR_TO_FORCE_RENDER.get(editor)
-        forceRender?.()
-      })
-      placeholderResizeObserver.current.observe(placeholderEl)
-    }
-
-    if (!placeholderEl && lastPlaceholderRef.current) {
-      // No placeholder element, so no need for a resize observer.
-      // Force a re-render of the editor so its min-height can be reset.
-      const forceRender = EDITOR_TO_FORCE_RENDER.get(editor)
-      forceRender?.()
-    }
-
-    lastPlaceholderRef.current = placeholderRef.current
-
-    return () => {
-      EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
-    }
-  }, [placeholderRef, leaf, editor])
+        placeholderRef.current = placeholderEl
+      }
+    },
+    [placeholderRef, leaf, editor]
+  )
 
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  if (leaf[PLACEHOLDER_SYMBOL]) {
+  const leafIsPlaceholder = leaf[PLACEHOLDER_SYMBOL]
+  useEffect(() => {
+    if (leafIsPlaceholder) {
+      if (!showPlaceholderTimeoutRef.current) {
+        // Delay the placeholder so it will not render in a selection
+        showPlaceholderTimeoutRef.current = setTimeout(() => {
+          setShowPlaceholder(true)
+          showPlaceholderTimeoutRef.current = null
+        }, 300)
+      }
+    } else {
+      clearTimeoutRef(showPlaceholderTimeoutRef)
+      setShowPlaceholder(false)
+    }
+    return () => clearTimeoutRef(showPlaceholderTimeoutRef)
+  }, [leafIsPlaceholder, setShowPlaceholder])
+
+  if (leafIsPlaceholder && showPlaceholder) {
     const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
       attributes: {
@@ -105,7 +127,7 @@ const Leaf = (props: {
           textDecoration: 'none',
         },
         contentEditable: false,
-        ref: placeholderRef,
+        ref: callbackPlaceholderRef,
       },
     }
 
