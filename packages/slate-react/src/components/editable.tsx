@@ -29,7 +29,6 @@ import { useSlate } from '../hooks/use-slate'
 import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
-  DOMNode,
   DOMRange,
   DOMText,
   getDefaultView,
@@ -789,24 +788,28 @@ export const Editable = (props: EditableProps) => {
     Array.from(Node.texts(editor)).length === 1 &&
     Node.string(editor) === '' &&
     !isComposing
+
+  const placeHolderResizeHandler = useCallback(
+    (placeholderEl: HTMLElement | null) => {
+      if (placeholderEl && showPlaceholder) {
+        setPlaceholderHeight(placeholderEl.getBoundingClientRect()?.height)
+      } else {
+        setPlaceholderHeight(undefined)
+      }
+    },
+    [showPlaceholder]
+  )
+
   if (showPlaceholder) {
     const start = Editor.start(editor, [])
     decorations.push({
       [PLACEHOLDER_SYMBOL]: true,
       placeholder,
+      onPlaceholderResize: placeHolderResizeHandler,
       anchor: start,
       focus: start,
     })
   }
-
-  useIsomorphicLayoutEffect(() => {
-    const placeholderEl = EDITOR_TO_PLACEHOLDER_ELEMENT.get(editor)
-    if (placeholderEl && showPlaceholder) {
-      setPlaceholderHeight(placeholderEl.getBoundingClientRect()?.height)
-    } else {
-      setPlaceholderHeight(undefined)
-    }
-  }, [showPlaceholder])
 
   const { marks } = editor
   state.hasMarkPlaceholder = false
@@ -1704,7 +1707,7 @@ export type RenderPlaceholderProps = {
     'data-slate-placeholder': boolean
     dir?: 'rtl'
     contentEditable: boolean
-    ref: React.Ref<any>
+    ref: React.RefCallback<any>
     style: React.CSSProperties
   }
 }

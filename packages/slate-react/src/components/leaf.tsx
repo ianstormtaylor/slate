@@ -72,12 +72,7 @@ const Leaf = (props: {
 
       if (placeholderEl == null) {
         EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
-
-        if (placeholderRef.current) {
-          // Force a re-render of the editor so its min-height can be reset.
-          const forceRender = EDITOR_TO_FORCE_RENDER.get(editor)
-          forceRender?.()
-        }
+        leaf.onPlaceholderResize?.(null)
       } else {
         EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
 
@@ -85,14 +80,10 @@ const Leaf = (props: {
           // Create a new observer and observe the placeholder element.
           const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
           placeholderResizeObserver.current = new ResizeObserver(() => {
-            // Force a re-render of the editor so its min-height can be updated
-            // to the new height of the placeholder.
-            const forceRender = EDITOR_TO_FORCE_RENDER.get(editor)
-            forceRender?.()
+            leaf.onPlaceholderResize?.(placeholderEl)
           })
         }
         placeholderResizeObserver.current.observe(placeholderEl)
-
         placeholderRef.current = placeholderEl
       }
     },
@@ -111,7 +102,7 @@ const Leaf = (props: {
         showPlaceholderTimeoutRef.current = setTimeout(() => {
           setShowPlaceholder(true)
           showPlaceholderTimeoutRef.current = null
-        }, 30)
+        }, 300)
       }
     } else {
       clearTimeoutRef(showPlaceholderTimeoutRef)
@@ -120,7 +111,7 @@ const Leaf = (props: {
     return () => clearTimeoutRef(showPlaceholderTimeoutRef)
   }, [leafIsPlaceholder, setShowPlaceholder])
 
-  if (leafIsPlaceholder) {
+  if (leafIsPlaceholder && showPlaceholder) {
     const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
       attributes: {
@@ -130,7 +121,7 @@ const Leaf = (props: {
           pointerEvents: 'none',
           width: '100%',
           maxWidth: '100%',
-          display: showPlaceholder ? 'block' : 'none',
+          display: 'block',
           opacity: '0.333',
           userSelect: 'none',
           textDecoration: 'none',
