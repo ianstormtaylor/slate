@@ -27,6 +27,7 @@ export const createEditor = (): Editor => {
     marks: null,
     isElementReadOnly: () => false,
     isInline: () => false,
+    isSelectable: () => true,
     isVoid: () => false,
     markableVoid: () => false,
     onChange: () => {},

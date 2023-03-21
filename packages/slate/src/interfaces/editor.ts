@@ -61,6 +61,7 @@ export interface BaseEditor {
   // Schema-specific node behaviors.
   isElementReadOnly: (element: Element) => boolean
   isInline: (element: Element) => boolean
+  isSelectable: (element: Element) => boolean
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
@@ -158,6 +159,7 @@ export interface EditorNodesOptions<T extends Node> {
   universal?: boolean
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorNormalizeOptions {
@@ -192,6 +194,7 @@ export interface EditorPositionsOptions {
   unit?: TextUnitAdjustment
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorPreviousOptions<T extends Node> {
@@ -272,6 +275,7 @@ export interface EditorInterface {
   isEmpty: (editor: Editor, element: Element) => boolean
   isInline: (editor: Editor, value: Element) => boolean
   isNormalizing: (editor: Editor) => boolean
+  isSelectable: (editor: Editor, element: Element) => boolean
   isStart: (editor: Editor, point: Point, at: Location) => boolean
   isVoid: (editor: Editor, value: Element) => boolean
   last: (editor: Editor, at: Location) => NodeEntry
@@ -674,6 +678,7 @@ export const Editor: EditorInterface = {
       typeof value.insertText === 'function' &&
       typeof value.isElementReadOnly === 'function' &&
       typeof value.isInline === 'function' &&
+      typeof value.isSelectable === 'function' &&
       typeof value.isVoid === 'function' &&
       typeof value.normalizeNode === 'function' &&
       typeof value.onChange === 'function' &&
@@ -743,6 +748,14 @@ export const Editor: EditorInterface = {
   isNormalizing(editor: Editor): boolean {
     const isNormalizing = NORMALIZING.get(editor)
     return isNormalizing === undefined ? true : isNormalizing
+  },
+
+  /**
+   * Check if a value is a selectable `Element` object.
+   */
+
+  isSelectable(editor: Editor, value: Element): boolean {
+    return editor.isSelectable(value)
   },
 
   /**
@@ -958,6 +971,7 @@ export const Editor: EditorInterface = {
       universal = false,
       reverse = false,
       voids = false,
+      ignoreNonSelectable = false,
     } = options
     let { match } = options
 
@@ -986,17 +1000,32 @@ export const Editor: EditorInterface = {
       reverse,
       from,
       to,
-      pass: ([n]) =>
-        voids
-          ? false
-          : Element.isElement(n) &&
-            (Editor.isVoid(editor, n) || Editor.isElementReadOnly(editor, n)),
+      pass: ([node]) => {
+        if (!Element.isElement(node)) return false
+        if (
+          !voids &&
+          (Editor.isVoid(editor, node) ||
+            Editor.isElementReadOnly(editor, node))
+        )
+          return true
+        if (ignoreNonSelectable && !Editor.isSelectable(editor, node))
+          return true
+        return false
+      },
     })
 
     const matches: NodeEntry<T>[] = []
     let hit: NodeEntry<T> | undefined
 
     for (const [node, path] of nodeEntries) {
+      if (
+        ignoreNonSelectable &&
+        Element.isElement(node) &&
+        !Editor.isSelectable(editor, node)
+      ) {
+        continue
+      }
+
       const isLower = hit && Path.compare(path, hit[1]) === 0
 
       // In highest mode any node lower than the last hit is not a match.
@@ -1342,6 +1371,7 @@ export const Editor: EditorInterface = {
       unit = 'offset',
       reverse = false,
       voids = false,
+      ignoreNonSelectable = false,
     } = options
 
     if (!at) {
@@ -1381,7 +1411,12 @@ export const Editor: EditorInterface = {
     // encounter the block node, then all of its text nodes, so when iterating
     // through the blockText and leafText we just need to remember a window of
     // one block node and leaf node, respectively.
-    for (const [node, path] of Editor.nodes(editor, { at, reverse, voids })) {
+    for (const [node, path] of Editor.nodes(editor, {
+      at,
+      reverse,
+      voids,
+      ignoreNonSelectable,
+    })) {
       /*
        * ELEMENT NODE - Yield position(s) for voids, collect blockText for blocks
        */

@@ -28,20 +28,18 @@ test.describe('Inlines example', () => {
       selection.addRange(range)
     })
 
-    const getBadgeIsSelected = async () => {
-      return (
-        (await badge.evaluate(e => e.dataset.playwrightSelected)) === 'true'
-      )
-    }
+    const getSelectionContainerText = () =>
+      page.evaluate(() => {
+        const selection = window.getSelection()
+        return selection.anchorNode.parentNode.innerText
+      })
 
-    expect(await getBadgeIsSelected()).toBe(false)
+    expect(await getSelectionContainerText()).toBe('.')
     await page.keyboard.press('ArrowLeft')
-    expect(await getBadgeIsSelected()).toBe(true)
-    await page.keyboard.press('ArrowLeft')
-    expect(await getBadgeIsSelected()).toBe(false)
+    expect(await getSelectionContainerText()).toBe(
+      '! Here is a read-only inline: '
+    )
     await page.keyboard.press('ArrowRight')
-    expect(await getBadgeIsSelected()).toBe(true)
-    await page.keyboard.press('ArrowRight')
-    expect(await getBadgeIsSelected()).toBe(false)
+    expect(await getSelectionContainerText()).toBe('.')
   })
 })
