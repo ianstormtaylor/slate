@@ -14,6 +14,8 @@ import {
 } from '../utils/weak-maps'
 import { isElementDecorationsEqual } from '../utils/range-list'
 import {
+  ElementRenderers,
+  LeafRenderers,
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
@@ -26,9 +28,11 @@ import {
 const Element = (props: {
   decorations: Range[]
   element: SlateElement
-  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderElement?:
+    | ((props: RenderElementProps) => JSX.Element)
+    | ElementRenderers
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   selection: Range | null
 }) => {
   const {
@@ -129,6 +133,18 @@ const Element = (props: {
 
     NODE_TO_INDEX.set(text, 0)
     NODE_TO_PARENT.set(text, element)
+  }
+
+  if (typeof renderElement !== 'function') {
+    const elementType = Reflect.get(element, 'type')
+    if (typeof elementType === 'string' && elementType in renderElement) {
+      return renderElement[elementType]({ attributes, children, element })
+    }
+    return (
+      <DefaultElement attributes={attributes} element={element}>
+        {children}
+      </DefaultElement>
+    )
   }
 
   return renderElement({ attributes, children, element })

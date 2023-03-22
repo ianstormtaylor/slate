@@ -77,12 +77,32 @@ const Children = (props: Parameters<typeof useChildren>[0]) => (
 )
 
 /**
+ * `ElementType` represents the `type` string property on any `Element`.
+ */
+
+export type ElementType = Element extends infer E
+  ? E extends { type: string }
+    ? E['type']
+    : never
+  : never
+
+/**
+ * `TypedElement` represents the `Element` with a `type` property of `T`.
+ */
+
+export type TypedElement<T extends ElementType> = Element extends infer E
+  ? E extends { type: T }
+    ? E
+    : never
+  : never
+
+/**
  * `RenderElementProps` are passed to the `renderElement` handler.
  */
 
-export interface RenderElementProps {
+export interface RenderElementProps<T extends ElementType = ElementType> {
   children: any
-  element: Element
+  element: ElementType extends T ? Element : TypedElement<T>
   attributes: {
     'data-slate-node': 'element'
     'data-slate-inline'?: true
@@ -93,16 +113,68 @@ export interface RenderElementProps {
 }
 
 /**
+ * `ElementRenderer` renders an element.
+ */
+
+export type ElementRenderer<T extends ElementType> = (
+  props: RenderElementProps<T>
+) => JSX.Element
+
+/**
+ * `ElementRenderers` maps element types to render functions.
+ */
+
+export type ElementRenderers = {
+  [T in ElementType]?: ElementRenderer<T>
+}
+
+/**
+ * `TextType` represents the `type` string property on any `Text`.
+ */
+
+export type TextType = Text extends infer T
+  ? T extends { type: string }
+    ? T['type']
+    : never
+  : never
+
+/**
+ * `TypedText` represents the `Text` with a `type` property of `T`.
+ */
+
+export type TypedText<T extends TextType> = Text extends infer L
+  ? L extends { type: T }
+    ? T
+    : never
+  : never
+
+/**
  * `RenderLeafProps` are passed to the `renderLeaf` handler.
  */
 
-export interface RenderLeafProps {
+export interface RenderLeafProps<T extends TextType = TextType> {
   children: any
-  leaf: Text
-  text: Text
+  leaf: TextType extends T ? Text : TypedText<T>
+  text: TextType extends T ? Text : TypedText<T>
   attributes: {
     'data-slate-leaf': true
   }
+}
+
+/**
+ * `LeafRenderer` renders a leaf.
+ */
+
+export type LeafRenderer<T extends TextType> = (
+  props: RenderLeafProps<T>
+) => JSX.Element
+
+/**
+ * `LeafRenderers` maps leaf types to render functions.
+ */
+
+export type LeafRenderers = {
+  [T in TextType]?: LeafRenderer<T>
 }
 
 /**
@@ -116,8 +188,10 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?:
+    | ((props: RenderElementProps) => JSX.Element)
+    | ElementRenderers
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType

@@ -8,7 +8,11 @@ import {
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
 } from '../utils/weak-maps'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import {
+  LeafRenderers,
+  RenderLeafProps,
+  RenderPlaceholderProps,
+} from './editable'
 import Leaf from './leaf'
 
 /**
@@ -20,7 +24,7 @@ const Text = (props: {
   isLast: boolean
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderLeaf?: ((props: RenderLeafProps) => JSX.Element) | LeafRenderers
   text: SlateText
 }) => {
   const {

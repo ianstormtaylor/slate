@@ -98,7 +98,10 @@ const InlinesExample = () => {
         <ToggleEditableButtonButton />
       </Toolbar>
       <Editable
-        renderElement={props => <Element {...props} />}
+        renderElement={{
+          button: EditableButtonComponent,
+          link: LinkComponent,
+        }}
         renderLeaf={props => <Text {...props} />}
         placeholder="Enter some text..."
         onKeyDown={onKeyDown}
@@ -230,7 +233,11 @@ const InlineChromiumBugfix = () => (
   </span>
 )
 
-const LinkComponent = ({ attributes, children, element }) => {
+const LinkComponent: SlateReact.ElementRenderer<'link'> = ({
+  attributes,
+  children,
+  element,
+}) => {
   const selected = useSelected()
   return (
     <a
@@ -251,7 +258,10 @@ const LinkComponent = ({ attributes, children, element }) => {
   )
 }
 
-const EditableButtonComponent = ({ attributes, children }) => {
+const EditableButtonComponent: SlateReact.ElementRenderer<'button'> = ({
+  attributes,
+  children,
+}) => {
   return (
     /*
       Note that this is not a true button, but a span with button-like CSS.
@@ -281,18 +291,6 @@ const EditableButtonComponent = ({ attributes, children }) => {
       <InlineChromiumBugfix />
     </span>
   )
-}
-
-const Element = props => {
-  const { attributes, children, element } = props
-  switch (element.type) {
-    case 'link':
-      return <LinkComponent {...props} />
-    case 'button':
-      return <EditableButtonComponent {...props} />
-    default:
-      return <p {...attributes}>{children}</p>
-  }
 }
 
 const Text = props => {
