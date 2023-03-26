@@ -77,7 +77,7 @@ If you have void "mention" elements that can accept marks like bold or italic:
 const { isVoid, markableVoid } = editor
 
 editor.isVoid = element => {
-  return element.type === 'mention' ? true : isInline(element)
+  return element.type === 'mention' ? true : isVoid(element)
 }
 
 editor.markableVoid = element => {
