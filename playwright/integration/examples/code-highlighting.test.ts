@@ -1,5 +1,7 @@
 import { test, expect, Page } from '@playwright/test'
 
+test.setTimeout(60 * 1000)
+
 test.describe('code highlighting', () => {
   test.beforeEach(async ({ page }) => {
     page.goto('http://localhost:3000/examples/code-highlighting')

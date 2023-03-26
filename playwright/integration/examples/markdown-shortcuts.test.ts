@@ -14,7 +14,7 @@ test.describe('On markdown-shortcuts example', () => {
     ).toContain('A wise quote.')
   })
 
-  test('can add list items', async ({ page }) => {
+  test('can add list items', async ({ page }, testInfo) => {
     expect(
       await page
         .getByRole('textbox')
@@ -23,7 +23,9 @@ test.describe('On markdown-shortcuts example', () => {
     ).toBe(0)
 
     await page.getByRole('textbox').click()
-    await page.getByRole('textbox').press('Home')
+    await page
+      .getByRole('textbox')
+      .press(testInfo.project.name === 'webkit' ? 'Meta+ArrowLeft' : 'Home')
     await page.getByRole('textbox').type('* 1st Item')
     await page.keyboard.press('Enter')
     await page.getByRole('textbox').type('2nd Item')

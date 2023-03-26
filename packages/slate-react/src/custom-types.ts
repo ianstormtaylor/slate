@@ -6,9 +6,11 @@ declare module 'slate' {
     Editor: ReactEditor
     Text: BaseText & {
       placeholder?: string
+      onPlaceholderResize?: (node: HTMLElement | null) => void
     }
     Range: BaseRange & {
       placeholder?: string
+      onPlaceholderResize?: (node: HTMLElement | null) => void
     }
   }
 }

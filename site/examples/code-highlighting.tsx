@@ -8,7 +8,7 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import {
   createEditor,
   Node,
@@ -51,7 +51,7 @@ const CodeHighlightingExample = () => {
       <SetNodeToDecorations />
       <Editable
         decorate={decorate}
-        renderElement={renderElement}
+        renderElement={ElementWrapper}
         renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}
       />
@@ -60,7 +60,7 @@ const CodeHighlightingExample = () => {
   )
 }
 
-const renderElement = (props: RenderElementProps) => {
+const ElementWrapper = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   const editor = useSlateStatic()
 
@@ -161,14 +161,17 @@ const renderLeaf = (props: RenderLeafProps) => {
 }
 
 const useDecorate = (editor: Editor) => {
-  return useCallback(([node, path]) => {
-    if (Element.isElement(node) && node.type === CodeLineType) {
-      const ranges = editor.nodeToDecorations.get(node) || []
-      return ranges
-    }
+  return useCallback(
+    ([node, path]) => {
+      if (Element.isElement(node) && node.type === CodeLineType) {
+        const ranges = editor.nodeToDecorations.get(node) || []
+        return ranges
+      }
 
-    return []
-  }, [])
+      return []
+    },
+    [editor.nodeToDecorations]
+  )
 }
 
 const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<
@@ -220,34 +223,35 @@ const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<
 const SetNodeToDecorations = () => {
   const editor = useSlate()
 
-  useMemo(() => {
-    const blockEntries = Array.from(
-      Editor.nodes(editor, {
-        at: [],
-        mode: 'highest',
-        match: n => Element.isElement(n) && n.type === CodeBlockType,
-      })
-    )
+  const blockEntries = Array.from(
+    Editor.nodes(editor, {
+      at: [],
+      mode: 'highest',
+      match: n => Element.isElement(n) && n.type === CodeBlockType,
+    })
+  )
 
-    const nodeToDecorations = mergeMaps(
-      ...blockEntries.map(getChildNodeToDecorations)
-    )
+  const nodeToDecorations = mergeMaps(
+    ...blockEntries.map(getChildNodeToDecorations)
+  )
 
-    editor.nodeToDecorations = nodeToDecorations
-  }, [editor.children])
+  editor.nodeToDecorations = nodeToDecorations
 
   return null
 }
 
 const useOnKeydown = (editor: Editor) => {
-  const onKeyDown: React.KeyboardEventHandler = useCallback(e => {
-    if (isHotkey('tab', e)) {
-      // handle tab key, insert spaces
-      e.preventDefault()
+  const onKeyDown: React.KeyboardEventHandler = useCallback(
+    e => {
+      if (isHotkey('tab', e)) {
+        // handle tab key, insert spaces
+        e.preventDefault()
 
-      Editor.insertText(editor, '  ')
-    }
-  }, [])
+        Editor.insertText(editor, '  ')
+      }
+    },
+    [editor]
+  )
 
   return onKeyDown
 }
