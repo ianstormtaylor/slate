@@ -1,7 +1,7 @@
 import { isPlainObject } from 'is-plain-object'
 import { produce } from 'immer'
 import { ExtendedType, Operation, Path } from '..'
-import { TextDirection } from './types'
+import { TextDirection } from '../types/types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate

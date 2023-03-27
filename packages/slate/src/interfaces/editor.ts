@@ -25,9 +25,10 @@ import {
   TextDirection,
   TextUnit,
   TextUnitAdjustment,
-} from './types'
+} from '../types/types'
 import { OmitFirstArg } from '../utils/types'
-import { isEditor } from '../is-editor'
+import { isEditor } from '../editor/is-editor'
+import { TextInsertTextOptions } from './transforms/text'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -93,7 +94,6 @@ export interface BaseEditor {
   removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
   select: OmitFirstArg<typeof Transforms.select>
   setNodes: <T extends Node>(
-    editor: Editor,
     props: Partial<T>,
     options?: {
       at?: Location
@@ -140,13 +140,17 @@ export interface BaseEditor {
   isVoid: OmitFirstArg<typeof Editor.isVoid>
   last: OmitFirstArg<typeof Editor.last>
   leaf: OmitFirstArg<typeof Editor.leaf>
-  levels: OmitFirstArg<typeof Editor.levels>
+  levels: <T extends Node>(
+    options?: EditorLevelsOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
   getMarks: OmitFirstArg<typeof Editor.marks>
   next: <T extends Descendant>(
     options?: EditorNextOptions<T>
   ) => NodeEntry<T> | undefined
   node: OmitFirstArg<typeof Editor.node>
-  nodes: OmitFirstArg<typeof Editor.nodes>
+  nodes: <T extends Node>(
+    options?: EditorNodesOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
   parent: OmitFirstArg<typeof Editor.parent>
   path: OmitFirstArg<typeof Editor.path>
   pathRef: OmitFirstArg<typeof Editor.pathRef>
@@ -155,7 +159,9 @@ export interface BaseEditor {
   pointRef: OmitFirstArg<typeof Editor.pointRef>
   pointRefs: OmitFirstArg<typeof Editor.pointRefs>
   positions: OmitFirstArg<typeof Editor.positions>
-  previous: OmitFirstArg<typeof Editor.previous>
+  previous: <T extends Node>(
+    options?: EditorPreviousOptions<T>
+  ) => NodeEntry<T> | undefined
   range: OmitFirstArg<typeof Editor.range>
   rangeRef: OmitFirstArg<typeof Editor.rangeRef>
   rangeRefs: OmitFirstArg<typeof Editor.rangeRefs>
@@ -324,7 +330,11 @@ export interface EditorInterface {
   insertSoftBreak: (editor: Editor) => void
   insertFragment: (editor: Editor, fragment: Node[]) => void
   insertNode: (editor: Editor, node: Node) => void
-  insertText: (editor: Editor, text: string) => void
+  insertText: (
+    editor: Editor,
+    text: string,
+    options?: TextInsertTextOptions
+  ) => void
   isBlock: (editor: Editor, value: Element) => boolean
   isEditor: (value: any) => value is Editor
   isEnd: (editor: Editor, point: Point, at: Location) => boolean
@@ -477,10 +487,6 @@ export const Editor: EditorInterface = {
     return editor.fragment(at)
   },
 
-  getMarks(editor) {
-    return editor.getMarks()
-  },
-
   /**
    * Check if a node has block children.
    */
@@ -627,7 +633,7 @@ export const Editor: EditorInterface = {
   /**
    * Iterate through all of the levels at a location.
    */
-  *levels(editor, options) {
+  levels(editor, options) {
     return editor.levels(options)
   },
 
@@ -658,7 +664,7 @@ export const Editor: EditorInterface = {
   /**
    * Iterate through all of the nodes in the Editor.
    */
-  *nodes(editor, options) {
+  nodes(editor, options) {
     return editor.nodes(options)
   },
 
@@ -736,7 +742,7 @@ export const Editor: EditorInterface = {
    * will not happen inside their content unless you pass in true for the
    * `voids` option, then iteration will occur.
    */
-  *positions(editor, options) {
+  positions(editor, options) {
     return editor.positions(options)
   },
 

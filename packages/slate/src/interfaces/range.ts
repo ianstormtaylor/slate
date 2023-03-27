@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import { isPlainObject } from 'is-plain-object'
 import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
-import { RangeDirection } from './types'
+import { RangeDirection } from '../types/types'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate

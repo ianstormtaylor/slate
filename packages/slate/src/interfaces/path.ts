@@ -2,11 +2,11 @@ import {
   InsertNodeOperation,
   MergeNodeOperation,
   MoveNodeOperation,
+  Operation,
   RemoveNodeOperation,
   SplitNodeOperation,
-  Operation,
 } from '..'
-import { TextDirection } from './types'
+import { TextDirection } from '../types/types'
 
 /**
  * `Path` arrays are a list of indexes that describe a node's exact position in
