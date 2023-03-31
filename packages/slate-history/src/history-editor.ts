@@ -17,6 +17,7 @@ export interface HistoryEditor extends BaseEditor {
   history: History
   undo: () => void
   redo: () => void
+  writeHistory: (stack: 'undos' | 'redos', batch: any) => void
 }
 
 // eslint-disable-next-line no-redeclare
