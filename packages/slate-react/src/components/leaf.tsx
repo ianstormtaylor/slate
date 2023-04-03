@@ -15,6 +15,7 @@ import {
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
+import { IS_SAFARI } from '../utils/environment'
 
 function disconnectPlaceholderResizeObserver(
   placeholderResizeObserver: MutableRefObject<ResizeObserver | null>,
@@ -125,6 +126,8 @@ const Leaf = (props: {
           opacity: '0.333',
           userSelect: 'none',
           textDecoration: 'none',
+          // Fixes https://github.com/udecode/plate/issues/2315
+          WebkitUserModify: IS_SAFARI ? 'inherit' : undefined,
         },
         contentEditable: false,
         ref: callbackPlaceholderRef,
