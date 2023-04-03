@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.93.0
+
+### Minor Changes
+
+- [#5382](https://github.com/ianstormtaylor/slate/commit/bab6943be9e0a307538c29a9dc5fcf23c09c5e40) Thanks [@reinvanimschoot](https://github.com/reinvanimschoot)! - Extracts history push to own function
+
 ## 0.86.0
 
 ### Patch Changes
