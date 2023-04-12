@@ -1,6 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
-import { Transforms, createEditor, Descendant } from 'slate'
+import {
+  Transforms,
+  createEditor,
+  Descendant,
+  Editor,
+  Element as SlateElement,
+  Path,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 import {
@@ -113,8 +120,14 @@ const withHtml = editor => {
   }
 
   editor.insertData = data => {
+    const [block] = Editor.above(editor, {
+      match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+    }) as [SlateElement, Path]
+    if (block.type.includes('code')) {
+      insertData(data)
+      return
+    }
     const html = data.getData('text/html')
-
     if (html) {
       const parsed = new DOMParser().parseFromString(html, 'text/html')
       const fragment = deserialize(parsed.body)
