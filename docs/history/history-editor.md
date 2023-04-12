@@ -6,9 +6,9 @@ The `HistoryEditor` interface is added to the `Editor` when it is instantiated u
 const [editor] = useState(() => withReact(withHistory(createEditor())))
 ```
 
-This adds properties to `editor` that enables undo and redo to Slate.
+This adds properties to `editor` that enables undo and redo in Slate.
 
-There are also a number of static methods to help while working with the Editor's undo/redo history.
+There are also static methods for working with the Editor's undo/redo history.
 
 ```typescript
 export interface HistoryEditor extends BaseEditor {
@@ -31,13 +31,13 @@ export interface HistoryEditor extends BaseEditor {
 
 #### `HistoryEditor.redo(editor: HistoryEditor): void`
 
-Redo to the previous saved state.
+Redo to the next saved state.
 
 #### `HistoryEditor.undo(editor: HistoryEditor): void`
 
 Undo to the previous saved state.
 
-### Merging and Savings
+### Merging and Saving
 
 #### `HistoryEditor.withoutMerging(editor: HistoryEditor, fn: () => void): void`
 
