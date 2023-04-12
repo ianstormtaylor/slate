@@ -153,7 +153,7 @@ const App = () => {
             Transforms.setNodes(
               editor,
               { type: 'code' },
-              { match: n => Editor.isBlock(editor, n) }
+              { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
             )
           }
         }}
