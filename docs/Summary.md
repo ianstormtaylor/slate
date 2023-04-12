@@ -54,6 +54,7 @@
 
 - [Slate React](libraries/slate-react.md)
 - [Slate History](libraries/slate-history.md)
+  - [History](/history/history.md)
 - [Slate Hyperscript](libraries/slate-hyperscript.md)
 
 ## General
