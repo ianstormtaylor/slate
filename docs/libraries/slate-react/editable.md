@@ -1,6 +1,6 @@
 # Editable component
 
-#### `Editable(props: EditableProps)`
+## `Editable(props: EditableProps): JSX.Element`
 
 The `Editable` component is the main editing component. Note that it must be inside a `Slate` component.
 
