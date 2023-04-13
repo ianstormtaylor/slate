@@ -2,13 +2,13 @@
 
 This sub-library contains the React-specific logic for Slate.
 
-- Usage (under construction)
-  - [Event Handling](./event-handling.md)
 - [withReact](./with-react.md)
 - [ReactEditor](./react-editor.md)
 - [Hooks](./hooks.md)
 - Slate (under construction)
 - [Editable](./editable.md)
+- Usage (under construction)
+  - [Event Handling](./event-handling.md)
 
 ## Components
 
