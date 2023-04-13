@@ -4,6 +4,8 @@
 
 The `Slate` component must include somewhere in its `children` the `Editable` component.
 
+### Props
+
 ```typescript
 type SlateProps = {
   editor: ReactEditor
@@ -12,8 +14,6 @@ type SlateProps = {
   onChange?: (value: Descendant[]) => void
 }
 ```
-
-### Slate Props
 
 #### `props.editor: ReactEditor`
 

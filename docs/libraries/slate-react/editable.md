@@ -4,6 +4,8 @@
 
 The `Editable` component is the main editing component. Note that it must be inside a `Slate` component.
 
+### Props
+
 It takes as its props, any props accepted by a Textarea element plus the following props.
 
 ```typescript
@@ -22,3 +24,5 @@ export type EditableProps = {
   disableDefaultStyles?: boolean
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 ```
+
+_NOTE: Detailed breakdown of Props not completed. Refer to the source code at the moment. Under construction._
