@@ -2,10 +2,13 @@
 
 `Operation` objects define the low-level instructions that Slate editors use to apply changes to their internal state. Representing all changes as operations is what allows Slate editors to easily implement history, collaboration, and other features.
 
-- [Node Operations](README.md#node-operations)
-- [Text Operations](README.md#text-operations)
-- [Selection Operation](README.md#selection-operation)
-- [Base Operation](README.md#base-operation)
+- Operation object
+  - [Operation](./operation.md)
+- Operation subtypes
+  - [Node Operations](README.md#node-operations)
+  - [Text Operations](README.md#text-operations)
+  - [Selection Operation](README.md#selection-operation)
+  - [Base Operation](README.md#base-operation)
 
 ### Node Operations
 
