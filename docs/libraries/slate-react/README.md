@@ -80,20 +80,6 @@ The default custom leaf renderer.
 
 A wrapper around the provider to handle `onChange` events, because the editor is a mutable singleton so it won't ever register as "changed" otherwise.
 
-## Plugins
-
-React-specific plugins for Slate editors
-
-### `withReact(editor: Editor)`
-
-Adds React and DOM specific behaviors to the editor.
-
-When used with `withHistory`, `withReact` should be applied outside. For example:
-
-```javascript
-const [editor] = useState(() => withReact(withHistory(createEditor())))
-```
-
 ## Utils
 
 Private convenience modules
