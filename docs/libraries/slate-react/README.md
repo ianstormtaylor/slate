@@ -3,6 +3,7 @@
 This sub-library contains the React-specific logic for Slate.
 
 - [withReact](./with-react.md)
+- [ReactEditor](./react-editor.md)
 
 ## Components
 
@@ -109,90 +110,6 @@ Get the current editor object from the React context. A version of useSlate that
 ### `useSlateSelection`
 
 Get the current editor selection from the React context. Only re-renders when the selection changes.
-
-## ReactEditor
-
-A React and DOM-specific version of the `Editor` interface. All about translating between the DOM and Slate.
-
-### `isComposing(editor: ReactEditor)`
-
-Check if the user is currently composing inside the editor.
-
-### `findKey(editor: ReactEditor, node: Node)`
-
-Find a key for a Slate node.
-
-### `findPath(editor: ReactEditor, node: Node)`
-
-Find the path of Slate node.
-
-### `isFocused(editor: ReactEditor)`
-
-Check if the editor is focused.
-
-### `isReadOnly(editor: ReactEditor)`
-
-Check if the editor is in read-only mode.
-
-### `blur(editor: ReactEditor)`
-
-Blur the editor.
-
-### `focus(editor: ReactEditor)`
-
-Focus the editor.
-
-### `deselect(editor: ReactEditor)`
-
-Deselect the editor.
-
-### `hasDOMNode(editor: ReactEditor, target: DOMNode, options: { editable?: boolean } = {})`
-
-Check if a DOM node is within the editor.
-
-### `insertData(editor: ReactEditor, data: DataTransfer)`
-
-Insert data from a `DataTransfer` into the editor. This is a proxy method to call in this order `insertFragmentData(editor: ReactEditor, data: DataTransfer)` and then `insertTextData(editor: ReactEditor, data: DataTransfer)`.
-
-### `insertFragmentData(editor: ReactEditor, data: DataTransfer)`
-
-Insert fragment data from a `DataTransfer` into the editor. Returns true if some content has been effectively inserted.
-
-### `insertTextData(editor: ReactEditor, data: DataTransfer)`
-
-Insert text data from a `DataTransfer` into the editor. Returns true if some content has been effectively inserted.
-
-### `setFragmentData(editor: ReactEditor, data: DataTransfer, originEvent?: 'drag' | 'copy' | 'cut')`
-
-Sets data from the currently selected fragment on a `DataTransfer`.
-
-### `toDOMNode(editor: ReactEditor, node: Node)`
-
-Find the native DOM element from a Slate node.
-
-### `toDOMPoint(editor: ReactEditor, point: Point)`
-
-Find a native DOM selection point from a Slate point.
-
-### `toDOMRange(editor: ReactEditor, range: Range)`
-
-Find a native DOM range from a Slate `range`.
-
-### `toSlateNode(editor: ReactEditor, domNode: DOMNode)`
-
-Find a Slate node from a native DOM `element`.
-
-### `findEventRange(editor: ReactEditor, event: any)`
-
-Get the target range from a DOM `event`.
-
-### `toSlatePoint(editor: ReactEditor, domPoint: DOMPoint)`
-
-Find a Slate point from a DOM selection's `domNode` and `domOffset`.
-
-### `toSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection, options?: { exactMatch?: boolean } = {})`
-
-Find a Slate range from a DOM range or selection.
 
 ## Plugins
 
