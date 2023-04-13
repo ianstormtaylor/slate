@@ -1,6 +1,6 @@
 # Slate Component
 
-## `Slate(prop: SlateProps)`
+## `Slate(props: SlateProps)`
 
 The `Slate` component must include somewhere in its `children` the `Editable` component.
 
