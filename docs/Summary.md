@@ -54,6 +54,7 @@
 ## Libraries
 
 - [Slate React](libraries/slate-react/README.md)
+  - [withReact](libraries/slate-react/with-react.md)
 - [Slate History](libraries/slate-history/README.md)
   - [withHistory](/libraries/slate-history/with-history.md)
   - [HistoryEditor](/libraries/slate-history/history-editor.md)

@@ -2,6 +2,8 @@
 
 This sub-library contains the React-specific logic for Slate.
 
+- [withReact](./with-react.md)
+
 ## Components
 
 React components for rendering Slate editors
