@@ -1,6 +1,6 @@
 # ReactEditor
 
-`ReactEditor` is added to `Editor` when it is instntiated using the `withReact` method.
+`ReactEditor` is added to `Editor` when it is instantiated using the `withReact` method.
 
 ```typescript
 const [editor] = useState(() => withReact(withHistory(createEditor())))
