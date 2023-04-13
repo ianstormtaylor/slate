@@ -47,8 +47,8 @@
   - [Range](api/locations/range.md)
   - [RangeRef](api/locations/range-ref.md)
   - [Span](api/locations/span.md)
-- [Operation](api/operation.md)
-  - [Operation Types](api/operation-types.md)
+- [Operation Types](api/operations/README.md)
+  - [Operation](api/operations/operation.md)
 - [Scrubber](api/scrubber.md)
 
 ## Libraries
