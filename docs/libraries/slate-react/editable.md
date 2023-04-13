@@ -9,7 +9,7 @@ The `Editable` component is the main editing component. Note that it must be ins
 It takes as its props, any props accepted by a Textarea element plus the following props.
 
 ```typescript
-export type EditableProps = {
+type EditableProps = {
   decorate?: (entry: NodeEntry) => Range[]
   onDOMBeforeInput?: (event: InputEvent) => void
   placeholder?: string
