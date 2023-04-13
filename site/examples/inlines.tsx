@@ -245,7 +245,7 @@ const InlineChromiumBugfix = () => (
       font-size: 0;
     `}
   >
-    ${String.fromCodePoint(160) /* Non-breaking space */}
+    {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 )
 
