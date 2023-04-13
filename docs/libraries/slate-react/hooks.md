@@ -44,7 +44,9 @@ Get the current editor selection from the React context. Only re-renders when th
 
 Similar to `useSlateSelection` but uses redux style selectors to prevent rerendering on every keystroke.
 
-Bear in mind rerendering can only prevented if the returned value is a value type or for reference types (e.g. objects and arrays) add a custom equality function.
+Returns a subset of the full selection value based on the `selector`.
+
+Bear in mind rerendering can only prevented if the returned value is a value type or for reference types (e.g. objects and arrays) add a custom equality function for the `equalityFn` argument.
 
 Example:
 
