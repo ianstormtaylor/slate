@@ -57,6 +57,7 @@
   - [withReact](libraries/slate-react/with-react.md)
   - [ReactEditor](libraries/slate-react/react-editor.md)
   - [Hooks](libraries/slate-react/hooks.md)
+  - [Slate](libraries/slate-react/slate.md)
   - [Editable](libraries/slate-react/editable.md)
   - [Event Handling](libraries/slate-react/event-handling.md)
 - [Slate History](libraries/slate-history/README.md)
