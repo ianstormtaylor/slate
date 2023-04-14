@@ -92,7 +92,10 @@ export const TextTransforms: TextTransforms = {
         }
       }
 
-      if (!voids && Editor.void(editor, { at })) {
+      if (
+        (!voids && Editor.void(editor, { at })) ||
+        Editor.elementReadOnly(editor, { at })
+      ) {
         return
       }
 

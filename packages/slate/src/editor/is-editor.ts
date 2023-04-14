@@ -27,7 +27,9 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.insertFragment === 'function' &&
     typeof value.insertNode === 'function' &&
     typeof value.insertText === 'function' &&
+    typeof value.isElementReadOnly === 'function' &&
     typeof value.isInline === 'function' &&
+    typeof value.isSelectable === 'function' &&
     typeof value.isVoid === 'function' &&
     typeof value.normalizeNode === 'function' &&
     typeof value.onChange === 'function' &&

@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
+import { Ancestor, Descendant, Editor, ExtendedType, Node, Path } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other

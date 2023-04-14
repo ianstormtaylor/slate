@@ -44,16 +44,11 @@ export interface BaseEditor {
 
   // Overrideable core methods.
 
-    apply: (operation: Operation) => void
-
-  /**
-     * Get the "dirty" paths generated from an operation.
-     */
+  apply: (operation: Operation) => void
+  elementReadOnly: (element: Element) => boolean
   getDirtyPaths: (operation: Operation) => Path[]
   isElementReadOnly: (element: Element) => boolean
-  isInline: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
-  isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
@@ -593,6 +588,13 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Check if a point is an edge of a location.
+   */
+  isEdge(editor, point, at) {
+    return editor.isEdge(point, at)
+  },
+
+  /**
    * Check if a value is an `Editor` object.
    */
   isEditor(value: any): value is Editor {
@@ -600,17 +602,10 @@ export const Editor: EditorInterface = {
   },
 
   /**
-   * Check if a point is the end point of a location.
+   * Check if a value is a read-only `Element` object.
    */
-  isEnd(editor, point, at) {
-    return editor.isEnd(point, at)
-  },
-
-  /**
-   * Check if a point is an edge of a location.
-   */
-  isEdge(editor, point, at) {
-    return editor.isEdge(point, at)
+  isElementReadOnly(editor, element) {
+    return editor.isElementReadOnly(element)
   },
 
   /**
@@ -621,18 +616,17 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Check if a point is the end point of a location.
+   */
+  isEnd(editor, point, at) {
+    return editor.isEnd(point, at)
+  },
+
+  /**
    * Check if a value is an inline `Element` object.
    */
   isInline(editor, value) {
     return editor.isInline(value)
-  },
-
-  /**
-   * Check if a value is a read-only `Element` object.
-   */
-
-  isElementReadOnly(editor: Editor, value: Element): boolean {
-    return editor.isElementReadOnly(value)
   },
 
   /**

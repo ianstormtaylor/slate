@@ -15,6 +15,7 @@ export function* nodes<T extends Node>(
     universal = false,
     reverse = false,
     voids = false,
+    ignoreNonSelectable = false,
   } = options
   let { match } = options
 
@@ -43,14 +44,30 @@ export function* nodes<T extends Node>(
     reverse,
     from,
     to,
-    pass: ([n]) =>
-      voids ? false : Element.isElement(n) && Editor.isVoid(editor, n),
+    pass: ([node]) => {
+      if (!Element.isElement(node)) return false
+      if (
+        !voids &&
+        (Editor.isVoid(editor, node) || Editor.isElementReadOnly(editor, node))
+      )
+        return true
+      if (ignoreNonSelectable && !Editor.isSelectable(editor, node)) return true
+      return false
+    },
   })
 
   const matches: NodeEntry<T>[] = []
   let hit: NodeEntry<T> | undefined
 
   for (const [node, path] of nodeEntries) {
+    if (
+      ignoreNonSelectable &&
+      Element.isElement(node) &&
+      !Editor.isSelectable(editor, node)
+    ) {
+      continue
+    }
+
     const isLower = hit && Path.compare(path, hit[1]) === 0
 
     // In highest mode any node lower than the last hit is not a match.

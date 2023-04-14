@@ -75,15 +75,17 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     const isAcrossBlocks =
       startBlock && endBlock && !Path.equals(startBlock[1], endBlock[1])
     const isSingleText = Path.equals(start.path, end.path)
-    const startVoid = voids
+    const startNonEditable = voids
       ? null
-      : Editor.void(editor, { at: start, mode: 'highest' })
-    const endVoid = voids
+      : Editor.void(editor, { at: start, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: start, mode: 'highest' })
+    const endNonEditable = voids
       ? null
-      : Editor.void(editor, { at: end, mode: 'highest' })
+      : Editor.void(editor, { at: end, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: end, mode: 'highest' })
 
     // If the start or end points are inside an inline void, nudge them out.
-    if (startVoid) {
+    if (startNonEditable) {
       const before = Editor.before(editor, start)
 
       if (before && startBlock && Path.isAncestor(startBlock[1], before.path)) {
@@ -91,7 +93,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       }
     }
 
-    if (endVoid) {
+    if (endNonEditable) {
       const after = Editor.after(editor, end)
 
       if (after && endBlock && Path.isAncestor(endBlock[1], after.path)) {
@@ -112,7 +114,10 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       }
 
       if (
-        (!voids && Element.isElement(node) && Editor.isVoid(editor, node)) ||
+        (!voids &&
+          Element.isElement(node) &&
+          (Editor.isVoid(editor, node) ||
+            Editor.isElementReadOnly(editor, node))) ||
         (!Path.isCommon(path, start.path) && !Path.isCommon(path, end.path))
       ) {
         matches.push(entry)
@@ -126,7 +131,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     let removedText = ''
 
-    if (!isSingleText && !startVoid) {
+    if (!isSingleText && !startNonEditable) {
       const point = startRef.current!
       const [node] = Editor.leaf(editor, point)
       const { path } = point
@@ -144,7 +149,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       .filter((r): r is Path => r !== null)
       .forEach(p => Transforms.removeNodes(editor, { at: p, voids }))
 
-    if (!endVoid) {
+    if (!endNonEditable) {
       const point = endRef.current!
       const [node] = Editor.leaf(editor, point)
       const { path } = point
