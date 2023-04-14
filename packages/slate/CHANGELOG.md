@@ -1,5 +1,15 @@
 # slate
 
+## 0.93.0
+
+### Minor Changes
+
+- [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isSelectable` to `editor` (default true). A non-selectable element is skipped over when navigating using arrow keys.
+  - Add `ignoreNonSelectable` to `Editor.nodes`, `Editor.positions`, `Editor.after` and `Editor.before` (default false)
+  - `Transforms.move` ignores non-selectable elements
+
+* [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isElementReadOnly` to `editor`. A read-only element behaves much like a void with regard to selection and deletion, but renders its `children` the same as any other non-void node.
+
 ## 0.91.4
 
 ### Patch Changes

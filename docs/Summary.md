@@ -47,13 +47,23 @@
   - [Range](api/locations/range.md)
   - [RangeRef](api/locations/range-ref.md)
   - [Span](api/locations/span.md)
-- [Operation](api/operation.md)
+- [Operation Types](api/operations/README.md)
+  - [Operation](api/operations/operation.md)
 - [Scrubber](api/scrubber.md)
 
 ## Libraries
 
-- [Slate React](libraries/slate-react.md)
-- [Slate History](libraries/slate-history.md)
+- [Slate React](libraries/slate-react/README.md)
+  - [withReact](libraries/slate-react/with-react.md)
+  - [ReactEditor](libraries/slate-react/react-editor.md)
+  - [Hooks](libraries/slate-react/hooks.md)
+  - [Slate Component](libraries/slate-react/slate.md)
+  - [Editable Component](libraries/slate-react/editable.md)
+  - [Event Handling](libraries/slate-react/event-handling.md)
+- [Slate History](libraries/slate-history/README.md)
+  - [withHistory](libraries/slate-history/with-history.md)
+  - [HistoryEditor](libraries/slate-history/history-editor.md)
+  - [History](libraries/slate-history/history.md)
 - [Slate Hyperscript](libraries/slate-hyperscript.md)
 
 ## General

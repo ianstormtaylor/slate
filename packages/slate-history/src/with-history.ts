@@ -37,7 +37,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       })
 
       history.redos.pop()
-      history.undos.push(batch)
+      e.writeHistory('undos', batch)
     }
   }
 
@@ -61,7 +61,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
         })
       })
 
-      history.redos.push(batch)
+      e.writeHistory('redos', batch)
       history.undos.pop()
     }
   }
@@ -97,7 +97,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
           operations: [op],
           selectionBefore: e.selection,
         }
-        undos.push(batch)
+        e.writeHistory('undos', batch)
       }
 
       while (undos.length > 100) {
@@ -108,6 +108,10 @@ export const withHistory = <T extends Editor>(editor: T) => {
     }
 
     apply(op)
+  }
+
+  e.writeHistory = (stack: 'undos' | 'redos', batch: any) => {
+    e.history[stack].push(batch)
   }
 
   return e

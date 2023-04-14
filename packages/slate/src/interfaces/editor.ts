@@ -44,12 +44,16 @@ export interface BaseEditor {
 
   // Overrideable core methods.
 
-  apply: (operation: Operation) => void
+    apply: (operation: Operation) => void
 
   /**
-   * Get the "dirty" paths generated from an operation.
-   */
+     * Get the "dirty" paths generated from an operation.
+     */
   getDirtyPaths: (operation: Operation) => Path[]
+  isElementReadOnly: (element: Element) => boolean
+  isInline: (element: Element) => boolean
+  isSelectable: (element: Element) => boolean
+  isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
@@ -202,6 +206,12 @@ export interface EditorDirectedDeletionOptions {
   unit?: TextUnit
 }
 
+export interface EditorElementReadOnlyOptions {
+  at?: Location
+  mode?: MaximizeMode
+  voids?: boolean
+}
+
 export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
@@ -237,6 +247,7 @@ export interface EditorNodesOptions<T extends Node> {
   universal?: boolean
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorNormalizeOptions {
@@ -271,6 +282,7 @@ export interface EditorPositionsOptions {
   unit?: TextUnitAdjustment
   reverse?: boolean
   voids?: boolean
+  ignoreNonSelectable?: boolean
 }
 
 export interface EditorPreviousOptions<T extends Node> {
@@ -319,6 +331,10 @@ export interface EditorInterface {
     options?: EditorFragmentDeletionOptions
   ) => void
   edges: (editor: Editor, at: Location) => [Point, Point]
+  elementReadOnly: (
+    editor: Editor,
+    options?: EditorElementReadOnlyOptions
+  ) => NodeEntry<Element> | undefined
   end: (editor: Editor, at: Location) => Point
   first: (editor: Editor, at: Location) => NodeEntry
   fragment: (editor: Editor, at: Location) => Descendant[]
@@ -339,9 +355,11 @@ export interface EditorInterface {
   isEditor: (value: any) => value is Editor
   isEnd: (editor: Editor, point: Point, at: Location) => boolean
   isEdge: (editor: Editor, point: Point, at: Location) => boolean
+  isElementReadOnly: (editor: Editor, element: Element) => boolean
   isEmpty: (editor: Editor, element: Element) => boolean
   isInline: (editor: Editor, value: Element) => boolean
   isNormalizing: (editor: Editor) => boolean
+  isSelectable: (editor: Editor, element: Element) => boolean
   isStart: (editor: Editor, point: Point, at: Location) => boolean
   isVoid: (editor: Editor, value: Element) => boolean
   last: (editor: Editor, at: Location) => NodeEntry
@@ -464,6 +482,20 @@ export const Editor: EditorInterface = {
    */
   edges(editor, at) {
     return editor.edges(at)
+  },
+
+  /**
+   * Match a read-only element in the current branch of the editor.
+   */
+
+  elementReadOnly(
+    editor: Editor,
+    options: EditorElementReadOnlyOptions = {}
+  ): NodeEntry<Element> | undefined {
+    return Editor.above(editor, {
+      ...options,
+      match: n => Element.isElement(n) && Editor.isElementReadOnly(editor, n),
+    })
   },
 
   /**
@@ -596,10 +628,26 @@ export const Editor: EditorInterface = {
   },
 
   /**
+   * Check if a value is a read-only `Element` object.
+   */
+
+  isElementReadOnly(editor: Editor, value: Element): boolean {
+    return editor.isElementReadOnly(value)
+  },
+
+  /**
    * Check if the editor is currently normalizing after each operation.
    */
   isNormalizing(editor) {
     return editor.isNormalizing()
+  },
+
+  /**
+   * Check if a value is a selectable `Element` object.
+   */
+
+  isSelectable(editor: Editor, value: Element): boolean {
+    return editor.isSelectable(value)
   },
 
   /**
