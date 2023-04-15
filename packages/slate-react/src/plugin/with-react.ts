@@ -194,15 +194,6 @@ export const withReact = <T extends BaseEditor>(
     }
   }
 
-  e.getFragment = () => {
-    const { selection } = editor
-
-    if (selection) {
-      return Node.fragment(editor, selection)
-    }
-    return []
-  }
-
   e.setFragmentData = (data: Pick<DataTransfer, 'getData' | 'setData'>) => {
     const { selection } = e
 

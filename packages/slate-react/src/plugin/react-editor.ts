@@ -7,7 +7,6 @@ import {
   Point,
   Range,
   Scrubber,
-  TextUnit,
   Transforms,
 } from 'slate'
 import { TextDiff } from '../utils/diff-text'
@@ -42,10 +41,6 @@ import {
   NODE_TO_KEY,
   NODE_TO_PARENT,
 } from '../utils/weak-maps'
-
-export interface EditorDirectedDeletionOptions {
-  unit?: TextUnit
-}
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
