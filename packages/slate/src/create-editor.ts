@@ -73,7 +73,9 @@ import { first } from './editor/first'
 import { end } from './editor/end'
 import { edges } from './editor/edges'
 import { isEdge } from './editor/is-edge'
-import { elementReadOnly } from './core/element-read-only'
+import { elementReadOnly } from './editor/element-read-only'
+import { deleteBackward } from './editor/delete-backward'
+import { deleteForward } from './editor/delete-forward'
 
 /**
  * Create a new Slate `Editor` object.
@@ -96,6 +98,8 @@ export const createEditor = (): Editor => {
 
     // Editor
     addMark: (...args) => addMark(editor, ...args),
+    deleteBackward: (...args) => deleteBackward(editor, ...args),
+    deleteForward: (...args) => deleteForward(editor, ...args),
     deleteFragment: (...args) => deleteFragment(editor, ...args),
     insertBreak: (...args) => insertBreak(editor, ...args),
     insertSoftBreak: (...args) => insertSoftBreak(editor, ...args),

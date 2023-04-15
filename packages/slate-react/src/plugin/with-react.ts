@@ -57,22 +57,6 @@ export const withReact = <T extends BaseEditor>(
   // avoid collisions between editors in the DOM that share the same value.
   EDITOR_TO_KEY_TO_ELEMENT.set(e, new WeakMap())
 
-  e.deleteBackward = ({ unit = 'character' } = {}) => {
-    const { selection } = editor
-
-    if (selection && Range.isCollapsed(selection)) {
-      Transforms.delete(editor, { unit })
-    }
-  }
-
-  e.deleteForward = ({ unit = 'character' } = {}) => {
-    const { selection } = editor
-
-    if (selection && Range.isCollapsed(selection)) {
-      Transforms.delete(editor, { unit })
-    }
-  }
-
   e.addMark = (key, value) => {
     EDITOR_TO_SCHEDULE_FLUSH.get(e)?.()
 

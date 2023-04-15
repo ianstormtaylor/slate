@@ -76,6 +76,9 @@ export interface BaseEditor {
   // slate-react
 
   collapse: OmitFirstArg<typeof Transforms.collapse>
+  deleteBackward: (unit: TextUnit) => void
+  deleteForward: (unit: TextUnit) => void
+
   //
 
   delete: OmitFirstArg<typeof Transforms.delete>
@@ -339,6 +342,22 @@ export interface EditorInterface {
     at: Location,
     options?: EditorBeforeOptions
   ) => Point | undefined
+
+  /**
+   * Delete content in the editor backward from the current selection.
+   */
+  deleteBackward: (
+    editor: Editor,
+    options?: EditorDirectedDeletionOptions
+  ) => void
+
+  /**
+   * Delete content in the editor forward from the current selection.
+   */
+  deleteForward: (
+    editor: Editor,
+    options?: EditorDirectedDeletionOptions
+  ) => void
 
   /**
    * Delete the content in the current selection.
@@ -707,6 +726,16 @@ export const Editor: EditorInterface = {
 
   before(editor, at, options) {
     return editor.before(at, options)
+  },
+
+  deleteBackward(editor, options = {}) {
+    const { unit = 'character' } = options
+    editor.deleteBackward(unit)
+  },
+
+  deleteForward(editor, options = {}) {
+    const { unit = 'character' } = options
+    editor.deleteForward(unit)
   },
 
   deleteFragment(editor, options) {

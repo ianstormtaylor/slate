@@ -19,6 +19,7 @@ export function* positions(
     unit = 'offset',
     reverse = false,
     voids = false,
+    ignoreNonSelectable = false,
   } = options
 
   if (!at) {
@@ -58,7 +59,12 @@ export function* positions(
   // encounter the block node, then all of its text nodes, so when iterating
   // through the blockText and leafText we just need to remember a window of
   // one block node and leaf node, respectively.
-  for (const [node, path] of Editor.nodes(editor, { at, reverse, voids })) {
+  for (const [node, path] of Editor.nodes(editor, {
+    at,
+    reverse,
+    voids,
+    ignoreNonSelectable,
+  })) {
     /*
      * ELEMENT NODE - Yield position(s) for voids, collect blockText for blocks
      */
@@ -66,7 +72,7 @@ export function* positions(
       // Void nodes are a special case, so by default we will always
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.
-      if (!voids && editor.isVoid(node)) {
+      if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
         yield Editor.start(editor, path)
         continue
       }

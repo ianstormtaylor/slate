@@ -29,7 +29,6 @@ import {
 import { IS_ANDROID, IS_CHROME, IS_FIREFOX } from '../utils/environment'
 
 import { Key } from '../utils/key'
-import { OmitFirstArg } from '../utils/types'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
@@ -54,16 +53,6 @@ export interface EditorDirectedDeletionOptions {
  */
 
 export interface ReactEditor extends BaseEditor {
-  /**
-   * Delete content in the editor backward from the current selection.
-   */
-  deleteBackward: OmitFirstArg<typeof ReactEditor.deleteBackward>
-
-  /**
-   * Delete content in the editor forward from the current selection.
-   */
-  deleteForward: OmitFirstArg<typeof Editor.deleteForward>
-
   getFragment: () => Descendant[]
   hasEditableTarget: (
     editor: ReactEditor,
@@ -92,65 +81,174 @@ export interface ReactEditor extends BaseEditor {
 }
 
 export interface ReactEditorInterface {
-  deleteBackward: (
-    editor: ReactEditor,
-    options?: EditorDirectedDeletionOptions
-  ) => void
+  /**
+   * Experimental and android specific: Get pending diffs
+   */
+  androidPendingDiffs: (editor: Editor) => TextDiff[] | undefined
 
-  deleteForward: (
-    editor: Editor,
-    options?: EditorDirectedDeletionOptions
-  ) => void
+  /**
+   * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
+   */
+  androidScheduleFlush: (editor: Editor) => void
 
-  deleteFragment: (
-    editor: ReactEditor,
-    options?: EditorDirectedDeletionOptions
-  ) => void
-
-  getFragment: (editor: ReactEditor) => Descendant[]
-
-  isComposing: (editor: ReactEditor) => boolean
-
-  getWindow: (editor: ReactEditor) => Window
-
-  findKey: (editor: ReactEditor, node: Node) => Key
-
-  findPath(editor: ReactEditor, node: Node): Path
-
-  findDocumentOrShadowRoot: (editor: ReactEditor) => Document | ShadowRoot
-
-  isFocused: (editor: ReactEditor) => boolean
-
-  isReadOnly: (editor: ReactEditor) => boolean
-
+  /**
+   * Blur the editor.
+   */
   blur: (editor: ReactEditor) => void
 
-  focus: (editor: ReactEditor) => void
-
+  /**
+   * Deselect the editor.
+   */
   deselect: (editor: ReactEditor) => void
 
+  /**
+   * Find the DOM node that implements DocumentOrShadowRoot for the editor.
+   */
+  findDocumentOrShadowRoot: (editor: ReactEditor) => Document | ShadowRoot
+
+  /**
+   * Get the target range from a DOM `event`.
+   */
+  findEventRange: (editor: ReactEditor, event: any) => Range
+
+  /**
+   * Find a key for a Slate node.
+   */
+  findKey: (editor: ReactEditor, node: Node) => Key
+
+  /**
+   * Find the path of Slate node.
+   */
+  findPath: (editor: ReactEditor, node: Node) => Path
+
+  /**
+   * Focus the editor.
+   */
+  focus: (editor: ReactEditor) => void
+
+  /**
+   *
+   */
+  getFragment: (editor: ReactEditor) => Descendant[]
+
+  /**
+   * Return the host window of the current editor.
+   */
+  getWindow: (editor: ReactEditor) => Window
+
+  /**
+   * Check if a DOM node is within the editor.
+   */
   hasDOMNode: (
     editor: ReactEditor,
     target: DOMNode,
     options?: { editable?: boolean }
   ) => boolean
 
+  /**
+   * Check if the target is editable and in the editor.
+   */
+  hasEditableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+
+  /**
+   *
+   */
+  hasRange: (editor: ReactEditor, range: Range) => boolean
+
+  /**
+   * Check if the target can be selectable
+   */
+  hasSelectableTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
+
+  /**
+   * Check if the target is in the editor.
+   */
+  hasTarget: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => target is DOMNode
+
+  /**
+   * Insert data from a `DataTransfer` into the editor.
+   */
   insertData: (editor: ReactEditor, data: DataTransfer) => void
+
+  /**
+   * Insert fragment data from a `DataTransfer` into the editor.
+   */
   insertFragmentData: (editor: ReactEditor, data: DataTransfer) => boolean
+
+  /**
+   * Insert text data from a `DataTransfer` into the editor.
+   */
   insertTextData: (editor: ReactEditor, data: DataTransfer) => boolean
 
+  /**
+   * Check if the user is currently composing inside the editor.
+   */
+  isComposing: (editor: ReactEditor) => boolean
+
+  /**
+   * Check if the editor is focused.
+   */
+  isFocused: (editor: ReactEditor) => boolean
+
+  /**
+   * Check if the editor is in read-only mode.
+   */
+  isReadOnly: (editor: ReactEditor) => boolean
+
+  /**
+   * Check if the target is inside void and in an non-readonly editor.
+   */
+  isTargetInsideNonReadonlyVoid: (
+    editor: ReactEditor,
+    target: EventTarget | null
+  ) => boolean
+
+  /**
+   * Sets data from the currently selected fragment on a `DataTransfer`.
+   */
   setFragmentData: (
     editor: ReactEditor,
     data: DataTransfer,
     originEvent?: 'drag' | 'copy' | 'cut'
   ) => void
 
+  /**
+   * Find the native DOM element from a Slate node.
+   */
   toDOMNode: (editor: ReactEditor, node: Node) => HTMLElement
-  toDOMPoint: (editor: ReactEditor, point: Point) => DOMPoint
-  toDOMRange: (editor: ReactEditor, range: Range) => DOMRange
-  toSlateNode: (editor: ReactEditor, domNode: DOMNode) => Node
-  findEventRange: (editor: ReactEditor, event: any) => Range
 
+  /**
+   * Find a native DOM selection point from a Slate point.
+   */
+  toDOMPoint: (editor: ReactEditor, point: Point) => DOMPoint
+
+  /**
+   * Find a native DOM range from a Slate `range`.
+   *
+   * Notice: the returned range will always be ordinal regardless of the direction of Slate `range` due to DOM API limit.
+   *
+   * there is no way to create a reverse DOM Range using Range.setStart/setEnd
+   * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
+   */
+  toDOMRange: (editor: ReactEditor, range: Range) => DOMRange
+
+  /**
+   * Find a Slate node from a native DOM `element`.
+   */
+  toSlateNode: (editor: ReactEditor, domNode: DOMNode) => Node
+
+  /**
+   * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
+   */
   toSlatePoint: <T extends boolean>(
     editor: ReactEditor,
     domPoint: DOMPoint,
@@ -160,6 +258,9 @@ export interface ReactEditorInterface {
     }
   ) => T extends true ? Point | null : Point
 
+  /**
+   * Find a Slate range from a DOM range or selection.
+   */
   toSlateRange: <T extends boolean>(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
@@ -168,58 +269,119 @@ export interface ReactEditorInterface {
       suppressThrow: T
     }
   ) => T extends true ? Range | null : Range
-
-  hasRange: (editor: ReactEditor, range: Range) => boolean
-  hasTarget: (
-    editor: ReactEditor,
-    target: EventTarget | null
-  ) => target is DOMNode
-  hasEditableTarget: (
-    editor: ReactEditor,
-    target: EventTarget | null
-  ) => target is DOMNode
-  hasSelectableTarget: (
-    editor: ReactEditor,
-    target: EventTarget | null
-  ) => boolean
-  isTargetInsideNonReadonlyVoid: (
-    editor: ReactEditor,
-    target: EventTarget | null
-  ) => boolean
-  androidScheduleFlush: (editor: Editor) => void
-  androidPendingDiffs: (editor: Editor) => TextDiff[] | undefined
 }
 
 // eslint-disable-next-line no-redeclare
 export const ReactEditor: ReactEditorInterface = {
-  deleteBackward: (editor, options) => editor.deleteBackward(options),
-  deleteForward: (editor, options) => editor.deleteForward(options),
-  deleteFragment: (editor, options) => editor.deleteFragment(options?.unit),
-  getFragment: editor => editor.getFragment(),
+  androidPendingDiffs: editor => EDITOR_TO_PENDING_DIFFS.get(editor),
 
-  /**
-   * Check if the user is currently composing inside the editor.
-   */
-
-  isComposing: editor => {
-    return !!IS_COMPOSING.get(editor)
+  androidScheduleFlush: editor => {
+    EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
   },
 
-  /**
-   * Return the host window of the current editor.
-   */
+  blur: editor => {
+    const el = ReactEditor.toDOMNode(editor, editor)
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    IS_FOCUSED.set(editor, false)
 
-  getWindow: editor => {
-    const window = EDITOR_TO_WINDOW.get(editor)
-    if (!window) {
-      throw new Error('Unable to find a host window element for this editor')
+    if (root.activeElement === el) {
+      el.blur()
     }
-    return window
   },
 
-  /**
-   * Find a key for a Slate node.
-   */
+  deselect: editor => {
+    const { selection } = editor
+    const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    const domSelection = root.getSelection()
+
+    if (domSelection && domSelection.rangeCount > 0) {
+      domSelection.removeAllRanges()
+    }
+
+    if (selection) {
+      Transforms.deselect(editor)
+    }
+  },
+
+  findDocumentOrShadowRoot: editor => {
+    const el = ReactEditor.toDOMNode(editor, editor)
+    const root = el.getRootNode()
+
+    if (
+      (root instanceof Document || root instanceof ShadowRoot) &&
+      root.getSelection != null
+    ) {
+      return root
+    }
+
+    return el.ownerDocument
+  },
+
+  findEventRange: (editor, event) => {
+    if ('nativeEvent' in event) {
+      event = event.nativeEvent
+    }
+
+    const { clientX: x, clientY: y, target } = event
+
+    if (x == null || y == null) {
+      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+    }
+
+    const node = ReactEditor.toSlateNode(editor, event.target)
+    const path = ReactEditor.findPath(editor, node)
+
+    // If the drop target is inside a void node, move it into either the
+    // next or previous node, depending on which side the `x` and `y`
+    // coordinates are closest to.
+    if (Element.isElement(node) && Editor.isVoid(editor, node)) {
+      const rect = target.getBoundingClientRect()
+      const isPrev = editor.isInline(node)
+        ? x - rect.left < rect.left + rect.width - x
+        : y - rect.top < rect.top + rect.height - y
+
+      const edge = Editor.point(editor, path, {
+        edge: isPrev ? 'start' : 'end',
+      })
+      const point = isPrev
+        ? Editor.before(editor, edge)
+        : Editor.after(editor, edge)
+
+      if (point) {
+        const range = Editor.range(editor, point)
+        return range
+      }
+    }
+
+    // Else resolve a range from the caret position where the drop occured.
+    let domRange
+    const { document } = ReactEditor.getWindow(editor)
+
+    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+    if (document.caretRangeFromPoint) {
+      domRange = document.caretRangeFromPoint(x, y)
+    } else {
+      const position = document.caretPositionFromPoint(x, y)
+
+      if (position) {
+        domRange = document.createRange()
+        domRange.setStart(position.offsetNode, position.offset)
+        domRange.setEnd(position.offsetNode, position.offset)
+      }
+    }
+
+    if (!domRange) {
+      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
+    }
+
+    // Resolve a Slate range from the DOM range.
+    const range = ReactEditor.toSlateRange(editor, domRange, {
+      exactMatch: false,
+      suppressThrow: false,
+    })
+    return range
+  },
+
   findKey: (editor, node) => {
     let key = NODE_TO_KEY.get(node)
 
@@ -231,9 +393,6 @@ export const ReactEditor: ReactEditorInterface = {
     return key
   },
 
-  /**
-   * Find the path of Slate node.
-   */
   findPath: (editor, node) => {
     const path: Path = []
     let child = node
@@ -264,49 +423,6 @@ export const ReactEditor: ReactEditorInterface = {
     )
   },
 
-  /**
-   * Find the DOM node that implements DocumentOrShadowRoot for the editor.
-   */
-  findDocumentOrShadowRoot: editor => {
-    const el = ReactEditor.toDOMNode(editor, editor)
-    const root = el.getRootNode()
-
-    if (
-      (root instanceof Document || root instanceof ShadowRoot) &&
-      root.getSelection != null
-    ) {
-      return root
-    }
-
-    return el.ownerDocument
-  },
-
-  /**
-   * Check if the editor is focused.
-   */
-  isFocused: editor => !!IS_FOCUSED.get(editor),
-
-  /**
-   * Check if the editor is in read-only mode.
-   */
-  isReadOnly: editor => !!IS_READ_ONLY.get(editor),
-
-  /**
-   * Blur the editor.
-   */
-  blur: editor => {
-    const el = ReactEditor.toDOMNode(editor, editor)
-    const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    IS_FOCUSED.set(editor, false)
-
-    if (root.activeElement === el) {
-      el.blur()
-    }
-  },
-
-  /**
-   * Focus the editor.
-   */
   focus: editor => {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
@@ -317,26 +433,16 @@ export const ReactEditor: ReactEditorInterface = {
     }
   },
 
-  /**
-   * Deselect the editor.
-   */
-  deselect: editor => {
-    const { selection } = editor
-    const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root.getSelection()
+  getFragment: editor => editor.getFragment(),
 
-    if (domSelection && domSelection.rangeCount > 0) {
-      domSelection.removeAllRanges()
+  getWindow: editor => {
+    const window = EDITOR_TO_WINDOW.get(editor)
+    if (!window) {
+      throw new Error('Unable to find a host window element for this editor')
     }
-
-    if (selection) {
-      Transforms.deselect(editor)
-    }
+    return window
   },
 
-  /**
-   * Check if a DOM node is within the editor.
-   */
   hasDOMNode: (editor, target, options = {}) => {
     const { editable = false } = options
     const editorEl = ReactEditor.toDOMNode(editor, editor)
@@ -373,32 +479,52 @@ export const ReactEditor: ReactEditorInterface = {
     )
   },
 
-  /**
-   * Insert data from a `DataTransfer` into the editor.
-   */
+  hasEditableTarget: (editor, target): target is DOMNode =>
+    isDOMNode(target) &&
+    ReactEditor.hasDOMNode(editor, target, { editable: true }),
+
+  hasRange: (editor, range) => {
+    const { anchor, focus } = range
+    return (
+      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
+    )
+  },
+
+  hasSelectableTarget: (editor, target) =>
+    ReactEditor.hasEditableTarget(editor, target) ||
+    ReactEditor.isTargetInsideNonReadonlyVoid(editor, target),
+
+  hasTarget: (editor, target): target is DOMNode =>
+    isDOMNode(target) && ReactEditor.hasDOMNode(editor, target),
+
   insertData: (editor, data) => {
     editor.insertData(data)
   },
 
-  /**
-   * Insert fragment data from a `DataTransfer` into the editor.
-   */
   insertFragmentData: (editor, data) => editor.insertFragmentData(data),
 
-  /**
-   * Insert text data from a `DataTransfer` into the editor.
-   */
   insertTextData: (editor, data) => editor.insertTextData(data),
 
-  /**
-   * Sets data from the currently selected fragment on a `DataTransfer`.
-   */
+  isComposing: editor => {
+    return !!IS_COMPOSING.get(editor)
+  },
+
+  isFocused: editor => !!IS_FOCUSED.get(editor),
+
+  isReadOnly: editor => !!IS_READ_ONLY.get(editor),
+
+  isTargetInsideNonReadonlyVoid: (editor, target) => {
+    if (IS_READ_ONLY.get(editor)) return false
+
+    const slateNode =
+      ReactEditor.hasTarget(editor, target) &&
+      ReactEditor.toSlateNode(editor, target)
+    return Element.isElement(slateNode) && Editor.isVoid(editor, slateNode)
+  },
+
   setFragmentData: (editor, data, originEvent) =>
     editor.setFragmentData(data, originEvent),
 
-  /**
-   * Find the native DOM element from a Slate node.
-   */
   toDOMNode: (editor, node) => {
     const KEY_TO_ELEMENT = EDITOR_TO_KEY_TO_ELEMENT.get(editor)
     const domNode = Editor.isEditor(node)
@@ -414,9 +540,6 @@ export const ReactEditor: ReactEditorInterface = {
     return domNode
   },
 
-  /**
-   * Find a native DOM selection point from a Slate point.
-   */
   toDOMPoint: (editor, point) => {
     const [node] = Editor.node(editor, point.path)
     const el = ReactEditor.toDOMNode(editor, node)
@@ -489,14 +612,6 @@ export const ReactEditor: ReactEditorInterface = {
     return domPoint
   },
 
-  /**
-   * Find a native DOM range from a Slate `range`.
-   *
-   * Notice: the returned range will always be ordinal regardless of the direction of Slate `range` due to DOM API limit.
-   *
-   * there is no way to create a reverse DOM Range using Range.setStart/setEnd
-   * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
-   */
   toDOMRange: (editor, range) => {
     const { anchor, focus } = range
     const isBackward = Range.isBackward(range)
@@ -527,9 +642,6 @@ export const ReactEditor: ReactEditorInterface = {
     return domRange
   },
 
-  /**
-   * Find a Slate node from a native DOM `element`.
-   */
   toSlateNode: (editor, domNode) => {
     let domEl = isDOMElement(domNode) ? domNode : domNode.parentElement
 
@@ -546,77 +658,6 @@ export const ReactEditor: ReactEditorInterface = {
     return node
   },
 
-  /**
-   * Get the target range from a DOM `event`.
-   */
-  findEventRange: (editor, event) => {
-    if ('nativeEvent' in event) {
-      event = event.nativeEvent
-    }
-
-    const { clientX: x, clientY: y, target } = event
-
-    if (x == null || y == null) {
-      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
-    }
-
-    const node = ReactEditor.toSlateNode(editor, event.target)
-    const path = ReactEditor.findPath(editor, node)
-
-    // If the drop target is inside a void node, move it into either the
-    // next or previous node, depending on which side the `x` and `y`
-    // coordinates are closest to.
-    if (Element.isElement(node) && Editor.isVoid(editor, node)) {
-      const rect = target.getBoundingClientRect()
-      const isPrev = editor.isInline(node)
-        ? x - rect.left < rect.left + rect.width - x
-        : y - rect.top < rect.top + rect.height - y
-
-      const edge = Editor.point(editor, path, {
-        edge: isPrev ? 'start' : 'end',
-      })
-      const point = isPrev
-        ? Editor.before(editor, edge)
-        : Editor.after(editor, edge)
-
-      if (point) {
-        const range = Editor.range(editor, point)
-        return range
-      }
-    }
-
-    // Else resolve a range from the caret position where the drop occured.
-    let domRange
-    const { document } = ReactEditor.getWindow(editor)
-
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (document.caretRangeFromPoint) {
-      domRange = document.caretRangeFromPoint(x, y)
-    } else {
-      const position = document.caretPositionFromPoint(x, y)
-
-      if (position) {
-        domRange = document.createRange()
-        domRange.setStart(position.offsetNode, position.offset)
-        domRange.setEnd(position.offsetNode, position.offset)
-      }
-    }
-
-    if (!domRange) {
-      throw new Error(`Cannot resolve a Slate range from a DOM event: ${event}`)
-    }
-
-    // Resolve a Slate range from the DOM range.
-    const range = ReactEditor.toSlateRange(editor, domRange, {
-      exactMatch: false,
-      suppressThrow: false,
-    })
-    return range
-  },
-
-  /**
-   * Find a Slate point from a DOM selection's `domNode` and `domOffset`.
-   */
   toSlatePoint: <T extends boolean>(
     editor: ReactEditor,
     domPoint: DOMPoint,
@@ -782,9 +823,6 @@ export const ReactEditor: ReactEditorInterface = {
     return { path, offset } as T extends true ? Point | null : Point
   },
 
-  /**
-   * Find a Slate range from a DOM range or selection.
-   */
   toSlateRange: <T extends boolean>(
     editor: ReactEditor,
     domRange: DOMRange | DOMStaticRange | DOMSelection,
@@ -925,55 +963,4 @@ export const ReactEditor: ReactEditorInterface = {
 
     return (range as unknown) as T extends true ? Range | null : Range
   },
-
-  hasRange: (editor, range) => {
-    const { anchor, focus } = range
-    return (
-      Editor.hasPath(editor, anchor.path) && Editor.hasPath(editor, focus.path)
-    )
-  },
-
-  /**
-   * Check if the target is in the editor.
-   */
-  hasTarget: (editor, target): target is DOMNode =>
-    isDOMNode(target) && ReactEditor.hasDOMNode(editor, target),
-
-  /**
-   * Check if the target is editable and in the editor.
-   */
-  hasEditableTarget: (editor, target): target is DOMNode =>
-    isDOMNode(target) &&
-    ReactEditor.hasDOMNode(editor, target, { editable: true }),
-
-  /**
-   * Check if the target can be selectable
-   */
-  hasSelectableTarget: (editor, target) =>
-    ReactEditor.hasEditableTarget(editor, target) ||
-    ReactEditor.isTargetInsideNonReadonlyVoid(editor, target),
-
-  /**
-   * Check if the target is inside void and in an non-readonly editor.
-   */
-  isTargetInsideNonReadonlyVoid: (editor, target) => {
-    if (IS_READ_ONLY.get(editor)) return false
-
-    const slateNode =
-      ReactEditor.hasTarget(editor, target) &&
-      ReactEditor.toSlateNode(editor, target)
-    return Element.isElement(slateNode) && Editor.isVoid(editor, slateNode)
-  },
-
-  /**
-   * Experimental and android specific: Flush all pending diffs and cancel composition at the next possible time.
-   */
-  androidScheduleFlush: editor => {
-    EDITOR_TO_SCHEDULE_FLUSH.get(editor)?.()
-  },
-
-  /**
-   * Experimental and android specific: Get pending diffs
-   */
-  androidPendingDiffs: editor => EDITOR_TO_PENDING_DIFFS.get(editor),
 }
