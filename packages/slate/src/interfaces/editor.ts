@@ -46,6 +46,7 @@ export interface BaseEditor {
 
   apply: (operation: Operation) => void
   getDirtyPaths: (operation: Operation) => Path[]
+  getFragment: () => Descendant[]
   isElementReadOnly: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
@@ -65,26 +66,16 @@ export interface BaseEditor {
   // Overrideable core transforms.
 
   addMark: OmitFirstArg<typeof Editor.addMark>
-  elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
-  insertNode: OmitFirstArg<typeof Editor.insertNode>
-  insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
-
-  // slate (not used)
-
-  deselect: OmitFirstArg<typeof Transforms.deselect>
-
-  // slate-react
-
   collapse: OmitFirstArg<typeof Transforms.collapse>
+  delete: OmitFirstArg<typeof Transforms.delete>
   deleteBackward: (unit: TextUnit) => void
   deleteForward: (unit: TextUnit) => void
-
-  //
-
-  delete: OmitFirstArg<typeof Transforms.delete>
   deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
+  deselect: OmitFirstArg<typeof Transforms.deselect>
   insertBreak: OmitFirstArg<typeof Editor.insertBreak>
   insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
+  insertNode: OmitFirstArg<typeof Editor.insertNode>
+  insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
   insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
   insertText: OmitFirstArg<typeof Transforms.insertText>
   liftNodes: OmitFirstArg<typeof Transforms.liftNodes>
@@ -125,17 +116,19 @@ export interface BaseEditor {
   after: OmitFirstArg<typeof Editor.after>
   before: OmitFirstArg<typeof Editor.before>
   edges: OmitFirstArg<typeof Editor.edges>
+  elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
   end: OmitFirstArg<typeof Editor.end>
   first: OmitFirstArg<typeof Editor.first>
   fragment: OmitFirstArg<typeof Editor.fragment>
+  getMarks: OmitFirstArg<typeof Editor.marks>
   hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
   hasInlines: OmitFirstArg<typeof Editor.hasInlines>
   hasPath: OmitFirstArg<typeof Editor.hasPath>
   hasTexts: OmitFirstArg<typeof Editor.hasTexts>
   isBlock: OmitFirstArg<typeof Editor.isBlock>
-  isEnd: OmitFirstArg<typeof Editor.isEnd>
   isEdge: OmitFirstArg<typeof Editor.isEdge>
   isEmpty: OmitFirstArg<typeof Editor.isEmpty>
+  isEnd: OmitFirstArg<typeof Editor.isEnd>
   isInline: OmitFirstArg<typeof Editor.isInline>
   isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
   isStart: OmitFirstArg<typeof Editor.isStart>
@@ -145,7 +138,6 @@ export interface BaseEditor {
   levels: <T extends Node>(
     options?: EditorLevelsOptions<T>
   ) => Generator<NodeEntry<T>, void, undefined>
-  getMarks: OmitFirstArg<typeof Editor.marks>
   next: <T extends Descendant>(
     options?: EditorNextOptions<T>
   ) => NodeEntry<T> | undefined

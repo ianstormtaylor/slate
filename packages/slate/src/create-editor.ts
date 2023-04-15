@@ -3,6 +3,7 @@ import {
   deleteFragment,
   Editor,
   getDirtyPaths,
+  getFragment,
   insertBreak,
   insertFragment,
   insertNode,
@@ -12,70 +13,76 @@ import {
   removeMark,
   shouldNormalize,
 } from './'
-import { apply } from './core/apply'
-import { above } from './editor/above'
-import { before } from './editor/before'
-import { after } from './editor/after'
-import { marks } from './editor/marks'
-import { deleteText } from './transforms-text/delete-text'
-import { collapse } from './transforms-selection/collapse'
-import { deselect } from './transforms-selection/deselect'
-import { move } from './transforms-selection/move'
-import { select } from './transforms-selection/select'
-import { setPoint } from './transforms-selection/set-point'
-import { setSelection } from './transforms-selection/set-selection'
-import { splitNodes } from './transforms-node/split-nodes'
-import { mergeNodes } from './transforms-node/merge-nodes'
-import { insertNodes } from './transforms-node/insert-nodes'
-import { liftNodes } from './transforms-node/lift-nodes'
-import { moveNodes } from './transforms-node/move-nodes'
-import { removeNodes } from './transforms-node/remove-nodes'
-import { setNodes } from './transforms-node/set-nodes'
-import { unsetNodes } from './transforms-node/unset-nodes'
-import { unwrapNodes } from './transforms-node/unwrap-nodes'
-import { wrapNodes } from './transforms-node/wrap-nodes'
-import { withoutNormalizing } from './editor/without-normalizing'
-import { getVoid } from './editor/get-void'
-import { unhangRange } from './editor/unhang-range'
-import { string } from './editor/string'
-import { setNormalizing } from './editor/set-normalizing'
-import { rangeRefs } from './editor/range-refs'
-import { start } from './editor/start'
-import { rangeRef } from './editor/range-ref'
-import { range } from './editor/range'
-import { previous } from './editor/previous'
-import { positions } from './editor/positions'
-import { pointRefs } from './editor/point-refs'
-import { pointRef } from './editor/point-ref'
-import { point } from './editor/point'
-import { pathRefs } from './editor/path-refs'
-import { pathRef } from './editor/path-ref'
-import { path } from './editor/path'
-import { parent } from './editor/parent'
-import { normalize } from './editor/normalize'
-import { nodes } from './editor/nodes'
-import { node } from './editor/node'
-import { next } from './editor/next'
-import { levels } from './editor/levels'
-import { leaf } from './editor/leaf'
-import { last } from './editor/last'
-import { isStart } from './editor/is-start'
-import { isNormalizing } from './editor/is-normalizing'
-import { isEnd } from './editor/is-end'
-import { isEmpty } from './editor/is-empty'
-import { isBlock } from './editor/is-block'
-import { hasTexts } from './editor/has-texts'
-import { hasPath } from './editor/has-path'
-import { hasInlines } from './editor/has-inlines'
-import { hasBlocks } from './editor/has-blocks'
-import { fragment } from './editor/fragment'
-import { first } from './editor/first'
-import { end } from './editor/end'
-import { edges } from './editor/edges'
-import { isEdge } from './editor/is-edge'
-import { elementReadOnly } from './editor/element-read-only'
-import { deleteBackward } from './editor/delete-backward'
-import { deleteForward } from './editor/delete-forward'
+import { apply } from './core'
+import {
+  above,
+  after,
+  before,
+  deleteBackward,
+  deleteForward,
+  edges,
+  elementReadOnly,
+  end,
+  first,
+  fragment,
+  getVoid,
+  hasBlocks,
+  hasInlines,
+  hasPath,
+  hasTexts,
+  isBlock,
+  isEdge,
+  isEmpty,
+  isEnd,
+  isNormalizing,
+  isStart,
+  last,
+  leaf,
+  levels,
+  marks,
+  next,
+  node,
+  nodes,
+  normalize,
+  parent,
+  path,
+  pathRef,
+  pathRefs,
+  point,
+  pointRef,
+  pointRefs,
+  positions,
+  previous,
+  range,
+  rangeRef,
+  rangeRefs,
+  setNormalizing,
+  start,
+  string,
+  unhangRange,
+  withoutNormalizing,
+} from './editor'
+import { deleteText } from './transforms-text'
+import {
+  collapse,
+  deselect,
+  move,
+  select,
+  setPoint,
+  setSelection,
+} from './transforms-selection'
+import {
+  insertNodes,
+  liftNodes,
+  mergeNodes,
+  moveNodes,
+  removeNodes,
+  setNodes,
+  splitNodes,
+  unsetNodes,
+  unwrapNodes,
+  wrapNodes,
+} from './transforms-node'
 
 /**
  * Create a new Slate `Editor` object.
@@ -101,6 +108,7 @@ export const createEditor = (): Editor => {
     deleteBackward: (...args) => deleteBackward(editor, ...args),
     deleteForward: (...args) => deleteForward(editor, ...args),
     deleteFragment: (...args) => deleteFragment(editor, ...args),
+    getFragment: (...args) => getFragment(editor, ...args),
     insertBreak: (...args) => insertBreak(editor, ...args),
     insertSoftBreak: (...args) => insertSoftBreak(editor, ...args),
     insertFragment: (...args) => insertFragment(editor, ...args),

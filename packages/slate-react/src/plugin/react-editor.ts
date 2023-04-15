@@ -1,6 +1,5 @@
 import {
   BaseEditor,
-  Descendant,
   Editor,
   Element,
   Node,
@@ -53,7 +52,6 @@ export interface EditorDirectedDeletionOptions {
  */
 
 export interface ReactEditor extends BaseEditor {
-  getFragment: () => Descendant[]
   hasEditableTarget: (
     editor: ReactEditor,
     target: EventTarget | null
@@ -125,11 +123,6 @@ export interface ReactEditorInterface {
    * Focus the editor.
    */
   focus: (editor: ReactEditor) => void
-
-  /**
-   *
-   */
-  getFragment: (editor: ReactEditor) => Descendant[]
 
   /**
    * Return the host window of the current editor.
@@ -432,8 +425,6 @@ export const ReactEditor: ReactEditorInterface = {
       el.focus({ preventScroll: true })
     }
   },
-
-  getFragment: editor => editor.getFragment(),
 
   getWindow: editor => {
     const window = EDITOR_TO_WINDOW.get(editor)
