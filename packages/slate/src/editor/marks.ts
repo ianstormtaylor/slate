@@ -1,7 +1,6 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Node, NodeEntry } from '../interfaces/node'
+import { NodeEntry } from '../interfaces/node'
 import { Range } from '../interfaces/range'
-import { Point } from '../interfaces/point'
 import { Path } from '../interfaces/path'
 import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
@@ -59,38 +58,4 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
 
   const { text, ...rest } = node
   return rest
-}
-
-export const path: EditorInterface['path'] = (editor, at, options = {}) => {
-  const { depth, edge } = options
-
-  if (Path.isPath(at)) {
-    if (edge === 'start') {
-      const [, firstPath] = Node.first(editor, at)
-      at = firstPath
-    } else if (edge === 'end') {
-      const [, lastPath] = Node.last(editor, at)
-      at = lastPath
-    }
-  }
-
-  if (Range.isRange(at)) {
-    if (edge === 'start') {
-      at = Range.start(at)
-    } else if (edge === 'end') {
-      at = Range.end(at)
-    } else {
-      at = Path.common(at.anchor.path, at.focus.path)
-    }
-  }
-
-  if (Point.isPoint(at)) {
-    at = at.path
-  }
-
-  if (depth != null) {
-    at = at.slice(0, depth)
-  }
-
-  return at
 }
