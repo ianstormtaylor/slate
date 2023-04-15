@@ -22,12 +22,23 @@ export interface TextInsertTextOptions {
 }
 
 export interface TextTransforms {
+  /**
+   * Delete content in the editor.
+   */
   delete: (editor: Editor, options?: TextDeleteOptions) => void
+
+  /**
+   * Insert a fragment at a specific location in the editor.
+   */
   insertFragment: (
     editor: Editor,
     fragment: Node[],
     options?: TextInsertFragmentOptions
   ) => void
+
+  /**
+   * Insert a string of text in the Editor.
+   */
   insertText: (
     editor: Editor,
     text: string,
@@ -37,24 +48,12 @@ export interface TextTransforms {
 
 // eslint-disable-next-line no-redeclare
 export const TextTransforms: TextTransforms = {
-  /**
-   * Delete content in the editor.
-   */
   delete(editor, options) {
     editor.delete(options)
   },
-
-  /**
-   * Insert a fragment at a specific location in the editor.
-   */
   insertFragment(editor, fragment, options) {
     editor.insertFragment(fragment, options)
   },
-
-  /**
-   * Insert a string of text in the Editor.
-   */
-
   insertText(
     editor: Editor,
     text: string,

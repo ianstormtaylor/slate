@@ -139,27 +139,43 @@ export type BaseOperation = NodeOperation | SelectionOperation | TextOperation
 export type Operation = ExtendedType<'Operation', BaseOperation>
 
 export interface OperationInterface {
+  /**
+   * Check if a value is a `NodeOperation` object.
+   */
   isNodeOperation: (value: any) => value is NodeOperation
+
+  /**
+   * Check if a value is an `Operation` object.
+   */
   isOperation: (value: any) => value is Operation
+
+  /**
+   * Check if a value is a list of `Operation` objects.
+   */
   isOperationList: (value: any) => value is Operation[]
+
+  /**
+   * Check if a value is a `SelectionOperation` object.
+   */
   isSelectionOperation: (value: any) => value is SelectionOperation
+
+  /**
+   * Check if a value is a `TextOperation` object.
+   */
   isTextOperation: (value: any) => value is TextOperation
+
+  /**
+   * Invert an operation, returning a new operation that will exactly undo the
+   * original when applied.
+   */
   inverse: (op: Operation) => Operation
 }
 
 // eslint-disable-next-line no-redeclare
 export const Operation: OperationInterface = {
-  /**
-   * Check if a value is a `NodeOperation` object.
-   */
-
   isNodeOperation(value: any): value is NodeOperation {
     return Operation.isOperation(value) && value.type.endsWith('_node')
   },
-
-  /**
-   * Check if a value is an `Operation` object.
-   */
 
   isOperation(value: any): value is Operation {
     if (!isPlainObject(value)) {
@@ -215,36 +231,19 @@ export const Operation: OperationInterface = {
     }
   },
 
-  /**
-   * Check if a value is a list of `Operation` objects.
-   */
-
   isOperationList(value: any): value is Operation[] {
     return (
       Array.isArray(value) && value.every(val => Operation.isOperation(val))
     )
   },
 
-  /**
-   * Check if a value is a `SelectionOperation` object.
-   */
-
   isSelectionOperation(value: any): value is SelectionOperation {
     return Operation.isOperation(value) && value.type.endsWith('_selection')
   },
 
-  /**
-   * Check if a value is a `TextOperation` object.
-   */
-
   isTextOperation(value: any): value is TextOperation {
     return Operation.isOperation(value) && value.type.endsWith('_text')
   },
-
-  /**
-   * Invert an operation, returning a new operation that will exactly undo the
-   * original when applied.
-   */
 
   inverse(op: Operation): Operation {
     switch (op.type) {

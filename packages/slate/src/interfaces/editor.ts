@@ -45,7 +45,6 @@ export interface BaseEditor {
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
-  elementReadOnly: (element: Element) => boolean
   getDirtyPaths: (operation: Operation) => Path[]
   isElementReadOnly: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
@@ -66,6 +65,7 @@ export interface BaseEditor {
   // Overrideable core transforms.
 
   addMark: OmitFirstArg<typeof Editor.addMark>
+  elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
   insertNode: OmitFirstArg<typeof Editor.insertNode>
   insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
 
@@ -306,140 +306,13 @@ export interface EditorVoidOptions {
 }
 
 export interface EditorInterface {
+  /**
+   * Get the ancestor above a location in the document.
+   */
   above: <T extends Ancestor>(
     editor: Editor,
     options?: EditorAboveOptions<T>
   ) => NodeEntry<T> | undefined
-  addMark: (editor: Editor, key: string, value: any) => void
-  after: (
-    editor: Editor,
-    at: Location,
-    options?: EditorAfterOptions
-  ) => Point | undefined
-  before: (
-    editor: Editor,
-    at: Location,
-    options?: EditorBeforeOptions
-  ) => Point | undefined
-  deleteFragment: (
-    editor: Editor,
-    options?: EditorFragmentDeletionOptions
-  ) => void
-  edges: (editor: Editor, at: Location) => [Point, Point]
-  elementReadOnly: (
-    editor: Editor,
-    options?: EditorElementReadOnlyOptions
-  ) => NodeEntry<Element> | undefined
-  end: (editor: Editor, at: Location) => Point
-  first: (editor: Editor, at: Location) => NodeEntry
-  fragment: (editor: Editor, at: Location) => Descendant[]
-  hasBlocks: (editor: Editor, element: Element) => boolean
-  hasInlines: (editor: Editor, element: Element) => boolean
-  hasPath: (editor: Editor, path: Path) => boolean
-  hasTexts: (editor: Editor, element: Element) => boolean
-  insertBreak: (editor: Editor) => void
-  insertSoftBreak: (editor: Editor) => void
-  insertFragment: (editor: Editor, fragment: Node[]) => void
-  insertNode: (editor: Editor, node: Node) => void
-  insertText: (
-    editor: Editor,
-    text: string,
-    options?: TextInsertTextOptions
-  ) => void
-  isBlock: (editor: Editor, value: Element) => boolean
-  isEditor: (value: any) => value is Editor
-  isEnd: (editor: Editor, point: Point, at: Location) => boolean
-  isEdge: (editor: Editor, point: Point, at: Location) => boolean
-  isElementReadOnly: (editor: Editor, element: Element) => boolean
-  isEmpty: (editor: Editor, element: Element) => boolean
-  isInline: (editor: Editor, value: Element) => boolean
-  isNormalizing: (editor: Editor) => boolean
-  isSelectable: (editor: Editor, element: Element) => boolean
-  isStart: (editor: Editor, point: Point, at: Location) => boolean
-  isVoid: (editor: Editor, value: Element) => boolean
-  last: (editor: Editor, at: Location) => NodeEntry
-  leaf: (
-    editor: Editor,
-    at: Location,
-    options?: EditorLeafOptions
-  ) => NodeEntry<Text>
-  levels: <T extends Node>(
-    editor: Editor,
-    options?: EditorLevelsOptions<T>
-  ) => Generator<NodeEntry<T>, void, undefined>
-  marks: (editor: Editor) => Omit<Text, 'text'> | null
-  next: <T extends Descendant>(
-    editor: Editor,
-    options?: EditorNextOptions<T>
-  ) => NodeEntry<T> | undefined
-  node: (editor: Editor, at: Location, options?: EditorNodeOptions) => NodeEntry
-  nodes: <T extends Node>(
-    editor: Editor,
-    options?: EditorNodesOptions<T>
-  ) => Generator<NodeEntry<T>, void, undefined>
-  normalize: (editor: Editor, options?: EditorNormalizeOptions) => void
-  parent: (
-    editor: Editor,
-    at: Location,
-    options?: EditorParentOptions
-  ) => NodeEntry<Ancestor>
-  path: (editor: Editor, at: Location, options?: EditorPathOptions) => Path
-  pathRef: (
-    editor: Editor,
-    path: Path,
-    options?: EditorPathRefOptions
-  ) => PathRef
-  pathRefs: (editor: Editor) => Set<PathRef>
-  point: (editor: Editor, at: Location, options?: EditorPointOptions) => Point
-  pointRef: (
-    editor: Editor,
-    point: Point,
-    options?: EditorPointRefOptions
-  ) => PointRef
-  pointRefs: (editor: Editor) => Set<PointRef>
-  positions: (
-    editor: Editor,
-    options?: EditorPositionsOptions
-  ) => Generator<Point, void, undefined>
-  previous: <T extends Node>(
-    editor: Editor,
-    options?: EditorPreviousOptions<T>
-  ) => NodeEntry<T> | undefined
-  range: (editor: Editor, at: Location, to?: Location) => Range
-  rangeRef: (
-    editor: Editor,
-    range: Range,
-    options?: EditorRangeRefOptions
-  ) => RangeRef
-  rangeRefs: (editor: Editor) => Set<RangeRef>
-  removeMark: (editor: Editor, key: string) => void
-  setNormalizing: (editor: Editor, isNormalizing: boolean) => void
-  start: (editor: Editor, at: Location) => Point
-  string: (
-    editor: Editor,
-    at: Location,
-    options?: EditorStringOptions
-  ) => string
-  unhangRange: (
-    editor: Editor,
-    range: Range,
-    options?: EditorUnhangRangeOptions
-  ) => Range
-  void: (
-    editor: Editor,
-    options?: EditorVoidOptions
-  ) => NodeEntry<Element> | undefined
-  withoutNormalizing: (editor: Editor, fn: () => void) => void
-}
-
-// eslint-disable-next-line no-redeclare
-export const Editor: EditorInterface = {
-  /**
-   * Get the ancestor above a location in the document.
-   */
-  above(editor, options) {
-    return editor.above(options)
-  },
 
   /**
    * Add a custom property to the leaf text nodes in the current selection.
@@ -447,330 +320,274 @@ export const Editor: EditorInterface = {
    * If the selection is currently collapsed, the marks will be added to the
    * `editor.marks` property instead, and applied when text is inserted next.
    */
-  addMark(editor, key, value) {
-    editor.addMark(key, value)
-  },
+  addMark: (editor: Editor, key: string, value: any) => void
 
   /**
    * Get the point after a location.
    */
-  after(editor, at, options) {
-    return editor.after(at, options)
-  },
+  after: (
+    editor: Editor,
+    at: Location,
+    options?: EditorAfterOptions
+  ) => Point | undefined
 
   /**
    * Get the point before a location.
    */
-  before(editor, at, options) {
-    return editor.before(at, options)
-  },
+  before: (
+    editor: Editor,
+    at: Location,
+    options?: EditorBeforeOptions
+  ) => Point | undefined
 
   /**
    * Delete the content in the current selection.
    */
-  deleteFragment(editor, options) {
-    editor.deleteFragment(options)
-  },
+  deleteFragment: (
+    editor: Editor,
+    options?: EditorFragmentDeletionOptions
+  ) => void
 
   /**
    * Get the start and end points of a location.
    */
-  edges(editor, at) {
-    return editor.edges(at)
-  },
+  edges: (editor: Editor, at: Location) => [Point, Point]
 
   /**
    * Match a read-only element in the current branch of the editor.
    */
-
-  elementReadOnly(
+  elementReadOnly: (
     editor: Editor,
-    options: EditorElementReadOnlyOptions = {}
-  ): NodeEntry<Element> | undefined {
-    return Editor.above(editor, {
-      ...options,
-      match: n => Element.isElement(n) && Editor.isElementReadOnly(editor, n),
-    })
-  },
+    options?: EditorElementReadOnlyOptions
+  ) => NodeEntry<Element> | undefined
 
   /**
    * Get the end point of a location.
    */
-  end(editor, at) {
-    return editor.end(at)
-  },
+  end: (editor: Editor, at: Location) => Point
 
   /**
    * Get the first node at a location.
    */
-  first(editor, at) {
-    return editor.first(at)
-  },
+  first: (editor: Editor, at: Location) => NodeEntry
 
   /**
    * Get the fragment at a location.
    */
-  fragment(editor, at) {
-    return editor.fragment(at)
-  },
+  fragment: (editor: Editor, at: Location) => Descendant[]
 
   /**
    * Check if a node has block children.
    */
-  hasBlocks(editor, element) {
-    return editor.hasBlocks(element)
-  },
+  hasBlocks: (editor: Editor, element: Element) => boolean
 
   /**
    * Check if a node has inline and text children.
    */
-  hasInlines(editor, element) {
-    return editor.hasInlines(element)
-  },
+  hasInlines: (editor: Editor, element: Element) => boolean
+
+  hasPath: (editor: Editor, path: Path) => boolean
 
   /**
    * Check if a node has text children.
    */
-  hasTexts(editor, element) {
-    return editor.hasTexts(element)
-  },
+  hasTexts: (editor: Editor, element: Element) => boolean
 
   /**
    * Insert a block break at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
    */
-  insertBreak(editor) {
-    editor.insertBreak()
-  },
-
-  /**
-   * Insert a soft break at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
-   */
-  insertSoftBreak(editor) {
-    editor.insertSoftBreak()
-  },
+  insertBreak: (editor: Editor) => void
 
   /**
    * Insert a fragment at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
    */
-  insertFragment(editor, fragment) {
-    editor.insertFragment(fragment)
-  },
+  insertFragment: (editor: Editor, fragment: Node[]) => void
 
   /**
    * Insert a node at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
    */
-  insertNode(editor, node) {
-    editor.insertNode(node)
-  },
+  insertNode: (editor: Editor, node: Node) => void
+
+  /**
+   * Insert a soft break at the current selection.
+   *
+   * If the selection is currently expanded, it will be deleted first.
+   */
+  insertSoftBreak: (editor: Editor) => void
 
   /**
    * Insert text at the current selection.
    *
    * If the selection is currently expanded, it will be deleted first.
    */
-  insertText(editor, text) {
-    editor.insertText(text)
-  },
+  insertText: (
+    editor: Editor,
+    text: string,
+    options?: TextInsertTextOptions
+  ) => void
 
   /**
    * Check if a value is a block `Element` object.
    */
-  isBlock(editor, value) {
-    return editor.isBlock(value)
-  },
+  isBlock: (editor: Editor, value: Element) => boolean
 
   /**
    * Check if a point is an edge of a location.
    */
-  isEdge(editor, point, at) {
-    return editor.isEdge(point, at)
-  },
+  isEdge: (editor: Editor, point: Point, at: Location) => boolean
 
   /**
    * Check if a value is an `Editor` object.
    */
-  isEditor(value: any): value is Editor {
-    return isEditor(value)
-  },
+  isEditor: (value: any) => value is Editor
 
   /**
    * Check if a value is a read-only `Element` object.
    */
-  isElementReadOnly(editor, element) {
-    return editor.isElementReadOnly(element)
-  },
+  isElementReadOnly: (editor: Editor, element: Element) => boolean
 
   /**
    * Check if an element is empty, accounting for void nodes.
    */
-  isEmpty(editor, element) {
-    return editor.isEmpty(element)
-  },
+  isEmpty: (editor: Editor, element: Element) => boolean
 
   /**
    * Check if a point is the end point of a location.
    */
-  isEnd(editor, point, at) {
-    return editor.isEnd(point, at)
-  },
+  isEnd: (editor: Editor, point: Point, at: Location) => boolean
 
   /**
    * Check if a value is an inline `Element` object.
    */
-  isInline(editor, value) {
-    return editor.isInline(value)
-  },
+  isInline: (editor: Editor, value: Element) => boolean
 
   /**
    * Check if the editor is currently normalizing after each operation.
    */
-  isNormalizing(editor) {
-    return editor.isNormalizing()
-  },
+  isNormalizing: (editor: Editor) => boolean
 
   /**
    * Check if a value is a selectable `Element` object.
    */
-
-  isSelectable(editor: Editor, value: Element): boolean {
-    return editor.isSelectable(value)
-  },
+  isSelectable: (editor: Editor, element: Element) => boolean
 
   /**
    * Check if a point is the start point of a location.
    */
-  isStart(editor, point, at) {
-    return editor.isStart(point, at)
-  },
+  isStart: (editor: Editor, point: Point, at: Location) => boolean
 
   /**
    * Check if a value is a void `Element` object.
    */
-  isVoid(editor, value) {
-    return editor.isVoid(value)
-  },
+  isVoid: (editor: Editor, value: Element) => boolean
 
   /**
    * Get the last node at a location.
    */
-  last(editor, at) {
-    return editor.last(at)
-  },
+  last: (editor: Editor, at: Location) => NodeEntry
 
   /**
    * Get the leaf text node at a location.
    */
-  leaf(editor, at, options) {
-    return editor.leaf(at, options)
-  },
+  leaf: (
+    editor: Editor,
+    at: Location,
+    options?: EditorLeafOptions
+  ) => NodeEntry<Text>
 
   /**
    * Iterate through all of the levels at a location.
    */
-  levels(editor, options) {
-    return editor.levels(options)
-  },
+  levels: <T extends Node>(
+    editor: Editor,
+    options?: EditorLevelsOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Get the marks that would be added to text at the current selection.
    */
-  marks(editor) {
-    return editor.getMarks()
-  },
+  marks: (editor: Editor) => Omit<Text, 'text'> | null
 
   /**
    * Get the matching node in the branch of the document after a location.
    */
-  next<T extends Descendant>(
+  next: <T extends Descendant>(
     editor: Editor,
     options?: EditorNextOptions<T>
-  ): NodeEntry<T> | undefined {
-    return editor.next(options)
-  },
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get the node at a location.
    */
-  node(editor, at, options) {
-    return editor.node(at, options)
-  },
+  node: (editor: Editor, at: Location, options?: EditorNodeOptions) => NodeEntry
 
   /**
    * Iterate through all of the nodes in the Editor.
    */
-  nodes(editor, options) {
-    return editor.nodes(options)
-  },
+  nodes: <T extends Node>(
+    editor: Editor,
+    options?: EditorNodesOptions<T>
+  ) => Generator<NodeEntry<T>, void, undefined>
 
   /**
    * Normalize any dirty objects in the editor.
    */
-  normalize(editor, options) {
-    editor.normalize(options)
-  },
+  normalize: (editor: Editor, options?: EditorNormalizeOptions) => void
 
   /**
    * Get the parent node of a location.
    */
-  parent(editor, at, options) {
-    return editor.parent(at, options)
-  },
+  parent: (
+    editor: Editor,
+    at: Location,
+    options?: EditorParentOptions
+  ) => NodeEntry<Ancestor>
 
   /**
    * Get the path of a location.
    */
-  path(editor, at, options) {
-    return editor.path(at, options)
-  },
-
-  hasPath(editor, path) {
-    return editor.hasPath(path)
-  },
+  path: (editor: Editor, at: Location, options?: EditorPathOptions) => Path
 
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
    * operations are applied to the editor.
    */
-  pathRef(editor, path, options) {
-    return editor.pathRef(path, options)
-  },
+  pathRef: (
+    editor: Editor,
+    path: Path,
+    options?: EditorPathRefOptions
+  ) => PathRef
 
   /**
    * Get the set of currently tracked path refs of the editor.
    */
-  pathRefs(editor) {
-    return editor.pathRefs()
-  },
+  pathRefs: (editor: Editor) => Set<PathRef>
 
   /**
    * Get the start or end point of a location.
    */
-  point(editor, at, options) {
-    return editor.point(at, options)
-  },
+  point: (editor: Editor, at: Location, options?: EditorPointOptions) => Point
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
    * operations are applied to the editor.
    */
-  pointRef(editor, point, options) {
-    return editor.pointRef(point, options)
-  },
+  pointRef: (
+    editor: Editor,
+    point: Point,
+    options?: EditorPointRefOptions
+  ) => PointRef
 
   /**
    * Get the set of currently tracked point refs of the editor.
    */
-  pointRefs(editor) {
-    return editor.pointRefs()
-  },
+  pointRefs: (editor: Editor) => Set<PointRef>
 
   /**
    * Return all the positions in `at` range where a `Point` can be placed.
@@ -784,38 +601,38 @@ export const Editor: EditorInterface = {
    * will not happen inside their content unless you pass in true for the
    * `voids` option, then iteration will occur.
    */
-  positions(editor, options) {
-    return editor.positions(options)
-  },
+  positions: (
+    editor: Editor,
+    options?: EditorPositionsOptions
+  ) => Generator<Point, void, undefined>
 
   /**
    * Get the matching node in the branch of the document before a location.
    */
-  previous(editor, options) {
-    return editor.previous(options)
-  },
+  previous: <T extends Node>(
+    editor: Editor,
+    options?: EditorPreviousOptions<T>
+  ) => NodeEntry<T> | undefined
 
   /**
    * Get a range of a location.
    */
-  range(editor, at, to) {
-    return editor.range(at, to)
-  },
+  range: (editor: Editor, at: Location, to?: Location) => Range
 
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
    * operations are applied to the editor.
    */
-  rangeRef(editor, range, options) {
-    return editor.rangeRef(range, options)
-  },
+  rangeRef: (
+    editor: Editor,
+    range: Range,
+    options?: EditorRangeRefOptions
+  ) => RangeRef
 
   /**
    * Get the set of currently tracked range refs of the editor.
    */
-  rangeRefs(editor) {
-    return editor.rangeRefs()
-  },
+  rangeRefs: (editor: Editor) => Set<RangeRef>
 
   /**
    * Remove a custom property from all of the leaf text nodes in the current
@@ -824,9 +641,7 @@ export const Editor: EditorInterface = {
    * If the selection is currently collapsed, the removal will be stored on
    * `editor.marks` and applied to the text inserted next.
    */
-  removeMark(editor, key) {
-    editor.removeMark(key)
-  },
+  removeMark: (editor: Editor, key: string) => void
 
   /**
    * Manually set if the editor should currently be normalizing.
@@ -834,16 +649,12 @@ export const Editor: EditorInterface = {
    * Note: Using this incorrectly can leave the editor in an invalid state.
    *
    */
-  setNormalizing(editor, isNormalizing) {
-    editor.setNormalizing(isNormalizing)
-  },
+  setNormalizing: (editor: Editor, isNormalizing: boolean) => void
 
   /**
    * Get the start point of a location.
    */
-  start(editor, at) {
-    return editor.start(at)
-  },
+  start: (editor: Editor, at: Location) => Point
 
   /**
    * Get the text string content of a location.
@@ -851,27 +662,264 @@ export const Editor: EditorInterface = {
    * Note: by default the text of void nodes is considered to be an empty
    * string, regardless of content, unless you pass in true for the voids option
    */
-  string(editor, at, options) {
-    return editor.string(at, options)
-  },
+  string: (
+    editor: Editor,
+    at: Location,
+    options?: EditorStringOptions
+  ) => string
 
   /**
    * Convert a range into a non-hanging one.
    */
-  unhangRange(editor, range, options) {
-    return editor.unhangRange(range, options)
-  },
+  unhangRange: (
+    editor: Editor,
+    range: Range,
+    options?: EditorUnhangRangeOptions
+  ) => Range
 
   /**
    * Match a void node in the current branch of the editor.
    */
-  void(editor, options) {
-    return editor.void(options)
-  },
+  void: (
+    editor: Editor,
+    options?: EditorVoidOptions
+  ) => NodeEntry<Element> | undefined
 
   /**
    * Call a function, deferring normalization until after it completes.
    */
+  withoutNormalizing: (editor: Editor, fn: () => void) => void
+}
+
+// eslint-disable-next-line no-redeclare
+export const Editor: EditorInterface = {
+  above(editor, options) {
+    return editor.above(options)
+  },
+
+  addMark(editor, key, value) {
+    editor.addMark(key, value)
+  },
+
+  after(editor, at, options) {
+    return editor.after(at, options)
+  },
+
+  before(editor, at, options) {
+    return editor.before(at, options)
+  },
+
+  deleteFragment(editor, options) {
+    editor.deleteFragment(options)
+  },
+
+  edges(editor, at) {
+    return editor.edges(at)
+  },
+
+  elementReadOnly(editor: Editor, options: EditorElementReadOnlyOptions = {}) {
+    return editor.elementReadOnly(options)
+  },
+
+  end(editor, at) {
+    return editor.end(at)
+  },
+
+  first(editor, at) {
+    return editor.first(at)
+  },
+
+  fragment(editor, at) {
+    return editor.fragment(at)
+  },
+
+  hasBlocks(editor, element) {
+    return editor.hasBlocks(element)
+  },
+
+  hasInlines(editor, element) {
+    return editor.hasInlines(element)
+  },
+
+  hasPath(editor, path) {
+    return editor.hasPath(path)
+  },
+
+  hasTexts(editor, element) {
+    return editor.hasTexts(element)
+  },
+
+  insertBreak(editor) {
+    editor.insertBreak()
+  },
+
+  insertFragment(editor, fragment) {
+    editor.insertFragment(fragment)
+  },
+
+  insertNode(editor, node) {
+    editor.insertNode(node)
+  },
+
+  insertSoftBreak(editor) {
+    editor.insertSoftBreak()
+  },
+
+  insertText(editor, text) {
+    editor.insertText(text)
+  },
+
+  isBlock(editor, value) {
+    return editor.isBlock(value)
+  },
+
+  isEdge(editor, point, at) {
+    return editor.isEdge(point, at)
+  },
+
+  isEditor(value: any): value is Editor {
+    return isEditor(value)
+  },
+
+  isElementReadOnly(editor, element) {
+    return editor.isElementReadOnly(element)
+  },
+
+  isEmpty(editor, element) {
+    return editor.isEmpty(element)
+  },
+
+  isEnd(editor, point, at) {
+    return editor.isEnd(point, at)
+  },
+
+  isInline(editor, value) {
+    return editor.isInline(value)
+  },
+
+  isNormalizing(editor) {
+    return editor.isNormalizing()
+  },
+
+  isSelectable(editor: Editor, value: Element) {
+    return editor.isSelectable(value)
+  },
+
+  isStart(editor, point, at) {
+    return editor.isStart(point, at)
+  },
+
+  isVoid(editor, value) {
+    return editor.isVoid(value)
+  },
+
+  last(editor, at) {
+    return editor.last(at)
+  },
+
+  leaf(editor, at, options) {
+    return editor.leaf(at, options)
+  },
+
+  levels(editor, options) {
+    return editor.levels(options)
+  },
+
+  marks(editor) {
+    return editor.getMarks()
+  },
+
+  next<T extends Descendant>(
+    editor: Editor,
+    options?: EditorNextOptions<T>
+  ): NodeEntry<T> | undefined {
+    return editor.next(options)
+  },
+
+  node(editor, at, options) {
+    return editor.node(at, options)
+  },
+
+  nodes(editor, options) {
+    return editor.nodes(options)
+  },
+
+  normalize(editor, options) {
+    editor.normalize(options)
+  },
+
+  parent(editor, at, options) {
+    return editor.parent(at, options)
+  },
+
+  path(editor, at, options) {
+    return editor.path(at, options)
+  },
+
+  pathRef(editor, path, options) {
+    return editor.pathRef(path, options)
+  },
+
+  pathRefs(editor) {
+    return editor.pathRefs()
+  },
+
+  point(editor, at, options) {
+    return editor.point(at, options)
+  },
+
+  pointRef(editor, point, options) {
+    return editor.pointRef(point, options)
+  },
+
+  pointRefs(editor) {
+    return editor.pointRefs()
+  },
+
+  positions(editor, options) {
+    return editor.positions(options)
+  },
+
+  previous(editor, options) {
+    return editor.previous(options)
+  },
+
+  range(editor, at, to) {
+    return editor.range(at, to)
+  },
+
+  rangeRef(editor, range, options) {
+    return editor.rangeRef(range, options)
+  },
+
+  rangeRefs(editor) {
+    return editor.rangeRefs()
+  },
+
+  removeMark(editor, key) {
+    editor.removeMark(key)
+  },
+
+  setNormalizing(editor, isNormalizing) {
+    editor.setNormalizing(isNormalizing)
+  },
+
+  start(editor, at) {
+    return editor.start(at)
+  },
+
+  string(editor, at, options) {
+    return editor.string(at, options)
+  },
+
+  unhangRange(editor, range, options) {
+    return editor.unhangRange(range, options)
+  },
+
+  void(editor, options) {
+    return editor.void(options)
+  },
+
   withoutNormalizing(editor, fn: () => void) {
     editor.withoutNormalizing(fn)
   },

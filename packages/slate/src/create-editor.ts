@@ -16,7 +16,7 @@ import { apply } from './core/apply'
 import { above } from './editor/above'
 import { before } from './editor/before'
 import { after } from './editor/after'
-import { marks } from './editor/tem-plate'
+import { marks } from './editor/marks'
 import { deleteText } from './transforms-text/delete-text'
 import { collapse } from './transforms-selection/collapse'
 import { deselect } from './transforms-selection/deselect'
@@ -73,10 +73,7 @@ import { first } from './editor/first'
 import { end } from './editor/end'
 import { edges } from './editor/edges'
 import { isEdge } from './editor/is-edge'
-
-// export const test: WithEditorFirstArg<Editor['test']> = editor => {}
-// export const test: WithEditorFirstArg<Editor['test']> = editor => {}
-// export const test: WithEditorFirstArg<Editor['test']> = editor => {}
+import { elementReadOnly } from './core/element-read-only'
 
 /**
  * Create a new Slate `Editor` object.
@@ -118,6 +115,7 @@ export const createEditor = (): Editor => {
     delete: (...args) => deleteText(editor, ...args),
     deselect: (...args) => deselect(editor, ...args),
     edges: (...args) => edges(editor, ...args),
+    elementReadOnly: (...args) => elementReadOnly(editor, ...args),
     end: (...args) => end(editor, ...args),
     first: (...args) => first(editor, ...args),
     fragment: (...args) => fragment(editor, ...args),
