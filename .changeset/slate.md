@@ -153,4 +153,4 @@ Note:
 
 Bug Fixes:
 
-- Interface methods JSDoc should now work on IDEs.
+- Moving JSDoc's to the interface type to allow IDEs access to the interface methods.
