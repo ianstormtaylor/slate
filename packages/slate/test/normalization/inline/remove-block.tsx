@@ -8,6 +8,8 @@ export const input = (
       <inline>
         <block>one</block>
         <text>two</text>
+        <block>three</block>
+        <text>four</text>
       </inline>
       <text />
     </block>
@@ -18,7 +20,7 @@ export const output = (
     <block>
       <text />
       <inline>
-        <text>two</text>
+        <text>twofour</text>
       </inline>
       <text />
     </block>
