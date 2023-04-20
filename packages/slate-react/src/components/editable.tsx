@@ -20,12 +20,14 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
 import { DecorateContext } from '../hooks/use-decorate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
+import { useTrackUserInput } from '../hooks/use-track-user-input'
+import { ReactEditor } from '../plugin/react-editor'
 import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
@@ -53,7 +55,6 @@ import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_INSERTION_MARKS,
-  EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
@@ -66,8 +67,6 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './restore-dom/restore-dom'
-import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
-import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 
 type DeferredOperation = () => void

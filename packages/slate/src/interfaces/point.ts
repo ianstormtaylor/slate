@@ -1,7 +1,7 @@
 import { isPlainObject } from 'is-plain-object'
 import { produce } from 'immer'
 import { ExtendedType, Operation, Path } from '..'
-import { TextDirection } from './types'
+import { TextDirection } from '../types/types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -22,11 +22,35 @@ export interface PointTransformOptions {
 }
 
 export interface PointInterface {
+  /**
+   * Compare a point to another, returning an integer indicating whether the
+   * point was before, at, or after the other.
+   */
   compare: (point: Point, another: Point) => -1 | 0 | 1
+
+  /**
+   * Check if a point is after another.
+   */
   isAfter: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a point is before another.
+   */
   isBefore: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a point is exactly equal to another.
+   */
   equals: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a value implements the `Point` interface.
+   */
   isPoint: (value: any) => value is Point
+
+  /**
+   * Transform a point by an operation.
+   */
   transform: (
     point: Point,
     op: Operation,
@@ -36,11 +60,6 @@ export interface PointInterface {
 
 // eslint-disable-next-line no-redeclare
 export const Point: PointInterface = {
-  /**
-   * Compare a point to another, returning an integer indicating whether the
-   * point was before, at, or after the other.
-   */
-
   compare(point: Point, another: Point): -1 | 0 | 1 {
     const result = Path.compare(point.path, another.path)
 
@@ -53,25 +72,13 @@ export const Point: PointInterface = {
     return result
   },
 
-  /**
-   * Check if a point is after another.
-   */
-
   isAfter(point: Point, another: Point): boolean {
     return Point.compare(point, another) === 1
   },
 
-  /**
-   * Check if a point is before another.
-   */
-
   isBefore(point: Point, another: Point): boolean {
     return Point.compare(point, another) === -1
   },
-
-  /**
-   * Check if a point is exactly equal to another.
-   */
 
   equals(point: Point, another: Point): boolean {
     // PERF: ensure the offsets are equal first since they are cheaper to check.
@@ -80,10 +87,6 @@ export const Point: PointInterface = {
     )
   },
 
-  /**
-   * Check if a value implements the `Point` interface.
-   */
-
   isPoint(value: any): value is Point {
     return (
       isPlainObject(value) &&
@@ -91,10 +94,6 @@ export const Point: PointInterface = {
       Path.isPath(value.path)
     )
   },
-
-  /**
-   * Transform a point by an operation.
-   */
 
   transform(
     point: Point | null,

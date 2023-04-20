@@ -1,4 +1,4 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { ReactEditor } from '../plugin/react-editor'
 import { useSlateStatic } from './use-slate-static'
 

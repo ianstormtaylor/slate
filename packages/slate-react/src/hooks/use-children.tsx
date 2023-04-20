@@ -1,18 +1,18 @@
 import React from 'react'
-import { Editor, Range, Element, Ancestor, Descendant } from 'slate'
-
-import ElementComponent from '../components/element'
-import TextComponent from '../components/text'
-import { ReactEditor } from '../plugin/react-editor'
-import { useSlateStatic } from './use-slate-static'
-import { useDecorate } from './use-decorate'
-import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import { Ancestor, Descendant, Editor, Element, Range } from 'slate'
 import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
 } from '../components/editable'
+
+import ElementComponent from '../components/element'
+import TextComponent from '../components/text'
+import { ReactEditor } from '../plugin/react-editor'
+import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import { useDecorate } from './use-decorate'
 import { SelectedContext } from './use-selected'
+import { useSlateStatic } from './use-slate-static'
 
 /**
  * Children.

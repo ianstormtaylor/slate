@@ -1,7 +1,6 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useCallback, useRef } from 'react'
 import { Element, Range, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { isTextDecorationsEqual } from '../utils/range-list'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
