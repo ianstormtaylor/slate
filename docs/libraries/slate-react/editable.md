@@ -26,3 +26,7 @@ type EditableProps = {
 ```
 
 _NOTE: Detailed breakdown of Props not completed. Refer to the source code at the moment. Under construction._
+
+#### `scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void`
+
+Slate has its own default method to scroll a DOM selection into view that works for most cases; however, if the default behavior isn't working for you, possible due to some complex styling, you may need to override the default behavior by providing a different function here.

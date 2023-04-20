@@ -71,7 +71,12 @@ Next up is to render a `<Slate>` context provider.
 The provider component keeps track of your Slate editor, its plugins, its value, its selection, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
 
 ```jsx
-const initialValue = []
+const initialValue = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
 
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
@@ -88,30 +93,9 @@ This is a slightly different mental model than things like `<input>` or `<textar
 
 By having a shared context, those other components can execute commands, query the editor's state, etc.
 
-Okay, so the next step is to render the `<Editable>` component itself:
+The next step is to render the `<Editable>` component itself. The component acts like `contenteditable`; anywhere you render it will render an editable richtext document for the nearest editor context.
 
 ```jsx
-const initialValue = []
-
-const App = () => {
-  const [editor] = useState(() => withReact(createEditor()))
-  return (
-    // Add the editable component inside the context.
-    <Slate editor={editor} value={initialValue}>
-      <Editable />
-    </Slate>
-  )
-}
-```
-
-The `<Editable>` component acts like `contenteditable`. Anywhere you render it will render an editable richtext document for the nearest editor context.
-
-There's only one last step. So far we've been using an empty `[]` array as the initial value of the editor, so it has no content. Let's fix that by defining an initial value.
-
-The value is just plain JSON. Here's one containing a single paragraph block with some text in it:
-
-```jsx
-// Add the initial value.
 const initialValue = [
   {
     type: 'paragraph',
@@ -121,8 +105,8 @@ const initialValue = [
 
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
-
   return (
+    // Add the editable component inside the context.
     <Slate editor={editor} value={initialValue}>
       <Editable />
     </Slate>
