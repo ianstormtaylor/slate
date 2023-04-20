@@ -42,7 +42,7 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   for (let i = 0; i < node.children.length; i++, n++) {
     const currentNode = Node.get(editor, path)
     if (Text.isText(currentNode)) continue
-    const child = currentNode.children[i] as Descendant
+    const child = currentNode.children[n] as Descendant
     const prev = currentNode.children[n - 1] as Descendant
     const isLast = i === node.children.length - 1
     const isInlineOrText =
