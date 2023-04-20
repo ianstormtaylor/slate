@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.94.0
+
+### Patch Changes
+
+- [#5307](https://github.com/ianstormtaylor/slate/pull/5307) [`3243c7e3`](https://github.com/ianstormtaylor/slate/commit/3243c7e34ac2602618c67c88b1b7df07fde1c2ec) Thanks [@zbeyens](https://github.com/zbeyens)! - Interface methods JSDoc should now work on IDEs.
+
 ## 0.93.0
 
 ### Patch Changes
