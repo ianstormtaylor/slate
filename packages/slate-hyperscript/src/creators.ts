@@ -1,12 +1,12 @@
-import { Element, Descendant, Node, Range, Text, Editor } from 'slate'
+import { Descendant, Editor, Element, Node, Range, Text } from 'slate'
 import {
-  AnchorToken,
-  FocusToken,
-  Token,
   addAnchorToken,
   addFocusToken,
+  AnchorToken,
+  FocusToken,
   getAnchorOffset,
   getFocusOffset,
+  Token,
 } from './tokens'
 
 /**
