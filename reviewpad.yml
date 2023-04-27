@@ -1,0 +1,147 @@
+# This file is used to configure Reviewpad.
+# The configuration is a proposal to help you get started.
+# You can use it as a starting point and customize it to your needs.
+# For more details see https://docs.reviewpad.com/guides/syntax.
+
+# Define the list of labels to be used by Reviewpad.
+# For more details see https://docs.reviewpad.com/guides/syntax#label.
+labels:
+  small:
+    description: Pull request is small
+    color: "#76dbbe"
+  medium:
+    description: Pull request is medium
+    color: "#2986cc"
+  large:
+    description: Pull request is large
+    color: "#c90076"
+
+# Define the list of workflows to be run by Reviewpad.
+# A workflow is a list of actions that will be executed based on the defined rules.
+# For more details see https://docs.reviewpad.com/guides/syntax#workflow.
+workflows:
+  # This workflow calls Reviewpad AI agent to summarize the pull request.
+  - name: summarize
+    description: Summarize the pull request
+    always-run: true
+    if:
+      # Summarize the pull request on pull request synchronization.
+      - rule: ($eventType() == "synchronize" || $eventType() == "opened") && $state() == "open"
+        extra-actions:
+          - $summarize()
+
+  # This workflow assigns the most relevant reviewer to pull requests.
+  # This helps guarantee that most pull requests are reviewed by at least one person.
+  - name: reviewer-assignment
+    description: Assign the most relevant reviewer to pull requests
+    always-run: true
+    if:
+      # Automatically assign reviewer when the pull request is ready for review;
+      - rule: $isDraft() == false
+        extra-actions:
+          - $assignCodeAuthorReviewers()
+
+  # This workflow praises contributors on their pull request contributions.
+  # This helps contributors feel appreciated.
+  - name: praise-contributors-on-milestones
+    description: Praise contributors based on their contributions
+    always-run: true
+    if:
+      # Praise contributors on their first pull request.
+      - rule: $pullRequestCountBy($author()) == 1
+        extra-actions:
+          - $commentOnce($sprintf("Thank you @%s for this first contribution!", [$author()]))
+
+  # This workflow validates that pull requests follow the conventional commits specification.
+  # This helps developers automatically generate changelogs.
+  # For more details, see https://www.conventionalcommits.org/en/v1.0.0/.
+  - name: check-conventional-commits
+    description: Validate that pull requests follow the conventional commits
+    always-run: true
+    if:
+      - rule: $isDraft() == false
+    then:
+      # Check commits messages against the conventional commits specification
+      - $commitLint()
+      # Check pull request title against the conventional commits specification.
+      - $titleLint()
+
+  # This workflow validates best practices for pull request management.
+  # This helps developers follow best practices.
+  - name: best-practices
+    description: Validate best practices for pull request management
+    always-run: true
+    if:
+      # Warn pull requests that do not have an associated GitHub issue.
+      - rule: $hasLinkedIssues() == false
+        extra-actions:
+          - $warn("Please link an issue to the pull request")
+      # Warn pull requests if their description is empty.
+      - rule: $description() == ""
+        extra-actions:
+          - $warn("Please provide a description for the pull request")
+      # Warn pull request do not have a clean linear history.
+      - rule: $hasLinearHistory() == false
+        extra-actions:
+          - $warn("Please rebase your pull request on the latest changes")
+
+  # This workflow labels pull requests based on the total number of lines changed.
+  # This helps pick pull requests based on their size and to incentivize small pull requests.
+  - name: size-labeling
+    description: Label pull request based on the number of lines changed
+    always-run: true
+    if:
+      - rule: $size() < 100
+        extra-actions:
+          - $removeLabels(["medium", "large"])
+          - $addLabel("small")
+      - rule: $size() >= 100 && $size() < 300
+        extra-actions:
+          - $removeLabels(["small", "large"])
+          - $addLabel("medium")
+      - rule: $size() >= 300
+        extra-actions:
+          - $removeLabels(["small", "medium"])
+          - $addLabel("large")
+
+  # This workflow signals pull requests waiting for reviews.
+  # This helps guarantee that pull requests are reviewed and approved by at least one person.
+  - name: check-approvals
+    description: Check that pull requests have the required number of approvals
+    always-run: true
+    if:
+      # Label pull requests with `waiting-for-review` if there are no approvals;
+      - rule: $isDraft() == false && $approvalsCount() < 1
+        extra-actions:
+          - $addLabel("waiting-for-review")
+
+  # This workflow labels pull requests based on the pull request change type.
+  # This helps pick pull requests based on their change type.
+  - name: change-type-labelling
+    description: Label pull requests based on the type of changes
+    always-run: true
+    if:
+      # Label pull requests with `docs` if they only modify Markdown or txt files.
+      - rule: $hasFileExtensions([".md", ".txt"])
+        extra-actions:
+          - $addLabel("docs")
+      # Label pull requests with `infra` if they modify Terraform files.
+      - rule: $hasFileExtensions([".tf"])
+        extra-actions:
+          - $addLabel("infra")
+      # Label pull requests with `dependencies` if they only modify `package.json` and `package.lock` files.
+      - rule: $hasFileExtensions(["package.json", "package-lock.json"])
+        extra-actions:
+          - $addLabel("dependencies")
+
+
+  # This workflow validates that pull requests do not contain changes to the license.
+  # This helps avoid unwanted license modifications.
+  - name: license-validation
+    description: Validate that licenses are not modified
+    always-run: true
+    if:
+      # Fail Reviewpad check on pull requests that modify any LICENSE;
+      - rule: $hasFilePattern("**/LICENSE*")
+        extra-actions:
+          - $fail("License files cannot be modified")
