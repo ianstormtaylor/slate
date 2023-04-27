@@ -9,7 +9,7 @@
 
 ### Retrieval methods
 
-#### `Node.ancestor(root: Node, path: Path) => Ancestor`
+#### `Node.ancestor(root: Node, path: Path) => Ancestor | undefined`
 
 Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, throw an error.
 
@@ -29,7 +29,7 @@ Iterate over the children of a node at a specific path.
 
 Options: `{reverse?: boolean}`
 
-#### `Node.common(root: Node, path: Path, another: Path) => NodeEntry`
+#### `Node.common(root: Node, path: Path, another: Path) => NodeEntry | undefined`
 
 Get an entry for the common ancestor node of two paths. It might be a Text node, an Element, or the Editor itself.
 
@@ -51,7 +51,7 @@ Return a generator of all the element nodes inside a root node. Each iteration w
 
 Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry => boolean)}`
 
-#### `Node.first(root: Node, path: Path) => NodeEntry`
+#### `Node.first(root: Node, path: Path) => NodeEntry | undefined`
 
 Get the first node entry in a root node from a `path`.
 
@@ -63,7 +63,7 @@ Get the sliced fragment represented by the `range`.
 
 Get the descendant node referred to by a specific `path`. If the path is an empty array, get the root node itself.
 
-#### `Node.last(root: Node, path: Path) => NodeEntry`
+#### `Node.last(root: Node, path: Path) => NodeEntry | undefined`
 
 Get the last node entry in a root node at a specific `path`.
 

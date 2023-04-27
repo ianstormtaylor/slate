@@ -25,7 +25,7 @@
 - [Rendering](concepts/09-rendering.md)
 - [Serializing](concepts/10-serializing.md)
 - [Normalizing](concepts/11-normalizing.md)
-- [TypeScript](concepts/12-typescript.md)
+- [TypeScript](concepts/13-typescript.md)
 - [Migrating](concepts/xx-migrating.md)
 
 ## API

@@ -50,7 +50,7 @@ Find a key for a Slate node.
 
 Returns an instance of `Key` which looks like `{ id: string }`
 
-#### `ReactEditor.findPath(editor: ReactEditor, node: Node): Path`
+#### `ReactEditor.findPath(editor: ReactEditor, node: Node): Path | undefined`
 
 Find the path of Slate node.
 
@@ -58,31 +58,31 @@ Find the path of Slate node.
 
 Check if a DOM node is within the editor.
 
-#### `ReactEditor.toDOMNode(editor: ReactEditor, node: Node): HTMLElement`
+#### `ReactEditor.toDOMNode(editor: ReactEditor, node: Node): HTMLElement | undefined`
 
 Find the native DOM element from a Slate node.
 
-#### `ReactEditor.toDOMPoint(editor: ReactEditor, point: Point): DOMPoint`
+#### `ReactEditor.toDOMPoint(editor: ReactEditor, point: Point): DOMPoint | undefined`
 
 Find a native DOM selection point from a Slate point.
 
-#### `ReactEditor.toDOMRange(editor: ReactEditor, range: Range): DOMRange`
+#### `ReactEditor.toDOMRange(editor: ReactEditor, range: Range): DOMRange | undefined`
 
 Find a native DOM range from a Slate `range`.
 
-#### `ReactEditor.toSlateNode(editor: ReactEditor, domNode: DOMNode): Node`
+#### `ReactEditor.toSlateNode(editor: ReactEditor, domNode: DOMNode): Node | undefined`
 
 Find a Slate node from a native DOM `element`.
 
-#### `ReactEditor.findEventRange(editor: ReactEditor, event: any): Range`
+#### `ReactEditor.findEventRange(editor: ReactEditor, event: any): Range | undefined`
 
 Get the target range from a DOM `event`.
 
-#### `ReactEditor.toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point | null`
+#### `ReactEditor.toSlatePoint(editor: ReactEditor, domPoint: DOMPoint): Point | null | undefined`
 
 Find a Slate point from a DOM selection's `domNode` and `domOffset`.
 
-#### `ReactEditor.toSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection, options?: { exactMatch?: boolean } = {}): Range | null`
+#### `ReactEditor.toSlateRange(editor: ReactEditor, domRange: DOMRange | DOMStaticRange | DOMSelection, options?: { exactMatch?: boolean } = {}): Range | null | undefined`
 
 Find a Slate range from a DOM range or selection.
 

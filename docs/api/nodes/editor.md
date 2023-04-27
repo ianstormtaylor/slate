@@ -87,15 +87,15 @@ If there is no point before the location (e.g. we are at the top of the document
 
 Options: `{distance?: number, unit?: 'offset' | 'character' | 'word' | 'line' | 'block', voids?: boolean}`
 
-#### `Editor.edges(editor: Editor, at: Location) => [Point, Point]`
+#### `Editor.edges(editor: Editor, at: Location) => [Point | undefined, Point | undefined]`
 
 Get the start and end points of a location.
 
-#### `Editor.end(editor: Editor, at: Location) => Point`
+#### `Editor.end(editor: Editor, at: Location) => Point | undefined`
 
 Get the end point of a location.
 
-#### `Editor.first(editor: Editor, at: Location) => NodeEntry`
+#### `Editor.first(editor: Editor, at: Location) => NodeEntry | undefined`
 
 Get the first node at a location.
 
@@ -103,11 +103,11 @@ Get the first node at a location.
 
 Get the fragment at a location.
 
-#### `Editor.last(editor: Editor, at: Location) => NodeEntry`
+#### `Editor.last(editor: Editor, at: Location) => NodeEntry | undefined`
 
 Get the last node at a location.
 
-#### `Editor.leaf(editor: Editor, at: Location, options?) => NodeEntry`
+#### `Editor.leaf(editor: Editor, at: Location, options?) => NodeEntry | undefined`
 
 Get the leaf text node at a location.
 
@@ -131,7 +131,7 @@ Note: To find the next Point, and not the next Node, use the `Editor.after` meth
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
-#### `Editor.node(editor: Editor, at: Location, options?) => NodeEntry`
+#### `Editor.node(editor: Editor, at: Location, options?) => NodeEntry | undefined`
 
 Get the node at a location.
 
@@ -151,19 +151,19 @@ Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | '
 - `'highest'`: in a hierarchy of nodes, only return the highest level matching nodes
 - `'lowest'`: in a hierarchy of nodes, only return the lowest level matching nodes
 
-#### `Editor.parent(editor: Editor, at: Location, options?) => NodeEntry<Ancestor>`
+#### `Editor.parent(editor: Editor, at: Location, options?) => NodeEntry<Ancestor> | undefined`
 
 Get the parent node of a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-#### `Editor.path(editor: Editor, at: Location, options?) => Path`
+#### `Editor.path(editor: Editor, at: Location, options?) => Path | undefined`
 
 Get the path of a location.
 
 Options: `{depth?: number, edge?: 'start' | 'end'}`
 
-#### `Editor.point(editor: Editor, at: Location, options?) => Point`
+#### `Editor.point(editor: Editor, at: Location, options?) => Point | undefined`
 
 Get the start or end point of a location.
 
@@ -196,11 +196,11 @@ Note: To find the previous Point, and not the previous Node, use the `Editor.bef
 
 Options: `{at?: Location, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', voids?: boolean}`
 
-#### `Editor.range(editor: Editor, at: Location, to?: Location) => Range`
+#### `Editor.range(editor: Editor, at: Location, to?: Location) => Range | undefined`
 
 Get a range of a location.
 
-#### `Editor.start(editor: Editor, at: Location) => Point`
+#### `Editor.start(editor: Editor, at: Location) => Point | undefined`
 
 Get the start point of a location.
 

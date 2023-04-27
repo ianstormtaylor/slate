@@ -39,7 +39,7 @@ The paths are sorted from shallowest to deepest. However, if the `reverse: true`
 
 Options: `{reverse?: boolean}`
 
-#### `Path.next(path: Path) => Path. | undefined`
+#### `Path.next(path: Path) => Path | undefined`
 
 Given a path, gets the path to the next sibling node. The method does not ensure that the returned `Path` is valid in the document.
 
