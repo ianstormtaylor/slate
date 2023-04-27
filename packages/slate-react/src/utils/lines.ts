@@ -16,8 +16,11 @@ const areRangesSameLine = (
   range1: Range,
   range2: Range
 ) => {
-  const rect1 = ReactEditor.toDOMRange(editor, range1).getBoundingClientRect()
-  const rect2 = ReactEditor.toDOMRange(editor, range2).getBoundingClientRect()
+  const rect1 = ReactEditor.toDOMRange(editor, range1)?.getBoundingClientRect()
+  if (!rect1) return false
+
+  const rect2 = ReactEditor.toDOMRange(editor, range2)?.getBoundingClientRect()
+  if (!rect2) return false
 
   return doRectsIntersect(rect1, rect2) && doRectsIntersect(rect2, rect1)
 }
@@ -33,21 +36,20 @@ const areRangesSameLine = (
 export const findCurrentLineRange = (
   editor: ReactEditor,
   parentRange: Range
-): Range => {
+): Range | undefined => {
   const parentRangeBoundary = Editor.range(editor, Range.end(parentRange))
+  if (!parentRangeBoundary) return
+
   const positions = Array.from(Editor.positions(editor, { at: parentRange }))
 
   let left = 0
   let right = positions.length
   let middle = Math.floor(right / 2)
 
-  if (
-    areRangesSameLine(
-      editor,
-      Editor.range(editor, positions[left]),
-      parentRangeBoundary
-    )
-  ) {
+  const leftRange = Editor.range(editor, positions[left])
+  if (!leftRange) return
+
+  if (areRangesSameLine(editor, leftRange, parentRangeBoundary)) {
     return Editor.range(editor, positions[left], parentRangeBoundary)
   }
 
@@ -60,13 +62,10 @@ export const findCurrentLineRange = (
   }
 
   while (middle !== positions.length && middle !== left) {
-    if (
-      areRangesSameLine(
-        editor,
-        Editor.range(editor, positions[middle]),
-        parentRangeBoundary
-      )
-    ) {
+    const middleRange = Editor.range(editor, positions[middle])
+    if (!middleRange) return
+
+    if (areRangesSameLine(editor, middleRange, parentRangeBoundary)) {
       right = middle
     } else {
       left = middle

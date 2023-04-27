@@ -48,7 +48,9 @@ export const normalize: EditorInterface['normalize'] = (
     for (const dirtyPath of getDirtyPaths(editor)) {
       if (Node.has(editor, dirtyPath)) {
         const entry = Editor.node(editor, dirtyPath)
-        const [node, _] = entry
+        if (!entry) return
+
+        const [node] = entry
 
         /*
           The default normalizer inserts an empty text node in this scenario, but it can be customised.
@@ -84,6 +86,8 @@ export const normalize: EditorInterface['normalize'] = (
       // If the node doesn't exist in the tree, it does not need to be normalized.
       if (Node.has(editor, dirtyPath)) {
         const entry = Editor.node(editor, dirtyPath)
+        if (!entry) return
+
         editor.normalizeNode(entry, { operation })
       }
       iteration++

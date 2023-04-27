@@ -41,7 +41,8 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         at = pointRef.unref()!
       }
     } else if (Path.isPath(at)) {
-      at = Editor.start(editor, at)
+      at = Editor.start(editor, at) ?? null
+      if (!at) return
     }
 
     if (!voids && Editor.void(editor, { at })) {
@@ -61,11 +62,9 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       const [, inlinePath] = inlineElementMatch
 
       if (Editor.isEnd(editor, at, inlinePath)) {
-        const after = Editor.after(editor, inlinePath)!
-        at = after
+        at = Editor.after(editor, inlinePath)!
       } else if (Editor.isStart(editor, at, inlinePath)) {
-        const before = Editor.before(editor, inlinePath)!
-        at = before
+        at = Editor.before(editor, inlinePath)!
       }
     }
 
@@ -80,8 +79,13 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     const isBlockEmpty = isBlockStart && isBlockEnd
     const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
     const mergeEnd = !isBlockEnd
-    const [, firstPath] = Node.first({ children: fragment }, [])
-    const [, lastPath] = Node.last({ children: fragment }, [])
+    const firstEntry = Node.first({ children: fragment }, [])
+    if (!firstEntry) return
+    const [, firstPath] = firstEntry
+
+    const lastEntry = Node.last({ children: fragment }, [])
+    if (!lastEntry) return
+    const [, lastPath] = lastEntry
 
     const matches: NodeEntry[] = []
     const matcher = ([n, p]: NodeEntry) => {
@@ -104,17 +108,13 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         return false
       }
 
-      if (
+      return !(
         mergeEnd &&
         Path.isAncestor(p, lastPath) &&
         Element.isElement(n) &&
         !editor.isVoid(n) &&
         !editor.isInline(n)
-      ) {
-        return false
-      }
-
-      return true
+      )
     }
 
     for (const entry of Node.nodes({ children: fragment }, { pass: matcher })) {
@@ -152,15 +152,16 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     const isInlineStart = Editor.isStart(editor, at, inlinePath)
     const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
 
-    const middleRef = Editor.pathRef(
-      editor,
+    const middlePath =
       isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
-    )
+    if (!middlePath) return
 
-    const endRef = Editor.pathRef(
-      editor,
-      isInlineEnd ? Path.next(inlinePath) : inlinePath
-    )
+    const middleRef = Editor.pathRef(editor, middlePath)
+
+    const endPath = isInlineEnd ? Path.next(inlinePath) : inlinePath
+    if (!endPath) return
+
+    const endRef = Editor.pathRef(editor, endPath)
 
     Transforms.splitNodes(editor, {
       at,
@@ -176,12 +177,13 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })
 
-    const startRef = Editor.pathRef(
-      editor,
+    const startPath =
       !isInlineStart || (isInlineStart && isInlineEnd)
         ? Path.next(inlinePath)
         : inlinePath
-    )
+    if (!startPath) return
+
+    const startRef = Editor.pathRef(editor, startPath)
 
     Transforms.insertNodes(editor, starts, {
       at: startRef.current!,
@@ -221,6 +223,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
       if (path) {
         const end = Editor.end(editor, path)
+        if (!end) return
         Transforms.select(editor, end)
       }
     }

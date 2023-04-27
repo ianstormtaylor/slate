@@ -1,12 +1,12 @@
 import {
   Editor,
+  Element,
   Node,
   Operation,
   Path,
   Point,
   Range,
   Text,
-  Element,
 } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
@@ -44,7 +44,8 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   }
 
   const nextPath = Path.next(path)
-  if (!Editor.hasPath(editor, nextPath)) {
+
+  if (!nextPath || !Editor.hasPath(editor, nextPath)) {
     return false
   }
 

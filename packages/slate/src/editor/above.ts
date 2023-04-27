@@ -16,6 +16,8 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
   }
 
   const path = Editor.path(editor, at)
+  if (!path) return
+
   const reverse = mode === 'lowest'
 
   for (const [n, p] of Editor.levels(editor, {

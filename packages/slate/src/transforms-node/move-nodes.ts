@@ -44,7 +44,10 @@ export const moveNodes: NodeTransforms['moveNodes'] = (editor, options) => {
         // When performing a sibling move to a later index, the path at the destination is shifted
         // to before the insertion point instead of after. To ensure our group of nodes are inserted
         // in the correct order we increment toRef to account for that
-        toRef.current = Path.next(toRef.current)
+        const nextPath = Path.next(toRef.current)
+        if (nextPath) {
+          toRef.current = nextPath
+        }
       }
     }
 

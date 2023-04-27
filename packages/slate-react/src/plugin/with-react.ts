@@ -107,10 +107,11 @@ export const withReact = <T extends BaseEditor>(
           parentBlockPath,
           e.selection.anchor
         )
+        if (!parentElementRange) return
 
         const currentLineRange = findCurrentLineRange(e, parentElementRange)
 
-        if (!Range.isCollapsed(currentLineRange)) {
+        if (currentLineRange && !Range.isCollapsed(currentLineRange)) {
           Transforms.delete(e, { at: currentLineRange })
         }
       }
@@ -166,21 +167,25 @@ export const withReact = <T extends BaseEditor>(
 
       case 'insert_node':
       case 'remove_node': {
-        matches.push(...getMatches(e, Path.parent(op.path)))
+        const parentPath = Path.parent(op.path)
+        if (!parentPath) break
+        matches.push(...getMatches(e, parentPath))
         break
       }
 
       case 'merge_node': {
         const prevPath = Path.previous(op.path)
+        if (!prevPath) break
         matches.push(...getMatches(e, prevPath))
         break
       }
 
       case 'move_node': {
-        const commonPath = Path.common(
-          Path.parent(op.path),
-          Path.parent(op.newPath)
-        )
+        const parentPath = Path.parent(op.path)
+        const parentNewPath = Path.parent(op.newPath)
+        if (!parentPath || !parentNewPath) break
+
+        const commonPath = Path.common(parentPath, parentNewPath)
         matches.push(...getMatches(e, commonPath))
         break
       }
@@ -189,7 +194,10 @@ export const withReact = <T extends BaseEditor>(
     apply(op)
 
     for (const [path, key] of matches) {
-      const [node] = Editor.node(e, path)
+      const entry = Editor.node(e, path)
+      if (!entry) continue
+      const [node] = entry
+
       NODE_TO_KEY.set(node, key)
     }
   }
@@ -212,6 +220,8 @@ export const withReact = <T extends BaseEditor>(
     // Create a fake selection so that we can add a Base64-encoded copy of the
     // fragment to the HTML, to decode on future pastes.
     const domRange = ReactEditor.toDOMRange(e, selection)
+    if (!domRange) return
+
     let contents = domRange.cloneContents()
     let attach = contents.childNodes[0] as HTMLElement
 
@@ -229,6 +239,8 @@ export const withReact = <T extends BaseEditor>(
       const [voidNode] = endVoid
       const r = domRange.cloneRange()
       const domNode = ReactEditor.toDOMNode(e, voidNode)
+      if (!domNode) return
+
       r.setEndAfter(domNode)
       contents = r.cloneContents()
     }

@@ -1,4 +1,5 @@
 import {
+  ErrorLogger,
   InsertNodeOperation,
   MergeNodeOperation,
   MoveNodeOperation,
@@ -134,7 +135,7 @@ export interface PathInterface {
   /**
    * Given a path, get the path to the next sibling node.
    */
-  next: (path: Path) => Path
+  next: (path: Path) => Path | undefined
 
   /**
    * Returns whether this operation can affect paths or not. Used as an
@@ -155,17 +156,17 @@ export interface PathInterface {
   /**
    * Given a path, return a new path referring to the parent node above it.
    */
-  parent: (path: Path) => Path
+  parent: (path: Path) => Path | undefined
 
   /**
    * Given a path, get the path to the previous sibling node.
    */
-  previous: (path: Path) => Path
+  previous: (path: Path) => Path | undefined
 
   /**
    * Get a path relative to an ancestor.
    */
-  relative: (path: Path, ancestor: Path) => Path
+  relative: (path: Path, ancestor: Path) => Path | undefined
 
   /**
    * Transform a path by an operation.
@@ -321,11 +322,13 @@ export const Path: PathInterface = {
     return list
   },
 
-  next(path: Path): Path {
+  next(path: Path): Path | undefined {
     if (path.length === 0) {
-      throw new Error(
-        `Cannot get the next path of a root path [${path}], because it has no next index.`
-      )
+      ErrorLogger.onError({
+        type: 'Path.next',
+        message: `Cannot get the next path of a root path [${path}], because it has no next index.`,
+      })
+      return
     }
 
     const last = path[path.length - 1]
@@ -352,37 +355,47 @@ export const Path: PathInterface = {
     }
   },
 
-  parent(path: Path): Path {
+  parent(path: Path): Path | undefined {
     if (path.length === 0) {
-      throw new Error(`Cannot get the parent path of the root path [${path}].`)
+      ErrorLogger.onError({
+        type: 'Path.parent',
+        message: `Cannot get the parent path of the root path [${path}].`,
+      })
+      return
     }
 
     return path.slice(0, -1)
   },
 
-  previous(path: Path): Path {
+  previous(path: Path): Path | undefined {
     if (path.length === 0) {
-      throw new Error(
-        `Cannot get the previous path of a root path [${path}], because it has no previous index.`
-      )
+      ErrorLogger.onError({
+        type: 'Path.previous',
+        message: `Cannot get the previous path of a root path [${path}], because it has no previous index.`,
+      })
+      return
     }
 
     const last = path[path.length - 1]
 
     if (last <= 0) {
-      throw new Error(
-        `Cannot get the previous path of a first child path [${path}] because it would result in a negative index.`
-      )
+      ErrorLogger.onError({
+        type: 'Path.previous',
+        message: `Cannot get the previous path of a first child path [${path}] because it would result in a negative index.`,
+      })
+      return
     }
 
     return path.slice(0, -1).concat(last - 1)
   },
 
-  relative(path: Path, ancestor: Path): Path {
+  relative(path: Path, ancestor: Path): Path | undefined {
     if (!Path.isAncestor(ancestor, path) && !Path.equals(path, ancestor)) {
-      throw new Error(
-        `Cannot get the relative path of [${path}] inside ancestor [${ancestor}], because it is not above or equal to the path.`
-      )
+      ErrorLogger.onError({
+        type: 'Path.relative',
+        message: `Cannot get the relative path of [${path}] inside ancestor [${ancestor}], because it is not above or equal to the path.`,
+      })
+      return
     }
 
     return path.slice(ancestor.length)

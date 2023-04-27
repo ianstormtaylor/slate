@@ -43,7 +43,11 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
     if (Path.isPath(at)) {
       const path = at
       const point = Editor.point(editor, path)
-      const [parent] = Editor.parent(editor, path)
+      if (!point) return
+
+      const parentEntry = Editor.parent(editor, path)
+      if (!parentEntry) return
+      const [parent] = parentEntry
       match = n => n === parent
       height = point.path.length - path.length + 1
       at = point
@@ -77,6 +81,8 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
           if (!after) {
             const text = { text: '' }
             const afterPath = Path.next(voidPath)
+            if (!afterPath) return
+
             Transforms.insertNodes(editor, text, { at: afterPath, voids })
             after = Editor.point(editor, afterPath)!
           }
@@ -130,6 +136,7 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
 
       if (options.at == null) {
         const point = afterRef.current || Editor.end(editor, [])
+        if (!point) return
         Transforms.select(editor, point)
       }
     } finally {

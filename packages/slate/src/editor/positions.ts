@@ -22,9 +22,7 @@ export function* positions(
     ignoreNonSelectable = false,
   } = options
 
-  if (!at) {
-    return
-  }
+  if (!at) return
 
   /**
    * Algorithm notes:
@@ -45,6 +43,8 @@ export function* positions(
    */
 
   const range = Editor.range(editor, at)
+  if (!range) return
+
   const [start, end] = Range.edges(range)
   const first = reverse ? end : start
   let isNewBlock = false
@@ -73,7 +73,9 @@ export function* positions(
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
-        yield Editor.start(editor, path)
+        const start = Editor.start(editor, path)
+        if (!start) continue
+        yield start
         continue
       }
 
@@ -98,9 +100,12 @@ export function* positions(
         const e = Path.isAncestor(path, end.path)
           ? end
           : Editor.end(editor, path)
+        if (!e) continue
+
         const s = Path.isAncestor(path, start.path)
           ? start
           : Editor.start(editor, path)
+        if (!s) continue
 
         blockText = Editor.string(editor, { anchor: s, focus: e }, { voids })
         isNewBlock = true

@@ -58,7 +58,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
 
     for (const [, rootPath] of roots) {
       const a = Range.isRange(at)
-        ? Range.intersection(at, Editor.range(editor, rootPath))
+        ? Range.intersection(at, Editor.range(editor, rootPath)!)
         : at
 
       if (!a) {
@@ -83,12 +83,17 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         const commonPath = Path.equals(firstPath, lastPath)
           ? Path.parent(firstPath)
           : Path.common(firstPath, lastPath)
+        if (!commonPath) return
 
         const range = Editor.range(editor, firstPath, lastPath)
         const commonNodeEntry = Editor.node(editor, commonPath)
+        if (!commonNodeEntry) return
+
         const [commonNode] = commonNodeEntry
         const depth = commonPath.length + 1
         const wrapperPath = Path.next(lastPath.slice(0, depth))
+        if (!wrapperPath) return
+
         const wrapper = { ...element, children: [] }
         Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
 

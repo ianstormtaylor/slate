@@ -39,7 +39,9 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
 
     if (match == null) {
       if (Path.isPath(at)) {
-        const [parent] = Editor.parent(editor, at)
+        const parentEntry = Editor.parent(editor, at)
+        if (!parentEntry) return
+        const [parent] = parentEntry
         match = n => parent.children.includes(n)
       } else {
         match = n => Element.isElement(n) && Editor.isBlock(editor, n)
@@ -80,6 +82,7 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
     }
 
     const newPath = Path.next(prevPath)
+    if (!newPath) return
     const commonPath = Path.common(path, prevPath)
     const isPreviousSibling = Path.isSibling(path, prevPath)
     const levels = Array.from(Editor.levels(editor, { at: path }), ([n]) => n)

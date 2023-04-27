@@ -19,6 +19,7 @@ export function* levels<T extends Node>(
 
   const levels: NodeEntry<T>[] = []
   const path = Editor.path(editor, at)
+  if (!path) return
 
   for (const [n, p] of Node.levels(editor, path)) {
     if (!match(n, p)) {

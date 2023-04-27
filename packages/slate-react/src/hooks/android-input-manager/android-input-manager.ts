@@ -114,6 +114,8 @@ export function createAndroidInputManager({
       }
 
       const targetRange = Editor.range(editor, target)
+      if (!targetRange) return
+
       if (!editor.selection || !Range.equals(editor.selection, targetRange)) {
         Transforms.select(editor, target)
       }
@@ -292,6 +294,8 @@ export function createAndroidInputManager({
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
 
     const target = Node.leaf(editor, path)
+    if (!target) return
+
     const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
     if (idx < 0) {
       const normalized = normalizeStringDiff(target.text, diff)
@@ -360,10 +364,13 @@ export function createAndroidInputManager({
 
     let [nativeTargetRange] = (event as any).getTargetRanges()
     if (nativeTargetRange) {
-      targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
+      const range = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
       })
+      if (!range) return
+
+      targetRange = range
     }
 
     // COMPAT: SelectionChange event is fired after the action is performed, so we
@@ -372,10 +379,14 @@ export function createAndroidInputManager({
     const domSelection = window.getSelection()
     if (!targetRange && domSelection) {
       nativeTargetRange = domSelection
-      targetRange = ReactEditor.toSlateRange(editor, domSelection, {
+
+      const range = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: true,
       })
+      if (!range) return
+
+      targetRange = range
     }
 
     targetRange = targetRange ?? editor.selection
@@ -394,6 +405,7 @@ export function createAndroidInputManager({
       if (Range.isExpanded(targetRange)) {
         const [start, end] = Range.edges(targetRange)
         const leaf = Node.leaf(editor, start.path)
+        if (!leaf) return
 
         if (leaf.text.length === start.offset && end.offset === 0) {
           const next = Editor.next(editor, {
@@ -408,7 +420,9 @@ export function createAndroidInputManager({
 
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
       const [start, end] = Range.edges(targetRange)
-      const [leaf, path] = Editor.leaf(editor, start.path)
+      const entry = Editor.leaf(editor, start.path)
+      if (!entry) return
+      const [leaf, path] = entry
 
       const diff = {
         text: '',
@@ -438,6 +452,8 @@ export function createAndroidInputManager({
         ) {
           const point = { path: targetRange.anchor.path, offset: start.offset }
           const range = Editor.range(editor, point, point)
+          if (!range) return
+
           handleUserSelect(range)
 
           return storeDiff(targetRange.anchor.path, {
@@ -468,6 +484,7 @@ export function createAndroidInputManager({
         const { anchor } = targetRange
         if (canStoreDiff && Range.isCollapsed(targetRange)) {
           const targetNode = Node.leaf(editor, anchor.path)
+          if (!targetNode) return
 
           if (anchor.offset < targetNode.text.length) {
             return storeDiff(anchor.path, {

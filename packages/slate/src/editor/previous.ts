@@ -16,7 +16,9 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
     return
   }
 
-  const [, to] = Editor.first(editor, [])
+  const firstEntry = Editor.first(editor, [])
+  if (!firstEntry) return
+  const [, to] = firstEntry
 
   // The search location is from the start of the document to the path of
   // the point before the location passed in
@@ -32,7 +34,10 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
 
   if (match == null) {
     if (Path.isPath(at)) {
-      const [parent] = Editor.parent(editor, at)
+      const parentEntry = Editor.parent(editor, at)
+      if (!parentEntry) return
+      const [parent] = parentEntry
+
       match = n => parent.children.includes(n)
     } else {
       match = () => true

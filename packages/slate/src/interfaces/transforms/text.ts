@@ -68,7 +68,9 @@ export const TextTransforms: TextTransforms = {
       }
 
       if (Path.isPath(at)) {
-        at = Editor.range(editor, at)
+        const range = Editor.range(editor, at)
+        if (!range) return
+        at = range
       }
 
       if (Range.isRange(at)) {

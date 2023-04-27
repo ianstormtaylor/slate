@@ -30,7 +30,10 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
 
   const { anchor } = selection
   const { path } = anchor
-  let [node] = Editor.leaf(editor, path)
+  const entry = Editor.leaf(editor, path)
+  if (!entry) return {}
+
+  let [node] = entry
 
   if (anchor.offset === 0) {
     const prev = Editor.previous(editor, { at: path, match: Text.isText })

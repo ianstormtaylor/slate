@@ -41,6 +41,7 @@ export function useSlateSelector<T>(
   const [, forceRender] = useReducer(s => s + 1, 0)
   const context = useContext(SlateSelectorContext)
   if (!context) {
+    // ERROR
     throw new Error(
       `The \`useSlateSelector\` hook must be used inside the <Slate> component's context.`
     )

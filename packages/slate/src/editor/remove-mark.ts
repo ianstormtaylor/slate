@@ -14,15 +14,24 @@ export const removeMark: EditorInterface['removeMark'] = (editor, key) => {
       if (!Text.isText(node)) {
         return false // marks can only be applied to text
       }
-      const [parentNode, parentPath] = Editor.parent(editor, path)
+      const parentPath = Editor.parent(editor, path)
+      if (!parentPath) return false
+      const [parentNode] = parentPath
+
       return !editor.isVoid(parentNode) || editor.markableVoid(parentNode)
     }
     const expandedSelection = Range.isExpanded(selection)
     let markAcceptingVoidSelected = false
     if (!expandedSelection) {
-      const [selectedNode, selectedPath] = Editor.node(editor, selection)
+      const entry = Editor.node(editor, selection)
+      if (!entry) return
+
+      const [selectedNode, selectedPath] = entry
       if (selectedNode && match(selectedNode, selectedPath)) {
-        const [parentNode] = Editor.parent(editor, selectedPath)
+        const parentEntry = Editor.parent(editor, selectedPath)
+        if (!parentEntry) return
+        const [parentNode] = parentEntry
+
         markAcceptingVoidSelected =
           parentNode && editor.markableVoid(parentNode)
       }

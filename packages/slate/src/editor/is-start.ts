@@ -8,5 +8,7 @@ export const isStart: EditorInterface['isStart'] = (editor, point, at) => {
   }
 
   const start = Editor.start(editor, at)
+  if (!start) return false
+
   return Point.equals(point, start)
 }

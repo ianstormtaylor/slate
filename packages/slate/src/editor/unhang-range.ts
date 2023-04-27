@@ -29,6 +29,7 @@ export const unhangRange: EditorInterface['unhangRange'] = (
   })
   const blockPath = endBlock ? endBlock[1] : []
   const first = Editor.start(editor, start)
+  if (!first) return range
   const before = { anchor: first, focus: end }
   let skip = true
 

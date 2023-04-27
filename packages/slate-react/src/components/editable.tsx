@@ -208,6 +208,8 @@ export const Editable = (props: EditableProps) => {
           !state.isDraggingInternally
         ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
+          if (!root) return
+
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
           const domSelection = root.getSelection()
@@ -287,6 +289,8 @@ export const Editable = (props: EditableProps) => {
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
+    if (!root) return
+
     const domSelection = root.getSelection()
 
     if (
@@ -352,17 +356,18 @@ export const Editable = (props: EditableProps) => {
       // but Slate's value is not being updated through any operation
       // and thus it doesn't transform selection on its own
       if (selection && !ReactEditor.hasRange(editor, selection)) {
-        editor.selection = ReactEditor.toSlateRange(editor, domSelection, {
-          exactMatch: false,
-          suppressThrow: true,
-        })
+        editor.selection =
+          ReactEditor.toSlateRange(editor, domSelection, {
+            exactMatch: false,
+            suppressThrow: true,
+          }) ?? null
         return
       }
 
       // Otherwise the DOM selection is out of sync, so update it.
       state.isUpdatingSelection = true
 
-      const newDomRange: DOMRange | null =
+      const newDomRange: DOMRange | null | undefined =
         selection && ReactEditor.toDOMRange(editor, selection)
 
       if (newDomRange) {
@@ -399,6 +404,8 @@ export const Editable = (props: EditableProps) => {
         // to focus the contenteditable element too. (2016/11/16)
         if (newDomRange && IS_FIREFOX) {
           const el = ReactEditor.toDOMNode(editor, editor)
+          if (!el) return
+
           el.focus()
         }
 
@@ -413,6 +420,8 @@ export const Editable = (props: EditableProps) => {
         const ensureDomSelection = (forceChange?: boolean) => {
           try {
             const el = ReactEditor.toDOMNode(editor, editor)
+            if (!el) return
+
             el.focus()
 
             setDomSelection(forceChange)
@@ -510,7 +519,10 @@ export const Editable = (props: EditableProps) => {
           // Therefore we don't allow native events to insert text at the end of anchor nodes.
           const { anchor } = selection
 
-          const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
+          const point = ReactEditor.toDOMPoint(editor, anchor)
+          if (!point) return
+          const [node, offset] = point
+
           const anchorNode = node.parentElement?.closest('a')
 
           const window = ReactEditor.getWindow(editor)
@@ -559,6 +571,7 @@ export const Editable = (props: EditableProps) => {
               exactMatch: false,
               suppressThrow: false,
             })
+            if (!range) return
 
             if (!selection || !Range.equals(selection, range)) {
               native = false
@@ -801,13 +814,16 @@ export const Editable = (props: EditableProps) => {
 
   if (showPlaceholder) {
     const start = Editor.start(editor, [])
-    decorations.push({
-      [PLACEHOLDER_SYMBOL]: true,
-      placeholder,
-      onPlaceholderResize: placeHolderResizeHandler,
-      anchor: start,
-      focus: start,
-    })
+
+    if (start) {
+      decorations.push({
+        [PLACEHOLDER_SYMBOL]: true,
+        placeholder,
+        onPlaceholderResize: placeHolderResizeHandler,
+        anchor: start,
+        focus: start,
+      })
+    }
   }
 
   const { marks } = editor
@@ -816,25 +832,27 @@ export const Editable = (props: EditableProps) => {
   if (editor.selection && Range.isCollapsed(editor.selection) && marks) {
     const { anchor } = editor.selection
     const leaf = Node.leaf(editor, anchor.path)
-    const { text, ...rest } = leaf
+    if (leaf) {
+      const { text, ...rest } = leaf
 
-    // While marks isn't a 'complete' text, we can still use loose Text.equals
-    // here which only compares marks anyway.
-    if (!Text.equals(leaf, marks as Text, { loose: true })) {
-      state.hasMarkPlaceholder = true
+      // While marks isn't a 'complete' text, we can still use loose Text.equals
+      // here which only compares marks anyway.
+      if (!Text.equals(leaf, marks as Text, { loose: true })) {
+        state.hasMarkPlaceholder = true
 
-      const unset = Object.fromEntries(
-        Object.keys(rest).map(mark => [mark, null])
-      )
+        const unset = Object.fromEntries(
+          Object.keys(rest).map(mark => [mark, null])
+        )
 
-      decorations.push({
-        [MARK_PLACEHOLDER_SYMBOL]: true,
-        ...unset,
-        ...marks,
+        decorations.push({
+          [MARK_PLACEHOLDER_SYMBOL]: true,
+          ...unset,
+          ...marks,
 
-        anchor,
-        focus: anchor,
-      })
+          anchor,
+          focus: anchor,
+        })
+      }
     }
   }
 
@@ -846,6 +864,7 @@ export const Editable = (props: EditableProps) => {
       if (selection) {
         const { anchor } = selection
         const text = Node.leaf(editor, anchor.path)
+        if (!text) return
 
         // While marks isn't a 'complete' text, we can still use loose Text.equals
         // here which only compares marks anyway.
@@ -975,6 +994,8 @@ export const Editable = (props: EditableProps) => {
                 // itself becomes unfocused, so we want to abort early to allow to
                 // editor to stay focused when the tab becomes focused again.
                 const root = ReactEditor.findDocumentOrShadowRoot(editor)
+                if (!root) return
+
                 if (state.latestElement === root.activeElement) {
                   return
                 }
@@ -1039,6 +1060,8 @@ export const Editable = (props: EditableProps) => {
                   isDOMNode(event.target)
                 ) {
                   const node = ReactEditor.toSlateNode(editor, event.target)
+                  if (!node) return
+
                   const path = ReactEditor.findPath(editor, node)
 
                   // At this time, the Slate document may be arbitrarily different,
@@ -1046,6 +1069,7 @@ export const Editable = (props: EditableProps) => {
                   // Therefore we must check that this path actually exists,
                   // and that it still refers to the same node.
                   if (
+                    !path ||
                     !Editor.hasPath(editor, path) ||
                     Node.get(editor, path) !== node
                   ) {
@@ -1067,6 +1091,8 @@ export const Editable = (props: EditableProps) => {
                     }
 
                     const range = Editor.range(editor, blockPath)
+                    if (!range) return
+
                     Transforms.select(editor, range)
                     return
                   }
@@ -1076,7 +1102,11 @@ export const Editable = (props: EditableProps) => {
                   }
 
                   const start = Editor.start(editor, path)
+                  if (!start) return
+
                   const end = Editor.end(editor, path)
+                  if (!end) return
+
                   const startVoid = Editor.void(editor, { at: start })
                   const endVoid = Editor.void(editor, { at: end })
 
@@ -1086,6 +1116,8 @@ export const Editable = (props: EditableProps) => {
                     Path.equals(startVoid[1], endVoid[1])
                   ) {
                     const range = Editor.range(editor, start)
+                    if (!range) return
+
                     Transforms.select(editor, range)
                   }
                 }
@@ -1236,6 +1268,8 @@ export const Editable = (props: EditableProps) => {
                       Editor.deleteFragment(editor)
                     } else {
                       const node = Node.parent(editor, selection.anchor.path)
+                      if (!node) return
+
                       if (Editor.isVoid(editor, node)) {
                         Transforms.delete(editor)
                       }
@@ -1271,7 +1305,11 @@ export const Editable = (props: EditableProps) => {
                   !isEventHandled(event, attributes.onDragStart)
                 ) {
                   const node = ReactEditor.toSlateNode(editor, event.target)
+                  if (!node) return
+
                   const path = ReactEditor.findPath(editor, node)
+                  if (!path) return
+
                   const voidMatch =
                     (Element.isElement(node) && Editor.isVoid(editor, node)) ||
                     Editor.void(editor, { at: path, voids: true })
@@ -1280,6 +1318,8 @@ export const Editable = (props: EditableProps) => {
                   // so that it shows up in the selection's fragment.
                   if (voidMatch) {
                     const range = Editor.range(editor, path)
+                    if (!range) return
+
                     Transforms.select(editor, range)
                   }
 
@@ -1308,6 +1348,8 @@ export const Editable = (props: EditableProps) => {
 
                   // Find the range where the drop happened
                   const range = ReactEditor.findEventRange(editor, event)
+                  if (!range) return
+
                   const data = event.dataTransfer
 
                   Transforms.select(editor, range)
@@ -1364,7 +1406,11 @@ export const Editable = (props: EditableProps) => {
                   !isEventHandled(event, attributes.onFocus)
                 ) {
                   const el = ReactEditor.toDOMNode(editor, editor)
+                  if (!el) return
+
                   const root = ReactEditor.findDocumentOrShadowRoot(editor)
+                  if (!root) return
+
                   state.latestElement = root.activeElement
 
                   // COMPAT: If the editor has nested editable elements, the focus

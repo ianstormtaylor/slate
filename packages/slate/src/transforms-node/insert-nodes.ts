@@ -35,6 +35,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
         at = editor.selection
       } else if (editor.children.length > 0) {
         at = Editor.end(editor, [])
+        if (!at) return
       } else {
         at = [0]
       }
@@ -86,12 +87,15 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
         Transforms.splitNodes(editor, { at, match, mode, voids })
         const path = pathRef.unref()!
         at = isAtEnd ? Path.next(path) : path
+        if (!at) return
       } else {
         return
       }
     }
 
     const parentPath = Path.parent(at)
+    if (!parentPath) return
+
     let index = at[at.length - 1]
 
     if (!voids && Editor.void(editor, { at: parentPath })) {
@@ -103,8 +107,10 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       index++
       editor.apply({ type: 'insert_node', path, node })
       at = Path.next(at)
+      if (!at) return
     }
     at = Path.previous(at)
+    if (!at) return
 
     if (select) {
       const point = Editor.end(editor, at)

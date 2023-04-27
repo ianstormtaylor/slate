@@ -36,10 +36,9 @@ export const setNodes: NodeTransforms['setNodes'] = (
     }
 
     if (split && Range.isRange(at)) {
-      if (
-        Range.isCollapsed(at) &&
-        Editor.leaf(editor, at.anchor)[0].text.length > 0
-      ) {
+      const leaf = Editor.leaf(editor, at.anchor)
+
+      if (Range.isCollapsed(at) && leaf && leaf[0].text.length > 0) {
         // If the range is collapsed in a non-empty node and 'split' is true, there's nothing to
         // set that won't get normalized away
         return

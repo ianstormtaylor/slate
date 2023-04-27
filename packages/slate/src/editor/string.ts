@@ -6,6 +6,8 @@ import { Path } from '../interfaces/path'
 export const string: EditorInterface['string'] = (editor, at, options = {}) => {
   const { voids = false } = options
   const range = Editor.range(editor, at)
+  if (!range) return ''
+
   const [start, end] = Range.edges(range)
   let text = ''
 

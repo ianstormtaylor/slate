@@ -1,17 +1,18 @@
 import { EditorError } from './editor'
 
-export type ErrorStore = {
+export type ErrorLogger = {
   errors: EditorError[]
   onError: (error: Omit<EditorError, 'error'>) => void
 }
 
-export interface ErrorStoreInterface {
-  setOnError(onError: ErrorStore['onError']): void
+export interface ErrorLoggerInterface {
+  onError: ErrorLogger['onError']
+  setOnError(onError: ErrorLogger['onError']): void
 }
 
 const _errors: EditorError[] = []
 
-const _errorStore: ErrorStore = {
+const _errorStore: ErrorLogger = {
   errors: _errors,
   onError: error => {
     try {
@@ -28,21 +29,25 @@ const _errorStore: ErrorStore = {
 /**
  * This interface implements an error store, which is used by Slate
  * internally on invalid calls of methods not depending on `editor`. Developers
- * using Slate may call ErrorStore.setOnError() to alter the behavior of this
+ * using Slate may call ErrorLogger.setOnError() to alter the behavior of this
  * function.
  *
  * For example, to throw an error only for one method:
  *
- *    import { ErrorStore } from 'slate';
- *    ErrorStore.setOnError(error => {
+ *    import { ErrorLogger } from 'slate';
+ *    ErrorLogger.setOnError(error => {
  *     if (error.type === 'point') {
  *       throw new Error(error.message)
  *     }
- *     // ...push the error to ErrorStore.errors
+ *     // ...push the error to ErrorLogger.errors
  *   });
  */
 // eslint-disable-next-line no-redeclare
-export const ErrorStore: ErrorStoreInterface = {
+export const ErrorLogger: ErrorLoggerInterface = {
+  onError(error) {
+    _errorStore.onError(error)
+  },
+
   setOnError(onError) {
     _errorStore.onError = onError
   },

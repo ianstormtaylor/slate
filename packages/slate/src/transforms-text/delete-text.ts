@@ -38,6 +38,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
         const target = reverse
           ? Editor.before(editor, at, opts) || Editor.start(editor, [])
           : Editor.after(editor, at, opts) || Editor.end(editor, [])
+        if (!target) return
         at = { anchor: at, focus: target }
         hanging = true
       }
@@ -55,6 +56,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     if (!hanging) {
       const [, end] = Range.edges(at)
       const endOfDoc = Editor.end(editor, [])
+      if (!endOfDoc) return
 
       if (!Point.equals(end, endOfDoc)) {
         at = Editor.unhangRange(editor, at, { voids })
@@ -133,7 +135,10 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     if (!isSingleText && !startNonEditable) {
       const point = startRef.current!
-      const [node] = Editor.leaf(editor, point)
+      const entry = Editor.leaf(editor, point)
+      if (!entry) return
+      const [node] = entry
+
       const { path } = point
       const { offset } = start
       const text = node.text.slice(offset)
@@ -151,7 +156,10 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
 
     if (!endNonEditable) {
       const point = endRef.current!
-      const [node] = Editor.leaf(editor, point)
+      const entry = Editor.leaf(editor, point)
+      if (!entry) return
+      const [node] = entry
+
       const { path } = point
       const offset = isSingleText ? start.offset : 0
       const text = node.text.slice(offset, end.offset)

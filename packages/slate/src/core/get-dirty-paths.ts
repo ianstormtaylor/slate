@@ -22,7 +22,7 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
     case 'insert_node': {
       const { node, path } = op
       const levels = Path.levels(path)
-      const descendants = Text.isText(node)
+      const descendants: Path[] = Text.isText(node)
         ? []
         : Array.from(Node.nodes(node), ([, p]) => path.concat(p))
 
@@ -33,6 +33,8 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
       const { path } = op
       const ancestors = Path.ancestors(path)
       const previousPath = Path.previous(path)
+      if (!previousPath) return [...ancestors]
+
       return [...ancestors, previousPath]
     }
 
@@ -73,6 +75,8 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
       const { path } = op
       const levels = Path.levels(path)
       const nextPath = Path.next(path)
+      if (!nextPath) return [...levels]
+
       return [...levels, nextPath]
     }
 

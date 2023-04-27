@@ -2,7 +2,11 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 
 export const after: EditorInterface['after'] = (editor, at, options = {}) => {
   const anchor = Editor.point(editor, at, { edge: 'end' })
+  if (!anchor) return
+
   const focus = Editor.end(editor, [])
+  if (!focus) return
+
   const range = { anchor, focus }
   const { distance = 1 } = options
   let d = 0

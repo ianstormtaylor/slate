@@ -31,10 +31,13 @@ export const removeNodes: NodeTransforms['removeNodes'] = (
     const pathRefs = Array.from(depths, ([, p]) => Editor.pathRef(editor, p))
 
     for (const pathRef of pathRefs) {
-      const path = pathRef.unref()!
+      const path = pathRef.unref()
 
       if (path) {
-        const [node] = Editor.node(editor, path)
+        const entry = Editor.node(editor, path)
+        if (!entry) return
+
+        const [node] = entry
         editor.apply({ type: 'remove_node', path, node })
       }
     }

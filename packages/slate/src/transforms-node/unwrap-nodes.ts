@@ -25,7 +25,9 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
     }
 
     if (Path.isPath(at)) {
-      at = Editor.range(editor, at)
+      const range = Editor.range(editor, at)
+      if (!range) return
+      at = range
     }
 
     const rangeRef = Range.isRange(at) ? Editor.rangeRef(editor, at) : null
@@ -40,8 +42,12 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
 
     for (const pathRef of pathRefs) {
       const path = pathRef.unref()!
-      const [node] = Editor.node(editor, path)
+      const entry = Editor.node(editor, path)
+      if (!entry) continue
+      const [node] = entry
+
       let range = Editor.range(editor, path)
+      if (!range) continue
 
       if (split && rangeRef) {
         range = Range.intersection(rangeRef.current!, range)!

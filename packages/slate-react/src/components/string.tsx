@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useRef, useState } from 'react'
-import { Editor, Text, Path, Element, Node } from 'slate'
+import { Editor, Element, Node, Path, Text } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -19,6 +19,10 @@ const String = (props: {
   const { isLast, leaf, parent, text } = props
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
+  if (!path) {
+    return <TextString text={leaf.text} />
+  }
+
   const parentPath = Path.parent(path)
   const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
 
@@ -32,6 +36,7 @@ const String = (props: {
   // width space that will convert into a line break when copying and pasting
   // to support expected plain text.
   if (
+    parentPath &&
     leaf.text === '' &&
     parent.children[parent.children.length - 1] === text &&
     !editor.isInline(parent) &&

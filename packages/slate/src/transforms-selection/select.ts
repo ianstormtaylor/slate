@@ -6,7 +6,10 @@ import { Scrubber } from '../interfaces/scrubber'
 
 export const select: SelectionTransforms['select'] = (editor, target) => {
   const { selection } = editor
-  target = Editor.range(editor, target)
+  const range = Editor.range(editor, target)
+  if (!range) return
+
+  target = range
 
   if (selection) {
     Transforms.setSelection(editor, target)
