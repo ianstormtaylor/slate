@@ -21,9 +21,11 @@ export const point: EditorInterface['point'] = (editor, at, options = {}) => {
     const node = Node.get(editor, path)
 
     if (!Text.isText(node)) {
-      throw new Error(
-        `Cannot get the ${edge} point in the node at path [${at}] because it has no ${edge} text node.`
-      )
+      editor.onError({
+        type: 'point',
+        message: `Cannot get the ${edge} point in the node at path [${at}] because it has no ${edge} text node.`,
+      })
+      return
     }
 
     return { path, offset: edge === 'end' ? node.text.length : 0 }

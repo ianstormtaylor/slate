@@ -30,9 +30,11 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const index = path[path.length - 1]
 
       if (index > parent.children.length) {
-        throw new Error(
-          `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
-        )
+        editor.onError({
+          type: 'insert_node',
+          message: `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`,
+        })
+        return
       }
 
       parent.children.splice(index, 0, node)
@@ -76,11 +78,13 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       } else if (!Text.isText(node) && !Text.isText(prev)) {
         prev.children.push(...node.children)
       } else {
-        throw new Error(
-          `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
+        editor.onError({
+          type: 'merge_node',
+          message: `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
             node
-          )} ${Scrubber.stringify(prev)}`
-        )
+          )} ${Scrubber.stringify(prev)}`,
+        })
+        return
       }
 
       parent.children.splice(index, 1)
@@ -98,9 +102,11 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, newPath } = op
 
       if (Path.isAncestor(path, newPath)) {
-        throw new Error(
-          `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`
-        )
+        editor.onError({
+          type: 'move_node',
+          message: `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`,
+        })
+        return
       }
 
       const node = Node.get(editor, path)
@@ -204,14 +210,22 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, properties, newProperties } = op
 
       if (path.length === 0) {
-        throw new Error(`Cannot set properties on the root node!`)
+        editor.onError({
+          type: 'set_node',
+          message: `Cannot set properties on the root node!`,
+        })
+        return
       }
 
       const node = Node.get(editor, path)
 
       for (const key in newProperties) {
         if (key === 'children' || key === 'text') {
-          throw new Error(`Cannot set the "${key}" property of nodes!`)
+          editor.onError({
+            type: 'set_node',
+            message: `Cannot set the "${key}" property of nodes!`,
+          })
+          return
         }
 
         const value = newProperties[key]
@@ -241,11 +255,13 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       } else {
         if (selection == null) {
           if (!Range.isRange(newProperties)) {
-            throw new Error(
-              `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
+            editor.onError({
+              type: 'set_selection',
+              message: `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
                 newProperties
-              )} when there is no current selection.`
-            )
+              )} when there is no current selection.`,
+            })
+            return
           }
 
           selection = { ...newProperties }
@@ -256,7 +272,11 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
           if (value == null) {
             if (key === 'anchor' || key === 'focus') {
-              throw new Error(`Cannot remove the "${key}" selection property`)
+              editor.onError({
+                type: 'set_selection',
+                message: `Cannot remove the "${key}" selection property`,
+              })
+              return
             }
 
             delete selection[key]
@@ -273,9 +293,11 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, position, properties } = op
 
       if (path.length === 0) {
-        throw new Error(
-          `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`
-        )
+        editor.onError({
+          type: 'split_node',
+          message: `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`,
+        })
+        return
       }
 
       const node = Node.get(editor, path)

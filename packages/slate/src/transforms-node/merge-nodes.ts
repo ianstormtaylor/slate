@@ -109,11 +109,13 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       position = prevNode.children.length
       properties = rest as Partial<Element>
     } else {
-      throw new Error(
-        `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
+      editor.onError({
+        type: 'mergeNodes',
+        message: `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
           node
-        )} ${Scrubber.stringify(prevNode)}`
-      )
+        )} ${Scrubber.stringify(prevNode)}`,
+      })
+      return
     }
 
     // If the node isn't already the next sibling of the previous node, move

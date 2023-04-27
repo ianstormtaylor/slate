@@ -31,9 +31,11 @@ export const liftNodes: NodeTransforms['liftNodes'] = (
       const path = pathRef.unref()!
 
       if (path.length < 2) {
-        throw new Error(
-          `Cannot lift node at a path [${path}] because it has a depth of less than \`2\`.`
-        )
+        editor.onError({
+          type: 'liftNodes',
+          message: `Cannot lift node at a path [${path}] because it has a depth of less than \`2\`.`,
+        })
+        return
       }
 
       const parentNodeEntry = Editor.node(editor, Path.parent(path))

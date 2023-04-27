@@ -23,7 +23,11 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
   const span: Span = [pointBeforeLocation.path, to]
 
   if (Path.isPath(at) && at.length === 0) {
-    throw new Error(`Cannot get the previous node from the root node!`)
+    editor.onError({
+      type: 'previous',
+      message: `Cannot get the previous node from the root node!`,
+    })
+    return
   }
 
   if (match == null) {

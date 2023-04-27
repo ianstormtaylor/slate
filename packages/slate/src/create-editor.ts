@@ -83,6 +83,7 @@ import {
   unwrapNodes,
   wrapNodes,
 } from './transforms-node'
+import { onError } from './core/on-error'
 
 /**
  * Create a new Slate `Editor` object.
@@ -91,6 +92,7 @@ export const createEditor = (): Editor => {
   const editor: Editor = {
     children: [],
     operations: [],
+    errors: [],
     selection: null,
     marks: null,
     isElementReadOnly: () => false,
@@ -99,6 +101,7 @@ export const createEditor = (): Editor => {
     isVoid: () => false,
     markableVoid: () => false,
     onChange: () => {},
+    onError: (...args) => onError(editor, ...args),
 
     // Core
     apply: (...args) => apply(editor, ...args),

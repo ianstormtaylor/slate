@@ -38,6 +38,7 @@ export interface BaseEditor {
   // Core state.
 
   children: Descendant[]
+  errors: EditorError[]
   selection: Selection
   operations: Operation[]
   marks: EditorMarks | null
@@ -52,6 +53,7 @@ export interface BaseEditor {
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
+  onError: (err: Omit<EditorError, 'error'>) => void
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -170,6 +172,12 @@ export type Editor = ExtendedType<'Editor', BaseEditor>
 export type BaseSelection = Range | null
 
 export type Selection = ExtendedType<'Selection', BaseSelection>
+
+export type EditorError = {
+  type: string
+  message: string
+  error: Error
+}
 
 export type EditorMarks = Omit<Text, 'text'>
 
@@ -583,7 +591,11 @@ export interface EditorInterface {
   /**
    * Get the start or end point of a location.
    */
-  point: (editor: Editor, at: Location, options?: EditorPointOptions) => Point
+  point: (
+    editor: Editor,
+    at: Location,
+    options?: EditorPointOptions
+  ) => Point | undefined
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new

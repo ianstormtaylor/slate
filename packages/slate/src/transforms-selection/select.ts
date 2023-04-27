@@ -14,11 +14,13 @@ export const select: SelectionTransforms['select'] = (editor, target) => {
   }
 
   if (!Range.isRange(target)) {
-    throw new Error(
-      `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${Scrubber.stringify(
+    editor.onError({
+      type: 'select',
+      message: `When setting the selection and the current selection is \`null\` you must provide at least an \`anchor\` and \`focus\`, but you passed: ${Scrubber.stringify(
         target
-      )}`
-    )
+      )}`,
+    })
+    return
   }
 
   editor.apply({
