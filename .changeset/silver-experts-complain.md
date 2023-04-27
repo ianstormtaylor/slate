@@ -1,9 +1,10 @@
 ---
-"slate": minor
-"slate-react": minor
+'slate': minor
+'slate-react': minor
 ---
 
 Breaking changes:
+
 - Enhanced error handling by introducing **`undefined`** checks
 - Added **`editor.onError`** function to handle errors in functions that depend on **`editor`**
 - Introduced global **`ErrorLogger`** interface for error handling in functions not depending on **`editor`**
