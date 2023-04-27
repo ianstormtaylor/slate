@@ -25,7 +25,7 @@ workflows:
     description: Summarize the pull request
     always-run: true
     if:
-      # Summarize the pull request on pull request synchronization.
+      # Summarize the pull request on pull request opening.
       - rule: ($eventType() == "synchronize" || $eventType() == "opened") && $state() == "open"
         extra-actions:
           - $summarize()
@@ -37,7 +37,7 @@ workflows:
     always-run: true
     if:
       # Automatically assign reviewer when the pull request is ready for review;
-      - rule: $isDraft() == false
+      - rule: $isDraft() == false && $eventType() == "opened" && $state() == "open"
         extra-actions:
           - $assignCodeAuthorReviewers()
 
@@ -55,16 +55,16 @@ workflows:
   # This workflow validates that pull requests follow the conventional commits specification.
   # This helps developers automatically generate changelogs.
   # For more details, see https://www.conventionalcommits.org/en/v1.0.0/.
-  - name: check-conventional-commits
-    description: Validate that pull requests follow the conventional commits
-    always-run: true
-    if:
-      - rule: $isDraft() == false
-    then:
-      # Check commits messages against the conventional commits specification
-      - $commitLint()
-      # Check pull request title against the conventional commits specification.
-      - $titleLint()
+#   - name: check-conventional-commits
+#     description: Validate that pull requests follow the conventional commits
+#     always-run: true
+#     if:
+#       - rule: $isDraft() == false
+#     then:
+#       # Check commits messages against the conventional commits specification
+#       - $commitLint()
+#       # Check pull request title against the conventional commits specification.
+#       - $titleLint()
 
   # This workflow validates best practices for pull request management.
   # This helps developers follow best practices.
@@ -73,9 +73,9 @@ workflows:
     always-run: true
     if:
       # Warn pull requests that do not have an associated GitHub issue.
-      - rule: $hasLinkedIssues() == false
-        extra-actions:
-          - $warn("Please link an issue to the pull request")
+#       - rule: $hasLinkedIssues() == false
+#         extra-actions:
+#           - $warn("Please link an issue to the pull request")
       # Warn pull requests if their description is empty.
       - rule: $description() == ""
         extra-actions:
@@ -122,7 +122,7 @@ workflows:
     always-run: true
     if:
       # Label pull requests with `docs` if they only modify Markdown or txt files.
-      - rule: $hasFileExtensions([".md", ".txt"])
+      - rule: $hasFileExtensions([".md", ".mdx", ".txt"])
         extra-actions:
           - $addLabel("docs")
       # Label pull requests with `infra` if they modify Terraform files.
@@ -130,7 +130,7 @@ workflows:
         extra-actions:
           - $addLabel("infra")
       # Label pull requests with `dependencies` if they only modify `package.json` and `package.lock` files.
-      - rule: $hasFileExtensions(["package.json", "package-lock.json"])
+      - rule: $hasFileExtensions(["package.json", "package-lock.json", "yarn.lock"])
         extra-actions:
           - $addLabel("dependencies")
 
