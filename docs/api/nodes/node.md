@@ -11,7 +11,7 @@
 
 #### `Node.ancestor(root: Node, path: Path) => Ancestor | undefined`
 
-Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, throw an error.
+Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, return `undefined`.
 
 #### `Node.ancestors(root: Node, path: Path, options?) => Generator<NodeEntry<Ancestor>>`
 
@@ -69,7 +69,7 @@ Get the last node entry in a root node at a specific `path`.
 
 #### `Node.leaf(root: Node, path: Path) => Text | undefined`
 
-Get the node at a specific `path`, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
+Get the node at a specific `path`, ensuring it's a leaf text node. If the node is not a leaf text node, return `undefined`.
 
 #### `Node.levels(root: Node, path: Path, options?) => Generator<NodeEntry>`
 

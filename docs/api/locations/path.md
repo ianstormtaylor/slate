@@ -49,7 +49,7 @@ Given a path, return a new path referring to the parent node above it. If the `p
 
 #### `Path.previous(path: Path) => Path | undefined`
 
-Given a path, get the path to the previous sibling node. The method will throw an error if there are no previous siblings (e.g. if the Path is currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal and will throw an error).
+Given a path, get the path to the previous sibling node. The method will return `undefined` if there are no previous siblings (e.g. if the Path is currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal and will return `undefined`).
 
 #### `Path.relative(path: Path, ancestor: Path) => Path | undefined`
 
