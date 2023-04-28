@@ -21,18 +21,18 @@ ErrorLogger.addErrorHandler(error => {
 You can also filter errors by type:
 
 ```tsx
-ErrorLogger.addErrorHandler((error) => {
+ErrorLogger.addErrorHandler(error => {
   // handle error
   if (error.type === 'Node.get') {
     throw new Error(error.message)
   }
 
   // access errors array
-  console.log(ErrorLogger.getErrors());
-  
+  console.log(ErrorLogger.getErrors())
+
   // reset errors array
-  console.log(ErrorLogger.resetErrors());
-});
+  console.log(ErrorLogger.resetErrors())
+})
 ```
 
 ## `editor.onError`
