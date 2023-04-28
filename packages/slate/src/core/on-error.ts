@@ -1,16 +1,12 @@
-import { WithEditorFirstArg } from '../utils'
 import { Editor } from '../interfaces'
+import { WithEditorFirstArg } from '../utils'
 
 export const onError: WithEditorFirstArg<Editor['onError']> = (
   editor,
   error
 ) => {
-  try {
-    throw new Error(error.message)
-  } catch (err) {
-    editor.errors.push({
-      ...error,
-      error: err,
-    })
-  }
+  editor.errors.push({
+    ...error,
+    error: new Error(error.message),
+  })
 }
