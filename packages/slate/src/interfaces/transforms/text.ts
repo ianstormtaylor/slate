@@ -1,4 +1,12 @@
-import { Editor, Location, Node, Path, Range, Transforms } from '../../index'
+import {
+  Editor,
+  getDefaultInsertLocation,
+  Location,
+  Node,
+  Path,
+  Range,
+  Transforms,
+} from '../../index'
 import { TextUnit } from '../../types/types'
 
 export interface TextDeleteOptions {
@@ -61,11 +69,7 @@ export const TextTransforms: TextTransforms = {
   ): void {
     Editor.withoutNormalizing(editor, () => {
       const { voids = false } = options
-      let { at = editor.selection } = options
-
-      if (!at) {
-        return
-      }
+      let { at = getDefaultInsertLocation(editor) } = options
 
       if (Path.isPath(at)) {
         at = Editor.range(editor, at)

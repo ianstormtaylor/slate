@@ -6,5 +6,5 @@ export const insertNode: EditorInterface['insertNode'] = (
   node,
   options
 ) => {
-  Transforms.insertNodes(editor, node)
+  Transforms.insertNodes(editor, node, options)
 }

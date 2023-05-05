@@ -6,6 +6,7 @@ import { Element } from '../interfaces/element'
 import { Node, NodeEntry } from '../interfaces/node'
 import { Text } from '../interfaces/text'
 import { TextTransforms } from '../interfaces/transforms/text'
+import { getDefaultInsertLocation } from '../utils'
 
 export const insertFragment: TextTransforms['insertFragment'] = (
   editor,
@@ -14,15 +15,13 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 ) => {
   Editor.withoutNormalizing(editor, () => {
     const { hanging = false, voids = false } = options
-    let { at = editor.selection } = options
+    let { at = getDefaultInsertLocation(editor) } = options
 
     if (!fragment.length) {
       return
     }
 
-    if (!at) {
-      return
-    } else if (Range.isRange(at)) {
+    if (Range.isRange(at)) {
       if (!hanging) {
         at = Editor.unhangRange(editor, at, { voids })
       }
