@@ -416,7 +416,8 @@ export interface EditorInterface {
   insertBreak: (editor: Editor) => void
 
   /**
-   * Inserts a fragment at the specified location in the document. If no location is specified, insert at the current selection.
+   * Inserts a fragment
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
   insertFragment: (
     editor: Editor,
@@ -425,7 +426,8 @@ export interface EditorInterface {
   ) => void
 
   /**
-   * Atomically inserts `nodes` at the specified location in the document. If no location is specified, inserts at the current selection. If there is no selection, inserts at the end of the document.
+   * Atomically inserts `nodes`
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
   insertNode: <T extends Node>(
     editor: Editor,
@@ -441,7 +443,8 @@ export interface EditorInterface {
   insertSoftBreak: (editor: Editor) => void
 
   /**
-   * Insert a string of text at the specified location in the document. If no location is specified, insert at the current selection.
+   * Insert a string of text
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
   insertText: (
     editor: Editor,

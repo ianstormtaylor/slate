@@ -248,19 +248,19 @@ Insert a block break at the current selection.
 
 #### `Editor.insertFragment(editor: Editor, fragment: Node[], options?) => void`
 
-Inserts a fragment at the specified location in the document. If no location is specified, insert at the current selection.
+Inserts a fragment at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Editor.insertNode(editor: Editor, node: Node, options?) => void`
 
-Atomically insert `node` at the specified location in the document. If no location is specified, inserts at the current selection. If there is no selection, inserts at the end of the document.
+Atomically insert `node` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
 #### `Editor.insertText(editor: Editor, text: string, options?) => void`
 
-Insert a string of text at the specified location in the document. If no location is specified, insert at the current selection.
+Insert a string of text at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, voids?: boolean}`
 
