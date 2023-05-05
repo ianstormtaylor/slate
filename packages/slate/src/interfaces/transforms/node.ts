@@ -2,6 +2,15 @@ import { Editor, Element, Location, Node, Path } from '../../index'
 import { NodeMatch, PropsCompare, PropsMerge } from '../editor'
 import { MaximizeMode, RangeMode } from '../../types/types'
 
+export interface NodeInsertNodesOptions<T extends Node> {
+  at?: Location
+  match?: NodeMatch<T>
+  mode?: RangeMode
+  hanging?: boolean
+  select?: boolean
+  voids?: boolean
+}
+
 export interface NodeTransforms {
   /**
    * Insert nodes at a specific location in the Editor.
@@ -9,14 +18,7 @@ export interface NodeTransforms {
   insertNodes: <T extends Node>(
     editor: Editor,
     nodes: Node | Node[],
-    options?: {
-      at?: Location
-      match?: NodeMatch<T>
-      mode?: RangeMode
-      hanging?: boolean
-      select?: boolean
-      voids?: boolean
-    }
+    options?: NodeInsertNodesOptions<T>
   ) => void
 
   /**
