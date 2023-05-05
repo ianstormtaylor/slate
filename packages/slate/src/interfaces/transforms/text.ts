@@ -1,13 +1,6 @@
-import {
-  Editor,
-  getDefaultInsertLocation,
-  Location,
-  Node,
-  Path,
-  Range,
-  Transforms,
-} from '../../index'
+import { Editor, Location, Node, Path, Range, Transforms } from '../../index'
 import { TextUnit } from '../../types/types'
+import { getDefaultInsertLocation } from '../../utils'
 
 export interface TextDeleteOptions {
   at?: Location
