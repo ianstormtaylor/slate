@@ -1,5 +1,5 @@
 ---
-"slate": patch
+'slate': patch
 ---
 
 `Editor.insertFragment`, `Editor.insertNode`, `Editor.insertText` now accept `options`.
