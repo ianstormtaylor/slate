@@ -21,10 +21,7 @@ export const next: EditorInterface['next'] = (editor, options = {}) => {
   const span: Span = [pointAfterLocation.path, to]
 
   if (Path.isPath(at) && at.length === 0) {
-    editor.onError({
-      type: 'next',
-      message: `Cannot get the next node from the root node!`,
-    })
+    editor.onError('EditorNext')
     return
   }
 

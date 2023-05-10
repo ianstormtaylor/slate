@@ -1,5 +1,6 @@
 /* eslint-disable no-redeclare */
 import { EditorError } from './editor'
+import { SlateError, SlateErrorType } from './slate-error'
 
 /**
  * This interface implements an error logger, which is used by Slate
@@ -21,7 +22,17 @@ class _ErrorLogger {
   private errors: EditorError[] = []
   private handlers: Array<(error: Omit<EditorError, 'error'>) => void> = []
 
-  onError = (error: Omit<EditorError, 'error'>) => {
+  onError = <T extends SlateErrorType>(
+    type: T,
+    ...args: Parameters<typeof SlateError[T]>
+  ) => {
+    const errorFn: (...args: any[]) => Omit<EditorError, 'error'> =
+      SlateError[type]
+    if (!errorFn) {
+      throw new Error(`Unknown error type: ${type}`)
+    }
+    const error = errorFn(...args)
+
     this.errors.push({
       ...error,
       error: new Error(error.message),

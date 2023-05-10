@@ -17,6 +17,7 @@ import {
   Text,
   Transforms,
 } from '..'
+import { isEditor } from '../editor/is-editor'
 import {
   LeafEdge,
   MaximizeMode,
@@ -27,7 +28,7 @@ import {
   TextUnitAdjustment,
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
-import { isEditor } from '../editor/is-editor'
+import { SlateError, SlateErrorType } from './slate-error'
 import { TextInsertTextOptions } from './transforms/text'
 
 /**
@@ -53,7 +54,10 @@ export interface BaseEditor {
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
-  onError: (err: Omit<EditorError, 'error'>) => void
+  onError: <T extends SlateErrorType>(
+    type: T,
+    ...args: Parameters<typeof SlateError[T]>
+  ) => void
   shouldNormalize: ({
     iteration,
     dirtyPaths,
