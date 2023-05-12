@@ -11,7 +11,7 @@ const StylingExample = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '40px' }}>
       <Slate
         editor={editor1}
-        value={[
+        initialValue={[
           {
             type: 'paragraph',
             children: [{ text: 'This editor is styled using the style prop.' }],
@@ -29,7 +29,7 @@ const StylingExample = () => {
 
       <Slate
         editor={editor2}
-        value={[
+        initialValue={[
           {
             type: 'paragraph',
             children: [

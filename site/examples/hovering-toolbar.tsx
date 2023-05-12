@@ -17,7 +17,7 @@ const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}

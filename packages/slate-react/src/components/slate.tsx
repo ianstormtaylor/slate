@@ -19,18 +19,18 @@ import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 export const Slate = (props: {
   editor: ReactEditor
-  value: Descendant[]
+  initialValue: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
 }) => {
-  const { editor, children, onChange, value, ...rest } = props
+  const { editor, children, onChange, initialValue, ...rest } = props
   const unmountRef = useRef(false)
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
-    if (!Node.isNodeList(value)) {
+    if (!Node.isNodeList(initialValue)) {
       throw new Error(
-        `[Slate] value is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          value
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          initialValue
         )}`
       )
     }
@@ -39,7 +39,7 @@ export const Slate = (props: {
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
-    editor.children = value
+    editor.children = initialValue
     Object.assign(editor, rest)
     return { v: 0, editor }
   })

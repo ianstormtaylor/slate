@@ -10,7 +10,9 @@ const createNodeMock = () => ({
 
 class MockResizeObserver {
   observe() {}
+
   unobserve() {}
+
   disconnect() {}
 }
 
@@ -21,14 +23,18 @@ describe('slate-react', () => {
     describe('NODE_TO_KEY logic', () => {
       test('should not unmount the node that gets split on a split_node operation', async () => {
         const editor = withReact(createEditor())
-        const value = [{ type: 'block', children: [{ text: 'test' }] }]
+        const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
         const mounts = jest.fn()
 
         let el: ReactTestRenderer
 
         act(() => {
           el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
+            <Slate
+              editor={editor}
+              initialValue={initialValue}
+              onChange={() => {}}
+            >
               <Editable
                 renderElement={({ children }) => {
                   useEffect(() => mounts(), [])
@@ -52,7 +58,7 @@ describe('slate-react', () => {
 
       test('should not unmount the node that gets merged into on a merge_node operation', async () => {
         const editor = withReact(createEditor())
-        const value = [
+        const initialValue = [
           { type: 'block', children: [{ text: 'te' }] },
           { type: 'block', children: [{ text: 'st' }] },
         ]
@@ -62,7 +68,11 @@ describe('slate-react', () => {
 
         act(() => {
           el = create(
-            <Slate editor={editor} value={value} onChange={() => {}}>
+            <Slate
+              editor={editor}
+              initialValue={initialValue}
+              onChange={() => {}}
+            >
               <Editable
                 renderElement={({ children }) => {
                   useEffect(() => mounts(), [])
