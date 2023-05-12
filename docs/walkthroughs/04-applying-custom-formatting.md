@@ -27,7 +27,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -72,7 +72,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -163,7 +163,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         // Pass in the `renderLeaf` function.

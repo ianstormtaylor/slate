@@ -35,7 +35,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -142,7 +142,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -200,7 +200,7 @@ const App = () => {
 
   return (
     // Add a toolbar with buttons that call the same methods.
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <div>
         <button
           onMouseDown={event => {
