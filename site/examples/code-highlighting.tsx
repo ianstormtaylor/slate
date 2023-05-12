@@ -324,7 +324,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
   return (
-    <Slate initialValue={initialValue} editor={editor}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable />
     </Slate>
   )
