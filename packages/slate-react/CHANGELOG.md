@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.94.2
+
+### Patch Changes
+
+- [#5423](https://github.com/ianstormtaylor/slate/pull/5423) [`042bca16`](https://github.com/ianstormtaylor/slate/commit/042bca167ac810acccae229bc905a49098aee546) Thanks [@horacioh](https://github.com/horacioh)! - fix placeholder position in Safari 16.x
+
 ## 0.94.0
 
 ### Patch Changes
