@@ -119,6 +119,7 @@ const Leaf = (props: {
         'data-slate-placeholder': true,
         style: {
           position: 'absolute',
+          top: 0,
           pointerEvents: 'none',
           width: '100%',
           maxWidth: '100%',
