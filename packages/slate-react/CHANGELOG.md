@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.95.0
+
+### Minor Changes
+
+- [#5422](https://github.com/ianstormtaylor/slate/pull/5422) [`0b179909`](https://github.com/ianstormtaylor/slate/commit/0b1799091a6800c7e868d5a6148b82648cbe8270) Thanks [@Chudesnov](https://github.com/Chudesnov)! - Prevents default focus styles from being removed in Editable
+
+* [#5421](https://github.com/ianstormtaylor/slate/pull/5421) [`91e388ec`](https://github.com/ianstormtaylor/slate/commit/91e388ecd9e6a540b4a651978436f196f38f667d) Thanks [@e1himself](https://github.com/e1himself)! - Rename `<Slate>` component prop from `value` to `initialValue` to emphasize uncontrolled nature of it
+
 ## 0.94.2
 
 ### Patch Changes
