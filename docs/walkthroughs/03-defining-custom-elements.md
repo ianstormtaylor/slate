@@ -18,7 +18,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         onKeyDown={event => {
           if (event.key === '&') {
@@ -88,7 +88,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         // Pass in the `renderElement` function.
         renderElement={renderElement}
@@ -142,7 +142,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -200,7 +200,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {

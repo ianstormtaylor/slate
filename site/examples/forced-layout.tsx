@@ -74,7 +74,7 @@ const ForcedLayoutExample = () => {
     []
   )
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         placeholder="Enter a title…"

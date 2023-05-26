@@ -48,7 +48,7 @@ const MarkdownPreviewExample = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         decorate={decorate}
         renderLeaf={renderLeaf}
