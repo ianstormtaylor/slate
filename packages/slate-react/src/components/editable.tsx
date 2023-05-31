@@ -46,7 +46,7 @@ import {
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_IOS,
-  IS_SAFARI,
+  IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
 } from '../utils/environment'
@@ -1014,7 +1014,7 @@ export const Editable = (props: EditableProps) => {
                 // COMPAT: Safari doesn't always remove the selection even if the content-
                 // editable element no longer has focus. Refer to:
                 // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
-                if (IS_SAFARI) {
+                if (IS_WEBKIT) {
                   const domSelection = root.getSelection()
                   domSelection?.removeAllRanges()
                 }
@@ -1112,7 +1112,7 @@ export const Editable = (props: EditableProps) => {
                   // type that we need. So instead, insert whenever a composition
                   // ends since it will already have been committed to the DOM.
                   if (
-                    !IS_SAFARI &&
+                    !IS_WEBKIT &&
                     !IS_FIREFOX_LEGACY &&
                     !IS_IOS &&
                     !IS_WECHATBROWSER &&
@@ -1621,7 +1621,7 @@ export const Editable = (props: EditableProps) => {
                       return
                     }
                   } else {
-                    if (IS_CHROME || IS_SAFARI) {
+                    if (IS_CHROME || IS_WEBKIT) {
                       // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
                       // an event when deleting backwards in a selected void inline node
                       if (
@@ -1670,7 +1670,7 @@ export const Editable = (props: EditableProps) => {
                   if (
                     !HAS_BEFORE_INPUT_SUPPORT ||
                     isPlainTextOnlyPaste(event.nativeEvent) ||
-                    IS_SAFARI
+                    IS_WEBKIT
                   ) {
                     event.preventDefault()
                     ReactEditor.insertData(editor, event.clipboardData)
