@@ -366,7 +366,9 @@ export const Editable = (props: EditableProps) => {
         selection && ReactEditor.toDOMRange(editor, selection)
 
       if (newDomRange) {
-        if (Range.isBackward(selection!)) {
+        if (ReactEditor.isComposing(editor)) {
+          domSelection.collapseToEnd()
+        } else if (Range.isBackward(selection!)) {
           domSelection.setBaseAndExtent(
             newDomRange.endContainer,
             newDomRange.endOffset,
