@@ -98,13 +98,7 @@ const App = () => {
             // When "B" is pressed, bold the text in the selection.
             case 'b': {
               event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                // Apply it to text nodes, and split the text node up if the
-                // selection is overlapping only part of it.
-                { match: n => Text.isText(n), split: true }
-              )
+              Editor.addMark(editor, 'bold', true)
               break
             }
           }
@@ -115,9 +109,11 @@ const App = () => {
 }
 ```
 
+Unlike the code format from the previous step, which is a block-level format, bold is a character-level format. Slate manages text contained within blocks (or any other element) using "leaves". Slate's character-level formats/styles are called "marks". Adjacent text with the same marks (styles) applied will be grouped within the same "leaf". When we use `addMark` to add our bold mark to the selected text, Slate will automatically break up the "leaves" using the selection boundaries and produce a new "leaf" with the bold mark added.
+
 Okay, so we've got the hotkey handler setup... but! If you happen to now try selecting text and hitting `Ctrl-B`, you won't notice any change. That's because we haven't told Slate how to render a "bold" mark.
 
-For every format you add, Slate will break up the text content into "leaves", and you need to tell Slate how to read it, just like for elements. So let's define a `Leaf` component:
+For every format you add, you need to tell Slate how to render it, just like for elements. So let's define a `Leaf` component:
 
 ```jsx
 // Define a React component to render leaves with bold text.
@@ -189,11 +185,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                { match: n => Text.isText(n), split: true }
-              )
+              Editor.addMark(editor, 'bold', true)
               break
             }
           }
