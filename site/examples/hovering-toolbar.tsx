@@ -26,13 +26,13 @@ const HoveringMenuExample = () => {
           switch (event.inputType) {
             case 'formatBold':
               event.preventDefault()
-              return toggleFormat(editor, 'bold')
+              return toggleMark(editor, 'bold')
             case 'formatItalic':
               event.preventDefault()
-              return toggleFormat(editor, 'italic')
+              return toggleMark(editor, 'italic')
             case 'formatUnderline':
               event.preventDefault()
-              return toggleFormat(editor, 'underlined')
+              return toggleMark(editor, 'underlined')
           }
         }}
       />
@@ -40,21 +40,19 @@ const HoveringMenuExample = () => {
   )
 }
 
-const toggleFormat = (editor, format) => {
-  const isActive = isFormatActive(editor, format)
-  Transforms.setNodes(
-    editor,
-    { [format]: isActive ? null : true },
-    { match: Text.isText, split: true }
-  )
+const toggleMark = (editor, format) => {
+  const isActive = isMarkActive(editor, format)
+
+  if (isActive) {
+    Editor.removeMark(editor, format)
+  } else {
+    Editor.addMark(editor, format, true)
+  }
 }
 
-const isFormatActive = (editor, format) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n[format] === true,
-    mode: 'all',
-  })
-  return !!match
+const isMarkActive = (editor, format) => {
+  const marks = Editor.marks(editor)
+  return marks ? marks[format] === true : false
 }
 
 const Leaf = ({ attributes, children, leaf }) => {
@@ -141,8 +139,8 @@ const FormatButton = ({ format, icon }) => {
   return (
     <Button
       reversed
-      active={isFormatActive(editor, format)}
-      onClick={() => toggleFormat(editor, format)}
+      active={isMarkActive(editor, format)}
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>
