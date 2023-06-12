@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.96.0
+
+### Minor Changes
+
+- [#5437](https://github.com/ianstormtaylor/slate/pull/5437) [`3ad13d60`](https://github.com/ianstormtaylor/slate/commit/3ad13d601550341688cc75466a75b616d8232154) Thanks [@josephmr](https://github.com/josephmr)! - Detect all WebKit based browsers for COMPAT behavior
+
+### Patch Changes
+
+- [#5443](https://github.com/ianstormtaylor/slate/pull/5443) [`eb7f5987`](https://github.com/ianstormtaylor/slate/commit/eb7f598707ab9a4f1bd62fd195719049e9536be0) Thanks [@OldDream](https://github.com/OldDream)! - fix wrong caret position during composition.
+
 ## 0.95.0
 
 ### Minor Changes
