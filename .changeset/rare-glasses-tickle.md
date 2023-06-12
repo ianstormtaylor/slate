@@ -1,5 +1,5 @@
 ---
-'slate-react': minor
+'slate-react': patch
 ---
 
 fix wrong caret position during composition.
