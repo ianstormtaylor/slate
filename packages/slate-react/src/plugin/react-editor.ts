@@ -870,7 +870,7 @@ export const ReactEditor: ReactEditorInterface = {
     if (
       'getAttribute' in focusNode &&
       (focusNode as HTMLElement).getAttribute('contenteditable') === 'false' &&
-      !focusNode.matches('[data-slate-void]')
+      !(focusNode as HTMLElement).matches('[data-slate-void]')
     ) {
       focusNode = anchorNode
       focusOffset = anchorNode.textContent?.length || 0
