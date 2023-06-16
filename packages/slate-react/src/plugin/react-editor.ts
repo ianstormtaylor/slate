@@ -869,7 +869,8 @@ export const ReactEditor: ReactEditorInterface = {
     // will cause `toSlatePoint` to throw an error. (2023/03/07)
     if (
       'getAttribute' in focusNode &&
-      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false'
+      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false' &&
+      (focusNode as HTMLElement).getAttribute('data-slate-void') !== 'true'
     ) {
       focusNode = anchorNode
       focusOffset = anchorNode.textContent?.length || 0
