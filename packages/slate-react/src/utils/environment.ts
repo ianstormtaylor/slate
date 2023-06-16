@@ -20,7 +20,8 @@ export const IS_FIREFOX =
   /^(?!.*Seamonkey)(?=.*Firefox).*/i.test(navigator.userAgent)
 
 export const IS_WEBKIT =
-  typeof navigator !== 'undefined' && /AppleWebKit/.test(navigator.userAgent)
+  typeof navigator !== 'undefined' &&
+  /AppleWebKit(?!.*Chrome)/i.test(navigator.userAgent)
 
 // "modern" Edge was released at 79.x
 export const IS_EDGE_LEGACY =
