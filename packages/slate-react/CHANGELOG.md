@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.97.0
+
+### Minor Changes
+
+- [#5451](https://github.com/ianstormtaylor/slate/pull/5451) [`12ff246e`](https://github.com/ianstormtaylor/slate/commit/12ff246e101bb7ae51248066c07c378ee4be9220) Thanks [@gtluszcz](https://github.com/gtluszcz)! - Fixed occasional crashes when selecting void elements in Chrome
+
+### Patch Changes
+
+- [#5453](https://github.com/ianstormtaylor/slate/pull/5453) [`cde0a155`](https://github.com/ianstormtaylor/slate/commit/cde0a155e23d015d4ee72f9f10f63b67e878668e) Thanks [@Shiba-ligo](https://github.com/Shiba-ligo)! - fix regular expression for testing Webkit based browser.
+
 ## 0.96.0
 
 ### Minor Changes
