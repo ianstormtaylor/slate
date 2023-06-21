@@ -330,9 +330,10 @@ export const withReact = <T extends BaseEditor>(
     // pass. So we have to use this unstable API to ensure it batches them.
     // (2019/12/03)
     // https://github.com/facebook/react/issues/14259#issuecomment-439702367
-    const maybeBatchUpdates = REACT_MAJOR_VERSION < 18
-      ? ReactDOM.unstable_batchedUpdates
-      : (callback: () => void) => callback()
+    const maybeBatchUpdates =
+      REACT_MAJOR_VERSION < 18
+        ? ReactDOM.unstable_batchedUpdates
+        : (callback: () => void) => callback()
 
     maybeBatchUpdates(() => {
       const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
