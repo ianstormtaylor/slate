@@ -5,7 +5,7 @@ import { ReactEditor } from '../plugin/react-editor'
 
 import { Provider } from './provider'
 
-export const ControlsProvider = (props: {
+export const ToolbarProvider = (props: {
   editor: ReactEditor
   children: React.ReactNode
 }) => {

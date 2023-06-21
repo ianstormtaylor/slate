@@ -10,7 +10,7 @@ export {
 export { DefaultElement } from './components/element'
 export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
-export { ControlsProvider } from './components/controls-provider'
+export { ToolbarProvider } from './components/toolbar-provider'
 
 // Hooks
 export { useEditor } from './hooks/use-editor'

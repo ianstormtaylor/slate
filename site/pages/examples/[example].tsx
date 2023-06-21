@@ -29,7 +29,7 @@ import Styling from '../../examples/styling'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
 import CustomPlaceholder from '../../examples/custom-placeholder'
-import ReachTextDetachedControls from '../../examples/richtext-detached-controls'
+import RichTextDetachedToolbarExample from '../../examples/richtext-detached-toolbar'
 
 // node
 import { getAllExamples } from '../api'
@@ -52,9 +52,9 @@ const EXAMPLES = [
   ['Read-only', ReadOnly, 'read-only'],
   ['Rich Text', RichText, 'richtext'],
   [
-    'Rich Text Detached Controls',
-    ReachTextDetachedControls,
-    'richtext-detached-controls',
+    'Rich Text Detached Toolbar',
+    RichTextDetachedToolbarExample,
+    'richtext-detached-toolbar',
   ],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],

@@ -5,7 +5,7 @@ import {
   withReact,
   useSlate,
   Slate,
-  ControlsProvider,
+  ToolbarProvider,
 } from 'slate-react'
 import {
   Editor,
@@ -28,14 +28,14 @@ const HOTKEYS = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
 
-const RichTextDetachedControlsExample = () => {
+const RichTextDetachedToolbarExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
     <>
-      <ControlsProvider editor={editor}>
+      <ToolbarProvider editor={editor}>
         <Toolbar style={{ marginBottom: 20 }}>
           <MarkButton format="bold" icon="format_bold" />
           <MarkButton format="italic" icon="format_italic" />
@@ -51,7 +51,7 @@ const RichTextDetachedControlsExample = () => {
           <BlockButton format="right" icon="format_align_right" />
           <BlockButton format="justify" icon="format_align_justify" />
         </Toolbar>
-      </ControlsProvider>
+      </ToolbarProvider>
 
       <Slate editor={editor} initialValue={initialValue}>
         <Editable
@@ -281,4 +281,4 @@ const initialValue: Descendant[] = [
   },
 ]
 
-export default RichTextDetachedControlsExample
+export default RichTextDetachedToolbarExample
