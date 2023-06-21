@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.97.1
+
+### Patch Changes
+
+- [#5460](https://github.com/ianstormtaylor/slate/pull/5460) [`53395449`](https://github.com/ianstormtaylor/slate/commit/53395449e5b03fde5c0521203ef044064f3c159e) Thanks [@12joan](https://github.com/12joan)! - Do not attempt to batch updates manually in React >= 18
+
 ## 0.97.0
 
 ### Minor Changes
