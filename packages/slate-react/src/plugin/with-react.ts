@@ -338,8 +338,8 @@ export const withReact = <T extends BaseEditor>(
     maybeBatchUpdates(() => {
       const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
 
-      if (onContextChange) {
-        onContextChange()
+      if (onContextChange?.size) {
+        onContextChange.forEach(callback => callback())
       }
 
       onChange(options)

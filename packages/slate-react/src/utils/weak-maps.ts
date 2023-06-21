@@ -47,7 +47,7 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<
  * Weak map for associating the context `onChange` context with the plugin.
  */
 
-export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
+export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, Set<() => void>>()
 
 /**
  * Weak maps for saving pending state on composition stage.
