@@ -9,7 +9,7 @@ import {
 } from '../hooks/use-slate-selector'
 import { EditorContext } from '../hooks/use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
-import { IS_REACT_VERSION_17_OR_ABOVE } from '../utils/environment'
+import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 /**
@@ -78,7 +78,7 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    if (IS_REACT_VERSION_17_OR_ABOVE) {
+    if (REACT_MAJOR_VERSION >= 17) {
       // In React >= 17 onFocus and onBlur listen to the focusin and focusout events during the bubbling phase.
       // Therefore in order for <Editable />'s handlers to run first, which is necessary for ReactEditor.isFocused(editor)
       // to return the correct value, we have to listen to the focusin and focusout events without useCapture here.
