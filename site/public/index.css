@@ -20,7 +20,7 @@ pre {
   white-space: pre-wrap;
 }
 
-:not(pre) > code {
+:not(pre)>code {
   font-family: monospace;
   background-color: #eee;
   padding: 3px;
@@ -75,8 +75,8 @@ iframe {
   border: 1px solid #eee;
 }
 
-[data-slate-editor] > * + * {
-  margin-top: 1em;
+[data-slate-editor]>*+* {
+  /* margin-top: 1em; */
 }
 
 .fancy {
