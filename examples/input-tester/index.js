@@ -1,4 +1,4 @@
-import { Editor, findRange } from 'slate-react'
+import { Editor, findRange } from '@bbc/old-optimo-slate-react'
 import { Value } from 'slate'
 
 import React from 'react'

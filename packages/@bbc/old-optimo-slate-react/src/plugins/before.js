@@ -1,5 +1,5 @@
 import Debug from 'debug'
-import Hotkeys from 'slate-hotkeys'
+import Hotkeys from '@bbc/old-optimo-slate-hotkeys'
 import ReactDOM from 'react-dom'
 import getWindow from 'get-window'
 import {

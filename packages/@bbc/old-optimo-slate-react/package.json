@@ -1,7 +1,10 @@
 {
-  "name": "slate-react",
+  "name": "@bbc/old-optimo-slate-react",
   "description": "A set of React components for building completely customizable rich-text editors.",
-  "version": "0.21.0",
+  "version": "0.21.1",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-react.js",
@@ -23,7 +26,7 @@
     "selection-is-backward": "^1.0.0",
     "slate-base64-serializer": "^0.2.83",
     "slate-dev-environment": "^0.2.0",
-    "slate-hotkeys": "^0.2.7",
+    "@bbc/old-optimo-slate-hotkeys": "^0.2.8",
     "slate-plain-serializer": "^0.6.22",
     "slate-prop-types": "^0.5.13",
     "slate-react-placeholder": "^0.1.0",

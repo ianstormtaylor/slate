@@ -1,7 +1,10 @@
 {
-  "name": "slate-hotkeys",
+  "name": "@bbc/old-optimo-slate-hotkeys",
   "description": "A set of function to detect common keypresses in a platform-agnostic way",
-  "version": "0.2.7",
+  "version": "0.2.8",
+  "publishConfig": {
+    "access": "restricted"
+  },
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "lib/slate-hotkeys.js",
