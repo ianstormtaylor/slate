@@ -1,7 +1,7 @@
 {
   "name": "@bbc/old-optimo-slate-hotkeys",
   "description": "A set of function to detect common keypresses in a platform-agnostic way",
-  "version": "0.2.8",
+  "version": "0.2.9",
   "publishConfig": {
     "access": "restricted"
   },
