@@ -98,7 +98,7 @@ const InlinesExample = () => {
   }
 
   return (
-    <SlateReact.Slate editor={editor} value={initialValue}>
+    <SlateReact.Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <AddLinkButton />
         <RemoveLinkButton />
@@ -245,7 +245,7 @@ const InlineChromiumBugfix = () => (
       font-size: 0;
     `}
   >
-    ${String.fromCodePoint(160) /* Non-breaking space */}
+    {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 )
 

@@ -20,12 +20,14 @@ import {
   Text,
   Transforms,
 } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
 import { DecorateContext } from '../hooks/use-decorate'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
+import { useTrackUserInput } from '../hooks/use-track-user-input'
+import { ReactEditor } from '../plugin/react-editor'
 import { TRIPLE_CLICK } from '../utils/constants'
 import {
   DOMElement,
@@ -44,7 +46,7 @@ import {
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_IOS,
-  IS_SAFARI,
+  IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
 } from '../utils/environment'
@@ -53,7 +55,6 @@ import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_INSERTION_MARKS,
-  EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   EDITOR_TO_WINDOW,
@@ -66,8 +67,6 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './restore-dom/restore-dom'
-import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
-import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 
 type DeferredOperation = () => void
@@ -367,7 +366,9 @@ export const Editable = (props: EditableProps) => {
         selection && ReactEditor.toDOMRange(editor, selection)
 
       if (newDomRange) {
-        if (Range.isBackward(selection!)) {
+        if (ReactEditor.isComposing(editor)) {
+          domSelection.collapseToEnd()
+        } else if (Range.isBackward(selection!)) {
           domSelection.setBaseAndExtent(
             newDomRange.endContainer,
             newDomRange.endOffset,
@@ -904,8 +905,6 @@ export const Editable = (props: EditableProps) => {
                 : {
                     // Allow positioning relative to the editable element.
                     position: 'relative',
-                    // Prevent the default outline styles.
-                    outline: 'none',
                     // Preserve adjacent whitespace and new lines.
                     whiteSpace: 'pre-wrap',
                     // Allow words to break if they are too long.
@@ -1017,7 +1016,7 @@ export const Editable = (props: EditableProps) => {
                 // COMPAT: Safari doesn't always remove the selection even if the content-
                 // editable element no longer has focus. Refer to:
                 // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
-                if (IS_SAFARI) {
+                if (IS_WEBKIT) {
                   const domSelection = root.getSelection()
                   domSelection?.removeAllRanges()
                 }
@@ -1115,7 +1114,7 @@ export const Editable = (props: EditableProps) => {
                   // type that we need. So instead, insert whenever a composition
                   // ends since it will already have been committed to the DOM.
                   if (
-                    !IS_SAFARI &&
+                    !IS_WEBKIT &&
                     !IS_FIREFOX_LEGACY &&
                     !IS_IOS &&
                     !IS_WECHATBROWSER &&
@@ -1624,7 +1623,7 @@ export const Editable = (props: EditableProps) => {
                       return
                     }
                   } else {
-                    if (IS_CHROME || IS_SAFARI) {
+                    if (IS_CHROME || IS_WEBKIT) {
                       // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
                       // an event when deleting backwards in a selected void inline node
                       if (
@@ -1673,7 +1672,7 @@ export const Editable = (props: EditableProps) => {
                   if (
                     !HAS_BEFORE_INPUT_SUPPORT ||
                     isPlainTextOnlyPaste(event.nativeEvent) ||
-                    IS_SAFARI
+                    IS_WEBKIT
                   ) {
                     event.preventDefault()
                     ReactEditor.insertData(editor, event.clipboardData)

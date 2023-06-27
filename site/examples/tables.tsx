@@ -18,7 +18,7 @@ const TablesExample = () => {
     []
   )
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable renderElement={renderElement} renderLeaf={renderLeaf} />
     </Slate>
   )

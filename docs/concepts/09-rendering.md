@@ -37,7 +37,7 @@ const MyEditor = () => {
 }
 ```
 
-> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your custom components! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
+> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your custom components! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the "leaves" holding text content and inline elements.
 
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
@@ -56,7 +56,7 @@ const renderElement = useCallback(props => {
 
 ## Leaves
 
-When text-level formatting is rendered, the characters are grouped into "leaves" of text that each contain the same formatting applied to them.
+When text-level formatting is rendered, the characters are grouped into "leaves" of text that each contain the same formatting (marks) applied to them.
 
 To customize the rendering of each leaf, you use a custom `renderLeaf` prop:
 
@@ -77,6 +77,8 @@ const renderLeaf = useCallback(({ attributes, children, leaf }) => {
 ```
 
 Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. \(But there's nothing preventing you from using custom components if you'd like!\)
+
+> 🤖 As with the Element renderer, be sure to mix in `props.attributes` and render `props.children` in your leaf renderer! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
 
 One disadvantage of text-level formatting is that you cannot guarantee that any given format is "contiguous"—meaning that it stays as a single leaf. This limitation with respect to leaves is similar to the DOM, where this is invalid:
 

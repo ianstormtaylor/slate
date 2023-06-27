@@ -309,7 +309,7 @@ const [value, setValue] = useState(initialValue)
 const [selection, setSelection] = useState(null)
 
 <Slate
-  value={value}
+  initialValue={initialValue}
   selection={selection}
   onChange={(value, selection) => {
     setValue(value)

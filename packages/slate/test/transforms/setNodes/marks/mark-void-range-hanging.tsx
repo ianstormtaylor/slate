@@ -1,6 +1,6 @@
 /** @jsx jsx */
 // Apply a mark across a range containing text with other marks and some voids that support marks
-import { Editor, Transforms } from 'slate'
+import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {

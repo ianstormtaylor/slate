@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Editor, Node, Path, Descendant, ExtendedType, Ancestor } from '..'
+import { Ancestor, Descendant, Editor, ExtendedType, Node, Path } from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -14,15 +14,42 @@ export interface BaseElement {
 export type Element = ExtendedType<'Element', BaseElement>
 
 export interface ElementInterface {
+  /**
+   * Check if a value implements the 'Ancestor' interface.
+   */
   isAncestor: (value: any) => value is Ancestor
+
+  /**
+   * Check if a value implements the `Element` interface.
+   */
   isElement: (value: any) => value is Element
+
+  /**
+   * Check if a value is an array of `Element` objects.
+   */
   isElementList: (value: any) => value is Element[]
+
+  /**
+   * Check if a set of props is a partial of Element.
+   */
   isElementProps: (props: any) => props is Partial<Element>
+
+  /**
+   * Check if a value implements the `Element` interface and has elementKey with selected value.
+   * Default it check to `type` key value
+   */
   isElementType: <T extends Element>(
     value: any,
     elementVal: string,
     elementKey?: string
   ) => value is T
+
+  /**
+   * Check if an element matches set of properties.
+   *
+   * Note: this checks custom properties, and it does not ensure that any
+   * children are equivalent.
+   */
   matches: (element: Element, props: Partial<Element>) => boolean
 }
 
@@ -39,39 +66,19 @@ const isElement = (value: any): value is Element => {
 
 // eslint-disable-next-line no-redeclare
 export const Element: ElementInterface = {
-  /**
-   * Check if a value implements the 'Ancestor' interface.
-   */
-
   isAncestor(value: any): value is Ancestor {
     return isPlainObject(value) && Node.isNodeList(value.children)
   },
 
-  /**
-   * Check if a value implements the `Element` interface.
-   */
-
   isElement,
-  /**
-   * Check if a value is an array of `Element` objects.
-   */
 
   isElementList(value: any): value is Element[] {
     return Array.isArray(value) && value.every(val => Element.isElement(val))
   },
 
-  /**
-   * Check if a set of props is a partial of Element.
-   */
-
   isElementProps(props: any): props is Partial<Element> {
     return (props as Partial<Element>).children !== undefined
   },
-
-  /**
-   * Check if a value implements the `Element` interface and has elementKey with selected value.
-   * Default it check to `type` key value
-   */
 
   isElementType: <T extends Element>(
     value: any,
@@ -80,13 +87,6 @@ export const Element: ElementInterface = {
   ): value is T => {
     return isElement(value) && value[elementKey] === elementVal
   },
-
-  /**
-   * Check if an element matches set of properties.
-   *
-   * Note: this checks custom properties, and it does not ensure that any
-   * children are equivalent.
-   */
 
   matches(element: Element, props: Partial<Element>): boolean {
     for (const key in props) {
@@ -107,5 +107,4 @@ export const Element: ElementInterface = {
  * `ElementEntry` objects refer to an `Element` and the `Path` where it can be
  * found inside a root node.
  */
-
 export type ElementEntry = [Element, Path]

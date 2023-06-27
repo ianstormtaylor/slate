@@ -18,7 +18,7 @@ const selectionRef = Editor.rangeRef(editor, editor.selection, {
 })
 // Allow the user to do stuff which might change the selection
 Transforms.unwrapNodes(editor)
-Transforms.select(editor, selectionRef.unRef())
+Transforms.select(editor, selectionRef.unref())
 ```
 
 - [Instance methods](range-ref.md#instance-methods)
@@ -27,7 +27,7 @@ Transforms.select(editor, selectionRef.unRef())
 
 ## Instance methods
 
-#### `unRef() => Range`
+#### `unref() => Range`
 
 Call this when you no longer need to sync this range.
 It also returns the current value.

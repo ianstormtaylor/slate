@@ -5222,17 +5222,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"caniuse-lite@npm:^1.0.30001248":
-  version: 1.0.30001251
-  resolution: "caniuse-lite@npm:1.0.30001251"
-  checksum: 918e1b1662c26c11291206146bc305d7fd1ca351aa9231c2e21cb1526d87b444830e2d8dc54416ebb8ecf7e0addea12d66a1c41493476229987e5e6922f0c14b
-  languageName: node
-  linkType: hard
-
-"caniuse-lite@npm:^1.0.30001332":
-  version: 1.0.30001363
-  resolution: "caniuse-lite@npm:1.0.30001363"
-  checksum: 8dfcb2fa97724349cbbe61d988810bd90bfb40106a289ed6613188fa96dd1f5885c7e9924e46bb30a641bd1579ec34096fdc2b21b47d8500f8a2bfb0db069323
+"caniuse-lite@npm:^1.0.30001248, caniuse-lite@npm:^1.0.30001332":
+  version: 1.0.30001486
+  resolution: "caniuse-lite@npm:1.0.30001486"
+  checksum: 5e8c2ba2679e4ad17dea6d2761a6449b814441bfeac81af6cc9d58af187df6af4b79b27befcbfc4a557e720b21c0399a7d1911c8705922e38938dcc0f40b5d4b
   languageName: node
   linkType: hard
 
@@ -13820,7 +13813,7 @@ resolve@^2.0.0-next.3:
     "@babel/runtime": ^7.7.4
     is-plain-object: ^5.0.0
     lodash: ^4.17.21
-    slate: ^0.93.0
+    slate: ^0.94.0
     slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
   peerDependencies:
@@ -13834,7 +13827,7 @@ resolve@^2.0.0-next.3:
   dependencies:
     "@babel/runtime": ^7.7.4
     is-plain-object: ^5.0.0
-    slate: ^0.93.0
+    slate: ^0.94.0
     source-map-loader: ^4.0.0
   peerDependencies:
     slate: ">=0.65.3"
@@ -13946,7 +13939,7 @@ resolve@^2.0.0-next.3:
     react-dom: ">=16.8.0"
     react-test-renderer: ">=16.8.0"
     scroll-into-view-if-needed: ^2.2.20
-    slate: ^0.93.0
+    slate: ^0.94.0
     slate-hyperscript: ^0.81.3
     source-map-loader: ^4.0.0
     tiny-invariant: 1.0.6
@@ -13957,7 +13950,7 @@ resolve@^2.0.0-next.3:
   languageName: unknown
   linkType: soft
 
-"slate@^0.93.0, slate@workspace:*, slate@workspace:packages/slate":
+"slate@^0.94.0, slate@workspace:*, slate@workspace:packages/slate":
   version: 0.0.0-use.local
   resolution: "slate@workspace:packages/slate"
   dependencies:

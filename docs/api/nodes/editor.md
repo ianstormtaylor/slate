@@ -246,23 +246,23 @@ Delete the content in the current selection.
 
 Insert a block break at the current selection.
 
-#### `Editor.insertFragment(editor: Editor, fragment: Node[]) => void`
+#### `Editor.insertFragment(editor: Editor, fragment: Node[], options?) => void`
 
-Inserts a fragment _at the current selection_.
+Inserts a fragment at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first. To atomically insert nodes (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
+Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
-#### `Editor.insertNode(editor: Editor, node: Node) => void`
+#### `Editor.insertNode(editor: Editor, node: Node, options?) => void`
 
-Inserts a node _at the current selection_.
+Atomically insert `node` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first. To atomically insert a node (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
+Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
-#### `Editor.insertText(editor: Editor, text: string) => void`
+#### `Editor.insertText(editor: Editor, text: string, options?) => void`
 
-Inserts text _at the current selection_.
+Insert a string of text at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first.
+Options: `{at?: Location, voids?: boolean}`
 
 #### `Editor.removeMark(editor: Editor, key: string) => void`
 

@@ -13,9 +13,12 @@ import {
   Scrubber,
   Selection,
   Text,
-} from '..'
+} from '../../index'
 
 export interface GeneralTransforms {
+  /**
+   * Transform the editor by an operation.
+   */
   transform: (editor: Editor, op: Operation) => void
 }
 
@@ -315,10 +318,6 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
 // eslint-disable-next-line no-redeclare
 export const GeneralTransforms: GeneralTransforms = {
-  /**
-   * Transform the editor by an operation.
-   */
-
   transform(editor: Editor, op: Operation): void {
     editor.children = createDraft(editor.children)
     let selection = editor.selection && createDraft(editor.selection)

@@ -1,23 +1,23 @@
-import React, { useCallback } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
-
-import Text from './text'
+import React, { useCallback } from 'react'
+import { Editor, Element as SlateElement, Node, Range } from 'slate'
+import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'
-import { ReactEditor, useSlateStatic, useReadOnly } from '..'
-import {
-  NODE_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-  NODE_TO_PARENT,
-  NODE_TO_INDEX,
-  EDITOR_TO_KEY_TO_ELEMENT,
-} from '../utils/weak-maps'
 import { isElementDecorationsEqual } from '../utils/range-list'
+import {
+  EDITOR_TO_KEY_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  NODE_TO_ELEMENT,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
+} from '../utils/weak-maps'
 import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
+
+import Text from './text'
 
 /**
  * Element.

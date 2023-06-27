@@ -18,7 +18,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable />
     </Slate>
   )
@@ -45,7 +45,7 @@ const App = () => {
   return (
     <Slate
       editor={editor}
-      value={initialValue}
+      initialValue={initialValue}
       onChange={value => {
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
@@ -85,7 +85,7 @@ const App = () => {
   return (
     <Slate
       editor={editor}
-      value={initialValue}
+      initialValue={initialValue}
       onChange={value => {
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
@@ -145,7 +145,7 @@ const App = () => {
   return (
     <Slate
       editor={editor}
-      value={initialValue}
+      initialValue={initialValue}
       onChange={value => {
         const isAstChange = editor.operations.some(
           op => 'set_selection' !== op.type
