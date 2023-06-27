@@ -6,34 +6,67 @@
 Breaking changes:
 
 - Enhanced error handling by introducing **`undefined`** checks
-- Added **`editor.onError`** function to handle errors in functions that depend on **`editor`**
-- Introduced `editor.strict`. If `true` (default), `editor.onError` will throw errors like before (unchanged behavior). If `false`, it will push the errors in `editor.errors` (new behavior).
-- Updated return types of several functions to include **`| undefined`**
+- Updated return types of many methods to include **`| undefined`** (see below).
 
-You can now filter errors by type:
+**`editor.strict`**:
+
+- `true` (default): keep throwing errors everywhere.
+- `false` (experimental): push errors to `editor.errors` array and let the editor continue to operate.
+
+This option has no effect if you override `editor.onError`.
+
+**`editor.onError`**: This function is used to handle errors in methods that depend on the **`editor`**.
 
 ```tsx
-// throw only for `shouldNormalize` case
+// Definition
+export type EditorError<T extends SlateErrorType = SlateErrorType> = {
+  key: string // Unique key: `<methodName>.<case>`
+  message: string // Contextual error description
+  error?: SlateError<T> // Underlying generic error
+  data?: unknown // Additional operation data
+  recovery?: unknown // Recovery value to return on error.
+}
+
+export type SlateError<T extends SlateErrorType = SlateErrorType> = {
+  type: T // Error type
+  message: string // Error description
+}
+
+export const onError = <T extends SlateErrorType>(
+  editor: Editor,
+  context: EditorError
+): any => {
+  const { message, recovery } = context
+
+  if (editor.strict) throw new Error(message)
+  editor.errors.push(context)
+  return recovery
+}
+
+// Overriding example
 editor.onError = error => {
+  // or send to Sentry
+  console.warn(error.message)
+
+  // throw only for `shouldNormalize` case
   if (error.key === 'shouldNormalize') {
     throw new Error(error.message)
   }
+
+  if (error.key === 'isEnd') {
+    // return false when the end point is not found
+    return false
+  }
+
+  // ...
+
+  return error.recovery
 }
 ```
 
-If you want to adopt the new error-free behavior, set `editor.strict = false`, the default being `true`. Or you can just override `onError` to handle errors.
+Slate methods will return `editor.onError(error)` on query error, so you can control what is returned for each case.
 
-Here is the quickest **migration** using non-null assertion (estimating to a couple of minutes):
-
-Throw an error like before:
-
-```tsx
-editor.onError = error => {
-  throw new Error(error.message)
-}
-```
-
-Here is the list of APIs that now return `| undefined`. Find usages for each of these and insert a non-null assertion. For example: `Path.next(...)` to `Path.next(...)!`
+**Migration:** here is the list of APIs that now return `| undefined`. Find usages for each of these and insert a non-null assertion. For example: `Path.next(...)` to `Path.next(...)!`
 
 ```tsx
 Path.next
