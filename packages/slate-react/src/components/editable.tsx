@@ -20,6 +20,7 @@ import {
   Text,
   Transforms,
 } from 'slate'
+import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
 import { DecorateContext } from '../hooks/use-decorate'
@@ -46,8 +47,8 @@ import {
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_IOS,
-  IS_SAFARI,
   IS_UC_MOBILE,
+  IS_WEBKIT,
   IS_WECHATBROWSER,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
@@ -67,7 +68,6 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './restore-dom/restore-dom'
-import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 
 type DeferredOperation = () => void
 
@@ -208,7 +208,13 @@ export const Editable = (props: EditableProps) => {
           !state.isDraggingInternally
         ) {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
-          if (!root) return
+          if (!root) {
+            editor.onError({
+              key: 'Editable.onDOMSelectionChange.findDocumentOrShadowRoot.1',
+              message: 'Unable to find root node',
+            })
+            return
+          }
 
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
@@ -289,7 +295,13 @@ export const Editable = (props: EditableProps) => {
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    if (!root) return
+    if (!root) {
+      editor.onError({
+        key: 'Editable.onDOMSelectionChange.findDocumentOrShadowRoot.2',
+        message: 'Unable to find root node',
+      })
+      return
+    }
 
     const domSelection = root.getSelection()
 
@@ -371,7 +383,9 @@ export const Editable = (props: EditableProps) => {
         selection && ReactEditor.toDOMRange(editor, selection)
 
       if (newDomRange) {
-        if (Range.isBackward(selection!)) {
+        if (ReactEditor.isComposing(editor)) {
+          domSelection.collapseToEnd()
+        } else if (Range.isBackward(selection!)) {
           domSelection.setBaseAndExtent(
             newDomRange.endContainer,
             newDomRange.endOffset,
@@ -404,7 +418,13 @@ export const Editable = (props: EditableProps) => {
         // to focus the contenteditable element too. (2016/11/16)
         if (newDomRange && IS_FIREFOX) {
           const el = ReactEditor.toDOMNode(editor, editor)
-          if (!el) return
+          if (!el) {
+            editor.onError({
+              key: 'Editable.toDOMNode',
+              message: 'Unable to find a DOM node',
+            })
+            return
+          }
 
           el.focus()
         }
@@ -420,7 +440,13 @@ export const Editable = (props: EditableProps) => {
         const ensureDomSelection = (forceChange?: boolean) => {
           try {
             const el = ReactEditor.toDOMNode(editor, editor)
-            if (!el) return
+            if (!el) {
+              editor.onError({
+                key: 'Editable.ensureDomSelection.toDOMNode',
+                message: 'Unable to find a DOM node',
+              })
+              return
+            }
 
             el.focus()
 
@@ -520,7 +546,14 @@ export const Editable = (props: EditableProps) => {
           const { anchor } = selection
 
           const point = ReactEditor.toDOMPoint(editor, anchor)
-          if (!point) return
+          if (!point) {
+            editor.onError({
+              key: 'Editable.onDOMBeforeInput.toDOMPoint',
+              message: 'Unable to find a DOM point',
+              data: { point: anchor },
+            })
+            return
+          }
           const [node, offset] = point
 
           const anchorNode = node.parentElement?.closest('a')
@@ -571,7 +604,14 @@ export const Editable = (props: EditableProps) => {
               exactMatch: false,
               suppressThrow: false,
             })
-            if (!range) return
+            if (!range) {
+              editor.onError({
+                key: 'Editable.onDOMBeforeInput.toSlateRange',
+                message: 'Unable to find a Slate range from a DOM range',
+                data: { domRange: targetRange },
+              })
+              return
+            }
 
             if (!selection || !Range.equals(selection, range)) {
               native = false
@@ -823,6 +863,11 @@ export const Editable = (props: EditableProps) => {
         anchor: start,
         focus: start,
       })
+    } else {
+      editor.onError({
+        key: 'Editable.start',
+        message: 'Cannot place placeholder at start of document',
+      })
     }
   }
 
@@ -853,6 +898,11 @@ export const Editable = (props: EditableProps) => {
           focus: anchor,
         })
       }
+    } else {
+      editor.onError({
+        key: 'Editable.leaf',
+        message: 'Cannot get leaf node from selection',
+      })
     }
   }
 
@@ -864,7 +914,14 @@ export const Editable = (props: EditableProps) => {
       if (selection) {
         const { anchor } = selection
         const text = Node.leaf(editor, anchor.path)
-        if (!text) return
+        if (!text) {
+          editor.onError({
+            key: 'Editable.leaf.2',
+            message: 'Cannot get leaf node from selection',
+            data: { path: anchor.path },
+          })
+          return
+        }
 
         // While marks isn't a 'complete' text, we can still use loose Text.equals
         // here which only compares marks anyway.
@@ -922,8 +979,6 @@ export const Editable = (props: EditableProps) => {
                 : {
                     // Allow positioning relative to the editable element.
                     position: 'relative',
-                    // Prevent the default outline styles.
-                    outline: 'none',
                     // Preserve adjacent whitespace and new lines.
                     whiteSpace: 'pre-wrap',
                     // Allow words to break if they are too long.
@@ -994,7 +1049,13 @@ export const Editable = (props: EditableProps) => {
                 // itself becomes unfocused, so we want to abort early to allow to
                 // editor to stay focused when the tab becomes focused again.
                 const root = ReactEditor.findDocumentOrShadowRoot(editor)
-                if (!root) return
+                if (!root) {
+                  editor.onError({
+                    key: 'Editable.blur.findDocumentOrShadowRoot',
+                    message: 'Cannot find document or shadow root',
+                  })
+                  return
+                }
 
                 if (state.latestElement === root.activeElement) {
                   return
@@ -1037,7 +1098,7 @@ export const Editable = (props: EditableProps) => {
                 // COMPAT: Safari doesn't always remove the selection even if the content-
                 // editable element no longer has focus. Refer to:
                 // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
-                if (IS_SAFARI) {
+                if (IS_WEBKIT) {
                   const domSelection = root.getSelection()
                   domSelection?.removeAllRanges()
                 }
@@ -1060,16 +1121,29 @@ export const Editable = (props: EditableProps) => {
                   isDOMNode(event.target)
                 ) {
                   const node = ReactEditor.toSlateNode(editor, event.target)
-                  if (!node) return
+                  if (!node) {
+                    editor.onError({
+                      key: 'Editable.onClick.toSlateNode',
+                      message: 'Cannot resolve a Slate node from a DOM node',
+                      data: { domNode: event.target },
+                    })
+                    return
+                  }
 
                   const path = ReactEditor.findPath(editor, node)
-
+                  if (!path) {
+                    editor.onError({
+                      key: 'Editable.onClick.findPath',
+                      message: 'Cannot resolve a Slate path from a Slate node',
+                      data: { node },
+                    })
+                    return
+                  }
                   // At this time, the Slate document may be arbitrarily different,
                   // because onClick handlers can change the document before we get here.
                   // Therefore we must check that this path actually exists,
                   // and that it still refers to the same node.
                   if (
-                    !path ||
                     !Editor.hasPath(editor, path) ||
                     Node.get(editor, path) !== node
                   ) {
@@ -1091,7 +1165,15 @@ export const Editable = (props: EditableProps) => {
                     }
 
                     const range = Editor.range(editor, blockPath)
-                    if (!range) return
+                    if (!range) {
+                      editor.onError({
+                        key: 'Editable.onClick.range',
+                        message:
+                          'Cannot resolve a Slate range from a Slate path',
+                        data: { path: blockPath },
+                      })
+                      return
+                    }
 
                     Transforms.select(editor, range)
                     return
@@ -1102,10 +1184,24 @@ export const Editable = (props: EditableProps) => {
                   }
 
                   const start = Editor.start(editor, path)
-                  if (!start) return
+                  if (!start) {
+                    editor.onError({
+                      key: 'Editable.onClick.start',
+                      message: 'Cannot resolve a Slate point from a Slate path',
+                      data: { path },
+                    })
+                    return
+                  }
 
                   const end = Editor.end(editor, path)
-                  if (!end) return
+                  if (!end) {
+                    editor.onError({
+                      key: 'Editable.onClick.end',
+                      message: 'Cannot resolve a Slate point from a Slate path',
+                      data: { path },
+                    })
+                    return
+                  }
 
                   const startVoid = Editor.void(editor, { at: start })
                   const endVoid = Editor.void(editor, { at: end })
@@ -1116,7 +1212,15 @@ export const Editable = (props: EditableProps) => {
                     Path.equals(startVoid[1], endVoid[1])
                   ) {
                     const range = Editor.range(editor, start)
-                    if (!range) return
+                    if (!range) {
+                      editor.onError({
+                        key: 'Editable.onClick.range',
+                        message:
+                          'Cannot resolve a Slate range from a Slate point',
+                        data: { point: start },
+                      })
+                      return
+                    }
 
                     Transforms.select(editor, range)
                   }
@@ -1146,7 +1250,7 @@ export const Editable = (props: EditableProps) => {
                   // type that we need. So instead, insert whenever a composition
                   // ends since it will already have been committed to the DOM.
                   if (
-                    !IS_SAFARI &&
+                    !IS_WEBKIT &&
                     !IS_FIREFOX_LEGACY &&
                     !IS_IOS &&
                     !IS_WECHATBROWSER &&
@@ -1268,7 +1372,14 @@ export const Editable = (props: EditableProps) => {
                       Editor.deleteFragment(editor)
                     } else {
                       const node = Node.parent(editor, selection.anchor.path)
-                      if (!node) return
+                      if (!node) {
+                        editor.onError({
+                          key: 'Editable.onCut.parent',
+                          message: 'Cannot find a node above the selection',
+                          data: { path: selection.anchor.path },
+                        })
+                        return
+                      }
 
                       if (Editor.isVoid(editor, node)) {
                         Transforms.delete(editor)
@@ -1305,10 +1416,24 @@ export const Editable = (props: EditableProps) => {
                   !isEventHandled(event, attributes.onDragStart)
                 ) {
                   const node = ReactEditor.toSlateNode(editor, event.target)
-                  if (!node) return
+                  if (!node) {
+                    editor.onError({
+                      key: 'Editable.onDragStart.toSlateNode',
+                      message: 'Cannot resolve a Slate node from the target',
+                      data: { domNode: event.target },
+                    })
+                    return
+                  }
 
                   const path = ReactEditor.findPath(editor, node)
-                  if (!path) return
+                  if (!path) {
+                    editor.onError({
+                      key: 'Editable.onDragStart.findPath',
+                      message: 'Cannot resolve a Slate path from the target',
+                      data: { node },
+                    })
+                    return
+                  }
 
                   const voidMatch =
                     (Element.isElement(node) && Editor.isVoid(editor, node)) ||
@@ -1318,7 +1443,14 @@ export const Editable = (props: EditableProps) => {
                   // so that it shows up in the selection's fragment.
                   if (voidMatch) {
                     const range = Editor.range(editor, path)
-                    if (!range) return
+                    if (!range) {
+                      editor.onError({
+                        key: 'Editable.onDragStart.range',
+                        message: 'Cannot resolve a range from the void node',
+                        data: { node },
+                      })
+                      return
+                    }
 
                     Transforms.select(editor, range)
                   }
@@ -1348,7 +1480,14 @@ export const Editable = (props: EditableProps) => {
 
                   // Find the range where the drop happened
                   const range = ReactEditor.findEventRange(editor, event)
-                  if (!range) return
+                  if (!range) {
+                    editor.onError({
+                      key: 'Editable.onDrop.findEventRange',
+                      message: 'Cannot resolve a range from the drop event',
+                      data: { event },
+                    })
+                    return
+                  }
 
                   const data = event.dataTransfer
 
@@ -1406,10 +1545,24 @@ export const Editable = (props: EditableProps) => {
                   !isEventHandled(event, attributes.onFocus)
                 ) {
                   const el = ReactEditor.toDOMNode(editor, editor)
-                  if (!el) return
+                  if (!el) {
+                    editor.onError({
+                      key: 'Editable.onFocus.toDOMNode',
+                      message:
+                        'Cannot resolve a native DOM node from the editor',
+                    })
+                    return
+                  }
 
                   const root = ReactEditor.findDocumentOrShadowRoot(editor)
-                  if (!root) return
+                  if (!root) {
+                    editor.onError({
+                      key: 'Editable.onFocus.findDocumentOrShadowRoot',
+                      message:
+                        'Cannot resolve a native Document or ShadowRoot from the editor',
+                    })
+                    return
+                  }
 
                   state.latestElement = root.activeElement
 
@@ -1669,7 +1822,7 @@ export const Editable = (props: EditableProps) => {
                       return
                     }
                   } else {
-                    if (IS_CHROME || IS_SAFARI) {
+                    if (IS_CHROME || IS_WEBKIT) {
                       // COMPAT: Chrome and Safari support `beforeinput` event but do not fire
                       // an event when deleting backwards in a selected void inline node
                       if (
@@ -1718,7 +1871,7 @@ export const Editable = (props: EditableProps) => {
                   if (
                     !HAS_BEFORE_INPUT_SUPPORT ||
                     isPlainTextOnlyPaste(event.nativeEvent) ||
-                    IS_SAFARI
+                    IS_WEBKIT
                   ) {
                     event.preventDefault()
                     ReactEditor.insertData(editor, event.clipboardData)

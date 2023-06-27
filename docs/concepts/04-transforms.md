@@ -22,12 +22,12 @@ Non-standard operations (or debugging/tracing which Nodes will be affected by a 
 For example, to replace all image elements with their alt text:
 
 ```javascript
-const imageElmnts = Editor.nodes(editor, {
+const imageElements = Editor.nodes(editor, {
   at: [], // Path of Editor
   match: (node, path) => 'image' === node.type,
   // mode defaults to "all", so this also searches the Editor's children
 })
-for (const nodeEntry of imageElmnts) {
+for (const nodeEntry of imageElements) {
   const altText =
     nodeEntry[0].alt ||
     nodeEntry[0].title ||

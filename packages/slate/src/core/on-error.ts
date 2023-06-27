@@ -1,12 +1,15 @@
 import { Editor } from '../interfaces'
-import { WithEditorFirstArg } from '../utils'
+import { EditorError, SlateErrorType } from '../interfaces/slate-errors'
 
-export const onError: WithEditorFirstArg<Editor['onError']> = (
-  editor,
-  error
-) => {
-  editor.errors.push({
-    ...error,
-    error: new Error(error.message),
-  })
+export const onError = <T extends SlateErrorType>(
+  editor: Editor,
+  context: EditorError
+): any => {
+  const { message, recovery } = context
+
+  if (editor.strict) throw new Error(message)
+
+  editor.errors.push(context)
+
+  return recovery
 }

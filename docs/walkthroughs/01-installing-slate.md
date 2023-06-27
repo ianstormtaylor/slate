@@ -81,7 +81,7 @@ const initialValue = [
 const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
   // Render the Slate context.
-  return <Slate editor={editor} value={initialValue} />
+  return <Slate editor={editor} initialValue={initialValue} />
 }
 ```
 
@@ -107,7 +107,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
   return (
     // Add the editable component inside the context.
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable />
     </Slate>
   )

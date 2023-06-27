@@ -17,7 +17,13 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
   }
 
   const firstEntry = Editor.first(editor, [])
-  if (!firstEntry) return
+  if (!firstEntry) {
+    return editor.onError({
+      key: 'previous.first',
+      message: 'Cannot get the first node',
+      data: { at },
+    })
+  }
   const [, to] = firstEntry
 
   // The search location is from the start of the document to the path of
@@ -25,17 +31,22 @@ export const previous: EditorInterface['previous'] = (editor, options = {}) => {
   const span: Span = [pointBeforeLocation.path, to]
 
   if (Path.isPath(at) && at.length === 0) {
-    editor.onError({
-      type: 'previous',
+    return editor.onError({
+      key: 'previous.root',
       message: `Cannot get the previous node from the root node!`,
     })
-    return
   }
 
   if (match == null) {
     if (Path.isPath(at)) {
       const parentEntry = Editor.parent(editor, at)
-      if (!parentEntry) return
+      if (!parentEntry) {
+        return editor.onError({
+          key: 'previous.parent',
+          message: 'Cannot get the parent node',
+          data: { at },
+        })
+      }
       const [parent] = parentEntry
 
       match = n => parent.children.includes(n)

@@ -73,7 +73,7 @@ const CheckListsExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         placeholder="Get to work…"

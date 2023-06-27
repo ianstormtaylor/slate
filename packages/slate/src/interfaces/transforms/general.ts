@@ -28,21 +28,23 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, node } = op
       const parent = Node.parent(editor, path)
       if (!parent) {
-        editor.onError({
-          type: 'insert_node',
+        return editor.onError({
+          key: 'apply.insert_node.parent',
           message: `Cannot apply an "insert_node" operation at path [${path}] because it has no parent.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const index = path[path.length - 1]
 
       if (index > parent.children.length) {
-        editor.onError({
-          type: 'insert_node',
+        return editor.onError({
+          key: 'apply.insert_node.index',
           message: `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`,
+          data: { path, parent, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       parent.children.splice(index, 0, node)
@@ -61,11 +63,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       if (text.length === 0) break
       const node = Node.leaf(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'insert_text',
+        return editor.onError({
+          key: 'apply.insert_text',
           message: `Cannot apply an "insert_text" operation at path [${path}] because it could not be found.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const before = node.text.slice(0, offset)
@@ -85,38 +88,42 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path } = op
       const node = Node.get(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'merge_node',
+        return editor.onError({
+          key: 'apply.merge_node.node',
           message: `Cannot apply a "merge_node" operation at path [${path}] because it could not be found.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const prevPath = Path.previous(path)
       if (!prevPath) {
-        editor.onError({
-          type: 'merge_node',
+        return editor.onError({
+          key: 'apply.merge_node.previousPath',
           message: `Cannot apply a "merge_node" operation at path [${path}] because it has no previous sibling.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const prev = Node.get(editor, prevPath)
       if (!prev) {
-        editor.onError({
-          type: 'merge_node',
+        return editor.onError({
+          key: 'apply.merge_node.previousNode',
           message: `Cannot apply a "merge_node" operation at path [${path}] because its previous sibling could not be found.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const parent = Node.parent(editor, path)
       if (!parent) {
-        editor.onError({
-          type: 'merge_node',
+        return editor.onError({
+          key: 'apply.merge_node.parent',
           message: `Cannot apply a "merge_node" operation at path [${path}] because it has no parent.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const index = path[path.length - 1]
@@ -126,13 +133,14 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       } else if (!Text.isText(node) && !Text.isText(prev)) {
         prev.children.push(...node.children)
       } else {
-        editor.onError({
-          type: 'merge_node',
+        return editor.onError({
+          key: 'apply.merge_node.type',
           message: `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
             node
           )} ${Scrubber.stringify(prev)}`,
+          data: { path, node, prev, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       parent.children.splice(index, 1)
@@ -150,29 +158,32 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, newPath } = op
 
       if (Path.isAncestor(path, newPath)) {
-        editor.onError({
-          type: 'move_node',
+        return editor.onError({
+          key: 'apply.move_node.ancestor',
           message: `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`,
+          data: { path, newPath, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const node = Node.get(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'move_node',
+        return editor.onError({
+          key: 'apply.move_node.node',
           message: `Cannot apply a "move_node" operation at path [${path}] because it could not be found.`,
+          data: { path, newPath, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const parent = Node.parent(editor, path)
       if (!parent) {
-        editor.onError({
-          type: 'move_node',
+        return editor.onError({
+          key: 'apply.move_node.parent',
           message: `Cannot apply a "move_node" operation at path [${path}] because it has no parent.`,
+          data: { path, newPath, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const index = path[path.length - 1]
@@ -188,11 +199,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
       const newParentPath = Path.parent(truePath)
       if (!newParentPath) {
-        editor.onError({
-          type: 'move_node',
+        return editor.onError({
+          key: 'apply.move_node.newParent',
           message: `Cannot apply a "move_node" operation at path [${path}] because it has no parent.`,
+          data: { path, newPath, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const newParent = Node.get(editor, newParentPath) as Ancestor
@@ -214,11 +226,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const index = path[path.length - 1]
       const parent = Node.parent(editor, path)
       if (!parent) {
-        editor.onError({
-          type: 'remove_node',
+        return editor.onError({
+          key: 'apply.remove_node.parent',
           message: `Cannot apply a "remove_node" operation at path [${path}] because it has no parent.`,
+          data: { path, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       parent.children.splice(index, 1)
@@ -276,11 +289,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       if (text.length === 0) break
       const node = Node.leaf(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'remove_text',
+        return editor.onError({
+          key: 'apply.remove_text',
           message: `Cannot apply a "remove_text" operation at path [${path}] because it could not be found.`,
+          data: { path, offset, text, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const before = node.text.slice(0, offset)
@@ -300,29 +314,32 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, properties, newProperties } = op
 
       if (path.length === 0) {
-        editor.onError({
-          type: 'set_node',
+        return editor.onError({
+          key: 'apply.set_node.root',
           message: `Cannot set properties on the root node!`,
+          data: { path, properties, newProperties, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const node = Node.get(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'set_node',
+        return editor.onError({
+          key: 'apply.set_node.node',
           message: `Cannot apply a "set_node" operation at path [${path}] because it could not be found.`,
+          data: { path, properties, newProperties, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       for (const key in newProperties) {
         if (key === 'children' || key === 'text') {
-          editor.onError({
-            type: 'set_node',
+          return editor.onError({
+            key: 'apply.set_node.children',
             message: `Cannot set the "${key}" property of nodes!`,
+            data: { key, path, properties, newProperties, selection },
+            recovery: selection,
           })
-          return selection
         }
 
         const value = newProperties[key]
@@ -352,13 +369,14 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       } else {
         if (selection == null) {
           if (!Range.isRange(newProperties)) {
-            editor.onError({
-              type: 'set_selection',
+            return editor.onError({
+              key: 'apply.set_selection.range',
               message: `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
                 newProperties
               )} when there is no current selection.`,
+              data: { newProperties },
+              recovery: selection,
             })
-            return selection
           }
 
           selection = { ...newProperties }
@@ -369,11 +387,12 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
           if (value == null) {
             if (key === 'anchor' || key === 'focus') {
-              editor.onError({
-                type: 'set_selection',
+              return editor.onError({
+                key: 'apply.set_selection.point',
                 message: `Cannot remove the "${key}" selection property`,
+                data: { key, newProperties },
+                recovery: selection,
               })
-              return selection
             }
 
             delete selection[key]
@@ -390,29 +409,32 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const { path, position, properties } = op
 
       if (path.length === 0) {
-        editor.onError({
-          type: 'split_node',
+        return editor.onError({
+          key: 'apply.split_node.root',
           message: `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`,
+          data: { path, position, properties, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const node = Node.get(editor, path)
       if (!node) {
-        editor.onError({
-          type: 'split_node',
+        return editor.onError({
+          key: 'apply.split_node.node',
           message: `Cannot apply a "split_node" operation at path [${path}] because it could not be found.`,
+          data: { path, position, properties, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const parent = Node.parent(editor, path)
       if (!parent) {
-        editor.onError({
-          type: 'split_node',
+        return editor.onError({
+          key: 'apply.split_node.parent',
           message: `Cannot apply a "split_node" operation at path [${path}] because it has no parent.`,
+          data: { path, position, properties, selection },
+          recovery: selection,
         })
-        return selection
       }
 
       const index = path[path.length - 1]

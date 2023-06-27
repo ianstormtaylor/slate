@@ -1,5 +1,12 @@
 # slate
 
+## 0.94.1
+
+### Patch Changes
+
+- [#5415](https://github.com/ianstormtaylor/slate/pull/5415) [`01f0210b`](https://github.com/ianstormtaylor/slate/commit/01f0210bccfe2c3a81c252f527bad9ded36a68ff) Thanks [@zbeyens](https://github.com/zbeyens)! - `Editor.insertFragment`, `Editor.insertNode`, `Editor.insertText` now accept `options`.
+  For all insert methods, the default location is now the editor selection if `at` is not defined, or the end of document if `editor.selection` is not defined.
+
 ## 0.94.0
 
 ### Minor Changes

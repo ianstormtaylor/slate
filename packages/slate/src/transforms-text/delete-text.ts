@@ -1,11 +1,11 @@
-import { TextTransforms } from '../interfaces/transforms/text'
 import { Editor } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Point } from '../interfaces/point'
-import { Path } from '../interfaces/path'
-import { Transforms } from '../interfaces/transforms'
 import { Element } from '../interfaces/element'
 import { NodeEntry } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
+import { Transforms } from '../interfaces/transforms'
+import { TextTransforms } from '../interfaces/transforms/text'
 
 export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
   Editor.withoutNormalizing(editor, () => {
@@ -38,7 +38,14 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
         const target = reverse
           ? Editor.before(editor, at, opts) || Editor.start(editor, [])
           : Editor.after(editor, at, opts) || Editor.end(editor, [])
-        if (!target) return
+        if (!target) {
+          editor.onError({
+            key: 'deleteText.target',
+            message: `Cannot find target point to delete from.`,
+            data: { at, unit, distance, reverse },
+          })
+          return
+        }
         at = { anchor: at, focus: target }
         hanging = true
       }
@@ -56,7 +63,14 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     if (!hanging) {
       const [, end] = Range.edges(at)
       const endOfDoc = Editor.end(editor, [])
-      if (!endOfDoc) return
+      if (!endOfDoc) {
+        editor.onError({
+          key: 'deleteText.end',
+          message: `Cannot find end of document.`,
+          data: { at },
+        })
+        return
+      }
 
       if (!Point.equals(end, endOfDoc)) {
         at = Editor.unhangRange(editor, at, { voids })
@@ -136,7 +150,14 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     if (!isSingleText && !startNonEditable) {
       const point = startRef.current!
       const entry = Editor.leaf(editor, point)
-      if (!entry) return
+      if (!entry) {
+        editor.onError({
+          key: 'deleteText.leaf',
+          message: `Cannot find leaf node at path [${point.path}].`,
+          data: { at },
+        })
+        return
+      }
       const [node] = entry
 
       const { path } = point
@@ -157,7 +178,14 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     if (!endNonEditable) {
       const point = endRef.current!
       const entry = Editor.leaf(editor, point)
-      if (!entry) return
+      if (!entry) {
+        editor.onError({
+          key: 'deleteText.leaf',
+          message: `Cannot find leaf node at path [${point.path}].`,
+          data: { at },
+        })
+        return
+      }
       const [node] = entry
 
       const { path } = point

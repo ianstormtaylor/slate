@@ -70,7 +70,7 @@ const MarkdownShortcutsExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}

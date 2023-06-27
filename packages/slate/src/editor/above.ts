@@ -1,7 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Text } from '../interfaces/text'
-import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
+import { Text } from '../interfaces/text'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {
   const {
@@ -16,7 +16,14 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
   }
 
   const path = Editor.path(editor, at)
-  if (!path) return
+  if (!path) {
+    return editor.onError({
+      key: 'above',
+      message:
+        'Cannot get the node above a void node at the root of the document',
+      data: { at },
+    })
+  }
 
   const reverse = mode === 'lowest'
 

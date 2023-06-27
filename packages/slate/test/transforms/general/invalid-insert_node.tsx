@@ -12,12 +12,14 @@ export const input = (
   </editor>
 )
 export const run = editor => {
+  editor.strict = false
+
   // position 2 is past the end of the block children
   Transforms.insertNodes(editor, <text>another</text>, { at: [0, 2] })
 
   assert.strictEqual(
-    editor.errors[0].type,
-    'insert_node',
+    editor.errors[0].key,
+    'apply.insert_node.index',
     'Inserting a node after the end of a block should fail'
   )
   // 1 is _at_ the end, so it's still valid

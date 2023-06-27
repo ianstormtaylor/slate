@@ -271,10 +271,22 @@ export const ReactEditor: ReactEditorInterface = {
 
   blur: editor => {
     const el = ReactEditor.toDOMNode(editor, editor)
-    if (!el) return
+    if (!el) {
+      editor.onError({
+        key: 'ReactEditor.blur.toDOMNode',
+        message: 'Cannot blur the editor because its DOM node is not mounted.',
+      })
+      return
+    }
 
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    if (!root) return
+    if (!root) {
+      editor.onError({
+        key: 'ReactEditor.blur.findDocumentOrShadowRoot',
+        message: 'Cannot blur the editor because its document is not defined.',
+      })
+      return
+    }
 
     IS_FOCUSED.set(editor, false)
 
@@ -286,7 +298,14 @@ export const ReactEditor: ReactEditorInterface = {
   deselect: editor => {
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    if (!root) return
+    if (!root) {
+      editor.onError({
+        key: 'ReactEditor.deselect.findDocumentOrShadowRoot',
+        message:
+          'Cannot deselect the editor because its document is not defined.',
+      })
+      return
+    }
 
     const domSelection = root.getSelection()
 
@@ -301,7 +320,13 @@ export const ReactEditor: ReactEditorInterface = {
 
   findDocumentOrShadowRoot: editor => {
     const el = ReactEditor.toDOMNode(editor, editor)
-    if (!el) return
+    if (!el) {
+      return editor.onError({
+        key: 'ReactEditor.findDocumentOrShadowRoot.toDOMNode',
+        message:
+          'Cannot find the document or ShadowRoot because the editor has no DOM node.',
+      })
+    }
 
     const root = el.getRootNode()
 
@@ -323,18 +348,30 @@ export const ReactEditor: ReactEditorInterface = {
     const { clientX: x, clientY: y, target } = event
 
     if (x == null || y == null) {
-      editor.onError({
-        type: 'findEventRange',
+      return editor.onError({
+        key: 'ReactEditor.findEventRange.event',
         message: `Cannot resolve a Slate range from a DOM event: ${event}`,
+        data: { event },
       })
-      return
     }
 
     const node = ReactEditor.toSlateNode(editor, event.target)
-    if (!node) return
+    if (!node) {
+      return editor.onError({
+        key: 'ReactEditor.findEventRange.toSlateNode',
+        message: `Cannot resolve a Slate range from a DOM event: ${event}`,
+        data: { event },
+      })
+    }
 
     const path = ReactEditor.findPath(editor, node)
-    if (!path) return
+    if (!path) {
+      return editor.onError({
+        key: 'ReactEditor.findEventRange.findPath',
+        message: `Cannot resolve a Slate range from a DOM event: ${event}`,
+        data: { node },
+      })
+    }
 
     // If the drop target is inside a void node, move it into either the
     // next or previous node, depending on which side the `x` and `y`
@@ -348,7 +385,13 @@ export const ReactEditor: ReactEditorInterface = {
       const edge = Editor.point(editor, path, {
         edge: isPrev ? 'start' : 'end',
       })
-      if (!edge) return
+      if (!edge) {
+        return editor.onError({
+          key: 'ReactEditor.findEventRange.point',
+          message: 'Cannot find a Slate point from a DOM event.',
+          data: { event },
+        })
+      }
 
       const point = isPrev
         ? Editor.before(editor, edge)
@@ -377,11 +420,11 @@ export const ReactEditor: ReactEditorInterface = {
     }
 
     if (!domRange) {
-      editor.onError({
-        type: 'findEventRange',
+      return editor.onError({
+        key: 'ReactEditor.findEventRange.domRange',
         message: `Cannot resolve a Slate range from a DOM event: ${event}`,
+        data: { event },
       })
-      return
     }
 
     // Resolve a Slate range from the DOM range.
@@ -427,21 +470,32 @@ export const ReactEditor: ReactEditorInterface = {
       child = parent
     }
 
-    editor.onError({
-      type: 'findPath',
+    return editor.onError({
+      key: 'ReactEditor.findPath',
       message: `Unable to find the path for Slate node: ${Scrubber.stringify(
         node
       )}`,
     })
-    return
   },
 
   focus: editor => {
     const el = ReactEditor.toDOMNode(editor, editor)
-    if (!el) return
+    if (!el) {
+      editor.onError({
+        key: 'ReactEditor.focus.toDOMNode',
+        message: 'Cannot focus the editor without a DOM node',
+      })
+      return
+    }
 
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    if (!root) return
+    if (!root) {
+      editor.onError({
+        key: 'ReactEditor.focus.findDocumentOrShadowRoot',
+        message: 'Cannot focus the editor without a root document',
+      })
+      return
+    }
 
     IS_FOCUSED.set(editor, true)
 
@@ -547,13 +601,13 @@ export const ReactEditor: ReactEditorInterface = {
       : KEY_TO_ELEMENT?.get(ReactEditor.findKey(editor, node))
 
     if (!domNode) {
-      editor.onError({
-        type: 'toDOMNode',
+      return editor.onError({
+        key: 'ReactEditor.toDOMNode',
         message: `Cannot resolve a DOM node from Slate node: ${Scrubber.stringify(
           node
         )}`,
+        data: { node },
       })
-      return
     }
 
     return domNode
@@ -561,12 +615,28 @@ export const ReactEditor: ReactEditorInterface = {
 
   toDOMPoint: (editor, point) => {
     const entry = Editor.node(editor, point.path)
-    if (!entry) return
+    if (!entry) {
+      return editor.onError({
+        key: 'ReactEditor.toDOMPoint.node',
+        message: `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
+          point
+        )}`,
+        data: { point },
+      })
+    }
 
     const [node] = entry
 
     const el = ReactEditor.toDOMNode(editor, node)
-    if (!el) return
+    if (!el) {
+      return editor.onError({
+        key: 'ReactEditor.toDOMPoint.toDOMNode',
+        message: `Cannot resolve a DOM node from Slate node: ${Scrubber.stringify(
+          node
+        )}`,
+        data: { node },
+      })
+    }
 
     let domPoint: DOMPoint | undefined
 
@@ -627,13 +697,12 @@ export const ReactEditor: ReactEditorInterface = {
     }
 
     if (!domPoint) {
-      editor.onError({
-        type: 'toDOMPoint',
+      return editor.onError({
+        key: 'ReactEditor.toDOMPoint.domPoint',
         message: `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
           point
         )}`,
       })
-      return
     }
 
     return domPoint
@@ -644,12 +713,28 @@ export const ReactEditor: ReactEditorInterface = {
     const isBackward = Range.isBackward(range)
 
     const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
-    if (!domAnchor) return
+    if (!domAnchor) {
+      return editor.onError({
+        key: 'ReactEditor.toDOMRange.domAnchor',
+        message: `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
+          anchor
+        )}`,
+        data: { point: anchor },
+      })
+    }
 
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
       : ReactEditor.toDOMPoint(editor, focus)
-    if (!domFocus) return
+    if (!domFocus) {
+      return editor.onError({
+        key: 'ReactEditor.toDOMRange.domFocus',
+        message: `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
+          focus
+        )}`,
+        data: { point: focus },
+      })
+    }
 
     const window = ReactEditor.getWindow(editor)
     const domRange = window.document.createRange()
@@ -683,11 +768,11 @@ export const ReactEditor: ReactEditorInterface = {
     const node = domEl ? ELEMENT_TO_NODE.get(domEl as HTMLElement) : null
 
     if (!node) {
-      editor.onError({
-        type: 'toSlateNode',
+      return editor.onError({
+        key: 'ReactEditor.toSlateNode',
         message: `Cannot resolve a Slate node from DOM node: ${domEl}`,
+        data: { ELEMENT_TO_NODE, domEl },
       })
-      return
     }
 
     return node
@@ -711,7 +796,13 @@ export const ReactEditor: ReactEditorInterface = {
 
     if (parentNode) {
       const editorEl = ReactEditor.toDOMNode(editor, editor)
-      if (!editorEl) return
+      if (!editorEl) {
+        return editor.onError({
+          key: 'ReactEditor.toSlatePoint',
+          message: `Cannot resolve a Slate point from DOM point: ${domPoint}`,
+          data: { domPoint },
+        })
+      }
 
       const potentialVoidNode = parentNode.closest('[data-slate-void="true"]')
       // Need to ensure that the closest void node is actually a void node
@@ -830,13 +921,31 @@ export const ReactEditor: ReactEditorInterface = {
 
       if (node && ReactEditor.hasDOMNode(editor, node, { editable: true })) {
         const slateNode = ReactEditor.toSlateNode(editor, node)
-        if (!slateNode) return
+        if (!slateNode) {
+          return editor.onError({
+            key: 'ReactEditor.toSlatePoint.toSlateNode',
+            message: `Cannot resolve a Slate node from DOM node: ${node}`,
+            data: { node },
+          })
+        }
 
         const slatePath = ReactEditor.findPath(editor, slateNode)
-        if (!slatePath) return
+        if (!slatePath) {
+          return editor.onError({
+            key: 'ReactEditor.toSlatePoint.findPath',
+            message: `Cannot resolve a Slate path from DOM node: ${slateNode}`,
+            data: { slateNode },
+          })
+        }
 
         const start = Editor.start(editor, slatePath)
-        if (!start) return
+        if (!start) {
+          return editor.onError({
+            key: 'ReactEditor.toSlatePoint.start',
+            message: `Cannot resolve a Slate point from DOM node: ${node}`,
+            data: { at: slatePath },
+          })
+        }
 
         let { path, offset } = start
 
@@ -853,18 +962,24 @@ export const ReactEditor: ReactEditorInterface = {
         return null as T extends true ? Point | null : Point
       }
 
-      editor.onError({
-        type: 'toSlatePoint',
+      return editor.onError({
+        key: 'ReactEditor.toSlatePoint',
         message: `Cannot resolve a Slate point from DOM point: ${domPoint}`,
+        data: { domPoint },
       })
-      return
     }
 
     // COMPAT: If someone is clicking from one Slate editor into another,
     // the select event fires twice, once for the old editor's `element`
     // first, and then afterwards for the correct `element`. (2017/03/03)
     const slateNode = ReactEditor.toSlateNode(editor, textNode!)
-    if (!slateNode) return
+    if (!slateNode) {
+      return editor.onError({
+        key: 'ReactEditor.toSlatePoint.toSlateNode.textNode',
+        message: `Cannot resolve a Slate node from DOM node: ${textNode}`,
+        data: { textNode },
+      })
+    }
 
     const path = ReactEditor.findPath(editor, slateNode)
     return { path, offset } as T extends true ? Point | null : Point
@@ -920,11 +1035,11 @@ export const ReactEditor: ReactEditorInterface = {
       anchorOffset == null ||
       focusOffset == null
     ) {
-      editor.onError({
-        type: 'toSlateRange',
+      return editor.onError({
+        key: 'ReactEditor.toSlateRange',
         message: `Cannot resolve a Slate range from DOM range: ${domRange}`,
+        data: { domRange },
       })
-      return
     }
 
     // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
@@ -932,7 +1047,8 @@ export const ReactEditor: ReactEditorInterface = {
     // will cause `toSlatePoint` to throw an error. (2023/03/07)
     if (
       'getAttribute' in focusNode &&
-      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false'
+      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false' &&
+      (focusNode as HTMLElement).getAttribute('data-slate-void') !== 'true'
     ) {
       focusNode = anchorNode
       focusOffset = anchorNode.textContent?.length || 0

@@ -25,7 +25,7 @@ const ImagesExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <InsertImageButton />
       </Toolbar>
