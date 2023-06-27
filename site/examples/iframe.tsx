@@ -25,7 +25,7 @@ const IFrameExample = () => {
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />

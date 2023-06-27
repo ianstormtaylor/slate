@@ -13,7 +13,7 @@ const initialValue: Descendant[] = [
 const PlainTextExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         placeholder="Type something"
         renderPlaceholder={({ children, attributes }) => (

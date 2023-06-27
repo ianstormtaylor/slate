@@ -25,7 +25,7 @@ const HugeDocumentExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable renderElement={renderElement} spellCheck autoFocus />
     </Slate>
   )

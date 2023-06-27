@@ -35,7 +35,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -60,11 +60,7 @@ const App = () => {
 
             case 'b': {
               event.preventDefault()
-              Transforms.setNodes(
-                editor,
-                { bold: true },
-                { match: n => Text.isText(n), split: true }
-              )
+              Editor.addMark(editor, 'bold', true)
               break
             }
           }
@@ -83,12 +79,8 @@ We can instead implement these domain-specific concepts by creating custom helpe
 // Define our own custom set of helpers.
 const CustomEditor = {
   isBoldMarkActive(editor) {
-    const [match] = Editor.nodes(editor, {
-      match: n => n.bold === true,
-      universal: true,
-    })
-
-    return !!match
+    const marks = Editor.marks(editor)
+    return marks ? marks.bold === true : false
   },
 
   isCodeBlockActive(editor) {
@@ -101,11 +93,11 @@ const CustomEditor = {
 
   toggleBoldMark(editor) {
     const isActive = CustomEditor.isBoldMarkActive(editor)
-    Transforms.setNodes(
-      editor,
-      { bold: isActive ? null : true },
-      { match: n => Text.isText(n), split: true }
-    )
+    if (isActive) {
+      Editor.removeMark(editor, 'bold')
+    } else {
+      Editor.addMark(editor, 'bold', true)
+    }
   },
 
   toggleCodeBlock(editor) {
@@ -142,7 +134,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -200,7 +192,7 @@ const App = () => {
 
   return (
     // Add a toolbar with buttons that call the same methods.
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <div>
         <button
           onMouseDown={event => {

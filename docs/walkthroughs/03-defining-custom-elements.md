@@ -18,7 +18,7 @@ const App = () => {
   const [editor] = useState(() => withReact(createEditor()))
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         onKeyDown={event => {
           if (event.key === '&') {
@@ -88,7 +88,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         // Pass in the `renderElement` function.
         renderElement={renderElement}
@@ -120,7 +120,7 @@ Okay, but now we'll need a way for the user to actually turn a block into a code
 
 ```jsx
 // Import the `Editor` and `Transforms` helpers from Slate.
-import { Editor, Transforms } from 'slate'
+import { Editor, Transforms, Element } from 'slate'
 
 const initialValue = [
   {
@@ -142,7 +142,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -200,7 +200,7 @@ const App = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         onKeyDown={event => {
@@ -214,7 +214,7 @@ const App = () => {
             Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: n => Editor.isBlock(editor, n) }
+              { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
             )
           }
         }}
