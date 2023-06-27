@@ -68,7 +68,13 @@ export const TextTransforms: TextTransforms = {
 
       if (Path.isPath(at)) {
         const range = Editor.range(editor, at)
-        if (!range) return
+        if (!range) {
+          return editor.onError({
+            key: 'insertText.range',
+            message: 'Cannot find the range',
+            data: { at },
+          })
+        }
         at = range
       }
 

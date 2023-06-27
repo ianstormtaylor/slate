@@ -1,9 +1,9 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
-import { matchPath } from '../utils/match-path'
 import { Element } from '../interfaces/element'
+import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
+import { NodeTransforms } from '../interfaces/transforms/node'
+import { matchPath } from '../utils/match-path'
 
 export const removeNodes: NodeTransforms['removeNodes'] = (
   editor,
@@ -35,7 +35,14 @@ export const removeNodes: NodeTransforms['removeNodes'] = (
 
       if (path) {
         const entry = Editor.node(editor, path)
-        if (!entry) return
+        if (!entry) {
+          editor.onError({
+            key: 'removeNodes.node',
+            message: `Cannot remove node at path [${path}] because it could not be found.`,
+            data: { path },
+          })
+          continue
+        }
 
         const [node] = entry
         editor.apply({ type: 'remove_node', path, node })

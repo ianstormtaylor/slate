@@ -1,5 +1,4 @@
 import {
-  ErrorLogger,
   InsertNodeOperation,
   MergeNodeOperation,
   MoveNodeOperation,
@@ -324,7 +323,6 @@ export const Path: PathInterface = {
 
   next(path: Path): Path | undefined {
     if (path.length === 0) {
-      ErrorLogger.onError('PathNext', path)
       return
     }
 
@@ -354,7 +352,6 @@ export const Path: PathInterface = {
 
   parent(path: Path): Path | undefined {
     if (path.length === 0) {
-      ErrorLogger.onError('PathParent', path)
       return
     }
 
@@ -363,14 +360,12 @@ export const Path: PathInterface = {
 
   previous(path: Path): Path | undefined {
     if (path.length === 0) {
-      ErrorLogger.onError('PathPrevious', path)
       return
     }
 
     const last = path[path.length - 1]
 
     if (last <= 0) {
-      ErrorLogger.onError('PathPreviousChild', path)
       return
     }
 
@@ -379,7 +374,6 @@ export const Path: PathInterface = {
 
   relative(path: Path, ancestor: Path): Path | undefined {
     if (!Path.isAncestor(ancestor, path) && !Path.equals(path, ancestor)) {
-      ErrorLogger.onError('PathRelative', path, ancestor)
       return
     }
 

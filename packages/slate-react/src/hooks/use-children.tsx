@@ -51,7 +51,14 @@ const useChildren = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
-    if (!range) continue
+    if (!range) {
+      editor.onError({
+        key: 'useChildren.range',
+        message: 'Unable to create range',
+        data: { path: p },
+      })
+      return children
+    }
 
     const sel = selection && Range.intersection(range, selection)
     const ds = decorate([n, p])

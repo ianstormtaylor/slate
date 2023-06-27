@@ -28,12 +28,12 @@ import {
   TextUnitAdjustment,
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
+import { EditorError, SlateErrorType } from './slate-errors'
+import { NodeInsertNodesOptions } from './transforms/node'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
-import { NodeInsertNodesOptions } from './transforms/node'
-import { SlateError, SlateErrorType } from './slate-error'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -48,6 +48,13 @@ export interface BaseEditor {
   operations: Operation[]
   marks: EditorMarks | null
 
+  /**
+   * In "strict" mode, invalid operations will throw errors rather
+   * than being ignored. Set it to `false` to handle these errors yourself.
+   * @default true
+   */
+  strict: boolean
+
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
@@ -58,10 +65,14 @@ export interface BaseEditor {
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
-  onError: <T extends SlateErrorType>(
-    type: T,
-    ...args: Parameters<typeof SlateError[T]>
-  ) => void
+
+  /**
+   * The `onError` callback is called anytime an operation has invalid data.
+   * If `editor.strict` is set to `true`, these will be thrown as errors.
+   * Otherwise, they will be added to the `editor.errors` array and return a recovery value.
+   */
+  onError: <T extends SlateErrorType>(context: EditorError<T>) => any
+
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -180,12 +191,6 @@ export type Editor = ExtendedType<'Editor', BaseEditor>
 export type BaseSelection = Range | null
 
 export type Selection = ExtendedType<'Selection', BaseSelection>
-
-export type EditorError = {
-  type: string
-  message: string
-  error: Error
-}
 
 export type EditorMarks = Omit<Text, 'text'>
 

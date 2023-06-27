@@ -1,20 +1,15 @@
-import { Editor, EditorError } from '../interfaces'
-import { SlateError, SlateErrorType } from '../interfaces/slate-error'
+import { Editor } from '../interfaces'
+import { EditorError, SlateErrorType } from '../interfaces/slate-errors'
 
 export const onError = <T extends SlateErrorType>(
   editor: Editor,
-  type: T,
-  ...args: Parameters<typeof SlateError[T]>
-) => {
-  const errorFn: (...args: any[]) => Omit<EditorError, 'error'> =
-    SlateError[type]
-  if (!errorFn) {
-    throw new Error(`Unknown error type: ${type}`)
-  }
-  const error = errorFn(...args)
+  context: EditorError
+): any => {
+  const { message, recovery } = context
 
-  editor.errors.push({
-    ...error,
-    error: new Error(error.message),
-  })
+  if (editor.strict) throw new Error(message)
+
+  editor.errors.push(context)
+
+  return recovery
 }

@@ -7,47 +7,27 @@ Breaking changes:
 
 - Enhanced error handling by introducing **`undefined`** checks
 - Added **`editor.onError`** function to handle errors in functions that depend on **`editor`**
-- Introduced global **`ErrorLogger`** class for error handling in functions not depending on **`editor`**
-- No errors are thrown by default, addressing community feedback from issue #3641
+- Introduced `editor.strict`. If `true` (default), `editor.onError` will throw errors like before (unchanged behavior). If `false`, it will push the errors in `editor.errors` (new behavior).
 - Updated return types of several functions to include **`| undefined`**
-- Replaced **`throw new Error()`** statements with either **`editor.onError()`** or **`ErrorLogger.onError()`**
-- Implemented conditional checks for variables before accessing them to prevent crashes and improve code stability
 
 You can now filter errors by type:
 
 ```tsx
-ErrorLogger.addErrorHandler(error => {
-  // handle error
-  if (error.type === 'Node.get') {
-    throw new Error(error.message)
-  }
-
-  // access errors array
-  console.log(ErrorLogger.getErrors())
-
-  // reset errors array
-  console.log(ErrorLogger.resetErrors())
-})
-
-// throw only for `move_node` operation
+// throw only for `shouldNormalize` case
 editor.onError = error => {
-  if (error.type === 'move_node') {
+  if (error.key === 'shouldNormalize') {
     throw new Error(error.message)
   }
 }
 ```
 
-If you want to keep the previous behavior, here is the quickest **migration** using non-null assertion (estimating to a couple of minutes):
+If you want to adopt the new error-free behavior, set `editor.strict = false`, the default being `true`. Or you can just override `onError` to handle errors.
+
+Here is the quickest **migration** using non-null assertion (estimating to a couple of minutes):
 
 Throw an error like before:
 
 ```tsx
-import { ErrorLogger } from 'slate'
-
-ErrorLogger.addErrorHandler(error => {
-  throw new Error(error.message)
-})
-
 editor.onError = error => {
   throw new Error(error.message)
 }

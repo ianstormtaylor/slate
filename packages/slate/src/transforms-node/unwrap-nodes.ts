@@ -1,10 +1,10 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
-import { matchPath } from '../utils/match-path'
 import { Element } from '../interfaces/element'
+import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
+import { NodeTransforms } from '../interfaces/transforms/node'
+import { matchPath } from '../utils/match-path'
 
 export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
   editor,
@@ -26,7 +26,14 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
 
     if (Path.isPath(at)) {
       const range = Editor.range(editor, at)
-      if (!range) return
+      if (!range) {
+        editor.onError({
+          key: 'unwrapNodes.range',
+          message: `Cannot unwrap nodes at path [${at}] because it could not be found.`,
+          data: { path: at },
+        })
+        return
+      }
       at = range
     }
 
@@ -43,11 +50,25 @@ export const unwrapNodes: NodeTransforms['unwrapNodes'] = (
     for (const pathRef of pathRefs) {
       const path = pathRef.unref()!
       const entry = Editor.node(editor, path)
-      if (!entry) continue
+      if (!entry) {
+        editor.onError({
+          key: 'unwrapNodes.node',
+          message: `Cannot unwrap node at path [${path}] because it could not be found.`,
+          data: { path },
+        })
+        continue
+      }
       const [node] = entry
 
       let range = Editor.range(editor, path)
-      if (!range) continue
+      if (!range) {
+        editor.onError({
+          key: 'unwrapNodes.range',
+          message: `Cannot unwrap nodes at path [${path}] because it could not be found.`,
+          data: { path },
+        })
+        continue
+      }
 
       if (split && rangeRef) {
         range = Range.intersection(rangeRef.current!, range)!

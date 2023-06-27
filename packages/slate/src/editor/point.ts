@@ -1,8 +1,8 @@
 import { EditorInterface } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
 import { Node } from '../interfaces/node'
-import { Text } from '../interfaces/text'
+import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
+import { Text } from '../interfaces/text'
 
 export const point: EditorInterface['point'] = (editor, at, options = {}) => {
   const { edge = 'start' } = options
@@ -12,12 +12,24 @@ export const point: EditorInterface['point'] = (editor, at, options = {}) => {
 
     if (edge === 'end') {
       const lastEntry = Node.last(editor, at)
-      if (!lastEntry) return
+      if (!lastEntry) {
+        return editor.onError({
+          key: 'point.last',
+          message: 'Cannot find the last node',
+          data: { at },
+        })
+      }
       const [, lastPath] = lastEntry
       path = lastPath
     } else {
       const firstEntry = Node.first(editor, at)
-      if (!firstEntry) return
+      if (!firstEntry) {
+        return editor.onError({
+          key: 'point.first',
+          message: 'Cannot find the first node',
+          data: { at },
+        })
+      }
       const [, firstPath] = firstEntry
       path = firstPath
     }
@@ -25,11 +37,11 @@ export const point: EditorInterface['point'] = (editor, at, options = {}) => {
     const node = Node.get(editor, path)
 
     if (!Text.isText(node)) {
-      editor.onError({
-        type: 'point',
-        message: `Cannot get the ${edge} point in the node at path [${at}] because it has no ${edge} text node.`,
+      return editor.onError({
+        key: 'point.text',
+        message: 'Cannot get the text node',
+        data: { at },
       })
-      return
     }
 
     return { path, offset: edge === 'end' ? node.text.length : 0 }

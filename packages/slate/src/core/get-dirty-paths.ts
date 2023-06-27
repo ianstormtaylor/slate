@@ -1,8 +1,9 @@
-import { WithEditorFirstArg } from '../utils/types'
-import { Path } from '../interfaces/path'
-import { Text } from '../interfaces/text'
-import { Node } from '../interfaces/node'
 import { Editor } from '../interfaces/editor'
+import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { SlateErrors } from '../interfaces/slate-errors'
+import { Text } from '../interfaces/text'
+import { WithEditorFirstArg } from '../utils/types'
 
 /**
  * Get the "dirty" paths generated from an operation.
@@ -33,7 +34,15 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
       const { path } = op
       const ancestors = Path.ancestors(path)
       const previousPath = Path.previous(path)
-      if (!previousPath) return [...ancestors]
+      if (!previousPath) {
+        return editor.onError({
+          key: 'getDirtyPaths.merge_node',
+          message: `Cannot get the dirty paths after merging at path [${path}], because it has no previous path.`,
+          error: SlateErrors.PathPrevious(path),
+          data: { path, ancestors },
+          recovery: [...ancestors],
+        })
+      }
 
       return [...ancestors, previousPath]
     }
@@ -75,7 +84,15 @@ export const getDirtyPaths: WithEditorFirstArg<Editor['getDirtyPaths']> = (
       const { path } = op
       const levels = Path.levels(path)
       const nextPath = Path.next(path)
-      if (!nextPath) return [...levels]
+      if (!nextPath) {
+        return editor.onError({
+          key: 'getDirtyPaths.split_node',
+          message: `Cannot get the dirty paths after splitting at path [${path}], because it has no next path.`,
+          error: SlateErrors.PathNext(path),
+          data: { path, levels },
+          recovery: [...levels],
+        })
+      }
 
       return [...levels, nextPath]
     }

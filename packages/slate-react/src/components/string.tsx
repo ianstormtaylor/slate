@@ -24,6 +24,10 @@ const String = (props: {
   }
 
   const parentPath = Path.parent(path)
+  if (!parentPath) {
+    return <TextString text={leaf.text} />
+  }
+
   const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
 
   // COMPAT: Render text inside void nodes with a zero-width space.
@@ -36,7 +40,6 @@ const String = (props: {
   // width space that will convert into a line break when copying and pasting
   // to support expected plain text.
   if (
-    parentPath &&
     leaf.text === '' &&
     parent.children[parent.children.length - 1] === text &&
     !editor.isInline(parent) &&

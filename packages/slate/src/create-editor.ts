@@ -95,13 +95,14 @@ export const createEditor = (): Editor => {
     errors: [],
     selection: null,
     marks: null,
+    strict: true,
     isElementReadOnly: () => false,
     isInline: () => false,
     isSelectable: () => true,
     isVoid: () => false,
     markableVoid: () => false,
     onChange: () => {},
-    onError: (type, ...args) => onError(editor, type, ...args),
+    onError: (...args) => onError(editor, ...args),
 
     // Core
     apply: (...args) => apply(editor, ...args),

@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { Editor, ErrorLogger, Path, Range, Scrubber, Text } from '..'
+import { Editor, Path, Range, Text } from '..'
 import { Element, ElementEntry } from './element'
 
 /**
@@ -214,12 +214,6 @@ export const Node: NodeInterface = {
     const node = Node.get(root, path)
 
     if (Text.isText(node)) {
-      ErrorLogger.onError({
-        type: 'Node.ancestor',
-        message: `Cannot get the ancestor node at path [${path}] because it refers to a text node instead: ${Scrubber.stringify(
-          node
-        )}`,
-      })
       return
     }
 
@@ -242,24 +236,12 @@ export const Node: NodeInterface = {
 
   child(root: Node, index: number): Descendant | undefined {
     if (Text.isText(root)) {
-      ErrorLogger.onError({
-        type: 'Node.child',
-        message: `Cannot get the child of a text node: ${Scrubber.stringify(
-          root
-        )}`,
-      })
       return
     }
 
     const c = root.children[index] as Descendant
 
     if (c == null) {
-      ErrorLogger.onError({
-        type: 'Node.child',
-        message: `Cannot get child at index \`${index}\` in node: ${Scrubber.stringify(
-          root
-        )}`,
-      })
       return
     }
 
@@ -297,12 +279,6 @@ export const Node: NodeInterface = {
     const node = Node.get(root, path)
 
     if (Editor.isEditor(node)) {
-      ErrorLogger.onError({
-        type: 'Node.descendant',
-        message: `Cannot get the descendant node at path [${path}] because it refers to the root editor node instead: ${Scrubber.stringify(
-          node
-        )}`,
-      })
       return
     }
 
@@ -364,12 +340,6 @@ export const Node: NodeInterface = {
 
   fragment(root: Node, range: Range): Descendant[] {
     if (Text.isText(root)) {
-      ErrorLogger.onError({
-        type: 'Node.fragment',
-        message: `Cannot get a fragment starting from a root text node: ${Scrubber.stringify(
-          root
-        )}`,
-      })
       return []
     }
 
@@ -416,12 +386,6 @@ export const Node: NodeInterface = {
       const p = path[i]
 
       if (Text.isText(node) || !node.children[p]) {
-        ErrorLogger.onError({
-          type: 'Node.get',
-          message: `Cannot find a descendant at path [${path}] in node: ${Scrubber.stringify(
-            root
-          )}`,
-        })
         return
       }
 
@@ -488,12 +452,6 @@ export const Node: NodeInterface = {
     const node = Node.get(root, path)
 
     if (!Text.isText(node)) {
-      ErrorLogger.onError({
-        type: 'Node.leaf',
-        message: `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(
-          node
-        )}`,
-      })
       return
     }
 
@@ -612,10 +570,6 @@ export const Node: NodeInterface = {
     const p = Node.get(root, parentPath)
 
     if (Text.isText(p)) {
-      ErrorLogger.onError({
-        type: 'Node.parent',
-        message: `Cannot get the parent of path [${path}] because it does not exist in the root.`,
-      })
       return
     }
 

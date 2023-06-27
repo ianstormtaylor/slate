@@ -1,6 +1,5 @@
 export * from './editor'
 export * from './element'
-export * from './error-logger'
 export * from './location'
 export * from './node'
 export * from './operation'

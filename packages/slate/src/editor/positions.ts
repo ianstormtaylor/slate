@@ -1,8 +1,8 @@
 import { Editor, EditorPositionsOptions } from '../interfaces/editor'
-import { Point } from '../interfaces/point'
-import { Range } from '../interfaces/range'
 import { Element } from '../interfaces/element'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
 import { Text } from '../interfaces/text'
 import {
   getCharacterDistance,
@@ -22,7 +22,9 @@ export function* positions(
     ignoreNonSelectable = false,
   } = options
 
-  if (!at) return
+  if (!at) {
+    return
+  }
 
   /**
    * Algorithm notes:
@@ -43,7 +45,13 @@ export function* positions(
    */
 
   const range = Editor.range(editor, at)
-  if (!range) return
+  if (!range) {
+    return editor.onError({
+      key: 'positions.range',
+      message: 'Cannot get the range',
+      data: { at },
+    })
+  }
 
   const [start, end] = Range.edges(range)
   const first = reverse ? end : start
@@ -74,7 +82,14 @@ export function* positions(
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
         const start = Editor.start(editor, path)
-        if (!start) continue
+        if (!start) {
+          editor.onError({
+            key: 'positions.start',
+            message: 'Cannot get the start point',
+            data: { at },
+          })
+          continue
+        }
         yield start
         continue
       }
@@ -100,12 +115,26 @@ export function* positions(
         const e = Path.isAncestor(path, end.path)
           ? end
           : Editor.end(editor, path)
-        if (!e) continue
+        if (!e) {
+          editor.onError({
+            key: 'positions.end',
+            message: 'Cannot get the end point',
+            data: { at },
+          })
+          continue
+        }
 
         const s = Path.isAncestor(path, start.path)
           ? start
           : Editor.start(editor, path)
-        if (!s) continue
+        if (!s) {
+          editor.onError({
+            key: 'positions.start',
+            message: 'Cannot get the start point',
+            data: { at },
+          })
+          continue
+        }
 
         blockText = Editor.string(editor, { anchor: s, focus: e }, { voids })
         isNewBlock = true
