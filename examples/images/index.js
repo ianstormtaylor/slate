@@ -1,4 +1,4 @@
-import { Editor, getEventRange, getEventTransfer } from 'slate-react'
+import { Editor, getEventRange, getEventTransfer } from '@bbc/old-optimo-slate-react'
 import { Block, Value } from 'slate'
 
 import React from 'react'

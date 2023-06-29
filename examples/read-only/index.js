@@ -1,5 +1,5 @@
 import Plain from 'slate-plain-serializer'
-import { Editor } from 'slate-react'
+import { Editor } from '@bbc/old-optimo-slate-react'
 
 import React from 'react'
 

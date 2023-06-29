@@ -1,6 +1,6 @@
 import Base64 from 'slate-base64-serializer'
 import Debug from 'debug'
-import Hotkeys from 'slate-hotkeys'
+import Hotkeys from '@bbc/old-optimo-slate-hotkeys'
 import Plain from 'slate-plain-serializer'
 import getWindow from 'get-window'
 import { IS_IOS } from 'slate-dev-environment'

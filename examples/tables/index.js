@@ -1,5 +1,5 @@
 import Plain from 'slate-plain-serializer'
-import { Editor, getEventTransfer } from 'slate-react'
+import { Editor, getEventTransfer } from '@bbc/old-optimo-slate-react'
 import { Value } from 'slate'
 
 import React from 'react'

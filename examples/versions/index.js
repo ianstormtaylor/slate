@@ -1,5 +1,5 @@
 import { Value } from 'slate'
-import { Editor } from 'slate-react'
+import { Editor } from '@bbc/old-optimo-slate-react'
 import React from 'react'
 import { List } from 'immutable'
 
