@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.97.2
+
+### Patch Changes
+
+- [#5462](https://github.com/ianstormtaylor/slate/pull/5462) [`a6b606d8`](https://github.com/ianstormtaylor/slate/commit/a6b606d804795d9b134784a35e3b00ac77f3ebbc) Thanks [@Ben-Wormald](https://github.com/Ben-Wormald)! - Update hotkeys util to use isHotkey for better support for non-latin keyboards
+
+* [#5470](https://github.com/ianstormtaylor/slate/pull/5470) [`4bd15ed3`](https://github.com/ianstormtaylor/slate/commit/4bd15ed3950e3a0871f5d0ecb391bb637c05e59d) Thanks [@josephmr](https://github.com/josephmr)! - Fix Android caret placement regression when inputting into empty editor
+
 ## 0.97.1
 
 ### Patch Changes
