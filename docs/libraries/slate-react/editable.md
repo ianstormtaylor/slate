@@ -27,21 +27,21 @@ type EditableProps = {
 
 _NOTE: Detailed breakdown of Props not completed. Refer to the [source code](https://github.com/ianstormtaylor/slate/blob/main/packages/slate-react/src/components/editable.tsx) at the moment. Under construction._
 
-#### `placeholder?: string`
+#### `placeholder?: string = ""`
 
 The text to display as a placeholder when the Editor is empty. A typical value for `placeholder` would be "Enter text here..." or "Start typing...". The placeholder text will not be treated as an actual value and will disappear when the user starts typing in the Editor.
 
-### `readOnly?: boolean`
+#### `readOnly?: boolean = false`
 
-The readOnly prop is an optional boolean attribute that, when set to true, renders the editor in a "read-only" state. In this state, user input and interactions will not modify the editor's content.
+When set to true, renders the editor in a "read-only" state. In this state, user input and interactions will not modify the editor's content.
 
 If this prop is omitted or set to false, the editor remains in the default "editable" state, allowing users to interact with and modify the content.
 
 This prop is particularly useful when you want to display text or rich media content without allowing users to edit it, such as when displaying published content or a preview of the user's input.
 
-### `renderElement?: (props: RenderElementProps) => JSX.Element`
+#### `renderElement?: (props: RenderElementProps) => JSX.Element`
 
-The `renderElement` prop is a function used to render a custom component for a specific type of Element node in the Slate.js document model. The function receives a RenderElementProps object as its argument and returns a JSX element.
+The `renderElement` prop is a function used to render a custom component for a specific type of Element node in the Slate.js document model.
 
 Here is the type of the `RenderElementProps` passed into the function.
 
@@ -110,11 +110,9 @@ const DefaultElement = props => {
 
 #### `renderLeaf?: (props: RenderLeafProps) => JSX.Element`
 
-The `renderLeaf` prop is an optional function that allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
+The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
 
-This function should return a JSX element, which defines how the leaf node is displayed in the editor.
-
-The `renderLeaf` function receives an object of type `RenderLeafProps` as its argument, which contains the following properties:
+The `renderLeaf` function receives an object of type `RenderLeafProps` as its argument:
 
 ```typescript
 export interface RenderLeafProps {
@@ -126,8 +124,6 @@ export interface RenderLeafProps {
   }
 }
 ```
-
-By providing your own `renderLeaf` function, you can control the rendering of different types of text, such as bold, italic, underlined text, or even custom types like mentions or hashtags.
 
 Example usage:
 
@@ -146,15 +142,11 @@ Example usage:
 />
 ```
 
-In this example, text marked as bold will be rendered with `fontWeight: bold` or otherwise with a `fontWeight: normal`.
-
 #### `renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element`
 
-The `renderPlaceholder` prop is an optional function that allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty.
+The `renderPlaceholder` prop allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty. The placeholder will only be shown when the editor's content is empty.
 
-The `renderPlaceholder` function receives an object `props` of type `RenderPlaceholderProps` and should return a JSX element that will be rendered as the placeholder.
-
-The `RenderPlaceholderProps` interface might contain properties such as:
+The `RenderPlaceholderProps` interface looks like this:
 
 ```typescript
 export type RenderPlaceholderProps = {
@@ -169,10 +161,6 @@ export type RenderPlaceholderProps = {
 }
 ```
 
-The `attributes` property is an object with various properties that should be applied to the element that wraps your placeholder, to ensure Slate's event handling works correctly.
-
-The `children` property is the `placeholder` content.
-
 An example usage might look like:
 
 ```jsx
@@ -185,31 +173,15 @@ An example usage might look like:
 />
 ```
 
-In this example, the placeholder text is styled to be italic and gray. The `{...attributes}` spread ensures that the necessary Slate data and event handlers are applied to the placeholder element.
-
-Note: The placeholder will only be shown when the editor's content is empty.
-
 #### `scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void`
 
 Slate has its own default method to scroll a DOM selection into view that works for most cases; however, if the default behavior isn't working for you, possible due to some complex styling, you may need to override the default behavior by providing a different function here.
 
-#### `disableDefaultStyles?: boolean`
+#### `disableDefaultStyles?: boolean = false`
 
-The `disableDefaultStyles` prop is an optional boolean that determines whether the default styles of the Slate.js `Editable` component are applied or not.
-
-If `disableDefaultStyles` is set to `true`, the default styles will be removed. This gives you more control over the styling of your editor component, as you can then provide your own styles without the need to override the default ones.
-
-Here's an example of how you might use this prop:
-
-```jsx
-<Editable disableDefaultStyles={true} />
-```
-
-In this example, all default styles of the `Editable` component are disabled, giving you a clean slate for applying your own styles.
+The `disableDefaultStyles` prop determines whether the default styles of the Slate.js `Editable` component are applied or not.
 
 Please note that with this prop set to `true`, you will need to ensure that your styles cater to all the functionalities of the editor that rely on specific styles to work properly.
-
-Default value is `false`, which means by default, the `Editable` component will use Slate's built-in styles.
 
 Here are the default styles:
 
