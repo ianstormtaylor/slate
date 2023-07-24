@@ -177,6 +177,10 @@ An example usage might look like:
 
 Slate has its own default method to scroll a DOM selection into view that works for most cases; however, if the default behavior isn't working for you, possible due to some complex styling, you may need to override the default behavior by providing a different function here.
 
+#### `as?: React.ElementType = "div"`
+
+The as prop specifies the type of element that will be used to render the Editable component in your React application. By default, this is a `div`.
+
 #### `disableDefaultStyles?: boolean = false`
 
 The `disableDefaultStyles` prop determines whether the default styles of the Slate.js `Editable` component are applied or not.
