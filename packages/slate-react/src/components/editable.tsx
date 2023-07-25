@@ -309,6 +309,8 @@ export const Editable = (props: EditableProps) => {
       const focusNode = domSelection.focusNode
       let anchorNode
 
+      // COMPAT: In firefox the normal seletion way does not work
+      // (https://github.com/ianstormtaylor/slate/pull/5486#issue-1820720223)
       if (IS_FIREFOX && domSelection.rangeCount > 1) {
         const firstRange = domSelection.getRangeAt(0)
         const lastRange = domSelection.getRangeAt(domSelection.rangeCount - 1)

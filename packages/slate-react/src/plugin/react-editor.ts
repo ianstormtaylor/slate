@@ -830,6 +830,7 @@ export const ReactEditor: ReactEditorInterface = {
     if (el) {
       if (isDOMSelection(domRange)) {
         // COMPAT: In firefox the normal seletion way does not work
+        // (https://github.com/ianstormtaylor/slate/pull/5486#issue-1820720223)
         if (IS_FIREFOX && domRange.rangeCount > 1) {
           focusNode = domRange.focusNode // Focus node works fine
           const firstRange = domRange.getRangeAt(0)
@@ -857,7 +858,7 @@ export const ReactEditor: ReactEditorInterface = {
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)
         // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
-        // IsColapsed might not work in firefox, but this will
+        // IsCollapsed might not work in firefox, but this will
         if ((IS_CHROME && hasShadowRoot(anchorNode)) || IS_FIREFOX) {
           isCollapsed =
             domRange.anchorNode === domRange.focusNode &&
