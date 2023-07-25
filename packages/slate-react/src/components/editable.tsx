@@ -305,12 +305,31 @@ export const Editable = (props: EditableProps) => {
         return
       }
 
+      // Get anchorNode and focusNode
+      const focusNode = domSelection.focusNode
+      let anchorNode
+
+      if (IS_FIREFOX && domSelection.rangeCount > 1) {
+        const firstRange = domSelection.getRangeAt(0)
+        const lastRange = domSelection.getRangeAt(domSelection.rangeCount - 1)
+
+        // Right to left
+        if (firstRange.startContainer === focusNode) {
+          anchorNode = lastRange.endContainer
+        } else {
+          // Left to right
+          anchorNode = firstRange.startContainer
+        }
+      } else {
+        anchorNode = domSelection.anchorNode
+      }
+
       // verify that the dom selection is in the editor
       const editorElement = EDITOR_TO_ELEMENT.get(editor)!
       let hasDomSelectionInEditor = false
       if (
-        editorElement.contains(domSelection.anchorNode) &&
-        editorElement.contains(domSelection.focusNode)
+        editorElement.contains(anchorNode) &&
+        editorElement.contains(focusNode)
       ) {
         hasDomSelectionInEditor = true
       }
@@ -336,7 +355,6 @@ export const Editable = (props: EditableProps) => {
           }
 
           // Ensure selection is inside the mark placeholder
-          const { anchorNode } = domSelection
           if (
             anchorNode?.parentElement?.hasAttribute(
               'data-slate-mark-placeholder'
@@ -391,19 +409,11 @@ export const Editable = (props: EditableProps) => {
       return newDomRange
     }
 
-    const newDomRange = setDomSelection()
     const ensureSelection =
       androidInputManagerRef.current?.isFlushing() === 'action'
 
     if (!IS_ANDROID || !ensureSelection) {
       setTimeout(() => {
-        // COMPAT: In Firefox, it's not enough to create a range, you also need
-        // to focus the contenteditable element too. (2016/11/16)
-        if (newDomRange && IS_FIREFOX) {
-          const el = ReactEditor.toDOMNode(editor, editor)
-          el.focus()
-        }
-
         state.isUpdatingSelection = false
       })
       return
