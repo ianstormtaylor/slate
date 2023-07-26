@@ -411,6 +411,11 @@ export const Editable = (props: EditableProps) => {
       return newDomRange
     }
 
+    // In firefox if there is more then 1 range and we call setDomSelection we remove the ability to select more cells in a table
+    if (domSelection.rangeCount <= 1) {
+      setDomSelection()
+    }
+
     const ensureSelection =
       androidInputManagerRef.current?.isFlushing() === 'action'
 
