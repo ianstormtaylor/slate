@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.98.0
+
+### Minor Changes
+
+- [#5486](https://github.com/ianstormtaylor/slate/pull/5486) [`8b548fb5`](https://github.com/ianstormtaylor/slate/commit/8b548fb53af861e1f391f2d5c052e3279f0a0b6c) Thanks [@WcaleNieWolny](https://github.com/WcaleNieWolny)! - Fix invalid usage of the selection API in firefox
+
 ## 0.97.2
 
 ### Patch Changes
