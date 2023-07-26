@@ -829,15 +829,37 @@ export const ReactEditor: ReactEditorInterface = {
 
     if (el) {
       if (isDOMSelection(domRange)) {
-        anchorNode = domRange.anchorNode
-        anchorOffset = domRange.anchorOffset
-        focusNode = domRange.focusNode
-        focusOffset = domRange.focusOffset
+        // COMPAT: In firefox the normal seletion way does not work
+        // (https://github.com/ianstormtaylor/slate/pull/5486#issue-1820720223)
+        if (IS_FIREFOX && domRange.rangeCount > 1) {
+          focusNode = domRange.focusNode // Focus node works fine
+          const firstRange = domRange.getRangeAt(0)
+          const lastRange = domRange.getRangeAt(domRange.rangeCount - 1)
+
+          // Right to left
+          if (firstRange.startContainer === focusNode) {
+            anchorNode = lastRange.endContainer
+            anchorOffset = lastRange.endOffset
+            focusOffset = firstRange.startOffset
+          } else {
+            // Left to right
+            anchorNode = firstRange.startContainer
+            anchorOffset = firstRange.endOffset
+            focusOffset = lastRange.startOffset
+          }
+        } else {
+          anchorNode = domRange.anchorNode
+          anchorOffset = domRange.anchorOffset
+          focusNode = domRange.focusNode
+          focusOffset = domRange.focusOffset
+        }
+
         // COMPAT: There's a bug in chrome that always returns `true` for
         // `isCollapsed` for a Selection that comes from a ShadowRoot.
         // (2020/08/08)
         // https://bugs.chromium.org/p/chromium/issues/detail?id=447523
-        if (IS_CHROME && hasShadowRoot(anchorNode)) {
+        // IsCollapsed might not work in firefox, but this will
+        if ((IS_CHROME && hasShadowRoot(anchorNode)) || IS_FIREFOX) {
           isCollapsed =
             domRange.anchorNode === domRange.focusNode &&
             domRange.anchorOffset === domRange.focusOffset
@@ -876,15 +898,19 @@ export const ReactEditor: ReactEditorInterface = {
       focusOffset = anchorNode.textContent?.length || 0
     }
 
-    let anchor = ReactEditor.toSlatePoint(editor, [anchorNode, anchorOffset], {
-      exactMatch,
-      suppressThrow,
-    })
+    const anchor = ReactEditor.toSlatePoint(
+      editor,
+      [anchorNode, anchorOffset],
+      {
+        exactMatch,
+        suppressThrow,
+      }
+    )
     if (!anchor) {
       return null as T extends true ? Range | null : Range
     }
 
-    let focus = isCollapsed
+    const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], {
           exactMatch,
@@ -892,46 +918,6 @@ export const ReactEditor: ReactEditorInterface = {
         })
     if (!focus) {
       return null as T extends true ? Range | null : Range
-    }
-
-    /**
-     * suppose we have this document:
-     *
-     * { type: 'paragraph',
-     *   children: [
-     *     { text: 'foo ' },
-     *     { text: 'bar' },
-     *     { text: ' baz' }
-     *   ]
-     * }
-     *
-     * a double click on "bar" on chrome will create this range:
-     *
-     * anchor -> [0,1] offset 0
-     * focus  -> [0,1] offset 3
-     *
-     * while on firefox will create this range:
-     *
-     * anchor -> [0,0] offset 4
-     * focus  -> [0,2] offset 0
-     *
-     * let's try to fix it...
-     */
-
-    if (IS_FIREFOX && !isCollapsed && anchorNode !== focusNode) {
-      const isEnd = Editor.isEnd(editor, anchor!, anchor.path)
-      const isStart = Editor.isStart(editor, focus!, focus.path)
-
-      if (isEnd) {
-        const after = Editor.after(editor, anchor as Point)
-        // Editor.after() might return undefined
-        anchor = (after || anchor!) as T extends true ? Point | null : Point
-      }
-
-      if (isStart) {
-        const before = Editor.before(editor, focus as Point)
-        focus = (before || focus!) as T extends true ? Point | null : Point
-      }
     }
 
     let range: Range = { anchor: anchor as Point, focus: focus as Point }
