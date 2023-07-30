@@ -836,16 +836,66 @@ export const ReactEditor: ReactEditorInterface = {
           const firstRange = domRange.getRangeAt(0)
           const lastRange = domRange.getRangeAt(domRange.rangeCount - 1)
 
-          // Right to left
-          if (firstRange.startContainer === focusNode) {
-            anchorNode = lastRange.endContainer
-            anchorOffset = lastRange.endOffset
-            focusOffset = firstRange.startOffset
+          // Here we are in the contenteditable mode of a table in firefox
+          if (
+            focusNode instanceof HTMLTableRowElement &&
+            firstRange.startContainer instanceof HTMLTableRowElement &&
+            lastRange.startContainer instanceof HTMLTableRowElement
+          ) {
+            // HTMLElement, becouse Element is a slate element
+            function getLastChildren(element: HTMLElement): HTMLElement {
+              if (element.childElementCount > 0) {
+                return getLastChildren(<HTMLElement>element.children[0])
+              } else {
+                return element
+              }
+            }
+
+            const firstNodeRow = <HTMLTableRowElement>firstRange.startContainer
+            const lastNodeRow = <HTMLTableRowElement>lastRange.startContainer
+
+            // This should never fail as "The HTMLElement interface represents any HTML element."
+            const firstNode = getLastChildren(
+              <HTMLElement>firstNodeRow.children[firstRange.startOffset]
+            )
+            const lastNode = getLastChildren(
+              <HTMLElement>lastNodeRow.children[lastRange.startOffset]
+            )
+
+            // Zero, as we allways take the right one as the anchor point
+            focusOffset = 0
+
+            if (lastNode.childNodes.length > 0) {
+              anchorNode = lastNode.childNodes[0]
+            } else {
+              anchorNode = lastNode
+            }
+
+            if (firstNode.childNodes.length > 0) {
+              focusNode = firstNode.childNodes[0]
+            } else {
+              focusNode = firstNode
+            }
+
+            if (lastNode instanceof HTMLElement) {
+              anchorOffset = (<HTMLElement>lastNode).innerHTML.length
+            } else {
+              // Fallback option
+              anchorOffset = 0
+            }
           } else {
-            // Left to right
-            anchorNode = firstRange.startContainer
-            anchorOffset = firstRange.endOffset
-            focusOffset = lastRange.startOffset
+            // This is the read only mode of a firefox table
+            // Right to left
+            if (firstRange.startContainer === focusNode) {
+              anchorNode = lastRange.endContainer
+              anchorOffset = lastRange.endOffset
+              focusOffset = firstRange.startOffset
+            } else {
+              // Left to right
+              anchorNode = firstRange.startContainer
+              anchorOffset = firstRange.endOffset
+              focusOffset = lastRange.startOffset
+            }
           }
         } else {
           anchorNode = domRange.anchorNode
