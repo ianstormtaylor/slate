@@ -10,7 +10,7 @@ const [editor] = useState(() => withReact(withHistory(createEditor())))
   - [Check methods](react-editor.md#check-methods)
   - [Focus and selection methods](react-editor.md#focus-and-selection-methods)
   - [DOM translation methods](react-editor.md#dom-translation-methods)
-  - [DataTranfer methods](react-editor.md#datatransfer-methods)
+  - [DataTransfer methods](react-editor.md#datatransfer-methods)
 
 ## Static methods
 

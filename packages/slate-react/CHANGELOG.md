@@ -1,5 +1,25 @@
 # slate-react
 
+## 0.98.1
+
+### Patch Changes
+
+- [#5491](https://github.com/ianstormtaylor/slate/pull/5491) [`a5576e56`](https://github.com/ianstormtaylor/slate/commit/a5576e56a73f061972775953f270b34081a5cad8) Thanks [@WcaleNieWolny](https://github.com/WcaleNieWolny)! - Fix firefox table selection if table is contentedtiable
+
+## 0.98.0
+
+### Minor Changes
+
+- [#5486](https://github.com/ianstormtaylor/slate/pull/5486) [`8b548fb5`](https://github.com/ianstormtaylor/slate/commit/8b548fb53af861e1f391f2d5c052e3279f0a0b6c) Thanks [@WcaleNieWolny](https://github.com/WcaleNieWolny)! - Fix invalid usage of the selection API in firefox
+
+## 0.97.2
+
+### Patch Changes
+
+- [#5462](https://github.com/ianstormtaylor/slate/pull/5462) [`a6b606d8`](https://github.com/ianstormtaylor/slate/commit/a6b606d804795d9b134784a35e3b00ac77f3ebbc) Thanks [@Ben-Wormald](https://github.com/Ben-Wormald)! - Update hotkeys util to use isHotkey for better support for non-latin keyboards
+
+* [#5470](https://github.com/ianstormtaylor/slate/pull/5470) [`4bd15ed3`](https://github.com/ianstormtaylor/slate/commit/4bd15ed3950e3a0871f5d0ecb391bb637c05e59d) Thanks [@josephmr](https://github.com/josephmr)! - Fix Android caret placement regression when inputting into empty editor
+
 ## 0.97.1
 
 ### Patch Changes
