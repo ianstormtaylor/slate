@@ -44,6 +44,9 @@ Transforms are a specific set of helpers that allow you to perform a wide variet
 
 ```javascript
 // Set a "bold" format on all of the text nodes in a range.
+// Normally you would apply a style like bold using the Editor.addMark() command.
+// The addMark() command performs a similar setNodes transform, but it uses a more
+// complicated match function in order to apply marks within markableVoid elements.
 Transforms.setNodes(
   editor,
   { bold: true },

@@ -9,7 +9,7 @@ import {
 } from '../hooks/use-slate-selector'
 import { EditorContext } from '../hooks/use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
-import { IS_REACT_VERSION_17_OR_ABOVE } from '../utils/environment'
+import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 /**
@@ -19,18 +19,18 @@ import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 export const Slate = (props: {
   editor: ReactEditor
-  value: Descendant[]
+  initialValue: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
 }) => {
-  const { editor, children, onChange, value, ...rest } = props
+  const { editor, children, onChange, initialValue, ...rest } = props
   const unmountRef = useRef(false)
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
-    if (!Node.isNodeList(value)) {
+    if (!Node.isNodeList(initialValue)) {
       throw new Error(
-        `[Slate] value is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          value
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          initialValue
         )}`
       )
     }
@@ -39,7 +39,7 @@ export const Slate = (props: {
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
-    editor.children = value
+    editor.children = initialValue
     Object.assign(editor, rest)
     return { v: 0, editor }
   })
@@ -78,7 +78,7 @@ export const Slate = (props: {
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    if (IS_REACT_VERSION_17_OR_ABOVE) {
+    if (REACT_MAJOR_VERSION >= 17) {
       // In React >= 17 onFocus and onBlur listen to the focusin and focusout events during the bubbling phase.
       // Therefore in order for <Editable />'s handlers to run first, which is necessary for ReactEditor.isFocused(editor)
       // to return the correct value, we have to listen to the focusin and focusout events without useCapture here.

@@ -98,7 +98,7 @@ const InlinesExample = () => {
   }
 
   return (
-    <SlateReact.Slate editor={editor} value={initialValue}>
+    <SlateReact.Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <AddLinkButton />
         <RemoveLinkButton />

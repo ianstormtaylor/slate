@@ -5,7 +5,7 @@ import { Slate, Editable, withReact } from 'slate-react'
 const ReadOnlyExample = () => {
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable readOnly placeholder="Enter some plain text..." />
     </Slate>
   )

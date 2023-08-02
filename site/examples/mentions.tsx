@@ -73,7 +73,7 @@ const MentionExample = () => {
   return (
     <Slate
       editor={editor}
-      value={initialValue}
+      initialValue={initialValue}
       onChange={() => {
         const { selection } = editor
 

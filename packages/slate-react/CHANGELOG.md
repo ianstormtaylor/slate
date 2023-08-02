@@ -1,5 +1,65 @@
 # slate-react
 
+## 0.98.1
+
+### Patch Changes
+
+- [#5491](https://github.com/ianstormtaylor/slate/pull/5491) [`a5576e56`](https://github.com/ianstormtaylor/slate/commit/a5576e56a73f061972775953f270b34081a5cad8) Thanks [@WcaleNieWolny](https://github.com/WcaleNieWolny)! - Fix firefox table selection if table is contentedtiable
+
+## 0.98.0
+
+### Minor Changes
+
+- [#5486](https://github.com/ianstormtaylor/slate/pull/5486) [`8b548fb5`](https://github.com/ianstormtaylor/slate/commit/8b548fb53af861e1f391f2d5c052e3279f0a0b6c) Thanks [@WcaleNieWolny](https://github.com/WcaleNieWolny)! - Fix invalid usage of the selection API in firefox
+
+## 0.97.2
+
+### Patch Changes
+
+- [#5462](https://github.com/ianstormtaylor/slate/pull/5462) [`a6b606d8`](https://github.com/ianstormtaylor/slate/commit/a6b606d804795d9b134784a35e3b00ac77f3ebbc) Thanks [@Ben-Wormald](https://github.com/Ben-Wormald)! - Update hotkeys util to use isHotkey for better support for non-latin keyboards
+
+* [#5470](https://github.com/ianstormtaylor/slate/pull/5470) [`4bd15ed3`](https://github.com/ianstormtaylor/slate/commit/4bd15ed3950e3a0871f5d0ecb391bb637c05e59d) Thanks [@josephmr](https://github.com/josephmr)! - Fix Android caret placement regression when inputting into empty editor
+
+## 0.97.1
+
+### Patch Changes
+
+- [#5460](https://github.com/ianstormtaylor/slate/pull/5460) [`53395449`](https://github.com/ianstormtaylor/slate/commit/53395449e5b03fde5c0521203ef044064f3c159e) Thanks [@12joan](https://github.com/12joan)! - Do not attempt to batch updates manually in React >= 18
+
+## 0.97.0
+
+### Minor Changes
+
+- [#5451](https://github.com/ianstormtaylor/slate/pull/5451) [`12ff246e`](https://github.com/ianstormtaylor/slate/commit/12ff246e101bb7ae51248066c07c378ee4be9220) Thanks [@gtluszcz](https://github.com/gtluszcz)! - Fixed occasional crashes when selecting void elements in Chrome
+
+### Patch Changes
+
+- [#5453](https://github.com/ianstormtaylor/slate/pull/5453) [`cde0a155`](https://github.com/ianstormtaylor/slate/commit/cde0a155e23d015d4ee72f9f10f63b67e878668e) Thanks [@Shiba-ligo](https://github.com/Shiba-ligo)! - fix regular expression for testing Webkit based browser.
+
+## 0.96.0
+
+### Minor Changes
+
+- [#5437](https://github.com/ianstormtaylor/slate/pull/5437) [`3ad13d60`](https://github.com/ianstormtaylor/slate/commit/3ad13d601550341688cc75466a75b616d8232154) Thanks [@josephmr](https://github.com/josephmr)! - Detect all WebKit based browsers for COMPAT behavior
+
+### Patch Changes
+
+- [#5443](https://github.com/ianstormtaylor/slate/pull/5443) [`eb7f5987`](https://github.com/ianstormtaylor/slate/commit/eb7f598707ab9a4f1bd62fd195719049e9536be0) Thanks [@OldDream](https://github.com/OldDream)! - fix wrong caret position during composition.
+
+## 0.95.0
+
+### Minor Changes
+
+- [#5422](https://github.com/ianstormtaylor/slate/pull/5422) [`0b179909`](https://github.com/ianstormtaylor/slate/commit/0b1799091a6800c7e868d5a6148b82648cbe8270) Thanks [@Chudesnov](https://github.com/Chudesnov)! - Prevents default focus styles from being removed in Editable
+
+* [#5421](https://github.com/ianstormtaylor/slate/pull/5421) [`91e388ec`](https://github.com/ianstormtaylor/slate/commit/91e388ecd9e6a540b4a651978436f196f38f667d) Thanks [@e1himself](https://github.com/e1himself)! - Rename `<Slate>` component prop from `value` to `initialValue` to emphasize uncontrolled nature of it
+
+## 0.94.2
+
+### Patch Changes
+
+- [#5423](https://github.com/ianstormtaylor/slate/pull/5423) [`042bca16`](https://github.com/ianstormtaylor/slate/commit/042bca167ac810acccae229bc905a49098aee546) Thanks [@horacioh](https://github.com/horacioh)! - fix placeholder position in Safari 16.x
+
 ## 0.94.0
 
 ### Patch Changes

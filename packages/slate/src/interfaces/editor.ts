@@ -28,7 +28,11 @@ import {
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
 import { isEditor } from '../editor/is-editor'
-import { TextInsertTextOptions } from './transforms/text'
+import {
+  TextInsertFragmentOptions,
+  TextInsertTextOptions,
+} from './transforms/text'
+import { NodeInsertNodesOptions } from './transforms/node'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -412,18 +416,24 @@ export interface EditorInterface {
   insertBreak: (editor: Editor) => void
 
   /**
-   * Insert a fragment at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
+   * Inserts a fragment
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertFragment: (editor: Editor, fragment: Node[]) => void
+  insertFragment: (
+    editor: Editor,
+    fragment: Node[],
+    options?: TextInsertFragmentOptions
+  ) => void
 
   /**
-   * Insert a node at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
+   * Atomically inserts `nodes`
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
-  insertNode: (editor: Editor, node: Node) => void
+  insertNode: <T extends Node>(
+    editor: Editor,
+    node: Node,
+    options?: NodeInsertNodesOptions<T>
+  ) => void
 
   /**
    * Insert a soft break at the current selection.
@@ -433,9 +443,8 @@ export interface EditorInterface {
   insertSoftBreak: (editor: Editor) => void
 
   /**
-   * Insert text at the current selection.
-   *
-   * If the selection is currently expanded, it will be deleted first.
+   * Insert a string of text
+   * at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
    */
   insertText: (
     editor: Editor,
@@ -774,8 +783,8 @@ export const Editor: EditorInterface = {
     editor.insertBreak()
   },
 
-  insertFragment(editor, fragment) {
-    editor.insertFragment(fragment)
+  insertFragment(editor, fragment, options) {
+    editor.insertFragment(fragment, options)
   },
 
   insertNode(editor, node) {

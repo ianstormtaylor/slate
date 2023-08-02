@@ -134,7 +134,7 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
- * Determines wether the active element is nested within a shadowRoot
+ * Determines whether the active element is nested within a shadowRoot
  */
 
 export const hasShadowRoot = (node: Node | null) => {

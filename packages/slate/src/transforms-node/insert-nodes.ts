@@ -7,6 +7,7 @@ import { Point } from '../interfaces/point'
 import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
 import { Path } from '../interfaces/path'
+import { getDefaultInsertLocation } from '../utils'
 
 export const insertNodes: NodeTransforms['insertNodes'] = (
   editor,
@@ -27,18 +28,8 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
 
     const [node] = nodes
 
-    // By default, use the selection as the target location. But if there is
-    // no selection, insert at the end of the document since that is such a
-    // common use case when inserting from a non-selected state.
     if (!at) {
-      if (editor.selection) {
-        at = editor.selection
-      } else if (editor.children.length > 0) {
-        at = Editor.end(editor, [])
-      } else {
-        at = [0]
-      }
-
+      at = getDefaultInsertLocation(editor)
       select = true
     }
 
