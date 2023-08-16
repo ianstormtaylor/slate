@@ -48,7 +48,6 @@ import {
   IS_IOS,
   IS_WEBKIT,
   IS_UC_MOBILE,
-  IS_WECHATBROWSER,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -1134,7 +1133,6 @@ export const Editable = (props: EditableProps) => {
                     !IS_WEBKIT &&
                     !IS_FIREFOX_LEGACY &&
                     !IS_IOS &&
-                    !IS_WECHATBROWSER &&
                     !IS_UC_MOBILE &&
                     event.data
                   ) {
