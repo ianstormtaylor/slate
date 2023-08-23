@@ -54,7 +54,8 @@ export const IS_UC_MOBILE =
 
 // Wechat browser (not including mac wechat)
 export const IS_WECHATBROWSER =
-  typeof navigator !== 'undefined' && /.*(?<!Mac)Wechat/.test(navigator.userAgent)
+  typeof navigator !== 'undefined' &&
+  /.*(?<!Mac)Wechat/.test(navigator.userAgent)
 
 // Check if DOM is available as React does internally.
 // https://github.com/facebook/react/blob/master/packages/shared/ExecutionEnvironment.js
