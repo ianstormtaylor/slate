@@ -1,4 +1,4 @@
-# Collaborative editing
+# Enabling Collaborative Editing
 
 A common use case for text editors is collaborative editing, and the Slate editor was designed with this in
 mind. You can enable multiplayer editing with [Yjs](https://github.com/yjs/yjs), a network-agnostic CRDT implementation
