@@ -36,7 +36,7 @@ const SlateEditor = () => {
 Yjs is network-agnostic, which means each Yjs provider is set up in a slightly different way. For
 example [@liveblocks/yjs](https://liveblocks.io/docs/api-reference/liveblocks-yjs) is
 fully-hosted, whereas others such as [y-websocket](https://github.com/yjs/y-websocket) require you to host your own
-websocket server. Because of this, we'll use code snippets that work for each provider, without going into too much
+WebSocket server. Because of this, we'll use code snippets that work for each provider, without going into too much
 detail about setting up the provider itself.
 
 This is how to connect to a collaborative Yjs document, ready to be used in your Slate editor.
