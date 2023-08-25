@@ -10,7 +10,7 @@
 - [Applying Custom Formatting](walkthroughs/04-applying-custom-formatting.md)
 - [Executing Commands](walkthroughs/05-executing-commands.md)
 - [Saving to a Database](walkthroughs/06-saving-to-a-database.md)
-- [Collaborative editing](walkthroughs/07-collaborative-editing.md)
+- [Enabling Collaborative Editing](walkthroughs/07-enabling-collaborative-editing.md)
 - [Using the Bundled Source](walkthroughs/xx-using-the-bundled-source.md)
 
 ## Concepts
