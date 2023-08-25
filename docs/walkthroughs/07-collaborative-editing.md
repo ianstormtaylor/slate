@@ -62,11 +62,9 @@ export const CollaborativeEditor = () => {
     const sharedDoc = yDoc.get('slate', Y.XmlText)
 
     // Set up your Yjs provider. This line of code is different for each provider.
-    const yProvider /* new YjsProvider(...) */ = yProvider.on(
-      'sync',
-      setConnected
-    )
+    const yProvider = new YjsProvider(/* ... */)
 
+    yProvider.on('sync', setConnected)
     setSharedType(sharedDoc)
     setProvider(yProvider)
 
@@ -121,11 +119,9 @@ export const CollaborativeEditor = () => {
     const sharedDoc = yDoc.get('slate', Y.XmlText)
 
     // Set up your Yjs provider. This line of code is different for each provider.
-    const yProvider /* new YjsProvider(...) */ = yProvider.on(
-      'sync',
-      setConnected
-    )
+    const yProvider = new YjsProvider(/* ... */)
 
+    yProvider.on('sync', setConnected)
     setSharedType(sharedDoc)
     setProvider(yProvider)
 
@@ -209,10 +205,10 @@ export const CollaborativeEditor = () => {
     const yDoc = new Y.Doc()
     const sharedDoc = yDoc.get('slate', Y.XmlText)
 
-    // Set up your Yjs provider. This line of code is different for each provider.
+    // Set up your Liveblocks provider with the current room and document
     const yProvider = new LiveblocksProvider(room, yDoc)
-    yProvider.on('sync', setConnected)
 
+    yProvider.on('sync', setConnected)
     setSharedType(sharedDoc)
     setProvider(yProvider)
 
