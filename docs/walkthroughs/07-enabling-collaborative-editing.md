@@ -336,8 +336,8 @@ With some matching styles to set up the positioning:
 ```
 
 You can then import this into your `SlateEditor` component. Notice that we're using `withCursors` from `slate-yjs`,
-adding `awareness` and the current user's name to it, and then wrapping `<Editable>` in the new `<Cursors>` component
-we've just created.
+adding `provider.awareness` and the current user's name to it. We're then wrapping `<Editable>` in the new `<Cursors>`
+component we've just created.
 
 ```jsx
 import { useEffect, useMemo, useState } from 'react'
