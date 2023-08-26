@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.98.2
+
+### Patch Changes
+
+- [#5497](https://github.com/ianstormtaylor/slate/pull/5497) [`76ba3759`](https://github.com/ianstormtaylor/slate/commit/76ba3759838fd538587fda2f4027f7c74ff09589) Thanks [@Dimitri-WEI-Lingfeng](https://github.com/Dimitri-WEI-Lingfeng)! - fix the bug that user cannot input chinese on mac wechat browser.
+
 ## 0.98.1
 
 ### Patch Changes
