@@ -52,6 +52,12 @@ export const IS_FIREFOX_LEGACY =
 export const IS_UC_MOBILE =
   typeof navigator !== 'undefined' && /.*UCBrowser/.test(navigator.userAgent)
 
+// Wechat browser (not including mac wechat)
+export const IS_WECHATBROWSER =
+  typeof navigator !== 'undefined' &&
+  /.*Wechat/.test(navigator.userAgent) &&
+  !/.*MacWechat/.test(navigator.userAgent) // avoid lookbehind (buggy in safari < 16.4)
+
 // Check if DOM is available as React does internally.
 // https://github.com/facebook/react/blob/master/packages/shared/ExecutionEnvironment.js
 export const CAN_USE_DOM = !!(
