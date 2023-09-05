@@ -235,6 +235,10 @@ Unlike other providers, Liveblocks hosts your Yjs back end for you, which means 
 to get this working. For more information on setting up Liveblocks providers, make sure to read
 their [Slate getting started](https://liveblocks.io/docs/get-started/yjs-slate-react) guide.
 
+> Note that Liveblocks is independent of the Slate project, and isn't required for collaboration, but it may be
+> convenient depending on your needs. [Other providers](https://github.com/yjs/yjs#providers) are available
+> should you wish to set up and host a Yjs back end yourself.
+
 After setting up Yjs, it's possible to add multiplayer cursors to your app. You can do this with hooks supplied by
 [slate-yjs](), which allow you to find the cursor positions of other users. Here's an example of setting up a cursor
 component.
