@@ -71,7 +71,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
   light-weight medium-style editor with no editor chrome.
 - [React Page](https://github.com/react-page/react-page) is a self-contained, customizable inline WYSIWYG editor
   library.
-- [Slate Plugins Next](https://github.com/zbeyens/slate-plugins-next) provides an editor with configurable and
+- [Plate (Plugins for Slate)](https://github.com/udecode/plate) provides an editor with configurable and
   extendable plugins.
 -
 - [Tripdocs](https://github.com/ctripcorp/tripdocs): It's a modern, production-ready rich text editor.
