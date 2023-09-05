@@ -73,6 +73,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
   library.
 - [Slate Plugins Next](https://github.com/zbeyens/slate-plugins-next) provides an editor with configurable and
   extendable plugins.
+-
 - [Tripdocs](https://github.com/ctripcorp/tripdocs): It's a modern, production-ready rich text editor.
 
 \(Or, if you have their exact use case, can be a drop-in editor for you.\)
