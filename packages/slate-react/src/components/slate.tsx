@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Descendant, Editor, Node, Scrubber } from 'slate'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -24,7 +24,6 @@ export const Slate = (props: {
   onChange?: (value: Descendant[]) => void
 }) => {
   const { editor, children, onChange, initialValue, ...rest } = props
-  const unmountRef = useRef(false)
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
     if (!Node.isNodeList(initialValue)) {
@@ -66,7 +65,6 @@ export const Slate = (props: {
 
     return () => {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
-      unmountRef.current = true
     }
   }, [editor, onContextChange])
 
