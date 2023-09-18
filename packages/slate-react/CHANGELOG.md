@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.98.4
+
+### Patch Changes
+
+- [#5510](https://github.com/ianstormtaylor/slate/pull/5510) [`13c7d271`](https://github.com/ianstormtaylor/slate/commit/13c7d271e35406a2497e78ef114417ad17796c65) Thanks [@e1himself](https://github.com/e1himself)! - Remove an unused React ref
+
 ## 0.98.3
 
 ### Patch Changes
