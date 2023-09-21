@@ -417,6 +417,12 @@ export const ReactEditor: ReactEditorInterface = {
     IS_FOCUSED.set(editor, true)
 
     if (root.activeElement !== el) {
+      if (root instanceof Document) {
+        const domSelection = root.getSelection()
+        const domRange = ReactEditor.toDOMRange(editor, editor.selection)
+        domSelection?.removeAllRanges()
+        domSelection?.addRange(domRange)
+      }
       el.focus({ preventScroll: true })
     }
   },
