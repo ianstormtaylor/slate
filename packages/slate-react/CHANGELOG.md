@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.99.0
+
+### Minor Changes
+
+- [#5516](https://github.com/ianstormtaylor/slate/pull/5516) [`300dc57a`](https://github.com/ianstormtaylor/slate/commit/300dc57a00c6437519ae0044384811efec653758) Thanks [@josephmr](https://github.com/josephmr)! - Retain editor selection when using ReactEditor.focus()
+
+### Patch Changes
+
+- [#5514](https://github.com/ianstormtaylor/slate/pull/5514) [`ff7db221`](https://github.com/ianstormtaylor/slate/commit/ff7db221205014605464628d18e41f1310bcead9) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix move_node triggers nodes re-render
+
 ## 0.98.4
 
 ### Patch Changes
