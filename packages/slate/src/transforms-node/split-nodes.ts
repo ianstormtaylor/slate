@@ -1,12 +1,13 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
 import { Element } from '../interfaces/element'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
-import { PointRef } from '../interfaces/point-ref'
-import { Transforms } from '../interfaces/transforms'
+import { Scrubber } from '../interfaces/index'
 import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
 import { Point } from '../interfaces/point'
+import { PointRef } from '../interfaces/point-ref'
+import { Range } from '../interfaces/range'
+import { Transforms } from '../interfaces/transforms'
+import { NodeTransforms } from '../interfaces/transforms/node'
 
 /**
  * Convert a range into a point by deleting it's content.
@@ -43,7 +44,27 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
     if (Path.isPath(at)) {
       const path = at
       const point = Editor.point(editor, path)
-      const [parent] = Editor.parent(editor, path)
+      if (!point) {
+        editor.onError({
+          key: 'splitNodes.point',
+          message: `Cannot find point at path ${Scrubber.stringify(path)}`,
+          data: { path },
+        })
+        return
+      }
+
+      const parentEntry = Editor.parent(editor, path)
+      if (!parentEntry) {
+        editor.onError({
+          key: 'splitNodes.parent',
+          message: `Cannot find parent node at path ${Scrubber.stringify(
+            path
+          )}`,
+          data: { path },
+        })
+        return
+      }
+      const [parent] = parentEntry
       match = n => n === parent
       height = point.path.length - path.length + 1
       at = point
@@ -77,6 +98,17 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
           if (!after) {
             const text = { text: '' }
             const afterPath = Path.next(voidPath)
+            if (!afterPath) {
+              editor.onError({
+                key: 'splitNodes.next',
+                message: `Cannot find next path after ${Scrubber.stringify(
+                  voidPath
+                )}`,
+                data: { path: voidPath },
+              })
+              return
+            }
+
             Transforms.insertNodes(editor, text, { at: afterPath, voids })
             after = Editor.point(editor, afterPath)!
           }
@@ -130,6 +162,14 @@ export const splitNodes: NodeTransforms['splitNodes'] = (
 
       if (options.at == null) {
         const point = afterRef.current || Editor.end(editor, [])
+        if (!point) {
+          editor.onError({
+            key: 'splitNodes.end',
+            message: `Cannot find end point after splitting nodes`,
+            data: { at },
+          })
+          return
+        }
         Transforms.select(editor, point)
       }
     } finally {

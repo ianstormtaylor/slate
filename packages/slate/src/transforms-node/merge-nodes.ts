@@ -1,12 +1,12 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
 import { Element } from '../interfaces/element'
-import { Range } from '../interfaces/range'
-import { Transforms } from '../interfaces/transforms'
-import { Text } from '../interfaces/text'
-import { Scrubber } from '../interfaces/scrubber'
 import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
+import { Scrubber } from '../interfaces/scrubber'
+import { Text } from '../interfaces/text'
+import { Transforms } from '../interfaces/transforms'
+import { NodeTransforms } from '../interfaces/transforms/node'
 
 const hasSingleChildNest = (editor: Editor, node: Node): boolean => {
   if (Element.isElement(node)) {
@@ -39,7 +39,16 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
 
     if (match == null) {
       if (Path.isPath(at)) {
-        const [parent] = Editor.parent(editor, at)
+        const parentEntry = Editor.parent(editor, at)
+        if (!parentEntry) {
+          editor.onError({
+            key: 'mergeNodes.parent',
+            message: `Cannot find parent node`,
+            data: { at },
+          })
+          return
+        }
+        const [parent] = parentEntry
         match = n => parent.children.includes(n)
       } else {
         match = n => Element.isElement(n) && Editor.isBlock(editor, n)
@@ -80,6 +89,14 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
     }
 
     const newPath = Path.next(prevPath)
+    if (!newPath) {
+      editor.onError({
+        key: 'mergeNodes.next',
+        message: `Cannot find next path`,
+        data: { prevPath },
+      })
+      return
+    }
     const commonPath = Path.common(path, prevPath)
     const isPreviousSibling = Path.isSibling(path, prevPath)
     const levels = Array.from(Editor.levels(editor, { at: path }), ([n]) => n)
@@ -109,11 +126,14 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       position = prevNode.children.length
       properties = rest as Partial<Element>
     } else {
-      throw new Error(
-        `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
+      editor.onError({
+        key: 'mergeNodes.invalidTypes',
+        message: `Cannot merge the node at path [${path}] with the previous sibling because it is not the same kind: ${Scrubber.stringify(
           node
-        )} ${Scrubber.stringify(prevNode)}`
-      )
+        )} ${Scrubber.stringify(prevNode)}`,
+        data: { path, node, prevNode },
+      })
+      return
     }
 
     // If the node isn't already the next sibling of the previous node, move

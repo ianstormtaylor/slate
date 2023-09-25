@@ -14,17 +14,38 @@ export const next: EditorInterface['next'] = (editor, options = {}) => {
 
   if (!pointAfterLocation) return
 
-  const [, to] = Editor.last(editor, [])
+  const toEntry = Editor.last(editor, [])
+  if (!toEntry) {
+    return editor.onError({
+      key: 'next.last',
+      message: 'Cannot get the last node',
+      data: { at },
+    })
+  }
+
+  const [, to] = toEntry
 
   const span: Span = [pointAfterLocation.path, to]
 
   if (Path.isPath(at) && at.length === 0) {
-    throw new Error(`Cannot get the next node from the root node!`)
+    return editor.onError({
+      key: 'next.root',
+      message: 'Cannot get the next node',
+      data: { at },
+    })
   }
 
   if (match == null) {
     if (Path.isPath(at)) {
-      const [parent] = Editor.parent(editor, at)
+      const parentEntry = Editor.parent(editor, at)
+      if (!parentEntry) {
+        return editor.onError({
+          key: 'next.parent',
+          message: 'Cannot get the parent node',
+          data: { at },
+        })
+      }
+      const [parent] = parentEntry
       match = n => parent.children.includes(n)
     } else {
       match = () => true

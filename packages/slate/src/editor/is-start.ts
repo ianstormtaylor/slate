@@ -8,5 +8,14 @@ export const isStart: EditorInterface['isStart'] = (editor, point, at) => {
   }
 
   const start = Editor.start(editor, at)
+  if (!start) {
+    return editor.onError({
+      key: 'isStart',
+      message: 'Cannot get the start point',
+      data: { at },
+      recovery: false,
+    })
+  }
+
   return Point.equals(point, start)
 }

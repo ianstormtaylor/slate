@@ -1,11 +1,11 @@
+import { Editor } from '../interfaces/editor'
+import { Path } from '../interfaces/path'
 import { PathRef } from '../interfaces/path-ref'
 import { PointRef } from '../interfaces/point-ref'
 import { RangeRef } from '../interfaces/range-ref'
-import { DIRTY_PATH_KEYS, DIRTY_PATHS, FLUSHING } from '../utils/weak-maps'
-import { Path } from '../interfaces/path'
 import { Transforms } from '../interfaces/transforms'
 import { WithEditorFirstArg } from '../utils/types'
-import { Editor } from '../interfaces/editor'
+import { DIRTY_PATH_KEYS, DIRTY_PATHS, FLUSHING } from '../utils/weak-maps'
 
 export const apply: WithEditorFirstArg<Editor['apply']> = (editor, op) => {
   for (const ref of Editor.pathRefs(editor)) {

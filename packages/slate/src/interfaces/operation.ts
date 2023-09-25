@@ -256,7 +256,7 @@ export const Operation: OperationInterface = {
       }
 
       case 'merge_node': {
-        return { ...op, type: 'split_node', path: Path.previous(op.path) }
+        return { ...op, type: 'split_node', path: Path.previous(op.path)! }
       }
 
       case 'move_node': {
@@ -280,7 +280,7 @@ export const Operation: OperationInterface = {
         // moves by looking at the impact of the move operation on the node
         // after the original move path.
         const inversePath = Path.transform(path, op)!
-        const inverseNewPath = Path.transform(Path.next(path), op)!
+        const inverseNewPath = Path.transform(Path.next(path)!, op)!
         return { ...op, path: inversePath, newPath: inverseNewPath }
       }
 
@@ -318,7 +318,7 @@ export const Operation: OperationInterface = {
       }
 
       case 'split_node': {
-        return { ...op, type: 'merge_node', path: Path.next(op.path) }
+        return { ...op, type: 'merge_node', path: Path.next(op.path)! }
       }
     }
   },

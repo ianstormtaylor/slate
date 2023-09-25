@@ -1,12 +1,12 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Node } from '../interfaces/node'
-import { Range } from '../interfaces/range'
-import { Transforms } from '../interfaces/transforms'
-import { Point } from '../interfaces/point'
-import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
+import { Node } from '../interfaces/node'
 import { Path } from '../interfaces/path'
+import { Point } from '../interfaces/point'
+import { Range } from '../interfaces/range'
+import { Text } from '../interfaces/text'
+import { Transforms } from '../interfaces/transforms'
+import { NodeTransforms } from '../interfaces/transforms/node'
 import { getDefaultInsertLocation } from '../utils'
 
 export const insertNodes: NodeTransforms['insertNodes'] = (
@@ -77,12 +77,27 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
         Transforms.splitNodes(editor, { at, match, mode, voids })
         const path = pathRef.unref()!
         at = isAtEnd ? Path.next(path) : path
+        if (!at) {
+          return editor.onError({
+            key: 'insertNodes.path',
+            message: 'Cannot find the next path',
+            data: { at, matchPath },
+          })
+        }
       } else {
         return
       }
     }
 
     const parentPath = Path.parent(at)
+    if (!parentPath) {
+      return editor.onError({
+        key: 'insertNodes.parent',
+        message: 'Cannot find the parent path',
+        data: { at },
+      })
+    }
+
     let index = at[at.length - 1]
 
     if (!voids && Editor.void(editor, { at: parentPath })) {
@@ -94,8 +109,22 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       index++
       editor.apply({ type: 'insert_node', path, node })
       at = Path.next(at)
+      if (!at) {
+        return editor.onError({
+          key: 'insertNodes.next',
+          message: 'Cannot find the next path',
+          data: { at },
+        })
+      }
     }
     at = Path.previous(at)
+    if (!at) {
+      return editor.onError({
+        key: 'insertNodes.previous',
+        message: 'Cannot find the previous path',
+        data: { at },
+      })
+    }
 
     if (select) {
       const point = Editor.end(editor, at)

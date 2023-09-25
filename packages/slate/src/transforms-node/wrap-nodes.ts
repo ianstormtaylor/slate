@@ -1,11 +1,11 @@
-import { NodeTransforms } from '../interfaces/transforms/node'
 import { Editor } from '../interfaces/editor'
-import { Path } from '../interfaces/path'
-import { matchPath } from '../utils/match-path'
 import { Element } from '../interfaces/element'
-import { Text } from '../interfaces/text'
+import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
+import { Text } from '../interfaces/text'
 import { Transforms } from '../interfaces/transforms'
+import { NodeTransforms } from '../interfaces/transforms/node'
+import { matchPath } from '../utils/match-path'
 
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
@@ -57,9 +57,17 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
     )
 
     for (const [, rootPath] of roots) {
-      const a = Range.isRange(at)
-        ? Range.intersection(at, Editor.range(editor, rootPath))
-        : at
+      const range = Editor.range(editor, rootPath)
+      if (!range) {
+        editor.onError({
+          key: 'wrapNodes.range',
+          message: 'Could not find range for rootPath',
+          data: { rootPath },
+        })
+        continue
+      }
+
+      const a = Range.isRange(at) ? Range.intersection(at, range) : at
 
       if (!a) {
         continue
@@ -83,12 +91,38 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
         const commonPath = Path.equals(firstPath, lastPath)
           ? Path.parent(firstPath)
           : Path.common(firstPath, lastPath)
+        if (!commonPath) {
+          editor.onError({
+            key: 'wrapNodes.commonPath',
+            message: 'Could not find commonPath',
+            data: { firstPath, lastPath },
+          })
+          continue
+        }
 
         const range = Editor.range(editor, firstPath, lastPath)
         const commonNodeEntry = Editor.node(editor, commonPath)
+        if (!commonNodeEntry) {
+          editor.onError({
+            key: 'wrapNodes.commonNodeEntry',
+            message: 'Could not find commonNodeEntry',
+            data: { commonPath },
+          })
+          continue
+        }
+
         const [commonNode] = commonNodeEntry
         const depth = commonPath.length + 1
         const wrapperPath = Path.next(lastPath.slice(0, depth))
+        if (!wrapperPath) {
+          editor.onError({
+            key: 'wrapNodes.wrapperPath',
+            message: 'Could not find wrapperPath',
+            data: { lastPath, depth },
+          })
+          continue
+        }
+
         const wrapper = { ...element, children: [] }
         Transforms.insertNodes(editor, wrapper, { at: wrapperPath, voids })
 

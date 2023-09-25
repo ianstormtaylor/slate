@@ -1,9 +1,9 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { NodeEntry } from '../interfaces/node'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
-import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
+import { NodeEntry } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
+import { Text } from '../interfaces/text'
 
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
@@ -30,7 +30,17 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
 
   const { anchor } = selection
   const { path } = anchor
-  let [node] = Editor.leaf(editor, path)
+  const entry = Editor.leaf(editor, path)
+  if (!entry) {
+    return editor.onError({
+      key: 'marks',
+      message: 'Cannot get the leaf node',
+      data: { at: path },
+      recovery: {},
+    })
+  }
+
+  let [node] = entry
 
   if (anchor.offset === 0) {
     const prev = Editor.previous(editor, { at: path, match: Text.isText })

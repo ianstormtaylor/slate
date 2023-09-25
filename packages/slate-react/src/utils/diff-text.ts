@@ -1,12 +1,13 @@
 import {
   Editor,
+  Element,
   Node,
   Operation,
   Path,
   Point,
   Range,
+  Scrubber,
   Text,
-  Element,
 } from 'slate'
 import { EDITOR_TO_PENDING_DIFFS } from './weak-maps'
 
@@ -44,6 +45,15 @@ export function verifyDiffState(editor: Editor, textDiff: TextDiff): boolean {
   }
 
   const nextPath = Path.next(path)
+  if (!nextPath) {
+    return editor.onError({
+      key: 'diff-text.next',
+      message: `Cannot get next path from path ${Scrubber.stringify(path)}`,
+      data: { path },
+      recovery: false,
+    })
+  }
+
   if (!Editor.hasPath(editor, nextPath)) {
     return false
   }

@@ -1,7 +1,7 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
 import { Element } from '../interfaces/element'
+import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
 import { Text } from '../interfaces/text'
 
 export const unhangRange: EditorInterface['unhangRange'] = (
@@ -29,6 +29,14 @@ export const unhangRange: EditorInterface['unhangRange'] = (
   })
   const blockPath = endBlock ? endBlock[1] : []
   const first = Editor.start(editor, start)
+  if (!first) {
+    return editor.onError({
+      key: 'unhangRange.start',
+      message: 'Cannot find the start point',
+      data: { at: start },
+      recovery: range,
+    })
+  }
   const before = { anchor: first, focus: end }
   let skip = true
 

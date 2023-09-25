@@ -22,6 +22,7 @@ import {
   getSlateFragmentAttribute,
   isDOMText,
 } from '../utils/dom'
+import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { Key } from '../utils/key'
 import { findCurrentLineRange } from '../utils/lines'
 import {
@@ -37,7 +38,6 @@ import {
   NODE_TO_KEY,
 } from '../utils/weak-maps'
 import { ReactEditor } from './react-editor'
-import { REACT_MAJOR_VERSION } from '../utils/environment'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -109,10 +109,18 @@ export const withReact = <T extends BaseEditor>(
           parentBlockPath,
           e.selection.anchor
         )
+        if (!parentElementRange) {
+          editor.onError({
+            key: 'withReact.deleteBackward.range',
+            message: `Failed to create range for current selection`,
+            data: { parentBlockPath },
+          })
+          return
+        }
 
         const currentLineRange = findCurrentLineRange(e, parentElementRange)
 
-        if (!Range.isCollapsed(currentLineRange)) {
+        if (currentLineRange && !Range.isCollapsed(currentLineRange)) {
           Transforms.delete(e, { at: currentLineRange })
         }
       }
@@ -169,21 +177,46 @@ export const withReact = <T extends BaseEditor>(
 
       case 'insert_node':
       case 'remove_node': {
-        matches.push(...getMatches(e, Path.parent(op.path)))
+        const parentPath = Path.parent(op.path)
+        if (!parentPath) {
+          editor.onError({
+            key: 'withReact.apply.insert_node',
+            message: 'Failed to get parent path for operation.',
+            data: { op },
+          })
+          break
+        }
+        matches.push(...getMatches(e, parentPath))
         break
       }
 
       case 'merge_node': {
         const prevPath = Path.previous(op.path)
+        if (!prevPath) {
+          editor.onError({
+            key: 'withReact.apply.merge_node',
+            message: 'Failed to get previous path for operation.',
+            data: { op },
+          })
+          break
+        }
         matches.push(...getMatches(e, prevPath))
         break
       }
 
       case 'move_node': {
-        const commonPath = Path.common(
-          Path.parent(op.path),
-          Path.parent(op.newPath)
-        )
+        const parentPath = Path.parent(op.path)
+        const parentNewPath = Path.parent(op.newPath)
+        if (!parentPath || !parentNewPath) {
+          editor.onError({
+            key: 'withReact.apply.move_node',
+            message: 'Failed to get parent path for operation.',
+            data: { op },
+          })
+          break
+        }
+
+        const commonPath = Path.common(parentPath, parentNewPath)
         matches.push(...getMatches(e, commonPath))
 
         let changedPath: Path
@@ -207,7 +240,17 @@ export const withReact = <T extends BaseEditor>(
     apply(op)
 
     for (const [path, key] of matches) {
-      const [node] = Editor.node(e, path)
+      const entry = Editor.node(e, path)
+      if (!entry) {
+        editor.onError({
+          key: 'withReact.apply.node',
+          message: 'Failed to get node entry for operation.',
+          data: { op },
+        })
+        continue
+      }
+      const [node] = entry
+
       NODE_TO_KEY.set(node, key)
     }
 
@@ -237,6 +280,14 @@ export const withReact = <T extends BaseEditor>(
     // Create a fake selection so that we can add a Base64-encoded copy of the
     // fragment to the HTML, to decode on future pastes.
     const domRange = ReactEditor.toDOMRange(e, selection)
+    if (!domRange) {
+      editor.onError({
+        key: 'withReact.setFragmentData.toDOMRange',
+        message: 'Failed to create DOM range for current selection',
+      })
+      return
+    }
+
     let contents = domRange.cloneContents()
     let attach = contents.childNodes[0] as HTMLElement
 
@@ -254,6 +305,15 @@ export const withReact = <T extends BaseEditor>(
       const [voidNode] = endVoid
       const r = domRange.cloneRange()
       const domNode = ReactEditor.toDOMNode(e, voidNode)
+      if (!domNode) {
+        editor.onError({
+          key: 'withReact.setFragmentData.toDOMNode',
+          message: 'Failed to create DOM node for current selection',
+          data: { voidNode },
+        })
+        return
+      }
+
       r.setEndAfter(domNode)
       contents = r.cloneContents()
     }

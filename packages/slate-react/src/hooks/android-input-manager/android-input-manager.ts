@@ -1,5 +1,14 @@
 import { DebouncedFunc } from 'lodash'
-import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
+import {
+  Editor,
+  Node,
+  Path,
+  Point,
+  Range,
+  Scrubber,
+  Text,
+  Transforms,
+} from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
   applyStringDiff,
@@ -114,6 +123,15 @@ export function createAndroidInputManager({
       }
 
       const targetRange = Editor.range(editor, target)
+      if (!targetRange) {
+        editor.onError({
+          key: 'createAndroidInputManager.range',
+          message: `Failed to create range for ${Scrubber.stringify(target)}`,
+          data: { target },
+        })
+        return
+      }
+
       if (!editor.selection || !Range.equals(editor.selection, targetRange)) {
         Transforms.select(editor, target)
       }
@@ -292,6 +310,15 @@ export function createAndroidInputManager({
     EDITOR_TO_PENDING_DIFFS.set(editor, pendingDiffs)
 
     const target = Node.leaf(editor, path)
+    if (!target) {
+      editor.onError({
+        key: 'createAndroidInputManager.storeDiff.leaf',
+        message: `Failed to find leaf node at path: ${path}`,
+        data: { path },
+      })
+      return
+    }
+
     const idx = pendingDiffs.findIndex(change => Path.equals(change.path, path))
     if (idx < 0) {
       const normalized = normalizeStringDiff(target.text, diff)
@@ -360,10 +387,21 @@ export function createAndroidInputManager({
 
     let [nativeTargetRange] = (event as any).getTargetRanges()
     if (nativeTargetRange) {
-      targetRange = ReactEditor.toSlateRange(editor, nativeTargetRange, {
+      const range = ReactEditor.toSlateRange(editor, nativeTargetRange, {
         exactMatch: false,
         suppressThrow: true,
       })
+      if (!range) {
+        editor.onError({
+          key:
+            'createAndroidInputManager.handleDOMBeforeInput.toSlateRange.nativeTargetRange',
+          message: `Failed to resolve Slate range from DOM range: ${nativeTargetRange}`,
+          data: { nativeTargetRange },
+        })
+        return
+      }
+
+      targetRange = range
     }
 
     // COMPAT: SelectionChange event is fired after the action is performed, so we
@@ -372,10 +410,22 @@ export function createAndroidInputManager({
     const domSelection = window.getSelection()
     if (!targetRange && domSelection) {
       nativeTargetRange = domSelection
-      targetRange = ReactEditor.toSlateRange(editor, domSelection, {
+
+      const range = ReactEditor.toSlateRange(editor, domSelection, {
         exactMatch: false,
         suppressThrow: true,
       })
+      if (!range) {
+        editor.onError({
+          key:
+            'createAndroidInputManager.handleDOMBeforeInput.toSlateRange.domSelection',
+          message: `Failed to resolve Slate range from DOM range: ${domSelection}`,
+          data: { domSelection },
+        })
+        return
+      }
+
+      targetRange = range
     }
 
     targetRange = targetRange ?? editor.selection
@@ -394,6 +444,14 @@ export function createAndroidInputManager({
       if (Range.isExpanded(targetRange)) {
         const [start, end] = Range.edges(targetRange)
         const leaf = Node.leaf(editor, start.path)
+        if (!leaf) {
+          editor.onError({
+            key: 'createAndroidInputManager.handleDOMBeforeInput.leaf',
+            message: `Failed to find leaf node at path: ${start.path}`,
+            data: { path: start.path },
+          })
+          return
+        }
 
         if (leaf.text.length === start.offset && end.offset === 0) {
           const next = Editor.next(editor, {
@@ -408,7 +466,16 @@ export function createAndroidInputManager({
 
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
       const [start, end] = Range.edges(targetRange)
-      const [leaf, path] = Editor.leaf(editor, start.path)
+      const entry = Editor.leaf(editor, start.path)
+      if (!entry) {
+        editor.onError({
+          key: 'createAndroidInputManager.handleDOMBeforeInput.leaf.2',
+          message: `Failed to find leaf node at path: ${start.path}`,
+          data: { path: start.path },
+        })
+        return
+      }
+      const [leaf, path] = entry
 
       const diff = {
         text: '',
@@ -438,6 +505,15 @@ export function createAndroidInputManager({
         ) {
           const point = { path: targetRange.anchor.path, offset: start.offset }
           const range = Editor.range(editor, point, point)
+          if (!range) {
+            editor.onError({
+              key: 'createAndroidInputManager.handleDOMBeforeInput.range',
+              message: `Failed to create range at point: ${point}`,
+              data: { point },
+            })
+            return
+          }
+
           handleUserSelect(range)
 
           return storeDiff(targetRange.anchor.path, {
@@ -468,6 +544,14 @@ export function createAndroidInputManager({
         const { anchor } = targetRange
         if (canStoreDiff && Range.isCollapsed(targetRange)) {
           const targetNode = Node.leaf(editor, anchor.path)
+          if (!targetNode) {
+            return editor.onError({
+              key:
+                'createAndroidInputManager.handleDOMBeforeInput.deleteContent.leaf',
+              message: `Failed to find leaf node at path: ${anchor.path}`,
+              data: { path: anchor.path },
+            })
+          }
 
           if (anchor.offset < targetNode.text.length) {
             return storeDiff(anchor.path, {

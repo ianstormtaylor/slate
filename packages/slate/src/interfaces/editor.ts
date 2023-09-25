@@ -17,6 +17,7 @@ import {
   Text,
   Transforms,
 } from '..'
+import { isEditor } from '../editor/is-editor'
 import {
   LeafEdge,
   MaximizeMode,
@@ -27,12 +28,12 @@ import {
   TextUnitAdjustment,
 } from '../types/types'
 import { OmitFirstArg } from '../utils/types'
-import { isEditor } from '../editor/is-editor'
+import { EditorError, SlateErrorType } from './slate-errors'
+import { NodeInsertNodesOptions } from './transforms/node'
 import {
   TextInsertFragmentOptions,
   TextInsertTextOptions,
 } from './transforms/text'
-import { NodeInsertNodesOptions } from './transforms/node'
 
 /**
  * The `Editor` interface stores all the state of a Slate editor. It is extended
@@ -42,9 +43,17 @@ export interface BaseEditor {
   // Core state.
 
   children: Descendant[]
+  errors: EditorError[]
   selection: Selection
   operations: Operation[]
   marks: EditorMarks | null
+
+  /**
+   * In "strict" mode, invalid operations will throw errors rather
+   * than being ignored. Set it to `false` to handle these errors yourself.
+   * @default true
+   */
+  strict: boolean
 
   // Overrideable core methods.
 
@@ -56,6 +65,14 @@ export interface BaseEditor {
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
+
+  /**
+   * The `onError` callback is called anytime an operation has invalid data.
+   * If `editor.strict` is set to `true`, these will be thrown as errors.
+   * Otherwise, they will be added to the `editor.errors` array and return a recovery value.
+   */
+  onError: <T extends SlateErrorType>(context: EditorError<T>) => any
+
   shouldNormalize: ({
     iteration,
     dirtyPaths,
@@ -366,7 +383,10 @@ export interface EditorInterface {
   /**
    * Get the start and end points of a location.
    */
-  edges: (editor: Editor, at: Location) => [Point, Point]
+  edges: (
+    editor: Editor,
+    at: Location
+  ) => [Point | undefined, Point | undefined]
 
   /**
    * Match a read-only element in the current branch of the editor.
@@ -379,12 +399,12 @@ export interface EditorInterface {
   /**
    * Get the end point of a location.
    */
-  end: (editor: Editor, at: Location) => Point
+  end: (editor: Editor, at: Location) => Point | undefined
 
   /**
    * Get the first node at a location.
    */
-  first: (editor: Editor, at: Location) => NodeEntry
+  first: (editor: Editor, at: Location) => NodeEntry | undefined
 
   /**
    * Get the fragment at a location.
@@ -510,7 +530,7 @@ export interface EditorInterface {
   /**
    * Get the last node at a location.
    */
-  last: (editor: Editor, at: Location) => NodeEntry
+  last: (editor: Editor, at: Location) => NodeEntry | undefined
 
   /**
    * Get the leaf text node at a location.
@@ -519,7 +539,7 @@ export interface EditorInterface {
     editor: Editor,
     at: Location,
     options?: EditorLeafOptions
-  ) => NodeEntry<Text>
+  ) => NodeEntry<Text> | undefined
 
   /**
    * Iterate through all of the levels at a location.
@@ -545,7 +565,11 @@ export interface EditorInterface {
   /**
    * Get the node at a location.
    */
-  node: (editor: Editor, at: Location, options?: EditorNodeOptions) => NodeEntry
+  node: (
+    editor: Editor,
+    at: Location,
+    options?: EditorNodeOptions
+  ) => NodeEntry | undefined
 
   /**
    * Iterate through all of the nodes in the Editor.
@@ -567,12 +591,16 @@ export interface EditorInterface {
     editor: Editor,
     at: Location,
     options?: EditorParentOptions
-  ) => NodeEntry<Ancestor>
+  ) => NodeEntry<Ancestor> | undefined
 
   /**
    * Get the path of a location.
    */
-  path: (editor: Editor, at: Location, options?: EditorPathOptions) => Path
+  path: (
+    editor: Editor,
+    at: Location,
+    options?: EditorPathOptions
+  ) => Path | undefined
 
   /**
    * Create a mutable ref for a `Path` object, which will stay in sync as new
@@ -592,7 +620,11 @@ export interface EditorInterface {
   /**
    * Get the start or end point of a location.
    */
-  point: (editor: Editor, at: Location, options?: EditorPointOptions) => Point
+  point: (
+    editor: Editor,
+    at: Location,
+    options?: EditorPointOptions
+  ) => Point | undefined
 
   /**
    * Create a mutable ref for a `Point` object, which will stay in sync as new
@@ -637,7 +669,7 @@ export interface EditorInterface {
   /**
    * Get a range of a location.
    */
-  range: (editor: Editor, at: Location, to?: Location) => Range
+  range: (editor: Editor, at: Location, to?: Location) => Range | undefined
 
   /**
    * Create a mutable ref for a `Range` object, which will stay in sync as new
@@ -674,7 +706,7 @@ export interface EditorInterface {
   /**
    * Get the start point of a location.
    */
-  start: (editor: Editor, at: Location) => Point
+  start: (editor: Editor, at: Location) => Point | undefined
 
   /**
    * Get the text string content of a location.

@@ -39,19 +39,19 @@ The paths are sorted from shallowest to deepest. However, if the `reverse: true`
 
 Options: `{reverse?: boolean}`
 
-#### `Path.next(path: Path) => Path`
+#### `Path.next(path: Path) => Path | undefined`
 
 Given a path, gets the path to the next sibling node. The method does not ensure that the returned `Path` is valid in the document.
 
-#### `Path.parent(path: Path) => Path`
+#### `Path.parent(path: Path) => Path | undefined`
 
 Given a path, return a new path referring to the parent node above it. If the `path` argument is equal to `[]`, throws an error.
 
-#### `Path.previous(path: Path) => Path`
+#### `Path.previous(path: Path) => Path | undefined`
 
-Given a path, get the path to the previous sibling node. The method will throw an error if there are no previous siblings (e.g. if the Path is currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal and will throw an error).
+Given a path, get the path to the previous sibling node. The method will return `undefined` if there are no previous siblings (e.g. if the Path is currently `[1, 0]`, the previous path would be `[1, -1]` which is illegal and will return `undefined`).
 
-#### `Path.relative(path: Path, ancestor: Path) => Path`
+#### `Path.relative(path: Path, ancestor: Path) => Path | undefined`
 
 Given two paths, one that is an ancestor to the other, returns the relative path from the `ancestor` argument to the `path` argument. If the `ancestor` path is not actually an ancestor or equal to the `path` argument, throws an error.
 

@@ -1,11 +1,19 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
+import { Path } from '../interfaces/path'
 import { Range } from '../interfaces/range'
 import { Text } from '../interfaces/text'
-import { Path } from '../interfaces/path'
 
 export const string: EditorInterface['string'] = (editor, at, options = {}) => {
   const { voids = false } = options
   const range = Editor.range(editor, at)
+  if (!range) {
+    return editor.onError({
+      key: 'string.range',
+      message: 'Cannot find the range',
+      data: { at },
+    })
+  }
+
   const [start, end] = Range.edges(range)
   let text = ''
 

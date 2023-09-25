@@ -5,10 +5,26 @@ export const path: EditorInterface['path'] = (editor, at, options = {}) => {
 
   if (Path.isPath(at)) {
     if (edge === 'start') {
-      const [, firstPath] = Node.first(editor, at)
+      const firstEntry = Node.first(editor, at)
+      if (!firstEntry) {
+        return editor.onError({
+          key: 'path.first',
+          message: 'Cannot find the first node',
+          data: { at },
+        })
+      }
+      const [, firstPath] = firstEntry
       at = firstPath
     } else if (edge === 'end') {
-      const [, lastPath] = Node.last(editor, at)
+      const lastEntry = Node.last(editor, at)
+      if (!lastEntry) {
+        return editor.onError({
+          key: 'path.last',
+          message: 'Cannot find the last node',
+          data: { at },
+        })
+      }
+      const [, lastPath] = lastEntry
       at = lastPath
     }
   }

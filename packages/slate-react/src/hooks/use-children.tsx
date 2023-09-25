@@ -36,8 +36,11 @@ const useChildren = (props: {
   } = props
   const decorate = useDecorate()
   const editor = useSlateStatic()
+  const children: JSX.Element[] = []
+
   const path = ReactEditor.findPath(editor, node)
-  const children = []
+  if (!path) return children
+
   const isLeafBlock =
     Element.isElement(node) &&
     !editor.isInline(node) &&
@@ -48,6 +51,15 @@ const useChildren = (props: {
     const n = node.children[i] as Descendant
     const key = ReactEditor.findKey(editor, n)
     const range = Editor.range(editor, p)
+    if (!range) {
+      editor.onError({
+        key: 'useChildren.range',
+        message: 'Unable to create range',
+        data: { path: p },
+      })
+      return children
+    }
+
     const sel = selection && Range.intersection(range, selection)
     const ds = decorate([n, p])
 

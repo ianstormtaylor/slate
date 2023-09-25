@@ -1,10 +1,11 @@
-import { Transforms } from '../interfaces/transforms'
 import { Editor } from '../interfaces/editor'
-import { Range } from '../interfaces/range'
-import { Path } from '../interfaces/path'
 import { Element } from '../interfaces/element'
+import { Point } from '../interfaces/index'
 import { Node, NodeEntry } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { Range } from '../interfaces/range'
 import { Text } from '../interfaces/text'
+import { Transforms } from '../interfaces/transforms'
 import { TextTransforms } from '../interfaces/transforms/text'
 import { getDefaultInsertLocation } from '../utils'
 
@@ -40,7 +41,15 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         at = pointRef.unref()!
       }
     } else if (Path.isPath(at)) {
-      at = Editor.start(editor, at)
+      const _at = Editor.start(editor, at)
+      if (!_at) {
+        editor.onError({
+          key: 'insertFragment.start',
+          message: `Cannot find start point to insert fragment at path [${at}].`,
+          data: { at, fragment },
+        })
+        return
+      }
     }
 
     if (!voids && Editor.void(editor, { at })) {
@@ -59,12 +68,26 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     if (inlineElementMatch) {
       const [, inlinePath] = inlineElementMatch
 
-      if (Editor.isEnd(editor, at, inlinePath)) {
-        const after = Editor.after(editor, inlinePath)!
-        at = after
-      } else if (Editor.isStart(editor, at, inlinePath)) {
-        const before = Editor.before(editor, inlinePath)!
-        at = before
+      if (Editor.isEnd(editor, at as Point, inlinePath)) {
+        at = Editor.after(editor, inlinePath)!
+        if (!at) {
+          editor.onError({
+            key: 'insertFragment.after',
+            message: `Cannot find end point to insert fragment after inline at path [${inlinePath}].`,
+            data: { at, fragment },
+          })
+          return
+        }
+      } else if (Editor.isStart(editor, at as Point, inlinePath)) {
+        at = Editor.before(editor, inlinePath)!
+        if (!at) {
+          editor.onError({
+            key: 'insertFragment.before',
+            message: `Cannot find start point to insert fragment before inline at path [${inlinePath}].`,
+            data: { at, fragment },
+          })
+          return
+        }
       }
     }
 
@@ -74,13 +97,32 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })!
     const [, blockPath] = blockMatch
-    const isBlockStart = Editor.isStart(editor, at, blockPath)
-    const isBlockEnd = Editor.isEnd(editor, at, blockPath)
+    const isBlockStart = Editor.isStart(editor, at as Point, blockPath)
+    const isBlockEnd = Editor.isEnd(editor, at as Point, blockPath)
     const isBlockEmpty = isBlockStart && isBlockEnd
     const mergeStart = !isBlockStart || (isBlockStart && isBlockEnd)
     const mergeEnd = !isBlockEnd
-    const [, firstPath] = Node.first({ children: fragment }, [])
-    const [, lastPath] = Node.last({ children: fragment }, [])
+    const firstEntry = Node.first({ children: fragment }, [])
+    if (!firstEntry) {
+      editor.onError({
+        key: 'insertFragment.first',
+        message: `Cannot find first point to insert fragment at path [${at}].`,
+        data: { at, fragment },
+      })
+      return
+    }
+    const [, firstPath] = firstEntry
+
+    const lastEntry = Node.last({ children: fragment }, [])
+    if (!lastEntry) {
+      editor.onError({
+        key: 'insertFragment.last',
+        message: `Cannot find last point to insert fragment at path [${at}].`,
+        data: { at, fragment },
+      })
+      return
+    }
+    const [, lastPath] = lastEntry
 
     const matches: NodeEntry[] = []
     const matcher = ([n, p]: NodeEntry) => {
@@ -103,17 +145,13 @@ export const insertFragment: TextTransforms['insertFragment'] = (
         return false
       }
 
-      if (
+      return !(
         mergeEnd &&
         Path.isAncestor(p, lastPath) &&
         Element.isElement(n) &&
         !editor.isVoid(n) &&
         !editor.isInline(n)
-      ) {
-        return false
-      }
-
-      return true
+      )
     }
 
     for (const entry of Node.nodes({ children: fragment }, { pass: matcher })) {
@@ -148,18 +186,33 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     })!
 
     const [, inlinePath] = inlineMatch
-    const isInlineStart = Editor.isStart(editor, at, inlinePath)
-    const isInlineEnd = Editor.isEnd(editor, at, inlinePath)
+    const isInlineStart = Editor.isStart(editor, at as Point, inlinePath)
+    const isInlineEnd = Editor.isEnd(editor, at as Point, inlinePath)
 
-    const middleRef = Editor.pathRef(
-      editor,
+    const middlePath =
       isBlockEnd && !ends.length ? Path.next(blockPath) : blockPath
-    )
+    if (!middlePath) {
+      editor.onError({
+        key: 'insertFragment.middlePath',
+        message: `Cannot find middle point to insert fragment at path [${at}].`,
+        data: { at, fragment },
+      })
+      return
+    }
 
-    const endRef = Editor.pathRef(
-      editor,
-      isInlineEnd ? Path.next(inlinePath) : inlinePath
-    )
+    const middleRef = Editor.pathRef(editor, middlePath)
+
+    const endPath = isInlineEnd ? Path.next(inlinePath) : inlinePath
+    if (!endPath) {
+      editor.onError({
+        key: 'insertFragment.endPath',
+        message: `Cannot find end point to insert fragment at path [${at}].`,
+        data: { at, fragment },
+      })
+      return
+    }
+
+    const endRef = Editor.pathRef(editor, endPath)
 
     Transforms.splitNodes(editor, {
       at,
@@ -175,12 +228,20 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       voids,
     })
 
-    const startRef = Editor.pathRef(
-      editor,
+    const startPath =
       !isInlineStart || (isInlineStart && isInlineEnd)
         ? Path.next(inlinePath)
         : inlinePath
-    )
+    if (!startPath) {
+      editor.onError({
+        key: 'insertFragment.startPath',
+        message: `Cannot find start point to insert fragment at path [${at}].`,
+        data: { at, fragment },
+      })
+      return
+    }
+
+    const startRef = Editor.pathRef(editor, startPath)
 
     Transforms.insertNodes(editor, starts, {
       at: startRef.current!,
@@ -220,6 +281,14 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 
       if (path) {
         const end = Editor.end(editor, path)
+        if (!end) {
+          editor.onError({
+            key: 'insertFragment.end',
+            message: `Cannot find end point to insert fragment at path [${at}].`,
+            data: { at, fragment },
+          })
+          return
+        }
         Transforms.select(editor, end)
       }
     }

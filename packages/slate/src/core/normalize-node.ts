@@ -1,9 +1,10 @@
-import { WithEditorFirstArg } from '../utils/types'
-import { Text } from '../interfaces/text'
-import { Element } from '../interfaces/element'
-import { Transforms } from '../interfaces/transforms'
-import { Descendant, Node } from '../interfaces/node'
 import { Editor } from '../interfaces/editor'
+import { Element } from '../interfaces/element'
+import { Descendant, Node } from '../interfaces/node'
+import { SlateErrors } from '../interfaces/slate-errors'
+import { Text } from '../interfaces/text'
+import { Transforms } from '../interfaces/transforms'
+import { WithEditorFirstArg } from '../utils/types'
 
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
@@ -41,6 +42,20 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
 
   for (let i = 0; i < node.children.length; i++, n++) {
     const currentNode = Node.get(editor, path)
+    if (!currentNode) {
+      const err = editor.onError({
+        key: 'normalizeNode.get',
+        message: `Cannot get the node at path [${path}] while normalizing.`,
+        data: { path },
+        error: SlateErrors.NodeGet(editor, path),
+      })
+      if (err) {
+        return
+      }
+
+      continue
+    }
+
     if (Text.isText(currentNode)) continue
     const child = currentNode.children[n] as Descendant
     const prev = currentNode.children[n - 1] as Descendant

@@ -67,7 +67,15 @@ export const TextTransforms: TextTransforms = {
       let { at = getDefaultInsertLocation(editor) } = options
 
       if (Path.isPath(at)) {
-        at = Editor.range(editor, at)
+        const range = Editor.range(editor, at)
+        if (!range) {
+          return editor.onError({
+            key: 'insertText.range',
+            message: 'Cannot find the range',
+            data: { at },
+          })
+        }
+        at = range
       }
 
       if (Range.isRange(at)) {

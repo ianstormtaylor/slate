@@ -1,6 +1,6 @@
-import { Node, NodeEntry } from '../interfaces/node'
 import { Editor, EditorLevelsOptions } from '../interfaces/editor'
 import { Element } from '../interfaces/element'
+import { Node, NodeEntry } from '../interfaces/node'
 
 export function* levels<T extends Node>(
   editor: Editor,
@@ -19,6 +19,13 @@ export function* levels<T extends Node>(
 
   const levels: NodeEntry<T>[] = []
   const path = Editor.path(editor, at)
+  if (!path) {
+    return editor.onError({
+      key: 'levels',
+      message: 'Cannot find the path',
+      data: { at },
+    })
+  }
 
   for (const [n, p] of Node.levels(editor, path)) {
     if (!match(n, p)) {

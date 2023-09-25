@@ -1,8 +1,8 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
-import { Path } from '../interfaces/path'
-import { Node } from '../interfaces/node'
 import { Element } from '../interfaces/element'
+import { Node } from '../interfaces/node'
+import { Path } from '../interfaces/path'
+import { DIRTY_PATH_KEYS, DIRTY_PATHS } from '../utils/weak-maps'
 
 export const normalize: EditorInterface['normalize'] = (
   editor,
@@ -48,7 +48,16 @@ export const normalize: EditorInterface['normalize'] = (
     for (const dirtyPath of getDirtyPaths(editor)) {
       if (Node.has(editor, dirtyPath)) {
         const entry = Editor.node(editor, dirtyPath)
-        const [node, _] = entry
+        if (!entry) {
+          editor.onError({
+            key: 'normalize.node',
+            message: 'Cannot get the node',
+            data: { dirtyPath },
+          })
+          continue
+        }
+
+        const [node] = entry
 
         /*
           The default normalizer inserts an empty text node in this scenario, but it can be customised.
@@ -84,7 +93,16 @@ export const normalize: EditorInterface['normalize'] = (
       // If the node doesn't exist in the tree, it does not need to be normalized.
       if (Node.has(editor, dirtyPath)) {
         const entry = Editor.node(editor, dirtyPath)
-        editor.normalizeNode(entry, { operation })
+        if (!entry) {
+          editor.onError({
+            key: 'normalize.node',
+            message: 'Cannot get the node',
+            data: { dirtyPath },
+          })
+        }
+        if (entry) {
+          editor.normalizeNode(entry, { operation })
+        }
       }
       iteration++
       dirtyPaths = getDirtyPaths(editor)

@@ -9,9 +9,9 @@
 
 ### Retrieval methods
 
-#### `Node.ancestor(root: Node, path: Path) => Ancestor`
+#### `Node.ancestor(root: Node, path: Path) => Ancestor | undefined`
 
-Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, throw an error.
+Get the node at a specific `path`, asserting that it is an ancestor node. If the specified node is not an ancestor node, return `undefined`.
 
 #### `Node.ancestors(root: Node, path: Path, options?) => Generator<NodeEntry<Ancestor>>`
 
@@ -19,23 +19,23 @@ Return a generator of all the ancestor nodes above a specific path. By default, 
 
 Options: `{reverse?: boolean}`
 
-#### `Node.child(root: Node, index: number) => Descendant`
+#### `Node.child(root: Node, index: number) => Descendant | undefined`
 
 Get the child of a node at the specified `index`.
 
-#### `Node.children(root: Node, path: Path, options?) => Generator<NodeEntry<Descendant>>`
+#### `Node.children(root: Node, path: Path, options?) => Generator<NodeEntry<Descendant>> | undefined`
 
 Iterate over the children of a node at a specific path.
 
 Options: `{reverse?: boolean}`
 
-#### `Node.common(root: Node, path: Path, another: Path) => NodeEntry`
+#### `Node.common(root: Node, path: Path, another: Path) => NodeEntry | undefined`
 
 Get an entry for the common ancestor node of two paths. It might be a Text node, an Element, or the Editor itself.
 
 For the common block ancestor, see [Editor Selection](https://docs.slatejs.org/concepts/03-locations#selection)
 
-#### `Node.descendant(root: Node, path: Path) => Descendant`
+#### `Node.descendant(root: Node, path: Path) => Descendant | undefined`
 
 Get the node at a specific path, asserting that it's a descendant node.
 
@@ -51,7 +51,7 @@ Return a generator of all the element nodes inside a root node. Each iteration w
 
 Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry => boolean)}`
 
-#### `Node.first(root: Node, path: Path) => NodeEntry`
+#### `Node.first(root: Node, path: Path) => NodeEntry | undefined`
 
 Get the first node entry in a root node from a `path`.
 
@@ -59,17 +59,17 @@ Get the first node entry in a root node from a `path`.
 
 Get the sliced fragment represented by the `range`.
 
-#### `Node.get(root: Node, path: Path) => Node`
+#### `Node.get(root: Node, path: Path) => Node | undefined`
 
 Get the descendant node referred to by a specific `path`. If the path is an empty array, get the root node itself.
 
-#### `Node.last(root: Node, path: Path) => NodeEntry`
+#### `Node.last(root: Node, path: Path) => NodeEntry | undefined`
 
 Get the last node entry in a root node at a specific `path`.
 
-#### `Node.leaf(root: Node, path: Path) => Text`
+#### `Node.leaf(root: Node, path: Path) => Text | undefined`
 
-Get the node at a specific `path`, ensuring it's a leaf text node. If the node is not a leaf text node, throw an error.
+Get the node at a specific `path`, ensuring it's a leaf text node. If the node is not a leaf text node, return `undefined`.
 
 #### `Node.levels(root: Node, path: Path, options?) => Generator<NodeEntry>`
 
@@ -83,7 +83,7 @@ Return a generator of all the node entries of a root node. Each entry is returne
 
 Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry => boolean)}`
 
-#### `Node.parent(root: Node, path: Path) => Ancestor`
+#### `Node.parent(root: Node, path: Path) => Ancestor | undefined`
 
 Get the parent of a node at a specific `path`.
 

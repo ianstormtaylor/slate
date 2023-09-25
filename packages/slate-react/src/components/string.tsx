@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useRef, useState } from 'react'
-import { Editor, Text, Path, Element, Node } from 'slate'
+import { Editor, Element, Node, Path, Text } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -19,7 +19,15 @@ const String = (props: {
   const { isLast, leaf, parent, text } = props
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
+  if (!path) {
+    return <TextString text={leaf.text} />
+  }
+
   const parentPath = Path.parent(path)
+  if (!parentPath) {
+    return <TextString text={leaf.text} />
+  }
+
   const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
 
   // COMPAT: Render text inside void nodes with a zero-width space.
