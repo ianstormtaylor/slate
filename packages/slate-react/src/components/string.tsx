@@ -25,7 +25,7 @@ const String = (props: {
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
   if (editor.isVoid(parent)) {
-    return <ZeroWidthString length={Node.string(parent).length} />
+    return <TextString text="" zeroWidth length={Node.string(parent).length} />
   }
 
   // COMPAT: If this is the last text node in an empty block, render a zero-
@@ -37,14 +37,18 @@ const String = (props: {
     !editor.isInline(parent) &&
     Editor.string(editor, parentPath) === ''
   ) {
-    return <ZeroWidthString isLineBreak isMarkPlaceholder={isMarkPlaceholder} />
+    return (
+      <TextString text="" isLineBreak isMarkPlaceholder={isMarkPlaceholder} />
+    )
   }
 
   // COMPAT: If the text is empty, it's because it's on the edge of an inline
   // node, so we render a zero-width space so that the selection can be
   // inserted next to it still.
   if (leaf.text === '') {
-    return <ZeroWidthString isMarkPlaceholder={isMarkPlaceholder} />
+    return (
+      <TextString text="" zeroWidth isMarkPlaceholder={isMarkPlaceholder} />
+    )
   }
 
   // COMPAT: Browsers will collapse trailing new lines at the end of blocks,
@@ -59,13 +63,51 @@ const String = (props: {
 /**
  * Leaf strings with text in them.
  */
-const TextString = (props: { text: string; isTrailing?: boolean }) => {
-  const { text, isTrailing = false } = props
+const TextString = (props: {
+  text: string
+  isTrailing?: boolean
+  zeroWidth?: boolean
+  length?: number
+  isLineBreak?: boolean
+  isMarkPlaceholder?: boolean
+}) => {
+  const {
+    text,
+    isTrailing = false,
+    zeroWidth,
+    length,
+    isLineBreak,
+    isMarkPlaceholder,
+  } = props
   const ref = useRef<HTMLSpanElement>(null)
   const getTextContent = () => {
+    if (zeroWidth) {
+      return '\uFEFF'
+    }
+
     return `${text ?? ''}${isTrailing ? '\n' : ''}`
   }
   const [initialText] = useState(getTextContent)
+
+  let attributes: Record<string, any> = {
+    'data-slate-string': true,
+  }
+  let children: React.ReactNode = initialText
+
+  if (zeroWidth || isLineBreak) {
+    attributes = {
+      'data-slate-zero-width': isLineBreak ? 'n' : 'z',
+      'data-slate-length': length ?? 0,
+    }
+
+    if (isLineBreak) {
+      children = <br />
+    }
+  }
+
+  if (isMarkPlaceholder) {
+    attributes['data-slate-mark-placeholder'] = true
+  }
 
   // This is the actual text rendering boundary where we interface with the DOM
   // The text is not rendered as part of the virtual DOM, as since we handle basic character insertions natively,
@@ -77,6 +119,10 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
 
   // useLayoutEffect: updating our span before browser paint
   useIsomorphicLayoutEffect(() => {
+    if (isLineBreak) {
+      return
+    }
+
     // null coalescing text to make sure we're not outputing "null" as a string in the extreme case it is nullish at runtime
     const textWithTrailing = getTextContent()
 
@@ -90,45 +136,23 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
 
   // We intentionally render a memoized <span> that only receives the initial text content when the component is mounted.
   // We defer to the layout effect above to update the `textContent` of the span element when needed.
-  return <MemoizedText ref={ref}>{initialText}</MemoizedText>
+  return (
+    <MemoizedText ref={ref} {...attributes}>
+      {children}
+    </MemoizedText>
+  )
 }
 
 const MemoizedText = memo(
-  forwardRef<HTMLSpanElement, { children: string }>((props, ref) => {
-    return (
-      <span data-slate-string ref={ref}>
-        {props.children}
-      </span>
-    )
-  })
-)
-
-/**
- * Leaf strings without text, render as zero-width strings.
- */
-
-export const ZeroWidthString = (props: {
-  length?: number
-  isLineBreak?: boolean
-  isMarkPlaceholder?: boolean
-}) => {
-  const { length = 0, isLineBreak = false, isMarkPlaceholder = false } = props
-
-  const attributes = {
-    'data-slate-zero-width': isLineBreak ? 'n' : 'z',
-    'data-slate-length': length,
-  }
-
-  if (isMarkPlaceholder) {
-    attributes['data-slate-mark-placeholder'] = true
-  }
-
-  return (
-    <span {...attributes}>
-      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
-      {isLineBreak ? <br /> : null}
-    </span>
+  forwardRef<HTMLSpanElement, React.HTMLAttributes<HTMLSpanElement>>(
+    ({ children, ...props }, ref) => {
+      return (
+        <span {...props} ref={ref}>
+          {children}
+        </span>
+      )
+    }
   )
-}
+)
 
 export default String
