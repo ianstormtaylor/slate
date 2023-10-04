@@ -5,8 +5,13 @@ on:
     branches:
       - main
 
+permissions: {}
 jobs:
   release:
+    permissions:
+      contents: write # to create release (changesets/action)
+      pull-requests: write # to create pull request (changesets/action)
+
     name: ${{ matrix.channel }}
     runs-on: ubuntu-latest
     strategy:
@@ -25,9 +30,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 12.x
+          node-version: 18.x
           cache: yarn
           registry-url: https://registry.npmjs.org
+          key: node18
 
       - name: Install dependencies
         run: yarn
@@ -38,7 +44,7 @@ jobs:
       # https://github.com/changesets/action
       - name: Create release pull request or Publish to npm
         if: matrix.channel == 'latest'
-        uses: changesets/action@master
+        uses: changesets/action@v1
         with:
           # defined in package.json#scripts
           version: yarn changesetversion

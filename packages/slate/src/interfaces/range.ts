@@ -1,6 +1,7 @@
 import { produce } from 'immer'
 import { isPlainObject } from 'is-plain-object'
 import { ExtendedType, Operation, Path, Point, PointEntry } from '..'
+import { RangeDirection } from '../types/types'
 
 /**
  * `Range` objects are a set of points that refer to a specific span of a Slate
@@ -15,45 +16,95 @@ export interface BaseRange {
 
 export type Range = ExtendedType<'Range', BaseRange>
 
-export interface RangeInterface {
-  edges: (
-    range: Range,
-    options?: {
-      reverse?: boolean
-    }
-  ) => [Point, Point]
-  end: (range: Range) => Point
-  equals: (range: Range, another: Range) => boolean
-  includes: (range: Range, target: Path | Point | Range) => boolean
-  intersection: (range: Range, another: Range) => Range | null
-  isBackward: (range: Range) => boolean
-  isCollapsed: (range: Range) => boolean
-  isExpanded: (range: Range) => boolean
-  isForward: (range: Range) => boolean
-  isRange: (value: any) => value is Range
-  points: (range: Range) => Generator<PointEntry, void, undefined>
-  start: (range: Range) => Point
-  transform: (
-    range: Range,
-    op: Operation,
-    options?: {
-      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
-    }
-  ) => Range | null
+export interface RangeEdgesOptions {
+  reverse?: boolean
 }
 
-export const Range: RangeInterface = {
+export interface RangeTransformOptions {
+  affinity?: RangeDirection | null
+}
+
+export interface RangeInterface {
   /**
    * Get the start and end points of a range, in the order in which they appear
    * in the document.
    */
+  edges: (range: Range, options?: RangeEdgesOptions) => [Point, Point]
 
-  edges(
+  /**
+   * Get the end point of a range.
+   */
+  end: (range: Range) => Point
+
+  /**
+   * Check if a range is exactly equal to another.
+   */
+  equals: (range: Range, another: Range) => boolean
+
+  /**
+   * Check if a range includes a path, a point or part of another range.
+   */
+  includes: (range: Range, target: Path | Point | Range) => boolean
+
+  /**
+   * Get the intersection of a range with another.
+   */
+  intersection: (range: Range, another: Range) => Range | null
+
+  /**
+   * Check if a range is backward, meaning that its anchor point appears in the
+   * document _after_ its focus point.
+   */
+  isBackward: (range: Range) => boolean
+
+  /**
+   * Check if a range is collapsed, meaning that both its anchor and focus
+   * points refer to the exact same position in the document.
+   */
+  isCollapsed: (range: Range) => boolean
+
+  /**
+   * Check if a range is expanded.
+   *
+   * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
+   */
+  isExpanded: (range: Range) => boolean
+
+  /**
+   * Check if a range is forward.
+   *
+   * This is the opposite of [[Range.isBackward]] and is provided for legibility.
+   */
+  isForward: (range: Range) => boolean
+
+  /**
+   * Check if a value implements the [[Range]] interface.
+   */
+  isRange: (value: any) => value is Range
+
+  /**
+   * Iterate through all of the point entries in a range.
+   */
+  points: (range: Range) => Generator<PointEntry, void, undefined>
+
+  /**
+   * Get the start point of a range.
+   */
+  start: (range: Range) => Point
+
+  /**
+   * Transform a range by an operation.
+   */
+  transform: (
     range: Range,
-    options: {
-      reverse?: boolean
-    } = {}
-  ): [Point, Point] {
+    op: Operation,
+    options?: RangeTransformOptions
+  ) => Range | null
+}
+
+// eslint-disable-next-line no-redeclare
+export const Range: RangeInterface = {
+  edges(range: Range, options: RangeEdgesOptions = {}): [Point, Point] {
     const { reverse = false } = options
     const { anchor, focus } = range
     return Range.isBackward(range) === reverse
@@ -61,18 +112,10 @@ export const Range: RangeInterface = {
       : [focus, anchor]
   },
 
-  /**
-   * Get the end point of a range.
-   */
-
   end(range: Range): Point {
     const [, end] = Range.edges(range)
     return end
   },
-
-  /**
-   * Check if a range is exactly equal to another.
-   */
 
   equals(range: Range, another: Range): boolean {
     return (
@@ -80,10 +123,6 @@ export const Range: RangeInterface = {
       Point.equals(range.focus, another.focus)
     )
   },
-
-  /**
-   * Check if a range includes a path, a point or part of another range.
-   */
 
   includes(range: Range, target: Path | Point | Range): boolean {
     if (Range.isRange(target)) {
@@ -114,10 +153,6 @@ export const Range: RangeInterface = {
     return isAfterStart && isBeforeEnd
   },
 
-  /**
-   * Get the intersection of a range with another.
-   */
-
   intersection(range: Range, another: Range): Range | null {
     const { anchor, focus, ...rest } = range
     const [s1, e1] = Range.edges(range)
@@ -132,49 +167,23 @@ export const Range: RangeInterface = {
     }
   },
 
-  /**
-   * Check if a range is backward, meaning that its anchor point appears in the
-   * document _after_ its focus point.
-   */
-
   isBackward(range: Range): boolean {
     const { anchor, focus } = range
     return Point.isAfter(anchor, focus)
   },
-
-  /**
-   * Check if a range is collapsed, meaning that both its anchor and focus
-   * points refer to the exact same position in the document.
-   */
 
   isCollapsed(range: Range): boolean {
     const { anchor, focus } = range
     return Point.equals(anchor, focus)
   },
 
-  /**
-   * Check if a range is expanded.
-   *
-   * This is the opposite of [[Range.isCollapsed]] and is provided for legibility.
-   */
-
   isExpanded(range: Range): boolean {
     return !Range.isCollapsed(range)
   },
 
-  /**
-   * Check if a range is forward.
-   *
-   * This is the opposite of [[Range.isBackward]] and is provided for legibility.
-   */
-
   isForward(range: Range): boolean {
     return !Range.isBackward(range)
   },
-
-  /**
-   * Check if a value implements the [[Range]] interface.
-   */
 
   isRange(value: any): value is Range {
     return (
@@ -184,34 +193,20 @@ export const Range: RangeInterface = {
     )
   },
 
-  /**
-   * Iterate through all of the point entries in a range.
-   */
-
   *points(range: Range): Generator<PointEntry, void, undefined> {
     yield [range.anchor, 'anchor']
     yield [range.focus, 'focus']
   },
-
-  /**
-   * Get the start point of a range.
-   */
 
   start(range: Range): Point {
     const [start] = Range.edges(range)
     return start
   },
 
-  /**
-   * Transform a range by an operation.
-   */
-
   transform(
     range: Range | null,
     op: Operation,
-    options: {
-      affinity?: 'forward' | 'backward' | 'outward' | 'inward' | null
-    } = {}
+    options: RangeTransformOptions = {}
   ): Range | null {
     return produce(range, r => {
       if (r === null) {

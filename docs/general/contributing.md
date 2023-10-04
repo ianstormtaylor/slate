@@ -32,9 +32,9 @@ Here's a [JSFiddle template for Slate](https://jsfiddle.net/01pLxfzu/) to get yo
 
 ## Asking Questions
 
-We've also got a [Slate Slack team](https://slate-slack.herokuapp.com) where you can ask questions and get answers from other people using Slate:
+We've also got a [Slate Slack team](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw) where you can ask questions and get answers from other people using Slate:
 
-[![](../.gitbook/assets/slack.png)](https://slate-slack.herokuapp.com)
+[![](../.gitbook/assets/slack.png)](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw)
 
 Please use the Slack instead of asking questions in issues, since we want to reserve issues for keeping track of bugs and features. We close questions in issues so that maintaining the project isn't overwhelming.
 
@@ -46,7 +46,7 @@ Please include tests and docs with every pull request!
 
 ## Repository Setup
 
-The slate repository is a monorepo that is managed with [lerna](https://github.com/lerna/lerna). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
+The Slate repository is a monorepo that is managed with [lerna](https://github.com/lerna/lerna). Unlike more traditional repositories, this means that the repository must be built in order for tests, linting, or other common development activities to function as expected.
 
 To run the build, you need to have the Slate repository cloned to your computer. After that, you need to `cd` into the directory where you cloned it, and install the dependencies with `yarn` and build the monorepo:
 
@@ -77,7 +77,7 @@ yarn test
 
 If you need to debug something, you can add a `debugger` line to the source, and then run `yarn test:inspect`.
 
-If you only want to run a specific test or tests, you can run `yarn test --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
+If you only want to run a specific test or tests, you can run `yarn run test:mocha --fgrep="slate-react rendering"` flag which will filter the tests being run by grepping for the string in each test. \(This is a Mocha flag that gets passed through.\)
 
 In addition to tests you should also run the linter:
 

@@ -2,21 +2,20 @@ import React, { useState, useMemo } from 'react'
 import { Transforms, createEditor, Descendant } from 'slate'
 import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 
 import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from '../components'
 import { EditableVoidElement } from './custom-types'
 
 const EditableVoidsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withEditableVoids(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={setValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <InsertEditableVoidButton />
       </Toolbar>

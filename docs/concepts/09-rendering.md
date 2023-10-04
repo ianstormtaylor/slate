@@ -13,7 +13,7 @@ import { createEditor } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
 const MyEditor = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   const renderElement = useCallback(({ attributes, children, element }) => {
     switch (element.type) {
       case 'quote':
@@ -37,7 +37,7 @@ const MyEditor = () => {
 }
 ```
 
-> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your custom components! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
+> 🤖 Be sure to mix in `props.attributes` and render `props.children` in your custom components! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the "leaves" holding text content and inline elements.
 
 You don't have to use simple HTML elements, you can use your own custom React components too:
 
@@ -56,7 +56,7 @@ const renderElement = useCallback(props => {
 
 ## Leaves
 
-When text-level formatting is rendered, the characters are grouped into "leaves" of text that each contain the same formatting applied to them.
+When text-level formatting is rendered, the characters are grouped into "leaves" of text that each contain the same formatting (marks) applied to them.
 
 To customize the rendering of each leaf, you use a custom `renderLeaf` prop:
 
@@ -77,6 +77,8 @@ const renderLeaf = useCallback(({ attributes, children, leaf }) => {
 ```
 
 Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. \(But there's nothing preventing you from using custom components if you'd like!\)
+
+> 🤖 As with the Element renderer, be sure to mix in `props.attributes` and render `props.children` in your leaf renderer! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
 
 One disadvantage of text-level formatting is that you cannot guarantee that any given format is "contiguous"—meaning that it stays as a single leaf. This limitation with respect to leaves is similar to the DOM, where this is invalid:
 
@@ -115,7 +117,7 @@ A common use case for this is rendering a toolbar with formatting buttons that a
 
 ```jsx
 const MyEditor = () => {
-  const editor = useMemo(() => withReact(createEditor()), [])
+  const [editor] = useState(() => withReact(createEditor()))
   return (
     <Slate editor={editor}>
       <Toolbar />
@@ -136,3 +138,24 @@ const Toolbar = () => {
 ```
 
 Because the `<Toolbar>` uses the `useSlate` hook to retrieve the context, it will re-render whenever the editor changes, so that the active state of the buttons stays in sync.
+
+## Editor Styling
+
+Custom styles can be applied to the editor itself by using the `style` prop on the `<Editable>` component.
+
+```jsx
+const MyEditor = () => {
+  const [editor] = useState(() => withReact(createEditor()))
+  return (
+    <Slate editor={editor}>
+      <Editable style={{ minHeight: '200px', backgroundColor: 'lime' }} />
+    </Slate>
+  )
+}
+```
+
+It is also possible to apply custom styles with a stylesheet and `className`. However, Slate uses inline styles to provide some default styles for the editor. Because inline styles take precedence over stylesheets, styles you provide using stylesheets will not override the default styles. If you are trying to use a stylesheet and your rules are not taking effect, do one of the following:
+
+- Provide your styles using the `style` prop instead of a stylesheet, which overrides the default inline styles.
+- Pass the `disableDefaultStyles` prop to the `<Editable>` component.
+- Use `!important` in your stylesheet declarations to make them override the inline styles.

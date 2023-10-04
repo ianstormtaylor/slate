@@ -1,6 +1,6 @@
 import React, { Ref, PropsWithChildren } from 'react'
 import ReactDOM from 'react-dom'
-import { cx, css } from 'emotion'
+import { cx, css } from '@emotion/css'
 
 interface BaseProps {
   className: string
@@ -149,6 +149,7 @@ export const Menu = React.forwardRef(
   ) => (
     <div
       {...props}
+      data-test-id="menu"
       ref={ref}
       className={cx(
         className,

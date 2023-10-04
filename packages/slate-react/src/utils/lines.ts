@@ -2,8 +2,8 @@
  * Utilities for single-line deletion
  */
 
-import { Range, Editor } from 'slate'
-import { ReactEditor } from '..'
+import { Editor, Range } from 'slate'
+import { ReactEditor } from '../plugin/react-editor'
 
 const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
   const middle = (compareRect.top + compareRect.bottom) / 2

@@ -25,4 +25,3 @@ export const output = (
     <block>two</block>
   </editor>
 )
-export const skip = true

@@ -1,5 +1,29 @@
 # slate-history
 
+## 0.93.0
+
+### Minor Changes
+
+- [#5382](https://github.com/ianstormtaylor/slate/commit/bab6943be9e0a307538c29a9dc5fcf23c09c5e40) Thanks [@reinvanimschoot](https://github.com/reinvanimschoot)! - Extracts history push to own function
+
+## 0.86.0
+
+### Patch Changes
+
+- [#5197](https://github.com/ianstormtaylor/slate/pull/5197) [`70b64dc8`](https://github.com/ianstormtaylor/slate/commit/70b64dc8f10199658ac09bfef141b56187498652) Thanks [@jacobcarpenter](https://github.com/jacobcarpenter)! - Fix isHistory check.
+
+## 0.85.0
+
+### Minor Changes
+
+- [#4717](https://github.com/ianstormtaylor/slate/pull/4717) [`d73026ee`](https://github.com/ianstormtaylor/slate/commit/d73026eed2d190da6153e91a914717978b155d8e) Thanks [@bryanph](https://github.com/bryanph)! - Changes how selections are stored in the history resulting in more consistent results
+
+## 0.81.3
+
+### Patch Changes
+
+- [#5042](https://github.com/ianstormtaylor/slate/pull/5042) [`11a93e65`](https://github.com/ianstormtaylor/slate/commit/11a93e65de4b197a43777e575caf13d7a05d5dc9) Thanks [@bryanph](https://github.com/bryanph)! - Upgrade next.js and source-map-loader packages
+
 ## 0.66.0
 
 ### Patch Changes

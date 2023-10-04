@@ -12,6 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
+import { ReactEditor } from '../plugin/react-editor'
 
 export {
   DOMNode,
@@ -133,13 +134,18 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
- * Determines wether the active element is nested within a shadowRoot
+ * Determines whether the active element is nested within a shadowRoot
  */
 
-export const hasShadowRoot = () => {
-  return !!(
-    window.document.activeElement && window.document.activeElement.shadowRoot
-  )
+export const hasShadowRoot = (node: Node | null) => {
+  let parent = node && node.parentNode
+  while (parent) {
+    if (parent.toString() === '[object ShadowRoot]') {
+      return true
+    }
+    parent = parent.parentNode
+  }
+  return false
 }
 
 /**
@@ -250,17 +256,61 @@ export const getSlateFragmentAttribute = (
  * Get the x-slate-fragment attribute that exist in text/html data
  * and append it to the DataTransfer object
  */
-export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
-  if (!dataTransfer.getData('application/x-slate-fragment')) {
+export const getClipboardData = (
+  dataTransfer: DataTransfer,
+  clipboardFormatKey = 'x-slate-fragment'
+): DataTransfer => {
+  if (!dataTransfer.getData(`application/${clipboardFormatKey}`)) {
     const fragment = getSlateFragmentAttribute(dataTransfer)
     if (fragment) {
       const clipboardData = new DataTransfer()
       dataTransfer.types.forEach(type => {
         clipboardData.setData(type, dataTransfer.getData(type))
       })
-      clipboardData.setData('application/x-slate-fragment', fragment)
+      clipboardData.setData(`application/${clipboardFormatKey}`, fragment)
       return clipboardData
     }
   }
   return dataTransfer
+}
+
+/**
+ * Check whether a mutation originates from a editable element inside the editor.
+ */
+
+export const isTrackedMutation = (
+  editor: ReactEditor,
+  mutation: MutationRecord,
+  batch: MutationRecord[]
+): boolean => {
+  const { target } = mutation
+  if (isDOMElement(target) && target.matches('[contentEditable="false"]')) {
+    return false
+  }
+
+  const { document } = ReactEditor.getWindow(editor)
+  if (document.contains(target)) {
+    return ReactEditor.hasDOMNode(editor, target, { editable: true })
+  }
+
+  const parentMutation = batch.find(({ addedNodes, removedNodes }) => {
+    for (const node of addedNodes) {
+      if (node === target || node.contains(target)) {
+        return true
+      }
+    }
+
+    for (const node of removedNodes) {
+      if (node === target || node.contains(target)) {
+        return true
+      }
+    }
+  })
+
+  if (!parentMutation || parentMutation === mutation) {
+    return false
+  }
+
+  // Target add/remove is tracked. Track the mutation if we track the parent mutation.
+  return isTrackedMutation(editor, parentMutation, batch)
 }

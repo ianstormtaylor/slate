@@ -8,7 +8,10 @@ type Location = Path | Point | Range
 
 - [Location](./location.md)
 - [Path](./path.md)
+- [PathRef](./path-ref.md)
 - [Point](./point.md)
-- [PointEntry](./pointe-entry.md)
+- [PointEntry](./point-entry.md)
+- [PointRef](./point-ref.md)
 - [Range](./range.md)
+- [RangeRef](./range-ref.md)
 - [Span](./span.md)

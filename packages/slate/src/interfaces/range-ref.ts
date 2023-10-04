@@ -13,14 +13,14 @@ export interface RangeRef {
 }
 
 export interface RangeRefInterface {
-  transform: (ref: RangeRef, op: Operation) => void
-}
-
-export const RangeRef: RangeRefInterface = {
   /**
    * Transform the range ref's current value by an operation.
    */
+  transform: (ref: RangeRef, op: Operation) => void
+}
 
+// eslint-disable-next-line no-redeclare
+export const RangeRef: RangeRefInterface = {
   transform(ref: RangeRef, op: Operation): void {
     const { current, affinity } = ref
 

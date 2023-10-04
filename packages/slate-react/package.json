@@ -1,7 +1,7 @@
 {
   "name": "slate-react",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.71.0",
+  "version": "0.99.0",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -14,6 +14,7 @@
     "dist/"
   ],
   "dependencies": {
+    "@juggle/resize-observer": "^3.4.0",
     "@types/is-hotkey": "^0.1.1",
     "@types/lodash": "^4.14.149",
     "direction": "^1.0.3",
@@ -25,15 +26,18 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.7.4",
+    "@types/jest": "^27.4.1",
+    "@types/jsdom": "^16.2.14",
     "@types/react": "^16.9.13",
     "@types/react-dom": "^16.9.4",
-    "jsdom": "^16.6.0",
+    "@types/react-test-renderer": "^16.8.0",
+    "@types/resize-observer-browser": "^0.1.7",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
     "react-test-renderer": ">=16.8.0",
-    "slate": "^0.71.0",
-    "slate-hyperscript": "^0.67.0",
-    "source-map-loader": "^0.2.4"
+    "slate": "^0.94.0",
+    "slate-hyperscript": "^0.81.3",
+    "source-map-loader": "^4.0.0"
   },
   "peerDependencies": {
     "react": ">=16.8.0",

@@ -1,13 +1,46 @@
-import React, { useRef, useEffect } from 'react'
+import React, {
+  useRef,
+  useCallback,
+  MutableRefObject,
+  useState,
+  useEffect,
+} from 'react'
 import { Element, Text } from 'slate'
+import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
-import { PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
+import {
+  PLACEHOLDER_SYMBOL,
+  EDITOR_TO_PLACEHOLDER_ELEMENT,
+  EDITOR_TO_FORCE_RENDER,
+} from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import { useSlateStatic } from '../hooks/use-slate-static'
+import { IS_WEBKIT } from '../utils/environment'
+
+function disconnectPlaceholderResizeObserver(
+  placeholderResizeObserver: MutableRefObject<ResizeObserver | null>,
+  releaseObserver: boolean
+) {
+  if (placeholderResizeObserver.current) {
+    placeholderResizeObserver.current.disconnect()
+    if (releaseObserver) {
+      placeholderResizeObserver.current = null
+    }
+  }
+}
+
+type TimerId = ReturnType<typeof setTimeout> | null
+
+function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
+  if (timeoutRef.current) {
+    clearTimeout(timeoutRef.current)
+    timeoutRef.current = null
+  }
+}
 
 /**
  * Individual leaves in a text node with unique formatting.
  */
-
 const Leaf = (props: {
   isLast: boolean
   leaf: Text
@@ -25,36 +58,68 @@ const Leaf = (props: {
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
   } = props
 
-  const placeholderRef = useRef<HTMLSpanElement | null>(null)
+  const editor = useSlateStatic()
+  const placeholderResizeObserver = useRef<ResizeObserver | null>(null)
+  const placeholderRef = useRef<HTMLElement | null>(null)
+  const [showPlaceholder, setShowPlaceholder] = useState(false)
+  const showPlaceholderTimeoutRef = useRef<TimerId>(null)
 
-  useEffect(() => {
-    const placeholderEl = placeholderRef?.current
-    const editorEl = document.querySelector<HTMLDivElement>(
-      '[data-slate-editor="true"]'
-    )
+  const callbackPlaceholderRef = useCallback(
+    (placeholderEl: HTMLElement | null) => {
+      disconnectPlaceholderResizeObserver(
+        placeholderResizeObserver,
+        placeholderEl == null
+      )
 
-    if (!placeholderEl || !editorEl) {
-      return
-    }
+      if (placeholderEl == null) {
+        EDITOR_TO_PLACEHOLDER_ELEMENT.delete(editor)
+        leaf.onPlaceholderResize?.(null)
+      } else {
+        EDITOR_TO_PLACEHOLDER_ELEMENT.set(editor, placeholderEl)
 
-    editorEl.style.minHeight = `${placeholderEl.clientHeight}px`
-
-    return () => {
-      editorEl.style.minHeight = 'auto'
-    }
-  }, [placeholderRef, leaf])
+        if (!placeholderResizeObserver.current) {
+          // Create a new observer and observe the placeholder element.
+          const ResizeObserver = window.ResizeObserver || ResizeObserverPolyfill
+          placeholderResizeObserver.current = new ResizeObserver(() => {
+            leaf.onPlaceholderResize?.(placeholderEl)
+          })
+        }
+        placeholderResizeObserver.current.observe(placeholderEl)
+        placeholderRef.current = placeholderEl
+      }
+    },
+    [placeholderRef, leaf, editor]
+  )
 
   let children = (
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  if (leaf[PLACEHOLDER_SYMBOL]) {
+  const leafIsPlaceholder = leaf[PLACEHOLDER_SYMBOL]
+  useEffect(() => {
+    if (leafIsPlaceholder) {
+      if (!showPlaceholderTimeoutRef.current) {
+        // Delay the placeholder so it will not render in a selection
+        showPlaceholderTimeoutRef.current = setTimeout(() => {
+          setShowPlaceholder(true)
+          showPlaceholderTimeoutRef.current = null
+        }, 300)
+      }
+    } else {
+      clearTimeoutRef(showPlaceholderTimeoutRef)
+      setShowPlaceholder(false)
+    }
+    return () => clearTimeoutRef(showPlaceholderTimeoutRef)
+  }, [leafIsPlaceholder, setShowPlaceholder])
+
+  if (leafIsPlaceholder && showPlaceholder) {
     const placeholderProps: RenderPlaceholderProps = {
       children: leaf.placeholder,
       attributes: {
         'data-slate-placeholder': true,
         style: {
           position: 'absolute',
+          top: 0,
           pointerEvents: 'none',
           width: '100%',
           maxWidth: '100%',
@@ -62,9 +127,11 @@ const Leaf = (props: {
           opacity: '0.333',
           userSelect: 'none',
           textDecoration: 'none',
+          // Fixes https://github.com/udecode/plate/issues/2315
+          WebkitUserModify: IS_WEBKIT ? 'inherit' : undefined,
         },
         contentEditable: false,
-        ref: placeholderRef,
+        ref: callbackPlaceholderRef,
       },
     }
 

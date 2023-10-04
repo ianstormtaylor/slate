@@ -18,7 +18,7 @@ Before creating Slate, I tried a lot of the other rich text libraries out there�
 - **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
 - **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
 - **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you had to learn a whole new system with new "gotchas".
-- **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use to for a realtime, collaborative editing use case without basically rewriting the editor.
+- **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use for a realtime, collaborative editing use case without basically rewriting the editor.
 - **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
 - **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
 
@@ -51,7 +51,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Plain text**](https://www.slatejs.org/examples/plaintext) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](https://www.slatejs.org/examples/richtext) — showing the features you'd expect from a basic editor.
 - [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://www.slatejs.org/examples/links) — showing how to wrap text in inline nodes with associated data.
+- [**Inlines**](https://www.slatejs.org/examples/inlines) — showing how to wrap text in inline nodes with associated data.
 - [**Images**](https://www.slatejs.org/examples/images) — showing how to use void \(text-less\) nodes to add images.
 - [**Hovering toolbar**](https://www.slatejs.org/examples/hovering-toolbar) — showing how a contextual hovering menu can be implemented.
 - [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.

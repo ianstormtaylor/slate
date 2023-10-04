@@ -1,0 +1,61 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "firefox",
+      "request": "launch",
+      "reAttach": true,
+      "name": "Debug in Firefox",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "!**/node_modules/**"
+      ],
+      "pathMappings": [
+        {
+          "url": "webpack://_n_e/src/interfaces",
+          "path": "${workspaceFolder}/packages/slate/src/interfaces"
+        },
+        {
+          "url": "webpack://_n_e/src/transforms",
+          "path": "${workspaceFolder}/packages/slate/src/transforms"
+        },
+        {
+          "url": "webpack://_n_e/src/utils",
+          "path": "${workspaceFolder}/packages/slate/src/utils"
+        },
+        {
+          "url": "webpack://_n_e/src/components",
+          "path": "${workspaceFolder}/packages/slate-react/src/components"
+        },
+        {
+          "url": "webpack://_n_e/src/hooks",
+          "path": "${workspaceFolder}/packages/slate-react/src/hooks"
+        },
+        {
+          "url": "webpack://_n_e/src/plugin",
+          "path": "${workspaceFolder}/packages/slate-react/src/plugin"
+        },
+        {
+          "url": "webpack://_n_e/src/utils",
+          "path": "${workspaceFolder}/packages/slate-react/src/utils"
+        }
+      ]
+    },
+    {
+      "type": "pwa-chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}",
+      "outFiles": [
+        "${workspaceFolder}/packages/*/dist/**/*.js",
+        "!**/node_modules/**"
+      ]
+    }
+  ]
+}

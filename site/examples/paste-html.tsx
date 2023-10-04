@@ -1,8 +1,8 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { jsx } from 'slate-hyperscript'
 import { Transforms, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import {
   Slate,
   Editable,
@@ -84,7 +84,6 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
@@ -92,7 +91,7 @@ const PasteHtmlExample = () => {
     []
   )
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         renderLeaf={renderLeaf}
@@ -226,7 +225,7 @@ const initialValue: Descendant[] = [
       { text: "'text/plain'", code: true },
       {
         text:
-          " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintaing its formatting. To do this, your editor needs to handle ",
+          " data. That's okay for some use cases, but sometimes you want users to be able to paste in content and have it maintain its formatting. To do this, your editor needs to handle ",
       },
       { text: "'text/html'", code: true },
       { text: ' data. ' },

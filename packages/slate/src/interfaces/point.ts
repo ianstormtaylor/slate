@@ -1,6 +1,7 @@
 import { isPlainObject } from 'is-plain-object'
 import { produce } from 'immer'
 import { ExtendedType, Operation, Path } from '..'
+import { TextDirection } from '../types/types'
 
 /**
  * `Point` objects refer to a specific location in a text node in a Slate
@@ -16,25 +17,49 @@ export interface BasePoint {
 
 export type Point = ExtendedType<'Point', BasePoint>
 
-export interface PointInterface {
-  compare: (point: Point, another: Point) => -1 | 0 | 1
-  isAfter: (point: Point, another: Point) => boolean
-  isBefore: (point: Point, another: Point) => boolean
-  equals: (point: Point, another: Point) => boolean
-  isPoint: (value: any) => value is Point
-  transform: (
-    point: Point,
-    op: Operation,
-    options?: { affinity?: 'forward' | 'backward' | null }
-  ) => Point | null
+export interface PointTransformOptions {
+  affinity?: TextDirection | null
 }
 
-export const Point: PointInterface = {
+export interface PointInterface {
   /**
    * Compare a point to another, returning an integer indicating whether the
    * point was before, at, or after the other.
    */
+  compare: (point: Point, another: Point) => -1 | 0 | 1
 
+  /**
+   * Check if a point is after another.
+   */
+  isAfter: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a point is before another.
+   */
+  isBefore: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a point is exactly equal to another.
+   */
+  equals: (point: Point, another: Point) => boolean
+
+  /**
+   * Check if a value implements the `Point` interface.
+   */
+  isPoint: (value: any) => value is Point
+
+  /**
+   * Transform a point by an operation.
+   */
+  transform: (
+    point: Point,
+    op: Operation,
+    options?: PointTransformOptions
+  ) => Point | null
+}
+
+// eslint-disable-next-line no-redeclare
+export const Point: PointInterface = {
   compare(point: Point, another: Point): -1 | 0 | 1 {
     const result = Path.compare(point.path, another.path)
 
@@ -47,25 +72,13 @@ export const Point: PointInterface = {
     return result
   },
 
-  /**
-   * Check if a point is after another.
-   */
-
   isAfter(point: Point, another: Point): boolean {
     return Point.compare(point, another) === 1
   },
 
-  /**
-   * Check if a point is before another.
-   */
-
   isBefore(point: Point, another: Point): boolean {
     return Point.compare(point, another) === -1
   },
-
-  /**
-   * Check if a point is exactly equal to another.
-   */
 
   equals(point: Point, another: Point): boolean {
     // PERF: ensure the offsets are equal first since they are cheaper to check.
@@ -73,10 +86,6 @@ export const Point: PointInterface = {
       point.offset === another.offset && Path.equals(point.path, another.path)
     )
   },
-
-  /**
-   * Check if a value implements the `Point` interface.
-   */
 
   isPoint(value: any): value is Point {
     return (
@@ -86,14 +95,10 @@ export const Point: PointInterface = {
     )
   },
 
-  /**
-   * Transform a point by an operation.
-   */
-
   transform(
     point: Point | null,
     op: Operation,
-    options: { affinity?: 'forward' | 'backward' | null } = {}
+    options: PointTransformOptions = {}
   ): Point | null {
     return produce(point, p => {
       if (p === null) {
@@ -110,7 +115,11 @@ export const Point: PointInterface = {
         }
 
         case 'insert_text': {
-          if (Path.equals(op.path, path) && op.offset <= offset) {
+          if (
+            Path.equals(op.path, path) &&
+            (op.offset < offset ||
+              (op.offset === offset && affinity === 'forward'))
+          ) {
             p.offset += op.text.length
           }
 

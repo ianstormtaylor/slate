@@ -12,14 +12,18 @@ export const input = [
     deleteForward() {},
     deleteFragment() {},
     insertBreak() {},
+    insertSoftBreak() {},
     insertFragment() {},
     insertNode() {},
     insertText() {},
+    isElementReadOnly() {},
     isInline() {},
+    isSelectable() {},
     isVoid() {},
     normalizeNode() {},
     onChange() {},
     removeMark() {},
+    getDirtyPaths() {},
   },
 ]
 export const test = value => {

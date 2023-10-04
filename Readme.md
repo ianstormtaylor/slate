@@ -26,8 +26,8 @@
   <a href="https://unpkg.com/slate/dist/slate.min.js">
     <img src="http://img.badgesize.io/https://unpkg.com/slate/dist/slate.min.js?compression=gzip&amp;label=size">
   </a>
-  <a href="https://slate-slack.herokuapp.com">
-    <img src="https://slate-slack.herokuapp.com/badge.svg">
+  <a href="https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw">
+    <img src="https://img.shields.io/badge/slack-slate--js-brightgreen.svg?logo=slack">
   </a>
   <a href="./packages/slate/package.json">
     <img src="https://img.shields.io/npm/v/slate.svg?maxAge=3600&label=version&colorB=007ec6">
@@ -106,7 +106,7 @@ To get a sense for how you might use Slate, check out a few of the examples:
 - [**Plain text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/plaintext.tsx) — showing the most basic case: a glorified `<textarea>`.
 - [**Rich text**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/richtext.tsx) — showing the features you'd expect from a basic editor.
 - [**Markdown preview**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/markdown-preview.tsx) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Links**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/links.tsx) — showing how wrap text in inline nodes with associated data.
+- [**Inlines**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/inlines.tsx) — showing how wrap text in inline nodes with associated data.
 - [**Images**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/images.tsx) — showing how to use void (text-less) nodes to add images.
 - [**Hovering toolbar**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/hovering-toolbar.tsx) — showing how a hovering toolbar can be implemented.
 - [**Tables**](https://github.com/ianstormtaylor/slate/tree/main/site/examples/tables.tsx) — showing how to nest blocks to render more advanced components.

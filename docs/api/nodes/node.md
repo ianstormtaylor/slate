@@ -15,7 +15,7 @@ Get the node at a specific `path`, asserting that it is an ancestor node. If the
 
 #### `Node.ancestors(root: Node, path: Path, options?) => Generator<NodeEntry<Ancestor>>`
 
-Return a generator of all the ancestor nodes above a specific path. By default, the order is bottom-up, from lowest to highest ancestor in the tree, but you can pass the `reverse: true` option to go top-down.
+Return a generator of all the ancestor nodes above a specific path. By default, the order is top-down, from highest to lowest ancestor in the tree, but you can pass the `reverse: true` option to go bottom-up.
 
 Options: `{reverse?: boolean}`
 
@@ -31,7 +31,9 @@ Options: `{reverse?: boolean}`
 
 #### `Node.common(root: Node, path: Path, another: Path) => NodeEntry`
 
-Get an entry for the common ancestor node of two paths.
+Get an entry for the common ancestor node of two paths. It might be a Text node, an Element, or the Editor itself.
+
+For the common block ancestor, see [Editor Selection](https://docs.slatejs.org/concepts/03-locations#selection)
 
 #### `Node.descendant(root: Node, path: Path) => Descendant`
 
@@ -71,7 +73,7 @@ Get the node at a specific `path`, ensuring it's a leaf text node. If the node i
 
 #### `Node.levels(root: Node, path: Path, options?) => Generator<NodeEntry>`
 
-Return a generator of the nodes in a branch of the tree, from a specific `path`. By default, the order is top-down, from the lowest to the highest node in the tree, but you can pass the `reverse: true` option to go bottom-up.
+Return a generator of the nodes in a branch of the tree, from a specific `path`. By default, the order is top-down, from the highest to the lowest node in the tree, but you can pass the `reverse: true` option to go bottom-up.
 
 Options: `{reverse?: boolean}`
 

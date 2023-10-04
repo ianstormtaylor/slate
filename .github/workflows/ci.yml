@@ -4,6 +4,9 @@ on:
   - push
   - pull_request
 
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
 jobs:
   ci:
     name: ${{ matrix.command }}
@@ -23,8 +26,9 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 12
+          node-version: 18.x
           cache: yarn
+          key: node18
 
       - name: Run ${{ matrix.command }}
         run: yarn && yarn build && yarn ${{ matrix.command }}

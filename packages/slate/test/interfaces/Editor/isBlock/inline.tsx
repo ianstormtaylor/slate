@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from 'slate'
+import { Editor, Element } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -11,6 +11,6 @@ export const input = (
 )
 export const test = editor => {
   const inline = editor.children[0].children[1]
-  return Editor.isBlock(editor, inline)
+  return Element.isElement(inline) && Editor.isBlock(editor, inline)
 }
 export const output = false

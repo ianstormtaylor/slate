@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback } from 'react'
 import {
   Slate,
   Editable,
@@ -16,7 +16,7 @@ import {
   Descendant,
   Element as SlateElement,
 } from 'slate'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
 
 const initialValue: Descendant[] = [
@@ -66,7 +66,6 @@ const initialValue: Descendant[] = [
 ]
 
 const CheckListsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
@@ -74,7 +73,7 @@ const CheckListsExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         placeholder="Get to work…"

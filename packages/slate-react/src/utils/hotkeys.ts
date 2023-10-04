@@ -1,4 +1,4 @@
-import { isKeyHotkey } from 'is-hotkey'
+import { isHotkey } from 'is-hotkey'
 import { IS_APPLE } from './environment'
 
 /**
@@ -17,7 +17,8 @@ const HOTKEYS = {
   extendBackward: 'shift+left',
   extendForward: 'shift+right',
   italic: 'mod+i',
-  splitBlock: 'shift?+enter',
+  insertSoftBreak: 'shift+enter',
+  splitBlock: 'enter',
   undo: 'mod+z',
 }
 
@@ -52,9 +53,9 @@ const create = (key: string) => {
   const generic = HOTKEYS[key]
   const apple = APPLE_HOTKEYS[key]
   const windows = WINDOWS_HOTKEYS[key]
-  const isGeneric = generic && isKeyHotkey(generic)
-  const isApple = apple && isKeyHotkey(apple)
-  const isWindows = windows && isKeyHotkey(windows)
+  const isGeneric = generic && isHotkey(generic)
+  const isApple = apple && isHotkey(apple)
+  const isWindows = windows && isHotkey(windows)
 
   return (event: KeyboardEvent) => {
     if (isGeneric && isGeneric(event)) return true
@@ -89,6 +90,7 @@ export default {
   isMoveWordBackward: create('moveWordBackward'),
   isMoveWordForward: create('moveWordForward'),
   isRedo: create('redo'),
+  isSoftBreak: create('insertSoftBreak'),
   isSplitBlock: create('splitBlock'),
   isTransposeCharacter: create('transposeCharacter'),
   isUndo: create('undo'),

@@ -15,7 +15,6 @@ const HOTKEYS = {
 }
 
 const IFrameExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(
     ({ attributes, children }) => <p {...attributes}>{children}</p>,
     []
@@ -26,7 +25,7 @@ const IFrameExample = () => {
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
@@ -105,14 +104,13 @@ const MarkButton = ({ format, icon }) => {
 }
 
 const IFrame = ({ children, ...props }) => {
-  const [contentRef, setContentRef] = useState(null)
-  const mountNode =
-    contentRef &&
-    contentRef.contentWindow &&
-    contentRef.contentWindow.document.body
+  const [iframeBody, setIframeBody] = useState(null)
+  const handleLoad = e => {
+    setIframeBody(e.target.contentDocument.body)
+  }
   return (
-    <iframe {...props} ref={setContentRef}>
-      {mountNode && createPortal(React.Children.only(children), mountNode)}
+    <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>
+      {iframeBody && createPortal(children, iframeBody)}
     </iframe>
   )
 }

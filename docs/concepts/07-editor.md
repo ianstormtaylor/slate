@@ -12,8 +12,9 @@ interface Editor {
   // Schema-specific node behaviors.
   isInline: (element: Element) => boolean
   isVoid: (element: Element) => boolean
+  markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  onChange: (options?: { operation?: Operation }) => void
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
   apply: (operation: Operation) => void
@@ -21,6 +22,7 @@ interface Editor {
   deleteForward: (unit: 'character' | 'word' | 'line' | 'block') => void
   deleteFragment: () => void
   insertBreak: () => void
+  insertSoftBreak: () => void
   insertFragment: (fragment: Node[]) => void
   insertNode: (node: Node) => void
   insertText: (text: string) => void
@@ -33,7 +35,7 @@ It is slightly more complex than the others, because it contains all of the top-
 The `children` property contains the document tree of nodes that make up the editor's content.
 
 The `selection` property contains the user's current selection, if any.
-Don't set it directly; use [Transforms.select](04-transforms#selection-transforms)
+Don't set it directly; use [Transforms.select](04-transforms.md#selection-transforms)
 
 The `operations` property contains all of the operations that have been applied since the last "change" was flushed. \(Since Slate batches operations up into ticks of the event loop.\)
 
@@ -66,6 +68,20 @@ editor.insertText = text => {
   }
 
   insertText(text)
+}
+```
+
+If you have void "mention" elements that can accept marks like bold or italic:
+
+```javascript
+const { isVoid, markableVoid } = editor
+
+editor.isVoid = element => {
+  return element.type === 'mention' ? true : isVoid(element)
+}
+
+editor.markableVoid = element => {
+  return element.type === 'mention' || markableVoid(element)
 }
 ```
 

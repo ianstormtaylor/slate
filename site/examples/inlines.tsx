@@ -1,7 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import isUrl from 'is-url'
 import { isKeyHotkey } from 'is-hotkey'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import { Editable, withReact, useSlate, useSelected } from 'slate-react'
 import * as SlateReact from 'slate-react'
 import {
@@ -38,7 +38,14 @@ const initialValue: Descendant[] = [
         children: [{ text: 'editable button' }],
       },
       {
-        text: '!',
+        text: '! Here is a read-only inline: ',
+      },
+      {
+        type: 'badge',
+        children: [{ text: 'Approved' }],
+      },
+      {
+        text: '.',
       },
     ],
   },
@@ -47,13 +54,20 @@ const initialValue: Descendant[] = [
     children: [
       {
         text:
-          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected.',
+          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
       },
+      // The following is an example of an inline at the end of a block.
+      // This is an edge case that can cause issues.
+      {
+        type: 'link',
+        url: 'https://twitter.com/JustMissEmma/status/1448679899531726852',
+        children: [{ text: 'Finally, here is our favorite dog video.' }],
+      },
+      { text: '' },
     ],
   },
 ]
 const InlinesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withInlines(withHistory(withReact(createEditor()))),
     []
@@ -84,11 +98,7 @@ const InlinesExample = () => {
   }
 
   return (
-    <SlateReact.Slate
-      editor={editor}
-      value={value}
-      onChange={value => setValue(value)}
-    >
+    <SlateReact.Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <AddLinkButton />
         <RemoveLinkButton />
@@ -96,6 +106,7 @@ const InlinesExample = () => {
       </Toolbar>
       <Editable
         renderElement={props => <Element {...props} />}
+        renderLeaf={props => <Text {...props} />}
         placeholder="Enter some text..."
         onKeyDown={onKeyDown}
       />
@@ -104,10 +115,22 @@ const InlinesExample = () => {
 }
 
 const withInlines = editor => {
-  const { insertData, insertText, isInline } = editor
+  const {
+    insertData,
+    insertText,
+    isInline,
+    isElementReadOnly,
+    isSelectable,
+  } = editor
 
   editor.isInline = element =>
-    ['link', 'button'].includes(element.type) || isInline(element)
+    ['link', 'button', 'badge'].includes(element.type) || isInline(element)
+
+  editor.isElementReadOnly = element =>
+    element.type === 'badge' || isElementReadOnly(element)
+
+  editor.isSelectable = element =>
+    element.type !== 'badge' && isSelectable(element)
 
   editor.insertText = text => {
     if (text && isUrl(text)) {
@@ -222,7 +245,7 @@ const InlineChromiumBugfix = () => (
       font-size: 0;
     `}
   >
-    ${String.fromCodePoint(160) /* Non-breaking space */}
+    {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 )
 
@@ -279,6 +302,30 @@ const EditableButtonComponent = ({ attributes, children }) => {
   )
 }
 
+const BadgeComponent = ({ attributes, children, element }) => {
+  const selected = useSelected()
+
+  return (
+    <span
+      {...attributes}
+      contentEditable={false}
+      className={css`
+        background-color: green;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 0.9em;
+        ${selected && 'box-shadow: 0 0 0 3px #ddd;'}
+      `}
+      data-playwright-selected={selected}
+    >
+      <InlineChromiumBugfix />
+      {children}
+      <InlineChromiumBugfix />
+    </span>
+  )
+}
+
 const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
@@ -286,9 +333,34 @@ const Element = props => {
       return <LinkComponent {...props} />
     case 'button':
       return <EditableButtonComponent {...props} />
+    case 'badge':
+      return <BadgeComponent {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }
+}
+
+const Text = props => {
+  const { attributes, children, leaf } = props
+  return (
+    <span
+      // The following is a workaround for a Chromium bug where,
+      // if you have an inline at the end of a block,
+      // clicking the end of a block puts the cursor inside the inline
+      // instead of inside the final {text: ''} node
+      // https://github.com/ianstormtaylor/slate/issues/4704#issuecomment-1006696364
+      className={
+        leaf.text === ''
+          ? css`
+              padding-left: 0.1px;
+            `
+          : null
+      }
+      {...attributes}
+    >
+      {children}
+    </span>
+  )
 }
 
 const AddLinkButton = () => {

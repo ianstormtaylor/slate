@@ -28,7 +28,7 @@ interface NodeOptions {
 
 - The `mode` option also filters the set of nodes.
 
-- When `voids` is false, [void Elements](./nodes/editor#schema-specific-instance-methods-to-override) are filtered out.
+- When `voids` is false, [void Elements](./nodes/editor.md#schema-specific-instance-methods-to-override) are filtered out.
 
 ## Static methods
 
@@ -38,15 +38,25 @@ Transforms that operate on nodes.
 
 #### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
 
-Insert of fragment of nodes at the specified location in the document. If no location is specified, insert at the current selection.
+Insert of fragment of nodes at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
-Insert `nodes` at the specified location in the document. If no location is specified, insert at the current selection. If there is no selection, insert at the end of the document.
+Atomically inserts `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
+
+For example, to insert at the very end, without replacing the current selection and regardless of block nesting, use
+
+```javascript
+Transforms.insertNodes(
+  editor,
+  { type: targetType, children: [{ text: '' }] },
+  { at: [editor.children.length] }
+)
+```
 
 #### `Transforms.removeNodes(editor: Editor, options?)`
 
@@ -91,7 +101,7 @@ Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `op
 
 Unset properties of nodes at the specified location. If no location is specified, use the selection.
 
-Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'` is also supported.
+Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.liftNodes(editor: Editor, options?)`
 
@@ -160,7 +170,7 @@ Options: `{at?: Location, distance?: number, unit?: 'character' | 'word' | 'line
 
 #### `Transforms.insertText(editor: Editor, text: string, options?)`
 
-Insert a string of text at the specified location in the document. If no location is specified, insert at the current selection.
+Insert a string of text at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, voids?: boolean}`
 

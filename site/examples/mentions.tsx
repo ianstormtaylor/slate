@@ -15,11 +15,11 @@ import { MentionElement } from './custom-types'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(
     () => withMentions(withReact(withHistory(createEditor()))),
     []
@@ -31,7 +31,7 @@ const MentionExample = () => {
 
   const onKeyDown = useCallback(
     event => {
-      if (target) {
+      if (target && chars.length > 0) {
         switch (event.key) {
           case 'ArrowDown':
             event.preventDefault()
@@ -57,7 +57,7 @@ const MentionExample = () => {
         }
       }
     },
-    [index, search, target]
+    [chars, editor, index, target]
   )
 
   useEffect(() => {
@@ -73,9 +73,8 @@ const MentionExample = () => {
   return (
     <Slate
       editor={editor}
-      value={value}
-      onChange={value => {
-        setValue(value)
+      initialValue={initialValue}
+      onChange={() => {
         const { selection } = editor
 
         if (selection && Range.isCollapsed(selection)) {
@@ -103,6 +102,7 @@ const MentionExample = () => {
     >
       <Editable
         renderElement={renderElement}
+        renderLeaf={renderLeaf}
         onKeyDown={onKeyDown}
         placeholder="Enter some text..."
       />
@@ -125,6 +125,11 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
+                onClick={() => {
+                  Transforms.select(editor, target)
+                  insertMention(editor, char)
+                  setTarget(null)
+                }}
                 style={{
                   padding: '1px 3px',
                   borderRadius: '3px',
@@ -142,7 +147,7 @@ const MentionExample = () => {
 }
 
 const withMentions = editor => {
-  const { isInline, isVoid } = editor
+  const { isInline, isVoid, markableVoid } = editor
 
   editor.isInline = element => {
     return element.type === 'mention' ? true : isInline(element)
@@ -150,6 +155,10 @@ const withMentions = editor => {
 
   editor.isVoid = element => {
     return element.type === 'mention' ? true : isVoid(element)
+  }
+
+  editor.markableVoid = element => {
+    return element.type === 'mention' || markableVoid(element)
   }
 
   return editor
@@ -165,6 +174,28 @@ const insertMention = (editor, character) => {
   Transforms.move(editor)
 }
 
+// Borrow Leaf renderer from the Rich Text example.
+// In a real project you would get this via `withRichText(editor)` or similar.
+const Leaf = ({ attributes, children, leaf }) => {
+  if (leaf.bold) {
+    children = <strong>{children}</strong>
+  }
+
+  if (leaf.code) {
+    children = <code>{children}</code>
+  }
+
+  if (leaf.italic) {
+    children = <em>{children}</em>
+  }
+
+  if (leaf.underline) {
+    children = <u>{children}</u>
+  }
+
+  return <span {...attributes}>{children}</span>
+}
+
 const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
@@ -178,21 +209,29 @@ const Element = props => {
 const Mention = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
+  const style: React.CSSProperties = {
+    padding: '3px 3px 2px',
+    margin: '0 1px',
+    verticalAlign: 'baseline',
+    display: 'inline-block',
+    borderRadius: '4px',
+    backgroundColor: '#eee',
+    fontSize: '0.9em',
+    boxShadow: selected && focused ? '0 0 0 2px #B4D5FF' : 'none',
+  }
+  // See if our empty text child has any styling marks applied and apply those
+  if (element.children[0].bold) {
+    style.fontWeight = 'bold'
+  }
+  if (element.children[0].italic) {
+    style.fontStyle = 'italic'
+  }
   return (
     <span
       {...attributes}
       contentEditable={false}
       data-cy={`mention-${element.character.replace(' ', '-')}`}
-      style={{
-        padding: '3px 3px 2px',
-        margin: '0 1px',
-        verticalAlign: 'baseline',
-        display: 'inline-block',
-        borderRadius: '4px',
-        backgroundColor: '#eee',
-        fontSize: '0.9em',
-        boxShadow: selected && focused ? '0 0 0 2px #B4D5FF' : 'none',
-      }}
+      style={style}
     >
       @{element.character}
       {children}
@@ -205,8 +244,29 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
+        text: 'This example shows how you might implement a simple ',
+      },
+      {
+        text: '@-mentions',
+        bold: true,
+      },
+      {
         text:
-          'This example shows how you might implement a simple @-mentions feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The mentions are rendered as void inline elements inside the document.',
+          ' feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The ',
+      },
+      {
+        text: 'mentions',
+        bold: true,
+      },
+      {
+        text: ' are rendered as ',
+      },
+      {
+        text: 'void inline elements',
+        code: true,
+      },
+      {
+        text: ' inside the document.',
       },
     ],
   },
@@ -217,7 +277,7 @@ const initialValue: Descendant[] = [
       {
         type: 'mention',
         character: 'R2-D2',
-        children: [{ text: '' }],
+        children: [{ text: '', bold: true }],
       },
       { text: ' or ' },
       {

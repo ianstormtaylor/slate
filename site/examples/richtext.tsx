@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
 import { Editable, withReact, useSlate, Slate } from 'slate-react'
 import {
@@ -20,15 +20,15 @@ const HOTKEYS = {
 }
 
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
+const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
 
 const RichTextExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
@@ -39,6 +39,10 @@ const RichTextExample = () => {
         <BlockButton format="block-quote" icon="format_quote" />
         <BlockButton format="numbered-list" icon="format_list_numbered" />
         <BlockButton format="bulleted-list" icon="format_list_bulleted" />
+        <BlockButton format="left" icon="format_align_left" />
+        <BlockButton format="center" icon="format_align_center" />
+        <BlockButton format="right" icon="format_align_right" />
+        <BlockButton format="justify" icon="format_align_justify" />
       </Toolbar>
       <Editable
         renderElement={renderElement}
@@ -61,18 +65,30 @@ const RichTextExample = () => {
 }
 
 const toggleBlock = (editor, format) => {
-  const isActive = isBlockActive(editor, format)
+  const isActive = isBlockActive(
+    editor,
+    format,
+    TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+  )
   const isList = LIST_TYPES.includes(format)
 
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type),
+      LIST_TYPES.includes(n.type) &&
+      !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   })
-  const newProperties: Partial<SlateElement> = {
-    type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+  let newProperties: Partial<SlateElement>
+  if (TEXT_ALIGN_TYPES.includes(format)) {
+    newProperties = {
+      align: isActive ? undefined : format,
+    }
+  } else {
+    newProperties = {
+      type: isActive ? 'paragraph' : isList ? 'list-item' : format,
+    }
   }
   Transforms.setNodes<SlateElement>(editor, newProperties)
 
@@ -92,15 +108,19 @@ const toggleMark = (editor, format) => {
   }
 }
 
-const isBlockActive = (editor, format) => {
+const isBlockActive = (editor, format, blockType = 'type') => {
   const { selection } = editor
   if (!selection) return false
 
-  const [match] = Editor.nodes(editor, {
-    at: Editor.unhangRange(editor, selection),
-    match: n =>
-      !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === format,
-  })
+  const [match] = Array.from(
+    Editor.nodes(editor, {
+      at: Editor.unhangRange(editor, selection),
+      match: n =>
+        !Editor.isEditor(n) &&
+        SlateElement.isElement(n) &&
+        n[blockType] === format,
+    })
+  )
 
   return !!match
 }
@@ -111,21 +131,50 @@ const isMarkActive = (editor, format) => {
 }
 
 const Element = ({ attributes, children, element }) => {
+  const style = { textAlign: element.align }
   switch (element.type) {
     case 'block-quote':
-      return <blockquote {...attributes}>{children}</blockquote>
+      return (
+        <blockquote style={style} {...attributes}>
+          {children}
+        </blockquote>
+      )
     case 'bulleted-list':
-      return <ul {...attributes}>{children}</ul>
+      return (
+        <ul style={style} {...attributes}>
+          {children}
+        </ul>
+      )
     case 'heading-one':
-      return <h1 {...attributes}>{children}</h1>
+      return (
+        <h1 style={style} {...attributes}>
+          {children}
+        </h1>
+      )
     case 'heading-two':
-      return <h2 {...attributes}>{children}</h2>
+      return (
+        <h2 style={style} {...attributes}>
+          {children}
+        </h2>
+      )
     case 'list-item':
-      return <li {...attributes}>{children}</li>
+      return (
+        <li style={style} {...attributes}>
+          {children}
+        </li>
+      )
     case 'numbered-list':
-      return <ol {...attributes}>{children}</ol>
+      return (
+        <ol style={style} {...attributes}>
+          {children}
+        </ol>
+      )
     default:
-      return <p {...attributes}>{children}</p>
+      return (
+        <p style={style} {...attributes}>
+          {children}
+        </p>
+      )
   }
 }
 
@@ -153,7 +202,11 @@ const BlockButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
-      active={isBlockActive(editor, format)}
+      active={isBlockActive(
+        editor,
+        format,
+        TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+      )}
       onMouseDown={event => {
         event.preventDefault()
         toggleBlock(editor, format)
@@ -212,6 +265,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'paragraph',
+    align: 'center',
     children: [{ text: 'Try it out for yourself!' }],
   },
 ]

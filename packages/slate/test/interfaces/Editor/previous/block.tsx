@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from 'slate'
+import { Editor, Element } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -11,7 +11,7 @@ export const input = (
 export const test = editor => {
   return Editor.previous(editor, {
     at: [1],
-    match: n => Editor.isBlock(editor, n),
+    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
   })
 }
 export const output = [<block>one</block>, [0]]

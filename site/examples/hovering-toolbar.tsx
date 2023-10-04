@@ -1,38 +1,38 @@
-import React, { useState, useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, ReactEditor, withReact, useSlate } from 'slate-react'
+import React, { useMemo, useRef, useEffect } from 'react'
+import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
 import {
   Editor,
   Transforms,
   Text,
   createEditor,
-  Element,
   Descendant,
   Range,
 } from 'slate'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
 
 import { Button, Icon, Menu, Portal } from '../components'
 
 const HoveringMenuExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}
         placeholder="Enter some text..."
         onDOMBeforeInput={(event: InputEvent) => {
-          event.preventDefault()
           switch (event.inputType) {
             case 'formatBold':
-              return toggleFormat(editor, 'bold')
+              event.preventDefault()
+              return toggleMark(editor, 'bold')
             case 'formatItalic':
-              return toggleFormat(editor, 'italic')
+              event.preventDefault()
+              return toggleMark(editor, 'italic')
             case 'formatUnderline':
-              return toggleFormat(editor, 'underlined')
+              event.preventDefault()
+              return toggleMark(editor, 'underlined')
           }
         }}
       />
@@ -40,21 +40,19 @@ const HoveringMenuExample = () => {
   )
 }
 
-const toggleFormat = (editor, format) => {
-  const isActive = isFormatActive(editor, format)
-  Transforms.setNodes(
-    editor,
-    { [format]: isActive ? null : true },
-    { match: Text.isText, split: true }
-  )
+const toggleMark = (editor, format) => {
+  const isActive = isMarkActive(editor, format)
+
+  if (isActive) {
+    Editor.removeMark(editor, format)
+  } else {
+    Editor.addMark(editor, format, true)
+  }
 }
 
-const isFormatActive = (editor, format) => {
-  const [match] = Editor.nodes(editor, {
-    match: n => n[format] === true,
-    mode: 'all',
-  })
-  return !!match
+const isMarkActive = (editor, format) => {
+  const marks = Editor.marks(editor)
+  return marks ? marks[format] === true : false
 }
 
 const Leaf = ({ attributes, children, leaf }) => {
@@ -76,6 +74,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 const HoveringToolbar = () => {
   const ref = useRef<HTMLDivElement | null>()
   const editor = useSlate()
+  const inFocus = useFocused()
 
   useEffect(() => {
     const el = ref.current
@@ -87,7 +86,7 @@ const HoveringToolbar = () => {
 
     if (
       !selection ||
-      !ReactEditor.isFocused(editor) ||
+      !inFocus ||
       Range.isCollapsed(selection) ||
       Editor.string(editor, selection) === ''
     ) {
@@ -122,6 +121,10 @@ const HoveringToolbar = () => {
           border-radius: 4px;
           transition: opacity 0.75s;
         `}
+        onMouseDown={e => {
+          // prevent toolbar from taking focus away from editor
+          e.preventDefault()
+        }}
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
@@ -136,11 +139,8 @@ const FormatButton = ({ format, icon }) => {
   return (
     <Button
       reversed
-      active={isFormatActive(editor, format)}
-      onMouseDown={event => {
-        event.preventDefault()
-        toggleFormat(editor, format)
-      }}
+      active={isMarkActive(editor, format)}
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>

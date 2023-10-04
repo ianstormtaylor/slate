@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import isHotkey from 'is-hotkey'
 import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
@@ -12,24 +13,29 @@ import {
   ReactEditor,
 } from 'slate-react'
 import { withHistory } from 'slate-history'
-import { css } from 'emotion'
+import { css } from '@emotion/css'
 
 import { Button, Icon, Toolbar } from '../components'
 import { ImageElement } from './custom-types'
 
 const ImagesExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
 
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <InsertImageButton />
       </Toolbar>
       <Editable
+        onKeyDown={event => {
+          if (isHotkey('mod+a', event)) {
+            event.preventDefault()
+            Transforms.select(editor, [])
+          }
+        }}
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
@@ -142,7 +148,7 @@ const InsertImageButton = () => {
           alert('URL is not an image')
           return
         }
-        insertImage(editor, url)
+        url && insertImage(editor, url)
       }}
     >
       <Icon>image</Icon>

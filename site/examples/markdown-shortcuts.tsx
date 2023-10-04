@@ -1,15 +1,16 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
+import React, { useCallback, useMemo } from 'react'
 import {
-  Editor,
-  Transforms,
-  Range,
-  Point,
   createEditor,
-  Element as SlateElement,
   Descendant,
+  Editor,
+  Element as SlateElement,
+  Node as SlateNode,
+  Point,
+  Range,
+  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
 import { BulletedListElement } from './custom-types'
 
 const SHORTCUTS = {
@@ -26,15 +27,52 @@ const SHORTCUTS = {
 }
 
 const MarkdownShortcutsExample = () => {
-  const [value, setValue] = useState<Descendant[]>(initialValue)
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))),
     []
   )
+
+  const handleDOMBeforeInput = useCallback(
+    (e: InputEvent) => {
+      queueMicrotask(() => {
+        const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+
+        const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
+          if (!diff.text.endsWith(' ')) {
+            return false
+          }
+
+          const { text } = SlateNode.leaf(editor, path)
+          const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+          if (!(beforeText in SHORTCUTS)) {
+            return
+          }
+
+          const blockEntry = Editor.above(editor, {
+            at: path,
+            match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+          })
+          if (!blockEntry) {
+            return false
+          }
+
+          const [, blockPath] = blockEntry
+          return Editor.isStart(editor, Editor.start(editor, path), blockPath)
+        })
+
+        if (scheduleFlush) {
+          ReactEditor.androidScheduleFlush(editor)
+        }
+      })
+    },
+    [editor]
+  )
+
   return (
-    <Slate editor={editor} value={value} onChange={value => setValue(value)}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
+        onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
         placeholder="Write some markdown..."
         spellCheck
@@ -50,25 +88,29 @@ const withShortcuts = editor => {
   editor.insertText = text => {
     const { selection } = editor
 
-    if (text === ' ' && selection && Range.isCollapsed(selection)) {
+    if (text.endsWith(' ') && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
       })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
       const range = { anchor, focus: start }
-      const beforeText = Editor.string(editor, range)
+      const beforeText = Editor.string(editor, range) + text.slice(0, -1)
       const type = SHORTCUTS[beforeText]
 
       if (type) {
         Transforms.select(editor, range)
-        Transforms.delete(editor)
+
+        if (!Range.isCollapsed(range)) {
+          Transforms.delete(editor)
+        }
+
         const newProperties: Partial<SlateElement> = {
           type,
         }
         Transforms.setNodes<SlateElement>(editor, newProperties, {
-          match: n => Editor.isBlock(editor, n),
+          match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
         })
 
         if (type === 'list-item') {
@@ -96,7 +138,7 @@ const withShortcuts = editor => {
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
       })
 
       if (match) {
