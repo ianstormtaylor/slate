@@ -2,7 +2,6 @@ import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import React, {
-  ReactElement,
   useCallback,
   useEffect,
   useMemo,
@@ -10,6 +9,7 @@ import React, {
   useRef,
   useState,
 } from 'react'
+import type { JSX } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
   Editor,
@@ -116,9 +116,9 @@ export type EditableProps = {
   readOnly?: boolean
   role?: string
   style?: React.CSSProperties
-  renderElement?: (props: RenderElementProps) => ReactElement
-  renderLeaf?: (props: RenderLeafProps) => ReactElement
-  renderPlaceholder?: (props: RenderPlaceholderProps) => ReactElement
+  renderElement?: (props: RenderElementProps) => JSX.Element
+  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
