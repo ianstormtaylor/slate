@@ -3752,43 +3752,32 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^16.9.20":
-  version: 16.9.20
-  resolution: "@types/react-dom@npm:16.9.20"
+"@types/react-dom@npm:^18.2.13":
+  version: 18.2.13
+  resolution: "@types/react-dom@npm:18.2.13"
   dependencies:
-    "@types/react": ^16
-  checksum: 5ec29cf34842c40fc65d7d98aa17d903a861897716bb5843301ee2bed87aa16b4a0261c25036e825d33bc097d79edd612ceb4a3432de21b646de6373a9c9340f
+    "@types/react": "*"
+  checksum: 22ba066b141dca5a5a9227fae0afc7c94b470fff8e8a38ade72649da57a8ea04d0cb2ba3e22005e7d8e772d49bddd28855b1dd98e6defd033bba6afb6edff883
   languageName: node
   linkType: hard
 
-"@types/react-test-renderer@npm:^16.9.8":
-  version: 16.9.8
-  resolution: "@types/react-test-renderer@npm:16.9.8"
+"@types/react-test-renderer@npm:^18.0.3":
+  version: 18.0.3
+  resolution: "@types/react-test-renderer@npm:18.0.3"
   dependencies:
-    "@types/react": ^16
-  checksum: 7bea1ed246a909baa5556a322fe0289fe60d7ec1bf39e28b0c1e6764c15b1d4aed67630a2505f27741cdd791dc221cfffc8a0707cd87e4cbacece51b9e2945f9
+    "@types/react": "*"
+  checksum: 6834c7c998d9e699b7b9aca31ce0f550a29a63526a9ab15f62764eeade28fcce634030e5cfd223a8417e8c53234e01bfb961906b35fd9a72dd513aba549181f0
   languageName: node
   linkType: hard
 
-"@types/react@npm:^16":
-  version: 16.14.13
-  resolution: "@types/react@npm:16.14.13"
+"@types/react@npm:*, @types/react@npm:^18.2.28":
+  version: 18.2.28
+  resolution: "@types/react@npm:18.2.28"
   dependencies:
     "@types/prop-types": "*"
     "@types/scheduler": "*"
     csstype: ^3.0.2
-  checksum: e611872c09eeb2abfae2de3ebf570065e346be8997c795c5652be0fb0d342c3749b1eabffba61c665f595c40432aff117f9f2079f6d9e7b7cf22d8e0179b21f0
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:^16.14.49":
-  version: 16.14.49
-  resolution: "@types/react@npm:16.14.49"
-  dependencies:
-    "@types/prop-types": "*"
-    "@types/scheduler": "*"
-    csstype: ^3.0.2
-  checksum: 0cc00bd22e8dd926abd5d4d364522ca0509da51f37da04637a0d49e08b30d9e0fa830bb3ca0dfae8cc38d6a9d665761e7641f9add73e8ad886d4d2024a962171
+  checksum: 81381bedeba83278f4c9febb0b83e0bd3f42a25897a50b9cb36ef53651d34b3d50f87ebf11211ea57ea575131f85d31e93e496ce46478a00b0f9bf7b26b5917a
   languageName: node
   linkType: hard
 
@@ -13844,8 +13833,8 @@ resolve@^2.0.0-next.3:
     "@types/mocha": ^5.2.7
     "@types/node": ^16.11.26
     "@types/prismjs": ^1.26.0
-    "@types/react": ^16.14.49
-    "@types/react-dom": ^16.9.20
+    "@types/react": ^18.2.28
+    "@types/react-dom": ^18.2.13
     "@typescript-eslint/eslint-plugin": ^5.30.5
     "@typescript-eslint/parser": ^5.30.5
     babel-eslint: ^10.0.3
@@ -13910,9 +13899,9 @@ resolve@^2.0.0-next.3:
     "@types/jest": ^27.4.1
     "@types/jsdom": ^16.2.14
     "@types/lodash": ^4.14.149
-    "@types/react": ^16.14.49
-    "@types/react-dom": ^16.9.20
-    "@types/react-test-renderer": ^16.9.8
+    "@types/react": ^18.2.28
+    "@types/react-dom": ^18.2.13
+    "@types/react-test-renderer": ^18.0.3
     "@types/resize-observer-browser": ^0.1.7
     direction: ^1.0.3
     is-hotkey: ^0.1.6
@@ -13927,9 +13916,9 @@ resolve@^2.0.0-next.3:
     source-map-loader: ^4.0.0
     tiny-invariant: 1.0.6
   peerDependencies:
-    react: ">=16.8.0"
-    react-dom: ">=16.8.0"
-    slate: ">=0.65.3"
+    react: ">=18.2.0"
+    react-dom: ">=18.2.0"
+    slate: ">=0.99.0"
   languageName: unknown
   linkType: soft
 

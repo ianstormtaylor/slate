@@ -745,7 +745,7 @@ export const Editable = (props: EditableProps) => {
   )
 
   const callbackRef = useCallback(
-    node => {
+    (node: HTMLDivElement | null) => {
       if (node == null) {
         onDOMSelectionChange.cancel()
         scheduleOnDOMSelectionChange.cancel()

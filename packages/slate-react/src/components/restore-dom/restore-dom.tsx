@@ -14,6 +14,7 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
 }
 
 type RestoreDOMProps = {
+  children: any
   receivedUserInput: RefObject<boolean>
   node: RefObject<HTMLDivElement>
 }
