@@ -167,7 +167,7 @@ export const Menu = React.forwardRef(
   )
 )
 
-export const Portal = ({ children }) => {
+export const Portal = ({ children }: {children?: any}) => {
   return typeof document === 'object'
     ? ReactDOM.createPortal(children, document.body)
     : null

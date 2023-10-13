@@ -450,7 +450,7 @@ export const ReactEditor: ReactEditorInterface = {
         : target.parentElement) as HTMLElement
     } catch (err) {
       if (
-        !err.message.includes('Permission denied to access property "nodeType"')
+        (err instanceof Error) && !err.message.includes('Permission denied to access property "nodeType"')
       ) {
         throw err
       }

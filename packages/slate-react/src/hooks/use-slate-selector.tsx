@@ -90,7 +90,11 @@ export function useSlateSelector<T>(
           // is re-rendered, the selectors are called again, and
           // will throw again, if neither props nor store state
           // changed
-          latestSubscriptionCallbackError.current = err
+          if (err instanceof Error) {
+            latestSubscriptionCallbackError.current = err
+          } else {
+            latestSubscriptionCallbackError.current = new Error(String(err));
+          }
         }
 
         forceRender()

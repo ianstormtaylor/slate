@@ -1,5 +1,5 @@
 import getDirection from 'direction'
-import React, { useCallback } from 'react'
+import React, { ReactElement, useCallback } from 'react'
 import { Editor, Element as SlateElement, Node, Range } from 'slate'
 import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'
@@ -26,9 +26,9 @@ import Text from './text'
 const Element = (props: {
   decorations: Range[]
   element: SlateElement
-  renderElement?: (props: RenderElementProps) => JSX.Element
-  renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
-  renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderElement?: (props: RenderElementProps) => ReactElement
+  renderPlaceholder: (props: RenderPlaceholderProps) => ReactElement
+  renderLeaf?: (props: RenderLeafProps) => ReactElement
   selection: Range | null
 }) => {
   const {

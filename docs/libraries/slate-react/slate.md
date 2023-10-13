@@ -1,6 +1,6 @@
 # Slate Component
 
-## `Slate(props: SlateProps): JSX.Element`
+## `Slate(props: SlateProps): ReactElement | null`
 
 The `Slate` component must include somewhere in its `children` the `Editable` component.
 
