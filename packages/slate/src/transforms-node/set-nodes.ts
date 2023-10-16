@@ -81,7 +81,8 @@ export const setNodes: NodeTransforms['setNodes'] = (
       voids,
     })) {
       const properties: Partial<Node> = {}
-      const newProperties: Partial<Node> = {}
+      // FIXME: is this correct?
+      const newProperties: Partial<Node> & { [key: string]: unknown } = {}
 
       // You can't set properties on the editor node.
       if (path.length === 0) {

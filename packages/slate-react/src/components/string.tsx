@@ -20,7 +20,7 @@ const String = (props: {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
   const parentPath = Path.parent(path)
-  const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
+  const isMarkPlaceholder = Boolean(leaf[MARK_PLACEHOLDER_SYMBOL])
 
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
@@ -114,7 +114,11 @@ export const ZeroWidthString = (props: {
 }) => {
   const { length = 0, isLineBreak = false, isMarkPlaceholder = false } = props
 
-  const attributes = {
+  const attributes: {
+    'data-slate-zero-width': string
+    'data-slate-length': number
+    'data-slate-mark-placeholder'?: boolean
+  } = {
     'data-slate-zero-width': isLineBreak ? 'n' : 'z',
     'data-slate-length': length,
   }

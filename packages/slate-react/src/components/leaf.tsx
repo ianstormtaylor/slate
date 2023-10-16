@@ -96,7 +96,7 @@ const Leaf = (props: {
     <String isLast={isLast} leaf={leaf} parent={parent} text={text} />
   )
 
-  const leafIsPlaceholder = leaf[PLACEHOLDER_SYMBOL]
+  const leafIsPlaceholder = Boolean(leaf[PLACEHOLDER_SYMBOL])
   useEffect(() => {
     if (leafIsPlaceholder) {
       if (!showPlaceholderTimeoutRef.current) {
