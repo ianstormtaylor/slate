@@ -88,13 +88,13 @@ export function* nodes<T extends Node>(
 
     // If there's a match and it's lower than the last, update the hit.
     if (mode === 'lowest' && isLower) {
-      hit = [node, path]
+      hit = [node, path] as NodeEntry<T>
       continue
     }
 
     // In lowest mode we emit the last hit, once it's guaranteed lowest.
     const emit: NodeEntry<T> | undefined =
-      mode === 'lowest' ? hit : [node, path]
+      mode === 'lowest' ? hit : ([node, path] as NodeEntry<T>)
 
     if (emit) {
       if (universal) {
@@ -104,7 +104,7 @@ export function* nodes<T extends Node>(
       }
     }
 
-    hit = [node, path]
+    hit = [node, path] as NodeEntry<T>
   }
 
   // Since lowest is always emitting one behind, catch up at the end.
