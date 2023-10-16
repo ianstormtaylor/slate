@@ -99,12 +99,18 @@ export const setNodes: NodeTransforms['setNodes'] = (
         if (compare(props[<keyof Node>k], node[<keyof Node>k])) {
           hasChanges = true
           // Omit new properties from the old properties list
-          if (node.hasOwnProperty(k)) properties[<keyof Node>k] = node[<keyof Node>k]
+          if (node.hasOwnProperty(k))
+            properties[<keyof Node>k] = node[<keyof Node>k]
           // Omit properties that have been removed from the new properties list
           if (merge) {
-            if (props[<keyof Node>k] != null) newProperties[<keyof Node>k] = merge(node[<keyof Node>k], props[<keyof Node>k])
+            if (props[<keyof Node>k] != null)
+              newProperties[<keyof Node>k] = merge(
+                node[<keyof Node>k],
+                props[<keyof Node>k]
+              )
           } else {
-            if (props[<keyof Node>k] != null) newProperties[<keyof Node>k] = props[<keyof Node>k]
+            if (props[<keyof Node>k] != null)
+              newProperties[<keyof Node>k] = props[<keyof Node>k]
           }
         }
       }

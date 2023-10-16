@@ -1,4 +1,10 @@
-import React, { Component, ComponentType, ContextType, ReactNode, RefObject } from 'react'
+import React, {
+  Component,
+  ComponentType,
+  ContextType,
+  ReactNode,
+  RefObject,
+} from 'react'
 import { EditorContext } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
 import {

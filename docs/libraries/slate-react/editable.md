@@ -18,7 +18,7 @@ type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
-  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element 
+  renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
@@ -108,7 +108,7 @@ const DefaultElement = props => {
 }
 ```
 
-#### `renderLeaf?: (props: RenderLeafProps) => JSX.Element` 
+#### `renderLeaf?: (props: RenderLeafProps) => JSX.Element`
 
 The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
 

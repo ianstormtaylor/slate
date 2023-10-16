@@ -5,7 +5,7 @@ import React, {
   useState,
   useEffect,
 } from 'react'
-import type { JSX } from 'react'
+import { JSX } from 'react'
 import { Element, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'

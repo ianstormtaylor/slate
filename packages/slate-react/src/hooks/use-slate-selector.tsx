@@ -93,7 +93,7 @@ export function useSlateSelector<T>(
           if (err instanceof Error) {
             latestSubscriptionCallbackError.current = err
           } else {
-            latestSubscriptionCallbackError.current = new Error(String(err));
+            latestSubscriptionCallbackError.current = new Error(String(err))
           }
         }
 

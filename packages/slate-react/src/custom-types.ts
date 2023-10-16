@@ -20,27 +20,26 @@ declare module 'slate' {
 }
 
 declare global {
-
   interface Window {
-    MSStream: boolean;
+    MSStream: boolean
   }
   interface DocumentOrShadowRoot {
-    getSelection(): Selection | null;
+    getSelection(): Selection | null
   }
 
   interface CaretPosition {
-    readonly offsetNode: Node;
-    readonly offset: number;
-    getClientRect(): DOMRect | null;
+    readonly offsetNode: Node
+    readonly offset: number
+    getClientRect(): DOMRect | null
   }
 
   interface Document {
-    caretPositionFromPoint(x: number, y: number): CaretPosition | null;
+    caretPositionFromPoint(x: number, y: number): CaretPosition | null
   }
 
   interface Node {
-    getRootNode(options?: GetRootNodeOptions): Document | ShadowRoot;
+    getRootNode(options?: GetRootNodeOptions): Document | ShadowRoot
   }
 }
 
-export {};
+export {}
