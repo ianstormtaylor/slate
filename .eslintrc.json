@@ -20,7 +20,7 @@
   "settings": {
     "import/extensions": [".js", ".ts", ".jsx", ".tsx"],
     "react": {
-      "version": "16"
+      "version": "18"
     }
   },
   "env": {
