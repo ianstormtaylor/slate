@@ -135,7 +135,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const parent = Node.parent(editor, path)
       parent.children.splice(index, 1)
 
-      // Transform all of the points in the value, but if the point was in the
+      // Transform all the points in the value, but if the point was in the
       // node that was removed we need to update the range or remove it.
       if (selection) {
         for (const [point, key] of Range.points(selection)) {
@@ -214,19 +214,19 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
           throw new Error(`Cannot set the "${key}" property of nodes!`)
         }
 
-        const value = newProperties[key]
+        const value = newProperties[<keyof Node>key]
 
         if (value == null) {
-          delete node[key]
+          delete node[<keyof Node>key]
         } else {
-          node[key] = value
+          node[<keyof Node>key] = value
         }
       }
 
       // properties that were previously defined, but are now missing, must be deleted
       for (const key in properties) {
         if (!newProperties.hasOwnProperty(key)) {
-          delete node[key]
+          delete node[<keyof Node>key]
         }
       }
 
@@ -252,16 +252,16 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
         }
 
         for (const key in newProperties) {
-          const value = newProperties[key]
+          const value = newProperties[<keyof Range>key]
 
           if (value == null) {
             if (key === 'anchor' || key === 'focus') {
               throw new Error(`Cannot remove the "${key}" selection property`)
             }
 
-            delete selection[key]
+            delete selection[<keyof Range>key]
           } else {
-            selection[key] = value
+            selection[<keyof Range>key] = value
           }
         }
       }

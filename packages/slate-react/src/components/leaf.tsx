@@ -5,6 +5,7 @@ import React, {
   useState,
   useEffect,
 } from 'react'
+import type { JSX } from 'react'
 import { Element, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
@@ -99,7 +100,7 @@ const Leaf = (props: {
   useEffect(() => {
     if (leafIsPlaceholder) {
       if (!showPlaceholderTimeoutRef.current) {
-        // Delay the placeholder so it will not render in a selection
+        // Delay the placeholder, so it will not render in a selection
         showPlaceholderTimeoutRef.current = setTimeout(() => {
           setShowPlaceholder(true)
           showPlaceholderTimeoutRef.current = null
