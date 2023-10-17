@@ -6,11 +6,6 @@ test.describe('table example', () => {
   })
 
   test('table tag rendered', async ({ page }) => {
-    expect(
-      await page
-        .getByRole('textbox')
-        .locator('table')
-        .count()
-    ).toBe(1)
+    expect(await page.getByRole('textbox').locator('table').count()).toBe(1)
   })
 })

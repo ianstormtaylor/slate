@@ -99,10 +99,9 @@ const HoveringToolbar = () => {
     const rect = domRange.getBoundingClientRect()
     el.style.opacity = '1'
     el.style.top = `${rect.top + window.pageYOffset - el.offsetHeight}px`
-    el.style.left = `${rect.left +
-      window.pageXOffset -
-      el.offsetWidth / 2 +
-      rect.width / 2}px`
+    el.style.left = `${
+      rect.left + window.pageXOffset - el.offsetWidth / 2 + rect.width / 2
+    }px`
   })
 
   return (
@@ -152,8 +151,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This example shows how you can make a hovering menu appear above your content, which you can use to make text ',
+        text: 'This example shows how you can make a hovering menu appear above your content, which you can use to make text ',
       },
       { text: 'bold', bold: true },
       { text: ', ' },

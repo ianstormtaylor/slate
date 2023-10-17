@@ -7,11 +7,7 @@ test.describe('Inlines example', () => {
 
   test('contains link', async ({ page }) => {
     expect(
-      await page
-        .getByRole('textbox')
-        .locator('a')
-        .nth(0)
-        .innerText()
+      await page.getByRole('textbox').locator('a').nth(0).innerText()
     ).toContain('hyperlink')
   })
 

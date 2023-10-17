@@ -67,38 +67,38 @@ const Leaf = ({ attributes, children, leaf }) => {
         font-style: ${leaf.italic && 'italic'};
         text-decoration: ${leaf.underlined && 'underline'};
         ${leaf.title &&
-          css`
-            display: inline-block;
-            font-weight: bold;
-            font-size: 20px;
-            margin: 20px 0 10px 0;
-          `}
+        css`
+          display: inline-block;
+          font-weight: bold;
+          font-size: 20px;
+          margin: 20px 0 10px 0;
+        `}
         ${leaf.list &&
-          css`
-            padding-left: 10px;
-            font-size: 20px;
-            line-height: 10px;
-          `}
+        css`
+          padding-left: 10px;
+          font-size: 20px;
+          line-height: 10px;
+        `}
         ${leaf.hr &&
-          css`
-            display: block;
-            text-align: center;
-            border-bottom: 2px solid #ddd;
-          `}
+        css`
+          display: block;
+          text-align: center;
+          border-bottom: 2px solid #ddd;
+        `}
         ${leaf.blockquote &&
-          css`
-            display: inline-block;
-            border-left: 2px solid #ddd;
-            padding-left: 10px;
-            color: #aaa;
-            font-style: italic;
-          `}
+        css`
+          display: inline-block;
+          border-left: 2px solid #ddd;
+          padding-left: 10px;
+          color: #aaa;
+          font-style: italic;
+        `}
         ${leaf.code &&
-          css`
-            font-family: monospace;
-            background-color: #eee;
-            padding: 3px;
-          `}
+        css`
+          font-family: monospace;
+          background-color: #eee;
+          padding: 3px;
+        `}
       `}
     >
       {children}
@@ -111,8 +111,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.',
+        text: 'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.',
       },
     ],
   },

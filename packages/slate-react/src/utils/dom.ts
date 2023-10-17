@@ -26,9 +26,9 @@ export {
 
 declare global {
   interface Window {
-    Selection: typeof Selection['constructor']
-    DataTransfer: typeof DataTransfer['constructor']
-    Node: typeof Node['constructor']
+    Selection: (typeof Selection)['constructor']
+    DataTransfer: (typeof DataTransfer)['constructor']
+    Node: (typeof Node)['constructor']
   }
 }
 

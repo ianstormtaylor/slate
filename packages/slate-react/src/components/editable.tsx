@@ -1139,9 +1139,8 @@ export const Editable = (props: EditableProps) => {
                     !IS_UC_MOBILE &&
                     event.data
                   ) {
-                    const placeholderMarks = EDITOR_TO_PENDING_INSERTION_MARKS.get(
-                      editor
-                    )
+                    const placeholderMarks =
+                      EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)
                     EDITOR_TO_PENDING_INSERTION_MARKS.delete(editor)
 
                     // Ensure we insert text with the marks the user was actually seeing
@@ -1782,7 +1781,7 @@ const defaultScrollSelectionIntoView = (
  */
 
 export const isEventHandled = <
-  EventType extends React.SyntheticEvent<unknown, unknown>
+  EventType extends React.SyntheticEvent<unknown, unknown>,
 >(
   event: EventType,
   handler?: (event: EventType) => void | boolean
@@ -1805,7 +1804,7 @@ export const isEventHandled = <
  * Check if the event's target is an input element
  */
 export const isDOMEventTargetInput = <
-  EventType extends React.SyntheticEvent<unknown, unknown>
+  EventType extends React.SyntheticEvent<unknown, unknown>,
 >(
   event: EventType
 ) => {

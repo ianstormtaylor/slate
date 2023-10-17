@@ -7,12 +7,7 @@ test.describe('On richtext example', () => {
   )
 
   test('renders rich text', async ({ page }) => {
-    expect(
-      await page
-        .locator('strong')
-        .nth(0)
-        .textContent()
-    ).toContain('rich')
+    expect(await page.locator('strong').nth(0).textContent()).toContain('rich')
     expect(await page.locator('blockquote').textContent()).toContain(
       'wise quote'
     )

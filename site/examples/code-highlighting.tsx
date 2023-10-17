@@ -31,7 +31,7 @@ import {
 import { withHistory } from 'slate-history'
 import isHotkey from 'is-hotkey'
 import { css } from '@emotion/css'
-import { CodeBlockElement } from './custom-types'
+import { CodeBlockElement } from './custom-types.d'
 import { normalizeTokens } from '../utils/normalize-tokens'
 import { Button, Icon, Toolbar } from '../components'
 
@@ -174,9 +174,10 @@ const useDecorate = (editor: Editor) => {
   )
 }
 
-const getChildNodeToDecorations = ([block, blockPath]: NodeEntry<
-  CodeBlockElement
->) => {
+const getChildNodeToDecorations = ([
+  block,
+  blockPath,
+]: NodeEntry<CodeBlockElement>) => {
   const nodeToDecorations = new Map<Element, Range[]>()
 
   const text = block.children.map(line => Node.string(line)).join('\n')

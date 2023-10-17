@@ -22,14 +22,8 @@ const Text = (props: {
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: SlateText
 }) => {
-  const {
-    decorations,
-    isLast,
-    parent,
-    renderPlaceholder,
-    renderLeaf,
-    text,
-  } = props
+  const { decorations, isLast, parent, renderPlaceholder, renderLeaf, text } =
+    props
   const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement | null>(null)
   const leaves = SlateText.decorations(text, decorations)
