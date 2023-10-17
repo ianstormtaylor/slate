@@ -53,7 +53,15 @@ export const withReact = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & ReactEditor => {
   const e = editor as T & ReactEditor
-  const { apply, onChange, deleteBackward, addMark, removeMark } = e
+  const {
+    apply,
+    onChange,
+    onValueChange,
+    onSelectionChange,
+    deleteBackward,
+    addMark,
+    removeMark,
+  } = e
 
   // The WeakMap which maps a key to a specific HTMLElement must be scoped to the editor instance to
   // avoid collisions between editors in the DOM that share the same value.
@@ -364,6 +372,14 @@ export const withReact = <T extends BaseEditor>(
 
       if (onContextChange) {
         onContextChange()
+      }
+
+      switch (options?.operation?.type) {
+        case 'set_selection':
+          onSelectionChange(options)
+          break
+        default:
+          onValueChange(options)
       }
 
       onChange(options)

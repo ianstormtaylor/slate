@@ -56,6 +56,8 @@ export interface BaseEditor {
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
   onChange: (options?: { operation?: Operation }) => void
+  onSelectionChange: (options?: { operation?: Operation }) => void
+  onValueChange: (options?: { operation?: Operation }) => void
   shouldNormalize: ({
     iteration,
     dirtyPaths,
