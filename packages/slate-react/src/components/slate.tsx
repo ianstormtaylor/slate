@@ -23,6 +23,7 @@ export const Slate = (props: {
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
 }) => {
+  // do we need to add onValueChange and onSelectorChange here?
   const { editor, children, onChange, initialValue, ...rest } = props
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
