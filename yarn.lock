@@ -10975,7 +10975,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lerna@npm:^3.19.0":
+"lerna@npm:^3.22.1":
   version: 3.22.1
   resolution: "lerna@npm:3.22.1"
   dependencies:
@@ -15126,7 +15126,7 @@ __metadata:
     is-url: ^1.2.4
     jest: 29.7.0
     jest-environment-jsdom: 29.7.0
-    lerna: ^3.19.0
+    lerna: ^3.22.1
     lint-staged: ">=10"
     lodash: ^4.17.21
     mocha: ^6.2.3
