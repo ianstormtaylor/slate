@@ -14661,12 +14661,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"simple-git-hooks@npm:>=2.0.3":
-  version: 2.5.1
-  resolution: "simple-git-hooks@npm:2.5.1"
+"simple-git-hooks@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "simple-git-hooks@npm:2.9.0"
   bin:
     simple-git-hooks: cli.js
-  checksum: 042149c1345482490b2c8504f3013a3c7ee4fe767d05462d5b3e50b90b5c94b7a471696d755098ca163945c725fefc482cf4a7a6f29e806f9f530ebd2f23b4fb
+  checksum: 0053d2ad35523307eb21dd4412a7ac7107cb1f9e0942a9ce9b80b9142182d2cd9008a8d8f6a9431c73e98a3c4a41430aec64ccca0e3ad2944b3cf15ab005ef87
   languageName: node
   linkType: hard
 
@@ -14792,7 +14792,7 @@ __metadata:
     rollup-plugin-terser: ^7.0.2
     rollup-plugin-typescript2: ^0.36.0
     shell-quote: ^1.8.1
-    simple-git-hooks: ">=2.0.3"
+    simple-git-hooks: ^2.9.0
     slate: "workspace:*"
     slate-history: "workspace:*"
     slate-hyperscript: "workspace:*"

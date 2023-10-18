@@ -107,7 +107,7 @@
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.36.0",
     "shell-quote": "^1.8.1",
-    "simple-git-hooks": ">=2.0.3",
+    "simple-git-hooks": "^2.9.0",
     "slate": "workspace:*",
     "slate-history": "workspace:*",
     "slate-hyperscript": "workspace:*",
