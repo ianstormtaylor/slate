@@ -127,6 +127,6 @@
   },
   "packageManager": "yarn@3.6.4",
   "resolutions": {
-    "@types/node": "18.15.3"
+    "@types/node": "18.18.6"
   }
 }
