@@ -3915,17 +3915,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/jsdom@npm:^16.2.15":
-  version: 16.2.15
-  resolution: "@types/jsdom@npm:16.2.15"
-  dependencies:
-    "@types/node": "*"
-    "@types/parse5": ^6.0.3
-    "@types/tough-cookie": "*"
-  checksum: e038335321bef42ebf220aaf597e186e2eec8de6107ce7a70de1c046a84c1fbb42d454e195a20383a6870b18c7ef6fa6b73812a626f88a4a2ef1f711d2e2e13c
-  languageName: node
-  linkType: hard
-
 "@types/jsdom@npm:^20.0.0":
   version: 20.0.1
   resolution: "@types/jsdom@npm:20.0.1"
@@ -3934,6 +3923,17 @@ __metadata:
     "@types/tough-cookie": "*"
     parse5: ^7.0.0
   checksum: d55402c5256ef451f93a6e3d3881f98339fe73a5ac2030588df056d6835df8367b5a857b48d27528289057e26dcdd3f502edc00cb877c79174cb3a4c7f2198c1
+  languageName: node
+  linkType: hard
+
+"@types/jsdom@npm:^21.1.4":
+  version: 21.1.4
+  resolution: "@types/jsdom@npm:21.1.4"
+  dependencies:
+    "@types/node": "*"
+    "@types/tough-cookie": "*"
+    parse5: ^7.0.0
+  checksum: 915f619111dadd8d1bb7f12b6736c9d2e486911e1aed086de5fb003e7e40ae1e368da322dc04f2122ef47faf40ca75b9315ae2df3e8011f882dcf84660fb0d68
   languageName: node
   linkType: hard
 
@@ -3999,13 +3999,6 @@ __metadata:
   version: 4.0.0
   resolution: "@types/parse-json@npm:4.0.0"
   checksum: fd6bce2b674b6efc3db4c7c3d336bd70c90838e8439de639b909ce22f3720d21344f52427f1d9e57b265fcb7f6c018699b99e5e0c208a1a4823014269a6bf35b
-  languageName: node
-  linkType: hard
-
-"@types/parse5@npm:^6.0.3":
-  version: 6.0.3
-  resolution: "@types/parse5@npm:6.0.3"
-  checksum: ddb59ee4144af5dfcc508a8dcf32f37879d11e12559561e65788756b95b33e6f03ea027d88e1f5408f9b7bfb656bf630ace31a2169edf44151daaf8dd58df1b7
   languageName: node
   linkType: hard
 
@@ -14861,7 +14854,7 @@ __metadata:
     "@juggle/resize-observer": ^3.4.0
     "@types/is-hotkey": ^0.1.8
     "@types/jest": 29.5.6
-    "@types/jsdom": ^16.2.15
+    "@types/jsdom": ^21.1.4
     "@types/lodash": ^4.14.200
     "@types/react": ^18.2.28
     "@types/react-dom": ^18.2.13
