@@ -95,4 +95,49 @@ describe('slate-react', () => {
       })
     })
   })
+
+  test('calls onSelectorChange when editor select change', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [
+      { type: 'block', children: [{ text: 'te' }] },
+      { type: 'block', children: [{ text: 'st' }] },
+    ]
+    const onSelectorChange = jest.fn()
+    act(() => {
+      create(
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onSelectorChange={onSelectorChange}
+        >
+          <Editable />
+        </Slate>,
+        { createNodeMock }
+      )
+    })
+    await act(async () =>
+      Transforms.select(editor, { path: [0, 0], offset: 2 })
+    )
+    expect(onSelectorChange).toHaveBeenCalled()
+  })
+
+  test('calls onValueChange when editor children change', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+    const onValueChange = jest.fn()
+    act(() => {
+      create(
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onValueChange={onValueChange}
+        >
+          <Editable />
+        </Slate>,
+        { createNodeMock }
+      )
+    })
+    await act(async () => Transforms.insertText(editor, 'Hello word!'))
+    expect(onValueChange).toHaveBeenCalled()
+  })
 })

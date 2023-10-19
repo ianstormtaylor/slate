@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Descendant, Editor, Node, Scrubber } from 'slate'
+import { Descendant, Editor, Node, Operation, Scrubber } from 'slate'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { SlateContext, SlateContextValue } from '../hooks/use-slate'
@@ -22,8 +22,18 @@ export const Slate = (props: {
   initialValue: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
+  onSelectorChange?: (value: Descendant[]) => void
+  onValueChange?: (value: Descendant[]) => void
 }) => {
-  const { editor, children, onChange, initialValue, ...rest } = props
+  const {
+    editor,
+    children,
+    onChange,
+    onSelectorChange,
+    onValueChange,
+    initialValue,
+    ...rest
+  } = props
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
     if (!Node.isNodeList(initialValue)) {
@@ -48,17 +58,28 @@ export const Slate = (props: {
     onChange: handleSelectorChange,
   } = useSelectorContext(editor)
 
-  const onContextChange = useCallback(() => {
-    if (onChange) {
-      onChange(editor.children)
-    }
+  const onContextChange = useCallback(
+    (options?: { operation?: Operation }) => {
+      if (onChange) {
+        onChange(editor.children)
+      }
 
-    setContext(prevContext => ({
-      v: prevContext.v + 1,
-      editor,
-    }))
-    handleSelectorChange(editor)
-  }, [editor, handleSelectorChange, onChange])
+      switch (options?.operation?.type) {
+        case 'set_selection':
+          onSelectorChange?.(editor.children)
+          break
+        default:
+          onValueChange?.(editor.children)
+      }
+
+      setContext(prevContext => ({
+        v: prevContext.v + 1,
+        editor,
+      }))
+      handleSelectorChange(editor)
+    },
+    [editor, handleSelectorChange, onChange, onSelectorChange, onValueChange]
+  )
 
   useEffect(() => {
     EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
