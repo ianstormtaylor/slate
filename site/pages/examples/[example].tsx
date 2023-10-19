@@ -328,6 +328,7 @@ const ExamplePage = ({ example }: { example: string }) => {
               key={p as string}
               href="/examples/[example]"
               as={`/examples/${p}`}
+              legacyBehavior
               passHref
             >
               <Tab onClick={() => setShowTabs(false)}>{n}</Tab>
