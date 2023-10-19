@@ -10,12 +10,12 @@ test.describe('hovering toolbar example', () => {
     await expect(page.getByTestId('menu')).toHaveCSS('opacity', '0')
 
     await page.locator('span[data-slate-string="true"]').nth(0).selectText()
-    expect(await page.getByTestId('menu').count()).toBe(1)
+    await expect(page.getByTestId('menu')).toHaveCount(1)
 
     await expect(page.getByTestId('menu')).toHaveCSS('opacity', '1')
-    expect(
-      await page.getByTestId('menu').locator('span.material-icons').count()
-    ).toBe(3)
+    await expect(
+      page.getByTestId('menu').locator('span.material-icons')
+    ).toHaveCount(3)
   })
 
   test('hovering toolbar disappears', async ({ page }) => {

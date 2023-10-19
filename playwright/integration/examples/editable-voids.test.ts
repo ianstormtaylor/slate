@@ -15,7 +15,7 @@ test.describe('editable voids', () => {
   test('checks for the elements', async ({ page }) => {
     for (const elem of elements) {
       const { tag, count } = elem
-      expect(await page.locator(tag).count()).toBe(count)
+      await expect(page.locator(tag)).toHaveCount(count)
     }
   })
 
@@ -25,7 +25,7 @@ test.describe('editable voids', () => {
 
     for (const elem of elements) {
       const { tag, count } = elem
-      expect(await page.locator(tag).count()).toBe(count * 2)
+      await expect(page.locator(tag)).toHaveCount(count * 2)
     }
   })
 

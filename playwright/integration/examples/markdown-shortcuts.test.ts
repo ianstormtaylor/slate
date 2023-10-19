@@ -12,7 +12,7 @@ test.describe('On markdown-shortcuts example', () => {
   })
 
   test('can add list items', async ({ page }, testInfo) => {
-    expect(await page.getByRole('textbox').locator('ul').count()).toBe(0)
+    await expect(page.getByRole('textbox').locator('ul')).toHaveCount(0)
 
     await page.getByRole('textbox').click()
     await page
@@ -26,7 +26,7 @@ test.describe('On markdown-shortcuts example', () => {
     await page.keyboard.press('Enter')
     await page.keyboard.press('Backspace')
 
-    expect(await page.locator('ul > li').count()).toBe(3)
+    await expect(page.locator('ul > li')).toHaveCount(3)
 
     expect(await page.locator('ul > li').nth(0).innerText()).toContain(
       '1st Item'
@@ -40,13 +40,13 @@ test.describe('On markdown-shortcuts example', () => {
   })
 
   test('can add a h1 item', async ({ page }) => {
-    expect(await page.getByRole('textbox').locator('h1').count()).toBe(0)
+    await expect(page.getByRole('textbox').locator('h1')).toHaveCount(0)
 
     await page.getByRole('textbox').press('Enter')
     await page.getByRole('textbox').press('ArrowLeft')
     await page.getByRole('textbox').type('# Heading')
 
-    expect(await page.locator('h1').count()).toBe(1)
+    await expect(page.locator('h1')).toHaveCount(1)
 
     expect(
       await page.getByRole('textbox').locator('h1').textContent()

@@ -12,7 +12,7 @@ test.describe('huge document example', () => {
 
   test('contains image', async ({ page }) => {
     for (const { tag, count } of elements) {
-      expect(await page.locator(tag).count()).toBe(count)
+      await expect(page.locator(tag)).toHaveCount(count)
     }
   })
 })

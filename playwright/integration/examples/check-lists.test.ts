@@ -31,6 +31,6 @@ test.describe('Check-lists example', () => {
       page.locator(slateNodeElement).nth(3).locator('span').nth(1)
     ).toHaveCSS('text-decoration-line', 'none')
 
-    expect(await page.locator('p[data-slate-node="element"]').count()).toBe(2)
+    await expect(page.locator('p[data-slate-node="element"]')).toHaveCount(2)
   })
 })
