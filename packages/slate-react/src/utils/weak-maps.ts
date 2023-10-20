@@ -1,4 +1,4 @@
-import { Ancestor, Editor, Node, Range, RangeRef, Text } from 'slate'
+import { Ancestor, Editor, Node, Operation, Range, RangeRef, Text } from 'slate'
 import { Action } from '../hooks/android-input-manager/android-input-manager'
 import { TextDiff } from './diff-text'
 import { Key } from './key'
@@ -47,7 +47,10 @@ export const EDITOR_TO_USER_SELECTION: WeakMap<
  * Weak map for associating the context `onChange` context with the plugin.
  */
 
-export const EDITOR_TO_ON_CHANGE = new WeakMap<Editor, () => void>()
+export const EDITOR_TO_ON_CHANGE = new WeakMap<
+  Editor,
+  (options?: { operation?: Operation }) => void
+>()
 
 /**
  * Weak maps for saving pending state on composition stage.

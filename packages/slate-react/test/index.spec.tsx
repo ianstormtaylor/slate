@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { createEditor, Element, Transforms } from 'slate'
+import { createEditor, Text, Transforms } from 'slate'
 import { create, act, ReactTestRenderer } from 'react-test-renderer'
 import { Slate, withReact, Editable } from '../src'
 
@@ -94,5 +94,108 @@ describe('slate-react', () => {
         expect(mounts).toHaveBeenCalledTimes(2)
       })
     })
+  })
+
+  test('calls onSelectionChange when editor select change', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [
+      { type: 'block', children: [{ text: 'te' }] },
+      { type: 'block', children: [{ text: 'st' }] },
+    ]
+    const onChange = jest.fn()
+    const onValueChange = jest.fn()
+    const onSelectionChange = jest.fn()
+
+    act(() => {
+      create(
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onChange={onChange}
+          onValueChange={onValueChange}
+          onSelectionChange={onSelectionChange}
+        >
+          <Editable />
+        </Slate>,
+        { createNodeMock }
+      )
+    })
+
+    await act(async () =>
+      Transforms.select(editor, { path: [0, 0], offset: 2 })
+    )
+
+    expect(onSelectionChange).toHaveBeenCalled()
+    expect(onChange).toHaveBeenCalled()
+    expect(onValueChange).not.toHaveBeenCalled()
+  })
+
+  test('calls onValueChange when editor children change', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+    const onChange = jest.fn()
+    const onValueChange = jest.fn()
+    const onSelectionChange = jest.fn()
+
+    act(() => {
+      create(
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onChange={onChange}
+          onValueChange={onValueChange}
+          onSelectionChange={onSelectionChange}
+        >
+          <Editable />
+        </Slate>,
+        { createNodeMock }
+      )
+    })
+
+    await act(async () => Transforms.insertText(editor, 'Hello word!'))
+
+    expect(onValueChange).toHaveBeenCalled()
+    expect(onChange).toHaveBeenCalled()
+    expect(onSelectionChange).not.toHaveBeenCalled()
+  })
+
+  test('calls onValueChange when editor setNodes', async () => {
+    const editor = withReact(createEditor())
+    const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+    const onChange = jest.fn()
+    const onValueChange = jest.fn()
+    const onSelectionChange = jest.fn()
+
+    act(() => {
+      create(
+        <Slate
+          editor={editor}
+          initialValue={initialValue}
+          onChange={onChange}
+          onValueChange={onValueChange}
+          onSelectionChange={onSelectionChange}
+        >
+          <Editable />
+        </Slate>,
+        { createNodeMock }
+      )
+    })
+
+    await act(async () =>
+      Transforms.setNodes(
+        editor,
+        // @ts-ignore
+        { bold: true },
+        {
+          at: { path: [0, 0], offset: 2 },
+          match: Text.isText,
+          split: true,
+        }
+      )
+    )
+
+    expect(onChange).toHaveBeenCalled()
+    expect(onValueChange).toHaveBeenCalled()
+    expect(onSelectionChange).not.toHaveBeenCalled()
   })
 })
