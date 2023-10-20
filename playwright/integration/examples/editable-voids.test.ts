@@ -30,7 +30,7 @@ test.describe('editable voids', () => {
   })
 
   test('make sure you can edit editable void', async ({ page }) => {
-    await page.locator(input).type('Typing')
+    await page.locator(input).fill('Typing')
     expect(await page.locator(input).inputValue()).toBe('Typing')
   })
 })

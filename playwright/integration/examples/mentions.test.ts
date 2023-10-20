@@ -15,7 +15,7 @@ test.describe('mentions example', () => {
     await page.getByRole('textbox').click()
     await page.getByRole('textbox').selectText()
     await page.getByRole('textbox').press('Backspace')
-    await page.getByRole('textbox').type(' @ma')
+    await page.getByRole('textbox').pressSequentially(' @ma')
     await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
   })
 
@@ -23,7 +23,7 @@ test.describe('mentions example', () => {
     await page.getByRole('textbox').click()
     await page.getByRole('textbox').selectText()
     await page.getByRole('textbox').press('Backspace')
-    await page.getByRole('textbox').type(' @Ja')
+    await page.getByRole('textbox').pressSequentially(' @Ja')
     await page.getByRole('textbox').press('Enter')
     await expect(page.locator('[data-cy="mention-Jabba"]')).toHaveCount(1)
   })

@@ -18,11 +18,12 @@ test.describe('On markdown-shortcuts example', () => {
     await page
       .getByRole('textbox')
       .press(testInfo.project.name === 'webkit' ? 'Meta+ArrowLeft' : 'Home')
-    await page.getByRole('textbox').type('* 1st Item')
+    await page.getByRole('textbox').pressSequentially('* ')
+    await page.getByRole('textbox').pressSequentially('1st Item')
     await page.keyboard.press('Enter')
-    await page.getByRole('textbox').type('2nd Item')
+    await page.getByRole('textbox').pressSequentially('2nd Item')
     await page.keyboard.press('Enter')
-    await page.getByRole('textbox').type('3rd Item')
+    await page.getByRole('textbox').pressSequentially('3rd Item')
     await page.keyboard.press('Enter')
     await page.keyboard.press('Backspace')
 
@@ -44,7 +45,8 @@ test.describe('On markdown-shortcuts example', () => {
 
     await page.getByRole('textbox').press('Enter')
     await page.getByRole('textbox').press('ArrowLeft')
-    await page.getByRole('textbox').type('# Heading')
+    await page.getByRole('textbox').pressSequentially('# ')
+    await page.getByRole('textbox').pressSequentially('Heading')
 
     await expect(page.locator('h1')).toHaveCount(1)
 
