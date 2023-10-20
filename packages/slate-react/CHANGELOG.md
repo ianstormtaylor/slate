@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.100.0
+
+### Minor Changes
+
+- [#5526](https://github.com/ianstormtaylor/slate/pull/5526) [`623f4452`](https://github.com/ianstormtaylor/slate/commit/623f44521ee95be38c53b6def456ed8c5f16e14b) Thanks [@jkcs](https://github.com/jkcs)! - Add `onSelectionChange` and `onValueChange` in Slate React component
+
+- [#5528](https://github.com/ianstormtaylor/slate/pull/5528) [`c4c14882`](https://github.com/ianstormtaylor/slate/commit/c4c14882edf13828f6583a88e50754ce63583bd7) Thanks [@dylans](https://github.com/dylans)! - Update dependencies to React 18, Node 20, TS 5.2, etc.
+
 ## 0.99.0
 
 ### Minor Changes
