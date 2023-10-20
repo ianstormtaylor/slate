@@ -22,10 +22,12 @@ export const setSelection: SelectionTransforms['setSelection'] = (
       (k === 'focus' &&
         props.focus != null &&
         !Point.equals(props.focus, selection.focus)) ||
-      (k !== 'anchor' && k !== 'focus' && props[k] !== selection[k])
+      (k !== 'anchor' &&
+        k !== 'focus' &&
+        props[<keyof Range>k] !== selection[<keyof Range>k])
     ) {
-      oldProps[k] = selection[k]
-      newProps[k] = props[k]
+      oldProps[<keyof Range>k] = selection[<keyof Range>k]
+      newProps[<keyof Range>k] = props[<keyof Range>k]
     }
   }
 

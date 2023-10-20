@@ -8,19 +8,12 @@ test.describe('Check-lists example', () => {
   test('checks the bullet when clicked', async ({ page }) => {
     const slateNodeElement = 'div[data-slate-node="element"]'
 
-    expect(
-      await page
-        .locator(slateNodeElement)
-        .nth(3)
-        .textContent()
-    ).toBe('Criss-cross!')
+    expect(await page.locator(slateNodeElement).nth(3).textContent()).toBe(
+      'Criss-cross!'
+    )
 
     await expect(
-      page
-        .locator(slateNodeElement)
-        .nth(3)
-        .locator('span')
-        .nth(1)
+      page.locator(slateNodeElement).nth(3).locator('span').nth(1)
     ).toHaveCSS('text-decoration-line', 'line-through')
 
     // Unchecking the checkboxes should un-cross the corresponding text.
@@ -31,20 +24,13 @@ test.describe('Check-lists example', () => {
       .nth(0)
       .locator('input')
       .uncheck()
-    expect(
-      await page
-        .locator(slateNodeElement)
-        .nth(3)
-        .textContent()
-    ).toBe('Criss-cross!')
+    expect(await page.locator(slateNodeElement).nth(3).textContent()).toBe(
+      'Criss-cross!'
+    )
     await expect(
-      page
-        .locator(slateNodeElement)
-        .nth(3)
-        .locator('span')
-        .nth(1)
+      page.locator(slateNodeElement).nth(3).locator('span').nth(1)
     ).toHaveCSS('text-decoration-line', 'none')
 
-    expect(await page.locator('p[data-slate-node="element"]').count()).toBe(2)
+    await expect(page.locator('p[data-slate-node="element"]')).toHaveCount(2)
   })
 })

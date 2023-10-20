@@ -10,7 +10,7 @@ export const input = (
 
 // patch in a custom normalizer that inserts empty paragraphs in the body instead of text nodes
 // this test also verifies the new node itself is also normalized, because it's inserting a non-normalized node
-const editor = (input as unknown) as Editor
+const editor = input as unknown as Editor
 const defaultNormalize = editor.normalizeNode
 editor.normalizeNode = entry => {
   const [node, path] = entry

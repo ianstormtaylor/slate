@@ -10,7 +10,7 @@ test.describe('search highlighting', () => {
     const searchField = 'input[type="search"]'
     const highlightedText = 'search-highlighted'
 
-    await page.locator(searchField).type('text')
-    expect(await page.locator(`[data-cy="${highlightedText}"]`).count()).toBe(2)
+    await page.locator(searchField).fill('text')
+    await expect(page.locator(`[data-cy="${highlightedText}"]`)).toHaveCount(2)
   })
 })

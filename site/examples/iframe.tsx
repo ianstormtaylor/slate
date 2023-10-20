@@ -131,8 +131,7 @@ const initialValue: Descendant[] = [
         italic: true,
       },
       {
-        text:
-          ' useful, when you need to separate the styles for your editor contents from the ones addressing your UI.',
+        text: ' useful, when you need to separate the styles for your editor contents from the ones addressing your UI.',
       },
     ],
   },

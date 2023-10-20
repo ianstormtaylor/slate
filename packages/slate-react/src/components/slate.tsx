@@ -53,10 +53,8 @@ export const Slate = (props: {
     return { v: 0, editor }
   })
 
-  const {
-    selectorContext,
-    onChange: handleSelectorChange,
-  } = useSelectorContext(editor)
+  const { selectorContext, onChange: handleSelectorChange } =
+    useSelectorContext(editor)
 
   const onContextChange = useCallback(
     (options?: { operation?: Operation }) => {

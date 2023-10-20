@@ -8,7 +8,7 @@ test.describe('plaintext example', () => {
 
   test('inserts text when typed', async ({ page }) => {
     await page.getByRole('textbox').press('Home')
-    await page.getByRole('textbox').type('Hello World')
+    await page.getByRole('textbox').pressSequentially('Hello World')
     expect(await page.getByRole('textbox').textContent()).toContain(
       'Hello World'
     )

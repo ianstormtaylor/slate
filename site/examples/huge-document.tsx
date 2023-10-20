@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 

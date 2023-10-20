@@ -7,12 +7,7 @@ test.describe('On richtext example', () => {
   )
 
   test('renders rich text', async ({ page }) => {
-    expect(
-      await page
-        .locator('strong')
-        .nth(0)
-        .textContent()
-    ).toContain('rich')
+    expect(await page.locator('strong').nth(0).textContent()).toContain('rich')
     expect(await page.locator('blockquote').textContent()).toContain(
       'wise quote'
     )
@@ -20,7 +15,7 @@ test.describe('On richtext example', () => {
 
   test('inserts text when typed', async ({ page }) => {
     await page.getByRole('textbox').press('Home')
-    await page.getByRole('textbox').type('Hello World')
+    await page.getByRole('textbox').pressSequentially('Hello World')
 
     expect(await page.getByRole('textbox').textContent()).toContain(
       'Hello World'

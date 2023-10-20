@@ -7,24 +7,24 @@ test.describe('mentions example', () => {
   )
 
   test('renders mention element', async ({ page }) => {
-    expect(await page.locator('[data-cy="mention-R2-D2"]').count()).toBe(1)
-    expect(await page.locator('[data-cy="mention-Mace-Windu"]').count()).toBe(1)
+    await expect(page.locator('[data-cy="mention-R2-D2"]')).toHaveCount(1)
+    await expect(page.locator('[data-cy="mention-Mace-Windu"]')).toHaveCount(1)
   })
 
   test('shows list of mentions', async ({ page }) => {
     await page.getByRole('textbox').click()
     await page.getByRole('textbox').selectText()
     await page.getByRole('textbox').press('Backspace')
-    await page.getByRole('textbox').type(' @ma')
-    expect(await page.locator('[data-cy="mentions-portal"]').count()).toBe(1)
+    await page.getByRole('textbox').pressSequentially(' @ma')
+    await expect(page.locator('[data-cy="mentions-portal"]')).toHaveCount(1)
   })
 
   test('inserts on enter from list', async ({ page }) => {
     await page.getByRole('textbox').click()
     await page.getByRole('textbox').selectText()
     await page.getByRole('textbox').press('Backspace')
-    await page.getByRole('textbox').type(' @Ja')
+    await page.getByRole('textbox').pressSequentially(' @Ja')
     await page.getByRole('textbox').press('Enter')
-    expect(await page.locator('[data-cy="mention-Jabba"]').count()).toBe(1)
+    await expect(page.locator('[data-cy="mention-Jabba"]')).toHaveCount(1)
   })
 })

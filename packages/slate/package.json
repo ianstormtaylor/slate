@@ -14,15 +14,15 @@
     "dist/"
   ],
   "dependencies": {
-    "immer": "^9.0.6",
+    "immer": "^10.0.3",
     "is-plain-object": "^5.0.0",
     "tiny-warning": "^1.0.3"
   },
   "devDependencies": {
-    "@babel/runtime": "^7.7.4",
+    "@babel/runtime": "^7.23.2",
     "lodash": "^4.17.21",
     "slate-hyperscript": "^0.81.3",
-    "source-map-loader": "^4.0.0"
+    "source-map-loader": "^4.0.1"
   },
   "keywords": [
     "canvas",

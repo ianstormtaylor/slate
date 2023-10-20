@@ -11,7 +11,7 @@ import {
 } from 'slate-react'
 
 import { Portal } from '../components'
-import { MentionElement } from './custom-types'
+import { MentionElement } from './custom-types.d'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
@@ -251,8 +251,7 @@ const initialValue: Descendant[] = [
         bold: true,
       },
       {
-        text:
-          ' feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The ',
+        text: ' feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The ',
       },
       {
         text: 'mentions',

@@ -445,11 +445,12 @@ export const ReactEditor: ReactEditorInterface = {
     // stepper arrow on a number input). (2018/05/04)
     // https://github.com/ianstormtaylor/slate/issues/1819
     try {
-      targetEl = (isDOMElement(target)
-        ? target
-        : target.parentElement) as HTMLElement
+      targetEl = (
+        isDOMElement(target) ? target : target.parentElement
+      ) as HTMLElement
     } catch (err) {
       if (
+        err instanceof Error &&
         !err.message.includes('Permission denied to access property "nodeType"')
       ) {
         throw err
@@ -620,13 +621,13 @@ export const ReactEditor: ReactEditorInterface = {
     // A slate Point at zero-width Leaf always has an offset of 0 but a native DOM selection at
     // zero-width node has an offset of 1 so we have to check if we are in a zero-width node and
     // adjust the offset accordingly.
-    const startEl = (isDOMElement(startNode)
-      ? startNode
-      : startNode.parentElement) as HTMLElement
+    const startEl = (
+      isDOMElement(startNode) ? startNode : startNode.parentElement
+    ) as HTMLElement
     const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
-    const endEl = (isDOMElement(endNode)
-      ? endNode
-      : endNode.parentElement) as HTMLElement
+    const endEl = (
+      isDOMElement(endNode) ? endNode : endNode.parentElement
+    ) as HTMLElement
     const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
 
     domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
@@ -990,6 +991,6 @@ export const ReactEditor: ReactEditorInterface = {
       range = Editor.unhangRange(editor, range, { voids: true })
     }
 
-    return (range as unknown) as T extends true ? Range | null : Range
+    return range as unknown as T extends true ? Range | null : Range
   },
 }

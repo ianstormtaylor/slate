@@ -10,6 +10,6 @@ test.describe('shadow-dom example', () => {
     const outerShadow = page.locator('[data-cy="outer-shadow-root"]')
     const innerShadow = outerShadow.locator('> div')
 
-    expect(await innerShadow.getByRole('textbox').count()).toBe(1)
+    await expect(innerShadow.getByRole('textbox')).toHaveCount(1)
   })
 })

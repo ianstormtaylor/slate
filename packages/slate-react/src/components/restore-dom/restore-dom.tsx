@@ -1,4 +1,10 @@
-import React, { Component, ComponentType, ContextType, RefObject } from 'react'
+import React, {
+  Component,
+  ComponentType,
+  ContextType,
+  ReactNode,
+  RefObject,
+} from 'react'
 import { EditorContext } from '../../hooks/use-slate-static'
 import { IS_ANDROID } from '../../utils/environment'
 import {
@@ -14,6 +20,7 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
 }
 
 type RestoreDOMProps = {
+  children?: ReactNode
   receivedUserInput: RefObject<boolean>
   node: RefObject<HTMLDivElement>
 }

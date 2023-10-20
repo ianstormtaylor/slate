@@ -26,9 +26,9 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 18.x
+          node-version: 20.x
           cache: yarn
-          key: node18
+          key: node20
 
       - name: Run ${{ matrix.command }}
         run: yarn && yarn build && yarn ${{ matrix.command }}

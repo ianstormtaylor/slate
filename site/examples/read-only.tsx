@@ -16,8 +16,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This example shows what happens when the Editor is set to readOnly, it is not editable',
+        text: 'This example shows what happens when the Editor is set to readOnly, it is not editable',
       },
     ],
   },
