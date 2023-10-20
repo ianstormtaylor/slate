@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Descendant, Editor, Node, Operation, Scrubber } from 'slate'
+import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { SlateContext, SlateContextValue } from '../hooks/use-slate'
@@ -22,14 +22,14 @@ export const Slate = (props: {
   initialValue: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
-  onSelectorChange?: (value: Descendant[]) => void
+  onSelectionChange?: (selection: Selection) => void
   onValueChange?: (value: Descendant[]) => void
 }) => {
   const {
     editor,
     children,
     onChange,
-    onSelectorChange,
+    onSelectionChange,
     onValueChange,
     initialValue,
     ...rest
@@ -66,7 +66,7 @@ export const Slate = (props: {
 
       switch (options?.operation?.type) {
         case 'set_selection':
-          onSelectorChange?.(editor.children)
+          onSelectionChange?.(editor.selection)
           break
         default:
           onValueChange?.(editor.children)
@@ -78,7 +78,7 @@ export const Slate = (props: {
       }))
       handleSelectorChange(editor)
     },
-    [editor, handleSelectorChange, onChange, onSelectorChange, onValueChange]
+    [editor, handleSelectorChange, onChange, onSelectionChange, onValueChange]
   )
 
   useEffect(() => {
