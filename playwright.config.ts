@@ -1,6 +1,6 @@
 import { PlaywrightTestConfig } from '@playwright/test'
 import { devices } from '@playwright/test'
-import os from 'os'
+import * as os from 'os'
 
 const projects = [
   {
