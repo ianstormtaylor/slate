@@ -125,8 +125,5 @@
       "eslint --fix"
     ]
   },
-  "packageManager": "yarn@3.6.4",
-  "resolutions": {
-    "@types/node": "20.8.7"
-  }
+  "packageManager": "yarn@3.6.4"
 }
