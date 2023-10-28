@@ -184,10 +184,10 @@ export const Editable = (props: EditableProps) => {
       }
       // Avoid leaking DOM nodes when this component is unmounted.
       if (state.latestElement != null) {
-        state.latestElement.remove();
+        state.latestElement.remove()
       }
       if (state.latestElement != null) {
-        state.latestElement = null;
+        state.latestElement = null
       }
     }
   }, [])
