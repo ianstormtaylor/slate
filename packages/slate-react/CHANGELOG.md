@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.100.1
+
+### Patch Changes
+
+- [#5542](https://github.com/ianstormtaylor/slate/pull/5542) [`8688ed5c`](https://github.com/ianstormtaylor/slate/commit/8688ed5c680069c4277d8b575b79fe525737935d) Thanks [@hellsan631](https://github.com/hellsan631)! - Fix Memory Leak when switching between focused editables
+
 ## 0.100.0
 
 ### Minor Changes
