@@ -943,6 +943,17 @@ export const ReactEditor: ReactEditorInterface = {
       )
     }
 
+    // COMPAT: Firefox sometimes includes an extra \n (rendered by TextString
+    // when isTrailing is true) in the focusOffset, resulting in an invalid
+    // Slate point. (2023/11/01)
+    if (
+      IS_FIREFOX &&
+      focusNode.textContent?.endsWith('\n\n') &&
+      focusOffset === focusNode.textContent.length
+    ) {
+      focusOffset--
+    }
+
     // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
     // inside a `contenteditable="false"` DOM node following the word, which
     // will cause `toSlatePoint` to throw an error. (2023/03/07)
