@@ -3,8 +3,8 @@ import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
 export const input = <editor />
-export const run = editor => {
-  Transforms.insertNodes(editor, <block>one</block>)
+export const run = (editor, options = {}) => {
+  Transforms.insertNodes(editor, <block>one</block>, options)
 }
 export const output = (
   <editor>

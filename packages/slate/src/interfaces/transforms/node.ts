@@ -9,6 +9,7 @@ export interface NodeInsertNodesOptions<T extends Node> {
   hanging?: boolean
   select?: boolean
   voids?: boolean
+  batchDirty?: boolean
 }
 
 export interface NodeTransforms {

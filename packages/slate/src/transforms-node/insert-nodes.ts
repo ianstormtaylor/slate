@@ -18,7 +18,12 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
   options = {}
 ) => {
   Editor.withoutNormalizing(editor, () => {
-    const { hanging = false, voids = false, mode = 'lowest' } = options
+    const {
+      hanging = false,
+      voids = false,
+      mode = 'lowest',
+      batchDirty = true,
+    } = options
     let { at, match, select } = options
 
     if (Node.isNode(nodes)) {
@@ -92,50 +97,60 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
       return
     }
 
-    // PERF: batch update dirty paths
-    // batched ops used to transform existing dirty paths
-    const batchedOps: BaseInsertNodeOperation[] = []
-    const newDirtyPaths: Path[] = Path.levels(parentPath)
-    batchDirtyPaths(
-      editor,
-      () => {
-        for (const node of nodes as Node[]) {
-          const path = parentPath.concat(index)
-          index++
+    if (batchDirty) {
+      // PERF: batch update dirty paths
+      // batched ops used to transform existing dirty paths
+      const batchedOps: BaseInsertNodeOperation[] = []
+      const newDirtyPaths: Path[] = Path.levels(parentPath)
+      batchDirtyPaths(
+        editor,
+        () => {
+          for (const node of nodes as Node[]) {
+            const path = parentPath.concat(index)
+            index++
 
-          const op: BaseInsertNodeOperation = {
-            type: 'insert_node',
-            path,
-            node,
-          }
-          editor.apply(op)
-          at = Path.next(at as Path)
+            const op: BaseInsertNodeOperation = {
+              type: 'insert_node',
+              path,
+              node,
+            }
+            editor.apply(op)
+            at = Path.next(at as Path)
 
-          batchedOps.push(op)
-          if (!Text.isText) {
-            newDirtyPaths.push(path)
-          } else {
-            newDirtyPaths.push(
-              ...Array.from(Node.nodes(node), ([, p]) => path.concat(p))
-            )
-          }
-        }
-      },
-      () => {
-        updateDirtyPaths(editor, newDirtyPaths, p => {
-          let newPath: Path | null = p
-          for (const op of batchedOps) {
-            if (Path.operationCanTransformPath(op)) {
-              newPath = Path.transform(newPath, op)
-              if (!newPath) {
-                return null
-              }
+            batchedOps.push(op)
+            if (!Text.isText) {
+              newDirtyPaths.push(path)
+            } else {
+              newDirtyPaths.push(
+                ...Array.from(Node.nodes(node), ([, p]) => path.concat(p))
+              )
             }
           }
-          return newPath
-        })
+        },
+        () => {
+          updateDirtyPaths(editor, newDirtyPaths, p => {
+            let newPath: Path | null = p
+            for (const op of batchedOps) {
+              if (Path.operationCanTransformPath(op)) {
+                newPath = Path.transform(newPath, op)
+                if (!newPath) {
+                  return null
+                }
+              }
+            }
+            return newPath
+          })
+        }
+      )
+    } else {
+      for (const node of nodes as Node[]) {
+        const path = parentPath.concat(index)
+        index++
+
+        editor.apply({ type: 'insert_node', path, node })
+        at = Path.next(at as Path)
       }
-    )
+    }
 
     at = Path.previous(at)
 

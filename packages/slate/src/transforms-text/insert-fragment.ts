@@ -15,7 +15,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
 ) => {
   Editor.withoutNormalizing(editor, () => {
     const { hanging = false, voids = false } = options
-    let { at = getDefaultInsertLocation(editor) } = options
+    let { at = getDefaultInsertLocation(editor), batchDirty = true } = options
 
     if (!fragment.length) {
       return
@@ -187,6 +187,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       match: n => Text.isText(n) || Editor.isInline(editor, n),
       mode: 'highest',
       voids,
+      batchDirty,
     })
 
     if (isBlockEmpty && !starts.length && middles.length && !ends.length) {
@@ -198,6 +199,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       match: n => Element.isElement(n) && Editor.isBlock(editor, n),
       mode: 'lowest',
       voids,
+      batchDirty,
     })
 
     Transforms.insertNodes(editor, ends, {
@@ -205,6 +207,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       match: n => Text.isText(n) || Editor.isInline(editor, n),
       mode: 'highest',
       voids,
+      batchDirty,
     })
 
     if (!options.at) {
