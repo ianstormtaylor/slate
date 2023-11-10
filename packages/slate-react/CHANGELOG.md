@@ -1,5 +1,19 @@
 # slate-react
 
+## 0.101.0
+
+### Minor Changes
+
+- [#5527](https://github.com/ianstormtaylor/slate/pull/5527) [`fc081816`](https://github.com/ianstormtaylor/slate/commit/fc081816e08ade6838d05a96f84088de9f2734ce) Thanks [@skogsmaskin](https://github.com/skogsmaskin)! - Fixes a bug with `ReactEditor.focus` where it would throw an error if the editor was in the middle of applying pending operations.
+  With this change, setting focus will be retried until the editor no longer has any pending operations.
+  Calling `ReactEditor.focus` on a editor without a current selection, will now make a selection in the top of the document.
+
+### Patch Changes
+
+- [#5549](https://github.com/ianstormtaylor/slate/pull/5549) [`f9cca97f`](https://github.com/ianstormtaylor/slate/commit/f9cca97f00e4b7827f7056cd7f1644345a4be953) Thanks [@12joan](https://github.com/12joan)! - Firefox compat: Fix incorrect focus.offset when text node ends with \n
+
+- [#5556](https://github.com/ianstormtaylor/slate/pull/5556) [`22495e14`](https://github.com/ianstormtaylor/slate/commit/22495e143d81fd602ff3efa0b5f6339a4b05b6c0) Thanks [@dylans](https://github.com/dylans)! - Revert #5542
+
 ## 0.100.1
 
 ### Patch Changes
