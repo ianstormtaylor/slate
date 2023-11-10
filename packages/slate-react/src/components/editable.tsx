@@ -4,7 +4,6 @@ import throttle from 'lodash/throttle'
 import React, {
   useCallback,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useReducer,
   useRef,
@@ -176,21 +175,6 @@ export const Editable = (props: EditableProps) => {
     }),
     []
   )
-
-  useLayoutEffect(() => {
-    return () => {
-      if (state == null) {
-        return
-      }
-      // Avoid leaking DOM nodes when this component is unmounted.
-      if (state.latestElement != null) {
-        state.latestElement.remove()
-      }
-      if (state.latestElement != null) {
-        state.latestElement = null
-      }
-    }
-  }, [])
 
   // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
   // needs to be manually focused.
