@@ -19,7 +19,7 @@
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
     "lodash": "^4.17.21",
-    "slate": "^0.100.0",
+    "slate": "^0.101.1",
     "slate-hyperscript": "^0.100.0",
     "source-map-loader": "^4.0.1"
   },
