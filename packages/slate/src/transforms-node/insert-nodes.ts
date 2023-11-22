@@ -30,7 +30,9 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
 
     if (!at) {
       at = getDefaultInsertLocation(editor)
-      select = true
+      if (select !== false) {
+        select = true
+      }
     }
 
     if (select == null) {
