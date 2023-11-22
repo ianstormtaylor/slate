@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.101.1
+
+### Patch Changes
+
+- [#5564](https://github.com/ianstormtaylor/slate/pull/5564) [`9aa573e9`](https://github.com/ianstormtaylor/slate/commit/9aa573e9b8b2aff0c702fc6efa622e71db7759f1) Thanks [@12joan](https://github.com/12joan)! - Apply 300ms placeholder delay only on Android devices
+
 ## 0.101.0
 
 ### Minor Changes

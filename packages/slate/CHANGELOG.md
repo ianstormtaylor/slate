@@ -1,5 +1,11 @@
 # slate
 
+## 0.101.1
+
+### Patch Changes
+
+- [#5562](https://github.com/ianstormtaylor/slate/pull/5562) [`91400a8e`](https://github.com/ianstormtaylor/slate/commit/91400a8e341b20194ce2fca078d8ba4b7a0476ea) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix the 'select' parameter of the insertNodes function has been overridden
+
 ## 0.100.0
 
 ### Minor Changes
