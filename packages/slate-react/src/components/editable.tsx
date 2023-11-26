@@ -1501,7 +1501,7 @@ export const Editable = (props: EditableProps) => {
                     if (selection && Range.isCollapsed(selection)) {
                       Transforms.move(editor, { reverse: !isRTL })
                     } else {
-                      Transforms.collapse(editor, { edge: 'start' })
+                      Transforms.collapse(editor, { edge: isRTL ? 'end' : 'start' })
                     }
 
                     return
@@ -1513,7 +1513,7 @@ export const Editable = (props: EditableProps) => {
                     if (selection && Range.isCollapsed(selection)) {
                       Transforms.move(editor, { reverse: isRTL })
                     } else {
-                      Transforms.collapse(editor, { edge: 'end' })
+                      Transforms.collapse(editor, { edge: isRTL ? 'start' : 'end' })
                     }
 
                     return
