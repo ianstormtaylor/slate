@@ -6,11 +6,6 @@ test.describe('images example', () => {
   })
 
   test('contains image', async ({ page }) => {
-    expect(
-      await page
-        .getByRole('textbox')
-        .locator('img')
-        .count()
-    ).toBe(2)
+    await expect(page.getByRole('textbox').locator('img')).toHaveCount(2)
   })
 })

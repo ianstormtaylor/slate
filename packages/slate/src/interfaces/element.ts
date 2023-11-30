@@ -85,7 +85,9 @@ export const Element: ElementInterface = {
     elementVal: string,
     elementKey: string = 'type'
   ): value is T => {
-    return isElement(value) && value[elementKey] === elementVal
+    return (
+      isElement(value) && value[<keyof Descendant>elementKey] === elementVal
+    )
   },
 
   matches(element: Element, props: Partial<Element>): boolean {
@@ -94,7 +96,7 @@ export const Element: ElementInterface = {
         continue
       }
 
-      if (element[key] !== props[key]) {
+      if (element[<keyof Descendant>key] !== props[<keyof Descendant>key]) {
         return false
       }
     }

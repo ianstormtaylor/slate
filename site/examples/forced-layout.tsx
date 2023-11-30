@@ -9,7 +9,7 @@ import {
   Editor,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { ParagraphElement, TitleElement } from './custom-types'
+import { ParagraphElement, TitleElement } from './custom-types.d'
 
 const withLayout = editor => {
   const { normalizeNode } = editor
@@ -103,8 +103,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This example shows how to enforce your layout with domain-specific constraints. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
+        text: 'This example shows how to enforce your layout with domain-specific constraints. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
       },
     ],
   },

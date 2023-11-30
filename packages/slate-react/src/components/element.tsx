@@ -1,5 +1,6 @@
 import getDirection from 'direction'
 import React, { useCallback } from 'react'
+import { JSX } from 'react'
 import { Editor, Element as SlateElement, Node, Range } from 'slate'
 import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'

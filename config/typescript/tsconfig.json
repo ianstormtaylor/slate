@@ -11,7 +11,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
-    "suppressImplicitAnyIndexErrors": true,
     "target": "esnext"
   }
 }

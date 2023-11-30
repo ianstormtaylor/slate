@@ -117,7 +117,7 @@ export interface ReactEditorInterface {
   /**
    * Focus the editor.
    */
-  focus: (editor: ReactEditor) => void
+  focus: (editor: ReactEditor, options?: { retries: number }) => void
 
   /**
    * Return the host window of the current editor.
@@ -411,19 +411,44 @@ export const ReactEditor: ReactEditorInterface = {
     )
   },
 
-  focus: editor => {
+  focus: (editor, options = { retries: 5 }) => {
+    // Return if already focused
+    if (IS_FOCUSED.get(editor)) {
+      return
+    }
+
+    // Retry setting focus if the editor has pending operations.
+    // The DOM (selection) is unstable while changes are applied.
+    // Retry until retries are exhausted or editor is focused.
+    if (options.retries <= 0) {
+      throw new Error(
+        'Could not set focus, editor seems stuck with pending operations'
+      )
+    }
+    if (editor.operations.length > 0) {
+      setTimeout(() => {
+        ReactEditor.focus(editor, { retries: options.retries - 1 })
+      }, 10)
+      return
+    }
+
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    IS_FOCUSED.set(editor, true)
-
     if (root.activeElement !== el) {
+      // Ensure that the DOM selection state is set to the editor's selection
       if (editor.selection && root instanceof Document) {
         const domSelection = root.getSelection()
         const domRange = ReactEditor.toDOMRange(editor, editor.selection)
         domSelection?.removeAllRanges()
         domSelection?.addRange(domRange)
       }
+      // Create a new selection in the top of the document if missing
+      if (!editor.selection) {
+        Transforms.select(editor, Editor.start(editor, []))
+        editor.onChange()
+      }
       el.focus({ preventScroll: true })
+      IS_FOCUSED.set(editor, true)
     }
   },
 
@@ -445,11 +470,12 @@ export const ReactEditor: ReactEditorInterface = {
     // stepper arrow on a number input). (2018/05/04)
     // https://github.com/ianstormtaylor/slate/issues/1819
     try {
-      targetEl = (isDOMElement(target)
-        ? target
-        : target.parentElement) as HTMLElement
+      targetEl = (
+        isDOMElement(target) ? target : target.parentElement
+      ) as HTMLElement
     } catch (err) {
       if (
+        err instanceof Error &&
         !err.message.includes('Permission denied to access property "nodeType"')
       ) {
         throw err
@@ -620,13 +646,13 @@ export const ReactEditor: ReactEditorInterface = {
     // A slate Point at zero-width Leaf always has an offset of 0 but a native DOM selection at
     // zero-width node has an offset of 1 so we have to check if we are in a zero-width node and
     // adjust the offset accordingly.
-    const startEl = (isDOMElement(startNode)
-      ? startNode
-      : startNode.parentElement) as HTMLElement
+    const startEl = (
+      isDOMElement(startNode) ? startNode : startNode.parentElement
+    ) as HTMLElement
     const isStartAtZeroWidth = !!startEl.getAttribute('data-slate-zero-width')
-    const endEl = (isDOMElement(endNode)
-      ? endNode
-      : endNode.parentElement) as HTMLElement
+    const endEl = (
+      isDOMElement(endNode) ? endNode : endNode.parentElement
+    ) as HTMLElement
     const isEndAtZeroWidth = !!endEl.getAttribute('data-slate-zero-width')
 
     domRange.setStart(startNode, isStartAtZeroWidth ? 1 : startOffset)
@@ -942,6 +968,17 @@ export const ReactEditor: ReactEditorInterface = {
       )
     }
 
+    // COMPAT: Firefox sometimes includes an extra \n (rendered by TextString
+    // when isTrailing is true) in the focusOffset, resulting in an invalid
+    // Slate point. (2023/11/01)
+    if (
+      IS_FIREFOX &&
+      focusNode.textContent?.endsWith('\n\n') &&
+      focusOffset === focusNode.textContent.length
+    ) {
+      focusOffset--
+    }
+
     // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
     // inside a `contenteditable="false"` DOM node following the word, which
     // will cause `toSlatePoint` to throw an error. (2023/03/07)
@@ -990,6 +1027,6 @@ export const ReactEditor: ReactEditorInterface = {
       range = Editor.unhangRange(editor, range, { voids: true })
     }
 
-    return (range as unknown) as T extends true ? Range | null : Range
+    return range as unknown as T extends true ? Range | null : Range
   },
 }

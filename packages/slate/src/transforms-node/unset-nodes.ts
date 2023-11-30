@@ -10,7 +10,7 @@ export const unsetNodes: NodeTransforms['unsetNodes'] = (
     props = [props]
   }
 
-  const obj = {}
+  const obj: any = {}
 
   for (const key of props) {
     obj[key] = null

@@ -26,5 +26,5 @@ export interface CustomTypes {
 
 export type ExtendedType<
   K extends ExtendableTypes,
-  B
+  B,
 > = unknown extends CustomTypes[K] ? B : CustomTypes[K]

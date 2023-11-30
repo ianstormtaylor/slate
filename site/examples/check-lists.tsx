@@ -24,8 +24,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
+        text: 'With Slate you can build complex block types that have their own embedded content and behaviors, like rendering checkboxes inside check list items!',
       },
     ],
   },

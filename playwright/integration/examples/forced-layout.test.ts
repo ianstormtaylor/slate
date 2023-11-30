@@ -12,7 +12,7 @@ test.describe('forced layout example', () => {
 
   test('checks for the elements', async ({ page }) => {
     for (const { tag, count } of elements) {
-      expect(await page.locator(tag).count()).toBe(count)
+      await expect(page.locator(tag)).toHaveCount(count)
     }
   })
 
@@ -22,7 +22,7 @@ test.describe('forced layout example', () => {
     // clear the textbox
     await page.locator('div[role="textbox"]').clear()
     for (const { tag, count } of elements) {
-      expect(await page.locator(tag).count()).toBe(count)
+      await expect(page.locator(tag)).toHaveCount(count)
     }
   })
 })

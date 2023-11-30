@@ -9,12 +9,7 @@ test.describe('markdown preview', () => {
   })
 
   test('checks for markdown', async ({ page }) => {
-    expect(
-      await page
-        .locator(slateEditor)
-        .locator(markdown)
-        .count()
-    ).toBe(9)
+    await expect(page.locator(slateEditor).locator(markdown)).toHaveCount(9)
 
     await page.locator(slateEditor).click()
     await page.keyboard.press('End')
@@ -22,11 +17,6 @@ test.describe('markdown preview', () => {
     await page.keyboard.type('## Try it out!')
     await page.keyboard.press('Enter')
     await page.pause()
-    expect(
-      await page
-        .locator(slateEditor)
-        .locator(markdown)
-        .count()
-    ).toBe(10)
+    await expect(page.locator(slateEditor).locator(markdown)).toHaveCount(10)
   })
 })

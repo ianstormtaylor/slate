@@ -42,10 +42,7 @@ import { Scrubber } from 'slate'
 const textRandomizer = (fieldNames: string[]) => (key, value) => {
   if (fieldNames.includes(key)) {
     if (typeof value === 'string') {
-      return value
-        .split('')
-        .map(generateRandomCharacter)
-        .join('')
+      return value.split('').map(generateRandomCharacter).join('')
     } else {
       return '... scrubbed ...'
     }

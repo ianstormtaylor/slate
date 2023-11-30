@@ -363,7 +363,7 @@ export const withReact = <T extends BaseEditor>(
       const onContextChange = EDITOR_TO_ON_CHANGE.get(e)
 
       if (onContextChange) {
-        onContextChange()
+        onContextChange(options)
       }
 
       onChange(options)

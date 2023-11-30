@@ -8,11 +8,6 @@ test.describe('embeds example', () => {
   })
 
   test('contains embeded', async ({ page }) => {
-    expect(
-      await page
-        .locator(slateEditor)
-        .locator('iframe')
-        .count()
-    ).toBe(1)
+    await expect(page.locator(slateEditor).locator('iframe')).toHaveCount(1)
   })
 })

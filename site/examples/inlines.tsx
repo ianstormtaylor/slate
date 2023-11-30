@@ -13,7 +13,7 @@ import {
   Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkElement, ButtonElement } from './custom-types'
+import { LinkElement, ButtonElement } from './custom-types.d'
 
 import { Button, Icon, Toolbar } from '../components'
 
@@ -22,8 +22,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'In addition to block nodes, you can create inline nodes. Here is a ',
+        text: 'In addition to block nodes, you can create inline nodes. Here is a ',
       },
       {
         type: 'link',
@@ -53,8 +52,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
+        text: 'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
       },
       // The following is an example of an inline at the end of a block.
       // This is an edge case that can cause issues.
@@ -115,13 +113,8 @@ const InlinesExample = () => {
 }
 
 const withInlines = editor => {
-  const {
-    insertData,
-    insertText,
-    isInline,
-    isElementReadOnly,
-    isSelectable,
-  } = editor
+  const { insertData, insertText, isInline, isElementReadOnly, isSelectable } =
+    editor
 
   editor.isInline = element =>
     ['link', 'button', 'badge'].includes(element.type) || isInline(element)

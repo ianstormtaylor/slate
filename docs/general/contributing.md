@@ -95,7 +95,7 @@ This will fix Prettier and Eslint errors.
 
 ## Running integration tests
 
-To run integrations with [cypress](https://github.com/cypress-io/cypress), first run `yarn start` to run the examples website, then run `yarn cypress:open` in a separate session to open the cypress GUI.
+To run integrations with [Playwright](https://playwright.dev/), first run `yarn start` to run the examples website, then run `yarn playwright` in a separate session to open the Playwright test suite. Or alternatively, run just `yarn test:integration-local`.
 
 ## Testing Input Methods
 

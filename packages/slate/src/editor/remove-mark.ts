@@ -35,7 +35,7 @@ export const removeMark: EditorInterface['removeMark'] = (editor, key) => {
       })
     } else {
       const marks = { ...(Editor.marks(editor) || {}) }
-      delete marks[key]
+      delete marks[<keyof Node>key]
       editor.marks = marks
       if (!FLUSHING.get(editor)) {
         editor.onChange()
