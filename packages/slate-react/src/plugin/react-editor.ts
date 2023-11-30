@@ -217,7 +217,11 @@ export interface ReactEditorInterface {
   /**
    * Find a native DOM selection point from a Slate point.
    */
-  toDOMPoint: (editor: ReactEditor, point: Point) => DOMPoint
+  toDOMPoint: <T extends boolean = false>(
+    editor: ReactEditor,
+    point: Point,
+    options?: { suppressThrow: T }
+  ) => T extends true ? DOMPoint | null : DOMPoint
 
   /**
    * Find a native DOM range from a Slate `range`.
@@ -227,7 +231,11 @@ export interface ReactEditorInterface {
    * there is no way to create a reverse DOM Range using Range.setStart/setEnd
    * according to https://dom.spec.whatwg.org/#concept-range-bp-set.
    */
-  toDOMRange: (editor: ReactEditor, range: Range) => DOMRange
+  toDOMRange: <T extends boolean = false>(
+    editor: ReactEditor,
+    range: Range,
+    options?: { suppressThrow: T }
+  ) => T extends true ? DOMRange | null : DOMRange
 
   /**
    * Find a Slate node from a native DOM `element`.
@@ -558,7 +566,11 @@ export const ReactEditor: ReactEditorInterface = {
     return domNode
   },
 
-  toDOMPoint: (editor, point) => {
+  toDOMPoint: <T extends boolean>(
+    editor: ReactEditor,
+    point: Point,
+    options?: { suppressThrow: T }
+  ) => {
     const [node] = Editor.node(editor, point.path)
     const el = ReactEditor.toDOMNode(editor, node)
     let domPoint: DOMPoint | undefined
@@ -620,6 +632,10 @@ export const ReactEditor: ReactEditorInterface = {
     }
 
     if (!domPoint) {
+      const suppressThrow = options?.suppressThrow
+      if (suppressThrow === true) {
+        return null as T extends true ? DOMPoint | null : DOMPoint
+      }
       throw new Error(
         `Cannot resolve a DOM point from Slate point: ${Scrubber.stringify(
           point
@@ -630,13 +646,38 @@ export const ReactEditor: ReactEditorInterface = {
     return domPoint
   },
 
-  toDOMRange: (editor, range) => {
+  toDOMRange: <T extends boolean>(
+    editor: ReactEditor,
+    range: Range,
+    options?: { suppressThrow: T }
+  ) => {
     const { anchor, focus } = range
     const isBackward = Range.isBackward(range)
-    const domAnchor = ReactEditor.toDOMPoint(editor, anchor)
+    const domAnchor = ReactEditor.toDOMPoint(editor, anchor, options)
+    if (!domAnchor) {
+      if (options?.suppressThrow) {
+        return null as T extends true ? DOMRange | null : DOMRange
+      }
+      throw new Error(
+        `Cannot resolve a DOM range from Slate range: ${Scrubber.stringify(
+          range
+        )}`
+      )
+    }
+
     const domFocus = Range.isCollapsed(range)
       ? domAnchor
-      : ReactEditor.toDOMPoint(editor, focus)
+      : ReactEditor.toDOMPoint(editor, focus, options)
+    if (!domFocus) {
+      if (options?.suppressThrow) {
+        return null as T extends true ? DOMRange | null : DOMRange
+      }
+      throw new Error(
+        `Cannot resolve a DOM range from Slate range: ${Scrubber.stringify(
+          range
+        )}`
+      )
+    }
 
     const window = ReactEditor.getWindow(editor)
     const domRange = window.document.createRange()
