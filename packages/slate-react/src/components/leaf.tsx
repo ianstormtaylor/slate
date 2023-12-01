@@ -16,7 +16,11 @@ import {
 } from '../utils/weak-maps'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
-import { IS_WEBKIT } from '../utils/environment'
+import { IS_WEBKIT, IS_ANDROID } from '../utils/environment'
+
+// Delay the placeholder on Android to prevent the keyboard from closing.
+// (https://github.com/ianstormtaylor/slate/pull/5368)
+const PLACEHOLDER_DELAY = IS_ANDROID ? 300 : 0
 
 function disconnectPlaceholderResizeObserver(
   placeholderResizeObserver: MutableRefObject<ResizeObserver | null>,
@@ -104,7 +108,7 @@ const Leaf = (props: {
         showPlaceholderTimeoutRef.current = setTimeout(() => {
           setShowPlaceholder(true)
           showPlaceholderTimeoutRef.current = null
-        }, 300)
+        }, PLACEHOLDER_DELAY)
       }
     } else {
       clearTimeoutRef(showPlaceholderTimeoutRef)
