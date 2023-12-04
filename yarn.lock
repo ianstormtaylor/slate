@@ -3507,32 +3507,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0":
-  version: 18.2.15
-  resolution: "@types/react-dom@npm:18.2.15"
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.13, @types/react-dom@npm:^18.2.17":
+  version: 18.2.17
+  resolution: "@types/react-dom@npm:18.2.17"
   dependencies:
     "@types/react": "npm:*"
-  checksum: 57ea7e9e210d95fa18fde82fc585cb6252c9118c8793a38b37b07ccbba05d09d14f88cf76af46eecda41c430b4400f789a4bbc505eec459a15cbaf13f56f887a
+  checksum: fe0dbb3224b48515da8fe25559e3777d756a27c3f22903f0b1b020de8d68bd57eb1f0af62b52ee65d9632637950afed8cbad24d158c4f3d910d083d49bd73fba
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.2.13":
-  version: 18.2.13
-  resolution: "@types/react-dom@npm:18.2.13"
-  dependencies:
-    "@types/react": "npm:*"
-  checksum: 0355d036d062bfa69345851282a555817c57be44d909250926296383bcc82fb4b79df08ecc882c519883e5ab8d179961d4cd245157a5c5977a7247714757b0ac
-  languageName: node
-  linkType: hard
-
-"@types/react@npm:*, @types/react@npm:^18.2.28":
-  version: 18.2.28
-  resolution: "@types/react@npm:18.2.28"
+"@types/react@npm:*, @types/react@npm:^18.2.41":
+  version: 18.2.41
+  resolution: "@types/react@npm:18.2.41"
   dependencies:
     "@types/prop-types": "npm:*"
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
-  checksum: 213828dae911f15c02fc313b9173b42e71fb128ec03561ac8d2e5260a706bfd9c78bcacf0cd0a2d40fb7c2deccdae6316d99f0a5fe0a40928dc9d3b4f5199a3c
+  checksum: 31a498a56ad3e825ae13799355fe49042c0cdbbe6f40003f39b6b9cf847ba1669393c22ba60e97b1072cf1c002b15432082cdd17e47c948430bdc1f0864829b9
   languageName: node
   linkType: hard
 
@@ -13322,7 +13313,7 @@ __metadata:
     "@types/mocha": "npm:^10.0.3"
     "@types/node": "npm:^20.8.7"
     "@types/prismjs": "npm:^1.26.1"
-    "@types/react": "npm:^18.2.28"
+    "@types/react": "npm:^18.2.41"
     "@types/react-dom": "npm:^18.2.13"
     "@typescript-eslint/eslint-plugin": "npm:^6.8.0"
     "@typescript-eslint/parser": "npm:^6.8.0"
@@ -13389,8 +13380,8 @@ __metadata:
     "@types/jest": "npm:29.5.6"
     "@types/jsdom": "npm:^21.1.4"
     "@types/lodash": "npm:^4.14.200"
-    "@types/react": "npm:^18.2.28"
-    "@types/react-dom": "npm:^18.2.13"
+    "@types/react": "npm:^18.2.41"
+    "@types/react-dom": "npm:^18.2.17"
     "@types/resize-observer-browser": "npm:^0.1.8"
     direction: "npm:^1.0.4"
     is-hotkey: "npm:^0.2.0"
