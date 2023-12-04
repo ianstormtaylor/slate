@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.101.2
+
+### Patch Changes
+
+- [#5567](https://github.com/ianstormtaylor/slate/pull/5567) [`07f59e36`](https://github.com/ianstormtaylor/slate/commit/07f59e36071bae2b9c09b787f1dd514c6bf859a4) Thanks [@timagixe](https://github.com/timagixe)! - Fix cursor position on selection collapse for RTL direction
+
 ## 0.101.1
 
 ### Patch Changes
