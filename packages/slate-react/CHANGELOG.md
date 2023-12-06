@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.101.3
+
+### Patch Changes
+
+- [#5576](https://github.com/ianstormtaylor/slate/pull/5576) [`8ce52fd4`](https://github.com/ianstormtaylor/slate/commit/8ce52fd494c5156c8f08841b972bc5eda2817c03) Thanks [@qirong77](https://github.com/qirong77)! - fix onCompositionEnd update error.
+
 ## 0.101.2
 
 ### Patch Changes
