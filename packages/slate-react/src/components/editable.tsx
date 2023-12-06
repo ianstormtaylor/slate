@@ -1114,8 +1114,10 @@ export const Editable = (props: EditableProps) => {
               (event: React.CompositionEvent<HTMLDivElement>) => {
                 if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                   if (ReactEditor.isComposing(editor)) {
-                    setIsComposing(false)
-                    IS_COMPOSING.set(editor, false)
+                    Promise.resolve(() => {
+                      setIsComposing(false)
+                      IS_COMPOSING.set(editor, false)
+                    })
                   }
 
                   androidInputManagerRef.current?.handleCompositionEnd(event)
