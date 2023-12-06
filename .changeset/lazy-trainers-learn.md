@@ -1,5 +1,5 @@
 ---
-'slate-react': major
+'slate-react': patch
 ---
 
 fix onCompositionEnd update error.
