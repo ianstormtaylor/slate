@@ -6,10 +6,6 @@ import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
 import {Point} from "../interfaces";
 
-export const IS_FIREFOX =
-  typeof navigator !== 'undefined' &&
-  /^(?!.*Seamonkey)(?=.*Firefox).*/i.test(navigator.userAgent)
-
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
 
@@ -23,13 +19,11 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   }
 
   if (Range.isExpanded(selection)) {
-    if (IS_FIREFOX) {
-      const isEnd = Editor.isEnd(editor, anchor, anchor.path)
-      if (isEnd) {
-        const after = Editor.after(editor, anchor as Point)
-        // Editor.after() might return undefined
-        anchor = (after || anchor)
-      }
+    const isEnd = Editor.isEnd(editor, anchor, anchor.path)
+    if (isEnd) {
+      const after = Editor.after(editor, anchor as Point)
+      // Editor.after() might return undefined
+      anchor = (after || anchor)
     }
     const [match] = Editor.nodes(editor, { match: Text.isText, at: {
       anchor, focus
