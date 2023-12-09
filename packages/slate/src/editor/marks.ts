@@ -4,7 +4,7 @@ import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 import { Text } from '../interfaces/text'
 import { Element } from '../interfaces/element'
-import {Point} from "../interfaces";
+import { Point } from '../interfaces'
 
 export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   const { marks, selection } = editor
@@ -23,11 +23,15 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
     if (isEnd) {
       const after = Editor.after(editor, anchor as Point)
       // Editor.after() might return undefined
-      anchor = (after || anchor)
+      anchor = after || anchor
     }
-    const [match] = Editor.nodes(editor, { match: Text.isText, at: {
-      anchor, focus
-    } })
+    const [match] = Editor.nodes(editor, {
+      match: Text.isText,
+      at: {
+        anchor,
+        focus,
+      },
+    })
     if (match) {
       const [node] = match as NodeEntry<Text>
       const { text, ...rest } = node
