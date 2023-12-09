@@ -19,12 +19,18 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   }
 
   if (Range.isExpanded(selection)) {
+    /**
+     * COMPAT: Make sure hanging ranges (caused by double clicking in Firefox)
+     * do not adversely affect the returned marks.
+     */
     const isEnd = Editor.isEnd(editor, anchor, anchor.path)
     if (isEnd) {
       const after = Editor.after(editor, anchor as Point)
-      // Editor.after() might return undefined
-      anchor = after || anchor
+      if (after) {
+        anchor = after
+      }
     }
+
     const [match] = Editor.nodes(editor, {
       match: Text.isText,
       at: {
@@ -32,6 +38,7 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
         focus,
       },
     })
+
     if (match) {
       const [node] = match as NodeEntry<Text>
       const { text, ...rest } = node
