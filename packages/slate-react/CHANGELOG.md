@@ -1,5 +1,17 @@
 # slate-react
 
+## 0.101.3
+
+### Patch Changes
+
+- [#5576](https://github.com/ianstormtaylor/slate/pull/5576) [`8ce52fd4`](https://github.com/ianstormtaylor/slate/commit/8ce52fd494c5156c8f08841b972bc5eda2817c03) Thanks [@qirong77](https://github.com/qirong77)! - fix onCompositionEnd update error.
+
+## 0.101.2
+
+### Patch Changes
+
+- [#5567](https://github.com/ianstormtaylor/slate/pull/5567) [`07f59e36`](https://github.com/ianstormtaylor/slate/commit/07f59e36071bae2b9c09b787f1dd514c6bf859a4) Thanks [@timagixe](https://github.com/timagixe)! - Fix cursor position on selection collapse for RTL direction
+
 ## 0.101.1
 
 ### Patch Changes

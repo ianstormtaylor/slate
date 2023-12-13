@@ -1,5 +1,11 @@
 # slate
 
+## 0.101.4
+
+### Patch Changes
+
+- [#5580](https://github.com/ianstormtaylor/slate/pull/5580) [`a374895b`](https://github.com/ianstormtaylor/slate/commit/a374895b3265ad60dbfe563eaa1a9415a440620e) Thanks [@Kaporos](https://github.com/Kaporos)! - Fix firefox double-click marks issue
+
 ## 0.101.1
 
 ### Patch Changes
