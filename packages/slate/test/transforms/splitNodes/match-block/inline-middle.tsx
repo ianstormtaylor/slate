@@ -1,9 +1,11 @@
 /** @jsx jsx */
-import { Editor, Transforms } from 'slate'
+import { Editor, Transforms, Element } from 'slate'
 import { jsx } from '../../..'
 
 export const run = editor => {
-  Transforms.splitNodes(editor, { match: n => Editor.isBlock(editor, n) })
+  Transforms.splitNodes(editor, {
+    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+  })
 }
 export const input = (
   <editor>

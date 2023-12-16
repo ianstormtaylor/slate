@@ -57,10 +57,10 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: 18.x
+          node-version: 20.x
           cache: yarn
           registry-url: https://registry.npmjs.org
-          key: node18
+          key: node20
 
       - name: Install dependencies
         run: yarn

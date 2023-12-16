@@ -1,5 +1,244 @@
 # slate
 
+## 0.101.4
+
+### Patch Changes
+
+- [#5580](https://github.com/ianstormtaylor/slate/pull/5580) [`a374895b`](https://github.com/ianstormtaylor/slate/commit/a374895b3265ad60dbfe563eaa1a9415a440620e) Thanks [@Kaporos](https://github.com/Kaporos)! - Fix firefox double-click marks issue
+
+## 0.101.1
+
+### Patch Changes
+
+- [#5562](https://github.com/ianstormtaylor/slate/pull/5562) [`91400a8e`](https://github.com/ianstormtaylor/slate/commit/91400a8e341b20194ce2fca078d8ba4b7a0476ea) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix the 'select' parameter of the insertNodes function has been overridden
+
+## 0.100.0
+
+### Minor Changes
+
+- [#5528](https://github.com/ianstormtaylor/slate/pull/5528) [`c4c14882`](https://github.com/ianstormtaylor/slate/commit/c4c14882edf13828f6583a88e50754ce63583bd7) Thanks [@dylans](https://github.com/dylans)! - Update dependencies to React 18, Node 20, TS 5.2, etc.
+
+## 0.94.1
+
+### Patch Changes
+
+- [#5415](https://github.com/ianstormtaylor/slate/pull/5415) [`01f0210b`](https://github.com/ianstormtaylor/slate/commit/01f0210bccfe2c3a81c252f527bad9ded36a68ff) Thanks [@zbeyens](https://github.com/zbeyens)! - `Editor.insertFragment`, `Editor.insertNode`, `Editor.insertText` now accept `options`.
+  For all insert methods, the default location is now the editor selection if `at` is not defined, or the end of document if `editor.selection` is not defined.
+
+## 0.94.0
+
+### Minor Changes
+
+- [#5307](https://github.com/ianstormtaylor/slate/pull/5307) [`3243c7e3`](https://github.com/ianstormtaylor/slate/commit/3243c7e34ac2602618c67c88b1b7df07fde1c2ec) Thanks [@zbeyens](https://github.com/zbeyens)! - New Features:
+
+  - All **`Editor`** and **`Transforms`** methods now call **`editor`** methods. For example: **`Transforms.insertBreak`** now calls **`editor.insertBreak`**.
+  - **`editor.setNodes`** now calls **`setNodes`**, an exported function that implements the default editor behavior.
+  - You can now override **`editor.setNodes`** with your own implementation.
+  - You can use either **`Editor.setNodes`** or **`editor.setNodes`** in your code, and both will use your overridden behavior.
+
+  The **`editor`** object now has many more methods:
+
+  ```tsx
+  export interface BaseEditor {
+    // Core state.
+
+    children: Descendant[]
+    selection: Selection
+    operations: Operation[]
+    marks: EditorMarks | null
+
+    // Overrideable core methods.
+
+    apply: (operation: Operation) => void
+    getDirtyPaths: (operation: Operation) => Path[]
+    getFragment: () => Descendant[]
+    isElementReadOnly: (element: Element) => boolean
+    isSelectable: (element: Element) => boolean
+    markableVoid: (element: Element) => boolean
+    normalizeNode: (
+      entry: NodeEntry,
+      options?: { operation?: Operation }
+    ) => void
+    onChange: (options?: { operation?: Operation }) => void
+    shouldNormalize: ({
+      iteration,
+      dirtyPaths,
+      operation,
+    }: {
+      iteration: number
+      initialDirtyPathsLength: number
+      dirtyPaths: Path[]
+      operation?: Operation
+    }) => boolean
+
+    // Overrideable core transforms.
+
+    addMark: OmitFirstArg<typeof Editor.addMark>
+    collapse: OmitFirstArg<typeof Transforms.collapse>
+    delete: OmitFirstArg<typeof Transforms.delete>
+    deleteBackward: (unit: TextUnit) => void
+    deleteForward: (unit: TextUnit) => void
+    deleteFragment: OmitFirstArg<typeof Editor.deleteFragment>
+    deselect: OmitFirstArg<typeof Transforms.deselect>
+    insertBreak: OmitFirstArg<typeof Editor.insertBreak>
+    insertFragment: OmitFirstArg<typeof Transforms.insertFragment>
+    insertNode: OmitFirstArg<typeof Editor.insertNode>
+    insertNodes: OmitFirstArg<typeof Transforms.insertNodes>
+    insertSoftBreak: OmitFirstArg<typeof Editor.insertSoftBreak>
+    insertText: OmitFirstArg<typeof Transforms.insertText>
+    liftNodes: OmitFirstArg<typeof Transforms.liftNodes>
+    mergeNodes: OmitFirstArg<typeof Transforms.mergeNodes>
+    move: OmitFirstArg<typeof Transforms.move>
+    moveNodes: OmitFirstArg<typeof Transforms.moveNodes>
+    normalize: OmitFirstArg<typeof Editor.normalize>
+    removeMark: OmitFirstArg<typeof Editor.removeMark>
+    removeNodes: OmitFirstArg<typeof Transforms.removeNodes>
+    select: OmitFirstArg<typeof Transforms.select>
+    setNodes: <T extends Node>(
+      props: Partial<T>,
+      options?: {
+        at?: Location
+        match?: NodeMatch<T>
+        mode?: MaximizeMode
+        hanging?: boolean
+        split?: boolean
+        voids?: boolean
+        compare?: PropsCompare
+        merge?: PropsMerge
+      }
+    ) => void
+    setNormalizing: OmitFirstArg<typeof Editor.setNormalizing>
+    setPoint: OmitFirstArg<typeof Transforms.setPoint>
+    setSelection: OmitFirstArg<typeof Transforms.setSelection>
+    splitNodes: OmitFirstArg<typeof Transforms.splitNodes>
+    unsetNodes: OmitFirstArg<typeof Transforms.unsetNodes>
+    unwrapNodes: OmitFirstArg<typeof Transforms.unwrapNodes>
+    withoutNormalizing: OmitFirstArg<typeof Editor.withoutNormalizing>
+    wrapNodes: OmitFirstArg<typeof Transforms.wrapNodes>
+
+    // Overrideable core queries.
+
+    above: <T extends Ancestor>(
+      options?: EditorAboveOptions<T>
+    ) => NodeEntry<T> | undefined
+    after: OmitFirstArg<typeof Editor.after>
+    before: OmitFirstArg<typeof Editor.before>
+    edges: OmitFirstArg<typeof Editor.edges>
+    elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
+    end: OmitFirstArg<typeof Editor.end>
+    first: OmitFirstArg<typeof Editor.first>
+    fragment: OmitFirstArg<typeof Editor.fragment>
+    getMarks: OmitFirstArg<typeof Editor.marks>
+    hasBlocks: OmitFirstArg<typeof Editor.hasBlocks>
+    hasInlines: OmitFirstArg<typeof Editor.hasInlines>
+    hasPath: OmitFirstArg<typeof Editor.hasPath>
+    hasTexts: OmitFirstArg<typeof Editor.hasTexts>
+    isBlock: OmitFirstArg<typeof Editor.isBlock>
+    isEdge: OmitFirstArg<typeof Editor.isEdge>
+    isEmpty: OmitFirstArg<typeof Editor.isEmpty>
+    isEnd: OmitFirstArg<typeof Editor.isEnd>
+    isInline: OmitFirstArg<typeof Editor.isInline>
+    isNormalizing: OmitFirstArg<typeof Editor.isNormalizing>
+    isStart: OmitFirstArg<typeof Editor.isStart>
+    isVoid: OmitFirstArg<typeof Editor.isVoid>
+    last: OmitFirstArg<typeof Editor.last>
+    leaf: OmitFirstArg<typeof Editor.leaf>
+    levels: <T extends Node>(
+      options?: EditorLevelsOptions<T>
+    ) => Generator<NodeEntry<T>, void, undefined>
+    next: <T extends Descendant>(
+      options?: EditorNextOptions<T>
+    ) => NodeEntry<T> | undefined
+    node: OmitFirstArg<typeof Editor.node>
+    nodes: <T extends Node>(
+      options?: EditorNodesOptions<T>
+    ) => Generator<NodeEntry<T>, void, undefined>
+    parent: OmitFirstArg<typeof Editor.parent>
+    path: OmitFirstArg<typeof Editor.path>
+    pathRef: OmitFirstArg<typeof Editor.pathRef>
+    pathRefs: OmitFirstArg<typeof Editor.pathRefs>
+    point: OmitFirstArg<typeof Editor.point>
+    pointRef: OmitFirstArg<typeof Editor.pointRef>
+    pointRefs: OmitFirstArg<typeof Editor.pointRefs>
+    positions: OmitFirstArg<typeof Editor.positions>
+    previous: <T extends Node>(
+      options?: EditorPreviousOptions<T>
+    ) => NodeEntry<T> | undefined
+    range: OmitFirstArg<typeof Editor.range>
+    rangeRef: OmitFirstArg<typeof Editor.rangeRef>
+    rangeRefs: OmitFirstArg<typeof Editor.rangeRefs>
+    start: OmitFirstArg<typeof Editor.start>
+    string: OmitFirstArg<typeof Editor.string>
+    unhangRange: OmitFirstArg<typeof Editor.unhangRange>
+    void: OmitFirstArg<typeof Editor.void>
+  }
+  ```
+
+  Note:
+
+  - None of these method implementations have changed.
+  - **`getMarks`** is an exception, as there is already **`editor.marks`** that stores the current marks.
+  - **`Transforms.insertText`** has not been moved to **`editor`** yet: there is already an **`editor.insertText`** method with extended behavior. This may change in a future release, but this release is trying to avoid any breaking changes.
+  - **`editor.insertText`** has a new argument (third): **`options?: TextInsertTextOptions`** to match **`Transforms.insertText`**.
+
+  Bug Fixes:
+
+  - Moving JSDoc's to the interface type to allow IDEs access to the interface methods.
+
+### Patch Changes
+
+- [#5396](https://github.com/ianstormtaylor/slate/pull/5396) [`bc945eb1`](https://github.com/ianstormtaylor/slate/commit/bc945eb12c612ef2688869d256416c8e37e32c07) Thanks [@Moerphy](https://github.com/Moerphy)! - Correct core normalization that could cause wrong nodes to be removed
+
+## 0.93.0
+
+### Minor Changes
+
+- [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isSelectable` to `editor` (default true). A non-selectable element is skipped over when navigating using arrow keys.
+  - Add `ignoreNonSelectable` to `Editor.nodes`, `Editor.positions`, `Editor.after` and `Editor.before` (default false)
+  - `Transforms.move` ignores non-selectable elements
+
+* [#5374](https://github.com/ianstormtaylor/slate/pull/5374) [`b52e08b0`](https://github.com/ianstormtaylor/slate/commit/b52e08b0eafdcf1c77439e282c9dc89a4c72fbf1) Thanks [@12joan](https://github.com/12joan)! - - Add `isElementReadOnly` to `editor`. A read-only element behaves much like a void with regard to selection and deletion, but renders its `children` the same as any other non-void node.
+
+## 0.91.4
+
+### Patch Changes
+
+- [#5311](https://github.com/ianstormtaylor/slate/pull/5311) [`0ac72a62`](https://github.com/ianstormtaylor/slate/commit/0ac72a626c41a9e259dc945b408d09367eca4b3f) Thanks [@zbeyens](https://github.com/zbeyens)! - Fix #5295 regression. `editor.shouldNormalize` new option: `initialDirtyPathsLength: number`
+
+## 0.91.3
+
+### Patch Changes
+
+- [#5295](https://github.com/ianstormtaylor/slate/pull/5295) [`84f811a7`](https://github.com/ianstormtaylor/slate/commit/84f811a79c9b76050cb3dbe424efca3192cc44c6) Thanks [@zbeyens](https://github.com/zbeyens)! - New `editor` method that can be overridden to control when the normalization should stop. Default behavior (unchanged) is to throw an error when it iterates over 42 times the dirty paths length.
+
+  ```ts
+  shouldNormalize: ({
+    iteration,
+    dirtyPaths,
+    operation,
+  }: {
+    iteration: number
+    dirtyPaths: Path[]
+    operation?: Operation
+  }) => boolean
+  ```
+
+  - `editor.onChange` signature change: `(options?: { operation?: Operation }) => void` where `operation` is triggering the function.
+  - `editor.normalizeNode` signature change: `(entry: NodeEntry, options?: { operation?: Operation }) => void` where `operation` is triggering the function.
+  - `EditorNormalizeOptions` new option `operation?: Operation` where `operation` is triggering the function.
+
+## 0.91.1
+
+### Patch Changes
+
+- [#5251](https://github.com/ianstormtaylor/slate/pull/5251) [`6fa4b954`](https://github.com/ianstormtaylor/slate/commit/6fa4b954a5e4c67cff87d00b1253b2a838c0db94) Thanks [@YaoKaiLun](https://github.com/YaoKaiLun)! - Fix the cursor jump to an unexpected position after deleting in android
+
+## 0.90.0
+
+### Patch Changes
+
+- [#5278](https://github.com/ianstormtaylor/slate/pull/5278) [`9c4097a2`](https://github.com/ianstormtaylor/slate/commit/9c4097a26fa92718e6f4fc1f984a70fb5af42ca2) Thanks [@kylemclean](https://github.com/kylemclean)! - Revert to using inline styles for default editor styles
+
 ## 0.88.1
 
 ### Patch Changes

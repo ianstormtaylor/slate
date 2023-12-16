@@ -6,7 +6,7 @@ import { css } from '@emotion/css'
 
 import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from '../components'
-import { EditableVoidElement } from './custom-types'
+import { EditableVoidElement } from './custom-types.d'
 
 const EditableVoidsExample = () => {
   const editor = useMemo(
@@ -15,7 +15,7 @@ const EditableVoidsExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <InsertEditableVoidButton />
       </Toolbar>
@@ -135,8 +135,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'In addition to nodes that contain editable text, you can insert void nodes, which can also contain editable elements, inputs, or an entire other Slate editor.',
+        text: 'In addition to nodes that contain editable text, you can insert void nodes, which can also contain editable elements, inputs, or an entire other Slate editor.',
       },
     ],
   },

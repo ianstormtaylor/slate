@@ -1,16 +1,16 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
-import { Editor, Node, Descendant, Scrubber } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import React, { useCallback, useEffect, useState } from 'react'
+import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
 import { FocusedContext } from '../hooks/use-focused'
-import { EditorContext } from '../hooks/use-slate-static'
+import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { SlateContext, SlateContextValue } from '../hooks/use-slate'
 import {
-  getSelectorContext,
+  useSelectorContext,
   SlateSelectorContext,
 } from '../hooks/use-slate-selector'
+import { EditorContext } from '../hooks/use-slate-static'
+import { ReactEditor } from '../plugin/react-editor'
+import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
-import { IS_REACT_VERSION_17_OR_ABOVE } from '../utils/environment'
-import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
@@ -19,18 +19,27 @@ import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect
 
 export const Slate = (props: {
   editor: ReactEditor
-  value: Descendant[]
+  initialValue: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
+  onSelectionChange?: (selection: Selection) => void
+  onValueChange?: (value: Descendant[]) => void
 }) => {
-  const { editor, children, onChange, value, ...rest } = props
-  const unmountRef = useRef(false)
+  const {
+    editor,
+    children,
+    onChange,
+    onSelectionChange,
+    onValueChange,
+    initialValue,
+    ...rest
+  } = props
 
   const [context, setContext] = React.useState<SlateContextValue>(() => {
-    if (!Node.isNodeList(value)) {
+    if (!Node.isNodeList(initialValue)) {
       throw new Error(
-        `[Slate] value is invalid! Expected a list of elements but got: ${Scrubber.stringify(
-          value
+        `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
+          initialValue
         )}`
       )
     }
@@ -39,46 +48,54 @@ export const Slate = (props: {
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
-    editor.children = value
+    editor.children = initialValue
     Object.assign(editor, rest)
     return { v: 0, editor }
   })
 
-  const {
-    selectorContext,
-    onChange: handleSelectorChange,
-  } = getSelectorContext(editor)
+  const { selectorContext, onChange: handleSelectorChange } =
+    useSelectorContext(editor)
 
-  const onContextChange = useCallback(() => {
-    if (onChange) {
-      onChange(editor.children)
-    }
+  const onContextChange = useCallback(
+    (options?: { operation?: Operation }) => {
+      if (onChange) {
+        onChange(editor.children)
+      }
 
-    setContext(prevContext => ({
-      v: prevContext.v + 1,
-      editor,
-    }))
-    handleSelectorChange(editor)
-  }, [onChange])
+      switch (options?.operation?.type) {
+        case 'set_selection':
+          onSelectionChange?.(editor.selection)
+          break
+        default:
+          onValueChange?.(editor.children)
+      }
 
-  EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+      setContext(prevContext => ({
+        v: prevContext.v + 1,
+        editor,
+      }))
+      handleSelectorChange(editor)
+    },
+    [editor, handleSelectorChange, onChange, onSelectionChange, onValueChange]
+  )
 
   useEffect(() => {
+    EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
+
     return () => {
       EDITOR_TO_ON_CHANGE.set(editor, () => {})
-      unmountRef.current = true
     }
-  }, [])
+  }, [editor, onContextChange])
 
   const [isFocused, setIsFocused] = useState(ReactEditor.isFocused(editor))
 
   useEffect(() => {
     setIsFocused(ReactEditor.isFocused(editor))
-  })
+  }, [editor])
 
   useIsomorphicLayoutEffect(() => {
     const fn = () => setIsFocused(ReactEditor.isFocused(editor))
-    if (IS_REACT_VERSION_17_OR_ABOVE) {
+    if (REACT_MAJOR_VERSION >= 17) {
       // In React >= 17 onFocus and onBlur listen to the focusin and focusout events during the bubbling phase.
       // Therefore in order for <Editable />'s handlers to run first, which is necessary for ReactEditor.isFocused(editor)
       // to return the correct value, we have to listen to the focusin and focusout events without useCapture here.

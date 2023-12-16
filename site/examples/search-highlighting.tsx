@@ -37,7 +37,7 @@ const SearchHighlightingExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <div
           className={css`
@@ -90,8 +90,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This is editable text that you can search. As you search, it looks for matching strings of text, and adds ',
+        text: 'This is editable text that you can search. As you search, it looks for matching strings of text, and adds ',
       },
       { text: 'decorations', bold: true },
       { text: ' to them in realtime.' },

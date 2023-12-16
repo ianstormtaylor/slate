@@ -1,23 +1,24 @@
-import React, { useCallback } from 'react'
 import getDirection from 'direction'
-import { Editor, Node, Range, Element as SlateElement } from 'slate'
-
-import Text from './text'
+import React, { useCallback } from 'react'
+import { JSX } from 'react'
+import { Editor, Element as SlateElement, Node, Range } from 'slate'
+import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'
-import { ReactEditor, useSlateStatic, useReadOnly } from '..'
+import { isElementDecorationsEqual } from '../utils/range-list'
 import {
-  NODE_TO_ELEMENT,
-  ELEMENT_TO_NODE,
-  NODE_TO_PARENT,
-  NODE_TO_INDEX,
   EDITOR_TO_KEY_TO_ELEMENT,
+  ELEMENT_TO_NODE,
+  NODE_TO_ELEMENT,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
 } from '../utils/weak-maps'
-import { isDecoratorRangeListEqual } from '../utils/range-list'
 import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
 } from './editable'
+
+import Text from './text'
 
 /**
  * Element.
@@ -139,7 +140,8 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
     prev.renderLeaf === next.renderLeaf &&
-    isDecoratorRangeListEqual(prev.decorations, next.decorations) &&
+    prev.renderPlaceholder === next.renderPlaceholder &&
+    isElementDecorationsEqual(prev.decorations, next.decorations) &&
     (prev.selection === next.selection ||
       (!!prev.selection &&
         !!next.selection &&

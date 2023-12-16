@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import { Editor } from 'slate'
+import { Editor, Element } from 'slate'
 import { jsx } from '../../..'
 
 export const input = (
@@ -19,7 +19,7 @@ const range = {
 export const test = editor => {
   return Editor.above(editor, {
     at: range,
-    match: n => Editor.isBlock(editor, n),
+    match: n => Element.isElement(n) && Editor.isBlock(editor, n),
   })
 }
 export const output = [

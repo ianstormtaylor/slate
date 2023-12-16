@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { forwardRef, memo, useRef, useState } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
@@ -20,7 +20,7 @@ const String = (props: {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, text)
   const parentPath = Path.parent(path)
-  const isMarkPlaceholder = leaf[MARK_PLACEHOLDER_SYMBOL] === true
+  const isMarkPlaceholder = Boolean(leaf[MARK_PLACEHOLDER_SYMBOL])
 
   // COMPAT: Render text inside void nodes with a zero-width space.
   // So the node can contain selection but the text is not visible.
@@ -61,12 +61,11 @@ const String = (props: {
  */
 const TextString = (props: { text: string; isTrailing?: boolean }) => {
   const { text, isTrailing = false } = props
-
   const ref = useRef<HTMLSpanElement>(null)
-
   const getTextContent = () => {
     return `${text ?? ''}${isTrailing ? '\n' : ''}`
   }
+  const [initialText] = useState(getTextContent)
 
   // This is the actual text rendering boundary where we interface with the DOM
   // The text is not rendered as part of the virtual DOM, as since we handle basic character insertions natively,
@@ -89,19 +88,20 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
     // as this effectively replaces "specifying the text in the virtual DOM under the <span> below" on each render
   })
 
-  // Render text content immediately if it's the first-time render
-  // Ensure that text content is rendered on server-side rendering
-  if (!ref.current) {
+  // We intentionally render a memoized <span> that only receives the initial text content when the component is mounted.
+  // We defer to the layout effect above to update the `textContent` of the span element when needed.
+  return <MemoizedText ref={ref}>{initialText}</MemoizedText>
+}
+
+const MemoizedText = memo(
+  forwardRef<HTMLSpanElement, { children: string }>((props, ref) => {
     return (
       <span data-slate-string ref={ref}>
-        {getTextContent()}
+        {props.children}
       </span>
     )
-  }
-
-  // the span is intentionally same on every render in virtual DOM, actual rendering happens in the layout effect above
-  return <span data-slate-string ref={ref} />
-}
+  })
+)
 
 /**
  * Leaf strings without text, render as zero-width strings.
@@ -114,7 +114,11 @@ export const ZeroWidthString = (props: {
 }) => {
   const { length = 0, isLineBreak = false, isMarkPlaceholder = false } = props
 
-  const attributes = {
+  const attributes: {
+    'data-slate-zero-width': string
+    'data-slate-length': number
+    'data-slate-mark-placeholder'?: boolean
+  } = {
     'data-slate-zero-width': isLineBreak ? 'n' : 'z',
     'data-slate-length': length,
   }

@@ -25,7 +25,7 @@ const IFrameExample = () => {
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
@@ -131,8 +131,7 @@ const initialValue: Descendant[] = [
         italic: true,
       },
       {
-        text:
-          ' useful, when you need to separate the styles for your editor contents from the ones addressing your UI.',
+        text: ' useful, when you need to separate the styles for your editor contents from the ones addressing your UI.',
       },
     ],
   },

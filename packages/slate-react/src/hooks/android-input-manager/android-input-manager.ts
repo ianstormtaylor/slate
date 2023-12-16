@@ -2,6 +2,7 @@ import { DebouncedFunc } from 'lodash'
 import { Editor, Node, Path, Point, Range, Text, Transforms } from 'slate'
 import { ReactEditor } from '../../plugin/react-editor'
 import {
+  applyStringDiff,
   mergeStringDiffs,
   normalizePoint,
   normalizeRange,
@@ -34,6 +35,10 @@ const FLUSH_DELAY = 200
 
 // Replace with `const debug = console.log` to debug
 const debug = (..._: unknown[]) => {}
+
+// Type guard to check if a value is a DataTransfer
+const isDataTransfer = (value: any): value is DataTransfer =>
+  value?.constructor.name === 'DataTransfer'
 
 export type CreateAndroidInputManagerOptions = {
   editor: ReactEditor
@@ -153,7 +158,7 @@ export function createAndroidInputManager({
       EDITOR_TO_PENDING_DIFFS.get(editor)
     )
 
-    let scheduleSelectionChange = !!EDITOR_TO_PENDING_DIFFS.get(editor)?.length
+    let scheduleSelectionChange = hasPendingDiffs()
 
     let diff: TextDiff | undefined
     while ((diff = EDITOR_TO_PENDING_DIFFS.get(editor)?.[0])) {
@@ -342,7 +347,8 @@ export function createAndroidInputManager({
 
     const { inputType: type } = event
     let targetRange: Range | null = null
-    const data = (event as any).dataTransfer || event.data || undefined
+    const data: DataTransfer | string | undefined =
+      (event as any).dataTransfer || event.data || undefined
 
     if (
       insertPositionHint !== false &&
@@ -377,33 +383,75 @@ export function createAndroidInputManager({
       return
     }
 
-    if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
-      const [start, end] = Range.edges(targetRange)
-      const leaf = Node.leaf(editor, start.path)
+    // By default, the input manager tries to store text diffs so that we can
+    // defer flushing them at a later point in time. We don't want to flush
+    // for every input event as this can be expensive. However, there are some
+    // scenarios where we cannot safely store the text diff and must instead
+    // schedule an action to let Slate normalize the editor state.
+    let canStoreDiff = true
 
-      if (leaf.text.length === start.offset && end.offset === 0) {
-        const next = Editor.next(editor, { at: start.path, match: Text.isText })
-        if (next && Path.equals(next[1], end.path)) {
-          targetRange = { anchor: end, focus: end }
-        }
-      }
-    }
-
-    if (Range.isExpanded(targetRange) && type.startsWith('delete')) {
-      if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
+    if (type.startsWith('delete')) {
+      if (Range.isExpanded(targetRange)) {
         const [start, end] = Range.edges(targetRange)
-        return storeDiff(targetRange.anchor.path, {
-          text: '',
-          end: end.offset,
-          start: start.offset,
-        })
+        const leaf = Node.leaf(editor, start.path)
+
+        if (leaf.text.length === start.offset && end.offset === 0) {
+          const next = Editor.next(editor, {
+            at: start.path,
+            match: Text.isText,
+          })
+          if (next && Path.equals(next[1], end.path)) {
+            targetRange = { anchor: end, focus: end }
+          }
+        }
       }
 
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
-      return scheduleAction(
-        () => Editor.deleteFragment(editor, { direction }),
-        { at: targetRange }
+      const [start, end] = Range.edges(targetRange)
+      const [leaf, path] = Editor.leaf(editor, start.path)
+
+      const diff = {
+        text: '',
+        start: start.offset,
+        end: end.offset,
+      }
+      const pendingDiffs = EDITOR_TO_PENDING_DIFFS.get(editor)
+      const relevantPendingDiffs = pendingDiffs?.find(change =>
+        Path.equals(change.path, path)
       )
+      const diffs = relevantPendingDiffs
+        ? [relevantPendingDiffs.diff, diff]
+        : [diff]
+      const text = applyStringDiff(leaf.text, ...diffs)
+
+      if (text.length === 0) {
+        // Text leaf will be removed, so we need to schedule an
+        // action to remove it so that Slate can normalize instead
+        // of storing as a diff
+        canStoreDiff = false
+      }
+
+      if (Range.isExpanded(targetRange)) {
+        if (
+          canStoreDiff &&
+          Path.equals(targetRange.anchor.path, targetRange.focus.path)
+        ) {
+          const point = { path: targetRange.anchor.path, offset: start.offset }
+          const range = Editor.range(editor, point, point)
+          handleUserSelect(range)
+
+          return storeDiff(targetRange.anchor.path, {
+            text: '',
+            end: end.offset,
+            start: start.offset,
+          })
+        }
+
+        return scheduleAction(
+          () => Editor.deleteFragment(editor, { direction }),
+          { at: targetRange }
+        )
+      }
     }
 
     switch (type) {
@@ -418,7 +466,7 @@ export function createAndroidInputManager({
       case 'deleteContent':
       case 'deleteContentForward': {
         const { anchor } = targetRange
-        if (Range.isCollapsed(targetRange)) {
+        if (canStoreDiff && Range.isCollapsed(targetRange)) {
           const targetNode = Node.leaf(editor, anchor.path)
 
           if (anchor.offset < targetNode.text.length) {
@@ -446,6 +494,7 @@ export function createAndroidInputManager({
           : !!nativeTargetRange?.collapsed
 
         if (
+          canStoreDiff &&
           nativeCollapsed &&
           Range.isCollapsed(targetRange) &&
           anchor.offset > 0
@@ -533,15 +582,9 @@ export function createAndroidInputManager({
       case 'insertFromYank':
       case 'insertReplacementText':
       case 'insertText': {
-        if (data?.constructor.name === 'DataTransfer') {
+        if (isDataTransfer(data)) {
           return scheduleAction(() => ReactEditor.insertData(editor, data), {
             at: targetRange,
-          })
-        }
-
-        if (typeof data === 'string' && data.includes('\n')) {
-          return scheduleAction(() => Editor.insertSoftBreak(editor), {
-            at: Range.end(targetRange),
           })
         }
 
@@ -551,6 +594,34 @@ export function createAndroidInputManager({
         // the placeholder itself and thus includes the zero-width space inside edit events.
         if (EDITOR_TO_PENDING_INSERTION_MARKS.get(editor)) {
           text = text.replace('\uFEFF', '')
+        }
+
+        // Pastes from the Android clipboard will generate `insertText` events.
+        // If the copied text contains any newlines, Android will append an
+        // extra newline to the end of the copied text.
+        if (type === 'insertText' && /.*\n.*\n$/.test(text)) {
+          text = text.slice(0, -1)
+        }
+
+        // If the text includes a newline, split it at newlines and paste each component
+        // string, with soft breaks in between each.
+        if (text.includes('\n')) {
+          return scheduleAction(
+            () => {
+              const parts = text.split('\n')
+              parts.forEach((line, i) => {
+                if (line) {
+                  Editor.insertText(editor, line)
+                }
+                if (i !== parts.length - 1) {
+                  Editor.insertSoftBreak(editor)
+                }
+              })
+            },
+            {
+              at: targetRange,
+            }
+          )
         }
 
         if (Path.equals(targetRange.anchor.path, targetRange.focus.path)) {
@@ -605,8 +676,10 @@ export function createAndroidInputManager({
             insertPositionHint = false
           }
 
-          storeDiff(start.path, diff)
-          return
+          if (canStoreDiff) {
+            storeDiff(start.path, diff)
+            return
+          }
         }
 
         return scheduleAction(() => Editor.insertText(editor, text), {
@@ -658,7 +731,7 @@ export function createAndroidInputManager({
       insertPositionHint = false
     }
 
-    if (pathChanged || !hasPendingDiffs()) {
+    if (pathChanged || hasPendingDiffs()) {
       flushTimeoutId = setTimeout(flush, FLUSH_DELAY)
     }
   }

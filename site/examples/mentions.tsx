@@ -11,7 +11,7 @@ import {
 } from 'slate-react'
 
 import { Portal } from '../components'
-import { MentionElement } from './custom-types'
+import { MentionElement } from './custom-types.d'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
@@ -57,7 +57,7 @@ const MentionExample = () => {
         }
       }
     },
-    [index, search, target]
+    [chars, editor, index, target]
   )
 
   useEffect(() => {
@@ -73,7 +73,7 @@ const MentionExample = () => {
   return (
     <Slate
       editor={editor}
-      value={initialValue}
+      initialValue={initialValue}
       onChange={() => {
         const { selection } = editor
 
@@ -125,6 +125,11 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
+                onClick={() => {
+                  Transforms.select(editor, target)
+                  insertMention(editor, char)
+                  setTarget(null)
+                }}
                 style={{
                   padding: '1px 3px',
                   borderRadius: '3px',
@@ -228,7 +233,8 @@ const Mention = ({ attributes, children, element }) => {
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      {children}@{element.character}
+      @{element.character}
+      {children}
     </span>
   )
 }
@@ -245,8 +251,7 @@ const initialValue: Descendant[] = [
         bold: true,
       },
       {
-        text:
-          ' feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The ',
+        text: ' feature that lets users autocomplete mentioning a user by their username. Which, in this case means Star Wars characters. The ',
       },
       {
         text: 'mentions',

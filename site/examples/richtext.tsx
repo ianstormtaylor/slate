@@ -28,7 +28,7 @@ const RichTextExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
@@ -249,13 +249,11 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          "Since it's rich text, you can do things like turn a selection of text ",
+        text: "Since it's rich text, you can do things like turn a selection of text ",
       },
       { text: 'bold', bold: true },
       {
-        text:
-          ', or add a semantically rendered block quote in the middle of the page, like this:',
+        text: ', or add a semantically rendered block quote in the middle of the page, like this:',
       },
     ],
   },

@@ -14,7 +14,7 @@ interface Editor {
   isVoid: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
   normalizeNode: (entry: NodeEntry) => void
-  onChange: () => void
+  onChange: (options?: { operation?: Operation }) => void
 
   // Overrideable core actions.
   addMark: (key: string, value: any) => void
@@ -40,7 +40,7 @@ interface Editor {
 - [Instance methods](editor.md#instance-methods)
   - [Schema-specific methods to override](editor.md#schema-specific-instance-methods-to-override)
   - [Element Type Methods](editor.md/#element-type-methods)
-  - [Normalize Method](editor.md/#normalize-method)
+  - [Normalize Methods](editor.md/#normalize-methods)
   - [Callback Method](editor.md/#callback-method)
   - [Mark Methods](editor.md/#mark-methods)
   - [getFragment Method](editor.md/#getfragment-method)
@@ -246,23 +246,23 @@ Delete the content in the current selection.
 
 Insert a block break at the current selection.
 
-#### `Editor.insertFragment(editor: Editor, fragment: Node[]) => void`
+#### `Editor.insertFragment(editor: Editor, fragment: Node[], options?) => void`
 
-Inserts a fragment _at the current selection_.
+Inserts a fragment at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first. To atomically insert nodes (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
+Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
-#### `Editor.insertNode(editor: Editor, node: Node) => void`
+#### `Editor.insertNode(editor: Editor, node: Node, options?) => void`
 
-Inserts a node _at the current selection_.
+Atomically insert `node` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first. To atomically insert a node (including at the very beginning or end), use [Transforms.insertNodes](../transforms.md#transformsinsertnodeseditor-editor-nodes-node--node-options).
+Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
-#### `Editor.insertText(editor: Editor, text: string) => void`
+#### `Editor.insertText(editor: Editor, text: string, options?) => void`
 
-Inserts text _at the current selection_.
+Insert a string of text at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
-If the selection is currently expanded, it will be deleted first.
+Options: `{at?: Location, voids?: boolean}`
 
 #### `Editor.removeMark(editor: Editor, key: string) => void`
 
@@ -341,7 +341,7 @@ Check if a value is a void `Element` object.
 
 Normalize any dirty objects in the editor.
 
-Options: `{force?: boolean}`
+Options: `{force?: boolean; operation?: Operation}`
 
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 
@@ -410,15 +410,21 @@ Check if a value is an inline `Element` object.
 
 Check if a value is a void `Element` object.
 
-### Normalize method
+### Normalize methods
 
-#### `normalizeNode(entry: NodeEntry) => void`
+#### `normalizeNode(entry: NodeEntry, { operation }) => void`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
+#### `shouldNormalize: (options) => boolean`
+
+Override this method to prevent normalizing the editor.
+
+Options: `{ dirtyPaths: Path[]; initialDirtyPathsLength: number; iteration: number; operation?: Operation }`
+
 ### Callback method
 
-#### `onChange() => void`
+#### `onChange(options?: { operation?: Operation }) => void`
 
 Called when there is a change in the editor.
 

@@ -1,9 +1,9 @@
-import React, { useState, PropsWithChildren, Ref } from 'react'
+import React, { useState, PropsWithChildren, Ref, ErrorInfo } from 'react'
 import { cx, css } from '@emotion/css'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
-import ErrorBoundary from 'react-error-boundary'
+import { ErrorBoundary } from 'react-error-boundary'
 
 import { Icon } from '../../components'
 
@@ -25,6 +25,7 @@ import ReadOnly from '../../examples/read-only'
 import RichText from '../../examples/richtext'
 import SearchHighlighting from '../../examples/search-highlighting'
 import ShadowDOM from '../../examples/shadow-dom'
+import Styling from '../../examples/styling'
 import Tables from '../../examples/tables'
 import IFrames from '../../examples/iframe'
 import CustomPlaceholder from '../../examples/custom-placeholder'
@@ -51,6 +52,7 @@ const EXAMPLES = [
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
+  ['Styling', Styling, 'styling'],
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
   ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
@@ -256,7 +258,7 @@ const Warning = props => (
 
 const ExamplePage = ({ example }: { example: string }) => {
   const [error, setError] = useState<Error | undefined>()
-  const [stacktrace, setStacktrace] = useState<string | undefined>()
+  const [stacktrace, setStacktrace] = useState<ErrorInfo | undefined>()
   const [showTabs, setShowTabs] = useState<boolean>()
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
   const [name, Component, path] = EXAMPLE
@@ -266,6 +268,19 @@ const ExamplePage = ({ example }: { example: string }) => {
         setError(error)
         setStacktrace(stacktrace)
       }}
+      fallbackRender={({ error, resetErrorBoundary }) => (
+        <Warning>
+          <p>An error was thrown by one of the example's React components!</p>
+          <pre>
+            <code>
+              {error.stack}
+              {'\n'}
+              {stacktrace}
+            </code>
+          </pre>
+          <button onClick={resetErrorBoundary}>Try again</button>
+        </Warning>
+      )}
     >
       <div>
         <Head>
@@ -313,6 +328,7 @@ const ExamplePage = ({ example }: { example: string }) => {
               key={p as string}
               href="/examples/[example]"
               as={`/examples/${p}`}
+              legacyBehavior
               passHref
             >
               <Tab onClick={() => setShowTabs(false)}>{n}</Tab>
@@ -324,9 +340,11 @@ const ExamplePage = ({ example }: { example: string }) => {
             <p>An error was thrown by one of the example's React components!</p>
             <pre>
               <code>
-                {error.stack}
-                {'\n'}
-                {stacktrace}
+                <>
+                  {error.stack}
+                  {'\n'}
+                  {stacktrace}
+                </>
               </code>
             </pre>
           </Warning>

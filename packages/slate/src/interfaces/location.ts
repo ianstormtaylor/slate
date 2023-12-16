@@ -12,15 +12,14 @@ import { Path, Point, Range } from '..'
 export type Location = Path | Point | Range
 
 export interface LocationInterface {
+  /**
+   * Check if a value implements the `Location` interface.
+   */
   isLocation: (value: any) => value is Location
 }
 
 // eslint-disable-next-line no-redeclare
 export const Location: LocationInterface = {
-  /**
-   * Check if a value implements the `Location` interface.
-   */
-
   isLocation(value: any): value is Location {
     return Path.isPath(value) || Point.isPoint(value) || Range.isRange(value)
   },
@@ -34,15 +33,14 @@ export const Location: LocationInterface = {
 export type Span = [Path, Path]
 
 export interface SpanInterface {
+  /**
+   * Check if a value implements the `Span` interface.
+   */
   isSpan: (value: any) => value is Span
 }
 
 // eslint-disable-next-line no-redeclare
 export const Span: SpanInterface = {
-  /**
-   * Check if a value implements the `Span` interface.
-   */
-
   isSpan(value: any): value is Span {
     return (
       Array.isArray(value) && value.length === 2 && value.every(Path.isPath)

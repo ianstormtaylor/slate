@@ -49,7 +49,7 @@ export function useSlateSelector<T>(
 
   const latestSubscriptionCallbackError = useRef<Error | undefined>()
   const latestSelector = useRef<(editor: Editor) => T>(() => null as any)
-  const latestSelectedState = useRef<T>((null as any) as T)
+  const latestSelectedState = useRef<T>(null as any as T)
   let selectedState: T
 
   try {
@@ -90,7 +90,11 @@ export function useSlateSelector<T>(
           // is re-rendered, the selectors are called again, and
           // will throw again, if neither props nor store state
           // changed
-          latestSubscriptionCallbackError.current = err
+          if (err instanceof Error) {
+            latestSubscriptionCallbackError.current = err
+          } else {
+            latestSubscriptionCallbackError.current = new Error(String(err))
+          }
         }
 
         forceRender()
@@ -112,17 +116,22 @@ export function useSlateSelector<T>(
 /**
  * Create selector context with editor updating on every editor change
  */
-export function getSelectorContext(editor: Editor) {
+export function useSelectorContext(editor: Editor) {
   const eventListeners = useRef<EditorChangeHandler[]>([]).current
   const slateRef = useRef<{
     editor: Editor
   }>({
     editor,
   }).current
-  const onChange = useCallback((editor: Editor) => {
-    slateRef.editor = editor
-    eventListeners.forEach((listener: EditorChangeHandler) => listener(editor))
-  }, [])
+  const onChange = useCallback(
+    (editor: Editor) => {
+      slateRef.editor = editor
+      eventListeners.forEach((listener: EditorChangeHandler) =>
+        listener(editor)
+      )
+    },
+    [eventListeners, slateRef]
+  )
 
   const selectorContext = useMemo(() => {
     return {

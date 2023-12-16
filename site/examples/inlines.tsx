@@ -13,7 +13,7 @@ import {
   Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkElement, ButtonElement } from './custom-types'
+import { LinkElement, ButtonElement } from './custom-types.d'
 
 import { Button, Icon, Toolbar } from '../components'
 
@@ -22,8 +22,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'In addition to block nodes, you can create inline nodes. Here is a ',
+        text: 'In addition to block nodes, you can create inline nodes. Here is a ',
       },
       {
         type: 'link',
@@ -38,7 +37,14 @@ const initialValue: Descendant[] = [
         children: [{ text: 'editable button' }],
       },
       {
-        text: '!',
+        text: '! Here is a read-only inline: ',
+      },
+      {
+        type: 'badge',
+        children: [{ text: 'Approved' }],
+      },
+      {
+        text: '.',
       },
     ],
   },
@@ -46,8 +52,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
+        text: 'There are two ways to add links. You can either add a link via the toolbar icon above, or if you want in on a little secret, copy a URL to your keyboard and paste it while a range of text is selected. ',
       },
       // The following is an example of an inline at the end of a block.
       // This is an edge case that can cause issues.
@@ -91,7 +96,7 @@ const InlinesExample = () => {
   }
 
   return (
-    <SlateReact.Slate editor={editor} value={initialValue}>
+    <SlateReact.Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <AddLinkButton />
         <RemoveLinkButton />
@@ -108,10 +113,17 @@ const InlinesExample = () => {
 }
 
 const withInlines = editor => {
-  const { insertData, insertText, isInline } = editor
+  const { insertData, insertText, isInline, isElementReadOnly, isSelectable } =
+    editor
 
   editor.isInline = element =>
-    ['link', 'button'].includes(element.type) || isInline(element)
+    ['link', 'button', 'badge'].includes(element.type) || isInline(element)
+
+  editor.isElementReadOnly = element =>
+    element.type === 'badge' || isElementReadOnly(element)
+
+  editor.isSelectable = element =>
+    element.type !== 'badge' && isSelectable(element)
 
   editor.insertText = text => {
     if (text && isUrl(text)) {
@@ -226,7 +238,7 @@ const InlineChromiumBugfix = () => (
       font-size: 0;
     `}
   >
-    ${String.fromCodePoint(160) /* Non-breaking space */}
+    {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 )
 
@@ -283,6 +295,30 @@ const EditableButtonComponent = ({ attributes, children }) => {
   )
 }
 
+const BadgeComponent = ({ attributes, children, element }) => {
+  const selected = useSelected()
+
+  return (
+    <span
+      {...attributes}
+      contentEditable={false}
+      className={css`
+        background-color: green;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 2px;
+        font-size: 0.9em;
+        ${selected && 'box-shadow: 0 0 0 3px #ddd;'}
+      `}
+      data-playwright-selected={selected}
+    >
+      <InlineChromiumBugfix />
+      {children}
+      <InlineChromiumBugfix />
+    </span>
+  )
+}
+
 const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
@@ -290,6 +326,8 @@ const Element = props => {
       return <LinkComponent {...props} />
     case 'button':
       return <EditableButtonComponent {...props} />
+    case 'badge':
+      return <BadgeComponent {...props} />
     default:
       return <p {...attributes}>{children}</p>
   }

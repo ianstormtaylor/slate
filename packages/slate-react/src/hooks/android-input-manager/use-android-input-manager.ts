@@ -22,34 +22,33 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
   characterData: true,
 }
 
-export function useAndroidInputManager({
-  node,
-  ...options
-}: UseAndroidInputManagerOptions) {
-  if (!IS_ANDROID) {
-    return null
-  }
+export const useAndroidInputManager = !IS_ANDROID
+  ? () => null
+  : ({ node, ...options }: UseAndroidInputManagerOptions) => {
+      if (!IS_ANDROID) {
+        return null
+      }
 
-  const editor = useSlateStatic()
-  const isMounted = useIsMounted()
+      const editor = useSlateStatic()
+      const isMounted = useIsMounted()
 
-  const [inputManager] = useState(() =>
-    createAndroidInputManager({
-      editor,
-      ...options,
-    })
-  )
+      const [inputManager] = useState(() =>
+        createAndroidInputManager({
+          editor,
+          ...options,
+        })
+      )
 
-  useMutationObserver(
-    node,
-    inputManager.handleDomMutations,
-    MUTATION_OBSERVER_CONFIG
-  )
+      useMutationObserver(
+        node,
+        inputManager.handleDomMutations,
+        MUTATION_OBSERVER_CONFIG
+      )
 
-  EDITOR_TO_SCHEDULE_FLUSH.set(editor, inputManager.scheduleFlush)
-  if (isMounted) {
-    inputManager.flush()
-  }
+      EDITOR_TO_SCHEDULE_FLUSH.set(editor, inputManager.scheduleFlush)
+      if (isMounted) {
+        inputManager.flush()
+      }
 
-  return inputManager
-}
+      return inputManager
+    }

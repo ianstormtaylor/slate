@@ -1,4 +1,4 @@
-import React, { Ref, PropsWithChildren } from 'react'
+import React, { ReactNode, Ref, PropsWithChildren } from 'react'
 import ReactDOM from 'react-dom'
 import { cx, css } from '@emotion/css'
 
@@ -149,6 +149,7 @@ export const Menu = React.forwardRef(
   ) => (
     <div
       {...props}
+      data-test-id="menu"
       ref={ref}
       className={cx(
         className,
@@ -166,7 +167,7 @@ export const Menu = React.forwardRef(
   )
 )
 
-export const Portal = ({ children }) => {
+export const Portal = ({ children }: { children?: ReactNode }) => {
   return typeof document === 'object'
     ? ReactDOM.createPortal(children, document.body)
     : null

@@ -1,12 +1,10 @@
 import Prism from 'prismjs'
+import 'prismjs/components/prism-markdown'
 import React, { useCallback, useMemo } from 'react'
 import { Slate, Editable, withReact } from 'slate-react'
 import { Text, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
-
-// eslint-disable-next-line
-;Prism.languages.markdown=Prism.languages.extend("markup",{}),Prism.languages.insertBefore("markdown","prolog",{blockquote:{pattern:/^>(?:[\t ]*>)*/m,alias:"punctuation"},code:[{pattern:/^(?: {4}|\t).+/m,alias:"keyword"},{pattern:/``.+?``|`[^`\n]+`/,alias:"keyword"}],title:[{pattern:/\w+.*(?:\r?\n|\r)(?:==+|--+)/,alias:"important",inside:{punctuation:/==+$|--+$/}},{pattern:/(^\s*)#+.+/m,lookbehind:!0,alias:"important",inside:{punctuation:/^#+|#+$/}}],hr:{pattern:/(^\s*)([*-])([\t ]*\2){2,}(?=\s*$)/m,lookbehind:!0,alias:"punctuation"},list:{pattern:/(^\s*)(?:[*+-]|\d+\.)(?=[\t ].)/m,lookbehind:!0,alias:"punctuation"},"url-reference":{pattern:/!?\[[^\]]+\]:[\t ]+(?:\S+|<(?:\\.|[^>\\])+>)(?:[\t ]+(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\)))?/,inside:{variable:{pattern:/^(!?\[)[^\]]+/,lookbehind:!0},string:/(?:"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|\((?:\\.|[^)\\])*\))$/,punctuation:/^[\[\]!:]|[<>]/},alias:"url"},bold:{pattern:/(^|[^\\])(\*\*|__)(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,lookbehind:!0,inside:{punctuation:/^\*\*|^__|\*\*$|__$/}},italic:{pattern:/(^|[^\\])([*_])(?:(?:\r?\n|\r)(?!\r?\n|\r)|.)+?\2/,lookbehind:!0,inside:{punctuation:/^[*_]|[*_]$/}},url:{pattern:/!?\[[^\]]+\](?:\([^\s)]+(?:[\t ]+"(?:\\.|[^"\\])*")?\)| ?\[[^\]\n]*\])/,inside:{variable:{pattern:/(!?\[)[^\]]+(?=\]$)/,lookbehind:!0},string:{pattern:/"(?:\\.|[^"\\])*"(?=\)$)/}}}}),Prism.languages.markdown.bold.inside.url=Prism.util.clone(Prism.languages.markdown.url),Prism.languages.markdown.italic.inside.url=Prism.util.clone(Prism.languages.markdown.url),Prism.languages.markdown.bold.inside.italic=Prism.util.clone(Prism.languages.markdown.italic),Prism.languages.markdown.italic.inside.bold=Prism.util.clone(Prism.languages.markdown.bold); // prettier-ignore
 
 const MarkdownPreviewExample = () => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
@@ -50,7 +48,7 @@ const MarkdownPreviewExample = () => {
   }, [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         decorate={decorate}
         renderLeaf={renderLeaf}
@@ -69,38 +67,38 @@ const Leaf = ({ attributes, children, leaf }) => {
         font-style: ${leaf.italic && 'italic'};
         text-decoration: ${leaf.underlined && 'underline'};
         ${leaf.title &&
-          css`
-            display: inline-block;
-            font-weight: bold;
-            font-size: 20px;
-            margin: 20px 0 10px 0;
-          `}
+        css`
+          display: inline-block;
+          font-weight: bold;
+          font-size: 20px;
+          margin: 20px 0 10px 0;
+        `}
         ${leaf.list &&
-          css`
-            padding-left: 10px;
-            font-size: 20px;
-            line-height: 10px;
-          `}
+        css`
+          padding-left: 10px;
+          font-size: 20px;
+          line-height: 10px;
+        `}
         ${leaf.hr &&
-          css`
-            display: block;
-            text-align: center;
-            border-bottom: 2px solid #ddd;
-          `}
+        css`
+          display: block;
+          text-align: center;
+          border-bottom: 2px solid #ddd;
+        `}
         ${leaf.blockquote &&
-          css`
-            display: inline-block;
-            border-left: 2px solid #ddd;
-            padding-left: 10px;
-            color: #aaa;
-            font-style: italic;
-          `}
+        css`
+          display: inline-block;
+          border-left: 2px solid #ddd;
+          padding-left: 10px;
+          color: #aaa;
+          font-style: italic;
+        `}
         ${leaf.code &&
-          css`
-            font-family: monospace;
-            background-color: #eee;
-            padding: 3px;
-          `}
+        css`
+          font-family: monospace;
+          background-color: #eee;
+          padding: 3px;
+        `}
       `}
     >
       {children}
@@ -113,8 +111,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.',
+        text: 'Slate is flexible enough to add **decorations** that can format text based on its content. For example, this editor has **Markdown** preview decorations on it, to make it _dead_ simple to make an editor with built-in Markdown previewing.',
       },
     ],
   },

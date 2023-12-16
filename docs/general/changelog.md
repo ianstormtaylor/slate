@@ -309,7 +309,7 @@ const [value, setValue] = useState(initialValue)
 const [selection, setSelection] = useState(null)
 
 <Slate
-  value={value}
+  initialValue={initialValue}
   selection={selection}
   onChange={(value, selection) => {
     setValue(value)
@@ -501,10 +501,7 @@ editor.run('onKeyDown', { key: 'Tab', ... })
 **The `editor.change` method is deprecated.** With the removal of the `Change` object, there's no need anymore to create the small closures with `editor.change()`. Instead you can directly invoke commands on the editor in series, and all of the changes will be emitted asynchronously on the next tick.
 
 ```javascript
-editor
-  .insertText('word')
-  .moveFocusForward(10)
-  .addMark('bold')
+editor.insertText('word').moveFocusForward(10).addMark('bold')
 ```
 
 **The `applyOperations` method is deprecated.** Instead you can loop a set of operations and apply each one using `applyOperation`. This is to reduce the number of methods exposed on the `Editor` to keep it simpler.

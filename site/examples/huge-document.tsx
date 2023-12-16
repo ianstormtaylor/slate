@@ -1,5 +1,5 @@
 import React, { useMemo, useCallback } from 'react'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 
@@ -25,7 +25,7 @@ const HugeDocumentExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const editor = useMemo(() => withReact(createEditor()), [])
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable renderElement={renderElement} spellCheck autoFocus />
     </Slate>
   )

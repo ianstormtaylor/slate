@@ -11,7 +11,7 @@ export const input = (
   </editor>
 )
 
-const editor = (input as unknown) as Editor
+const editor = input as unknown as Editor
 const defaultNormalize = editor.normalizeNode
 editor.normalizeNode = entry => {
   const [node, path] = entry

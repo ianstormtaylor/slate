@@ -11,7 +11,7 @@ import {
 } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
-import { BulletedListElement } from './custom-types'
+import { BulletedListElement } from './custom-types.d'
 
 const SHORTCUTS = {
   '*': 'list-item',
@@ -33,41 +33,44 @@ const MarkdownShortcutsExample = () => {
     []
   )
 
-  const handleDOMBeforeInput = useCallback((e: InputEvent) => {
-    queueMicrotask(() => {
-      const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
+  const handleDOMBeforeInput = useCallback(
+    (e: InputEvent) => {
+      queueMicrotask(() => {
+        const pendingDiffs = ReactEditor.androidPendingDiffs(editor)
 
-      const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
-        if (!diff.text.endsWith(' ')) {
-          return false
-        }
+        const scheduleFlush = pendingDiffs?.some(({ diff, path }) => {
+          if (!diff.text.endsWith(' ')) {
+            return false
+          }
 
-        const { text } = SlateNode.leaf(editor, path)
-        const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
-        if (!(beforeText in SHORTCUTS)) {
-          return
-        }
+          const { text } = SlateNode.leaf(editor, path)
+          const beforeText = text.slice(0, diff.start) + diff.text.slice(0, -1)
+          if (!(beforeText in SHORTCUTS)) {
+            return
+          }
 
-        const blockEntry = Editor.above(editor, {
-          at: path,
-          match: n => Editor.isBlock(editor, n),
+          const blockEntry = Editor.above(editor, {
+            at: path,
+            match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
+          })
+          if (!blockEntry) {
+            return false
+          }
+
+          const [, blockPath] = blockEntry
+          return Editor.isStart(editor, Editor.start(editor, path), blockPath)
         })
-        if (!blockEntry) {
-          return false
+
+        if (scheduleFlush) {
+          ReactEditor.androidScheduleFlush(editor)
         }
-
-        const [, blockPath] = blockEntry
-        return Editor.isStart(editor, Editor.start(editor, path), blockPath)
       })
-
-      if (scheduleFlush) {
-        ReactEditor.androidScheduleFlush(editor)
-      }
-    })
-  }, [])
+    },
+    [editor]
+  )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         onDOMBeforeInput={handleDOMBeforeInput}
         renderElement={renderElement}
@@ -88,7 +91,7 @@ const withShortcuts = editor => {
     if (text.endsWith(' ') && selection && Range.isCollapsed(selection)) {
       const { anchor } = selection
       const block = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
       })
       const path = block ? block[1] : []
       const start = Editor.start(editor, path)
@@ -107,7 +110,7 @@ const withShortcuts = editor => {
           type,
         }
         Transforms.setNodes<SlateElement>(editor, newProperties, {
-          match: n => Editor.isBlock(editor, n),
+          match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
         })
 
         if (type === 'list-item') {
@@ -135,7 +138,7 @@ const withShortcuts = editor => {
 
     if (selection && Range.isCollapsed(selection)) {
       const match = Editor.above(editor, {
-        match: n => Editor.isBlock(editor, n),
+        match: n => SlateElement.isElement(n) && Editor.isBlock(editor, n),
       })
 
       if (match) {
@@ -204,8 +207,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
+        text: 'The editor gives you full control over the logic you can add. For example, it\'s fairly common to want to add markdown-like shortcuts to editors. So that, when you start a line with "> " you get a blockquote that looks like this:',
       },
     ],
   },
@@ -217,8 +219,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'Order when you start a line with "## " you get a level-two heading, like this:',
+        text: 'Order when you start a line with "## " you get a level-two heading, like this:',
       },
     ],
   },
@@ -230,8 +231,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
+        text: 'Try it out for yourself! Try starting a new line with ">", "-", or "#"s.',
       },
     ],
   },

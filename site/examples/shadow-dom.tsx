@@ -1,5 +1,5 @@
-import ReactDOM from 'react-dom'
 import React, { useMemo, useRef, useEffect } from 'react'
+import { createRoot } from 'react-dom/client'
 import { createEditor, Descendant } from 'slate'
 import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
@@ -21,7 +21,8 @@ const ShadowDOM = () => {
     innerShadowRoot.appendChild(reactRoot)
 
     // Render the editor within the nested shadow DOM
-    ReactDOM.render(<ShadowEditor />, reactRoot)
+    const root = createRoot(reactRoot)
+    root.render(<ShadowEditor />)
   })
 
   return <div ref={container} data-cy="outer-shadow-root" />
@@ -31,7 +32,7 @@ const ShadowEditor = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable placeholder="Enter some plain text..." />
     </Slate>
   )

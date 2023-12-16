@@ -6,21 +6,25 @@ import {
   Node,
   Element as SlateElement,
   Descendant,
+  Editor,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { ParagraphElement, TitleElement } from './custom-types'
+import { ParagraphElement, TitleElement } from './custom-types.d'
 
 const withLayout = editor => {
   const { normalizeNode } = editor
 
   editor.normalizeNode = ([node, path]) => {
     if (path.length === 0) {
-      if (editor.children.length < 1) {
+      if (editor.children.length <= 1 && Editor.string(editor, [0, 0]) === '') {
         const title: TitleElement = {
           type: 'title',
           children: [{ text: 'Untitled' }],
         }
-        Transforms.insertNodes(editor, title, { at: path.concat(0) })
+        Transforms.insertNodes(editor, title, {
+          at: path.concat(0),
+          select: true,
+        })
       }
 
       if (editor.children.length < 2) {
@@ -70,7 +74,7 @@ const ForcedLayoutExample = () => {
     []
   )
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={renderElement}
         placeholder="Enter a title…"
@@ -99,8 +103,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This example shows how to enforce your layout with domain-specific constraints. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
+        text: 'This example shows how to enforce your layout with domain-specific constraints. This document will always have a title block at the top and at least one paragraph in the body. Try deleting them and see what happens!',
       },
     ],
   },

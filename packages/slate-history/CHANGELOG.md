@@ -1,5 +1,17 @@
 # slate-history
 
+## 0.100.0
+
+### Minor Changes
+
+- [#5528](https://github.com/ianstormtaylor/slate/pull/5528) [`c4c14882`](https://github.com/ianstormtaylor/slate/commit/c4c14882edf13828f6583a88e50754ce63583bd7) Thanks [@dylans](https://github.com/dylans)! - Update dependencies to React 18, Node 20, TS 5.2, etc.
+
+## 0.93.0
+
+### Minor Changes
+
+- [#5382](https://github.com/ianstormtaylor/slate/commit/bab6943be9e0a307538c29a9dc5fcf23c09c5e40) Thanks [@reinvanimschoot](https://github.com/reinvanimschoot)! - Extracts history push to own function
+
 ## 0.86.0
 
 ### Patch Changes

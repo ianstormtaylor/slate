@@ -209,62 +209,64 @@ export function createText(
  * Create a top-level `Editor` object.
  */
 
-export const createEditor = (makeEditor: () => Editor) => (
-  tagName: string,
-  attributes: { [key: string]: any },
-  children: any[]
-): Editor => {
-  const otherChildren: any[] = []
-  let selectionChild: Range | undefined
+export const createEditor =
+  (makeEditor: () => Editor) =>
+  (
+    tagName: string,
+    attributes: { [key: string]: any },
+    children: any[]
+  ): Editor => {
+    const otherChildren: any[] = []
+    let selectionChild: Range | undefined
 
-  for (const child of children) {
-    if (Range.isRange(child)) {
-      selectionChild = child
-    } else {
-      otherChildren.push(child)
-    }
-  }
-
-  const descendants = resolveDescendants(otherChildren)
-  const selection: Partial<Range> = {}
-  const editor = makeEditor()
-  Object.assign(editor, attributes)
-  editor.children = descendants as Element[]
-
-  // Search the document's texts to see if any of them have tokens associated
-  // that need incorporated into the selection.
-  for (const [node, path] of Node.texts(editor)) {
-    const anchor = getAnchorOffset(node)
-    const focus = getFocusOffset(node)
-
-    if (anchor != null) {
-      const [offset] = anchor
-      selection.anchor = { path, offset }
+    for (const child of children) {
+      if (Range.isRange(child)) {
+        selectionChild = child
+      } else {
+        otherChildren.push(child)
+      }
     }
 
-    if (focus != null) {
-      const [offset] = focus
-      selection.focus = { path, offset }
+    const descendants = resolveDescendants(otherChildren)
+    const selection: Partial<Range> = {}
+    const editor = makeEditor()
+    Object.assign(editor, attributes)
+    editor.children = descendants as Element[]
+
+    // Search the document's texts to see if any of them have tokens associated
+    // that need incorporated into the selection.
+    for (const [node, path] of Node.texts(editor)) {
+      const anchor = getAnchorOffset(node)
+      const focus = getFocusOffset(node)
+
+      if (anchor != null) {
+        const [offset] = anchor
+        selection.anchor = { path, offset }
+      }
+
+      if (focus != null) {
+        const [offset] = focus
+        selection.focus = { path, offset }
+      }
     }
-  }
 
-  if (selection.anchor && !selection.focus) {
-    throw new Error(
-      `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<anchor />\`. For collapsed selections, use \`<cursor />\` instead.`
-    )
-  }
+    if (selection.anchor && !selection.focus) {
+      throw new Error(
+        `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<anchor />\`. For collapsed selections, use \`<cursor />\` instead.`
+      )
+    }
 
-  if (!selection.anchor && selection.focus) {
-    throw new Error(
-      `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<focus />\`. For collapsed selections, use \`<cursor />\` instead.`
-    )
-  }
+    if (!selection.anchor && selection.focus) {
+      throw new Error(
+        `Slate hyperscript ranges must have both \`<anchor />\` and \`<focus />\` defined if one is defined, but you only defined \`<focus />\`. For collapsed selections, use \`<cursor />\` instead.`
+      )
+    }
 
-  if (selectionChild != null) {
-    editor.selection = selectionChild
-  } else if (Range.isRange(selection)) {
-    editor.selection = selection
-  }
+    if (selectionChild != null) {
+      editor.selection = selectionChild
+    } else if (Range.isRange(selection)) {
+      editor.selection = selection
+    }
 
-  return editor
-}
+    return editor
+  }

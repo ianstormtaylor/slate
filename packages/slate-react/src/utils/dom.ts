@@ -26,9 +26,9 @@ export {
 
 declare global {
   interface Window {
-    Selection: typeof Selection['constructor']
-    DataTransfer: typeof DataTransfer['constructor']
-    Node: typeof Node['constructor']
+    Selection: (typeof Selection)['constructor']
+    DataTransfer: (typeof DataTransfer)['constructor']
+    Node: (typeof Node)['constructor']
   }
 }
 
@@ -134,13 +134,18 @@ export const normalizeDOMPoint = (domPoint: DOMPoint): DOMPoint => {
 }
 
 /**
- * Determines wether the active element is nested within a shadowRoot
+ * Determines whether the active element is nested within a shadowRoot
  */
 
-export const hasShadowRoot = () => {
-  return !!(
-    window.document.activeElement && window.document.activeElement.shadowRoot
-  )
+export const hasShadowRoot = (node: Node | null) => {
+  let parent = node && node.parentNode
+  while (parent) {
+    if (parent.toString() === '[object ShadowRoot]') {
+      return true
+    }
+    parent = parent.parentNode
+  }
+  return false
 }
 
 /**
@@ -251,15 +256,18 @@ export const getSlateFragmentAttribute = (
  * Get the x-slate-fragment attribute that exist in text/html data
  * and append it to the DataTransfer object
  */
-export const getClipboardData = (dataTransfer: DataTransfer): DataTransfer => {
-  if (!dataTransfer.getData('application/x-slate-fragment')) {
+export const getClipboardData = (
+  dataTransfer: DataTransfer,
+  clipboardFormatKey = 'x-slate-fragment'
+): DataTransfer => {
+  if (!dataTransfer.getData(`application/${clipboardFormatKey}`)) {
     const fragment = getSlateFragmentAttribute(dataTransfer)
     if (fragment) {
       const clipboardData = new DataTransfer()
       dataTransfer.types.forEach(type => {
         clipboardData.setData(type, dataTransfer.getData(type))
       })
-      clipboardData.setData('application/x-slate-fragment', fragment)
+      clipboardData.setData(`application/${clipboardFormatKey}`, fragment)
       return clipboardData
     }
   }

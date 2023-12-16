@@ -16,7 +16,7 @@ import {
 const EmbedsExample = () => {
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Editable
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
@@ -107,8 +107,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'In addition to simple image nodes, you can actually create complex embedded nodes. For example, this one contains an input element that lets you change the video being rendered!',
+        text: 'In addition to simple image nodes, you can actually create complex embedded nodes. For example, this one contains an input element that lets you change the video being rendered!',
       },
     ],
   },
@@ -121,8 +120,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'Try it out! This editor is built to handle Vimeo embeds, but you could handle any type.',
+        text: 'Try it out! This editor is built to handle Vimeo embeds, but you could handle any type.',
       },
     ],
   },

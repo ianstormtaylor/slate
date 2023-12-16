@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
+import isHotkey from 'is-hotkey'
 import { Transforms, createEditor, Descendant } from 'slate'
 import {
   Slate,
@@ -15,7 +16,7 @@ import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 
 import { Button, Icon, Toolbar } from '../components'
-import { ImageElement } from './custom-types'
+import { ImageElement } from './custom-types.d'
 
 const ImagesExample = () => {
   const editor = useMemo(
@@ -24,11 +25,17 @@ const ImagesExample = () => {
   )
 
   return (
-    <Slate editor={editor} value={initialValue}>
+    <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
         <InsertImageButton />
       </Toolbar>
       <Editable
+        onKeyDown={event => {
+          if (isHotkey('mod+a', event)) {
+            event.preventDefault()
+            Transforms.select(editor, [])
+          }
+        }}
         renderElement={props => <Element {...props} />}
         placeholder="Enter some text..."
       />
@@ -161,8 +168,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
+        text: 'In addition to nodes that contain editable text, you can also create other types of nodes, like images or videos.',
       },
     ],
   },
@@ -175,8 +181,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
+        text: 'This example shows images in action. It features two ways to add images. You can either add an image via the toolbar icon above, or if you want in on a little secret, copy an image URL to your clipboard and paste it anywhere in the editor!',
       },
     ],
   },
@@ -184,8 +189,7 @@ const initialValue: Descendant[] = [
     type: 'paragraph',
     children: [
       {
-        text:
-          'You can delete images with the cross in the top left. Try deleting this sheep:',
+        text: 'You can delete images with the cross in the top left. Try deleting this sheep:',
       },
     ],
   },
