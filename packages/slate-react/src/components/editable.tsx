@@ -1114,7 +1114,7 @@ export const Editable = (props: EditableProps) => {
               (event: React.CompositionEvent<HTMLDivElement>) => {
                 if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                   if (ReactEditor.isComposing(editor)) {
-                    Promise.resolve(() => {
+                    Promise.resolve().then(() => {
                       setIsComposing(false)
                       IS_COMPOSING.set(editor, false)
                     })
