@@ -1,5 +1,11 @@
 # slate
 
+## 0.101.5
+
+### Patch Changes
+
+- [#5316](https://github.com/ianstormtaylor/slate/pull/5316) [`8ba3a9c0`](https://github.com/ianstormtaylor/slate/commit/8ba3a9c0348f73324b7c9ec32a4bbd348564d4f0) Thanks [@GeneralChauhan](https://github.com/GeneralChauhan)! - Punctuation Mark "+" Support Added
+
 ## 0.101.4
 
 ### Patch Changes
