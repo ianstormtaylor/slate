@@ -2,6 +2,7 @@ import getDirection from 'direction'
 import debounce from 'lodash/debounce'
 import throttle from 'lodash/throttle'
 import React, {
+  JSX,
   useCallback,
   useEffect,
   useMemo,
@@ -9,7 +10,6 @@ import React, {
   useRef,
   useState,
 } from 'react'
-import { JSX } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
   Editor,
@@ -21,6 +21,7 @@ import {
   Text,
   Transforms,
 } from 'slate'
+import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
 import { DecorateContext } from '../hooks/use-decorate'
@@ -47,8 +48,8 @@ import {
   IS_FIREFOX,
   IS_FIREFOX_LEGACY,
   IS_IOS,
-  IS_WEBKIT,
   IS_UC_MOBILE,
+  IS_WEBKIT,
   IS_WECHATBROWSER,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
@@ -68,7 +69,6 @@ import {
   PLACEHOLDER_SYMBOL,
 } from '../utils/weak-maps'
 import { RestoreDOM } from './restore-dom/restore-dom'
-import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 
 type DeferredOperation = () => void
 
@@ -1192,26 +1192,9 @@ export const Editable = (props: EditableProps) => {
                   setIsComposing(true)
 
                   const { selection } = editor
-                  if (selection) {
-                    if (Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor)
-                      return
-                    }
-                    const inline = Editor.above(editor, {
-                      match: n =>
-                        Element.isElement(n) && Editor.isInline(editor, n),
-                      mode: 'highest',
-                    })
-                    if (inline) {
-                      const [, inlinePath] = inline
-                      if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-                        const point = Editor.after(editor, inlinePath)!
-                        Transforms.setSelection(editor, {
-                          anchor: point,
-                          focus: point,
-                        })
-                      }
-                    }
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                    return
                   }
                 }
               },
