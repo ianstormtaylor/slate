@@ -1,0 +1,1 @@
+{"version":3,"file":"delete-forward.d.ts","sourceRoot":"","sources":["../../../../packages/slate/src/editor/delete-forward.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,sBAAsB,CAAA;AAG7C,OAAO,EAAE,kBAAkB,EAAE,MAAM,gBAAgB,CAAA;AAEnD,eAAO,MAAM,aAAa,EAAE,kBAAkB,CAAC,MAAM,CAAC,eAAe,CAAC,CASrE,CAAA"}

@@ -1,0 +1,1 @@
+{"version":3,"file":"use-mutation-observer.d.ts","sourceRoot":"","sources":["../../../../packages/slate-react/src/hooks/use-mutation-observer.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,SAAS,EAAuB,MAAM,OAAO,CAAA;AAGtD,wBAAgB,mBAAmB,CACjC,IAAI,EAAE,SAAS,CAAC,WAAW,CAAC,EAC5B,QAAQ,EAAE,gBAAgB,EAC1B,OAAO,EAAE,oBAAoB,QAkB9B"}

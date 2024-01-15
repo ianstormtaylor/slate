@@ -1,0 +1,1 @@
+{"version":3,"file":"delete-backward.d.ts","sourceRoot":"","sources":["../../../../packages/slate/src/editor/delete-backward.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,MAAM,sBAAsB,CAAA;AAG7C,OAAO,EAAE,kBAAkB,EAAE,MAAM,gBAAgB,CAAA;AAEnD,eAAO,MAAM,cAAc,EAAE,kBAAkB,CAAC,MAAM,CAAC,gBAAgB,CAAC,CASvE,CAAA"}

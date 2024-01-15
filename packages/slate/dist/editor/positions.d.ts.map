@@ -1,0 +1,1 @@
+{"version":3,"file":"positions.d.ts","sourceRoot":"","sources":["../../../../packages/slate/src/editor/positions.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,MAAM,EAAE,sBAAsB,EAAE,MAAM,sBAAsB,CAAA;AACrE,OAAO,EAAE,KAAK,EAAE,MAAM,qBAAqB,CAAA;AAW3C,wBAAiB,SAAS,CACxB,MAAM,EAAE,MAAM,EACd,OAAO,GAAE,sBAA2B,GACnC,SAAS,CAAC,KAAK,EAAE,IAAI,EAAE,SAAS,CAAC,CA8KnC"}
