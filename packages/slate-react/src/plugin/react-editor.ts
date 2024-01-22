@@ -447,8 +447,10 @@ export const ReactEditor: ReactEditorInterface = {
         Transforms.select(editor, Editor.start(editor, []))
         editor.onChange()
       }
-      el.focus({ preventScroll: true })
+      // IS_FOCUSED should be set before calling el.focus() to ensure that
+      // FocusedContext is updated to the correct value
       IS_FOCUSED.set(editor, true)
+      el.focus({ preventScroll: true })
     }
   },
 
