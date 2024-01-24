@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.101.6
+
+### Patch Changes
+
+- [#5593](https://github.com/ianstormtaylor/slate/pull/5593) [`54594d0f`](https://github.com/ianstormtaylor/slate/commit/54594d0f81627166d72c97256203c4b5642a82ff) Thanks [@12joan](https://github.com/12joan)! - Fix: Calling `ReactEditor.focus` doesn't update `useFocused` when running in @testing-library/react
+
 ## 0.101.5
 
 ### Patch Changes
