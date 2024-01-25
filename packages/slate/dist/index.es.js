@@ -4127,10 +4127,6 @@ var applyToDraft = (editor, selection, op) => {
         var _node5 = Node.get(editor, _path6);
 
         for (var _key6 in newProperties) {
-          if (_key6 === 'children' || _key6 === 'text') {
-            throw new Error("Cannot set the \"".concat(_key6, "\" property of nodes!"));
-          }
-
           var value = newProperties[_key6];
 
           if (value == null) {
@@ -4846,10 +4842,6 @@ var NodeTransforms = {
         var hasChanges = false;
 
         for (var k in props) {
-          if (k === 'children' || k === 'text') {
-            continue;
-          }
-
           if (compare(props[k], node[k])) {
             hasChanges = true; // Omit new properties from the old properties list
 
@@ -5345,7 +5337,8 @@ var SelectionTransforms = {
     } = selection;
     var opts = {
       distance,
-      unit
+      unit,
+      voids: true
     };
     var props = {};
 

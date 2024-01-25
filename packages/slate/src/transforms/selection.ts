@@ -91,7 +91,7 @@ export const SelectionTransforms: SelectionTransforms = {
     }
 
     const { anchor, focus } = selection
-    const opts = { distance, unit }
+    const opts = { distance, unit, voids: true }
     const props: Partial<Range> = {}
 
     if (edge == null || edge === 'anchor') {

@@ -207,10 +207,6 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
       const node = Node.get(editor, path)
 
       for (const key in newProperties) {
-        if (key === 'children' || key === 'text') {
-          throw new Error(`Cannot set the "${key}" property of nodes!`)
-        }
-
         const value = newProperties[key]
 
         if (value == null) {

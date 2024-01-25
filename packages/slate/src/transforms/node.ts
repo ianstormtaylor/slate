@@ -656,10 +656,6 @@ export const NodeTransforms: NodeTransforms = {
         let hasChanges = false
 
         for (const k in props) {
-          if (k === 'children' || k === 'text') {
-            continue
-          }
-
           if (compare(props[k], node[k])) {
             hasChanges = true
             // Omit new properties from the old properties list
