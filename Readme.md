@@ -1,3 +1,9 @@
+:warning: The build script must be invoked with older OpenSSL provider:
+
+```bash
+NODE_OPTIONS=--openssl-legacy-provider yarn run build
+```
+
 <p align="center">
   <a href="#"><img src="./docs/images/banner.png" /></a>
 </p>
