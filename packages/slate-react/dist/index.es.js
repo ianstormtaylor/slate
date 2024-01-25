@@ -1140,13 +1140,6 @@ var Editable$1 = props => {
     }
 
     setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need
-      // to focus the contenteditable element too. (2016/11/16)
-      if (newDomRange && IS_FIREFOX) {
-        var el = ReactEditor.toDOMNode(editor, editor);
-        el.focus();
-      }
-
       state.isUpdatingSelection = false;
     });
   }); // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it

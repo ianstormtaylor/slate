@@ -245,13 +245,6 @@ export const Editable = (props: EditableProps) => {
     }
 
     setTimeout(() => {
-      // COMPAT: In Firefox, it's not enough to create a range, you also need
-      // to focus the contenteditable element too. (2016/11/16)
-      if (newDomRange && IS_FIREFOX) {
-        const el = ReactEditor.toDOMNode(editor, editor)
-        el.focus()
-      }
-
       state.isUpdatingSelection = false
     })
   })
