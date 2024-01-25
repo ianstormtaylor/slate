@@ -1,0 +1,1 @@
+{"version":3,"file":"history.d.ts","sourceRoot":"","sources":["packages/slate-history/src/history.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,SAAS,EAAE,MAAM,OAAO,CAAA;AAEjC;;;GAGG;AAEH,MAAM,WAAW,OAAO;IACtB,KAAK,EAAE,SAAS,EAAE,EAAE,CAAA;IACpB,KAAK,EAAE,SAAS,EAAE,EAAE,CAAA;CACrB;AAED,eAAO,MAAM,OAAO;IAClB;;OAEG;qBAEc,GAAG;CASrB,CAAA"}

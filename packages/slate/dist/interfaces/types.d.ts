@@ -1,0 +1,11 @@
+export declare type LeafEdge = 'start' | 'end';
+export declare type MaximizeMode = RangeMode | 'all';
+export declare type MoveUnit = 'offset' | 'character' | 'word' | 'line';
+export declare type RangeDirection = TextDirection | 'outward' | 'inward';
+export declare type RangeMode = 'highest' | 'lowest';
+export declare type SelectionEdge = 'anchor' | 'focus' | 'start' | 'end';
+export declare type SelectionMode = 'all' | 'highest' | 'lowest';
+export declare type TextDirection = 'forward' | 'backward';
+export declare type TextUnit = 'character' | 'word' | 'line' | 'block';
+export declare type TextUnitAdjustment = TextUnit | 'offset';
+//# sourceMappingURL=types.d.ts.map

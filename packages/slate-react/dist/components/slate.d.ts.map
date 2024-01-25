@@ -1,0 +1,1 @@
+{"version":3,"file":"slate.d.ts","sourceRoot":"","sources":["../packages/slate-react/src/components/slate.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAmD,MAAM,OAAO,CAAA;AACvE,OAAO,EAAgB,UAAU,EAAY,MAAM,OAAO,CAAA;AAC1D,OAAO,EAAE,WAAW,EAAE,MAAM,wBAAwB,CAAA;AAYpD;;;GAGG;AAEH,eAAO,MAAM,KAAK;YACR,WAAW;WACZ,UAAU,EAAE;cACT,KAAK,CAAC,SAAS;wBACN,UAAU,EAAE,KAAK,IAAI;iBAqFzC,CAAA"}

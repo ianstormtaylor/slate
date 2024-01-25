@@ -1,0 +1,1 @@
+{"version":3,"file":"use-restore-dom.d.ts","sourceRoot":"","sources":["../../packages/slate-react/src/components/android/use-restore-dom.tsx"],"names":[],"mappings":"AAAA,OAAO,KAAyC,MAAM,OAAO,CAAA;AAgC7D,wBAAgB,aAAa,CAC3B,IAAI,EAAE,KAAK,CAAC,SAAS,CAAC,WAAW,CAAC,EAClC,iBAAiB,EAAE,KAAK,CAAC,SAAS,CAAC,OAAO,CAAC,cA8C5C"}
