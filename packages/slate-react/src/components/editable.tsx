@@ -219,6 +219,19 @@ export const Editable = (props: EditableProps) => {
       return
     }
 
+    // HACK: We must prevent selection going into the Monaco editor when in multi-select mode but with only a single block selected.
+    if (
+      selection &&
+      selection.multiBlock &&
+      selection.anchor &&
+      selection.focus &&
+      selection.anchor.path[0] === selection.focus.path[0] &&
+      selection.anchor.path[1] === selection.focus.path[1]
+    ) {
+      domSelection.removeAllRanges()
+      return
+    }
+
     // Otherwise the DOM selection is out of sync, so update it.
     state.isUpdatingSelection = true
 
