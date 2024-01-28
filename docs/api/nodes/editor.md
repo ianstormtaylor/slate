@@ -346,7 +346,7 @@ Options: `{force?: boolean; operation?: Operation}`
 #### `Editor.withoutNormalizing(editor: Editor, fn: () => void) => void`
 
 Call a function, deferring normalization until after it completes.
-See [Normalization - Implications for Other Code](./11-normalizing.md#implications-for-other-code);
+See [Normalization - Implications for Other Code](../../concepts/11-normalizing.md#implications-for-other-code);
 
 ### Ref Methods
 
