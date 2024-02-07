@@ -14,12 +14,13 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
+export const run = (editor, options = {}) => {
   Transforms.insertNodes(
     editor,
     <inline void>
       <text>four</text>
-    </inline>
+    </inline>,
+    options
   )
 }
 export const output = (

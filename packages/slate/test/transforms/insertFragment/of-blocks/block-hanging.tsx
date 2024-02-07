@@ -8,8 +8,8 @@ const fragment = (
     <block>two</block>
   </fragment>
 )
-export const run = editor => {
-  Transforms.insertFragment(editor, fragment)
+export const run = (editor, options = {}) => {
+  Transforms.insertFragment(editor, fragment, options)
 }
 export const input = (
   <editor>

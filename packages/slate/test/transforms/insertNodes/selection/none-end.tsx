@@ -7,8 +7,8 @@ export const input = (
     <block>one</block>
   </editor>
 )
-export const run = editor => {
-  Transforms.insertNodes(editor, <block>two</block>)
+export const run = (editor, options = {}) => {
+  Transforms.insertNodes(editor, <block>two</block>, options)
 }
 export const output = (
   <editor>

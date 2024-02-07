@@ -10,13 +10,17 @@ export const input = (
     </block>
   </editor>
 )
-export const run = editor => {
-  Transforms.insertNodes(editor, [
-    <inline>
-      <text />
-    </inline>,
-    <text>world</text>,
-  ])
+export const run = (editor, options = {}) => {
+  Transforms.insertNodes(
+    editor,
+    [
+      <inline>
+        <text />
+      </inline>,
+      <text>world</text>,
+    ],
+    options
+  )
 }
 export const output = (
   <editor>

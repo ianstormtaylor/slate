@@ -2,7 +2,7 @@
 import { Transforms } from 'slate'
 import { jsx } from '../../..'
 
-export const run = editor => {
+export const run = (editor, options = {}) => {
   Transforms.insertFragment(
     editor,
     <block>
@@ -12,7 +12,8 @@ export const run = editor => {
           <block>2</block>
         </block>
       </block>
-    </block>
+    </block>,
+    options
   )
 }
 export const input = (

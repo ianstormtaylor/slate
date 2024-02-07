@@ -1,6 +1,7 @@
 import assert from 'assert'
+import { cloneDeep } from 'lodash'
 import { fixtures } from '../../../support/fixtures'
-import { Editor } from 'slate'
+import { Editor, createEditor } from 'slate'
 import { createHyperscript } from 'slate-hyperscript'
 
 describe('slate', () => {
@@ -45,6 +46,31 @@ describe('slate', () => {
     const result = test(input)
     assert.deepEqual(result, output)
   })
+  // make sure with or without batchDirty, the normalize result is the same
+  const testBatchDirty = ({ module }) => {
+    const { input, run } = module
+
+    const input2 = createEditor()
+    input2.children = cloneDeep(input.children)
+    input2.selection = cloneDeep(input.selection)
+
+    const dirties1 = []
+    const dirties2 = []
+
+    const editor1 = withBatchTest(withTest(input), dirties1)
+    const editor2 = withBatchTest(withTest(input2), dirties2)
+
+    run(editor1, { batchDirty: true })
+    run(editor2, { batchDirty: false })
+
+    assert.equal(dirties1.join(' '), dirties2.join(' '))
+  }
+  fixtures(__dirname, 'transforms/insertNodes', ({ module }) => {
+    testBatchDirty({ module })
+  })
+  fixtures(__dirname, 'transforms/insertFragment', ({ module }) => {
+    testBatchDirty({ module })
+  })
 })
 const withTest = editor => {
   const { isInline, isVoid, isElementReadOnly, isSelectable } = editor
@@ -59,6 +85,14 @@ const withTest = editor => {
   }
   editor.isSelectable = element => {
     return element.nonSelectable === true ? false : isSelectable(element)
+  }
+  return editor
+}
+const withBatchTest = (editor, dirties) => {
+  const { normalizeNode } = editor
+  editor.normalizeNode = ([node, path]) => {
+    dirties.push(JSON.stringify(path))
+    normalizeNode([node, path])
   }
   return editor
 }

@@ -15,6 +15,7 @@ export interface TextInsertFragmentOptions {
   at?: Location
   hanging?: boolean
   voids?: boolean
+  batchDirty?: boolean
 }
 
 export interface TextInsertTextOptions {
