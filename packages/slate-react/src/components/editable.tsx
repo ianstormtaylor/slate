@@ -1192,26 +1192,9 @@ export const Editable = (props: EditableProps) => {
                   setIsComposing(true)
 
                   const { selection } = editor
-                  if (selection) {
-                    if (Range.isExpanded(selection)) {
-                      Editor.deleteFragment(editor)
-                      return
-                    }
-                    const inline = Editor.above(editor, {
-                      match: n =>
-                        Element.isElement(n) && Editor.isInline(editor, n),
-                      mode: 'highest',
-                    })
-                    if (inline) {
-                      const [, inlinePath] = inline
-                      if (Editor.isEnd(editor, selection.anchor, inlinePath)) {
-                        const point = Editor.after(editor, inlinePath)!
-                        Transforms.setSelection(editor, {
-                          anchor: point,
-                          focus: point,
-                        })
-                      }
-                    }
+                  if (selection && Range.isExpanded(selection)) {
+                    Editor.deleteFragment(editor)
+                    return
                   }
                 }
               },
