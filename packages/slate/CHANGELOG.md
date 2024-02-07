@@ -1,5 +1,11 @@
 # slate
 
+## 0.102.0
+
+### Minor Changes
+
+- [#5543](https://github.com/ianstormtaylor/slate/pull/5543) [`3aaf3b51`](https://github.com/ianstormtaylor/slate/commit/3aaf3b517c2020c198bffe0f3aa8156746914408) Thanks [@mainhanu](https://github.com/mainhanu)! - Transform.insertNodes & Transform.insertFragment performance optimize
+
 ## 0.101.5
 
 ### Patch Changes
