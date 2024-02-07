@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.102.0
+
+### Patch Changes
+
+- [#5541](https://github.com/ianstormtaylor/slate/pull/5541) [`c2ae1eda`](https://github.com/ianstormtaylor/slate/commit/c2ae1eda91d0aae1cd63bd46af759c542c292a8a) Thanks [@12joan](https://github.com/12joan)! - Do not move selection outside inline node when composition starts
+
 ## 0.101.6
 
 ### Patch Changes
