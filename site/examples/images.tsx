@@ -84,7 +84,7 @@ const insertImage = (editor, url) => {
   Transforms.insertNodes(editor, image)
   Transforms.insertNodes(editor, {
     type: 'paragraph',
-    children: [{ text: "" }],
+    children: [{ text: '' }],
   });
 }
 
