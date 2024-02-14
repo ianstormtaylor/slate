@@ -72,11 +72,23 @@ export const withHistory = <T extends Editor>(editor: T) => {
     const lastBatch = undos[undos.length - 1]
     const lastOp =
       lastBatch && lastBatch.operations[lastBatch.operations.length - 1]
+    const selectionBefore = lastBatch && lastBatch.selectionBefore
     let save = HistoryEditor.isSaving(e)
     let merge = HistoryEditor.isMerging(e)
 
     if (save == null) {
       save = shouldSave(op, lastOp)
+    }
+
+    // Push empty batch to history as a delimeter when the current operation
+    // is a non-inversed set_selection  that comes after non empty batches
+    if (op.type === 'set_selection' && selectionBefore) {
+      // Push empty batch when current operation is the non-inversed selection operation
+      !checkIfInvertedSelection(op, selectionBefore) &&
+        e.writeHistory('undos', {
+          operations: [],
+          selectionBefore: null,
+        })
     }
 
     if (save) {
@@ -155,4 +167,23 @@ const shouldSave = (op: Operation, prev: Operation | undefined): boolean => {
   }
 
   return true
+}
+
+const checkIfInvertedSelection = (op: Operation, selectionBefore: any) => {
+  // Retrieve offset values for selection; Offset - is like an x-axis coordinate for the caret (cursor)
+  let oldOffset = (op.properties.focus ?? op.properties.anchor).offset
+  let newOffset = (op.newProperties.focus ?? op.newProperties.anchor).offset
+
+  // Swap offset values if selection was made from left to right
+  if (op.properties.anchor) {
+    ;[oldOffset, newOffset] = [newOffset, oldOffset]
+  }
+
+  // Compare with selectionBefore, if the current selection matches with selectionBefore
+  // it means that the current operation is the inversed selection that came from undo()
+  // and we don't want to populate the history with an empty batch in this case
+  return (
+    selectionBefore.anchor.offset === oldOffset &&
+    selectionBefore.focus.offset === newOffset
+  )
 }
