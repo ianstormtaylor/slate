@@ -13,15 +13,13 @@
         "--grep",
         "${fileBasenameNoExtension}",
         "--timeout",
-        "999999",
+        "999999"
       ],
       "internalConsoleOptions": "openOnSessionStart",
       "name": "Mocha Tests",
       "program": "${workspaceFolder}/.yarn/releases/yarn-4.0.2.cjs",
       "request": "launch",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
+      "skipFiles": ["<node_internals>/**"],
       "type": "node"
     },
     {
