@@ -5,6 +5,24 @@
   "version": "0.2.0",
   "configurations": [
     {
+      "args": [
+        "mocha",
+        "--require",
+        "${workspaceFolder}/config/babel/register.cjs",
+        "${workspaceFolder}/packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
+        "--grep",
+        "${fileBasenameNoExtension}",
+        "--timeout",
+        "999999"
+      ],
+      "internalConsoleOptions": "openOnSessionStart",
+      "name": "Mocha Tests",
+      "program": "${workspaceFolder}/.yarn/releases/yarn-4.0.2.cjs",
+      "request": "launch",
+      "skipFiles": ["<node_internals>/**"],
+      "type": "node"
+    },
+    {
       "type": "firefox",
       "request": "launch",
       "reAttach": true,
