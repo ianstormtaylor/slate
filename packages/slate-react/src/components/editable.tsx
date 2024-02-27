@@ -337,6 +337,34 @@ export const Editable = (props: EditableProps) => {
         hasDomSelectionInEditor = true
       }
 
+      state.isUpdatingSelection = false
+    })
+  })
+
+  // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
+  // needs to be manually focused.
+  useEffect(() => {
+    if (ref.current && autoFocus) {
+      if (window.getSelection && document.createRange) {
+        const range = document.createRange()
+        ref.current.focus()
+        range.setStart(ref.current, ref.current.childNodes.length)
+        range.setEnd(ref.current, ref.current.childNodes.length)
+        const sel = window.getSelection()
+        sel?.removeAllRanges()
+        sel?.addRange(range)
+      }
+      ref.current.focus()
+    }
+  }, [autoFocus])
+
+  // Listen on the native `selectionchange` event to be able to update any time
+  // the selection changes. This is required because React's `onSelect` is leaky
+  // and non-standard so it doesn't fire until after a selection has been
+  // released. This causes issues in situations where another change happens
+  // while a selection is being dragged.
+  const onDOMSelectionChange = useCallback(
+    throttle(() => {
       // If the DOM selection is in the editor and the editor selection is already correct, we're done.
       if (
         hasDomSelection &&
