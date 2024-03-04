@@ -54,7 +54,7 @@ Of course we haven't rendered anything, so you won't see any changes.
 import { BaseEditor, Descendant } from 'slate'
 import { ReactEditor } from 'slate-react'
 
-type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomElement = { type: string; children: CustomText[] }
 type CustomText = { text: string }
 
 declare module 'slate' {
