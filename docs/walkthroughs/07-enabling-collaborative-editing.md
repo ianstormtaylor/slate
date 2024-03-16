@@ -362,7 +362,7 @@ const SlateEditor = ({ sharedType, provider }) => {
         // The current user's name and color
         data: {
           name: 'Chris',
-          color: '##00ff00',
+          color: '#00ff00',
         },
       })
     )
