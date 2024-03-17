@@ -384,7 +384,13 @@ export const Editable = (props: EditableProps) => {
       state.isUpdatingSelection = true
 
       const newDomRange: DOMRange | null =
-        selection && ReactEditor.toDOMRange(editor, selection)
+        selection &&
+        ReactEditor.toDOMRange(editor, selection, {
+          // Even when we have a selection in Slate, the DOM might have moved
+          // underneath us, so we have to check that the anchor and focus nodes
+          // still exist.
+          suppressThrow: true,
+        })
 
       if (newDomRange) {
         if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
