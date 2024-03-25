@@ -75,6 +75,19 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
         }
       }
     } else {
+      // If the child is not a text node, and doesn't have a `children` field,
+      // then we have an invalid node that will upset slate.
+      //
+      // eg: `{ type: 'some_node' }`.
+      //
+      // To prevent slate from breaking, we can add the `children` field,
+      // and now that it is valid, we can to many more operations easily,
+      // such as extend normalizers to fix erronous structure.
+      if (!Text.isText(child) && !('children' in child)) {
+        const elementChild = child as Element
+        elementChild.children = []
+      }
+
       // Merge adjacent text nodes that are empty or match.
       if (prev != null && Text.isText(prev)) {
         if (Text.equals(child, prev, { loose: true })) {
