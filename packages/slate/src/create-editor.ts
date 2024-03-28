@@ -57,6 +57,7 @@ import {
   rangeRef,
   rangeRefs,
   setNormalizing,
+  shouldMergeNodesRemovePrevNode,
   start,
   string,
   unhangRange,
@@ -181,6 +182,8 @@ export const createEditor = (): Editor => {
     void: (...args) => getVoid(editor, ...args),
     withoutNormalizing: (...args) => withoutNormalizing(editor, ...args),
     wrapNodes: (...args) => wrapNodes(editor, ...args),
+    shouldMergeNodesRemovePrevNode: (...args) =>
+      shouldMergeNodesRemovePrevNode(editor, ...args),
   }
 
   return editor
