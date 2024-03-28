@@ -128,12 +128,7 @@ export const mergeNodes: NodeTransforms['mergeNodes'] = (
       Transforms.removeNodes(editor, { at: emptyRef.current!, voids })
     }
 
-    // If the target node that we're merging with is empty, remove it instead
-    // of merging the two. This is a common rich text editor behavior to
-    // prevent losing formatting when deleting entire nodes when you have a
-    // hanging selection.
-    // if prevNode is first child in parent,don't remove it.
-    if (editor.shouldMergeNodesRemovePrevNode(prev, current)) {
+    if (Editor.shouldMergeNodesRemovePrevNode(editor, prev, current)) {
       Transforms.removeNodes(editor, { at: prevPath, voids })
     } else {
       editor.apply({
