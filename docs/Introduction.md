@@ -1,26 +1,26 @@
 # Introduction
 
-[Slate](http://slatejs.org) is a _completely_ customizable framework for building rich text editors.
+Testing asd [Slate](http://slatejs.org) is a _completely_ customizable framework for building rich text editors.
 
 Slate lets you build rich, intuitive editors like those in [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/)—which are becoming table stakes for applications on the web—without your codebase getting mired in complexity.
 
 It can do this because all of its logic is implemented with a series of plugins, so you aren't ever constrained by what _is_ or _isn't_ in "core". You can think of it like a pluggable implementation of `contenteditable` built on top of [React](https://facebook.github.io/react/). It was inspired by libraries like [Draft.js](https://facebook.github.io/draft-js/), [Prosemirror](http://prosemirror.net/) and [Quill](http://quilljs.com/).
 
-> 🤖 **Slate is currently in beta**. Its core API is usable now, but you might need to pull request fixes for advanced use cases. Some of its APIs are not "finalized" and will \(breaking\) change over time as we find better solutions.
+> 🤖 **Slate is currently in beta**. Its core API is usable now, but you might need to pull request fixes for advanced use cases. Some of its APIs are not "finalized" and will (breaking) change over time as we find better solutions.
 
 ## Why?
 
-Why create Slate? Well... _\(Beware: this section has a few of_ [_my_](https://github.com/ianstormtaylor) _opinions!\)_
+Why create Slate? Well... _(Beware: this section has a few of_ [_my_](https://github.com/ianstormtaylor) _opinions!)_
 
 Before creating Slate, I tried a lot of the other rich text libraries out there—[**Draft.js**](https://facebook.github.io/draft-js/), [**Prosemirror**](http://prosemirror.net/), [**Quill**](http://quilljs.com/), etc. What I found was that while getting simple examples to work was easy enough, once you started trying to build something like [Medium](https://medium.com/), [Dropbox Paper](https://www.dropbox.com/paper) or [Google Docs](https://www.google.com/docs/about/), you ran into deeper issues...
 
-- **The editor's "schema" was hardcoded and hard to customize.** Things like bold and italic were supported out of the box, but what about comments, or embeds, or even more domain-specific needs?
-- **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
-- **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
-- **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you had to learn a whole new system with new "gotchas".
-- **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use for a realtime, collaborative editing use case without basically rewriting the editor.
-- **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
-- **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
+* **The editor's "schema" was hardcoded and hard to customize.** Things like bold and italic were supported out of the box, but what about comments, or embeds, or even more domain-specific needs?
+* **Transforming the documents programmatically was very convoluted.** Writing as a user may have worked, but making programmatic changes, which is critical for building advanced behaviors, was needlessly complex.
+* **Serializing to HTML, Markdown, etc. seemed like an afterthought.** Simple things like transforming a document to HTML or Markdown involved writing lots of boilerplate code, for what seemed like very common use cases.
+* **Re-inventing the view layer seemed inefficient and limiting.** Most editors rolled their own views, instead of using existing technologies like React, so you had to learn a whole new system with new "gotchas".
+* **Collaborative editing wasn't designed for in advance.** Often the editor's internal representation of data made it impossible to use for a realtime, collaborative editing use case without basically rewriting the editor.
+* **The repositories were monolithic, not small and reusable.** The code bases for many of the editors often didn't expose the internal tooling that could have been re-used by developers, leading to having to reinvent the wheel.
+* **Building complex, nested documents was impossible.** Many editors were designed around simplistic "flat" documents, making things like tables, embeds and captions difficult to reason about and sometimes impossible.
 
 Of course not every editor exhibits all of these issues, but if you've tried using another editor you might have run into similar problems. To get around the limitations of their APIs and achieve the user experience you're after, you have to resort to very hacky things. And some experiences are just plain impossible to achieve.
 
@@ -48,15 +48,15 @@ Check out the [**live demo**](http://slatejs.org) of all of the examples!
 
 To get a sense for how you might use Slate, check out a few of the examples:
 
-- [**Plain text**](https://www.slatejs.org/examples/plaintext) — showing the most basic case: a glorified `<textarea>`.
-- [**Rich text**](https://www.slatejs.org/examples/richtext) — showing the features you'd expect from a basic editor.
-- [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
-- [**Inlines**](https://www.slatejs.org/examples/inlines) — showing how to wrap text in inline nodes with associated data.
-- [**Images**](https://www.slatejs.org/examples/images) — showing how to use void \(text-less\) nodes to add images.
-- [**Hovering toolbar**](https://www.slatejs.org/examples/hovering-toolbar) — showing how a contextual hovering menu can be implemented.
-- [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.
-- [**Paste HTML**](https://www.slatejs.org/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
-- [**Mentions**](https://www.slatejs.org/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
+* [**Plain text**](https://www.slatejs.org/examples/plaintext) — showing the most basic case: a glorified `<textarea>`.
+* [**Rich text**](https://www.slatejs.org/examples/richtext) — showing the features you'd expect from a basic editor.
+* [**Markdown preview**](https://www.slatejs.org/examples/markdown-preview) — showing how to add key handlers for Markdown-like shortcuts.
+* [**Inlines**](https://www.slatejs.org/examples/inlines) — showing how to wrap text in inline nodes with associated data.
+* [**Images**](https://www.slatejs.org/examples/images) — showing how to use void (text-less) nodes to add images.
+* [**Hovering toolbar**](https://www.slatejs.org/examples/hovering-toolbar) — showing how a contextual hovering menu can be implemented.
+* [**Tables**](https://www.slatejs.org/examples/tables) — showing how to nest blocks to render more advanced components.
+* [**Paste HTML**](https://www.slatejs.org/examples/paste-html) — showing how to use an HTML serializer to handle pasted HTML.
+* [**Mentions**](https://www.slatejs.org/examples/mentions) — showing how to use inline void nodes for simple @-mentions.
 
 Each example includes a **View Source** link to the code that implements it. And we have [other examples](https://github.com/ianstormtaylor/slate/tree/master/site/examples) too.
 
@@ -66,16 +66,16 @@ If you have an idea for an example that shows a common use case, pull request it
 
 If you're using Slate for the first time, check out the [Getting Started](http://docs.slatejs.org/walkthroughs/01-installing-slate) walkthroughs and the [Concepts](http://docs.slatejs.org/concepts) to familiarize yourself with Slate's architecture and mental models.
 
-- [**Walkthroughs**](http://docs.slatejs.org/walkthroughs)
-- [**Concepts**](http://docs.slatejs.org/concepts)
-- [**FAQ**](http://docs.slatejs.org/general/faq)
-- [**Resources**](http://docs.slatejs.org/general/resources)
+* [**Walkthroughs**](http://docs.slatejs.org/walkthroughs)
+* [**Concepts**](http://docs.slatejs.org/concepts)
+* [**FAQ**](http://docs.slatejs.org/general/faq)
+* [**Resources**](http://docs.slatejs.org/general/resources)
 
 If even that's not enough, you can always [read the source itself](https://github.com/ianstormtaylor/slate/tree/master/packages), which is heavily commented.
 
 There are also translations of the documentation into other languages:
 
-- [中文](https://doodlewind.github.io/slate-doc-cn/)
+* [中文](https://doodlewind.github.io/slate-doc-cn/)
 
 If you're maintaining a translation, feel free to pull request it here!
 
