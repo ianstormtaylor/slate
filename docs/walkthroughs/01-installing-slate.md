@@ -1,6 +1,6 @@
 # Installing Slate
 
-Slate is a monorepo divided up into multiple npm packages, so to install it you do:
+Slate is a monorepo divided up into multiple npm packages, so to install it you do: 456
 
 ```text
 yarn add slate slate-react
