@@ -83,7 +83,12 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
       // To prevent slate from breaking, we can add the `children` field,
       // and now that it is valid, we can to many more operations easily,
       // such as extend normalizers to fix erronous structure.
-      if (!Text.isText(child) && !('children' in child)) {
+      if (
+        !Text.isText(child) &&
+        child != null &&
+        typeof child === 'object' &&
+        !('children' in child)
+      ) {
         const elementChild = child as Element
         elementChild.children = []
       }
