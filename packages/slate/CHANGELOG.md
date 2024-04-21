@@ -1,5 +1,15 @@
 # slate
 
+## 0.103.0
+
+### Minor Changes
+
+- [#5621](https://github.com/ianstormtaylor/slate/pull/5621) [`d271c4be`](https://github.com/ianstormtaylor/slate/commit/d271c4be543027be2197f353d7ea61b51e9c48c6) Thanks [@felixfeng33](https://github.com/felixfeng33)! - Add a `shouldMergeNodesRemovePrevNode` editor method to control when `Transforms.mergeNodes` should remove the previous node rather than carrying out a merge operation.
+
+### Patch Changes
+
+- [#5620](https://github.com/ianstormtaylor/slate/pull/5620) [`4470f370`](https://github.com/ianstormtaylor/slate/commit/4470f370570ed1f2dce8b4b58d6117d3a87fa6c0) Thanks [@JohnCosta27](https://github.com/JohnCosta27)! - Making `normalizeNode` capable of normalizing erronous nodes, making slate more resilient.
+
 ## 0.102.0
 
 ### Minor Changes
