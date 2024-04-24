@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useEffect, useRef, useState, Fragment, useContext, createContext, useMemo, useCallback, useReducer } from 'react';
+import React, { useLayoutEffect, useEffect, useRef, useState, Fragment, createContext, useContext, useMemo, useCallback, useReducer } from 'react';
 import { Path, Node, Editor, Text as Text$1, Range, Element as Element$1, Transforms, Scrubber } from 'slate';
 import getDirection from 'direction';
 import debounce from 'lodash/debounce';
@@ -583,6 +583,7 @@ var DefaultElement = props => {
  */
 
 var EditorContext = /*#__PURE__*/createContext(null);
+EditorContext.displayName = 'EditorContext';
 /**
  * Get the current editor object from the React context.
  */
@@ -800,6 +801,7 @@ var useReadOnly = () => {
  */
 
 var SlateContext = /*#__PURE__*/createContext(null);
+SlateContext.displayName = 'SlateContext';
 /**
  * Get the current editor object from the React context.
  */
@@ -3980,6 +3982,7 @@ var AndroidEditable = props => {
  */
 
 var FocusedContext = /*#__PURE__*/createContext(false);
+FocusedContext.displayName = 'FocusedContext';
 /**
  * Get the current `focused` state of the editor.
  */
@@ -3997,6 +4000,7 @@ function isError(error) {
 
 
 var SlateSelectorContext = /*#__PURE__*/createContext({});
+SlateSelectorContext.displayName = 'SlateSelectorContext';
 
 var refEquality = (a, b) => a === b;
 /**
