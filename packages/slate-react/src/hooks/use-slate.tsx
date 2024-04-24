@@ -8,6 +8,7 @@ import { ReactEditor } from '../plugin/react-editor'
  */
 
 export const SlateContext = createContext<[ReactEditor] | null>(null)
+SlateContext.displayName = 'SlateContext'
 
 /**
  * Get the current editor object from the React context.

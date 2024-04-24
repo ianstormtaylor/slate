@@ -7,6 +7,7 @@ import { Editor } from 'slate'
  */
 
 export const EditorContext = createContext<ReactEditor | null>(null)
+EditorContext.displayName = 'EditorContext'
 
 /**
  * Get the current editor object from the React context.

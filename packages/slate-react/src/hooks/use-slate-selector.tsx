@@ -22,6 +22,7 @@ export const SlateSelectorContext = createContext<{
   getSlate: () => Editor
   addEventListener: (callback: EditorChangeHandler) => () => void
 }>({} as any)
+SlateSelectorContext.displayName = 'SlateSelectorContext'
 
 const refEquality = (a: any, b: any) => a === b
 

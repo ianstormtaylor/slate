@@ -5,6 +5,7 @@ import { createContext, useContext } from 'react'
  */
 
 export const FocusedContext = createContext(false)
+FocusedContext.displayName = 'FocusedContext'
 
 /**
  * Get the current `focused` state of the editor.
