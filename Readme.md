@@ -1,8 +1,24 @@
+# Deepnote-specific info
+
 :warning: The build script must be invoked with older OpenSSL provider:
 
 ```bash
 NODE_OPTIONS=--openssl-legacy-provider yarn run build
 ```
+
+How does this work?
+
+- The `package.json` of the Deepnote app repo https://github.com/deepnote/deepnote references this repo https://github.com/deepnote/slate repository (its `deepnote` branch) through the gitpkg npm proxy.
+- The build artifacts are included (committed) in this repo.
+- Every change to this fork must be followed by a build run and committing of the produced build artifacts. It is done this way for release simplicity – we would need to change the package names in the repo and publish it to npm as `@deepnote/slate` for example and use that in our codebase.
+- Updates to this fork should be done as PRs to this repo with each PR being tested against the Deepnote app by replacing the reference in `package.json` (and running `pnpm install` afterwards), for example:
+
+```
+"slate": "https://gitpkg.now.sh/deepnote/slate/packages/slate?my-pr-branch",
+"slate-react": "https://gitpkg.now.sh/deepnote/slate/packages/slate-react?my-pr-branch",
+```
+
+# Slate
 
 <p align="center">
   <a href="#"><img src="./docs/images/banner.png" /></a>
