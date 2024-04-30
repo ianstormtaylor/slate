@@ -85,4 +85,13 @@ export const HistoryEditor = {
     fn()
     SAVING.set(editor, prev)
   },
+
+
+  /**
+   * Push a batch of operations as either undos or redos onto editor.undos or editor.redos
+   */
+
+  writeHistory(editor: HistoryEditor, stack: 'undos' | 'redos', batch: any): void {
+    return editor.writeHistory(stack, batch)
+  }
 }
