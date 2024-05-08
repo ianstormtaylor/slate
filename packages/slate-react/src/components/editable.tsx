@@ -34,6 +34,7 @@ import {
   DOMElement,
   DOMRange,
   DOMText,
+  getActiveElement,
   getDefaultView,
   isDOMElement,
   isDOMNode,
@@ -156,6 +157,7 @@ export const Editable = (props: EditableProps) => {
   const [placeholderHeight, setPlaceholderHeight] = useState<
     number | undefined
   >()
+  const processing = useRef(false)
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -202,6 +204,32 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useMemo(
     () =>
       throttle(() => {
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const root = el.getRootNode()
+        const safariVersion = navigator.userAgent.match(/Version\/(\d+\.\d+)/)
+        const isSafariVersionLessThan17 =
+          IS_WEBKIT && safariVersion && parseFloat(safariVersion[1]) < 17.0
+
+        if (
+          isSafariVersionLessThan17 &&
+          !processing.current &&
+          IS_WEBKIT &&
+          root instanceof ShadowRoot
+        ) {
+          processing.current = true
+
+          const active = getActiveElement()
+
+          if (active) {
+            document.execCommand('indent')
+          } else {
+            Transforms.deselect(editor)
+          }
+
+          processing.current = false
+          return
+        }
+
         const androidInputManager = androidInputManagerRef.current
         if (
           (IS_ANDROID || !ReactEditor.isComposing(editor)) &&
@@ -471,6 +499,39 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/11211
   const onDOMBeforeInput = useCallback(
     (event: InputEvent) => {
+      const el = ReactEditor.toDOMNode(editor, editor)
+      const root = el.getRootNode()
+      const safariVersion = navigator.userAgent.match(/Version\/(\d+\.\d+)/)
+      const isSafariVersionLessThan17 =
+        IS_WEBKIT && safariVersion && parseFloat(safariVersion[1]) < 17.0
+
+      if (
+        isSafariVersionLessThan17 &&
+        processing?.current &&
+        IS_WEBKIT &&
+        root instanceof ShadowRoot
+      ) {
+        // @ts-ignore
+        const ranges = event.getTargetRanges()
+        const range = ranges[0]
+
+        const newRange = new window.Range()
+
+        newRange.setStart(range.startContainer, range.startOffset)
+        newRange.setEnd(range.endContainer, range.endOffset)
+
+        // Translate the DOM Range into a Slate Range
+        const slateRange = ReactEditor.toSlateRange(editor, newRange, {
+          exactMatch: false,
+          suppressThrow: false,
+        })
+
+        Transforms.select(editor, slateRange)
+
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return
+      }
       onUserInput()
 
       if (
@@ -921,17 +982,17 @@ export const Editable = (props: EditableProps) => {
               ...(disableDefaultStyles
                 ? {}
                 : {
-                    // Allow positioning relative to the editable element.
-                    position: 'relative',
-                    // Preserve adjacent whitespace and new lines.
-                    whiteSpace: 'pre-wrap',
-                    // Allow words to break if they are too long.
-                    wordWrap: 'break-word',
-                    // Make the minimum height that of the placeholder.
-                    ...(placeholderHeight
-                      ? { minHeight: placeholderHeight }
-                      : {}),
-                  }),
+                  // Allow positioning relative to the editable element.
+                  position: 'relative',
+                  // Preserve adjacent whitespace and new lines.
+                  whiteSpace: 'pre-wrap',
+                  // Allow words to break if they are too long.
+                  wordWrap: 'break-word',
+                  // Make the minimum height that of the placeholder.
+                  ...(placeholderHeight
+                    ? { minHeight: placeholderHeight }
+                    : {}),
+                }),
               // Allow for passed-in styles to override anything.
               ...userStyle,
             }}
@@ -1414,7 +1475,7 @@ export const Editable = (props: EditableProps) => {
                   const element =
                     editor.children[
                       selection !== null ? selection.focus.path[0] : 0
-                    ]
+                      ]
                   const isRTL = getDirection(Node.string(element)) === 'rtl'
 
                   // COMPAT: Since we prevent the default behavior on
@@ -1722,9 +1783,9 @@ export type RenderPlaceholderProps = {
  */
 
 export const DefaultPlaceholder = ({
-  attributes,
-  children,
-}: RenderPlaceholderProps) => (
+                                     attributes,
+                                     children,
+                                   }: RenderPlaceholderProps) => (
   // COMPAT: Artificially add a line-break to the end on the placeholder element
   // to prevent Android IMEs to pick up its content in autocorrect and to auto-capitalize the first letter
   <span {...attributes}>
