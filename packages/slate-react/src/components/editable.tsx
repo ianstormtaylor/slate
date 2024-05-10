@@ -506,7 +506,6 @@ export const Editable = (props: EditableProps) => {
         IS_WEBKIT &&
         root instanceof ShadowRoot
       ) {
-        // @ts-ignore
         const ranges = event.getTargetRanges()
         const range = ranges[0]
 
@@ -977,17 +976,17 @@ export const Editable = (props: EditableProps) => {
               ...(disableDefaultStyles
                 ? {}
                 : {
-                  // Allow positioning relative to the editable element.
-                  position: 'relative',
-                  // Preserve adjacent whitespace and new lines.
-                  whiteSpace: 'pre-wrap',
-                  // Allow words to break if they are too long.
-                  wordWrap: 'break-word',
-                  // Make the minimum height that of the placeholder.
-                  ...(placeholderHeight
-                    ? { minHeight: placeholderHeight }
-                    : {}),
-                }),
+                    // Allow positioning relative to the editable element.
+                    position: 'relative',
+                    // Preserve adjacent whitespace and new lines.
+                    whiteSpace: 'pre-wrap',
+                    // Allow words to break if they are too long.
+                    wordWrap: 'break-word',
+                    // Make the minimum height that of the placeholder.
+                    ...(placeholderHeight
+                      ? { minHeight: placeholderHeight }
+                      : {}),
+                  }),
               // Allow for passed-in styles to override anything.
               ...userStyle,
             }}
@@ -1470,7 +1469,7 @@ export const Editable = (props: EditableProps) => {
                   const element =
                     editor.children[
                       selection !== null ? selection.focus.path[0] : 0
-                      ]
+                    ]
                   const isRTL = getDirection(Node.string(element)) === 'rtl'
 
                   // COMPAT: Since we prevent the default behavior on
@@ -1778,9 +1777,9 @@ export type RenderPlaceholderProps = {
  */
 
 export const DefaultPlaceholder = ({
-                                     attributes,
-                                     children,
-                                   }: RenderPlaceholderProps) => (
+  attributes,
+  children,
+}: RenderPlaceholderProps) => (
   // COMPAT: Artificially add a line-break to the end on the placeholder element
   // to prevent Android IMEs to pick up its content in autocorrect and to auto-capitalize the first letter
   <span {...attributes}>

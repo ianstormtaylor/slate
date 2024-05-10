@@ -170,7 +170,7 @@ export const getEditableChildAndIndex = (
     isDOMComment(child) ||
     (isDOMElement(child) && child.childNodes.length === 0) ||
     (isDOMElement(child) && child.getAttribute('contenteditable') === 'false')
-    ) {
+  ) {
     if (triedForward && triedBackward) {
       break
     }
