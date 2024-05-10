@@ -315,17 +315,15 @@ export const isTrackedMutation = (
   return isTrackedMutation(editor, parentMutation, batch)
 }
 
-export function getActiveElement() {
-  let active = document.activeElement
+/**
+ * Retrieves the deepest active element in the DOM, considering nested shadow DOMs.
+ */
+export const getActiveElement = () => {
+  let activeElement = document.activeElement
 
-  // eslint-disable-next-line no-constant-condition
-  while (true) {
-    if (active && active.shadowRoot && active.shadowRoot.activeElement) {
-      active = active.shadowRoot.activeElement
-    } else {
-      break
-    }
+  while (activeElement?.shadowRoot && activeElement.shadowRoot?.activeElement) {
+    activeElement = activeElement?.shadowRoot?.activeElement
   }
 
-  return active
+  return activeElement
 }
