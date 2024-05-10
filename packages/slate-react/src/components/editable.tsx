@@ -51,6 +51,7 @@ import {
   IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
+  IS_SAFARI_LEGACY,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -206,12 +207,9 @@ export const Editable = (props: EditableProps) => {
       throttle(() => {
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
-        const safariVersion = navigator.userAgent.match(/Version\/(\d+\.\d+)/)
-        const isSafariVersionLessThan17 =
-          IS_WEBKIT && safariVersion && parseFloat(safariVersion[1]) < 17.0
 
         if (
-          isSafariVersionLessThan17 &&
+          IS_SAFARI_LEGACY &&
           !processing.current &&
           IS_WEBKIT &&
           root instanceof ShadowRoot
@@ -501,12 +499,9 @@ export const Editable = (props: EditableProps) => {
     (event: InputEvent) => {
       const el = ReactEditor.toDOMNode(editor, editor)
       const root = el.getRootNode()
-      const safariVersion = navigator.userAgent.match(/Version\/(\d+\.\d+)/)
-      const isSafariVersionLessThan17 =
-        IS_WEBKIT && safariVersion && parseFloat(safariVersion[1]) < 17.0
 
       if (
-        isSafariVersionLessThan17 &&
+        IS_SAFARI_LEGACY &&
         processing?.current &&
         IS_WEBKIT &&
         root instanceof ShadowRoot

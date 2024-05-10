@@ -66,6 +66,15 @@ export const CAN_USE_DOM = !!(
   typeof window.document.createElement !== 'undefined'
 )
 
+// Check if the browser is Safari and older than 17
+export const IS_SAFARI_LEGACY =
+  typeof navigator !== 'undefined' &&
+  /Safari/.test(navigator.userAgent) &&
+  /Version\/(\d+)/.test(navigator.userAgent) &&
+  (navigator.userAgent.match(/Version\/(\d+)/)?.[1]
+    ? parseInt(navigator.userAgent.match(/Version\/(\d+)/)?.[1]!, 10) < 17
+    : false)
+
 // COMPAT: Firefox/Edge Legacy don't support the `beforeinput` event
 // Chrome Legacy doesn't support `beforeinput` correctly
 export const HAS_BEFORE_INPUT_SUPPORT =
