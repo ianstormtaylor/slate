@@ -29,8 +29,5 @@ test.describe('shadow-dom example', () => {
 
     // Assert that the textbox contains the correct text
     await expect(textbox).toHaveValue('Hello, Playwright!')
-
-    // Optionally, if you want to assert just the presence of text, not exact match
-    await expect(textbox).toContainText('Hello, Playwright!')
   })
 })
