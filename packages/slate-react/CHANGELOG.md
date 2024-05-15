@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.104.0
+
+### Minor Changes
+
+- [#5648](https://github.com/ianstormtaylor/slate/pull/5648) [`0bb7be54`](https://github.com/ianstormtaylor/slate/commit/0bb7be5496db4c31042667a17f9ff95c3f3d42b0) Thanks [@MahmoudElsayad](https://github.com/MahmoudElsayad)! - Fix Safari selection inside Shadow DOM.
+
 ## 0.102.0
 
 ### Patch Changes
