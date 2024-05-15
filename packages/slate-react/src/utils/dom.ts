@@ -314,3 +314,16 @@ export const isTrackedMutation = (
   // Target add/remove is tracked. Track the mutation if we track the parent mutation.
   return isTrackedMutation(editor, parentMutation, batch)
 }
+
+/**
+ * Retrieves the deepest active element in the DOM, considering nested shadow DOMs.
+ */
+export const getActiveElement = () => {
+  let activeElement = document.activeElement
+
+  while (activeElement?.shadowRoot && activeElement.shadowRoot?.activeElement) {
+    activeElement = activeElement?.shadowRoot?.activeElement
+  }
+
+  return activeElement
+}

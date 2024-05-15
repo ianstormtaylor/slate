@@ -34,6 +34,7 @@ import {
   DOMElement,
   DOMRange,
   DOMText,
+  getActiveElement,
   getDefaultView,
   isDOMElement,
   isDOMNode,
@@ -50,6 +51,7 @@ import {
   IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
+  IS_SAFARI_LEGACY,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -156,6 +158,7 @@ export const Editable = (props: EditableProps) => {
   const [placeholderHeight, setPlaceholderHeight] = useState<
     number | undefined
   >()
+  const processing = useRef(false)
 
   const { onUserInput, receivedUserInput } = useTrackUserInput()
 
@@ -202,6 +205,29 @@ export const Editable = (props: EditableProps) => {
   const onDOMSelectionChange = useMemo(
     () =>
       throttle(() => {
+        const el = ReactEditor.toDOMNode(editor, editor)
+        const root = el.getRootNode()
+
+        if (
+          IS_SAFARI_LEGACY &&
+          !processing.current &&
+          IS_WEBKIT &&
+          root instanceof ShadowRoot
+        ) {
+          processing.current = true
+
+          const active = getActiveElement()
+
+          if (active) {
+            document.execCommand('indent')
+          } else {
+            Transforms.deselect(editor)
+          }
+
+          processing.current = false
+          return
+        }
+
         const androidInputManager = androidInputManagerRef.current
         if (
           (IS_ANDROID || !ReactEditor.isComposing(editor)) &&
@@ -471,6 +497,35 @@ export const Editable = (props: EditableProps) => {
   // https://github.com/facebook/react/issues/11211
   const onDOMBeforeInput = useCallback(
     (event: InputEvent) => {
+      const el = ReactEditor.toDOMNode(editor, editor)
+      const root = el.getRootNode()
+
+      if (
+        IS_SAFARI_LEGACY &&
+        processing?.current &&
+        IS_WEBKIT &&
+        root instanceof ShadowRoot
+      ) {
+        const ranges = event.getTargetRanges()
+        const range = ranges[0]
+
+        const newRange = new window.Range()
+
+        newRange.setStart(range.startContainer, range.startOffset)
+        newRange.setEnd(range.endContainer, range.endOffset)
+
+        // Translate the DOM Range into a Slate Range
+        const slateRange = ReactEditor.toSlateRange(editor, newRange, {
+          exactMatch: false,
+          suppressThrow: false,
+        })
+
+        Transforms.select(editor, slateRange)
+
+        event.preventDefault()
+        event.stopImmediatePropagation()
+        return
+      }
       onUserInput()
 
       if (
