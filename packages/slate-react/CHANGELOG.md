@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.105.0
+
+### Minor Changes
+
+- [#5654](https://github.com/ianstormtaylor/slate/pull/5654) [`2a8b4e95`](https://github.com/ianstormtaylor/slate/commit/2a8b4e958bd02f3b70da51c3880fd764270424ad) Thanks [@alex-starostin](https://github.com/alex-starostin)! - Make capitalizing work for iOS
+
 ## 0.104.0
 
 ### Minor Changes
