@@ -51,7 +51,6 @@ import {
   IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
-  IS_SAFARI_LEGACY,
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
@@ -208,12 +207,7 @@ export const Editable = (props: EditableProps) => {
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
 
-        if (
-          IS_SAFARI_LEGACY &&
-          !processing.current &&
-          IS_WEBKIT &&
-          root instanceof ShadowRoot
-        ) {
+        if (!processing.current && IS_WEBKIT && root instanceof ShadowRoot) {
           processing.current = true
 
           const active = getActiveElement()
@@ -500,12 +494,7 @@ export const Editable = (props: EditableProps) => {
       const el = ReactEditor.toDOMNode(editor, editor)
       const root = el.getRootNode()
 
-      if (
-        IS_SAFARI_LEGACY &&
-        processing?.current &&
-        IS_WEBKIT &&
-        root instanceof ShadowRoot
-      ) {
+      if (processing?.current && IS_WEBKIT && root instanceof ShadowRoot) {
         const ranges = event.getTargetRanges()
         const range = ranges[0]
 
