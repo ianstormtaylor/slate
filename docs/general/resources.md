@@ -54,6 +54,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Taskade](https://www.taskade.com/): Get work done in one unified workspace
 - [TRPG Engine](https://trpg.moonrailgun.com/)
 - [Thoughts](https://thoughts.teambition.com/)
+- [Notestamp](https://notestamp.com): A note-taking web app that synchronizes your notes to audio, video and pdfs.
 
 ## Editors
 
@@ -74,7 +75,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
   library.
 - [Plate (Plugins for Slate)](https://github.com/udecode/plate) provides an editor with configurable and
   extendable plugins.
--
 - [Tripdocs](https://github.com/ctripcorp/tripdocs): It's a modern, production-ready rich text editor.
+- [Notestamp](https://github.com/fortyoneplustwo/notestamp-editor-react): Synchronize your text entries to media using this rich text editor that inserts clickable stamps alongside text.
 
 \(Or, if you have their exact use case, can be a drop-in editor for you.\)
