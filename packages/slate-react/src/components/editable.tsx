@@ -822,26 +822,37 @@ export const Editable = (props: EditableProps) => {
     ]
   )
 
-  // Attach a native DOM event handler for `selectionchange`, because React's
-  // built-in `onSelect` handler doesn't fire for all selection changes. It's a
-  // leaky polyfill that only fires on keypresses or clicks. Instead, we want to
-  // fire for any change to the selection inside the editor. (2019/11/04)
-  // https://github.com/facebook/react/issues/5785
   useIsomorphicLayoutEffect(() => {
     const window = ReactEditor.getWindow(editor)
 
+    // Attach a native DOM event handler for `selectionchange`, because React's
+    // built-in `onSelect` handler doesn't fire for all selection changes. It's
+    // a leaky polyfill that only fires on keypresses or clicks. Instead, we
+    // want to fire for any change to the selection inside the editor.
+    // (2019/11/04) https://github.com/facebook/react/issues/5785
     window.document.addEventListener(
       'selectionchange',
       scheduleOnDOMSelectionChange
     )
+
+    // Listen for dragend and drop globally. In Firefox, if a drop handler
+    // initiates an operation that causes the originally dragged element to
+    // unmount, that element will not emit a dragend event. (2024/06/21)
+    const stoppedDragging = () => {
+      state.isDraggingInternally = false
+    }
+    window.document.addEventListener('dragend', stoppedDragging)
+    window.document.addEventListener('drop', stoppedDragging)
 
     return () => {
       window.document.removeEventListener(
         'selectionchange',
         scheduleOnDOMSelectionChange
       )
+      window.document.removeEventListener('dragend', stoppedDragging)
+      window.document.removeEventListener('drop', stoppedDragging)
     }
-  }, [scheduleOnDOMSelectionChange])
+  }, [scheduleOnDOMSelectionChange, state])
 
   const decorations = decorate([editor, []])
 
@@ -1378,8 +1389,6 @@ export const Editable = (props: EditableProps) => {
                     ReactEditor.focus(editor)
                   }
                 }
-
-                state.isDraggingInternally = false
               },
               [readOnly, editor, attributes.onDrop, state]
             )}
@@ -1393,11 +1402,6 @@ export const Editable = (props: EditableProps) => {
                 ) {
                   attributes.onDragEnd(event)
                 }
-
-                // When dropping on a different droppable element than the current editor,
-                // `onDrop` is not called. So we need to clean up in `onDragEnd` instead.
-                // Note: `onDragEnd` is only called when `onDrop` is not called
-                state.isDraggingInternally = false
               },
               [readOnly, state, attributes, editor]
             )}
