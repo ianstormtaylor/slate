@@ -44,6 +44,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Kitemaker](https://kitemaker.co/): Product development tool built to manage the work, not the workers
 - [Living Spec](https://livingspec.com/): A modern way for product teams to work
 - [Netlify CMS](https://www.netlifycms.org/): Open source content management for your Git workflow
+- [Notestamp](https://notestamp.com): A note-taking web app that synchronizes your notes to audio, video and pdfs.
 - [Notes Together](https://notestogether.hominidsoftware.com/): Get mundane details out of your head
 - [Prezly](https://www.prezly.com/): Turn your audience into fans
 - [Quill Forms](https://demo.quillforms.com/): Open Source Typeform Alternative WordPress Plugin
@@ -54,7 +55,6 @@ These products use Slate, and can give you an idea of what's possible:
 - [Taskade](https://www.taskade.com/): Get work done in one unified workspace
 - [TRPG Engine](https://trpg.moonrailgun.com/)
 - [Thoughts](https://thoughts.teambition.com/)
-- [Notestamp](https://notestamp.com): A note-taking web app that synchronizes your notes to audio, video and pdfs.
 
 ## Editors
 
@@ -69,6 +69,7 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 - [French Press Editor](https://github.com/roast-cms/french-press-editor) is a customizeable editor with offline
   support.
 - [Nossas Editor](http://slate-editor.bonde.org/) is a drop-in WYSIWYG editor.
+- [Notestamp](https://github.com/fortyoneplustwo/notestamp-editor-react): Synchronize your text entries to media using this rich text editor that inserts clickable stamps alongside text.
 - [React Force Slate Editor](https://github.com/nareshbhatia/react-force/tree/master/packages/slate-editor) is a
   light-weight medium-style editor with no editor chrome.
 - [React Page](https://github.com/react-page/react-page) is a self-contained, customizable inline WYSIWYG editor
@@ -76,6 +77,5 @@ These pre-packaged editors are built on top of Slate, and can be helpful to see 
 - [Plate (Plugins for Slate)](https://github.com/udecode/plate) provides an editor with configurable and
   extendable plugins.
 - [Tripdocs](https://github.com/ctripcorp/tripdocs): It's a modern, production-ready rich text editor.
-- [Notestamp](https://github.com/fortyoneplustwo/notestamp-editor-react): Synchronize your text entries to media using this rich text editor that inserts clickable stamps alongside text.
 
 \(Or, if you have their exact use case, can be a drop-in editor for you.\)
