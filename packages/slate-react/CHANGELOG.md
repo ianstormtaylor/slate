@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.106.0
+
+### Minor Changes
+
+- [#5659](https://github.com/ianstormtaylor/slate/pull/5659) [`e6254f70`](https://github.com/ianstormtaylor/slate/commit/e6254f706a47d0e451d3d40485bf96f819eaa9ab) Thanks [@MahmoudElsayad](https://github.com/MahmoudElsayad)! - Enable Shadow DOM fix for all Safari versions.
+
+### Patch Changes
+
+- [#5664](https://github.com/ianstormtaylor/slate/pull/5664) [`0016f984`](https://github.com/ianstormtaylor/slate/commit/0016f9843f76fee1fe7d26330dd00cd1307915ec) Thanks [@12joan](https://github.com/12joan)! - Fix: `state.isDraggingInternally` is stale if a drop handler outside the editor causes the dragged DOM element to unmount
+
 ## 0.105.0
 
 ### Minor Changes
