@@ -13,7 +13,12 @@ const IS_PROD = process.env.NODE_ENV === 'production'
 const IS_DEV = !IS_PROD
 
 const config = {
-  entry: ['react-hot-loader/patch', './examples/index.js'],
+  entry: [
+    'babel-polyfill',
+    'element-closest',
+    'react-hot-loader/patch',
+    './examples/index.js',
+  ],
   output: {
     path: path.resolve(__dirname, '../../build'),
     filename: '[name]-[hash].js',
@@ -68,7 +73,6 @@ const config = {
       title: 'Slate',
       template: HtmlWebpackTemplate,
       inject: false,
-      scripts: ['https://cdn.polyfill.io/v2/polyfill.min.js'],
       links: [
         'https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&subset=latin-ext',
         'https://fonts.googleapis.com/icon?family=Material+Icons',
