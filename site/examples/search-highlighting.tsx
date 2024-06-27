@@ -13,38 +13,48 @@ const SearchHighlightingExample = () => {
     ([node, path]) => {
       const ranges = []
 
-      if (search && Array.isArray(node.children) && node.children.every(Text.isText)) {
-        const texts = node.children.map(it => it.text);
-        const str = texts.join('');
-        let start = str.indexOf(search);
+      if (
+        search &&
+        Array.isArray(node.children) &&
+        node.children.every(Text.isText)
+      ) {
+        const texts = node.children.map(it => it.text)
+        const str = texts.join('')
+        const length = search.length
+        let start = str.indexOf(search)
+        let index = 0
+        let iterated = 0
         while (start !== -1) {
-          let index = 0;
-          let offset = start;
-          let length = search.length;
+          // Skip already iterated strings
+          while (
+            index < texts.length &&
+            start >= iterated + texts[index].length
+          ) {
+            iterated = iterated + texts[index].length
+            index++
+          }
           // Find the index of array and relative position
-          while (length > 0 && index < texts.length) {
-            const currentText = texts[index];
-            const currentPath = [...path, index];
-            // May span multiple array elements
-            if (offset < currentText.length && index < texts.length) {
-              // Get the smaller value of boundary and remaining length
-              let taken = Math.min(currentText.length - offset, length);
-              ranges.push({
-                anchor: { path: currentPath, offset: offset },
-                focus: { path: currentPath, offset: offset + taken },
-                highlight: true,
-              });
-              length = length - taken;
+          let offset = start - iterated
+          let remaining = length
+          while (index < texts.length && remaining > 0) {
+            const currentText = texts[index]
+            const currentPath = [...path, index]
+            const taken = Math.min(remaining, currentText.length - offset)
+            ranges.push({
+              anchor: { path: currentPath, offset },
+              focus: { path: currentPath, offset: offset + taken },
+              highlight: true,
+            })
+            remaining = remaining - taken
+            if (remaining > 0) {
+              iterated = iterated + currentText.length
               // Next block will be indexed from 0
-              offset = 0;
-              index++;
-            } else {
-              offset = offset - currentText.length;
-              index++;
+              offset = 0
+              index++
             }
           }
           // Looking for next search block
-          start = str.indexOf(search, start + search.length);
+          start = str.indexOf(search, start + search.length)
         }
       }
 
