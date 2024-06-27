@@ -13,22 +13,39 @@ const SearchHighlightingExample = () => {
     ([node, path]) => {
       const ranges = []
 
-      if (search && Text.isText(node)) {
-        const { text } = node
-        const parts = text.split(search)
-        let offset = 0
-
-        parts.forEach((part, i) => {
-          if (i !== 0) {
-            ranges.push({
-              anchor: { path, offset: offset - search.length },
-              focus: { path, offset },
-              highlight: true,
-            })
+      if (search && Array.isArray(node.children) && node.children.every(Text.isText)) {
+        const texts = node.children.map(it => it.text);
+        const str = texts.join('');
+        let start = str.indexOf(search);
+        while (start !== -1) {
+          let index = 0;
+          let offset = start;
+          let length = search.length;
+          // Find the index of array and relative position
+          while (length > 0 && index < texts.length) {
+            const currentText = texts[index];
+            const currentPath = [...path, index];
+            // May span multiple array elements
+            if (offset < currentText.length && index < texts.length) {
+              // Get the smaller value of boundary and remaining length
+              let taken = Math.min(currentText.length - offset, length);
+              ranges.push({
+                anchor: { path: currentPath, offset: offset },
+                focus: { path: currentPath, offset: offset + taken },
+                highlight: true,
+              });
+              length = length - taken;
+              // Next block will be indexed from 0
+              offset = 0;
+              index++;
+            } else {
+              offset = offset - currentText.length;
+              index++;
+            }
           }
-
-          offset = offset + part.length + search.length
-        })
+          // Looking for next search block
+          start = str.indexOf(search, start + search.length);
+        }
       }
 
       return ranges
