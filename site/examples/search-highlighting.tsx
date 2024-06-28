@@ -13,22 +13,49 @@ const SearchHighlightingExample = () => {
     ([node, path]) => {
       const ranges = []
 
-      if (search && Text.isText(node)) {
-        const { text } = node
-        const parts = text.split(search)
-        let offset = 0
-
-        parts.forEach((part, i) => {
-          if (i !== 0) {
+      if (
+        search &&
+        Array.isArray(node.children) &&
+        node.children.every(Text.isText)
+      ) {
+        const texts = node.children.map(it => it.text)
+        const str = texts.join('')
+        const length = search.length
+        let start = str.indexOf(search)
+        let index = 0
+        let iterated = 0
+        while (start !== -1) {
+          // Skip already iterated strings
+          while (
+            index < texts.length &&
+            start >= iterated + texts[index].length
+          ) {
+            iterated = iterated + texts[index].length
+            index++
+          }
+          // Find the index of array and relative position
+          let offset = start - iterated
+          let remaining = length
+          while (index < texts.length && remaining > 0) {
+            const currentText = texts[index]
+            const currentPath = [...path, index]
+            const taken = Math.min(remaining, currentText.length - offset)
             ranges.push({
-              anchor: { path, offset: offset - search.length },
-              focus: { path, offset },
+              anchor: { path: currentPath, offset },
+              focus: { path: currentPath, offset: offset + taken },
               highlight: true,
             })
+            remaining = remaining - taken
+            if (remaining > 0) {
+              iterated = iterated + currentText.length
+              // Next block will be indexed from 0
+              offset = 0
+              index++
+            }
           }
-
-          offset = offset + part.length + search.length
-        })
+          // Looking for next search block
+          start = str.indexOf(search, start + search.length)
+        }
       }
 
       return ranges
