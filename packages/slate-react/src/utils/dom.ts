@@ -275,6 +275,16 @@ export const getClipboardData = (
 }
 
 /**
+ * Get the dom selection from Shadow Root if possible, otherwise from the document
+ */
+export const getSelection = (root: Document | ShadowRoot): Selection | null => {
+  if (root.getSelection != null) {
+    return root.getSelection()
+  }
+  return document.getSelection()
+}
+
+/**
  * Check whether a mutation originates from a editable element inside the editor.
  */
 
