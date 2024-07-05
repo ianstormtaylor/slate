@@ -24,10 +24,9 @@ test.describe('shadow-dom example', () => {
     await expect(textbox).toHaveCount(1)
 
     // Clear any existing text and type new text into the textbox
-    await textbox.fill('') // Clears the textbox
-    await textbox.type('Hello, Playwright!')
+    await textbox.fill('Hello, Playwright!')
 
     // Assert that the textbox contains the correct text
-    await expect(textbox).toHaveValue('Hello, Playwright!')
+    await expect(textbox).toHaveText('Hello, Playwright!')
   })
 })
