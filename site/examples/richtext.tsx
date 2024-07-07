@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate } from 'slate-react'
+import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
 import {
   Editor,
   Transforms,
@@ -27,8 +27,27 @@ const RichTextExample = () => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
+  // DEBUG: reproduce the problem env
+  useMemo(() => {
+    // @ts-expect-error debug
+    window.editor = editor
+    // @ts-expect-error debug
+    window.ReactEditor = ReactEditor
+    const { apply } = editor
+    editor.apply = operation => {
+      console.log('OnApply', operation)
+      apply(operation)
+    }
+  }, [editor])
+
   return (
-    <Slate editor={editor} initialValue={initialValue}>
+    <Slate
+      editor={editor}
+      initialValue={initialValue}
+      onChange={(...args) => console.log('OnChange', ...args)}
+      onValueChange={(...args) => console.log('OnValueChange', ...args)}
+      onSelectionChange={(...args) => console.log('OnSelectionChange', ...args)}
+    >
       <Toolbar>
         <MarkButton format="bold" icon="format_bold" />
         <MarkButton format="italic" icon="format_italic" />
@@ -49,7 +68,7 @@ const RichTextExample = () => {
         renderLeaf={renderLeaf}
         placeholder="Enter some rich text…"
         spellCheck
-        autoFocus
+        // autoFocus
         onKeyDown={event => {
           for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event as any)) {
