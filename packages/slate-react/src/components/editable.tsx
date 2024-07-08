@@ -36,6 +36,7 @@ import {
   DOMText,
   getActiveElement,
   getDefaultView,
+  getSelection,
   isDOMElement,
   isDOMNode,
   isPlainTextOnlyPaste,
@@ -231,7 +232,7 @@ export const Editable = (props: EditableProps) => {
           const root = ReactEditor.findDocumentOrShadowRoot(editor)
           const { activeElement } = root
           const el = ReactEditor.toDOMNode(editor, editor)
-          const domSelection = root.getSelection()
+          const domSelection = getSelection(root)
 
           if (activeElement === el) {
             state.latestElement = activeElement
@@ -308,7 +309,7 @@ export const Editable = (props: EditableProps) => {
     // Make sure the DOM selection state is in sync.
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root.getSelection()
+    const domSelection = getSelection(root)
 
     if (
       !domSelection ||
@@ -1090,7 +1091,7 @@ export const Editable = (props: EditableProps) => {
                 // editable element no longer has focus. Refer to:
                 // https://stackoverflow.com/questions/12353247/force-contenteditable-div-to-stop-accepting-input-after-it-loses-focus-under-web
                 if (IS_WEBKIT) {
-                  const domSelection = root.getSelection()
+                  const domSelection = getSelection(root)
                   domSelection?.removeAllRanges()
                 }
 

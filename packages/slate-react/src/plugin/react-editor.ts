@@ -18,6 +18,7 @@ import {
   DOMSelection,
   DOMStaticRange,
   DOMText,
+  getSelection,
   hasShadowRoot,
   isDOMElement,
   isDOMNode,
@@ -280,7 +281,7 @@ export const ReactEditor: ReactEditorInterface = {
   deselect: editor => {
     const { selection } = editor
     const root = ReactEditor.findDocumentOrShadowRoot(editor)
-    const domSelection = root.getSelection()
+    const domSelection = getSelection(root)
 
     if (domSelection && domSelection.rangeCount > 0) {
       domSelection.removeAllRanges()
@@ -295,10 +296,7 @@ export const ReactEditor: ReactEditorInterface = {
     const el = ReactEditor.toDOMNode(editor, editor)
     const root = el.getRootNode()
 
-    if (
-      (root instanceof Document || root instanceof ShadowRoot) &&
-      root.getSelection != null
-    ) {
+    if (root instanceof Document || root instanceof ShadowRoot) {
       return root
     }
 
@@ -437,7 +435,7 @@ export const ReactEditor: ReactEditorInterface = {
     if (root.activeElement !== el) {
       // Ensure that the DOM selection state is set to the editor's selection
       if (editor.selection && root instanceof Document) {
-        const domSelection = root.getSelection()
+        const domSelection = getSelection(root)
         const domRange = ReactEditor.toDOMRange(editor, editor.selection)
         domSelection?.removeAllRanges()
         domSelection?.addRange(domRange)
