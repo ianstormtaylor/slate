@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.107.0
+
+### Minor Changes
+
+- [#5676](https://github.com/ianstormtaylor/slate/pull/5676) [`ec9e5f0a`](https://github.com/ianstormtaylor/slate/commit/ec9e5f0a366dda80f826e90042ff8a49b1cf3933) Thanks [@ivan-sysoi](https://github.com/ivan-sysoi)! - Changed behaviour of ReactEditor.findDocumentOrShadowRoot. It returns shadow root or document without checking for the existence of the getSelection method.
+
 ## 0.106.0
 
 ### Minor Changes
