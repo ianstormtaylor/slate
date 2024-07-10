@@ -85,6 +85,37 @@ describe('slate-react', () => {
           expect(windowSelection?.focusOffset).toBe(testSelection.focus.offset)
         })
       })
+
+      test('should not trigger onValueChange when focus is called', async () => {
+        const editor = withReact(createEditor())
+        const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+        const onValueChange = jest.fn()
+
+        act(() => {
+          render(
+            <Slate
+              editor={editor}
+              initialValue={initialValue}
+              onValueChange={onValueChange}
+            >
+              <Editable />
+            </Slate>
+          )
+        })
+
+        expect(editor.selection).toBe(null)
+
+        await act(async () => {
+          ReactEditor.focus(editor)
+        })
+
+        expect(editor.selection).toEqual({
+          anchor: { path: [0, 0], offset: 0 },
+          focus: { path: [0, 0], offset: 0 },
+        })
+
+        expect(onValueChange).not.toHaveBeenCalled()
+      })
     })
   })
 })

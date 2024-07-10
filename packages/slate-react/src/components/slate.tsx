@@ -66,8 +66,14 @@ export const Slate = (props: {
         case 'set_selection':
           onSelectionChange?.(editor.selection)
           break
-        default:
+        case 'insert_node':
+        case 'remove_node':
+        case 'merge_node':
+        case 'split_node':
+        case 'move_node':
+        case 'set_node':
           onValueChange?.(editor.children)
+          break
       }
 
       setContext(prevContext => ({
