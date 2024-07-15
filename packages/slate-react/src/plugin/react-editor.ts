@@ -443,7 +443,6 @@ export const ReactEditor: ReactEditorInterface = {
       // Create a new selection in the top of the document if missing
       if (!editor.selection) {
         Transforms.select(editor, Editor.start(editor, []))
-        editor.onChange()
       }
       // IS_FOCUSED should be set before calling el.focus() to ensure that
       // FocusedContext is updated to the correct value
