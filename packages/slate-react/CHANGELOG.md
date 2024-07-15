@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.107.1
+
+### Patch Changes
+
+- [#5677](https://github.com/ianstormtaylor/slate/pull/5677) [`a9a70405`](https://github.com/ianstormtaylor/slate/commit/a9a7040583ffe6a5ddf623acbaa91dee8fc76904) Thanks [@WindrunnerMax](https://github.com/WindrunnerMax)! - fix unexpected event triggered when using `ReactEditor.focus`
+
 ## 0.107.0
 
 ### Minor Changes
