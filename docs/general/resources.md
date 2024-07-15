@@ -32,6 +32,7 @@ These products use Slate, and can give you an idea of what's possible:
 - [Chatterbug](https://chatterbug.com/): Learn languages from real people
 - [CoCalc](https://cocalc.com/): Collaborative calculation and data science
 - [Coda](https://coda.io/): Coda brings all your words, data, and teamwork into one powerful doc
+- [Decap CMS](https://decapcms.org/): Open source content management for your Git workflow
 - [Dropdeck](https://www.dropdeck.com/): Magically create beautiful slides — faster than ever
 - [Easy Email Pro](https://www.easyemail.pro/): A powerful, highly customizable email editor
 - [Eraser](https://www.tryeraser.com/): The Whiteboard for Engineering Teams
@@ -41,9 +42,9 @@ These products use Slate, and can give you an idea of what's possible:
 - [Guilded](https://www.guilded.gg/): Better chat, happier communities
 - [Guru](https://www.getguru.com/): Organize company information. Access it anywhere. [wiki]
 - [Hygraph](https://hygraph.com/): The federated content platform
+- [Hot Page](https://hot.page/): A graphical website builder for writing HTML and CSS from scratch
 - [Kitemaker](https://kitemaker.co/): Product development tool built to manage the work, not the workers
 - [Living Spec](https://livingspec.com/): A modern way for product teams to work
-- [Netlify CMS](https://www.netlifycms.org/): Open source content management for your Git workflow
 - [Notestamp](https://notestamp.com): A note-taking web app that synchronizes your notes to audio, video and pdfs.
 - [Notes Together](https://notestogether.hominidsoftware.com/): Get mundane details out of your head
 - [Prezly](https://www.prezly.com/): Turn your audience into fans
