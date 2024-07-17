@@ -15,8 +15,6 @@
   ],
   "dependencies": {
     "@juggle/resize-observer": "^3.4.0",
-    "@types/is-hotkey": "^0.1.8",
-    "@types/lodash": "^4.14.200",
     "direction": "^1.0.4",
     "is-hotkey": "^0.2.0",
     "is-plain-object": "^5.0.0",
@@ -27,8 +25,10 @@
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
     "@testing-library/react": "^14.0.0",
+    "@types/is-hotkey": "^0.1.8",
     "@types/jest": "29.5.6",
     "@types/jsdom": "^21.1.4",
+    "@types/lodash": "^4.14.200",
     "@types/react": "^18.2.41",
     "@types/react-dom": "^18.2.17",
     "@types/resize-observer-browser": "^0.1.8",
