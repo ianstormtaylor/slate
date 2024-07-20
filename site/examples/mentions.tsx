@@ -1,4 +1,11 @@
-import React, { useMemo, useCallback, useRef, useEffect, useState } from 'react'
+import React, {
+  useMemo,
+  useCallback,
+  useRef,
+  useEffect,
+  useState,
+  Fragment,
+} from 'react'
 import { Editor, Transforms, Range, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -12,6 +19,7 @@ import {
 
 import { Portal } from '../components'
 import { MentionElement } from './custom-types.d'
+import { IS_MAC } from '../utils/environment'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
@@ -133,6 +141,7 @@ const MentionExample = () => {
                 style={{
                   padding: '1px 3px',
                   borderRadius: '3px',
+                  cursor: 'pointer',
                   background: i === index ? '#B4D5FF' : 'transparent',
                 }}
               >
@@ -233,8 +242,18 @@ const Mention = ({ attributes, children, element }) => {
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      @{element.character}
-      {children}
+      {IS_MAC ? (
+        // Mac OS IME https://github.com/ianstormtaylor/slate/issues/3490
+        <Fragment>
+          {children}@{element.character}
+        </Fragment>
+      ) : (
+        // Others like Android https://github.com/ianstormtaylor/slate/pull/5360
+        <Fragment>
+          @{element.character}
+          {children}
+        </Fragment>
+      )}
     </span>
   )
 }
