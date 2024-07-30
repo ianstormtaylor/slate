@@ -41,9 +41,24 @@ const Element = props => {
   }
 }
 
+const allowedSchemes = ['http:', 'https:']
+
 const VideoElement = ({ attributes, children, element }) => {
   const editor = useSlateStatic()
   const { url } = element
+
+  const safeUrl = useMemo(() => {
+    let parsedUrl: URL = null
+    try {
+      parsedUrl = new URL(url)
+      // eslint-disable-next-line no-empty
+    } catch {}
+    if (parsedUrl && allowedSchemes.includes(parsedUrl.protocol)) {
+      return parsedUrl.href
+    }
+    return 'about:blank'
+  }, [url])
+
   return (
     <div {...attributes}>
       <div contentEditable={false}>
@@ -54,7 +69,7 @@ const VideoElement = ({ attributes, children, element }) => {
           }}
         >
           <iframe
-            src={`${url}?title=0&byline=0&portrait=0`}
+            src={`${safeUrl}?title=0&byline=0&portrait=0`}
             frameBorder="0"
             style={{
               position: 'absolute',

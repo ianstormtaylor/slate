@@ -242,12 +242,27 @@ const InlineChromiumBugfix = () => (
   </span>
 )
 
+const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
+
 const LinkComponent = ({ attributes, children, element }) => {
   const selected = useSelected()
+
+  const safeUrl = useMemo(() => {
+    let parsedUrl: URL = null
+    try {
+      parsedUrl = new URL(element.url)
+      // eslint-disable-next-line no-empty
+    } catch {}
+    if (parsedUrl && allowedSchemes.includes(parsedUrl.protocol)) {
+      return parsedUrl.href
+    }
+    return 'about:blank'
+  }, [element.url])
+
   return (
     <a
       {...attributes}
-      href={element.url}
+      href={safeUrl}
       className={
         selected
           ? css`
