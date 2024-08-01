@@ -160,13 +160,35 @@ const Element = props => {
       return <ol {...attributes}>{children}</ol>
     case 'link':
       return (
-        <a href={element.url} {...attributes}>
+        <SafeLink href={element.url} {...attributes}>
           {children}
-        </a>
+        </SafeLink>
       )
     case 'image':
       return <ImageElement {...props} />
   }
+}
+
+const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
+
+const SafeLink = ({ attributes, children, href }) => {
+  const safeHref = useMemo(() => {
+    let parsedUrl: URL = null
+    try {
+      parsedUrl = new URL(href)
+      // eslint-disable-next-line no-empty
+    } catch {}
+    if (parsedUrl && allowedSchemes.includes(parsedUrl.protocol)) {
+      return parsedUrl.href
+    }
+    return 'about:blank'
+  }, [href])
+
+  return (
+    <a href={safeHref} {...attributes}>
+      {children}
+    </a>
+  )
 }
 
 const ImageElement = ({ attributes, children, element }) => {
