@@ -132,7 +132,7 @@ export type EditableProps = {
  * Editable.
  */
 
-export const Editable = React.forwardRef(
+export const Editable = forwardRef(
   (props: EditableProps, forwardedRef: ForwardedRef<HTMLDivElement>) => {
     const defaultRenderPlaceholder = useCallback(
       (props: RenderPlaceholderProps) => <DefaultPlaceholder {...props} />,
