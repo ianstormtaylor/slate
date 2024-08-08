@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.108.0
+
+### Minor Changes
+
+- [#5681](https://github.com/ianstormtaylor/slate/pull/5681) [`b8bf92dc`](https://github.com/ianstormtaylor/slate/commit/b8bf92dc7e42f7547128fcfe1c63e89dffb29032) Thanks [@yf-yang](https://github.com/yf-yang)! - Forward ref from Editable component
+
 ## 0.107.1
 
 ### Patch Changes
