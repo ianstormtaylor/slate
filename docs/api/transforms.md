@@ -95,6 +95,8 @@ Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'
 
 Set properties of nodes at the specified location. If no location is specified, use the selection.
 
+if `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
 #### `Transforms.unsetNodes(editor: Editor, props: string | string[], options?)`
