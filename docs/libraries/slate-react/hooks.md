@@ -8,6 +8,10 @@
 
 React hooks for Slate editors
 
+#### `useComposing(): boolean`
+
+Get the current `composing` state of the editor. It deals with `compositionstart`, `compositionupdate`, `compositionend` events.
+
 #### `useFocused(): boolean`
 
 Get the current `focused` state of the editor.
