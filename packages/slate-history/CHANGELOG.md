@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.109.0
+
+### Minor Changes
+
+- [#5696](https://github.com/ianstormtaylor/slate/pull/5696) [`e5fed793`](https://github.com/ianstormtaylor/slate/commit/e5fed793e7ed592298af2fa1fc8d2dde21ebf326) Thanks [@felixfeng33](https://github.com/felixfeng33)! - Add `withMerging`
+
 ## 0.100.0
 
 ### Minor Changes
