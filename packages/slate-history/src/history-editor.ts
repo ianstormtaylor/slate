@@ -63,6 +63,17 @@ export const HistoryEditor = {
   },
 
   /**
+   * Apply a series of changes inside a synchronous `fn`, These operations will
+   * be merged into the previous history.
+   */
+  withMerging(editor: HistoryEditor, fn: () => void): void {
+    const prev = HistoryEditor.isMerging(editor)
+    MERGING.set(editor, true)
+    fn()
+    MERGING.set(editor, prev)
+  },
+
+  /**
    * Apply a series of changes inside a synchronous `fn`, without merging any of
    * the new operations into previous save point in the history.
    */
