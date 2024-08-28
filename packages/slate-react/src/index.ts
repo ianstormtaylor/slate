@@ -14,6 +14,7 @@ export { Slate } from './components/slate'
 // Hooks
 export { useEditor } from './hooks/use-editor'
 export { useSlateStatic } from './hooks/use-slate-static'
+export { useComposing } from './hooks/use-composing'
 export { useFocused } from './hooks/use-focused'
 export { useReadOnly } from './hooks/use-read-only'
 export { useSelected } from './hooks/use-selected'
