@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.110.0
+
+### Minor Changes
+
+- [#5706](https://github.com/ianstormtaylor/slate/pull/5706) [`f9e83b80`](https://github.com/ianstormtaylor/slate/commit/f9e83b807f4b2ae717814af5943f53f366a48fd2) Thanks [@yf-yang](https://github.com/yf-yang)! - Expose useComposing hook
+
 ## 0.109.0
 
 ### Minor Changes
