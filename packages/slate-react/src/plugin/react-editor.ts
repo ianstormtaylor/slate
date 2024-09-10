@@ -794,8 +794,7 @@ export const ReactEditor: ReactEditorInterface = {
           })
         }
       } else if (nonEditableNode) {
-        // Find the edge of the nearest leaf in `searchDirection` from the
-        // non-editable node
+        // Find the edge of the nearest leaf in `searchDirection`
         const getLeafNodes = (node: DOMElement | null | undefined) =>
           node
             ? node.querySelectorAll(
