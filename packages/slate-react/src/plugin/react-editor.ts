@@ -823,9 +823,7 @@ export const ReactEditor: ReactEditorInterface = {
             leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf)) ?? null
         }
 
-        if (!leafNode) {
-          offset = 1
-        } else {
+        if (leafNode) {
           textNode = leafNode.closest('[data-slate-node="text"]')!
           domNode = leafNode
           if (searchDirection === 'forward') {
