@@ -691,7 +691,7 @@ export const ReactEditor: ReactEditorInterface = {
       searchDirection?: 'forward' | 'backward'
     }
   ): T extends true ? Point | null : Point => {
-    const { exactMatch, suppressThrow, searchDirection } = options
+    const { exactMatch, suppressThrow, searchDirection = 'backward' } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
       : normalizeDOMPoint(domPoint)
@@ -796,17 +796,32 @@ export const ReactEditor: ReactEditorInterface = {
       } else if (nonEditableNode) {
         // Find the edge of the nearest leaf in `searchDirection` from the
         // non-editable node
-        const leafNodes = Array.from(
-          editorEl.querySelectorAll(
-            // This editor's leaves (not those of a nested editor)
-            '[data-slate-leaf]:not(:scope [data-slate-editor] [data-slate-leaf])'
-          )
+        const getLeafNodes = (node: DOMElement | null | undefined) =>
+          node
+            ? node.querySelectorAll(
+                // Exclude leaf nodes in nested editors
+                '[data-slate-leaf]:not(:scope [data-slate-editor] [data-slate-leaf])'
+              )
+            : []
+        const elementNode = nonEditableNode.closest(
+          '[data-slate-node="element"]'
         )
-        leafNode =
-          (searchDirection === 'forward'
-            ? leafNodes.find(leaf => isAfter(nonEditableNode, leaf))
-            : leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf))) ??
-          null
+
+        if (searchDirection === 'forward') {
+          const leafNodes = [
+            ...getLeafNodes(elementNode),
+            ...getLeafNodes(elementNode?.nextElementSibling),
+          ]
+          leafNode =
+            leafNodes.find(leaf => isAfter(nonEditableNode, leaf)) ?? null
+        } else {
+          const leafNodes = [
+            ...getLeafNodes(elementNode?.previousElementSibling),
+            ...getLeafNodes(elementNode),
+          ]
+          leafNode =
+            leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf)) ?? null
+        }
 
         if (!leafNode) {
           offset = 1
