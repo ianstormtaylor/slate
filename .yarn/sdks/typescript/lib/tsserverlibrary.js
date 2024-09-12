@@ -1,15 +1,38 @@
 #!/usr/bin/env node
 
 const {existsSync} = require(`fs`);
-const {createRequire, createRequireFromPath} = require(`module`);
+const {createRequire, register} = require(`module`);
 const {resolve} = require(`path`);
+const {pathToFileURL} = require(`url`);
 
 const relPnpApiPath = "../../../../.pnp.cjs";
 
 const absPnpApiPath = resolve(__dirname, relPnpApiPath);
-const absRequire = (createRequire || createRequireFromPath)(absPnpApiPath);
+const absUserWrapperPath = resolve(__dirname, `./sdk.user.cjs`);
+const absRequire = createRequire(absPnpApiPath);
 
-const moduleWrapper = tsserver => {
+const absPnpLoaderPath = resolve(absPnpApiPath, `../.pnp.loader.mjs`);
+const isPnpLoaderEnabled = existsSync(absPnpLoaderPath);
+
+if (existsSync(absPnpApiPath)) {
+  if (!process.versions.pnp) {
+    // Setup the environment to be able to require typescript/lib/tsserverlibrary.js
+    require(absPnpApiPath).setup();
+    if (isPnpLoaderEnabled && register) {
+      register(pathToFileURL(absPnpLoaderPath));
+    }
+  }
+}
+
+const wrapWithUserWrapper = existsSync(absUserWrapperPath)
+  ? exports => absRequire(absUserWrapperPath)(exports)
+  : exports => exports;
+
+const moduleWrapper = exports => {
+  return wrapWithUserWrapper(moduleWrapperFn(exports));
+};
+
+const moduleWrapperFn = tsserver => {
   if (!process.versions.pnp) {
     return tsserver;
   }
@@ -18,6 +41,7 @@ const moduleWrapper = tsserver => {
   const pnpApi = require(`pnpapi`);
 
   const isVirtual = str => str.match(/\/(\$\$virtual|__virtual__)\//);
+  const isPortal = str => str.startsWith("portal:/");
   const normalize = str => str.replace(/\\/g, `/`).replace(/^\/?/, `/`);
 
   const dependencyTreeRoots = new Set(pnpApi.getDependencyTreeRoots().map(locator => {
@@ -30,7 +54,7 @@ const moduleWrapper = tsserver => {
 
   function toEditorPath(str) {
     // We add the `zip:` prefix to both `.zip/` paths and virtual paths
-    if (isAbsolute(str) && !str.match(/^\^zip:/) && (str.match(/\.zip\//) || isVirtual(str))) {
+    if (isAbsolute(str) && !str.match(/^\^?(zip:|\/zip\/)/) && (str.match(/\.zip\//) || isVirtual(str))) {
       // We also take the opportunity to turn virtual paths into physical ones;
       // this makes it much easier to work with workspaces that list peer
       // dependencies, since otherwise Ctrl+Click would bring us to the virtual
@@ -44,7 +68,7 @@ const moduleWrapper = tsserver => {
       const resolved = isVirtual(str) ? pnpApi.resolveVirtual(str) : str;
       if (resolved) {
         const locator = pnpApi.findPackageLocator(resolved);
-        if (locator && dependencyTreeRoots.has(`${locator.name}@${locator.reference}`)) {
+        if (locator && (dependencyTreeRoots.has(`${locator.name}@${locator.reference}`) || isPortal(locator.reference))) {
           str = resolved;
         }
       }
@@ -60,8 +84,32 @@ const moduleWrapper = tsserver => {
           //
           // Ref: https://github.com/microsoft/vscode/issues/105014#issuecomment-686760910
           //
-          case `vscode`: {
+          // 2021-10-08: VSCode changed the format in 1.61.
+          // Before | ^zip:/c:/foo/bar.zip/package.json
+          // After  | ^/zip//c:/foo/bar.zip/package.json
+          //
+          // 2022-04-06: VSCode changed the format in 1.66.
+          // Before | ^/zip//c:/foo/bar.zip/package.json
+          // After  | ^/zip/c:/foo/bar.zip/package.json
+          //
+          // 2022-05-06: VSCode changed the format in 1.68
+          // Before | ^/zip/c:/foo/bar.zip/package.json
+          // After  | ^/zip//c:/foo/bar.zip/package.json
+          //
+          case `vscode <1.61`: {
             str = `^zip:${str}`;
+          } break;
+
+          case `vscode <1.66`: {
+            str = `^/zip/${str}`;
+          } break;
+
+          case `vscode <1.68`: {
+            str = `^/zip${str}`;
+          } break;
+
+          case `vscode`: {
+            str = `^/zip/${str}`;
           } break;
 
           // To make "go to definition" work,
@@ -77,13 +125,15 @@ const moduleWrapper = tsserver => {
           // everything else is up to neovim
           case `neovim`: {
             str = normalize(resolved).replace(/\.zip\//, `.zip::`);
-            str = `zipfile:${str}`;
+            str = `zipfile://${str}`;
           } break;
 
           default: {
             str = `zip:${str}`;
           } break;
         }
+      } else {
+        str = str.replace(/^\/?/, process.platform === `win32` ? `` : `/`);
       }
     }
 
@@ -91,9 +141,28 @@ const moduleWrapper = tsserver => {
   }
 
   function fromEditorPath(str) {
-    return process.platform === `win32`
-      ? str.replace(/^\^?zip:\//, ``)
-      : str.replace(/^\^?zip:/, ``);
+    switch (hostInfo) {
+      case `coc-nvim`: {
+        str = str.replace(/\.zip::/, `.zip/`);
+        // The path for coc-nvim is in format of /<pwd>/zipfile:/<pwd>/.yarn/...
+        // So in order to convert it back, we use .* to match all the thing
+        // before `zipfile:`
+        return process.platform === `win32`
+          ? str.replace(/^.*zipfile:\//, ``)
+          : str.replace(/^.*zipfile:/, ``);
+      } break;
+
+      case `neovim`: {
+        str = str.replace(/\.zip::/, `.zip/`);
+        // The path for neovim is in format of zipfile:///<pwd>/.yarn/...
+        return str.replace(/^zipfile:\/\//, ``);
+      } break;
+
+      case `vscode`:
+      default: {
+        return str.replace(/^\^?(zip:|\/zip(\/ts-nul-authority)?)\/+/, process.platform === `win32` ? `` : `/`)
+      } break;
+    }
   }
 
   // Force enable 'allowLocalPluginLoads'
@@ -119,8 +188,9 @@ const moduleWrapper = tsserver => {
   let hostInfo = `unknown`;
 
   Object.assign(Session.prototype, {
-    onMessage(/** @type {string} */ message) {
-      const parsedMessage = JSON.parse(message)
+    onMessage(/** @type {string | object} */ message) {
+      const isStringMessage = typeof message === 'string';
+      const parsedMessage = isStringMessage ? JSON.parse(message) : message;
 
       if (
         parsedMessage != null &&
@@ -129,11 +199,32 @@ const moduleWrapper = tsserver => {
         typeof parsedMessage.arguments.hostInfo === `string`
       ) {
         hostInfo = parsedMessage.arguments.hostInfo;
+        if (hostInfo === `vscode` && process.env.VSCODE_IPC_HOOK) {
+          const [, major, minor] = (process.env.VSCODE_IPC_HOOK.match(
+            // The RegExp from https://semver.org/ but without the caret at the start
+            /(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$/
+          ) ?? []).map(Number)
+
+          if (major === 1) {
+            if (minor < 61) {
+              hostInfo += ` <1.61`;
+            } else if (minor < 66) {
+              hostInfo += ` <1.66`;
+            } else if (minor < 68) {
+              hostInfo += ` <1.68`;
+            }
+          }
+        }
       }
 
-      return originalOnMessage.call(this, JSON.stringify(parsedMessage, (key, value) => {
-        return typeof value === `string` ? fromEditorPath(value) : value;
-      }));
+      const processedMessageJSON = JSON.stringify(parsedMessage, (key, value) => {
+        return typeof value === 'string' ? fromEditorPath(value) : value;
+      });
+
+      return originalOnMessage.call(
+        this,
+        isStringMessage ? processedMessageJSON : JSON.parse(processedMessageJSON)
+      );
     },
 
     send(/** @type {any} */ msg) {
@@ -146,11 +237,11 @@ const moduleWrapper = tsserver => {
   return tsserver;
 };
 
-if (existsSync(absPnpApiPath)) {
-  if (!process.versions.pnp) {
-    // Setup the environment to be able to require typescript/lib/tsserverlibrary.js
-    require(absPnpApiPath).setup();
-  }
+const [major, minor] = absRequire(`typescript/package.json`).version.split(`.`, 2).map(value => parseInt(value, 10));
+// In TypeScript@>=5.5 the tsserver uses the public TypeScript API so that needs to be patched as well.
+// Ref https://github.com/microsoft/TypeScript/pull/55326
+if (major > 5 || (major === 5 && minor >= 5)) {
+  moduleWrapper(absRequire(`typescript`));
 }
 
 // Defer to the real typescript/lib/tsserverlibrary.js your application uses
