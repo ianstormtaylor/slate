@@ -20,6 +20,8 @@ import {
   DOMText,
   getSelection,
   hasShadowRoot,
+  isAfter,
+  isBefore,
   isDOMElement,
   isDOMNode,
   isDOMSelection,
@@ -244,6 +246,11 @@ export interface ReactEditorInterface {
     options: {
       exactMatch: boolean
       suppressThrow: T
+      /**
+       * The direction to search for Slate leaf nodes if `domPoint` is
+       * non-editable and non-void.
+       */
+      searchDirection?: 'forward' | 'backward'
     }
   ) => T extends true ? Point | null : Point
 
@@ -681,9 +688,10 @@ export const ReactEditor: ReactEditorInterface = {
     options: {
       exactMatch: boolean
       suppressThrow: T
+      searchDirection?: 'forward' | 'backward'
     }
   ): T extends true ? Point | null : Point => {
-    const { exactMatch, suppressThrow } = options
+    const { exactMatch, suppressThrow, searchDirection = 'backward' } = options
     const [nearestNode, nearestOffset] = exactMatch
       ? domPoint
       : normalizeDOMPoint(domPoint)
@@ -701,6 +709,13 @@ export const ReactEditor: ReactEditorInterface = {
       const voidNode =
         potentialVoidNode && editorEl.contains(potentialVoidNode)
           ? potentialVoidNode
+          : null
+      const potentialNonEditableNode = parentNode.closest(
+        '[contenteditable="false"]'
+      )
+      const nonEditableNode =
+        potentialNonEditableNode && editorEl.contains(potentialNonEditableNode)
+          ? potentialNonEditableNode
           : null
       let leafNode = parentNode.closest('[data-slate-leaf]')
       let domNode: DOMElement | null = null
@@ -777,6 +792,47 @@ export const ReactEditor: ReactEditorInterface = {
           domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
             offset -= el.textContent!.length
           })
+        }
+      } else if (nonEditableNode) {
+        // Find the edge of the nearest leaf in `searchDirection`
+        const getLeafNodes = (node: DOMElement | null | undefined) =>
+          node
+            ? node.querySelectorAll(
+                // Exclude leaf nodes in nested editors
+                '[data-slate-leaf]:not(:scope [data-slate-editor] [data-slate-leaf])'
+              )
+            : []
+        const elementNode = nonEditableNode.closest(
+          '[data-slate-node="element"]'
+        )
+
+        if (searchDirection === 'forward') {
+          const leafNodes = [
+            ...getLeafNodes(elementNode),
+            ...getLeafNodes(elementNode?.nextElementSibling),
+          ]
+          leafNode =
+            leafNodes.find(leaf => isAfter(nonEditableNode, leaf)) ?? null
+        } else {
+          const leafNodes = [
+            ...getLeafNodes(elementNode?.previousElementSibling),
+            ...getLeafNodes(elementNode),
+          ]
+          leafNode =
+            leafNodes.findLast(leaf => isBefore(nonEditableNode, leaf)) ?? null
+        }
+
+        if (leafNode) {
+          textNode = leafNode.closest('[data-slate-node="text"]')!
+          domNode = leafNode
+          if (searchDirection === 'forward') {
+            offset = 0
+          } else {
+            offset = domNode.textContent!.length
+            domNode.querySelectorAll('[data-slate-zero-width]').forEach(el => {
+              offset -= el.textContent!.length
+            })
+          }
         }
       }
 
@@ -978,18 +1034,6 @@ export const ReactEditor: ReactEditorInterface = {
       focusOffset--
     }
 
-    // COMPAT: Triple-clicking a word in chrome will sometimes place the focus
-    // inside a `contenteditable="false"` DOM node following the word, which
-    // will cause `toSlatePoint` to throw an error. (2023/03/07)
-    if (
-      'getAttribute' in focusNode &&
-      (focusNode as HTMLElement).getAttribute('contenteditable') === 'false' &&
-      (focusNode as HTMLElement).getAttribute('data-slate-void') !== 'true'
-    ) {
-      focusNode = anchorNode
-      focusOffset = anchorNode.textContent?.length || 0
-    }
-
     const anchor = ReactEditor.toSlatePoint(
       editor,
       [anchorNode, anchorOffset],
@@ -1002,11 +1046,15 @@ export const ReactEditor: ReactEditorInterface = {
       return null as T extends true ? Range | null : Range
     }
 
+    const focusBeforeAnchor =
+      isBefore(anchorNode, focusNode) ||
+      (anchorNode === focusNode && focusOffset < anchorOffset)
     const focus = isCollapsed
       ? anchor
       : ReactEditor.toSlatePoint(editor, [focusNode, focusOffset], {
           exactMatch,
           suppressThrow,
+          searchDirection: focusBeforeAnchor ? 'forward' : 'backward',
         })
     if (!focus) {
       return null as T extends true ? Range | null : Range
