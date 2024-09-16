@@ -15,7 +15,7 @@ import {
 import { withHistory } from 'slate-history'
 import { LinkElement, ButtonElement } from './custom-types.d'
 
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon, Toolbar } from './components'
 
 const initialValue: Descendant[] = [
   {

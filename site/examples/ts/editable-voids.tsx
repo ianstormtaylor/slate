@@ -5,7 +5,7 @@ import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 
 import RichTextEditor from './richtext'
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon, Toolbar } from './components'
 import { EditableVoidElement } from './custom-types.d'
 
 const EditableVoidsExample = () => {

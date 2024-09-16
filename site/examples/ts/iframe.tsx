@@ -5,7 +5,7 @@ import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
 import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
 
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon, Toolbar } from './components'
 
 const HOTKEYS = {
   'mod+b': 'bold',

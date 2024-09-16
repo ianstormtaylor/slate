@@ -15,7 +15,7 @@ import {
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
 
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon, Toolbar } from './components'
 import { ImageElement } from './custom-types.d'
 
 const ImagesExample = () => {

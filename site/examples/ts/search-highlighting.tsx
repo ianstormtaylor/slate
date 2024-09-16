@@ -4,7 +4,7 @@ import { Text, Descendant, createEditor } from 'slate'
 import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
 
-import { Icon, Toolbar } from '../components'
+import { Icon, Toolbar } from './components'
 
 const SearchHighlightingExample = () => {
   const [search, setSearch] = useState<string | undefined>()

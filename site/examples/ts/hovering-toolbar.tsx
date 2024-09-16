@@ -11,7 +11,7 @@ import {
 import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
 
-import { Button, Icon, Menu, Portal } from '../components'
+import { Button, Icon, Menu, Portal } from './components'
 
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])

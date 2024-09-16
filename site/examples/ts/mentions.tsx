@@ -17,9 +17,9 @@ import {
   useFocused,
 } from 'slate-react'
 
-import { Portal } from '../components'
+import { Portal } from './components'
 import { MentionElement } from './custom-types.d'
-import { IS_MAC } from '../utils/environment'
+import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
   const ref = useRef<HTMLDivElement | null>()
