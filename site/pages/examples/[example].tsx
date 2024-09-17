@@ -330,16 +330,12 @@ const ExamplePage = ({ example }: { example: string }) => {
             <A
               href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/js/${path}.jsx`}
             >
-              <Pill>
-                JS Code
-              </Pill>
+              <Pill>JS Code</Pill>
             </A>
             <A
               href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/ts/${path}.tsx`}
             >
-              <Pill>
-                TS Code
-              </Pill>
+              <Pill>TS Code</Pill>
             </A>
           </ExampleTitle>
         </ExampleHeader>
