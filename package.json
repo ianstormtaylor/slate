@@ -19,6 +19,7 @@
     "lint:typescript": "tsc --build ./ --force",
     "open": "open http://localhost:3000",
     "prerelease": "NODE_ENV=production yarn build:rollup && yarn test && yarn lint",
+    "convert-examples": "tsc --project ./site/tsconfig.example.json",
     "release:publish:latext": "lerna publish --force-publish",
     "release:publish:next": "lerna publish --dist-tag next --force-publish",
     "release:publish:experimental": "lerna publish --dist-tag experimental",
