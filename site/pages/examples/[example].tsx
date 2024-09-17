@@ -108,6 +108,18 @@ const A = props => (
   />
 )
 
+const Pill = props => (
+  <span
+    {...props}
+    className={css`
+      background: #333;
+      border-radius: 9999px;
+      color: #aaa;
+      padding: 0.2em 0.5em;
+    `}
+  />
+)
+
 const TabList = ({ isVisible, ...props }) => (
   <div
     {...props}
@@ -316,9 +328,18 @@ const ExamplePage = ({ example }: { example: string }) => {
           <ExampleTitle>
             {name}
             <A
-              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/${path}.tsx`}
+              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/js/${path}.jsx`}
             >
-              (View Source)
+              <Pill>
+                JS Code
+              </Pill>
+            </A>
+            <A
+              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/ts/${path}.tsx`}
+            >
+              <Pill>
+                TS Code
+              </Pill>
             </A>
           </ExampleTitle>
         </ExampleHeader>
