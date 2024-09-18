@@ -132,6 +132,11 @@ export interface NodeInterface {
   get: (root: Node, path: Path) => Node
 
   /**
+   * Similar to get, but returns undefined if the node does not exist.
+   */
+  getIf: (root: Node, path: Path) => Node | undefined
+
+  /**
    * Check if a descendant node exists at a specific path.
    */
   has: (root: Node, path: Path) => boolean
@@ -400,6 +405,22 @@ export const Node: NodeInterface = {
             root
           )}`
         )
+      }
+
+      node = node.children[p]
+    }
+
+    return node
+  },
+
+  getIf(root: Node, path: Path): Node | undefined {
+    let node = root
+
+    for (let i = 0; i < path.length; i++) {
+      const p = path[i]
+
+      if (Text.isText(node) || !node.children[p]) {
+        return
       }
 
       node = node.children[p]
