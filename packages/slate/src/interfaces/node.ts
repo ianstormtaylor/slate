@@ -394,22 +394,14 @@ export const Node: NodeInterface = {
   },
 
   get(root: Node, path: Path): Node {
-    let node = root
-
-    for (let i = 0; i < path.length; i++) {
-      const p = path[i]
-
-      if (Text.isText(node) || !node.children[p]) {
-        throw new Error(
-          `Cannot find a descendant at path [${path}] in node: ${Scrubber.stringify(
-            root
-          )}`
-        )
-      }
-
-      node = node.children[p]
+    const node = Node.getIf(root, path)
+    if (node === undefined) {
+      throw new Error(
+        `Cannot find a descendant at path [${path}] in node: ${Scrubber.stringify(
+          root
+        )}`
+      )
     }
-
     return node
   },
 
