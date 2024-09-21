@@ -19,6 +19,10 @@ export const marks: EditorInterface['marks'] = (editor, options = {}) => {
   }
 
   if (Range.isExpanded(selection)) {
+    const isBackward = Range.isBackward(selection)
+    if (isBackward) {
+      ;[focus, anchor] = [anchor, focus]
+    }
     /**
      * COMPAT: Make sure hanging ranges (caused by double clicking in Firefox)
      * do not adversely affect the returned marks.
