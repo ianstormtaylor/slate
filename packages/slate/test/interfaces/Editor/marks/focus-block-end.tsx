@@ -3,10 +3,10 @@ import { Editor } from 'slate'
 import { jsx } from '../../..'
 
 /**
- * This test verifies that when double clicking a marked word in Firefox,
- * Editor.marks for the resulting selection includes the marked word. Double
- * clicking a marked word in Firefox results in a selection that starts at the
- * end of the previous text node and ends at the end of the marked text node.
+ * Similar to firefox-double-click.tsx, when the selection is at the end of
+ * the previous node's path, using Editor.marks retrieves the marks of that node.
+ * However, when addMark is triggered, that node is not within the range for
+ * adding marks,  thus failing to transfer the state correctly.
  */
 
 export const input = (
