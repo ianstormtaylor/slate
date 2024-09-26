@@ -1,7 +1,7 @@
 import { readdirSync } from 'fs'
 import { join } from 'path'
 
-const examplePath = join(process.cwd(), 'examples')
+const examplePath = join(process.cwd(), 'examples/ts')
 
 export function getAllExamples() {
   const slugs = readdirSync(examplePath)

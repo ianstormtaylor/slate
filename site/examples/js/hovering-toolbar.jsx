@@ -1,28 +1,19 @@
 import React, { useMemo, useRef, useEffect } from 'react'
 import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
-import {
-  Editor,
-  Transforms,
-  Text,
-  createEditor,
-  Descendant,
-  Range,
-} from 'slate'
+import { Editor, createEditor, Range } from 'slate'
 import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
-
-import { Button, Icon, Menu, Portal } from '../components'
+import { Button, Icon, Menu, Portal } from './components'
 
 const HoveringMenuExample = () => {
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <HoveringToolbar />
       <Editable
         renderLeaf={props => <Leaf {...props} />}
         placeholder="Enter some text..."
-        onDOMBeforeInput={(event: InputEvent) => {
+        onDOMBeforeInput={event => {
           switch (event.inputType) {
             case 'formatBold':
               event.preventDefault()
@@ -39,51 +30,40 @@ const HoveringMenuExample = () => {
     </Slate>
   )
 }
-
 const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format)
-
   if (isActive) {
     Editor.removeMark(editor, format)
   } else {
     Editor.addMark(editor, format, true)
   }
 }
-
 const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
 }
-
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
-
   if (leaf.italic) {
     children = <em>{children}</em>
   }
-
   if (leaf.underlined) {
     children = <u>{children}</u>
   }
-
   return <span {...attributes}>{children}</span>
 }
-
 const HoveringToolbar = () => {
-  const ref = useRef<HTMLDivElement | null>()
+  const ref = useRef()
   const editor = useSlate()
   const inFocus = useFocused()
-
   useEffect(() => {
     const el = ref.current
     const { selection } = editor
-
     if (!el) {
       return
     }
-
     if (
       !selection ||
       !inFocus ||
@@ -93,7 +73,6 @@ const HoveringToolbar = () => {
       el.removeAttribute('style')
       return
     }
-
     const domSelection = window.getSelection()
     const domRange = domSelection.getRangeAt(0)
     const rect = domRange.getBoundingClientRect()
@@ -103,7 +82,6 @@ const HoveringToolbar = () => {
       rect.left + window.pageXOffset - el.offsetWidth / 2 + rect.width / 2
     }px`
   })
-
   return (
     <Portal>
       <Menu
@@ -132,7 +110,6 @@ const HoveringToolbar = () => {
     </Portal>
   )
 }
-
 const FormatButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
@@ -145,8 +122,7 @@ const FormatButton = ({ format, icon }) => {
     </Button>
   )
 }
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -168,5 +144,4 @@ const initialValue: Descendant[] = [
     ],
   },
 ]
-
 export default HoveringMenuExample

@@ -2,7 +2,7 @@ import React, { useMemo } from 'react'
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import isHotkey from 'is-hotkey'
-import { Transforms, createEditor, Descendant } from 'slate'
+import { Transforms, createEditor } from 'slate'
 import {
   Slate,
   Editable,
@@ -14,16 +14,13 @@ import {
 } from 'slate-react'
 import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
-
-import { Button, Icon, Toolbar } from '../components'
-import { ImageElement } from './custom-types.d'
+import { Button, Icon, Toolbar } from './components'
 
 const ImagesExample = () => {
   const editor = useMemo(
     () => withImages(withHistory(withReact(createEditor()))),
     []
   )
-
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
@@ -42,29 +39,23 @@ const ImagesExample = () => {
     </Slate>
   )
 }
-
 const withImages = editor => {
   const { insertData, isVoid } = editor
-
   editor.isVoid = element => {
     return element.type === 'image' ? true : isVoid(element)
   }
-
   editor.insertData = data => {
     const text = data.getData('text/plain')
     const { files } = data
-
     if (files && files.length > 0) {
       for (const file of files) {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
-
         if (mime === 'image') {
           reader.addEventListener('load', () => {
             const url = reader.result
             insertImage(editor, url)
           })
-
           reader.readAsDataURL(file)
         }
       }
@@ -74,23 +65,19 @@ const withImages = editor => {
       insertData(data)
     }
   }
-
   return editor
 }
-
 const insertImage = (editor, url) => {
   const text = { text: '' }
-  const image: ImageElement = { type: 'image', url, children: [text] }
+  const image = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image)
   Transforms.insertNodes(editor, {
     type: 'paragraph',
     children: [{ text: '' }],
   })
 }
-
 const Element = props => {
   const { attributes, children, element } = props
-
   switch (element.type) {
     case 'image':
       return <Image {...props} />
@@ -98,11 +85,9 @@ const Element = props => {
       return <p {...attributes}>{children}</p>
   }
 }
-
 const Image = ({ attributes, children, element }) => {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, element)
-
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -140,7 +125,6 @@ const Image = ({ attributes, children, element }) => {
     </div>
   )
 }
-
 const InsertImageButton = () => {
   const editor = useSlateStatic()
   return (
@@ -159,15 +143,13 @@ const InsertImageButton = () => {
     </Button>
   )
 }
-
 const isImageUrl = url => {
   if (!url) return false
   if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()
   return imageExtensions.includes(ext)
 }
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -203,5 +185,4 @@ const initialValue: Descendant[] = [
     children: [{ text: '' }],
   },
 ]
-
 export default ImagesExample

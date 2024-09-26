@@ -10,14 +10,11 @@ import {
   Range,
   createEditor,
   Element as SlateElement,
-  Descendant,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkElement, ButtonElement } from './custom-types.d'
+import { Button, Icon, Toolbar } from './components'
 
-import { Button, Icon, Toolbar } from '../components'
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -70,10 +67,8 @@ const InlinesExample = () => {
     () => withInlines(withHistory(withReact(createEditor()))),
     []
   )
-
-  const onKeyDown: React.KeyboardEventHandler<HTMLInputElement> = event => {
+  const onKeyDown = event => {
     const { selection } = editor
-
     // Default left/right behavior is unit:'character'.
     // This fails to distinguish between two cursor positions, such as
     // <inline>foo<cursor/></inline> vs <inline>foo</inline><cursor/>.
@@ -94,7 +89,6 @@ const InlinesExample = () => {
       }
     }
   }
-
   return (
     <SlateReact.Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
@@ -111,20 +105,15 @@ const InlinesExample = () => {
     </SlateReact.Slate>
   )
 }
-
 const withInlines = editor => {
   const { insertData, insertText, isInline, isElementReadOnly, isSelectable } =
     editor
-
   editor.isInline = element =>
     ['link', 'button', 'badge'].includes(element.type) || isInline(element)
-
   editor.isElementReadOnly = element =>
     element.type === 'badge' || isElementReadOnly(element)
-
   editor.isSelectable = element =>
     element.type !== 'badge' && isSelectable(element)
-
   editor.insertText = text => {
     if (text && isUrl(text)) {
       wrapLink(editor, text)
@@ -132,32 +121,26 @@ const withInlines = editor => {
       insertText(text)
     }
   }
-
   editor.insertData = data => {
     const text = data.getData('text/plain')
-
     if (text && isUrl(text)) {
       wrapLink(editor, text)
     } else {
       insertData(data)
     }
   }
-
   return editor
 }
-
 const insertLink = (editor, url) => {
   if (editor.selection) {
     wrapLink(editor, url)
   }
 }
-
 const insertButton = editor => {
   if (editor.selection) {
     wrapButton(editor)
   }
 }
-
 const isLinkActive = editor => {
   const [link] = Editor.nodes(editor, {
     match: n =>
@@ -165,7 +148,6 @@ const isLinkActive = editor => {
   })
   return !!link
 }
-
 const isButtonActive = editor => {
   const [button] = Editor.nodes(editor, {
     match: n =>
@@ -173,34 +155,29 @@ const isButtonActive = editor => {
   })
   return !!button
 }
-
 const unwrapLink = editor => {
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
   })
 }
-
 const unwrapButton = editor => {
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'button',
   })
 }
-
-const wrapLink = (editor, url: string) => {
+const wrapLink = (editor, url) => {
   if (isLinkActive(editor)) {
     unwrapLink(editor)
   }
-
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const link: LinkElement = {
+  const link = {
     type: 'link',
     url,
     children: isCollapsed ? [{ text: url }] : [],
   }
-
   if (isCollapsed) {
     Transforms.insertNodes(editor, link)
   } else {
@@ -208,19 +185,16 @@ const wrapLink = (editor, url: string) => {
     Transforms.collapse(editor, { edge: 'end' })
   }
 }
-
 const wrapButton = editor => {
   if (isButtonActive(editor)) {
     unwrapButton(editor)
   }
-
   const { selection } = editor
   const isCollapsed = selection && Range.isCollapsed(selection)
-  const button: ButtonElement = {
+  const button = {
     type: 'button',
     children: isCollapsed ? [{ text: 'Edit me!' }] : [],
   }
-
   if (isCollapsed) {
     Transforms.insertNodes(editor, button)
   } else {
@@ -228,7 +202,6 @@ const wrapButton = editor => {
     Transforms.collapse(editor, { edge: 'end' })
   }
 }
-
 // Put this at the start and end of an inline component to work around this Chromium bug:
 // https://bugs.chromium.org/p/chromium/issues/detail?id=1249405
 const InlineChromiumBugfix = () => (
@@ -241,14 +214,11 @@ const InlineChromiumBugfix = () => (
     {String.fromCodePoint(160) /* Non-breaking space */}
   </span>
 )
-
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
-
 const LinkComponent = ({ attributes, children, element }) => {
   const selected = useSelected()
-
   const safeUrl = useMemo(() => {
-    let parsedUrl: URL = null
+    let parsedUrl = null
     try {
       parsedUrl = new URL(element.url)
       // eslint-disable-next-line no-empty
@@ -258,7 +228,6 @@ const LinkComponent = ({ attributes, children, element }) => {
     }
     return 'about:blank'
   }, [element.url])
-
   return (
     <a
       {...attributes}
@@ -277,7 +246,6 @@ const LinkComponent = ({ attributes, children, element }) => {
     </a>
   )
 }
-
 const EditableButtonComponent = ({ attributes, children }) => {
   return (
     /*
@@ -309,10 +277,8 @@ const EditableButtonComponent = ({ attributes, children }) => {
     </span>
   )
 }
-
 const BadgeComponent = ({ attributes, children, element }) => {
   const selected = useSelected()
-
   return (
     <span
       {...attributes}
@@ -333,7 +299,6 @@ const BadgeComponent = ({ attributes, children, element }) => {
     </span>
   )
 }
-
 const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
@@ -347,7 +312,6 @@ const Element = props => {
       return <p {...attributes}>{children}</p>
   }
 }
-
 const Text = props => {
   const { attributes, children, leaf } = props
   return (
@@ -370,7 +334,6 @@ const Text = props => {
     </span>
   )
 }
-
 const AddLinkButton = () => {
   const editor = useSlate()
   return (
@@ -387,10 +350,8 @@ const AddLinkButton = () => {
     </Button>
   )
 }
-
 const RemoveLinkButton = () => {
   const editor = useSlate()
-
   return (
     <Button
       active={isLinkActive(editor)}
@@ -404,7 +365,6 @@ const RemoveLinkButton = () => {
     </Button>
   )
 }
-
 const ToggleEditableButtonButton = () => {
   const editor = useSlate()
   return (
@@ -423,5 +383,4 @@ const ToggleEditableButtonButton = () => {
     </Button>
   )
 }
-
 export default InlinesExample

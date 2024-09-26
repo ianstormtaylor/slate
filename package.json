@@ -35,6 +35,7 @@
     "test:integration-local": "run-p -r serve playwright",
     "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
+    "tsc:examples": "tsc --project ./site/tsconfig.example.json",
     "watch": "yarn build:rollup --watch",
     "playwright": "playwright test"
   },
