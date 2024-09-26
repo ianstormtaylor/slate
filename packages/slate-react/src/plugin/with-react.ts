@@ -216,6 +216,8 @@ export const withReact = <T extends BaseEditor>(
         const [node] = Editor.node(e, pathRef.current)
         NODE_TO_KEY.set(node, key)
       }
+
+      pathRef.unref()
     }
   }
 
