@@ -255,11 +255,9 @@ export const Editable = forwardRef(
               ReactEditor.hasEditableTarget(editor, anchorNode) ||
               ReactEditor.isTargetInsideNonReadonlyVoid(editor, anchorNode)
 
-            const focusNodeSelectable =
-              ReactEditor.hasEditableTarget(editor, focusNode) ||
-              ReactEditor.isTargetInsideNonReadonlyVoid(editor, focusNode)
+            const focusNodeInEditor = ReactEditor.hasTarget(editor, focusNode)
 
-            if (anchorNodeSelectable && focusNodeSelectable) {
+            if (anchorNodeSelectable && focusNodeInEditor) {
               const range = ReactEditor.toSlateRange(editor, domSelection, {
                 exactMatch: false,
                 suppressThrow: true,
@@ -279,7 +277,7 @@ export const Editable = forwardRef(
             }
 
             // Deselect the editor if the dom selection is not selectable in readonly mode
-            if (readOnly && (!anchorNodeSelectable || !focusNodeSelectable)) {
+            if (readOnly && (!anchorNodeSelectable || !focusNodeInEditor)) {
               Transforms.deselect(editor)
             }
           }

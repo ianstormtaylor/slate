@@ -54,6 +54,10 @@ Check if a `range` includes a path, a point, or part of another range.
 
 For clarity the definition of `includes` can mean partially includes. Another way to describe this is if one Range intersects the other Range.
 
+#### `Range.surrounds(range: Range, target: Range) => boolean`
+
+Check if a `range` includes another range.
+
 #### `Range.isBackward(range: Range) => boolean`
 
 Check if a `range` is backward, meaning that its anchor point appears _after_ its focus point in the document.

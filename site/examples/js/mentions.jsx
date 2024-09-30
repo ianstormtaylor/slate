@@ -6,7 +6,7 @@ import React, {
   useState,
   Fragment,
 } from 'react'
-import { Editor, Transforms, Range, createEditor, Descendant } from 'slate'
+import { Editor, Transforms, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
   Slate,
@@ -16,14 +16,12 @@ import {
   useSelected,
   useFocused,
 } from 'slate-react'
-
-import { Portal } from '../components'
-import { MentionElement } from './custom-types.d'
-import { IS_MAC } from '../utils/environment'
+import { Portal } from './components'
+import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
-  const ref = useRef<HTMLDivElement | null>()
-  const [target, setTarget] = useState<Range | undefined>()
+  const ref = useRef()
+  const [target, setTarget] = useState()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -32,11 +30,9 @@ const MentionExample = () => {
     () => withMentions(withReact(withHistory(createEditor()))),
     []
   )
-
   const chars = CHARACTERS.filter(c =>
     c.toLowerCase().startsWith(search.toLowerCase())
   ).slice(0, 10)
-
   const onKeyDown = useCallback(
     event => {
       if (target && chars.length > 0) {
@@ -67,7 +63,6 @@ const MentionExample = () => {
     },
     [chars, editor, index, target]
   )
-
   useEffect(() => {
     if (target && chars.length > 0) {
       const el = ref.current
@@ -77,14 +72,12 @@ const MentionExample = () => {
       el.style.left = `${rect.left + window.pageXOffset}px`
     }
   }, [chars.length, editor, index, search, target])
-
   return (
     <Slate
       editor={editor}
       initialValue={initialValue}
       onChange={() => {
         const { selection } = editor
-
         if (selection && Range.isCollapsed(selection)) {
           const [start] = Range.edges(selection)
           const wordBefore = Editor.before(editor, start, { unit: 'word' })
@@ -96,7 +89,6 @@ const MentionExample = () => {
           const afterRange = Editor.range(editor, start, after)
           const afterText = Editor.string(editor, afterRange)
           const afterMatch = afterText.match(/^(\s|$)/)
-
           if (beforeMatch && afterMatch) {
             setTarget(beforeRange)
             setSearch(beforeMatch[1])
@@ -104,7 +96,6 @@ const MentionExample = () => {
             return
           }
         }
-
         setTarget(null)
       }}
     >
@@ -154,27 +145,21 @@ const MentionExample = () => {
     </Slate>
   )
 }
-
 const withMentions = editor => {
   const { isInline, isVoid, markableVoid } = editor
-
   editor.isInline = element => {
     return element.type === 'mention' ? true : isInline(element)
   }
-
   editor.isVoid = element => {
     return element.type === 'mention' ? true : isVoid(element)
   }
-
   editor.markableVoid = element => {
     return element.type === 'mention' || markableVoid(element)
   }
-
   return editor
 }
-
 const insertMention = (editor, character) => {
-  const mention: MentionElement = {
+  const mention = {
     type: 'mention',
     character,
     children: [{ text: '' }],
@@ -182,29 +167,23 @@ const insertMention = (editor, character) => {
   Transforms.insertNodes(editor, mention)
   Transforms.move(editor)
 }
-
 // Borrow Leaf renderer from the Rich Text example.
 // In a real project you would get this via `withRichText(editor)` or similar.
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
-
   if (leaf.code) {
     children = <code>{children}</code>
   }
-
   if (leaf.italic) {
     children = <em>{children}</em>
   }
-
   if (leaf.underline) {
     children = <u>{children}</u>
   }
-
   return <span {...attributes}>{children}</span>
 }
-
 const Element = props => {
   const { attributes, children, element } = props
   switch (element.type) {
@@ -214,11 +193,10 @@ const Element = props => {
       return <p {...attributes}>{children}</p>
   }
 }
-
 const Mention = ({ attributes, children, element }) => {
   const selected = useSelected()
   const focused = useFocused()
-  const style: React.CSSProperties = {
+  const style = {
     padding: '3px 3px 2px',
     margin: '0 1px',
     verticalAlign: 'baseline',
@@ -257,8 +235,7 @@ const Mention = ({ attributes, children, element }) => {
     </span>
   )
 }
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -307,7 +284,6 @@ const initialValue: Descendant[] = [
     ],
   },
 ]
-
 const CHARACTERS = [
   'Aayla Secura',
   'Adi Gallia',
@@ -713,5 +689,4 @@ const CHARACTERS = [
   'Ziro the Hutt',
   'Zuckuss',
 ]
-
 export default MentionExample

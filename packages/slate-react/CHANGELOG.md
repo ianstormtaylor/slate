@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.110.1
+
+### Patch Changes
+
+- [#5716](https://github.com/ianstormtaylor/slate/pull/5716) [`10abeff8`](https://github.com/ianstormtaylor/slate/commit/10abeff84fd856f9fd72240f8ee1631466f98d02) Thanks [@TyMick](https://github.com/TyMick)! - Fix selections with non-void non-editable focus
+
 ## 0.110.0
 
 ### Minor Changes

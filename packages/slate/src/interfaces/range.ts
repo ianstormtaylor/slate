@@ -47,6 +47,11 @@ export interface RangeInterface {
   includes: (range: Range, target: Path | Point | Range) => boolean
 
   /**
+   * Check if a range includes another range.
+   */
+  surrounds: (range: Range, target: Range) => boolean
+
+  /**
    * Get the intersection of a range with another.
    */
   intersection: (range: Range, another: Range) => Range | null
@@ -122,6 +127,14 @@ export const Range: RangeInterface = {
       Point.equals(range.anchor, another.anchor) &&
       Point.equals(range.focus, another.focus)
     )
+  },
+
+  surrounds(range: Range, target: Range): boolean {
+    const intersectionRange = Range.intersection(range, target)
+    if (!intersectionRange) {
+      return false
+    }
+    return Range.equals(intersectionRange, target)
   },
 
   includes(range: Range, target: Path | Point | Range): boolean {

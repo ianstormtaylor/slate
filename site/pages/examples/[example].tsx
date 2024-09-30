@@ -5,30 +5,30 @@ import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ErrorBoundary } from 'react-error-boundary'
 
-import { Icon } from '../../components'
+import { Icon } from '../../examples/ts/components/index'
 
-import CheckLists from '../../examples/check-lists'
-import CodeHighlighting from '../../examples/code-highlighting'
-import EditableVoids from '../../examples/editable-voids'
-import Embeds from '../../examples/embeds'
-import ForcedLayout from '../../examples/forced-layout'
-import HoveringToolbar from '../../examples/hovering-toolbar'
-import HugeDocument from '../../examples/huge-document'
-import Images from '../../examples/images'
-import Inlines from '../../examples/inlines'
-import MarkdownPreview from '../../examples/markdown-preview'
-import MarkdownShortcuts from '../../examples/markdown-shortcuts'
-import Mentions from '../../examples/mentions'
-import PasteHtml from '../../examples/paste-html'
-import PlainText from '../../examples/plaintext'
-import ReadOnly from '../../examples/read-only'
-import RichText from '../../examples/richtext'
-import SearchHighlighting from '../../examples/search-highlighting'
-import ShadowDOM from '../../examples/shadow-dom'
-import Styling from '../../examples/styling'
-import Tables from '../../examples/tables'
-import IFrames from '../../examples/iframe'
-import CustomPlaceholder from '../../examples/custom-placeholder'
+import CheckLists from '../../examples/ts/check-lists'
+import CodeHighlighting from '../../examples/ts/code-highlighting'
+import EditableVoids from '../../examples/ts/editable-voids'
+import Embeds from '../../examples/ts/embeds'
+import ForcedLayout from '../../examples/ts/forced-layout'
+import HoveringToolbar from '../../examples/ts/hovering-toolbar'
+import HugeDocument from '../../examples/ts/huge-document'
+import Images from '../../examples/ts/images'
+import Inlines from '../../examples/ts/inlines'
+import MarkdownPreview from '../../examples/ts/markdown-preview'
+import MarkdownShortcuts from '../../examples/ts/markdown-shortcuts'
+import Mentions from '../../examples/ts/mentions'
+import PasteHtml from '../../examples/ts/paste-html'
+import PlainText from '../../examples/ts/plaintext'
+import ReadOnly from '../../examples/ts/read-only'
+import RichText from '../../examples/ts/richtext'
+import SearchHighlighting from '../../examples/ts/search-highlighting'
+import ShadowDOM from '../../examples/ts/shadow-dom'
+import Styling from '../../examples/ts/styling'
+import Tables from '../../examples/ts/tables'
+import IFrames from '../../examples/ts/iframe'
+import CustomPlaceholder from '../../examples/ts/custom-placeholder'
 
 // node
 import { getAllExamples } from '../api'
@@ -104,6 +104,18 @@ const A = props => (
         color: #fff;
         text-decoration: underline;
       }
+    `}
+  />
+)
+
+const Pill = props => (
+  <span
+    {...props}
+    className={css`
+      background: #333;
+      border-radius: 9999px;
+      color: #aaa;
+      padding: 0.2em 0.5em;
     `}
   />
 )
@@ -316,9 +328,14 @@ const ExamplePage = ({ example }: { example: string }) => {
           <ExampleTitle>
             {name}
             <A
-              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/${path}.tsx`}
+              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/js/${path}.jsx`}
             >
-              (View Source)
+              <Pill>JS Code</Pill>
+            </A>
+            <A
+              href={`https://github.com/ianstormtaylor/slate/blob/main/site/examples/ts/${path}.tsx`}
+            >
+              <Pill>TS Code</Pill>
             </A>
           </ExampleTitle>
         </ExampleHeader>

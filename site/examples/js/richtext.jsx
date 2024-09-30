@@ -5,12 +5,10 @@ import {
   Editor,
   Transforms,
   createEditor,
-  Descendant,
   Element as SlateElement,
 } from 'slate'
 import { withHistory } from 'slate-history'
-
-import { Button, Icon, Toolbar } from '../components'
+import { Button, Icon, Toolbar } from './components'
 
 const HOTKEYS = {
   'mod+b': 'bold',
@@ -18,15 +16,12 @@ const HOTKEYS = {
   'mod+u': 'underline',
   'mod+`': 'code',
 }
-
 const LIST_TYPES = ['numbered-list', 'bulleted-list']
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
-
 const RichTextExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <Toolbar>
@@ -52,7 +47,7 @@ const RichTextExample = () => {
         autoFocus
         onKeyDown={event => {
           for (const hotkey in HOTKEYS) {
-            if (isHotkey(hotkey, event as any)) {
+            if (isHotkey(hotkey, event)) {
               event.preventDefault()
               const mark = HOTKEYS[hotkey]
               toggleMark(editor, mark)
@@ -63,7 +58,6 @@ const RichTextExample = () => {
     </Slate>
   )
 }
-
 const toggleBlock = (editor, format) => {
   const isActive = isBlockActive(
     editor,
@@ -71,7 +65,6 @@ const toggleBlock = (editor, format) => {
     TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
   )
   const isList = LIST_TYPES.includes(format)
-
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) &&
@@ -80,7 +73,7 @@ const toggleBlock = (editor, format) => {
       !TEXT_ALIGN_TYPES.includes(format),
     split: true,
   })
-  let newProperties: Partial<SlateElement>
+  let newProperties
   if (TEXT_ALIGN_TYPES.includes(format)) {
     newProperties = {
       align: isActive ? undefined : format,
@@ -90,28 +83,23 @@ const toggleBlock = (editor, format) => {
       type: isActive ? 'paragraph' : isList ? 'list-item' : format,
     }
   }
-  Transforms.setNodes<SlateElement>(editor, newProperties)
-
+  Transforms.setNodes(editor, newProperties)
   if (!isActive && isList) {
     const block = { type: format, children: [] }
     Transforms.wrapNodes(editor, block)
   }
 }
-
 const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format)
-
   if (isActive) {
     Editor.removeMark(editor, format)
   } else {
     Editor.addMark(editor, format, true)
   }
 }
-
 const isBlockActive = (editor, format, blockType = 'type') => {
   const { selection } = editor
   if (!selection) return false
-
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
@@ -121,15 +109,12 @@ const isBlockActive = (editor, format, blockType = 'type') => {
         n[blockType] === format,
     })
   )
-
   return !!match
 }
-
 const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
 }
-
 const Element = ({ attributes, children, element }) => {
   const style = { textAlign: element.align }
   switch (element.type) {
@@ -177,27 +162,21 @@ const Element = ({ attributes, children, element }) => {
       )
   }
 }
-
 const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
-
   if (leaf.code) {
     children = <code>{children}</code>
   }
-
   if (leaf.italic) {
     children = <em>{children}</em>
   }
-
   if (leaf.underline) {
     children = <u>{children}</u>
   }
-
   return <span {...attributes}>{children}</span>
 }
-
 const BlockButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
@@ -216,7 +195,6 @@ const BlockButton = ({ format, icon }) => {
     </Button>
   )
 }
-
 const MarkButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
@@ -231,8 +209,7 @@ const MarkButton = ({ format, icon }) => {
     </Button>
   )
 }
-
-const initialValue: Descendant[] = [
+const initialValue = [
   {
     type: 'paragraph',
     children: [
@@ -267,5 +244,4 @@ const initialValue: Descendant[] = [
     children: [{ text: 'Try it out for yourself!' }],
   },
 ]
-
 export default RichTextExample
