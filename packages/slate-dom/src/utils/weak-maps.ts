@@ -1,7 +1,17 @@
-import { Ancestor, Editor, Node, Operation, Range, RangeRef, Text } from 'slate'
-import { Action } from '../hooks/android-input-manager/android-input-manager'
+import {
+  Ancestor,
+  Editor,
+  Node,
+  Operation,
+  Point,
+  Range,
+  RangeRef,
+  Text,
+} from 'slate'
 import { TextDiff } from './diff-text'
 import { Key } from './key'
+
+export type Action = { at?: Point | Range; run: () => void }
 
 /**
  * Two weak maps that allow us rebuild a path given a node. They are populated
