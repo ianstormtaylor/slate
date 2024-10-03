@@ -17,9 +17,10 @@ export const withReact = <T extends BaseEditor>(
   clipboardFormatKey = 'x-slate-fragment'
 ): T & ReactEditor => {
   let e = editor as T & ReactEditor
-  const { onChange } = e
 
   e = withDOM(e, clipboardFormatKey)
+
+  const { onChange } = e
 
   e.onChange = options => {
     // COMPAT: React < 18 doesn't batch `setState` hook calls, which means
