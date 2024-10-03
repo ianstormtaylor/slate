@@ -3,7 +3,7 @@
  */
 
 import { Editor, Range } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import { DOMEditor } from '../plugin/dom-editor'
 
 const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
   const middle = (compareRect.top + compareRect.bottom) / 2
@@ -11,13 +11,9 @@ const doRectsIntersect = (rect: DOMRect, compareRect: DOMRect) => {
   return rect.top <= middle && rect.bottom >= middle
 }
 
-const areRangesSameLine = (
-  editor: ReactEditor,
-  range1: Range,
-  range2: Range
-) => {
-  const rect1 = ReactEditor.toDOMRange(editor, range1).getBoundingClientRect()
-  const rect2 = ReactEditor.toDOMRange(editor, range2).getBoundingClientRect()
+const areRangesSameLine = (editor: DOMEditor, range1: Range, range2: Range) => {
+  const rect1 = DOMEditor.toDOMRange(editor, range1).getBoundingClientRect()
+  const rect2 = DOMEditor.toDOMRange(editor, range2).getBoundingClientRect()
 
   return doRectsIntersect(rect1, rect2) && doRectsIntersect(rect2, rect1)
 }
@@ -31,7 +27,7 @@ const areRangesSameLine = (
  * @returns {Range} A valid portion of the parentRange which is one a single line
  */
 export const findCurrentLineRange = (
-  editor: ReactEditor,
+  editor: DOMEditor,
   parentRange: Range
 ): Range => {
   const parentRangeBoundary = Editor.range(editor, Range.end(parentRange))

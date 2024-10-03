@@ -1,0 +1,64 @@
+{
+  "name": "slate-dom",
+  "description": "Tools for building completely customizable richtext editors with React.",
+  "version": "0.110.1",
+  "license": "MIT",
+  "repository": "git://github.com/ianstormtaylor/slate.git",
+  "main": "dist/index.js",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "umd": "dist/slate-dom.js",
+  "umdMin": "dist/slate-dom.min.js",
+  "sideEffects": false,
+  "files": [
+    "dist/"
+  ],
+  "dependencies": {
+    "@juggle/resize-observer": "^3.4.0",
+    "direction": "^1.0.4",
+    "is-hotkey": "^0.2.0",
+    "is-plain-object": "^5.0.0",
+    "lodash": "^4.17.21",
+    "scroll-into-view-if-needed": "^3.1.0",
+    "tiny-invariant": "1.3.1"
+  },
+  "devDependencies": {
+    "@babel/runtime": "^7.23.2",
+    "@types/is-hotkey": "^0.1.8",
+    "@types/jest": "29.5.6",
+    "@types/jsdom": "^21.1.4",
+    "@types/lodash": "^4.14.200",
+    "@types/resize-observer-browser": "^0.1.8",
+    "slate": "^0.103.0",
+    "slate-hyperscript": "^0.100.0",
+    "source-map-loader": "^4.0.1"
+  },
+  "peerDependencies": {
+    "slate": ">=0.99.0"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
+  },
+  "keywords": [
+    "canvas",
+    "contenteditable",
+    "docs",
+    "document",
+    "edit",
+    "editor",
+    "editable",
+    "html",
+    "immutable",
+    "markdown",
+    "medium",
+    "paper",
+    "react",
+    "rich",
+    "richtext",
+    "richtext",
+    "slate",
+    "text",
+    "wysiwyg",
+    "wysiwym"
+  ]
+}
