@@ -1,7 +1,7 @@
 import { RefObject, useState } from 'react'
 import { useSlateStatic } from '../use-slate-static'
-import { IS_ANDROID } from '../../utils/environment'
-import { EDITOR_TO_SCHEDULE_FLUSH } from '../../utils/weak-maps'
+import { IS_ANDROID } from 'slate-dom'
+import { EDITOR_TO_SCHEDULE_FLUSH } from 'slate-dom'
 import {
   createAndroidInputManager,
   CreateAndroidInputManagerOptions,

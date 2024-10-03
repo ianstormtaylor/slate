@@ -9,7 +9,7 @@ import {
   Scrubber,
   Transforms,
 } from 'slate'
-import { TextDiff } from '../utils/diff-text'
+import { TextDiff } from 'slate-dom'
 import {
   DOMElement,
   DOMNode,
@@ -26,10 +26,10 @@ import {
   isDOMNode,
   isDOMSelection,
   normalizeDOMPoint,
-} from '../utils/dom'
-import { IS_ANDROID, IS_CHROME, IS_FIREFOX } from '../utils/environment'
+} from 'slate-dom'
+import { IS_ANDROID, IS_CHROME, IS_FIREFOX } from 'slate-dom'
 
-import { Key } from '../utils/key'
+import { Key } from 'slate-dom'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
@@ -43,7 +43,7 @@ import {
   NODE_TO_INDEX,
   NODE_TO_KEY,
   NODE_TO_PARENT,
-} from '../utils/weak-maps'
+} from 'slate-dom'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.

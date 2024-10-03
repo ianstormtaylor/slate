@@ -6,7 +6,7 @@ import React, {
   RefObject,
 } from 'react'
 import { EditorContext } from '../../hooks/use-slate-static'
-import { IS_ANDROID } from '../../utils/environment'
+import { IS_ANDROID } from 'slate-dom'
 import {
   createRestoreDomManager,
   RestoreDOMManager,
