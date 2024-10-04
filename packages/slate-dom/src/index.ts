@@ -1,5 +1,5 @@
 // Plugin
-export { DOMEditor as ReactEditor } from './plugin/dom-editor'
+export { DOMEditor } from './plugin/dom-editor'
 export { withDOM } from './plugin/with-dom'
 
 // Utils
