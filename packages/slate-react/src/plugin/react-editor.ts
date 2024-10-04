@@ -1,5 +1,4 @@
-import { DOMEditor } from 'slate-dom'
-import { DOMEditorInterface } from 'slate-dom/dist/plugin/dom-editor'
+import { DOMEditor, type DOMEditorInterface } from 'slate-dom'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
