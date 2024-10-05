@@ -8,4 +8,5 @@ export interface ReactEditor extends DOMEditor {}
 
 export interface ReactEditorInterface extends DOMEditorInterface {}
 
+// eslint-disable-next-line no-redeclare
 export const ReactEditor: ReactEditorInterface = DOMEditor
