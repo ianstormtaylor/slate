@@ -1,12 +1,12 @@
 import React, { useCallback, useRef } from 'react'
 import { Element, Range, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
-import { isTextDecorationsEqual } from '../utils/range-list'
+import { isTextDecorationsEqual } from 'slate-dom'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
-} from '../utils/weak-maps'
+} from 'slate-dom'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import Leaf from './leaf'
 

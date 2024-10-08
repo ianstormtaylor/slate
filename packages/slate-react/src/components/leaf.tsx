@@ -13,10 +13,10 @@ import {
   PLACEHOLDER_SYMBOL,
   EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
-} from '../utils/weak-maps'
+} from 'slate-dom'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
-import { IS_WEBKIT, IS_ANDROID } from '../utils/environment'
+import { IS_WEBKIT, IS_ANDROID } from 'slate-dom'
 
 // Delay the placeholder on Android to prevent the keyboard from closing.
 // (https://github.com/ianstormtaylor/slate/pull/5368)

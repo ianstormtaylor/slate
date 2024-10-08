@@ -4,14 +4,14 @@ import { JSX } from 'react'
 import { Editor, Element as SlateElement, Node, Range } from 'slate'
 import { ReactEditor, useReadOnly, useSlateStatic } from '..'
 import useChildren from '../hooks/use-children'
-import { isElementDecorationsEqual } from '../utils/range-list'
+import { isElementDecorationsEqual } from 'slate-dom'
 import {
   EDITOR_TO_KEY_TO_ELEMENT,
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
   NODE_TO_INDEX,
   NODE_TO_PARENT,
-} from '../utils/weak-maps'
+} from 'slate-dom'
 import {
   RenderElementProps,
   RenderLeafProps,
