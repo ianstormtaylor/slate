@@ -242,18 +242,22 @@ const Mention = ({ attributes, children, element }) => {
       data-cy={`mention-${element.character.replace(' ', '-')}`}
       style={style}
     >
-      {IS_MAC ? (
-        // Mac OS IME https://github.com/ianstormtaylor/slate/issues/3490
-        <Fragment>
-          {children}@{element.character}
-        </Fragment>
-      ) : (
-        // Others like Android https://github.com/ianstormtaylor/slate/pull/5360
-        <Fragment>
-          @{element.character}
-          {children}
-        </Fragment>
-      )}
+      {/* Prevent Chromium from interrupting IME when moving the cursor */}
+      {/* 1. span + inline-block 2. div + contenteditable=false */}
+      <div contentEditable={false}>
+        {IS_MAC ? (
+          // Mac OS IME https://github.com/ianstormtaylor/slate/issues/3490
+          <Fragment>
+            {children}@{element.character}
+          </Fragment>
+        ) : (
+          // Others like Android https://github.com/ianstormtaylor/slate/pull/5360
+          <Fragment>
+            @{element.character}
+            {children}
+          </Fragment>
+        )}
+      </div>
     </span>
   )
 }
