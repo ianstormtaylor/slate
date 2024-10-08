@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.110.2
+
+### Patch Changes
+
+- [#5727](https://github.com/ianstormtaylor/slate/pull/5727) [`335c5418`](https://github.com/ianstormtaylor/slate/commit/335c54188ff1e2985cc584dd9fa3117508208dd3) Thanks [@hernansartorio](https://github.com/hernansartorio)! - Call unref on pathRefs created for move_node to remove memory leak
+
 ## 0.110.1
 
 ### Patch Changes
