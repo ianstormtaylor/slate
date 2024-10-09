@@ -1042,8 +1042,31 @@ export const Editable = forwardRef(
                       op()
                     }
                     deferredOperations.current = []
+
+                    // COMPAT: Since `beforeinput` doesn't fully `preventDefault`,
+                    // there's a chance that content might be placed in the browser's undo stack.
+                    // This means undo can be triggered even when the div is not focused,
+                    // and it only triggers the input event for the node. (2024/10/09)
+                    if (!ReactEditor.isFocused(editor)) {
+                      const native = event.nativeEvent as InputEvent
+                      const maybeHistoryEditor: any = editor
+                      if (
+                        native.inputType === 'historyUndo' &&
+                        typeof maybeHistoryEditor.undo === 'function'
+                      ) {
+                        maybeHistoryEditor.undo()
+                        return
+                      }
+                      if (
+                        native.inputType === 'historyRedo' &&
+                        typeof maybeHistoryEditor.redo === 'function'
+                      ) {
+                        maybeHistoryEditor.redo()
+                        return
+                      }
+                    }
                   },
-                  [attributes.onInput]
+                  [attributes.onInput, editor]
                 )}
                 onBlur={useCallback(
                   (event: React.FocusEvent<HTMLDivElement>) => {
