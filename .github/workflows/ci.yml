@@ -10,7 +10,8 @@ permissions:
 jobs:
   ci:
     name: ${{ matrix.command }}
-    runs-on: ubuntu-latest
+    # Pin the version to avoid dependency installation issues
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         command:
