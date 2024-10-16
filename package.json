@@ -31,7 +31,7 @@
     "test": "yarn run test:mocha && yarn run test:jest",
     "test:custom": "mocha --require ./config/babel/register.cjs ./packages/slate/test/index.js",
     "test:inspect": "yarn test --inspect-brk",
-    "test:integration": "playwright install --with-deps && run-p -r serve playwright",
+    "test:integration": "sudo apt-get update && playwright install --with-deps && run-p -r serve playwright",
     "test:integration-local": "playwright install && run-p -r serve playwright",
     "test:mocha": "mocha --require ./config/babel/register.cjs ./packages/{slate,slate-history,slate-hyperscript}/test/**/*.{js,ts}",
     "test:jest": "jest --config jest.config.js",
