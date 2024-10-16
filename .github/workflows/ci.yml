@@ -10,7 +10,8 @@ permissions:
 jobs:
   ci:
     name: ${{ matrix.command }}
-    runs-on: ubuntu-latest
+    # Pin the version to avoid dependency installation issues
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         command:
@@ -31,6 +32,6 @@ jobs:
           key: node20
 
       - name: Run ${{ matrix.command }}
-        run: export YARN_ENABLE_IMMUTABLE_INSTALLS=false && yarn && yarn build && yarn ${{ matrix.command }}
+        run: yarn && yarn build && yarn ${{ matrix.command }}
         env:
           CI: true
