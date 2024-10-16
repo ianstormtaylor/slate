@@ -9,7 +9,7 @@ import {
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '../plugin/react-editor'
-import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import { NODE_TO_INDEX, NODE_TO_PARENT } from 'slate-dom'
 import { useDecorate } from './use-decorate'
 import { SelectedContext } from './use-selected'
 import { useSlateStatic } from './use-slate-static'

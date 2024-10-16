@@ -12,7 +12,7 @@ import DOMText = globalThis.Text
 import DOMRange = globalThis.Range
 import DOMSelection = globalThis.Selection
 import DOMStaticRange = globalThis.StaticRange
-import { ReactEditor } from '../plugin/react-editor'
+import { DOMEditor } from '../plugin/dom-editor'
 
 export {
   DOMNode,
@@ -289,7 +289,7 @@ export const getSelection = (root: Document | ShadowRoot): Selection | null => {
  */
 
 export const isTrackedMutation = (
-  editor: ReactEditor,
+  editor: DOMEditor,
   mutation: MutationRecord,
   batch: MutationRecord[]
 ): boolean => {
@@ -298,9 +298,9 @@ export const isTrackedMutation = (
     return false
   }
 
-  const { document } = ReactEditor.getWindow(editor)
+  const { document } = DOMEditor.getWindow(editor)
   if (document.contains(target)) {
-    return ReactEditor.hasDOMNode(editor, target, { editable: true })
+    return DOMEditor.hasDOMNode(editor, target, { editable: true })
   }
 
   const parentMutation = batch.find(({ addedNodes, removedNodes }) => {

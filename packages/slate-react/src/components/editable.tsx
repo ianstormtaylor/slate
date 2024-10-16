@@ -31,7 +31,7 @@ import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
 import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
-import { TRIPLE_CLICK } from '../utils/constants'
+import { TRIPLE_CLICK } from 'slate-dom'
 import {
   DOMElement,
   DOMRange,
@@ -42,7 +42,7 @@ import {
   isDOMElement,
   isDOMNode,
   isPlainTextOnlyPaste,
-} from '../utils/dom'
+} from 'slate-dom'
 import {
   CAN_USE_DOM,
   HAS_BEFORE_INPUT_SUPPORT,
@@ -54,8 +54,8 @@ import {
   IS_WEBKIT,
   IS_UC_MOBILE,
   IS_WECHATBROWSER,
-} from '../utils/environment'
-import Hotkeys from '../utils/hotkeys'
+} from 'slate-dom'
+import { Hotkeys } from 'slate-dom'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
@@ -70,7 +70,7 @@ import {
   MARK_PLACEHOLDER_SYMBOL,
   NODE_TO_ELEMENT,
   PLACEHOLDER_SYMBOL,
-} from '../utils/weak-maps'
+} from 'slate-dom'
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 import { ComposingContext } from '../hooks/use-composing'
@@ -594,7 +594,7 @@ export const Editable = forwardRef(
 
               if (
                 lastText === node &&
-                lastText.textContent?.length === offset
+                lastText!.textContent?.length === offset
               ) {
                 native = false
               }
