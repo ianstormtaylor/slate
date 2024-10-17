@@ -1,5 +1,15 @@
 # slate
 
+## 0.110.2
+
+### Patch Changes
+
+- [#5723](https://github.com/ianstormtaylor/slate/pull/5723) [`ee2c4540`](https://github.com/ianstormtaylor/slate/commit/ee2c45408cba9ca827df3bab0696ba5cb5ace886) Thanks [@RavenColEvol](https://github.com/RavenColEvol)! - feat: add Node.getIf method
+
+- [#5725](https://github.com/ianstormtaylor/slate/pull/5725) [`f31167cf`](https://github.com/ianstormtaylor/slate/commit/f31167cf5fa0b4f0385cd4db9123ebe403141e11) Thanks [@WindRunnerMax](https://github.com/WindRunnerMax)! - fix marks at the start of the selection
+
+- [#5729](https://github.com/ianstormtaylor/slate/pull/5729) [`b1a10216`](https://github.com/ianstormtaylor/slate/commit/b1a1021612b504bbc75488d650dc4d3eb926f20c) Thanks [@electroluxcode](https://github.com/electroluxcode)! - feat: add prop surrounds with range
+
 ## 0.103.0
 
 ### Minor Changes
