@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.110.2
+
+### Patch Changes
+
+- [#5737](https://github.com/ianstormtaylor/slate/pull/5737) [`cd21bb1f`](https://github.com/ianstormtaylor/slate/commit/cd21bb1f80cfaa824253849b407781c9471dcd9a) Thanks [@WindRunnerMax](https://github.com/WindRunnerMax)! - fix: sync built-in state on undo when editor is unfocused
+
+- [#5727](https://github.com/ianstormtaylor/slate/pull/5727) [`335c5418`](https://github.com/ianstormtaylor/slate/commit/335c54188ff1e2985cc584dd9fa3117508208dd3) Thanks [@hernansartorio](https://github.com/hernansartorio)! - Call unref on pathRefs created for move_node to remove memory leak
+
 ## 0.110.1
 
 ### Patch Changes
