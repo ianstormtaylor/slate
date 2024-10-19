@@ -1,5 +1,5 @@
 ---
-"slate-history": patch
+'slate-history': patch
 ---
 
 Add `HistoryEditor.withNewBatch`
