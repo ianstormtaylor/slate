@@ -8,6 +8,7 @@ import { History } from './history'
 export const HISTORY = new WeakMap<Editor, History>()
 export const SAVING = new WeakMap<Editor, boolean | undefined>()
 export const MERGING = new WeakMap<Editor, boolean | undefined>()
+export const SPLITTING_ONCE = new WeakMap<Editor, boolean | undefined>()
 
 /**
  * `HistoryEditor` contains helpers for history-enabled editors.
@@ -36,6 +37,18 @@ export const HistoryEditor = {
 
   isMerging(editor: HistoryEditor): boolean | undefined {
     return MERGING.get(editor)
+  },
+
+  /**
+   * Get the splitting once flag's current value.
+   */
+
+  isSplittingOnce(editor: HistoryEditor): boolean | undefined {
+    return SPLITTING_ONCE.get(editor)
+  },
+
+  setSplittingOnce(editor: HistoryEditor, value: boolean | undefined): void {
+    SPLITTING_ONCE.set(editor, value)
   },
 
   /**
@@ -71,6 +84,20 @@ export const HistoryEditor = {
     MERGING.set(editor, true)
     fn()
     MERGING.set(editor, prev)
+  },
+
+  /**
+   * Apply a series of changes inside a synchronous `fn`, ensuring that the first
+   * operation starts a new batch in the history. Subsequent operations will be
+   * merged as usual.
+   */
+  withNewBatch(editor: HistoryEditor, fn: () => void): void {
+    const prev = HistoryEditor.isMerging(editor)
+    MERGING.set(editor, true)
+    SPLITTING_ONCE.set(editor, true)
+    fn()
+    MERGING.set(editor, prev)
+    SPLITTING_ONCE.delete(editor)
   },
 
   /**
