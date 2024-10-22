@@ -22,6 +22,7 @@ import {
   EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
   IS_COMPOSING,
+  IS_NODE_MAP_DIRTY,
 } from '../../utils/weak-maps'
 
 export type Action = { at?: Point | Range; run: () => void }
@@ -343,6 +344,10 @@ export function createAndroidInputManager({
     if (flushTimeoutId) {
       clearTimeout(flushTimeoutId)
       flushTimeoutId = null
+    }
+
+    if (IS_NODE_MAP_DIRTY.get(editor)) {
+      return
     }
 
     const { inputType: type } = event
