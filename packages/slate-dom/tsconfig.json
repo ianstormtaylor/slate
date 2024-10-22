@@ -5,12 +5,5 @@
     "rootDir": "./src",
     "outDir": "./lib"
   },
-  "references": [
-    {
-      "path": "../slate"
-    },
-    {
-      "path": "../slate-dom"
-    }
-  ]
+  "references": [{ "path": "../slate" }]
 }

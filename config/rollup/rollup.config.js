@@ -12,6 +12,7 @@ import { startCase } from 'lodash'
 import Core from '../../packages/slate/package.json'
 import History from '../../packages/slate-history/package.json'
 import Hyperscript from '../../packages/slate-hyperscript/package.json'
+import DOM from '../../packages/slate-dom/package.json'
 import React from '../../packages/slate-react/package.json'
 
 /**
@@ -203,5 +204,6 @@ export default [
   ...factory(Core),
   ...factory(History),
   ...factory(Hyperscript),
+  ...factory(DOM),
   ...factory(React),
 ]

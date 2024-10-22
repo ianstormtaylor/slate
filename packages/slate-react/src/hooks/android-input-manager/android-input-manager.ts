@@ -11,8 +11,8 @@ import {
   targetRange,
   TextDiff,
   verifyDiffState,
-} from '../../utils/diff-text'
-import { isDOMSelection, isTrackedMutation } from '../../utils/dom'
+} from 'slate-dom'
+import { isDOMSelection, isTrackedMutation } from 'slate-dom'
 import {
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_ACTION,
@@ -22,7 +22,7 @@ import {
   EDITOR_TO_PLACEHOLDER_ELEMENT,
   EDITOR_TO_USER_MARKS,
   IS_COMPOSING,
-} from '../../utils/weak-maps'
+} from 'slate-dom'
 
 export type Action = { at?: Point | Range; run: () => void }
 
