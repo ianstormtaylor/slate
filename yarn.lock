@@ -13274,7 +13274,7 @@ __metadata:
     is-plain-object: "npm:^5.0.0"
     lodash: "npm:^4.17.21"
     scroll-into-view-if-needed: "npm:^3.1.0"
-    slate: "npm:^0.103.0"
+    slate: "npm:^0.110.2"
     slate-hyperscript: "npm:^0.100.0"
     source-map-loader: "npm:^4.0.1"
     tiny-invariant: "npm:1.3.1"
@@ -13427,17 +13427,6 @@ __metadata:
     slate-dom: ">=0.110.2"
   languageName: unknown
   linkType: soft
-
-"slate@npm:^0.103.0":
-  version: 0.103.0
-  resolution: "slate@npm:0.103.0"
-  dependencies:
-    immer: "npm:^10.0.3"
-    is-plain-object: "npm:^5.0.0"
-    tiny-warning: "npm:^1.0.3"
-  checksum: c8d34c002049c2576d6b2fb81e89500e77186ba3d19a78b8638b5cf500eb227907b2806b2ab9345b64f4cf91e975cf9d90715b11c5b5a488d6d5092901cb3778
-  languageName: node
-  linkType: hard
 
 "slate@npm:^0.110.2, slate@workspace:*, slate@workspace:packages/slate":
   version: 0.0.0-use.local
