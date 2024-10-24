@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.110.3
+
+### Patch Changes
+
+- [#5747](https://github.com/ianstormtaylor/slate/pull/5747) [`0e1e4b4d`](https://github.com/ianstormtaylor/slate/commit/0e1e4b4dbf470d7ec795309e510ce683674a4ce5) Thanks [@zbeyens](https://github.com/zbeyens)! - Add `HistoryEditor.withNewBatch`
+
 ## 0.109.0
 
 ### Minor Changes

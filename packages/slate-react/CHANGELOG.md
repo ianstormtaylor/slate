@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.110.3
+
+### Patch Changes
+
+- [#5746](https://github.com/ianstormtaylor/slate/pull/5746) [`e97a9f88`](https://github.com/ianstormtaylor/slate/commit/e97a9f8857b24d57c1386b2d01e9922360f98599) Thanks [@DustinMackintosh](https://github.com/DustinMackintosh)! - Invalidate node maps when nodes change until next react paint
+
 ## 0.110.2
 
 ### Patch Changes
