@@ -57,6 +57,7 @@ import {
 } from '../utils/environment'
 import Hotkeys from '../utils/hotkeys'
 import {
+  IS_NODE_MAP_DIRTY,
   EDITOR_TO_ELEMENT,
   EDITOR_TO_FORCE_RENDER,
   EDITOR_TO_PENDING_INSERTION_MARKS,
@@ -209,6 +210,11 @@ export const Editable = forwardRef(
     const onDOMSelectionChange = useMemo(
       () =>
         throttle(() => {
+          if (IS_NODE_MAP_DIRTY.get(editor)) {
+            onDOMSelectionChange()
+            return
+          }
+
           const el = ReactEditor.toDOMNode(editor, editor)
           const root = el.getRootNode()
 
@@ -573,55 +579,62 @@ export const Editable = forwardRef(
               native = false
             }
 
-            // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
-            // Therefore we don't allow native events to insert text at the end of anchor nodes.
-            const { anchor } = selection
+            // If the NODE_MAP is dirty, we can't trust the selection anchor (eg ReactEditor.toDOMPoint)
+            if (!IS_NODE_MAP_DIRTY.get(editor)) {
+              // Chrome also has issues correctly editing the end of anchor elements: https://bugs.chromium.org/p/chromium/issues/detail?id=1259100
+              // Therefore we don't allow native events to insert text at the end of anchor nodes.
+              const { anchor } = selection
 
-            const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
-            const anchorNode = node.parentElement?.closest('a')
+              const [node, offset] = ReactEditor.toDOMPoint(editor, anchor)
+              const anchorNode = node.parentElement?.closest('a')
 
-            const window = ReactEditor.getWindow(editor)
-
-            if (
-              native &&
-              anchorNode &&
-              ReactEditor.hasDOMNode(editor, anchorNode)
-            ) {
-              // Find the last text node inside the anchor.
-              const lastText = window?.document
-                .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
-                .lastChild() as DOMText | null
+              const window = ReactEditor.getWindow(editor)
 
               if (
-                lastText === node &&
-                lastText.textContent?.length === offset
+                native &&
+                anchorNode &&
+                ReactEditor.hasDOMNode(editor, anchorNode)
               ) {
-                native = false
+                // Find the last text node inside the anchor.
+                const lastText = window?.document
+                  .createTreeWalker(anchorNode, NodeFilter.SHOW_TEXT)
+                  .lastChild() as DOMText | null
+
+                if (
+                  lastText === node &&
+                  lastText.textContent?.length === offset
+                ) {
+                  native = false
+                }
               }
-            }
 
-            // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
-            // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
-            if (
-              native &&
-              node.parentElement &&
-              window?.getComputedStyle(node.parentElement)?.whiteSpace === 'pre'
-            ) {
-              const block = Editor.above(editor, {
-                at: anchor.path,
-                match: n => Element.isElement(n) && Editor.isBlock(editor, n),
-              })
+              // Chrome has issues with the presence of tab characters inside elements with whiteSpace = 'pre'
+              // causing abnormal insert behavior: https://bugs.chromium.org/p/chromium/issues/detail?id=1219139
+              if (
+                native &&
+                node.parentElement &&
+                window?.getComputedStyle(node.parentElement)?.whiteSpace ===
+                  'pre'
+              ) {
+                const block = Editor.above(editor, {
+                  at: anchor.path,
+                  match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+                })
 
-              if (block && Node.string(block[0]).includes('\t')) {
-                native = false
+                if (block && Node.string(block[0]).includes('\t')) {
+                  native = false
+                }
               }
             }
           }
-
           // COMPAT: For the deleting forward/backward input types we don't want
           // to change the selection because it is the range that will be deleted,
           // and those commands determine that for themselves.
-          if (!type.startsWith('delete') || type.startsWith('deleteBy')) {
+          // If the NODE_MAP is dirty, we can't trust the selection anchor (eg ReactEditor.toDOMPoint via ReactEditor.toSlateRange)
+          if (
+            (!type.startsWith('delete') || type.startsWith('deleteBy')) &&
+            !IS_NODE_MAP_DIRTY.get(editor)
+          ) {
             const [targetRange] = (event as any).getTargetRanges()
 
             if (targetRange) {

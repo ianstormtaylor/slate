@@ -9,7 +9,11 @@ import {
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '../plugin/react-editor'
-import { NODE_TO_INDEX, NODE_TO_PARENT } from '../utils/weak-maps'
+import {
+  IS_NODE_MAP_DIRTY,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
+} from '../utils/weak-maps'
 import { useDecorate } from './use-decorate'
 import { SelectedContext } from './use-selected'
 import { useSlateStatic } from './use-slate-static'
@@ -36,6 +40,7 @@ const useChildren = (props: {
   } = props
   const decorate = useDecorate()
   const editor = useSlateStatic()
+  IS_NODE_MAP_DIRTY.set(editor as ReactEditor, false)
   const path = ReactEditor.findPath(editor, node)
   const children = []
   const isLeafBlock =
