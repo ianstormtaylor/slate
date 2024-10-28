@@ -34,7 +34,11 @@ declare global {
   }
 
   interface Document {
-    caretPositionFromPoint(x: number, y: number): CaretPosition | null
+    caretPositionFromPoint(
+      x: number,
+      y: number,
+      options?: { shadowRoots?: ShadowRoot[] }
+    ): CaretPosition | null
   }
 
   interface Node {

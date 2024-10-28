@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { dispatchDropEvent } from '../../playwrightTestHelpers'
 
 test.describe('shadow-dom example', () => {
   test.beforeEach(
@@ -28,5 +29,26 @@ test.describe('shadow-dom example', () => {
 
     // Assert that the textbox contains the correct text
     await expect(textbox).toHaveText('Hello, Playwright!')
+  })
+  test('drag and drop text above the textbox', async ({ page }) => {
+    const outerShadow = page.locator('[data-cy="outer-shadow-root"]')
+    const innerShadow = outerShadow.locator('> div')
+
+    const textbox = innerShadow.getByRole('textbox')
+    await textbox.fill('test ')
+
+    const droppedText = 'droppedText'
+    const textboxEl = (await textbox.elementHandle()) as HTMLElement
+    const { x, y, width, height } = await textbox.boundingBox()
+    await dispatchDropEvent({
+      page,
+      element: textboxEl,
+      droppedText: droppedText,
+      clientX: x + width - 5,
+      clientY: y + height / 2,
+    })
+
+    const expectedText = `test ${droppedText}`
+    await expect(textbox).toHaveText(expectedText)
   })
 })

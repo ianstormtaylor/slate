@@ -355,3 +355,10 @@ export const isAfter = (node: DOMNode, otherNode: DOMNode): boolean =>
     node.compareDocumentPosition(otherNode) &
       DOMNode.DOCUMENT_POSITION_FOLLOWING
   )
+
+export const findTextNodesInNode = (node: Node): Text[] => {
+  if (isDOMText(node)) {
+    return [node as Text]
+  }
+  return Array.from(node.childNodes).flatMap(findTextNodesInNode)
+}

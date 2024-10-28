@@ -44,6 +44,10 @@ import {
   NODE_TO_KEY,
   NODE_TO_PARENT,
 } from '../utils/weak-maps'
+import {
+  CursorPoint,
+  findClosestCharacterToCursorPoint,
+} from '../utils/find-closest-character-in-element-by-cursor-point'
 
 /**
  * A React and DOM-specific version of the `Editor` interface.
@@ -97,6 +101,12 @@ export interface ReactEditorInterface {
    */
   deselect: (editor: ReactEditor) => void
 
+  findEventRangeInShadowRoot: (
+    shadowRoot: ShadowRoot,
+    cursorPoint: CursorPoint
+  ) => DOMRange | null
+
+  createDomRangeFromCaretPoint: (cursorPoint: CaretPosition) => DOMRange
   /**
    * Find the DOM node that implements DocumentOrShadowRoot for the editor.
    */
@@ -310,6 +320,44 @@ export const ReactEditor: ReactEditorInterface = {
     return el.ownerDocument
   },
 
+  findEventRangeInShadowRoot: (
+    shadowRoot: ShadowRoot,
+    cursorPoint: CursorPoint
+  ): DOMRange | null => {
+    const { x, y } = cursorPoint
+    // The third parameter in caretPositionFromPoint is not compatible with all browsers.
+    // https://developer.mozilla.org/en-US/docs/Web/API/Document/caretPositionFromPoint#browser_compatibility
+    if (document?.caretPositionFromPoint?.length === 3) {
+      const options = { shadowRoots: [shadowRoot] }
+      const position = document.caretPositionFromPoint(x, y, options)
+      if (position) return ReactEditor.createDomRangeFromCaretPoint(position)
+    }
+
+    const elementUnderCursor = shadowRoot.elementFromPoint(x, y)
+    const closestChar = elementUnderCursor
+      ? findClosestCharacterToCursorPoint(elementUnderCursor, cursorPoint)
+      : null
+    if (!closestChar) return null
+
+    const { textNode, offset } = closestChar
+
+    console.log('closestChar', textNode)
+    const selection = getSelection(shadowRoot)
+    selection?.setBaseAndExtent(textNode, offset, textNode, offset)
+    const range = selection?.getRangeAt(0)
+    return range || null
+  },
+
+  createDomRangeFromCaretPoint: (cursorPoint: CaretPosition): DOMRange => {
+    const { offsetNode, offset } = cursorPoint
+
+    const range = document.createRange()
+    range.setStart(offsetNode, offset)
+    range.setEnd(offsetNode, offset)
+
+    return range
+  },
+
   findEventRange: (editor, event) => {
     if ('nativeEvent' in event) {
       event = event.nativeEvent
@@ -349,17 +397,25 @@ export const ReactEditor: ReactEditorInterface = {
     // Else resolve a range from the caret position where the drop occured.
     let domRange
     const { document } = ReactEditor.getWindow(editor)
+    const shadowRootOrDocument = ReactEditor.toDOMNode(
+      editor,
+      editor
+    ).getRootNode()
+    const shadowRoot =
+      shadowRootOrDocument instanceof ShadowRoot ? shadowRootOrDocument : null
 
-    // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
-    if (document.caretRangeFromPoint) {
-      domRange = document.caretRangeFromPoint(x, y)
+    if (shadowRoot) {
+      domRange = ReactEditor.findEventRangeInShadowRoot(shadowRoot, { x, y })
     } else {
-      const position = document.caretPositionFromPoint(x, y)
+      // COMPAT: In Firefox, `caretRangeFromPoint` doesn't exist. (2016/07/25)
+      if (document.caretRangeFromPoint) {
+        domRange = document.caretRangeFromPoint(x, y)
+      } else {
+        const position = document.caretPositionFromPoint(x, y)
 
-      if (position) {
-        domRange = document.createRange()
-        domRange.setStart(position.offsetNode, position.offset)
-        domRange.setEnd(position.offsetNode, position.offset)
+        if (position) {
+          domRange = ReactEditor.createDomRangeFromCaretPoint(position)
+        }
       }
     }
 
