@@ -42,7 +42,7 @@ const findClosestCharacterInSingleTextNode = (
   cursorPoint: CursorPoint
 ): ClosestCharacter | null => {
   let closestChar: ClosestCharacter | null = null
-  let textLength = textNode.textContent?.length ?? 0
+  const textLength = textNode.textContent?.length ?? 0
 
   for (let i = 0; i < textLength; i++) {
     const range = document.createRange()

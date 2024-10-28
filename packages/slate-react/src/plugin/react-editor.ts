@@ -341,7 +341,6 @@ export const ReactEditor: ReactEditorInterface = {
 
     const { textNode, offset } = closestChar
 
-    console.log('closestChar', textNode)
     const selection = getSelection(shadowRoot)
     selection?.setBaseAndExtent(textNode, offset, textNode, offset)
     const range = selection?.getRangeAt(0)
