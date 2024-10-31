@@ -1,14 +1,14 @@
 {
-  "name": "slate-react",
+  "name": "slate-dom",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.110.3",
+  "version": "0.110.2",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
-  "umd": "dist/slate-react.js",
-  "umdMin": "dist/slate-react.min.js",
+  "umd": "dist/slate-dom.js",
+  "umdMin": "dist/slate-dom.min.js",
   "sideEffects": false,
   "files": [
     "dist/"
@@ -24,29 +24,19 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
-    "@testing-library/react": "^14.0.0",
     "@types/is-hotkey": "^0.1.8",
     "@types/jest": "29.5.6",
     "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
-    "@types/react": "^18.2.41",
-    "@types/react-dom": "^18.2.17",
     "@types/resize-observer-browser": "^0.1.8",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
     "slate": "^0.110.2",
-    "slate-dom": "^0.110.2",
     "slate-hyperscript": "^0.100.0",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
-    "react": ">=18.2.0",
-    "react-dom": ">=18.2.0",
-    "slate": ">=0.99.0",
-    "slate-dom": ">=0.110.2"
+    "slate": ">=0.99.0"
   },
   "umdGlobals": {
-    "react": "React",
     "slate": "Slate"
   },
   "keywords": [

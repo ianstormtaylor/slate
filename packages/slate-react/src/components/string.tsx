@@ -3,8 +3,8 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { IS_ANDROID, IS_IOS } from '../utils/environment'
-import { MARK_PLACEHOLDER_SYMBOL } from '../utils/weak-maps'
+import { IS_ANDROID, IS_IOS } from 'slate-dom'
+import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 /**
  * Leaf content strings.

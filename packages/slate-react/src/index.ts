@@ -27,4 +27,4 @@ export { ReactEditor } from './plugin/react-editor'
 export { withReact } from './plugin/with-react'
 
 // Utils
-export { NODE_TO_INDEX, NODE_TO_PARENT } from './utils/weak-maps'
+export { NODE_TO_INDEX, NODE_TO_PARENT } from 'slate-dom'

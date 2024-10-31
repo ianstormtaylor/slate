@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react'
 import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
+import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { SlateContext, SlateContextValue } from '../hooks/use-slate'
@@ -10,7 +11,6 @@ import {
 import { EditorContext } from '../hooks/use-slate-static'
 import { ReactEditor } from '../plugin/react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
-import { EDITOR_TO_ON_CHANGE } from '../utils/weak-maps'
 
 /**
  * A wrapper around the provider to handle `onChange` events, because the editor
