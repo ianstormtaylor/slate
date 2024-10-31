@@ -5,7 +5,9 @@
     { "repo": "ianstormtaylor/slate" }
   ],
   "commit": false,
-  "linked": [["slate", "slate-history", "slate-hyperscript", "slate-react"]],
+  "linked": [
+    ["slate", "slate-dom", "slate-history", "slate-hyperscript", "slate-react"]
+  ],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
