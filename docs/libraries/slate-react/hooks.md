@@ -28,15 +28,15 @@ Get the current `selected` state of an element.
 
 ### Editor hooks
 
-#### `useSlate(): ReactEditor`
+#### `useSlate(): Editor`
 
 Get the current editor object from the React context. Re-renders the context whenever changes occur in the editor.
 
-#### `useSlateWithV(): { editor: ReactEditor, v: number }`
+#### `useSlateWithV(): { editor: Editor, v: number }`
 
 The same as `useSlate()` but includes a version counter which you can use to prevent re-renders.
 
-#### `useSlateStatic(): ReactEditor`
+#### `useSlateStatic(): Editor`
 
 Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
 
