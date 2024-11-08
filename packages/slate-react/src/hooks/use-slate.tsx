@@ -34,7 +34,7 @@ export const useSlate = (): Editor => {
   return editor
 }
 
-export const useSlateWithV = () => {
+export const useSlateWithV = (): { editor: Editor; v: number } => {
   const context = useContext(SlateContext)
 
   if (!context) {
