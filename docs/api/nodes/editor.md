@@ -165,7 +165,7 @@ Options: `{depth?: number, edge?: 'start' | 'end'}`
 
 #### `Editor.point(editor: Editor, at: Location, options?) => Point`
 
-Get the start or end point of a location.
+Get the `start` or `end` (default is `start`) point of a location.
 
 Options: `{edge?: 'start' | 'end'}`
 
