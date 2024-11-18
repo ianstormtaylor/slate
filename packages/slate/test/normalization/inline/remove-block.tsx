@@ -20,7 +20,7 @@ export const output = (
     <block>
       <text />
       <inline>
-        <text>twofour</text>
+        <text>onetwothreefour</text>
       </inline>
       <text />
     </block>
