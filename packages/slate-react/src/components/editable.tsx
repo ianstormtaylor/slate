@@ -339,7 +339,7 @@ export const Editable = forwardRef(
         const focusNode = domSelection.focusNode
         let anchorNode
 
-        // COMPAT: In firefox the normal seletion way does not work
+        // COMPAT: In firefox the normal selection way does not work
         // (https://github.com/ianstormtaylor/slate/pull/5486#issue-1820720223)
         if (IS_FIREFOX && domSelection.rangeCount > 1) {
           const firstRange = domSelection.getRangeAt(0)
@@ -412,8 +412,13 @@ export const Editable = forwardRef(
         // Otherwise the DOM selection is out of sync, so update it.
         state.isUpdatingSelection = true
 
-        const newDomRange: DOMRange | null =
-          selection && ReactEditor.toDOMRange(editor, selection)
+        let newDomRange: DOMRange | null = null
+
+        try {
+          newDomRange = selection && ReactEditor.toDOMRange(editor, selection)
+        } catch (e) {
+          // Ignore, dom and state might be out of sync
+        }
 
         if (newDomRange) {
           if (ReactEditor.isComposing(editor) && !IS_ANDROID) {
