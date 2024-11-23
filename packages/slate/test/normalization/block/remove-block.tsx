@@ -12,7 +12,7 @@ export const input = (
 export const output = (
   <editor>
     <block>
-      <text>one</text>
+      <text>onetwo</text>
     </block>
   </editor>
 )

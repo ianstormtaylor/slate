@@ -53,7 +53,11 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
     // other inline nodes, or parent blocks that only contain inlines and
     // text.
     if (isInlineOrText !== shouldHaveInlines) {
-      Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
+      if (isInlineOrText) {
+        Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
+      } else {
+        Transforms.unwrapNodes(editor, { at: path.concat(n), voids: true })
+      }
       n--
     } else if (Element.isElement(child)) {
       // Ensure that inline nodes are surrounded by text nodes.
