@@ -25,7 +25,7 @@ export interface GeneralTransforms {
 const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
   switch (op.type) {
     case 'insert_node': {
-      const { path, node } = op
+      const { path, node, enableSelectionOp = true } = op
       const parent = Node.parent(editor, path)
       const index = path[path.length - 1]
 
@@ -37,7 +37,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
       parent.children.splice(index, 0, node)
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
@@ -47,24 +47,23 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
     }
 
     case 'insert_text': {
-      const { path, offset, text } = op
+      const { path, offset, text, enableSelectionOp = true } = op
       if (text.length === 0) break
       const node = Node.leaf(editor, path)
       const before = node.text.slice(0, offset)
       const after = node.text.slice(offset)
       node.text = before + text + after
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
       }
-
       break
     }
 
     case 'merge_node': {
-      const { path } = op
+      const { path, enableSelectionOp = true } = op
       const node = Node.get(editor, path)
       const prevPath = Path.previous(path)
       const prev = Node.get(editor, prevPath)
@@ -85,7 +84,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
       parent.children.splice(index, 1)
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
@@ -95,7 +94,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
     }
 
     case 'move_node': {
-      const { path, newPath } = op
+      const { path, newPath, enableSelectionOp = true } = op
 
       if (Path.isAncestor(path, newPath)) {
         throw new Error(
@@ -120,7 +119,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
       newParent.children.splice(newIndex, 0, node)
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
@@ -130,14 +129,14 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
     }
 
     case 'remove_node': {
-      const { path } = op
+      const { path, enableSelectionOp = true } = op
       const index = path[path.length - 1]
       const parent = Node.parent(editor, path)
       parent.children.splice(index, 1)
 
       // Transform all the points in the value, but if the point was in the
       // node that was removed we need to update the range or remove it.
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           const result = Point.transform(point, op)
 
@@ -184,14 +183,14 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
     }
 
     case 'remove_text': {
-      const { path, offset, text } = op
+      const { path, offset, text, enableSelectionOp = true } = op
       if (text.length === 0) break
       const node = Node.leaf(editor, path)
       const before = node.text.slice(0, offset)
       const after = node.text.slice(offset + text.length)
       node.text = before + after
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
@@ -270,7 +269,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
     }
 
     case 'split_node': {
-      const { path, position, properties } = op
+      const { path, position, properties, enableSelectionOp = true } = op
 
       if (path.length === 0) {
         throw new Error(
@@ -304,7 +303,7 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
 
       parent.children.splice(index + 1, 0, newNode)
 
-      if (selection) {
+      if (selection && enableSelectionOp) {
         for (const [point, key] of Range.points(selection)) {
           selection[key] = Point.transform(point, op)!
         }
