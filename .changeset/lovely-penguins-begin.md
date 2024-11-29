@@ -1,6 +1,6 @@
 ---
-"slate-react": minor
-"slate": minor
+"slate-react": patch
+"slate": patch
 ---
 
-feat:  add prop enableSelectionOp and onDOMSelectionChangeThrottleTime
+add prop enableSelectionOp and onDOMSelectionChangeThrottleTime
