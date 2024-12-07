@@ -1,5 +1,13 @@
 # slate-react
 
+## 0.112.0
+
+### Patch Changes
+
+- [#5763](https://github.com/ianstormtaylor/slate/pull/5763) [`644ebdc8`](https://github.com/ianstormtaylor/slate/commit/644ebdc8f5f30878fb87dc8685f62e0636c23491) Thanks [@TyMick](https://github.com/TyMick)! - Use extended `Editor` type in `useSlateWithV` return type
+
+- [#5741](https://github.com/ianstormtaylor/slate/pull/5741) [`90fbcdef`](https://github.com/ianstormtaylor/slate/commit/90fbcdeff58d9b1f5de13102a1198f1c7244ae0c) Thanks [@AdrienPoupa](https://github.com/AdrienPoupa)! - Fix ReactEditor.toDOMRange crash in setDomSelection
+
 ## 0.111.0
 
 ### Minor Changes
