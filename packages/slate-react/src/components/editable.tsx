@@ -22,6 +22,7 @@ import {
   Range,
   Text,
   Transforms,
+  DecoratedRange,
 } from 'slate'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
@@ -116,7 +117,7 @@ export interface RenderLeafProps {
  */
 
 export type EditableProps = {
-  decorate?: (entry: NodeEntry) => Range[]
+  decorate?: (entry: NodeEntry) => DecoratedRange[]
   onDOMBeforeInput?: (event: InputEvent) => void
   placeholder?: string
   readOnly?: boolean
@@ -1876,7 +1877,7 @@ export const DefaultPlaceholder = ({
  * A default memoized decorate function.
  */
 
-export const defaultDecorate: (entry: NodeEntry) => Range[] = () => []
+export const defaultDecorate: (entry: NodeEntry) => DecoratedRange[] = () => []
 
 /**
  * A default implement to scroll dom range into view.
