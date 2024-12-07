@@ -861,7 +861,11 @@ export const Editable = forwardRef(
       // (2019/11/04) https://github.com/facebook/react/issues/5785
       window.document.addEventListener(
         'selectionchange',
-        scheduleOnDOMSelectionChange
+        ()=>{
+          if(mouseDown.current){
+            scheduleOnDOMSelectionChange()
+          }
+        }
       )
 
       // Listen for dragend and drop globally. In Firefox, if a drop handler
