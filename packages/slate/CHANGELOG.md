@@ -1,5 +1,15 @@
 # slate
 
+## 0.112.0
+
+### Minor Changes
+
+- [#5776](https://github.com/ianstormtaylor/slate/pull/5776) [`5a1c728c`](https://github.com/ianstormtaylor/slate/commit/5a1c728c62bcc6bafe60b9598946bb3adde21cdf) Thanks [@yf-yang](https://github.com/yf-yang)! - Add `merge` optional function to decorations and change related type signatures to `DecoratedRange`. Now developers can specify how two decoration object with the same key but different value are merged together if they overlap"
+
+### Patch Changes
+
+- [#5768](https://github.com/ianstormtaylor/slate/pull/5768) [`4bc552f7`](https://github.com/ianstormtaylor/slate/commit/4bc552f71ff75c4b7ad18386a65dabdd8b4e1bba) Thanks [@ahoisl](https://github.com/ahoisl)! - Keep data in normalization when blocks are not allowed
+
 ## 0.110.2
 
 ### Patch Changes
