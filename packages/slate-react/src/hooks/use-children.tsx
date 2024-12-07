@@ -1,5 +1,12 @@
 import React from 'react'
-import { Ancestor, Descendant, Editor, Element, Range } from 'slate'
+import {
+  Ancestor,
+  Descendant,
+  Editor,
+  Element,
+  Range,
+  DecoratedRange,
+} from 'slate'
 import {
   RenderElementProps,
   RenderLeafProps,
@@ -19,7 +26,7 @@ import { useSlateStatic } from './use-slate-static'
  */
 
 const useChildren = (props: {
-  decorations: Range[]
+  decorations: DecoratedRange[]
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element

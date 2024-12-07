@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { Element, Range, Text as SlateText } from 'slate'
+import { Element, DecoratedRange, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { isTextDecorationsEqual } from 'slate-dom'
 import {
@@ -15,7 +15,7 @@ import Leaf from './leaf'
  */
 
 const Text = (props: {
-  decorations: Range[]
+  decorations: DecoratedRange[]
   isLast: boolean
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element

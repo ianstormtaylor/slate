@@ -19,6 +19,14 @@ export interface TextEqualsOptions {
   loose?: boolean
 }
 
+export type DecoratedRange = Range & {
+  /**
+   * Customize how another decoration is merged into a text node. If not specified, `Object.assign` would be used.
+   * It is useful for overlapping decorations with the same key but different values.
+   */
+  merge?: (leaf: Text, decoration: object) => void
+}
+
 export interface TextInterface {
   /**
    * Check if two text nodes are equal.
@@ -54,7 +62,7 @@ export interface TextInterface {
   /**
    * Get the leaves for a text node given decorations.
    */
-  decorations: (node: Text, decorations: Range[]) => Text[]
+  decorations: (node: Text, decorations: DecoratedRange[]) => Text[]
 }
 
 // eslint-disable-next-line no-redeclare
@@ -103,16 +111,17 @@ export const Text: TextInterface = {
     return true
   },
 
-  decorations(node: Text, decorations: Range[]): Text[] {
+  decorations(node: Text, decorations: DecoratedRange[]): Text[] {
     let leaves: Text[] = [{ ...node }]
 
     for (const dec of decorations) {
-      const { anchor, focus, ...rest } = dec
+      const { anchor, focus, merge: mergeDecoration, ...rest } = dec
       const [start, end] = Range.edges(dec)
       const next = []
       let leafEnd = 0
       const decorationStart = start.offset
       const decorationEnd = end.offset
+      const merge = mergeDecoration ?? Object.assign
 
       for (const leaf of leaves) {
         const { length } = leaf.text
@@ -121,7 +130,7 @@ export const Text: TextInterface = {
 
         // If the range encompasses the entire leaf, add the range.
         if (decorationStart <= leafStart && leafEnd <= decorationEnd) {
-          Object.assign(leaf, rest)
+          merge(leaf, rest)
           next.push(leaf)
           continue
         }
@@ -157,7 +166,7 @@ export const Text: TextInterface = {
           middle = { ...middle, text: middle.text.slice(off) }
         }
 
-        Object.assign(middle, rest)
+        merge(middle, rest)
 
         if (before) {
           next.push(before)
