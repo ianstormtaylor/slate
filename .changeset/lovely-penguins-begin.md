@@ -1,6 +1,6 @@
 ---
 "slate-react": patch
-"slate": patch
+'slate': patch
 ---
 
 add prop enableSelectionOp and onDOMSelectionChangeThrottleTime
