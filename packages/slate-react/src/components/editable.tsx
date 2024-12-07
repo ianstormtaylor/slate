@@ -165,7 +165,7 @@ export const Editable = forwardRef(
       number | undefined
     >()
     const processing = useRef(false)
-
+    const mouseDown = useRef(false)
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
     const [, forceRender] = useReducer(s => s + 1, 0)
@@ -456,9 +456,7 @@ export const Editable = forwardRef(
         androidInputManagerRef.current?.isFlushing() === 'action'
 
       if (!IS_ANDROID || !ensureSelection) {
-        setTimeout(() => {
-          state.isUpdatingSelection = false
-        })
+        state.isUpdatingSelection = false
         return
       }
 
@@ -1162,8 +1160,9 @@ export const Editable = forwardRef(
                     attributes.onBlur,
                   ]
                 )}
-                onClick={useCallback(
+                onMouseDown={useCallback(
                   (event: React.MouseEvent<HTMLDivElement>) => {
+                    mouseDown.current = true
                     if (
                       ReactEditor.hasTarget(editor, event.target) &&
                       !isEventHandled(event, attributes.onClick) &&
@@ -1224,8 +1223,11 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [editor, attributes.onClick, readOnly]
+                  [editor, attributes.onMouseDown, readOnly]
                 )}
+                onMouseUp={useCallback(() => {
+                  mouseDown.current = false
+                }, [])}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
