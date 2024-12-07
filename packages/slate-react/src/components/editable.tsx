@@ -1166,7 +1166,7 @@ export const Editable = forwardRef(
                     mouseDown.current = true
                     if (
                       ReactEditor.hasTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onClick) &&
+                      !isEventHandled(event, attributes.onMouseDown) &&
                       isDOMNode(event.target)
                     ) {
                       const node = ReactEditor.toSlateNode(editor, event.target)
