@@ -13258,7 +13258,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"slate-dom@npm:^0.111.0, slate-dom@workspace:packages/slate-dom":
+"slate-dom@npm:^0.111.0, slate-dom@workspace:*, slate-dom@workspace:packages/slate-dom":
   version: 0.0.0-use.local
   resolution: "slate-dom@workspace:packages/slate-dom"
   dependencies:
@@ -13385,6 +13385,7 @@ __metadata:
     shell-quote: "npm:^1.8.1"
     simple-git-hooks: "npm:^2.9.0"
     slate: "workspace:*"
+    slate-dom: "workspace:*"
     slate-history: "workspace:*"
     slate-hyperscript: "workspace:*"
     slate-react: "workspace:*"
