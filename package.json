@@ -110,6 +110,7 @@
     "shell-quote": "^1.8.1",
     "simple-git-hooks": "^2.9.0",
     "slate": "workspace:*",
+    "slate-dom": "workspace:*",
     "slate-history": "workspace:*",
     "slate-hyperscript": "workspace:*",
     "slate-react": "workspace:*",
