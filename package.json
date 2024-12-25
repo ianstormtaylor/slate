@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
-    "build:next": "cd ./site && next build && next export",
+    "build:next": "cd ./site && next build",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js --bundleConfigAsCjs",
     "changesetversion": "yarn changeset version && yarn install && git add .",
     "clean": "rimraf './packages/*/{dist,lib,node_modules}' './site/{.next,out}' --glob",
