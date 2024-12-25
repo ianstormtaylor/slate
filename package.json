@@ -127,5 +127,8 @@
       "eslint --fix"
     ]
   },
-  "packageManager": "yarn@4.0.2"
+  "packageManager": "yarn@4.0.2",
+  "dependencies": {
+    "eslint-config-next": "^15.1.2"
+  }
 }
