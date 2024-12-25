@@ -3,9 +3,9 @@
   "extends": [
     "plugin:import/typescript",
     "plugin:prettier/recommended",
-    "next/core-web-vitals"
+    "plugin:react-hooks/recommended"
   ],
-  "plugins": ["@typescript-eslint", "import", "react"],
+  "plugins": ["import", "react"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "sourceType": "module",
