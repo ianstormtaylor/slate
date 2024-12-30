@@ -34,3 +34,11 @@ The `children` which must contain an `Editable` component.
 #### `props.onChange: (value: Descendant[]) => void`
 
 An optional callback function which you can use to be notified of changes in the editor's value.
+
+#### `props.onValueChange?: (value: Descendant[]) => void`
+
+`props.onChange` alias.
+
+#### `props.onSelectionChange?: (selection: Selection) => void`
+
+An optional callback function which you can use to be notified of changes of the editor's selection.
