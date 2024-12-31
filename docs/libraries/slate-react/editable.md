@@ -22,6 +22,7 @@ type EditableProps = {
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
   disableDefaultStyles?: boolean
+  onDOMSelectionChangeThrottleTime?: number
 } & React.TextareaHTMLAttributes<HTMLDivElement>
 ```
 
