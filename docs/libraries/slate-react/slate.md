@@ -12,6 +12,8 @@ type SlateProps = {
   value: Descendant[]
   children: React.ReactNode
   onChange?: (value: Descendant[]) => void
+  onSelectionChange?: (selection: Selection) => void
+  onValueChange?: (value: Descendant[]) => void
 }
 ```
 
