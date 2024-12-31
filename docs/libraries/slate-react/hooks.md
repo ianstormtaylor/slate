@@ -46,7 +46,7 @@ Get the current editor object from the React context. A version of useSlate that
 
 Get the current editor selection from the React context. Only re-renders when the selection changes.
 
-#### `useSlateSelector<T>(selector: (editor: Editor): T, equalityFn?: (a: T, b: T) => boolean): T`
+#### `useSlateSelector<T>(selector: (editor: Editor) => T, equalityFn?: (a: T, b: T) => boolean): T`
 
 Similar to `useSlateSelection` but uses redux style selectors to prevent rerendering on every keystroke.
 
