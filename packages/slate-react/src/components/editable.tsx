@@ -165,7 +165,7 @@ export const Editable = forwardRef(
       number | undefined
     >()
     const processing = useRef(false)
-
+    const mouseDown = useRef(false)
     const { onUserInput, receivedUserInput } = useTrackUserInput()
 
     const [, forceRender] = useReducer(s => s + 1, 0)
@@ -456,9 +456,7 @@ export const Editable = forwardRef(
         androidInputManagerRef.current?.isFlushing() === 'action'
 
       if (!IS_ANDROID || !ensureSelection) {
-        setTimeout(() => {
-          state.isUpdatingSelection = false
-        })
+        state.isUpdatingSelection = false
         return
       }
 
@@ -861,10 +859,11 @@ export const Editable = forwardRef(
       // a leaky polyfill that only fires on keypresses or clicks. Instead, we
       // want to fire for any change to the selection inside the editor.
       // (2019/11/04) https://github.com/facebook/react/issues/5785
-      window.document.addEventListener(
-        'selectionchange',
-        scheduleOnDOMSelectionChange
-      )
+      window.document.addEventListener('selectionchange', () => {
+        if (mouseDown.current) {
+          scheduleOnDOMSelectionChange()
+        }
+      })
 
       // Listen for dragend and drop globally. In Firefox, if a drop handler
       // initiates an operation that causes the originally dragged element to
@@ -1162,11 +1161,12 @@ export const Editable = forwardRef(
                     attributes.onBlur,
                   ]
                 )}
-                onClick={useCallback(
+                onMouseDown={useCallback(
                   (event: React.MouseEvent<HTMLDivElement>) => {
+                    mouseDown.current = true
                     if (
                       ReactEditor.hasTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onClick) &&
+                      !isEventHandled(event, attributes.onMouseDown) &&
                       isDOMNode(event.target)
                     ) {
                       const node = ReactEditor.toSlateNode(editor, event.target)
@@ -1224,8 +1224,11 @@ export const Editable = forwardRef(
                       }
                     }
                   },
-                  [editor, attributes.onClick, readOnly]
+                  [editor, attributes.onMouseDown, readOnly]
                 )}
+                onMouseUp={useCallback(() => {
+                  mouseDown.current = false
+                }, [])}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
