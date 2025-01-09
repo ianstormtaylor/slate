@@ -127,7 +127,7 @@ export interface RenderLeafProps {
 
 Example usage:
 
-```typescript
+```jsx
 <Editor
   renderLeaf={({ attributes, children, leaf }) => {
     return (
