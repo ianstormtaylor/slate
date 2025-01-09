@@ -174,7 +174,7 @@ An example usage might look like:
         color: 'gray',
       },
     };
-    return <div {...styledAttributes}>{children}</div>;
+    return <div {...styledAttributes}>{children}</div>
   }}
 />
 ```
