@@ -210,7 +210,10 @@ export const withDOM = <T extends BaseEditor>(
       case 'remove_node':
       case 'merge_node':
       case 'move_node':
-      case 'split_node': {
+      case 'split_node':
+      case 'insert_text':
+      case 'remove_text':
+      case 'set_selection': {
         IS_NODE_MAP_DIRTY.set(e, true)
       }
     }
