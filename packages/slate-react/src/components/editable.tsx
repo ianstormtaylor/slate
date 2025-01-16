@@ -886,7 +886,8 @@ export const Editable = forwardRef(
       window.document.addEventListener('drop', stoppedDragging)
 
       return () => {
-        window.document.removeEventListener('selectionchange',
+        window.document.removeEventListener(
+          'selectionchange',
           onSelectionChange
         )
         window.document.removeEventListener('dragend', stoppedDragging)
