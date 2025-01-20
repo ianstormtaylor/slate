@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.112.1
+
+### Patch Changes
+
+- [#5795](https://github.com/ianstormtaylor/slate/pull/5795) [`f456dfbf`](https://github.com/ianstormtaylor/slate/commit/f456dfbf133f93fabe683849adb7952b8b04fc60) Thanks [@12joan](https://github.com/12joan)! - Ignore selectionchange events originating from input and textarea elements (addresses Chrome bug https://issues.chromium.org/issues/389368412)
+
 ## 0.112.0
 
 ### Patch Changes
