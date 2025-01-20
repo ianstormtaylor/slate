@@ -856,15 +856,25 @@ export const Editable = forwardRef(
     useIsomorphicLayoutEffect(() => {
       const window = ReactEditor.getWindow(editor)
 
+      // COMPAT: In Chrome, `selectionchange` events can fire when <input> and
+      // <textarea> elements are appended to the DOM, causing
+      // `editor.selection` to be overwritten in some circumstances.
+      // (2025/01/16) https://issues.chromium.org/issues/389368412
+      const onSelectionChange = ({ target }: Event) => {
+        const targetElement = target instanceof HTMLElement ? target : null
+        const targetTagName = targetElement?.tagName
+        if (targetTagName === 'INPUT' || targetTagName === 'TEXTAREA') {
+          return
+        }
+        scheduleOnDOMSelectionChange()
+      }
+
       // Attach a native DOM event handler for `selectionchange`, because React's
       // built-in `onSelect` handler doesn't fire for all selection changes. It's
       // a leaky polyfill that only fires on keypresses or clicks. Instead, we
       // want to fire for any change to the selection inside the editor.
       // (2019/11/04) https://github.com/facebook/react/issues/5785
-      window.document.addEventListener(
-        'selectionchange',
-        scheduleOnDOMSelectionChange
-      )
+      window.document.addEventListener('selectionchange', onSelectionChange)
 
       // Listen for dragend and drop globally. In Firefox, if a drop handler
       // initiates an operation that causes the originally dragged element to
@@ -878,7 +888,7 @@ export const Editable = forwardRef(
       return () => {
         window.document.removeEventListener(
           'selectionchange',
-          scheduleOnDOMSelectionChange
+          onSelectionChange
         )
         window.document.removeEventListener('dragend', stoppedDragging)
         window.document.removeEventListener('drop', stoppedDragging)
