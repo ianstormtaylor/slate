@@ -3507,12 +3507,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.13, @types/react-dom@npm:^18.2.17":
+"@types/react-dom@npm:^18.0.0, @types/react-dom@npm:^18.2.17":
   version: 18.2.17
   resolution: "@types/react-dom@npm:18.2.17"
   dependencies:
     "@types/react": "npm:*"
   checksum: fe0dbb3224b48515da8fe25559e3777d756a27c3f22903f0b1b020de8d68bd57eb1f0af62b52ee65d9632637950afed8cbad24d158c4f3d910d083d49bd73fba
+  languageName: node
+  linkType: hard
+
+"@types/react-dom@npm:^19.0.0":
+  version: 19.0.3
+  resolution: "@types/react-dom@npm:19.0.3"
+  peerDependencies:
+    "@types/react": ^19.0.0
+  checksum: 815907f7adaa078acbf1d1ae7b6bf69cebe86bd301b8b9744e392bc0f16feb31bfb9fe0bfa2681d7d86678c83d52dedba5ed9bc7776736d4050cdd426b8b2d2b
   languageName: node
   linkType: hard
 
@@ -3524,6 +3533,15 @@ __metadata:
     "@types/scheduler": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 31a498a56ad3e825ae13799355fe49042c0cdbbe6f40003f39b6b9cf847ba1669393c22ba60e97b1072cf1c002b15432082cdd17e47c948430bdc1f0864829b9
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:^19.0.0":
+  version: 19.0.7
+  resolution: "@types/react@npm:19.0.7"
+  dependencies:
+    csstype: "npm:^3.0.2"
+  checksum: 09522132bde715888e57c61fc89a87db06699872535450296f1c975c5014a7953ff08c3bff6b37d4a4515ceeb65b09cc5f841513cc8fede65fec788790b21154
   languageName: node
   linkType: hard
 
@@ -12175,14 +12193,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-error-boundary@npm:^4.0.11":
-  version: 4.0.11
-  resolution: "react-error-boundary@npm:4.0.11"
+"react-dom@npm:^19.0.0":
+  version: 19.0.0
+  resolution: "react-dom@npm:19.0.0"
+  dependencies:
+    scheduler: "npm:^0.25.0"
+  peerDependencies:
+    react: ^19.0.0
+  checksum: aa64a2f1991042f516260e8b0eca0ae777b6c8f1aa2b5ae096e80bbb6ac9b005aef2bca697969841d34f7e1819556263476bdfea36c35092e8d9aefde3de2d9a
+  languageName: node
+  linkType: hard
+
+"react-error-boundary@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "react-error-boundary@npm:5.0.0"
   dependencies:
     "@babel/runtime": "npm:^7.12.5"
   peerDependencies:
     react: ">=16.13.1"
-  checksum: 12495458ec9f4a809f5eac684e115cc4247aa607c686f8506caf32930c53d4bb6c234428c12d7ab91708f34cfdbc6452be0ef0fb8c857cc11aea165d3e76aa27
+  checksum: 8b68de3441bd3d50a2c8433f9c921ff02c691e920e268972ae002087b5080e38435c6f9b2198241683b7f4c6a6ed2f53bf593b83c42946f14daa00322b3c2909
   languageName: node
   linkType: hard
 
@@ -12247,6 +12276,13 @@ __metadata:
   dependencies:
     loose-envify: "npm:^1.1.0"
   checksum: b9214a9bd79e99d08de55f8bef2b7fc8c39630be97c4e29d7be173d14a9a10670b5325e94485f74cd8bff4966ef3c78ee53c79a7b0b9b70cba20aa8973acc694
+  languageName: node
+  linkType: hard
+
+"react@npm:^19.0.0":
+  version: 19.0.0
+  resolution: "react@npm:19.0.0"
+  checksum: 2490969c503f644703c88990d20e4011fa6119ddeca451e9de48f6d7ab058d670d2852a5fcd3aa3cd90a923ab2815d532637bd4a814add402ae5c0d4f129ee71
   languageName: node
   linkType: hard
 
@@ -13000,6 +13036,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"scheduler@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "scheduler@npm:0.25.0"
+  checksum: e661e38503ab29a153429a99203fefa764f28b35c079719eb5efdd2c1c1086522f6653d8ffce388209682c23891a6d1d32fa6badf53c35fb5b9cd0c55ace42de
+  languageName: node
+  linkType: hard
+
 "scroll-into-view-if-needed@npm:^3.1.0":
   version: 3.1.0
   resolution: "scroll-into-view-if-needed@npm:3.1.0"
@@ -13338,8 +13381,8 @@ __metadata:
     "@types/mocha": "npm:^10.0.3"
     "@types/node": "npm:^20.8.7"
     "@types/prismjs": "npm:^1.26.1"
-    "@types/react": "npm:^18.2.41"
-    "@types/react-dom": "npm:^18.2.13"
+    "@types/react": "npm:^19.0.0"
+    "@types/react-dom": "npm:^19.0.0"
     "@typescript-eslint/eslint-plugin": "npm:^6.8.0"
     "@typescript-eslint/parser": "npm:^6.8.0"
     babel-eslint: "npm:^10.1.0"
@@ -13366,9 +13409,9 @@ __metadata:
     nx: "npm:^16.10.0"
     prettier: "npm:^3.0.3"
     prismjs: "npm:^1.29.0"
-    react: "npm:^18.2.0"
-    react-dom: "npm:^18.2.0"
-    react-error-boundary: "npm:^4.0.11"
+    react: "npm:^19.0.0"
+    react-dom: "npm:^19.0.0"
+    react-error-boundary: "npm:^5.0.0"
     react-router-dom: "npm:^6.17.0"
     react-values: "npm:^0.3.3"
     rimraf: "npm:^5.0.5"
