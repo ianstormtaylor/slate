@@ -178,7 +178,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/kFrdX5IeQzI',
+    url: 'https://images.unsplash.com/photo-1709884732259-9f2f0a52288b',
     children: [{ text: '' }],
   },
   {
@@ -199,7 +199,7 @@ const initialValue: Descendant[] = [
   },
   {
     type: 'image',
-    url: 'https://source.unsplash.com/zOwZKwZOZq8',
+    url: 'https://images.unsplash.com/photo-1709884732294-ac35fa831eb4',
     children: [{ text: '' }],
   },
 ]
