@@ -215,7 +215,7 @@ export const withDOM = <T extends BaseEditor>(
       case 'remove_text':
       case 'set_selection': {
         // FIXME: Rename to something like IS_DOM_EDITOR_DESYNCED
-        // to better reflect reality, see #5792 
+        // to better reflect reality, see #5792
         IS_NODE_MAP_DIRTY.set(e, true)
       }
     }
