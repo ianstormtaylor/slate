@@ -175,7 +175,7 @@ const initialValue = [
     type: 'paragraph',
     children: [
       {
-        text: 'You can delete images with the cross in the top left. Try deleting this sheep:',
+        text: 'You can delete images with the trash icon in the top left. Try deleting this image:',
       },
     ],
   },

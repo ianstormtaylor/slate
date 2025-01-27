@@ -1,4 +1,4 @@
-import React, { forwardRef, memo, useRef, useState } from 'react'
+import React, { memo, useRef, useState } from 'react'
 import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
@@ -94,13 +94,13 @@ const TextString = (props: { text: string; isTrailing?: boolean }) => {
 }
 
 const MemoizedText = memo(
-  forwardRef<HTMLSpanElement, { children: string }>((props, ref) => {
+  (props: { children: string; ref: React.Ref<HTMLSpanElement> }) => {
     return (
-      <span data-slate-string ref={ref}>
+      <span data-slate-string ref={props.ref}>
         {props.children}
       </span>
     )
-  })
+  }
 )
 
 /**
