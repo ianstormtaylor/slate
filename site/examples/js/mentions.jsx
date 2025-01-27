@@ -20,7 +20,7 @@ import { Portal } from './components'
 import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
-  const ref = useRef()
+  const ref = useRef(null)
   const [target, setTarget] = useState()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')

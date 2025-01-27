@@ -72,7 +72,7 @@ const Leaf = ({ attributes, children, leaf }) => {
 }
 
 const HoveringToolbar = () => {
-  const ref = useRef<HTMLDivElement | null>()
+  const ref = useRef<HTMLDivElement | null>(null)
   const editor = useSlate()
   const inFocus = useFocused()
 

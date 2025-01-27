@@ -22,7 +22,7 @@ import { MentionElement } from './custom-types.d'
 import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
-  const ref = useRef<HTMLDivElement | null>()
+  const ref = useRef<HTMLDivElement | null>(null)
   const [target, setTarget] = useState<Range | undefined>()
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
