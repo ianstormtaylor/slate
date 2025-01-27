@@ -1,11 +1,11 @@
 import React, {
   useRef,
   useCallback,
-  MutableRefObject,
   useState,
   useEffect,
+  RefObject,
+  JSX,
 } from 'react'
-import { JSX } from 'react'
 import { Element, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
@@ -23,7 +23,7 @@ import { IS_WEBKIT, IS_ANDROID } from 'slate-dom'
 const PLACEHOLDER_DELAY = IS_ANDROID ? 300 : 0
 
 function disconnectPlaceholderResizeObserver(
-  placeholderResizeObserver: MutableRefObject<ResizeObserver | null>,
+  placeholderResizeObserver: RefObject<ResizeObserver | null>,
   releaseObserver: boolean
 ) {
   if (placeholderResizeObserver.current) {
@@ -36,7 +36,7 @@ function disconnectPlaceholderResizeObserver(
 
 type TimerId = ReturnType<typeof setTimeout> | null
 
-function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
+function clearTimeoutRef(timeoutRef: RefObject<TimerId>) {
   if (timeoutRef.current) {
     clearTimeout(timeoutRef.current)
     timeoutRef.current = null

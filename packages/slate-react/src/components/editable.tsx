@@ -8,8 +8,8 @@ import React, {
   useReducer,
   useRef,
   useState,
+  JSX,
 } from 'react'
-import { JSX } from 'react'
 import scrollIntoView from 'scroll-into-view-if-needed'
 import {
   Editor,
