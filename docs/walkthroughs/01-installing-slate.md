@@ -28,6 +28,10 @@ import { Slate, Editable, withReact } from 'slate-react'
 
 Before we use those imports, let's start with an empty `<App>` component:
 
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
 ```jsx
 // Define our app...
 const App = () => {
@@ -35,7 +39,26 @@ const App = () => {
 }
 ```
 
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```tsx
+// Define our app...
+const App = () => {
+  return null
+}
+```
+
+{% endtab %}
+
+{% endtabs %}
+
 The next step is to create a new `Editor` object. We want the editor to be stable across renders, so we use the `useState` hook [without a setter](https://github.com/ianstormtaylor/slate/pull/3925#issuecomment-781179930):
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
 
 ```jsx
 const App = () => {
@@ -44,6 +67,22 @@ const App = () => {
   return null
 }
 ```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```tsx
+const App = () => {
+  // Create a Slate editor object that won't change across renders.
+  const [editor] = useState(() => withReact(createEditor()))
+  return null
+}
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 Of course we haven't rendered anything, so you won't see any changes.
 
@@ -70,6 +109,10 @@ Next up is to render a `<Slate>` context provider.
 
 The provider component keeps track of your Slate editor, its plugins, its value, its selection, and any changes that occur. It **must** be rendered above any `<Editable>` components. But it can also provide the editor state to other components like toolbars, menus, etc. using the `useSlate` hook.
 
+{% tabs %}
+
+{% tab title="JavaScript" %}
+
 ```jsx
 const initialValue = [
   {
@@ -85,6 +128,29 @@ const App = () => {
 }
 ```
 
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```tsx
+const initialValue: Descendant[] = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
+const App = () => {
+  const [editor] = useState(() => withReact(createEditor()))
+  // Render the Slate context.
+  return <Slate editor={editor} initialValue={initialValue} />
+}
+```
+
+{% endtab %}
+
+{% endtabs %}
+
 You can think of the `<Slate>` component as providing a context to every component underneath it.
 
 > Slate Provider's "value" prop is only used as initial state for editor.children. If your code relies on replacing editor.children you should do so by replacing it directly instead of relying on the "value" prop to do this for you. See [Slate PR 4540](https://github.com/ianstormtaylor/slate/pull/4540) for a more in-depth discussion.
@@ -94,6 +160,10 @@ This is a slightly different mental model than things like `<input>` or `<textar
 By having a shared context, those other components can execute commands, query the editor's state, etc.
 
 The next step is to render the `<Editable>` component itself. The component acts like `contenteditable`; anywhere you render it will render an editable richtext document for the nearest editor context.
+
+{% tabs %}
+
+{% tab title="JavaScript" %}
 
 ```jsx
 const initialValue = [
@@ -113,6 +183,33 @@ const App = () => {
   )
 }
 ```
+
+{% endtab %}
+
+{% tab title="TypeScript" %}
+
+```tsx
+const initialValue: Descendant[] = [
+  {
+    type: 'paragraph',
+    children: [{ text: 'A line of text in a paragraph.' }],
+  },
+]
+
+const App = () => {
+  const [editor] = useState(() => withReact(createEditor()))
+  return (
+    // Add the editable component inside the context.
+    <Slate editor={editor} initialValue={initialValue}>
+      <Editable />
+    </Slate>
+  )
+}
+```
+
+{% endtab %}
+
+{% endtabs %}
 
 There you have it!
 
