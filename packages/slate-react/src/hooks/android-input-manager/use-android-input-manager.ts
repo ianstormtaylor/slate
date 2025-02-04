@@ -10,7 +10,7 @@ import { useIsMounted } from '../use-is-mounted'
 import { useMutationObserver } from '../use-mutation-observer'
 
 type UseAndroidInputManagerOptions = {
-  node: RefObject<HTMLElement>
+  node: RefObject<HTMLElement | null>
 } & Omit<
   CreateAndroidInputManagerOptions,
   'editor' | 'onUserInput' | 'receivedUserInput'
@@ -25,10 +25,6 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
 export const useAndroidInputManager = !IS_ANDROID
   ? () => null
   : ({ node, ...options }: UseAndroidInputManagerOptions) => {
-      if (!IS_ANDROID) {
-        return null
-      }
-
       const editor = useSlateStatic()
       const isMounted = useIsMounted()
 

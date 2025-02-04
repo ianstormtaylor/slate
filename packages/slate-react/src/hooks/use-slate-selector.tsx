@@ -47,7 +47,7 @@ export function useSlateSelector<T>(
   }
   const { getSlate, addEventListener } = context
 
-  const latestSubscriptionCallbackError = useRef<Error | undefined>()
+  const latestSubscriptionCallbackError = useRef<Error | undefined>(undefined)
   const latestSelector = useRef<(editor: Editor) => T>(() => null as any)
   const latestSelectedState = useRef<T>(null as any as T)
   let selectedState: T

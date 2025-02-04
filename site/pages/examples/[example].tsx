@@ -1,12 +1,10 @@
-import React, { useState, PropsWithChildren, Ref, ErrorInfo } from 'react'
+import React, { useState, PropsWithChildren, ErrorInfo } from 'react'
 import { cx, css } from '@emotion/css'
 import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ErrorBoundary } from 'react-error-boundary'
-
 import { Icon } from '../../examples/ts/components/index'
-
 import CheckLists from '../../examples/ts/check-lists'
 import CodeHighlighting from '../../examples/ts/code-highlighting'
 import EditableVoids from '../../examples/ts/editable-voids'
@@ -33,6 +31,7 @@ import CustomPlaceholder from '../../examples/ts/custom-placeholder'
 // node
 import { getAllExamples } from '../api'
 
+// in format of [name, component, path]
 const EXAMPLES = [
   ['Checklists', CheckLists, 'check-lists'],
   ['Editable Voids', EditableVoids, 'editable-voids'],
@@ -56,7 +55,7 @@ const EXAMPLES = [
   ['Tables', Tables, 'tables'],
   ['Rendering in iframes', IFrames, 'iframe'],
   ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
-]
+] as const
 
 const Header = props => (
   <div
@@ -171,22 +170,23 @@ const TabButton = props => (
   />
 )
 
-const Tab = React.forwardRef(
-  (
-    {
-      active,
-      href,
-      ...props
-    }: PropsWithChildren<{
-      active: boolean
-      href: string
-      [key: string]: unknown
-    }>,
-    ref: Ref<HTMLAnchorElement | null>
-  ) => (
+const Tab = ({
+  path,
+  active,
+  ref,
+  ...props
+}: PropsWithChildren<{
+  path: string
+  active?: boolean
+  [key: string]: unknown
+}>) => (
+  <Link
+    href="/examples/[example]"
+    as={`/examples/${path}`}
+    legacyBehavior
+    passHref
+  >
     <a
-      ref={ref}
-      href={href}
       {...props}
       className={css`
         display: inline-block;
@@ -202,7 +202,7 @@ const Tab = React.forwardRef(
         }
       `}
     />
-  )
+  </Link>
 )
 
 const Wrapper = ({ className, ...props }) => (
@@ -272,8 +272,13 @@ const ExamplePage = ({ example }: { example: string }) => {
   const [error, setError] = useState<Error | undefined>()
   const [stacktrace, setStacktrace] = useState<ErrorInfo | undefined>()
   const [showTabs, setShowTabs] = useState<boolean>()
-  const EXAMPLE = EXAMPLES.find(e => e[2] === example)
+  const EXAMPLE = EXAMPLES.find(e => e[2] === example) // e[2] is the example path
+
+  if (!EXAMPLE) {
+    return <div>Example not found</div>
+  }
   const [name, Component, path] = EXAMPLE
+
   return (
     <ErrorBoundary
       onError={(error, stacktrace) => {
@@ -340,16 +345,10 @@ const ExamplePage = ({ example }: { example: string }) => {
           </ExampleTitle>
         </ExampleHeader>
         <TabList isVisible={showTabs}>
-          {EXAMPLES.map(([n, , p]) => (
-            <Link
-              key={p as string}
-              href="/examples/[example]"
-              as={`/examples/${p}`}
-              legacyBehavior
-              passHref
-            >
-              <Tab onClick={() => setShowTabs(false)}>{n}</Tab>
-            </Link>
+          {EXAMPLES.map(([name, _, path]) => (
+            <Tab key={path} path={path} onClick={() => setShowTabs(false)}>
+              {name}
+            </Tab>
           ))}
         </TabList>
         {error ? (

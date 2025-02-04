@@ -2,73 +2,69 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { cx, css } from '@emotion/css'
 
-export const Button = React.forwardRef(
-  ({ className, active, reversed, ...props }, ref) => (
-    <span
-      {...props}
+export const Button = ({ className, active, reversed, ref, ...props }) => (
+  <span
+    {...props}
+    ref={ref}
+    className={cx(
+      className,
+      css`
+        cursor: pointer;
+        color: ${reversed
+          ? active
+            ? 'white'
+            : '#aaa'
+          : active
+          ? 'black'
+          : '#ccc'};
+      `
+    )}
+  />
+)
+export const EditorValue = ({ className, value, ref, ...props }) => {
+  const textLines = value.document.nodes
+    .map(node => node.text)
+    .toArray()
+    .join('\n')
+  return (
+    <div
       ref={ref}
+      {...props}
       className={cx(
         className,
         css`
-          cursor: pointer;
-          color: ${reversed
-            ? active
-              ? 'white'
-              : '#aaa'
-            : active
-            ? 'black'
-            : '#ccc'};
+          margin: 30px -20px 0;
         `
       )}
-    />
-  )
-)
-export const EditorValue = React.forwardRef(
-  ({ className, value, ...props }, ref) => {
-    const textLines = value.document.nodes
-      .map(node => node.text)
-      .toArray()
-      .join('\n')
-    return (
+    >
       <div
-        ref={ref}
-        {...props}
-        className={cx(
-          className,
-          css`
-            margin: 30px -20px 0;
-          `
-        )}
+        className={css`
+          font-size: 14px;
+          padding: 5px 20px;
+          color: #404040;
+          border-top: 2px solid #eeeeee;
+          background: #f8f8f8;
+        `}
       >
-        <div
-          className={css`
-            font-size: 14px;
-            padding: 5px 20px;
-            color: #404040;
-            border-top: 2px solid #eeeeee;
-            background: #f8f8f8;
-          `}
-        >
-          Slate's value as text
-        </div>
-        <div
-          className={css`
-            color: #404040;
-            font: 12px monospace;
-            white-space: pre-wrap;
-            padding: 10px 20px;
-            div {
-              margin: 0 0 0.5em;
-            }
-          `}
-        >
-          {textLines}
-        </div>
+        Slate's value as text
       </div>
-    )
-  }
-)
-export const Icon = React.forwardRef(({ className, ...props }, ref) => (
+      <div
+        className={css`
+          color: #404040;
+          font: 12px monospace;
+          white-space: pre-wrap;
+          padding: 10px 20px;
+          div {
+            margin: 0 0 0.5em;
+          }
+        `}
+      >
+        {textLines}
+      </div>
+    </div>
+  )
+}
+export const Icon = ({ className, ref, ...props }) => (
   <span
     {...props}
     ref={ref}
@@ -81,8 +77,8 @@ export const Icon = React.forwardRef(({ className, ...props }, ref) => (
       `
     )}
   />
-))
-export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
+)
+export const Instruction = ({ className, ref, ...props }) => (
   <div
     {...props}
     ref={ref}
@@ -97,8 +93,8 @@ export const Instruction = React.forwardRef(({ className, ...props }, ref) => (
       `
     )}
   />
-))
-export const Menu = React.forwardRef(({ className, ...props }, ref) => (
+)
+export const Menu = ({ className, ref, ...props }) => (
   <div
     {...props}
     data-test-id="menu"
@@ -116,13 +112,13 @@ export const Menu = React.forwardRef(({ className, ...props }, ref) => (
       `
     )}
   />
-))
+)
 export const Portal = ({ children }) => {
   return typeof document === 'object'
     ? ReactDOM.createPortal(children, document.body)
     : null
 }
-export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
+export const Toolbar = ({ className, ref, ...props }) => (
   <Menu
     {...props}
     ref={ref}
@@ -137,4 +133,4 @@ export const Toolbar = React.forwardRef(({ className, ...props }, ref) => (
       `
     )}
   />
-))
+)

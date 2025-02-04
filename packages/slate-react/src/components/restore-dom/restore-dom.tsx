@@ -22,7 +22,7 @@ const MUTATION_OBSERVER_CONFIG: MutationObserverInit = {
 type RestoreDOMProps = {
   children?: ReactNode
   receivedUserInput: RefObject<boolean>
-  node: RefObject<HTMLDivElement>
+  node: RefObject<HTMLDivElement | null>
 }
 
 // We have to use a class component here since we rely on `getSnapshotBeforeUpdate` which has no FC equivalent

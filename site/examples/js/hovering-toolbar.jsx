@@ -55,7 +55,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 const HoveringToolbar = () => {
-  const ref = useRef()
+  const ref = useRef(null)
   const editor = useSlate()
   const inFocus = useFocused()
   useEffect(() => {
