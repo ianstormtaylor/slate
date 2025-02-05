@@ -39,7 +39,7 @@ const App = () => {
             Transforms.setNodes(
               editor,
               { type: match ? 'paragraph' : 'code' },
-              { match: n => Editor.isBlock(editor, n) }
+              { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
             )
           }
         }}
@@ -90,7 +90,7 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { type: match ? 'paragraph' : 'code' },
-                { match: n => Editor.isBlock(editor, n) }
+                { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
               )
               break
             }
@@ -178,7 +178,7 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: n => Editor.isBlock(editor, n) }
+                { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
               )
               break
             }
