@@ -169,7 +169,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       })
     }
 
-    // For Thai script, deleting N character(s) backward should delete
+    // For Thai, Khmer, Lao, Burmese script, deleting N character(s) backward should delete
     // N code point(s) instead of an entire grapheme cluster.
     // Therefore, the remaining code points should be inserted back.
     if (
@@ -177,7 +177,7 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       reverse &&
       unit === 'character' &&
       removedText.length > 1 &&
-      removedText.match(/[\u0E00-\u0E7F]+/)
+      removedText.match(/[\u0E00-\u0E7F\u1780-\u17ff\u0E80-\u0EFF\u1000-\u109F]+/)
     ) {
       Transforms.insertText(
         editor,
