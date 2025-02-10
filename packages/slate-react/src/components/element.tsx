@@ -1,6 +1,5 @@
 import getDirection from 'direction'
-import React, { useCallback } from 'react'
-import { JSX } from 'react'
+import React, { useCallback, JSX } from 'react'
 import {
   Editor,
   Element as SlateElement,

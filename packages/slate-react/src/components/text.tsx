@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from 'react'
+import React, { JSX, useCallback, useRef } from 'react'
 import { Element, DecoratedRange, Text as SlateText } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { isTextDecorationsEqual } from 'slate-dom'

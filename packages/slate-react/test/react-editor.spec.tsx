@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react'
-import { createEditor, Text, Transforms } from 'slate'
+import React from 'react'
+import { createEditor, Transforms } from 'slate'
 import { act, render } from '@testing-library/react'
 import { Slate, withReact, Editable, ReactEditor } from '../src'
 

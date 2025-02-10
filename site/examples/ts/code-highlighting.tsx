@@ -8,7 +8,7 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-java'
-import React, { useCallback, useState } from 'react'
+import React, { JSX, useCallback, useState } from 'react'
 import {
   createEditor,
   Node,
