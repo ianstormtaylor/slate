@@ -3354,7 +3354,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^22.13.4":
   version: 22.13.4
   resolution: "@types/node@npm:22.13.4"
   dependencies:
@@ -3367,15 +3367,6 @@ __metadata:
   version: 12.20.55
   resolution: "@types/node@npm:12.20.55"
   checksum: 10/1f916a06fff02faadb09a16ed6e31820ce170798b202ef0b14fc244bfbd721938c54a3a99836e185e4414ca461fe96c5bb5c67c3d248f153555b7e6347f061dd
-  languageName: node
-  linkType: hard
-
-"@types/node@npm:^20.8.7":
-  version: 20.17.19
-  resolution: "@types/node@npm:20.17.19"
-  dependencies:
-    undici-types: "npm:~6.19.2"
-  checksum: 10/4ab6662d3661ad9357d9f1876f5ecaf739fe741d6a1ec5fca3d9183eb3cf87daecb9a3590e8521ad3c460e6257f3aa113585130502519b8ec5fa050c8e6f66ea
   languageName: node
   linkType: hard
 
@@ -12886,7 +12877,7 @@ __metadata:
     "@types/jest": "npm:29.5.6"
     "@types/lodash": "npm:^4.14.200"
     "@types/mocha": "npm:^10.0.3"
-    "@types/node": "npm:^20.8.7"
+    "@types/node": "npm:^22.13.4"
     "@types/prismjs": "npm:^1.26.1"
     "@types/react": "npm:^18.2.41"
     "@types/react-dom": "npm:^18.2.13"
@@ -14038,13 +14029,6 @@ __metadata:
     has-symbols: "npm:^1.1.0"
     which-boxed-primitive: "npm:^1.1.1"
   checksum: 10/fadb347020f66b2c8aeacf8b9a79826fa34cc5e5457af4eb0bbc4e79bd87fed0fa795949825df534320f7c13f199259516ad30abc55a6e7b91d8d996ca069e50
-  languageName: node
-  linkType: hard
-
-"undici-types@npm:~6.19.2":
-  version: 6.19.8
-  resolution: "undici-types@npm:6.19.8"
-  checksum: 10/cf0b48ed4fc99baf56584afa91aaffa5010c268b8842f62e02f752df209e3dea138b372a60a963b3b2576ed932f32329ce7ddb9cb5f27a6c83040d8cd74b7a70
   languageName: node
   linkType: hard
 
