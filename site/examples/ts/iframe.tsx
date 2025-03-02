@@ -1,13 +1,22 @@
-import React, { useCallback, useMemo, useState } from 'react'
-import { createPortal } from 'react-dom'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
+import { MouseEvent, useCallback, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
+import {
+  Editable,
+  ReactEditor,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  useSlate,
+  withReact,
+} from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
+import { CustomEditor, CustomTextKey } from './custom-types.d'
 
-const HOTKEYS = {
+const HOTKEYS: Record<string, CustomTextKey> = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+u': 'underline',
@@ -16,11 +25,19 @@ const HOTKEYS = {
 
 const IFrameExample = () => {
   const renderElement = useCallback(
-    ({ attributes, children }) => <p {...attributes}>{children}</p>,
+    ({ attributes, children }: RenderElementProps) => (
+      <p {...attributes}>{children}</p>
+    ),
     []
   )
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const renderLeaf = useCallback(
+    (props: RenderLeafProps) => <Leaf {...props} />,
+    []
+  )
+  const editor = useMemo(
+    () => withHistory(withReact(createEditor())) as CustomEditor,
+    []
+  )
 
   const handleBlur = useCallback(() => ReactEditor.deselect(editor), [editor])
 
@@ -54,7 +71,7 @@ const IFrameExample = () => {
   )
 }
 
-const toggleMark = (editor, format) => {
+const toggleMark = (editor: CustomEditor, format: CustomTextKey) => {
   const isActive = isMarkActive(editor, format)
   if (isActive) {
     Editor.removeMark(editor, format)
@@ -63,12 +80,12 @@ const toggleMark = (editor, format) => {
   }
 }
 
-const isMarkActive = (editor, format) => {
+const isMarkActive = (editor: CustomEditor, format: CustomTextKey) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -88,12 +105,17 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const MarkButton = ({ format, icon }) => {
+interface MarkButtonProps {
+  format: CustomTextKey
+  icon: string
+}
+
+const MarkButton = ({ format, icon }: MarkButtonProps) => {
   const editor = useSlate()
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault()
         toggleMark(editor, format)
       }}
@@ -103,10 +125,16 @@ const MarkButton = ({ format, icon }) => {
   )
 }
 
-const IFrame = ({ children, ...props }) => {
-  const [iframeBody, setIframeBody] = useState(null)
-  const handleLoad = e => {
-    setIframeBody(e.target.contentDocument.body)
+interface IFrameProps extends React.IframeHTMLAttributes<HTMLIFrameElement> {
+  children: React.ReactNode
+}
+
+const IFrame = ({ children, ...props }: IFrameProps) => {
+  const [iframeBody, setIframeBody] = useState<HTMLElement | null>(null)
+  const handleLoad = (e: React.SyntheticEvent<HTMLIFrameElement>) => {
+    const iframe = e.target as HTMLIFrameElement
+    if (!iframe.contentDocument) return
+    setIframeBody(iframe.contentDocument.body)
   }
   return (
     <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>

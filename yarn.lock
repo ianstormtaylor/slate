@@ -3371,6 +3371,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/is-url@npm:^1.2.32":
+  version: 1.2.32
+  resolution: "@types/is-url@npm:1.2.32"
+  checksum: f76697c868680b3be88d7f18f9724a334c62a8dc1b0f40fad8dc725b2072ad74f38d50b4ce902c07a65bb081ae2782baf06f5b3334c64bd2679c35e0a12042c5
+  languageName: node
+  linkType: hard
+
 "@types/istanbul-lib-coverage@npm:*, @types/istanbul-lib-coverage@npm:^2.0.0, @types/istanbul-lib-coverage@npm:^2.0.1":
   version: 2.0.3
   resolution: "@types/istanbul-lib-coverage@npm:2.0.3"
@@ -13341,6 +13348,7 @@ __metadata:
     "@faker-js/faker": "npm:^8.2.0"
     "@playwright/test": "npm:^1.39.0"
     "@types/is-hotkey": "npm:^0.1.10"
+    "@types/is-url": "npm:^1.2.32"
     "@types/jest": "npm:29.5.6"
     "@types/lodash": "npm:^4.14.200"
     "@types/mocha": "npm:^10.0.3"

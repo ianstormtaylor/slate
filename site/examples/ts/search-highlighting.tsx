@@ -1,20 +1,21 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, Descendant, createEditor } from 'slate'
 import { css } from '@emotion/css'
+import { useCallback, useMemo, useState } from 'react'
+import { Descendant, Element, NodeEntry, Range, Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 
 import { Icon, Toolbar } from './components'
+import { CustomEditor, CustomText } from './custom-types.d'
 
 const SearchHighlightingExample = () => {
-  const [search, setSearch] = useState<string | undefined>()
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  const [search, setSearch] = useState<string>('')
+  const editor = useMemo(() => withHistory(withReact(createEditor())) as CustomEditor, [])
   const decorate = useCallback(
-    ([node, path]) => {
-      const ranges = []
-
+    ([node, path]: NodeEntry) => {
+      const ranges: Range[] = []
       if (
         search &&
+        Element.isElement(node) &&
         Array.isArray(node.children) &&
         node.children.every(Text.isText)
       ) {
@@ -92,19 +93,27 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable decorate={decorate} renderLeaf={props => <Leaf {...props} />} />
+      <Editable 
+        decorate={decorate} 
+        renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />} 
+      />
     </Slate>
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+interface HighlightLeaf extends CustomText {
+  highlight?: boolean
+}
+
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+  const highlightLeaf = leaf as HighlightLeaf
   return (
     <span
       {...attributes}
-      {...(leaf.highlight && { 'data-cy': 'search-highlighted' })}
+      {...(highlightLeaf.highlight && { 'data-cy': 'search-highlighted' })}
       className={css`
-        font-weight: ${leaf.bold && 'bold'};
-        background-color: ${leaf.highlight && '#ffeeba'};
+        font-weight: ${highlightLeaf.bold && 'bold'};
+        background-color: ${highlightLeaf.highlight && '#ffeeba'};
       `}
     >
       {children}

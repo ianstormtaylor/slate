@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import {
   createEditor,
   Descendant,
@@ -10,10 +10,15 @@ import {
   Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, ReactEditor, Slate, withReact } from 'slate-react'
-import { BulletedListElement } from './custom-types.d'
+import { Editable, ReactEditor, RenderElementProps, Slate, withReact } from 'slate-react'
 
-const SHORTCUTS = {
+import {
+  BulletedListElement,
+  CustomEditor,
+  CustomElementType,
+} from './custom-types.d'
+
+const SHORTCUTS: Record<string, CustomElementType> = {
   '*': 'list-item',
   '-': 'list-item',
   '+': 'list-item',
@@ -24,12 +29,12 @@ const SHORTCUTS = {
   '####': 'heading-four',
   '#####': 'heading-five',
   '######': 'heading-six',
-}
+} as const;
 
 const MarkdownShortcutsExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
   const editor = useMemo(
-    () => withShortcuts(withReact(withHistory(createEditor()))),
+    () => withShortcuts(withReact(withHistory(createEditor()))) as CustomEditor,
     []
   )
 
@@ -82,7 +87,7 @@ const MarkdownShortcutsExample = () => {
   )
 }
 
-const withShortcuts = editor => {
+const withShortcuts = (editor: CustomEditor) => {
   const { deleteBackward, insertText } = editor
 
   editor.insertText = text => {
@@ -177,7 +182,7 @@ const withShortcuts = editor => {
   return editor
 }
 
-const Element = ({ attributes, children, element }) => {
+const Element = ({ attributes, children, element }: RenderElementProps) => {
   switch (element.type) {
     case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>

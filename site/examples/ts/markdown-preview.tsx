@@ -1,28 +1,38 @@
+import { css } from '@emotion/css'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
-import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor, Descendant } from 'slate'
+import { useCallback, useMemo } from 'react'
+import { Descendant, NodeEntry, Range, Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from '@emotion/css'
+import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
+import { CustomEditor } from './custom-types.d'
 
 const MarkdownPreviewExample = () => {
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
-  const editor = useMemo(() => withHistory(withReact(createEditor())), [])
-  const decorate = useCallback(([node, path]) => {
-    const ranges = []
+  const renderLeaf = useCallback(
+    (props: RenderLeafProps) => <Leaf {...props} />,
+    []
+  )
+  const editor = useMemo(
+    () => withHistory(withReact(createEditor())) as CustomEditor,
+    []
+  )
+  const decorate = useCallback(([node, path]: NodeEntry) => {
+    const ranges: Range[] = []
 
     if (!Text.isText(node)) {
       return ranges
     }
 
-    const getLength = token => {
+    const getLength = (token: string | Prism.Token): number => {
       if (typeof token === 'string') {
         return token.length
       } else if (typeof token.content === 'string') {
         return token.content.length
       } else {
-        return token.content.reduce((l, t) => l + getLength(t), 0)
+        return (token.content as Prism.Token[]).reduce(
+          (l, t) => l + getLength(t),
+          0
+        )
       }
     }
 
@@ -58,7 +68,7 @@ const MarkdownPreviewExample = () => {
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   return (
     <span
       {...attributes}

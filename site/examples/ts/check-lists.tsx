@@ -20,7 +20,7 @@ import {
 } from 'slate'
 import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
-import { CheckListItemElement, CustomEditor } from './custom-types'
+import { CheckListItemElement, CustomEditor, RenderElementPropsFor } from './custom-types'
 
 const initialValue: Descendant[] = [
   {
@@ -136,8 +136,8 @@ const Element = (props: RenderElementProps) => {
   }
 }
 
-const CheckListItemElement = ({ attributes, children, element }: RenderElementProps) => {
-  const { checked } = element as CheckListItemElement
+const CheckListItemElement = ({ attributes, children, element }: RenderElementPropsFor<CheckListItemElement>) => {
+  const { checked } = element;
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
   return (

@@ -1,35 +1,52 @@
-import React, { useCallback, useMemo } from 'react'
-import { jsx } from 'slate-hyperscript'
-import { Transforms, createEditor, Descendant } from 'slate'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
+import { useCallback, useMemo } from 'react'
+import { Descendant, Transforms, createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import { jsx } from 'slate-hyperscript'
 import {
-  Slate,
   Editable,
-  withReact,
-  useSelected,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
   useFocused,
+  useSelected,
+  withReact,
 } from 'slate-react'
 
-const ELEMENT_TAGS = {
-  A: el => ({ type: 'link', url: el.getAttribute('href') }),
-  BLOCKQUOTE: () => ({ type: 'quote' }),
+import { CustomEditor, CustomElement, CustomElementType, ImageElement, RenderElementPropsFor } from './custom-types.d'
+
+interface ElementAttributes {
+  type: CustomElementType
+  url?: string
+}
+
+const ELEMENT_TAGS: Record<string, (el: HTMLElement) => ElementAttributes> = {
+  A: el => ({ type: 'link', url: el.getAttribute('href')! }),
+  BLOCKQUOTE: () => ({ type: 'block-quote' }),
   H1: () => ({ type: 'heading-one' }),
   H2: () => ({ type: 'heading-two' }),
   H3: () => ({ type: 'heading-three' }),
   H4: () => ({ type: 'heading-four' }),
   H5: () => ({ type: 'heading-five' }),
   H6: () => ({ type: 'heading-six' }),
-  IMG: el => ({ type: 'image', url: el.getAttribute('src') }),
+  IMG: el => ({ type: 'image', url: el.getAttribute('src')! }),
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'numbered-list' }),
   P: () => ({ type: 'paragraph' }),
-  PRE: () => ({ type: 'code' }),
+  PRE: () => ({ type: 'code-block' }),
   UL: () => ({ type: 'bulleted-list' }),
 }
 
 // COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
-const TEXT_TAGS = {
+interface TextAttributes {
+  code?: boolean
+  strikethrough?: boolean
+  italic?: boolean
+  bold?: boolean
+  underline?: boolean
+}
+
+const TEXT_TAGS: Record<string, () => TextAttributes> = {
   CODE: () => ({ code: true }),
   DEL: () => ({ strikethrough: true }),
   EM: () => ({ italic: true }),
@@ -39,7 +56,7 @@ const TEXT_TAGS = {
   U: () => ({ underline: true }),
 }
 
-export const deserialize = el => {
+export const deserialize = (el: HTMLElement | ChildNode): any => {
   if (el.nodeType === 3) {
     return el.textContent
   } else if (el.nodeType !== 1) {
@@ -69,12 +86,12 @@ export const deserialize = el => {
   }
 
   if (ELEMENT_TAGS[nodeName]) {
-    const attrs = ELEMENT_TAGS[nodeName](el)
+    const attrs = ELEMENT_TAGS[nodeName](el as HTMLElement)
     return jsx('element', attrs, children)
   }
 
   if (TEXT_TAGS[nodeName]) {
-    const attrs = TEXT_TAGS[nodeName](el)
+    const attrs = TEXT_TAGS[nodeName]()
     return children.map(child => jsx('text', attrs, child))
   }
 
@@ -82,10 +99,10 @@ export const deserialize = el => {
 }
 
 const PasteHtmlExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
   const editor = useMemo(
-    () => withHtml(withReact(withHistory(createEditor()))),
+    () => withHtml(withReact(withHistory(createEditor()))) as CustomEditor,
     []
   )
   return (
@@ -99,14 +116,14 @@ const PasteHtmlExample = () => {
   )
 }
 
-const withHtml = editor => {
+const withHtml = (editor: CustomEditor) => {
   const { insertData, isInline, isVoid } = editor
 
-  editor.isInline = element => {
+  editor.isInline = (element: CustomElement) => {
     return element.type === 'link' ? true : isInline(element)
   }
 
-  editor.isVoid = element => {
+  editor.isVoid = (element: CustomElement) => {
     return element.type === 'image' ? true : isVoid(element)
   }
 
@@ -126,15 +143,15 @@ const withHtml = editor => {
   return editor
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
     default:
       return <p {...attributes}>{children}</p>
-    case 'quote':
+    case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>
-    case 'code':
+    case 'code-block':
       return (
         <pre>
           <code {...attributes}>{children}</code>
@@ -160,7 +177,7 @@ const Element = props => {
       return <ol {...attributes}>{children}</ol>
     case 'link':
       return (
-        <SafeLink href={element.url} {...attributes}>
+        <SafeLink href={element.url} attributes={attributes}>
           {children}
         </SafeLink>
       )
@@ -171,9 +188,15 @@ const Element = props => {
 
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
 
-const SafeLink = ({ attributes, children, href }) => {
+interface SafeLinkProps {
+  attributes: Record<string, unknown>
+  children: React.ReactNode
+  href: string
+}
+
+const SafeLink = ({ children, href, attributes }: SafeLinkProps) => {
   const safeHref = useMemo(() => {
-    let parsedUrl: URL = null
+    let parsedUrl: URL | null = null
     try {
       parsedUrl = new URL(href)
       // eslint-disable-next-line no-empty
@@ -191,7 +214,7 @@ const SafeLink = ({ attributes, children, href }) => {
   )
 }
 
-const ImageElement = ({ attributes, children, element }) => {
+const ImageElement = ({ attributes, children, element }: RenderElementPropsFor<ImageElement>) => {
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -210,7 +233,7 @@ const ImageElement = ({ attributes, children, element }) => {
   )
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }

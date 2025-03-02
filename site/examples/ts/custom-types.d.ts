@@ -37,6 +37,30 @@ export type HeadingTwoElement = {
   children: Descendant[]
 }
 
+export type HeadingThreeElement = {
+  type: 'heading-three'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingFourElement = {
+  type: 'heading-four'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingFiveElement = {
+  type: 'heading-five'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingSixElement = {
+  type: 'heading-six'
+  align?: string
+  children: Descendant[]
+}
+
 export type ImageElement = {
   type: 'image'
   url: string
@@ -93,6 +117,10 @@ export type CustomElementWithAlign =
   | ParagraphElement
   | HeadingElement
   | HeadingTwoElement
+  | HeadingThreeElement
+  | HeadingFourElement
+  | HeadingFiveElement
+  | HeadingSixElement
   | BlockQuoteElement
   | BulletedListElement
 
@@ -103,6 +131,10 @@ type CustomElement =
   | EditableVoidElement
   | HeadingElement
   | HeadingTwoElement
+  | HeadingThreeElement
+  | HeadingFourElement
+  | HeadingFiveElement
+  | HeadingSixElement
   | ImageElement
   | LinkElement
   | ButtonElement
@@ -126,6 +158,13 @@ export type CustomText = {
   italic?: boolean
   code?: boolean
   underline?: boolean
+  strikethrough?: boolean
+  // MARKDOWN PREVIEW SPECIFIC LEAF
+  underlined?: boolean
+  title?: boolean
+  list?: boolean
+  hr?: boolean
+  blockquote?: boolean
   text: string
 }
 
@@ -133,6 +172,10 @@ export type CustomTextKey = keyof Omit<CustomText, 'text'>
 
 export type EmptyText = {
   text: string
+}
+
+export type RenderElementPropsFor<T> = RenderElementProps & {
+  element: T
 }
 
 export type CustomEditor = BaseEditor &
