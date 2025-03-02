@@ -56,7 +56,7 @@ const withImages = (editor: CustomEditor) => {
     const { files } = data
 
     if (files && files.length > 0) {
-      for (const file of files) {
+      Array.from(files).forEach(file => {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
 
@@ -68,7 +68,7 @@ const withImages = (editor: CustomEditor) => {
 
           reader.readAsDataURL(file)
         }
-      }
+      })
     } else if (isImageUrl(text)) {
       insertImage(editor, text)
     } else {
