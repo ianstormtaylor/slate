@@ -1,39 +1,39 @@
+import { css } from '@emotion/css'
+import isHotkey from 'is-hotkey'
 import Prism from 'prismjs'
+import 'prismjs/components/prism-java'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-typescript'
-import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-sql'
-import 'prismjs/components/prism-java'
-import React, { useCallback, useState } from 'react'
+import 'prismjs/components/prism-tsx'
+import 'prismjs/components/prism-typescript'
+import React, { ChangeEvent, MouseEvent, useCallback, useState } from 'react'
 import {
-  createEditor,
-  Node,
   Editor,
-  Range,
   Element,
-  Transforms,
+  Node,
   NodeEntry,
+  Range,
+  Transforms,
+  createEditor
 } from 'slate'
+import { withHistory } from 'slate-history'
 import {
-  withReact,
-  Slate,
   Editable,
+  ReactEditor,
   RenderElementProps,
   RenderLeafProps,
+  Slate,
   useSlate,
-  ReactEditor,
   useSlateStatic,
+  withReact,
 } from 'slate-react'
-import { withHistory } from 'slate-history'
-import isHotkey from 'is-hotkey'
-import { css } from '@emotion/css'
-import { CodeBlockElement } from './custom-types.d'
-import { normalizeTokens } from './utils/normalize-tokens'
 import { Button, Icon, Toolbar } from './components'
+import { CodeBlockElement, CodeLineElement, CustomEditor, CustomElement, CustomText } from './custom-types.d'
+import { normalizeTokens } from './utils/normalize-tokens'
 
 const ParagraphType = 'paragraph'
 const CodeBlockType = 'code-block'
@@ -139,7 +139,7 @@ const CodeBlockButton = () => {
     <Button
       data-test-id="code-block-button"
       active
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent<HTMLButtonElement>) => {
         event.preventDefault()
         handleClick()
       }}
@@ -160,11 +160,11 @@ const renderLeaf = (props: RenderLeafProps) => {
   )
 }
 
-const useDecorate = (editor: Editor) => {
+const useDecorate = (editor: CustomEditor) => {
   return useCallback(
-    ([node, path]) => {
+    ([node, path]: NodeEntry) => {
       if (Element.isElement(node) && node.type === CodeLineType) {
-        const ranges = editor.nodeToDecorations.get(node) || []
+        const ranges = editor.nodeToDecorations?.get(node) || []
         return ranges
       }
 
@@ -174,11 +174,20 @@ const useDecorate = (editor: Editor) => {
   )
 }
 
+interface TokenRange extends Range {
+  token: boolean
+  [key: string]: unknown
+}
+
+type EditorWithDecorations = CustomEditor & {
+  nodeToDecorations: Map<Element, TokenRange[]>
+}
+
 const getChildNodeToDecorations = ([
   block,
   blockPath,
-]: NodeEntry<CodeBlockElement>) => {
-  const nodeToDecorations = new Map<Element, Range[]>()
+]: NodeEntry<CodeBlockElement>): Map<Element, TokenRange[]> => {
+  const nodeToDecorations = new Map<Element, TokenRange[]>()
 
   const text = block.children.map(line => Node.string(line)).join('\n')
   const language = block.language
@@ -222,10 +231,10 @@ const getChildNodeToDecorations = ([
 
 // precalculate editor.nodeToDecorations map to use it inside decorate function then
 const SetNodeToDecorations = () => {
-  const editor = useSlate()
+  const editor = useSlate() as EditorWithDecorations
 
   const blockEntries = Array.from(
-    Editor.nodes(editor, {
+    Editor.nodes<CodeBlockElement>(editor, {
       at: [],
       mode: 'highest',
       match: n => Element.isElement(n) && n.type === CodeBlockType,
@@ -241,8 +250,8 @@ const SetNodeToDecorations = () => {
   return null
 }
 
-const useOnKeydown = (editor: Editor) => {
-  const onKeyDown: React.KeyboardEventHandler = useCallback(
+const useOnKeydown = (editor: CustomEditor) => {
+  const onKeyDown: React.KeyboardEventHandler<HTMLDivElement> = useCallback(
     e => {
       if (isHotkey('tab', e)) {
         // handle tab key, insert spaces
@@ -257,7 +266,12 @@ const useOnKeydown = (editor: Editor) => {
   return onKeyDown
 }
 
-const LanguageSelect = (props: JSX.IntrinsicElements['select']) => {
+interface LanguageSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+  value?: string
+  onChange: (event: ChangeEvent<HTMLSelectElement>) => void
+}
+
+const LanguageSelect = (props: LanguageSelectProps) => {
   return (
     <select
       data-test-id="language-select"
@@ -297,13 +311,13 @@ const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
   return map
 }
 
-const toChildren = (content: string) => [{ text: content }]
-const toCodeLines = (content: string): Element[] =>
+const toChildren = (content: string): CustomText[] => [{ text: content }]
+const toCodeLines = (content: string): CodeLineElement[] =>
   content
     .split('\n')
     .map(line => ({ type: CodeLineType, children: toChildren(line) }))
 
-const initialValue: Element[] = [
+const initialValue: CustomElement[] = [
   {
     type: ParagraphType,
     children: toChildren(

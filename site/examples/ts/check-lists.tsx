@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react'
+import React, { useMemo, useCallback, ChangeEvent } from 'react'
 import {
   Slate,
   Editable,
@@ -6,6 +6,7 @@ import {
   useSlateStatic,
   useReadOnly,
   ReactEditor,
+  RenderElementProps,
 } from 'slate-react'
 import {
   Editor,
@@ -15,9 +16,11 @@ import {
   createEditor,
   Descendant,
   Element as SlateElement,
+  BaseEditor,
 } from 'slate'
 import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
+import { CheckListItemElement, CustomEditor } from './custom-types'
 
 const initialValue: Descendant[] = [
   {
@@ -65,7 +68,7 @@ const initialValue: Descendant[] = [
 ]
 
 const CheckListsExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
     []
@@ -83,7 +86,7 @@ const CheckListsExample = () => {
   )
 }
 
-const withChecklists = editor => {
+const withChecklists = (editor: CustomEditor) => {
   const { deleteBackward } = editor
 
   editor.deleteBackward = (...args) => {
@@ -122,7 +125,7 @@ const withChecklists = editor => {
   return editor
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
@@ -133,10 +136,10 @@ const Element = props => {
   }
 }
 
-const CheckListItemElement = ({ attributes, children, element }) => {
+const CheckListItemElement = ({ attributes, children, element }: RenderElementProps) => {
+  const { checked } = element as CheckListItemElement
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
-  const { checked } = element
   return (
     <div
       {...attributes}
@@ -159,7 +162,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
         <input
           type="checkbox"
           checked={checked}
-          onChange={event => {
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const path = ReactEditor.findPath(editor, element)
             const newProperties: Partial<SlateElement> = {
               checked: event.target.checked,
