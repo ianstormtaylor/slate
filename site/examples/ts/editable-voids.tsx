@@ -1,12 +1,12 @@
-import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor, Descendant } from 'slate'
-import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
+import React, { MouseEvent, useMemo, useState } from 'react'
+import { createEditor, Descendant, Transforms } from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, RenderElementProps, Slate, useSlateStatic, withReact } from 'slate-react'
 
-import RichTextEditor from './richtext'
 import { Button, Icon, Toolbar } from './components'
-import { EditableVoidElement } from './custom-types.d'
+import { CustomEditor, EditableVoidElement } from './custom-types.d'
+import RichTextEditor from './richtext'
 
 const EditableVoidsExample = () => {
   const editor = useMemo(
@@ -28,7 +28,7 @@ const EditableVoidsExample = () => {
   )
 }
 
-const withEditableVoids = editor => {
+const withEditableVoids = (editor: CustomEditor) => {
   const { isVoid } = editor
 
   editor.isVoid = element => {
@@ -38,7 +38,7 @@ const withEditableVoids = editor => {
   return editor
 }
 
-const insertEditableVoid = editor => {
+const insertEditableVoid = (editor: CustomEditor) => {
   const text = { text: '' }
   const voidNode: EditableVoidElement = {
     type: 'editable-void',
@@ -47,7 +47,7 @@ const insertEditableVoid = editor => {
   Transforms.insertNodes(editor, voidNode)
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
@@ -62,7 +62,7 @@ const unsetWidthStyle = css`
   width: unset;
 `
 
-const EditableVoid = ({ attributes, children, element }) => {
+const EditableVoid = ({ attributes, children, element }: RenderElementProps) => {
   const [inputValue, setInputValue] = useState('')
 
   return (
@@ -81,7 +81,7 @@ const EditableVoid = ({ attributes, children, element }) => {
           `}
           type="text"
           value={inputValue}
-          onChange={e => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setInputValue(e.target.value)
           }}
         />
@@ -120,7 +120,7 @@ const InsertEditableVoidButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
         event.preventDefault()
         insertEditableVoid(editor)
       }}
