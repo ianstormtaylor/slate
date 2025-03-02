@@ -26,7 +26,7 @@ export type EditableVoidElement = {
 }
 
 export type HeadingElement = {
-  type: 'heading'
+  type: 'heading-one'
   align?: string
   children: Descendant[]
 }
@@ -50,6 +50,11 @@ export type ButtonElement = { type: 'button'; children: Descendant[] }
 export type BadgeElement = { type: 'badge'; children: Descendant[] }
 
 export type ListItemElement = { type: 'list-item'; children: Descendant[] }
+
+export type NumberedListItemElement = {
+  type: 'numbered-list'
+  children: Descendant[]
+}
 
 export type MentionElement = {
   type: 'mention'
@@ -84,6 +89,13 @@ export type CodeLineElement = {
   children: Descendant[]
 }
 
+export type CustomElementWithAlign =
+  | ParagraphElement
+  | HeadingElement
+  | HeadingTwoElement
+  | BlockQuoteElement
+  | BulletedListElement
+
 type CustomElement =
   | BlockQuoteElement
   | BulletedListElement
@@ -96,6 +108,7 @@ type CustomElement =
   | ButtonElement
   | BadgeElement
   | ListItemElement
+  | NumberedListItemElement
   | MentionElement
   | ParagraphElement
   | TableElement
@@ -106,12 +119,17 @@ type CustomElement =
   | CodeBlockElement
   | CodeLineElement
 
+export type CustomElementType = CustomElement['type']
+
 export type CustomText = {
   bold?: boolean
   italic?: boolean
   code?: boolean
+  underline?: boolean
   text: string
 }
+
+export type CustomTextKey = keyof Omit<CustomText, 'text'>
 
 export type EmptyText = {
   text: string
@@ -127,7 +145,7 @@ declare module 'slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
-    Text: CustomText | EmptyText
+    Text: CustomText
     Range: BaseRange & {
       [key: string]: unknown
     }

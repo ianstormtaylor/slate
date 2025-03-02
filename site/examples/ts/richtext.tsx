@@ -1,30 +1,34 @@
-import React, { useCallback, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate } from 'slate-react'
+import { KeyboardEvent, MouseEvent, useCallback, useMemo } from 'react'
 import {
+  Descendant,
   Editor,
+  Element as SlateElement,
   Transforms,
   createEditor,
-  Descendant,
-  Element as SlateElement,
 } from 'slate'
 import { withHistory } from 'slate-history'
-
+import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
+import { CustomEditor, CustomElement, CustomElementType, CustomElementWithAlign, CustomTextKey } from './custom-types'
 
-const HOTKEYS = {
+const HOTKEYS: Record<string, CustomTextKey> = {
   'mod+b': 'bold',
   'mod+i': 'italic',
   'mod+u': 'underline',
   'mod+`': 'code',
 }
 
-const LIST_TYPES = ['numbered-list', 'bulleted-list']
-const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify']
+const LIST_TYPES = ['numbered-list', 'bulleted-list'] as const
+const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'] as const
+
+type AlignType = typeof TEXT_ALIGN_TYPES[number]
+type ListType = typeof LIST_TYPES[number]
+type CustomElementFormat = CustomElementType | AlignType | ListType
 
 const RichTextExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -50,7 +54,7 @@ const RichTextExample = () => {
         placeholder="Enter some rich text…"
         spellCheck
         autoFocus
-        onKeyDown={event => {
+        onKeyDown={(event: KeyboardEvent<HTMLDivElement>) => {
           for (const hotkey in HOTKEYS) {
             if (isHotkey(hotkey, event as any)) {
               event.preventDefault()
@@ -64,24 +68,24 @@ const RichTextExample = () => {
   )
 }
 
-const toggleBlock = (editor, format) => {
+const toggleBlock = (editor: CustomEditor, format: CustomElementFormat) => {
   const isActive = isBlockActive(
     editor,
     format,
-    TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+    isAlignType(format) ? 'align' : 'type'
   )
-  const isList = LIST_TYPES.includes(format)
+  const isList = isListType(format)
 
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type) &&
-      !TEXT_ALIGN_TYPES.includes(format),
+      isListType(n.type) &&
+      !isAlignType(format),
     split: true,
   })
   let newProperties: Partial<SlateElement>
-  if (TEXT_ALIGN_TYPES.includes(format)) {
+  if (isAlignType(format)) {
     newProperties = {
       align: isActive ? undefined : format,
     }
@@ -98,7 +102,7 @@ const toggleBlock = (editor, format) => {
   }
 }
 
-const toggleMark = (editor, format) => {
+const toggleMark = (editor: CustomEditor, format: CustomTextKey) => {
   const isActive = isMarkActive(editor, format)
 
   if (isActive) {
@@ -108,30 +112,38 @@ const toggleMark = (editor, format) => {
   }
 }
 
-const isBlockActive = (editor, format, blockType = 'type') => {
+const isBlockActive = (editor: CustomEditor, format: CustomElementFormat, blockType: 'type' | 'align' = 'type') => {
   const { selection } = editor
   if (!selection) return false
 
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: n =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        n[blockType] === format,
+      match: n => {
+        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+          if (blockType === 'align' && isAlignElement(n)) {
+            return n.align === format
+          }
+          return n.type === format
+        }
+        return false
+      },
     })
   )
 
   return !!match
 }
 
-const isMarkActive = (editor, format) => {
+const isMarkActive = (editor: CustomEditor, format: CustomTextKey) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
 }
 
-const Element = ({ attributes, children, element }) => {
-  const style = { textAlign: element.align }
+const Element = ({ attributes, children, element }: RenderElementProps) => {
+  const style: React.CSSProperties = {};
+  if (isAlignElement(element)) {
+    style.textAlign = element.align as AlignType;
+  }
   switch (element.type) {
     case 'block-quote':
       return (
@@ -178,7 +190,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -198,16 +210,21 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const BlockButton = ({ format, icon }) => {
+interface BlockButtonProps {
+  format: CustomElementFormat
+  icon: string
+}
+
+const BlockButton = ({ format, icon }: BlockButtonProps) => {
   const editor = useSlate()
   return (
     <Button
       active={isBlockActive(
         editor,
         format,
-        TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+        isAlignType(format) ? 'align' : 'type'
       )}
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
         event.preventDefault()
         toggleBlock(editor, format)
       }}
@@ -217,12 +234,17 @@ const BlockButton = ({ format, icon }) => {
   )
 }
 
-const MarkButton = ({ format, icon }) => {
+interface MarkButtonProps {
+  format: CustomTextKey
+  icon: string
+}
+
+const MarkButton = ({ format, icon }: MarkButtonProps) => {
   const editor = useSlate()
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
         event.preventDefault()
         toggleMark(editor, format)
       }}
@@ -230,6 +252,18 @@ const MarkButton = ({ format, icon }) => {
       <Icon>{icon}</Icon>
     </Button>
   )
+}
+
+const isAlignType = (format: CustomElementFormat): format is AlignType => {
+  return TEXT_ALIGN_TYPES.includes(format as AlignType)
+}
+
+const isListType = (format: CustomElementFormat): format is ListType => {
+  return LIST_TYPES.includes(format as ListType)
+}
+
+const isAlignElement = (element: CustomElement): element is CustomElementWithAlign => {
+  return 'align' in element;
 }
 
 const initialValue: Descendant[] = [

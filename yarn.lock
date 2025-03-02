@@ -3357,6 +3357,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/is-hotkey@npm:^0.1.10":
+  version: 0.1.10
+  resolution: "@types/is-hotkey@npm:0.1.10"
+  checksum: 9ecc49fb3822b3cfa8335132d54c6e577d0b14bb52d0bf1f817cdd19c442555b7523945e2ae72f6098e3c7f64b4777390f38afec3e4660343cfb471377e7fd82
+  languageName: node
+  linkType: hard
+
 "@types/is-hotkey@npm:^0.1.8":
   version: 0.1.8
   resolution: "@types/is-hotkey@npm:0.1.8"
@@ -13333,6 +13340,7 @@ __metadata:
     "@emotion/css": "npm:^11.11.2"
     "@faker-js/faker": "npm:^8.2.0"
     "@playwright/test": "npm:^1.39.0"
+    "@types/is-hotkey": "npm:^0.1.10"
     "@types/jest": "npm:29.5.6"
     "@types/lodash": "npm:^4.14.200"
     "@types/mocha": "npm:^10.0.3"
