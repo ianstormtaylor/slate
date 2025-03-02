@@ -1,7 +1,7 @@
 import { css } from '@emotion/css'
 import { isKeyHotkey } from 'is-hotkey'
 import isUrl from 'is-url'
-import { MouseEvent, useMemo } from 'react'
+import React, { MouseEvent, useMemo } from 'react'
 import {
   createEditor,
   Descendant,
@@ -258,10 +258,14 @@ const InlineChromiumBugfix = () => (
 
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
 
-const LinkComponent = ({ attributes, children, element }: RenderElementPropsFor<LinkElement>) => {
+const LinkComponent = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<LinkElement>) => {
   const selected = useSelected()
   const safeUrl = useMemo(() => {
-    let parsedUrl: URL | null = null;
+    let parsedUrl: URL | null = null
     try {
       parsedUrl = new URL(element.url)
       // eslint-disable-next-line no-empty
@@ -291,7 +295,10 @@ const LinkComponent = ({ attributes, children, element }: RenderElementPropsFor<
   )
 }
 
-const EditableButtonComponent = ({ attributes, children }: RenderElementProps) => {
+const EditableButtonComponent = ({
+  attributes,
+  children,
+}: RenderElementProps) => {
   return (
     /*
       Note that this is not a true button, but a span with button-like CSS.
@@ -323,7 +330,11 @@ const EditableButtonComponent = ({ attributes, children }: RenderElementProps) =
   )
 }
 
-const BadgeComponent = ({ attributes, children, element }: RenderElementProps) => {
+const BadgeComponent = ({
+  attributes,
+  children,
+  element,
+}: RenderElementProps) => {
   const selected = useSelected()
 
   return (

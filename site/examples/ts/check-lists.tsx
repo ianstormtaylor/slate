@@ -1,26 +1,29 @@
-import React, { useMemo, useCallback, ChangeEvent } from 'react'
+import { css } from '@emotion/css'
+import React, { ChangeEvent, useCallback, useMemo } from 'react'
 import {
-  Slate,
+  Descendant,
+  Editor,
+  Point,
+  Range,
+  Element as SlateElement,
+  Transforms,
+  createEditor,
+} from 'slate'
+import { withHistory } from 'slate-history'
+import {
   Editable,
-  withReact,
-  useSlateStatic,
-  useReadOnly,
   ReactEditor,
   RenderElementProps,
+  Slate,
+  useReadOnly,
+  useSlateStatic,
+  withReact,
 } from 'slate-react'
 import {
-  Editor,
-  Transforms,
-  Range,
-  Point,
-  createEditor,
-  Descendant,
-  Element as SlateElement,
-  BaseEditor,
-} from 'slate'
-import { css } from '@emotion/css'
-import { withHistory } from 'slate-history'
-import { CheckListItemElement, CustomEditor, RenderElementPropsFor } from './custom-types'
+  CheckListItemElement as CheckListItemType,
+  CustomEditor,
+  RenderElementPropsFor,
+} from './custom-types.d'
 
 const initialValue: Descendant[] = [
   {
@@ -68,7 +71,10 @@ const initialValue: Descendant[] = [
 ]
 
 const CheckListsExample = () => {
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
     []
@@ -136,8 +142,12 @@ const Element = (props: RenderElementProps) => {
   }
 }
 
-const CheckListItemElement = ({ attributes, children, element }: RenderElementPropsFor<CheckListItemElement>) => {
-  const { checked } = element;
+const CheckListItemElement = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<CheckListItemType>) => {
+  const { checked } = element
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
   return (

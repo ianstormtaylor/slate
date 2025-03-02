@@ -2,7 +2,7 @@ import { css } from '@emotion/css'
 import imageExtensions from 'image-extensions'
 import isHotkey from 'is-hotkey'
 import isUrl from 'is-url'
-import { MouseEvent, useMemo } from 'react'
+import React, { MouseEvent, useMemo } from 'react'
 import { Descendant, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -17,7 +17,12 @@ import {
 } from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
-import { CustomEditor, ImageElement, ParagraphElement, RenderElementPropsFor } from './custom-types.d'
+import {
+  CustomEditor,
+  ImageElement,
+  ParagraphElement,
+  RenderElementPropsFor,
+} from './custom-types.d'
 
 const ImagesExample = () => {
   const editor = useMemo(
@@ -31,7 +36,7 @@ const ImagesExample = () => {
         <InsertImageButton />
       </Toolbar>
       <Editable
-        onKeyDown={(event) => {
+        onKeyDown={event => {
           if (isHotkey('mod+a', event)) {
             event.preventDefault()
             Transforms.select(editor, [])
@@ -101,7 +106,11 @@ const Element = (props: RenderElementProps) => {
   }
 }
 
-const Image = ({ attributes, children, element }: RenderElementPropsFor<ImageElement>) => {
+const Image = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<ImageElement>) => {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, element)
   const selected = useSelected()

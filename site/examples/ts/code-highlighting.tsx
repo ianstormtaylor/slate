@@ -18,7 +18,7 @@ import {
   NodeEntry,
   Range,
   Transforms,
-  createEditor
+  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -32,7 +32,13 @@ import {
   withReact,
 } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
-import { CodeBlockElement, CodeLineElement, CustomEditor, CustomElement, CustomText } from './custom-types.d'
+import {
+  CodeBlockElement,
+  CodeLineElement,
+  CustomEditor,
+  CustomElement,
+  CustomText,
+} from './custom-types.d'
 import { normalizeTokens } from './utils/normalize-tokens'
 
 const ParagraphType = 'paragraph'
@@ -266,7 +272,8 @@ const useOnKeydown = (editor: CustomEditor) => {
   return onKeyDown
 }
 
-interface LanguageSelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface LanguageSelectProps
+  extends React.SelectHTMLAttributes<HTMLSelectElement> {
   value?: string
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void
 }

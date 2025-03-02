@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import { KeyboardEvent, MouseEvent, useCallback, useMemo } from 'react'
+import React, { KeyboardEvent, MouseEvent, useCallback, useMemo } from 'react'
 import {
   Descendant,
   Editor,
@@ -8,9 +8,22 @@ import {
   createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, RenderElementProps, RenderLeafProps, Slate, useSlate, withReact } from 'slate-react'
+import {
+  Editable,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  useSlate,
+  withReact,
+} from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
-import { CustomEditor, CustomElement, CustomElementType, CustomElementWithAlign, CustomTextKey } from './custom-types'
+import {
+  CustomEditor,
+  CustomElement,
+  CustomElementType,
+  CustomElementWithAlign,
+  CustomTextKey,
+} from './custom-types.d'
 
 const HOTKEYS: Record<string, CustomTextKey> = {
   'mod+b': 'bold',
@@ -22,13 +35,19 @@ const HOTKEYS: Record<string, CustomTextKey> = {
 const LIST_TYPES = ['numbered-list', 'bulleted-list'] as const
 const TEXT_ALIGN_TYPES = ['left', 'center', 'right', 'justify'] as const
 
-type AlignType = typeof TEXT_ALIGN_TYPES[number]
-type ListType = typeof LIST_TYPES[number]
+type AlignType = (typeof TEXT_ALIGN_TYPES)[number]
+type ListType = (typeof LIST_TYPES)[number]
 type CustomElementFormat = CustomElementType | AlignType | ListType
 
 const RichTextExample = () => {
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
-  const renderLeaf = useCallback((props: RenderLeafProps) => <Leaf {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
+  const renderLeaf = useCallback(
+    (props: RenderLeafProps) => <Leaf {...props} />,
+    []
+  )
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
 
   return (
@@ -112,7 +131,11 @@ const toggleMark = (editor: CustomEditor, format: CustomTextKey) => {
   }
 }
 
-const isBlockActive = (editor: CustomEditor, format: CustomElementFormat, blockType: 'type' | 'align' = 'type') => {
+const isBlockActive = (
+  editor: CustomEditor,
+  format: CustomElementFormat,
+  blockType: 'type' | 'align' = 'type'
+) => {
   const { selection } = editor
   if (!selection) return false
 
@@ -140,9 +163,9 @@ const isMarkActive = (editor: CustomEditor, format: CustomTextKey) => {
 }
 
 const Element = ({ attributes, children, element }: RenderElementProps) => {
-  const style: React.CSSProperties = {};
+  const style: React.CSSProperties = {}
   if (isAlignElement(element)) {
-    style.textAlign = element.align as AlignType;
+    style.textAlign = element.align as AlignType
   }
   switch (element.type) {
     case 'block-quote':
@@ -262,8 +285,10 @@ const isListType = (format: CustomElementFormat): format is ListType => {
   return LIST_TYPES.includes(format as ListType)
 }
 
-const isAlignElement = (element: CustomElement): element is CustomElementWithAlign => {
-  return 'align' in element;
+const isAlignElement = (
+  element: CustomElement
+): element is CustomElementWithAlign => {
+  return 'align' in element
 }
 
 const initialValue: Descendant[] = [

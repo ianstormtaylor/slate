@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import {
   createEditor,
   Descendant,
@@ -10,7 +10,13 @@ import {
   Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, ReactEditor, RenderElementProps, Slate, withReact } from 'slate-react'
+import {
+  Editable,
+  ReactEditor,
+  RenderElementProps,
+  Slate,
+  withReact,
+} from 'slate-react'
 
 import {
   BulletedListElement,
@@ -29,10 +35,13 @@ const SHORTCUTS: Record<string, CustomElementType> = {
   '####': 'heading-four',
   '#####': 'heading-five',
   '######': 'heading-six',
-} as const;
+} as const
 
 const MarkdownShortcutsExample = () => {
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(
     () => withShortcuts(withReact(withHistory(createEditor()))) as CustomEditor,
     []

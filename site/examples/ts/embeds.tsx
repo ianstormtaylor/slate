@@ -13,7 +13,11 @@ import {
   ReactEditor,
   RenderElementProps,
 } from 'slate-react'
-import { CustomEditor, RenderElementPropsFor, VideoElement as VideoElementType } from './custom-types.d'
+import {
+  CustomEditor,
+  RenderElementPropsFor,
+  VideoElement as VideoElementType,
+} from './custom-types.d'
 
 const EmbedsExample = () => {
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
@@ -45,12 +49,16 @@ const Element = (props: RenderElementProps) => {
 
 const allowedSchemes = ['http:', 'https:']
 
-const VideoElement = ({ attributes, children, element }: RenderElementPropsFor<VideoElementType>) => {
+const VideoElement = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<VideoElementType>) => {
   const editor = useSlateStatic()
-  const { url } = element;
+  const { url } = element
 
   const safeUrl = useMemo(() => {
-    let parsedUrl: URL | null = null;
+    let parsedUrl: URL | null = null
     try {
       parsedUrl = new URL(url)
       // eslint-disable-next-line no-empty

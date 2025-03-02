@@ -1,9 +1,13 @@
 import { faker } from '@faker-js/faker'
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { createEditor, Descendant } from 'slate'
 import { Editable, RenderElementProps, Slate, withReact } from 'slate-react'
 
-import { CustomEditor, HeadingElement, ParagraphElement } from './custom-types.d'
+import {
+  CustomEditor,
+  HeadingElement,
+  ParagraphElement,
+} from './custom-types.d'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
@@ -26,7 +30,10 @@ for (let h = 0; h < HEADINGS; h++) {
 }
 
 const HugeDocumentExample = () => {
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(() => withReact(createEditor()) as CustomEditor, [])
   return (
     <Slate editor={editor} initialValue={initialValue}>

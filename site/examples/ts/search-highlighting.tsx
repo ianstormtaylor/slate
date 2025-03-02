@@ -1,6 +1,13 @@
 import { css } from '@emotion/css'
-import { useCallback, useMemo, useState } from 'react'
-import { Descendant, Element, NodeEntry, Range, Text, createEditor } from 'slate'
+import React, { useCallback, useMemo, useState } from 'react'
+import {
+  Descendant,
+  Element,
+  NodeEntry,
+  Range,
+  Text,
+  createEditor,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, RenderLeafProps, Slate, withReact } from 'slate-react'
 
@@ -9,7 +16,10 @@ import { CustomEditor, CustomText } from './custom-types.d'
 
 const SearchHighlightingExample = () => {
   const [search, setSearch] = useState<string>('')
-  const editor = useMemo(() => withHistory(withReact(createEditor())) as CustomEditor, [])
+  const editor = useMemo(
+    () => withHistory(withReact(createEditor())) as CustomEditor,
+    []
+  )
   const decorate = useCallback(
     ([node, path]: NodeEntry) => {
       const ranges: Range[] = []
@@ -93,9 +103,9 @@ const SearchHighlightingExample = () => {
           />
         </div>
       </Toolbar>
-      <Editable 
-        decorate={decorate} 
-        renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />} 
+      <Editable
+        decorate={decorate}
+        renderLeaf={(props: RenderLeafProps) => <Leaf {...props} />}
       />
     </Slate>
   )

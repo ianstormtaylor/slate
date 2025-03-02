@@ -1,164 +1,227 @@
-import { css } from '@emotion/css';
-import isHotkey from 'is-hotkey';
-import Prism from 'prismjs';
-import 'prismjs/components/prism-java';
-import 'prismjs/components/prism-javascript';
-import 'prismjs/components/prism-jsx';
-import 'prismjs/components/prism-markdown';
-import 'prismjs/components/prism-php';
-import 'prismjs/components/prism-python';
-import 'prismjs/components/prism-sql';
-import 'prismjs/components/prism-tsx';
-import 'prismjs/components/prism-typescript';
-import React, { useCallback, useState } from 'react';
-import { Editor, Element, Node, Transforms, createEditor } from 'slate';
-import { withHistory } from 'slate-history';
-import { Editable, ReactEditor, Slate, useSlate, useSlateStatic, withReact, } from 'slate-react';
-import { Button, Icon, Toolbar } from './components';
-import { normalizeTokens } from './utils/normalize-tokens';
-const ParagraphType = 'paragraph';
-const CodeBlockType = 'code-block';
-const CodeLineType = 'code-line';
+import { css } from '@emotion/css'
+import isHotkey from 'is-hotkey'
+import Prism from 'prismjs'
+import 'prismjs/components/prism-java'
+import 'prismjs/components/prism-javascript'
+import 'prismjs/components/prism-jsx'
+import 'prismjs/components/prism-markdown'
+import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-python'
+import 'prismjs/components/prism-sql'
+import 'prismjs/components/prism-tsx'
+import 'prismjs/components/prism-typescript'
+import React, { useCallback, useState } from 'react'
+import { Editor, Element, Node, Transforms, createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import {
+  Editable,
+  ReactEditor,
+  Slate,
+  useSlate,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
+import { Button, Icon, Toolbar } from './components'
+import { normalizeTokens } from './utils/normalize-tokens'
+
+const ParagraphType = 'paragraph'
+const CodeBlockType = 'code-block'
+const CodeLineType = 'code-line'
 const CodeHighlightingExample = () => {
-    const [editor] = useState(() => withHistory(withReact(createEditor())));
-    const decorate = useDecorate(editor);
-    const onKeyDown = useOnKeydown(editor);
-    return (<Slate editor={editor} initialValue={initialValue}>
+  const [editor] = useState(() => withHistory(withReact(createEditor())))
+  const decorate = useDecorate(editor)
+  const onKeyDown = useOnKeydown(editor)
+  return (
+    <Slate editor={editor} initialValue={initialValue}>
       <ExampleToolbar />
       <SetNodeToDecorations />
-      <Editable decorate={decorate} renderElement={ElementWrapper} renderLeaf={renderLeaf} onKeyDown={onKeyDown}/>
+      <Editable
+        decorate={decorate}
+        renderElement={ElementWrapper}
+        renderLeaf={renderLeaf}
+        onKeyDown={onKeyDown}
+      />
       <style>{prismThemeCss}</style>
-    </Slate>);
-};
-const ElementWrapper = (props) => {
-    const { attributes, children, element } = props;
-    const editor = useSlateStatic();
-    if (element.type === CodeBlockType) {
-        const setLanguage = (language) => {
-            const path = ReactEditor.findPath(editor, element);
-            Transforms.setNodes(editor, { language }, { at: path });
-        };
-        return (<div {...attributes} className={css(`
+    </Slate>
+  )
+}
+const ElementWrapper = props => {
+  const { attributes, children, element } = props
+  const editor = useSlateStatic()
+  if (element.type === CodeBlockType) {
+    const setLanguage = language => {
+      const path = ReactEditor.findPath(editor, element)
+      Transforms.setNodes(editor, { language }, { at: path })
+    }
+    return (
+      <div
+        {...attributes}
+        className={css(`
         font-family: monospace;
         font-size: 16px;
         line-height: 20px;
         margin-top: 0;
         background: rgba(0, 20, 60, .03);
         padding: 5px 13px;
-      `)} style={{ position: 'relative' }} spellCheck={false}>
-        <LanguageSelect value={element.language} onChange={e => setLanguage(e.target.value)}/>
+      `)}
+        style={{ position: 'relative' }}
+        spellCheck={false}
+      >
+        <LanguageSelect
+          value={element.language}
+          onChange={e => setLanguage(e.target.value)}
+        />
         {children}
-      </div>);
-    }
-    if (element.type === CodeLineType) {
-        return (<div {...attributes} style={{ position: 'relative' }}>
+      </div>
+    )
+  }
+  if (element.type === CodeLineType) {
+    return (
+      <div {...attributes} style={{ position: 'relative' }}>
         {children}
-      </div>);
-    }
-    const Tag = editor.isInline(element) ? 'span' : 'div';
-    return (<Tag {...attributes} style={{ position: 'relative' }}>
+      </div>
+    )
+  }
+  const Tag = editor.isInline(element) ? 'span' : 'div'
+  return (
+    <Tag {...attributes} style={{ position: 'relative' }}>
       {children}
-    </Tag>);
-};
+    </Tag>
+  )
+}
 const ExampleToolbar = () => {
-    return (<Toolbar>
+  return (
+    <Toolbar>
       <CodeBlockButton />
-    </Toolbar>);
-};
+    </Toolbar>
+  )
+}
 const CodeBlockButton = () => {
-    const editor = useSlateStatic();
-    const handleClick = () => {
-        Transforms.wrapNodes(editor, { type: CodeBlockType, language: 'html', children: [] }, {
-            match: n => Element.isElement(n) && n.type === ParagraphType,
-            split: true,
-        });
-        Transforms.setNodes(editor, { type: CodeLineType }, { match: n => Element.isElement(n) && n.type === ParagraphType });
-    };
-    return (<Button data-test-id="code-block-button" active onMouseDown={(event) => {
-            event.preventDefault();
-            handleClick();
-        }}>
+  const editor = useSlateStatic()
+  const handleClick = () => {
+    Transforms.wrapNodes(
+      editor,
+      { type: CodeBlockType, language: 'html', children: [] },
+      {
+        match: n => Element.isElement(n) && n.type === ParagraphType,
+        split: true,
+      }
+    )
+    Transforms.setNodes(
+      editor,
+      { type: CodeLineType },
+      { match: n => Element.isElement(n) && n.type === ParagraphType }
+    )
+  }
+  return (
+    <Button
+      data-test-id="code-block-button"
+      active
+      onMouseDown={event => {
+        event.preventDefault()
+        handleClick()
+      }}
+    >
       <Icon>code</Icon>
-    </Button>);
-};
-const renderLeaf = (props) => {
-    const { attributes, children, leaf } = props;
-    const { text, ...rest } = leaf;
-    return (<span {...attributes} className={Object.keys(rest).join(' ')}>
+    </Button>
+  )
+}
+const renderLeaf = props => {
+  const { attributes, children, leaf } = props
+  const { text, ...rest } = leaf
+  return (
+    <span {...attributes} className={Object.keys(rest).join(' ')}>
       {children}
-    </span>);
-};
-const useDecorate = (editor) => {
-    return useCallback(([node, path]) => {
-        if (Element.isElement(node) && node.type === CodeLineType) {
-            const ranges = editor.nodeToDecorations?.get(node) || [];
-            return ranges;
-        }
-        return [];
-    }, [editor.nodeToDecorations]);
-};
-const getChildNodeToDecorations = ([block, blockPath,]) => {
-    const nodeToDecorations = new Map();
-    const text = block.children.map(line => Node.string(line)).join('\n');
-    const language = block.language;
-    const tokens = Prism.tokenize(text, Prism.languages[language]);
-    const normalizedTokens = normalizeTokens(tokens); // make tokens flat and grouped by line
-    const blockChildren = block.children;
-    for (let index = 0; index < normalizedTokens.length; index++) {
-        const tokens = normalizedTokens[index];
-        const element = blockChildren[index];
-        if (!nodeToDecorations.has(element)) {
-            nodeToDecorations.set(element, []);
-        }
-        let start = 0;
-        for (const token of tokens) {
-            const length = token.content.length;
-            if (!length) {
-                continue;
-            }
-            const end = start + length;
-            const path = [...blockPath, index, 0];
-            const range = {
-                anchor: { path, offset: start },
-                focus: { path, offset: end },
-                token: true,
-                ...Object.fromEntries(token.types.map(type => [type, true])),
-            };
-            nodeToDecorations.get(element).push(range);
-            start = end;
-        }
+    </span>
+  )
+}
+const useDecorate = editor => {
+  return useCallback(
+    ([node, path]) => {
+      if (Element.isElement(node) && node.type === CodeLineType) {
+        const ranges = editor.nodeToDecorations?.get(node) || []
+        return ranges
+      }
+      return []
+    },
+    [editor.nodeToDecorations]
+  )
+}
+const getChildNodeToDecorations = ([block, blockPath]) => {
+  const nodeToDecorations = new Map()
+  const text = block.children.map(line => Node.string(line)).join('\n')
+  const language = block.language
+  const tokens = Prism.tokenize(text, Prism.languages[language])
+  const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
+  const blockChildren = block.children
+  for (let index = 0; index < normalizedTokens.length; index++) {
+    const tokens = normalizedTokens[index]
+    const element = blockChildren[index]
+    if (!nodeToDecorations.has(element)) {
+      nodeToDecorations.set(element, [])
     }
-    return nodeToDecorations;
-};
+    let start = 0
+    for (const token of tokens) {
+      const length = token.content.length
+      if (!length) {
+        continue
+      }
+      const end = start + length
+      const path = [...blockPath, index, 0]
+      const range = {
+        anchor: { path, offset: start },
+        focus: { path, offset: end },
+        token: true,
+        ...Object.fromEntries(token.types.map(type => [type, true])),
+      }
+      nodeToDecorations.get(element).push(range)
+      start = end
+    }
+  }
+  return nodeToDecorations
+}
 // precalculate editor.nodeToDecorations map to use it inside decorate function then
 const SetNodeToDecorations = () => {
-    const editor = useSlate();
-    const blockEntries = Array.from(Editor.nodes(editor, {
-        at: [],
-        mode: 'highest',
-        match: n => Element.isElement(n) && n.type === CodeBlockType,
-    }));
-    const nodeToDecorations = mergeMaps(...blockEntries.map(getChildNodeToDecorations));
-    editor.nodeToDecorations = nodeToDecorations;
-    return null;
-};
-const useOnKeydown = (editor) => {
-    const onKeyDown = useCallback(e => {
-        if (isHotkey('tab', e)) {
-            // handle tab key, insert spaces
-            e.preventDefault();
-            Editor.insertText(editor, '  ');
-        }
-    }, [editor]);
-    return onKeyDown;
-};
-const LanguageSelect = (props) => {
-    return (<select data-test-id="language-select" contentEditable={false} className={css `
+  const editor = useSlate()
+  const blockEntries = Array.from(
+    Editor.nodes(editor, {
+      at: [],
+      mode: 'highest',
+      match: n => Element.isElement(n) && n.type === CodeBlockType,
+    })
+  )
+  const nodeToDecorations = mergeMaps(
+    ...blockEntries.map(getChildNodeToDecorations)
+  )
+  editor.nodeToDecorations = nodeToDecorations
+  return null
+}
+const useOnKeydown = editor => {
+  const onKeyDown = useCallback(
+    e => {
+      if (isHotkey('tab', e)) {
+        // handle tab key, insert spaces
+        e.preventDefault()
+        Editor.insertText(editor, '  ')
+      }
+    },
+    [editor]
+  )
+  return onKeyDown
+}
+const LanguageSelect = props => {
+  return (
+    <select
+      data-test-id="language-select"
+      contentEditable={false}
+      className={css`
         position: absolute;
         right: 5px;
         top: 5px;
         z-index: 1;
-      `} {...props}>
+      `}
+      {...props}
+    >
       <option value="css">CSS</option>
       <option value="html">HTML</option>
       <option value="java">Java</option>
@@ -170,30 +233,34 @@ const LanguageSelect = (props) => {
       <option value="sql">SQL</option>
       <option value="tsx">TSX</option>
       <option value="typescript">TypeScript</option>
-    </select>);
-};
+    </select>
+  )
+}
 const mergeMaps = (...maps) => {
-    const map = new Map();
-    for (const m of maps) {
-        for (const item of m) {
-            map.set(...item);
-        }
+  const map = new Map()
+  for (const m of maps) {
+    for (const item of m) {
+      map.set(...item)
     }
-    return map;
-};
-const toChildren = (content) => [{ text: content }];
-const toCodeLines = (content) => content
+  }
+  return map
+}
+const toChildren = content => [{ text: content }]
+const toCodeLines = content =>
+  content
     .split('\n')
-    .map(line => ({ type: CodeLineType, children: toChildren(line) }));
+    .map(line => ({ type: CodeLineType, children: toChildren(line) }))
 const initialValue = [
-    {
-        type: ParagraphType,
-        children: toChildren("Here's one containing a single paragraph block with some text in it:"),
-    },
-    {
-        type: CodeBlockType,
-        language: 'jsx',
-        children: toCodeLines(`// Add the initial value.
+  {
+    type: ParagraphType,
+    children: toChildren(
+      "Here's one containing a single paragraph block with some text in it:"
+    ),
+  },
+  {
+    type: CodeBlockType,
+    language: 'jsx',
+    children: toCodeLines(`// Add the initial value.
 const initialValue = [
   {
     type: 'paragraph',
@@ -210,15 +277,17 @@ const App = () => {
     </Slate>
   )
 }`),
-    },
-    {
-        type: ParagraphType,
-        children: toChildren('If you are using TypeScript, you will also need to extend the Editor with ReactEditor and add annotations as per the documentation on TypeScript. The example below also includes the custom types required for the rest of this example.'),
-    },
-    {
-        type: CodeBlockType,
-        language: 'typescript',
-        children: toCodeLines(`// TypeScript users only add this code
+  },
+  {
+    type: ParagraphType,
+    children: toChildren(
+      'If you are using TypeScript, you will also need to extend the Editor with ReactEditor and add annotations as per the documentation on TypeScript. The example below also includes the custom types required for the rest of this example.'
+    ),
+  },
+  {
+    type: CodeBlockType,
+    language: 'typescript',
+    children: toCodeLines(`// TypeScript users only add this code
 import { BaseEditor, Descendant } from 'slate'
 import { ReactEditor } from 'slate-react'
 
@@ -232,12 +301,12 @@ declare module 'slate' {
     Text: CustomText
   }
 }`),
-    },
-    {
-        type: ParagraphType,
-        children: toChildren('There you have it!'),
-    },
-];
+  },
+  {
+    type: ParagraphType,
+    children: toChildren('There you have it!'),
+  },
+]
 // Prismjs theme stored as a string instead of emotion css function.
 // It is useful for copy/pasting different themes. Also lets keeping simpler Leaf implementation
 // In the real project better to use just css file
@@ -382,5 +451,5 @@ pre[class*="language-"] {
 .token.entity {
     cursor: help;
 }
-`;
-export default CodeHighlightingExample;
+`
+export default CodeHighlightingExample

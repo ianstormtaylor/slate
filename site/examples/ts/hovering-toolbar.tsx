@@ -1,13 +1,15 @@
 import { css } from '@emotion/css'
-import { MouseEvent, useEffect, useMemo, useRef } from 'react'
-import {
-  Descendant,
-  Editor,
-  Range,
-  createEditor
-} from 'slate'
+import React, { MouseEvent, useEffect, useMemo, useRef } from 'react'
+import { Descendant, Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, RenderLeafProps, Slate, useFocused, useSlate, withReact } from 'slate-react'
+import {
+  Editable,
+  RenderLeafProps,
+  Slate,
+  useFocused,
+  useSlate,
+  withReact,
+} from 'slate-react'
 
 import { Button, Icon, Menu, Portal } from './components'
 import { CustomEditor, CustomTextKey } from './custom-types.d'

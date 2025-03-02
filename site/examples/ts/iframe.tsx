@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import { MouseEvent, useCallback, useMemo, useState } from 'react'
+import React, { MouseEvent, useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'

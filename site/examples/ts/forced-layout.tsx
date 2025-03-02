@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import {
   Descendant,
   Editor,
@@ -10,7 +10,12 @@ import {
 } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, RenderElementProps, Slate, withReact } from 'slate-react'
-import { CustomEditor, CustomElementType, ParagraphElement, TitleElement } from './custom-types.d'
+import {
+  CustomEditor,
+  CustomElementType,
+  ParagraphElement,
+  TitleElement,
+} from './custom-types.d'
 
 const withLayout = (editor: CustomEditor) => {
   const { normalizeNode } = editor
@@ -69,7 +74,10 @@ const withLayout = (editor: CustomEditor) => {
 }
 
 const ForcedLayoutExample = () => {
-  const renderElement = useCallback((props: RenderElementProps) => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),
     []

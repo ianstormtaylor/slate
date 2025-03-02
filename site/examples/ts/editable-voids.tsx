@@ -2,7 +2,13 @@ import { css } from '@emotion/css'
 import React, { MouseEvent, useMemo, useState } from 'react'
 import { createEditor, Descendant, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
-import { Editable, RenderElementProps, Slate, useSlateStatic, withReact } from 'slate-react'
+import {
+  Editable,
+  RenderElementProps,
+  Slate,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
 import { CustomEditor, EditableVoidElement } from './custom-types.d'
@@ -62,7 +68,11 @@ const unsetWidthStyle = css`
   width: unset;
 `
 
-const EditableVoid = ({ attributes, children, element }: RenderElementProps) => {
+const EditableVoid = ({
+  attributes,
+  children,
+  element,
+}: RenderElementProps) => {
   const [inputValue, setInputValue] = useState('')
 
   return (

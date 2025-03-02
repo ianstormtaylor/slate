@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { Descendant, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, RenderPlaceholderProps, Slate, withReact } from 'slate-react'
@@ -16,7 +16,10 @@ const PlainTextExample = () => {
     <Slate editor={editor} initialValue={initialValue}>
       <Editable
         placeholder="Type something"
-        renderPlaceholder={({ children, attributes }: RenderPlaceholderProps) => (
+        renderPlaceholder={({
+          children,
+          attributes,
+        }: RenderPlaceholderProps) => (
           <div {...attributes}>
             <p>{children}</p>
             <pre>
