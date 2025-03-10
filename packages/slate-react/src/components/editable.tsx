@@ -125,6 +125,7 @@ export type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  onDOMSelectionChangeThrottleTime?: number
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
@@ -154,6 +155,7 @@ export const Editable = forwardRef(
       style: userStyle = {},
       as: Component = 'div',
       disableDefaultStyles = false,
+      onDOMSelectionChangeThrottleTime = 100,
       ...attributes
     } = props
     const editor = useSlate()
@@ -288,8 +290,8 @@ export const Editable = forwardRef(
               Transforms.deselect(editor)
             }
           }
-        }, 100),
-      [editor, readOnly, state]
+        }, onDOMSelectionChangeThrottleTime),
+      [editor, onDOMSelectionChangeThrottleTime, readOnly, state]
     )
 
     const scheduleOnDOMSelectionChange = useMemo(

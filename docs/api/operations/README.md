@@ -20,6 +20,8 @@ type InsertNodeOperation = {
   type: 'insert_node'
   path: Path
   node: Node
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // merge two `Node` objects
@@ -28,6 +30,8 @@ type MergeNodeOperation = {
   path: Path
   position: number
   properties: Partial<Node>
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // move `Node` from one path to another
@@ -35,6 +39,8 @@ type MoveNodeOperation = {
   type: 'move_node'
   path: Path
   newPath: Path
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // Remove a `Node`
@@ -42,6 +48,8 @@ type RemoveNodeOperation = {
   type: 'remove_node'
   path: Path
   node: Node
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // Set properties of a `Node`
@@ -50,6 +58,8 @@ type SetNodeOperation = {
   path: Path
   properties: Partial<Node>
   newProperties: Partial<Node>
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // Split a node into two separate `Node` objects
@@ -58,6 +68,8 @@ type SplitNodeOperation = {
   path: Path
   position: number
   properties: Partial<Node>
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 export type NodeOperation =
@@ -82,6 +94,8 @@ type InsertTextOperation = {
   path: Path
   offset: number
   text: string
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 // remove text from an existing `Text` node
@@ -90,6 +104,8 @@ type RemoveTextOperation = {
   path: Path
   offset: number
   text: string
+  // default value is true
+  enableSelectionOp: boolean
 }
 
 export type TextOperation = InsertTextOperation | RemoveTextOperation
