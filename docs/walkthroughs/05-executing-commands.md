@@ -53,7 +53,7 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: n => Editor.isBlock(editor, n) }
+                { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
               )
               break
             }
@@ -105,7 +105,7 @@ const CustomEditor = {
     Transforms.setNodes(
       editor,
       { type: isActive ? null : 'code' },
-      { match: n => Editor.isBlock(editor, n) }
+      { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
     )
   },
 }
