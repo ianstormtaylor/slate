@@ -38,13 +38,13 @@ Transforms that operate on nodes.
 
 #### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
 
-Insert of fragment of nodes at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+Insert a fragment of nodes at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
 #### `Transforms.insertNodes(editor: Editor, nodes: Node | Node[], options?)`
 
-Atomically inserts `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+Atomically insert `nodes` at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options supported: `NodeOptions & {hanging?: boolean, select?: boolean}`.
 
