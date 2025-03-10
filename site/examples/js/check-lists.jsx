@@ -121,9 +121,9 @@ const Element = props => {
   }
 }
 const CheckListItemElement = ({ attributes, children, element }) => {
+  const { checked } = element
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
-  const { checked } = element
   return (
     <div
       {...attributes}

@@ -33,7 +33,9 @@ import CustomPlaceholder from '../../examples/ts/custom-placeholder'
 // node
 import { getAllExamples } from '../api'
 
-const EXAMPLES = [
+type ExampleTuple = [string, React.ComponentType, string]
+
+const EXAMPLES: ExampleTuple[] = [
   ['Checklists', CheckLists, 'check-lists'],
   ['Editable Voids', EditableVoids, 'editable-voids'],
   ['Embeds', Embeds, 'embeds'],
@@ -58,7 +60,7 @@ const EXAMPLES = [
   ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
 ]
 
-const Header = props => (
+const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
     className={css`
@@ -73,7 +75,7 @@ const Header = props => (
   />
 )
 
-const Title = props => (
+const Title = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     {...props}
     className={css`
@@ -82,7 +84,7 @@ const Title = props => (
   />
 )
 
-const LinkList = props => (
+const LinkList = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
     className={css`
@@ -92,7 +94,7 @@ const LinkList = props => (
   />
 )
 
-const A = props => (
+const A = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
   <a
     {...props}
     className={css`
@@ -108,7 +110,7 @@ const A = props => (
   />
 )
 
-const Pill = props => (
+const Pill = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     {...props}
     className={css`
@@ -120,7 +122,10 @@ const Pill = props => (
   />
 )
 
-const TabList = ({ isVisible, ...props }) => (
+const TabList = ({
+  isVisible,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean }) => (
   <div
     {...props}
     className={css`
@@ -139,7 +144,10 @@ const TabList = ({ isVisible, ...props }) => (
   />
 )
 
-const TabListUnderlay = ({ isVisible, ...props }) => (
+const TabListUnderlay = ({
+  isVisible,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean }) => (
   <div
     {...props}
     className={css`
@@ -153,7 +161,7 @@ const TabListUnderlay = ({ isVisible, ...props }) => (
   />
 )
 
-const TabButton = props => (
+const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     {...props}
     className={css`
@@ -182,7 +190,7 @@ const Tab = React.forwardRef(
       href: string
       [key: string]: unknown
     }>,
-    ref: Ref<HTMLAnchorElement | null>
+    ref: Ref<HTMLAnchorElement>
   ) => (
     <a
       ref={ref}
@@ -205,7 +213,10 @@ const Tab = React.forwardRef(
   )
 )
 
-const Wrapper = ({ className, ...props }) => (
+const Wrapper = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
     className={cx(
@@ -219,7 +230,7 @@ const Wrapper = ({ className, ...props }) => (
   />
 )
 
-const ExampleHeader = props => (
+const ExampleHeader = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div
     {...props}
     className={css`
@@ -234,7 +245,7 @@ const ExampleHeader = props => (
   />
 )
 
-const ExampleTitle = props => (
+const ExampleTitle = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <span
     {...props}
     className={css`
@@ -243,7 +254,7 @@ const ExampleTitle = props => (
   />
 )
 
-const ExampleContent = props => (
+const ExampleContent = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <Wrapper
     {...props}
     className={css`
@@ -252,7 +263,7 @@ const ExampleContent = props => (
   />
 )
 
-const Warning = props => (
+const Warning = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <Wrapper
     {...props}
     className={css`
@@ -269,11 +280,11 @@ const Warning = props => (
 )
 
 const ExamplePage = ({ example }: { example: string }) => {
-  const [error, setError] = useState<Error | undefined>()
-  const [stacktrace, setStacktrace] = useState<ErrorInfo | undefined>()
-  const [showTabs, setShowTabs] = useState<boolean>()
+  const [error, setError] = useState<Error | undefined>(undefined)
+  const [stacktrace, setStacktrace] = useState<ErrorInfo | undefined>(undefined)
+  const [showTabs, setShowTabs] = useState<boolean>(false)
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
-  const [name, Component, path] = EXAMPLE
+  const [name, Component, path] = EXAMPLE!
   return (
     <ErrorBoundary
       onError={(error, stacktrace) => {

@@ -1,18 +1,19 @@
-import React, { useState, useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
-import { Text, createEditor } from 'slate'
 import { css } from '@emotion/css'
+import React, { useCallback, useMemo, useState } from 'react'
+import { Element, Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
 import { Icon, Toolbar } from './components'
 
 const SearchHighlightingExample = () => {
-  const [search, setSearch] = useState()
+  const [search, setSearch] = useState('')
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
   const decorate = useCallback(
     ([node, path]) => {
       const ranges = []
       if (
         search &&
+        Element.isElement(node) &&
         Array.isArray(node.children) &&
         node.children.every(Text.isText)
       ) {
@@ -93,13 +94,14 @@ const SearchHighlightingExample = () => {
   )
 }
 const Leaf = ({ attributes, children, leaf }) => {
+  const highlightLeaf = leaf
   return (
     <span
       {...attributes}
-      {...(leaf.highlight && { 'data-cy': 'search-highlighted' })}
+      {...(highlightLeaf.highlight && { 'data-cy': 'search-highlighted' })}
       className={css`
-        font-weight: ${leaf.bold && 'bold'};
-        background-color: ${leaf.highlight && '#ffeeba'};
+        font-weight: ${highlightLeaf.bold && 'bold'};
+        background-color: ${highlightLeaf.highlight && '#ffeeba'};
       `}
     >
       {children}

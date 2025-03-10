@@ -1,20 +1,26 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
 import {
-  Transforms,
-  createEditor,
-  Node,
-  Element as SlateElement,
   Descendant,
   Editor,
+  Node,
+  NodeEntry,
+  Element as SlateElement,
+  Transforms,
+  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { ParagraphElement, TitleElement } from './custom-types.d'
+import { Editable, RenderElementProps, Slate, withReact } from 'slate-react'
+import {
+  CustomEditor,
+  CustomElementType,
+  ParagraphElement,
+  TitleElement,
+} from './custom-types.d'
 
-const withLayout = editor => {
+const withLayout = (editor: CustomEditor) => {
   const { normalizeNode } = editor
 
-  editor.normalizeNode = ([node, path]) => {
+  editor.normalizeNode = ([node, path]: NodeEntry) => {
     if (path.length === 0) {
       if (editor.children.length <= 1 && Editor.string(editor, [0, 0]) === '') {
         const title: TitleElement = {
@@ -36,9 +42,9 @@ const withLayout = editor => {
       }
 
       for (const [child, childPath] of Node.children(editor, path)) {
-        let type: string
+        let type: CustomElementType
         const slateIndex = childPath[0]
-        const enforceType = type => {
+        const enforceType = (type: CustomElementType) => {
           if (SlateElement.isElement(child) && child.type !== type) {
             const newProperties: Partial<SlateElement> = { type }
             Transforms.setNodes<SlateElement>(editor, newProperties, {
@@ -68,7 +74,10 @@ const withLayout = editor => {
 }
 
 const ForcedLayoutExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(
     () => withLayout(withHistory(withReact(createEditor()))),
     []
@@ -85,7 +94,7 @@ const ForcedLayoutExample = () => {
   )
 }
 
-const Element = ({ attributes, children, element }) => {
+const Element = ({ attributes, children, element }: RenderElementProps) => {
   switch (element.type) {
     case 'title':
       return <h2 {...attributes}>{children}</h2>

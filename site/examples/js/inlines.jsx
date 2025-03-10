@@ -1,17 +1,17 @@
-import React, { useMemo } from 'react'
-import isUrl from 'is-url'
-import { isKeyHotkey } from 'is-hotkey'
 import { css } from '@emotion/css'
-import { Editable, withReact, useSlate, useSelected } from 'slate-react'
-import * as SlateReact from 'slate-react'
+import { isKeyHotkey } from 'is-hotkey'
+import isUrl from 'is-url'
+import React, { useMemo } from 'react'
 import {
-  Transforms,
-  Editor,
-  Range,
   createEditor,
+  Editor,
   Element as SlateElement,
+  Range,
+  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, useSelected, useSlate, withReact } from 'slate-react'
+import * as SlateReact from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
 
 const initialValue = [
@@ -326,7 +326,7 @@ const Text = props => {
           ? css`
               padding-left: 0.1px;
             `
-          : null
+          : undefined
       }
       {...attributes}
     >

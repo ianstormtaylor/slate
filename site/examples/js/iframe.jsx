@@ -1,9 +1,9 @@
+import isHotkey from 'is-hotkey'
 import React, { useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
-import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate, ReactEditor } from 'slate-react'
 import { Editor, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, ReactEditor, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
 
 const HOTKEYS = {
@@ -93,7 +93,9 @@ const MarkButton = ({ format, icon }) => {
 const IFrame = ({ children, ...props }) => {
   const [iframeBody, setIframeBody] = useState(null)
   const handleLoad = e => {
-    setIframeBody(e.target.contentDocument.body)
+    const iframe = e.target
+    if (!iframe.contentDocument) return
+    setIframeBody(iframe.contentDocument.body)
   }
   return (
     <iframe srcDoc={`<!DOCTYPE html>`} {...props} onLoad={handleLoad}>

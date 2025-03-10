@@ -1,10 +1,10 @@
+import { css } from '@emotion/css'
 import Prism from 'prismjs'
 import 'prismjs/components/prism-markdown'
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
 import { Text, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from '@emotion/css'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const MarkdownPreviewExample = () => {
   const renderLeaf = useCallback(props => <Leaf {...props} />, [])

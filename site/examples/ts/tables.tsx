@@ -1,20 +1,33 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
 import {
-  Editor,
-  Range,
-  Point,
   Descendant,
-  createEditor,
+  Editor,
+  Point,
+  Range,
   Element as SlateElement,
+  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import {
+  Editable,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
+  withReact,
+} from 'slate-react'
+import { CustomEditor } from './custom-types.d'
 
 const TablesExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
+  const renderLeaf = useCallback(
+    (props: RenderLeafProps) => <Leaf {...props} />,
+    []
+  )
   const editor = useMemo(
-    () => withTables(withHistory(withReact(createEditor()))),
+    () => withTables(withHistory(withReact(createEditor()))) as CustomEditor,
     []
   )
   return (
@@ -24,10 +37,10 @@ const TablesExample = () => {
   )
 }
 
-const withTables = editor => {
+const withTables = (editor: CustomEditor) => {
   const { deleteBackward, deleteForward, insertBreak } = editor
 
-  editor.deleteBackward = unit => {
+  editor.deleteBackward = (unit: 'character' | 'word' | 'line' | 'block') => {
     const { selection } = editor
 
     if (selection && Range.isCollapsed(selection)) {
@@ -97,7 +110,7 @@ const withTables = editor => {
   return editor
 }
 
-const Element = ({ attributes, children, element }) => {
+const Element = ({ attributes, children, element }: RenderElementProps) => {
   switch (element.type) {
     case 'table':
       return (
@@ -114,7 +127,7 @@ const Element = ({ attributes, children, element }) => {
   }
 }
 
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }

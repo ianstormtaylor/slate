@@ -1,26 +1,32 @@
-import React, { useMemo } from 'react'
-import imageExtensions from 'image-extensions'
-import isUrl from 'is-url'
-import isHotkey from 'is-hotkey'
-import { Transforms, createEditor, Descendant } from 'slate'
-import {
-  Slate,
-  Editable,
-  useSlateStatic,
-  useSelected,
-  useFocused,
-  withReact,
-  ReactEditor,
-} from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
+import imageExtensions from 'image-extensions'
+import isHotkey from 'is-hotkey'
+import isUrl from 'is-url'
+import React, { MouseEvent, useMemo } from 'react'
+import { Descendant, Transforms, createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import {
+  Editable,
+  ReactEditor,
+  RenderElementProps,
+  Slate,
+  useFocused,
+  useSelected,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
-import { ImageElement } from './custom-types.d'
+import {
+  CustomEditor,
+  ImageElement,
+  ParagraphElement,
+  RenderElementPropsFor,
+} from './custom-types.d'
 
 const ImagesExample = () => {
   const editor = useMemo(
-    () => withImages(withHistory(withReact(createEditor()))),
+    () => withImages(withHistory(withReact(createEditor()))) as CustomEditor,
     []
   )
 
@@ -36,14 +42,14 @@ const ImagesExample = () => {
             Transforms.select(editor, [])
           }
         }}
-        renderElement={props => <Element {...props} />}
+        renderElement={(props: RenderElementProps) => <Element {...props} />}
         placeholder="Enter some text..."
       />
     </Slate>
   )
 }
 
-const withImages = editor => {
+const withImages = (editor: CustomEditor) => {
   const { insertData, isVoid } = editor
 
   editor.isVoid = element => {
@@ -55,19 +61,19 @@ const withImages = editor => {
     const { files } = data
 
     if (files && files.length > 0) {
-      for (const file of files) {
+      Array.from(files).forEach(file => {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
 
         if (mime === 'image') {
           reader.addEventListener('load', () => {
             const url = reader.result
-            insertImage(editor, url)
+            insertImage(editor, url as string)
           })
 
           reader.readAsDataURL(file)
         }
-      }
+      })
     } else if (isImageUrl(text)) {
       insertImage(editor, text)
     } else {
@@ -78,17 +84,18 @@ const withImages = editor => {
   return editor
 }
 
-const insertImage = (editor, url) => {
+const insertImage = (editor: CustomEditor, url: string) => {
   const text = { text: '' }
   const image: ImageElement = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image)
-  Transforms.insertNodes(editor, {
+  const paragraph: ParagraphElement = {
     type: 'paragraph',
     children: [{ text: '' }],
-  })
+  }
+  Transforms.insertNodes(editor, paragraph)
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
@@ -99,10 +106,13 @@ const Element = props => {
   }
 }
 
-const Image = ({ attributes, children, element }) => {
+const Image = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<ImageElement>) => {
   const editor = useSlateStatic()
   const path = ReactEditor.findPath(editor, element)
-
   const selected = useSelected()
   const focused = useFocused()
   return (
@@ -145,7 +155,7 @@ const InsertImageButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the image:')
         if (url && !isImageUrl(url)) {
@@ -160,11 +170,11 @@ const InsertImageButton = () => {
   )
 }
 
-const isImageUrl = url => {
+const isImageUrl = (url: string): boolean => {
   if (!url) return false
   if (!isUrl(url)) return false
   const ext = new URL(url).pathname.split('.').pop()
-  return imageExtensions.includes(ext)
+  return imageExtensions.includes(ext!)
 }
 
 const initialValue: Descendant[] = [

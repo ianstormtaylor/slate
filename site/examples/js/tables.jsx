@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
 import {
   Editor,
-  Range,
   Point,
-  createEditor,
+  Range,
   Element as SlateElement,
+  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const TablesExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])

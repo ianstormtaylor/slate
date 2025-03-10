@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react'
 import { createEditor } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const initialValue = [
   {

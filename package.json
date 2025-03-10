@@ -58,6 +58,8 @@
     "@emotion/css": "^11.11.2",
     "@faker-js/faker": "^8.2.0",
     "@playwright/test": "^1.39.0",
+    "@types/is-hotkey": "^0.1.10",
+    "@types/is-url": "^1.2.32",
     "@types/jest": "29.5.6",
     "@types/lodash": "^4.14.200",
     "@types/mocha": "^10.0.3",

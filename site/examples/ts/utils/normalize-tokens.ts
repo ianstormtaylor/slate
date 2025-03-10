@@ -53,7 +53,7 @@ export const normalizeTokens = (
 
   let i = 0
   let stackIndex = 0
-  let currentLine = []
+  let currentLine: Token[] = []
 
   const acc = [currentLine]
 
@@ -84,7 +84,7 @@ export const normalizeTokens = (
       if (typeof content !== 'string') {
         stackIndex++
         typeArrStack.push(types)
-        tokenArrStack.push(content)
+        tokenArrStack.push(content as PrismToken[])
         tokenArrIndexStack.push(0)
         tokenArrSizeStack.push(content.length)
         continue

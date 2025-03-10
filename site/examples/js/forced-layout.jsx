@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react'
-import { Slate, Editable, withReact } from 'slate-react'
 import {
-  Transforms,
-  createEditor,
+  Editor,
   Node,
   Element as SlateElement,
-  Editor,
+  Transforms,
+  createEditor,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const withLayout = editor => {
   const { normalizeNode } = editor

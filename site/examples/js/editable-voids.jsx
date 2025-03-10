@@ -1,10 +1,10 @@
-import React, { useState, useMemo } from 'react'
-import { Transforms, createEditor } from 'slate'
-import { Slate, Editable, useSlateStatic, withReact } from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
-import RichTextEditor from './richtext'
+import React, { useMemo, useState } from 'react'
+import { createEditor, Transforms } from 'slate'
+import { withHistory } from 'slate-history'
+import { Editable, Slate, useSlateStatic, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
+import RichTextEditor from './richtext'
 
 const EditableVoidsExample = () => {
   const editor = useMemo(

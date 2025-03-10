@@ -1,27 +1,27 @@
 import React, {
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect,
-  useState,
   Fragment,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react'
 import { Editor, Transforms, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
-  Slate,
   Editable,
   ReactEditor,
-  withReact,
-  useSelected,
+  Slate,
   useFocused,
+  useSelected,
+  withReact,
 } from 'slate-react'
 import { Portal } from './components'
 import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
-  const ref = useRef()
-  const [target, setTarget] = useState()
+  const ref = useRef(null)
+  const [target, setTarget] = useState(null)
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -64,7 +64,7 @@ const MentionExample = () => {
     [chars, editor, index, target]
   )
   useEffect(() => {
-    if (target && chars.length > 0) {
+    if (target && chars.length > 0 && ref.current) {
       const el = ref.current
       const domRange = ReactEditor.toDOMRange(editor, target)
       const rect = domRange.getBoundingClientRect()
@@ -124,7 +124,7 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={() => {
+                onClick={e => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)

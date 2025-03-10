@@ -26,13 +26,37 @@ export type EditableVoidElement = {
 }
 
 export type HeadingElement = {
-  type: 'heading'
+  type: 'heading-one'
   align?: string
   children: Descendant[]
 }
 
 export type HeadingTwoElement = {
   type: 'heading-two'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingThreeElement = {
+  type: 'heading-three'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingFourElement = {
+  type: 'heading-four'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingFiveElement = {
+  type: 'heading-five'
+  align?: string
+  children: Descendant[]
+}
+
+export type HeadingSixElement = {
+  type: 'heading-six'
   align?: string
   children: Descendant[]
 }
@@ -50,6 +74,11 @@ export type ButtonElement = { type: 'button'; children: Descendant[] }
 export type BadgeElement = { type: 'badge'; children: Descendant[] }
 
 export type ListItemElement = { type: 'list-item'; children: Descendant[] }
+
+export type NumberedListItemElement = {
+  type: 'numbered-list'
+  children: Descendant[]
+}
 
 export type MentionElement = {
   type: 'mention'
@@ -84,6 +113,17 @@ export type CodeLineElement = {
   children: Descendant[]
 }
 
+export type CustomElementWithAlign =
+  | ParagraphElement
+  | HeadingElement
+  | HeadingTwoElement
+  | HeadingThreeElement
+  | HeadingFourElement
+  | HeadingFiveElement
+  | HeadingSixElement
+  | BlockQuoteElement
+  | BulletedListElement
+
 type CustomElement =
   | BlockQuoteElement
   | BulletedListElement
@@ -91,11 +131,16 @@ type CustomElement =
   | EditableVoidElement
   | HeadingElement
   | HeadingTwoElement
+  | HeadingThreeElement
+  | HeadingFourElement
+  | HeadingFiveElement
+  | HeadingSixElement
   | ImageElement
   | LinkElement
   | ButtonElement
   | BadgeElement
   | ListItemElement
+  | NumberedListItemElement
   | MentionElement
   | ParagraphElement
   | TableElement
@@ -106,15 +151,31 @@ type CustomElement =
   | CodeBlockElement
   | CodeLineElement
 
+export type CustomElementType = CustomElement['type']
+
 export type CustomText = {
   bold?: boolean
   italic?: boolean
   code?: boolean
+  underline?: boolean
+  strikethrough?: boolean
+  // MARKDOWN PREVIEW SPECIFIC LEAF
+  underlined?: boolean
+  title?: boolean
+  list?: boolean
+  hr?: boolean
+  blockquote?: boolean
   text: string
 }
 
+export type CustomTextKey = keyof Omit<CustomText, 'text'>
+
 export type EmptyText = {
   text: string
+}
+
+export type RenderElementPropsFor<T> = RenderElementProps & {
+  element: T
 }
 
 export type CustomEditor = BaseEditor &
@@ -127,7 +188,7 @@ declare module 'slate' {
   interface CustomTypes {
     Editor: CustomEditor
     Element: CustomElement
-    Text: CustomText | EmptyText
+    Text: CustomText
     Range: BaseRange & {
       [key: string]: unknown
     }

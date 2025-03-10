@@ -1,19 +1,19 @@
+import { css } from '@emotion/css'
 import React, { useCallback, useMemo } from 'react'
-import { jsx } from 'slate-hyperscript'
 import { Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import { css } from '@emotion/css'
+import { jsx } from 'slate-hyperscript'
 import {
-  Slate,
   Editable,
-  withReact,
-  useSelected,
+  Slate,
   useFocused,
+  useSelected,
+  withReact,
 } from 'slate-react'
 
 const ELEMENT_TAGS = {
   A: el => ({ type: 'link', url: el.getAttribute('href') }),
-  BLOCKQUOTE: () => ({ type: 'quote' }),
+  BLOCKQUOTE: () => ({ type: 'block-quote' }),
   H1: () => ({ type: 'heading-one' }),
   H2: () => ({ type: 'heading-two' }),
   H3: () => ({ type: 'heading-three' }),
@@ -24,10 +24,9 @@ const ELEMENT_TAGS = {
   LI: () => ({ type: 'list-item' }),
   OL: () => ({ type: 'numbered-list' }),
   P: () => ({ type: 'paragraph' }),
-  PRE: () => ({ type: 'code' }),
+  PRE: () => ({ type: 'code-block' }),
   UL: () => ({ type: 'bulleted-list' }),
 }
-// COMPAT: `B` is omitted here because Google Docs uses `<b>` in weird ways.
 const TEXT_TAGS = {
   CODE: () => ({ code: true }),
   DEL: () => ({ strikethrough: true }),
@@ -66,7 +65,7 @@ export const deserialize = el => {
     return jsx('element', attrs, children)
   }
   if (TEXT_TAGS[nodeName]) {
-    const attrs = TEXT_TAGS[nodeName](el)
+    const attrs = TEXT_TAGS[nodeName]()
     return children.map(child => jsx('text', attrs, child))
   }
   return children
@@ -113,9 +112,9 @@ const Element = props => {
   switch (element.type) {
     default:
       return <p {...attributes}>{children}</p>
-    case 'quote':
+    case 'block-quote':
       return <blockquote {...attributes}>{children}</blockquote>
-    case 'code':
+    case 'code-block':
       return (
         <pre>
           <code {...attributes}>{children}</code>
@@ -141,7 +140,7 @@ const Element = props => {
       return <ol {...attributes}>{children}</ol>
     case 'link':
       return (
-        <SafeLink href={element.url} {...attributes}>
+        <SafeLink href={element.url} attributes={attributes}>
           {children}
         </SafeLink>
       )
@@ -150,7 +149,7 @@ const Element = props => {
   }
 }
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
-const SafeLink = ({ attributes, children, href }) => {
+const SafeLink = ({ children, href, attributes }) => {
   const safeHref = useMemo(() => {
     let parsedUrl = null
     try {

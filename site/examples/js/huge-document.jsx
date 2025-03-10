@@ -1,21 +1,23 @@
-import React, { useMemo, useCallback } from 'react'
 import { faker } from '@faker-js/faker'
+import React, { useCallback, useMemo } from 'react'
 import { createEditor } from 'slate'
-import { Slate, Editable, withReact } from 'slate-react'
+import { Editable, Slate, withReact } from 'slate-react'
 
 const HEADINGS = 100
 const PARAGRAPHS = 7
 const initialValue = []
 for (let h = 0; h < HEADINGS; h++) {
-  initialValue.push({
-    type: 'heading',
+  const heading = {
+    type: 'heading-one',
     children: [{ text: faker.lorem.sentence() }],
-  })
+  }
+  initialValue.push(heading)
   for (let p = 0; p < PARAGRAPHS; p++) {
-    initialValue.push({
+    const paragraph = {
       type: 'paragraph',
       children: [{ text: faker.lorem.paragraph() }],
-    })
+    }
+    initialValue.push(paragraph)
   }
 }
 const HugeDocumentExample = () => {
@@ -29,7 +31,7 @@ const HugeDocumentExample = () => {
 }
 const Element = ({ attributes, children, element }) => {
   switch (element.type) {
-    case 'heading':
+    case 'heading-one':
       return <h1 {...attributes}>{children}</h1>
     default:
       return <p {...attributes}>{children}</p>

@@ -1,23 +1,29 @@
-import React, { useMemo, useCallback } from 'react'
+import { css } from '@emotion/css'
+import React, { ChangeEvent, useCallback, useMemo } from 'react'
 import {
-  Slate,
+  Descendant,
+  Editor,
+  Point,
+  Range,
+  Element as SlateElement,
+  Transforms,
+  createEditor,
+} from 'slate'
+import { withHistory } from 'slate-history'
+import {
   Editable,
-  withReact,
-  useSlateStatic,
-  useReadOnly,
   ReactEditor,
+  RenderElementProps,
+  Slate,
+  useReadOnly,
+  useSlateStatic,
+  withReact,
 } from 'slate-react'
 import {
-  Editor,
-  Transforms,
-  Range,
-  Point,
-  createEditor,
-  Descendant,
-  Element as SlateElement,
-} from 'slate'
-import { css } from '@emotion/css'
-import { withHistory } from 'slate-history'
+  CheckListItemElement as CheckListItemType,
+  CustomEditor,
+  RenderElementPropsFor,
+} from './custom-types.d'
 
 const initialValue: Descendant[] = [
   {
@@ -65,7 +71,10 @@ const initialValue: Descendant[] = [
 ]
 
 const CheckListsExample = () => {
-  const renderElement = useCallback(props => <Element {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
   const editor = useMemo(
     () => withChecklists(withHistory(withReact(createEditor()))),
     []
@@ -83,7 +92,7 @@ const CheckListsExample = () => {
   )
 }
 
-const withChecklists = editor => {
+const withChecklists = (editor: CustomEditor) => {
   const { deleteBackward } = editor
 
   editor.deleteBackward = (...args) => {
@@ -122,7 +131,7 @@ const withChecklists = editor => {
   return editor
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
 
   switch (element.type) {
@@ -133,10 +142,14 @@ const Element = props => {
   }
 }
 
-const CheckListItemElement = ({ attributes, children, element }) => {
+const CheckListItemElement = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<CheckListItemType>) => {
+  const { checked } = element
   const editor = useSlateStatic()
   const readOnly = useReadOnly()
-  const { checked } = element
   return (
     <div
       {...attributes}
@@ -159,7 +172,7 @@ const CheckListItemElement = ({ attributes, children, element }) => {
         <input
           type="checkbox"
           checked={checked}
-          onChange={event => {
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
             const path = ReactEditor.findPath(editor, element)
             const newProperties: Partial<SlateElement> = {
               checked: event.target.checked,

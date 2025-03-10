@@ -1,35 +1,56 @@
 import React, {
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect,
-  useState,
   Fragment,
+  KeyboardEvent,
+  MouseEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react'
-import { Editor, Transforms, Range, createEditor, Descendant } from 'slate'
+import {
+  Editor,
+  Transforms,
+  Range,
+  createEditor,
+  Descendant,
+  Element as SlateElement,
+} from 'slate'
 import { withHistory } from 'slate-history'
 import {
-  Slate,
   Editable,
   ReactEditor,
-  withReact,
-  useSelected,
+  RenderElementProps,
+  RenderLeafProps,
+  Slate,
   useFocused,
+  useSelected,
+  withReact,
 } from 'slate-react'
 
 import { Portal } from './components'
-import { MentionElement } from './custom-types.d'
+import {
+  CustomEditor,
+  MentionElement,
+  RenderElementPropsFor,
+} from './custom-types.d'
 import { IS_MAC } from './utils/environment'
 
 const MentionExample = () => {
-  const ref = useRef<HTMLDivElement | null>()
-  const [target, setTarget] = useState<Range | undefined>()
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [target, setTarget] = useState<Range | null>(null)
   const [index, setIndex] = useState(0)
   const [search, setSearch] = useState('')
-  const renderElement = useCallback(props => <Element {...props} />, [])
-  const renderLeaf = useCallback(props => <Leaf {...props} />, [])
+  const renderElement = useCallback(
+    (props: RenderElementProps) => <Element {...props} />,
+    []
+  )
+  const renderLeaf = useCallback(
+    (props: RenderLeafProps) => <Leaf {...props} />,
+    []
+  )
   const editor = useMemo(
-    () => withMentions(withReact(withHistory(createEditor()))),
+    () => withMentions(withReact(withHistory(createEditor()))) as CustomEditor,
     []
   )
 
@@ -38,7 +59,7 @@ const MentionExample = () => {
   ).slice(0, 10)
 
   const onKeyDown = useCallback(
-    event => {
+    (event: KeyboardEvent<HTMLDivElement>) => {
       if (target && chars.length > 0) {
         switch (event.key) {
           case 'ArrowDown':
@@ -69,7 +90,7 @@ const MentionExample = () => {
   )
 
   useEffect(() => {
-    if (target && chars.length > 0) {
+    if (target && chars.length > 0 && ref.current) {
       const el = ref.current
       const domRange = ReactEditor.toDOMRange(editor, target)
       const rect = domRange.getBoundingClientRect()
@@ -133,7 +154,7 @@ const MentionExample = () => {
             {chars.map((char, i) => (
               <div
                 key={char}
-                onClick={() => {
+                onClick={(e: MouseEvent) => {
                   Transforms.select(editor, target)
                   insertMention(editor, char)
                   setTarget(null)
@@ -155,25 +176,25 @@ const MentionExample = () => {
   )
 }
 
-const withMentions = editor => {
+const withMentions = (editor: CustomEditor) => {
   const { isInline, isVoid, markableVoid } = editor
 
-  editor.isInline = element => {
+  editor.isInline = (element: SlateElement) => {
     return element.type === 'mention' ? true : isInline(element)
   }
 
-  editor.isVoid = element => {
+  editor.isVoid = (element: SlateElement) => {
     return element.type === 'mention' ? true : isVoid(element)
   }
 
-  editor.markableVoid = element => {
+  editor.markableVoid = (element: SlateElement) => {
     return element.type === 'mention' || markableVoid(element)
   }
 
   return editor
 }
 
-const insertMention = (editor, character) => {
+const insertMention = (editor: CustomEditor, character: string) => {
   const mention: MentionElement = {
     type: 'mention',
     character,
@@ -185,7 +206,7 @@ const insertMention = (editor, character) => {
 
 // Borrow Leaf renderer from the Rich Text example.
 // In a real project you would get this via `withRichText(editor)` or similar.
-const Leaf = ({ attributes, children, leaf }) => {
+const Leaf = ({ attributes, children, leaf }: RenderLeafProps) => {
   if (leaf.bold) {
     children = <strong>{children}</strong>
   }
@@ -205,7 +226,7 @@ const Leaf = ({ attributes, children, leaf }) => {
   return <span {...attributes}>{children}</span>
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'mention':
@@ -215,7 +236,11 @@ const Element = props => {
   }
 }
 
-const Mention = ({ attributes, children, element }) => {
+const Mention = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<MentionElement>) => {
   const selected = useSelected()
   const focused = useFocused()
   const style: React.CSSProperties = {

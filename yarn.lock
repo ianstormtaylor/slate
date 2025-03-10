@@ -3357,10 +3357,24 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/is-hotkey@npm:^0.1.10":
+  version: 0.1.10
+  resolution: "@types/is-hotkey@npm:0.1.10"
+  checksum: 9ecc49fb3822b3cfa8335132d54c6e577d0b14bb52d0bf1f817cdd19c442555b7523945e2ae72f6098e3c7f64b4777390f38afec3e4660343cfb471377e7fd82
+  languageName: node
+  linkType: hard
+
 "@types/is-hotkey@npm:^0.1.8":
   version: 0.1.8
   resolution: "@types/is-hotkey@npm:0.1.8"
   checksum: a80320d50774f8619f3c27beba5cd72452c59a3a0d5716032b540126975d6a7010af6ce660b906cb5ea6532949ca7a2830a96d75a1bbc0118020ba647a50dd5c
+  languageName: node
+  linkType: hard
+
+"@types/is-url@npm:^1.2.32":
+  version: 1.2.32
+  resolution: "@types/is-url@npm:1.2.32"
+  checksum: f76697c868680b3be88d7f18f9724a334c62a8dc1b0f40fad8dc725b2072ad74f38d50b4ce902c07a65bb081ae2782baf06f5b3334c64bd2679c35e0a12042c5
   languageName: node
   linkType: hard
 
@@ -13333,6 +13347,8 @@ __metadata:
     "@emotion/css": "npm:^11.11.2"
     "@faker-js/faker": "npm:^8.2.0"
     "@playwright/test": "npm:^1.39.0"
+    "@types/is-hotkey": "npm:^0.1.10"
+    "@types/is-url": "npm:^1.2.32"
     "@types/jest": "npm:29.5.6"
     "@types/lodash": "npm:^4.14.200"
     "@types/mocha": "npm:^10.0.3"

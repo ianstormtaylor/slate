@@ -1,28 +1,28 @@
+import { css } from '@emotion/css'
+import isHotkey from 'is-hotkey'
 import Prism from 'prismjs'
+import 'prismjs/components/prism-java'
 import 'prismjs/components/prism-javascript'
 import 'prismjs/components/prism-jsx'
-import 'prismjs/components/prism-typescript'
-import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-markdown'
-import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-php'
+import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-sql'
-import 'prismjs/components/prism-java'
+import 'prismjs/components/prism-tsx'
+import 'prismjs/components/prism-typescript'
 import React, { useCallback, useState } from 'react'
-import { createEditor, Node, Editor, Element, Transforms } from 'slate'
-import {
-  withReact,
-  Slate,
-  Editable,
-  useSlate,
-  ReactEditor,
-  useSlateStatic,
-} from 'slate-react'
+import { Editor, Element, Node, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
-import isHotkey from 'is-hotkey'
-import { css } from '@emotion/css'
-import { normalizeTokens } from './utils/normalize-tokens'
+import {
+  Editable,
+  ReactEditor,
+  Slate,
+  useSlate,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
+import { normalizeTokens } from './utils/normalize-tokens'
 
 const ParagraphType = 'paragraph'
 const CodeBlockType = 'code-block'
@@ -139,7 +139,7 @@ const useDecorate = editor => {
   return useCallback(
     ([node, path]) => {
       if (Element.isElement(node) && node.type === CodeLineType) {
-        const ranges = editor.nodeToDecorations.get(node) || []
+        const ranges = editor.nodeToDecorations?.get(node) || []
         return ranges
       }
       return []

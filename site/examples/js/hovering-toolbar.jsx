@@ -1,8 +1,8 @@
-import React, { useMemo, useRef, useEffect } from 'react'
-import { Slate, Editable, withReact, useSlate, useFocused } from 'slate-react'
-import { Editor, createEditor, Range } from 'slate'
 import { css } from '@emotion/css'
+import React, { useEffect, useMemo, useRef } from 'react'
+import { Editor, Range, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, useFocused, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Menu, Portal } from './components'
 
 const HoveringMenuExample = () => {
@@ -23,7 +23,7 @@ const HoveringMenuExample = () => {
               return toggleMark(editor, 'italic')
             case 'formatUnderline':
               event.preventDefault()
-              return toggleMark(editor, 'underlined')
+              return toggleMark(editor, 'underline')
           }
         }}
       />
@@ -49,13 +49,13 @@ const Leaf = ({ attributes, children, leaf }) => {
   if (leaf.italic) {
     children = <em>{children}</em>
   }
-  if (leaf.underlined) {
+  if (leaf.underline) {
     children = <u>{children}</u>
   }
   return <span {...attributes}>{children}</span>
 }
 const HoveringToolbar = () => {
-  const ref = useRef()
+  const ref = useRef(null)
   const editor = useSlate()
   const inFocus = useFocused()
   useEffect(() => {
@@ -105,7 +105,7 @@ const HoveringToolbar = () => {
       >
         <FormatButton format="bold" icon="format_bold" />
         <FormatButton format="italic" icon="format_italic" />
-        <FormatButton format="underlined" icon="format_underlined" />
+        <FormatButton format="underline" icon="format_underlined" />
       </Menu>
     </Portal>
   )

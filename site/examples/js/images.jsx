@@ -1,19 +1,19 @@
-import React, { useMemo } from 'react'
-import imageExtensions from 'image-extensions'
-import isUrl from 'is-url'
-import isHotkey from 'is-hotkey'
-import { Transforms, createEditor } from 'slate'
-import {
-  Slate,
-  Editable,
-  useSlateStatic,
-  useSelected,
-  useFocused,
-  withReact,
-  ReactEditor,
-} from 'slate-react'
-import { withHistory } from 'slate-history'
 import { css } from '@emotion/css'
+import imageExtensions from 'image-extensions'
+import isHotkey from 'is-hotkey'
+import isUrl from 'is-url'
+import React, { useMemo } from 'react'
+import { Transforms, createEditor } from 'slate'
+import { withHistory } from 'slate-history'
+import {
+  Editable,
+  ReactEditor,
+  Slate,
+  useFocused,
+  useSelected,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
 
 const ImagesExample = () => {
@@ -48,7 +48,7 @@ const withImages = editor => {
     const text = data.getData('text/plain')
     const { files } = data
     if (files && files.length > 0) {
-      for (const file of files) {
+      Array.from(files).forEach(file => {
         const reader = new FileReader()
         const [mime] = file.type.split('/')
         if (mime === 'image') {
@@ -58,7 +58,7 @@ const withImages = editor => {
           })
           reader.readAsDataURL(file)
         }
-      }
+      })
     } else if (isImageUrl(text)) {
       insertImage(editor, text)
     } else {
@@ -71,10 +71,11 @@ const insertImage = (editor, url) => {
   const text = { text: '' }
   const image = { type: 'image', url, children: [text] }
   Transforms.insertNodes(editor, image)
-  Transforms.insertNodes(editor, {
+  const paragraph = {
     type: 'paragraph',
     children: [{ text: '' }],
-  })
+  }
+  Transforms.insertNodes(editor, paragraph)
 }
 const Element = props => {
   const { attributes, children, element } = props

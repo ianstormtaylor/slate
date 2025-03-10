@@ -1,13 +1,13 @@
-import React, { useCallback, useMemo } from 'react'
 import isHotkey from 'is-hotkey'
-import { Editable, withReact, useSlate, Slate } from 'slate-react'
+import React, { useCallback, useMemo } from 'react'
 import {
   Editor,
+  Element as SlateElement,
   Transforms,
   createEditor,
-  Element as SlateElement,
 } from 'slate'
 import { withHistory } from 'slate-history'
+import { Editable, Slate, useSlate, withReact } from 'slate-react'
 import { Button, Icon, Toolbar } from './components'
 
 const HOTKEYS = {
@@ -62,19 +62,19 @@ const toggleBlock = (editor, format) => {
   const isActive = isBlockActive(
     editor,
     format,
-    TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+    isAlignType(format) ? 'align' : 'type'
   )
-  const isList = LIST_TYPES.includes(format)
+  const isList = isListType(format)
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) &&
       SlateElement.isElement(n) &&
-      LIST_TYPES.includes(n.type) &&
-      !TEXT_ALIGN_TYPES.includes(format),
+      isListType(n.type) &&
+      !isAlignType(format),
     split: true,
   })
   let newProperties
-  if (TEXT_ALIGN_TYPES.includes(format)) {
+  if (isAlignType(format)) {
     newProperties = {
       align: isActive ? undefined : format,
     }
@@ -103,10 +103,15 @@ const isBlockActive = (editor, format, blockType = 'type') => {
   const [match] = Array.from(
     Editor.nodes(editor, {
       at: Editor.unhangRange(editor, selection),
-      match: n =>
-        !Editor.isEditor(n) &&
-        SlateElement.isElement(n) &&
-        n[blockType] === format,
+      match: n => {
+        if (!Editor.isEditor(n) && SlateElement.isElement(n)) {
+          if (blockType === 'align' && isAlignElement(n)) {
+            return n.align === format
+          }
+          return n.type === format
+        }
+        return false
+      },
     })
   )
   return !!match
@@ -116,7 +121,10 @@ const isMarkActive = (editor, format) => {
   return marks ? marks[format] === true : false
 }
 const Element = ({ attributes, children, element }) => {
-  const style = { textAlign: element.align }
+  const style = {}
+  if (isAlignElement(element)) {
+    style.textAlign = element.align
+  }
   switch (element.type) {
     case 'block-quote':
       return (
@@ -184,7 +192,7 @@ const BlockButton = ({ format, icon }) => {
       active={isBlockActive(
         editor,
         format,
-        TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
+        isAlignType(format) ? 'align' : 'type'
       )}
       onMouseDown={event => {
         event.preventDefault()
@@ -208,6 +216,15 @@ const MarkButton = ({ format, icon }) => {
       <Icon>{icon}</Icon>
     </Button>
   )
+}
+const isAlignType = format => {
+  return TEXT_ALIGN_TYPES.includes(format)
+}
+const isListType = format => {
+  return LIST_TYPES.includes(format)
+}
+const isAlignElement = element => {
+  return 'align' in element
 }
 const initialValue = [
   {

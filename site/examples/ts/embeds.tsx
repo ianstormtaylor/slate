@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { ChangeEvent, useMemo } from 'react'
 import {
   Transforms,
   createEditor,
@@ -11,7 +11,13 @@ import {
   withReact,
   useSlateStatic,
   ReactEditor,
+  RenderElementProps,
 } from 'slate-react'
+import {
+  CustomEditor,
+  RenderElementPropsFor,
+  VideoElement as VideoElementType,
+} from './custom-types.d'
 
 const EmbedsExample = () => {
   const editor = useMemo(() => withEmbeds(withReact(createEditor())), [])
@@ -25,13 +31,13 @@ const EmbedsExample = () => {
   )
 }
 
-const withEmbeds = editor => {
+const withEmbeds = (editor: CustomEditor) => {
   const { isVoid } = editor
   editor.isVoid = element => (element.type === 'video' ? true : isVoid(element))
   return editor
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'video':
@@ -43,12 +49,16 @@ const Element = props => {
 
 const allowedSchemes = ['http:', 'https:']
 
-const VideoElement = ({ attributes, children, element }) => {
+const VideoElement = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<VideoElementType>) => {
   const editor = useSlateStatic()
   const { url } = element
 
   const safeUrl = useMemo(() => {
-    let parsedUrl: URL = null
+    let parsedUrl: URL | null = null
     try {
       parsedUrl = new URL(url)
       // eslint-disable-next-line no-empty
@@ -98,17 +108,22 @@ const VideoElement = ({ attributes, children, element }) => {
   )
 }
 
-const UrlInput = ({ url, onChange }) => {
+interface UrlInputProps {
+  url: string
+  onChange: (url: string) => void
+}
+
+const UrlInput = ({ url, onChange }: UrlInputProps) => {
   const [value, setValue] = React.useState(url)
   return (
     <input
       value={value}
-      onClick={e => e.stopPropagation()}
+      onClick={(e: React.MouseEvent) => e.stopPropagation()}
       style={{
         marginTop: '5px',
         boxSizing: 'border-box',
       }}
-      onChange={e => {
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
         const newUrl = e.target.value
         setValue(newUrl)
         onChange(newUrl)

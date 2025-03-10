@@ -1,21 +1,35 @@
-import React, { useMemo } from 'react'
-import isUrl from 'is-url'
-import { isKeyHotkey } from 'is-hotkey'
 import { css } from '@emotion/css'
-import { Editable, withReact, useSlate, useSelected } from 'slate-react'
-import * as SlateReact from 'slate-react'
+import { isKeyHotkey } from 'is-hotkey'
+import isUrl from 'is-url'
+import React, { MouseEvent, useMemo } from 'react'
 import {
-  Transforms,
-  Editor,
-  Range,
   createEditor,
-  Element as SlateElement,
   Descendant,
+  Editor,
+  Element as SlateElement,
+  Range,
+  Transforms,
 } from 'slate'
 import { withHistory } from 'slate-history'
-import { LinkElement, ButtonElement } from './custom-types.d'
+import {
+  Editable,
+  RenderElementProps,
+  RenderLeafProps,
+  useSelected,
+  useSlate,
+  withReact,
+} from 'slate-react'
+import * as SlateReact from 'slate-react'
 
 import { Button, Icon, Toolbar } from './components'
+import {
+  BadgeElement,
+  ButtonElement,
+  CustomEditor,
+  CustomElement,
+  LinkElement,
+  RenderElementPropsFor,
+} from './custom-types.d'
 
 const initialValue: Descendant[] = [
   {
@@ -67,7 +81,7 @@ const initialValue: Descendant[] = [
 ]
 const InlinesExample = () => {
   const editor = useMemo(
-    () => withInlines(withHistory(withReact(createEditor()))),
+    () => withInlines(withHistory(withReact(createEditor()))) as CustomEditor,
     []
   )
 
@@ -112,17 +126,17 @@ const InlinesExample = () => {
   )
 }
 
-const withInlines = editor => {
+const withInlines = (editor: CustomEditor) => {
   const { insertData, insertText, isInline, isElementReadOnly, isSelectable } =
     editor
 
-  editor.isInline = element =>
+  editor.isInline = (element: CustomElement) =>
     ['link', 'button', 'badge'].includes(element.type) || isInline(element)
 
-  editor.isElementReadOnly = element =>
+  editor.isElementReadOnly = (element: CustomElement) =>
     element.type === 'badge' || isElementReadOnly(element)
 
-  editor.isSelectable = element =>
+  editor.isSelectable = (element: CustomElement) =>
     element.type !== 'badge' && isSelectable(element)
 
   editor.insertText = text => {
@@ -146,19 +160,19 @@ const withInlines = editor => {
   return editor
 }
 
-const insertLink = (editor, url) => {
+const insertLink = (editor: CustomEditor, url: string) => {
   if (editor.selection) {
     wrapLink(editor, url)
   }
 }
 
-const insertButton = editor => {
+const insertButton = (editor: CustomEditor) => {
   if (editor.selection) {
     wrapButton(editor)
   }
 }
 
-const isLinkActive = editor => {
+const isLinkActive = (editor: CustomEditor): boolean => {
   const [link] = Editor.nodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
@@ -166,7 +180,7 @@ const isLinkActive = editor => {
   return !!link
 }
 
-const isButtonActive = editor => {
+const isButtonActive = (editor: CustomEditor): boolean => {
   const [button] = Editor.nodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'button',
@@ -174,21 +188,21 @@ const isButtonActive = editor => {
   return !!button
 }
 
-const unwrapLink = editor => {
+const unwrapLink = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'link',
   })
 }
 
-const unwrapButton = editor => {
+const unwrapButton = (editor: CustomEditor) => {
   Transforms.unwrapNodes(editor, {
     match: n =>
       !Editor.isEditor(n) && SlateElement.isElement(n) && n.type === 'button',
   })
 }
 
-const wrapLink = (editor, url: string) => {
+const wrapLink = (editor: CustomEditor, url: string) => {
   if (isLinkActive(editor)) {
     unwrapLink(editor)
   }
@@ -209,7 +223,7 @@ const wrapLink = (editor, url: string) => {
   }
 }
 
-const wrapButton = editor => {
+const wrapButton = (editor: CustomEditor) => {
   if (isButtonActive(editor)) {
     unwrapButton(editor)
   }
@@ -244,11 +258,14 @@ const InlineChromiumBugfix = () => (
 
 const allowedSchemes = ['http:', 'https:', 'mailto:', 'tel:']
 
-const LinkComponent = ({ attributes, children, element }) => {
+const LinkComponent = ({
+  attributes,
+  children,
+  element,
+}: RenderElementPropsFor<LinkElement>) => {
   const selected = useSelected()
-
   const safeUrl = useMemo(() => {
-    let parsedUrl: URL = null
+    let parsedUrl: URL | null = null
     try {
       parsedUrl = new URL(element.url)
       // eslint-disable-next-line no-empty
@@ -278,7 +295,10 @@ const LinkComponent = ({ attributes, children, element }) => {
   )
 }
 
-const EditableButtonComponent = ({ attributes, children }) => {
+const EditableButtonComponent = ({
+  attributes,
+  children,
+}: RenderElementProps) => {
   return (
     /*
       Note that this is not a true button, but a span with button-like CSS.
@@ -310,7 +330,11 @@ const EditableButtonComponent = ({ attributes, children }) => {
   )
 }
 
-const BadgeComponent = ({ attributes, children, element }) => {
+const BadgeComponent = ({
+  attributes,
+  children,
+  element,
+}: RenderElementProps) => {
   const selected = useSelected()
 
   return (
@@ -334,7 +358,7 @@ const BadgeComponent = ({ attributes, children, element }) => {
   )
 }
 
-const Element = props => {
+const Element = (props: RenderElementProps) => {
   const { attributes, children, element } = props
   switch (element.type) {
     case 'link':
@@ -348,7 +372,7 @@ const Element = props => {
   }
 }
 
-const Text = props => {
+const Text = (props: RenderLeafProps) => {
   const { attributes, children, leaf } = props
   return (
     <span
@@ -362,7 +386,7 @@ const Text = props => {
           ? css`
               padding-left: 0.1px;
             `
-          : null
+          : undefined
       }
       {...attributes}
     >
@@ -376,7 +400,7 @@ const AddLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault()
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
@@ -394,7 +418,7 @@ const RemoveLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent) => {
         if (isLinkActive(editor)) {
           unwrapLink(editor)
         }
@@ -410,7 +434,7 @@ const ToggleEditableButtonButton = () => {
   return (
     <Button
       active
-      onMouseDown={event => {
+      onMouseDown={(event: MouseEvent) => {
         event.preventDefault()
         if (isButtonActive(editor)) {
           unwrapButton(editor)
