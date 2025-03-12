@@ -1,32 +1,34 @@
 #!/usr/bin/env node
 
-const {existsSync} = require(`fs`);
-const {createRequire, register} = require(`module`);
-const {resolve} = require(`path`);
-const {pathToFileURL} = require(`url`);
+const { existsSync } = require("fs");
+const { createRequire, register } = require("module");
+const { resolve } = require("path");
+const { pathToFileURL } = require("url");
 
-const relPnpApiPath = "../../../../.pnp.cjs";
+// Define paths
+const PNP_API_PATH = resolve(__dirname, "../../../../.pnp.cjs");
+const PNP_LOADER_PATH = resolve(PNP_API_PATH, "../.pnp.loader.mjs");
+const USER_WRAPPER_PATH = resolve(__dirname, "./sdk.user.cjs");
 
-const absPnpApiPath = resolve(__dirname, relPnpApiPath);
-const absUserWrapperPath = resolve(__dirname, `./sdk.user.cjs`);
-const absRequire = createRequire(absPnpApiPath);
+const requireFromPnp = createRequire(PNP_API_PATH);
+const isPnpAvailable = existsSync(PNP_API_PATH);
+const isPnpLoaderEnabled = existsSync(PNP_LOADER_PATH);
+const isUserWrapperAvailable = existsSync(USER_WRAPPER_PATH);
 
-const absPnpLoaderPath = resolve(absPnpApiPath, `../.pnp.loader.mjs`);
-const isPnpLoaderEnabled = existsSync(absPnpLoaderPath);
+//setup PnP environment If required
+if (isPnpAvailable && !process.versions.pnp) {
+  require(PNP_API_PATH).setup();
 
-if (existsSync(absPnpApiPath)) {
-  if (!process.versions.pnp) {
-    // Setup the environment to be able to require eslint/bin/eslint.js
-    require(absPnpApiPath).setup();
-    if (isPnpLoaderEnabled && register) {
-      register(pathToFileURL(absPnpLoaderPath));
-    }
+  if (isPnpLoaderEnabled && register) {
+    register(pathToFileURL(PNP_LOADER_PATH));
   }
 }
 
-const wrapWithUserWrapper = existsSync(absUserWrapperPath)
-  ? exports => absRequire(absUserWrapperPath)(exports)
+//   apply user wrapper if It exists
+const wrapWithUserWrapper = isUserWrapperAvailable
+  ? exports => requireFromPnp(USER_WRAPPER_PATH)(exports)
   : exports => exports;
 
-// Defer to the real eslint/bin/eslint.js your application uses
-module.exports = wrapWithUserWrapper(absRequire(`eslint/bin/eslint.js`));
+// export ESLint from the appropriate Location
+module.exports = wrapWithUserWrapper(requireFromPnp("eslint/bin/eslint.js"));
+
