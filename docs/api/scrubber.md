@@ -24,7 +24,7 @@ Scrubber.setScrubber((key, value) => {
 ```
 
 By setting the scrubber in this way, the error example given above will be
-printed as
+printed as:
 
 ```
 Cannot get the child of a text node: {"text": "... scrubbed ..."}
@@ -62,7 +62,7 @@ const generateRandomCharacter = (): string => {
 Scrubber.setScrubber(Scrubber.textRandomizer(['text', 'src']))
 ```
 
-In this example, a Node that looked like
+In this example, a Node that looked like:
 
 ```json
 { "text": "My test input string", "count": 5 }
