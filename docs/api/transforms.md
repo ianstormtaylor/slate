@@ -11,7 +11,9 @@ Transforms are helper functions operating on the document. They can be used in d
 
 ## Node options
 
-All transforms support a parameter `options`. This includes options specific to the transform, and general `NodeOptions` to specify which Nodes in the document that the transform is applied to.
+All transforms support a parameter `options`. This includes options specific to the transform and general `NodeOptions` to specify which Nodes in the document the transform is applied to.
+
+
 
 ```typescript
 interface NodeOptions {
@@ -34,11 +36,11 @@ interface NodeOptions {
 
 ### Node transforms
 
-Transforms that operate on nodes.
+These transforms operate on nodes.
 
 #### `Transforms.insertFragment(editor: Editor, fragment: Node[], options?)`
 
-Insert of fragment of nodes at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
+Insert a fragment of nodes at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
 
 Options: `{at?: Location, hanging?: boolean, voids?: boolean}`
 
@@ -95,7 +97,8 @@ Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'
 
 Set properties of nodes at the specified location. If no location is specified, use the selection.
 
-if `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
+
 
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
