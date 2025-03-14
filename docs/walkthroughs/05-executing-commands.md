@@ -53,7 +53,9 @@ const App = () => {
               Transforms.setNodes(
                 editor,
                 { type: match ? null : 'code' },
-                { match: n => Element.isElement(n) && Editor.isBlock(editor, n) }
+                {
+                  match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+                }
               )
               break
             }
