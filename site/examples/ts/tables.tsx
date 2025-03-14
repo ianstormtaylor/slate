@@ -16,6 +16,7 @@ import {
   withReact,
 } from 'slate-react'
 import { CustomEditor } from './custom-types.d'
+import { css } from '@emotion/css'
 
 const TablesExample = () => {
   const renderElement = useCallback(
@@ -114,7 +115,12 @@ const Element = ({ attributes, children, element }: RenderElementProps) => {
   switch (element.type) {
     case 'table':
       return (
-        <table>
+        <table
+          className={css`
+            // avoid unexpected selection behavior on both sides of the table
+            position: relative;
+          `}
+        >
           <tbody {...attributes}>{children}</tbody>
         </table>
       )
