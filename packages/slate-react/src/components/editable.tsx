@@ -506,6 +506,7 @@ export const Editable = forwardRef(
     // https://github.com/facebook/react/issues/11211
     const onDOMBeforeInput = useCallback(
       (event: InputEvent) => {
+        handleNativeHistoryEvents(editor, event)
         const el = ReactEditor.toDOMNode(editor, editor)
         const root = el.getRootNode()
 
@@ -1077,22 +1078,10 @@ export const Editable = forwardRef(
                     // This means undo can be triggered even when the div is not focused,
                     // and it only triggers the input event for the node. (2024/10/09)
                     if (!ReactEditor.isFocused(editor)) {
-                      const native = event.nativeEvent as InputEvent
-                      const maybeHistoryEditor: any = editor
-                      if (
-                        native.inputType === 'historyUndo' &&
-                        typeof maybeHistoryEditor.undo === 'function'
-                      ) {
-                        maybeHistoryEditor.undo()
-                        return
-                      }
-                      if (
-                        native.inputType === 'historyRedo' &&
-                        typeof maybeHistoryEditor.redo === 'function'
-                      ) {
-                        maybeHistoryEditor.redo()
-                        return
-                      }
+                      handleNativeHistoryEvents(
+                        editor,
+                        event.nativeEvent as InputEvent
+                      )
                     }
                   },
                   [attributes.onInput, editor]
@@ -1975,4 +1964,22 @@ export const isDOMEventHandled = <E extends Event>(
   }
 
   return event.defaultPrevented
+}
+
+const handleNativeHistoryEvents = (editor: Editor, event: InputEvent) => {
+  const maybeHistoryEditor: any = editor
+  if (
+    event.inputType === 'historyUndo' &&
+    typeof maybeHistoryEditor.undo === 'function'
+  ) {
+    maybeHistoryEditor.undo()
+    return
+  }
+  if (
+    event.inputType === 'historyRedo' &&
+    typeof maybeHistoryEditor.redo === 'function'
+  ) {
+    maybeHistoryEditor.redo()
+    return
+  }
 }
