@@ -77,12 +77,12 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     const isSingleText = Path.equals(start.path, end.path)
     const startNonEditable = voids
       ? null
-      : Editor.void(editor, { at: start, mode: 'highest' }) ??
-        Editor.elementReadOnly(editor, { at: start, mode: 'highest' })
+      : (Editor.void(editor, { at: start, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: start, mode: 'highest' }))
     const endNonEditable = voids
       ? null
-      : Editor.void(editor, { at: end, mode: 'highest' }) ??
-        Editor.elementReadOnly(editor, { at: end, mode: 'highest' })
+      : (Editor.void(editor, { at: end, mode: 'highest' }) ??
+        Editor.elementReadOnly(editor, { at: end, mode: 'highest' }))
 
     // If the start or end points are inside an inline void, nudge them out.
     if (startNonEditable) {
