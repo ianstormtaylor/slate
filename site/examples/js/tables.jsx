@@ -8,6 +8,7 @@ import {
 } from 'slate'
 import { withHistory } from 'slate-history'
 import { Editable, Slate, withReact } from 'slate-react'
+import { css } from '@emotion/css'
 
 const TablesExample = () => {
   const renderElement = useCallback(props => <Element {...props} />, [])
@@ -83,7 +84,12 @@ const Element = ({ attributes, children, element }) => {
   switch (element.type) {
     case 'table':
       return (
-        <table>
+        <table
+          className={css`
+            // avoid unexpected selection behavior on both sides of the table
+            position: relative;
+          `}
+        >
           <tbody {...attributes}>{children}</tbody>
         </table>
       )
