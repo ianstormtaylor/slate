@@ -13,8 +13,6 @@ Transforms are helper functions operating on the document. They can be used in d
 
 All transforms support a parameter `options`. This includes options specific to the transform and general `NodeOptions` to specify which Nodes in the document the transform is applied to.
 
-
-
 ```typescript
 interface NodeOptions {
   at?: Location
@@ -98,7 +96,6 @@ Options supported: `NodeOptions & {split?: boolean}`. For `options.mode`, `'all'
 Set properties of nodes at the specified location. If no location is specified, use the selection.
 
 If `props` contains `undefined` values, the node's corresponding property will also be set to `undefined` as opposed to ignored.
-
 
 Options supported: `NodeOptions & {hanging?: boolean, split?: boolean}`. For `options.mode`, `'all'` is also supported.
 
