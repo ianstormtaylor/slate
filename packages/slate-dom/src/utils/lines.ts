@@ -71,5 +71,5 @@ export const findCurrentLineRange = (
     middle = Math.floor((left + right) / 2)
   }
 
-  return Editor.range(editor, positions[right], parentRangeBoundary)
+  return Editor.range(editor, positions[left], parentRangeBoundary)
 }
