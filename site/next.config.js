@@ -1,18 +1,20 @@
-const fs = require('fs')
-const path = require('path')
-
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',
   webpack: config => {
     config.module.rules.push({
       test: /\.js$/,
       enforce: 'pre',
-      exclude: [/node_modules[\\\/]@next/, /node_modules[\\\/]next/],
+      exclude: [/node_modules[\\/](next|@next)/],
       use: [
         {
-          loader: require.resolve('source-map-loader'),
+          loader: 'source-map-loader',
         },
       ],
     })
+
     return config
   },
 }
+
+module.exports = nextConfig

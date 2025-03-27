@@ -4,7 +4,7 @@ test.setTimeout(60 * 1000)
 
 test.describe('code highlighting', () => {
   test.beforeEach(async ({ page }) => {
-    page.goto('http://localhost:3000/examples/code-highlighting')
+    await page.goto('http://localhost:3000/examples/code-highlighting')
   })
 
   for (const testCase of getTestCases()) {
@@ -32,7 +32,10 @@ test.describe('code highlighting', () => {
 async function setText(page: Page, text: string, language: string) {
   await page.locator('[data-slate-editor]').fill('') // clear editor
   await page.getByTestId('code-block-button').click() // convert first and the only one paragraph to code block
-  await page.getByTestId('language-select').selectOption({ value: language }) // select the language option
+  await page
+    .getByTestId('language-select')
+    .first()
+    .selectOption({ value: language }) // select the language option
 
   await page.keyboard.type(text) // type text
 }
