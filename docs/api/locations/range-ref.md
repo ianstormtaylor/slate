@@ -27,7 +27,7 @@ Transforms.select(editor, selectionRef.unref())
 
 ## Instance methods
 
-#### `unref() => Range`
+#### `unref() => Range | null`
 
 Call this when you no longer need to sync this range.
 It also returns the current value.

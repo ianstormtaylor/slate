@@ -16,7 +16,7 @@ interface PointRef {
 
 ## Instance methods
 
-#### `unRef() => Point`
+#### `unref() => Point | null`
 
 Call this when you no longer need to sync this point.
 It also returns the current value.
