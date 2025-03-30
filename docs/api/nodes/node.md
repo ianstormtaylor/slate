@@ -58,10 +58,10 @@ Extract all properties from a Node except for its content-related fields (`child
 ```typescript
 // For an Element node
 const element = {
-    type: 'paragraph',
-    align: 'center',
-    children: [{ text: 'Try it out for yourself!' }],
-  }
+  type: 'paragraph',
+  align: 'center',
+  children: [{ text: 'Try it out for yourself!' }],
+}
 const props = Node.extractProps(element)
 // Returns: { type: 'paragraph', align: "center" }
 
