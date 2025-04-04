@@ -115,6 +115,10 @@ Check is a value implements the `Path` interface.
 
 Check if a path is a sibling of another.
 
+#### `Path.operationCanTransformPath(operation: Operation) => operation is InsertNodeOperation | RemoveNodeOperation | MergeNodeOperation | SplitNodeOperation | MoveNodeOperation`
+
+Returns whether this operation can affect paths or not.
+
 ### Transform method
 
 #### `Path.transform(path: Path, operation: Operation, options?) => Path | null`

@@ -51,6 +51,26 @@ Return a generator of all the element nodes inside a root node. Each iteration w
 
 Options: `{from?: Path, to?: Path, reverse?: boolean, pass?: (node: NodeEntry => boolean)}`
 
+#### `Node.extractProps(node: Node) => NodeProps`
+
+Extract all properties from a Node except for its content-related fields (`children` for Element nodes and `text` for Text nodes).
+
+```typescript
+// For an Element node
+const element = {
+  type: 'paragraph',
+  align: 'center',
+  children: [{ text: 'Try it out for yourself!' }],
+}
+const props = Node.extractProps(element)
+// Returns: { type: 'paragraph', align: "center" }
+
+// For a Text node
+const text = { text: 'Hello', bold: true }
+const props = Node.extractProps(text)
+// Returns: { bold: true }
+```
+
 #### `Node.first(root: Node, path: Path) => NodeEntry`
 
 Get the first node entry in a root node from a `path`.
@@ -62,6 +82,19 @@ Get the sliced fragment represented by the `range`.
 #### `Node.get(root: Node, path: Path) => Node`
 
 Get the descendant node referred to by a specific `path`. If the path is an empty array, get the root node itself.
+
+#### `Node.getIf(root: Node, path: Path) => Node | undefined`
+
+Get a descendant node at a specific path, returning `undefined` if the node does not exist. This is a safer alternative to `Node.get()` as it won't throw an error if the path is invalid.
+
+```typescript
+const node = Node.getIf(root, [0, 1])
+if (node) {
+  // node exists at path [0, 1]
+} else {
+  // no node exists at path [0, 1]
+}
+```
 
 #### `Node.last(root: Node, path: Path) => NodeEntry`
 

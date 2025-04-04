@@ -246,6 +246,10 @@ Delete the content in the current selection.
 
 Insert a block break at the current selection.
 
+#### `Editor.insertSoftBreak(editor: Editor) => void`
+
+Insert a soft break at the current selection.
+
 #### `Editor.insertFragment(editor: Editor, fragment: Node[], options?) => void`
 
 Inserts a fragment at the specified location or (if not defined) the current selection or (if not defined) the end of the document.
@@ -444,7 +448,7 @@ Remove a custom property from the leaf text nodes within non-void nodes or void 
 
 ### getFragment method
 
-#### `getFragment() => Descendant`
+#### `getFragment() => Descendant[]`
 
 Returns the fragment at the current selection. Used when cutting or copying, as an example, to get the fragment at the current selection.
 

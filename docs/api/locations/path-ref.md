@@ -10,8 +10,15 @@ interface PathRef {
 }
 ```
 
+- [Instance methods](path-ref.md#instance-methods)
 - [Static methods](path-ref.md#static-methods)
   - [Transform methods](path-ref.md#trasnform-methods)
+
+## Instance methods
+
+#### `unref() => Path | null`
+
+Free the resources used by the PathRef. This should be called when you no longer need to track the path. Returns the final path value before being unrefed, or null if the path was already invalid.
 
 ## Static methods
 
