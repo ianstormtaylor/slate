@@ -1,5 +1,11 @@
 # slate-history
 
+## 0.113.1
+
+### Patch Changes
+
+- [#5837](https://github.com/ianstormtaylor/slate/pull/5837) [`701d5f32`](https://github.com/ianstormtaylor/slate/commit/701d5f320f37733071150dd0f78201f3bf7bfdc9) Thanks [@ederzz](https://github.com/ederzz)! - fix: add try/finally block in withoutSaving method to ensure state restoration
+
 ## 0.110.3
 
 ### Patch Changes
