@@ -136,7 +136,7 @@ const CodeBlockButton = () => {
     )
     Transforms.setNodes(
       editor,
-      { type: CodeLineType },
+      { type: CodeLineType } as Partial<CustomElement>,
       { match: n => Element.isElement(n) && n.type === ParagraphType }
     )
   }
