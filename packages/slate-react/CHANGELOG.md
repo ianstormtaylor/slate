@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.113.0
+
+### Patch Changes
+
+- [#5822](https://github.com/ianstormtaylor/slate/pull/5822) [`68915e8c`](https://github.com/ianstormtaylor/slate/commit/68915e8cfadd9d8dd545dbcd8c33b6b69827a287) Thanks [@RavenColEvol](https://github.com/RavenColEvol)! - add context menu undo support
+
 ## 0.112.1
 
 ### Patch Changes

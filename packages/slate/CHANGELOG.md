@@ -1,5 +1,15 @@
 # slate
 
+## 0.113.0
+
+### Minor Changes
+
+- [#5843](https://github.com/ianstormtaylor/slate/pull/5843) [`63c0db5b`](https://github.com/ianstormtaylor/slate/commit/63c0db5b862137490baf2883d4378efd0b6311de) Thanks [@12joan](https://github.com/12joan)! - Add `pass` option to `Editor.nodes`, which is passed through to `Node.nodes`.
+
+### Patch Changes
+
+- [#5842](https://github.com/ianstormtaylor/slate/pull/5842) [`463ef3a6`](https://github.com/ianstormtaylor/slate/commit/463ef3a6504020a869fa06e4dd722f72de32677a) Thanks [@wkq](https://github.com/wkq)! - fix: correct dirty path update for Text nodes
+
 ## 0.112.0
 
 ### Minor Changes
