@@ -120,7 +120,7 @@ export const insertNodes: NodeTransforms['insertNodes'] = (
             at = Path.next(at as Path)
 
             batchedOps.push(op)
-            if (!Text.isText) {
+            if (Text.isText(node)) {
               newDirtyPaths.push(path)
             } else {
               newDirtyPaths.push(
