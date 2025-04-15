@@ -4,7 +4,7 @@ import { jsx } from '../..'
 import { cloneDeep } from 'lodash'
 
 export const run = editor => {
-  Transforms.delete(editor)
+  Transforms.delete(editor, { reverse: true })
 }
 export const input = (
   <editor>
@@ -15,5 +15,4 @@ export const input = (
     </block>
   </editor>
 )
-export const skip = true // TODO: see https://github.com/ianstormtaylor/slate/pull/4188
 export const output = cloneDeep(input)
