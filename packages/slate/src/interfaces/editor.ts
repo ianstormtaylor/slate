@@ -244,6 +244,7 @@ export interface EditorNodesOptions<T extends Node> {
   universal?: boolean
   reverse?: boolean
   voids?: boolean
+  pass?: (entry: NodeEntry) => boolean
   ignoreNonSelectable?: boolean
 }
 

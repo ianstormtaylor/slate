@@ -141,7 +141,7 @@ Options: `depth?: number, edge?: 'start' | 'end'`
 
 At any given `Location` or `Span` in the editor provided by `at` (default is the current selection), the method returns a Generator of `NodeEntry` objects that represent the nodes that include `at`. At the top of the hierarchy is the `Editor` object itself.
 
-Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean}`
+Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean, pass?: (node: NodeEntry => boolean), ignoreNonSelectable?: boolean}`
 
 `options.match`: Provide a value to the `match?` option to limit the `NodeEntry` objects that are returned.
 
@@ -150,6 +150,8 @@ Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | '
 - `'all'` (default): Return all matching nodes
 - `'highest'`: in a hierarchy of nodes, only return the highest level matching nodes
 - `'lowest'`: in a hierarchy of nodes, only return the lowest level matching nodes
+
+`options.pass`: Skip the descendants of certain nodes (but not the nodes themselves).
 
 #### `Editor.parent(editor: Editor, at: Location, options?) => NodeEntry<Ancestor>`
 

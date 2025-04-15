@@ -15,6 +15,7 @@ export function* nodes<T extends Node>(
     universal = false,
     reverse = false,
     voids = false,
+    pass,
     ignoreNonSelectable = false,
   } = options
   let { match } = options
@@ -44,7 +45,8 @@ export function* nodes<T extends Node>(
     reverse,
     from,
     to,
-    pass: ([node]) => {
+    pass: ([node, path]) => {
+      if (pass && pass([node, path])) return true
       if (!Element.isElement(node)) return false
       if (
         !voids &&
