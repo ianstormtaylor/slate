@@ -179,22 +179,17 @@ const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   />
 )
 
-const Tab = React.forwardRef(
-  (
-    {
-      active,
-      href,
-      ...props
-    }: PropsWithChildren<{
-      active: boolean
-      href: string
-      [key: string]: unknown
-    }>,
-    ref: Ref<HTMLAnchorElement>
-  ) => (
+interface TabProps {
+  active: boolean
+  href: string
+  [key: string]: unknown
+}
+
+const Tab = React.forwardRef<HTMLAnchorElement, PropsWithChildren<TabProps>>(
+  ({ active, href, ...props }, ref) => (
     <a
       ref={ref}
-      href={href}
+      href={href as string}
       {...props}
       className={css`
         display: inline-block;

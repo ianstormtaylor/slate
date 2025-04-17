@@ -14,8 +14,15 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
-    "incremental": true
+    "incremental": true,
+    "types": []
   },
-  "exclude": ["node_modules"],
+  "exclude": [
+    "node_modules",
+    "**/*.d.ts",
+    "../node_modules",
+    "../../node_modules",
+    "../../../.yarn"
+  ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
 }
