@@ -57,7 +57,13 @@ export function useSlateSelector<T>(
       selector !== latestSelector.current ||
       latestSubscriptionCallbackError.current
     ) {
-      selectedState = selector(getSlate())
+      const selectorResult = selector(getSlate())
+
+      if (equalityFn(latestSelectedState.current, selectorResult)) {
+        selectedState = latestSelectedState.current
+      } else {
+        selectedState = selectorResult
+      }
     } else {
       selectedState = latestSelectedState.current
     }
