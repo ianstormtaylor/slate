@@ -110,7 +110,7 @@ This is where the `renderText` prop comes in. It allows you to render a componen
 ```jsx
 const renderText = useCallback(({ attributes, children, text }) => {
   return (
-    <span {...attributes} className="...">
+    <span {...attributes} className="custom-text">
       {children}
       {/* Render anything you want here */}
     </span>

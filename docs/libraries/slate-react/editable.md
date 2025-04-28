@@ -134,6 +134,55 @@ export interface RenderLeafProps {
 }
 ```
 
+Example usage:
+
+```typescript
+<Editor
+  renderLeaf={({ attributes, children, leaf }) => {
+    return (
+      <span
+        {...attributes}
+        style={{ fontWeight: leaf.bold ? 'bold' : 'normal' }}
+      >
+        {children}
+      </span>
+    )
+  }}
+/>
+```
+
+#### `renderText?: (props: RenderTextProps) => JSX.Element`
+
+The `renderText` prop allows you to customize the rendering of the container element for a Text node in the Slate editor. This is useful when you need to wrap the entire text node content or add elements associated with the text node as a whole, regardless of how decorations might split the text into multiple leaves.
+
+The `renderText` function receives an object of type `RenderTextProps` as its argument:
+
+```typescript
+export interface RenderTextProps {
+  text: Text
+  children: any
+  attributes: {
+    'data-slate-node': 'text'
+    ref: any
+  }
+}
+```
+
+Example usage:
+
+```jsx
+<Editable
+  renderText={({ attributes, children, text }) => {
+    return (
+      <span {...attributes} className="custom-text">
+        {children}
+        {text.tooltipContent && <Tooltip content={text.tooltipContent} />}
+      </span>
+    )
+  }}
+/>
+```
+
 #### `renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element`
 
 The `renderPlaceholder` prop allows you to customize how the placeholder of the Slate.js `Editable` component is rendered when the editor is empty. The placeholder will only be shown when the editor's content is empty.
