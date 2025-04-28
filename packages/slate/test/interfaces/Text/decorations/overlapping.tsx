@@ -32,16 +32,22 @@ export const output = [
     text: 'a',
     mark: 'mark',
     decoration2: 'decoration2',
+    start: 0,
+    end: 1,
   },
   {
     text: 'b',
     mark: 'mark',
     decoration1: 'decoration1',
     decoration2: 'decoration2',
+    start: 1,
+    end: 2,
   },
   {
     text: 'c',
     mark: 'mark',
     decoration2: 'decoration2',
+    start: 2,
+    end: 3,
   },
 ]

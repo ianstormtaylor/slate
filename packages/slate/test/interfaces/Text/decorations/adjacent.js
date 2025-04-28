@@ -33,19 +33,27 @@ export const output = [
   {
     text: 'a',
     mark: 'mark',
+    start: 0,
+    end: 1,
   },
   {
     text: 'b',
     mark: 'mark',
     decoration1: 'decoration1',
+    start: 1,
+    end: 2,
   },
   {
     text: 'c',
     mark: 'mark',
     decoration2: 'decoration2',
+    start: 2,
+    end: 3,
   },
   {
     text: 'd',
     mark: 'mark',
+    start: 3,
+    end: 4,
   },
 ]

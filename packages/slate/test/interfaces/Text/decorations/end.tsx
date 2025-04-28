@@ -20,10 +20,14 @@ export const output = [
   {
     text: 'ab',
     mark: 'mark',
+    start: 0,
+    end: 2,
   },
   {
     text: 'c',
     mark: 'mark',
     decoration: 'decoration',
+    start: 2,
+    end: 3,
   },
 ]

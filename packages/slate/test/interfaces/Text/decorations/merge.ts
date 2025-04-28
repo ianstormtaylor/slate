@@ -40,15 +40,21 @@ export const output = [
     text: 'a',
     mark: 'mark',
     decoration: [1, 2, 3],
+    start: 0,
+    end: 1,
   },
   {
     text: 'b',
     mark: 'mark',
     decoration: [1, 2, 3, 4, 5, 6],
+    start: 1,
+    end: 2,
   },
   {
     text: 'c',
     mark: 'mark',
     decoration: [4, 5, 6],
+    start: 2,
+    end: 3,
   },
 ]

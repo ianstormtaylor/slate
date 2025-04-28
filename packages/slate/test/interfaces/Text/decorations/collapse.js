@@ -55,11 +55,15 @@ export const output = [
   {
     text: 'a',
     mark: 'mark',
+    start: 0,
+    end: 1,
   },
   {
     text: 'b',
     mark: 'mark',
     decoration1: 'decoration1',
+    start: 1,
+    end: 2,
   },
   {
     text: '',
@@ -67,19 +71,27 @@ export const output = [
     decoration1: 'decoration1',
     decoration2: 'decoration2',
     decoration3: 'decoration3',
+    start: 2,
+    end: 2,
   },
   {
     text: 'c',
     mark: 'mark',
     decoration3: 'decoration3',
+    start: 2,
+    end: 3,
   },
   {
     text: 'd',
     mark: 'mark',
+    start: 3,
+    end: 4,
   },
   {
     text: '',
     mark: 'mark',
     decoration4: 'decoration4',
+    start: 4,
+    end: 4,
   },
 ]

@@ -21,9 +21,13 @@ export const output = [
     text: 'a',
     mark: 'mark',
     decoration: 'decoration',
+    start: 0,
+    end: 1,
   },
   {
     text: 'bc',
     mark: 'mark',
+    start: 1,
+    end: 3,
   },
 ]
