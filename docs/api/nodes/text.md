@@ -30,10 +30,17 @@ If there are properties in `text` that are not in `props`, those will be ignored
 
 Get the leaves for a text node, given `decorations`.
 
-Each `Leaf` object includes all properties of the original `Text` node, plus `start` and `end` properties indicating the offset range within the original `node.text` that the leaf represents.
+Each `Leaf` object includes all properties of the original `Text` node, plus an optional `position` property that is only present when the text node is split into multiple leaves by decorations.
 
 ```typescript
-type Leaf = Text & { start: number; end: number }
+type Leaf = Text & {
+  position?: {
+    start: number
+    end: number
+    isFirst?: true
+    isLast?: true
+  }
+}
 ```
 
 ### Check methods
