@@ -11,7 +11,6 @@ import { isDeepEqual } from '../utils/deep-equal'
 
 export interface BaseText {
   text: string
-  [key: string]: unknown
 }
 
 export type Text = ExtendedType<'Text', BaseText>
