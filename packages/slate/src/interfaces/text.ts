@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Range } from '..'
+import { Path, Range } from '..'
 import { ExtendedType } from '../types/custom-types'
 import { isDeepEqual } from '../utils/deep-equal'
 
@@ -14,6 +14,8 @@ export interface BaseText {
 }
 
 export type Text = ExtendedType<'Text', BaseText>
+
+export type Leaf = Text & { start: number; end: number }
 
 export interface TextEqualsOptions {
   loose?: boolean
@@ -62,7 +64,7 @@ export interface TextInterface {
   /**
    * Get the leaves for a text node given decorations.
    */
-  decorations: (node: Text, decorations: DecoratedRange[]) => Text[]
+  decorations: (node: Text, decorations: DecoratedRange[]) => Leaf[]
 }
 
 // eslint-disable-next-line no-redeclare
@@ -111,8 +113,14 @@ export const Text: TextInterface = {
     return true
   },
 
-  decorations(node: Text, decorations: DecoratedRange[]): Text[] {
-    let leaves: Text[] = [{ ...node }]
+  decorations(node: Text, decorations: DecoratedRange[]): Leaf[] {
+    let leaves: Leaf[] = [
+      {
+        ...node,
+        start: 0,
+        end: node.text.length,
+      },
+    ]
 
     for (const dec of decorations) {
       const { anchor, focus, merge: mergeDecoration, ...rest } = dec
@@ -180,6 +188,16 @@ export const Text: TextInterface = {
       }
 
       leaves = next
+    }
+
+    let currentOffset = 0
+    for (const leaf of leaves) {
+      const start = currentOffset
+      const end = start + leaf.text.length
+
+      leaf.start = start
+      leaf.end = end
+      currentOffset = end
     }
 
     return leaves

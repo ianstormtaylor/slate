@@ -23,6 +23,7 @@ import {
   Text,
   Transforms,
   DecoratedRange,
+  Leaf,
 } from 'slate'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
@@ -105,8 +106,9 @@ export interface RenderElementProps {
 
 export interface RenderLeafProps {
   children: any
-  leaf: Text
+  leaf: Leaf
   text: Text
+  isLast: boolean
   attributes: {
     'data-slate-leaf': true
   }
@@ -1828,6 +1830,7 @@ export const Editable = forwardRef(
                 <Children
                   decorations={decorations}
                   node={editor}
+                  path={[]}
                   renderElement={renderElement}
                   renderPlaceholder={renderPlaceholder}
                   renderLeaf={renderLeaf}

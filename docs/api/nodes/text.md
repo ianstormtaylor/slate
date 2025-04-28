@@ -26,9 +26,15 @@ If a `props.text` property is passed in, it will be ignored.
 
 If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
 
-#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => Text[]`
+#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => Leaf[]`
 
 Get the leaves for a text node, given `decorations`.
+
+Each `Leaf` object includes all properties of the original `Text` node, plus `start` and `end` properties indicating the offset range within the original `node.text` that the leaf represents.
+
+```typescript
+type Leaf = Text & { start: number; end: number }
+```
 
 ### Check methods
 

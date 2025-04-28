@@ -117,7 +117,7 @@ The `renderLeaf` function receives an object of type `RenderLeafProps` as its ar
 ```typescript
 export interface RenderLeafProps {
   children: any
-  leaf: Text
+  leaf: Leaf
   text: Text
   attributes: {
     'data-slate-leaf': true
