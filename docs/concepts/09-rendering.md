@@ -80,7 +80,7 @@ Notice though how we've handled it slightly differently than `renderElement`. Si
 
 > 🤖 As with the Element renderer, be sure to mix in `props.attributes` and render `props.children` in your leaf renderer! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
 
-When decorations split a single text node, the `renderLeaf` function will receive an additional `leafPosition` property. This object contains the `start` and `end` offsets of the leaf within the original text node, along with optional `isFirst` and `isLast` booleans.
+When decorations split a single text node, the `renderLeaf` function will receive an additional `leafPosition` property. This object contains the `start` and `end` offsets of the leaf within the original text node, along with optional `isFirst` and `isLast` booleans. This `leafPosition` property is only added when a text node is actually split by decorations.
 
 One disadvantage of text-level formatting is that you cannot guarantee that any given format is "contiguous"—meaning that it stays as a single leaf. This limitation with respect to leaves is similar to the DOM, where this is invalid:
 
@@ -100,6 +100,37 @@ Of course, this leaf stuff sounds pretty complex. But, you do not have to think 
 
 - Text properties are for **non-contiguous**, character-level formatting.
 - Element properties are for **contiguous**, semantic elements in the document.
+
+## Texts
+
+While `renderLeaf` allows you to customize the rendering of individual leaves based on their formatting (marks and decorations), sometimes you need to customize the rendering for an entire text node, regardless of how decorations might split it into multiple leaves.
+
+This is where the `renderText` prop comes in. It allows you to render a component that wraps all the leaves generated for a single `Text` node.
+
+```jsx
+const renderText = useCallback(({ attributes, children, text }) => {
+  return (
+    <span {...attributes} className="...">
+      {children}
+      {/* Render anything you want here */}
+    </span>
+  )
+}, [])
+
+// In your editor component:
+<Editable
+  renderText={renderText}
+  renderLeaf={renderLeaf}
+/>
+```
+
+**When to use `renderLeaf` vs `renderText`:**
+
+- **`renderLeaf`**: Use this when you need to apply styles or rendering logic based on the specific properties of each individual leaf (e.g., applying bold style if `leaf.bold` is true, or highlighting based on a decoration). This function might be called multiple times for a single text node if decorations split it. You can use the optional `leafPosition` prop (available when a text node is split) to conditionally render something based on the position of the leaf within the text node.
+
+- **`renderText`**: Use this when you need to render something exactly once for a given text node, regardless of how many leaves it's split into. It's ideal for wrapping the entire text node's content or adding elements associated with the text node as a whole without worrying about duplication caused by decorations.
+
+You can use both `renderText` and `renderLeaf` together. `renderLeaf` renders the individual marks and decorations within a text node (leaves), and `renderText` renders the container of those leaves.
 
 ## Decorations
 
