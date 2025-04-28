@@ -55,13 +55,13 @@ export const output = [
   {
     text: 'a',
     mark: 'mark',
-    position: { start: 0, end: 1, isFirst: true, isLast: false },
+    position: { start: 0, end: 1, isFirst: true },
   },
   {
     text: 'b',
     mark: 'mark',
     decoration1: 'decoration1',
-    position: { start: 1, end: 2, isFirst: false, isLast: false },
+    position: { start: 1, end: 2 },
   },
   {
     text: '',
@@ -69,23 +69,23 @@ export const output = [
     decoration1: 'decoration1',
     decoration2: 'decoration2',
     decoration3: 'decoration3',
-    position: { start: 2, end: 2, isFirst: false, isLast: false },
+    position: { start: 2, end: 2 },
   },
   {
     text: 'c',
     mark: 'mark',
     decoration3: 'decoration3',
-    position: { start: 2, end: 3, isFirst: false, isLast: false },
+    position: { start: 2, end: 3 },
   },
   {
     text: 'd',
     mark: 'mark',
-    position: { start: 3, end: 4, isFirst: false, isLast: false },
+    position: { start: 3, end: 4 },
   },
   {
     text: '',
     mark: 'mark',
     decoration4: 'decoration4',
-    position: { start: 4, end: 4, isFirst: false, isLast: true },
+    position: { start: 4, end: 4, isLast: true },
   },
 ]

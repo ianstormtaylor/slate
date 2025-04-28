@@ -22,8 +22,8 @@ export type Leaf = Text & {
   position?: {
     start: number
     end: number
-    isFirst: boolean
-    isLast: boolean
+    isFirst?: true
+    isLast?: true
   }
 }
 
@@ -199,12 +199,12 @@ export const Text: TextInterface = {
       for (const [index, leaf] of leaves.entries()) {
         const start = currentOffset
         const end = start + leaf.text.length
-        leaf.position = {
-          start,
-          end,
-          isFirst: index === 0,
-          isLast: index === leaves.length - 1,
-        }
+        const position: Leaf['position'] = { start, end }
+
+        if (index === 0) position.isFirst = true
+        if (index === leaves.length - 1) position.isLast = true
+
+        leaf.position = position
         currentOffset = end
       }
     }

@@ -40,18 +40,18 @@ export const output = [
     text: 'a',
     mark: 'mark',
     decoration: [1, 2, 3],
-    position: { start: 0, end: 1, isFirst: true, isLast: false },
+    position: { start: 0, end: 1, isFirst: true },
   },
   {
     text: 'b',
     mark: 'mark',
     decoration: [1, 2, 3, 4, 5, 6],
-    position: { start: 1, end: 2, isFirst: false, isLast: false },
+    position: { start: 1, end: 2 },
   },
   {
     text: 'c',
     mark: 'mark',
     decoration: [4, 5, 6],
-    position: { start: 2, end: 3, isFirst: false, isLast: true },
+    position: { start: 2, end: 3, isLast: true },
   },
 ]
