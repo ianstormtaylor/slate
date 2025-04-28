@@ -110,12 +110,14 @@ const DefaultElement = props => {
 
 #### `renderLeaf?: (props: RenderLeafProps) => JSX.Element`
 
-A function to render a text [`Leaf`](../api/nodes/text.md) interface.
+The `renderLeaf` prop allows you to customize the rendering of leaf nodes in the document tree of your Slate editor. A "leaf" in Slate is the smallest chunk of text and its associated formatting attributes.
+
+The `renderLeaf` function receives an object of type `RenderLeafProps` as its argument:
 
 ```typescript
 export interface RenderLeafProps {
   children: any
-  leaf: Text // The leaf node with any applied decorations. If no decorations are applied, it will be identical to the `text` property.
+  leaf: Text
   text: Text
   attributes: {
     'data-slate-leaf': true
@@ -131,27 +133,6 @@ export interface RenderLeafProps {
   }
 }
 ```
-
-#### `renderText?: (props: RenderTextProps) => JSX.Element`
-
-A function to wrap the default rendering of a [`Text`](../api/nodes/text.md) node. The default rendering (including processing of decorations and calls to `renderLeaf`) is passed as `props.children`. This allows rendering elements before or after the entire content of a text node.
-
-Example:
-
-```jsx
-const renderText = ({ children, text }) => {
-  return (
-    <>
-      {text.someProperty && <IconBefore />}
-      {/* Default rendering of leaves */}
-      {children}
-      <ElementAfter text={text} />
-    </>
-  )
-}
-```
-
-If provided, this function takes precedence over `renderLeaf` for the purpose of wrapping the node; `renderLeaf` will still be called for each individual leaf _within_ the `children` passed to `renderText`.
 
 #### `renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element`
 
