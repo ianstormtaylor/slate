@@ -108,7 +108,6 @@ export interface RenderLeafProps {
   children: any
   leaf: Leaf
   text: Text
-  isLast: boolean
   attributes: {
     'data-slate-leaf': true
   }
