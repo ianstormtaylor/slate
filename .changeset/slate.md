@@ -2,6 +2,4 @@
 'slate': minor
 ---
 
-- Update `Text.decorations` to return `Leaf[]`.
-- Add `position?: { start, end, isFirst, isLast }` property to `Leaf` type.
-- The `position` property is only added if decorations cause the text node to be split into multiple leaves.
+- Update `Text.decorations` to return the positions in addition to the leaf nodes: `{ leaf: Text, position?: { start: number, end: number, isFirst: boolean, isLast: boolean } }[]`.

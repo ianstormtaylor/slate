@@ -26,22 +26,9 @@ If a `props.text` property is passed in, it will be ignored.
 
 If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
 
-#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => Leaf[]`
+#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => { leaf: Text; position?: LeafPosition }[]`
 
-Get the leaves for a text node, given `decorations`.
-
-Each `Leaf` object includes all properties of the original `Text` node, plus an optional `position` property that is only present when the text node is split into multiple leaves by decorations.
-
-```typescript
-type Leaf = Text & {
-  position?: {
-    start: number
-    end: number
-    isFirst?: true
-    isLast?: true
-  }
-}
-```
+Get the leaves and positions for a text node, given `decorations`.
 
 ### Check methods
 

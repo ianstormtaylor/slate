@@ -2,4 +2,5 @@
 'slate-react': minor
 ---
 
-- Update `RenderLeafProps` to receive the `Leaf` type from `slate`, which may include an optional nested `position: { start, end, isFirst, isLast }` property if the text node was split by decorations. Useful to render something only in a single leaf per text node.
+- Update `RenderLeafProps` interface to add `leafPosition` property containing `start`, `end`, `isFirst`, and `isLast` when a text node is split by decorations.
+- Add optional `renderText` prop to `<Editable />` component for customizing text node rendering.
