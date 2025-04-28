@@ -15,7 +15,17 @@ export interface BaseText {
 
 export type Text = ExtendedType<'Text', BaseText>
 
-export type Leaf = Text & { start: number; end: number }
+export type Leaf = Text & {
+  /**
+   * The position of the leaf in the original text node, defined only if the text node was split by decorations.
+   */
+  position?: {
+    start: number
+    end: number
+    isFirst: boolean
+    isLast: boolean
+  }
+}
 
 export interface TextEqualsOptions {
   loose?: boolean
@@ -114,13 +124,7 @@ export const Text: TextInterface = {
   },
 
   decorations(node: Text, decorations: DecoratedRange[]): Leaf[] {
-    let leaves: Leaf[] = [
-      {
-        ...node,
-        start: 0,
-        end: node.text.length,
-      },
-    ]
+    let leaves: Leaf[] = [{ ...node }]
 
     for (const dec of decorations) {
       const { anchor, focus, merge: mergeDecoration, ...rest } = dec
@@ -190,14 +194,19 @@ export const Text: TextInterface = {
       leaves = next
     }
 
-    let currentOffset = 0
-    for (const leaf of leaves) {
-      const start = currentOffset
-      const end = start + leaf.text.length
-
-      leaf.start = start
-      leaf.end = end
-      currentOffset = end
+    if (leaves.length > 1) {
+      let currentOffset = 0
+      for (const [index, leaf] of leaves.entries()) {
+        const start = currentOffset
+        const end = start + leaf.text.length
+        leaf.position = {
+          start,
+          end,
+          isFirst: index === 0,
+          isLast: index === leaves.length - 1,
+        }
+        currentOffset = end
+      }
     }
 
     return leaves
