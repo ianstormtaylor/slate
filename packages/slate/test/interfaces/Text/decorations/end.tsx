@@ -20,14 +20,12 @@ export const output = [
   {
     text: 'ab',
     mark: 'mark',
-    start: 0,
-    end: 2,
+    position: { start: 0, end: 2, isFirst: true, isLast: false },
   },
   {
     text: 'c',
     mark: 'mark',
     decoration: 'decoration',
-    start: 2,
-    end: 3,
+    position: { start: 2, end: 3, isFirst: false, isLast: true },
   },
 ]

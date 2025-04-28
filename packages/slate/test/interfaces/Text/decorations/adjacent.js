@@ -33,27 +33,23 @@ export const output = [
   {
     text: 'a',
     mark: 'mark',
-    start: 0,
-    end: 1,
+    position: { start: 0, end: 1, isFirst: true, isLast: false },
   },
   {
     text: 'b',
     mark: 'mark',
     decoration1: 'decoration1',
-    start: 1,
-    end: 2,
+    position: { start: 1, end: 2, isFirst: false, isLast: false },
   },
   {
     text: 'c',
     mark: 'mark',
     decoration2: 'decoration2',
-    start: 2,
-    end: 3,
+    position: { start: 2, end: 3, isFirst: false, isLast: false },
   },
   {
     text: 'd',
     mark: 'mark',
-    start: 3,
-    end: 4,
+    position: { start: 3, end: 4, isFirst: false, isLast: true },
   },
 ]

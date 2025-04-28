@@ -21,13 +21,11 @@ export const output = [
     text: 'a',
     mark: 'mark',
     decoration: 'decoration',
-    start: 0,
-    end: 1,
+    position: { start: 0, end: 1, isFirst: true, isLast: false },
   },
   {
     text: 'bc',
     mark: 'mark',
-    start: 1,
-    end: 3,
+    position: { start: 1, end: 3, isFirst: false, isLast: true },
   },
 ]
