@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react'
 import { JSX } from 'react'
-import { Element, Leaf as LeafType, Text } from 'slate'
+import { Element, LeafPosition, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
 import {
@@ -48,11 +48,12 @@ function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
  */
 const Leaf = (props: {
   isLast: boolean
-  leaf: LeafType
+  leaf: Text
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   text: Text
+  leafPosition?: LeafPosition
 }) => {
   const {
     leaf,
@@ -61,6 +62,7 @@ const Leaf = (props: {
     parent,
     renderPlaceholder,
     renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
+    leafPosition,
   } = props
 
   const editor = useSlateStatic()
@@ -157,7 +159,13 @@ const Leaf = (props: {
     'data-slate-leaf': true,
   }
 
-  return renderLeaf({ attributes, children, leaf, text })
+  return renderLeaf({
+    attributes,
+    children,
+    leaf,
+    text,
+    leafPosition,
+  })
 }
 
 const MemoizedLeaf = React.memo(Leaf, (prev, next) => {

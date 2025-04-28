@@ -1,5 +1,5 @@
 import React, { forwardRef, memo, useRef, useState } from 'react'
-import { Editor, Text, Path, Element, Node, Leaf } from 'slate'
+import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
@@ -12,7 +12,7 @@ import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 const String = (props: {
   isLast: boolean
-  leaf: Leaf
+  leaf: Text
   parent: Element
   text: Text
 }) => {

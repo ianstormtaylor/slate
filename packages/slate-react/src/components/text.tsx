@@ -1,5 +1,5 @@
 import React, { useCallback, useRef } from 'react'
-import { Element, DecoratedRange, Text as SlateText } from 'slate'
+import { Element, Text as SlateText, DecoratedRange } from 'slate'
 import { ReactEditor, useSlateStatic } from '..'
 import { isTextDecorationsEqual } from 'slate-dom'
 import {
@@ -7,7 +7,11 @@ import {
   ELEMENT_TO_NODE,
   NODE_TO_ELEMENT,
 } from 'slate-dom'
-import { RenderLeafProps, RenderPlaceholderProps } from './editable'
+import {
+  RenderLeafProps,
+  RenderPlaceholderProps,
+  RenderTextProps,
+} from './editable'
 import Leaf from './leaf'
 
 /**
@@ -20,25 +24,34 @@ const Text = (props: {
   parent: Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   text: SlateText
 }) => {
-  const { decorations, isLast, parent, renderPlaceholder, renderLeaf, text } =
-    props
+  const {
+    decorations,
+    isLast,
+    parent,
+    renderPlaceholder,
+    renderLeaf,
+    renderText,
+    text,
+  } = props
   const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement | null>(null)
-  const leaves = SlateText.decorations(text, decorations)
+  const decoratedLeaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
   const children = []
 
-  for (let i = 0; i < leaves.length; i++) {
-    const leaf = leaves[i]
+  for (let i = 0; i < decoratedLeaves.length; i++) {
+    const { leaf, position } = decoratedLeaves[i]
 
     children.push(
       <Leaf
-        isLast={isLast && i === leaves.length - 1}
+        isLast={isLast && i === decoratedLeaves.length - 1}
         key={`${key.id}-${i}`}
         renderPlaceholder={renderPlaceholder}
         leaf={leaf}
+        leafPosition={position}
         text={text}
         parent={parent}
         renderLeaf={renderLeaf}
@@ -65,17 +78,32 @@ const Text = (props: {
     },
     [ref, editor, key, text]
   )
-  return (
+
+  const textContent = (
     <span data-slate-node="text" ref={callbackRef}>
       {children}
     </span>
   )
+
+  if (renderText) {
+    return renderText({
+      text,
+      children: textContent,
+      attributes: {
+        'data-slate-node': 'text',
+        ref: callbackRef,
+      },
+    })
+  }
+
+  return textContent
 }
 
 const MemoizedText = React.memo(Text, (prev, next) => {
   return (
     next.parent === prev.parent &&
     next.isLast === prev.isLast &&
+    next.renderText === prev.renderText &&
     next.renderLeaf === prev.renderLeaf &&
     next.renderPlaceholder === prev.renderPlaceholder &&
     next.text === prev.text &&
