@@ -76,7 +76,7 @@ const renderLeaf = useCallback(({ attributes, children, leaf }) => {
 }, [])
 ```
 
-Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. (But there's nothing preventing you from using custom components if you'd like!)
+Notice though how we've handled it slightly differently than `renderElement`. Since text formatting tends to be fairly simple, we've opted to ditch the `switch` statement and just toggle on/off a few styles instead. \(But there's nothing preventing you from using custom components if you'd like!\)
 
 > 🤖 As with the Element renderer, be sure to mix in `props.attributes` and render `props.children` in your leaf renderer! The attributes must be added to the top-level DOM element inside the component, as they are required for Slate's DOM helper functions to work. And the children are the actual text content of your document which Slate manages for you automatically.
 
