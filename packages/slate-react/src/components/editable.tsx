@@ -1830,7 +1830,6 @@ export const Editable = forwardRef(
                 <Children
                   decorations={decorations}
                   node={editor}
-                  path={[]}
                   renderElement={renderElement}
                   renderPlaceholder={renderPlaceholder}
                   renderLeaf={renderLeaf}
