@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.114.0
+
+### Minor Changes
+
+- [#5850](https://github.com/ianstormtaylor/slate/pull/5850) [`22a3dda3`](https://github.com/ianstormtaylor/slate/commit/22a3dda36d4362d5dfdb9a75836297dae8cd7f9e) Thanks [@zbeyens](https://github.com/zbeyens)! - - Update `RenderLeafProps` interface to add `leafPosition` property containing `start`, `end`, `isFirst`, and `isLast` when a text node is split by decorations.
+
+  - Add optional `renderText` prop to `<Editable />` component for customizing text node rendering.
+
+- [#5848](https://github.com/ianstormtaylor/slate/pull/5848) [`2c62e017`](https://github.com/ianstormtaylor/slate/commit/2c62e0179734871369ac23d38ebfc1378ec9ad68) Thanks [@dpolugic](https://github.com/dpolugic)! - Use equalityFn in useSlateSelector during render as well
+
 ## 0.113.0
 
 ### Patch Changes
