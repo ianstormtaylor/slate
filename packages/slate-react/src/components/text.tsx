@@ -33,7 +33,7 @@ const Text = (props: {
     parent,
     renderPlaceholder,
     renderLeaf,
-    renderText,
+    renderText = (props: RenderTextProps) => <DefaultText {...props} />,
     text,
   } = props
   const editor = useSlateStatic()
@@ -79,24 +79,19 @@ const Text = (props: {
     [ref, editor, key, text]
   )
 
-  const textContent = (
-    <span data-slate-node="text" ref={callbackRef}>
-      {children}
-    </span>
-  )
-
-  if (renderText) {
-    return renderText({
-      text,
-      children: textContent,
-      attributes: {
-        'data-slate-node': 'text',
-        ref: callbackRef,
-      },
-    })
+  const attributes: {
+    'data-slate-node': 'text'
+    ref: any
+  } = {
+    'data-slate-node': 'text',
+    ref: callbackRef,
   }
 
-  return textContent
+  return renderText({
+    text,
+    children,
+    attributes,
+  })
 }
 
 const MemoizedText = React.memo(Text, (prev, next) => {
@@ -110,5 +105,10 @@ const MemoizedText = React.memo(Text, (prev, next) => {
     isTextDecorationsEqual(next.decorations, prev.decorations)
   )
 })
+
+export const DefaultText = (props: RenderTextProps) => {
+  const { attributes, children } = props
+  return <span {...attributes}>{children}</span>
+}
 
 export default MemoizedText
