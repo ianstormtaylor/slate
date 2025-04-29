@@ -1,5 +1,11 @@
 # slate
 
+## 0.114.0
+
+### Minor Changes
+
+- [#5850](https://github.com/ianstormtaylor/slate/pull/5850) [`22a3dda3`](https://github.com/ianstormtaylor/slate/commit/22a3dda36d4362d5dfdb9a75836297dae8cd7f9e) Thanks [@zbeyens](https://github.com/zbeyens)! - - Update `Text.decorations` to return the positions in addition to the leaf nodes: `{ leaf: Text, position?: { start: number, end: number, isFirst: boolean, isLast: boolean } }[]`.
+
 ## 0.113.0
 
 ### Minor Changes

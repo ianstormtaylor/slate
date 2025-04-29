@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.114.0
+
+### Patch Changes
+
+- [#5849](https://github.com/ianstormtaylor/slate/pull/5849) [`0fde537b`](https://github.com/ianstormtaylor/slate/commit/0fde537b52c23dd374721501e31e9aab56ce6477) Thanks [@12joan](https://github.com/12joan)! - Fix: Deleting backward by a line misses 1 character (belated changeset for https://github.com/ianstormtaylor/slate/pull/5827)
+
 ## 0.112.2
 
 ### Patch Changes
