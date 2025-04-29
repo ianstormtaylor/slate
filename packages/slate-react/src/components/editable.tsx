@@ -23,6 +23,7 @@ import {
   Text,
   Transforms,
   DecoratedRange,
+  LeafPosition,
 } from 'slate'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
@@ -105,10 +106,30 @@ export interface RenderElementProps {
 
 export interface RenderLeafProps {
   children: any
+  /**
+   * The leaf node with any applied decorations.
+   * If no decorations are applied, it will be identical to the `text` property.
+   */
   leaf: Text
   text: Text
   attributes: {
     'data-slate-leaf': true
+  }
+  /**
+   * The position of the leaf within the Text node, only present when the text node is split by decorations.
+   */
+  leafPosition?: LeafPosition
+}
+
+/**
+ * `RenderTextProps` are passed to the `renderText` handler.
+ */
+export interface RenderTextProps {
+  text: Text
+  children: any
+  attributes: {
+    'data-slate-node': 'text'
+    ref: any
   }
 }
 
@@ -125,6 +146,7 @@ export type EditableProps = {
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
   scrollSelectionIntoView?: (editor: ReactEditor, domRange: DOMRange) => void
   as?: React.ElementType
@@ -149,6 +171,7 @@ export const Editable = forwardRef(
       readOnly = false,
       renderElement,
       renderLeaf,
+      renderText,
       renderPlaceholder = defaultRenderPlaceholder,
       scrollSelectionIntoView = defaultScrollSelectionIntoView,
       style: userStyle = {},
@@ -1831,6 +1854,7 @@ export const Editable = forwardRef(
                   renderElement={renderElement}
                   renderPlaceholder={renderPlaceholder}
                   renderLeaf={renderLeaf}
+                  renderText={renderText}
                   selection={editor.selection}
                 />
               </Component>

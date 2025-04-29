@@ -26,9 +26,9 @@ If a `props.text` property is passed in, it will be ignored.
 
 If there are properties in `text` that are not in `props`, those will be ignored when it comes to testing for a match.
 
-#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => Text[]`
+#### `Text.decorations(node: Text, decorations: DecoratedRange[]) => { leaf: Text; position?: LeafPosition }[]`
 
-Get the leaves for a text node, given `decorations`.
+Get the leaves and positions for a text node, given `decorations`.
 
 ### Check methods
 

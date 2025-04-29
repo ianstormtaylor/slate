@@ -18,12 +18,18 @@ export const test = decorations => {
 }
 export const output = [
   {
-    text: 'a',
-    mark: 'mark',
-    decoration: 'decoration',
+    leaf: {
+      text: 'a',
+      mark: 'mark',
+      decoration: 'decoration',
+    },
+    position: { start: 0, end: 1, isFirst: true },
   },
   {
-    text: 'bc',
-    mark: 'mark',
+    leaf: {
+      text: 'bc',
+      mark: 'mark',
+    },
+    position: { start: 1, end: 3, isLast: true },
   },
 ]

@@ -11,6 +11,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
+  RenderTextProps,
 } from '../components/editable'
 
 import ElementComponent from '../components/element'
@@ -30,6 +31,7 @@ const useChildren = (props: {
   node: Ancestor
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {

@@ -22,6 +22,7 @@ import {
   RenderElementProps,
   RenderLeafProps,
   RenderPlaceholderProps,
+  RenderTextProps,
 } from './editable'
 
 import Text from './text'
@@ -35,6 +36,7 @@ const Element = (props: {
   element: SlateElement
   renderElement?: (props: RenderElementProps) => JSX.Element
   renderPlaceholder: (props: RenderPlaceholderProps) => JSX.Element
+  renderText?: (props: RenderTextProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   selection: Range | null
 }) => {
@@ -44,6 +46,7 @@ const Element = (props: {
     renderElement = (p: RenderElementProps) => <DefaultElement {...p} />,
     renderPlaceholder,
     renderLeaf,
+    renderText,
     selection,
   } = props
   const editor = useSlateStatic()
@@ -71,6 +74,7 @@ const Element = (props: {
     renderElement,
     renderPlaceholder,
     renderLeaf,
+    renderText,
     selection,
   })
 
@@ -145,6 +149,7 @@ const MemoizedElement = React.memo(Element, (prev, next) => {
   return (
     prev.element === next.element &&
     prev.renderElement === next.renderElement &&
+    prev.renderText === next.renderText &&
     prev.renderLeaf === next.renderLeaf &&
     prev.renderPlaceholder === next.renderPlaceholder &&
     isElementDecorationsEqual(prev.decorations, next.decorations) &&

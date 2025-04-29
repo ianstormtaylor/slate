@@ -122,6 +122,15 @@ export interface RenderLeafProps {
   attributes: {
     'data-slate-leaf': true
   }
+  /**
+   * The position of the leaf within the Text node, only present when the text node is split by decorations.
+   */
+  leafPosition?: {
+    start: number
+    end: number
+    isFirst?: true
+    isLast?: true
+  }
 }
 ```
 
@@ -136,6 +145,38 @@ Example usage:
         style={{ fontWeight: leaf.bold ? 'bold' : 'normal' }}
       >
         {children}
+      </span>
+    )
+  }}
+/>
+```
+
+#### `renderText?: (props: RenderTextProps) => JSX.Element`
+
+The `renderText` prop allows you to customize the rendering of the container element for a Text node in the Slate editor. This is useful when you need to wrap the entire text node content or add elements associated with the text node as a whole, regardless of how decorations might split the text into multiple leaves.
+
+The `renderText` function receives an object of type `RenderTextProps` as its argument:
+
+```typescript
+export interface RenderTextProps {
+  text: Text
+  children: any
+  attributes: {
+    'data-slate-node': 'text'
+    ref: any
+  }
+}
+```
+
+Example usage:
+
+```jsx
+<Editable
+  renderText={({ attributes, children, text }) => {
+    return (
+      <span {...attributes} className="custom-text">
+        {children}
+        {text.tooltipContent && <Tooltip content={text.tooltipContent} />}
       </span>
     )
   }}

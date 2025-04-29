@@ -53,43 +53,64 @@ export const test = decorations => {
 
 export const output = [
   {
-    text: 'a',
-    mark: 'mark',
+    leaf: {
+      text: 'a',
+      mark: 'mark',
+    },
+    position: { start: 0, end: 1, isFirst: true },
   },
   {
-    text: 'b',
-    mark: 'mark',
-    decoration1: 'decoration1',
-    decoration2: 'decoration2',
+    leaf: {
+      text: 'b',
+      mark: 'mark',
+      decoration1: 'decoration1',
+      decoration2: 'decoration2',
+    },
+    position: { start: 1, end: 2 },
   },
   {
-    text: '',
-    mark: 'mark',
-    decoration1: 'decoration1',
-    decoration2: 'decoration2',
-    decoration3: 'decoration3',
-    decoration4: 'decoration4',
+    leaf: {
+      text: '',
+      mark: 'mark',
+      decoration1: 'decoration1',
+      decoration2: 'decoration2',
+      decoration3: 'decoration3',
+      decoration4: 'decoration4',
+    },
+    position: { start: 2, end: 2 },
   },
   {
-    text: 'c',
-    mark: 'mark',
-    decoration1: 'decoration1',
-    decoration2: 'decoration2',
-    decoration4: 'decoration4',
+    leaf: {
+      text: 'c',
+      mark: 'mark',
+      decoration1: 'decoration1',
+      decoration2: 'decoration2',
+      decoration4: 'decoration4',
+    },
+    position: { start: 2, end: 3 },
   },
   {
-    text: 'd',
-    mark: 'mark',
-    decoration1: 'decoration1',
-    decoration4: 'decoration4',
+    leaf: {
+      text: 'd',
+      mark: 'mark',
+      decoration1: 'decoration1',
+      decoration4: 'decoration4',
+    },
+    position: { start: 3, end: 4 },
   },
   {
-    text: 'e',
-    mark: 'mark',
-    decoration1: 'decoration1',
+    leaf: {
+      text: 'e',
+      mark: 'mark',
+      decoration1: 'decoration1',
+    },
+    position: { start: 4, end: 5 },
   },
   {
-    text: 'f',
-    mark: 'mark',
+    leaf: {
+      text: 'f',
+      mark: 'mark',
+    },
+    position: { start: 5, end: 6, isLast: true },
   },
 ]

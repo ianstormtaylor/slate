@@ -31,21 +31,33 @@ export const test = decorations => {
 
 export const output = [
   {
-    text: 'a',
-    mark: 'mark',
+    leaf: {
+      text: 'a',
+      mark: 'mark',
+    },
+    position: { start: 0, end: 1, isFirst: true },
   },
   {
-    text: 'b',
-    mark: 'mark',
-    decoration1: 'decoration1',
+    leaf: {
+      text: 'b',
+      mark: 'mark',
+      decoration1: 'decoration1',
+    },
+    position: { start: 1, end: 2 },
   },
   {
-    text: 'c',
-    mark: 'mark',
-    decoration2: 'decoration2',
+    leaf: {
+      text: 'c',
+      mark: 'mark',
+      decoration2: 'decoration2',
+    },
+    position: { start: 2, end: 3 },
   },
   {
-    text: 'd',
-    mark: 'mark',
+    leaf: {
+      text: 'd',
+      mark: 'mark',
+    },
+    position: { start: 3, end: 4, isLast: true },
   },
 ]

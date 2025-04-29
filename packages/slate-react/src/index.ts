@@ -8,6 +8,7 @@ export {
 } from './components/editable'
 
 export { DefaultElement } from './components/element'
+export { DefaultText } from './components/text'
 export { DefaultLeaf } from './components/leaf'
 export { Slate } from './components/slate'
 

@@ -1,5 +1,5 @@
 import { isPlainObject } from 'is-plain-object'
-import { Range } from '..'
+import { Path, Range } from '..'
 import { ExtendedType } from '../types/custom-types'
 import { isDeepEqual } from '../utils/deep-equal'
 
@@ -14,6 +14,13 @@ export interface BaseText {
 }
 
 export type Text = ExtendedType<'Text', BaseText>
+
+export interface LeafPosition {
+  start: number
+  end: number
+  isFirst?: true
+  isLast?: true
+}
 
 export interface TextEqualsOptions {
   loose?: boolean
@@ -62,7 +69,10 @@ export interface TextInterface {
   /**
    * Get the leaves for a text node given decorations.
    */
-  decorations: (node: Text, decorations: DecoratedRange[]) => Text[]
+  decorations: (
+    node: Text,
+    decorations: DecoratedRange[]
+  ) => { leaf: Text; position?: LeafPosition }[]
 }
 
 // eslint-disable-next-line no-redeclare
@@ -111,8 +121,13 @@ export const Text: TextInterface = {
     return true
   },
 
-  decorations(node: Text, decorations: DecoratedRange[]): Text[] {
-    let leaves: Text[] = [{ ...node }]
+  decorations(
+    node: Text,
+    decorations: DecoratedRange[]
+  ): { leaf: Text; position?: LeafPosition }[] {
+    let leaves: { leaf: Text; position?: LeafPosition }[] = [
+      { leaf: { ...node } },
+    ]
 
     for (const dec of decorations) {
       const { anchor, focus, merge: mergeDecoration, ...rest } = dec
@@ -123,7 +138,7 @@ export const Text: TextInterface = {
       const decorationEnd = end.offset
       const merge = mergeDecoration ?? Object.assign
 
-      for (const leaf of leaves) {
+      for (const { leaf } of leaves) {
         const { length } = leaf.text
         const leafStart = leafEnd
         leafEnd += length
@@ -131,7 +146,7 @@ export const Text: TextInterface = {
         // If the range encompasses the entire leaf, add the range.
         if (decorationStart <= leafStart && leafEnd <= decorationEnd) {
           merge(leaf, rest)
-          next.push(leaf)
+          next.push({ leaf })
           continue
         }
 
@@ -143,7 +158,7 @@ export const Text: TextInterface = {
           decorationEnd < leafStart ||
           (decorationEnd === leafStart && leafStart !== 0)
         ) {
-          next.push(leaf)
+          next.push({ leaf })
           continue
         }
 
@@ -156,13 +171,13 @@ export const Text: TextInterface = {
 
         if (decorationEnd < leafEnd) {
           const off = decorationEnd - leafStart
-          after = { ...middle, text: middle.text.slice(off) }
+          after = { leaf: { ...middle, text: middle.text.slice(off) } }
           middle = { ...middle, text: middle.text.slice(0, off) }
         }
 
         if (decorationStart > leafStart) {
           const off = decorationStart - leafStart
-          before = { ...middle, text: middle.text.slice(0, off) }
+          before = { leaf: { ...middle, text: middle.text.slice(0, off) } }
           middle = { ...middle, text: middle.text.slice(off) }
         }
 
@@ -172,7 +187,7 @@ export const Text: TextInterface = {
           next.push(before)
         }
 
-        next.push(middle)
+        next.push({ leaf: middle })
 
         if (after) {
           next.push(after)
@@ -180,6 +195,21 @@ export const Text: TextInterface = {
       }
 
       leaves = next
+    }
+
+    if (leaves.length > 1) {
+      let currentOffset = 0
+      for (const [index, item] of leaves.entries()) {
+        const start = currentOffset
+        const end = start + item.leaf.text.length
+        const position: LeafPosition = { start, end }
+
+        if (index === 0) position.isFirst = true
+        if (index === leaves.length - 1) position.isLast = true
+
+        item.position = position
+        currentOffset = end
+      }
     }
 
     return leaves
