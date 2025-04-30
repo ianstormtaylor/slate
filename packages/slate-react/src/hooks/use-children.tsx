@@ -40,6 +40,7 @@ const useChildren = (props: {
     node,
     renderElement,
     renderPlaceholder,
+    renderText,
     renderLeaf,
     selection,
   } = props
@@ -79,6 +80,7 @@ const useChildren = (props: {
             renderElement={renderElement}
             renderPlaceholder={renderPlaceholder}
             renderLeaf={renderLeaf}
+            renderText={renderText}
             selection={sel}
           />
         </SelectedContext.Provider>
@@ -92,6 +94,7 @@ const useChildren = (props: {
           parent={node}
           renderPlaceholder={renderPlaceholder}
           renderLeaf={renderLeaf}
+          renderText={renderText}
           text={n}
         />
       )
