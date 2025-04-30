@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.114.1
+
+### Patch Changes
+
+- [#5853](https://github.com/ianstormtaylor/slate/pull/5853) [`9fe6184c`](https://github.com/ianstormtaylor/slate/commit/9fe6184ca26c518a1114b66df319504f31a07cbb) Thanks [@12joan](https://github.com/12joan)! - Increase minimum `slate` version to 0.114.0 due to https://github.com/ianstormtaylor/slate/issues/5852
+
 ## 0.114.0
 
 ### Minor Changes
