@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.114.2
+
+### Patch Changes
+
+- [#5855](https://github.com/ianstormtaylor/slate/pull/5855) [`ec367fb0`](https://github.com/ianstormtaylor/slate/commit/ec367fb04f018c8fd0daf8b0d09f87c89a8c155b) Thanks [@zbeyens](https://github.com/zbeyens)! - Fix `renderText` prop not applied
+
 ## 0.114.1
 
 ### Patch Changes
