@@ -1,4 +1,3 @@
-import { isPlainObject } from 'is-plain-object'
 import { Ancestor, Descendant, Editor, ExtendedType, Node, Path } from '..'
 
 /**
@@ -57,17 +56,13 @@ export interface ElementInterface {
  * Shared the function with isElementType utility
  */
 const isElement = (value: any): value is Element => {
-  return (
-    isPlainObject(value) &&
-    Node.isNodeList(value.children) &&
-    !Editor.isEditor(value)
-  )
+  return !!value && Node.isNodeList(value.children) && !Editor.isEditor(value)
 }
 
 // eslint-disable-next-line no-redeclare
 export const Element: ElementInterface = {
   isAncestor(value: any): value is Ancestor {
-    return isPlainObject(value) && Node.isNodeList(value.children)
+    return !!value && Node.isNodeList(value.children)
   },
 
   isElement,
