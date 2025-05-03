@@ -1,4 +1,3 @@
-import { isPlainObject } from 'is-plain-object'
 import { Element, createEditor as makeEditor } from 'slate'
 import {
   createAnchor,
@@ -86,8 +85,8 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
       attributes = {}
     }
 
-    if (!isPlainObject(attributes)) {
-      children = [attributes].concat(children)
+    if (!attributes || typeof attributes !== 'object') {
+      children = [attributes as any].concat(children)
       attributes = {}
     }
 

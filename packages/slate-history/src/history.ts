@@ -1,4 +1,3 @@
-import { isPlainObject } from 'is-plain-object'
 import { Operation, Range } from 'slate'
 
 interface Batch {
@@ -24,7 +23,8 @@ export const History = {
 
   isHistory(value: any): value is History {
     return (
-      isPlainObject(value) &&
+      !!value &&
+      typeof value === 'object' &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
       (value.redos.length === 0 ||

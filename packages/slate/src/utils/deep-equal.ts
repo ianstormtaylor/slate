@@ -1,5 +1,3 @@
-import { isPlainObject } from 'is-plain-object'
-
 /*
   Custom deep equal comparison for Slate nodes.
 
@@ -17,13 +15,13 @@ export const isDeepEqual = (
   for (const key in node) {
     const a = node[key]
     const b = another[key]
-    if (isPlainObject(a) && isPlainObject(b)) {
-      if (!isDeepEqual(a, b)) return false
-    } else if (Array.isArray(a) && Array.isArray(b)) {
+    if (Array.isArray(a) && Array.isArray(b)) {
       if (a.length !== b.length) return false
       for (let i = 0; i < a.length; i++) {
         if (a[i] !== b[i]) return false
       }
+    } else if (a && b && typeof a === 'object' && typeof b === 'object') {
+      if (!isDeepEqual(a, b)) return false
     } else if (a !== b) {
       return false
     }

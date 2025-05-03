@@ -1,20 +1,13 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { isPlainObject } from 'is-plain-object'
 import { Range } from '../interfaces/range'
 import { Node } from '../interfaces/node'
 import { Operation } from '../interfaces/operation'
 
-const IS_EDITOR_CACHE = new WeakMap<object, boolean>()
-
 export const isEditor: EditorInterface['isEditor'] = (
-  value: any
+  value: any,
+  { deep = false } = {}
 ): value is Editor => {
-  const cachedIsEditor = IS_EDITOR_CACHE.get(value)
-  if (cachedIsEditor !== undefined) {
-    return cachedIsEditor
-  }
-
-  if (!isPlainObject(value)) {
+  if (!value || typeof value !== 'object') {
     return false
   }
 
@@ -35,10 +28,10 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.onChange === 'function' &&
     typeof value.removeMark === 'function' &&
     typeof value.getDirtyPaths === 'function' &&
-    (value.marks === null || isPlainObject(value.marks)) &&
+    (value.marks === null || typeof value.marks === 'object') &&
     (value.selection === null || Range.isRange(value.selection)) &&
-    Node.isNodeList(value.children) &&
+    (!deep || Node.isNodeList(value.children)) &&
     Operation.isOperationList(value.operations)
-  IS_EDITOR_CACHE.set(value, isEditor)
+
   return isEditor
 }

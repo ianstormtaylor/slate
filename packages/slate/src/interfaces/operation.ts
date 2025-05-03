@@ -1,5 +1,4 @@
 import { ExtendedType, Node, Path, Range } from '..'
-import { isPlainObject } from 'is-plain-object'
 
 export type BaseInsertNodeOperation = {
   type: 'insert_node'
@@ -178,7 +177,7 @@ export const Operation: OperationInterface = {
   },
 
   isOperation(value: any): value is Operation {
-    if (!isPlainObject(value)) {
+    if (!value || typeof value !== 'object') {
       return false
     }
 
@@ -195,7 +194,7 @@ export const Operation: OperationInterface = {
         return (
           typeof value.position === 'number' &&
           Path.isPath(value.path) &&
-          isPlainObject(value.properties)
+          typeof value.properties === 'object'
         )
       case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
@@ -210,21 +209,21 @@ export const Operation: OperationInterface = {
       case 'set_node':
         return (
           Path.isPath(value.path) &&
-          isPlainObject(value.properties) &&
-          isPlainObject(value.newProperties)
+          typeof value.properties === 'object' &&
+          typeof value.newProperties === 'object'
         )
       case 'set_selection':
         return (
           (value.properties === null && Range.isRange(value.newProperties)) ||
           (value.newProperties === null && Range.isRange(value.properties)) ||
-          (isPlainObject(value.properties) &&
-            isPlainObject(value.newProperties))
+          (typeof value.properties === 'object' &&
+            typeof value.newProperties === 'object')
         )
       case 'split_node':
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          isPlainObject(value.properties)
+          typeof value.properties === 'object'
         )
       default:
         return false
