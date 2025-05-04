@@ -1,4 +1,12 @@
-import { Ancestor, Descendant, Editor, ExtendedType, Node, Path } from '..'
+import {
+  Ancestor,
+  Descendant,
+  Editor,
+  ExtendedType,
+  Node,
+  Path,
+  isObject,
+} from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -69,7 +77,7 @@ const isElement = (
   value: any,
   { deep = false }: ElementIsElementOptions = {}
 ): value is Element => {
-  if (!value || typeof value !== 'object') return false
+  if (!isObject(value)) return false
 
   // PERF: No need to use the full Editor.isEditor here
   const isEditor = typeof value.apply === 'function'
@@ -88,11 +96,7 @@ export const Element: ElementInterface = {
     value: any,
     { deep = false }: ElementIsElementOptions = {}
   ): value is Ancestor {
-    return (
-      !!value &&
-      typeof value === 'object' &&
-      Node.isNodeList(value.children, { deep })
-    )
+    return isObject(value) && Node.isNodeList(value.children, { deep })
   },
 
   isElement,

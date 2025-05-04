@@ -1,4 +1,4 @@
-import { Element, createEditor as makeEditor } from 'slate'
+import { Element, createEditor as makeEditor, isObject } from 'slate'
 import {
   createAnchor,
   createCursor,
@@ -85,8 +85,8 @@ const createFactory = <T extends HyperscriptCreators>(creators: T) => {
       attributes = {}
     }
 
-    if (!attributes || typeof attributes !== 'object') {
-      children = [attributes as any].concat(children)
+    if (!isObject(attributes)) {
+      children = [attributes].concat(children)
       attributes = {}
     }
 

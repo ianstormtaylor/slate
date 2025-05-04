@@ -1,3 +1,5 @@
+import { isObject } from './is-object'
+
 /*
   Custom deep equal comparison for Slate nodes.
 
@@ -20,7 +22,7 @@ export const isDeepEqual = (
       for (let i = 0; i < a.length; i++) {
         if (a[i] !== b[i]) return false
       }
-    } else if (a && b && typeof a === 'object' && typeof b === 'object') {
+    } else if (isObject(a) && isObject(b)) {
       if (!isDeepEqual(a, b)) return false
     } else if (a !== b) {
       return false

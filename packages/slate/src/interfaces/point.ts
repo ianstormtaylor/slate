@@ -1,5 +1,5 @@
 import { produce } from 'immer'
-import { ExtendedType, Operation, Path } from '..'
+import { ExtendedType, Operation, Path, isObject } from '..'
 import { TextDirection } from '../types/types'
 
 /**
@@ -88,8 +88,7 @@ export const Point: PointInterface = {
 
   isPoint(value: any): value is Point {
     return (
-      !!value &&
-      typeof value === 'object' &&
+      isObject(value) &&
       typeof value.offset === 'number' &&
       Path.isPath(value.path)
     )

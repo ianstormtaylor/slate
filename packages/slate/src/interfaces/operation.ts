@@ -1,4 +1,4 @@
-import { ExtendedType, Node, Path, Range } from '..'
+import { ExtendedType, Node, Path, Range, isObject } from '..'
 
 export type BaseInsertNodeOperation = {
   type: 'insert_node'
@@ -177,7 +177,7 @@ export const Operation: OperationInterface = {
   },
 
   isOperation(value: any): value is Operation {
-    if (!value || typeof value !== 'object') {
+    if (!isObject(value)) {
       return false
     }
 
@@ -194,7 +194,7 @@ export const Operation: OperationInterface = {
         return (
           typeof value.position === 'number' &&
           Path.isPath(value.path) &&
-          typeof value.properties === 'object'
+          isObject(value.properties)
         )
       case 'move_node':
         return Path.isPath(value.path) && Path.isPath(value.newPath)
@@ -209,21 +209,20 @@ export const Operation: OperationInterface = {
       case 'set_node':
         return (
           Path.isPath(value.path) &&
-          typeof value.properties === 'object' &&
-          typeof value.newProperties === 'object'
+          isObject(value.properties) &&
+          isObject(value.newProperties)
         )
       case 'set_selection':
         return (
           (value.properties === null && Range.isRange(value.newProperties)) ||
           (value.newProperties === null && Range.isRange(value.properties)) ||
-          (typeof value.properties === 'object' &&
-            typeof value.newProperties === 'object')
+          (isObject(value.properties) && isObject(value.newProperties))
         )
       case 'split_node':
         return (
           Path.isPath(value.path) &&
           typeof value.position === 'number' &&
-          typeof value.properties === 'object'
+          isObject(value.properties)
         )
       default:
         return false

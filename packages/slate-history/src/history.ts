@@ -1,4 +1,4 @@
-import { Operation, Range } from 'slate'
+import { Operation, Range, isObject } from 'slate'
 
 interface Batch {
   operations: Operation[]
@@ -23,8 +23,7 @@ export const History = {
 
   isHistory(value: any): value is History {
     return (
-      !!value &&
-      typeof value === 'object' &&
+      isObject(value) &&
       Array.isArray(value.redos) &&
       Array.isArray(value.undos) &&
       (value.redos.length === 0 ||

@@ -2,12 +2,13 @@ import { Editor, EditorInterface } from '../interfaces/editor'
 import { Range } from '../interfaces/range'
 import { Node } from '../interfaces/node'
 import { Operation } from '../interfaces/operation'
+import { isObject } from '../utils'
 
 export const isEditor: EditorInterface['isEditor'] = (
   value: any,
   { deep = false } = {}
 ): value is Editor => {
-  if (!value || typeof value !== 'object') {
+  if (!isObject(value)) {
     return false
   }
 
@@ -28,7 +29,7 @@ export const isEditor: EditorInterface['isEditor'] = (
     typeof value.onChange === 'function' &&
     typeof value.removeMark === 'function' &&
     typeof value.getDirtyPaths === 'function' &&
-    (value.marks === null || typeof value.marks === 'object') &&
+    (value.marks === null || isObject(value.marks)) &&
     (value.selection === null || Range.isRange(value.selection)) &&
     (!deep || Node.isNodeList(value.children)) &&
     Operation.isOperationList(value.operations)
