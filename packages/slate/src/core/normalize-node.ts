@@ -4,6 +4,7 @@ import { Element } from '../interfaces/element'
 import { Transforms } from '../interfaces/transforms'
 import { Descendant, Node } from '../interfaces/node'
 import { Editor } from '../interfaces/editor'
+import { getNodeToParent } from '../editor/find-path'
 
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
@@ -24,6 +25,14 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
       voids: true,
     })
     return
+  }
+
+  // Cache dirty nodes child-parent relationships for editor.findPath()
+  if (!Text.isText(node)) {
+    const nodeToParent = getNodeToParent(editor)
+    node.children.forEach(child => {
+      nodeToParent.set(child, node)
+    })
   }
 
   // Determine whether the node should have block or inline children.
