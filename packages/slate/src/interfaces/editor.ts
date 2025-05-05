@@ -213,6 +213,10 @@ export interface EditorFragmentDeletionOptions {
   direction?: TextDirection
 }
 
+export interface EditorIsEditorOptions {
+  deep?: boolean
+}
+
 export interface EditorLeafOptions {
   depth?: number
   edge?: LeafEdge
@@ -469,7 +473,7 @@ export interface EditorInterface {
   /**
    * Check if a value is an `Editor` object.
    */
-  isEditor: (value: any) => value is Editor
+  isEditor: (value: any, options?: EditorIsEditorOptions) => value is Editor
 
   /**
    * Check if a value is a read-only `Element` object.

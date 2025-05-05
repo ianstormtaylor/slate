@@ -1,5 +1,4 @@
-import { isPlainObject } from 'is-plain-object'
-import { Path, Range } from '..'
+import { Range, isObject } from '..'
 import { ExtendedType } from '../types/custom-types'
 import { isDeepEqual } from '../utils/deep-equal'
 
@@ -93,7 +92,7 @@ export const Text: TextInterface = {
   },
 
   isText(value: any): value is Text {
-    return isPlainObject(value) && typeof value.text === 'string'
+    return isObject(value) && typeof value.text === 'string'
   },
 
   isTextList(value: any): value is Text[] {

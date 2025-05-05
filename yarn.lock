@@ -13302,7 +13302,6 @@ __metadata:
   resolution: "slate-history@workspace:packages/slate-history"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
-    is-plain-object: "npm:^5.0.0"
     lodash: "npm:^4.17.21"
     slate: "npm:^0.114.0"
     slate-hyperscript: "npm:^0.100.0"
@@ -13317,7 +13316,6 @@ __metadata:
   resolution: "slate-hyperscript@workspace:packages/slate-hyperscript"
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
-    is-plain-object: "npm:^5.0.0"
     slate: "npm:^0.114.0"
     source-map-loader: "npm:^4.0.1"
   peerDependencies:
@@ -13427,7 +13425,6 @@ __metadata:
     "@types/resize-observer-browser": "npm:^0.1.8"
     direction: "npm:^1.0.4"
     is-hotkey: "npm:^0.2.0"
-    is-plain-object: "npm:^5.0.0"
     lodash: "npm:^4.17.21"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -13451,7 +13448,6 @@ __metadata:
   dependencies:
     "@babel/runtime": "npm:^7.23.2"
     immer: "npm:^10.0.3"
-    is-plain-object: "npm:^5.0.0"
     lodash: "npm:^4.17.21"
     slate-hyperscript: "npm:^0.100.0"
     source-map-loader: "npm:^4.0.1"

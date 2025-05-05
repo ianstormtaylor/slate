@@ -1,5 +1,12 @@
-import { isPlainObject } from 'is-plain-object'
-import { Ancestor, Descendant, Editor, ExtendedType, Node, Path } from '..'
+import {
+  Ancestor,
+  Descendant,
+  Editor,
+  ExtendedType,
+  Node,
+  Path,
+  isObject,
+} from '..'
 
 /**
  * `Element` objects are a type of node in a Slate document that contain other
@@ -13,21 +20,31 @@ export interface BaseElement {
 
 export type Element = ExtendedType<'Element', BaseElement>
 
+export interface ElementIsElementOptions {
+  deep?: boolean
+}
+
 export interface ElementInterface {
   /**
    * Check if a value implements the 'Ancestor' interface.
    */
-  isAncestor: (value: any) => value is Ancestor
+  isAncestor: (
+    value: any,
+    options?: ElementIsElementOptions
+  ) => value is Ancestor
 
   /**
    * Check if a value implements the `Element` interface.
    */
-  isElement: (value: any) => value is Element
+  isElement: (value: any, options?: ElementIsElementOptions) => value is Element
 
   /**
    * Check if a value is an array of `Element` objects.
    */
-  isElementList: (value: any) => value is Element[]
+  isElementList: (
+    value: any,
+    options?: ElementIsElementOptions
+  ) => value is Element[]
 
   /**
    * Check if a set of props is a partial of Element.
@@ -56,24 +73,42 @@ export interface ElementInterface {
 /**
  * Shared the function with isElementType utility
  */
-const isElement = (value: any): value is Element => {
-  return (
-    isPlainObject(value) &&
-    Node.isNodeList(value.children) &&
-    !Editor.isEditor(value)
-  )
+const isElement = (
+  value: any,
+  { deep = false }: ElementIsElementOptions = {}
+): value is Element => {
+  if (!isObject(value)) return false
+
+  // PERF: No need to use the full Editor.isEditor here
+  const isEditor = typeof value.apply === 'function'
+  if (isEditor) return false
+
+  const isChildrenValid = deep
+    ? Node.isNodeList(value.children)
+    : Array.isArray(value.children)
+
+  return isChildrenValid
 }
 
 // eslint-disable-next-line no-redeclare
 export const Element: ElementInterface = {
-  isAncestor(value: any): value is Ancestor {
-    return isPlainObject(value) && Node.isNodeList(value.children)
+  isAncestor(
+    value: any,
+    { deep = false }: ElementIsElementOptions = {}
+  ): value is Ancestor {
+    return isObject(value) && Node.isNodeList(value.children, { deep })
   },
 
   isElement,
 
-  isElementList(value: any): value is Element[] {
-    return Array.isArray(value) && value.every(val => Element.isElement(val))
+  isElementList(
+    value: any,
+    { deep = false }: ElementIsElementOptions = {}
+  ): value is Element[] {
+    return (
+      Array.isArray(value) &&
+      value.every(val => Element.isElement(val, { deep }))
+    )
   },
 
   isElementProps(props: any): props is Partial<Element> {

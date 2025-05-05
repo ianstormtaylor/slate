@@ -32,6 +32,10 @@ export interface NodeElementsOptions {
   pass?: (node: NodeEntry) => boolean
 }
 
+export interface NodeIsNodeOptions {
+  deep?: boolean
+}
+
 export interface NodeLevelsOptions {
   reverse?: boolean
 }
@@ -144,12 +148,12 @@ export interface NodeInterface {
   /**
    * Check if a value implements the `Node` interface.
    */
-  isNode: (value: any) => value is Node
+  isNode: (value: any, options?: NodeIsNodeOptions) => value is Node
 
   /**
    * Check if a value is a list of `Node` objects.
    */
-  isNodeList: (value: any) => value is Node[]
+  isNodeList: (value: any, options?: NodeIsNodeOptions) => value is Node[]
 
   /**
    * Get the last node entry in a root node from a path.
@@ -210,8 +214,6 @@ export interface NodeInterface {
     options?: NodeTextsOptions
   ) => Generator<NodeEntry<Text>, void, undefined>
 }
-
-const IS_NODE_LIST_CACHE = new WeakMap<any[], boolean>()
 
 // eslint-disable-next-line no-redeclare
 export const Node: NodeInterface = {
@@ -437,23 +439,21 @@ export const Node: NodeInterface = {
     return true
   },
 
-  isNode(value: any): value is Node {
+  isNode(value: any, { deep = false }: NodeIsNodeOptions = {}): value is Node {
     return (
-      Text.isText(value) || Element.isElement(value) || Editor.isEditor(value)
+      Text.isText(value) ||
+      Element.isElement(value, { deep }) ||
+      Editor.isEditor(value, { deep })
     )
   },
 
-  isNodeList(value: any): value is Node[] {
-    if (!Array.isArray(value)) {
-      return false
-    }
-    const cachedResult = IS_NODE_LIST_CACHE.get(value)
-    if (cachedResult !== undefined) {
-      return cachedResult
-    }
-    const isNodeList = value.every(val => Node.isNode(val))
-    IS_NODE_LIST_CACHE.set(value, isNodeList)
-    return isNodeList
+  isNodeList(
+    value: any,
+    { deep = false }: NodeIsNodeOptions = {}
+  ): value is Node[] {
+    return (
+      Array.isArray(value) && value.every(val => Node.isNode(val, { deep }))
+    )
   },
 
   last(root: Node, path: Path): NodeEntry {
