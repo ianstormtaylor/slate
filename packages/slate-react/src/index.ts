@@ -3,6 +3,7 @@ export {
   Editable,
   RenderElementProps,
   RenderLeafProps,
+  RenderTextProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,
 } from './components/editable'
