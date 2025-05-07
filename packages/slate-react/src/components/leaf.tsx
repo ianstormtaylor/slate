@@ -9,11 +9,7 @@ import { JSX } from 'react'
 import { Element, LeafPosition, Text } from 'slate'
 import { ResizeObserver as ResizeObserverPolyfill } from '@juggle/resize-observer'
 import String from './string'
-import {
-  PLACEHOLDER_SYMBOL,
-  EDITOR_TO_PLACEHOLDER_ELEMENT,
-  EDITOR_TO_FORCE_RENDER,
-} from 'slate-dom'
+import { PLACEHOLDER_SYMBOL, EDITOR_TO_PLACEHOLDER_ELEMENT } from 'slate-dom'
 import { RenderLeafProps, RenderPlaceholderProps } from './editable'
 import { useSlateStatic } from '../hooks/use-slate-static'
 import { IS_WEBKIT, IS_ANDROID } from 'slate-dom'
@@ -43,6 +39,8 @@ function clearTimeoutRef(timeoutRef: MutableRefObject<TimerId>) {
   }
 }
 
+const defaultRenderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />
+
 /**
  * Individual leaves in a text node with unique formatting.
  */
@@ -61,7 +59,7 @@ const Leaf = (props: {
     text,
     parent,
     renderPlaceholder,
-    renderLeaf = (props: RenderLeafProps) => <DefaultLeaf {...props} />,
+    renderLeaf = defaultRenderLeaf,
     leafPosition,
   } = props
 

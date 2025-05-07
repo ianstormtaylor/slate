@@ -1,8 +1,9 @@
 import ReactDOM from 'react-dom'
-import { BaseEditor } from 'slate'
+import { BaseEditor, Node } from 'slate'
 import { withDOM } from 'slate-dom'
 import { ReactEditor } from './react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
+import { getChunkTreeForNode } from '../chunking'
 
 /**
  * `withReact` adds React and DOM specific behaviors to the editor.
@@ -20,7 +21,9 @@ export const withReact = <T extends BaseEditor>(
 
   e = withDOM(e, clipboardFormatKey)
 
-  const { onChange } = e
+  const { onChange, apply } = e
+
+  e.getChunkSize = () => null
 
   e.onChange = options => {
     // COMPAT: React < 18 doesn't batch `setState` hook calls, which means
@@ -36,6 +39,25 @@ export const withReact = <T extends BaseEditor>(
     maybeBatchUpdates(() => {
       onChange(options)
     })
+  }
+
+  // On move_node, if the chunking optimization is enabled for the parent of the
+  // node being moved, add the moved node to the movedNodeKeys set of the
+  // parent's chunk tree.
+  e.apply = operation => {
+    if (operation.type === 'move_node') {
+      const parent = Node.parent(e, operation.path)
+      const chunking = !!e.getChunkSize(parent)
+
+      if (chunking) {
+        const node = Node.get(e, operation.path)
+        const chunkTree = getChunkTreeForNode(e, parent)
+        const key = ReactEditor.findKey(e, node)
+        chunkTree.movedNodeKeys.add(key)
+      }
+    }
+
+    apply(operation)
   }
 
   return e
