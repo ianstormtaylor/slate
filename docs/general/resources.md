@@ -21,6 +21,7 @@ These extensions and plugins add additional features and capabilities to Slate:
 - [`slate-yjs`](https://github.com/BitPhinix/slate-yjs/) Collaborative editing utilities for Slate leveraging Yjs
 - [`slate-collaborative`](https://github.com/cudr/slate-collaborative) Collaborative editing utilities for Slate
   leveraging Automerge
+- [`slate-vue3`](https://github.com/Guan-Erjia/slate-vue3) Which is a useful supplement to Slate for building a rich text editor using Vue3, integrated all functions in an npm package
 
 ## Products
 
