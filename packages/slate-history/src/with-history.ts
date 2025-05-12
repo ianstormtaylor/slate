@@ -83,7 +83,7 @@ export const withHistory = <T extends Editor>(editor: T) => {
       if (merge == null) {
         if (lastBatch == null) {
           merge = false
-        } else if (operations.length !== 0) {
+        } else if (operations.includes(lastOp)) {
           merge = true
         } else {
           merge = shouldMerge(op, lastOp)
