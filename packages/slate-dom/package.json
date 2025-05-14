@@ -29,8 +29,8 @@
     "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
     "@types/resize-observer-browser": "^0.1.8",
-    "slate": "^0.114.0",
-    "slate-hyperscript": "^0.100.0",
+    "slate": "^0.114.3",
+    "slate-hyperscript": "^0.114.3",
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
