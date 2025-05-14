@@ -19,7 +19,7 @@
     "source-map-loader": "^4.0.1"
   },
   "peerDependencies": {
-    "slate": ">=0.65.3"
+    "slate": ">=0.114.3"
   },
   "umdGlobals": {
     "slate": "Slate"
