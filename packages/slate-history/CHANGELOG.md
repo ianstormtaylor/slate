@@ -1,5 +1,15 @@
 # slate-history
 
+## 0.114.3
+
+### Patch Changes
+
+- [#5866](https://github.com/ianstormtaylor/slate/pull/5866) [`7f5f9e1c`](https://github.com/ianstormtaylor/slate/commit/7f5f9e1c626e61ec476087212b22ee9ff86538e4) Thanks [@nabbydude](https://github.com/nabbydude)! - Fix certain undos undoing more than they should
+
+- [#5862](https://github.com/ianstormtaylor/slate/pull/5862) [`98b115b7`](https://github.com/ianstormtaylor/slate/commit/98b115b7e1ce8a9bfec57f80bcb9a4e11152eca5) Thanks [@12joan](https://github.com/12joan)! - Increase minimum `slate` version to `0.114.3`
+
+- [#5859](https://github.com/ianstormtaylor/slate/pull/5859) [`72532fd2`](https://github.com/ianstormtaylor/slate/commit/72532fd2d7be594251ea26fefb5c1ce8337b76ed) Thanks [@12joan](https://github.com/12joan)! - Optimize `isElement`, `isText`, `isNodeList` and `isEditor` by removing dependency on `is-plain-object` and by performing shallow checks by default. To perform a full check, including all descendants, pass the `{ deep: true }` option to `isElement`, `isNodeList` or `isEditor`.
+
 ## 0.113.1
 
 ### Patch Changes
