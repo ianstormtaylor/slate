@@ -35,4 +35,3 @@ export const input = (
   </editor>
 )
 export const output = cloneDeep(input)
-export const skip = true
