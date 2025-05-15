@@ -97,7 +97,7 @@ const SearchHighlightingExample = () => {
             placeholder="Search the text..."
             onChange={e => setSearch(e.target.value)}
             className={css`
-              padding-left: 2.5em;
+              padding-left: 2.5em !important;
               width: 100%;
             `}
           />

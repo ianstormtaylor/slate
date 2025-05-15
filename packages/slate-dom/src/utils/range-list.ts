@@ -1,5 +1,6 @@
-import { Range } from 'slate'
+import { Ancestor, DecoratedRange, Editor, Range } from 'slate'
 import { PLACEHOLDER_SYMBOL } from './weak-maps'
+import { DOMEditor } from '../plugin/dom-editor'
 
 export const shallowCompare = (
   obj1: { [key: string]: unknown },
@@ -29,9 +30,17 @@ const isDecorationFlagsEqual = (range: Range, other: Range) => {
  */
 
 export const isElementDecorationsEqual = (
-  list: Range[],
-  another: Range[]
+  list: Range[] | null,
+  another: Range[] | null
 ): boolean => {
+  if (list === another) {
+    return true
+  }
+
+  if (!list || !another) {
+    return false
+  }
+
   if (list.length !== another.length) {
     return false
   }
@@ -57,9 +66,17 @@ export const isElementDecorationsEqual = (
  */
 
 export const isTextDecorationsEqual = (
-  list: Range[],
-  another: Range[]
+  list: Range[] | null,
+  another: Range[] | null
 ): boolean => {
+  if (list === another) {
+    return true
+  }
+
+  if (!list || !another) {
+    return false
+  }
+
   if (list.length !== another.length) {
     return false
   }
@@ -79,4 +96,66 @@ export const isTextDecorationsEqual = (
   }
 
   return true
+}
+
+/**
+ * Split and group decorations by each child of a node.
+ *
+ * @returns An array with length equal to that of `node.children`. Each index
+ * corresponds to a child of `node`, and the value is an array of decorations
+ * for that child.
+ */
+
+export const splitDecorationsByChild = (
+  editor: Editor,
+  node: Ancestor,
+  decorations: DecoratedRange[]
+): DecoratedRange[][] => {
+  const decorationsByChild = Array.from(
+    node.children,
+    (): DecoratedRange[] => []
+  )
+
+  if (decorations.length === 0) {
+    return decorationsByChild
+  }
+
+  const path = DOMEditor.findPath(editor, node)
+  const level = path.length
+  const ancestorRange = Editor.range(editor, path)
+
+  const cachedChildRanges = new Array<Range | undefined>(node.children.length)
+
+  const getChildRange = (index: number) => {
+    const cachedRange = cachedChildRanges[index]
+    if (cachedRange) return cachedRange
+    const childRange = Editor.range(editor, [...path, index])
+    cachedChildRanges[index] = childRange
+    return childRange
+  }
+
+  for (const decoration of decorations) {
+    const decorationRange = Range.intersection(ancestorRange, decoration)
+    if (!decorationRange) continue
+
+    const [startPoint, endPoint] = Range.edges(decorationRange)
+    const startIndex = startPoint.path[level]
+    const endIndex = endPoint.path[level]
+
+    for (let i = startIndex; i <= endIndex; i++) {
+      const ds = decorationsByChild[i]
+      if (!ds) continue
+
+      const childRange = getChildRange(i)
+      const childDecorationRange = Range.intersection(childRange, decoration)
+      if (!childDecorationRange) continue
+
+      ds.push({
+        ...decoration,
+        ...childDecorationRange,
+      })
+    }
+  }
+
+  return decorationsByChild
 }

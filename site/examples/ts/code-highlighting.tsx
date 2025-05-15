@@ -16,9 +16,9 @@ import {
   Element,
   Node,
   NodeEntry,
-  Range,
   Transforms,
   createEditor,
+  DecoratedRange,
 } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -27,7 +27,6 @@ import {
   RenderElementProps,
   RenderLeafProps,
   Slate,
-  useSlate,
   useSlateStatic,
   withReact,
 } from 'slate-react'
@@ -48,13 +47,12 @@ const CodeLineType = 'code-line'
 const CodeHighlightingExample = () => {
   const [editor] = useState(() => withHistory(withReact(createEditor())))
 
-  const decorate = useDecorate(editor)
+  const decorate = useDecorate()
   const onKeyDown = useOnKeydown(editor)
 
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <ExampleToolbar />
-      <SetNodeToDecorations />
       <Editable
         decorate={decorate}
         renderElement={ElementWrapper}
@@ -166,48 +164,27 @@ const renderLeaf = (props: RenderLeafProps) => {
   )
 }
 
-const useDecorate = (editor: CustomEditor) => {
-  return useCallback(
-    ([node, path]: NodeEntry) => {
-      if (Element.isElement(node) && node.type === CodeLineType) {
-        const ranges = editor.nodeToDecorations?.get(node) || []
-        return ranges
-      }
+const useDecorate = () => {
+  return useCallback(([node, path]: NodeEntry) => {
+    if (Element.isElement(node) && node.type === CodeBlockType) {
+      return decorateCodeBlock([node, path])
+    }
 
-      return []
-    },
-    [editor.nodeToDecorations]
-  )
+    return []
+  }, [])
 }
 
-interface TokenRange extends Range {
-  token: boolean
-  [key: string]: unknown
-}
-
-type EditorWithDecorations = CustomEditor & {
-  nodeToDecorations: Map<Element, TokenRange[]>
-}
-
-const getChildNodeToDecorations = ([
+const decorateCodeBlock = ([
   block,
   blockPath,
-]: NodeEntry<CodeBlockElement>): Map<Element, TokenRange[]> => {
-  const nodeToDecorations = new Map<Element, TokenRange[]>()
-
+]: NodeEntry<CodeBlockElement>): DecoratedRange[] => {
   const text = block.children.map(line => Node.string(line)).join('\n')
-  const language = block.language
-  const tokens = Prism.tokenize(text, Prism.languages[language])
+  const tokens = Prism.tokenize(text, Prism.languages[block.language])
   const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
-  const blockChildren = block.children as Element[]
+  const decorations: DecoratedRange[] = []
 
   for (let index = 0; index < normalizedTokens.length; index++) {
     const tokens = normalizedTokens[index]
-    const element = blockChildren[index]
-
-    if (!nodeToDecorations.has(element)) {
-      nodeToDecorations.set(element, [])
-    }
 
     let start = 0
     for (const token of tokens) {
@@ -219,41 +196,19 @@ const getChildNodeToDecorations = ([
       const end = start + length
 
       const path = [...blockPath, index, 0]
-      const range = {
+
+      decorations.push({
         anchor: { path, offset: start },
         focus: { path, offset: end },
         token: true,
         ...Object.fromEntries(token.types.map(type => [type, true])),
-      }
-
-      nodeToDecorations.get(element)!.push(range)
+      })
 
       start = end
     }
   }
 
-  return nodeToDecorations
-}
-
-// precalculate editor.nodeToDecorations map to use it inside decorate function then
-const SetNodeToDecorations = () => {
-  const editor = useSlate() as EditorWithDecorations
-
-  const blockEntries = Array.from(
-    Editor.nodes<CodeBlockElement>(editor, {
-      at: [],
-      mode: 'highest',
-      match: n => Element.isElement(n) && n.type === CodeBlockType,
-    })
-  )
-
-  const nodeToDecorations = mergeMaps(
-    ...blockEntries.map(getChildNodeToDecorations)
-  )
-
-  editor.nodeToDecorations = nodeToDecorations
-
-  return null
+  return decorations
 }
 
 const useOnKeydown = (editor: CustomEditor) => {
@@ -304,18 +259,6 @@ const LanguageSelect = (props: LanguageSelectProps) => {
       <option value="typescript">TypeScript</option>
     </select>
   )
-}
-
-const mergeMaps = <K, V>(...maps: Map<K, V>[]) => {
-  const map = new Map<K, V>()
-
-  for (const m of maps) {
-    for (const item of m) {
-      map.set(...item)
-    }
-  }
-
-  return map
 }
 
 const toChildren = (content: string): CustomText[] => [{ text: content }]

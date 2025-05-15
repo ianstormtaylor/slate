@@ -1,4 +1,3 @@
-import { createDraft, finishDraft, isDraft } from 'immer'
 import {
   Ancestor,
   Descendant,
@@ -22,224 +21,320 @@ export interface GeneralTransforms {
   transform: (editor: Editor, op: Operation) => void
 }
 
-const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
-  switch (op.type) {
-    case 'insert_node': {
-      const { path, node } = op
-      const parent = Node.parent(editor, path)
-      const index = path[path.length - 1]
+const insertChildren = <T>(xs: T[], index: number, ...newValues: T[]) => [
+  ...xs.slice(0, index),
+  ...newValues,
+  ...xs.slice(index),
+]
 
-      if (index > parent.children.length) {
-        throw new Error(
-          `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
-        )
-      }
+const replaceChildren = <T>(
+  xs: T[],
+  index: number,
+  removeCount: number,
+  ...newValues: T[]
+) => [...xs.slice(0, index), ...newValues, ...xs.slice(index + removeCount)]
 
-      parent.children.splice(index, 0, node)
+const removeChildren = replaceChildren
 
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
-      }
+/**
+ * Replace a descendant with a new node, replacing all ancestors
+ */
+const modifyDescendant = <N extends Descendant>(
+  editor: Editor,
+  path: Path,
+  f: (node: N) => N
+) => {
+  if (path.length === 0) {
+    throw new Error('Cannot modify the editor')
+  }
 
-      break
+  const node = Node.get(editor, path) as N
+  const slicedPath = path.slice()
+  let modifiedNode: Node = f(node)
+
+  while (slicedPath.length > 1) {
+    const index = slicedPath.pop()!
+    const ancestorNode = Node.get(editor, slicedPath) as Ancestor
+
+    modifiedNode = {
+      ...ancestorNode,
+      children: replaceChildren(ancestorNode.children, index, 1, modifiedNode),
     }
+  }
 
-    case 'insert_text': {
-      const { path, offset, text } = op
-      if (text.length === 0) break
-      const node = Node.leaf(editor, path)
-      const before = node.text.slice(0, offset)
-      const after = node.text.slice(offset)
-      node.text = before + text + after
+  const index = slicedPath.pop()!
+  editor.children = replaceChildren(editor.children, index, 1, modifiedNode)
+}
 
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
-      }
-
-      break
-    }
-
-    case 'merge_node': {
-      const { path } = op
-      const node = Node.get(editor, path)
-      const prevPath = Path.previous(path)
-      const prev = Node.get(editor, prevPath)
-      const parent = Node.parent(editor, path)
-      const index = path[path.length - 1]
-
-      if (Text.isText(node) && Text.isText(prev)) {
-        prev.text += node.text
-      } else if (!Text.isText(node) && !Text.isText(prev)) {
-        prev.children.push(...node.children)
-      } else {
+/**
+ * Replace the children of a node, replacing all ancestors
+ */
+const modifyChildren = (
+  editor: Editor,
+  path: Path,
+  f: (children: Descendant[]) => Descendant[]
+) => {
+  if (path.length === 0) {
+    editor.children = f(editor.children)
+  } else {
+    modifyDescendant<Element>(editor, path, node => {
+      if (Text.isText(node)) {
         throw new Error(
-          `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
+          `Cannot get the element at path [${path}] because it refers to a leaf node: ${Scrubber.stringify(
             node
-          )} ${Scrubber.stringify(prev)}`
+          )}`
         )
       }
 
-      parent.children.splice(index, 1)
+      return { ...node, children: f(node.children) }
+    })
+  }
+}
 
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
-      }
-
-      break
+/**
+ * Replace a leaf, replacing all ancestors
+ */
+const modifyLeaf = (editor: Editor, path: Path, f: (leaf: Text) => Text) =>
+  modifyDescendant(editor, path, node => {
+    if (!Text.isText(node)) {
+      throw new Error(
+        `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(
+          node
+        )}`
+      )
     }
 
-    case 'move_node': {
-      const { path, newPath } = op
+    return f(node)
+  })
 
-      if (Path.isAncestor(path, newPath)) {
-        throw new Error(
-          `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`
-        )
+// eslint-disable-next-line no-redeclare
+export const GeneralTransforms: GeneralTransforms = {
+  transform(editor: Editor, op: Operation): void {
+    let transformSelection = false
+
+    switch (op.type) {
+      case 'insert_node': {
+        const { path, node } = op
+
+        modifyChildren(editor, Path.parent(path), children => {
+          const index = path[path.length - 1]
+
+          if (index > children.length) {
+            throw new Error(
+              `Cannot apply an "insert_node" operation at path [${path}] because the destination is past the end of the node.`
+            )
+          }
+
+          return insertChildren(children, index, node)
+        })
+
+        transformSelection = true
+        break
       }
 
-      const node = Node.get(editor, path)
-      const parent = Node.parent(editor, path)
-      const index = path[path.length - 1]
+      case 'insert_text': {
+        const { path, offset, text } = op
+        if (text.length === 0) break
 
-      // This is tricky, but since the `path` and `newPath` both refer to
-      // the same snapshot in time, there's a mismatch. After either
-      // removing the original position, the second step's path can be out
-      // of date. So instead of using the `op.newPath` directly, we
-      // transform `op.path` to ascertain what the `newPath` would be after
-      // the operation was applied.
-      parent.children.splice(index, 1)
-      const truePath = Path.transform(path, op)!
-      const newParent = Node.get(editor, Path.parent(truePath)) as Ancestor
-      const newIndex = truePath[truePath.length - 1]
+        modifyLeaf(editor, path, node => {
+          const before = node.text.slice(0, offset)
+          const after = node.text.slice(offset)
 
-      newParent.children.splice(newIndex, 0, node)
+          return {
+            ...node,
+            text: before + text + after,
+          }
+        })
 
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
+        transformSelection = true
+        break
       }
 
-      break
-    }
+      case 'merge_node': {
+        const { path } = op
+        const index = path[path.length - 1]
+        const prevPath = Path.previous(path)
+        const prevIndex = prevPath[prevPath.length - 1]
 
-    case 'remove_node': {
-      const { path } = op
-      const index = path[path.length - 1]
-      const parent = Node.parent(editor, path)
-      parent.children.splice(index, 1)
+        modifyChildren(editor, Path.parent(path), children => {
+          const node = children[index]
+          const prev = children[prevIndex]
+          let newNode: Descendant
 
-      // Transform all the points in the value, but if the point was in the
-      // node that was removed we need to update the range or remove it.
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          const result = Point.transform(point, op)
-
-          if (selection != null && result != null) {
-            selection[key] = result
+          if (Text.isText(node) && Text.isText(prev)) {
+            newNode = { ...prev, text: prev.text + node.text }
+          } else if (!Text.isText(node) && !Text.isText(prev)) {
+            newNode = { ...prev, children: prev.children.concat(node.children) }
           } else {
-            let prev: NodeEntry<Text> | undefined
-            let next: NodeEntry<Text> | undefined
+            throw new Error(
+              `Cannot apply a "merge_node" operation at path [${path}] to nodes of different interfaces: ${Scrubber.stringify(
+                node
+              )} ${Scrubber.stringify(prev)}`
+            )
+          }
 
-            for (const [n, p] of Node.texts(editor)) {
-              if (Path.compare(p, path) === -1) {
-                prev = [n, p]
-              } else {
-                next = [n, p]
-                break
-              }
-            }
+          return replaceChildren(children, prevIndex, 2, newNode)
+        })
 
-            let preferNext = false
-            if (prev && next) {
-              if (Path.equals(next[1], path)) {
-                preferNext = !Path.hasPrevious(next[1])
-              } else {
-                preferNext =
-                  Path.common(prev[1], path).length <
-                  Path.common(next[1], path).length
-              }
-            }
+        transformSelection = true
+        break
+      }
 
-            if (prev && !preferNext) {
-              point.path = prev[1]
-              point.offset = prev[0].text.length
-            } else if (next) {
-              point.path = next[1]
-              point.offset = 0
+      case 'move_node': {
+        const { path, newPath } = op
+        const index = path[path.length - 1]
+
+        if (Path.isAncestor(path, newPath)) {
+          throw new Error(
+            `Cannot move a path [${path}] to new path [${newPath}] because the destination is inside itself.`
+          )
+        }
+
+        const node = Node.get(editor, path)
+
+        modifyChildren(editor, Path.parent(path), children =>
+          removeChildren(children, index, 1)
+        )
+
+        // This is tricky, but since the `path` and `newPath` both refer to
+        // the same snapshot in time, there's a mismatch. After either
+        // removing the original position, the second step's path can be out
+        // of date. So instead of using the `op.newPath` directly, we
+        // transform `op.path` to ascertain what the `newPath` would be after
+        // the operation was applied.
+        const truePath = Path.transform(path, op)!
+        const newIndex = truePath[truePath.length - 1]
+
+        modifyChildren(editor, Path.parent(truePath), children =>
+          insertChildren(children, newIndex, node)
+        )
+
+        transformSelection = true
+        break
+      }
+
+      case 'remove_node': {
+        const { path } = op
+        const index = path[path.length - 1]
+
+        modifyChildren(editor, Path.parent(path), children =>
+          removeChildren(children, index, 1)
+        )
+
+        // Transform all the points in the value, but if the point was in the
+        // node that was removed we need to update the range or remove it.
+        if (editor.selection) {
+          let selection: Selection = { ...editor.selection }
+
+          for (const [point, key] of Range.points(selection)) {
+            const result = Point.transform(point, op)
+
+            if (selection != null && result != null) {
+              selection[key] = result
             } else {
-              selection = null
+              let prev: NodeEntry<Text> | undefined
+              let next: NodeEntry<Text> | undefined
+
+              for (const [n, p] of Node.texts(editor)) {
+                if (Path.compare(p, path) === -1) {
+                  prev = [n, p]
+                } else {
+                  next = [n, p]
+                  break
+                }
+              }
+
+              let preferNext = false
+              if (prev && next) {
+                if (Path.equals(next[1], path)) {
+                  preferNext = !Path.hasPrevious(next[1])
+                } else {
+                  preferNext =
+                    Path.common(prev[1], path).length <
+                    Path.common(next[1], path).length
+                }
+              }
+
+              if (prev && !preferNext) {
+                selection![key] = { path: prev[1], offset: prev[0].text.length }
+              } else if (next) {
+                selection![key] = { path: next[1], offset: 0 }
+              } else {
+                selection = null
+              }
             }
           }
-        }
-      }
 
-      break
-    }
-
-    case 'remove_text': {
-      const { path, offset, text } = op
-      if (text.length === 0) break
-      const node = Node.leaf(editor, path)
-      const before = node.text.slice(0, offset)
-      const after = node.text.slice(offset + text.length)
-      node.text = before + after
-
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
-      }
-
-      break
-    }
-
-    case 'set_node': {
-      const { path, properties, newProperties } = op
-
-      if (path.length === 0) {
-        throw new Error(`Cannot set properties on the root node!`)
-      }
-
-      const node = Node.get(editor, path)
-
-      for (const key in newProperties) {
-        if (key === 'children' || key === 'text') {
-          throw new Error(`Cannot set the "${key}" property of nodes!`)
+          editor.selection = selection
         }
 
-        const value = newProperties[<keyof Node>key]
-
-        if (value == null) {
-          delete node[<keyof Node>key]
-        } else {
-          node[<keyof Node>key] = value
-        }
+        break
       }
 
-      // properties that were previously defined, but are now missing, must be deleted
-      for (const key in properties) {
-        if (!newProperties.hasOwnProperty(key)) {
-          delete node[<keyof Node>key]
-        }
+      case 'remove_text': {
+        const { path, offset, text } = op
+        if (text.length === 0) break
+
+        modifyLeaf(editor, path, node => {
+          const before = node.text.slice(0, offset)
+          const after = node.text.slice(offset + text.length)
+
+          return {
+            ...node,
+            text: before + after,
+          }
+        })
+
+        transformSelection = true
+        break
       }
 
-      break
-    }
+      case 'set_node': {
+        const { path, properties, newProperties } = op
 
-    case 'set_selection': {
-      const { newProperties } = op
+        if (path.length === 0) {
+          throw new Error(`Cannot set properties on the root node!`)
+        }
 
-      if (newProperties == null) {
-        selection = newProperties
-      } else {
-        if (selection == null) {
+        modifyDescendant(editor, path, node => {
+          const newNode = { ...node }
+
+          for (const key in newProperties) {
+            if (key === 'children' || key === 'text') {
+              throw new Error(`Cannot set the "${key}" property of nodes!`)
+            }
+
+            const value = newProperties[<keyof Node>key]
+
+            if (value == null) {
+              delete newNode[<keyof Node>key]
+            } else {
+              newNode[<keyof Node>key] = value
+            }
+          }
+
+          // properties that were previously defined, but are now missing, must be deleted
+          for (const key in properties) {
+            if (!newProperties.hasOwnProperty(key)) {
+              delete newNode[<keyof Node>key]
+            }
+          }
+
+          return newNode
+        })
+
+        break
+      }
+
+      case 'set_selection': {
+        const { newProperties } = op
+
+        if (newProperties == null) {
+          editor.selection = null
+          break
+        }
+
+        if (editor.selection == null) {
           if (!Range.isRange(newProperties)) {
             throw new Error(
               `Cannot apply an incomplete "set_selection" operation properties ${Scrubber.stringify(
@@ -248,8 +343,11 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
             )
           }
 
-          selection = { ...newProperties }
+          editor.selection = { ...newProperties }
+          break
         }
+
+        const selection = { ...editor.selection }
 
         for (const key in newProperties) {
           const value = newProperties[<keyof Range>key]
@@ -264,76 +362,67 @@ const applyToDraft = (editor: Editor, selection: Selection, op: Operation) => {
             selection[<keyof Range>key] = value
           }
         }
+
+        editor.selection = selection
+
+        break
       }
 
-      break
+      case 'split_node': {
+        const { path, position, properties } = op
+        const index = path[path.length - 1]
+
+        if (path.length === 0) {
+          throw new Error(
+            `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`
+          )
+        }
+
+        modifyChildren(editor, Path.parent(path), children => {
+          const node = children[index]
+          let newNode: Descendant
+          let nextNode: Descendant
+
+          if (Text.isText(node)) {
+            const before = node.text.slice(0, position)
+            const after = node.text.slice(position)
+            newNode = {
+              ...node,
+              text: before,
+            }
+            nextNode = {
+              ...(properties as Partial<Text>),
+              text: after,
+            }
+          } else {
+            const before = node.children.slice(0, position)
+            const after = node.children.slice(position)
+            newNode = {
+              ...node,
+              children: before,
+            }
+            nextNode = {
+              ...(properties as Partial<Element>),
+              children: after,
+            }
+          }
+
+          return replaceChildren(children, index, 1, newNode, nextNode)
+        })
+
+        transformSelection = true
+        break
+      }
     }
 
-    case 'split_node': {
-      const { path, position, properties } = op
+    if (transformSelection && editor.selection) {
+      const selection = { ...editor.selection }
 
-      if (path.length === 0) {
-        throw new Error(
-          `Cannot apply a "split_node" operation at path [${path}] because the root node cannot be split.`
-        )
+      for (const [point, key] of Range.points(selection)) {
+        selection[key] = Point.transform(point, op)!
       }
 
-      const node = Node.get(editor, path)
-      const parent = Node.parent(editor, path)
-      const index = path[path.length - 1]
-      let newNode: Descendant
-
-      if (Text.isText(node)) {
-        const before = node.text.slice(0, position)
-        const after = node.text.slice(position)
-        node.text = before
-        newNode = {
-          ...(properties as Partial<Text>),
-          text: after,
-        }
-      } else {
-        const before = node.children.slice(0, position)
-        const after = node.children.slice(position)
-        node.children = before
-
-        newNode = {
-          ...(properties as Partial<Element>),
-          children: after,
-        }
-      }
-
-      parent.children.splice(index + 1, 0, newNode)
-
-      if (selection) {
-        for (const [point, key] of Range.points(selection)) {
-          selection[key] = Point.transform(point, op)!
-        }
-      }
-
-      break
-    }
-  }
-  return selection
-}
-
-// eslint-disable-next-line no-redeclare
-export const GeneralTransforms: GeneralTransforms = {
-  transform(editor: Editor, op: Operation): void {
-    editor.children = createDraft(editor.children)
-    let selection = editor.selection && createDraft(editor.selection)
-
-    try {
-      selection = applyToDraft(editor, selection, op)
-    } finally {
-      editor.children = finishDraft(editor.children)
-
-      if (selection) {
-        editor.selection = isDraft(selection)
-          ? (finishDraft(selection) as Range)
-          : selection
-      } else {
-        editor.selection = null
-      }
+      editor.selection = selection
     }
   },
 }

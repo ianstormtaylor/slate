@@ -10,6 +10,7 @@ packages/*/yarn.lock
 site/out/
 tmp/
 test-results/
+coverage
 .DS_Store
 
 # Recommendation from https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored (not using Zero-installs)

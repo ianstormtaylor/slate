@@ -10,6 +10,10 @@ body {
   margin: 0;
 }
 
+h1 {
+  margin-top: 0;
+}
+
 p {
   margin: 0;
 }
@@ -56,7 +60,8 @@ td {
   border: 2px solid #ddd;
 }
 
-input {
+input[type='text'],
+input[type='search'] {
   box-sizing: border-box;
   font-size: 0.85em;
   width: 100%;
@@ -65,7 +70,8 @@ input {
   background: #fafafa;
 }
 
-input:focus {
+input[type='text']:focus,
+input[type='search']:focus {
   outline: 0;
   border-color: blue;
 }
@@ -75,7 +81,12 @@ iframe {
   border: 1px solid #eee;
 }
 
-[data-slate-editor] > * + * {
+details > summary {
+  user-select: none;
+}
+
+[data-slate-editor] > * + *,
+[data-slate-chunk] > * + * {
   margin-top: 1em;
 }
 
@@ -88,4 +99,28 @@ iframe {
   border-radius: 20px;
   outline-offset: -20px;
   white-space: pre-wrap;
+}
+
+.performance-controls {
+  padding: 20px;
+  margin: -20px -20px 20px -20px;
+  background-color: white;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  border-bottom: 1px solid lightgrey;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.performance-controls > * {
+  margin-top: 10px;
+}
+
+.performance-controls > details > :not(summary) {
+  margin-left: 10px;
+}
+
+.performance-controls p {
+  margin-top: 5px;
 }

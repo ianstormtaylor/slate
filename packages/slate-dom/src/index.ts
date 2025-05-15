@@ -59,6 +59,7 @@ export { Key } from './utils/key'
 export {
   isElementDecorationsEqual,
   isTextDecorationsEqual,
+  splitDecorationsByChild,
 } from './utils/range-list'
 
 export {

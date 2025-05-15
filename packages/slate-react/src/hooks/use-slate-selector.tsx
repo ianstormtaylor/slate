@@ -1,120 +1,77 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useReducer,
-  useRef,
-} from 'react'
+import { createContext, useCallback, useContext, useMemo, useRef } from 'react'
 import { Editor } from 'slate'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
+import { useSlateStatic } from './use-slate-static'
+import { useGenericSelector } from './use-generic-selector'
 
-function isError(error: any): error is Error {
-  return error instanceof Error
+type Callback = () => void
+
+export interface SlateSelectorOptions {
+  /**
+   * If true, defer calling the selector function until after `Editable` has
+   * finished rendering. This ensures that `ReactEditor.findPath` won't return
+   * an outdated path if called inside the selector.
+   */
+  deferred?: boolean
 }
 
-type EditorChangeHandler = (editor: Editor) => void
 /**
  * A React context for sharing the editor selector context in a way to control rerenders
  */
 
 export const SlateSelectorContext = createContext<{
-  getSlate: () => Editor
-  addEventListener: (callback: EditorChangeHandler) => () => void
+  addEventListener: (
+    callback: Callback,
+    options: SlateSelectorOptions
+  ) => () => void
+  flushDeferred: () => void
 }>({} as any)
 
 const refEquality = (a: any, b: any) => a === b
 
 /**
- * use redux style selectors to prevent rerendering on every keystroke.
- * Bear in mind rerendering can only prevented if the returned value is a value type or for reference types (e.g. objects and arrays) add a custom equality function.
+ * Use redux style selectors to prevent rerendering on every keystroke.
  *
- * Example:
- * ```
- *  const isSelectionActive = useSlateSelector(editor => Boolean(editor.selection));
- * ```
+ * Bear in mind rerendering can only prevented if the returned value is a value
+ * type or for reference types (e.g. objects and arrays) add a custom equality
+ * function.
+ *
+ * If `selector` is memoized using `useCallback`, then it will only be called
+ * when it or the editor state changes. Otherwise, `selector` will be called
+ * every time the component renders.
+ *
+ * @example
+ * const isSelectionActive = useSlateSelector(editor => Boolean(editor.selection))
  */
+
 export function useSlateSelector<T>(
   selector: (editor: Editor) => T,
-  equalityFn: (a: T, b: T) => boolean = refEquality
-) {
-  const [, forceRender] = useReducer(s => s + 1, 0)
+  equalityFn: (a: T | null, b: T) => boolean = refEquality,
+  { deferred }: SlateSelectorOptions = {}
+): T {
   const context = useContext(SlateSelectorContext)
   if (!context) {
     throw new Error(
       `The \`useSlateSelector\` hook must be used inside the <Slate> component's context.`
     )
   }
-  const { getSlate, addEventListener } = context
+  const { addEventListener } = context
 
-  const latestSubscriptionCallbackError = useRef<Error | undefined>()
-  const latestSelector = useRef<(editor: Editor) => T>(() => null as any)
-  const latestSelectedState = useRef<T>(null as any as T)
-  let selectedState: T
-
-  try {
-    if (
-      selector !== latestSelector.current ||
-      latestSubscriptionCallbackError.current
-    ) {
-      const selectorResult = selector(getSlate())
-
-      if (equalityFn(latestSelectedState.current, selectorResult)) {
-        selectedState = latestSelectedState.current
-      } else {
-        selectedState = selectorResult
-      }
-    } else {
-      selectedState = latestSelectedState.current
-    }
-  } catch (err) {
-    if (latestSubscriptionCallbackError.current && isError(err)) {
-      err.message += `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`
-    }
-
-    throw err
-  }
-  useIsomorphicLayoutEffect(() => {
-    latestSelector.current = selector
-    latestSelectedState.current = selectedState
-    latestSubscriptionCallbackError.current = undefined
-  })
-
-  useIsomorphicLayoutEffect(
-    () => {
-      function checkForUpdates() {
-        try {
-          const newSelectedState = latestSelector.current(getSlate())
-
-          if (equalityFn(newSelectedState, latestSelectedState.current)) {
-            return
-          }
-
-          latestSelectedState.current = newSelectedState
-        } catch (err) {
-          // we ignore all errors here, since when the component
-          // is re-rendered, the selectors are called again, and
-          // will throw again, if neither props nor store state
-          // changed
-          if (err instanceof Error) {
-            latestSubscriptionCallbackError.current = err
-          } else {
-            latestSubscriptionCallbackError.current = new Error(String(err))
-          }
-        }
-
-        forceRender()
-      }
-
-      const unsubscribe = addEventListener(checkForUpdates)
-
-      checkForUpdates()
-
-      return () => unsubscribe()
-    },
-    // don't rerender on equalityFn change since we want to be able to define it inline
-    [addEventListener, getSlate]
+  const editor = useSlateStatic()
+  const genericSelector = useCallback(
+    () => selector(editor),
+    [editor, selector]
   )
+  const [selectedState, update] = useGenericSelector(
+    genericSelector,
+    equalityFn
+  )
+
+  useIsomorphicLayoutEffect(() => {
+    const unsubscribe = addEventListener(update, { deferred })
+    update()
+    return unsubscribe
+  }, [addEventListener, update, deferred])
 
   return selectedState
 }
@@ -122,33 +79,46 @@ export function useSlateSelector<T>(
 /**
  * Create selector context with editor updating on every editor change
  */
-export function useSelectorContext(editor: Editor) {
-  const eventListeners = useRef<EditorChangeHandler[]>([]).current
-  const slateRef = useRef<{
-    editor: Editor
-  }>({
-    editor,
-  }).current
-  const onChange = useCallback(
-    (editor: Editor) => {
-      slateRef.editor = editor
-      eventListeners.forEach((listener: EditorChangeHandler) =>
-        listener(editor)
-      )
+export function useSelectorContext() {
+  const eventListeners = useRef(new Set<Callback>())
+  const deferredEventListeners = useRef(new Set<Callback>())
+
+  const onChange = useCallback(() => {
+    eventListeners.current.forEach(listener => listener())
+  }, [])
+
+  const flushDeferred = useCallback(() => {
+    deferredEventListeners.current.forEach(listener => listener())
+    deferredEventListeners.current.clear()
+  }, [])
+
+  const addEventListener = useCallback(
+    (callbackProp: Callback, { deferred = false }: SlateSelectorOptions) => {
+      const callback = deferred
+        ? () => deferredEventListeners.current.add(callbackProp)
+        : callbackProp
+
+      eventListeners.current.add(callback)
+
+      return () => {
+        eventListeners.current.delete(callback)
+      }
     },
-    [eventListeners, slateRef]
+    []
   )
 
-  const selectorContext = useMemo(() => {
-    return {
-      getSlate: () => slateRef.editor,
-      addEventListener: (callback: EditorChangeHandler) => {
-        eventListeners.push(callback)
-        return () => {
-          eventListeners.splice(eventListeners.indexOf(callback), 1)
-        }
-      },
-    }
-  }, [eventListeners, slateRef])
+  const selectorContext = useMemo(
+    () => ({
+      addEventListener,
+      flushDeferred,
+    }),
+    [addEventListener, flushDeferred]
+  )
+
   return { selectorContext, onChange }
+}
+
+export function useFlushDeferredSelectorsOnRender() {
+  const { flushDeferred } = useContext(SlateSelectorContext)
+  useIsomorphicLayoutEffect(flushDeferred)
 }

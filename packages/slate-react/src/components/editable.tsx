@@ -27,7 +27,7 @@ import {
 } from 'slate'
 import { useAndroidInputManager } from '../hooks/android-input-manager/use-android-input-manager'
 import useChildren from '../hooks/use-children'
-import { DecorateContext } from '../hooks/use-decorate'
+import { DecorateContext, useDecorateContext } from '../hooks/use-decorations'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
 import { ReadOnlyContext } from '../hooks/use-read-only'
 import { useSlate } from '../hooks/use-slate'
@@ -77,6 +77,7 @@ import {
 import { RestoreDOM } from './restore-dom/restore-dom'
 import { AndroidInputManager } from '../hooks/android-input-manager/android-input-manager'
 import { ComposingContext } from '../hooks/use-composing'
+import { useFlushDeferredSelectorsOnRender } from '../hooks/use-slate-selector'
 
 type DeferredOperation = () => void
 
@@ -97,6 +98,18 @@ export interface RenderElementProps {
     'data-slate-void'?: true
     dir?: 'rtl'
     ref: any
+  }
+}
+
+/**
+ * `RenderChunkProps` are passed to the `renderChunk` handler
+ */
+export interface RenderChunkProps {
+  highest: boolean
+  lowest: boolean
+  children: any
+  attributes: {
+    'data-slate-chunk': true
   }
 }
 
@@ -145,6 +158,7 @@ export type EditableProps = {
   role?: string
   style?: React.CSSProperties
   renderElement?: (props: RenderElementProps) => JSX.Element
+  renderChunk?: (props: RenderChunkProps) => JSX.Element
   renderLeaf?: (props: RenderLeafProps) => JSX.Element
   renderText?: (props: RenderTextProps) => JSX.Element
   renderPlaceholder?: (props: RenderPlaceholderProps) => JSX.Element
@@ -170,6 +184,7 @@ export const Editable = forwardRef(
       placeholder,
       readOnly = false,
       renderElement,
+      renderChunk,
       renderLeaf,
       renderText,
       renderPlaceholder = defaultRenderPlaceholder,
@@ -920,6 +935,7 @@ export const Editable = forwardRef(
     }, [scheduleOnDOMSelectionChange, state])
 
     const decorations = decorate([editor, []])
+    const decorateContext = useDecorateContext(decorate)
 
     const showPlaceholder =
       placeholder &&
@@ -999,10 +1015,12 @@ export const Editable = forwardRef(
       })
     })
 
+    useFlushDeferredSelectorsOnRender()
+
     return (
       <ReadOnlyContext.Provider value={readOnly}>
         <ComposingContext.Provider value={isComposing}>
-          <DecorateContext.Provider value={decorate}>
+          <DecorateContext.Provider value={decorateContext}>
             <RestoreDOM node={ref} receivedUserInput={receivedUserInput}>
               <Component
                 role={readOnly ? undefined : 'textbox'}
@@ -1852,10 +1870,10 @@ export const Editable = forwardRef(
                   decorations={decorations}
                   node={editor}
                   renderElement={renderElement}
+                  renderChunk={renderChunk}
                   renderPlaceholder={renderPlaceholder}
                   renderLeaf={renderLeaf}
                   renderText={renderText}
-                  selection={editor.selection}
                 />
               </Component>
             </RestoreDOM>
