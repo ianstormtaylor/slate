@@ -9,7 +9,7 @@ export const KEY_TO_CHUNK_TREE = new WeakMap<Key, ChunkTree>()
 /**
  * Get or create the chunk tree for a Slate node
  *
- * If the reconcile option is set to true, the chunk tree will be updated to
+ * If the reconcile option is provided, the chunk tree will be updated to
  * match the current children of the node. The children are chunked
  * automatically using the given chunk size.
  */

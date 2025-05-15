@@ -3,6 +3,10 @@ import { Key } from 'slate-dom'
 import { ChunkLeaf } from './types'
 import { ReactEditor } from '../plugin/react-editor'
 
+/**
+ * Traverse an array of children, providing helpers useful for reconciling the
+ * children array with a chunk tree
+ */
 export class ChildrenHelper {
   private editor: Editor
   private children: Descendant[]

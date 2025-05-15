@@ -42,9 +42,6 @@ export class ChunkTreeHelper {
    */
   private debug: boolean
 
-  // The chunk tree manager maintains a pointer that is used to traverse the
-  // chunk tree
-
   /**
    * Whether the traversal has reached the end of the chunk tree
    *
