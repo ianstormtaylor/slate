@@ -36,10 +36,6 @@ export const reconcileChildren = (
   const chunkTreeHelper = new ChunkTreeHelper(chunkTree, { chunkSize, debug })
   const childrenHelper = new ChildrenHelper(editor, children)
 
-  // Track the number of insertions and removals to work out whether each
-  // node's index has changed
-  let insertionsMinusRemovals = 0
-
   let treeLeaf: ChunkLeaf | null
 
   // Read leaves from the tree one by one, each one representing a single Slate
@@ -61,7 +57,6 @@ export const reconcileChildren = (
     // If the tree leaf was moved or removed, remove it
     if (lookAhead === -1 || wasMoved) {
       chunkTreeHelper.remove()
-      insertionsMinusRemovals--
       continue
     }
 
@@ -82,8 +77,6 @@ export const reconcileChildren = (
       insertedChildren.forEach((node, relativeIndex) => {
         onInsert?.(node, insertedChildrenStartIndex + relativeIndex)
       })
-
-      insertionsMinusRemovals += insertedChildren.length
     }
 
     const matchingChildIndex = childrenHelper.pointerIndex - 1
@@ -96,11 +89,10 @@ export const reconcileChildren = (
       onUpdate?.(matchingChild, matchingChildIndex)
     }
 
-    // If an unequal number of previous nodes were inserted and removed, the
-    // current node's index must have changed
-    if (insertionsMinusRemovals !== 0) {
-      onIndexChange?.(matchingChild, matchingChildIndex)
+    // Update the index if it has changed
+    if (treeLeaf.index !== matchingChildIndex) {
       treeLeaf.index = matchingChildIndex
+      onIndexChange?.(matchingChild, matchingChildIndex)
     }
 
     // Manually invalidate chunks containing specific children that we want to
