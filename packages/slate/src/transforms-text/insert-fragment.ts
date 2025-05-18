@@ -84,9 +84,7 @@ export const insertFragment: TextTransforms['insertFragment'] = (
     // be kept. At minimum, all text nodes will be inserted, but if
     // `shouldInsert` returns true for some ancestor of a particular text node,
     // then the entire ancestor will be inserted rather than inserting the text
-    // nodes individually. The resulting `nodesToInsert` array may contain a
-    // mixture of text nodes and elements.
-    const nodesToInsert: NodeEntry<Descendant>[] = []
+    // nodes individually.
     const shouldInsert = ([n, p]: NodeEntry) => {
       const isRoot = p.length === 0
       if (isRoot) {
@@ -127,37 +125,47 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       return true
     }
 
+    // Whether the current node is in the first block of the fragment.
+    let starting = true
+
+    // Inline nodes in the first block of the fragment, to be merged with the
+    // destination block.
+    const starts: Descendant[] = []
+
+    // Blocks in the middle of the fragment.
+    const middles: Element[] = []
+
+    // Inline nodes in the last block of the fragment, to be merged with the
+    // destination block. If the fragment contains only one block, this will be
+    // empty.
+    const ends: Descendant[] = []
+
     for (const entry of Node.nodes(
       { children: fragment },
       { pass: shouldInsert }
     )) {
-      if (shouldInsert(entry)) {
-        nodesToInsert.push(entry)
-      }
-    }
+      const [node, path] = entry
 
-    // Inline nodes at the start of the fragment, to be merged with the
-    // destination block.
-    const starts: Descendant[] = []
-
-    // Blocks to be inserted into the middle of the destination block, splitting
-    // it in half.
-    const middles: Element[] = []
-
-    // Inline nodes at the end of the fragment, to be merged with the
-    // destination block.
-    const ends: Descendant[] = []
-
-    let starting = true
-
-    for (const [node] of nodesToInsert) {
-      if (Element.isElement(node) && !editor.isInline(node)) {
+      // If we encounter a block that does not contain the first leaf, we're no
+      // longer in the first block of the fragment.
+      if (
+        starting &&
+        Element.isElement(node) &&
+        !editor.isInline(node) &&
+        !Path.isAncestor(path, firstLeafPath)
+      ) {
         starting = false
-        middles.push(node)
-      } else if (starting) {
-        starts.push(node)
-      } else {
-        ends.push(node)
+      }
+
+      if (shouldInsert(entry)) {
+        if (Element.isElement(node) && !editor.isInline(node)) {
+          starting = false
+          middles.push(node)
+        } else if (starting) {
+          starts.push(node)
+        } else {
+          ends.push(node)
+        }
       }
     }
 
@@ -182,8 +190,9 @@ export const insertFragment: TextTransforms['insertFragment'] = (
       isInlineEnd ? Path.next(inlinePath) : inlinePath
     )
 
-    // If the nodes to insert include blocks, split the destination block.
-    const splitBlock = middles.length > 0
+    // If the fragment contains inlines in multiple distinct blocks, split the
+    // destination block.
+    const splitBlock = ends.length > 0
 
     Transforms.splitNodes(editor, {
       at,
