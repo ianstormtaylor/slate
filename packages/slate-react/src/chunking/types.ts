@@ -39,7 +39,7 @@ export interface Chunk {
 
 // A chunk leaf is unrelated to a Slate leaf; it is a leaf of the chunk tree,
 // containing a single element that is a child of the Slate node the chunk tree
-// belongs to .
+// belongs to.
 export interface ChunkLeaf {
   type: 'leaf'
   key: Key
