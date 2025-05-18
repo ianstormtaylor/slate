@@ -15,8 +15,4 @@ module.exports = {
     })
     return config
   },
-  // https://answers.netlify.com/t/basic-nextjs-website-failing-to-build-with-exit-code-129/120273/2
-  experimental: {
-    cpus: 1,
-  },
 }
