@@ -3,7 +3,7 @@ import { Editor, Text, Path, Element, Node } from 'slate'
 
 import { ReactEditor, useSlateStatic } from '..'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { IS_ANDROID, IS_IOS } from 'slate-dom'
+import { IS_ANDROID } from 'slate-dom'
 import { MARK_PLACEHOLDER_SYMBOL } from 'slate-dom'
 
 /**
@@ -127,9 +127,17 @@ export const ZeroWidthString = (props: {
     attributes['data-slate-mark-placeholder'] = true
   }
 
+  // FIXME: Inserting the \uFEFF on iOS breaks capitalization at the start of an
+  // empty editor (https://github.com/ianstormtaylor/slate/issues/5199).
+  //
+  // However, not inserting the \uFEFF on iOS causes the editor to crash when
+  // inserting any text using an IME at the start of a block. This appears to
+  // be because accepting an IME suggestion when at the start of a block (no
+  // preceding \uFEFF) removes one or more DOM elements that `toSlateRange`
+  // depends on. (https://github.com/ianstormtaylor/slate/issues/5703)
   return (
     <span {...attributes}>
-      {!(IS_ANDROID || IS_IOS) || !isLineBreak ? '\uFEFF' : null}
+      {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
       {isLineBreak ? <br /> : null}
     </span>
   )
