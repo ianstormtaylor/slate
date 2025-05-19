@@ -134,7 +134,7 @@ export const ZeroWidthString = (props: {
   // inserting any text using an IME at the start of a block. This appears to
   // be because accepting an IME suggestion when at the start of a block (no
   // preceding \uFEFF) removes one or more DOM elements that `toSlateRange`
-  // depends on. (https://github.com/ianstormtaylor/slate/issues/5762)
+  // depends on. (https://github.com/ianstormtaylor/slate/issues/5703)
   return (
     <span {...attributes}>
       {!IS_ANDROID || !isLineBreak ? '\uFEFF' : null}
