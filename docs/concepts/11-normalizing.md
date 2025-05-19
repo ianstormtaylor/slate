@@ -34,7 +34,7 @@ import { Transforms, Element, Node } from 'slate'
 const withParagraphs = editor => {
   const { normalizeNode } = editor
 
-  editor.normalizeNode = entry => {
+  editor.normalizeNode = (entry, options) => {
     const [node, path] = entry
 
     // If the element is a paragraph, ensure its children are valid.
@@ -48,7 +48,7 @@ const withParagraphs = editor => {
     }
 
     // Fall back to the original `normalizeNode` to enforce other constraints.
-    normalizeNode(entry)
+    normalizeNode(entry, options)
   }
 
   return editor
@@ -135,7 +135,7 @@ For example, consider a normalization that ensured `link` elements have a valid 
 const withLinks = editor => {
   const { normalizeNode } = editor
 
-  editor.normalizeNode = entry => {
+  editor.normalizeNode = (entry, options) => {
     const [node, path] = entry
 
     if (
@@ -148,7 +148,7 @@ const withLinks = editor => {
       return
     }
 
-    normalizeNode(entry)
+    normalizeNode(entry, options)
   }
 
   return editor
