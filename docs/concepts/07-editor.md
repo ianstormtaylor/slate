@@ -90,7 +90,7 @@ Or you can even define custom "normalizations" that take place to ensure that li
 ```javascript
 const { normalizeNode } = editor
 
-editor.normalizeNode = entry => {
+editor.normalizeNode = (entry, options) => {
   const [node, path] = entry
 
   if (Element.isElement(node) && node.type === 'link') {
@@ -98,7 +98,7 @@ editor.normalizeNode = entry => {
     return
   }
 
-  normalizeNode(entry)
+  normalizeNode(entry, options)
 }
 ```
 

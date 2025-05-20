@@ -54,7 +54,13 @@ export interface BaseEditor {
   isElementReadOnly: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
-  normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
+  normalizeNode: (
+    entry: NodeEntry,
+    options?: {
+      operation?: Operation
+      fallbackElement?: () => Element
+    }
+  ) => void
   onChange: (options?: { operation?: Operation }) => void
   shouldNormalize: ({
     iteration,

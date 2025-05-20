@@ -25,8 +25,14 @@ describe('slate', () => {
     assert.deepEqual(editor.selection, output.selection)
   })
   fixtures(__dirname, 'normalization', ({ module }) => {
-    const { input, output } = module
+    const { input, output, withFallbackElement } = module
     const editor = withTest(input)
+    if (withFallbackElement) {
+      const { normalizeNode } = editor
+      editor.normalizeNode = (entry, options) => {
+        normalizeNode(entry, { ...options, fallbackElement: () => ({}) })
+      }
+    }
     Editor.normalize(editor, { force: true })
     assert.deepEqual(editor.children, output.children)
     assert.deepEqual(editor.selection, output.selection)

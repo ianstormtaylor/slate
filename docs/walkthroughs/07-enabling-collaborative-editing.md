@@ -145,11 +145,11 @@ const SlateEditor = ({ sharedType, provider }) => {
 
     // Ensure editor always has at least 1 valid child
     const { normalizeNode } = e
-    e.normalizeNode = entry => {
+    e.normalizeNode = (entry, options) => {
       const [node] = entry
 
       if (!Editor.isEditor(node) || node.children.length > 0) {
-        return normalizeNode(entry)
+        return normalizeNode(entry, options)
       }
 
       Transforms.insertNodes(editor, initialValue, { at: [0] })
@@ -369,11 +369,11 @@ const SlateEditor = ({ sharedType, provider }) => {
 
     // Ensure editor always has at least 1 valid child
     const { normalizeNode } = e
-    e.normalizeNode = entry => {
+    e.normalizeNode = (entry, options) => {
       const [node] = entry
 
       if (!Editor.isEditor(node) || node.children.length > 0) {
-        return normalizeNode(entry)
+        return normalizeNode(entry, options)
       }
 
       Transforms.insertNodes(editor, initialValue, { at: [0] })
