@@ -1,6 +1,4 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Text } from '../interfaces/text'
-import { Range } from '../interfaces/range'
 import { Path } from '../interfaces/path'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {
@@ -18,24 +16,16 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
   const path = Editor.path(editor, at)
   const reverse = mode === 'lowest'
 
-  for (const [n, p] of Editor.levels(editor, {
-    at: path,
+  if (path.length === 0) {
+    return
+  }
+
+  for (const entry of Editor.levels(editor, {
+    at: Path.parent(path),
     voids,
     match,
     reverse,
   })) {
-    if (Text.isText(n)) continue
-    if (Range.isRange(at)) {
-      if (
-        Path.isAncestor(p, at.anchor.path) &&
-        Path.isAncestor(p, at.focus.path)
-      ) {
-        return [n, p]
-      }
-    } else {
-      if (!Path.equals(path, p)) {
-        return [n, p]
-      }
-    }
+    return entry
   }
 }
