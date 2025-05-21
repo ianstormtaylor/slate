@@ -1,4 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
+import { Range } from '../interfaces'
 import { Path } from '../interfaces/path'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {
@@ -13,15 +14,18 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
     return
   }
 
-  const path = Editor.path(editor, at)
-  const reverse = mode === 'lowest'
+  let path = Editor.path(editor, at)
 
-  if (path.length === 0) {
-    return
+  // start with the direct ancestor -- unless its already the common ancestor of a cross-node range
+  if (!Range.isRange(at) || Path.equals(at.focus.path, at.anchor.path)) {
+    if (path.length === 0) return
+    path = Path.parent(path)
   }
 
+  const reverse = mode === 'lowest'
+
   for (const entry of Editor.levels(editor, {
-    at: Path.parent(path),
+    at: path,
     voids,
     match,
     reverse,
