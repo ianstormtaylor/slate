@@ -25,12 +25,6 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
 
   const reverse = mode === 'lowest'
 
-  for (const entry of Editor.levels(editor, {
-    at: path,
-    voids,
-    match,
-    reverse,
-  })) {
-    return entry
-  }
+  const [firstMatch] = Editor.levels(editor, { at: path, voids, match, reverse });
+  return firstMatch // if nothing matches this returns undefined
 }
