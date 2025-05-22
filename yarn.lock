@@ -3040,14 +3040,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:^1.39.0":
-  version: 1.39.0
-  resolution: "@playwright/test@npm:1.39.0"
+"@playwright/test@npm:^1.52.0":
+  version: 1.52.0
+  resolution: "@playwright/test@npm:1.52.0"
   dependencies:
-    playwright: "npm:1.39.0"
+    playwright: "npm:1.52.0"
   bin:
     playwright: cli.js
-  checksum: 5d039234609395f3eab46b5954b259bdd80dacf79efe531369c1633647dcafce25a78d497e61e671d661274bf66076426a1bd46be585c44addf23bb5bfaa15a2
+  checksum: e18a4eb626c7bc6cba212ff2e197cf9ae2e4da1c91bfdf08a744d62e27222751173e4b220fa27da72286a89a3b4dea7c09daf384d23708f284b64f98e9a63a88
   languageName: node
   linkType: hard
 
@@ -11871,27 +11871,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.39.0":
-  version: 1.39.0
-  resolution: "playwright-core@npm:1.39.0"
+"playwright-core@npm:1.52.0":
+  version: 1.52.0
+  resolution: "playwright-core@npm:1.52.0"
   bin:
     playwright-core: cli.js
-  checksum: e4e01ddea024c7564bbfacdba5f545b004a4017b466af08ae90e5184da4f5bc61e74c96e37cc5e30b7d4f97341c0883cfb2038c8cfbfab65316d714f65b82d83
+  checksum: 42e13f5f98dc25ebc95525fb338a215b9097b2ba39d41e99972a190bf75d79979f163f5bc07b1ca06847ee07acb2c9b487d070fab67e9cd55e33310fc05aca3c
   languageName: node
   linkType: hard
 
-"playwright@npm:1.39.0":
-  version: 1.39.0
-  resolution: "playwright@npm:1.39.0"
+"playwright@npm:1.52.0":
+  version: 1.52.0
+  resolution: "playwright@npm:1.52.0"
   dependencies:
     fsevents: "npm:2.3.2"
-    playwright-core: "npm:1.39.0"
+    playwright-core: "npm:1.52.0"
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 6f6b2f4381fccfbc560c4cd25e164f5093fec4e2046990587282e18618151d723b299b56c16741ce08e44a759c22e38c3e705b716d31238320e08e6ffcfa7319
+  checksum: 214175446089000c2ac997b925063b95f7d86d129c5d7c74caa5ddcb05bcad598dfd569d2133a10dc82d288bf67e7858877dcd099274b0b928b9c63db7d6ecec
   languageName: node
   linkType: hard
 
@@ -13344,7 +13344,7 @@ __metadata:
     "@changesets/cli": "npm:^2.26.2"
     "@emotion/css": "npm:^11.11.2"
     "@faker-js/faker": "npm:^8.2.0"
-    "@playwright/test": "npm:^1.39.0"
+    "@playwright/test": "npm:^1.52.0"
     "@types/is-hotkey": "npm:^0.1.10"
     "@types/is-url": "npm:^1.2.32"
     "@types/jest": "npm:29.5.6"
