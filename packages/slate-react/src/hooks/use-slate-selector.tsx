@@ -22,7 +22,7 @@ export interface SlateSelectorOptions {
 export const SlateSelectorContext = createContext<{
   addEventListener: (
     callback: Callback,
-    options: SlateSelectorOptions
+    options?: SlateSelectorOptions
   ) => () => void
   flushDeferred: () => void
 }>({} as any)
@@ -69,6 +69,7 @@ export function useSlateSelector<T>(
 
   useIsomorphicLayoutEffect(() => {
     const unsubscribe = addEventListener(update, { deferred })
+    update()
     return unsubscribe
   }, [addEventListener, update, deferred])
 
@@ -92,7 +93,10 @@ export function useSelectorContext() {
   }, [])
 
   const addEventListener = useCallback(
-    (callbackProp: Callback, { deferred = false }: SlateSelectorOptions) => {
+    (
+      callbackProp: Callback,
+      { deferred = false }: SlateSelectorOptions = {}
+    ) => {
       const callback = deferred
         ? () => deferredEventListeners.current.add(callbackProp)
         : callbackProp
