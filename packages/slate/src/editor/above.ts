@@ -1,6 +1,5 @@
 import { Editor, EditorInterface } from '../interfaces/editor'
-import { Text } from '../interfaces/text'
-import { Range } from '../interfaces/range'
+import { Range } from '../interfaces'
 import { Path } from '../interfaces/path'
 
 export const above: EditorInterface['above'] = (editor, options = {}) => {
@@ -15,27 +14,22 @@ export const above: EditorInterface['above'] = (editor, options = {}) => {
     return
   }
 
-  const path = Editor.path(editor, at)
+  let path = Editor.path(editor, at)
+
+  // If `at` is a Range that spans mulitple nodes, `path` will be their common ancestor.
+  // Otherwise `path` will be a text node and/or the same as `at`, in which cases we want to start with its parent.
+  if (!Range.isRange(at) || Path.equals(at.focus.path, at.anchor.path)) {
+    if (path.length === 0) return
+    path = Path.parent(path)
+  }
+
   const reverse = mode === 'lowest'
 
-  for (const [n, p] of Editor.levels(editor, {
+  const [firstMatch] = Editor.levels(editor, {
     at: path,
     voids,
     match,
     reverse,
-  })) {
-    if (Text.isText(n)) continue
-    if (Range.isRange(at)) {
-      if (
-        Path.isAncestor(p, at.anchor.path) &&
-        Path.isAncestor(p, at.focus.path)
-      ) {
-        return [n, p]
-      }
-    } else {
-      if (!Path.equals(path, p)) {
-        return [n, p]
-      }
-    }
-  }
+  })
+  return firstMatch // if nothing matches this returns undefined
 }
