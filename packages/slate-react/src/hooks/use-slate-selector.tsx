@@ -69,7 +69,6 @@ export function useSlateSelector<T>(
 
   useIsomorphicLayoutEffect(() => {
     const unsubscribe = addEventListener(update, { deferred })
-    update()
     return unsubscribe
   }, [addEventListener, update, deferred])
 

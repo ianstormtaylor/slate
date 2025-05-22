@@ -225,6 +225,11 @@ export const Editable = forwardRef(
 
     // The autoFocus TextareaHTMLAttribute doesn't do anything on a div, so it
     // needs to be manually focused.
+    //
+    // If this stops working in Firefox, make sure nothing is causing this
+    // component to re-render during the initial mount. If the DOM selection is
+    // set by `useIsomorphicLayoutEffect` before `onDOMSelectionChange` updates
+    // `editor.selection`, the DOM selection can be removed accidentally.
     useEffect(() => {
       if (ref.current && autoFocus) {
         ref.current.focus()
