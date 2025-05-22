@@ -196,6 +196,7 @@ const HugeDocumentExample = () => {
       ) : (
         <Slate key={editorVersion} editor={editor} initialValue={initialValue}>
           <Editable
+            placeholder="Enter some text…"
             renderElement={renderElement}
             renderChunk={config.chunkDivs ? renderChunk : undefined}
             spellCheck
