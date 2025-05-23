@@ -1,27 +1,11 @@
-import { createContext, useContext, useReducer } from 'react'
+import { MutableRefObject, useContext, useMemo, useReducer } from 'react'
 import { Editor } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
-import { SlateSelectorContext, useSlateSelector } from './use-slate-selector'
+import { SlateSelectorContext } from './use-slate-selector'
 import { useSlateStatic } from './use-slate-static'
 import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /**
- * A React context for sharing the editor object, in a way that re-renders the
- * context whenever changes occur.
- */
-
-export interface SlateContextValue {
-  v: number
-  editor: ReactEditor
-}
-
-export const SlateContext = createContext<{
-  v: number
-  editor: ReactEditor
-} | null>(null)
-
-/**
- * Get the current editor object and re-render whenever it changes
+ * Get the current editor object and re-render whenever it changes.
  */
 
 export const useSlate = (): Editor => {
@@ -42,14 +26,36 @@ export const useSlate = (): Editor => {
   return useSlateStatic()
 }
 
-export const useSlateWithV = (): { editor: Editor; v: number } => {
-  const context = useContext(SlateContext)
+const EDITOR_TO_V = new WeakMap<Editor, MutableRefObject<number>>()
 
-  if (!context) {
-    throw new Error(
-      `The \`useSlate\` hook must be used inside the <Slate> component's context.`
-    )
+const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
+  let v = EDITOR_TO_V.get(editor)
+
+  if (v) {
+    return v
   }
 
-  return context
+  v = { current: 0 }
+  EDITOR_TO_V.set(editor, v)
+
+  // Register the `onChange` handler exactly once per editor
+  const { onChange } = editor
+
+  editor.onChange = options => {
+    v!.current++
+    onChange(options)
+  }
+
+  return v
+}
+
+/**
+ * Get the current editor object and its version, which increments on every
+ * change.
+ */
+
+export const useSlateWithV = (): { editor: Editor; v: number } => {
+  const editor = useSlate()
+  const vRef = useMemo(() => getEditorVersionRef(editor), [editor])
+  return { editor, v: vRef.current }
 }

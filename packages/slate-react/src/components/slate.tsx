@@ -3,7 +3,6 @@ import { Descendant, Editor, Node, Operation, Scrubber, Selection } from 'slate'
 import { EDITOR_TO_ON_CHANGE } from 'slate-dom'
 import { FocusedContext } from '../hooks/use-focused'
 import { useIsomorphicLayoutEffect } from '../hooks/use-isomorphic-layout-effect'
-import { SlateContext, SlateContextValue } from '../hooks/use-slate'
 import {
   useSelectorContext,
   SlateSelectorContext,
@@ -35,7 +34,8 @@ export const Slate = (props: {
     ...rest
   } = props
 
-  const [context, setContext] = React.useState<SlateContextValue>(() => {
+  // Run once on first mount, but before `useEffect` or render
+  React.useState(() => {
     if (!Node.isNodeList(initialValue)) {
       throw new Error(
         `[Slate] initialValue is invalid! Expected a list of elements but got: ${Scrubber.stringify(
@@ -43,14 +43,15 @@ export const Slate = (props: {
         )}`
       )
     }
+
     if (!Editor.isEditor(editor)) {
       throw new Error(
         `[Slate] editor is invalid! You passed: ${Scrubber.stringify(editor)}`
       )
     }
+
     editor.children = initialValue
     Object.assign(editor, rest)
-    return { v: 0, editor }
   })
 
   const { selectorContext, onChange: handleSelectorChange } =
@@ -70,10 +71,6 @@ export const Slate = (props: {
           onValueChange?.(editor.children)
       }
 
-      setContext(prevContext => ({
-        v: prevContext.v + 1,
-        editor,
-      }))
       handleSelectorChange()
     },
     [editor, handleSelectorChange, onChange, onSelectionChange, onValueChange]
@@ -117,13 +114,11 @@ export const Slate = (props: {
 
   return (
     <SlateSelectorContext.Provider value={selectorContext}>
-      {/* <SlateContext.Provider value={context}>*/}
-      <EditorContext.Provider value={context.editor}>
+      <EditorContext.Provider value={editor}>
         <FocusedContext.Provider value={isFocused}>
           {children}
         </FocusedContext.Provider>
       </EditorContext.Provider>
-      {/* </SlateContext.Provider>*/}
     </SlateSelectorContext.Provider>
   )
 }
