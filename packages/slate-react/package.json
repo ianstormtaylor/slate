@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.0.0",
     "@types/is-hotkey": "^0.1.8",
     "@types/jest": "29.5.6",

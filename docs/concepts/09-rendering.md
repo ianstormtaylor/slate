@@ -192,3 +192,7 @@ It is also possible to apply custom styles with a stylesheet and `className`. Ho
 - Provide your styles using the `style` prop instead of a stylesheet, which overrides the default inline styles.
 - Pass the `disableDefaultStyles` prop to the `<Editable>` component.
 - Use `!important` in your stylesheet declarations to make them override the inline styles.
+
+## Performance
+
+See [Improving Performance](../walkthroughs/09-performance.md) for ways to improve the rendering performance of the editor.

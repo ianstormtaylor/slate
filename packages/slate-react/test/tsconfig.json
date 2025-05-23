@@ -1,4 +1,7 @@
 {
   "extends": "../../../config/typescript/tsconfig.json",
+  "compilerOptions": {
+    "types": ["@testing-library/jest-dom"]
+  },
   "references": [{ "path": "../" }]
 }

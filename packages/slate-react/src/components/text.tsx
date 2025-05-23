@@ -13,6 +13,9 @@ import {
   RenderTextProps,
 } from './editable'
 import Leaf from './leaf'
+import { useDecorations } from '../hooks/use-decorations'
+
+const defaultRenderText = (props: RenderTextProps) => <DefaultText {...props} />
 
 /**
  * Text.
@@ -28,16 +31,18 @@ const Text = (props: {
   text: SlateText
 }) => {
   const {
-    decorations,
+    decorations: parentDecorations,
     isLast,
     parent,
     renderPlaceholder,
     renderLeaf,
-    renderText = (props: RenderTextProps) => <DefaultText {...props} />,
+    renderText = defaultRenderText,
     text,
   } = props
+
   const editor = useSlateStatic()
   const ref = useRef<HTMLSpanElement | null>(null)
+  const decorations = useDecorations(text, parentDecorations)
   const decoratedLeaves = SlateText.decorations(text, decorations)
   const key = ReactEditor.findKey(editor, text)
   const children = []

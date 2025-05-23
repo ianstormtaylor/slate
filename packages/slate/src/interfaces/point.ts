@@ -1,4 +1,3 @@
-import { produce } from 'immer'
 import { ExtendedType, Operation, Path, isObject } from '..'
 import { TextDirection } from '../types/types'
 
@@ -99,81 +98,85 @@ export const Point: PointInterface = {
     op: Operation,
     options: PointTransformOptions = {}
   ): Point | null {
-    return produce(point, p => {
-      if (p === null) {
-        return null
+    if (point === null) {
+      return null
+    }
+
+    const { affinity = 'forward' } = options
+    let { path, offset } = point
+
+    switch (op.type) {
+      case 'insert_node':
+      case 'move_node': {
+        path = Path.transform(path, op, options)!
+        break
       }
-      const { affinity = 'forward' } = options
-      const { path, offset } = p
 
-      switch (op.type) {
-        case 'insert_node':
-        case 'move_node': {
-          p.path = Path.transform(path, op, options)!
-          break
+      case 'insert_text': {
+        if (
+          Path.equals(op.path, path) &&
+          (op.offset < offset ||
+            (op.offset === offset && affinity === 'forward'))
+        ) {
+          offset += op.text.length
         }
 
-        case 'insert_text': {
-          if (
-            Path.equals(op.path, path) &&
-            (op.offset < offset ||
-              (op.offset === offset && affinity === 'forward'))
-          ) {
-            p.offset += op.text.length
-          }
+        break
+      }
 
-          break
+      case 'merge_node': {
+        if (Path.equals(op.path, path)) {
+          offset += op.position
         }
 
-        case 'merge_node': {
-          if (Path.equals(op.path, path)) {
-            p.offset += op.position
-          }
+        path = Path.transform(path, op, options)!
+        break
+      }
 
-          p.path = Path.transform(path, op, options)!
-          break
+      case 'remove_text': {
+        if (Path.equals(op.path, path) && op.offset <= offset) {
+          offset -= Math.min(offset - op.offset, op.text.length)
         }
 
-        case 'remove_text': {
-          if (Path.equals(op.path, path) && op.offset <= offset) {
-            p.offset -= Math.min(offset - op.offset, op.text.length)
-          }
+        break
+      }
 
-          break
+      case 'remove_node': {
+        if (Path.equals(op.path, path) || Path.isAncestor(op.path, path)) {
+          return null
         }
 
-        case 'remove_node': {
-          if (Path.equals(op.path, path) || Path.isAncestor(op.path, path)) {
+        path = Path.transform(path, op, options)!
+        break
+      }
+
+      case 'split_node': {
+        if (Path.equals(op.path, path)) {
+          if (op.position === offset && affinity == null) {
             return null
-          }
+          } else if (
+            op.position < offset ||
+            (op.position === offset && affinity === 'forward')
+          ) {
+            offset -= op.position
 
-          p.path = Path.transform(path, op, options)!
-          break
+            path = Path.transform(path, op, {
+              ...options,
+              affinity: 'forward',
+            })!
+          }
+        } else {
+          path = Path.transform(path, op, options)!
         }
 
-        case 'split_node': {
-          if (Path.equals(op.path, path)) {
-            if (op.position === offset && affinity == null) {
-              return null
-            } else if (
-              op.position < offset ||
-              (op.position === offset && affinity === 'forward')
-            ) {
-              p.offset -= op.position
-
-              p.path = Path.transform(path, op, {
-                ...options,
-                affinity: 'forward',
-              })!
-            }
-          } else {
-            p.path = Path.transform(path, op, options)!
-          }
-
-          break
-        }
+        break
       }
-    })
+
+      default:
+        return point
+    }
+
+    return { path, offset }
   },
 }
 

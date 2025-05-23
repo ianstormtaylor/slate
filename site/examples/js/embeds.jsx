@@ -90,6 +90,7 @@ const UrlInput = ({ url, onChange }) => {
   const [value, setValue] = React.useState(url)
   return (
     <input
+      type="text"
       value={value}
       onClick={e => e.stopPropagation()}
       style={{

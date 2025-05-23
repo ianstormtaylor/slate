@@ -2,6 +2,7 @@
 export {
   Editable,
   RenderElementProps,
+  RenderChunkProps,
   RenderLeafProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,
@@ -14,6 +15,7 @@ export { Slate } from './components/slate'
 
 // Hooks
 export { useEditor } from './hooks/use-editor'
+export { useElement, useElementIf } from './hooks/use-element'
 export { useSlateStatic } from './hooks/use-slate-static'
 export { useComposing } from './hooks/use-composing'
 export { useFocused } from './hooks/use-focused'
