@@ -16,7 +16,8 @@ export interface SlateSelectorOptions {
 }
 
 /**
- * A React context for sharing the editor selector context in a way to control rerenders
+ * A React context for sharing the editor selector context in a way to control
+ * re-renders.
  */
 
 export const SlateSelectorContext = createContext<{
@@ -30,9 +31,9 @@ export const SlateSelectorContext = createContext<{
 const refEquality = (a: any, b: any) => a === b
 
 /**
- * Use redux style selectors to prevent rerendering on every keystroke.
+ * Use redux style selectors to prevent re-rendering on every keystroke.
  *
- * Bear in mind rerendering can only prevented if the returned value is a value
+ * Bear in mind re-rendering can only prevented if the returned value is a value
  * type or for reference types (e.g. objects and arrays) add a custom equality
  * function.
  *

@@ -11,7 +11,8 @@
 - [Executing Commands](walkthroughs/05-executing-commands.md)
 - [Saving to a Database](walkthroughs/06-saving-to-a-database.md)
 - [Enabling Collaborative Editing](walkthroughs/07-enabling-collaborative-editing.md)
-- [Using the Bundled Source](walkthroughs/xx-using-the-bundled-source.md)
+- [Using the Bundled Source](walkthroughs/08-using-the-bundled-source.md)
+- [Improving Performance](walkthroughs/09-performance.md)
 
 ## Concepts
 
