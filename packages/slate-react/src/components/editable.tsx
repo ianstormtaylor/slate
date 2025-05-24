@@ -1173,6 +1173,7 @@ export const Editable = forwardRef(
                       const domSelection = getSelection(root)
                       domSelection?.removeAllRanges()
                     }
+
                     IS_FOCUSED.delete(editor)
                     el.focus({ preventScroll: true })
                   },
