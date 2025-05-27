@@ -238,7 +238,6 @@ const TestCase = ({ value }: AndroidTestCase) => {
         renderLeaf={renderLeaf}
         placeholder="Enter some text…"
         spellCheck
-        autoFocus
       />
     </Slate>
   )

@@ -221,7 +221,6 @@ const TestCase = ({ value }) => {
         renderLeaf={renderLeaf}
         placeholder="Enter some text…"
         spellCheck
-        autoFocus
       />
     </Slate>
   )
