@@ -103,7 +103,7 @@ To run integrations with [Playwright](https://playwright.dev/), first run `yarn 
 
 ## Android tests
 
-When making changes that might affect Android compatibility, you can perform the manual Android tests at [/examples/android-tests/](https://slatejs.org/examples/android-tests).
+When making changes that might affect Android compatibility, you can perform the manual Android tests at [/examples/android-tests](https://slatejs.org/examples/android-tests).
 
 ## Publishing Releases
 
