@@ -1,22 +1,22 @@
-import React, { useMemo, useCallback } from 'react'
-import {
-  Slate,
-  Editable,
-  withReact,
-  useSlateStatic,
-  useReadOnly,
-  ReactEditor,
-} from 'slate-react'
+import { css } from '@emotion/css'
+import React, { useCallback, useMemo } from 'react'
 import {
   Editor,
-  Transforms,
-  Range,
   Point,
-  createEditor,
+  Range,
   Element as SlateElement,
+  Transforms,
+  createEditor,
 } from 'slate'
-import { css } from '@emotion/css'
 import { withHistory } from 'slate-history'
+import {
+  Editable,
+  ReactEditor,
+  Slate,
+  useReadOnly,
+  useSlateStatic,
+  withReact,
+} from 'slate-react'
 
 const initialValue = [
   {
