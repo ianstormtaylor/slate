@@ -10,7 +10,7 @@
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js --bundleConfigAsCjs",
     "changesetversion": "yarn changeset version && yarn install && git add .",
     "clean": "rimraf './packages/*/{dist,lib,node_modules}' './site/{.next,out}' --glob",
-    "fix": "yarn fix:prettier && yarn fix:eslint",
+    "fix": "yarn tsc:examples && yarn fix:prettier && yarn fix:eslint",
     "fix:eslint": "yarn lint:eslint --fix",
     "fix:prettier": "yarn lint:prettier --write",
     "lint": "yarn lint:typescript && yarn lint:eslint && yarn lint:prettier",
