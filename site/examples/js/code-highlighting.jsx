@@ -17,7 +17,6 @@ import {
   Editable,
   ReactEditor,
   Slate,
-  useSlate,
   useSlateStatic,
   withReact,
 } from 'slate-react'
@@ -29,12 +28,11 @@ const CodeBlockType = 'code-block'
 const CodeLineType = 'code-line'
 const CodeHighlightingExample = () => {
   const [editor] = useState(() => withHistory(withReact(createEditor())))
-  const decorate = useDecorate(editor)
+  const decorate = useDecorate()
   const onKeyDown = useOnKeydown(editor)
   return (
     <Slate editor={editor} initialValue={initialValue}>
       <ExampleToolbar />
-      <SetNodeToDecorations />
       <Editable
         decorate={decorate}
         renderElement={ElementWrapper}
@@ -135,31 +133,21 @@ const renderLeaf = props => {
     </span>
   )
 }
-const useDecorate = editor => {
-  return useCallback(
-    ([node, path]) => {
-      if (Element.isElement(node) && node.type === CodeLineType) {
-        const ranges = editor.nodeToDecorations?.get(node) || []
-        return ranges
-      }
-      return []
-    },
-    [editor.nodeToDecorations]
-  )
+const useDecorate = () => {
+  return useCallback(([node, path]) => {
+    if (Element.isElement(node) && node.type === CodeBlockType) {
+      return decorateCodeBlock([node, path])
+    }
+    return []
+  }, [])
 }
-const getChildNodeToDecorations = ([block, blockPath]) => {
-  const nodeToDecorations = new Map()
+const decorateCodeBlock = ([block, blockPath]) => {
   const text = block.children.map(line => Node.string(line)).join('\n')
-  const language = block.language
-  const tokens = Prism.tokenize(text, Prism.languages[language])
+  const tokens = Prism.tokenize(text, Prism.languages[block.language])
   const normalizedTokens = normalizeTokens(tokens) // make tokens flat and grouped by line
-  const blockChildren = block.children
+  const decorations = []
   for (let index = 0; index < normalizedTokens.length; index++) {
     const tokens = normalizedTokens[index]
-    const element = blockChildren[index]
-    if (!nodeToDecorations.has(element)) {
-      nodeToDecorations.set(element, [])
-    }
     let start = 0
     for (const token of tokens) {
       const length = token.content.length
@@ -168,33 +156,16 @@ const getChildNodeToDecorations = ([block, blockPath]) => {
       }
       const end = start + length
       const path = [...blockPath, index, 0]
-      const range = {
+      decorations.push({
         anchor: { path, offset: start },
         focus: { path, offset: end },
         token: true,
         ...Object.fromEntries(token.types.map(type => [type, true])),
-      }
-      nodeToDecorations.get(element).push(range)
+      })
       start = end
     }
   }
-  return nodeToDecorations
-}
-// precalculate editor.nodeToDecorations map to use it inside decorate function then
-const SetNodeToDecorations = () => {
-  const editor = useSlate()
-  const blockEntries = Array.from(
-    Editor.nodes(editor, {
-      at: [],
-      mode: 'highest',
-      match: n => Element.isElement(n) && n.type === CodeBlockType,
-    })
-  )
-  const nodeToDecorations = mergeMaps(
-    ...blockEntries.map(getChildNodeToDecorations)
-  )
-  editor.nodeToDecorations = nodeToDecorations
-  return null
+  return decorations
 }
 const useOnKeydown = editor => {
   const onKeyDown = useCallback(
@@ -235,15 +206,6 @@ const LanguageSelect = props => {
       <option value="typescript">TypeScript</option>
     </select>
   )
-}
-const mergeMaps = (...maps) => {
-  const map = new Map()
-  for (const m of maps) {
-    for (const item of m) {
-      map.set(...item)
-    }
-  }
-  return map
 }
 const toChildren = content => [{ text: content }]
 const toCodeLines = content =>
