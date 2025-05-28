@@ -13360,7 +13360,7 @@ __metadata:
     slate-hyperscript: "npm:^0.100.0"
     source-map-loader: "npm:^4.0.1"
   peerDependencies:
-    slate: ">=0.65.3"
+    slate: ">=0.114.3"
   languageName: unknown
   linkType: soft
 
@@ -13372,7 +13372,7 @@ __metadata:
     slate: "npm:^0.114.0"
     source-map-loader: "npm:^4.0.1"
   peerDependencies:
-    slate: ">=0.65.3"
+    slate: ">=0.114.3"
   languageName: unknown
   linkType: soft
 

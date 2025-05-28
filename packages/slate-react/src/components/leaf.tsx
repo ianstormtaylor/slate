@@ -142,8 +142,8 @@ const Leaf = (props: {
 
     children = (
       <React.Fragment>
-        {renderPlaceholder(placeholderProps)}
         {children}
+        {renderPlaceholder(placeholderProps)}
       </React.Fragment>
     )
   }

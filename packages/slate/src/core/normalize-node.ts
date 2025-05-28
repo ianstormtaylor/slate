@@ -7,7 +7,8 @@ import { Editor } from '../interfaces/editor'
 
 export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
   editor,
-  entry
+  entry,
+  options
 ) => {
   const [node, path] = entry
 
@@ -54,7 +55,14 @@ export const normalizeNode: WithEditorFirstArg<Editor['normalizeNode']> = (
     // text.
     if (isInlineOrText !== shouldHaveInlines) {
       if (isInlineOrText) {
-        Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
+        if (options?.fallbackElement) {
+          Transforms.wrapNodes(editor, options.fallbackElement(), {
+            at: path.concat(n),
+            voids: true,
+          })
+        } else {
+          Transforms.removeNodes(editor, { at: path.concat(n), voids: true })
+        }
       } else {
         Transforms.unwrapNodes(editor, { at: path.concat(n), voids: true })
       }

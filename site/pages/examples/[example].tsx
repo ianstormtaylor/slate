@@ -7,6 +7,7 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { Icon } from '../../examples/ts/components/index'
 
+import AndroidTests from '../../examples/ts/android-tests'
 import CheckLists from '../../examples/ts/check-lists'
 import CodeHighlighting from '../../examples/ts/code-highlighting'
 import EditableVoids from '../../examples/ts/editable-voids'
@@ -33,13 +34,15 @@ import CustomPlaceholder from '../../examples/ts/custom-placeholder'
 // node
 import { getAllExamples } from '../api'
 
-type ExampleTuple = [string, React.ComponentType, string]
+type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
 const EXAMPLES: ExampleTuple[] = [
+  ['Android Tests', AndroidTests, 'android-tests'],
   ['Checklists', CheckLists, 'check-lists'],
+  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
+  ['Custom Placeholder', CustomPlaceholder, 'custom-placeholder'],
   ['Editable Voids', EditableVoids, 'editable-voids'],
   ['Embeds', Embeds, 'embeds'],
-  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
   ['Forced Layout', ForcedLayout, 'forced-layout'],
   ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
   ['Huge Document', HugeDocument, 'huge-document'],
@@ -51,14 +54,19 @@ const EXAMPLES: ExampleTuple[] = [
   ['Paste HTML', PasteHtml, 'paste-html'],
   ['Plain Text', PlainText, 'plaintext'],
   ['Read-only', ReadOnly, 'read-only'],
+  ['Rendering in iframes', IFrames, 'iframe'],
   ['Rich Text', RichText, 'richtext'],
   ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
   ['Shadow DOM', ShadowDOM, 'shadow-dom'],
   ['Styling', Styling, 'styling'],
   ['Tables', Tables, 'tables'],
-  ['Rendering in iframes', IFrames, 'iframe'],
-  ['Custom placeholder', CustomPlaceholder, 'custom-placeholder'],
 ]
+
+const HIDDEN_EXAMPLES = ['android-tests']
+
+const NON_HIDDEN_EXAMPLES = EXAMPLES.filter(
+  ([, , path]) => !HIDDEN_EXAMPLES.includes(path)
+)
 
 const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div
@@ -352,7 +360,7 @@ const ExamplePage = ({ example }: { example: string }) => {
           </ExampleTitle>
         </ExampleHeader>
         <TabList isVisible={showTabs}>
-          {EXAMPLES.map(([n, , p]) => (
+          {NON_HIDDEN_EXAMPLES.map(([n, , p]) => (
             <Link
               key={p as string}
               href="/examples/[example]"
