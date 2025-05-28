@@ -73,8 +73,21 @@ export function* positions(
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
-        yield Editor.start(editor, path)
-        continue
+        if (editor.isSelectable(node)) {
+          yield Editor.start(editor, path)
+          continue
+        }
+
+        /**
+         * If the node is not selectable, skip it
+         */
+        if (reverse) {
+          yield Editor.end(editor, Path.previous(path))
+          continue
+        } else {
+          yield Editor.start(editor, Path.next(path))
+          continue
+        }
       }
 
       // Inline element nodes are ignored as they don't themselves
