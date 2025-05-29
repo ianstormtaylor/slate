@@ -52,6 +52,9 @@ const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
 /**
  * Get the current editor object and its version, which increments on every
  * change.
+ *
+ * @deprecated The `v` counter is no longer used except for this hook, and may
+ * be removed in a future version.
  */
 
 export const useSlateWithV = (): { editor: Editor; v: number } => {

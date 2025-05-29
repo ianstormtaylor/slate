@@ -1,3 +1,4 @@
+/* eslint-disable import/no-deprecated */
 import React from 'react'
 import { Transforms, createEditor } from 'slate'
 import { render, act } from '@testing-library/react'

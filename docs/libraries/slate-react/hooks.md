@@ -30,10 +30,6 @@ Get the current `selected` state of an element. An element is selected if `edito
 
 Get the current editor object. Re-renders whenever changes occur in the editor.
 
-#### `useSlateWithV(): { editor: Editor, v: number }`
-
-The same as `useSlate()` but includes a version counter which you can use to prevent re-renders.
-
 #### `useSlateStatic(): Editor`
 
 Get the current editor object from the React context. A version of useSlate that does not re-render the context. Previously called `useEditor`.
