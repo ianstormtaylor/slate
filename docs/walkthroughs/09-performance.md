@@ -28,7 +28,7 @@ Before you start optimizing, make sure you know which of these areas is most res
 
 Usually, if the core Slate logic is causing a noticeable delay, it's because of [normalizing](../concepts/11-normalizing.md). If custom normalization logic is causing slowness in your app, consider whether the logic can be made more efficient.
 
-Understand that `normalizeNode` is called once for every modified node and every ancestor of a modified node. As a result, `normalizeNode` is called for the editor node whenever anything changes in the editor.
+Understand that `normalizeNode` is called once for every modified node and every ancestor of a modified node. As a result, `normalizeNode` is called for the editor node whenever anything changes in the editor, but for other nodes it is called much less frequently.
 
 Make sure you only normalize the node passed into `normalizeNode` and (occasionally) its direct children, not its children's descendants. Normalization logic should only be applied directly to the editor node when absolutely necessary, such when enforcing that the last block in the document is a paragraph.
 
