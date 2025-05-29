@@ -85,6 +85,7 @@ export function* positions(
       // then we will iterate over their content.
       if (!voids && (editor.isVoid(node) || editor.isElementReadOnly(node))) {
         yield Editor.start(editor, path)
+        continue
       }
 
       // Inline element nodes are ignored as they don't themselves
