@@ -418,7 +418,7 @@ Check if a value is a void `Element` object.
 
 ### Normalize methods
 
-#### `normalizeNode(entry: NodeEntry, { operation }) => void`
+#### `normalizeNode(entry: NodeEntry, { operation, fallbackElement }) => void`
 
 [Normalize](../../concepts/11-normalizing.md) a Node according to the schema.
 
