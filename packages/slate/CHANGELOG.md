@@ -1,5 +1,11 @@
 # slate
 
+## 0.115.1
+
+### Patch Changes
+
+- [#5887](https://github.com/ianstormtaylor/slate/pull/5887) [`293aca9c`](https://github.com/ianstormtaylor/slate/commit/293aca9c7aa20ec5b99bbe1130237fa6b7ee758d) Thanks [@12joan](https://github.com/12joan)! - Handle backspace correctly for grapheme clusters in Bengali
+
 ## 0.115.0
 
 ### Minor Changes
