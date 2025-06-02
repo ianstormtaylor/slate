@@ -1,5 +1,19 @@
 # slate
 
+## 0.115.0
+
+### Minor Changes
+
+- [#5878](https://github.com/ianstormtaylor/slate/pull/5878) [`11b957a4`](https://github.com/ianstormtaylor/slate/commit/11b957a44171634d032d79ad8feaf548b78e58b0) Thanks [@ahoisl](https://github.com/ahoisl)! - Allow to prevent data-loss in normalizeNode
+
+### Patch Changes
+
+- [#5880](https://github.com/ianstormtaylor/slate/pull/5880) [`de260565`](https://github.com/ianstormtaylor/slate/commit/de260565c70c1a39acd02961f76ede6ff094b881) Thanks [@nabbydude](https://github.com/nabbydude)! - Optimize editor#above and allow passing a location that doesnt exist as long as its parent exists
+
+- [#5875](https://github.com/ianstormtaylor/slate/pull/5875) [`896bc9c7`](https://github.com/ianstormtaylor/slate/commit/896bc9c7c75e929e861e341fc4d7cc7395e8e82a) Thanks [@12joan](https://github.com/12joan)! - Fix: Inserting a fragment containing exactly two blocks merges those blocks together.
+
+- [#5859](https://github.com/ianstormtaylor/slate/pull/5859) [`72532fd2`](https://github.com/ianstormtaylor/slate/commit/72532fd2d7be594251ea26fefb5c1ce8337b76ed) Thanks [@12joan](https://github.com/12joan)! - Optimize `isElement`, `isText`, `isNodeList` and `isEditor` by removing dependency on `is-plain-object` and by performing shallow checks by default. To perform a full check, including all descendants, pass the `{ deep: true }` option to `isElement`, `isNodeList` or `isEditor`.
+
 ## 0.114.0
 
 ### Minor Changes
