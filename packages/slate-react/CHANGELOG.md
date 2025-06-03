@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.115.0
+
+### Patch Changes
+
+- [#5881](https://github.com/ianstormtaylor/slate/pull/5881) [`05263b54`](https://github.com/ianstormtaylor/slate/commit/05263b544c32b4c704d141dc5142190f18c056e1) Thanks [@12joan](https://github.com/12joan)! - Fix IME issues in Firefox caused by placeholder
+
+- [#5877](https://github.com/ianstormtaylor/slate/pull/5877) [`747ebfda`](https://github.com/ianstormtaylor/slate/commit/747ebfda0a06b29fc31720f9172c67222fbeae07) Thanks [@12joan](https://github.com/12joan)! - Fix a crash on iOS when composing text using an IME at the start of a block, at the cost of breaking capitalization on iOS in an empty editor.
+
+- [#5859](https://github.com/ianstormtaylor/slate/pull/5859) [`72532fd2`](https://github.com/ianstormtaylor/slate/commit/72532fd2d7be594251ea26fefb5c1ce8337b76ed) Thanks [@12joan](https://github.com/12joan)! - Optimize `isElement`, `isText`, `isNodeList` and `isEditor` by removing dependency on `is-plain-object` and by performing shallow checks by default. To perform a full check, including all descendants, pass the `{ deep: true }` option to `isElement`, `isNodeList` or `isEditor`.
+
 ## 0.114.2
 
 ### Patch Changes

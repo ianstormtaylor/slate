@@ -169,15 +169,17 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
       })
     }
 
-    // For Thai script, deleting N character(s) backward should delete
+    // For certain scripts, deleting N character(s) backward should delete
     // N code point(s) instead of an entire grapheme cluster.
     // Therefore, the remaining code points should be inserted back.
+    // Bengali: \u0980-\u09FF
+    // Thai: \u0E00-\u0E7F
     if (
       isCollapsed &&
       reverse &&
       unit === 'character' &&
       removedText.length > 1 &&
-      removedText.match(/[\u0E00-\u0E7F]+/)
+      removedText.match(/[\u0980-\u09FF\u0E00-\u0E7F]+/)
     ) {
       Transforms.insertText(
         editor,
