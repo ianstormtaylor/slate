@@ -220,6 +220,7 @@ const Tab = React.forwardRef(
     />
   )
 )
+Tab.displayName = 'Tab'
 
 const Wrapper = ({
   className,
@@ -301,7 +302,9 @@ const ExamplePage = ({ example }: { example: string }) => {
       }}
       fallbackRender={({ error, resetErrorBoundary }) => (
         <Warning>
-          <p>An error was thrown by one of the example's React components!</p>
+          <p>
+            An error was thrown by one of the example&apos;s React components!
+          </p>
           <pre>
             <code>
               {error.stack}
@@ -373,7 +376,9 @@ const ExamplePage = ({ example }: { example: string }) => {
         </TabList>
         {error ? (
           <Warning>
-            <p>An error was thrown by one of the example's React components!</p>
+            <p>
+              An error was thrown by one of the example&apos;s React components!
+            </p>
             <pre>
               <code>
                 <>
