@@ -255,7 +255,6 @@ export interface EditorNodesOptions<T extends Node> {
   reverse?: boolean
   voids?: boolean
   pass?: (entry: NodeEntry) => boolean
-  ignoreNonSelectable?: boolean
 }
 
 export interface EditorNormalizeOptions {
@@ -290,7 +289,6 @@ export interface EditorPositionsOptions {
   unit?: TextUnitAdjustment
   reverse?: boolean
   voids?: boolean
-  ignoreNonSelectable?: boolean
 }
 
 export interface EditorPreviousOptions<T extends Node> {

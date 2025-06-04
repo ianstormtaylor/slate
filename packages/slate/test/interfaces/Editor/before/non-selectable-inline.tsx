@@ -12,11 +12,7 @@ export const input = (
 )
 
 export const test = editor => {
-  return Editor.before(
-    editor,
-    { path: [0, 2], offset: 0 },
-    { ignoreNonSelectable: true }
-  )
+  return Editor.before(editor, { path: [0, 2], offset: 0 })
 }
 
 export const output = { path: [0, 0], offset: 3 }

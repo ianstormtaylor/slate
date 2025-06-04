@@ -6,7 +6,11 @@ import { jsx } from '../../..'
 export const input = (
   <editor>
     <block>
-      one<inline nonSelectable>two</inline>three
+      one
+      <inline void nonSelectable>
+        <text />
+      </inline>
+      three
     </block>
   </editor>
 )

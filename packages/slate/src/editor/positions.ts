@@ -19,7 +19,6 @@ export function* positions(
     unit = 'offset',
     reverse = false,
     voids = false,
-    ignoreNonSelectable = false,
   } = options
 
   if (!at) {
@@ -63,12 +62,24 @@ export function* positions(
     at,
     reverse,
     voids,
-    ignoreNonSelectable,
   })) {
     /*
      * ELEMENT NODE - Yield position(s) for voids, collect blockText for blocks
      */
     if (Element.isElement(node)) {
+      if (!editor.isSelectable(node)) {
+        /**
+         * If the node is not selectable, skip it
+         */
+        if (reverse) {
+          yield Editor.end(editor, Path.previous(path))
+          continue
+        } else {
+          yield Editor.start(editor, Path.next(path))
+          continue
+        }
+      }
+
       // Void nodes are a special case, so by default we will always
       // yield their first point. If the `voids` option is set to true,
       // then we will iterate over their content.

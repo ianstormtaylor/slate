@@ -21,7 +21,7 @@ export const move: SelectionTransforms['move'] = (editor, options = {}) => {
   }
 
   const { anchor, focus } = selection
-  const opts = { distance, unit, ignoreNonSelectable: true }
+  const opts = { distance, unit }
   const props: Partial<Range> = {}
 
   if (edge == null || edge === 'anchor') {
