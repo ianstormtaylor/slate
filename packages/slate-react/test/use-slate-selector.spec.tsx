@@ -1,14 +1,7 @@
-/* eslint-disable no-console */
-import React, { useEffect } from 'react'
-import { createEditor, Editor, Text, Transforms } from 'slate'
-import { act, render, renderHook } from '@testing-library/react'
-import {
-  Slate,
-  withReact,
-  Editable,
-  ReactEditor,
-  useSlateSelector,
-} from '../src'
+import React from 'react'
+import { createEditor, Transforms } from 'slate'
+import { act, renderHook } from '@testing-library/react'
+import { Slate, withReact, Editable, useSlateSelector } from '../src'
 import _ from 'lodash'
 
 describe('useSlateSelector', () => {

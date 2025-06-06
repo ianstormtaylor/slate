@@ -23,6 +23,7 @@
   },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
+    "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^14.0.0",
     "@types/is-hotkey": "^0.1.8",
     "@types/jest": "29.5.6",
@@ -42,7 +43,7 @@
     "react": ">=18.2.0",
     "react-dom": ">=18.2.0",
     "slate": ">=0.114.0",
-    "slate-dom": ">=0.110.2"
+    "slate-dom": ">=0.116.0"
   },
   "umdGlobals": {
     "react": "React",

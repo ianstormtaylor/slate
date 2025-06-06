@@ -76,8 +76,8 @@ const config: PlaywrightTestConfig = {
     /* Base URL to use in actions like `await page.goto('/')`. */
     // baseURL: 'http://localhost:3000',
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    /* Collect trace if the first attempt fails. See https://playwright.dev/docs/trace-viewer */
+    trace: 'retain-on-first-failure',
 
     /* Name of attribute for selecting elements by page.getByTestId */
     testIdAttribute: 'data-test-id',

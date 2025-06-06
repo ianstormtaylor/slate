@@ -78,7 +78,7 @@ const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
       display: flex;
       height: 42px;
       position: relative;
-      z-index: 1; /* To appear above the underlay */
+      z-index: 3; /* To appear above the underlay */
     `}
   />
 )
@@ -147,7 +147,7 @@ const TabList = ({
       width: ${isVisible ? '200px' : '0'};
       white-space: nowrap;
       max-height: 70vh;
-      z-index: 1; /* To appear above the underlay */
+      z-index: 3; /* To appear above the underlay */
     `}
   />
 )
@@ -165,6 +165,7 @@ const TabListUnderlay = ({
       top: 0;
       position: fixed;
       width: 100%;
+      z-index: 2;
     `}
   />
 )
@@ -248,7 +249,7 @@ const ExampleHeader = (props: React.HTMLAttributes<HTMLDivElement>) => (
       display: flex;
       height: 42px;
       position: relative;
-      z-index: 1; /* To appear above the underlay */
+      z-index: 3; /* To appear above the underlay */
     `}
   />
 )
