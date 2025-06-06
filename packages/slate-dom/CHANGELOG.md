@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.116.0
+
+### Minor Changes
+
+- [#5871](https://github.com/ianstormtaylor/slate/pull/5871) [`fb87646e`](https://github.com/ianstormtaylor/slate/commit/fb87646e8643e1d0547134cea9d1f57912f06a92) Thanks [@12joan](https://github.com/12joan)! - - Add `splitDecorationsByChild` to split an array of decorated ranges by child index.
+
 ## 0.114.0
 
 ### Patch Changes

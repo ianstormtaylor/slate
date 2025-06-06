@@ -1,5 +1,11 @@
 # slate
 
+## 0.116.0
+
+### Patch Changes
+
+- [#5871](https://github.com/ianstormtaylor/slate/pull/5871) [`fb87646e`](https://github.com/ianstormtaylor/slate/commit/fb87646e8643e1d0547134cea9d1f57912f06a92) Thanks [@12joan](https://github.com/12joan)! - - PERF: Use pure JS instead of Immer for applying operations and transforming points and ranges. Immer is now used only for producing fragments.
+
 ## 0.115.1
 
 ### Patch Changes
