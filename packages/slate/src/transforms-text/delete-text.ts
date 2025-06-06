@@ -174,12 +174,22 @@ export const deleteText: TextTransforms['delete'] = (editor, options = {}) => {
     // Therefore, the remaining code points should be inserted back.
     // Bengali: \u0980-\u09FF
     // Thai: \u0E00-\u0E7F
+    // Burmese (Myanmar): \u1000-\u109F
+    // Hindi (Devanagari): \u0900-\u097F
+    // Khmer: \u1780-\u17FF
+    // Malayalam: \u0D00-\u0D7F
+    // Oriya: \u0B00-\u0B7F
+    // Punjabi (Gurmukhi): \u0A00-\u0A7F
+    // Tamil: \u0B80-\u0BFF
+    // Telugu: \u0C00-\u0C7F
     if (
       isCollapsed &&
       reverse &&
       unit === 'character' &&
       removedText.length > 1 &&
-      removedText.match(/[\u0980-\u09FF\u0E00-\u0E7F]+/)
+      removedText.match(
+        /[\u0980-\u09FF\u0E00-\u0E7F\u1000-\u109F\u0900-\u097F\u1780-\u17FF\u0D00-\u0D7F\u0B00-\u0B7F\u0A00-\u0A7F\u0B80-\u0BFF\u0C00-\u0C7F]+/
+      )
     ) {
       Transforms.insertText(
         editor,
