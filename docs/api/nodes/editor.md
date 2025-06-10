@@ -141,7 +141,7 @@ Options: `depth?: number, edge?: 'start' | 'end'`
 
 At any given `Location` or `Span` in the editor provided by `at` (default is the current selection), the method returns a Generator of `NodeEntry` objects that represent the nodes that include `at`. At the top of the hierarchy is the `Editor` object itself.
 
-Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean, pass?: (node: NodeEntry => boolean), ignoreNonSelectable?: boolean}`
+Options: `{at?: Location | Span, match?: NodeMatch, mode?: 'all' | 'highest' | 'lowest', universal?: boolean, reverse?: boolean, voids?: boolean, pass?: (node: NodeEntry => boolean)}`
 
 `options.match`: Provide a value to the `match?` option to limit the `NodeEntry` objects that are returned.
 
