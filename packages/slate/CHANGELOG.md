@@ -1,5 +1,16 @@
 # slate
 
+## 0.117.0
+
+### Minor Changes
+
+- [#5885](https://github.com/ianstormtaylor/slate/pull/5885) [`c56a98fd`](https://github.com/ianstormtaylor/slate/commit/c56a98fd65183ddd9e0e711e615687bf2437e677) Thanks [@felixfeng33](https://github.com/felixfeng33)! - - Remove `ignoreNonSelectable` option from positions,before,after,nodes.
+  - Fix move behavior when encounter non-selectable inline voids.
+
+### Patch Changes
+
+- [#5890](https://github.com/ianstormtaylor/slate/pull/5890) [`9862ae71`](https://github.com/ianstormtaylor/slate/commit/9862ae71bff60d99f423b44937ec9cf662698622) Thanks [@joblolin95](https://github.com/joblolin95)! - Handle backspace correctly for grapheme clusters in Burmese, Hindi, Khmer, Malayalam, Oriya, Punjabi, Tamil, and Telugu.
+
 ## 0.116.0
 
 ### Patch Changes
