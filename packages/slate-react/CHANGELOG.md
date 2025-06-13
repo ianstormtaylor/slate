@@ -17,6 +17,10 @@
     - If this change impacts you, consider changing your `decorate` function to work on the node's parent instead.
     - For example, if your `decorate` function decorates a `code-line` based on the parent `code-block`'s language, decorate the `code-block` instead.
     - This is unlikely to result in any performance detriment, since in previous versions of `slate-react`, the decorations of all siblings were recomputed when one sibling was modified.
+  - **BREAKING CHANGE:** Elements no longer re-render due to selection changes.
+    - To re-render whenever an element becomes selected or deselected, subscribe to `useSelected`.
+    - To re-render whenever the selection changes anywhere in the editor, subscribe to `useSlateSelection`.
+    - To re-render whenever the intersection of the selection with an element changes (the previous behaviour), use `useSlateSelector` to compute this intersection using `Range.intersection`. Ensure you provide a suitable equality function using `Range.equals`.
   - Increase minimum `slate-dom` version to `0.116.0`.
   - Deprecate the `useSlateWithV` hook
   - PERF: Use subscribable pattern for `useSlate`, `useSelected` and decorations to reduce re-renders.
