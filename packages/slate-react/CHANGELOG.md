@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.117.1
+
+### Patch Changes
+
+- [#5902](https://github.com/ianstormtaylor/slate/pull/5902) [`47da9bf4`](https://github.com/ianstormtaylor/slate/commit/47da9bf45599c81359cb6bc86aa59d01c77bba52) Thanks [@zbeyens](https://github.com/zbeyens)! - Fixes #5900
+
 ## 0.116.0
 
 ### Minor Changes
