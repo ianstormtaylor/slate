@@ -682,17 +682,15 @@ export function createAndroidInputManager({
           }
 
           if (canStoreDiff) {
-            // Store the current selection before applying the diff
             const currentSelection = editor.selection
             storeDiff(start.path, diff)
 
-            // After storing the diff, ensure we maintain the correct selection position
             if (currentSelection) {
               const newPoint = {
                 path: start.path,
                 offset: start.offset + text.length,
               }
-              // Use scheduleAction to ensure the selection update happens after the diff is applied
+
               scheduleAction(
                 () => {
                   Transforms.select(editor, {
