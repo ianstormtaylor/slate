@@ -265,7 +265,9 @@ export const GeneralTransforms: GeneralTransforms = {
             }
           }
 
-          editor.selection = selection
+          if (!selection || !Range.equals(selection, editor.selection)) {
+            editor.selection = selection
+          }
         }
 
         break
@@ -422,7 +424,9 @@ export const GeneralTransforms: GeneralTransforms = {
         selection[key] = Point.transform(point, op)!
       }
 
-      editor.selection = selection
+      if (!Range.equals(selection, editor.selection)) {
+        editor.selection = selection
+      }
     }
   },
 }
