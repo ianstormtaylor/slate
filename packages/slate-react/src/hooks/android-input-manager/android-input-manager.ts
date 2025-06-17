@@ -396,21 +396,6 @@ export function createAndroidInputManager({
     let canStoreDiff = true
 
     if (type.startsWith('delete')) {
-      if (Range.isExpanded(targetRange)) {
-        const [start, end] = Range.edges(targetRange)
-        const leaf = Node.leaf(editor, start.path)
-
-        if (leaf.text.length === start.offset && end.offset === 0) {
-          const next = Editor.next(editor, {
-            at: start.path,
-            match: Text.isText,
-          })
-          if (next && Path.equals(next[1], end.path)) {
-            targetRange = { anchor: end, focus: end }
-          }
-        }
-      }
-
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
       const [start, end] = Range.edges(targetRange)
       const [leaf, path] = Editor.leaf(editor, start.path)
