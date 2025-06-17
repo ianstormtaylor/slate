@@ -1,5 +1,40 @@
 # slate-react
 
+## 0.117.1
+
+### Patch Changes
+
+- [#5902](https://github.com/ianstormtaylor/slate/pull/5902) [`47da9bf4`](https://github.com/ianstormtaylor/slate/commit/47da9bf45599c81359cb6bc86aa59d01c77bba52) Thanks [@zbeyens](https://github.com/zbeyens)! - Fixes #5900
+
+## 0.116.0
+
+### Minor Changes
+
+- [#5871](https://github.com/ianstormtaylor/slate/pull/5871) [`fb87646e`](https://github.com/ianstormtaylor/slate/commit/fb87646e8643e1d0547134cea9d1f57912f06a92) Thanks [@12joan](https://github.com/12joan)! - - Implement experimental chunking optimization (disabled by default, see https://docs.slatejs.org/walkthroughs/09-performance).
+  - Add `useElement` and `useElementIf` hooks to get the current element.
+  - **BREAKING CHANGE:** Decorations are no longer recomputed when a node's parent re-renders, only when the node itself re-renders or when the `decorate` function is changed.
+    - Ensure that `decorate` is a pure function of the node passed into it. Depending on the node's parent may result in decorations not being recomputed when you expect them to be.
+    - If this change impacts you, consider changing your `decorate` function to work on the node's parent instead.
+    - For example, if your `decorate` function decorates a `code-line` based on the parent `code-block`'s language, decorate the `code-block` instead.
+    - This is unlikely to result in any performance detriment, since in previous versions of `slate-react`, the decorations of all siblings were recomputed when one sibling was modified.
+  - **BREAKING CHANGE:** Elements no longer re-render due to selection changes.
+    - To re-render whenever an element becomes selected or deselected, subscribe to `useSelected`.
+    - To re-render whenever the selection changes anywhere in the editor, subscribe to `useSlateSelection`.
+    - To re-render whenever the intersection of the selection with an element changes (the previous behaviour), use `useSlateSelector` to compute this intersection using `Range.intersection`. Ensure you provide a suitable equality function using `Range.equals`.
+  - Increase minimum `slate-dom` version to `0.116.0`.
+  - Deprecate the `useSlateWithV` hook
+  - PERF: Use subscribable pattern for `useSlate`, `useSelected` and decorations to reduce re-renders.
+
+## 0.115.0
+
+### Patch Changes
+
+- [#5881](https://github.com/ianstormtaylor/slate/pull/5881) [`05263b54`](https://github.com/ianstormtaylor/slate/commit/05263b544c32b4c704d141dc5142190f18c056e1) Thanks [@12joan](https://github.com/12joan)! - Fix IME issues in Firefox caused by placeholder
+
+- [#5877](https://github.com/ianstormtaylor/slate/pull/5877) [`747ebfda`](https://github.com/ianstormtaylor/slate/commit/747ebfda0a06b29fc31720f9172c67222fbeae07) Thanks [@12joan](https://github.com/12joan)! - Fix a crash on iOS when composing text using an IME at the start of a block, at the cost of breaking capitalization on iOS in an empty editor.
+
+- [#5859](https://github.com/ianstormtaylor/slate/pull/5859) [`72532fd2`](https://github.com/ianstormtaylor/slate/commit/72532fd2d7be594251ea26fefb5c1ce8337b76ed) Thanks [@12joan](https://github.com/12joan)! - Optimize `isElement`, `isText`, `isNodeList` and `isEditor` by removing dependency on `is-plain-object` and by performing shallow checks by default. To perform a full check, including all descendants, pass the `{ deep: true }` option to `isElement`, `isNodeList` or `isEditor`.
+
 ## 0.114.2
 
 ### Patch Changes

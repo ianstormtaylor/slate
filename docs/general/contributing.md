@@ -101,6 +101,10 @@ To run integrations with [Playwright](https://playwright.dev/), first run `yarn 
 
 [Here's a helpful page](https://github.com/Microsoft/vscode/wiki/IME-Test) detailing how to test various input scenarios on Windows, Mac and Linux.
 
+## Android tests
+
+When making changes that might affect Android compatibility, you can perform the manual Android tests at [/examples/android-tests](https://slatejs.org/examples/android-tests).
+
 ## Publishing Releases
 
 **Important**: When creating releases using Lerna with the instructions below, you will be given choices around how to increase version numbers. You should always use a `major`, `minor` or `patch` release and must never use a `prerelease`. If a prerelease is used, the root package will not link to the packages in the `packages` directory creating hard to diagnose issues.

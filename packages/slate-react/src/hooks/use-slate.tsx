@@ -1,47 +1,64 @@
-import { createContext, useContext } from 'react'
+import { MutableRefObject, useContext, useMemo, useReducer } from 'react'
 import { Editor } from 'slate'
-import { ReactEditor } from '../plugin/react-editor'
+import { SlateSelectorContext } from './use-slate-selector'
+import { useSlateStatic } from './use-slate-static'
+import { useIsomorphicLayoutEffect } from './use-isomorphic-layout-effect'
 
 /**
- * A React context for sharing the editor object, in a way that re-renders the
- * context whenever changes occur.
- */
-
-export interface SlateContextValue {
-  v: number
-  editor: ReactEditor
-}
-
-export const SlateContext = createContext<{
-  v: number
-  editor: ReactEditor
-} | null>(null)
-
-/**
- * Get the current editor object from the React context.
+ * Get the current editor object and re-render whenever it changes.
  */
 
 export const useSlate = (): Editor => {
-  const context = useContext(SlateContext)
+  const { addEventListener } = useContext(SlateSelectorContext)
+  const [, forceRender] = useReducer(s => s + 1, 0)
 
-  if (!context) {
+  if (!addEventListener) {
     throw new Error(
       `The \`useSlate\` hook must be used inside the <Slate> component's context.`
     )
   }
 
-  const { editor } = context
-  return editor
+  useIsomorphicLayoutEffect(
+    () => addEventListener(forceRender),
+    [addEventListener]
+  )
+
+  return useSlateStatic()
 }
 
-export const useSlateWithV = (): { editor: Editor; v: number } => {
-  const context = useContext(SlateContext)
+const EDITOR_TO_V = new WeakMap<Editor, MutableRefObject<number>>()
 
-  if (!context) {
-    throw new Error(
-      `The \`useSlate\` hook must be used inside the <Slate> component's context.`
-    )
+const getEditorVersionRef = (editor: Editor): MutableRefObject<number> => {
+  let v = EDITOR_TO_V.get(editor)
+
+  if (v) {
+    return v
   }
 
-  return context
+  v = { current: 0 }
+  EDITOR_TO_V.set(editor, v)
+
+  // Register the `onChange` handler exactly once per editor
+  const { onChange } = editor
+
+  editor.onChange = options => {
+    v!.current++
+    onChange(options)
+  }
+
+  return v
+}
+
+/**
+ * Get the current editor object and its version, which increments on every
+ * change.
+ *
+ * @deprecated The `v` counter is no longer used except for this hook, and may
+ * be removed in a future version.
+ */
+
+export const useSlateWithV = (): { editor: Editor; v: number } => {
+  const editor = useSlate()
+  const vRef = useMemo(() => getEditorVersionRef(editor), [editor])
+  return { editor, v: vRef.current }
 }

@@ -54,7 +54,13 @@ export interface BaseEditor {
   isElementReadOnly: (element: Element) => boolean
   isSelectable: (element: Element) => boolean
   markableVoid: (element: Element) => boolean
-  normalizeNode: (entry: NodeEntry, options?: { operation?: Operation }) => void
+  normalizeNode: (
+    entry: NodeEntry,
+    options?: {
+      operation?: Operation
+      fallbackElement?: () => Element
+    }
+  ) => void
   onChange: (options?: { operation?: Operation }) => void
   shouldNormalize: ({
     iteration,
@@ -249,7 +255,6 @@ export interface EditorNodesOptions<T extends Node> {
   reverse?: boolean
   voids?: boolean
   pass?: (entry: NodeEntry) => boolean
-  ignoreNonSelectable?: boolean
 }
 
 export interface EditorNormalizeOptions {
@@ -284,7 +289,6 @@ export interface EditorPositionsOptions {
   unit?: TextUnitAdjustment
   reverse?: boolean
   voids?: boolean
-  ignoreNonSelectable?: boolean
 }
 
 export interface EditorPreviousOptions<T extends Node> {
