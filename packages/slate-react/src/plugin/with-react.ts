@@ -1,6 +1,6 @@
 import ReactDOM from 'react-dom'
 import { BaseEditor, Node } from 'slate'
-import { withDOM } from 'slate-dom'
+import { withDOM, IS_ANDROID, EDITOR_TO_PENDING_SELECTION } from 'slate-dom'
 import { ReactEditor } from './react-editor'
 import { REACT_MAJOR_VERSION } from '../utils/environment'
 import { getChunkTreeForNode } from '../chunking'
@@ -21,9 +21,23 @@ export const withReact = <T extends BaseEditor>(
 
   e = withDOM(e, clipboardFormatKey)
 
-  const { onChange, apply } = e
+  const { onChange, apply, insertText } = e
 
   e.getChunkSize = () => null
+
+  if (IS_ANDROID) {
+    e.insertText = (text, options) => {
+      // COMPAT: Android devices, specifically Samsung devices, experience cursor jumping.
+      // This issue occurs when the ⁠insertText function is called immediately after typing.
+      // The problem arises because typing schedules a selection change.
+      // However, this selection change is only executed after the ⁠insertText function.
+      // As a result, the already obsolete selection is applied, leading to incorrect
+      // final cursor position.
+      EDITOR_TO_PENDING_SELECTION.delete(e)
+
+      return insertText(text, options)
+    }
+  }
 
   e.onChange = options => {
     // COMPAT: React < 18 doesn't batch `setState` hook calls, which means
