@@ -397,8 +397,30 @@ export function createAndroidInputManager({
 
     if (type.startsWith('delete')) {
       const direction = type.endsWith('Backward') ? 'backward' : 'forward'
-      const [start, end] = Range.edges(targetRange)
-      const [leaf, path] = Editor.leaf(editor, start.path)
+      let [start, end] = Range.edges(targetRange)
+      let [leaf, path] = Editor.leaf(editor, start.path)
+
+      if (Range.isExpanded(targetRange)) {
+        if (leaf.text.length === start.offset && end.offset === 0) {
+          const next = Editor.next(editor, {
+            at: start.path,
+            match: Text.isText,
+          })
+          if (next && Path.equals(next[1], end.path)) {
+            // when deleting a linebreak, targetRange will span across the break (ie start in the node before and end in the node after)
+            // if the node before is empty, this will look like a hanging range and get unhung later--which will take the break we want to remove out of the range
+            // so to avoid this we collapse the target range to default to single character deletion
+            if (direction === "backward") {
+              targetRange = { anchor: end, focus: end }
+              start = end
+              ;[leaf, path] = next
+            } else {
+              targetRange = { anchor: start, focus: start }
+              end = start
+            }
+          }
+        }
+      }
 
       const diff = {
         text: '',
