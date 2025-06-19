@@ -410,7 +410,7 @@ export function createAndroidInputManager({
             // when deleting a linebreak, targetRange will span across the break (ie start in the node before and end in the node after)
             // if the node before is empty, this will look like a hanging range and get unhung later--which will take the break we want to remove out of the range
             // so to avoid this we collapse the target range to default to single character deletion
-            if (direction === "backward") {
+            if (direction === 'backward') {
               targetRange = { anchor: end, focus: end }
               start = end
               ;[leaf, path] = next
