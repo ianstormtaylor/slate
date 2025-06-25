@@ -1,5 +1,11 @@
 # slate
 
+## 0.117.2
+
+### Patch Changes
+
+- [#5899](https://github.com/ianstormtaylor/slate/pull/5899) [`94fb04a4`](https://github.com/ianstormtaylor/slate/commit/94fb04a42c0d071c0778dd1369afb360c1ce5f11) Thanks [@12joan](https://github.com/12joan)! - Fix: `editor.selection` is sometimes replaced with a new object even if the selection did not change
+
 ## 0.117.0
 
 ### Minor Changes

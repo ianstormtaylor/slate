@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.117.2
+
+### Patch Changes
+
+- [#5908](https://github.com/ianstormtaylor/slate/pull/5908) [`06b21fdc`](https://github.com/ianstormtaylor/slate/commit/06b21fdca39705c4686c2d3afb9649d63f9ddde5) Thanks [@nabbydude](https://github.com/nabbydude)! - Fixed issue on android where deleting forward at the end of a block would delete the first character in the next block instead of the linebreak
+
 ## 0.117.1
 
 ### Patch Changes
