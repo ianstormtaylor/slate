@@ -689,7 +689,25 @@ export function createAndroidInputManager({
           }
 
           if (canStoreDiff) {
+            const currentSelection = editor.selection
             storeDiff(start.path, diff)
+
+            if (currentSelection) {
+              const newPoint = {
+                path: start.path,
+                offset: start.offset + text.length,
+              }
+
+              scheduleAction(
+                () => {
+                  Transforms.select(editor, {
+                    anchor: newPoint,
+                    focus: newPoint,
+                  })
+                },
+                { at: newPoint }
+              )
+            }
             return
           }
         }
