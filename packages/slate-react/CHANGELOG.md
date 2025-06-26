@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.117.3
+
+### Patch Changes
+
+- [#5901](https://github.com/ianstormtaylor/slate/pull/5901) [`5a20ea3a`](https://github.com/ianstormtaylor/slate/commit/5a20ea3ad8f725b6072b6512f68d48e440da8901) Thanks [@bibixx](https://github.com/bibixx)! - Fix Android cursor jumping to word start after autocorrect
+
 ## 0.117.2
 
 ### Patch Changes
