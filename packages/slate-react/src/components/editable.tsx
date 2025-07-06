@@ -1929,7 +1929,7 @@ export const defaultDecorate: (entry: NodeEntry) => DecoratedRange[] = () => []
  * A default implement to scroll dom range into view.
  */
 
-const defaultScrollSelectionIntoView = (
+export const defaultScrollSelectionIntoView = (
   editor: ReactEditor,
   domRange: DOMRange
 ) => {
