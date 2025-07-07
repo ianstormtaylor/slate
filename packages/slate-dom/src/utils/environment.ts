@@ -53,7 +53,7 @@ export const IS_WECHATBROWSER =
   typeof navigator !== 'undefined' &&
   /.*Wechat/.test(navigator.userAgent) &&
   !/.*MacWechat/.test(navigator.userAgent) && // avoid lookbehind (buggy in safari < 16.4)
-  (IS_CHROME ? IS_CHROME_LEGACY : true) // wechat and low chrome is real wechat
+  (!IS_CHROME || IS_CHROME_LEGACY) // wechat and low chrome is real wechat
 // Check if DOM is available as React does internally.
 // https://github.com/facebook/react/blob/master/packages/shared/ExecutionEnvironment.js
 export const CAN_USE_DOM = !!(
