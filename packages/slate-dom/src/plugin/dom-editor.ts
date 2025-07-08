@@ -422,6 +422,12 @@ export const DOMEditor: DOMEditorInterface = {
       return
     }
 
+    // Return if no dom node is associated with the editor, which means the editor is not yet mounted
+    // or has been unmounted. This can happen especially, while retrying to focus the editor.
+    if (!EDITOR_TO_ELEMENT.get(editor)) {
+      return
+    }
+
     // Retry setting focus if the editor has pending operations.
     // The DOM (selection) is unstable while changes are applied.
     // Retry until retries are exhausted or editor is focused.
