@@ -6,6 +6,7 @@ export {
   RenderLeafProps,
   RenderPlaceholderProps,
   DefaultPlaceholder,
+  defaultScrollSelectionIntoView,
 } from './components/editable'
 
 export { DefaultElement } from './components/element'
