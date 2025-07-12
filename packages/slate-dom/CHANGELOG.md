@@ -1,5 +1,13 @@
 # slate-dom
 
+## 0.117.4
+
+### Patch Changes
+
+- [#5919](https://github.com/ianstormtaylor/slate/pull/5919) [`e029a87a`](https://github.com/ianstormtaylor/slate/commit/e029a87aba0d124af39c519813448201da32193d) Thanks [@12joan](https://github.com/12joan)! - Do not apply WeChat-related workarounds on recent versions of Chrome
+
+- [#5916](https://github.com/ianstormtaylor/slate/pull/5916) [`f2ea1e1e`](https://github.com/ianstormtaylor/slate/commit/f2ea1e1e3ae281cfef145b92a9cb61c7a749363d) Thanks [@delijah](https://github.com/delijah)! - Do not retry focusing editor after it has been unmounted
+
 ## 0.116.0
 
 ### Minor Changes

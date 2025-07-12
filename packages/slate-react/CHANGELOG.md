@@ -1,5 +1,11 @@
 # slate-react
 
+## 0.117.4
+
+### Patch Changes
+
+- [#5914](https://github.com/ianstormtaylor/slate/pull/5914) [`ef76eb46`](https://github.com/ianstormtaylor/slate/commit/ef76eb46e054a47a8b01da73b9e2d9852626b72c) Thanks [@12joan](https://github.com/12joan)! - Export `defaultScrollSelectionIntoView`
+
 ## 0.117.3
 
 ### Patch Changes
