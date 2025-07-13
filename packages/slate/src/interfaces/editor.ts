@@ -46,6 +46,11 @@ export interface BaseEditor {
   operations: Operation[]
   marks: EditorMarks | null
 
+  /**
+   * @internal Caches for internal use.
+   */
+  _caches: EditorCaches
+
   // Overrideable core methods.
 
   apply: (operation: Operation) => void
@@ -128,6 +133,7 @@ export interface BaseEditor {
   edges: OmitFirstArg<typeof Editor.edges>
   elementReadOnly: OmitFirstArg<typeof Editor.elementReadOnly>
   end: OmitFirstArg<typeof Editor.end>
+  findPath: OmitFirstArg<typeof Editor.findPath>
   first: OmitFirstArg<typeof Editor.first>
   fragment: OmitFirstArg<typeof Editor.fragment>
   getMarks: OmitFirstArg<typeof Editor.marks>
@@ -185,6 +191,13 @@ export type BaseSelection = Range | null
 export type Selection = ExtendedType<'Selection', BaseSelection>
 
 export type EditorMarks = Omit<Text, 'text'>
+
+export interface EditorCaches {
+  /**
+   * Editor children snapshot after the last flush.
+   */
+  nodeToParent: WeakMap<Descendant, Ancestor> | undefined
+}
 
 export interface EditorAboveOptions<T extends Ancestor> {
   at?: Location
@@ -397,6 +410,11 @@ export interface EditorInterface {
    * Get the first node at a location.
    */
   first: (editor: Editor, at: Location) => NodeEntry
+
+  /**
+   * Find the path of Slate node.
+   */
+  findPath: (editor: Editor, node: Node) => Path
 
   /**
    * Get the fragment at a location.
@@ -774,6 +792,10 @@ export const Editor: EditorInterface = {
 
   end(editor, at) {
     return editor.end(at)
+  },
+
+  findPath(editor, node) {
+    return editor.findPath(node)
   },
 
   first(editor, at) {
