@@ -25,10 +25,9 @@ export const output = (
     <block>
       <text />
       <inline void>
-        <text>
-          <cursor />
-        </text>
+        <text />
       </inline>
+      <cursor />
       word
     </block>
   </editor>

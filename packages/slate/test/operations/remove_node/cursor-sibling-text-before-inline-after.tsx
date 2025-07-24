@@ -23,10 +23,10 @@ export const operations = [
 export const output = (
   <editor>
     <element>
-      <text id="0">a</text>
-      <inline>
-        <cursor />b
-      </inline>
+      <text id="0">
+        a<cursor />
+      </text>
+      <inline>b</inline>
       <text />
     </element>
   </editor>

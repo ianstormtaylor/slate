@@ -24,10 +24,10 @@ export const output = (
   <editor>
     <element>
       <text />
-      <inline>
-        a<cursor />
-      </inline>
-      <text id="1">b</text>
+      <inline>a</inline>
+      <text id="1">
+        <cursor />b
+      </text>
     </element>
   </editor>
 )

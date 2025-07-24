@@ -246,8 +246,10 @@ export const GeneralTransforms: GeneralTransforms = {
 
               let preferNext = false
               if (prev && next) {
-                if (Path.equals(next[1], path)) {
-                  preferNext = !Path.hasPrevious(next[1])
+                if (Path.isSibling(prev[1], path)) {
+                  preferNext = false
+                } else if (Path.equals(next[1], path)) {
+                  preferNext = true
                 } else {
                   preferNext =
                     Path.common(prev[1], path).length <
