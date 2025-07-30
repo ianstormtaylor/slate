@@ -1,5 +1,15 @@
 # slate
 
+## 0.118.0
+
+### Minor Changes
+
+- [#5923](https://github.com/ianstormtaylor/slate/pull/5923) [`ba33735a`](https://github.com/ianstormtaylor/slate/commit/ba33735a8ca7ca7437e891365451d25a6646a4c7) Thanks [@12joan](https://github.com/12joan)! - - When removing a text node containing the cursor, always perfer placing the cursor in a sibling text node if one exists.
+  - Previously, the selection would enter a sibling inline in some circumstances, even when a sibling text node was available.
+  - The most noticeable effect of this change occurs when pressing backspace at the start of line N when the last non-empty node in line N-1 is an inline.
+    - Before, the cursor would be placed inside the inline.
+    - Now, the cursor is placed outside the inline.
+
 ## 0.117.2
 
 ### Patch Changes
