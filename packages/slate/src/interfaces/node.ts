@@ -127,7 +127,10 @@ export interface NodeInterface {
   /**
    * Get the sliced fragment represented by a range inside a root node.
    */
-  fragment: (root: Node, range: Range) => Descendant[]
+  fragment: <T extends Ancestor = Editor>(
+    root: T,
+    range: Range
+  ) => T['children']
 
   /**
    * Get the descendant node referred to by a specific path. If the path is an
@@ -353,15 +356,7 @@ export const Node: NodeInterface = {
     return [n, p]
   },
 
-  fragment(root: Node, range: Range): Descendant[] {
-    if (Text.isText(root)) {
-      throw new Error(
-        `Cannot get a fragment starting from a root text node: ${Scrubber.stringify(
-          root
-        )}`
-      )
-    }
-
+  fragment<T extends Ancestor = Editor>(root: T, range: Range): T['children'] {
     const newRoot = produce({ children: root.children }, r => {
       const [start, end] = Range.edges(range)
       const nodeEntries = Node.nodes(r, {
