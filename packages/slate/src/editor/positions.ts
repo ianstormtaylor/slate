@@ -91,7 +91,7 @@ export function* positions(
         } else {
           const nextPath = Path.next(path)
           if (Editor.hasPath(editor, nextPath)) {
-            yield* maybeYield(Editor.start(editor, Path.next(path)))
+            yield* maybeYield(Editor.start(editor, nextPath))
           }
           continue
         }
