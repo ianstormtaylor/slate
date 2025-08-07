@@ -274,6 +274,7 @@ export interface EditorPathOptions {
 
 export interface EditorPathRefOptions {
   affinity?: TextDirection | null
+  onChange?: (path: Path | null) => void
 }
 
 export interface EditorPointOptions {
