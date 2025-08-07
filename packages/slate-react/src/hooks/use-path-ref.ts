@@ -10,8 +10,13 @@ export const usePathRef = (
   const [, setCacheKey] = useState(0)
   const prevPath = useRef<Path | null>(null)
   const pathRef = useRef<PathRef | null>(null)
+  const isComparable = Boolean(prevPath.current && path)
 
-  if (prevPath.current !== path) {
+  if (
+    isComparable
+      ? !Path.equals(prevPath.current, path)
+      : prevPath.current !== path
+  ) {
     prevPath.current = path
 
     pathRef.current?.unref()
@@ -26,5 +31,5 @@ export const usePathRef = (
     setCacheKey(prev => prev + 1)
   }
 
-  return pathRef.current?.current
+  return pathRef.current.current
 }
