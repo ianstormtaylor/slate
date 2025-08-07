@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useSlateStatic } from './use-slate-static'
-import { Editor, EditorPathRefOptions, Path } from 'slate'
+import { Editor, EditorPathRefOptions, Path, PathRef } from 'slate'
 
 export const usePathRef = (
   path: Path,
@@ -8,30 +8,23 @@ export const usePathRef = (
 ) => {
   const editor = useSlateStatic()
   const [, setCacheKey] = useState(0)
+  const prevPath = useRef<Path | null>(null)
+  const pathRef = useRef<PathRef | null>(null)
 
-  const pathRef = useMemo(() => {
-    if (path) {
-      return Editor.pathRef(editor, path, {
-        ...options,
-        onChange: () => {
-          setCacheKey(prev => prev + 1)
-        },
-      })
-    }
+  if (prevPath.current !== path) {
+    prevPath.current = path
 
-    return {
-      current: null,
-      unref: () => {},
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [path])
+    pathRef.current?.unref()
 
-  useEffect(
-    () => () => {
-      pathRef.unref()
-    },
-    [pathRef]
-  )
+    pathRef.current = Editor.pathRef(editor, path, {
+      ...options,
+      onChange: () => {
+        setCacheKey(prev => prev + 1)
+      },
+    })
 
-  return pathRef.current
+    setCacheKey(prev => prev + 1)
+  }
+
+  return pathRef.current?.current
 }
