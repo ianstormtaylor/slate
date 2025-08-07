@@ -23,14 +23,13 @@ export interface RangeRefInterface {
 // eslint-disable-next-line no-redeclare
 export const RangeRef: RangeRefInterface = {
   transform(ref: RangeRef, op: Operation): boolean {
-    const { current, affinity } = ref
+    const { current: prevRange, affinity } = ref
 
-    if (current == null) {
+    if (prevRange == null) {
       return false
     }
 
-    const prevRange = ref.current
-    const range = Range.transform(current, op, { affinity })
+    const range = Range.transform(prevRange, op, { affinity })
     ref.current = range
 
     if (range == null) {

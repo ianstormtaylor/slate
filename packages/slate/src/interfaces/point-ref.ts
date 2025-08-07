@@ -24,14 +24,13 @@ export interface PointRefInterface {
 // eslint-disable-next-line no-redeclare
 export const PointRef: PointRefInterface = {
   transform(ref: PointRef, op: Operation): boolean {
-    const { current, affinity } = ref
+    const { current: prevPoint, affinity } = ref
 
-    if (current == null) {
+    if (prevPoint == null) {
       return false
     }
 
-    const prevPoint = ref.current
-    const point = Point.transform(current, op, { affinity })
+    const point = Point.transform(prevPoint, op, { affinity })
     ref.current = point
 
     if (point == null) {
