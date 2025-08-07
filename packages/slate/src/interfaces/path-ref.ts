@@ -23,23 +23,18 @@ export interface PathRefInterface {
 // eslint-disable-next-line no-redeclare
 export const PathRef: PathRefInterface = {
   transform(ref: PathRef, op: Operation): boolean {
-    const { current, affinity } = ref
+    const { current: prevPath, affinity } = ref
 
-    if (current == null) {
+    if (prevPath == null) {
       return false
     }
 
-    const prevPath = ref.current
-    const path = Path.transform(current, op, { affinity })
+    const path = Path.transform(prevPath, op, { affinity })
 
     ref.current = path
 
     if (path == null) {
       ref.unref()
-    }
-
-    if (path && prevPath) {
-      return !Path.equals(path, prevPath)
     }
 
     return path !== prevPath
