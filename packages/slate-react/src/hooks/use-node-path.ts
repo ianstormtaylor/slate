@@ -6,8 +6,12 @@ import { usePathRef } from './use-path-ref'
 
 export const useNodePath = (node: Node) => {
   const editor = useSlateStatic()
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const path = useMemo(() => ReactEditor.findPath(editor, node), [node])
+  const key = ReactEditor.findKey(editor, node)
+  const path = useMemo(
+    () => ReactEditor.findPath(editor, node),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [editor, key]
+  )
 
   return usePathRef(path, { affinity: 'backward' })
 }
