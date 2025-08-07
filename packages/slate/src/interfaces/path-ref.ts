@@ -9,7 +9,7 @@ import { Operation, Path } from '..'
 export interface PathRef {
   current: Path | null
   affinity: 'forward' | 'backward' | null
-  onChange(path: Path | null): void
+  onChange(): void
   unref(): Path | null
 }
 
@@ -17,19 +17,19 @@ export interface PathRefInterface {
   /**
    * Transform the path ref's current value by an operation.
    */
-  transform: (ref: PathRef, op: Operation) => void
+  transform: (ref: PathRef, op: Operation) => boolean
 }
 
 // eslint-disable-next-line no-redeclare
 export const PathRef: PathRefInterface = {
-  transform(ref: PathRef, op: Operation): (() => void) | void {
+  transform(ref: PathRef, op: Operation): boolean {
     const { current, affinity } = ref
 
     if (current == null) {
-      return
+      return false
     }
 
-    const prevPath = ref.current ? [...ref.current] : ref.current
+    const prevPath = ref.current
     const path = Path.transform(current, op, { affinity })
 
     ref.current = path
@@ -38,8 +38,10 @@ export const PathRef: PathRefInterface = {
       ref.unref()
     }
 
-    if (path && prevPath ? !Path.equals(path, prevPath) : path !== prevPath) {
-      return () => ref.onChange(path)
+    if (path && prevPath) {
+      return !Path.equals(path, prevPath)
     }
+
+    return path !== prevPath
   },
 }
