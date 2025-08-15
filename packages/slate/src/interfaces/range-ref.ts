@@ -9,6 +9,7 @@ import { Operation, Range } from '..'
 export interface RangeRef {
   current: Range | null
   affinity: 'forward' | 'backward' | 'outward' | 'inward' | null
+  onChange(): void
   unref(): Range | null
 }
 
@@ -16,23 +17,29 @@ export interface RangeRefInterface {
   /**
    * Transform the range ref's current value by an operation.
    */
-  transform: (ref: RangeRef, op: Operation) => void
+  transform: (ref: RangeRef, op: Operation) => boolean
 }
 
 // eslint-disable-next-line no-redeclare
 export const RangeRef: RangeRefInterface = {
-  transform(ref: RangeRef, op: Operation): void {
-    const { current, affinity } = ref
+  transform(ref: RangeRef, op: Operation): boolean {
+    const { current: prevRange, affinity } = ref
 
-    if (current == null) {
-      return
+    if (prevRange == null) {
+      return false
     }
 
-    const path = Range.transform(current, op, { affinity })
-    ref.current = path
+    const range = Range.transform(prevRange, op, { affinity })
+    ref.current = range
 
-    if (path == null) {
+    if (range == null) {
       ref.unref()
     }
+
+    if (range && prevRange) {
+      return !Range.equals(range, prevRange)
+    }
+
+    return range !== prevRange
   },
 }
