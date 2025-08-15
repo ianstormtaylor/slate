@@ -32,6 +32,8 @@ Here's a [JSFiddle template for Slate](https://jsfiddle.net/01pLxfzu/) to get yo
 
 ## Asking Questions
 
+**ℹ️ If you're looking for help with the [Slate CRM platform](https://slate.org/), that's an unrelated project to us.**
+
 We've also got a [Slate Slack team](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw) where you can ask questions and get answers from other people using Slate:
 
 [![](../.gitbook/assets/slack.png)](https://join.slack.com/t/slate-js/shared_invite/zt-f8t986ip-7dA1DyiqPpzootz1snKXkw)
