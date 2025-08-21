@@ -12,12 +12,7 @@ import {
 import ElementComponent from '../components/element'
 import TextComponent from '../components/text'
 import { ReactEditor } from '../plugin/react-editor'
-import {
-  IS_NODE_MAP_DIRTY,
-  NODE_TO_INDEX,
-  NODE_TO_PARENT,
-  splitDecorationsByChild,
-} from 'slate-dom'
+import { IS_NODE_MAP_DIRTY, splitDecorationsByChild } from 'slate-dom'
 import { useSlateStatic } from './use-slate-static'
 import { getChunkTreeForNode } from '../chunking'
 import ChunkTree from '../components/chunk-tree'
@@ -59,16 +54,6 @@ const useChildren = (props: {
     node,
     decorations
   )
-
-  // Update the index and parent of each child.
-  // PERF: If chunking is enabled, this is done while traversing the chunk tree
-  // instead to eliminate unnecessary weak map operations.
-  if (!chunking) {
-    node.children.forEach((n, i) => {
-      NODE_TO_INDEX.set(n, i)
-      NODE_TO_PARENT.set(n, node)
-    })
-  }
 
   const renderElementComponent = useCallback(
     (n: Element, i: number, cachedKey?: Key) => {
@@ -127,17 +112,6 @@ const useChildren = (props: {
     reconcile: {
       chunkSize,
       rerenderChildren: childrenToRedecorate,
-      onInsert: (n, i) => {
-        NODE_TO_INDEX.set(n, i)
-        NODE_TO_PARENT.set(n, node)
-      },
-      onUpdate: (n, i) => {
-        NODE_TO_INDEX.set(n, i)
-        NODE_TO_PARENT.set(n, node)
-      },
-      onIndexChange: (n, i) => {
-        NODE_TO_INDEX.set(n, i)
-      },
     },
   })
 

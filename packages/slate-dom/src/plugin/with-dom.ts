@@ -35,6 +35,8 @@ import {
   EDITOR_TO_USER_MARKS,
   EDITOR_TO_USER_SELECTION,
   NODE_TO_KEY,
+  NODE_TO_INDEX,
+  NODE_TO_PARENT,
 } from '../utils/weak-maps'
 import { DOMEditor } from './dom-editor'
 
@@ -222,6 +224,15 @@ export const withDOM = <T extends BaseEditor>(
 
     for (const [path, key] of matches) {
       const [node] = Editor.node(e, path)
+
+      NODE_TO_INDEX.set(node, path.length ? path[path.length - 1] : 0)
+
+      if (path.length) {
+        const [parent] = Editor.parent(e, path)
+
+        NODE_TO_PARENT.set(node, parent)
+      }
+
       NODE_TO_KEY.set(node, key)
     }
 
