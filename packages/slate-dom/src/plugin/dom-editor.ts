@@ -40,9 +40,9 @@ import {
   IS_COMPOSING,
   IS_FOCUSED,
   IS_READ_ONLY,
-  NODE_TO_INDEX,
+  EDITOR_TO_NODE_KEY_TO_INDEX,
   NODE_TO_KEY,
-  NODE_TO_PARENT,
+  EDITOR_TO_NODE_KEY_TO_PARENT,
 } from '../utils/weak-maps'
 
 /**
@@ -391,7 +391,8 @@ export const DOMEditor: DOMEditorInterface = {
     let child = node
 
     while (true) {
-      const parent = NODE_TO_PARENT.get(child)
+      const key = NODE_TO_KEY.get(child)
+      const parent = key && EDITOR_TO_NODE_KEY_TO_PARENT.get(editor)![key.id]
 
       if (parent == null) {
         if (Editor.isEditor(child)) {
@@ -401,7 +402,7 @@ export const DOMEditor: DOMEditorInterface = {
         }
       }
 
-      const i = NODE_TO_INDEX.get(child)
+      const i = key && EDITOR_TO_NODE_KEY_TO_INDEX.get(editor)![key.id]
 
       if (i == null) {
         break
