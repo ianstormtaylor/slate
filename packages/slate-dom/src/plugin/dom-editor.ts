@@ -33,6 +33,7 @@ import { Key } from '../utils/key'
 import {
   EDITOR_TO_ELEMENT,
   EDITOR_TO_KEY_TO_ELEMENT,
+  EDITOR_TO_NODE_KEY_TO_PATH,
   EDITOR_TO_PENDING_DIFFS,
   EDITOR_TO_SCHEDULE_FLUSH,
   EDITOR_TO_WINDOW,
@@ -40,9 +41,7 @@ import {
   IS_COMPOSING,
   IS_FOCUSED,
   IS_READ_ONLY,
-  EDITOR_TO_NODE_KEY_TO_INDEX,
   NODE_TO_KEY,
-  EDITOR_TO_NODE_KEY_TO_PARENT,
 } from '../utils/weak-maps'
 
 /**
@@ -387,29 +386,11 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   findPath: (editor, node) => {
-    const path: Path = []
-    let child = node
+    const key = NODE_TO_KEY.get(node)
+    const path = key && EDITOR_TO_NODE_KEY_TO_PATH.get(editor)?.get(key)
 
-    while (true) {
-      const key = NODE_TO_KEY.get(child)
-      const parent = key && EDITOR_TO_NODE_KEY_TO_PARENT.get(editor)![key.id]
-
-      if (parent == null) {
-        if (Editor.isEditor(child)) {
-          return path
-        } else {
-          break
-        }
-      }
-
-      const i = key && EDITOR_TO_NODE_KEY_TO_INDEX.get(editor)![key.id]
-
-      if (i == null) {
-        break
-      }
-
-      path.unshift(i)
-      child = parent
+    if (path) {
+      return path
     }
 
     throw new Error(
