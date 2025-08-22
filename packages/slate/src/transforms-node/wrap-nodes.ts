@@ -6,6 +6,7 @@ import { Element } from '../interfaces/element'
 import { Text } from '../interfaces/text'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
+import { Point } from '../interfaces'
 
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
@@ -15,7 +16,6 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
   Editor.withoutNormalizing(editor, () => {
     const { mode = 'lowest', split = false, voids = false } = options
     let { match, at = editor.selection } = options
-    const isInline = editor.isInline(element)
 
     if (!at) {
       return
@@ -24,7 +24,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
     if (match == null) {
       if (Path.isPath(at)) {
         match = matchPath(editor, at)
-      } else if (isInline) {
+      } else if (editor.isInline(element)) {
         match = n =>
           (Element.isElement(n) && Editor.isInline(editor, n)) || Text.isText(n)
       } else {
@@ -34,16 +34,35 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
 
     if (split && Range.isRange(at)) {
       const [start, end] = Range.edges(at)
+
       const rangeRef = Editor.rangeRef(editor, at, {
         affinity: 'inward',
       })
-      Transforms.splitNodes(editor, { at: end, match, voids, always: isInline })
+
+      // Always split if we're in the middle of a block, to ensure that text
+      // node boundaries are handled correctly.
+      const isAtBlockEdge = (point: Point) => {
+        const blockAbove = Editor.above(editor, {
+          at: point,
+          match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+        })
+        return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
+      }
+
+      Transforms.splitNodes(editor, {
+        at: end,
+        match,
+        voids,
+        always: !isAtBlockEdge(end),
+      })
+
       Transforms.splitNodes(editor, {
         at: start,
         match,
         voids,
-        always: isInline,
+        always: !isAtBlockEdge(start),
       })
+
       at = rangeRef.unref()!
 
       if (options.at == null) {
