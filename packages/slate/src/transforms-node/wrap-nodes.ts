@@ -15,6 +15,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
   Editor.withoutNormalizing(editor, () => {
     const { mode = 'lowest', split = false, voids = false } = options
     let { match, at = editor.selection } = options
+    const isInline = editor.isInline(element)
 
     if (!at) {
       return
@@ -23,7 +24,7 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
     if (match == null) {
       if (Path.isPath(at)) {
         match = matchPath(editor, at)
-      } else if (editor.isInline(element)) {
+      } else if (isInline) {
         match = n =>
           (Element.isElement(n) && Editor.isInline(editor, n)) || Text.isText(n)
       } else {
@@ -36,8 +37,13 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
       const rangeRef = Editor.rangeRef(editor, at, {
         affinity: 'inward',
       })
-      Transforms.splitNodes(editor, { at: end, match, voids })
-      Transforms.splitNodes(editor, { at: start, match, voids })
+      Transforms.splitNodes(editor, { at: end, match, voids, always: isInline })
+      Transforms.splitNodes(editor, {
+        at: start,
+        match,
+        voids,
+        always: isInline,
+      })
       at = rangeRef.unref()!
 
       if (options.at == null) {
