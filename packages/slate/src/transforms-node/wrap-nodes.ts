@@ -6,6 +6,7 @@ import { Element } from '../interfaces/element'
 import { Text } from '../interfaces/text'
 import { Range } from '../interfaces/range'
 import { Transforms } from '../interfaces/transforms'
+import { Point } from '../interfaces'
 
 export const wrapNodes: NodeTransforms['wrapNodes'] = (
   editor,
@@ -33,11 +34,35 @@ export const wrapNodes: NodeTransforms['wrapNodes'] = (
 
     if (split && Range.isRange(at)) {
       const [start, end] = Range.edges(at)
+
       const rangeRef = Editor.rangeRef(editor, at, {
         affinity: 'inward',
       })
-      Transforms.splitNodes(editor, { at: end, match, voids })
-      Transforms.splitNodes(editor, { at: start, match, voids })
+
+      // Always split if we're in the middle of a block, to ensure that text
+      // node boundaries are handled correctly.
+      const isAtBlockEdge = (point: Point) => {
+        const blockAbove = Editor.above(editor, {
+          at: point,
+          match: n => Element.isElement(n) && Editor.isBlock(editor, n),
+        })
+        return blockAbove && Editor.isEdge(editor, point, blockAbove[1])
+      }
+
+      Transforms.splitNodes(editor, {
+        at: end,
+        match,
+        voids,
+        always: !isAtBlockEdge(end),
+      })
+
+      Transforms.splitNodes(editor, {
+        at: start,
+        match,
+        voids,
+        always: !isAtBlockEdge(start),
+      })
+
       at = rangeRef.unref()!
 
       if (options.at == null) {
