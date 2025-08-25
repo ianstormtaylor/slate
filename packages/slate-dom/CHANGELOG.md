@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.118.1
+
+### Patch Changes
+
+- [#5936](https://github.com/ianstormtaylor/slate/pull/5936) [`05583457`](https://github.com/ianstormtaylor/slate/commit/0558345703e3451f82ffd7eeb15dee51102b1209) Thanks [@delijah](https://github.com/delijah)! - Search backward and forward for leaf nodes in non contenteditable elements inside `toSlatePoint`
+
 ## 0.117.4
 
 ### Patch Changes

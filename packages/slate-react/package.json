@@ -34,8 +34,8 @@
     "@types/resize-observer-browser": "^0.1.8",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "slate": "^0.118.0",
-    "slate-dom": "^0.117.4",
+    "slate": "^0.118.1",
+    "slate-dom": "^0.118.1",
     "slate-hyperscript": "^0.115.0",
     "source-map-loader": "^4.0.1"
   },
