@@ -1,7 +1,7 @@
 {
   "name": "slate-dom",
   "description": "Tools for building completely customizable richtext editors with React.",
-  "version": "0.117.4",
+  "version": "0.118.1",
   "license": "MIT",
   "repository": "git://github.com/ianstormtaylor/slate.git",
   "main": "dist/index.js",
@@ -29,7 +29,7 @@
     "@types/jsdom": "^21.1.4",
     "@types/lodash": "^4.14.200",
     "@types/resize-observer-browser": "^0.1.8",
-    "slate": "^0.118.0",
+    "slate": "^0.118.1",
     "slate-hyperscript": "^0.115.0",
     "source-map-loader": "^4.0.1"
   },

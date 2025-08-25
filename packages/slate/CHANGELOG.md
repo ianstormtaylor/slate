@@ -1,5 +1,18 @@
 # slate
 
+## 0.118.1
+
+### Patch Changes
+
+- [#5929](https://github.com/ianstormtaylor/slate/pull/5929) [`fdaa9c80`](https://github.com/ianstormtaylor/slate/commit/fdaa9c8088e81bde2618784b42027be44598d11c) Thanks [@12joan](https://github.com/12joan)! - - Fix error when a non-selectable node has no next or previous node
+
+  - Do not return points from `Editor.positions` that are inside non-selectable nodes
+    - Previously, `editor.isSelectable` was handled incorrectly inside `Editor.positions`. When encountering a non-selectable node, it would immediately return the point before or after it (depending on `reverse`), but it would not skip returning points inside the non-selectable node if more than one point was consumed from `Editor.positions`.
+
+- [#5943](https://github.com/ianstormtaylor/slate/pull/5943) [`aaad6717`](https://github.com/ianstormtaylor/slate/commit/aaad6717d2f3a74c2295b59c40bcc86cbb5a9b54) Thanks [@12joan](https://github.com/12joan)! - Fix: The `split: true` option on `Transforms.wrapNodes` does not work correctly when one or more points is at the start or end of a text node.
+
+- [#5926](https://github.com/ianstormtaylor/slate/pull/5926) [`cf10119a`](https://github.com/ianstormtaylor/slate/commit/cf10119ad858b79d624d1e35814f534c20a9d362) Thanks [@12joan](https://github.com/12joan)! - Use generics for the return type of `Node.fragment`
+
 ## 0.118.0
 
 ### Minor Changes
