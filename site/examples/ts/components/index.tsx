@@ -25,6 +25,8 @@ export const Button = React.forwardRef(
     <span
       {...props}
       ref={ref}
+      tabIndex={0}
+      role="button"
       className={cx(
         className,
         css`
