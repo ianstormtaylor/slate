@@ -10,7 +10,7 @@ import 'prismjs/components/prism-python'
 import 'prismjs/components/prism-sql'
 import 'prismjs/components/prism-tsx'
 import 'prismjs/components/prism-typescript'
-import React, { ChangeEvent, MouseEvent, useCallback, useState } from 'react'
+import React, { ChangeEvent, PointerEvent, useCallback, useState } from 'react'
 import {
   Editor,
   Element,
@@ -143,10 +143,10 @@ const CodeBlockButton = () => {
     <Button
       data-test-id="code-block-button"
       active
-      onMouseDown={(event: MouseEvent<HTMLButtonElement>) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        handleClick()
       }}
+      onClick={handleClick}
     >
       <Icon>code</Icon>
     </Button>

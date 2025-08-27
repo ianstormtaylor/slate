@@ -1,5 +1,5 @@
 import { css } from '@emotion/css'
-import React, { MouseEvent, useMemo, useState } from 'react'
+import React, { PointerEvent, useMemo, useState } from 'react'
 import { createEditor, Descendant, Transforms } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -130,10 +130,10 @@ const InsertEditableVoidButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        insertEditableVoid(editor)
       }}
+      onClick={() => insertEditableVoid(editor)}
     >
       <Icon>add</Icon>
     </Button>

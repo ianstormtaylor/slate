@@ -146,7 +146,9 @@ const TabList = ({
       overflow: auto;
       padding-top: 0.2em;
       position: absolute;
-      transition: width 0.2s;
+      transition:
+        width 0.2s,
+        visibility 0.2s;
       width: ${isVisible ? '200px' : '0'};
       white-space: nowrap;
       max-height: 70vh;
@@ -178,7 +180,6 @@ const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <button
     {...props}
     aria-label="Toggle examples menu"
-    aria-expanded={props['aria-expanded']}
     aria-haspopup="menu"
     className={css`
       margin-left: 0.8em;

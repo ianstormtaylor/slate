@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import React, { MouseEvent, useCallback, useMemo, useState } from 'react'
+import React, { PointerEvent, useCallback, useMemo, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { Editor, createEditor, Descendant } from 'slate'
 import { withHistory } from 'slate-history'
@@ -115,10 +115,10 @@ const MarkButton = ({ format, icon }: MarkButtonProps) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={(event: MouseEvent) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
         event.preventDefault()
-        toggleMark(editor, format)
       }}
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>
