@@ -178,7 +178,6 @@ const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
   <button
     {...props}
     aria-label="Toggle examples menu"
-    aria-expanded={props['aria-expanded']}
     aria-haspopup="menu"
     className={css`
       margin-left: 0.8em;
