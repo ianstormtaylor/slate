@@ -135,6 +135,9 @@ const TabList = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean }) => (
   <div
+    role="menu"
+    aria-label="Examples navigation"
+    aria-hidden={!isVisible}
     {...props}
     className={css`
       background-color: #222;
@@ -143,11 +146,14 @@ const TabList = ({
       overflow: auto;
       padding-top: 0.2em;
       position: absolute;
-      transition: width 0.2s;
+      transition:
+        width 0.2s,
+        visibility 0.2s;
       width: ${isVisible ? '200px' : '0'};
       white-space: nowrap;
       max-height: 70vh;
       z-index: 3; /* To appear above the underlay */
+      visibility: ${isVisible ? 'visible' : 'hidden'};
     `}
   />
 )
@@ -171,10 +177,16 @@ const TabListUnderlay = ({
 )
 
 const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
+  <button
     {...props}
+    aria-label="Toggle examples menu"
+    aria-haspopup="menu"
     className={css`
       margin-left: 0.8em;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
 
       &:hover {
         cursor: pointer;
@@ -204,6 +216,8 @@ const Tab = React.forwardRef(
     <a
       ref={ref}
       href={href}
+      role="menuitem"
+      aria-current={active ? 'page' : undefined}
       {...props}
       className={css`
         display: inline-block;
@@ -342,6 +356,12 @@ const ExamplePage = ({ example }: { example: string }) => {
               e.stopPropagation()
               setShowTabs(!showTabs)
             }}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Escape') {
+                setShowTabs(false)
+              }
+            }}
+            aria-expanded={showTabs}
           >
             <Icon>menu</Icon>
           </TabButton>
@@ -368,7 +388,17 @@ const ExamplePage = ({ example }: { example: string }) => {
               legacyBehavior
               passHref
             >
-              <Tab onClick={() => setShowTabs(false)}>{n}</Tab>
+              <Tab
+                onClick={() => setShowTabs(false)}
+                active={p === path}
+                onKeyDown={(e: React.KeyboardEvent) => {
+                  if (e.key === 'Escape') {
+                    setShowTabs(false)
+                  }
+                }}
+              >
+                {n}
+              </Tab>
             </Link>
           ))}
         </TabList>
@@ -393,6 +423,11 @@ const ExamplePage = ({ example }: { example: string }) => {
         <TabListUnderlay
           isVisible={showTabs}
           onClick={() => setShowTabs(false)}
+          onKeyDown={(e: React.KeyboardEvent) => {
+            if (e.key === 'Escape') {
+              setShowTabs(false)
+            }
+          }}
         />
       </div>
     </ErrorBoundary>

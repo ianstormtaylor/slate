@@ -1,5 +1,5 @@
 import isHotkey from 'is-hotkey'
-import React, { KeyboardEvent, MouseEvent, useCallback, useMemo } from 'react'
+import React, { KeyboardEvent, PointerEvent, useCallback, useMemo } from 'react'
 import {
   Descendant,
   Editor,
@@ -247,10 +247,10 @@ const BlockButton = ({ format, icon }: BlockButtonProps) => {
         format,
         isAlignType(format) ? 'align' : 'type'
       )}
-      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
-        toggleBlock(editor, format)
-      }}
+      }
+      onClick={() => toggleBlock(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>
@@ -267,10 +267,10 @@ const MarkButton = ({ format, icon }: MarkButtonProps) => {
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={(event: MouseEvent<HTMLSpanElement>) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
-        toggleMark(editor, format)
-      }}
+      }
+      onClick={() => toggleMark(editor, format)}
     >
       <Icon>{icon}</Icon>
     </Button>

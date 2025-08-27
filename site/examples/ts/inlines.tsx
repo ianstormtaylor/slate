@@ -1,7 +1,7 @@
 import { css } from '@emotion/css'
 import { isKeyHotkey } from 'is-hotkey'
 import isUrl from 'is-url'
-import React, { MouseEvent, useMemo } from 'react'
+import React, { PointerEvent, useMemo } from 'react'
 import {
   createEditor,
   Descendant,
@@ -400,8 +400,10 @@ const AddLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={(event: MouseEvent) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
+      }
+      onClick={() => {
         const url = window.prompt('Enter the URL of the link:')
         if (!url) return
         insertLink(editor, url)
@@ -418,7 +420,10 @@ const RemoveLinkButton = () => {
   return (
     <Button
       active={isLinkActive(editor)}
-      onMouseDown={(event: MouseEvent) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
+        event.preventDefault()
+      }
+      onClick={() => {
         if (isLinkActive(editor)) {
           unwrapLink(editor)
         }
@@ -434,8 +439,10 @@ const ToggleEditableButtonButton = () => {
   return (
     <Button
       active
-      onMouseDown={(event: MouseEvent) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
+      }
+      onClick={() => {
         if (isButtonActive(editor)) {
           unwrapButton(editor)
         } else {

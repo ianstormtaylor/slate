@@ -2,7 +2,7 @@ import { css } from '@emotion/css'
 import imageExtensions from 'image-extensions'
 import isHotkey from 'is-hotkey'
 import isUrl from 'is-url'
-import React, { MouseEvent, useMemo } from 'react'
+import React, { PointerEvent, useMemo } from 'react'
 import { Descendant, Transforms, createEditor } from 'slate'
 import { withHistory } from 'slate-history'
 import {
@@ -135,6 +135,9 @@ const Image = ({
         />
         <Button
           active
+          onPointerDown={(event: PointerEvent<HTMLButtonElement>) => {
+            event.preventDefault()
+          }}
           onClick={() => Transforms.removeNodes(editor, { at: path })}
           className={css`
             display: ${selected && focused ? 'inline' : 'none'};
@@ -155,8 +158,10 @@ const InsertImageButton = () => {
   const editor = useSlateStatic()
   return (
     <Button
-      onMouseDown={(event: MouseEvent) => {
+      onPointerDown={(event: PointerEvent<HTMLButtonElement>) =>
         event.preventDefault()
+      }
+      onClick={() => {
         const url = window.prompt('Enter the URL of the image:')
         if (url && !isImageUrl(url)) {
           alert('URL is not an image')

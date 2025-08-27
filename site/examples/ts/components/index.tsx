@@ -20,14 +20,16 @@ export const Button = React.forwardRef(
         reversed: boolean
       } & BaseProps
     >,
-    ref: Ref<HTMLSpanElement>
+    ref: Ref<HTMLButtonElement>
   ) => (
-    <span
+    <button
       {...props}
       ref={ref}
       className={cx(
-        className,
         css`
+          border: none;
+          background: none;
+          padding: 0;
           cursor: pointer;
           color: ${reversed
             ? active
@@ -36,7 +38,8 @@ export const Button = React.forwardRef(
             : active
             ? 'black'
             : '#ccc'};
-        `
+        `,
+        className
       )}
     />
   )
