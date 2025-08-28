@@ -12,11 +12,7 @@ test.describe('selection', () => {
     for (let i = 0; i < 3; i++) {
       await page.locator(slateEditor).nth(1).click()
     }
-    await page.pause()
-
-    // .css-1vdn1ty is the gray, unselected button
-    expect(await page.locator('.css-1vdn1ty').nth(6).textContent()).toBe(
-      'format_quote'
-    )
+    const quoteButton = page.getByTestId('block-button-block-quote')
+    await expect(quoteButton).toHaveCSS('color', 'rgb(204, 204, 204)')
   })
 })

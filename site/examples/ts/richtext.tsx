@@ -251,6 +251,7 @@ const BlockButton = ({ format, icon }: BlockButtonProps) => {
         event.preventDefault()
       }
       onClick={() => toggleBlock(editor, format)}
+      data-test-id={`block-button-${format}`}
     >
       <Icon>{icon}</Icon>
     </Button>
