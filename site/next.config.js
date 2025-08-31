@@ -1,7 +1,8 @@
-const fs = require('fs')
-const path = require('path')
-
-module.exports = {
+/**
+ * @type {import('next').NextConfig}
+ */
+const nextConfig = {
+  output: 'export',
   webpack: config => {
     config.module.rules.push({
       test: /\.js$/,
@@ -20,3 +21,5 @@ module.exports = {
     cpus: 1,
   },
 }
+
+module.exports = nextConfig
