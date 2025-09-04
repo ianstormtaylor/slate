@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "yarn build:rollup && yarn build:next",
-    "build:next": "cd ./site && next build && next export",
+    "build:next": "cd ./site && next build",
     "build:rollup": "rollup --config ./config/rollup/rollup.config.js --bundleConfigAsCjs",
     "changesetversion": "yarn changeset version && yarn install && git add .",
     "clean": "rimraf './packages/*/{dist,lib,node_modules}' './site/{.next,out}' --glob",
@@ -88,7 +88,7 @@
     "lint-staged": "^15.0.1",
     "lodash": "^4.17.21",
     "mocha": "^10.2.0",
-    "next": "^13.5.6",
+    "next": "^14.2.32",
     "npm-run-all": "^4.1.5",
     "nx": "^16.10.0",
     "prettier": "^3.0.3",
