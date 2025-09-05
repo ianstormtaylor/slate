@@ -1198,6 +1198,7 @@ export const Editable = forwardRef(
                     }
 
                     IS_FOCUSED.delete(editor)
+                    el.focus({ preventScroll: true })
                   },
                   [
                     readOnly,
