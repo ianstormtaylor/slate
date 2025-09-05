@@ -7,59 +7,104 @@ import { ErrorBoundary } from 'react-error-boundary'
 
 import { Icon } from '../../examples/ts/components/index'
 
-import AndroidTests from '../../examples/ts/android-tests'
-import CheckLists from '../../examples/ts/check-lists'
-import CodeHighlighting from '../../examples/ts/code-highlighting'
-import EditableVoids from '../../examples/ts/editable-voids'
-import Embeds from '../../examples/ts/embeds'
-import ForcedLayout from '../../examples/ts/forced-layout'
-import HoveringToolbar from '../../examples/ts/hovering-toolbar'
-import HugeDocument from '../../examples/ts/huge-document'
-import Images from '../../examples/ts/images'
-import Inlines from '../../examples/ts/inlines'
-import MarkdownPreview from '../../examples/ts/markdown-preview'
-import MarkdownShortcuts from '../../examples/ts/markdown-shortcuts'
-import Mentions from '../../examples/ts/mentions'
-import PasteHtml from '../../examples/ts/paste-html'
-import PlainText from '../../examples/ts/plaintext'
-import ReadOnly from '../../examples/ts/read-only'
-import RichText from '../../examples/ts/richtext'
-import SearchHighlighting from '../../examples/ts/search-highlighting'
-import ShadowDOM from '../../examples/ts/shadow-dom'
-import Styling from '../../examples/ts/styling'
-import Tables from '../../examples/ts/tables'
-import IFrames from '../../examples/ts/iframe'
-import CustomPlaceholder from '../../examples/ts/custom-placeholder'
-
 // node
 import { getAllExamples } from '../api'
 
 type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
+// Dynamic imports to reduce initial bundle size
 const EXAMPLES: ExampleTuple[] = [
-  ['Android Tests', AndroidTests, 'android-tests'],
-  ['Checklists', CheckLists, 'check-lists'],
-  ['Code Highlighting', CodeHighlighting, 'code-highlighting'],
-  ['Custom Placeholder', CustomPlaceholder, 'custom-placeholder'],
-  ['Editable Voids', EditableVoids, 'editable-voids'],
-  ['Embeds', Embeds, 'embeds'],
-  ['Forced Layout', ForcedLayout, 'forced-layout'],
-  ['Hovering Toolbar', HoveringToolbar, 'hovering-toolbar'],
-  ['Huge Document', HugeDocument, 'huge-document'],
-  ['Images', Images, 'images'],
-  ['Inlines', Inlines, 'inlines'],
-  ['Markdown Preview', MarkdownPreview, 'markdown-preview'],
-  ['Markdown Shortcuts', MarkdownShortcuts, 'markdown-shortcuts'],
-  ['Mentions', Mentions, 'mentions'],
-  ['Paste HTML', PasteHtml, 'paste-html'],
-  ['Plain Text', PlainText, 'plaintext'],
-  ['Read-only', ReadOnly, 'read-only'],
-  ['Rendering in iframes', IFrames, 'iframe'],
-  ['Rich Text', RichText, 'richtext'],
-  ['Search Highlighting', SearchHighlighting, 'search-highlighting'],
-  ['Shadow DOM', ShadowDOM, 'shadow-dom'],
-  ['Styling', Styling, 'styling'],
-  ['Tables', Tables, 'tables'],
+  [
+    'Android Tests',
+    dynamic(() => import('../../examples/ts/android-tests')),
+    'android-tests',
+  ],
+  [
+    'Checklists',
+    dynamic(() => import('../../examples/ts/check-lists')),
+    'check-lists',
+  ],
+  [
+    'Code Highlighting',
+    dynamic(() => import('../../examples/ts/code-highlighting')),
+    'code-highlighting',
+  ],
+  [
+    'Custom Placeholder',
+    dynamic(() => import('../../examples/ts/custom-placeholder')),
+    'custom-placeholder',
+  ],
+  [
+    'Editable Voids',
+    dynamic(() => import('../../examples/ts/editable-voids')),
+    'editable-voids',
+  ],
+  ['Embeds', dynamic(() => import('../../examples/ts/embeds')), 'embeds'],
+  [
+    'Forced Layout',
+    dynamic(() => import('../../examples/ts/forced-layout')),
+    'forced-layout',
+  ],
+  [
+    'Hovering Toolbar',
+    dynamic(() => import('../../examples/ts/hovering-toolbar')),
+    'hovering-toolbar',
+  ],
+  [
+    'Huge Document',
+    dynamic(() => import('../../examples/ts/huge-document')),
+    'huge-document',
+  ],
+  ['Images', dynamic(() => import('../../examples/ts/images')), 'images'],
+  ['Inlines', dynamic(() => import('../../examples/ts/inlines')), 'inlines'],
+  [
+    'Markdown Preview',
+    dynamic(() => import('../../examples/ts/markdown-preview')),
+    'markdown-preview',
+  ],
+  [
+    'Markdown Shortcuts',
+    dynamic(() => import('../../examples/ts/markdown-shortcuts')),
+    'markdown-shortcuts',
+  ],
+  ['Mentions', dynamic(() => import('../../examples/ts/mentions')), 'mentions'],
+  [
+    'Paste HTML',
+    dynamic(() => import('../../examples/ts/paste-html')),
+    'paste-html',
+  ],
+  [
+    'Plain Text',
+    dynamic(() => import('../../examples/ts/plaintext')),
+    'plaintext',
+  ],
+  [
+    'Read-only',
+    dynamic(() => import('../../examples/ts/read-only')),
+    'read-only',
+  ],
+  [
+    'Rendering in iframes',
+    dynamic(() => import('../../examples/ts/iframe')),
+    'iframe',
+  ],
+  [
+    'Rich Text',
+    dynamic(() => import('../../examples/ts/richtext')),
+    'richtext',
+  ],
+  [
+    'Search Highlighting',
+    dynamic(() => import('../../examples/ts/search-highlighting')),
+    'search-highlighting',
+  ],
+  [
+    'Shadow DOM',
+    dynamic(() => import('../../examples/ts/shadow-dom')),
+    'shadow-dom',
+  ],
+  ['Styling', dynamic(() => import('../../examples/ts/styling')), 'styling'],
+  ['Tables', dynamic(() => import('../../examples/ts/tables')), 'tables'],
 ]
 
 const HIDDEN_EXAMPLES = ['android-tests']
