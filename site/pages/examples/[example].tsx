@@ -4,11 +4,19 @@ import Head from 'next/head'
 import Link from 'next/link'
 import dynamic from 'next/dynamic'
 import { ErrorBoundary } from 'react-error-boundary'
+import { Roboto } from 'next/font/google'
 
 import { Icon } from '../../examples/ts/components/index'
 
 // node
 import { getAllExamples } from '../api'
+
+const roboto = Roboto({
+  weight: ['400', '700'],
+  style: ['normal', 'italic'],
+  subsets: ['latin', 'latin-ext'],
+  display: 'swap',
+})
 
 type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
@@ -373,15 +381,17 @@ const ExamplePage = ({ example }: { example: string }) => {
         </Warning>
       )}
     >
-      <div>
+      <div className={roboto.className}>
         <Head>
           <title>Slate Examples</title>
           <meta name="viewport" content="width=device-width, initial-scale=1" />
           <link rel="icon" href="/favicon.ico" />
           <link rel="stylesheet" href="/index.css" />
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css?family=Roboto:400,400i,700,700i&subset=latin-ext"
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin=""
           />
           <link
             rel="stylesheet"
