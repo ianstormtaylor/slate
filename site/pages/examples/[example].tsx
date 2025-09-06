@@ -382,22 +382,6 @@ const ExamplePage = ({ example }: { example: string }) => {
       )}
     >
       <div className={roboto.className}>
-        <Head>
-          <title>Slate Examples</title>
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <link rel="icon" href="/favicon.ico" />
-          <link rel="stylesheet" href="/index.css" />
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com"
-            crossOrigin=""
-          />
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/icon?family=Material+Icons"
-          />
-        </Head>
         <Header>
           <Title>Slate Examples</Title>
           <LinkList>
