@@ -124,3 +124,153 @@ details > summary {
 .performance-controls p {
   margin-top: 5px;
 }
+
+.example-header {
+  align-items: center;
+  background: #000;
+  color: #aaa;
+  display: flex;
+  height: 42px;
+  position: relative;
+  z-index: 3; /* To appear above the underlay */
+}
+
+.example-title {
+  margin-left: 1em;
+}
+
+.example-link-list {
+  margin-left: auto;
+  margin-right: 1em;
+}
+
+.example-link {
+  margin-left: 1em;
+  color: #aaa;
+  text-decoration: none;
+}
+
+.example-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.example-pill {
+  background: #333;
+  border-radius: 9999px;
+  color: #aaa;
+  padding: 0.2em 0.5em;
+}
+
+.example-tab-list {
+  background-color: #222;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  padding-top: 0.2em;
+  position: absolute;
+  transition: 
+    width 0.2s, 
+    visibility 0.2s;
+  white-space: nowrap;
+  max-height: 70vh;
+  z-index: 3; /* To appear above the underlay */
+}
+
+.example-tab-list.visible {
+  width: 200px;
+  visibility: visible;
+}
+
+.example-tab-list.hidden {
+  width: 0;
+  visibility: hidden;
+}
+
+.example-tab-list-underlay {
+  background-color: rgba(200, 200, 200, 0.8);
+  height: 100%;
+  top: 0;
+  position: fixed;
+  width: 100%;
+  z-index: 2;
+}
+
+.example-tab-list-underlay.visible {
+  display: block;
+}
+
+.example-tab-list-underlay.hidden {
+  display: none;
+}
+
+.example-tab-button {
+  margin-left: 0.8em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.example-tab-button:hover {
+  cursor: pointer;
+}
+
+.example-tab-button .material-icons {
+  color: #aaa;
+  font-size: 24px;
+}
+
+.example-tab {
+  display: inline-block;
+  margin-bottom: 0.2em;
+  padding: 0.2em 1em;
+  border-radius: 0.2em;
+  text-decoration: none;
+  color: #777;
+  background: transparent;
+}
+
+.example-tab.active {
+  color: white;
+  background: #333;
+}
+
+.example-tab:hover {
+  background: #333;
+}
+
+.example-page-header {
+  align-items: center;
+  background-color: #555;
+  color: #ddd;
+  display: flex;
+  height: 42px;
+  position: relative;
+  z-index: 3; /* To appear above the underlay */
+}
+
+.example-page-title {
+  margin-left: 1em;
+}
+
+.example-content {
+  max-width: 42em;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fff;
+}
+
+.example-warning {
+  max-width: 42em;
+  margin: 20px auto;
+  padding: 20px;
+  background: #fffae0;
+}
+
+.example-warning > pre {
+  background: #fbf1bd;
+  white-space: pre;
+  overflow-x: scroll;
+  margin-bottom: 0;
+}

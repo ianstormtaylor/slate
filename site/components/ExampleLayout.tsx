@@ -1,68 +1,25 @@
 import React, { useState, ErrorInfo } from 'react'
-import { cx, css } from '@emotion/css'
 import Link from 'next/link'
 import { Icon } from '../examples/ts/components/index'
 
 const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    {...props}
-    className={css`
-      align-items: center;
-      background: #000;
-      color: #aaa;
-      display: flex;
-      height: 42px;
-      position: relative;
-      z-index: 3; /* To appear above the underlay */
-    `}
-  />
+  <div {...props} className="example-header" />
 )
 
 const Title = (props: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
-    {...props}
-    className={css`
-      margin-left: 1em;
-    `}
-  />
+  <span {...props} className="example-title" />
 )
 
 const LinkList = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    {...props}
-    className={css`
-      margin-left: auto;
-      margin-right: 1em;
-    `}
-  />
+  <div {...props} className="example-link-list" />
 )
 
 const A = (props: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
-  <a
-    {...props}
-    className={css`
-      margin-left: 1em;
-      color: #aaa;
-      text-decoration: none;
-
-      &:hover {
-        color: #fff;
-        text-decoration: underline;
-      }
-    `}
-  />
+  <a {...props} className="example-link" />
 )
 
 const Pill = (props: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
-    {...props}
-    className={css`
-      background: #333;
-      border-radius: 9999px;
-      color: #aaa;
-      padding: 0.2em 0.5em;
-    `}
-  />
+  <span {...props} className="example-pill" />
 )
 
 const TabList = ({
@@ -74,22 +31,7 @@ const TabList = ({
     aria-label="Examples navigation"
     aria-hidden={!isVisible}
     {...props}
-    className={css`
-      background-color: #222;
-      display: flex;
-      flex-direction: column;
-      overflow: auto;
-      padding-top: 0.2em;
-      position: absolute;
-      transition:
-        width 0.2s,
-        visibility 0.2s;
-      width: ${isVisible ? '200px' : '0'};
-      white-space: nowrap;
-      max-height: 70vh;
-      z-index: 3; /* To appear above the underlay */
-      visibility: ${isVisible ? 'visible' : 'hidden'};
-    `}
+    className={`example-tab-list ${isVisible ? 'visible' : 'hidden'}`}
   />
 )
 
@@ -99,15 +41,7 @@ const TabListUnderlay = ({
 }: React.HTMLAttributes<HTMLDivElement> & { isVisible?: boolean }) => (
   <div
     {...props}
-    className={css`
-      background-color: rgba(200, 200, 200, 0.8);
-      display: ${isVisible ? 'block' : 'none'};
-      height: 100%;
-      top: 0;
-      position: fixed;
-      width: 100%;
-      z-index: 2;
-    `}
+    className={`example-tab-list-underlay ${isVisible ? 'visible' : 'hidden'}`}
   />
 )
 
@@ -116,22 +50,7 @@ const TabButton = (props: React.HTMLAttributes<HTMLSpanElement>) => (
     {...props}
     aria-label="Toggle examples menu"
     aria-haspopup="menu"
-    className={css`
-      margin-left: 0.8em;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0;
-
-      &:hover {
-        cursor: pointer;
-      }
-
-      .material-icons {
-        color: #aaa;
-        font-size: 24px;
-      }
-    `}
+    className="example-tab-button"
   />
 )
 
@@ -152,76 +71,25 @@ const Tab = React.forwardRef(
       role="menuitem"
       aria-current={active ? 'page' : undefined}
       {...props}
-      className={css`
-        display: inline-block;
-        margin-bottom: 0.2em;
-        padding: 0.2em 1em;
-        border-radius: 0.2em;
-        text-decoration: none;
-        color: ${active ? 'white' : '#777'};
-        background: ${active ? '#333' : 'transparent'};
-
-        &:hover {
-          background: #333;
-        }
-      `}
+      className={`example-tab ${active ? 'active' : ''}`}
     />
   )
 )
 
 const ExampleHeader = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    {...props}
-    className={css`
-      align-items: center;
-      background-color: #555;
-      color: #ddd;
-      display: flex;
-      height: 42px;
-      position: relative;
-      z-index: 3; /* To appear above the underlay */
-    `}
-  />
+  <div {...props} className="example-page-header" />
 )
 
 const ExampleTitle = (props: React.HTMLAttributes<HTMLSpanElement>) => (
-  <span
-    {...props}
-    className={css`
-      margin-left: 1em;
-    `}
-  />
+  <span {...props} className="example-page-title" />
 )
 
 const ExampleContent = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    {...props}
-    className={css`
-      max-width: 42em;
-      margin: 20px auto;
-      padding: 20px;
-      background: #fff;
-    `}
-  />
+  <div {...props} className="example-content" />
 )
 
 export const Warning = (props: React.HTMLAttributes<HTMLDivElement>) => (
-  <div
-    {...props}
-    className={css`
-      max-width: 42em;
-      margin: 20px auto;
-      padding: 20px;
-      background: #fffae0;
-
-      & > pre {
-        background: #fbf1bd;
-        white-space: pre;
-        overflow-x: scroll;
-        margin-bottom: 0;
-      }
-    `}
-  />
+  <div {...props} className="example-warning" />
 )
 
 const EXAMPLES = [
