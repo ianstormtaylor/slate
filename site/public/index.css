@@ -169,8 +169,8 @@ details > summary {
   overflow: auto;
   padding-top: 0.2em;
   position: absolute;
-  transition: 
-    width 0.2s, 
+  transition:
+    width 0.2s,
     visibility 0.2s;
   white-space: nowrap;
   max-height: 70vh;
@@ -273,4 +273,77 @@ details > summary {
   white-space: pre;
   overflow-x: scroll;
   margin-bottom: 0;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  max-width: 42em;
+}
+
+.spinner {
+  border: 3px solid rgba(0, 0, 0, 0.1);
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-text {
+  margin: 0;
+  color: #666;
+  font-weight: 300;
+}
+
+.loading-spinner {
+  min-height: 150px;
+}
+
+.loading-spinner .spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+}
+
+.loading-spinner p {
+  font-size: 14px;
+}
+
+.huge-loader-container {
+  min-height: 80vh;
+}
+
+.huge-loader-container .spinner {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 20px;
+}
+
+.huge-title {
+  font-size: 24px;
+  letter-spacing: 0.5px;
+  color: #333;
+}
+
+.huge-subtitle {
+  margin: 8px 0 0 0;
+  font-size: 14px;
+  color: #666;
 }

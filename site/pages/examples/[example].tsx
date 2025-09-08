@@ -4,6 +4,10 @@ import dynamic from 'next/dynamic'
 
 // node
 import { getAllExamples } from '../api'
+import {
+  ComponentLoader,
+  HugeDocumentLoader,
+} from '../../components/ComponentLoader'
 
 type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 
@@ -11,102 +15,166 @@ type ExampleTuple = [name: string, component: React.ComponentType, path: string]
 const EXAMPLES: ExampleTuple[] = [
   [
     'Android Tests',
-    dynamic(() => import('../../examples/ts/android-tests')),
+    dynamic(() => import('../../examples/ts/android-tests'), {
+      loading: ComponentLoader,
+    }),
     'android-tests',
   ],
   [
     'Checklists',
-    dynamic(() => import('../../examples/ts/check-lists')),
+    dynamic(() => import('../../examples/ts/check-lists'), {
+      loading: ComponentLoader,
+    }),
     'check-lists',
   ],
   [
     'Code Highlighting',
-    dynamic(() => import('../../examples/ts/code-highlighting')),
+    dynamic(() => import('../../examples/ts/code-highlighting'), {
+      loading: ComponentLoader,
+    }),
     'code-highlighting',
   ],
   [
     'Custom Placeholder',
-    dynamic(() => import('../../examples/ts/custom-placeholder')),
+    dynamic(() => import('../../examples/ts/custom-placeholder'), {
+      loading: ComponentLoader,
+    }),
     'custom-placeholder',
   ],
   [
     'Editable Voids',
-    dynamic(() => import('../../examples/ts/editable-voids')),
+    dynamic(() => import('../../examples/ts/editable-voids'), {
+      loading: ComponentLoader,
+    }),
     'editable-voids',
   ],
-  ['Embeds', dynamic(() => import('../../examples/ts/embeds')), 'embeds'],
+  [
+    'Embeds',
+    dynamic(() => import('../../examples/ts/embeds'), {
+      loading: ComponentLoader,
+    }),
+    'embeds',
+  ],
   [
     'Forced Layout',
-    dynamic(() => import('../../examples/ts/forced-layout')),
+    dynamic(() => import('../../examples/ts/forced-layout'), {
+      loading: ComponentLoader,
+    }),
     'forced-layout',
   ],
   [
     'Hovering Toolbar',
-    dynamic(() => import('../../examples/ts/hovering-toolbar')),
+    dynamic(() => import('../../examples/ts/hovering-toolbar'), {
+      loading: ComponentLoader,
+    }),
     'hovering-toolbar',
   ],
   [
     'Huge Document',
-    dynamic(() => import('../../examples/ts/huge-document')),
+    dynamic(() => import('../../examples/ts/huge-document'), {
+      loading: HugeDocumentLoader,
+    }),
     'huge-document',
   ],
-  ['Images', dynamic(() => import('../../examples/ts/images')), 'images'],
-  ['Inlines', dynamic(() => import('../../examples/ts/inlines')), 'inlines'],
+  [
+    'Images',
+    dynamic(() => import('../../examples/ts/images'), {
+      loading: ComponentLoader,
+    }),
+    'images',
+  ],
+  [
+    'Inlines',
+    dynamic(() => import('../../examples/ts/inlines'), {
+      loading: ComponentLoader,
+    }),
+    'inlines',
+  ],
   [
     'Markdown Preview',
-    dynamic(() => import('../../examples/ts/markdown-preview')),
+    dynamic(() => import('../../examples/ts/markdown-preview'), {
+      loading: ComponentLoader,
+    }),
     'markdown-preview',
   ],
   [
     'Markdown Shortcuts',
-    dynamic(() => import('../../examples/ts/markdown-shortcuts')),
+    dynamic(() => import('../../examples/ts/markdown-shortcuts'), {
+      loading: ComponentLoader,
+    }),
     'markdown-shortcuts',
   ],
-  ['Mentions', dynamic(() => import('../../examples/ts/mentions')), 'mentions'],
+  [
+    'Mentions',
+    dynamic(() => import('../../examples/ts/mentions'), {
+      loading: ComponentLoader,
+    }),
+    'mentions',
+  ],
   [
     'Paste HTML',
-    dynamic(() => import('../../examples/ts/paste-html')),
+    dynamic(() => import('../../examples/ts/paste-html'), {
+      loading: ComponentLoader,
+    }),
     'paste-html',
   ],
   [
     'Plain Text',
-    dynamic(() => import('../../examples/ts/plaintext')),
+    dynamic(() => import('../../examples/ts/plaintext'), {
+      loading: ComponentLoader,
+    }),
     'plaintext',
   ],
   [
     'Read-only',
-    dynamic(() => import('../../examples/ts/read-only')),
+    dynamic(() => import('../../examples/ts/read-only'), {
+      loading: ComponentLoader,
+    }),
     'read-only',
   ],
   [
     'Rendering in iframes',
-    dynamic(() => import('../../examples/ts/iframe')),
+    dynamic(() => import('../../examples/ts/iframe'), {
+      loading: ComponentLoader,
+    }),
     'iframe',
   ],
   [
     'Rich Text',
-    dynamic(() => import('../../examples/ts/richtext')),
+    dynamic(() => import('../../examples/ts/richtext'), {
+      loading: ComponentLoader,
+    }),
     'richtext',
   ],
   [
     'Search Highlighting',
-    dynamic(() => import('../../examples/ts/search-highlighting')),
+    dynamic(() => import('../../examples/ts/search-highlighting'), {
+      loading: ComponentLoader,
+    }),
     'search-highlighting',
   ],
   [
     'Shadow DOM',
-    dynamic(() => import('../../examples/ts/shadow-dom')),
+    dynamic(() => import('../../examples/ts/shadow-dom'), {
+      loading: ComponentLoader,
+    }),
     'shadow-dom',
   ],
-  ['Styling', dynamic(() => import('../../examples/ts/styling')), 'styling'],
-  ['Tables', dynamic(() => import('../../examples/ts/tables')), 'tables'],
+  [
+    'Styling',
+    dynamic(() => import('../../examples/ts/styling'), {
+      loading: ComponentLoader,
+    }),
+    'styling',
+  ],
+  [
+    'Tables',
+    dynamic(() => import('../../examples/ts/tables'), {
+      loading: ComponentLoader,
+    }),
+    'tables',
+  ],
 ]
-
-const HIDDEN_EXAMPLES = ['android-tests']
-
-const NON_HIDDEN_EXAMPLES = EXAMPLES.filter(
-  ([, , path]) => !HIDDEN_EXAMPLES.includes(path)
-)
 
 const ExamplePage = ({ example }: { example: string }) => {
   const EXAMPLE = EXAMPLES.find(e => e[2] === example)
