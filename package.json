@@ -56,7 +56,7 @@
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2",
     "@emotion/css": "^11.11.2",
-    "@faker-js/faker": "^8.2.0",
+    "@faker-js/faker": "^10.0.0",
     "@playwright/test": "^1.52.0",
     "@types/is-hotkey": "^0.1.10",
     "@types/is-url": "^1.2.32",
