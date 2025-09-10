@@ -13448,16 +13448,9 @@ __metadata:
   linkType: hard
 
 "shell-quote@npm:^1.6.1":
-  version: 1.7.2
-  resolution: "shell-quote@npm:1.7.2"
-  checksum: 5d7540d320ee5acb5a1d5ca3163d5706fbe055cc4e0adf6f1f85ef8f54c55b453c492d125c450f20d9bec223dcac9df4c74510b4ea3ff4c24f15f7d848a0fc4c
-  languageName: node
-  linkType: hard
-
-"shell-quote@npm:^1.8.1":
-  version: 1.8.1
-  resolution: "shell-quote@npm:1.8.1"
-  checksum: af19ab5a1ec30cb4b2f91fd6df49a7442d5c4825a2e269b3712eded10eedd7f9efeaab96d57829880733fc55bcdd8e9b1d8589b4befb06667c731d08145e274d
+  version: 1.8.3
+  resolution: "shell-quote@npm:1.8.3"
+  checksum: 5473e354637c2bd698911224129c9a8961697486cff1fb221f234d71c153fc377674029b0223d1d3c953a68d451d79366abfe53d1a0b46ee1f28eb9ade928f4c
   languageName: node
   linkType: hard
 
@@ -13662,7 +13655,6 @@ __metadata:
     rollup-plugin-replace: "npm:^2.2.0"
     rollup-plugin-terser: "npm:^7.0.2"
     rollup-plugin-typescript2: "npm:^0.36.0"
-    shell-quote: "npm:^1.8.1"
     simple-git-hooks: "npm:^2.9.0"
     slate: "workspace:*"
     slate-dom: "workspace:*"
