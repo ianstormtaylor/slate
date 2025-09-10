@@ -216,7 +216,7 @@ export async function getStaticProps({
   params: { example: string }
 }) {
   const EXAMPLE = EXAMPLES.find(e => e[2] === params.example)
-  const [name, , path] = EXAMPLE!
+  const [name, , path] = EXAMPLE || [params.example, null, params.example]
   return {
     props: {
       example: params.example,
