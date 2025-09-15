@@ -1,6 +1,7 @@
 import React, { useState, ErrorInfo } from 'react'
 import Link from 'next/link'
 import { Icon } from '../examples/ts/components/index'
+import { NON_HIDDEN_EXAMPLES } from '../constants/examples'
 
 const Header = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className="example-header" />
@@ -90,37 +91,6 @@ const ExampleContent = (props: React.HTMLAttributes<HTMLDivElement>) => (
 
 export const Warning = (props: React.HTMLAttributes<HTMLDivElement>) => (
   <div {...props} className="example-warning" />
-)
-
-const EXAMPLES = [
-  ['Android Tests', 'android-tests'],
-  ['Checklists', 'check-lists'],
-  ['Code Highlighting', 'code-highlighting'],
-  ['Custom Placeholder', 'custom-placeholder'],
-  ['Editable Voids', 'editable-voids'],
-  ['Embeds', 'embeds'],
-  ['Forced Layout', 'forced-layout'],
-  ['Hovering Toolbar', 'hovering-toolbar'],
-  ['Huge Document', 'huge-document'],
-  ['Images', 'images'],
-  ['Inlines', 'inlines'],
-  ['Markdown Preview', 'markdown-preview'],
-  ['Markdown Shortcuts', 'markdown-shortcuts'],
-  ['Mentions', 'mentions'],
-  ['Paste HTML', 'paste-html'],
-  ['Plain Text', 'plaintext'],
-  ['Read-only', 'read-only'],
-  ['Rendering in iframes', 'iframe'],
-  ['Rich Text', 'richtext'],
-  ['Search Highlighting', 'search-highlighting'],
-  ['Shadow DOM', 'shadow-dom'],
-  ['Styling', 'styling'],
-  ['Tables', 'tables'],
-]
-
-const HIDDEN_EXAMPLES = ['android-tests']
-const NON_HIDDEN_EXAMPLES = EXAMPLES.filter(
-  ([, path]) => !HIDDEN_EXAMPLES.includes(path)
 )
 
 interface ExampleLayoutProps {
