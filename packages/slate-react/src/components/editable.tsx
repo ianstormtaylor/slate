@@ -692,8 +692,18 @@ export const Editable = forwardRef(
                 exactMatch: false,
                 suppressThrow: false,
               })
+              const flippedRange = {
+                anchor: range.focus,
+                focus: range.anchor,
+              }
 
-              if (!selection || !Range.equals(selection, range)) {
+              if (
+                !selection ||
+                !(
+                  Range.equals(selection, range) ||
+                  Range.equals(selection, flippedRange)
+                )
+              ) {
                 native = false
 
                 const selectionRef =
