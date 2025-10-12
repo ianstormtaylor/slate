@@ -1030,6 +1030,7 @@ export const Editable = forwardRef(
               <Component
                 role={readOnly ? undefined : 'textbox'}
                 aria-multiline={readOnly ? undefined : true}
+                translate="no"
                 {...attributes}
                 // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
                 // have to use hacks to make these replacement-based features work.
