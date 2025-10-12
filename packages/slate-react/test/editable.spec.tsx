@@ -200,5 +200,42 @@ describe('slate-react', () => {
       expect(onChange).toHaveBeenCalled()
       expect(onSelectionChange).not.toHaveBeenCalled()
     })
+
+    describe('translate="no"', () => {
+      test('should have translate="no" attribute', () => {
+        const editor = withReact(createEditor())
+        const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+        const { container } = render(
+          <Slate
+            editor={editor}
+            initialValue={initialValue}
+            onChange={() => {}}
+          >
+            <Editable />
+          </Slate>
+        )
+
+        const editableElement = container.querySelector('[data-slate-editor]')
+        expect(editableElement?.getAttribute('translate')).toBe('no')
+      })
+      test('should allow override of translate attribute', () => {
+        const editor = withReact(createEditor())
+        const initialValue = [{ type: 'block', children: [{ text: 'test' }] }]
+
+        const { container } = render(
+          <Slate
+            editor={editor}
+            initialValue={initialValue}
+            onChange={() => {}}
+          >
+            <Editable translate="yes" />
+          </Slate>
+        )
+
+        const editableElement = container.querySelector('[data-slate-editor]')
+        expect(editableElement?.getAttribute('translate')).toBe('yes')
+      })
+    })
   })
 })
