@@ -23,6 +23,12 @@ const projects = [
       ...devices['Desktop Firefox'],
     },
   },
+  {
+    name: 'mobile',
+    use: {
+      ...devices['Pixel 5'],
+    },
+  },
 ]
 
 if (os.type() === 'Darwin') {
@@ -34,11 +40,7 @@ if (os.type() === 'Darwin') {
   })
 }
 
-const retries = process.env.PLAYWRIGHT_RETRIES
-  ? +process.env.PLAYWRIGHT_RETRIES
-  : process.env.CI
-  ? 5
-  : 2
+const retries = 0
 
 /**
  * See https://playwright.dev/docs/test-configuration.
