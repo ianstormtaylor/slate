@@ -24,7 +24,9 @@ test.describe('shadow-dom example', () => {
     await expect(textbox).toHaveCount(1)
 
     // Clear any existing text and type new text into the textbox
-    await page.locator('[data-slate-editor]').selectText()
+    await textbox.click()
+    await page.keyboard.press('Meta+A')
+
     await page.keyboard.press('Backspace')
     await page.keyboard.type('Hello, Playwright!')
 
