@@ -26,6 +26,7 @@ import { findCurrentLineRange } from '../utils/lines'
 import {
   IS_NODE_MAP_DIRTY,
   EDITOR_TO_KEY_TO_ELEMENT,
+  EDITOR_TO_NODE_KEY_TO_PATH,
   EDITOR_TO_ON_CHANGE,
   EDITOR_TO_PENDING_ACTION,
   EDITOR_TO_PENDING_DIFFS,
@@ -220,8 +221,16 @@ export const withDOM = <T extends BaseEditor>(
       }
     }
 
+    if (!EDITOR_TO_NODE_KEY_TO_PATH.has(editor)) {
+      EDITOR_TO_NODE_KEY_TO_PATH.set(editor, new WeakMap())
+    }
+
+    const nodeKeyToPath = EDITOR_TO_NODE_KEY_TO_PATH.get(editor)!
+
     for (const [path, key] of matches) {
       const [node] = Editor.node(e, path)
+
+      nodeKeyToPath.set(key, path)
       NODE_TO_KEY.set(node, key)
     }
 
