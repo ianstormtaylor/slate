@@ -387,6 +387,7 @@ export const DOMEditor: DOMEditorInterface = {
   },
 
   findPath: (editor, node) => {
+    const newVersionPath = editor.findPath(node)
     const path: Path = []
     let child = node
 
@@ -395,6 +396,13 @@ export const DOMEditor: DOMEditorInterface = {
 
       if (parent == null) {
         if (Editor.isEditor(child)) {
+          if (!Path.equals(newVersionPath, path)) {
+            throw new Error(
+              `path mismatch, expected ${JSON.stringify(
+                path
+              )}, got ${JSON.stringify(newVersionPath)}`
+            )
+          }
           return path
         } else {
           break
