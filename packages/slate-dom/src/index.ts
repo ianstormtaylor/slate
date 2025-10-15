@@ -18,6 +18,8 @@ export {
 } from './utils/diff-text'
 
 export {
+  closestShadowAware,
+  containsShadowAware,
   DOMElement,
   DOMNode,
   DOMPoint,

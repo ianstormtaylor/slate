@@ -299,19 +299,19 @@ export const isTrackedMutation = (
   }
 
   const { document } = DOMEditor.getWindow(editor)
-  if (document.contains(target)) {
+  if (containsShadowAware(document, target)) {
     return DOMEditor.hasDOMNode(editor, target, { editable: true })
   }
 
   const parentMutation = batch.find(({ addedNodes, removedNodes }) => {
     for (const node of addedNodes) {
-      if (node === target || node.contains(target)) {
+      if (node === target || containsShadowAware(node, target)) {
         return true
       }
     }
 
     for (const node of removedNodes) {
-      if (node === target || node.contains(target)) {
+      if (node === target || containsShadowAware(node, target)) {
         return true
       }
     }
@@ -355,3 +355,79 @@ export const isAfter = (node: DOMNode, otherNode: DOMNode): boolean =>
     node.compareDocumentPosition(otherNode) &
       DOMNode.DOCUMENT_POSITION_FOLLOWING
   )
+
+/**
+ * Shadow DOM-aware version of Element.closest()
+ * Traverses up the DOM tree, crossing shadow DOM boundaries
+ */
+export const closestShadowAware = (
+  element: DOMElement | null | undefined,
+  selector: string
+): DOMElement | null => {
+  if (!element) {
+    return null
+  }
+
+  let current: DOMElement | null = element
+
+  while (current) {
+    // Check if current element matches the selector
+    if (current.matches && current.matches(selector)) {
+      return current
+    }
+
+    // Try to go to the parent element
+    if (current.parentElement) {
+      current = current.parentElement
+    } else if ((current.parentNode as any)?.host) {
+      // If there's no parent element but there's a host (ShadowRoot),
+      // cross the shadow boundary
+      current = (current.parentNode as any).host as DOMElement
+    } else {
+      // No more parents, we've reached the top
+      return null
+    }
+  }
+
+  return null
+}
+
+/**
+ * Shadow DOM-aware version of Node.contains()
+ * Checks if a node contains another node, crossing shadow DOM boundaries
+ */
+export const containsShadowAware = (
+  parent: DOMNode | null | undefined,
+  child: DOMNode | null | undefined
+): boolean => {
+  if (!parent || !child) {
+    return false
+  }
+
+  // Try the standard contains first (works for nodes in the same tree)
+  if (parent.contains(child)) {
+    return true
+  }
+
+  // If standard contains fails, traverse up from child crossing shadow boundaries
+  let current: DOMNode | null = child
+
+  while (current) {
+    if (current === parent) {
+      return true
+    }
+
+    // Try to go to the parent node
+    if (current.parentNode) {
+      current = current.parentNode
+    } else if ((current as any).host) {
+      // If this is a ShadowRoot, go to its host
+      current = (current as any).host
+    } else {
+      // No more parents, we've reached the top
+      return false
+    }
+  }
+
+  return false
+}
