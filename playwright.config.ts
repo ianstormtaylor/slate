@@ -43,8 +43,8 @@ if (os.type() === 'Darwin') {
 const retries = process.env.PLAYWRIGHT_RETRIES
   ? +process.env.PLAYWRIGHT_RETRIES
   : process.env.CI
-    ? 5
-    : 2
+  ? 5
+  : 2
 
 /**
  * See https://playwright.dev/docs/test-configuration.

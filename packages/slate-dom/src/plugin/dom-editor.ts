@@ -506,7 +506,8 @@ export const DOMEditor: DOMEditorInterface = {
         ? true
         : (typeof targetEl.isContentEditable === 'boolean' && // isContentEditable exists only on HTMLElement, and on other nodes it will be undefined
             // this is the core logic that lets you know you got the right editor.selection instead of null when editor is contenteditable="false"(readOnly)
-            closestShadowAware(targetEl, '[contenteditable="false"]') === editorEl) ||
+            closestShadowAware(targetEl, '[contenteditable="false"]') ===
+              editorEl) ||
           !!targetEl.getAttribute('data-slate-zero-width'))
     )
   },
@@ -722,7 +723,8 @@ export const DOMEditor: DOMEditorInterface = {
         '[contenteditable="false"]'
       )
       const nonEditableNode =
-        potentialNonEditableNode && containsShadowAware(editorEl, potentialNonEditableNode)
+        potentialNonEditableNode &&
+        containsShadowAware(editorEl, potentialNonEditableNode)
           ? potentialNonEditableNode
           : null
       let leafNode = parentNode.closest('[data-slate-leaf]')
