@@ -23,6 +23,12 @@ const projects = [
       ...devices['Desktop Firefox'],
     },
   },
+  {
+    name: 'mobile',
+    use: {
+      ...devices['Pixel 5'],
+    },
+  },
 ]
 
 if (os.type() === 'Darwin') {
