@@ -1274,6 +1274,9 @@ export const Editable = forwardRef(
                 )}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (isDOMEventTargetInput(event)) {
+                      return
+                    }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                       if (ReactEditor.isComposing(editor)) {
                         Promise.resolve().then(() => {
@@ -1331,7 +1334,8 @@ export const Editable = forwardRef(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
                     if (
                       ReactEditor.hasSelectableTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onCompositionUpdate)
+                      !isEventHandled(event, attributes.onCompositionUpdate) &&
+                      !isDOMEventTargetInput(event)
                     ) {
                       if (!ReactEditor.isComposing(editor)) {
                         setIsComposing(true)
@@ -1343,6 +1347,9 @@ export const Editable = forwardRef(
                 )}
                 onCompositionStart={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (isDOMEventTargetInput(event)) {
+                      return
+                    }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                       androidInputManagerRef.current?.handleCompositionStart(
                         event
