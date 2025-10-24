@@ -1,5 +1,15 @@
 # slate-react
 
+## 0.118.2
+
+### Patch Changes
+
+- [#5957](https://github.com/ianstormtaylor/slate/pull/5957) [`bd66bfa2`](https://github.com/ianstormtaylor/slate/commit/bd66bfa2f17e8fab6eb95823fd719fddcb6e0122) Thanks [@scrapooo](https://github.com/scrapooo)! - Fix: `onValueChange` was not triggered when replacing text after selecting it from right to left.
+
+- [#5965](https://github.com/ianstormtaylor/slate/pull/5965) [`cc5a9d8c`](https://github.com/ianstormtaylor/slate/commit/cc5a9d8c10ec4a923d9e56ec1a322b91408faabd) Thanks [@hiteshshetty-dev](https://github.com/hiteshshetty-dev)! - Ignores composition events when fired from nested input or textarea
+
+- [#5959](https://github.com/ianstormtaylor/slate/pull/5959) [`622fb115`](https://github.com/ianstormtaylor/slate/commit/622fb11530811fffae284d463de1f49a1ef217a1) Thanks [@hiteshshetty-dev](https://github.com/hiteshshetty-dev)! - Adds translate='no' to Editable component to skip DOM from translation
+
 ## 0.117.4
 
 ### Patch Changes
