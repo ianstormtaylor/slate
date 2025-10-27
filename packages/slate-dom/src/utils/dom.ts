@@ -371,20 +371,15 @@ export const closestShadowAware = (
   let current: DOMElement | null = element
 
   while (current) {
-    // Check if current element matches the selector
     if (current.matches && current.matches(selector)) {
       return current
     }
 
-    // Try to go to the parent element
     if (current.parentElement) {
       current = current.parentElement
     } else if (current.parentNode && 'host' in current.parentNode) {
-      // If there's no parent element but there's a host (ShadowRoot),
-      // cross the shadow boundary
       current = (current.parentNode as ShadowRoot).host as DOMElement
     } else {
-      // No more parents, we've reached the top
       return null
     }
   }
@@ -404,12 +399,10 @@ export const containsShadowAware = (
     return false
   }
 
-  // Try the standard contains first (works for nodes in the same tree)
   if (parent.contains(child)) {
     return true
   }
 
-  // If standard contains fails, traverse up from child crossing shadow boundaries
   let current: DOMNode | null = child
 
   while (current) {
@@ -417,16 +410,13 @@ export const containsShadowAware = (
       return true
     }
 
-    // Try to go to the parent node
     if (current.parentNode) {
       if ('host' in current.parentNode) {
-        // If parentNode is a ShadowRoot, go to its host
         current = (current.parentNode as ShadowRoot).host
       } else {
         current = current.parentNode
       }
     } else {
-      // No more parents, we've reached the top
       return false
     }
   }

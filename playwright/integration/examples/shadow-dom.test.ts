@@ -37,7 +37,6 @@ test.describe('shadow-dom example', () => {
   test('user can type add a new line in editor inside shadow DOM', async ({
     page,
   }) => {
-    // Capture console errors
     const consoleErrors: string[] = []
     page.on('console', msg => {
       if (msg.type() === 'error') {
@@ -45,7 +44,6 @@ test.describe('shadow-dom example', () => {
       }
     })
 
-    // Capture page errors (uncaught exceptions)
     const pageErrors: Error[] = []
     page.on('pageerror', error => {
       pageErrors.push(error)
@@ -55,16 +53,11 @@ test.describe('shadow-dom example', () => {
     const innerShadow = outerShadow.locator('> div')
     const textbox = innerShadow.getByRole('textbox')
 
-    // Click to focus the editor
+    // Add text in a new line
     await textbox.click()
-
-    // Press Enter to create a new line
     await page.keyboard.press('Enter')
-
-    // Type text on the new line
     await page.keyboard.type('New line text')
 
-    // Assert no console errors or page errors occurred
     expect(consoleErrors, 'Console errors occurred').toEqual([])
     expect(pageErrors, 'Page errors occurred').toEqual([])
 
