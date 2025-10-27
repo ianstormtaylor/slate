@@ -379,10 +379,10 @@ export const closestShadowAware = (
     // Try to go to the parent element
     if (current.parentElement) {
       current = current.parentElement
-    } else if ((current.parentNode as any)?.host) {
+    } else if (current.parentNode && 'host' in current.parentNode) {
       // If there's no parent element but there's a host (ShadowRoot),
       // cross the shadow boundary
-      current = (current.parentNode as any).host as DOMElement
+      current = (current.parentNode as ShadowRoot).host as DOMElement
     } else {
       // No more parents, we've reached the top
       return null
@@ -419,10 +419,12 @@ export const containsShadowAware = (
 
     // Try to go to the parent node
     if (current.parentNode) {
-      current = current.parentNode
-    } else if ((current as any).host) {
-      // If this is a ShadowRoot, go to its host
-      current = (current as any).host
+      if ('host' in current.parentNode) {
+        // If parentNode is a ShadowRoot, go to its host
+        current = (current.parentNode as ShadowRoot).host
+      } else {
+        current = current.parentNode
+      }
     } else {
       // No more parents, we've reached the top
       return false
