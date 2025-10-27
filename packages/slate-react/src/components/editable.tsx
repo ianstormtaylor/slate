@@ -693,8 +693,18 @@ export const Editable = forwardRef(
                 exactMatch: false,
                 suppressThrow: false,
               })
+              const flippedRange = {
+                anchor: range.focus,
+                focus: range.anchor,
+              }
 
-              if (!selection || !Range.equals(selection, range)) {
+              if (
+                !selection ||
+                !(
+                  Range.equals(selection, range) ||
+                  Range.equals(selection, flippedRange)
+                )
+              ) {
                 native = false
 
                 const selectionRef =
@@ -1031,6 +1041,7 @@ export const Editable = forwardRef(
               <Component
                 role={readOnly ? undefined : 'textbox'}
                 aria-multiline={readOnly ? undefined : true}
+                translate="no"
                 {...attributes}
                 // COMPAT: Certain browsers don't support the `beforeinput` event, so we'd
                 // have to use hacks to make these replacement-based features work.
@@ -1274,6 +1285,9 @@ export const Editable = forwardRef(
                 )}
                 onCompositionEnd={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (isDOMEventTargetInput(event)) {
+                      return
+                    }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                       if (ReactEditor.isComposing(editor)) {
                         Promise.resolve().then(() => {
@@ -1331,7 +1345,8 @@ export const Editable = forwardRef(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
                     if (
                       ReactEditor.hasSelectableTarget(editor, event.target) &&
-                      !isEventHandled(event, attributes.onCompositionUpdate)
+                      !isEventHandled(event, attributes.onCompositionUpdate) &&
+                      !isDOMEventTargetInput(event)
                     ) {
                       if (!ReactEditor.isComposing(editor)) {
                         setIsComposing(true)
@@ -1343,6 +1358,9 @@ export const Editable = forwardRef(
                 )}
                 onCompositionStart={useCallback(
                   (event: React.CompositionEvent<HTMLDivElement>) => {
+                    if (isDOMEventTargetInput(event)) {
+                      return
+                    }
                     if (ReactEditor.hasSelectableTarget(editor, event.target)) {
                       androidInputManagerRef.current?.handleCompositionStart(
                         event
