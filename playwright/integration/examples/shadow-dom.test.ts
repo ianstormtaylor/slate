@@ -53,7 +53,6 @@ test.describe('shadow-dom example', () => {
     const innerShadow = outerShadow.locator('> div')
     const textbox = innerShadow.getByRole('textbox')
 
-    // Add text in a new line
     await textbox.click()
     await page.keyboard.press('Enter')
     await page.keyboard.type('New line text')
