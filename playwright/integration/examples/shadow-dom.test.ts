@@ -25,7 +25,7 @@ test.describe('shadow-dom example', () => {
 
     // Clear any existing text and type new text into the textbox
     await textbox.click()
-    await page.keyboard.press('Meta+A')
+    await page.keyboard.press('ControlOrMeta+A')
 
     await page.keyboard.press('Backspace')
     await page.keyboard.type('Hello, Playwright!')
