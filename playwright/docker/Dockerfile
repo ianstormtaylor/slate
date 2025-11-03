@@ -1,16 +1,11 @@
-# Match GitHub Actions CI environment (ubuntu-22.04, Node 22.x)
-FROM ubuntu:22.04
+# Use Node.js 22 base (Debian-based, similar to CI ubuntu-22.04)
+# Note: Can't use official Playwright image because Yarn PnP uses absolute paths
+# that break when the project is mounted at a different location in Docker
+FROM node:22-slim
 
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Install Node.js 22.x and socat (for localhost port forwarding in container)
+# Install curl (for health checks) and socat (for localhost port forwarding)
 RUN apt-get update && \
-    apt-get install -y curl ca-certificates gnupg socat && \
-    mkdir -p /etc/apt/keyrings && \
-    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
-    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_22.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list && \
-    apt-get update && \
-    apt-get install -y nodejs && \
+    apt-get install -y curl socat && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

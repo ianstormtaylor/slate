@@ -9,7 +9,7 @@ services:
     environment:
       - CI=true
       - PLAYWRIGHT_BASE_URL=http://host.docker.internal:3000
-      - NODE_PATH=/usr/lib/node_modules
+      - NODE_PATH=/usr/local/lib/node_modules
     extra_hosts:
       - "host.docker.internal:host-gateway"
       - "localhost:host-gateway"
