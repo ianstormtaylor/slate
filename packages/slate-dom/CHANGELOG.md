@@ -1,5 +1,11 @@
 # slate-dom
 
+## 0.119.0
+
+### Minor Changes
+
+- [#5963](https://github.com/ianstormtaylor/slate/pull/5963) [`33e74a82`](https://github.com/ianstormtaylor/slate/commit/33e74a822b82c4b9ce1444f456c5343970441ccb) Thanks [@iperzic](https://github.com/iperzic)! - Fixes an editor crash that happens when editor is placed inside Shadow DOM and the user is typing on Android
+
 ## 0.118.1
 
 ### Patch Changes
