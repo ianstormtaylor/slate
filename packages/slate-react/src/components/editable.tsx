@@ -35,6 +35,7 @@ import { useTrackUserInput } from '../hooks/use-track-user-input'
 import { ReactEditor } from '../plugin/react-editor'
 import { TRIPLE_CLICK } from 'slate-dom'
 import {
+  containsShadowAware,
   DOMElement,
   DOMRange,
   DOMText,
@@ -404,8 +405,8 @@ export const Editable = forwardRef(
         const editorElement = EDITOR_TO_ELEMENT.get(editor)!
         let hasDomSelectionInEditor = false
         if (
-          editorElement.contains(anchorNode) &&
-          editorElement.contains(focusNode)
+          containsShadowAware(editorElement, anchorNode) &&
+          containsShadowAware(editorElement, focusNode)
         ) {
           hasDomSelectionInEditor = true
         }
