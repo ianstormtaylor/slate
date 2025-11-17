@@ -1,7 +1,6 @@
 import {
   Ancestor,
   Descendant,
-  Editor,
   Element,
   Node,
   Path,
@@ -28,7 +27,7 @@ export const removeChildren = replaceChildren
  * Replace a descendant with a new node, replacing all ancestors
  */
 export const modifyDescendant = <N extends Descendant>(
-  editor: Editor,
+  root: Ancestor,
   path: Path,
   f: (node: N) => N
 ) => {
@@ -36,13 +35,13 @@ export const modifyDescendant = <N extends Descendant>(
     throw new Error('Cannot modify the editor')
   }
 
-  const node = Node.get(editor, path) as N
+  const node = Node.get(root, path) as N
   const slicedPath = path.slice()
   let modifiedNode: Node = f(node)
 
   while (slicedPath.length > 1) {
     const index = slicedPath.pop()!
-    const ancestorNode = Node.get(editor, slicedPath) as Ancestor
+    const ancestorNode = Node.get(root, slicedPath) as Ancestor
 
     modifiedNode = {
       ...ancestorNode,
@@ -51,21 +50,21 @@ export const modifyDescendant = <N extends Descendant>(
   }
 
   const index = slicedPath.pop()!
-  editor.children = replaceChildren(editor.children, index, 1, modifiedNode)
+  root.children = replaceChildren(root.children, index, 1, modifiedNode)
 }
 
 /**
  * Replace the children of a node, replacing all ancestors
  */
 export const modifyChildren = (
-  editor: Editor,
+  root: Ancestor,
   path: Path,
   f: (children: Descendant[]) => Descendant[]
 ) => {
   if (path.length === 0) {
-    editor.children = f(editor.children)
+    root.children = f(root.children)
   } else {
-    modifyDescendant<Element>(editor, path, node => {
+    modifyDescendant<Element>(root, path, node => {
       if (Text.isText(node)) {
         throw new Error(
           `Cannot get the element at path [${path}] because it refers to a leaf node: ${Scrubber.stringify(
@@ -83,11 +82,11 @@ export const modifyChildren = (
  * Replace a leaf, replacing all ancestors
  */
 export const modifyLeaf = (
-  editor: Editor,
+  root: Ancestor,
   path: Path,
   f: (leaf: Text) => Text
 ) =>
-  modifyDescendant(editor, path, node => {
+  modifyDescendant(root, path, node => {
     if (!Text.isText(node)) {
       throw new Error(
         `Cannot get the leaf node at path [${path}] because it refers to a non-leaf node: ${Scrubber.stringify(
