@@ -57,24 +57,25 @@ export const Slate = (props: {
   const { selectorContext, onChange: handleSelectorChange } =
     useSelectorContext()
 
-  const onContextChange = useCallback(
-    (options?: { operation?: Operation }) => {
-      if (onChange) {
-        onChange(editor.children)
-      }
+  const onContextChange = useCallback(() => {
+    if (onChange) {
+      onChange(editor.children)
+    }
+    if (
+      onSelectionChange &&
+      editor.operations.find(op => op.type === 'set_selection')
+    ) {
+      onSelectionChange(editor.selection)
+    }
+    if (
+      onValueChange &&
+      editor.operations.find(op => op.type !== 'set_selection')
+    ) {
+      onValueChange(editor.children)
+    }
 
-      switch (options?.operation?.type) {
-        case 'set_selection':
-          onSelectionChange?.(editor.selection)
-          break
-        default:
-          onValueChange?.(editor.children)
-      }
-
-      handleSelectorChange()
-    },
-    [editor, handleSelectorChange, onChange, onSelectionChange, onValueChange]
-  )
+    handleSelectorChange()
+  }, [editor, handleSelectorChange, onChange, onSelectionChange, onValueChange])
 
   useEffect(() => {
     EDITOR_TO_ON_CHANGE.set(editor, onContextChange)
