@@ -13743,7 +13743,7 @@ __metadata:
     react: ">=18.2.0"
     react-dom: ">=18.2.0"
     slate: ">=0.114.0"
-    slate-dom: ">=0.116.0"
+    slate-dom: ">=0.119.0"
   languageName: unknown
   linkType: soft
 
