@@ -1,5 +1,17 @@
 # slate-react
 
+## 0.120.0
+
+### Minor Changes
+
+- [#5968](https://github.com/ianstormtaylor/slate/pull/5968) [`49f28e50`](https://github.com/ianstormtaylor/slate/commit/49f28e5067b213431bd16e423524d608cd819a80) Thanks [@TyMick](https://github.com/TyMick)! - Scroll to focus point of expanded selections in `defaultScrollSelectionIntoView`
+
+### Patch Changes
+
+- [#5976](https://github.com/ianstormtaylor/slate/pull/5976) [`3d38db8f`](https://github.com/ianstormtaylor/slate/commit/3d38db8fe7068e6a245d5b4b1ebef536ea3f8a3e) Thanks [@semimikoh](https://github.com/semimikoh)! - Fix slate-dom peer dependency to require >=0.119.0 to resolve containsShadowAware import error
+
+- [#5975](https://github.com/ianstormtaylor/slate/pull/5975) [`d0d192b8`](https://github.com/ianstormtaylor/slate/commit/d0d192b824827f3873e62f237cb5169999791744) Thanks [@nabbydude](https://github.com/nabbydude)! - Allow onValueChange and onSelectionChange to trigger on the same frame, fixing a few bugs where one was not being called
+
 ## 0.119.0
 
 ### Minor Changes

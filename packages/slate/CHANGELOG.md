@@ -1,5 +1,11 @@
 # slate
 
+## 0.120.0
+
+### Patch Changes
+
+- [#5971](https://github.com/ianstormtaylor/slate/pull/5971) [`addf0c51`](https://github.com/ianstormtaylor/slate/commit/addf0c5128bd48693f86a2c97cea133b66dd87e6) Thanks [@nabbydude](https://github.com/nabbydude)! - Removed the last traces of immer and eliminated it as a dependency
+
 ## 0.118.1
 
 ### Patch Changes
