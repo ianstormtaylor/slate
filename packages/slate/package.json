@@ -13,10 +13,6 @@
   "files": [
     "dist/"
   ],
-  "dependencies": {
-    "immer": "^10.0.3",
-    "tiny-warning": "^1.0.3"
-  },
   "devDependencies": {
     "@babel/runtime": "^7.23.2",
     "lodash": "^4.17.21",
