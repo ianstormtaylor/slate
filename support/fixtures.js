@@ -10,47 +10,50 @@ export const fixtures = (...args) => {
     fn = args.pop()
   }
 
-  const path = resolve(...args)
-  const files = fs.readdirSync(path)
-  const dir = basename(path)
-  const d = options.skip ? describe.skip : describe
+  const dirPath = resolve(...args)
+  const dirName = basename(dirPath)
+  const describeFn = options.skip ? describe.skip : describe
 
-  d(dir, () => {
-    for (const file of files) {
-      const p = resolve(path, file)
-      const stat = fs.statSync(p)
+  try {
+    const files = fs.readdirSync(dirPath)
 
-      if (stat.isDirectory()) {
-        fixtures(path, file, fn)
-      }
-      if (
-        stat.isFile() &&
-        (file.endsWith('.js') ||
-          file.endsWith('.tsx') ||
-          file.endsWith('.ts')) &&
-        !file.endsWith('custom-types.ts') &&
-        !file.endsWith('type-guards.ts') &&
-        !file.startsWith('.') &&
-        // Ignoring `index.js` files allows us to use the fixtures directly
-        // from the top-level directory itself, instead of only children.
-        file !== 'index.js'
-      ) {
-        const name = basename(file, extname(file))
+    describeFn(dirName, () => {
+      files.forEach((file) => {
+        const filePath = resolve(dirPath, file)
+        const stat = fs.statSync(filePath)
 
-        // This needs to be a non-arrow function to use `this.skip()`.
-        it(`${name} `, function () {
-          const module = require(p)
+        if (stat.isDirectory()) {
+          fixtures(dirPath, file, fn)
+          return
+        }
 
+        if (!isValidFixtureFile(file)) return
+
+        const testName = basename(file, extname(file))
+
+        it(testName, function () {
+          const module = require(filePath)
           if (module.skip) {
             this.skip()
             return
           }
-
-          fn({ name, path, module })
+          fn({ name: testName, path: filePath, module })
         })
-      }
-    }
-  })
+      })
+    })
+  } catch (error) {
+    console.error(`Error reading fixtures from ${dirPath}:`, error)
+  }
+}
+
+// Helper function to filter valid test files
+const isValidFixtureFile = (file) => {
+  if (file.startsWith('.') || file === 'index.js') return false
+
+  const validExtensions = ['.js', '.ts', '.tsx']
+  const excludedFiles = ['custom-types.ts', 'type-guards.ts']
+
+  return validExtensions.includes(extname(file)) && !excludedFiles.includes(file)
 }
 
 fixtures.skip = (...args) => {
